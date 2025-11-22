@@ -50,7 +50,7 @@
             />
             <transition name="fade">
               <span v-if="!isCollapsed" class="font-medium text-[15px]">
-                {{ item.name }}
+                {{ $t(item.i18nKey) }}
               </span>
             </transition>
 
@@ -61,7 +61,7 @@
                      opacity-0 group-hover:opacity-100 transition-opacity duration-200
                      pointer-events-none whitespace-nowrap shadow-lg"
             >
-              {{ item.name }}
+              {{ $t(item.i18nKey) }}
             </div>
           </NuxtLink>
         </li>

@@ -47,7 +47,7 @@
         </div>
       </div>
 
-      <!-- Right Section: Notifications & User -->
+      <!-- Right Section: Language Switcher & User -->
       <div class="flex items-center gap-2">
         <!-- Search Icon (Mobile) -->
         <button
@@ -57,48 +57,44 @@
           <Icon name="lucide:search" class="w-5 h-5 text-gray-700" />
         </button>
 
-        <!-- Notifications -->
+        <!-- Language Switcher -->
         <div class="relative">
           <button
-            class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group relative"
-            @click="toggleNotifications"
-            aria-label="Notifications"
+            class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
+            @click="toggleLanguageMenu"
+            aria-label="Switch language"
           >
             <Icon
-              name="lucide:bell"
+              name="lucide:languages"
               class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
             />
-            <span
-              class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full
-                     animate-pulse"
-            ></span>
           </button>
 
-          <!-- Notifications Dropdown -->
+          <!-- Language Dropdown -->
           <transition name="dropdown">
             <div
-              v-if="showNotifications"
-              class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200
+              v-if="showLanguageMenu"
+              class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200
                      overflow-hidden"
             >
-              <div class="p-4 border-b border-gray-200">
-                <h3 class="font-semibold text-gray-900">通知</h3>
-              </div>
-              <div class="max-h-96 overflow-y-auto">
-                <div
-                  v-for="notification in notifications"
-                  :key="notification.id"
-                  class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                >
-                  <p class="text-sm font-medium text-gray-900">{{ notification.title }}</p>
-                  <p class="text-xs text-gray-500 mt-1">{{ notification.time }}</p>
-                </div>
-              </div>
-              <div class="p-3 text-center border-t border-gray-200">
-                <button class="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150">
-                  查看全部
-                </button>
-              </div>
+              <button
+                v-for="locale in availableLocales"
+                :key="locale.code"
+                @click="switchLanguage(locale.code)"
+                :class="[
+                  'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors duration-150',
+                  currentLocale === locale.code
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-700 hover:bg-gray-50'
+                ]"
+              >
+                <span>{{ locale.name }}</span>
+                <Icon
+                  v-if="currentLocale === locale.code"
+                  name="lucide:check"
+                  class="w-4 h-4"
+                />
+              </button>
             </div>
           </transition>
         </div>
@@ -164,7 +160,7 @@
 
     <!-- Click outside to close dropdowns -->
     <div
-      v-if="showNotifications || showUserMenu"
+      v-if="showLanguageMenu || showUserMenu"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
     ></div>
@@ -184,14 +180,18 @@ const emit = defineEmits<{
   toggleMobileMenu: []
 }>()
 
-const showNotifications = ref(false)
-const showUserMenu = ref(false)
+const { locale, locales, setLocale } = useI18n()
 
-const notifications = [
-  { id: 1, title: '新任务已分配给你', time: '5分钟前' },
-  { id: 2, title: '项目更新提醒', time: '1小时前' },
-  { id: 3, title: '团队成员加入', time: '2小时前' }
-]
+const showUserMenu = ref(false)
+const showLanguageMenu = ref(false)
+
+const currentLocale = computed(() => locale.value)
+const availableLocales = computed(() => locales.value)
+
+const switchLanguage = async (localeCode: string) => {
+  await setLocale(localeCode as 'zh-Hans' | 'zh-Hant' | 'en' | 'ja')
+  showLanguageMenu.value = false
+}
 
 const toggleSidebar = () => {
   emit('toggleSidebar')
@@ -201,19 +201,19 @@ const toggleMobileMenu = () => {
   emit('toggleMobileMenu')
 }
 
-const toggleNotifications = () => {
+const toggleLanguageMenu = () => {
   showUserMenu.value = false
-  showNotifications.value = !showNotifications.value
+  showLanguageMenu.value = !showLanguageMenu.value
 }
 
 const toggleUserMenu = () => {
-  showNotifications.value = false
+  showLanguageMenu.value = false
   showUserMenu.value = !showUserMenu.value
 }
 
 const closeAllDropdowns = () => {
-  showNotifications.value = false
   showUserMenu.value = false
+  showLanguageMenu.value = false
 }
 </script>
 

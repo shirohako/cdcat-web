@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "dashboard": "ダッシュボード",
+    "album": "アルバム",
+    "artist": "アーティスト",
+    "event": "イベント"
+  },
+  "user": {
+    "profile": "プロフィール",
+    "account": "アカウント設定",
+    "help": "ヘルプセンター",
+    "logout": "ログアウト"
+  },
+  "common": {
+    "search": "検索..."
+  }
+}

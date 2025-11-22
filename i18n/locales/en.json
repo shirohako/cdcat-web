@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "album": "Album",
+    "artist": "Artist",
+    "event": "Event"
+  },
+  "user": {
+    "profile": "Profile",
+    "account": "Account Settings",
+    "help": "Help Center",
+    "logout": "Sign Out"
+    },
+  "common": {
+    "search": "Search..."
+  }
+}

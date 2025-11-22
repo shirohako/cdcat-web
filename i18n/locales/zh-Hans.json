@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "dashboard": "仪表盘",
+    "album": "专辑",
+    "artist": "艺术家",
+    "event": "活动"
+  },
+  "user": {
+    "profile": "个人资料",
+    "account": "账户设置",
+    "help": "帮助中心",
+    "logout": "退出登录"
+  },
+  "common": {
+    "search": "搜索..."
+  }
+}

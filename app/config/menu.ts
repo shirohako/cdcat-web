@@ -1,5 +1,6 @@
 export interface MenuItem {
   name: string
+  i18nKey: string
   path: string
   icon: string
   badge?: string | number
@@ -8,34 +9,33 @@ export interface MenuItem {
 
 export const menuItems: MenuItem[] = [
   {
-    name: '仪表盘',
+    name: 'dashboard',
+    i18nKey: 'menu.dashboard',
     path: '/',
     icon: 'lucide:layout-dashboard'
   },
   {
-    name: '项目',
-    path: '/projects',
-    icon: 'lucide:folder'
+    name: 'album',
+    i18nKey: 'menu.album',
+    path: '/album',
+    icon: 'lucide:disc-3'
   },
   {
-    name: '任务',
-    path: '/tasks',
-    icon: 'lucide:check-square'
+    name: 'artist',
+    i18nKey: 'menu.artist',
+    path: '/artist',
+    icon: 'lucide:mic-2'
   },
   {
-    name: '团队',
-    path: '/team',
-    icon: 'lucide:users'
-  },
-  {
-    name: '设置',
-    path: '/settings',
-    icon: 'lucide:settings'
+    name: 'event',
+    i18nKey: 'menu.event',
+    path: '/event',
+    icon: 'lucide:calendar'
   }
 ]
 
 export const userMenuItems = [
-  { name: '个人资料', icon: 'lucide:user', path: '/profile' },
-  { name: '账户设置', icon: 'lucide:settings', path: '/account' },
-  { name: '帮助中心', icon: 'lucide:help-circle', path: '/help' }
+  { name: 'profile', i18nKey: 'user.profile', icon: 'lucide:user', path: '/profile' },
+  { name: 'account', i18nKey: 'user.account', icon: 'lucide:settings', path: '/account' },
+  { name: 'help', i18nKey: 'user.help', icon: 'lucide:help-circle', path: '/help' }
 ]
