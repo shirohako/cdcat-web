@@ -35,20 +35,11 @@
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
           <AlbumDescriptions
-            v-if="workData?.descriptions.length > 0"
-            :descriptions="workData?.descriptions"
+            v-if="albumDescriptions.length > 0"
+            :descriptions="albumDescriptions"
           />
           <AlbumCredits :credits="credits" />
-          <AlbumTracklist :tracks="tracks" />
-
-          <!-- Memos -->
-          <section class="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-              <MessageSquare :size="24" />
-              Memos
-            </h2>
-            <p class="text-gray-500 text-sm">No memos yet.</p>
-          </section>
+          <AlbumTracklist :songs="songs" />
 
           <!-- Reviews -->
           <section class="bg-white rounded-lg border border-gray-200 p-6">
@@ -80,22 +71,6 @@
             :rating-text="rating.text"
             :review-count="rating.reviewCount"
           />
-
-          <!-- Images -->
-          <section class="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-bold mb-3">Images</h3>
-            <ul class="space-y-2 text-sm">
-              <li>
-                <a href="#" class="text-blue-500 hover:underline">Cover</a>
-              </li>
-              <li>
-                <a href="#" class="text-blue-500 hover:underline">Booklet</a>
-              </li>
-              <li>
-                <a href="#" class="text-blue-500 hover:underline">Etc...</a>
-              </li>
-            </ul>
-          </section>
 
           <!-- Links -->
           <section class="bg-white rounded-lg border border-gray-200 p-6">
@@ -181,6 +156,9 @@ const artistsData = computed(() => {
   }));
 });
 
+const albumDescriptions = computed(() => workData.value?.descriptions ?? []);
+const songs = computed(() => workData.value?.songs ?? []);
+
 const credits = [
   {
     role: "Compose",
@@ -196,59 +174,6 @@ const credits = [
   { role: "Novel", names: "habi" },
   { role: "Japanese Translate", names: "ukaee" },
   { role: "Special Thanks", names: "EmoCosine" },
-];
-
-const tracks = [
-  {
-    id: "01",
-    title: "Prelude to Memories",
-    artist: "ARForest",
-    duration: "2:34",
-  },
-  {
-    id: "02",
-    title: "Lost in the Forest",
-    artist: "Nego_tiator",
-    duration: "4:12",
-  },
-  {
-    id: "03",
-    title: "Echoes of Yesterday",
-    artist: "HAGANE",
-    duration: "3:45",
-  },
-  {
-    id: "04",
-    title: "Midnight Whispers",
-    artist: "Elliot Hsu",
-    duration: "5:23",
-  },
-  {
-    id: "05",
-    title: "Unattended Dreams",
-    artist: "Yuu(xh)",
-    duration: "4:56",
-  },
-  { id: "06", title: "Silent Butterfly", artist: "AAAA", duration: "3:18" },
-  {
-    id: "07",
-    title: "Starlight Memories",
-    artist: "Haoto",
-    duration: "4:42",
-  },
-  {
-    id: "08",
-    title: "Forgotten Path",
-    artist: "Monmori Atsushi",
-    duration: "5:11",
-  },
-  { id: "09", title: "Twilight Sonata", artist: "Street", duration: "4:28" },
-  {
-    id: "10",
-    title: "The Unattended",
-    artist: "EmoCosine",
-    duration: "6:34",
-  },
 ];
 
 const stats = {
