@@ -17,19 +17,19 @@ export const menuItems: MenuItem[] = [
   {
     name: 'album',
     i18nKey: 'menu.album',
-    path: '/album',
+    path: '/works',
     icon: 'lucide:disc-3'
   },
   {
     name: 'artist',
     i18nKey: 'menu.artist',
-    path: '/artist',
+    path: '/artists',
     icon: 'lucide:mic-2'
   },
   {
     name: 'event',
     i18nKey: 'menu.event',
-    path: '/event',
+    path: '/events',
     icon: 'lucide:calendar'
   }
 ]

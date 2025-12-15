@@ -22,7 +22,7 @@
         isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
       ]"
     >
-      <div class="p-6">
+      <div>
         <slot />
       </div>
     </main>

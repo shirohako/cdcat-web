@@ -1,75 +1,39 @@
-# Nuxt Minimal Starter
+# CDCAT Web
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Frontend for CDCAT — a music database covering doujin releases, game soundtracks, Vocaloid, covers, Touhou, and anime-related music.
 
-## Setup
+## Tech Stack
 
-Make sure to install dependencies:
+- Nuxt 4 + Vue 3
+- Tailwind CSS + daisyUI
+- `@nuxtjs/i18n` for localization
+
+## Requirements
+
+- Node.js (LTS recommended)
+- pnpm (recommended; this repo is configured for pnpm)
+
+## Environment Variables
+
+This project uses Nuxt runtime config mapped from environment variables.
+
+Copy the example env file:
 
 ```bash
-# npm
-npm install
+cp .env.example .env
+```
 
-# pnpm
+Edit `.env` as needed:
+
+- `NUXT_PUBLIC_BASE_URL` (your site URL, used by SEO/i18n)
+- `NUXT_PUBLIC_API_BASE_URL` (backend API base URL)
+- `PORT` (server port for production preview/server)
+
+## Development
+
+```bash
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Then open `http://localhost:3200`.
