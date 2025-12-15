@@ -13,6 +13,8 @@
           <div class="flex items-center gap-2 text-gray-600">
             <Disc3 :size="16" />
             <span>Disc {{ disc.discNumber }}</span>
+            <span v-if="disc.title" class="text-gray-300">|</span>
+            <span v-if="disc.title">{{ disc.title }}</span>
           </div>
           <span>{{ disc.tracks.length }} Tracks</span>
         </div>
@@ -49,6 +51,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  structure: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const normalizeNumber = value => {
@@ -70,7 +76,51 @@ const formatDuration = value => {
 const trackSortValue = song =>
   normalizeNumber(song.track_number) ?? Number.MAX_SAFE_INTEGER;
 
+const processTracks = (list, discNumber) => {
+  return list
+    .slice()
+    .sort((a, b) => trackSortValue(a) - trackSortValue(b))
+    .map(song => {
+      const trackNumber = normalizeNumber(song.track_number);
+      const artistNames = Array.isArray(song.artists)
+        ? song.artists
+            .map(artist => artist?.name)
+            .filter(Boolean)
+            .join(", ")
+        : song.artist_names || song.artist || song.artist_name || "";
+
+      return {
+        uid:
+          song.id ??
+          `disc-${discNumber}-${trackNumber ?? song.title ?? "track"}`,
+        displayNumber:
+          trackNumber !== null
+            ? trackNumber.toString().padStart(2, "0")
+            : "--",
+        title: song.title || "Untitled Track",
+        artist: artistNames,
+        duration: formatDuration(song.duration),
+      };
+    });
+};
+
 const discs = computed(() => {
+  if (Array.isArray(props.structure) && props.structure.length > 0) {
+    return props.structure.map(disc => {
+      const discNumber = disc.disc_number;
+      const songs = Array.isArray(disc.songs)
+        ? disc.songs
+        : props.songs.filter(
+            s => (normalizeNumber(s.disc_number) ?? 1) === discNumber
+          );
+      return {
+        discNumber,
+        title: disc.name || disc.title,
+        tracks: processTracks(songs, discNumber),
+      };
+    });
+  }
+
   if (!Array.isArray(props.songs) || props.songs.length === 0) {
     return [];
   }
@@ -87,35 +137,10 @@ const discs = computed(() => {
   return Array.from(discMap.entries())
     .sort((a, b) => a[0] - b[0])
     .map(([discNumber, discSongs]) => {
-      const tracks = discSongs
-        .slice()
-        .sort((a, b) => trackSortValue(a) - trackSortValue(b))
-        .map(song => {
-          const trackNumber = normalizeNumber(song.track_number);
-          const artistNames = Array.isArray(song.artists)
-            ? song.artists
-                .map(artist => artist?.name)
-                .filter(Boolean)
-                .join(", ")
-            : song.artist_names || song.artist || song.artist_name || "";
-
-          return {
-            uid:
-              song.id ??
-              `disc-${discNumber}-${trackNumber ?? song.title ?? "track"}`,
-            displayNumber:
-              trackNumber !== null
-                ? trackNumber.toString().padStart(2, "0")
-                : "--",
-            title: song.title || "Untitled Track",
-            artist: artistNames,
-            duration: formatDuration(song.duration),
-          };
-        });
-
       return {
         discNumber,
-        tracks,
+        title: null,
+        tracks: processTracks(discSongs, discNumber),
       };
     });
 });

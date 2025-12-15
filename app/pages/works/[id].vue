@@ -39,16 +39,13 @@
             :descriptions="albumDescriptions"
           />
           <AlbumCredits :credits="credits" />
-          <AlbumTracklist :songs="songs" />
+          <AlbumTracklist 
+            :songs="songs" 
+            :structure="albumStructure"
+          />
 
           <!-- Reviews -->
-          <section class="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-              <Star :size="24" />
-              Reviews
-            </h2>
-            <p class="text-gray-500 text-sm">No reviews yet.</p>
-          </section>
+          <AlbumReviews />
         </div>
 
         <!-- Right Column - Sidebar -->
@@ -73,22 +70,10 @@
           />
 
           <!-- Links -->
-          <section class="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
-              <Link2 :size="20" />
-              Links
-            </h3>
-            <p class="text-gray-500 text-sm">No links available.</p>
-          </section>
+          <AlbumLinks />
 
           <!-- Data Contributors -->
-          <section class="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 class="text-lg font-bold mb-3 flex items-center gap-2">
-              <Database :size="20" />
-              Data Contributors
-            </h3>
-            <p class="text-gray-500 text-sm">No contributors yet.</p>
-          </section>
+          <AlbumContributors />
         </div>
       </div>
     </div>
@@ -97,7 +82,6 @@
 </template>
 
 <script setup>
-import { MessageSquare, Star, Link2, Database } from "lucide-vue-next";
 
 // 获取路由参数
 const route = useRoute();
@@ -158,6 +142,7 @@ const artistsData = computed(() => {
 
 const albumDescriptions = computed(() => workData.value?.descriptions ?? []);
 const songs = computed(() => workData.value?.songs ?? []);
+const albumStructure = computed(() => workData.value?.structure ?? []);
 
 const credits = [
   {
