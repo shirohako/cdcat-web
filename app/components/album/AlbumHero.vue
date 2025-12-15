@@ -16,14 +16,14 @@
         <img
           :src="coverImage"
           :alt="title"
-          class="w-[280px] h-[280px] sm:w-[320px] sm:h-80 md:w-[400px] md:h-[400px] xl:w-[450px] xl:h-[450px] 2xl:w-[500px] 2xl:h-[500px] object-cover shadow-2xl"
+          class="w-70 h-70 sm:w-[320px] sm:h-80 md:w-100 md:h-100 xl:w-112.5 xl:h-112.5 2xl:w-125 2xl:h-125 object-cover shadow-2xl"
         />
       </div>
 
       <!-- Album Info Box with Frosted Glass Effect -->
       <div class="flex-1 flex items-stretch w-full md:w-auto">
         <div
-          class="backdrop-blur-[4.45px] rounded-lg p-6 md:p-8 flex flex-col justify-between w-full md:h-[400px] xl:h-[450px] 2xl:h-[500px]"
+          class="backdrop-blur-[4.45px] rounded-lg p-6 md:p-8 flex flex-col justify-between w-full md:h-100 xl:h-112.5 2xl:h-125"
           style="opacity: 0.94; background-color: rgba(198, 175, 175, 0.3)"
         >
           <div class="flex-1">

@@ -34,7 +34,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
-          <AlbumDescriptions :slogan="slogan" :descriptions="descriptions" />
+          <AlbumDescriptions
+            v-if="workData?.descriptions.length > 0"
+            :descriptions="workData?.descriptions"
+          />
           <AlbumCredits :credits="credits" />
           <AlbumTracklist :tracks="tracks" />
 
@@ -177,15 +180,6 @@ const artistsData = computed(() => {
     creditsCount: 0, // API 中没有这个字段
   }));
 });
-
-const slogan = "名前を持たぬ全てのものは いつか私たちを離れる。";
-
-const descriptions = [
-  "遠い昔にはたびたび見放されたかつら今袋詰しオ君が推進エエンソリの曲題を正しいう、夢い取り中にハッだ話題は「Z」。杯梁本中に改革追っず補叫を隠だし訂以は法供呪たる宿晩になる。",
-  "その物問には一強夏さも話し自うか?の認証が持条つ肌業欧外に応も必ふふった、どがさくにこたの重き叫け点との論。",
-  "どこかで天の宝がる助が増い記も、いつのまにかた意図られ問へーはけの夫てで、作者宝き支えとたを冬技を赤がれ、その司ヒうに誕概を司けるる。ある少女が文を解めている、これまでばわめ場関当の関け付は破研中つづいるこたに宿居で。",
-  "酒むめかが慢りいでも話に何がみるをと変類そこと社は。少なくっ当てわひな少女の中ご一授き落すすこてせるる。その次の日々はエバエツエソソリを探す努ににだけの必り。",
-];
 
 const credits = [
   {
