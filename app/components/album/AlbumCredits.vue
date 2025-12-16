@@ -4,20 +4,18 @@
       <Users :size="24" />
       Credits
     </h2>
-    <div class="space-y-3">
-      <div
-        v-for="(credit, index) in credits"
-        :key="index"
-        class="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-2 sm:gap-4 pb-3 border-b border-gray-100 last:border-b-0 last:pb-0"
-      >
-        <div class="font-semibold text-sm text-gray-600 uppercase tracking-wide">
-          {{ credit.role }}
-        </div>
-        <div class="text-sm text-gray-800 leading-relaxed">
-          {{ credit.names }}
-        </div>
+    
+    <div v-if="credits && credits.length" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <div v-for="(item, index) in credits" :key="index" class="flex flex-col">
+        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
+          {{ item.role }}
+        </span>
+        <span class="text-sm font-medium text-gray-900 leading-relaxed">
+          {{ item.names }}
+        </span>
       </div>
     </div>
+    <p v-else class="text-sm text-gray-500">暂无制作人员信息。</p>
   </section>
 </template>
 
@@ -27,7 +25,7 @@ import { Users } from "lucide-vue-next";
 defineProps({
   credits: {
     type: Array,
-    required: true,
-  },
+    default: () => []
+  }
 });
 </script>

@@ -141,25 +141,45 @@ const artistsData = computed(() => {
 });
 
 const albumDescriptions = computed(() => workData.value?.descriptions ?? []);
-const songs = computed(() => workData.value?.songs ?? []);
+const songs = computed(() => {
+  const list = workData.value?.songs ?? [];
+  const allCredits = workData.value?.credits ?? [];
+
+  const creditsMap = new Map();
+  for (const credit of allCredits) {
+    if (credit.song_id) {
+      if (!creditsMap.has(credit.song_id)) creditsMap.set(credit.song_id, []);
+      creditsMap.get(credit.song_id).push(credit);
+    }
+  }
+
+  return list.map((song) => ({
+    ...song,
+    credits: creditsMap.get(song.id) || [],
+  }));
+});
 const albumStructure = computed(() => workData.value?.structure ?? []);
 
-const credits = [
-  {
-    role: "Compose",
-    names:
-      "ARForest, Nego_tiator, HAGANE, Elliot Hsu, Yuu(xh), AAAA, Haoto, Monmori Atsushi, Street, EmoCosine, ginihihaL, sakuzyo, mamomo, Roijii Theatre, Jun Kuroda, CapchJL, Ark, Juggernaut_, ESPITZ, Sdorica, Fmmn, lce, BlackY, Blacklolita, sakita, An",
-  },
-  { role: "Featuring", names: "marolt" },
-  { role: "Producer", names: "ARForrest" },
-  { role: "Mastering", names: "Chester Park" },
-  { role: "Co-producer", names: "Chester Park" },
-  { role: "Jacket Design", names: "habi" },
-  { role: "Illustration", names: "Sin-cK" },
-  { role: "Novel", names: "habi" },
-  { role: "Japanese Translate", names: "ukaee" },
-  { role: "Special Thanks", names: "EmoCosine" },
-];
+const credits = computed(() => {
+  const list = workData.value?.credits || [];
+  if (!list.length) return [];
+
+  const groups = new Map();
+  for (const item of list) {
+    const role = item.role || 'Staff';
+    const name = item.artist_name || item.artist?.name || item.name;
+    if (name) {
+      const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
+      if (!groups.has(displayRole)) groups.set(displayRole, []);
+      if (!groups.get(displayRole).includes(name)) groups.get(displayRole).push(name);
+    }
+  }
+
+  return Array.from(groups.entries()).map(([role, names]) => ({
+    role,
+    names: names.join(', ')
+  }));
+});
 
 const stats = {
   viewed: 15,

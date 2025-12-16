@@ -50,7 +50,7 @@
               </h2>
               <p class="text-gray-500 text-sm leading-relaxed max-w-2xl">{{ groupDescription(group) }}</p>
             </div>
-            <div class="flex-shrink-0 pt-1">
+            <div class="shrink-0 pt-1">
               <a
                 v-if="group.website"
                 :href="group.website"

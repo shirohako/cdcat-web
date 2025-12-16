@@ -33,6 +33,14 @@
               <p v-if="track.artist" class="text-sm text-gray-500">
                 {{ track.artist }}
               </p>
+              <div
+                v-if="track.credits && track.credits.length"
+                class="mt-1 space-y-0.5"
+              >
+                <p v-for="(credit, idx) in track.credits" :key="idx" class="text-xs text-gray-400">
+                  {{ credit }}
+                </p>
+              </div>
             </div>
             <span class="text-gray-500 text-sm">{{ track.duration }}</span>
           </div>
@@ -89,6 +97,22 @@ const processTracks = (list, discNumber) => {
             .join(", ")
         : song.artist_names || song.artist || song.artist_name || "";
 
+      // 处理歌曲 Credit
+      const credits = song.credits || [];
+      const formattedCredits = [];
+      if (credits.length > 0) {
+        const groups = new Map();
+        credits.forEach((c) => {
+          const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : "Credit";
+          const name = c.artist_name || c.artist?.name || c.name;
+          if (name) {
+            if (!groups.has(role)) groups.set(role, []);
+            groups.get(role).push(name);
+          }
+        });
+        for (const [role, names] of groups) formattedCredits.push(`${role}: ${names.join(", ")}`);
+      }
+
       return {
         uid:
           song.id ??
@@ -98,6 +122,7 @@ const processTracks = (list, discNumber) => {
             ? trackNumber.toString().padStart(2, "0")
             : "--",
         title: song.title || "Untitled Track",
+        credits: formattedCredits,
         artist: artistNames,
         duration: formatDuration(song.duration),
       };
