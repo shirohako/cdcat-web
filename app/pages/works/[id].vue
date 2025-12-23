@@ -70,7 +70,7 @@
           />
 
           <!-- Links -->
-          <AlbumLinks />
+          <AlbumLinks :links="links" />
 
           <!-- Data Contributors -->
           <AlbumContributors />
@@ -180,6 +180,8 @@ const credits = computed(() => {
     names: names.join(', ')
   }));
 });
+
+const links = computed(() => workData.value?.links || []);
 
 const stats = {
   viewed: 15,

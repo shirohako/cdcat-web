@@ -5,18 +5,21 @@
       Tracklist
     </h2>
 
-    <div v-if="discs.length" class="space-y-6">
-      <div v-for="disc in discs" :key="disc.discNumber" class="space-y-3">
-        <div
-          class="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-gray-500"
-        >
-          <div class="flex items-center gap-2 text-gray-600">
-            <Disc3 :size="16" />
-            <span>Disc {{ disc.discNumber }}</span>
-            <span v-if="disc.title" class="text-gray-300">|</span>
-            <span v-if="disc.title">{{ disc.title }}</span>
+    <div v-if="discs.length" class="space-y-10">
+      <div v-for="disc in discs" :key="disc.discNumber">
+        <div class="bg-gray-100 px-4 py-3 mb-4 rounded-md flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <Disc3 :size="20" class="text-gray-700" />
+            <h3 class="text-lg font-bold text-gray-900">
+              Disc {{ disc.discNumber }}
+            </h3>
+            <span v-if="disc.title" class="text-base font-medium text-gray-700">
+              — {{ disc.title }}
+            </span>
           </div>
-          <span>{{ disc.tracks.length }} Tracks</span>
+          <span class="text-sm text-gray-500">
+            {{ disc.tracks.length }} tracks
+          </span>
         </div>
 
         <div class="space-y-2">
