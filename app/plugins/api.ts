@@ -16,7 +16,11 @@ export default defineNuxtPlugin(() => {
     // 请求拦截器
     onRequest({ options }) {
       // 自动添加认证 token
-      const token = useCookie('token').value
+      // 优先使用 cookie 中的 token，其次使用环境变量中的 token（用于测试）
+      const cookieToken = useCookie('token').value
+      const envToken = config.public.authToken
+      const token = cookieToken || envToken
+
       if (token) {
         const headers = new Headers(options.headers)
         headers.set('Authorization', `Bearer ${token}`)
