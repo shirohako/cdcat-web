@@ -4,7 +4,7 @@
       'fixed top-0 h-16 bg-white border-b border-gray-200 z-30',
       'transition-all duration-300 ease-in-out',
       'left-0 right-0',
-      isCollapsed ? 'lg:left-16' : 'lg:left-64'
+      isCollapsed ? 'lg:left-16' : 'lg:left-56'
     ]"
   >
     <div class="h-full px-4 flex items-center justify-between">

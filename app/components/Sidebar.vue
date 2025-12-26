@@ -4,7 +4,7 @@
       'fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40',
       'transition-all duration-300 ease-in-out',
       'flex flex-col',
-      isCollapsed ? 'w-16' : 'w-64',
+      isCollapsed ? 'w-16' : 'w-56',
       isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
     ]"
   >

@@ -19,7 +19,7 @@
     <main
       :class="[
         'pt-16 transition-all duration-300 ease-in-out',
-        isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
+        isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-56'
       ]"
     >
       <div>
