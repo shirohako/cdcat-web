@@ -2,9 +2,15 @@
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
       <!-- 页面标题 -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2">Works</h1>
-        <p class="text-gray-600">Explore all music albums and works</p>
+      <div class="mb-8 flex items-start justify-between">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Works</h1>
+          <p class="text-gray-600">Explore all music albums and works</p>
+        </div>
+        <NuxtLink to="/contribute/work" class="btn btn-primary gap-2">
+          <Plus :size="20" />
+          <span class="hidden sm:inline">Create Work</span>
+        </NuxtLink>
       </div>
 
       <!-- 加载状态 -->
@@ -167,7 +173,7 @@
 </template>
 
 <script setup>
-import { Disc3, Disc, Music, Calendar, Heart, Eye } from "lucide-vue-next";
+import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "lucide-vue-next";
 
 const route = useRoute();
 const router = useRouter();
