@@ -87,8 +87,15 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-wrap justify-center md:justify-start gap-3">
-              <button
+              <NuxtLink
+                :to="`/contribute/artist/${artistId}`"
                 class="btn btn-md bg-linear-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 gap-2 shadow-lg"
+              >
+                <Edit :size="18" />
+                Edit
+              </NuxtLink>
+              <button
+                class="btn btn-md btn-outline border-gray-300 hover:bg-gray-50 gap-2"
               >
                 <UserPlus :size="18" />
                 Follow
@@ -223,6 +230,7 @@ import {
   Heart,
   Play,
   Eye,
+  Edit,
 } from "lucide-vue-next";
 
 // Get artist ID from route
