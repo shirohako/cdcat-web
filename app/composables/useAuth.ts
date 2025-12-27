@@ -7,29 +7,28 @@ export const useAuth = () => {
   const { $api } = useNuxtApp()
   const router = useRouter()
 
+  // 使用 cookie 存储 token 和用户信息
+  const tokenCookie = useCookie<string | null>('auth_token', {
+    maxAge: 60 * 60 * 24 * 7, // 7 天
+    sameSite: 'lax'
+  })
+  const userCookie = useCookie<User | null>('auth_user', {
+    maxAge: 60 * 60 * 24 * 7, // 7 天
+    sameSite: 'lax'
+  })
+
   // 使用 useState 来保证状态在服务端和客户端之间共享
-  const user = useState<User | null>('auth:user', () => null)
-  const token = useState<string | null>('auth:token', () => null)
+  const user = useState<User | null>('auth:user', () => userCookie.value)
+  const token = useState<string | null>('auth:token', () => tokenCookie.value)
 
   // 计算属性：是否已登录
   const isAuthenticated = computed(() => !!user.value && !!token.value)
 
-  // 从 localStorage 初始化认证状态
+  // 从 cookie 初始化认证状态
   const initAuth = () => {
-    if (import.meta.client) {
-      const savedToken = localStorage.getItem('auth_token')
-      const savedUser = localStorage.getItem('auth_user')
-
-      if (savedToken && savedUser) {
-        token.value = savedToken
-        try {
-          user.value = JSON.parse(savedUser)
-        } catch (e) {
-          // 如果解析失败，清除无效数据
-          localStorage.removeItem('auth_token')
-          localStorage.removeItem('auth_user')
-        }
-      }
+    if (tokenCookie.value && userCookie.value) {
+      token.value = tokenCookie.value
+      user.value = userCookie.value
     }
   }
 
@@ -37,22 +36,16 @@ export const useAuth = () => {
   const saveAuth = (authData: AuthResponse) => {
     token.value = authData.token
     user.value = authData.user
-
-    if (import.meta.client) {
-      localStorage.setItem('auth_token', authData.token)
-      localStorage.setItem('auth_user', JSON.stringify(authData.user))
-    }
+    tokenCookie.value = authData.token
+    userCookie.value = authData.user
   }
 
   // 清除认证数据
   const clearAuth = () => {
     token.value = null
     user.value = null
-
-    if (import.meta.client) {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('auth_user')
-    }
+    tokenCookie.value = null
+    userCookie.value = null
   }
 
   // 登录
@@ -118,10 +111,7 @@ export const useAuth = () => {
     try {
       const response = await $api<User>('/v1/auth/me')
       user.value = response
-
-      if (import.meta.client) {
-        localStorage.setItem('auth_user', JSON.stringify(response))
-      }
+      userCookie.value = response
 
       return { success: true, data: response }
     } catch (error: any) {
