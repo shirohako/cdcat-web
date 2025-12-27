@@ -14,6 +14,11 @@
 </template>
 
 <script setup>
+// 应用认证中间件，保护此页面
+definePageMeta({
+  middleware: 'auth'
+})
+
 // 设置页面元数据
 useHead({
   title: 'Contribute New Artist',

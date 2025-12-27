@@ -34,6 +34,11 @@
 </template>
 
 <script setup>
+// 应用认证中间件，保护此页面
+definePageMeta({
+  middleware: 'auth'
+})
+
 const route = useRoute();
 
 // 获取作品 ID

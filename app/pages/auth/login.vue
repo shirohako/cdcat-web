@@ -159,6 +159,7 @@
 import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft } from 'lucide-vue-next'
 
 const router = useRouter()
+const route = useRoute()
 const { login } = useAuth()
 
 const formData = ref({
@@ -185,8 +186,9 @@ const handleLogin = async () => {
     })
 
     if (result.success) {
-      // 登录成功，跳转到首页
-      await router.push('/')
+      // 登录成功，检查是否有重定向参数
+      const redirectTo = route.query.redirect as string || '/'
+      await router.push(redirectTo)
     } else {
       // 登录失败，显示错误信息
       errorMessage.value = result.error || '登录失败，请重试'
