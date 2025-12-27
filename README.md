@@ -36,4 +36,4 @@ pnpm install
 pnpm dev
 ```
 
-Then open `http://localhost:3200`.
+Then open `http://localhost:3210`.
