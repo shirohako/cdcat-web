@@ -99,8 +99,8 @@
           </transition>
         </div>
 
-        <!-- User Menu -->
-        <div class="relative">
+        <!-- User Menu or Login/Register Buttons -->
+        <div v-if="isAuthenticated" class="relative">
           <button
             class="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg
                    transition-colors duration-200 group"
@@ -111,7 +111,7 @@
               class="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center
                      ring-2 ring-transparent group-hover:ring-gray-300 transition-all duration-200"
             >
-              <span class="text-white text-sm font-semibold">A</span>
+              <span class="text-white text-sm font-semibold">{{ userInitial }}</span>
             </div>
             <Icon
               name="lucide:chevron-down"
@@ -128,8 +128,8 @@
                      overflow-hidden"
             >
               <div class="p-4 border-b border-gray-200">
-                <p class="font-semibold text-gray-900">用户名</p>
-                <p class="text-sm text-gray-500">user@example.com</p>
+                <p class="font-semibold text-gray-900">{{ user?.username }}</p>
+                <p class="text-sm text-gray-500">{{ user?.email }}</p>
               </div>
               <div class="py-2">
                 <NuxtLink
@@ -145,6 +145,7 @@
               </div>
               <div class="border-t border-gray-200">
                 <button
+                  @click="handleLogout"
                   class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600
                          hover:bg-red-50 transition-colors duration-150"
                 >
@@ -154,6 +155,22 @@
               </div>
             </div>
           </transition>
+        </div>
+
+        <!-- Login/Register Buttons (Not Authenticated) -->
+        <div v-else class="flex items-center gap-2">
+          <NuxtLink
+            to="/auth/login"
+            class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          >
+            登录
+          </NuxtLink>
+          <NuxtLink
+            to="/auth/register"
+            class="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+          >
+            注册
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -181,12 +198,19 @@ const emit = defineEmits<{
 }>()
 
 const { locale, locales, setLocale } = useI18n()
+const { user, isAuthenticated, logout } = useAuth()
 
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
 
 const currentLocale = computed(() => locale.value)
 const availableLocales = computed(() => locales.value)
+
+// 获取用户名首字母
+const userInitial = computed(() => {
+  if (!user.value?.username) return 'U'
+  return user.value.username.charAt(0).toUpperCase()
+})
 
 const switchLanguage = async (localeCode: string) => {
   await setLocale(localeCode as 'zh-Hans' | 'zh-Hant' | 'en' | 'ja')
@@ -214,6 +238,11 @@ const toggleUserMenu = () => {
 const closeAllDropdowns = () => {
   showUserMenu.value = false
   showLanguageMenu.value = false
+}
+
+const handleLogout = async () => {
+  await logout()
+  showUserMenu.value = false
 }
 </script>
 

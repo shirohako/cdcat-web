@@ -1,0 +1,25 @@
+export interface User {
+  id: number
+  username: string
+  email: string
+  avatar?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+  remember?: boolean
+}
+
+export interface RegisterRequest {
+  username: string
+  email: string
+  password: string
+}
+
+export interface AuthResponse {
+  token: string
+  user: User
+}

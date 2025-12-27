@@ -16,10 +16,18 @@ export default defineNuxtPlugin(() => {
     // 请求拦截器
     onRequest({ options }) {
       // 自动添加认证 token
-      // 优先使用 cookie 中的 token，其次使用环境变量中的 token（用于测试）
-      const cookieToken = useCookie('token').value
-      const envToken = config.public.authToken
-      const token = cookieToken || envToken
+      // 优先使用 localStorage 中的 token，其次是 cookie，最后是环境变量
+      let token = null
+
+      if (import.meta.client) {
+        token = localStorage.getItem('auth_token')
+      }
+
+      if (!token) {
+        const cookieToken = useCookie('token').value
+        const envToken = config.public.authToken
+        token = cookieToken || envToken
+      }
 
       if (token) {
         const headers = new Headers(options.headers)
@@ -79,7 +87,13 @@ export default defineNuxtPlugin(() => {
       if (status === 401) {
         const token = useCookie('token')
         token.value = null
-        await navigateTo('/login')
+
+        if (import.meta.client) {
+          localStorage.removeItem('auth_token')
+          localStorage.removeItem('auth_user')
+        }
+
+        await navigateTo('/auth/login')
         throw new Error(errorMessage || '未授权，请重新登录')
       }
 

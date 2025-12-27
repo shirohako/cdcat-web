@@ -22,6 +22,11 @@
           <p class="text-slate-600">登录到 CDCAT 继续探索音乐世界</p>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="animate-fade-in bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+          <p class="text-sm text-red-600">{{ errorMessage }}</p>
+        </div>
+
         <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-4 animate-rise">
           <!-- Email Input -->
@@ -88,10 +93,12 @@
           <button
             type="submit"
             class="w-full btn-primary"
+            :disabled="isLoading"
           >
-            <LogIn :size="20" />
-            <span>登录</span>
-            <ArrowRight :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
+            <div v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <LogIn v-else :size="20" />
+            <span>{{ isLoading ? '登录中...' : '登录' }}</span>
+            <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
         </form>
 
@@ -151,6 +158,9 @@
 <script setup lang="ts">
 import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft } from 'lucide-vue-next'
 
+const router = useRouter()
+const { login } = useAuth()
+
 const formData = ref({
   email: '',
   password: '',
@@ -158,10 +168,34 @@ const formData = ref({
 })
 
 const showPassword = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref('')
 
-const handleLogin = () => {
-  // TODO: Implement login logic
-  console.log('Login form submitted:', formData.value)
+const handleLogin = async () => {
+  if (isLoading.value) return
+
+  errorMessage.value = ''
+  isLoading.value = true
+
+  try {
+    const result = await login({
+      email: formData.value.email,
+      password: formData.value.password,
+      remember: formData.value.remember
+    })
+
+    if (result.success) {
+      // 登录成功，跳转到首页
+      await router.push('/')
+    } else {
+      // 登录失败，显示错误信息
+      errorMessage.value = result.error || '登录失败，请重试'
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || '登录失败，请重试'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 useHead({

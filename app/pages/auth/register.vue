@@ -22,6 +22,11 @@
           <p class="text-slate-600">加入 CDCAT，开启你的音乐探索之旅</p>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="animate-fade-in bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+          <p class="text-sm text-red-600">{{ errorMessage }}</p>
+        </div>
+
         <!-- Register Form -->
         <form @submit.prevent="handleRegister" class="space-y-4 animate-rise">
           <!-- Username Input -->
@@ -153,11 +158,12 @@
           <button
             type="submit"
             class="w-full btn-primary"
-            :disabled="!isFormValid"
+            :disabled="!isFormValid || isLoading"
           >
-            <UserPlus :size="20" />
-            <span>创建账号</span>
-            <ArrowRight :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
+            <div v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <UserPlus v-else :size="20" />
+            <span>{{ isLoading ? '注册中...' : '创建账号' }}</span>
+            <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
         </form>
 
@@ -217,6 +223,9 @@
 <script setup lang="ts">
 import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft } from 'lucide-vue-next'
 
+const router = useRouter()
+const { register } = useAuth()
+
 const formData = ref({
   username: '',
   email: '',
@@ -227,6 +236,8 @@ const formData = ref({
 
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
+const isLoading = ref(false)
+const errorMessage = ref('')
 
 const passwordStrength = computed(() => {
   const password = formData.value.password
@@ -270,9 +281,31 @@ const isFormValid = computed(() => {
   )
 })
 
-const handleRegister = () => {
-  // TODO: Implement register logic
-  console.log('Register form submitted:', formData.value)
+const handleRegister = async () => {
+  if (isLoading.value) return
+
+  errorMessage.value = ''
+  isLoading.value = true
+
+  try {
+    const result = await register({
+      username: formData.value.username,
+      email: formData.value.email,
+      password: formData.value.password
+    })
+
+    if (result.success) {
+      // 注册成功，跳转到首页
+      await router.push('/')
+    } else {
+      // 注册失败，显示错误信息
+      errorMessage.value = result.error || '注册失败，请重试'
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || '注册失败，请重试'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 useHead({
