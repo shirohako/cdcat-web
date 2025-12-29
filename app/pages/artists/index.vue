@@ -158,11 +158,13 @@ const currentPage = computed(() => {
   return page > 0 ? page : 1;
 });
 
-// 从 API 获取艺术家列表
+// 从 API 获取艺术家列表 - 使用 computed query 以响应路由变化
 const { data: artistsResponse, pending, error } = await useAPI("/v1/artists", {
-  query: {
+  query: computed(() => ({
     page: currentPage.value,
-  },
+    per_page: 18,
+  })),
+  watch: [currentPage],
 });
 
 // 处理艺术家数据
@@ -193,10 +195,9 @@ const pagination = computed(() => {
 // 格式化艺术家类型
 const formatType = (type) => {
   const typeMap = {
+    person: "Person",
     circle: "Circle",
-    artist: "Artist",
-    band: "Band",
-    label: "Label",
+    other: "Other",
   };
   return typeMap[type] || type;
 };

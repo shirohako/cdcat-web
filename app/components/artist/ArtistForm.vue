@@ -33,10 +33,9 @@
             required
           >
             <option value="">Select type</option>
-            <option value="artist">Artist</option>
+            <option value="person">Person</option>
             <option value="circle">Circle</option>
-            <option value="band">Band</option>
-            <option value="label">Label</option>
+            <option value="other">Other</option>
           </select>
           <label v-if="errors.type" class="label">
             <span class="label-text-alt text-error">{{ errors.type }}</span>
@@ -56,24 +55,6 @@
           />
           <label class="label">
             <span class="label-text-alt text-gray-500">Country or region where the artist is based</span>
-          </label>
-        </div>
-
-        <!-- 活动开始年份 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Active Since</span>
-          </label>
-          <input
-            v-model="formData.active_since"
-            type="number"
-            placeholder="e.g., 2010"
-            class="input input-bordered w-full"
-            min="1900"
-            :max="new Date().getFullYear()"
-          />
-          <label class="label">
-            <span class="label-text-alt text-gray-500">Year when the artist became active</span>
           </label>
         </div>
 
@@ -163,7 +144,6 @@ const props = defineProps({
       name: '',
       type: '',
       region: '',
-      active_since: null,
       image_url: '',
       bio: '',
     }),
@@ -180,12 +160,43 @@ const router = useRouter();
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.artistId);
 
+// 初始化表单数据
+const initFormData = () => {
+  if (props.initialData && Object.keys(props.initialData).length > 0) {
+    return {
+      artist_id: props.initialData.id, // 保存原始 artist ID
+      name: props.initialData.name || '',
+      type: props.initialData.type || '',
+      region: props.initialData.region || '',
+      image_url: props.initialData.image_url || '',
+      bio: props.initialData.bio || '',
+    };
+  }
+  return {
+    artist_id: null,
+    name: '',
+    type: '',
+    region: '',
+    image_url: '',
+    bio: '',
+  };
+};
+
 // 表单数据
-const formData = ref({ ...props.initialData });
+const formData = ref(initFormData());
 
 // 监听 initialData 变化（用于编辑模式数据加载）
 watch(() => props.initialData, (newData) => {
-  formData.value = { ...newData };
+  if (newData && Object.keys(newData).length > 0) {
+    formData.value = {
+      artist_id: newData.id, // 保存原始 artist ID
+      name: newData.name || '',
+      type: newData.type || '',
+      region: newData.region || '',
+      image_url: newData.image_url || '',
+      bio: newData.bio || '',
+    };
+  }
 }, { deep: true });
 
 // 表单验证错误
@@ -246,12 +257,14 @@ const handleSubmit = async () => {
       type: formData.value.type,
     };
 
+    // 如果是编辑模式，添加 artist ID
+    if (formData.value.artist_id) {
+      payload.id = formData.value.artist_id;
+    }
+
     // 添加可选字段
     if (formData.value.region) {
       payload.region = formData.value.region.trim();
-    }
-    if (formData.value.active_since) {
-      payload.active_since = parseInt(formData.value.active_since);
     }
     if (formData.value.image_url) {
       payload.image_url = formData.value.image_url.trim();

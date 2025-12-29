@@ -47,14 +47,7 @@ const isLoading = ref(true);
 const loadError = ref('');
 
 // 艺术家数据
-const artistData = ref({
-  name: '',
-  type: '',
-  region: '',
-  active_since: null,
-  image_url: '',
-  bio: '',
-});
+const artistData = ref(null);
 
 // 加载艺术家数据
 onMounted(async () => {
@@ -63,14 +56,8 @@ onMounted(async () => {
     const artist = await $api(`/v1/artists/${artistId}`);
 
     if (artist) {
-      artistData.value = {
-        name: artist.name || '',
-        type: artist.type || '',
-        region: artist.region || '',
-        active_since: artist.active_since || null,
-        image_url: artist.image_url || '',
-        bio: artist.bio || '',
-      };
+      // 传递完整的 artist 对象给 ArtistForm 组件
+      artistData.value = artist;
     }
   } catch (error) {
     console.error('Failed to load artist data:', error);
