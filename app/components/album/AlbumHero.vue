@@ -69,13 +69,23 @@
                 Add to Mylist
               </button>
             </div>
-            <div class="flex gap-3">
+            <div class="flex gap-2 sm:gap-3">
               <button
-                class="btn btn-sm md:btn-md bg-black hover:bg-gray-800 text-white border-0 gap-2 w-full md:w-60"
+                class="btn btn-sm md:btn-md bg-black hover:bg-gray-800 text-white border-0 gap-2 flex-1 md:flex-none md:w-48"
               >
                 <ShoppingCart :size="18" />
                 Buy it
               </button>
+
+              <!-- Edit Button -->
+              <NuxtLink
+                v-if="workId"
+                :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
+                class="btn btn-sm md:btn-md btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-2 flex-1 md:flex-none md:w-auto"
+              >
+                <Edit :size="18" />
+                <span class="hidden sm:inline">Edit</span>
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -93,7 +103,10 @@ import {
   Disc3,
   Hash,
   BadgeJapaneseYen,
+  Edit,
 } from "lucide-vue-next";
+
+const { isAuthenticated } = useAuth()
 
 defineProps({
   title: {
@@ -127,6 +140,10 @@ defineProps({
   backgroundImage: {
     type: String,
     required: true,
+  },
+  workId: {
+    type: [String, Number],
+    default: null,
   },
 });
 </script>

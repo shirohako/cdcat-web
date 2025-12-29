@@ -27,6 +27,7 @@
         :price="albumData.price"
         :cover-image="albumData.coverImage"
         :background-image="albumData.backgroundImage"
+        :work-id="workId"
       />
 
     <!-- Album Details Section -->
