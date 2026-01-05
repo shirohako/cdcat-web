@@ -47,17 +47,7 @@ const isLoading = ref(true);
 const loadError = ref('');
 
 // 作品数据
-const workData = ref({
-  title: '',
-  type: '',
-  catalog_number: '',
-  release_date: '',
-  disc_count: 1,
-  track_count: 0,
-  image_url: '',
-  banner_url: '',
-  description: '',
-});
+const workData = ref(null);
 
 // 加载作品数据
 onMounted(async () => {
@@ -66,17 +56,8 @@ onMounted(async () => {
     const work = await $api(`/v1/works/${workId}`);
 
     if (work) {
-      workData.value = {
-        title: work.title || '',
-        type: work.type || '',
-        catalog_number: work.catalog_number || '',
-        release_date: work.release_date || '',
-        disc_count: work.disc_count || 1,
-        track_count: work.track_count || 0,
-        image_url: work.image_url || '',
-        banner_url: work.banner_url || '',
-        description: work.description || '',
-      };
+      // 传递完整的 work 对象给 WorkForm 组件
+      workData.value = work;
     }
   } catch (error) {
     console.error('Failed to load work data:', error);

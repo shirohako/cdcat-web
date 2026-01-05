@@ -3,7 +3,8 @@
     "dashboard": "儀表板",
     "album": "專輯",
     "artist": "藝術家",
-    "event": "活動"
+    "event": "活動",
+    "entry": "條目"
   },
   "user": {
     "profile": "個人資料",

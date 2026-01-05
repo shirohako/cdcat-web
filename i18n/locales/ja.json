@@ -3,7 +3,8 @@
     "dashboard": "ダッシュボード",
     "album": "アルバム",
     "artist": "アーティスト",
-    "event": "イベント"
+    "event": "イベント",
+    "entry": "エントリー"
   },
   "user": {
     "profile": "プロフィール",

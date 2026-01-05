@@ -3,7 +3,8 @@
     "dashboard": "仪表盘",
     "album": "专辑",
     "artist": "艺术家",
-    "event": "活动"
+    "event": "活动",
+    "entry": "条目"
   },
   "user": {
     "profile": "个人资料",

@@ -3,7 +3,8 @@
     "dashboard": "Dashboard",
     "album": "Album",
     "artist": "Artist",
-    "event": "Event"
+    "event": "Event",
+    "entry": "Entry"
   },
   "user": {
     "profile": "Profile",

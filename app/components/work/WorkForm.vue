@@ -271,37 +271,21 @@
         </div>
 
         <div v-for="(artist, index) in formData.artists" :key="artist.id" class="border border-gray-200 rounded-lg p-4">
-          <div class="flex items-start gap-4">
-            <div class="flex-1 space-y-3">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Artist ID or Name</span>
-                </label>
-                <input
-                  v-model="artist.artist_id"
-                  type="text"
-                  placeholder="Enter artist ID or search name"
-                  class="input input-bordered input-sm w-full"
-                />
-              </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Role</span>
-                </label>
-                <select v-model="artist.role" class="select select-bordered select-sm w-full">
-                  <option value="main">Main Artist</option>
-                  <option value="featured">Featured</option>
-                  <option value="composer">Composer</option>
-                  <option value="arranger">Arranger</option>
-                  <option value="lyricist">Lyricist</option>
-                  <option value="producer">Producer</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Artist ID</span>
+            </label>
+            <div class="flex items-center gap-2">
+              <input
+                v-model="artist.artist_id"
+                type="text"
+                placeholder="Enter artist ID"
+                class="input input-bordered input-sm flex-1"
+              />
+              <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeArtist(index)">
+                <Trash2 :size="16" />
+              </button>
             </div>
-            <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeArtist(index)">
-              <Trash2 :size="16" />
-            </button>
           </div>
         </div>
       </div>
@@ -417,9 +401,33 @@
 
       <!-- Tab 6: Preview JSON -->
       <div v-show="currentTab === 'preview'" class="space-y-6">
-        <h2 class="text-xl font-bold text-gray-900">Preview JSON Data</h2>
-        <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto max-h-96 font-mono text-sm">
-          <pre>{{ JSON.stringify(getSubmitData(), null, 2) }}</pre>
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Preview JSON Data</h2>
+
+        <!-- 完整数据预览 -->
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-lg font-semibold mb-2">Complete Payload</h3>
+            <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto max-h-96 font-mono text-sm">
+              <pre>{{ JSON.stringify(getSubmitData(), null, 2) }}</pre>
+            </div>
+          </div>
+
+          <!-- 分开显示 Structure 和 Songs -->
+          <div v-if="formData.structure.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <h3 class="text-lg font-semibold mb-2">Structure (Discs)</h3>
+              <div class="bg-gray-900 text-blue-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">
+                <pre>{{ JSON.stringify(getSubmitData().structure, null, 2) }}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-lg font-semibold mb-2">Songs (Tracks)</h3>
+              <div class="bg-gray-900 text-yellow-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">
+                <pre>{{ JSON.stringify(getSubmitData().songs, null, 2) }}</pre>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -492,8 +500,8 @@ const router = useRouter();
 // Tabs
 const tabs = [
   { id: 'basic', label: 'Basic Info' },
-  { id: 'tracks', label: 'Discs & Tracks' },
   { id: 'artists', label: 'Artists' },
+  { id: 'tracks', label: 'Discs & Tracks' },
   { id: 'credits', label: 'Credits' },
   { id: 'links', label: 'Links' },
   { id: 'preview', label: 'Preview' },
@@ -504,31 +512,122 @@ const currentTab = ref('basic');
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.workId);
 
-// 表单数据
-const formData = ref({
-  title: '',
-  type: '',
-  catalog_number: '',
-  release_date: '',
-  image_url: '',
-  banner_url: '',
-  description: '',
-  structure: [],
-  artists: [],
-  credits: [],
-  links: [],
-  ...props.initialData,
-});
-
-// 监听 initialData 变化
-watch(() => props.initialData, (newData) => {
-  formData.value = {
+// 转换后端数据到表单格式
+const transformBackendData = (data) => {
+  const transformed = {
+    work_id: data.id, // 保存原始 work ID
+    title: data.title || '',
+    type: data.type || '',
+    catalog_number: data.catalog_number || '',
+    release_date: data.release_date || '',
+    image_url: data.image_url || '',
+    banner_url: data.banner_url || '',
+    description: data.description || '',
     structure: [],
     artists: [],
     credits: [],
     links: [],
-    ...newData
   };
+
+  // 处理 structure - 合并 disc 结构和 songs
+  if (data.structure && Array.isArray(data.structure)) {
+    transformed.structure = data.structure.map((disc, index) => {
+      // 找到属于这个碟片的所有歌曲
+      const discSongs = data.songs
+        ? data.songs
+            .filter(song => song.disc_number === disc.disc_number)
+            .sort((a, b) => a.track_number - b.track_number)
+            .map((song, songIndex) => ({
+              id: `track-${song.id || songIndex}`,
+              song_id: song.id, // 保存原始 song ID
+              track_number: song.track_number,
+              title: song.title || '',
+              duration: song.duration || '',
+              composer: song.composer || '',
+            }))
+        : [];
+
+      return {
+        id: `disc-${disc.disc_number || index}`,
+        structure_id: disc.id, // 保存原始 structure ID
+        disc_number: disc.disc_number,
+        disc_title: disc.title || '',
+        songs: discSongs,
+      };
+    });
+  }
+
+  // 处理 artists - 提取 artist_id
+  if (data.artists && Array.isArray(data.artists)) {
+    transformed.artists = data.artists.map((artist, index) => ({
+      id: `artist-${artist.id || index}`,
+      artist_id: String(artist.id || artist.artist_id || ''),
+    }));
+  }
+
+  // 处理 credits
+  if (data.credits && Array.isArray(data.credits)) {
+    transformed.credits = data.credits.map((credit, index) => ({
+      id: `credit-${credit.id || index}`,
+      credit_id: credit.id, // 保存原始 credit ID
+      name: credit.name || '',
+      role: credit.role || '',
+      track: credit.track || '',
+    }));
+  }
+
+  // 处理 links - 暂时为空
+  if (data.links && Array.isArray(data.links)) {
+    transformed.links = data.links;
+  }
+
+  return transformed;
+};
+
+// 初始化表单数据
+const initFormData = () => {
+  if (props.initialData && Object.keys(props.initialData).length > 0) {
+    return transformBackendData(props.initialData);
+  }
+  return {
+    work_id: null,
+    title: '',
+    type: '',
+    catalog_number: '',
+    release_date: '',
+    image_url: '',
+    banner_url: '',
+    description: '',
+    structure: [],
+    artists: [],
+    credits: [],
+    links: [],
+  };
+};
+
+// 表单数据
+const formData = ref(initFormData());
+
+// 监听 initialData 变化
+watch(() => props.initialData, (newData) => {
+  if (newData && Object.keys(newData).length > 0) {
+    formData.value = transformBackendData(newData);
+  } else {
+    formData.value = {
+      work_id: null,
+      title: '',
+      type: '',
+      catalog_number: '',
+      release_date: '',
+      image_url: '',
+      banner_url: '',
+      description: '',
+      structure: [],
+      artists: [],
+      credits: [],
+      links: [],
+    };
+  }
 }, { deep: true });
 
 // 表单验证错误
@@ -600,7 +699,6 @@ const addArtist = () => {
   formData.value.artists.push({
     id: `artist-${artistIdCounter++}`,
     artist_id: '',
-    role: 'main',
   });
 };
 
@@ -665,6 +763,11 @@ const getSubmitData = () => {
     type: formData.value.type,
   };
 
+  // 如果是编辑模式，添加 work ID
+  if (formData.value.work_id) {
+    payload.id = formData.value.work_id;
+  }
+
   // 添加可选字段
   if (formData.value.catalog_number) {
     payload.catalog_number = formData.value.catalog_number.trim();
@@ -686,18 +789,38 @@ const getSubmitData = () => {
   payload.disc_count = formData.value.structure.length;
   payload.track_count = formData.value.structure.reduce((total, disc) => total + disc.songs.length, 0);
 
-  // 添加结构化数据
+  // 添加结构化数据 - 分开 structure 和 songs
   if (formData.value.structure.length > 0) {
-    payload.structure = formData.value.structure.map((disc, discIndex) => ({
-      disc_number: discIndex + 1,
-      disc_title: disc.disc_title || null,
-      songs: disc.songs.map((song, songIndex) => ({
-        track_number: songIndex + 1,
-        title: song.title,
-        duration: song.duration || null,
-        composer: song.composer || null,
-      })),
-    }));
+    // Structure: 只包含碟片信息
+    payload.structure = formData.value.structure.map((disc, discIndex) => {
+      const structureItem = {
+        disc_number: discIndex + 1,
+        disc_title: disc.disc_title || null,
+      };
+      // 保留原有 ID（如果存在）
+      if (disc.structure_id) {
+        structureItem.id = disc.structure_id;
+      }
+      return structureItem;
+    });
+
+    // Songs: 扁平化的歌曲列表
+    payload.songs = formData.value.structure.flatMap((disc, discIndex) =>
+      disc.songs.map((song, songIndex) => {
+        const songItem = {
+          disc_number: discIndex + 1,
+          track_number: songIndex + 1,
+          title: song.title,
+          duration: song.duration || null,
+          composer: song.composer || null,
+        };
+        // 保留原有 ID（如果存在）
+        if (song.song_id) {
+          songItem.id = song.song_id;
+        }
+        return songItem;
+      })
+    );
   }
 
   // 添加艺术家关联
@@ -706,7 +829,6 @@ const getSubmitData = () => {
       .filter(a => a.artist_id)
       .map(a => ({
         artist_id: a.artist_id,
-        role: a.role,
       }));
   }
 
@@ -714,11 +836,18 @@ const getSubmitData = () => {
   if (formData.value.credits.length > 0) {
     payload.credits = formData.value.credits
       .filter(c => c.name && c.role)
-      .map(c => ({
-        name: c.name,
-        role: c.role,
-        track: c.track || null,
-      }));
+      .map(c => {
+        const creditItem = {
+          name: c.name,
+          role: c.role,
+          track: c.track || null,
+        };
+        // 保留原有 ID（如果存在）
+        if (c.credit_id) {
+          creditItem.id = c.credit_id;
+        }
+        return creditItem;
+      });
   }
 
   // 添加链接
