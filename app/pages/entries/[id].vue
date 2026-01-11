@@ -245,6 +245,23 @@
                 </div>
               </div>
             </div>
+
+            <!-- Quick Links Card -->
+            <div v-if="entryData.bangumi_id" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+              <div class="space-y-2">
+                <a
+                  :href="`https://bgm.tv/subject/${entryData.bangumi_id}`"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group border border-gray-200"
+                >
+                  <Icon name="lucide:external-link" class="w-5 h-5 text-pink-500" />
+                  <span class="flex-1 font-medium text-gray-700 group-hover:text-pink-600">View on Bangumi</span>
+                  <Icon name="lucide:arrow-up-right" class="w-4 h-4 text-gray-400 group-hover:text-pink-600" />
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -291,7 +308,7 @@ const entryData = computed(() => {
   return {
     id: entry.id,
     name: entry.name,
-    title: meta.bangumi_name_cn || meta.bangumi_name || entry.name,
+    title: entry.name,
     type: entry.type,
     year: year,
     release_date: entry.release_date,
@@ -303,6 +320,7 @@ const entryData = computed(() => {
     favorites_count: entry.favorites_count || 0,
     works_count: entry.works_count || 0,
     links: entry.links || [],
+    bangumi_id: meta.bangumi_id || null,
     meta: meta,
   };
 });
