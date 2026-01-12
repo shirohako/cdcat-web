@@ -118,6 +118,61 @@
               </div>
             </div>
 
+            <!-- Related Entries -->
+            <div v-if="Object.keys(groupedRelatedEntries).length > 0" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                  <Link2 :size="24" />
+                  关联条目
+                </h2>
+              </div>
+
+              <!-- Grouped Entries -->
+              <div class="related-section">
+                <section
+                  v-for="(entries, group) in groupedRelatedEntries"
+                  :key="group"
+                  class="relation-card"
+                  :style="relationStyle(group)"
+                >
+                  <div class="relation-header">
+                    <div class="relation-chip">
+                      <Icon :name="getRelationIcon(group)" class="w-4 h-4" />
+                      <span>{{ formatRelationType(group) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="entry-grid">
+                    <NuxtLink
+                      v-for="entry in entries"
+                      :key="entry.id"
+                      :to="`/entries/${entry.id}`"
+                      class="entry-tile"
+                    >
+                      <div class="entry-thumb">
+                        <img
+                          v-if="entry.meta?.image_url"
+                          :src="entry.meta.image_url"
+                          :alt="entry.name"
+                        />
+                        <div v-else class="entry-fallback">
+                          <Film :size="28" />
+                        </div>
+                      </div>
+                      <div class="entry-info">
+                        <p class="entry-title" :title="entry.name">
+                          {{ entry.name }}
+                        </p>
+                        <p v-if="entry.meta?.platform || entry.type" class="entry-subtle">
+                          {{ entry.meta?.platform || formatType(entry.type) }}
+                        </p>
+                      </div>
+                    </NuxtLink>
+                  </div>
+                </section>
+              </div>
+            </div>
+
             <!-- Related Music Works -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
               <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
@@ -270,7 +325,7 @@
 </template>
 
 <script setup>
-import { Film, Calendar, Clock, Heart, Eye, Music2, Info, ExternalLink, Disc } from "lucide-vue-next";
+import { Film, Calendar, Clock, Heart, Eye, Music2, Info, ExternalLink, Disc, Link2 } from "lucide-vue-next";
 
 // Get route params
 const route = useRoute();
@@ -325,6 +380,29 @@ const entryData = computed(() => {
   };
 });
 
+// Related entries grouped by relation_type
+const groupedRelatedEntries = computed(() => {
+  if (!entryResponse.value?.related_entries) {
+    return {};
+  }
+
+  const groups = {};
+  const entries = entryResponse.value.related_entries;
+
+  // Group by relation_type
+  entries.forEach(entry => {
+    const relationType = entry.relation_type || 'other';
+
+    if (!groups[relationType]) {
+      groups[relationType] = [];
+    }
+
+    groups[relationType].push(entry);
+  });
+
+  return groups;
+});
+
 // Related music works
 const relatedWorks = computed(() => {
   return entryData.value.works || [];
@@ -352,6 +430,58 @@ const formatType = (type) => {
     other: "Other",
   };
   return typeMap[type] || type;
+};
+
+// Format relation type label
+const formatRelationType = (relationType) => {
+  if (!relationType) return "其他";
+  const relationMap = {
+    prequel: "前传",
+    sequel: "续作",
+    spinoff: "衍生",
+    adaptation: "改编",
+    character: "角色",
+    crossover: "联动",
+  };
+  const normalized = relationType.toLowerCase();
+  if (relationMap[normalized]) {
+    return relationMap[normalized];
+  }
+  return relationType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+// Accent colors per relation type
+const relationStyle = (relationType) => {
+  const palette = {
+    prequel: { soft: "#dbeafe", strong: "#1d4ed8" },
+    sequel: { soft: "#ecfeff", strong: "#0891b2" },
+    spinoff: { soft: "#f3e8ff", strong: "#7c3aed" },
+    adaptation: { soft: "#dcfce7", strong: "#16a34a" },
+    character: { soft: "#fef2f2", strong: "#e11d48" },
+    crossover: { soft: "#f1f5f9", strong: "#0ea5e9" },
+    other: { soft: "#e2e8f0", strong: "#475569" },
+  };
+
+  const key = (relationType || "other").toLowerCase();
+  const { soft, strong } = palette[key] || palette.other;
+  return {
+    "--relation-soft": soft,
+    "--relation-strong": strong,
+  };
+};
+
+// Icon per relation type
+const getRelationIcon = (relationType) => {
+  const iconMap = {
+    prequel: "lucide:rewind",
+    sequel: "lucide:fast-forward",
+    spinoff: "lucide:git-branch",
+    adaptation: "lucide:book-open",
+    character: "lucide:user",
+    crossover: "lucide:merge",
+  };
+  const key = (relationType || "other").toLowerCase();
+  return iconMap[key] || "lucide:sparkles";
 };
 
 // Format date
@@ -390,5 +520,170 @@ const formatDate = (dateString) => {
   100% {
     background-position: 0% 50%;
   }
+}
+
+.related-section {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .related-section {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  }
+}
+
+.relation-card {
+  position: relative;
+  padding: 1.05rem 1rem 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: linear-gradient(135deg, #ffffff 0%, #f6f8fb 55%, #f8fafc 100%);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.relation-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px auto -1px -1px;
+  width: 8px;
+  background: linear-gradient(180deg, var(--relation-strong, #475569), var(--relation-soft, #e2e8f0));
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.relation-card::after {
+  content: "";
+  position: absolute;
+  inset: -30% -12% auto 32%;
+  height: 120px;
+  background: radial-gradient(circle at 50% 50%, rgba(71, 85, 105, 0.12), transparent 60%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.relation-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.relation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--relation-strong, #0f172a);
+  background: linear-gradient(125deg, #ffffff 0%, rgba(255, 255, 255, 0.92) 48%, var(--relation-soft, #e2e8f0) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.entry-tile {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+  transition: all 0.25s ease, transform 0.2s ease;
+  overflow: hidden;
+}
+
+.entry-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(71, 85, 105, 0.07), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.entry-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--relation-strong, #475569);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+.entry-tile:hover::after {
+  opacity: 1;
+}
+
+.entry-thumb {
+  width: 76px;
+  height: 104px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, #f8fafc, #eef2f7);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.entry-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.entry-tile:hover .entry-thumb img {
+  transform: scale(1.05);
+}
+
+.entry-fallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #cbd5e1;
+  background: linear-gradient(180deg, #f8fafc, #e5e7eb);
+}
+
+.entry-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.entry-title {
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.entry-subtle {
+  font-size: 12px;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.entry-subtle::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--relation-strong, #475569);
+  box-shadow: 0 0 0 5px rgba(71, 85, 105, 0.12);
 }
 </style>

@@ -2,7 +2,7 @@
   <div class="relative w-full overflow-hidden bg-white">
     <!-- Background Image -->
     <img
-      :src="backgroundImage"
+      :src="albumData.backgroundImage"
       alt="Background"
       class="absolute inset-0 w-full h-full object-cover opacity-30"
     />
@@ -14,8 +14,8 @@
       <!-- Album Cover -->
       <div class="shrink-0">
         <img
-          :src="coverImage"
-          :alt="title"
+          :src="albumData.coverImage"
+          :alt="albumData.title"
           class="w-70 h-70 sm:w-[320px] sm:h-80 md:w-100 md:h-100 xl:w-112.5 xl:h-112.5 2xl:w-125 2xl:h-125 object-cover shadow-2xl"
         />
       </div>
@@ -28,26 +28,36 @@
         >
           <div class="flex-1">
             <h1 class="text-3xl md:text-5xl font-bold mb-2 md:mb-3 text-gray-900">
-              {{ title }}
+              {{ albumData.title }}
             </h1>
-            <p class="text-lg md:text-xl text-gray-700 mb-4 md:mb-6">{{ label }}</p>
+            <p class="text-lg md:text-xl text-gray-700 mb-4 md:mb-6">
+              <template v-for="(artist, index) in albumData.artists" :key="artist.id">
+                <NuxtLink
+                  :to="`/artists/${artist.id}`"
+                  class="hover:underline hover:text-gray-900 transition-colors"
+                >
+                  {{ artist.pivot?.display_name || artist.name }}
+                </NuxtLink>
+                <span v-if="index < albumData.artists.length - 1">, </span>
+              </template>
+            </p>
 
             <div class="space-y-2 text-gray-800 text-sm md:text-base">
               <div class="flex items-center gap-2">
                 <Calendar :size="18" class="text-gray-600" />
-                <span>{{ releaseDate }}</span>
+                <span>{{ albumData.releaseDate }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <Disc3 :size="18" class="text-gray-600" />
-                <span>{{ format }}</span>
+                <span>{{ albumData.format }}</span>
               </div>
               <div class="flex items-center gap-2">
                 <Hash :size="18" class="text-gray-600" />
-                <span>{{ catalogNumber }}</span>
+                <span>{{ albumData.catalogNumber }}</span>
               </div>
-              <div v-if="price" class="flex items-center gap-2 text-lg mt-2">
+              <div v-if="albumData.price" class="flex items-center gap-2 text-lg mt-2">
                 <BadgeJapaneseYen :size="20" class="text-gray-600" />
-                <span>{{ price }}</span>
+                <span>{{ albumData.price }}</span>
               </div>
             </div>
           </div>
@@ -109,36 +119,8 @@ import {
 const { isAuthenticated } = useAuth()
 
 defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  label: {
-    type: String,
-    required: true,
-  },
-  releaseDate: {
-    type: String,
-    required: true,
-  },
-  format: {
-    type: String,
-    required: true,
-  },
-  catalogNumber: {
-    type: String,
-    required: true,
-  },
-  price: {
-    type: String,
-    default: "",
-  },
-  coverImage: {
-    type: String,
-    required: true,
-  },
-  backgroundImage: {
-    type: String,
+  albumData: {
+    type: Object,
     required: true,
   },
   workId: {

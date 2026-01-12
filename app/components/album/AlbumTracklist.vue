@@ -33,6 +33,9 @@
             }}</span>
             <div class="flex-1">
               <p class="font-medium">{{ track.title }}</p>
+              <p v-if="track.subtitle" class="text-sm text-gray-600 italic mt-0.5">
+                {{ track.subtitle }}
+              </p>
               <p v-if="track.artist" class="text-sm text-gray-500">
                 {{ track.artist }}
               </p>
@@ -41,7 +44,18 @@
                 class="mt-1 space-y-0.5"
               >
                 <p v-for="(credit, idx) in track.credits" :key="idx" class="text-xs text-gray-400">
-                  {{ credit }}
+                  <span class="font-medium">{{ credit.role }}:</span>
+                  <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
+                    <NuxtLink
+                      v-if="artist.artistId"
+                      :to="`/artists/${artist.artistId}`"
+                      class="hover:underline hover:text-gray-500 transition-colors"
+                    >
+                      {{ artist.name }}
+                    </NuxtLink>
+                    <span v-else>{{ artist.name }}</span>
+                    <span v-if="artistIdx < credit.artists.length - 1">, </span>
+                  </template>
                 </p>
               </div>
             </div>
@@ -107,13 +121,21 @@ const processTracks = (list, discNumber) => {
         const groups = new Map();
         credits.forEach((c) => {
           const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : "Credit";
-          const name = c.artist_name || c.artist?.name || c.name;
+          // 优先级：外层 display_name -> artist.name -> pivot.display_name
+          const name = c.display_name || c.artist?.name || c.artist?.pivot?.display_name || c.name;
+          const artistId = c.artist_id || c.artist?.id;
           if (name) {
             if (!groups.has(role)) groups.set(role, []);
-            groups.get(role).push(name);
+            // 检查是否已存在相同的 artist
+            const existing = groups.get(role).find(item => item.name === name);
+            if (!existing) {
+              groups.get(role).push({ name, artistId });
+            }
           }
         });
-        for (const [role, names] of groups) formattedCredits.push(`${role}: ${names.join(", ")}`);
+        for (const [role, artists] of groups) {
+          formattedCredits.push({ role, artists });
+        }
       }
 
       return {
@@ -125,6 +147,7 @@ const processTracks = (list, discNumber) => {
             ? trackNumber.toString().padStart(2, "0")
             : "--",
         title: song.title || "Untitled Track",
+        subtitle: song.meta?.subtitle || null,
         credits: formattedCredits,
         artist: artistNames,
         duration: formatDuration(song.duration),

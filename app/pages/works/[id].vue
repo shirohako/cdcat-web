@@ -19,14 +19,7 @@
     <div v-else>
       <!-- Album Hero Section -->
       <AlbumHero
-        :title="albumData.title"
-        :label="albumData.label"
-        :release-date="albumData.releaseDate"
-        :format="albumData.format"
-        :catalog-number="albumData.catalogNumber"
-        :price="albumData.price"
-        :cover-image="albumData.coverImage"
-        :background-image="albumData.backgroundImage"
+        :album-data="albumData"
         :work-id="workId"
       />
 
@@ -39,14 +32,17 @@
             v-if="albumDescriptions.length > 0"
             :descriptions="albumDescriptions"
           />
-          <AlbumCredits :credits="credits" />
-          <AlbumTracklist 
-            :songs="songs" 
+          <AlbumCredits
+            v-if="credits.length > 0"
+            :credits="credits"
+          />
+          <AlbumTracklist
+            :songs="songs"
             :structure="albumStructure"
           />
 
           <!-- Reviews -->
-          <AlbumReviews :reviews="mockReviews" />
+          <AlbumReviews :reviews="mockReviews" class="hidden" />
         </div>
 
         <!-- Right Column - Sidebar -->
@@ -114,12 +110,9 @@ const albumData = computed(() => {
   const discText = work.disc_count > 1 ? `${work.disc_count}CD` : "CD";
   const format = `${discText} | ${work.track_count} Tracks`;
 
-  // 组合多个艺术家名称作为 label
-  const artistNames = work.artists?.map(a => a.name).join(", ") || "";
-
   return {
     title: work.title || "",
-    label: artistNames, // 使用所有艺术家的名字，用逗号分隔
+    artists: work.artists || [], // 传递完整的 artists 数组，包含 pivot 数据
     releaseDate: work.release_date || "",
     format: format,
     catalogNumber: work.catalog_number || "",
@@ -149,12 +142,25 @@ const albumDescriptions = computed(() => workData.value?.descriptions ?? []);
 const songs = computed(() => {
   const list = workData.value?.songs ?? [];
   const allCredits = workData.value?.credits ?? [];
+  const artists = workData.value?.artists ?? [];
+
+  // 创建 artist_id 到 artist 对象的映射
+  const artistsMap = new Map();
+  artists.forEach(artist => {
+    artistsMap.set(artist.id, artist);
+  });
 
   const creditsMap = new Map();
   for (const credit of allCredits) {
     if (credit.song_id) {
       if (!creditsMap.has(credit.song_id)) creditsMap.set(credit.song_id, []);
-      creditsMap.get(credit.song_id).push(credit);
+
+      // 关联 artist 信息
+      const creditWithArtist = {
+        ...credit,
+        artist: artistsMap.get(credit.artist_id) || null
+      };
+      creditsMap.get(credit.song_id).push(creditWithArtist);
     }
   }
 
@@ -172,7 +178,8 @@ const credits = computed(() => {
   const groups = new Map();
   for (const item of list) {
     const role = item.role || 'Staff';
-    const name = item.artist_name || item.artist?.name || item.name;
+    // 优先级：外层 display_name -> artist.name -> pivot.display_name
+    const name = item.display_name || item.artist?.name || item.artist?.pivot?.display_name || item.name;
     if (name) {
       const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
       if (!groups.has(displayRole)) groups.set(displayRole, []);
