@@ -46,7 +46,6 @@
 <script setup>
 import { FileText } from "lucide-vue-next";
 import MarkdownIt from "markdown-it";
-import DOMPurify from "dompurify";
 
 const props = defineProps({
   slogan: {
@@ -65,6 +64,9 @@ const md = new MarkdownIt({
   breaks: true, // 将换行符转换为 <br>
   linkify: true, // 自动将 URL 转换为链接
 });
+
+// 只在客户端导入 DOMPurify
+const DOMPurify = import.meta.client ? (await import('dompurify')).default : null;
 
 const languageOptions = computed(() => {
   const list = Array.isArray(props.descriptions) ? props.descriptions : [];
@@ -140,11 +142,16 @@ const renderedMarkdown = computed(() => {
   // 渲染 Markdown
   const rendered = md.render(text);
 
-  // 使用 DOMPurify 清理 HTML，防止 XSS 攻击
-  return DOMPurify.sanitize(rendered, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-    ALLOWED_ATTR: ['href', 'target', 'rel']
-  });
+  // 在客户端使用 DOMPurify 清理 HTML，防止 XSS 攻击
+  // 在服务器端直接返回渲染的 HTML（因为 html: false 已经禁止了 HTML 标签）
+  if (DOMPurify) {
+    return DOMPurify.sanitize(rendered, {
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+      ALLOWED_ATTR: ['href', 'target', 'rel']
+    });
+  }
+
+  return rendered;
 });
 
 const languageLabel = (code) => {

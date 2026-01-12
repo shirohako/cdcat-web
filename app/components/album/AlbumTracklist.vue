@@ -1,9 +1,28 @@
 <template>
   <section class="bg-white rounded-lg border border-gray-200 p-6">
-    <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
-      <ListMusic :size="24" />
-      Tracklist
-    </h2>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-2xl font-bold flex items-center gap-2">
+        <ListMusic :size="24" />
+        Tracklist
+      </h2>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <span class="text-sm text-gray-600 flex items-center gap-1.5">
+          <Users :size="16" />
+          人员信息
+        </span>
+        <button
+          type="button"
+          @click="showCredits = !showCredits"
+          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          :class="showCredits ? 'bg-blue-600' : 'bg-gray-300'"
+        >
+          <span
+            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+            :class="showCredits ? 'translate-x-6' : 'translate-x-1'"
+          />
+        </button>
+      </label>
+    </div>
 
     <div v-if="discs.length" class="space-y-10">
       <div v-for="disc in discs" :key="disc.discNumber">
@@ -33,14 +52,14 @@
             }}</span>
             <div class="flex-1">
               <p class="font-medium">{{ track.title }}</p>
-              <p v-if="track.subtitle" class="text-sm text-gray-600 italic mt-0.5">
+              <p v-if="track.subtitle" class="text-sm text-gray-500 mt-0.5">
                 {{ track.subtitle }}
               </p>
-              <p v-if="track.artist" class="text-sm text-gray-500">
+              <p v-if="showCredits && track.artist" class="text-sm text-gray-500">
                 {{ track.artist }}
               </p>
               <div
-                v-if="track.credits && track.credits.length"
+                v-if="showCredits && track.credits && track.credits.length"
                 class="mt-1 space-y-0.5"
               >
                 <p v-for="(credit, idx) in track.credits" :key="idx" class="text-xs text-gray-400">
@@ -69,7 +88,9 @@
 </template>
 
 <script setup>
-import { ListMusic, Disc3 } from "lucide-vue-next";
+import { ListMusic, Disc3, Users } from "lucide-vue-next";
+
+const showCredits = ref(true);
 
 const props = defineProps({
   songs: {
