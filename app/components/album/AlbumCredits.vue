@@ -5,7 +5,7 @@
       Credits
     </h2>
     
-    <div v-if="credits && credits.length" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+    <div v-if="credits && credits.length" class="grid grid-cols-1 gap-y-6">
       <div v-for="(item, index) in credits" :key="index" class="flex flex-col">
         <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">
           {{ item.role }}

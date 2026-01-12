@@ -29,7 +29,12 @@
       </div>
 
       <!-- Main Descriptions -->
-      <div class="text-gray-700 space-y-2 text-sm leading-relaxed">
+      <div
+        v-if="isMarkdown"
+        class="text-gray-700 text-sm leading-relaxed prose prose-sm max-w-none"
+        v-html="renderedMarkdown"
+      />
+      <div v-else class="text-gray-700 space-y-2 text-sm leading-relaxed">
         <p v-for="(paragraph, index) in displayDescriptions" :key="index">
           {{ paragraph }}
         </p>
@@ -40,6 +45,8 @@
 
 <script setup>
 import { FileText } from "lucide-vue-next";
+import MarkdownIt from "markdown-it";
+import DOMPurify from "dompurify";
 
 const props = defineProps({
   slogan: {
@@ -50,6 +57,13 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+});
+
+// 初始化 markdown-it
+const md = new MarkdownIt({
+  html: false, // 不允许 HTML 标签
+  breaks: true, // 将换行符转换为 <br>
+  linkify: true, // 自动将 URL 转换为链接
 });
 
 const languageOptions = computed(() => {
@@ -97,6 +111,11 @@ const displaySlogan = computed(() => {
   return fromApi || props.slogan || "";
 });
 
+const isMarkdown = computed(() => {
+  const format = activeDescription.value?.content?.body?.format;
+  return format === "markdown";
+});
+
 const displayDescriptions = computed(() => {
   const fromApi = activeDescription.value?.content?.body?.text;
   if (fromApi) {
@@ -110,6 +129,22 @@ const displayDescriptions = computed(() => {
   if (list.length === 0) return [];
   if (typeof list[0] === "string") return list;
   return [];
+});
+
+const renderedMarkdown = computed(() => {
+  if (!isMarkdown.value) return "";
+
+  const text = activeDescription.value?.content?.body?.text || "";
+  if (!text) return "";
+
+  // 渲染 Markdown
+  const rendered = md.render(text);
+
+  // 使用 DOMPurify 清理 HTML，防止 XSS 攻击
+  return DOMPurify.sanitize(rendered, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    ALLOWED_ATTR: ['href', 'target', 'rel']
+  });
 });
 
 const languageLabel = (code) => {
