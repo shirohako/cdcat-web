@@ -37,6 +37,12 @@ export const menuItems: MenuItem[] = [
     i18nKey: 'menu.entry',
     path: '/entries',
     icon: 'lucide:film'
+  },
+  {
+    name: 'series',
+    i18nKey: 'menu.series',
+    path: '/series',
+    icon: 'lucide:library'
   }
 ]
 
