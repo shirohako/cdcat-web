@@ -5,7 +5,6 @@ import { Disc3, Eye, Film } from 'lucide-vue-next'
 interface Series {
   id: number
   name: string
-  name_cn?: string
   image_url?: string
   description?: string
   entries_count: number
@@ -22,7 +21,6 @@ const mockSeriesData: Series[] = [
   {
     id: 1,
     name: 'Atelier',
-    name_cn: '炼金工房',
     image_url: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=800&h=450&fit=crop',
     description: '炼金工房系列是由 Gust 公司开发的角色扮演游戏系列，以炼金术为核心玩法',
     entries_count: 23,
@@ -33,7 +31,6 @@ const mockSeriesData: Series[] = [
   {
     id: 2,
     name: 'The Legend of Heroes',
-    name_cn: '英雄传说',
     image_url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
     description: '英雄传说是 Falcom 公司的知名 RPG 系列，包含轨迹系列等多个子系列',
     entries_count: 18,
@@ -44,7 +41,6 @@ const mockSeriesData: Series[] = [
   {
     id: 3,
     name: 'Tales of',
-    name_cn: '传说',
     image_url: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&h=450&fit=crop',
     description: 'Bandai Namco 的传说系列，以独特的战斗系统和精彩剧情闻名',
     entries_count: 25,
@@ -55,7 +51,6 @@ const mockSeriesData: Series[] = [
   {
     id: 4,
     name: 'Persona',
-    name_cn: '女神异闻录',
     image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=450&fit=crop',
     description: 'Atlus 旗下的现代奇幻 RPG 系列，融合校园生活与地下城探索',
     entries_count: 12,
@@ -123,9 +118,14 @@ const formatNumber = (num: number) => {
 <template>
   <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
     <!-- 页面标题 -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">系列列表</h1>
-      <p class="text-gray-600">浏览所有游戏、动画、音乐系列作品</p>
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">系列列表</h1>
+        <p class="text-gray-600">浏览所有游戏、动画、音乐系列作品</p>
+      </div>
+      <NuxtLink class="btn btn-primary btn-sm w-full md:w-auto" to="/contribute/series">
+        创建系列
+      </NuxtLink>
     </div>
 
     <!-- 系列卡片网格 -->
@@ -141,7 +141,7 @@ const formatNumber = (num: number) => {
           <img
             v-if="series.image_url"
             :src="series.image_url"
-            :alt="series.name_cn || series.name"
+            :alt="series.name"
             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
@@ -152,11 +152,8 @@ const formatNumber = (num: number) => {
         <!-- 系列信息 -->
         <div class="p-4">
           <h3 class="font-bold text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">
-            {{ series.name_cn || series.name }}
-          </h3>
-          <p v-if="series.name_cn" class="text-xs text-gray-500 mb-2 truncate">
             {{ series.name }}
-          </p>
+          </h3>
 
           <p v-if="series.description" class="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
             {{ series.description }}

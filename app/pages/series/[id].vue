@@ -8,7 +8,6 @@ const seriesId = computed(() => Number(route.params.id))
 interface SeriesDetail {
   id: number
   name: string
-  name_cn?: string
   image_url?: string
   banner_url?: string
   description: string
@@ -16,7 +15,6 @@ interface SeriesDetail {
   works_count: number
   views_count: number
   favorites_count: number
-  tags: string[]
   entries: Entry[]
   recentWorks: Work[]
   stats: {
@@ -29,7 +27,6 @@ interface SeriesDetail {
 interface Entry {
   id: number
   name: string
-  name_cn?: string
   type: 'anime' | 'game' | 'movie' | 'tv' | 'other'
   image_url?: string
   works_count: number
@@ -47,7 +44,6 @@ interface Work {
 const mockSeriesDetail: SeriesDetail = {
   id: seriesId.value,
   name: 'Atelier',
-  name_cn: '炼金工房',
   image_url: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=800&h=450&fit=crop',
   banner_url: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=1200&h=400&fit=crop',
   description: '《炼金工房》（Atelier）系列是由 Gust 公司开发的角色扮演游戏系列，以炼金术为核心玩法。该系列以其独特的合成系统、可爱的角色设计和优美的音乐而闻名。系列作品众多，包括多个子系列如「黄昏系列」、「不可思议系列」、「秘密系列」等。每一代都有独特的世界观和故事，但都围绕着炼金术士的成长与冒险展开。',
@@ -55,12 +51,10 @@ const mockSeriesDetail: SeriesDetail = {
   works_count: 156,
   views_count: 12453,
   favorites_count: 892,
-  tags: ['RPG', '炼金术', 'JRPG', 'Gust', '可爱', '音乐', '合成系统'],
   entries: [
     {
       id: 1,
       name: 'Atelier Ryza: Ever Darkness & the Secret Hideout',
-      name_cn: '莱莎的炼金工房：常暗女王与秘密藏身处',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=300&h=300&fit=crop',
       works_count: 12
@@ -68,7 +62,6 @@ const mockSeriesDetail: SeriesDetail = {
     {
       id: 2,
       name: 'Atelier Ryza 2: Lost Legends & the Secret Fairy',
-      name_cn: '莱莎的炼金工房2：失落的传说与秘密妖精',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=300&h=300&fit=crop',
       works_count: 10
@@ -76,7 +69,6 @@ const mockSeriesDetail: SeriesDetail = {
     {
       id: 3,
       name: 'Atelier Ryza 3: Alchemist of the End & the Secret Key',
-      name_cn: '莱莎的炼金工房3：终结之炼金术士与秘密钥匙',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=300&h=300&fit=crop',
       works_count: 14
@@ -84,7 +76,6 @@ const mockSeriesDetail: SeriesDetail = {
     {
       id: 4,
       name: 'Atelier Sophie: The Alchemist of the Mysterious Book',
-      name_cn: '苏菲的炼金工房：不可思议之书的炼金术士',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&h=300&fit=crop',
       works_count: 8
@@ -92,7 +83,6 @@ const mockSeriesDetail: SeriesDetail = {
     {
       id: 5,
       name: 'Atelier Firis: The Alchemist and the Mysterious Journey',
-      name_cn: '菲莉丝的炼金工房：不可思议旅的炼金术士',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=300&h=300&fit=crop',
       works_count: 7
@@ -100,7 +90,6 @@ const mockSeriesDetail: SeriesDetail = {
     {
       id: 6,
       name: 'Atelier Lydie & Suelle: The Alchemists and the Mysterious Paintings',
-      name_cn: '莉迪&苏瑞的炼金工房：不可思议绘画的炼金术士',
       type: 'game',
       image_url: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=300&h=300&fit=crop',
       works_count: 9
@@ -185,7 +174,7 @@ const getEntryTypeLabel = (type: string) => {
       <img
         v-if="series.banner_url"
         :src="series.banner_url"
-        :alt="series.name_cn || series.name"
+        :alt="series.name"
         class="w-full h-full object-cover opacity-30"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
@@ -200,7 +189,7 @@ const getEntryTypeLabel = (type: string) => {
                 <img
                   v-if="series.image_url"
                   :src="series.image_url"
-                  :alt="series.name_cn || series.name"
+                  :alt="series.name"
                   class="w-full h-full object-cover"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
@@ -212,11 +201,8 @@ const getEntryTypeLabel = (type: string) => {
             <!-- 标题和基本信息 -->
             <div class="flex-1 pb-2">
               <h1 class="text-4xl font-bold text-white mb-2">
-                {{ series.name_cn || series.name }}
-              </h1>
-              <p v-if="series.name_cn" class="text-xl text-white/80 mb-4">
                 {{ series.name }}
-              </p>
+              </h1>
               <div class="flex items-center gap-4 text-white/90">
                 <div class="flex items-center gap-2">
                   <Film class="w-5 h-5" />
@@ -248,16 +234,6 @@ const getEntryTypeLabel = (type: string) => {
               {{ series.description }}
             </p>
 
-            <!-- 标签 -->
-            <div class="flex flex-wrap gap-2 mt-6">
-              <span
-                v-for="tag in series.tags"
-                :key="tag"
-                class="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-full border border-blue-200"
-              >
-                {{ tag }}
-              </span>
-            </div>
           </div>
 
           <!-- 系列条目 -->
@@ -279,7 +255,7 @@ const getEntryTypeLabel = (type: string) => {
                   <img
                     v-if="entry.image_url"
                     :src="entry.image_url"
-                    :alt="entry.name_cn || entry.name"
+                    :alt="entry.name"
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                   <div v-else class="w-full h-full flex items-center justify-center">
@@ -288,18 +264,15 @@ const getEntryTypeLabel = (type: string) => {
                 </div>
 
                 <!-- 条目信息 -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between gap-2 mb-1">
-                    <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
-                      {{ entry.name_cn || entry.name }}
-                    </h3>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                      <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
+                        {{ entry.name }}
+                      </h3>
                     <span :class="['text-xs px-2 py-0.5 rounded-full border flex-shrink-0', getEntryTypeColor(entry.type)]">
                       {{ getEntryTypeLabel(entry.type) }}
                     </span>
                   </div>
-                  <p v-if="entry.name_cn" class="text-sm text-gray-500 mb-2 line-clamp-1">
-                    {{ entry.name }}
-                  </p>
                   <div class="flex items-center gap-3 text-xs text-gray-600">
                     <span class="flex items-center gap-1">
                       <Disc3 class="w-3.5 h-3.5" />
