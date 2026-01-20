@@ -4,7 +4,8 @@
     "album": "Album",
     "artist": "Artist",
     "event": "Event",
-    "entry": "Entry"
+    "entry": "Entry",
+    "series": "Series"
   },
   "user": {
     "profile": "Profile",

@@ -27,7 +27,6 @@ const createEmptyGroup = (): SeriesGroup => ({
 
 const tabs = [
   { id: 'basic', label: '基础信息', icon: 'lucide:tag' },
-  { id: 'media', label: '图片', icon: 'lucide:image' },
   { id: 'groups', label: '系列分组', icon: 'lucide:layers' },
   { id: 'related-entries', label: '关联条目', icon: 'lucide:film' },
   { id: 'related-works', label: '关联专辑', icon: 'lucide:disc-3' }
@@ -40,14 +39,14 @@ const form = reactive<SeriesCreateForm>({
   image_url: '',
   meta: [createEmptyMeta()],
   groups: [],
-  relatedEntries: [createEmptyRelated()],
-  relatedWorks: [createEmptyRelated()]
+  relatedEntries: [],
+  relatedWorks: []
 })
 
 const isSubmitting = ref(false)
 const submitMessage = ref('')
 const showPreview = ref(false)
-const errors = reactive<{ name?: string }>({})
+const errors = reactive<{ name?: string; image_url?: string }>({})
 
 const isMetaFilled = (meta: MetaItem[]) => meta.some((item) => item.key.trim() || item.value.trim())
 const filledGroups = computed(() => form.groups.filter((group) => group.id.trim() || isMetaFilled(group.meta)))
@@ -105,10 +104,7 @@ const addRelatedEntry = () => {
 }
 
 const removeRelatedEntry = (index: number) => {
-  if (form.relatedEntries.length === 1) {
-    form.relatedEntries[0] = createEmptyRelated()
-    return
-  }
+  if (index < 0 || index >= form.relatedEntries.length) return
   form.relatedEntries.splice(index, 1)
 }
 
@@ -117,10 +113,7 @@ const addRelatedWork = () => {
 }
 
 const removeRelatedWork = (index: number) => {
-  if (form.relatedWorks.length === 1) {
-    form.relatedWorks[0] = createEmptyRelated()
-    return
-  }
+  if (index < 0 || index >= form.relatedWorks.length) return
   form.relatedWorks.splice(index, 1)
 }
 
@@ -142,25 +135,35 @@ const submissionPayload = computed(() => ({
     id: group.id,
     meta: buildMetaObject(group.meta)
   })),
-  related_entries: form.relatedEntries.map((item) => ({
-    id: item.id,
-    group_id: item.group_id || null,
-    meta: buildMetaObject(item.meta)
-  })),
-  related_works: form.relatedWorks.map((item) => ({
-    id: item.id,
-    group_id: item.group_id || null,
-    meta: buildMetaObject(item.meta)
-  }))
+  related_entries: form.relatedEntries
+    .filter((item) => item.id.trim())
+    .map((item) => ({
+      id: item.id,
+      group_id: item.group_id || null,
+      meta: buildMetaObject(item.meta)
+    })),
+  related_works: form.relatedWorks
+    .filter((item) => item.id.trim())
+    .map((item) => ({
+      id: item.id,
+      group_id: item.group_id || null,
+      meta: buildMetaObject(item.meta)
+    }))
 }))
 
 const previewJson = computed(() => JSON.stringify(submissionPayload.value, null, 2))
 
 const openPreview = () => {
   errors.name = undefined
+  errors.image_url = undefined
   submitMessage.value = ''
   if (!form.name.trim()) {
     errors.name = '请输入系列名称'
+    currentTab.value = 'basic'
+    return
+  }
+  if (!form.image_url.trim()) {
+    errors.image_url = '请输入封面图 URL'
     currentTab.value = 'basic'
     return
   }
@@ -169,6 +172,7 @@ const openPreview = () => {
 
 const submitForm = async () => {
   errors.name = undefined
+  errors.image_url = undefined
   submitMessage.value = ''
 
   if (!form.name.trim()) {
@@ -177,13 +181,20 @@ const submitForm = async () => {
   }
 
   isSubmitting.value = true
-  await new Promise((resolve) => setTimeout(resolve, 800))
-  isSubmitting.value = false
+  try {
+    const { $api } = useNuxtApp()
+    const formData = new FormData()
+    formData.append('payload', JSON.stringify(submissionPayload.value))
+    await $api('/v1/franchises', {
+      method: 'POST',
+      body: formData
+    })
+    // await navigateTo('/series')
+  } finally {
+    isSubmitting.value = false
+  }
 
-  const groupCount = filledGroups.value.length || form.groups.length
-  const relatedEntryCount = filledRelatedEntries.value.length || form.relatedEntries.length
-  const relatedWorkCount = filledRelatedWorks.value.length || form.relatedWorks.length
-  submitMessage.value = `系列「${form.name}」已提交（分组 ${groupCount} 个，关联条目 ${relatedEntryCount} 条，关联专辑 ${relatedWorkCount} 条）`
+  submitMessage.value = `系列「${form.name}」已提交。`
   showPreview.value = false
 }
 
@@ -210,7 +221,6 @@ useHead({
               :on-add-meta="addMeta"
               :on-remove-meta="removeMeta"
             />
-            <SeriesMediaSection v-show="currentTab === 'media'" :form="form" />
             <SeriesGroupsSection
               v-show="currentTab === 'groups'"
               :groups="form.groups"
@@ -237,18 +247,12 @@ useHead({
             <div class="flex flex-wrap items-center gap-3 pt-2">
               <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
                 <Save class="w-4 h-4" />
-                {{ isSubmitting ? '生成中...' : '预览提交' }}
+                {{ isSubmitting ? '生成中...' : '预览' }}
               </button>
               <span class="text-sm text-gray-500">提交后由管理员审核，审核通过后公开展示。</span>
             </div>
 
             <div v-if="showPreview" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-3">
-              <div class="flex items-center justify-between">
-                <h3 class="text-sm font-semibold text-gray-900">提交预览（只读 JSON）</h3>
-                <button type="button" class="btn btn-ghost btn-xs" @click="showPreview = false">
-                  返回编辑
-                </button>
-              </div>
               <div class="rounded-lg border border-blue-100 bg-white p-3 text-xs text-gray-700 font-mono whitespace-pre-wrap">
                 {{ previewJson }}
               </div>
@@ -256,7 +260,9 @@ useHead({
                 <button type="button" class="btn btn-primary btn-sm" :disabled="isSubmitting" @click="submitForm">
                   {{ isSubmitting ? '提交中...' : '确认提交' }}
                 </button>
-                <span class="text-xs text-gray-500">确认后将提交到后端。</span>
+                <button type="button" class="btn btn-ghost btn-sm" @click="showPreview = false">
+                  返回编辑
+                </button>
               </div>
             </div>
 

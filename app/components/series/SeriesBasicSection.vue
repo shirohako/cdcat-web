@@ -25,6 +25,26 @@
       </label>
     </div>
 
+    <div class="form-control">
+      <label class="label">
+        <span class="label-text font-semibold">封面图 URL <span class="text-red-500">*</span></span>
+      </label>
+      <input
+        v-model="form.image_url"
+        type="url"
+        placeholder="https://example.com/cover.jpg"
+        class="input input-bordered w-full"
+        :class="{ 'input-error': errors.image_url }"
+        required
+      />
+      <label class="label">
+        <span class="label-text-alt text-xs text-gray-400">16:9 横向封面</span>
+      </label>
+      <label v-if="errors.image_url" class="label">
+        <span class="label-text-alt text-error">{{ errors.image_url }}</span>
+      </label>
+    </div>
+
     <div class="space-y-3">
       <div class="flex items-center justify-between">
         <div>
@@ -75,7 +95,7 @@ import type { SeriesCreateForm } from './seriesFormTypes'
 
 const props = defineProps<{
   form: SeriesCreateForm
-  errors: { name?: string }
+  errors: { name?: string; image_url?: string }
   onAddMeta: () => void
   onRemoveMeta: (index: number) => void
 }>()

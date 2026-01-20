@@ -4,7 +4,8 @@
     "album": "アルバム",
     "artist": "アーティスト",
     "event": "イベント",
-    "entry": "エントリー"
+    "entry": "エントリー",
+    "series": "シリーズ"
   },
   "user": {
     "profile": "プロフィール",

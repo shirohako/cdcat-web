@@ -1,78 +1,50 @@
 <script setup lang="ts">
-import { Disc3, Eye, Film } from 'lucide-vue-next'
+import { Disc3, Film } from 'lucide-vue-next'
 
-// 模拟数据
-interface Series {
-  id: number
-  name: string
-  image_url?: string
-  description?: string
-  entries_count: number
-  works_count: number
-  views_count: number
-  favorites_count: number
-}
+const route = useRoute()
+const router = useRouter()
 
-const currentPage = ref(1)
-const pageSize = 24
-
-// 模拟系列数据
-const mockSeriesData: Series[] = [
-  {
-    id: 1,
-    name: 'Atelier',
-    image_url: 'https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=800&h=450&fit=crop',
-    description: '炼金工房系列是由 Gust 公司开发的角色扮演游戏系列，以炼金术为核心玩法',
-    entries_count: 23,
-    works_count: 156,
-    views_count: 12453,
-    favorites_count: 892
-  },
-  {
-    id: 2,
-    name: 'The Legend of Heroes',
-    image_url: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=450&fit=crop',
-    description: '英雄传说是 Falcom 公司的知名 RPG 系列，包含轨迹系列等多个子系列',
-    entries_count: 18,
-    works_count: 234,
-    views_count: 23567,
-    favorites_count: 1543
-  },
-  {
-    id: 3,
-    name: 'Tales of',
-    image_url: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&h=450&fit=crop',
-    description: 'Bandai Namco 的传说系列，以独特的战斗系统和精彩剧情闻名',
-    entries_count: 25,
-    works_count: 312,
-    views_count: 34289,
-    favorites_count: 2156
-  },
-  {
-    id: 4,
-    name: 'Persona',
-    image_url: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&h=450&fit=crop',
-    description: 'Atlus 旗下的现代奇幻 RPG 系列，融合校园生活与地下城探索',
-    entries_count: 12,
-    works_count: 198,
-    views_count: 45678,
-    favorites_count: 3421
-  }
-]
-
-// 分页逻辑
-const totalPages = computed(() => Math.ceil(mockSeriesData.length / pageSize))
-const paginatedSeries = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  const end = start + pageSize
-  return mockSeriesData.slice(start, end)
+// 获取当前页码
+const currentPage = computed(() => {
+  const page = parseInt(route.query.page as string || '1') || 1
+  return page > 0 ? page : 1
 })
+
+// 从 API 获取系列列表
+const { data: seriesResponse, pending, error } = await useAPI('/v1/franchises', {
+  query: {
+    page: currentPage.value,
+  },
+})
+
+// 处理系列数据
+const seriesData = computed(() => {
+  if (!seriesResponse.value) {
+    return []
+  }
+  return (seriesResponse.value as any).franchises || []
+})
+
+// 分页信息
+const pagination = computed(() => {
+  if (!(seriesResponse.value as any)?.pagination) {
+    return {
+      total: 0,
+      per_page: 24,
+      current_page: 1,
+      last_page: 1,
+    }
+  }
+  return (seriesResponse.value as any).pagination
+})
+
+const totalPages = computed(() => pagination.value.last_page)
 
 // 显示的页码（最多显示 7 个页码按钮）
 const visiblePages = computed(() => {
-  const pages = []
+  const pages: (number | string)[] = []
   const total = totalPages.value
-  const current = currentPage.value
+  const current = pagination.value.current_page
 
   if (total <= 7) {
     for (let i = 1; i <= total; i++) {
@@ -100,18 +72,16 @@ const visiblePages = computed(() => {
 })
 
 const goToPage = (page: number) => {
-  if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-}
+  if (page < 1 || page > totalPages.value) return
 
-// 格式化数字
-const formatNumber = (num: number) => {
-  if (num >= 10000) {
-    return (num / 10000).toFixed(1) + 'w'
-  }
-  return num.toLocaleString()
+  router.push({
+    query: {
+      ...route.query,
+      page: page === 1 ? undefined : page,
+    },
+  })
+
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 </script>
 
@@ -128,91 +98,108 @@ const formatNumber = (num: number) => {
       </NuxtLink>
     </div>
 
-    <!-- 系列卡片网格 -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-      <NuxtLink
-        v-for="series in paginatedSeries"
-        :key="series.id"
-        :to="`/series/${series.id}`"
-        class="group block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-      >
-        <!-- 系列封面 -->
-        <div class="relative aspect-video overflow-hidden bg-gray-100">
-          <img
-            v-if="series.image_url"
-            :src="series.image_url"
-            :alt="series.name"
-            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-          <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <Disc3 class="w-12 h-12 text-gray-400" />
-          </div>
-        </div>
-
-        <!-- 系列信息 -->
-        <div class="p-4">
-          <h3 class="font-bold text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">
-            {{ series.name }}
-          </h3>
-
-          <p v-if="series.description" class="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">
-            {{ series.description }}
-          </p>
-
-          <!-- 统计信息 -->
-          <div class="space-y-1.5 text-xs text-gray-600">
-            <div class="flex items-center gap-1.5">
-              <Film class="w-3.5 h-3.5 text-gray-400" />
-              <span>{{ series.entries_count }} 条目</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <Disc3 class="w-3.5 h-3.5 text-gray-400" />
-              <span>{{ series.works_count }} 专辑</span>
-            </div>
-            <div class="flex items-center gap-1.5">
-              <Eye class="w-3.5 h-3.5 text-gray-400" />
-              <span>{{ formatNumber(series.views_count) }}</span>
-            </div>
-          </div>
-        </div>
-      </NuxtLink>
+    <!-- 加载状态 -->
+    <div v-if="pending" class="flex items-center justify-center min-h-100">
+      <span class="loading loading-spinner loading-lg"></span>
     </div>
 
-    <!-- 分页控制 -->
-    <div v-if="totalPages > 1" class="flex justify-center mt-8">
-      <div class="join">
-        <button
-          class="join-item btn btn-sm"
-          :disabled="currentPage === 1"
-          @click="goToPage(currentPage - 1)"
-        >
-          «
-        </button>
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="flex items-center justify-center min-h-100">
+      <div class="alert alert-error max-w-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>加载失败: {{ error.message }}</span>
+      </div>
+    </div>
 
-        <template v-for="(page, index) in visiblePages" :key="index">
+    <div v-else>
+      <!-- 系列卡片网格 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <NuxtLink
+          v-for="series in seriesData"
+          :key="series.id"
+          :to="`/series/${series.id}`"
+          class="group block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <!-- 系列封面 -->
+          <div class="relative aspect-video overflow-hidden bg-gray-100">
+            <img
+              v-if="series.image_url"
+              :src="series.image_url"
+              :alt="series.name"
+              class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+            <div v-else class="w-full h-full flex items-center justify-center bg-linear-to-br from-gray-100 to-gray-200">
+              <Disc3 class="w-12 h-12 text-gray-400" />
+            </div>
+          </div>
+
+          <!-- 系列信息 -->
+          <div class="p-4">
+            <h3 class="font-bold text-gray-800 mb-1 truncate group-hover:text-blue-600 transition-colors">
+              {{ series.name }}
+            </h3>
+
+            <!-- 统计信息 -->
+            <div class="space-y-1.5 text-xs text-gray-600">
+              <div class="flex items-center gap-1.5">
+                <Film class="w-3.5 h-3.5 text-gray-400" />
+                <span>{{ series.entries_count }} 条目</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <Disc3 class="w-3.5 h-3.5 text-gray-400" />
+                <span>{{ series.works_count }} 专辑</span>
+              </div>
+            </div>
+          </div>
+        </NuxtLink>
+      </div>
+
+      <!-- 空状态 -->
+      <div v-if="seriesData.length === 0" class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <Disc3 :size="64" class="mx-auto" />
+        </div>
+        <p class="text-gray-500">暂无系列</p>
+      </div>
+
+      <!-- 分页控制 -->
+      <div v-if="totalPages > 1" class="flex justify-center mt-8">
+        <div class="join">
           <button
-            v-if="page === '...'"
-            class="join-item btn btn-sm btn-disabled"
-          >
-            ...
-          </button>
-          <button
-            v-else
             class="join-item btn btn-sm"
-            :class="{ 'btn-active': currentPage === page }"
-            @click="goToPage(page as number)"
+            :disabled="pagination.current_page === 1"
+            @click="goToPage(pagination.current_page - 1)"
           >
-            {{ page }}
+            «
           </button>
-        </template>
 
-        <button
-          class="join-item btn btn-sm"
-          :disabled="currentPage === totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
-          »
-        </button>
+          <template v-for="(page, index) in visiblePages" :key="index">
+            <button
+              v-if="page === '...'"
+              class="join-item btn btn-sm btn-disabled"
+            >
+              ...
+            </button>
+            <button
+              v-else
+              class="join-item btn btn-sm"
+              :class="{ 'btn-active': pagination.current_page === page }"
+              @click="goToPage(page as number)"
+            >
+              {{ page }}
+            </button>
+          </template>
+
+          <button
+            class="join-item btn btn-sm"
+            :disabled="pagination.current_page === totalPages"
+            @click="goToPage(pagination.current_page + 1)"
+          >
+            »
+          </button>
+        </div>
       </div>
     </div>
   </div>
