@@ -314,8 +314,7 @@ const getEntryDescription = (entry) => {
 };
 
 const getEntryImageUrl = (entry) => {
-  const meta = entry.meta || {};
-  return meta.image_url || entry.image_url || "";
+  return entry.image_url || "";
 };
 
 // Calculate visible pages

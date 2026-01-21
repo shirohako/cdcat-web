@@ -151,8 +151,8 @@
                     >
                       <div class="entry-thumb">
                         <img
-                          v-if="entry.meta?.image_url"
-                          :src="entry.meta.image_url"
+                          v-if="entry.image_url"
+                          :src="entry.image_url"
                           :alt="entry.name"
                         />
                         <div v-else class="entry-fallback">
@@ -369,8 +369,8 @@ const entryData = computed(() => {
     release_date: entry.release_date,
     status: meta.platform || "",
     description: meta.description || "",
-    image_url: meta.image_url || "",
-    banner_url: meta.banner_url || meta.image_url || "",
+    image_url: entry.image_url || "",
+    banner_url: meta.banner_url || entry.image_url || "",
     views_count: entry.views_count || 0,
     favorites_count: entry.favorites_count || 0,
     works_count: entry.works_count || 0,

@@ -48,15 +48,7 @@
         <!-- Right Column - Sidebar -->
         <div class="lg:col-span-1 space-y-6">
           <!-- 显示所有艺术家 -->
-          <AlbumArtistCard
-            v-for="artist in artistsData"
-            :key="artist.id"
-            :name="artist.name"
-            :avatar="artist.avatar"
-            :since="artist.since"
-            :discography="artist.discography"
-            :credits-count="artist.creditsCount"
-          />
+          <AlbumArtistCard :artists="artistsData" />
 
           <AlbumStats :stats="stats" />
 
@@ -131,10 +123,8 @@ const artistsData = computed(() => {
   return workData.value.artists.map(artist => ({
     id: artist.id,
     name: artist.name || "",
+    displayName: artist.pivot?.display_name || artist.name || "",
     avatar: artist.image_url || "",
-    since: "Unknown", // API 中没有这个字段
-    discography: 0, // API 中没有这个字段
-    creditsCount: 0, // API 中没有这个字段
   }));
 });
 

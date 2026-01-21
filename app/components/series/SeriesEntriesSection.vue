@@ -46,18 +46,16 @@
 
               <!-- 条目信息 -->
               <div class="flex-1 min-w-0">
-                <div class="flex items-start justify-between gap-2 mb-1">
-                  <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
-                    {{ entry.name }}
-                  </h3>
-                  <span :class="['text-xs px-2 py-0.5 rounded-full border flex-shrink-0', getEntryTypeColor(entry.type)]">
-                    {{ getEntryTypeLabel(entry.type) }}
-                  </span>
-                </div>
-                <div class="flex items-center gap-3 text-xs text-gray-600">
-                  <span class="flex items-center gap-1">
+                <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+                  {{ entry.name }}
+                </h3>
+                <div class="flex items-center justify-between gap-2">
+                  <span class="flex items-center gap-1 text-xs text-gray-600">
                     <Disc3 class="w-3.5 h-3.5" />
                     {{ entry.works_count }} 专辑
+                  </span>
+                  <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
+                    {{ getEntryTypeLabel(entry.type) }}
                   </span>
                 </div>
               </div>
@@ -95,18 +93,16 @@
 
             <!-- 条目信息 -->
             <div class="flex-1 min-w-0">
-              <div class="flex items-start justify-between gap-2 mb-1">
-                <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
-                  {{ entry.name }}
-                </h3>
-                <span :class="['text-xs px-2 py-0.5 rounded-full border flex-shrink-0', getEntryTypeColor(entry.type)]">
-                  {{ getEntryTypeLabel(entry.type) }}
-                </span>
-              </div>
-              <div class="flex items-center gap-3 text-xs text-gray-600">
-                <span class="flex items-center gap-1">
+              <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+                {{ entry.name }}
+              </h3>
+              <div class="flex items-center justify-between gap-2">
+                <span class="flex items-center gap-1 text-xs text-gray-600">
                   <Disc3 class="w-3.5 h-3.5" />
                   {{ entry.works_count }} 专辑
+                </span>
+                <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
+                  {{ getEntryTypeLabel(entry.type) }}
                 </span>
               </div>
             </div>
@@ -138,18 +134,16 @@
 
           <!-- 条目信息 -->
           <div class="flex-1 min-w-0">
-            <div class="flex items-start justify-between gap-2 mb-1">
-              <h3 class="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
-                {{ entry.name }}
-              </h3>
-              <span :class="['text-xs px-2 py-0.5 rounded-full border flex-shrink-0', getEntryTypeColor(entry.type)]">
-                {{ getEntryTypeLabel(entry.type) }}
-              </span>
-            </div>
-            <div class="flex items-center gap-3 text-xs text-gray-600">
-              <span class="flex items-center gap-1">
+            <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
+              {{ entry.name }}
+            </h3>
+            <div class="flex items-center justify-between gap-2">
+              <span class="flex items-center gap-1 text-xs text-gray-600">
                 <Disc3 class="w-3.5 h-3.5" />
                 {{ entry.works_count }} 专辑
+              </span>
+              <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
+                {{ getEntryTypeLabel(entry.type) }}
               </span>
             </div>
           </div>

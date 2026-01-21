@@ -121,15 +121,28 @@
       </div>
 
       <!-- 操作按钮 -->
-      <div class="mt-8">
+      <div class="mt-8 flex gap-3">
         <button
           type="submit"
-          class="btn btn-primary w-full"
+          class="btn btn-primary flex-1"
           :disabled="isSubmitting"
         >
           <span v-if="isSubmitting" class="loading loading-spinner loading-sm"></span>
           <span v-else>{{ isEditMode ? 'Update Artist' : 'Create Artist' }}</span>
         </button>
+        <button
+          type="button"
+          class="btn btn-outline"
+          @click="togglePreview"
+        >
+          Preview JSON
+        </button>
+      </div>
+
+      <!-- JSON 预览区域 -->
+      <div v-if="showPreview" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-3 mt-6">
+        <h3 class="text-lg font-semibold text-gray-900">Preview JSON Data</h3>
+        <div class="rounded-lg border border-blue-100 bg-gray-900 text-green-400 p-4 text-sm font-mono whitespace-pre-wrap overflow-auto max-h-96">{{ previewJson }}</div>
       </div>
     </form>
   </div>
@@ -210,6 +223,7 @@ const isSubmitting = ref(false);
 const submitError = ref('');
 const submitSuccess = ref(false);
 const imageError = ref(false);
+const showPreview = ref(false);
 
 // 监听图片 URL 变化，重置错误状态
 watch(() => formData.value.image_url, () => {
@@ -237,6 +251,40 @@ const validateForm = () => {
   return isValid;
 };
 
+// 准备提交数据
+const getSubmitPayload = () => {
+  const payload = {
+    name: formData.value.name.trim(),
+    type: formData.value.type,
+  };
+
+  // 如果是编辑模式，添加 artist ID
+  if (formData.value.artist_id) {
+    payload.id = formData.value.artist_id;
+  }
+
+  // 添加可选字段
+  if (formData.value.region) {
+    payload.region = formData.value.region.trim();
+  }
+  if (formData.value.image_url) {
+    payload.image_url = formData.value.image_url.trim();
+  }
+  if (formData.value.bio) {
+    payload.bio = formData.value.bio.trim();
+  }
+
+  return payload;
+};
+
+// 预览 JSON
+const previewJson = computed(() => JSON.stringify(getSubmitPayload(), null, 2));
+
+// 切换预览
+const togglePreview = () => {
+  showPreview.value = !showPreview.value;
+};
+
 // 提交表单
 const handleSubmit = async () => {
   // 重置提示
@@ -251,27 +299,10 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    // 准备提交数据
-    const payload = {
-      name: formData.value.name.trim(),
-      type: formData.value.type,
-    };
-
-    // 如果是编辑模式，添加 artist ID
-    if (formData.value.artist_id) {
-      payload.id = formData.value.artist_id;
-    }
-
-    // 添加可选字段
-    if (formData.value.region) {
-      payload.region = formData.value.region.trim();
-    }
-    if (formData.value.image_url) {
-      payload.image_url = formData.value.image_url.trim();
-    }
-    if (formData.value.bio) {
-      payload.bio = formData.value.bio.trim();
-    }
+    // 准备提交数据 - 使用 FormData
+    const payload = getSubmitPayload();
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('payload', JSON.stringify(payload));
 
     // 根据模式发送不同的请求
     const { $api } = useNuxtApp();
@@ -281,18 +312,19 @@ const handleSubmit = async () => {
       // 更新艺术家 - PUT 请求
       response = await $api(`/v1/artists/${props.artistId}`, {
         method: 'PUT',
-        body: payload,
+        body: formDataToSubmit,
       });
     } else {
       // 创建艺术家 - POST 请求
       response = await $api('/v1/artists', {
         method: 'POST',
-        body: payload,
+        body: formDataToSubmit,
       });
     }
 
     // 显示成功提示
     submitSuccess.value = true;
+    showPreview.value = false;
 
     // 1.5 秒后跳转到艺术家详情页
     setTimeout(() => {

@@ -27,20 +27,20 @@
           style="opacity: 0.94; background-color: rgba(198, 175, 175, 0.3)"
         >
           <div class="flex-1">
-            <h1 class="text-3xl md:text-5xl font-bold mb-2 md:mb-3 text-gray-900">
+            <h1 class="text-xl md:text-3xl font-bold mb-2 md:mb-3 text-gray-900 leading-snug break-words">
               {{ albumData.title }}
             </h1>
-            <p class="text-lg md:text-xl text-gray-700 mb-4 md:mb-6">
-              <template v-for="(artist, index) in albumData.artists" :key="artist.id">
-                <NuxtLink
-                  :to="`/artists/${artist.id}`"
-                  class="hover:underline hover:text-gray-900 transition-colors"
-                >
-                  {{ artist.pivot?.display_name || artist.name }}
-                </NuxtLink>
-                <span v-if="index < albumData.artists.length - 1">, </span>
-              </template>
-            </p>
+            <div class="flex flex-wrap gap-3 text-sm md:text-base text-gray-700 mb-4 md:mb-6">
+              <NuxtLink
+                v-for="artist in albumData.artists"
+                :key="artist.id"
+                :to="`/artists/${artist.id}`"
+                class="inline-flex items-center gap-1 hover:underline hover:text-gray-900 transition-colors"
+              >
+                <UserRound :size="14" class="text-gray-500" />
+                {{ artist.pivot?.display_name || artist.name }}
+              </NuxtLink>
+            </div>
 
             <div class="space-y-2 text-gray-800 text-sm md:text-base">
               <div class="flex items-center gap-2">
@@ -114,6 +114,7 @@ import {
   Hash,
   BadgeJapaneseYen,
   Edit,
+  UserRound,
 } from "lucide-vue-next";
 
 const { isAuthenticated } = useAuth()

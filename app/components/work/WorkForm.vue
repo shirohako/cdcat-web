@@ -22,414 +22,46 @@
 
     <form @submit.prevent="handleSubmit">
       <!-- Tab 1: Basic Information -->
-      <div v-show="currentTab === 'basic'" class="space-y-6">
-        <h2 class="text-xl font-bold text-gray-900">Basic Information</h2>
+      <WorkFormBasicTab
+        v-show="currentTab === 'basic'"
+        :form-data="formData"
+        :errors="errors"
+        @update:form-data="formData = $event"
+      />
 
-        <!-- 作品标题 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Title <span class="text-red-500">*</span></span>
-          </label>
-          <input
-            v-model="formData.title"
-            type="text"
-            placeholder="Enter work title"
-            class="input input-bordered w-full"
-            :class="{ 'input-error': errors.title }"
-            required
-          />
-          <label v-if="errors.title" class="label">
-            <span class="label-text-alt text-error">{{ errors.title }}</span>
-          </label>
-        </div>
+      <!-- Tab 2: Artists -->
+      <WorkFormArtistsTab
+        v-show="currentTab === 'artists'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
 
-        <!-- 作品类型 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Type <span class="text-red-500">*</span></span>
-          </label>
-          <select
-            v-model="formData.type"
-            class="select select-bordered w-full"
-            :class="{ 'select-error': errors.type }"
-            required
-          >
-            <option value="">Select type</option>
-            <option value="album">Album</option>
-            <option value="single">Single</option>
-            <option value="ep">EP</option>
-            <option value="compilation">Compilation</option>
-          </select>
-          <label v-if="errors.type" class="label">
-            <span class="label-text-alt text-error">{{ errors.type }}</span>
-          </label>
-        </div>
-
-        <!-- 目录编号 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Catalog Number</span>
-          </label>
-          <input
-            v-model="formData.catalog_number"
-            type="text"
-            placeholder="e.g., ABCD-1234"
-            class="input input-bordered w-full"
-          />
-          <label class="label">
-            <span class="label-text-alt text-gray-500">The catalog number for this work</span>
-          </label>
-        </div>
-
-        <!-- 发行日期 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Release Date</span>
-          </label>
-          <input
-            v-model="formData.release_date"
-            type="date"
-            class="input input-bordered w-full"
-          />
-          <label class="label">
-            <span class="label-text-alt text-gray-500">When was this work released</span>
-          </label>
-        </div>
-
-        <!-- 封面图片 URL -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Cover Image URL</span>
-          </label>
-          <input
-            v-model="formData.image_url"
-            type="url"
-            placeholder="https://example.com/cover.jpg"
-            class="input input-bordered w-full"
-          />
-          <label class="label">
-            <span class="label-text-alt text-gray-500">URL to the work's cover image</span>
-          </label>
-          <!-- 封面图片预览 -->
-          <div v-if="formData.image_url" class="mt-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Cover Preview:</p>
-            <div class="flex items-center justify-center w-48 h-48 rounded-lg overflow-hidden border border-gray-200">
-              <img
-                :src="formData.image_url"
-                alt="Cover Preview"
-                class="w-full h-full object-cover"
-                @error="imageError = true"
-              />
-            </div>
-            <p v-if="imageError" class="text-xs text-error mt-1">Failed to load image</p>
-          </div>
-        </div>
-
-        <!-- 横幅图片 URL -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Banner Image URL</span>
-          </label>
-          <input
-            v-model="formData.banner_url"
-            type="url"
-            placeholder="https://example.com/banner.jpg"
-            class="input input-bordered w-full"
-          />
-          <label class="label">
-            <span class="label-text-alt text-gray-500">URL to the work's banner image (optional, used for background)</span>
-          </label>
-          <!-- 横幅图片预览 -->
-          <div v-if="formData.banner_url" class="mt-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">Banner Preview:</p>
-            <div class="flex items-center justify-center w-full h-32 rounded-lg overflow-hidden border border-gray-200">
-              <img
-                :src="formData.banner_url"
-                alt="Banner Preview"
-                class="w-full h-full object-cover"
-                @error="bannerError = true"
-              />
-            </div>
-            <p v-if="bannerError" class="text-xs text-error mt-1">Failed to load banner</p>
-          </div>
-        </div>
-
-        <!-- 简介 -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Description</span>
-          </label>
-          <textarea
-            v-model="formData.description"
-            class="textarea textarea-bordered w-full resize-none"
-            rows="5"
-            placeholder="Brief description about the work..."
-          ></textarea>
-          <label class="label">
-            <span class="label-text-alt text-gray-500">Optional description or notes about this work</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Tab 2: Discs & Tracks -->
-      <div v-show="currentTab === 'tracks'" class="space-y-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Discs & Tracks</h2>
-          <button type="button" class="btn btn-sm btn-primary" @click="addDisc">
-            <Plus :size="16" />
-            Add Disc
-          </button>
-        </div>
-
-        <div v-if="formData.structure.length === 0" class="text-center py-8 text-gray-500">
-          No discs added yet. Click "Add Disc" to start.
-        </div>
-
-        <!-- Disc List -->
-        <div v-for="(disc, discIndex) in formData.structure" :key="disc.id" class="border border-gray-200 rounded-lg p-4 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-semibold text-lg">Disc {{ discIndex + 1 }}</h3>
-            <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeDisc(discIndex)">
-              <Trash2 :size="16" />
-              Remove Disc
-            </button>
-          </div>
-
-          <!-- Disc Title -->
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-semibold">Disc Title (Optional)</span>
-            </label>
-            <input
-              v-model="disc.disc_title"
-              type="text"
-              placeholder="e.g., Main Album, Bonus Disc"
-              class="input input-bordered input-sm w-full"
-            />
-          </div>
-
-          <!-- Tracks -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="font-medium">Tracks</span>
-              <button type="button" class="btn btn-xs btn-outline" @click="addTrack(discIndex)">
-                <Plus :size="14" />
-                Add Track
-              </button>
-            </div>
-
-            <div v-if="disc.songs.length === 0" class="text-sm text-gray-500 py-4 text-center">
-              No tracks yet. Click "Add Track" to add.
-            </div>
-
-            <div v-for="(song, songIndex) in disc.songs" :key="song.id" class="bg-gray-50 rounded p-3 space-y-2">
-              <div class="flex items-start gap-2">
-                <span class="text-sm font-medium text-gray-600 mt-2">{{ songIndex + 1 }}.</span>
-                <div class="flex-1 space-y-2">
-                  <input
-                    v-model="song.title"
-                    type="text"
-                    placeholder="Track title"
-                    class="input input-bordered input-sm w-full"
-                  />
-                  <div class="grid grid-cols-2 gap-2">
-                    <input
-                      v-model="song.duration"
-                      type="text"
-                      placeholder="Duration (e.g., 3:45)"
-                      class="input input-bordered input-sm w-full"
-                    />
-                    <input
-                      v-model="song.composer"
-                      type="text"
-                      placeholder="Composer (optional)"
-                      class="input input-bordered input-sm w-full"
-                    />
-                  </div>
-                </div>
-                <button type="button" class="btn btn-xs btn-ghost text-error" @click="removeTrack(discIndex, songIndex)">
-                  <X :size="16" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tab 3: Artists -->
-      <div v-show="currentTab === 'artists'" class="space-y-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Associated Artists</h2>
-          <button type="button" class="btn btn-sm btn-primary" @click="addArtist">
-            <Plus :size="16" />
-            Add Artist
-          </button>
-        </div>
-
-        <div v-if="formData.artists.length === 0" class="text-center py-8 text-gray-500">
-          No artists associated yet. Click "Add Artist" to start.
-        </div>
-
-        <div v-for="(artist, index) in formData.artists" :key="artist.id" class="border border-gray-200 rounded-lg p-4">
-          <div class="form-control">
-            <label class="label">
-              <span class="label-text font-semibold">Artist ID</span>
-            </label>
-            <div class="flex items-center gap-2">
-              <input
-                v-model="artist.artist_id"
-                type="text"
-                placeholder="Enter artist ID"
-                class="input input-bordered input-sm flex-1"
-              />
-              <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeArtist(index)">
-                <Trash2 :size="16" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Tab 3: Discs & Tracks -->
+      <WorkFormTracksTab
+        v-show="currentTab === 'tracks'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
 
       <!-- Tab 4: Credits -->
-      <div v-show="currentTab === 'credits'" class="space-y-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-900">Credits</h2>
-          <button type="button" class="btn btn-sm btn-primary" @click="addCredit">
-            <Plus :size="16" />
-            Add Credit
-          </button>
-        </div>
-
-        <div v-if="formData.credits.length === 0" class="text-center py-8 text-gray-500">
-          No credits added yet. Click "Add Credit" to start.
-        </div>
-
-        <div v-for="(credit, index) in formData.credits" :key="credit.id" class="border border-gray-200 rounded-lg p-4">
-          <div class="flex items-start gap-4">
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Name</span>
-                </label>
-                <input
-                  v-model="credit.name"
-                  type="text"
-                  placeholder="Person or artist name"
-                  class="input input-bordered input-sm w-full"
-                />
-              </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Role</span>
-                </label>
-                <input
-                  v-model="credit.role"
-                  type="text"
-                  placeholder="e.g., Vocal, Guitar, Mix"
-                  class="input input-bordered input-sm w-full"
-                />
-              </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Track (Optional)</span>
-                </label>
-                <input
-                  v-model="credit.track"
-                  type="text"
-                  placeholder="Specific track or leave blank for all"
-                  class="input input-bordered input-sm w-full"
-                />
-              </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeCredit(index)">
-              <Trash2 :size="16" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <WorkFormCreditsTab
+        v-show="currentTab === 'credits'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
 
       <!-- Tab 5: Links -->
-      <div v-show="currentTab === 'links'" class="space-y-6">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-bold text-gray-900">External Links</h2>
-          <button type="button" class="btn btn-sm btn-primary" @click="addLink">
-            <Plus :size="16" />
-            Add Link
-          </button>
-        </div>
-
-        <div v-if="formData.links.length === 0" class="text-center py-8 text-gray-500">
-          No links added yet. Click "Add Link" to start.
-        </div>
-
-        <div v-for="(link, index) in formData.links" :key="link.id" class="border border-gray-200 rounded-lg p-4">
-          <div class="flex items-start gap-4">
-            <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">Platform</span>
-                </label>
-                <select v-model="link.platform" class="select select-bordered select-sm w-full">
-                  <option value="spotify">Spotify</option>
-                  <option value="apple_music">Apple Music</option>
-                  <option value="youtube">YouTube</option>
-                  <option value="bandcamp">Bandcamp</option>
-                  <option value="soundcloud">SoundCloud</option>
-                  <option value="official_site">Official Site</option>
-                  <option value="twitter">Twitter</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-semibold">URL</span>
-                </label>
-                <input
-                  v-model="link.url"
-                  type="url"
-                  placeholder="https://..."
-                  class="input input-bordered input-sm w-full"
-                />
-              </div>
-            </div>
-            <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeLink(index)">
-              <Trash2 :size="16" />
-            </button>
-          </div>
-        </div>
-      </div>
+      <WorkFormLinksTab
+        v-show="currentTab === 'links'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
 
       <!-- Tab 6: Preview JSON -->
-      <div v-show="currentTab === 'preview'" class="space-y-6">
-        <h2 class="text-xl font-bold text-gray-900 mb-4">Preview JSON Data</h2>
-
-        <!-- 完整数据预览 -->
-        <div class="space-y-4">
-          <div>
-            <h3 class="text-lg font-semibold mb-2">Complete Payload</h3>
-            <div class="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto max-h-96 font-mono text-sm">
-              <pre>{{ JSON.stringify(getSubmitData(), null, 2) }}</pre>
-            </div>
-          </div>
-
-          <!-- 分开显示 Structure 和 Songs -->
-          <div v-if="formData.structure.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 class="text-lg font-semibold mb-2">Structure (Discs)</h3>
-              <div class="bg-gray-900 text-blue-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">
-                <pre>{{ JSON.stringify(getSubmitData().structure, null, 2) }}</pre>
-              </div>
-            </div>
-
-            <div>
-              <h3 class="text-lg font-semibold mb-2">Songs (Tracks)</h3>
-              <div class="bg-gray-900 text-yellow-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">
-                <pre>{{ JSON.stringify(getSubmitData().songs, null, 2) }}</pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <WorkFormPreviewTab
+        v-show="currentTab === 'preview'"
+        :submit-data="getSubmitData()"
+      />
 
       <!-- 错误提示 -->
       <div v-if="submitError" class="alert alert-error mt-6">
@@ -470,8 +102,6 @@
 </template>
 
 <script setup>
-import { Plus, Trash2, X } from 'lucide-vue-next';
-
 const props = defineProps({
   initialData: {
     type: Object,
@@ -515,7 +145,7 @@ const isEditMode = computed(() => !!props.workId);
 // 转换后端数据到表单格式
 const transformBackendData = (data) => {
   const transformed = {
-    work_id: data.id, // 保存原始 work ID
+    work_id: data.id,
     title: data.title || '',
     type: data.type || '',
     catalog_number: data.catalog_number || '',
@@ -532,24 +162,22 @@ const transformBackendData = (data) => {
   // 处理 structure - 合并 disc 结构和 songs
   if (data.structure && Array.isArray(data.structure)) {
     transformed.structure = data.structure.map((disc, index) => {
-      // 找到属于这个碟片的所有歌曲
       const discSongs = data.songs
         ? data.songs
             .filter(song => song.disc_number === disc.disc_number)
             .sort((a, b) => a.track_number - b.track_number)
             .map((song, songIndex) => ({
               id: `track-${song.id || songIndex}`,
-              song_id: song.id, // 保存原始 song ID
+              song_id: song.id,
               track_number: song.track_number,
               title: song.title || '',
               duration: song.duration || '',
-              composer: song.composer || '',
             }))
         : [];
 
       return {
         id: `disc-${disc.disc_number || index}`,
-        structure_id: disc.id, // 保存原始 structure ID
+        structure_id: disc.id,
         disc_number: disc.disc_number,
         disc_title: disc.title || '',
         songs: discSongs,
@@ -569,14 +197,14 @@ const transformBackendData = (data) => {
   if (data.credits && Array.isArray(data.credits)) {
     transformed.credits = data.credits.map((credit, index) => ({
       id: `credit-${credit.id || index}`,
-      credit_id: credit.id, // 保存原始 credit ID
+      credit_id: credit.id,
       name: credit.name || '',
       role: credit.role || '',
       track: credit.track || '',
     }));
   }
 
-  // 处理 links - 暂时为空
+  // 处理 links
   if (data.links && Array.isArray(data.links)) {
     transformed.links = data.links;
   }
@@ -640,100 +268,6 @@ const errors = ref({
 const isSubmitting = ref(false);
 const submitError = ref('');
 const submitSuccess = ref(false);
-const imageError = ref(false);
-const bannerError = ref(false);
-
-// 监听图片 URL 变化
-watch(() => formData.value.image_url, () => {
-  imageError.value = false;
-});
-
-watch(() => formData.value.banner_url, () => {
-  bannerError.value = false;
-});
-
-// Disc 管理
-let discIdCounter = 0;
-const addDisc = () => {
-  formData.value.structure.push({
-    id: `disc-${discIdCounter++}`,
-    disc_number: formData.value.structure.length + 1,
-    disc_title: '',
-    songs: [],
-  });
-};
-
-const removeDisc = (index) => {
-  formData.value.structure.splice(index, 1);
-  // 重新编号
-  formData.value.structure.forEach((disc, i) => {
-    disc.disc_number = i + 1;
-  });
-};
-
-// Track 管理
-let trackIdCounter = 0;
-const addTrack = (discIndex) => {
-  const disc = formData.value.structure[discIndex];
-  disc.songs.push({
-    id: `track-${trackIdCounter++}`,
-    track_number: disc.songs.length + 1,
-    title: '',
-    duration: '',
-    composer: '',
-  });
-};
-
-const removeTrack = (discIndex, trackIndex) => {
-  const disc = formData.value.structure[discIndex];
-  disc.songs.splice(trackIndex, 1);
-  // 重新编号
-  disc.songs.forEach((song, i) => {
-    song.track_number = i + 1;
-  });
-};
-
-// Artist 管理
-let artistIdCounter = 0;
-const addArtist = () => {
-  formData.value.artists.push({
-    id: `artist-${artistIdCounter++}`,
-    artist_id: '',
-  });
-};
-
-const removeArtist = (index) => {
-  formData.value.artists.splice(index, 1);
-};
-
-// Credit 管理
-let creditIdCounter = 0;
-const addCredit = () => {
-  formData.value.credits.push({
-    id: `credit-${creditIdCounter++}`,
-    name: '',
-    role: '',
-    track: '',
-  });
-};
-
-const removeCredit = (index) => {
-  formData.value.credits.splice(index, 1);
-};
-
-// Link 管理
-let linkIdCounter = 0;
-const addLink = () => {
-  formData.value.links.push({
-    id: `link-${linkIdCounter++}`,
-    platform: 'official_site',
-    url: '',
-  });
-};
-
-const removeLink = (index) => {
-  formData.value.links.splice(index, 1);
-};
 
 // 验证表单
 const validateForm = () => {
@@ -791,20 +325,17 @@ const getSubmitData = () => {
 
   // 添加结构化数据 - 分开 structure 和 songs
   if (formData.value.structure.length > 0) {
-    // Structure: 只包含碟片信息
     payload.structure = formData.value.structure.map((disc, discIndex) => {
       const structureItem = {
         disc_number: discIndex + 1,
         disc_title: disc.disc_title || null,
       };
-      // 保留原有 ID（如果存在）
       if (disc.structure_id) {
         structureItem.id = disc.structure_id;
       }
       return structureItem;
     });
 
-    // Songs: 扁平化的歌曲列表
     payload.songs = formData.value.structure.flatMap((disc, discIndex) =>
       disc.songs.map((song, songIndex) => {
         const songItem = {
@@ -812,9 +343,7 @@ const getSubmitData = () => {
           track_number: songIndex + 1,
           title: song.title,
           duration: song.duration || null,
-          composer: song.composer || null,
         };
-        // 保留原有 ID（如果存在）
         if (song.song_id) {
           songItem.id = song.song_id;
         }
@@ -842,7 +371,6 @@ const getSubmitData = () => {
           role: c.role,
           track: c.track || null,
         };
-        // 保留原有 ID（如果存在）
         if (c.credit_id) {
           creditItem.id = c.credit_id;
         }
@@ -876,19 +404,23 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
+    // 准备提交数据 - 使用 FormData
     const payload = getSubmitData();
+    const formDataToSubmit = new FormData();
+    formDataToSubmit.append('payload', JSON.stringify(payload));
+
     const { $api } = useNuxtApp();
     let response;
 
     if (isEditMode.value) {
       response = await $api(`/v1/works/${props.workId}`, {
         method: 'PUT',
-        body: payload,
+        body: formDataToSubmit,
       });
     } else {
       response = await $api('/v1/works', {
         method: 'POST',
-        body: payload,
+        body: formDataToSubmit,
       });
     }
 

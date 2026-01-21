@@ -137,18 +137,23 @@ type WorkItem = {
   image_url?: string
   catalog_number?: string
   release_date?: string
+  group_id?: string
 }
 
-type WorkGroup = {
+type FranchiseGroup = {
   id: string
-  name: string
-  work_ids: number[]
+  order: number
+  meta: {
+    name: string
+    name_cn?: string
+    name_ja?: string
+  }
 }
 
 const props = withDefaults(defineProps<{
   works: WorkItem[]
   worksCount: number
-  groups?: WorkGroup[]
+  groups?: FranchiseGroup[]
   mode?: 'time' | 'group'
 }>(), {
   mode: 'time'
@@ -174,18 +179,31 @@ const worksByYear = computed(() => {
 
 const groupedWorks = computed(() => {
   if (!props.groups || props.groups.length === 0) return []
-  const workMap = new Map(props.works.map((work) => [work.id, work]))
-  return props.groups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    works: group.work_ids.map((id) => workMap.get(id)).filter(Boolean) as WorkItem[]
-  }))
+
+  // 根据 work 的 group_id 分组
+  const worksByGroupId = new Map<string, WorkItem[]>()
+  props.works.forEach((work) => {
+    if (work.group_id) {
+      if (!worksByGroupId.has(work.group_id)) {
+        worksByGroupId.set(work.group_id, [])
+      }
+      worksByGroupId.get(work.group_id)!.push(work)
+    }
+  })
+
+  // 按 groups 的 order 排序并返回
+  return props.groups
+    .filter((group) => worksByGroupId.has(group.id))
+    .sort((a, b) => a.order - b.order)
+    .map((group) => ({
+      id: group.id,
+      name: group.meta.name_cn || group.meta.name,
+      works: worksByGroupId.get(group.id) || []
+    }))
 })
 
 const ungroupedWorks = computed(() => {
-  if (!props.groups || props.groups.length === 0) return props.works
-  const groupedIds = new Set(props.groups.flatMap((group) => group.work_ids))
-  return props.works.filter((work) => !groupedIds.has(work.id))
+  return props.works.filter((work) => !work.group_id)
 })
 
 const formatDate = (dateString: string) => {
