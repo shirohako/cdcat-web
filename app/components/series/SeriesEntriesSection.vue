@@ -32,7 +32,7 @@
               class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
             >
               <!-- 条目封面 -->
-              <div class="w-full aspect-[4/5] rounded-lg overflow-hidden bg-gray-100">
+              <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
                 <img
                   v-if="entry.image_url"
                   :src="entry.image_url"
@@ -79,7 +79,7 @@
             class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
           >
             <!-- 条目封面 -->
-            <div class="w-full aspect-[4/5] rounded-lg overflow-hidden bg-gray-100">
+            <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
               <img
                 v-if="entry.image_url"
                 :src="entry.image_url"
@@ -120,7 +120,7 @@
           class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
         >
           <!-- 条目封面 -->
-          <div class="w-full aspect-[4/5] rounded-lg overflow-hidden bg-gray-100">
+          <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
             <img
               v-if="entry.image_url"
               :src="entry.image_url"
@@ -228,7 +228,7 @@ const getEntryTypeLabel = (type: string) => {
 <style scoped>
 .line-clamp-1 {
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

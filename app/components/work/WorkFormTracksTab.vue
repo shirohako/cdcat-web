@@ -28,11 +28,31 @@
           <span class="label-text font-semibold">Disc Title (Optional)</span>
         </label>
         <input
-          v-model="disc.disc_title"
+          v-model="disc.title"
           type="text"
           placeholder="e.g., Main Album, Bonus Disc"
           class="input input-bordered input-sm w-full"
         />
+      </div>
+
+      <!-- Disc Options -->
+      <div class="flex flex-wrap gap-4">
+        <label class="label cursor-pointer gap-2">
+          <input
+            v-model="disc.is_bonus"
+            type="checkbox"
+            class="checkbox checkbox-sm"
+          />
+          <span class="label-text">Bonus Disc</span>
+        </label>
+        <label class="label cursor-pointer gap-2">
+          <input
+            v-model="disc.is_counted"
+            type="checkbox"
+            class="checkbox checkbox-sm"
+          />
+          <span class="label-text">Count in Total</span>
+        </label>
       </div>
 
       <!-- Tracks -->
@@ -89,7 +109,9 @@ interface Song {
 interface Disc {
   id: string
   disc_number: number
-  disc_title: string
+  title: string
+  is_bonus: boolean
+  is_counted: boolean
   songs: Song[]
 }
 
@@ -110,12 +132,14 @@ let discIdCounter = 0
 let trackIdCounter = 0
 
 const addDisc = () => {
-  const newStructure = [
+  const newStructure: Disc[] = [
     ...props.formData.structure,
     {
       id: `disc-${discIdCounter++}`,
       disc_number: props.formData.structure.length + 1,
-      disc_title: '',
+      title: '',
+      is_bonus: false,
+      is_counted: true,
       songs: [],
     },
   ]

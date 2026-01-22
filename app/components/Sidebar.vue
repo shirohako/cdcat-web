@@ -4,7 +4,7 @@
       'fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40',
       'transition-all duration-300 ease-in-out',
       'flex flex-col',
-      isCollapsed ? 'w-16' : 'w-56',
+      isCollapsed ? 'w-16' : 'w-52',
       isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
     ]"
   >
@@ -30,12 +30,14 @@
 
     <!-- Navigation -->
     <nav class="flex-1 min-h-0 overflow-y-auto py-6">
-      <ul class="space-y-2 px-3">
+      <ul :class="['space-y-2', isCollapsed ? 'px-2' : 'px-3']">
         <li v-for="item in menuItems" :key="item.name">
           <NuxtLink
             :to="item.path"
             :class="[
-              'flex items-center gap-4 px-4 py-3 rounded-xl',
+              'flex items-center',
+              isCollapsed ? 'justify-center px-3 py-3' : 'gap-4 px-4 py-3',
+              'rounded-xl',
               'transition-all duration-200',
               'hover:bg-gray-100 group relative',
               isActive(item.path) ? 'bg-gray-900 text-white hover:bg-gray-800' : 'text-gray-700'

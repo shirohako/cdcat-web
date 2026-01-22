@@ -57,7 +57,17 @@
         @update:form-data="formData = $event"
       />
 
-      <!-- Tab 6: Preview JSON -->
+      <!-- Tab 6: JSON Editor -->
+      <WorkFormJsonTab
+        v-show="currentTab === 'json'"
+        :json-text="jsonDraft"
+        :error="jsonError"
+        :success="jsonSuccess"
+        @update:json-text="jsonDraft = $event"
+        @apply="applyJsonDraft"
+      />
+
+      <!-- Tab 7: Preview JSON -->
       <WorkFormPreviewTab
         v-show="currentTab === 'preview'"
         :submit-data="getSubmitData()"
@@ -134,6 +144,7 @@ const tabs = [
   { id: 'tracks', label: 'Discs & Tracks' },
   { id: 'credits', label: 'Credits' },
   { id: 'links', label: 'Links' },
+  { id: 'json', label: 'JSON Editor' },
   { id: 'preview', label: 'Preview' },
 ];
 
@@ -162,8 +173,8 @@ const transformBackendData = (data) => {
   // 处理 structure - 合并 disc 结构和 songs
   if (data.structure && Array.isArray(data.structure)) {
     transformed.structure = data.structure.map((disc, index) => {
-      const discSongs = data.songs
-        ? data.songs
+      const discSongs = (data.related_songs || data.songs)
+        ? (data.related_songs || data.songs)
             .filter(song => song.disc_number === disc.disc_number)
             .sort((a, b) => a.track_number - b.track_number)
             .map((song, songIndex) => ({
@@ -179,7 +190,9 @@ const transformBackendData = (data) => {
         id: `disc-${disc.disc_number || index}`,
         structure_id: disc.id,
         disc_number: disc.disc_number,
-        disc_title: disc.title || '',
+        title: disc.title || '',
+        is_bonus: disc.is_bonus ?? false,
+        is_counted: disc.is_counted ?? true,
         songs: discSongs,
       };
     });
@@ -235,6 +248,10 @@ const initFormData = () => {
 
 // 表单数据
 const formData = ref(initFormData());
+const jsonDraft = ref('');
+const jsonError = ref('');
+const jsonSuccess = ref('');
+const isApplyingJson = ref(false);
 
 // 监听 initialData 变化
 watch(() => props.initialData, (newData) => {
@@ -268,6 +285,7 @@ const errors = ref({
 const isSubmitting = ref(false);
 const submitError = ref('');
 const submitSuccess = ref(false);
+
 
 // 验证表单
 const validateForm = () => {
@@ -328,7 +346,9 @@ const getSubmitData = () => {
     payload.structure = formData.value.structure.map((disc, discIndex) => {
       const structureItem = {
         disc_number: discIndex + 1,
-        disc_title: disc.disc_title || null,
+        title: disc.title || null,
+        is_bonus: disc.is_bonus ?? false,
+        is_counted: disc.is_counted ?? true,
       };
       if (disc.structure_id) {
         structureItem.id = disc.structure_id;
@@ -336,7 +356,7 @@ const getSubmitData = () => {
       return structureItem;
     });
 
-    payload.songs = formData.value.structure.flatMap((disc, discIndex) =>
+    const relatedSongs = formData.value.structure.flatMap((disc, discIndex) =>
       disc.songs.map((song, songIndex) => {
         const songItem = {
           disc_number: discIndex + 1,
@@ -350,11 +370,12 @@ const getSubmitData = () => {
         return songItem;
       })
     );
+    payload.related_songs = relatedSongs;
   }
 
   // 添加艺术家关联
   if (formData.value.artists.length > 0) {
-    payload.artists = formData.value.artists
+    payload.related_artists = formData.value.artists
       .filter(a => a.artist_id)
       .map(a => ({
         artist_id: a.artist_id,
@@ -391,6 +412,174 @@ const getSubmitData = () => {
   return payload;
 };
 
+const syncJsonDraft = (clearSuccess = true) => {
+  jsonDraft.value = JSON.stringify(getSubmitData(), null, 2);
+  jsonError.value = '';
+  if (clearSuccess) {
+    jsonSuccess.value = '';
+  }
+};
+
+watch(formData, () => {
+  syncJsonDraft(!isApplyingJson.value);
+}, { deep: true, immediate: true });
+
+const validateJsonPayload = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return 'JSON must be an object.';
+  }
+  if (!payload.title || typeof payload.title !== 'string') {
+    return 'Field "title" is required.';
+  }
+  if (!payload.type || typeof payload.type !== 'string') {
+    return 'Field "type" is required.';
+  }
+  if (payload.structure && !Array.isArray(payload.structure)) {
+    return 'Field "structure" must be an array.';
+  }
+  if (payload.songs && !Array.isArray(payload.songs)) {
+    return 'Field "songs" must be an array.';
+  }
+  if (payload.related_songs && !Array.isArray(payload.related_songs)) {
+    return 'Field "related_songs" must be an array.';
+  }
+  if (payload.artists && !Array.isArray(payload.artists)) {
+    return 'Field "artists" must be an array.';
+  }
+  if (payload.related_artists && !Array.isArray(payload.related_artists)) {
+    return 'Field "related_artists" must be an array.';
+  }
+  if (payload.credits && !Array.isArray(payload.credits)) {
+    return 'Field "credits" must be an array.';
+  }
+  if (payload.links && !Array.isArray(payload.links)) {
+    return 'Field "links" must be an array.';
+  }
+  return '';
+};
+
+const transformPayloadToFormData = (payload) => {
+  const structure = Array.isArray(payload.structure) ? payload.structure : [];
+  const songsSource = payload.related_songs ?? payload.songs;
+  const songs = Array.isArray(songsSource) ? songsSource : [];
+  const discNumberSet = new Set();
+  const normalizeNumber = (value, fallback) => {
+    const num = Number(value);
+    return Number.isFinite(num) && num > 0 ? num : fallback;
+  };
+
+  structure.forEach((disc, index) => {
+    const discNumber = normalizeNumber(disc.disc_number ?? disc.discNumber, index + 1);
+    discNumberSet.add(discNumber);
+  });
+
+  songs.forEach((song) => {
+    const discNumber = normalizeNumber(song.disc_number, 1);
+    discNumberSet.add(discNumber);
+  });
+
+  const discNumbers = Array.from(discNumberSet).sort((a, b) => a - b);
+  const structureMap = new Map();
+  structure.forEach((disc, index) => {
+    const discNumber = normalizeNumber(disc.disc_number ?? disc.discNumber, index + 1);
+    structureMap.set(discNumber, disc);
+  });
+
+  const mappedStructure = discNumbers.map((discNumber, discIndex) => {
+    const disc = structureMap.get(discNumber) || {};
+    const discSongs = songs
+      .filter((song) => normalizeNumber(song.disc_number, 1) === discNumber)
+      .sort((a, b) => normalizeNumber(a.track_number, 0) - normalizeNumber(b.track_number, 0))
+      .map((song, songIndex) => ({
+        id: `track-${song.id ?? `${discNumber}-${songIndex}`}`,
+        song_id: song.id,
+        track_number: normalizeNumber(song.track_number, songIndex + 1),
+        title: song.title ? String(song.title) : '',
+        duration: song.duration ? String(song.duration) : '',
+      }));
+
+    return {
+      id: `disc-${disc.disc_number ?? discNumber ?? discIndex + 1}`,
+      structure_id: disc.id,
+      disc_number: discNumber || discIndex + 1,
+      title: disc.title || '',
+      is_bonus: disc.is_bonus ?? false,
+      is_counted: disc.is_counted ?? true,
+      songs: discSongs,
+    };
+  });
+
+  return {
+    work_id: payload.id ?? null,
+    title: payload.title ? String(payload.title) : '',
+    type: payload.type ? String(payload.type) : '',
+    catalog_number: payload.catalog_number ? String(payload.catalog_number) : '',
+    release_date: payload.release_date ? String(payload.release_date) : '',
+    image_url: payload.image_url ? String(payload.image_url) : '',
+    banner_url: payload.banner_url ? String(payload.banner_url) : '',
+    description: payload.description ? String(payload.description) : '',
+    structure: mappedStructure,
+    artists: Array.isArray(payload.related_artists ?? payload.artists)
+      ? (payload.related_artists ?? payload.artists).map((artist, index) => ({
+          id: `artist-${artist.artist_id || artist.id || index}`,
+          artist_id: String(artist.artist_id || artist.id || ''),
+        }))
+      : [],
+    credits: Array.isArray(payload.credits)
+      ? payload.credits.map((credit, index) => ({
+        id: `credit-${credit.id || index}`,
+        credit_id: credit.id,
+        name: credit.name || '',
+        role: credit.role || '',
+        track: credit.track || '',
+      }))
+      : [],
+    links: Array.isArray(payload.links)
+      ? payload.links.map((link) => ({
+        platform: link.platform || '',
+        url: link.url || '',
+      }))
+      : [],
+  };
+};
+
+const applyJsonDraft = () => {
+  jsonError.value = '';
+  jsonSuccess.value = '';
+
+  let payload;
+  try {
+    payload = JSON.parse(jsonDraft.value || '{}');
+  } catch (error) {
+    jsonError.value = `Invalid JSON: ${error.message}`;
+    return;
+  }
+
+  if (payload && typeof payload === 'object' && payload.payload) {
+    try {
+      payload = typeof payload.payload === 'string'
+        ? JSON.parse(payload.payload)
+        : payload.payload;
+    } catch (error) {
+      jsonError.value = `Invalid payload field: ${error.message}`;
+      return;
+    }
+  }
+
+  const validationError = validateJsonPayload(payload);
+  if (validationError) {
+    jsonError.value = validationError;
+    return;
+  }
+
+  isApplyingJson.value = true;
+  formData.value = transformPayloadToFormData(payload);
+  jsonSuccess.value = 'JSON applied to form data.';
+  nextTick(() => {
+    isApplyingJson.value = false;
+  });
+};
+
 // 提交表单
 const handleSubmit = async () => {
   submitError.value = '';
@@ -416,11 +605,13 @@ const handleSubmit = async () => {
       response = await $api(`/v1/works/${props.workId}`, {
         method: 'PUT',
         body: formDataToSubmit,
+        headers: { Accept: 'application/json' },
       });
     } else {
       response = await $api('/v1/works', {
         method: 'POST',
         body: formDataToSubmit,
+        headers: { Accept: 'application/json' },
       });
     }
 

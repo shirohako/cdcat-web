@@ -27,7 +27,7 @@
           style="opacity: 0.94; background-color: rgba(198, 175, 175, 0.3)"
         >
           <div class="flex-1">
-            <h1 class="text-xl md:text-3xl font-bold mb-2 md:mb-3 text-gray-900 leading-snug break-words">
+            <h1 class="text-xl md:text-3xl font-bold mb-2 md:mb-3 text-gray-900 leading-snug wrap-break-word">
               {{ albumData.title }}
             </h1>
             <div class="flex flex-wrap gap-3 text-sm md:text-base text-gray-700 mb-4 md:mb-6">

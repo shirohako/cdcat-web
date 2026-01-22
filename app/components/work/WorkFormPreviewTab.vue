@@ -21,9 +21,9 @@
         </div>
 
         <div>
-          <h3 class="text-lg font-semibold mb-2">Songs (Tracks)</h3>
+          <h3 class="text-lg font-semibold mb-2">Related Songs (Tracks)</h3>
           <div class="bg-gray-900 text-yellow-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">
-            <pre>{{ JSON.stringify(submitData.songs, null, 2) }}</pre>
+            <pre>{{ JSON.stringify(submitData.related_songs, null, 2) }}</pre>
           </div>
         </div>
       </div>
