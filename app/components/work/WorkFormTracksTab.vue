@@ -35,6 +35,32 @@
         />
       </div>
 
+      <!-- Catalog Number & Length -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Catalog Number (Optional)</span>
+          </label>
+          <input
+            v-model="disc.catalog_number"
+            type="text"
+            placeholder="e.g., ABCD-1234"
+            class="input input-bordered input-sm w-full"
+          />
+        </div>
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">Length (Optional)</span>
+          </label>
+          <input
+            v-model="disc.length"
+            type="text"
+            placeholder="e.g., 45:30"
+            class="input input-bordered input-sm w-full"
+          />
+        </div>
+      </div>
+
       <!-- Disc Options -->
       <div class="flex flex-wrap gap-4">
         <label class="label cursor-pointer gap-2">
@@ -109,7 +135,9 @@ interface Song {
 interface Disc {
   id: string
   disc_number: number
-  title: string
+  title: string | null
+  catalog_number: string | null
+  length: string | null
   is_bonus: boolean
   is_counted: boolean
   songs: Song[]
@@ -132,16 +160,18 @@ let discIdCounter = 0
 let trackIdCounter = 0
 
 const addDisc = () => {
-  const newStructure: Disc[] = [
+  const newStructure = [
     ...props.formData.structure,
     {
       id: `disc-${discIdCounter++}`,
       disc_number: props.formData.structure.length + 1,
-      title: '',
+      title: null,
+      catalog_number: null,
+      length: null,
       is_bonus: false,
       is_counted: true,
       songs: [],
-    },
+    } as Disc,
   ]
   emit('update:formData', { ...props.formData, structure: newStructure })
 }
@@ -157,12 +187,13 @@ const removeDisc = (index: number) => {
 
 const addTrack = (discIndex: number) => {
   const newStructure = [...props.formData.structure]
-  const disc = { ...newStructure[discIndex] }
+  const disc = { ...newStructure[discIndex] } as Disc
+  const currentSongs = disc.songs || []
   disc.songs = [
-    ...disc.songs,
+    ...currentSongs,
     {
       id: `track-${trackIdCounter++}`,
-      track_number: disc.songs.length + 1,
+      track_number: currentSongs.length + 1,
       title: '',
       duration: '',
     },
@@ -173,8 +204,8 @@ const addTrack = (discIndex: number) => {
 
 const removeTrack = (discIndex: number, trackIndex: number) => {
   const newStructure = [...props.formData.structure]
-  const disc = { ...newStructure[discIndex] }
-  disc.songs = disc.songs.filter((_, i) => i !== trackIndex)
+  const disc = { ...newStructure[discIndex] } as Disc
+  disc.songs = (disc.songs || []).filter((_, i) => i !== trackIndex)
   // 重新编号
   disc.songs.forEach((song, i) => {
     song.track_number = i + 1
