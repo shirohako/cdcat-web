@@ -10,10 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/eslint": "1.10.0",
-    "@nuxt/icon": "2.1.0",
-    "@nuxt/image": "2.0.0",
-    "@nuxtjs/i18n": "10.2.1",
+    "@nuxt/eslint": "^1.12.1",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxt/image": "^2.0.0",
+    "@nuxtjs/i18n": "^10.2.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",
     "@types/dompurify": "^3.2.0",
@@ -22,14 +22,14 @@
     "eslint": "^9.39.2",
     "lucide-vue-next": "^0.555.0",
     "markdown-it": "^14.1.0",
-    "nuxt": "^4.2.2",
+    "nuxt": "^4.3.0",
     "tailwindcss": "^4.1.18",
-    "vue": "^3.5.25",
+    "vue": "^3.5.27",
     "vue-router": "^4.6.4"
   },
   "packageManager": "pnpm@10.18.2+sha512.9fb969fa749b3ade6035e0f109f0b8a60b5d08a1a87fdf72e337da90dcc93336e2280ca4e44f2358a649b83c17959e9993e777c2080879f3801e6f0d999ad3dd",
   "devDependencies": {
-    "@types/node": "^24.10.4",
+    "@types/node": "^24.10.9",
     "daisyui": "^5.5.14"
   }
 }
