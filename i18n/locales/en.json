@@ -9,10 +9,11 @@
   },
   "user": {
     "profile": "Profile",
+    "revisions": "Revisions",
     "account": "Account Settings",
     "help": "Help Center",
     "logout": "Sign Out"
-    },
+  },
   "common": {
     "search": "Search..."
   }

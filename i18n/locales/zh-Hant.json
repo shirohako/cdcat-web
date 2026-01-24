@@ -9,6 +9,7 @@
   },
   "user": {
     "profile": "個人資料",
+    "revisions": "修訂列表",
     "account": "帳戶設定",
     "help": "幫助中心",
     "logout": "登出"

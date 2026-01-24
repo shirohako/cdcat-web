@@ -9,6 +9,7 @@
   },
   "user": {
     "profile": "プロフィール",
+    "revisions": "リビジョン一覧",
     "account": "アカウント設定",
     "help": "ヘルプセンター",
     "logout": "ログアウト"

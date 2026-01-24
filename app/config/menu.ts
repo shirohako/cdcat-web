@@ -48,6 +48,7 @@ export const menuItems: MenuItem[] = [
 
 export const userMenuItems = [
   { name: 'profile', i18nKey: 'user.profile', icon: 'lucide:user', path: '/profile' },
+  { name: 'revisions', i18nKey: 'user.revisions', icon: 'lucide:git-pull-request', path: '/revisions' },
   { name: 'account', i18nKey: 'user.account', icon: 'lucide:settings', path: '/account' },
   { name: 'help', i18nKey: 'user.help', icon: 'lucide:help-circle', path: '/help' }
 ]

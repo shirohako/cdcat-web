@@ -81,14 +81,6 @@
         <span>{{ submitError }}</span>
       </div>
 
-      <!-- 成功提示 -->
-      <div v-if="submitSuccess" class="alert alert-success mt-6">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ isEditMode ? 'Work updated successfully!' : 'Work created successfully!' }}</span>
-      </div>
-
       <!-- 操作按钮 -->
       <div class="mt-8 flex gap-3">
         <button
@@ -286,7 +278,6 @@ const errors = ref({
 // 提交状态
 const isSubmitting = ref(false);
 const submitError = ref('');
-const submitSuccess = ref(false);
 
 
 // 验证表单
@@ -589,7 +580,6 @@ const applyJsonDraft = () => {
 // 提交表单
 const handleSubmit = async () => {
   submitError.value = '';
-  submitSuccess.value = false;
 
   if (!validateForm()) {
     currentTab.value = 'basic';
@@ -599,42 +589,38 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
-    // 准备提交数据 - 使用 FormData
     const payload = getSubmitData();
-    const formDataToSubmit = new FormData();
-    formDataToSubmit.append('payload', JSON.stringify(payload));
-
     const { $api } = useNuxtApp();
-    let response;
 
-    if (isEditMode.value) {
-      response = await $api(`/v1/works/${props.workId}`, {
-        method: 'PUT',
-        body: formDataToSubmit,
-        headers: { Accept: 'application/json' },
-      });
-    } else {
-      response = await $api('/v1/works', {
-        method: 'POST',
-        body: formDataToSubmit,
-        headers: { Accept: 'application/json' },
-      });
+    // 构建 revision 请求数据
+    const revisionData = {
+      type: 'work',
+      action: isEditMode.value ? 'update' : 'create',
+      payload: JSON.stringify(payload),
+    };
+
+    // 如果是更新，添加 entity_id
+    if (isEditMode.value && props.workId) {
+      revisionData.entity_id = props.workId;
     }
 
-    submitSuccess.value = true;
+    await $api('/v1/revisions', {
+      method: 'POST',
+      body: revisionData,
+      headers: { Accept: 'application/json' },
+    });
 
-    setTimeout(() => {
-      const targetId = isEditMode.value ? props.workId : response.id;
-      if (targetId) {
-        router.push(`/works/${targetId}`);
-      } else {
-        router.push('/works');
-      }
-    }, 1500);
+    // 提交成功，跳转到成功页面
+    router.push({
+      path: '/works/submit-success',
+      query: {
+        action: isEditMode.value ? 'update' : 'create',
+      },
+    });
 
   } catch (error) {
-    console.error(`Failed to ${isEditMode.value ? 'update' : 'create'} work:`, error);
-    submitError.value = error.data?.message || error.message || `Failed to ${isEditMode.value ? 'update' : 'create'} work. Please try again.`;
+    console.error(`Failed to submit work ${isEditMode.value ? 'update' : 'creation'}:`, error);
+    submitError.value = error.data?.message || error.message || `Failed to submit. Please try again.`;
   } finally {
     isSubmitting.value = false;
   }

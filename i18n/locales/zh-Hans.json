@@ -9,6 +9,7 @@
   },
   "user": {
     "profile": "个人资料",
+    "revisions": "修订列表",
     "account": "账户设置",
     "help": "帮助中心",
     "logout": "退出登录"
