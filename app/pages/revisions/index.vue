@@ -39,13 +39,12 @@
             <table class="table w-full">
               <thead class="bg-gray-50">
                 <tr>
+                  <th class="text-left">ID</th>
                   <th class="text-left">Title</th>
                 <th class="text-left">Type</th>
-                <th class="text-left">Action</th>
                 <th class="text-left">Changes</th>
                 <th class="text-left">Submitter</th>
                 <th class="text-left">Status</th>
-                <th class="text-left">Created</th>
                 <th class="text-left">Detail</th>
                 <th class="text-left">Page</th>
               </tr>
@@ -56,22 +55,24 @@
                   :key="revision.id"
                   class="hover:bg-gray-50 cursor-pointer"
                 >
+                  <td class="text-sm text-gray-500 font-mono">
+                    {{ revision.id }}
+                  </td>
                   <td class="max-w-xs">
                     <div class="truncate font-medium" :title="revision.title">
                       {{ revision.title }}
+                    </div>
+                    <div class="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                      <span class="badge badge-sm" :class="getActionBadgeClass(revision.action)">
+                        {{ formatAction(revision.action) }}
+                      </span>
+                      <span class="text-gray-400">•</span>
+                      <span>{{ formatDate(revision.created_at) }}</span>
                     </div>
                   </td>
                   <td>
                     <span class="badge badge-outline badge-sm">
                       {{ formatType(revision.resource_type) }}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      class="badge badge-sm"
-                      :class="getActionBadgeClass(revision.action)"
-                    >
-                      {{ formatAction(revision.action) }}
                     </span>
                   </td>
                   <td>
@@ -95,9 +96,6 @@
                     >
                       {{ formatStatus(revision.status) }}
                     </span>
-                  </td>
-                  <td class="text-sm text-gray-500">
-                    {{ formatDate(revision.created_at) }}
                   </td>
                   <td class="text-sm">
                     <button
@@ -130,17 +128,18 @@
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-500">{{ formatType(revision.resource_type) }}</p>
+                  <p class="text-sm text-gray-500">#{{ revision.id }} · {{ formatType(revision.resource_type) }}</p>
                   <h2 class="font-semibold text-base leading-snug line-clamp-2" :title="revision.title">
                     {{ revision.title }}
                   </h2>
+                  <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                    <span class="badge badge-sm" :class="getActionBadgeClass(revision.action)">
+                      {{ formatAction(revision.action) }}
+                    </span>
+                    <span class="text-gray-400">•</span>
+                    <span>{{ formatDate(revision.created_at) }}</span>
+                  </div>
                 </div>
-                <span
-                  class="badge badge-sm whitespace-nowrap"
-                  :class="getActionBadgeClass(revision.action)"
-                >
-                  {{ formatAction(revision.action) }}
-                </span>
               </div>
 
               <div class="mt-3 flex items-center gap-3 text-sm">
@@ -165,7 +164,6 @@
                   <span class="font-medium">{{ revision.submitter?.name || 'Unknown' }}</span>
                 </div>
                 <div class="text-right">
-                  <p class="text-gray-500 text-xs">{{ formatDate(revision.created_at) }}</p>
                   <button
                     class="btn btn-primary btn-xs mt-1"
                     @click="goToDetail(revision.id)"
@@ -247,12 +245,20 @@ const currentPage = computed(() => {
   return page > 0 ? page : 1;
 });
 
+const { $api } = useNuxtApp();
+
 // 从 API 获取修订列表
-const { data: response, pending, error } = await useAPI('/v1/revisions', {
-  query: {
-    page: currentPage.value,
+const { data: response, pending, error } = await useAsyncData(
+  'revisions-list',
+  () => $api('/v1/revisions', {
+    query: {
+      page: currentPage.value,
+    },
+  }),
+  {
+    watch: [currentPage],
   },
-});
+);
 
 // 处理修订数据
 const revisionsData = computed(() => {
