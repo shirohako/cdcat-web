@@ -594,14 +594,14 @@ const handleSubmit = async () => {
 
     // 构建 revision 请求数据
     const revisionData = {
-      type: 'work',
+      resource_type: 'work',
       action: isEditMode.value ? 'update' : 'create',
       payload: JSON.stringify(payload),
     };
 
-    // 如果是更新，添加 entity_id
+    // 如果是更新，添加 resource_id
     if (isEditMode.value && props.workId) {
-      revisionData.entity_id = props.workId;
+      revisionData.resource_id = props.workId;
     }
 
     await $api('/v1/revisions', {

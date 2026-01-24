@@ -40,18 +40,19 @@
               <thead class="bg-gray-50">
                 <tr>
                   <th class="text-left">Title</th>
-                  <th class="text-left">Type</th>
-                  <th class="text-left">Action</th>
-                  <th class="text-left">Changes</th>
-                  <th class="text-left">Submitter</th>
-                  <th class="text-left">Status</th>
-                  <th class="text-left">Created</th>
-                  <th class="text-left">Detail</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="revision in revisionsData"
+                <th class="text-left">Type</th>
+                <th class="text-left">Action</th>
+                <th class="text-left">Changes</th>
+                <th class="text-left">Submitter</th>
+                <th class="text-left">Status</th>
+                <th class="text-left">Created</th>
+                <th class="text-left">Detail</th>
+                <th class="text-left">Page</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="revision in revisionsData"
                   :key="revision.id"
                   class="hover:bg-gray-50 cursor-pointer"
                 >
@@ -62,7 +63,7 @@
                   </td>
                   <td>
                     <span class="badge badge-outline badge-sm">
-                      {{ formatType(revision.revisionable_type) }}
+                      {{ formatType(revision.resource_type) }}
                     </span>
                   </td>
                   <td>
@@ -106,6 +107,15 @@
                       View
                     </button>
                   </td>
+                  <td class="text-sm">
+                    <button
+                      v-if="revision.resource_id"
+                      class="btn btn-secondary btn-xs"
+                      @click.stop="goToEntity(revision)"
+                    >
+                      Open
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -120,7 +130,7 @@
             >
               <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-500">{{ formatType(revision.revisionable_type) }}</p>
+                  <p class="text-sm text-gray-500">{{ formatType(revision.resource_type) }}</p>
                   <h2 class="font-semibold text-base leading-snug line-clamp-2" :title="revision.title">
                     {{ revision.title }}
                   </h2>
@@ -161,6 +171,13 @@
                     @click="goToDetail(revision.id)"
                   >
                     查看详情
+                  </button>
+                  <button
+                    v-if="revision.resource_id"
+                    class="btn btn-secondary btn-xs mt-1"
+                    @click="goToEntity(revision)"
+                  >
+                    查看实体
                   </button>
                 </div>
               </div>
@@ -366,5 +383,21 @@ const goToPage = (page) => {
 const goToDetail = (id) => {
   if (!id) return;
   router.push({ path: `/revisions/${id}` });
+};
+
+// 跳转到实体详情页
+const goToEntity = (revision) => {
+  if (!revision?.resource_id) return;
+  const type = revision.resource_type;
+  const id = revision.resource_id;
+  const routeMap = {
+    work: `/works/${id}`,
+    artist: `/artists/${id}`,
+    series: `/series/${id}`,
+    event: `/events/${id}`,
+    entry: `/entries/${id}`,
+  };
+  const target = routeMap[type] || `/revisions/${revision.id}`;
+  router.push({ path: target });
 };
 </script>
