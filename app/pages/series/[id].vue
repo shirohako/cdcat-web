@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Disc3, Film } from 'lucide-vue-next'
+import { Disc3, Film, Pencil } from 'lucide-vue-next'
 
 const route = useRoute()
 const seriesId = computed(() => Number(route.params.id))
@@ -126,6 +126,14 @@ const entryGroups = computed(() => {
                 </div>
               </div>
             </div>
+            <!-- 编辑按钮 -->
+            <NuxtLink
+              :to="`/contribute/series/${series.id}`"
+              class="btn btn-ghost btn-sm text-white border-white/30 hover:bg-white/20"
+            >
+              <Pencil class="w-4 h-4" />
+              编辑
+            </NuxtLink>
           </div>
         </div>
       </div>
