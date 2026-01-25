@@ -612,8 +612,9 @@ const handleSubmit = async () => {
 
     // 提交成功，跳转到成功页面
     router.push({
-      path: '/works/submit-success',
+      path: '/contribute/success',
       query: {
+        type: 'work',
         action: isEditMode.value ? 'update' : 'create',
       },
     });

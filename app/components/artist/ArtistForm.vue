@@ -112,14 +112,6 @@
         <span>{{ submitError }}</span>
       </div>
 
-      <!-- 成功提示 -->
-      <div v-if="submitSuccess" class="alert alert-success mt-6">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ isEditMode ? 'Artist updated successfully!' : 'Artist created successfully!' }}</span>
-      </div>
-
       <!-- 操作按钮 -->
       <div class="mt-8 flex gap-3">
         <button
@@ -128,7 +120,7 @@
           :disabled="isSubmitting"
         >
           <span v-if="isSubmitting" class="loading loading-spinner loading-sm"></span>
-          <span v-else>{{ isEditMode ? 'Update Artist' : 'Create Artist' }}</span>
+          <span v-else>{{ isEditMode ? 'Submit Update' : 'Submit' }}</span>
         </button>
         <button
           type="button"
@@ -221,7 +213,6 @@ const errors = ref({
 // 提交状态
 const isSubmitting = ref(false);
 const submitError = ref('');
-const submitSuccess = ref(false);
 const imageError = ref(false);
 const showPreview = ref(false);
 
@@ -289,7 +280,6 @@ const togglePreview = () => {
 const handleSubmit = async () => {
   // 重置提示
   submitError.value = '';
-  submitSuccess.value = false;
 
   // 验证表单
   if (!validateForm()) {
@@ -303,38 +293,24 @@ const handleSubmit = async () => {
     const payload = getSubmitPayload();
     const formDataToSubmit = new FormData();
     formDataToSubmit.append('payload', JSON.stringify(payload));
+    formDataToSubmit.append('resource_type', 'artist');
+    formDataToSubmit.append('action', isEditMode.value ? 'update' : 'create');
 
-    // 根据模式发送不同的请求
+    // 发送到 revisions 接口
     const { $api } = useNuxtApp();
-    let response;
+    await $api('/v1/revisions', {
+      method: 'POST',
+      body: formDataToSubmit,
+    });
 
-    if (isEditMode.value) {
-      // 更新艺术家 - PUT 请求
-      response = await $api(`/v1/artists/${props.artistId}`, {
-        method: 'PUT',
-        body: formDataToSubmit,
-      });
-    } else {
-      // 创建艺术家 - POST 请求
-      response = await $api('/v1/artists', {
-        method: 'POST',
-        body: formDataToSubmit,
-      });
-    }
-
-    // 显示成功提示
-    submitSuccess.value = true;
-    showPreview.value = false;
-
-    // 1.5 秒后跳转到艺术家详情页
-    setTimeout(() => {
-      const targetId = isEditMode.value ? props.artistId : response.id;
-      if (targetId) {
-        router.push(`/artists/${targetId}`);
-      } else {
-        router.push('/artists');
-      }
-    }, 1500);
+    // 提交成功，跳转到成功页面
+    router.push({
+      path: '/contribute/success',
+      query: {
+        type: 'artist',
+        action: isEditMode.value ? 'update' : 'create',
+      },
+    });
 
   } catch (error) {
     console.error(`Failed to ${isEditMode.value ? 'update' : 'create'} artist:`, error);

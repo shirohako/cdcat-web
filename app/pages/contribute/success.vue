@@ -11,12 +11,12 @@
 
         <!-- 标题 -->
         <h1 class="text-2xl font-bold text-gray-900 mb-3">
-          {{ isUpdate ? 'Update Submitted' : 'Work Submitted' }}
+          {{ pageTitle }}
         </h1>
 
         <!-- 描述 -->
         <p class="text-gray-600 mb-6">
-          Your {{ isUpdate ? 'update' : 'work' }} has been submitted successfully and is now pending review.
+          Your {{ resourceLabel }} has been submitted successfully and is now pending review.
           It will be visible once approved by our moderators.
         </p>
 
@@ -35,11 +35,11 @@
 
         <!-- 操作按钮 -->
         <div class="flex flex-col sm:flex-row gap-3">
-          <NuxtLink to="/works" class="btn btn-primary flex-1">
+          <NuxtLink :to="browseLink" class="btn btn-primary flex-1">
             <ArrowLeft :size="18" />
-            Browse Works
+            Browse {{ resourceTypeLabel }}
           </NuxtLink>
-          <NuxtLink to="/contribute/work" class="btn btn-outline flex-1">
+          <NuxtLink :to="contributeLink" class="btn btn-outline flex-1">
             <Plus :size="18" />
             Submit Another
           </NuxtLink>
@@ -54,5 +54,57 @@ import { CheckCircle, Clock, ArrowLeft, Plus } from 'lucide-vue-next';
 
 const route = useRoute();
 
+const resourceType = computed(() => route.query.type || 'work');
 const isUpdate = computed(() => route.query.action === 'update');
+
+const resourceTypeLabel = computed(() => {
+  const labels = {
+    work: 'Works',
+    artist: 'Artists',
+    series: 'Series',
+  };
+  return labels[resourceType.value] || 'Items';
+});
+
+const resourceLabel = computed(() => {
+  if (isUpdate.value) {
+    return 'update';
+  }
+  const labels = {
+    work: 'work',
+    artist: 'artist',
+    series: 'series',
+  };
+  return labels[resourceType.value] || 'submission';
+});
+
+const pageTitle = computed(() => {
+  if (isUpdate.value) {
+    return 'Update Submitted';
+  }
+  const titles = {
+    work: 'Work Submitted',
+    artist: 'Artist Submitted',
+    series: 'Series Submitted',
+  };
+  return titles[resourceType.value] || 'Submitted Successfully';
+});
+
+const browseLink = computed(() => {
+  const links = {
+    work: '/works',
+    artist: '/artists',
+    series: '/series',
+  };
+  return links[resourceType.value] || '/';
+});
+
+const contributeLink = computed(() => {
+  const links = {
+    work: '/contribute/work',
+    artist: '/contribute/artist',
+    series: '/contribute/series',
+  };
+  return links[resourceType.value] || '/contribute';
+});
 </script>
