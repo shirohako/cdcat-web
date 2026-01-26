@@ -2,9 +2,15 @@
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
       <!-- Page Header -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2">Entries</h1>
-        <p class="text-gray-600">Explore anime, movies, TV shows and more</p>
+      <div class="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Entries</h1>
+          <p class="text-gray-600">Explore anime, movies, TV shows and more</p>
+        </div>
+        <NuxtLink to="/contribute/entry" class="btn btn-primary gap-2">
+          <Plus :size="18" />
+          创建条目
+        </NuxtLink>
       </div>
 
       <!-- Filter Tabs -->
@@ -184,7 +190,7 @@
 </template>
 
 <script setup>
-import { Film, Calendar, Heart, Eye, Music2 } from "lucide-vue-next";
+import { Film, Calendar, Heart, Eye, Music2, Plus } from "lucide-vue-next";
 
 const route = useRoute();
 const router = useRouter();
