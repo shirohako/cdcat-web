@@ -43,6 +43,12 @@ export const menuItems: MenuItem[] = [
     i18nKey: 'menu.series',
     path: '/series',
     icon: 'lucide:library'
+  },
+  {
+    name: 'vinyl',
+    i18nKey: 'menu.vinyl',
+    path: '/vinyls',
+    icon: 'lucide:disc'
   }
 ]
 

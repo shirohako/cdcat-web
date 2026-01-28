@@ -5,7 +5,8 @@
     "artist": "アーティスト",
     "event": "イベント",
     "entry": "エントリー",
-    "series": "シリーズ"
+    "series": "シリーズ",
+    "vinyl": "レコード"
   },
   "user": {
     "profile": "プロフィール",
