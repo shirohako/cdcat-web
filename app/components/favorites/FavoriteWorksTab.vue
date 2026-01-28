@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div class="p-4 sm:p-6 md:p-8">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">
       <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
@@ -19,21 +19,21 @@
     <!-- Works List -->
     <div v-else>
       <!-- List View (one album per row) -->
-      <div class="space-y-4 mb-8">
+      <div class="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
         <div
           v-for="work in works"
           :key="work.id"
           class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4
                  hover:shadow-md hover:ring-black/10 transition-all duration-200"
         >
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4">
             <!-- Cover -->
             <NuxtLink
               :to="`/works/${work.workId}`"
-              class="shrink-0 flex items-center gap-3"
+              class="shrink-0"
               :aria-label="`查看专辑：${work.workTitle}`"
             >
-              <div class="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
                 <img
                   v-if="work.cover"
                   :src="work.cover"
@@ -41,50 +41,50 @@
                   class="w-full h-full object-cover"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
-                  <Icon name="lucide:disc-3" class="w-10 h-10" />
+                  <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
               </div>
             </NuxtLink>
 
             <!-- Info -->
-            <div class="min-w-0 flex-1">
+            <div class="min-w-0 flex-1 text-center sm:text-left">
               <NuxtLink
                 :to="`/works/${work.workId}`"
-                class="block font-semibold text-gray-900 truncate hover:text-blue-700 transition-colors"
+                class="block font-semibold text-sm sm:text-base text-gray-900 hover:text-blue-700 transition-colors line-clamp-2"
               >
                 {{ work.workTitle }}
               </NuxtLink>
 
-              <p class="text-sm text-gray-600 mt-1 truncate">
+              <p class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">
                 {{ work.artists.join(', ') }}
               </p>
 
-              <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-400">
+              <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-400">
                 <span v-if="work.releaseDate">发行：{{ formatDate(work.releaseDate) }}</span>
                 <span>收藏：{{ formatDate(work.createdAt) }}</span>
               </div>
             </div>
 
             <!-- Actions -->
-            <div class="shrink-0 w-full sm:w-auto flex items-center justify-end gap-2">
+            <div class="shrink-0 flex items-center justify-center sm:justify-end gap-2 sm:gap-1">
               <NuxtLink
                 :to="`/works/${work.workId}`"
-                class="inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
                 :aria-label="`查看专辑：${work.workTitle}`"
                 title="查看"
               >
-                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-600" />
+                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
               <button
                 type="button"
                 :disabled="!!unliked[work.id] || !!unlikeLoading[work.id]"
                 @click="handleUnlike(work.id)"
-                class="inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[work.id] ? '已取消喜欢' : '取消喜欢'"
               >
                 <Icon
                   :name="unliked[work.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
-                  class="w-5 h-5"
+                  class="w-4 h-4 sm:w-5 sm:h-5"
                   :class="unliked[work.id] ? 'text-gray-400' : 'text-red-600'"
                 />
               </button>

@@ -8,12 +8,12 @@
       </div>
 
       <!-- Tabs navigation -->
-      <nav class="flex gap-1 border-b border-gray-200 mb-8 overflow-x-auto scrollbar-none" aria-label="Settings tabs">
+      <nav class="flex flex-wrap gap-1 border-b border-gray-200 mb-8" aria-label="Settings tabs">
         <button
           v-for="tab in tabs"
           :key="tab.key"
           type="button"
-          class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap shrink-0 -mb-px"
+          class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px"
           :class="activeTab === tab.key
             ? 'border-blue-500 text-blue-600'
             : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-300'"

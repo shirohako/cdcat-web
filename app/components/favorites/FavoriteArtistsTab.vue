@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div class="p-4 sm:p-6 md:p-8">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">
       <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
@@ -19,21 +19,21 @@
     <!-- Artists List -->
     <div v-else>
       <!-- List View (one artist per row) -->
-      <div class="space-y-4 mb-8">
+      <div class="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
         <div
           v-for="artist in artists"
           :key="artist.id"
-          class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4
+          class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-3 sm:p-4
                  hover:shadow-md hover:ring-black/10 transition-all duration-200"
         >
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex items-center gap-3 sm:gap-4">
             <!-- Avatar -->
             <NuxtLink
               :to="`/artists/${artist.artistId}`"
               class="shrink-0"
               :aria-label="`查看艺术家：${artist.artistName}`"
             >
-              <div class="w-12 h-12 rounded-full overflow-hidden bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5">
+              <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5">
                 <img
                   v-if="artist.avatar"
                   :src="artist.avatar"
@@ -50,42 +50,36 @@
             <div class="min-w-0 flex-1">
               <NuxtLink
                 :to="`/artists/${artist.artistId}`"
-                class="block font-semibold text-gray-900 truncate hover:text-blue-700 transition-colors"
+                class="block font-semibold text-sm text-gray-900 hover:text-blue-700 transition-colors truncate"
               >
                 {{ artist.artistName }}
               </NuxtLink>
 
-              <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-                <span class="inline-flex items-center gap-1 text-sm text-gray-600">
-                  <Icon name="lucide:users" class="w-4 h-4 text-gray-400" />
-                  {{ formatFollowers(artist.followersCount) }} 粉丝
-                </span>
-                <span class="text-xs text-gray-400">
-                  已喜欢：{{ formatDate(artist.createdAt) }}
-                </span>
-              </div>
+              <p class="text-xs text-gray-400 mt-0.5">
+                已喜欢：{{ formatDate(artist.createdAt) }}
+              </p>
             </div>
 
             <!-- Actions -->
-            <div class="shrink-0 w-full sm:w-auto flex items-center justify-end gap-2">
+            <div class="shrink-0 flex items-center justify-end gap-1 sm:gap-2">
               <NuxtLink
                 :to="`/artists/${artist.artistId}`"
-                class="inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
                 :aria-label="`查看艺术家：${artist.artistName}`"
                 title="查看"
               >
-                <Icon name="lucide:arrow-right" class="w-5 h-5 text-gray-600" />
+                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
               <button
                 type="button"
                 :disabled="!!unliked[artist.id] || !!unlikeLoading[artist.id]"
                 @click="handleUnlike(artist.id)"
-                class="inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[artist.id] ? '已取消喜欢' : '取消喜欢'"
               >
                 <Icon
                   :name="unliked[artist.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
-                  class="w-5 h-5"
+                  class="w-4 h-4 sm:w-5 sm:h-5"
                   :class="unliked[artist.id] ? 'text-gray-400' : 'text-red-600'"
                 />
               </button>

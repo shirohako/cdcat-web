@@ -42,20 +42,20 @@
 
       <!-- Tabs Navigation -->
       <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-        <nav class="flex gap-0 border-b border-gray-200" aria-label="Favorites tabs">
+        <nav class="flex flex-wrap gap-0 border-b border-gray-200" aria-label="Favorites tabs">
           <button
             v-for="tab in tabs"
             :key="tab.key"
             type="button"
-            class="flex-1 flex items-center justify-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors"
+            class="flex-1 min-w-0 md:flex-1 sm:flex-none flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap"
             :class="activeTab === tab.key
               ? 'border-blue-500 text-blue-600 bg-blue-50/30'
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'"
             @click="switchTab(tab.key)"
           >
-            <Icon :name="tab.icon" class="w-5 h-5" />
-            <span>{{ tab.label }}</span>
-            <span class="text-xs font-semibold text-gray-400 ml-1">({{ getTabCount(tab.key) }})</span>
+            <Icon :name="tab.icon" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+            <span class="truncate">{{ tab.label }}</span>
+            <span class="hidden sm:inline text-xs font-semibold text-gray-400 ml-0.5 sm:ml-1">({{ getTabCount(tab.key) }})</span>
           </button>
         </nav>
 

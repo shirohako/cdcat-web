@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div class="p-4 sm:p-6 md:p-8">
     <!-- Loading State -->
     <div v-if="isLoading" class="flex items-center justify-center py-12">
       <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
@@ -18,8 +18,8 @@
 
     <!-- Songs List -->
     <div v-else class="space-y-3">
-      <!-- Songs Table -->
-      <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <!-- Songs Table (Desktop) -->
+      <div class="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
         <table class="w-full text-sm">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -107,6 +107,67 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Songs Cards (Mobile) -->
+      <div class="md:hidden space-y-3">
+        <div
+          v-for="song in songs"
+          :key="song.id"
+          class="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-all duration-200"
+        >
+          <div class="flex items-center gap-3">
+            <!-- Cover -->
+            <div class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 ring-1 ring-black/5 shrink-0">
+              <img
+                v-if="song.cover"
+                :src="song.cover"
+                :alt="song.songTitle"
+                class="w-full h-full object-cover"
+              />
+              <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
+                <Icon name="lucide:disc-3" class="w-6 h-6" />
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ song.songTitle }}</p>
+              <p class="text-xs text-gray-600 mt-0.5 line-clamp-1">
+                {{ song.workTitle || '无专辑' }}
+              </p>
+              <div class="flex gap-2 mt-2 text-xs text-gray-500">
+                <span>{{ formatDuration(song.duration) }}</span>
+                <span>{{ formatDate(song.createdAt) }}</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="shrink-0 flex items-center gap-1">
+              <button
+                type="button"
+                disabled
+                class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-30"
+                title="添加笔记（即将支持）"
+              >
+                <Icon name="lucide:sticky-note" class="w-4 h-4 text-gray-500" />
+              </button>
+              <button
+                type="button"
+                :disabled="!!unliked[song.id] || !!unlikeLoading[song.id]"
+                @click="handleUnlike(song.id)"
+                class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+                :title="unliked[song.id] ? '已取消喜欢' : '取消喜欢'"
+              >
+                <Icon
+                  :name="unliked[song.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
+                  class="w-4 h-4"
+                  :class="unliked[song.id] ? 'text-gray-400' : 'text-red-600'"
+                />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Pagination -->
