@@ -28,6 +28,16 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
+          <AlbumProducts
+            v-if="products.length > 0"
+            :products="products"
+          />
+
+          <AlbumBonuses
+            v-if="bonuses.length > 0"
+            :bonuses="bonuses"
+          />
+
           <AlbumDescriptions
             v-if="albumDescriptions.length > 0"
             :descriptions="albumDescriptions"
@@ -184,6 +194,158 @@ const credits = computed(() => {
 });
 
 const links = computed(() => workData.value?.links || []);
+
+// TODO: 替换为真实 API 数据 workData.value?.products / workData.value?.bonuses
+const mockProducts = [
+  {
+    id: 1,
+    work_id: workId,
+    edition_type: 'LIMITED',
+    edition_name: '初回限定盤',
+    is_limited: true,
+    limited_rule: 'COUNT',
+    limited_name: null,
+    catalog_number: 'SRCL-12345',
+    barcode: '4547366512345',
+    format: 'CD + Blu-ray',
+    medium: 'physical',
+    is_hires: false,
+    release_date: '2024-12-18',
+    prices: { JPY: 4950 },
+    is_available: true,
+    image_url: null,
+  },
+  {
+    id: 2,
+    work_id: workId,
+    edition_type: 'REGULAR',
+    edition_name: '通常盤',
+    is_limited: false,
+    limited_rule: null,
+    limited_name: null,
+    catalog_number: 'SRCL-12346',
+    barcode: '4547366512346',
+    format: 'CD',
+    medium: 'physical',
+    is_hires: false,
+    release_date: '2024-12-18',
+    prices: { JPY: 3300 },
+    is_available: true,
+    image_url: null,
+  },
+  {
+    id: 3,
+    work_id: workId,
+    edition_type: 'LIMITED',
+    edition_name: '期間生産限定盤',
+    is_limited: true,
+    limited_rule: 'PERIOD',
+    limited_name: null,
+    catalog_number: 'SRCL-12347',
+    barcode: '4547366512347',
+    format: 'CD + DVD',
+    medium: 'physical',
+    is_hires: false,
+    release_date: '2024-12-18',
+    prices: { JPY: 4400 },
+    is_available: false,
+    image_url: null,
+  },
+  {
+    id: 4,
+    work_id: workId,
+    edition_type: 'REGULAR',
+    edition_name: null,
+    is_limited: false,
+    limited_rule: null,
+    limited_name: null,
+    catalog_number: null,
+    barcode: null,
+    format: 'FLAC / AAC',
+    medium: 'digital',
+    is_hires: true,
+    release_date: '2024-12-18',
+    prices: { JPY: 2750 },
+    is_available: true,
+    image_url: null,
+  },
+];
+
+const mockBonuses = [
+  {
+    id: 1,
+    work_id: workId,
+    product_id: 1,
+    type: 'blu_ray',
+    name: 'Music Video Collection',
+    description: '收录全部 3 首 Music Video 及 Making 映像',
+    image_url: null,
+  },
+  {
+    id: 2,
+    work_id: workId,
+    product_id: 1,
+    type: 'photocard',
+    name: 'Special Photocard Set (5枚)',
+    description: '初回限定盤专属写真卡片套装',
+    image_url: null,
+  },
+  {
+    id: 3,
+    work_id: workId,
+    product_id: 3,
+    type: 'dvd',
+    name: 'Live Performance Digest',
+    description: '2024年全国巡演精选现场映像',
+    image_url: null,
+  },
+  {
+    id: 4,
+    work_id: workId,
+    product_id: null,
+    type: 'bonus_track',
+    name: 'Acoustic Version - Track 03',
+    description: '第3曲目的 Acoustic 重新编曲版',
+    image_url: null,
+  },
+  {
+    id: 5,
+    work_id: workId,
+    product_id: null,
+    type: 'event_ticket',
+    name: 'リリースイベント抽選応募券',
+    description: '发售纪念活动抽选应募券（全版本共通）',
+    image_url: null,
+  },
+  {
+    id: 6,
+    work_id: workId,
+    product_id: 2,
+    type: 'poster',
+    name: 'B2 Size Poster',
+    description: '通常盤购入特典海报',
+    image_url: null,
+  },
+];
+
+const products = computed(() => {
+  // 优先使用 API 数据，如果没有则使用 mock
+  return workData.value?.products?.length ? workData.value.products : mockProducts;
+});
+
+const bonuses = computed(() => {
+  const productList = products.value;
+  const productMap = new Map();
+  productList.forEach(p => productMap.set(p.id, p));
+
+  // 优先使用 API 数据，如果没有则使用 mock
+  const list = workData.value?.bonuses?.length ? workData.value.bonuses : mockBonuses;
+
+  return list.map(bonus => ({
+    ...bonus,
+    product: bonus.product_id ? productMap.get(bonus.product_id) || null : null,
+  }));
+});
 
 const stats = {
   viewed: 15,
