@@ -40,6 +40,18 @@
         @error="(msg) => showToast(msg, 'error')"
       />
 
+      <AccountPreferencesTab
+        v-if="activeTab === 'preferences'"
+        :user="user"
+        @save="showToast('偏好设置已保存')"
+      />
+
+      <AccountAddressTab
+        v-if="activeTab === 'address'"
+        :user="user"
+        @save="(msg) => typeof msg === 'object' ? showToast(msg.message, msg.type) : showToast(msg)"
+      />
+
       <AccountSecurityTab
         v-if="activeTab === 'security'"
         @save="(msg) => showToast(msg)"
@@ -89,7 +101,7 @@
 
 <script setup>
 import {
-  User as UserIcon, Mail, Lock, Bell, AlertTriangle,
+  User as UserIcon, Mail, Lock, Bell, AlertTriangle, Settings, MapPin,
   Check, Info as InfoIcon
 } from 'lucide-vue-next'
 
@@ -102,7 +114,9 @@ const { toast, showToast } = useToast()
 
 const tabs = [
   { key: 'profile', label: '个人资料', icon: UserIcon },
-  { key: 'email', label: '邮箱绑定', icon: Mail },
+  { key: 'email', label: '邮箱', icon: Mail },
+  { key: 'preferences', label: '偏好设置', icon: Settings },
+  { key: 'address', label: '收货地址', icon: MapPin },
   { key: 'security', label: '安全设置', icon: Lock },
   { key: 'notifications', label: '通知偏好', icon: Bell },
   { key: 'danger', label: '危险区域', icon: AlertTriangle }
