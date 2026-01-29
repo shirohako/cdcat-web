@@ -10,12 +10,43 @@
   },
   "user": {
     "profile": "プロフィール",
+    "favorites": "お気に入り",
+    "tracking": "トラッキング",
     "revisions": "リビジョン一覧",
     "account": "アカウント設定",
     "help": "ヘルプセンター",
     "logout": "ログアウト"
   },
+  "tracking": {
+    "title": "マイトラッキング",
+    "description": "聴きたいアルバムやコレクションを管理",
+    "status": {
+      "plan_to_listen": "聴きたい",
+      "wishlist": "ウィッシュリスト",
+      "completed": "聴いた",
+      "owned": "入手済み",
+      "dropped": "興味なし"
+    },
+    "tab": {
+      "plan_to_listen": "聴きたい",
+      "wishlist": "ウィッシュリスト",
+      "completed": "聴いた",
+      "owned": "入手済み",
+      "dropped": "興味なし"
+    },
+    "empty_state": "トラッキングしたアルバムがまだありません",
+    "empty_hint": "好きなアルバムを見つけて、トラッキングを開始しましょう",
+    "change_status": "ステータスを変更",
+    "remove": "トラッキングを削除",
+    "view_details": "詳細を表示",
+    "status_updated": "ステータスが更新されました",
+    "removed": "トラッキングを削除しました"
+  },
   "common": {
-    "search": "検索..."
+    "search": "検索...",
+    "discover": "アルバムを発見",
+    "view": "表示",
+    "previous": "前へ",
+    "next": "次へ"
   }
 }

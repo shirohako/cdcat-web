@@ -10,12 +10,43 @@
   },
   "user": {
     "profile": "个人资料",
+    "favorites": "收藏",
+    "tracking": "追踪",
     "revisions": "修订列表",
     "account": "账户设置",
     "help": "帮助中心",
     "logout": "退出登录"
   },
+  "tracking": {
+    "title": "我的追踪",
+    "description": "管理你想听的专辑和收藏",
+    "status": {
+      "plan_to_listen": "想听",
+      "wishlist": "想要",
+      "completed": "听过",
+      "owned": "已入手",
+      "dropped": "不感兴趣"
+    },
+    "tab": {
+      "plan_to_listen": "想听",
+      "wishlist": "想要",
+      "completed": "听过",
+      "owned": "已入手",
+      "dropped": "不感兴趣"
+    },
+    "empty_state": "还没有追踪任何专辑",
+    "empty_hint": "发现你喜欢的专辑，开始追踪吧",
+    "change_status": "更改状态",
+    "remove": "移除追踪",
+    "view_details": "查看详情",
+    "status_updated": "状态已更新",
+    "removed": "已移除追踪"
+  },
   "common": {
-    "search": "搜索..."
+    "search": "搜索...",
+    "discover": "发现专辑",
+    "view": "查看",
+    "previous": "上一页",
+    "next": "下一页"
   }
 }

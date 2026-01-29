@@ -10,12 +10,43 @@
   },
   "user": {
     "profile": "Profile",
+    "favorites": "Favorites",
+    "tracking": "Tracking",
     "revisions": "Revisions",
     "account": "Account Settings",
     "help": "Help Center",
     "logout": "Sign Out"
   },
+  "tracking": {
+    "title": "My Tracking",
+    "description": "Manage your albums you want to listen and collections",
+    "status": {
+      "plan_to_listen": "Plan to Listen",
+      "wishlist": "Wishlist",
+      "completed": "Completed",
+      "owned": "Owned",
+      "dropped": "Dropped"
+    },
+    "tab": {
+      "plan_to_listen": "Plan to Listen",
+      "wishlist": "Wishlist",
+      "completed": "Completed",
+      "owned": "Owned",
+      "dropped": "Dropped"
+    },
+    "empty_state": "No albums tracked yet",
+    "empty_hint": "Discover your favorite albums and start tracking them",
+    "change_status": "Change Status",
+    "remove": "Remove Tracking",
+    "view_details": "View Details",
+    "status_updated": "Status updated",
+    "removed": "Tracking removed"
+  },
   "common": {
-    "search": "Search..."
+    "search": "Search...",
+    "discover": "Discover Albums",
+    "view": "View",
+    "previous": "Previous",
+    "next": "Next"
   }
 }
