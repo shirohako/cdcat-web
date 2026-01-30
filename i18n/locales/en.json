@@ -64,6 +64,25 @@
     "last_reply_by": "last reply by",
     "empty": "No topics yet"
   },
+  "profile": {
+    "joined": "Joined",
+    "top_contributor": "Top Contributor",
+    "recent_activity": "Recent Activity",
+    "recent_reviews": "Recent Reviews",
+    "favorites": "Favorites",
+    "top_artists": "Top Artists",
+    "music_taste": "Music Taste",
+    "total": "total",
+    "genres": "genres",
+    "stats": {
+      "reviews": "Reviews",
+      "avg_score": "Avg Score",
+      "favorites": "Favorites",
+      "tracking": "Tracking",
+      "discussions": "Discussions",
+      "contributions": "Contributions"
+    }
+  },
   "common": {
     "search": "Search...",
     "discover": "Discover Albums",

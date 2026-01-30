@@ -64,6 +64,25 @@
     "last_reply_by": "最終返信",
     "empty": "まだトピックがありません"
   },
+  "profile": {
+    "joined": "登録日",
+    "top_contributor": "トップ貢献者",
+    "recent_activity": "最近のアクティビティ",
+    "recent_reviews": "最近のレビュー",
+    "favorites": "お気に入り作品",
+    "top_artists": "お気に入りアーティスト",
+    "music_taste": "音楽の好み",
+    "total": "合計",
+    "genres": "ジャンル",
+    "stats": {
+      "reviews": "レビュー",
+      "avg_score": "平均スコア",
+      "favorites": "お気に入り",
+      "tracking": "トラッキング",
+      "discussions": "ディスカッション",
+      "contributions": "貢献"
+    }
+  },
   "common": {
     "search": "検索...",
     "discover": "アルバムを発見",

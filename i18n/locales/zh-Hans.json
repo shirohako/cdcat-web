@@ -64,6 +64,25 @@
     "last_reply_by": "最后回复",
     "empty": "暂无讨论主题"
   },
+  "profile": {
+    "joined": "加入于",
+    "top_contributor": "杰出贡献者",
+    "recent_activity": "近期动态",
+    "recent_reviews": "近期评价",
+    "favorites": "收藏作品",
+    "top_artists": "最爱艺术家",
+    "music_taste": "音乐品味",
+    "total": "总计",
+    "genres": "种类型",
+    "stats": {
+      "reviews": "评价",
+      "avg_score": "平均分",
+      "favorites": "收藏",
+      "tracking": "追踪",
+      "discussions": "讨论",
+      "contributions": "贡献"
+    }
+  },
   "common": {
     "search": "搜索...",
     "discover": "发现专辑",

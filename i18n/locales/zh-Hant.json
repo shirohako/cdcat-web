@@ -64,6 +64,25 @@
     "last_reply_by": "最後回覆",
     "empty": "暫無討論主題"
   },
+  "profile": {
+    "joined": "加入於",
+    "top_contributor": "傑出貢獻者",
+    "recent_activity": "近期動態",
+    "recent_reviews": "近期評價",
+    "favorites": "收藏作品",
+    "top_artists": "最愛藝術家",
+    "music_taste": "音樂品味",
+    "total": "總計",
+    "genres": "種類型",
+    "stats": {
+      "reviews": "評價",
+      "avg_score": "平均分",
+      "favorites": "收藏",
+      "tracking": "追蹤",
+      "discussions": "討論",
+      "contributions": "貢獻"
+    }
+  },
   "common": {
     "search": "搜尋...",
     "discover": "發現專輯",
