@@ -6,7 +6,8 @@
     "event": "イベント",
     "entry": "エントリー",
     "series": "シリーズ",
-    "vinyl": "レコード"
+    "vinyl": "レコード",
+    "discussion": "ディスカッション"
   },
   "user": {
     "profile": "プロフィール",
@@ -41,6 +42,27 @@
     "view_details": "詳細を表示",
     "status_updated": "ステータスが更新されました",
     "removed": "トラッキングを削除しました"
+  },
+  "discussion": {
+    "description": "言語セクションを選んでディスカッションに参加",
+    "lang": {
+      "ja": "日本語",
+      "en": "英語",
+      "ko": "韓国語",
+      "zh": "中国語",
+      "other": "その他"
+    },
+    "tab": {
+      "latest": "最新",
+      "hot": "人気",
+      "unanswered": "未回答"
+    },
+    "search_placeholder": "トピック・タグ・投稿者を検索...",
+    "search_no_results": "検索条件に一致する結果がありません。",
+    "new_topic": "新しいトピック",
+    "pinned": "ピン留め",
+    "last_reply_by": "最終返信",
+    "empty": "まだトピックがありません"
   },
   "common": {
     "search": "検索...",

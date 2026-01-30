@@ -6,7 +6,8 @@
     "event": "活动",
     "entry": "条目",
     "series": "系列",
-    "vinyl": "黑胶"
+    "vinyl": "黑胶",
+    "discussion": "讨论"
   },
   "user": {
     "profile": "个人资料",
@@ -41,6 +42,27 @@
     "view_details": "查看详情",
     "status_updated": "状态已更新",
     "removed": "已移除追踪"
+  },
+  "discussion": {
+    "description": "选择一个语言板块，参与讨论",
+    "lang": {
+      "ja": "日语",
+      "en": "英语",
+      "ko": "韩语",
+      "zh": "中文",
+      "other": "其他"
+    },
+    "tab": {
+      "latest": "最新",
+      "hot": "热门",
+      "unanswered": "无人回复"
+    },
+    "search_placeholder": "搜索主题、标签或作者…",
+    "search_no_results": "没有匹配的结果，试试其他关键词。",
+    "new_topic": "发布主题",
+    "pinned": "置顶",
+    "last_reply_by": "最后回复",
+    "empty": "暂无讨论主题"
   },
   "common": {
     "search": "搜索...",

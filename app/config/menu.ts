@@ -49,6 +49,12 @@ export const menuItems: MenuItem[] = [
     i18nKey: 'menu.vinyl',
     path: '/vinyls',
     icon: 'lucide:disc'
+  },
+  {
+    name: 'discussion',
+    i18nKey: 'menu.discussion',
+    path: '/discussions',
+    icon: 'lucide:message-circle'
   }
 ]
 

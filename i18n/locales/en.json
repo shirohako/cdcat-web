@@ -6,7 +6,8 @@
     "event": "Event",
     "entry": "Entry",
     "series": "Series",
-    "vinyl": "Vinyl"
+    "vinyl": "Vinyl",
+    "discussion": "Discussion"
   },
   "user": {
     "profile": "Profile",
@@ -41,6 +42,27 @@
     "view_details": "View Details",
     "status_updated": "Status updated",
     "removed": "Tracking removed"
+  },
+  "discussion": {
+    "description": "Choose a language section to join the discussion",
+    "lang": {
+      "ja": "Japanese",
+      "en": "English",
+      "ko": "Korean",
+      "zh": "Chinese",
+      "other": "Other"
+    },
+    "tab": {
+      "latest": "Latest",
+      "hot": "Hot",
+      "unanswered": "Unanswered"
+    },
+    "search_placeholder": "Search topics, tags, or authors...",
+    "search_no_results": "No results for your search.",
+    "new_topic": "New Topic",
+    "pinned": "Pinned",
+    "last_reply_by": "last reply by",
+    "empty": "No topics yet"
   },
   "common": {
     "search": "Search...",

@@ -6,7 +6,8 @@
     "event": "活動",
     "entry": "條目",
     "series": "系列",
-    "vinyl": "黑膠"
+    "vinyl": "黑膠",
+    "discussion": "討論"
   },
   "user": {
     "profile": "個人資料",
@@ -41,6 +42,27 @@
     "view_details": "查看詳情",
     "status_updated": "狀態已更新",
     "removed": "已移除追蹤"
+  },
+  "discussion": {
+    "description": "選擇一個語言板塊，參與討論",
+    "lang": {
+      "ja": "日語",
+      "en": "英語",
+      "ko": "韓語",
+      "zh": "中文",
+      "other": "其他"
+    },
+    "tab": {
+      "latest": "最新",
+      "hot": "熱門",
+      "unanswered": "無人回覆"
+    },
+    "search_placeholder": "搜尋主題、標籤或作者…",
+    "search_no_results": "沒有符合的結果，試試其他關鍵字。",
+    "new_topic": "發佈主題",
+    "pinned": "置頂",
+    "last_reply_by": "最後回覆",
+    "empty": "暫無討論主題"
   },
   "common": {
     "search": "搜尋...",
