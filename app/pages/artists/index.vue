@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl">
       <!-- 页面标题 -->
       <div class="mb-8 flex items-start justify-between">
         <div>
@@ -41,14 +41,14 @@
         </div>
 
         <!-- 艺术家网格 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+        <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-9 gap-2.5 md:gap-3">
           <NuxtLink
             v-for="artist in artistsData"
             :key="artist.id"
             :to="`/artists/${artist.id}`"
             class="group"
           >
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border border-gray-100">
               <!-- 艺术家头像 -->
               <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
                 <img
@@ -59,32 +59,32 @@
                   style="image-rendering: -webkit-optimize-contrast;"
                 />
                 <div v-else class="text-gray-300">
-                  <Users :size="64" />
+                  <Users :size="32" />
                 </div>
                 <!-- 渐变遮罩，增强对比度 -->
                 <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
 
               <!-- 艺术家信息 -->
-              <div class="p-4 bg-white">
-                <h3 class="font-bold text-base mb-2 truncate group-hover:text-blue-600 transition-colors">
+              <div class="px-2.5 py-2 bg-white">
+                <h3 class="font-bold text-xs mb-1 truncate group-hover:text-blue-600 transition-colors">
                   {{ artist.name }}
                 </h3>
 
-                <div class="flex items-center gap-2 text-xs mb-3">
-                  <span v-if="artist.type" class="px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">
+                <div class="flex items-center gap-1 text-[10px] mb-1.5">
+                  <span v-if="artist.type" class="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
                     {{ formatType(artist.type) }}
                   </span>
                   <span v-if="artist.region" class="text-gray-500 truncate">{{ artist.region }}</span>
                 </div>
 
-                <div class="flex items-center justify-between text-sm text-gray-600">
-                  <div class="flex items-center gap-1.5">
-                    <Disc3 :size="16" class="text-gray-400" />
+                <div class="flex items-center justify-between text-[11px] text-gray-600">
+                  <div class="flex items-center gap-1">
+                    <Disc3 :size="12" class="text-gray-400" />
                     <span class="font-medium">{{ artist.albums_count || 0 }}</span>
                   </div>
-                  <div class="flex items-center gap-1.5">
-                    <Heart :size="16" class="text-gray-400 group-hover:text-red-400 transition-colors" />
+                  <div class="flex items-center gap-1">
+                    <Heart :size="12" class="text-gray-400 group-hover:text-red-400 transition-colors" />
                     <span class="font-medium">{{ artist.followers_count || 0 }}</span>
                   </div>
                 </div>
