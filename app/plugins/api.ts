@@ -75,6 +75,19 @@ export default defineNuxtPlugin(() => {
         errorMessage = result.error.message
       }
 
+      // 创建包含 API 错误详情的 Error
+      const createApiError = (msg: string) => {
+        const error = new Error(msg)
+        if (result?.error) {
+          Object.assign(error, {
+            code: result.error.code,
+            name: result.error.name,
+            details: result.error,
+          })
+        }
+        return error
+      }
+
       // 401 未授权 - 清除 token 并跳转登录
       if (status === 401) {
         const authToken = useCookie('auth_token')
@@ -83,26 +96,26 @@ export default defineNuxtPlugin(() => {
         authUser.value = null
 
         await navigateTo('/auth/login')
-        throw new Error(errorMessage || '未授权，请重新登录')
+        throw createApiError(errorMessage || '未授权，请重新登录')
       }
 
       // 403 禁止访问
       if (status === 403) {
-        throw new Error(errorMessage || '没有访问权限')
+        throw createApiError(errorMessage || '没有访问权限')
       }
 
       // 404 未找到
       if (status === 404) {
-        throw new Error(errorMessage || '请求的资源不存在')
+        throw createApiError(errorMessage || '请求的资源不存在')
       }
 
       // 500 服务器错误
       if (status >= 500) {
-        throw new Error(errorMessage || '服务器错误，请稍后重试')
+        throw createApiError(errorMessage || '服务器错误，请稍后重试')
       }
 
       // 其他错误
-      throw new Error(errorMessage)
+      throw createApiError(errorMessage)
     },
   })
 

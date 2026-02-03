@@ -1,11 +1,6 @@
-export interface User {
-  id: number
-  username: string
-  email: string
-  avatar?: string
-  created_at: string
-  updated_at: string
-}
+import type { User } from './user'
+
+export type { User }
 
 export interface LoginRequest {
   email: string
@@ -14,9 +9,10 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  username: string
+  nickname: string
   email: string
   password: string
+  verification_code: string
 }
 
 export interface AuthResponse {

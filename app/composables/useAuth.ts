@@ -77,9 +77,11 @@ export const useAuth = () => {
       saveAuth(response)
       return { success: true, data: response }
     } catch (error: any) {
+      const apiError = error.details
       return {
         success: false,
-        error: error.message || '注册失败，请重试'
+        error: apiError?.message || error.message || '注册失败，请重试',
+        details: apiError?.details as Record<string, string[]> | undefined
       }
     }
   }
