@@ -128,14 +128,14 @@
                      overflow-hidden"
             >
               <div class="p-4 border-b border-gray-200">
-                <p class="font-semibold text-gray-900">{{ user?.username }}</p>
-                <p class="text-sm text-gray-500">{{ user?.email }}</p>
+                <p class="font-semibold text-gray-900">{{ user?.nickname }}</p>
+                <p class="text-sm text-gray-500">@{{ user?.username }}</p>
               </div>
               <div class="py-2">
                 <NuxtLink
                   v-for="item in userMenuItems"
                   :key="item.name"
-                  :to="item.path"
+                  :to="item.name === 'profile' ? `/profile/${user?.username}` : item.path"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700
                          hover:bg-gray-50 transition-colors duration-150"
                 >
