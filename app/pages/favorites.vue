@@ -39,16 +39,13 @@ definePageMeta({
 const route = useRoute()
 
 const tabs = [
-  { key: 'works', label: '我喜欢的专辑', icon: 'lucide:disc-3', to: '/favorites' },
+  { key: 'works', label: '我喜欢的专辑', icon: 'lucide:disc-3', to: '/favorites/works' },
   { key: 'songs', label: '我喜欢的歌曲', icon: 'lucide:music', to: '/favorites/songs' },
   { key: 'artists', label: '我喜欢的艺术家', icon: 'lucide:mic-2', to: '/favorites/artists' }
 ]
 
 const isActiveTab = (to: string) => {
-  if (to === '/favorites') {
-    return route.path === '/favorites' || route.path === '/favorites/'
-  }
-  return route.path.startsWith(to)
+  return route.path === to || route.path === to + '/'
 }
 
 useHead({

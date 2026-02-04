@@ -1,7 +1,5 @@
-<template>
-  <FavoriteWorksTab />
-</template>
-
 <script setup>
-import FavoriteWorksTab from '~/components/favorites/FavoriteWorksTab.vue'
+definePageMeta({
+  redirect: '/favorites/works'
+})
 </script>
