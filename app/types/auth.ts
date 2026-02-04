@@ -13,6 +13,7 @@ export interface RegisterRequest {
   email: string
   password: string
   verification_code: string
+  birthday: string
 }
 
 export interface AuthResponse {

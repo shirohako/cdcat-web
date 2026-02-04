@@ -165,6 +165,22 @@
             </p>
           </div>
 
+          <!-- Birthday Input -->
+          <div class="flex flex-col gap-2">
+            <label for="birthday" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <Cake :size="16" />
+              <span>生日</span>
+            </label>
+            <input
+              id="birthday"
+              v-model="formData.birthday"
+              type="date"
+              class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+              required
+            />
+            <p class="text-xs text-slate-500 mt-1">生日将用于找回密码时的身份验证</p>
+          </div>
+
           <!-- Terms & Conditions -->
           <div class="flex items-start gap-2">
             <input
@@ -246,7 +262,7 @@
 </template>
 
 <script setup lang="ts">
-import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, ShieldCheck } from 'lucide-vue-next'
+import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, ShieldCheck, Cake } from 'lucide-vue-next'
 
 const router = useRouter()
 const { $api } = useNuxtApp()
@@ -258,6 +274,7 @@ const formData = ref({
   verificationCode: '',
   password: '',
   confirmPassword: '',
+  birthday: '',
   acceptTerms: false
 })
 
@@ -274,7 +291,8 @@ const fieldLabels: Record<string, string> = {
   email: '邮箱',
   password: '密码',
   nickname: '昵称',
-  verification_code: '验证码'
+  verification_code: '验证码',
+  birthday: '生日'
 }
 
 const setError = (message: string, details?: Record<string, string[]>) => {
@@ -358,6 +376,7 @@ const isFormValid = computed(() => {
     formData.value.verificationCode &&
     formData.value.password &&
     formData.value.password === formData.value.confirmPassword &&
+    formData.value.birthday &&
     formData.value.acceptTerms &&
     formData.value.password.length >= 8
   )
@@ -375,7 +394,8 @@ const handleRegister = async () => {
       nickname: formData.value.nickname,
       email: formData.value.email,
       password: formData.value.password,
-      verification_code: formData.value.verificationCode
+      verification_code: formData.value.verificationCode,
+      birthday: formData.value.birthday
     })
 
     if (result.success) {
