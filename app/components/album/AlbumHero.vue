@@ -66,10 +66,15 @@
           <div class="space-y-2 mt-6 md:mt-0">
             <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button
-                class="btn btn-sm md:btn-md btn-outline border-red-400 text-red-600 hover:bg-red-50 gap-2"
+                class="btn btn-sm md:btn-md gap-2"
+                :class="isFavorited
+                  ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                  : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
+                :disabled="isToggling"
+                @click="toggleLike"
               >
-                <Heart :size="18" />
-                Like
+                <Heart :size="18" :fill="isFavorited ? 'currentColor' : 'none'" />
+                {{ isFavorited ? 'Liked' : 'Like' }}
               </button>
 
               <button
@@ -118,8 +123,10 @@ import {
 } from "lucide-vue-next";
 
 const { isAuthenticated } = useAuth()
+const { $api } = useNuxtApp()
+const route = useRoute()
 
-defineProps({
+const props = defineProps({
   albumData: {
     type: Object,
     required: true,
@@ -129,4 +136,28 @@ defineProps({
     default: null,
   },
 });
+
+const isFavorited = ref(false)
+const isToggling = ref(false)
+
+const toggleLike = async () => {
+  if (!isAuthenticated.value) {
+    await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
+    return
+  }
+
+  if (!props.workId || isToggling.value) return
+
+  isToggling.value = true
+  try {
+    const result = await $api(`/v1/favorites/works/${props.workId}`, {
+      method: 'POST',
+    })
+    isFavorited.value = result.favorited
+  } catch {
+    // 401 已由 api 插件处理
+  } finally {
+    isToggling.value = false
+  }
+}
 </script>

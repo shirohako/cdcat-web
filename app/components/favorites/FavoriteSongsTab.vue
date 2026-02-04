@@ -209,11 +209,7 @@
 </template>
 
 <script setup lang="ts">
-import type { FavoriteSong, FavoritesStats } from '~/types/favorites'
-
-defineProps<{
-  stats: FavoritesStats
-}>()
+import type { FavoriteSong } from '~/types/favorites'
 
 const { getFavoriteSongs, removeFavoriteItem } = useFavorites()
 

@@ -18,7 +18,6 @@
 
     <!-- Artists List -->
     <div v-else>
-      <!-- List View (one artist per row) -->
       <div class="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
         <div
           v-for="artist in artists"
@@ -29,15 +28,15 @@
           <div class="flex items-center gap-3 sm:gap-4">
             <!-- Avatar -->
             <NuxtLink
-              :to="`/artists/${artist.artistId}`"
+              :to="`/artists/${artist.id}`"
               class="shrink-0"
-              :aria-label="`查看艺术家：${artist.artistName}`"
+              :aria-label="`查看艺术家：${artist.name}`"
             >
               <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5">
                 <img
-                  v-if="artist.avatar"
-                  :src="artist.avatar"
-                  :alt="artist.artistName"
+                  v-if="artist.image_url"
+                  :src="artist.image_url"
+                  :alt="artist.name"
                   class="w-full h-full object-cover"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center text-white/40">
@@ -49,30 +48,30 @@
             <!-- Info -->
             <div class="min-w-0 flex-1">
               <NuxtLink
-                :to="`/artists/${artist.artistId}`"
+                :to="`/artists/${artist.id}`"
                 class="block font-semibold text-sm text-gray-900 hover:text-blue-700 transition-colors truncate"
               >
-                {{ artist.artistName }}
+                {{ artist.name }}
               </NuxtLink>
 
-              <p class="text-xs text-gray-400 mt-0.5">
-                已喜欢：{{ formatDate(artist.createdAt) }}
+              <p v-if="artist.favorited_at" class="text-xs text-gray-400 mt-0.5">
+                已喜欢：{{ formatDate(artist.favorited_at) }}
               </p>
             </div>
 
             <!-- Actions -->
             <div class="shrink-0 flex items-center justify-end gap-1 sm:gap-2">
               <NuxtLink
-                :to="`/artists/${artist.artistId}`"
+                :to="`/artists/${artist.id}`"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
-                :aria-label="`查看艺术家：${artist.artistName}`"
+                :aria-label="`查看艺术家：${artist.name}`"
                 title="查看"
               >
                 <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
               <button
                 type="button"
-                :disabled="!!unliked[artist.id] || !!unlikeLoading[artist.id]"
+                :disabled="!!unlikeLoading[artist.id]"
                 @click="handleUnlike(artist.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[artist.id] ? '已取消喜欢' : '取消喜欢'"
@@ -127,21 +126,17 @@
 </template>
 
 <script setup lang="ts">
-import type { FavoriteArtist, FavoritesStats } from '~/types/favorites'
+import type { FavoriteArtist } from '~/types/favorites'
 
-defineProps<{
-  stats: FavoritesStats
-}>()
-
-const { getFavoriteArtists, removeFavoriteItem } = useFavorites()
+const { getFavoriteArtists, toggleFavoriteArtist } = useFavorites()
 
 const artists = ref<FavoriteArtist[]>([])
 const page = ref(1)
-const pageSize = 12
+const perPage = 15
 const totalItems = ref(0)
 const isLoading = ref(false)
 
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize))
+const totalPages = computed(() => Math.ceil(totalItems.value / perPage))
 
 const visiblePages = computed(() => {
   const pages = []
@@ -171,23 +166,12 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const formatFollowers = (count?: number) => {
-  if (!count) return '0'
-  if (count >= 1000000) {
-    return (count / 1000000).toFixed(1) + 'M'
-  }
-  if (count >= 1000) {
-    return (count / 1000).toFixed(1) + 'K'
-  }
-  return count.toString()
-}
-
 const loadData = async () => {
   isLoading.value = true
   try {
-    const response = await getFavoriteArtists(page.value, pageSize)
-    artists.value = response.data
-    totalItems.value = response.total
+    const response = await getFavoriteArtists(page.value, perPage)
+    artists.value = response.artists
+    totalItems.value = response.pagination.total
   } catch (error) {
     console.error('Failed to load artists:', error)
   } finally {
@@ -198,40 +182,28 @@ const loadData = async () => {
 const unliked = ref<Record<number, boolean>>({})
 const unlikeLoading = ref<Record<number, boolean>>({})
 
-const setLoading = (favoriteId: number, pending: boolean) => {
-  if (pending) {
-    unlikeLoading.value = { ...unlikeLoading.value, [favoriteId]: true }
-    return
-  }
-  const { [favoriteId]: _removed, ...rest } = unlikeLoading.value
-  unlikeLoading.value = rest
-}
-
-const handleUnlike = async (favoriteId: number) => {
-  if (unliked.value[favoriteId] || unlikeLoading.value[favoriteId]) return
-  setLoading(favoriteId, true)
-  unliked.value = { ...unliked.value, [favoriteId]: true }
+const handleUnlike = async (artistId: number) => {
+  if (unliked.value[artistId] || unlikeLoading.value[artistId]) return
+  unlikeLoading.value = { ...unlikeLoading.value, [artistId]: true }
   try {
-    await removeFavoriteItem(favoriteId, 'artist')
+    const result = await toggleFavoriteArtist(artistId)
+    if (!result.favorited) {
+      unliked.value = { ...unliked.value, [artistId]: true }
+    }
   } catch (error) {
     console.error('Failed to unlike artist:', error)
-    const { [favoriteId]: _removed, ...rest } = unliked.value
-    unliked.value = rest
   } finally {
-    setLoading(favoriteId, false)
+    const { [artistId]: _, ...rest } = unlikeLoading.value
+    unlikeLoading.value = rest
   }
 }
 
 const previousPage = () => {
-  if (page.value > 1) {
-    page.value -= 1
-  }
+  if (page.value > 1) page.value -= 1
 }
 
 const nextPage = () => {
-  if (page.value < totalPages.value) {
-    page.value += 1
-  }
+  if (page.value < totalPages.value) page.value += 1
 }
 
 const goToPage = (p: number) => {

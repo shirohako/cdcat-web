@@ -18,7 +18,6 @@
 
     <!-- Works List -->
     <div v-else>
-      <!-- List View (one album per row) -->
       <div class="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
         <div
           v-for="work in works"
@@ -29,15 +28,15 @@
           <div class="flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4">
             <!-- Cover -->
             <NuxtLink
-              :to="`/works/${work.workId}`"
+              :to="`/works/${work.id}`"
               class="shrink-0"
-              :aria-label="`查看专辑：${work.workTitle}`"
+              :aria-label="`查看专辑：${work.title}`"
             >
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
                 <img
-                  v-if="work.cover"
-                  :src="work.cover"
-                  :alt="work.workTitle"
+                  v-if="work.image_url"
+                  :src="work.image_url"
+                  :alt="work.title"
                   class="w-full h-full object-cover"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
@@ -49,35 +48,35 @@
             <!-- Info -->
             <div class="min-w-0 flex-1 text-center sm:text-left">
               <NuxtLink
-                :to="`/works/${work.workId}`"
+                :to="`/works/${work.id}`"
                 class="block font-semibold text-sm sm:text-base text-gray-900 hover:text-blue-700 transition-colors line-clamp-2"
               >
-                {{ work.workTitle }}
+                {{ work.title }}
               </NuxtLink>
 
-              <p class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">
-                {{ work.artists.join(', ') }}
+              <p v-if="work.artists?.length" class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">
+                {{ work.artists.map(a => a.pivot?.display_name || a.name).join(', ') }}
               </p>
 
               <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-400">
-                <span v-if="work.releaseDate">发行：{{ formatDate(work.releaseDate) }}</span>
-                <span>收藏：{{ formatDate(work.createdAt) }}</span>
+                <span v-if="work.release_date">发行：{{ formatDate(work.release_date) }}</span>
+                <span v-if="work.favorited_at">收藏：{{ formatDate(work.favorited_at) }}</span>
               </div>
             </div>
 
             <!-- Actions -->
             <div class="shrink-0 flex items-center justify-center sm:justify-end gap-2 sm:gap-1">
               <NuxtLink
-                :to="`/works/${work.workId}`"
+                :to="`/works/${work.id}`"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
-                :aria-label="`查看专辑：${work.workTitle}`"
+                :aria-label="`查看专辑：${work.title}`"
                 title="查看"
               >
                 <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
               <button
                 type="button"
-                :disabled="!!unliked[work.id] || !!unlikeLoading[work.id]"
+                :disabled="!!unlikeLoading[work.id]"
                 @click="handleUnlike(work.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[work.id] ? '已取消喜欢' : '取消喜欢'"
@@ -132,21 +131,17 @@
 </template>
 
 <script setup lang="ts">
-import type { FavoriteWork, FavoritesStats } from '~/types/favorites'
+import type { FavoriteWork } from '~/types/favorites'
 
-defineProps<{
-  stats: FavoritesStats
-}>()
-
-const { getFavoriteWorks, removeFavoriteItem } = useFavorites()
+const { getFavoriteWorks, toggleFavoriteWork } = useFavorites()
 
 const works = ref<FavoriteWork[]>([])
 const page = ref(1)
-const pageSize = 12
+const perPage = 15
 const totalItems = ref(0)
 const isLoading = ref(false)
 
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize))
+const totalPages = computed(() => Math.ceil(totalItems.value / perPage))
 
 const visiblePages = computed(() => {
   const pages = []
@@ -179,9 +174,9 @@ const formatDate = (dateString: string) => {
 const loadData = async () => {
   isLoading.value = true
   try {
-    const response = await getFavoriteWorks(page.value, pageSize)
-    works.value = response.data
-    totalItems.value = response.total
+    const response = await getFavoriteWorks(page.value, perPage)
+    works.value = response.works
+    totalItems.value = response.pagination.total
   } catch (error) {
     console.error('Failed to load works:', error)
   } finally {
@@ -192,40 +187,28 @@ const loadData = async () => {
 const unliked = ref<Record<number, boolean>>({})
 const unlikeLoading = ref<Record<number, boolean>>({})
 
-const setLoading = (favoriteId: number, pending: boolean) => {
-  if (pending) {
-    unlikeLoading.value = { ...unlikeLoading.value, [favoriteId]: true }
-    return
-  }
-  const { [favoriteId]: _removed, ...rest } = unlikeLoading.value
-  unlikeLoading.value = rest
-}
-
-const handleUnlike = async (favoriteId: number) => {
-  if (unliked.value[favoriteId] || unlikeLoading.value[favoriteId]) return
-  setLoading(favoriteId, true)
-  unliked.value = { ...unliked.value, [favoriteId]: true }
+const handleUnlike = async (workId: number) => {
+  if (unliked.value[workId] || unlikeLoading.value[workId]) return
+  unlikeLoading.value = { ...unlikeLoading.value, [workId]: true }
   try {
-    await removeFavoriteItem(favoriteId, 'work')
+    const result = await toggleFavoriteWork(workId)
+    if (!result.favorited) {
+      unliked.value = { ...unliked.value, [workId]: true }
+    }
   } catch (error) {
     console.error('Failed to unlike work:', error)
-    const { [favoriteId]: _removed, ...rest } = unliked.value
-    unliked.value = rest
   } finally {
-    setLoading(favoriteId, false)
+    const { [workId]: _, ...rest } = unlikeLoading.value
+    unlikeLoading.value = rest
   }
 }
 
 const previousPage = () => {
-  if (page.value > 1) {
-    page.value -= 1
-  }
+  if (page.value > 1) page.value -= 1
 }
 
 const nextPage = () => {
-  if (page.value < totalPages.value) {
-    page.value += 1
-  }
+  if (page.value < totalPages.value) page.value += 1
 }
 
 const goToPage = (p: number) => {

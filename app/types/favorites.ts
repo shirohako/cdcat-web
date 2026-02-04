@@ -36,12 +36,12 @@
 
 export interface FavoriteWork {
   id: number
-  workId: number
-  workTitle: string
-  artists: string[] // 艺术家名称列表
-  cover?: string // 封面图片URL
-  releaseDate?: string
-  createdAt: string
+  title: string
+  catalog_number?: string
+  image_url?: string
+  release_date?: string
+  artists?: Array<{ id: number; name: string; pivot?: { display_name?: string } }>
+  favorited_at: string
 }
 
 export interface FavoriteSong {
@@ -57,11 +57,9 @@ export interface FavoriteSong {
 
 export interface FavoriteArtist {
   id: number
-  artistId: number
-  artistName: string
-  avatar?: string // 艺术家头像
-  followersCount?: number
-  createdAt: string
+  name: string
+  image_url?: string
+  favorited_at: string
 }
 
 // 收藏汇总信息

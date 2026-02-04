@@ -107,10 +107,15 @@
                 Share
               </button>
               <button
-                class="btn btn-md btn-outline border-gray-300 hover:bg-gray-50 gap-2"
+                class="btn btn-md gap-2"
+                :class="isFavorited
+                  ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                  : 'btn-outline border-gray-300 hover:bg-gray-50'"
+                :disabled="isToggling"
+                @click="toggleLike"
               >
-                <Heart :size="18" />
-                Like
+                <Heart :size="18" :fill="isFavorited ? 'currentColor' : 'none'" />
+                {{ isFavorited ? 'Liked' : 'Like' }}
               </button>
             </div>
           </div>
@@ -233,12 +238,40 @@ import {
   Edit,
 } from "lucide-vue-next";
 
+const { isAuthenticated } = useAuth()
+const { $api } = useNuxtApp()
+
 // Get artist ID from route
 const route = useRoute();
 const artistId = route.params.id;
 
 // Fetch artist data from API
 const { data: artist } = await useAPI(`/v1/artists/${artistId}`);
+
+// Favorite state
+const isFavorited = ref(false)
+const isToggling = ref(false)
+
+const toggleLike = async () => {
+  if (!isAuthenticated.value) {
+    await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
+    return
+  }
+
+  if (isToggling.value) return
+
+  isToggling.value = true
+  try {
+    const result = await $api(`/v1/favorites/artists/${artistId}`, {
+      method: 'POST',
+    })
+    isFavorited.value = result.favorited
+  } catch {
+    // 401 已由 api 插件处理
+  } finally {
+    isToggling.value = false
+  }
+}
 
 // Computed artist data with fallbacks
 const artistData = computed(() => ({
