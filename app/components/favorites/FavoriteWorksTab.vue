@@ -77,7 +77,7 @@
               <button
                 type="button"
                 :disabled="!!unlikeLoading[work.id]"
-                @click="handleUnlike(work.id)"
+                @click="handleToggle(work.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[work.id] ? '已取消喜欢' : '取消喜欢'"
               >
@@ -187,16 +187,14 @@ const loadData = async () => {
 const unliked = ref<Record<number, boolean>>({})
 const unlikeLoading = ref<Record<number, boolean>>({})
 
-const handleUnlike = async (workId: number) => {
-  if (unliked.value[workId] || unlikeLoading.value[workId]) return
+const handleToggle = async (workId: number) => {
+  if (unlikeLoading.value[workId]) return
   unlikeLoading.value = { ...unlikeLoading.value, [workId]: true }
   try {
     const result = await toggleFavoriteWork(workId)
-    if (!result.favorited) {
-      unliked.value = { ...unliked.value, [workId]: true }
-    }
+    unliked.value = { ...unliked.value, [workId]: !result.favorited }
   } catch (error) {
-    console.error('Failed to unlike work:', error)
+    console.error('Failed to toggle work favorite:', error)
   } finally {
     const { [workId]: _, ...rest } = unlikeLoading.value
     unlikeLoading.value = rest

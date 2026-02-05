@@ -72,7 +72,7 @@
               <button
                 type="button"
                 :disabled="!!unlikeLoading[artist.id]"
-                @click="handleUnlike(artist.id)"
+                @click="handleToggle(artist.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="unliked[artist.id] ? '已取消喜欢' : '取消喜欢'"
               >
@@ -182,16 +182,14 @@ const loadData = async () => {
 const unliked = ref<Record<number, boolean>>({})
 const unlikeLoading = ref<Record<number, boolean>>({})
 
-const handleUnlike = async (artistId: number) => {
-  if (unliked.value[artistId] || unlikeLoading.value[artistId]) return
+const handleToggle = async (artistId: number) => {
+  if (unlikeLoading.value[artistId]) return
   unlikeLoading.value = { ...unlikeLoading.value, [artistId]: true }
   try {
     const result = await toggleFavoriteArtist(artistId)
-    if (!result.favorited) {
-      unliked.value = { ...unliked.value, [artistId]: true }
-    }
+    unliked.value = { ...unliked.value, [artistId]: !result.favorited }
   } catch (error) {
-    console.error('Failed to unlike artist:', error)
+    console.error('Failed to toggle artist favorite:', error)
   } finally {
     const { [artistId]: _, ...rest } = unlikeLoading.value
     unlikeLoading.value = rest

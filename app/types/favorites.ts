@@ -46,13 +46,16 @@ export interface FavoriteWork {
 
 export interface FavoriteSong {
   id: number
-  songId: number
-  songTitle: string
-  artist: string // 艺术家名称
-  workTitle?: string // 所属专辑
-  cover?: string // 封面图片URL（通常为专辑封面）
-  duration?: number // 时长（秒）
-  createdAt: string
+  title: string
+  duration?: number
+  track_number?: number
+  disc_number?: number
+  work?: {
+    id: number
+    title: string
+    image_url?: string
+  }
+  favorited_at: string
 }
 
 export interface FavoriteArtist {
@@ -62,32 +65,3 @@ export interface FavoriteArtist {
   favorited_at: string
 }
 
-// 收藏汇总信息
-export interface FavoritesStats {
-  worksCount: number
-  songsCount: number
-  artistsCount: number
-}
-
-// API 请求/响应类型
-export interface GetFavoritesResponse<T> {
-  data: T[]
-  total: number
-  page: number
-  pageSize: number
-}
-
-export interface AddFavoriteRequest {
-  itemId: number
-  type: 'work' | 'song' | 'artist'
-}
-
-export interface RemoveFavoriteRequest {
-  itemId: number
-  type: 'work' | 'song' | 'artist'
-}
-
-export interface CheckFavoriteResponse {
-  isFavorited: boolean
-  favoriteId?: number
-}

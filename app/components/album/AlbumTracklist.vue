@@ -45,11 +45,25 @@
           <div
             v-for="track in disc.tracks"
             :key="track.uid"
-            class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded transition"
+            class="flex items-center gap-2 p-3 hover:bg-gray-50 rounded transition"
           >
-            <span class="text-gray-500 font-mono text-sm w-8">{{
+            <span class="text-gray-500 font-mono text-sm w-8 text-center">{{
               track.displayNumber
             }}</span>
+            <button
+              v-if="isAuthenticated && track.songId"
+              type="button"
+              :disabled="!!toggleLoading[track.songId]"
+              @click="handleToggleFavorite(track.songId)"
+              class="p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              :title="favoritedSongs[track.songId] ? '取消收藏' : '收藏'"
+            >
+              <Heart
+                :size="16"
+                :fill="favoritedSongs[track.songId] ? 'currentColor' : 'none'"
+                :class="favoritedSongs[track.songId] ? 'text-red-500' : 'text-gray-400'"
+              />
+            </button>
             <div class="flex-1">
               <p class="font-medium">{{ track.title }}</p>
               <p v-if="track.subtitle" class="text-sm text-gray-500 mt-0.5">
@@ -88,9 +102,34 @@
 </template>
 
 <script setup>
-import { ListMusic, Disc3, Users } from "lucide-vue-next";
+import { ListMusic, Disc3, Users, Heart } from "lucide-vue-next";
+
+const { isAuthenticated } = useAuth();
+const { toggleFavoriteSong } = useFavorites();
+const route = useRoute();
 
 const showCredits = ref(true);
+const favoritedSongs = ref({});
+const toggleLoading = ref({});
+
+const handleToggleFavorite = async (songId) => {
+  if (!isAuthenticated.value) {
+    await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`);
+    return;
+  }
+  if (toggleLoading.value[songId]) return;
+
+  toggleLoading.value = { ...toggleLoading.value, [songId]: true };
+  try {
+    const result = await toggleFavoriteSong(songId);
+    favoritedSongs.value = { ...favoritedSongs.value, [songId]: result.favorited };
+  } catch {
+    // 401 已由 api 插件处理
+  } finally {
+    const { [songId]: _, ...rest } = toggleLoading.value;
+    toggleLoading.value = rest;
+  }
+};
 
 const props = defineProps({
   songs: {
@@ -160,6 +199,7 @@ const processTracks = (list, discNumber) => {
       }
 
       return {
+        songId: song.id ?? null,
         uid:
           song.id ??
           `disc-${discNumber}-${trackNumber ?? song.title ?? "track"}`,

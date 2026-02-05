@@ -25,7 +25,6 @@
             <tr>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">歌曲</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">所属专辑</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">时长</th>
               <th class="px-6 py-3 text-left font-semibold text-gray-700">收藏时间</th>
               <th class="px-6 py-3 text-center font-semibold text-gray-700">操作</th>
             </tr>
@@ -41,7 +40,7 @@
                 <div class="flex items-center gap-3">
                   <Icon name="lucide:music" class="w-5 h-5 text-gray-400" />
                   <div class="min-w-0">
-                    <p class="font-medium text-gray-900 truncate">{{ song.songTitle }}</p>
+                    <p class="font-medium text-gray-900 truncate">{{ song.title }}</p>
                   </div>
                 </div>
               </td>
@@ -51,30 +50,29 @@
                 <div class="flex items-center gap-2 min-w-0">
                   <div class="w-8 h-8 rounded-md overflow-hidden bg-gray-100 ring-1 ring-black/5 shrink-0">
                     <img
-                      v-if="song.cover"
-                      :src="song.cover"
-                      :alt="song.workTitle || song.songTitle"
+                      v-if="song.work?.image_url"
+                      :src="song.work.image_url"
+                      :alt="song.work?.title || song.title"
                       class="w-full h-full object-cover"
                     />
                     <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
                       <Icon name="lucide:disc-3" class="w-4 h-4" />
                     </div>
                   </div>
-                  <span v-if="song.workTitle" class="text-blue-600 hover:underline cursor-pointer truncate">
-                    {{ song.workTitle }}
-                  </span>
+                  <NuxtLink
+                    v-if="song.work"
+                    :to="`/works/${song.work.id}`"
+                    class="text-blue-600 hover:underline truncate"
+                  >
+                    {{ song.work.title }}
+                  </NuxtLink>
                   <span v-else class="text-gray-400">-</span>
                 </div>
               </td>
 
-              <!-- Duration -->
-              <td class="px-6 py-4 text-gray-600">
-                {{ formatDuration(song.duration) }}
-              </td>
-
               <!-- Created At -->
               <td class="px-6 py-4 text-gray-600 text-sm">
-                {{ formatDate(song.createdAt) }}
+                {{ formatDate(song.favorited_at) }}
               </td>
 
               <!-- Actions -->
@@ -82,19 +80,10 @@
                 <div class="flex items-center justify-center gap-2">
                   <button
                     type="button"
-                    disabled
-                    class="text-gray-600 hover:text-gray-700 transition-colors p-1 rounded hover:bg-gray-100
-                           disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    title="添加笔记（即将支持）"
-                  >
-                    <Icon name="lucide:sticky-note" class="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    :disabled="!!unliked[song.id] || !!unlikeLoading[song.id]"
-                    @click="handleUnlike(song.id)"
+                    :disabled="!!unlikeLoading[song.id]"
+                    @click="handleToggle(song.id)"
                     class="transition-colors p-1 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    :title="unliked[song.id] ? '已取消喜欢' : '取消喜欢'"
+                    :title="unliked[song.id] ? '已取消收藏' : '取消收藏'"
                   >
                     <Icon
                       :name="unliked[song.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -120,9 +109,9 @@
             <!-- Cover -->
             <div class="w-12 h-12 rounded-md overflow-hidden bg-gray-100 ring-1 ring-black/5 shrink-0">
               <img
-                v-if="song.cover"
-                :src="song.cover"
-                :alt="song.songTitle"
+                v-if="song.work?.image_url"
+                :src="song.work.image_url"
+                :alt="song.title"
                 class="w-full h-full object-cover"
               />
               <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
@@ -132,13 +121,19 @@
 
             <!-- Info -->
             <div class="min-w-0 flex-1">
-              <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ song.songTitle }}</p>
+              <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ song.title }}</p>
               <p class="text-xs text-gray-600 mt-0.5 line-clamp-1">
-                {{ song.workTitle || '无专辑' }}
+                <NuxtLink
+                  v-if="song.work"
+                  :to="`/works/${song.work.id}`"
+                  class="hover:underline"
+                >
+                  {{ song.work.title }}
+                </NuxtLink>
+                <span v-else>无专辑</span>
               </p>
               <div class="flex gap-2 mt-2 text-xs text-gray-500">
-                <span>{{ formatDuration(song.duration) }}</span>
-                <span>{{ formatDate(song.createdAt) }}</span>
+                <span>{{ formatDate(song.favorited_at) }}</span>
               </div>
             </div>
 
@@ -146,18 +141,10 @@
             <div class="shrink-0 flex items-center gap-1">
               <button
                 type="button"
-                disabled
-                class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-30"
-                title="添加笔记（即将支持）"
-              >
-                <Icon name="lucide:sticky-note" class="w-4 h-4 text-gray-500" />
-              </button>
-              <button
-                type="button"
                 :disabled="!!unliked[song.id] || !!unlikeLoading[song.id]"
-                @click="handleUnlike(song.id)"
+                @click="handleToggle(song.id)"
                 class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                :title="unliked[song.id] ? '已取消喜欢' : '取消喜欢'"
+                :title="unliked[song.id] ? '已取消收藏' : '取消收藏'"
               >
                 <Icon
                   :name="unliked[song.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -211,15 +198,15 @@
 <script setup lang="ts">
 import type { FavoriteSong } from '~/types/favorites'
 
-const { getFavoriteSongs, removeFavoriteItem } = useFavorites()
+const { getFavoriteSongs, toggleFavoriteSong } = useFavorites()
 
 const songs = ref<FavoriteSong[]>([])
 const page = ref(1)
-const pageSize = 10
+const perPage = 15
 const totalItems = ref(0)
 const isLoading = ref(false)
 
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize))
+const totalPages = computed(() => Math.ceil(totalItems.value / perPage))
 
 const visiblePages = computed(() => {
   const pages = []
@@ -249,19 +236,12 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const formatDuration = (seconds?: number) => {
-  if (!seconds) return '-'
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${mins}:${secs.toString().padStart(2, '0')}`
-}
-
 const loadData = async () => {
   isLoading.value = true
   try {
-    const response = await getFavoriteSongs(page.value, pageSize)
-    songs.value = response.data
-    totalItems.value = response.total
+    const response = await getFavoriteSongs(page.value, perPage)
+    songs.value = response.songs
+    totalItems.value = response.pagination.total
   } catch (error) {
     console.error('Failed to load songs:', error)
   } finally {
@@ -272,40 +252,26 @@ const loadData = async () => {
 const unliked = ref<Record<number, boolean>>({})
 const unlikeLoading = ref<Record<number, boolean>>({})
 
-const setLoading = (favoriteId: number, pending: boolean) => {
-  if (pending) {
-    unlikeLoading.value = { ...unlikeLoading.value, [favoriteId]: true }
-    return
-  }
-  const { [favoriteId]: _removed, ...rest } = unlikeLoading.value
-  unlikeLoading.value = rest
-}
-
-const handleUnlike = async (favoriteId: number) => {
-  if (unliked.value[favoriteId] || unlikeLoading.value[favoriteId]) return
-  setLoading(favoriteId, true)
-  unliked.value = { ...unliked.value, [favoriteId]: true }
+const handleToggle = async (songId: number) => {
+  if (unlikeLoading.value[songId]) return
+  unlikeLoading.value = { ...unlikeLoading.value, [songId]: true }
   try {
-    await removeFavoriteItem(favoriteId, 'song')
+    const result = await toggleFavoriteSong(songId)
+    unliked.value = { ...unliked.value, [songId]: !result.favorited }
   } catch (error) {
-    console.error('Failed to unlike song:', error)
-    const { [favoriteId]: _removed, ...rest } = unliked.value
-    unliked.value = rest
+    console.error('Failed to toggle song favorite:', error)
   } finally {
-    setLoading(favoriteId, false)
+    const { [songId]: _, ...rest } = unlikeLoading.value
+    unlikeLoading.value = rest
   }
 }
 
 const previousPage = () => {
-  if (page.value > 1) {
-    page.value -= 1
-  }
+  if (page.value > 1) page.value -= 1
 }
 
 const nextPage = () => {
-  if (page.value < totalPages.value) {
-    page.value += 1
-  }
+  if (page.value < totalPages.value) page.value += 1
 }
 
 const goToPage = (p: number) => {
