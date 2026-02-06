@@ -41,7 +41,12 @@
     "remove": "トラッキングを削除",
     "view_details": "詳細を表示",
     "status_updated": "ステータスが更新されました",
-    "removed": "トラッキングを削除しました"
+    "removed": "トラッキングを削除しました",
+    "widget": {
+      "title": "トラッキング",
+      "remove": "トラッキングを削除",
+      "manage": "トラッキング管理"
+    }
   },
   "discussion": {
     "description": "言語セクションを選んでディスカッションに参加",

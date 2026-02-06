@@ -60,6 +60,9 @@
           <!-- 显示所有艺术家 -->
           <AlbumArtistCard :artists="artistsData" />
 
+          <!-- 追踪状态 -->
+          <AlbumTracking :work-id="workId" />
+
           <AlbumStats :stats="stats" />
 
           <AlbumRankings

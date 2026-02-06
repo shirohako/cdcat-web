@@ -468,12 +468,67 @@ export const useTracking = () => {
     return mockTrackingWorks.find(w => w.workId === workId) || null
   }
 
+  /**
+   * 获取专辑的追踪状态（基于 workId）
+   * @param workId 专辑 ID
+   */
+  const getWorkTracking = async (workId: number): Promise<{ status: TrackingStatus | null; trackingId: number | null }> => {
+    const { $api } = useNuxtApp()
+    try {
+      const response = await $api<{ status: TrackingStatus; id: number }>(`/v1/tracking/works/${workId}`)
+      return { status: response.status, trackingId: response.id }
+    } catch (error: any) {
+      // 404 表示用户未追踪该专辑
+      if (error.statusCode === 404) {
+        return { status: null, trackingId: null }
+      }
+      throw error
+    }
+  }
+
+  /**
+   * 设置或更新专辑的追踪状态（基于 workId）
+   * @param workId 专辑 ID
+   * @param status 追踪状态
+   */
+  const setWorkTracking = async (workId: number, status: TrackingStatus): Promise<{ status: TrackingStatus; id: number }> => {
+    const statusMap: Record<TrackingStatus, number> = {
+      plan_to_listen: 1,
+      wishlist: 2,
+      completed: 3,
+      owned: 4,
+      dropped: 5
+    }
+    const { $api } = useNuxtApp()
+    return await $api<{ status: TrackingStatus; id: number }>(`/v1/tracking/works/${workId}`, {
+      method: 'POST',
+      body: { status: statusMap[status] }
+    })
+  }
+
+  /**
+   * 删除专辑的追踪记录（基于 workId）
+   * @param workId 专辑 ID
+   */
+  const deleteWorkTracking = async (workId: number): Promise<boolean> => {
+    const { $api } = useNuxtApp()
+    try {
+      await $api(`/v1/tracking/works/${workId}`, { method: 'DELETE' })
+      return true
+    } catch {
+      return false
+    }
+  }
+
   return {
     getTrackingWorks,
     getTrackingStats,
     createTracking,
     updateTrackingStatus,
     removeTracking,
-    checkTracking
+    checkTracking,
+    getWorkTracking,
+    setWorkTracking,
+    deleteWorkTracking
   }
 }

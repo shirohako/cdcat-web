@@ -41,7 +41,12 @@
     "remove": "Remove Tracking",
     "view_details": "View Details",
     "status_updated": "Status updated",
-    "removed": "Tracking removed"
+    "removed": "Tracking removed",
+    "widget": {
+      "title": "Tracking Status",
+      "remove": "Remove Tracking",
+      "manage": "Manage My Tracking"
+    }
   },
   "discussion": {
     "description": "Choose a language section to join the discussion",

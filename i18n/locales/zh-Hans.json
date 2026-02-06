@@ -41,7 +41,12 @@
     "remove": "移除追踪",
     "view_details": "查看详情",
     "status_updated": "状态已更新",
-    "removed": "已移除追踪"
+    "removed": "已移除追踪",
+    "widget": {
+      "title": "追踪状态",
+      "remove": "取消追踪",
+      "manage": "管理我的追踪"
+    }
   },
   "discussion": {
     "description": "选择一个语言板块，参与讨论",
