@@ -129,7 +129,7 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="totalPages > 1" class="flex items-center justify-center gap-2">
+      <div v-if="total > 0" class="flex items-center justify-center gap-2">
         <button
           :disabled="currentPage === 1"
           @click="previousPage"
@@ -178,7 +178,7 @@ const emit = defineEmits<{
   'update:stats': [void]
 }>()
 
-const { getTrackingWorks } = useTracking()
+const { getTrackingWorks, setWorkTracking, deleteWorkTracking } = useTracking()
 const { t } = useI18n()
 
 const works = ref<TrackingWork[]>([])
@@ -288,12 +288,33 @@ const goToPage = (page: number) => {
   currentPage.value = page
 }
 
-const handleStatusChange = async (_trackingId: number, _newStatus: TrackingStatus) => {
-  // TODO: 后端接口就绪后实现
+const handleStatusChange = async (trackingId: number, newStatus: TrackingStatus) => {
+  const work = works.value.find(w => w.id === trackingId)
+  if (!work) return
+
+  try {
+    await setWorkTracking(work.workId, newStatus)
+    await loadWorks()
+    emit('update:stats')
+  } catch (error) {
+    console.error('Failed to change tracking status:', error)
+  }
 }
 
-const handleRemove = async (_trackingId: number) => {
-  // TODO: 后端接口就绪后实现
+const handleRemove = async (trackingId: number) => {
+  const work = works.value.find(w => w.id === trackingId)
+  if (!work) return
+
+  removingId.value = trackingId
+  try {
+    await deleteWorkTracking(work.workId)
+    await loadWorks()
+    emit('update:stats')
+  } catch (error) {
+    console.error('Failed to remove tracking:', error)
+  } finally {
+    removingId.value = null
+  }
 }
 
 const formatDate = (dateString: string) => {
@@ -318,6 +339,10 @@ watch(
 )
 
 onMounted(() => {
+  loadWorks()
+})
+
+onActivated(() => {
   loadWorks()
 })
 </script>
