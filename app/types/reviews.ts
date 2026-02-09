@@ -64,6 +64,7 @@ export interface CreateReviewRequest {
   workId: number
   content: string
   score: number | null
+  language?: string
 }
 
 // 更新评价请求

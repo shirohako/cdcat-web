@@ -91,9 +91,45 @@
         />
       </div>
 
+      <!-- Delete Confirm Dialog -->
+      <Teleport to="body">
+        <div v-if="deleteConfirm.show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="cancelDelete" />
+          <div class="relative bg-white rounded-2xl shadow-xl ring-1 ring-black/5 w-full max-w-sm p-6">
+            <div class="flex flex-col items-center text-center">
+              <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+                <Icon name="lucide:trash-2" class="w-6 h-6 text-red-500" />
+              </div>
+              <h3 class="text-lg font-bold text-gray-900">删除评价</h3>
+              <p class="text-sm text-gray-500 mt-2">确定要删除这条评价吗？此操作无法撤销。</p>
+            </div>
+            <div class="flex gap-3 mt-6">
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm flex-1"
+                :disabled="deleteConfirm.loading"
+                @click="cancelDelete"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                class="btn btn-error btn-sm flex-1 gap-2"
+                :disabled="deleteConfirm.loading"
+                @click="confirmDelete"
+              >
+                <Icon v-if="deleteConfirm.loading" name="lucide:loader" class="w-4 h-4 animate-spin" />
+                删除
+              </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
       <!-- Write/Edit Review Modal -->
-      <ReviewFormModal
+      <ReviewsReviewFormModal
         v-if="showWriteModal"
+        :key="editingReview?.id ?? 'new'"
         :review="editingReview"
         @close="closeModal"
         @saved="handleSaved"
@@ -113,7 +149,7 @@ useHead({
   title: 'My Reviews | CDCAT'
 })
 
-const { getReviews, getReviewStats, deleteReview } = useReviews()
+const { $api } = useNuxtApp()
 
 // State
 const reviews = ref<UserReview[]>([])
@@ -126,30 +162,71 @@ const total = ref(0)
 const sortBy = ref<ReviewSortBy>('date_desc')
 const showWriteModal = ref(false)
 const editingReview = ref<UserReview | null>(null)
+const deleteConfirm = reactive({ show: false, reviewId: 0, loading: false })
+
+// API 响应 → UserReview 映射
+function mapReview(raw: any): UserReview {
+  return {
+    id: raw.id,
+    workId: raw.work_id,
+    workTitle: raw.work?.title ?? '',
+    workImageUrl: raw.work?.image_url ?? '',
+    artists: [],
+    content: raw.content ?? '',
+    score: raw.rating ?? null,
+    reactions: {
+      helpful: raw.useful_count ?? 0,
+      unhelpful: raw.dislike_count ?? 0,
+      funny: raw.fun_count ?? 0,
+    },
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
+  }
+}
+
+// 从评价列表计算统计
+function computeStats(list: UserReview[], totalCount: number): ReviewStats {
+  const scored = list.filter(r => r.score !== null)
+  return {
+    totalReviews: totalCount,
+    averageScore: scored.length > 0
+      ? scored.reduce((sum, r) => sum + r.score!, 0) / scored.length
+      : 0,
+    scoredCount: scored.length,
+  }
+}
+
+// 排序参数映射
+const sortQueryMap: Record<ReviewSortBy, string> = {
+  date_desc: '-created_at',
+  date_asc: 'created_at',
+  score_desc: '-rating',
+  score_asc: 'rating',
+}
 
 // Load reviews
 const loadReviews = async () => {
   isLoading.value = true
   try {
-    const response = await getReviews(currentPage.value, pageSize.value, sortBy.value)
-    reviews.value = response.data
-    total.value = response.total
+    const res = await $api<any>('/v1/reviews/mine', {
+      params: {
+        page: currentPage.value,
+        per_page: pageSize.value,
+        sort: sortQueryMap[sortBy.value],
+      },
+    })
+    const data = res.reviews ?? res.data?.reviews ?? []
+    const pagination = res.pagination ?? res.data?.pagination ?? {}
+    reviews.value = data.map(mapReview)
+    total.value = pagination.total ?? data.length
+
+    // 用当前数据计算统计
+    stats.value = computeStats(reviews.value, total.value)
+    statsLoading.value = false
   } catch (error) {
     console.error('Failed to load reviews:', error)
   } finally {
     isLoading.value = false
-  }
-}
-
-// Load stats
-const loadStats = async () => {
-  statsLoading.value = true
-  try {
-    stats.value = await getReviewStats()
-  } catch (error) {
-    console.error('Failed to load review stats:', error)
-  } finally {
-    statsLoading.value = false
   }
 }
 
@@ -166,21 +243,32 @@ const handleEdit = (review: UserReview) => {
   showWriteModal.value = true
 }
 
-const handleDelete = async (reviewId: number) => {
-  if (!confirm('确定要删除这条评价吗？')) return
+const handleDelete = (reviewId: number) => {
+  deleteConfirm.reviewId = reviewId
+  deleteConfirm.show = true
+}
+
+const cancelDelete = () => {
+  deleteConfirm.show = false
+  deleteConfirm.reviewId = 0
+}
+
+const confirmDelete = async () => {
+  deleteConfirm.loading = true
   try {
-    await deleteReview(reviewId)
+    await $api(`/v1/reviews/${deleteConfirm.reviewId}`, { method: 'DELETE' })
+    cancelDelete()
     await loadReviews()
-    await loadStats()
   } catch (error) {
     console.error('Failed to delete review:', error)
+  } finally {
+    deleteConfirm.loading = false
   }
 }
 
 const handleSaved = () => {
   closeModal()
   loadReviews()
-  loadStats()
 }
 
 const closeModal = () => {
@@ -203,7 +291,6 @@ watch(currentPage, () => {
 })
 
 onMounted(() => {
-  loadStats()
   loadReviews()
 })
 </script>

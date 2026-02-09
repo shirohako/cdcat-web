@@ -53,6 +53,13 @@
 
           <!-- Reviews -->
           <AlbumReviews :reviews="mockReviews" class="hidden" />
+
+          <!-- Review Modal -->
+          <AlbumReviewModal
+            v-model="showReviewModal"
+            :work-id="workId"
+            @saved="onReviewSaved"
+          />
         </div>
 
         <!-- Right Column - Sidebar -->
@@ -73,6 +80,7 @@
             :genre-rank="rankings.genreRank"
             :genre-total="rankings.genreTotal"
             :genre-name="rankings.genreName"
+            @write-review="handleWriteReview"
           />
 
           <!-- Links -->
@@ -88,6 +96,23 @@
 </template>
 
 <script setup>
+const { isAuthenticated } = useAuth()
+const router = useRouter()
+
+// 评价弹窗状态
+const showReviewModal = ref(false)
+
+const handleWriteReview = () => {
+  if (!isAuthenticated.value) {
+    navigateTo({ path: '/auth/login', query: { redirect: router.currentRoute.value.fullPath } })
+    return
+  }
+  showReviewModal.value = true
+}
+
+const onReviewSaved = () => {
+  // TODO: 刷新评价列表
+}
 
 // 获取路由参数
 const route = useRoute();

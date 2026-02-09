@@ -1,4 +1,5 @@
 <template>
+  <Teleport to="body">
   <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
     <!-- Backdrop -->
     <div
@@ -194,6 +195,11 @@
         </div>
       </div>
 
+      <!-- Error Message -->
+      <div v-if="errorMessage" class="mx-6 mb-0 px-4 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+        {{ errorMessage }}
+      </div>
+
       <!-- Footer -->
       <div
         class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4
@@ -222,10 +228,20 @@
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import type { UserReview, SearchableAlbum } from '~/types/reviews'
+import type { UserReview } from '~/types/reviews'
+
+interface SearchableAlbum {
+  id: number
+  title: string
+  imageUrl: string
+  artists: { id: number; name: string }[]
+  releaseDate: string
+  catalogNumber: string
+}
 
 interface Props {
   review?: UserReview | null
@@ -240,15 +256,18 @@ const emit = defineEmits<{
   saved: []
 }>()
 
-const { searchAlbums, createReview, updateReview } = useReviews()
+const { $api } = useNuxtApp()
 
 const isEditing = computed(() => props.review !== null)
 
 // Form state
 const form = reactive({
   content: props.review?.content ?? '',
-  score: props.review?.score ?? null as number | null
+  score: props.review?.score ?? null as number | null,
 })
+
+// Error state
+const errorMessage = ref('')
 
 // Album search state
 const albumQuery = ref('')
@@ -281,7 +300,20 @@ watch(albumQuery, (query) => {
   }
   isSearching.value = true
   searchTimer = setTimeout(async () => {
-    albumResults.value = await searchAlbums(query)
+    try {
+      const res = await $api<any>('/v1/works', { params: { q: query, per_page: 5 } })
+      const list = res.data ?? res ?? []
+      albumResults.value = (Array.isArray(list) ? list : []).map((w: any) => ({
+        id: w.id,
+        title: w.title ?? '',
+        imageUrl: w.image_url ?? '',
+        artists: w.artists?.map((a: any) => ({ id: a.id, name: a.name })) ?? [],
+        releaseDate: w.release_date ?? '',
+        catalogNumber: w.catalog_number ?? '',
+      }))
+    } catch {
+      albumResults.value = []
+    }
     isSearching.value = false
     hasSearched.value = true
   }, 300)
@@ -317,24 +349,29 @@ const getScoreColorClass = (score: number): string => {
 const handleSubmit = async () => {
   if (!canSubmit.value || isSubmitting.value) return
   isSubmitting.value = true
+  errorMessage.value = ''
 
   try {
     if (isEditing.value && props.review) {
-      await updateReview({
-        reviewId: props.review.id,
-        content: form.content.trim(),
-        score: form.score
+      await $api(`/v1/works/${props.review.workId}/reviews`, {
+        method: 'POST',
+        body: {
+          content: form.content.trim(),
+          rating: form.score,
+        },
       })
     } else if (selectedAlbum.value) {
-      await createReview({
-        workId: selectedAlbum.value.id,
-        content: form.content.trim(),
-        score: form.score
+      await $api(`/v1/works/${selectedAlbum.value.id}/reviews`, {
+        method: 'POST',
+        body: {
+          content: form.content.trim(),
+          rating: form.score,
+        },
       })
     }
     emit('saved')
-  } catch (error) {
-    console.error('Failed to save review:', error)
+  } catch (e: any) {
+    errorMessage.value = e?.message || '提交失败，请稍后重试'
   } finally {
     isSubmitting.value = false
   }
