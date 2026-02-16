@@ -111,7 +111,7 @@ export const useAuth = () => {
     }
 
     try {
-      const response = await $api<User>('/v1/auth/me')
+      const response = await $api<User>('/v1/me')
       user.value = response
       userCookie.value = response
 
