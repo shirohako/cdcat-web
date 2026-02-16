@@ -10,22 +10,46 @@
         <!-- Avatar -->
         <div class="flex items-center gap-6">
           <div class="relative group shrink-0">
-            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center ring-1 ring-black/5">
-              <UserIcon :size="32" class="text-gray-400" />
+            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center ring-1 ring-black/5 overflow-hidden">
+              <NuxtImg
+                v-if="avatarPreview"
+                :src="avatarPreview"
+                alt="头像"
+                class="w-full h-full object-cover"
+                @error="avatarPreview = ''"
+              />
+              <UserIcon v-else :size="32" class="text-gray-400" />
             </div>
             <button
               type="button"
               class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
+              @click="showAvatarInput = !showAvatarInput"
             >
               <Camera :size="18" class="text-white" />
             </button>
           </div>
-          <div class="space-y-1">
+          <div class="space-y-2 flex-1 max-w-sm">
             <p class="text-sm font-medium text-gray-900">头像</p>
-            <p class="text-xs text-gray-400">支持 JPG、PNG 格式，最大 2MB</p>
-            <button type="button" class="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors">
-              上传新头像
-            </button>
+            <div v-if="showAvatarInput" class="flex gap-2">
+              <input
+                v-model="form.avatar"
+                type="url"
+                class="input input-bordered input-sm flex-1 bg-white text-sm"
+                placeholder="https://example.com/avatar.jpg"
+                @input="onAvatarUrlInput"
+              />
+              <button
+                type="button"
+                class="btn btn-primary btn-sm shrink-0"
+                :disabled="isUpdatingAvatar || !isAvatarChanged"
+                @click="updateAvatar"
+              >
+                <span v-if="isUpdatingAvatar" class="loading loading-spinner loading-xs"></span>
+                <span v-else>保存</span>
+              </button>
+            </div>
+            <p v-if="avatarStatus" :class="avatarStatus.class">{{ avatarStatus.message }}</p>
+            <p v-else class="text-xs text-gray-400">点击头像输入图片 URL</p>
           </div>
         </div>
 
@@ -150,7 +174,8 @@ const { fetchUser } = useAuth()
 const form = reactive({
   username: props.user?.username || '',
   nickname: props.user?.nickname || '',
-  bio: ''
+  bio: '',
+  avatar: props.user?.avatar || ''
 })
 
 const originalBio = ref('')
@@ -161,6 +186,52 @@ const nicknameStatus = ref(null)
 const isUpdatingNickname = ref(false)
 const bioStatus = ref(null)
 const isUpdatingBio = ref(false)
+
+// Avatar
+const showAvatarInput = ref(false)
+const avatarPreview = ref(props.user?.avatar || '')
+const avatarStatus = ref(null)
+const isUpdatingAvatar = ref(false)
+const originalAvatar = ref(props.user?.avatar || '')
+
+const isAvatarChanged = computed(() => {
+  return form.avatar.trim() !== originalAvatar.value
+})
+
+const onAvatarUrlInput = () => {
+  avatarStatus.value = null
+  const url = form.avatar.trim()
+  avatarPreview.value = url || originalAvatar.value
+}
+
+const updateAvatar = async () => {
+  const url = form.avatar.trim()
+  isUpdatingAvatar.value = true
+  avatarStatus.value = null
+
+  try {
+    await $api('/v1/me/avatar', {
+      method: 'PUT',
+      body: { avatar: url }
+    })
+
+    avatarStatus.value = {
+      class: 'text-xs text-emerald-600 font-medium',
+      message: '✓ 头像更新成功'
+    }
+
+    originalAvatar.value = url
+    avatarPreview.value = url
+    await fetchUser()
+  } catch (error) {
+    avatarStatus.value = {
+      class: 'text-xs text-red-600 font-medium',
+      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+    }
+  } finally {
+    isUpdatingAvatar.value = false
+  }
+}
 
 // 加载用户简介
 const loadBio = async () => {

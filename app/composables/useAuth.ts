@@ -32,11 +32,16 @@ export const useAuth = () => {
     }
   }
 
-  // 保存认证数据
+  // 保存 token
+  const saveToken = (tokenStr: string) => {
+    token.value = tokenStr
+    tokenCookie.value = tokenStr
+  }
+
+  // 保存认证数据（token + user）
   const saveAuth = (authData: AuthResponse) => {
-    token.value = authData.token
+    saveToken(authData.token)
     user.value = authData.user
-    tokenCookie.value = authData.token
     userCookie.value = authData.user
   }
 
@@ -51,13 +56,16 @@ export const useAuth = () => {
   // 登录
   const login = async (credentials: LoginRequest) => {
     try {
-      const response = await $api<AuthResponse>('/v1/auth/login', {
+      const response = await $api<{ token: string }>('/v1/auth/login', {
         method: 'POST',
         body: credentials
       })
 
-      saveAuth(response)
-      return { success: true, data: response }
+      // 先保存 token
+      saveToken(response.token)
+      // 再用 token 拉取完整用户数据
+      await fetchUser()
+      return { success: true }
     } catch (error: any) {
       return {
         success: false,

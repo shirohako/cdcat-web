@@ -108,10 +108,17 @@
             aria-label="User menu"
           >
             <div
-              class="w-8 h-8 bg-gray-900 rounded-full flex items-center justify-center
+              class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden
                      ring-2 ring-transparent group-hover:ring-gray-300 transition-all duration-200"
+              :class="user?.avatar ? '' : 'bg-gray-900'"
             >
-              <span class="text-white text-sm font-semibold">{{ userInitial }}</span>
+              <NuxtImg
+                v-if="user?.avatar"
+                :src="user.avatar"
+                alt="avatar"
+                class="w-full h-full object-cover"
+              />
+              <span v-else class="text-white text-sm font-semibold">{{ userInitial }}</span>
             </div>
             <Icon
               name="lucide:chevron-down"

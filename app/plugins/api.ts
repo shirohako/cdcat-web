@@ -15,11 +15,12 @@ export default defineNuxtPlugin(() => {
 
     // 请求拦截器
     onRequest({ options }) {
-      // 自动添加认证 token
-      // 优先使用 auth_token cookie，其次使用环境变量
-      const authToken = useCookie('auth_token').value
+      // 从 useState 读取 token（与 useAuth composable 共享同一个 ref，写入即时生效）
+      // 回退到 cookie（SSR 首次请求时 useState 可能未初始化）和环境变量
+      const stateToken = useState<string | null>('auth:token').value
+      const cookieToken = useCookie('auth_token').value
       const envToken = config.public.authToken
-      const token = authToken || envToken
+      const token = stateToken || cookieToken || envToken
 
       if (token) {
         const headers = new Headers(options.headers)

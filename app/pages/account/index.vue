@@ -41,51 +41,55 @@
         </div>
       </div>
 
-      <div class="grid lg:grid-cols-[260px,1fr] gap-6">
-        <!-- Desktop sidebar -->
-        <aside class="hidden lg:block">
-          <div class="sticky top-20 rounded-2xl ring-1 ring-black/5 overflow-hidden">
-            <div class="bg-white/70 backdrop-blur-xl p-2">
-              <nav class="space-y-1" aria-label="Account settings">
-                <button
-                  v-for="tab in tabs"
-                  :key="tab.key"
-                  type="button"
-                  class="group w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
-                  :class="activeTab === tab.key
-                    ? 'bg-white shadow-sm ring-1 ring-black/5 text-gray-900'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-white/60'"
-                  @click="activeTab = tab.key"
-                >
-                  <component :is="tab.icon" :size="16" class="text-gray-400 group-hover:text-gray-500 transition-colors" />
-                  <span class="truncate">{{ tab.label }}</span>
-                  <Icon name="lucide:chevron-right" class="ml-auto w-4 h-4 text-gray-300 group-hover:text-gray-400 transition-colors" />
-                </button>
-              </nav>
-            </div>
+      <div>
+        <!-- Tabs -->
+        <nav class="relative mb-6" aria-label="Account settings">
+          <div
+            ref="tabsScrollRef"
+            class="flex items-center gap-1 overflow-x-auto rounded-2xl bg-white/70 backdrop-blur ring-1 ring-black/5 p-1.5 [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            @scroll="onTabsScroll"
+          >
+            <button
+              v-for="tab in tabs"
+              :key="tab.key"
+              type="button"
+              class="shrink-0 flex items-center gap-1.5 rounded-xl font-medium transition-all px-3 py-2 text-xs md:px-4 md:py-2.5 md:text-sm md:gap-2"
+              :class="activeTab === tab.key
+                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
+                : 'text-gray-500 hover:text-gray-900 hover:bg-white/60 active:bg-white/60'"
+              @click="activeTab = tab.key"
+            >
+              <component
+                :is="tab.icon"
+                :size="15"
+                class="shrink-0 transition-colors"
+                :class="activeTab === tab.key ? 'text-blue-500' : 'text-gray-400'"
+              />
+              <span class="whitespace-nowrap">{{ tab.label }}</span>
+            </button>
           </div>
-        </aside>
+          <!-- Scroll hints -->
+          <button
+            v-show="canScrollLeft"
+            type="button"
+            class="absolute inset-y-0 left-0 w-9 rounded-l-2xl bg-linear-to-r from-white/95 from-40% to-transparent flex items-center justify-start pl-1.5 text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Scroll left"
+            @click="scrollTabs('left')"
+          >
+            <Icon name="lucide:chevron-left" class="w-4 h-4" />
+          </button>
+          <button
+            v-show="canScrollRight"
+            type="button"
+            class="absolute inset-y-0 right-0 w-9 rounded-r-2xl bg-linear-to-l from-white/95 from-40% to-transparent flex items-center justify-end pr-1.5 text-gray-600 hover:text-gray-900 transition-colors"
+            aria-label="Scroll right"
+            @click="scrollTabs('right')"
+          >
+            <Icon name="lucide:chevron-right" class="w-4 h-4" />
+          </button>
+        </nav>
 
-        <!-- Main -->
         <section>
-          <!-- Mobile tabs -->
-          <nav class="lg:hidden mb-5" aria-label="Settings tabs">
-            <div class="flex items-center gap-2 overflow-x-auto rounded-2xl bg-white/70 backdrop-blur ring-1 ring-black/5 p-1">
-              <button
-                v-for="tab in tabs"
-                :key="tab.key"
-                type="button"
-                class="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all"
-                :class="activeTab === tab.key
-                  ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
-                  : 'text-gray-500 hover:text-gray-900 hover:bg-white/60'"
-                @click="activeTab = tab.key"
-              >
-                <component :is="tab.icon" :size="15" />
-                {{ tab.label }}
-              </button>
-            </div>
-          </nav>
 
           <!-- Tab panels -->
           <KeepAlive>
@@ -197,6 +201,31 @@ const tabs = [
 ]
 
 const activeTab = ref('profile')
+
+// Scroll fade hints
+const tabsScrollRef = ref(null)
+const canScrollLeft = ref(false)
+const canScrollRight = ref(false)
+
+function onTabsScroll() {
+  const el = tabsScrollRef.value
+  if (!el) return
+  canScrollLeft.value = el.scrollLeft > 4
+  canScrollRight.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 4
+}
+
+function scrollTabs(direction) {
+  const el = tabsScrollRef.value
+  if (!el) return
+  el.scrollBy({ left: direction === 'left' ? -150 : 150, behavior: 'smooth' })
+}
+
+onMounted(() => {
+  nextTick(onTabsScroll)
+  if (tabsScrollRef.value) {
+    new ResizeObserver(onTabsScroll).observe(tabsScrollRef.value)
+  }
+})
 
 useHead({
   title: 'Account Settings | CDCAT'

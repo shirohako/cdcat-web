@@ -57,5 +57,5 @@ export default defineNuxtConfig({
       tailwindcss(),
     ],
   },
-  css: ['./app/assets/css/main.css'],
+  css: ['~/assets/css/main.css'],
 })
