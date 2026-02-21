@@ -27,7 +27,6 @@
             </div>
             <div class="min-w-0 flex-1">
               <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">点击修改密码</p>
-              <p class="text-xs text-gray-400 mt-0.5">上次修改：从未</p>
             </div>
             <ChevronRight :size="16" class="text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
           </button>
@@ -96,13 +95,28 @@
           </div>
         </div>
 
+        <!-- Error message -->
+        <div v-if="errorMessage" class="px-6 pb-0">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+            <p class="text-sm text-red-600">{{ errorMessage }}</p>
+          </div>
+        </div>
+
         <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex justify-end gap-2">
           <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
             取消
           </button>
-          <button type="button" class="btn btn-primary btn-sm gap-1.5" @click="submitPassword">
-            <Lock :size="14" />
-            更新密码
+          <button
+            type="button"
+            class="btn btn-primary btn-sm gap-1.5"
+            :disabled="isSubmitting"
+            @click="submitPassword"
+          >
+            <span v-if="isSubmitting" class="loading loading-spinner loading-xs"></span>
+            <template v-else>
+              <Lock :size="14" />
+              更新密码
+            </template>
           </button>
         </div>
         </div>
@@ -115,9 +129,13 @@
 <script setup>
 import { Lock, KeyRound, ChevronRight } from 'lucide-vue-next'
 
+const { $api } = useNuxtApp()
+
 const emit = defineEmits(['save', 'error'])
 
 const editing = ref(false)
+const isSubmitting = ref(false)
+const errorMessage = ref('')
 
 const passwordForm = reactive({
   currentPassword: '',
@@ -129,6 +147,7 @@ const resetForm = () => {
   passwordForm.currentPassword = ''
   passwordForm.newPassword = ''
   passwordForm.confirmPassword = ''
+  errorMessage.value = ''
 }
 
 const cancelEdit = () => {
@@ -157,21 +176,40 @@ const strength = computed(() => {
   return { level: score, ...map[score] }
 })
 
-const submitPassword = () => {
+const submitPassword = async () => {
   if (!passwordForm.currentPassword || !passwordForm.newPassword) {
-    emit('error', '请填写完整信息')
+    errorMessage.value = '请填写完整信息'
     return
   }
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    emit('error', '两次输入的密码不一致')
+    errorMessage.value = '两次输入的密码不一致'
     return
   }
   if (passwordForm.newPassword.length < 8) {
-    emit('error', '密码长度至少 8 个字符')
+    errorMessage.value = '密码长度至少 8 个字符'
     return
   }
-  emit('save', '密码已更新')
-  resetForm()
-  editing.value = false
+
+  isSubmitting.value = true
+  errorMessage.value = ''
+
+  try {
+    await $api('/v1/me/password', {
+      method: 'PUT',
+      body: {
+        current_password: passwordForm.currentPassword,
+        password: passwordForm.newPassword,
+        password_confirmation: passwordForm.confirmPassword
+      }
+    })
+
+    emit('save', '密码已更新')
+    resetForm()
+    editing.value = false
+  } catch (error) {
+    errorMessage.value = error?.message || '修改密码失败，请稍后重试'
+  } finally {
+    isSubmitting.value = false
+  }
 }
 </script>
