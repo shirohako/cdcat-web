@@ -1,70 +1,184 @@
 <template>
-  <div class="container mx-auto px-4 md:px-6 pt-10 pb-2 max-w-6xl animate-fade-in-up">
-    <div class="rounded-3xl bg-white/70 backdrop-blur-xl ring-1 ring-black/5 shadow-xl overflow-hidden">
-      <!-- Gradient accent banner -->
-      <div class="h-32 sm:h-40 bg-linear-to-r from-sky-400 via-blue-500 to-indigo-500 relative overflow-hidden">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.15)_1px,transparent_0)] bg-size-[20px_20px]" />
-        <div class="absolute top-4 right-8 w-20 h-20 rounded-full bg-white/10 blur-sm" />
-        <div class="absolute bottom-6 left-1/4 w-12 h-12 rounded-full bg-white/10 blur-sm" />
-        <div class="absolute top-1/2 right-1/3 w-8 h-8 rounded-full bg-white/5" />
+  <div class="container mx-auto max-w-6xl px-4 pb-2 pt-8 md:px-6">
+    <header class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]">
+      <div class="relative h-[8.25rem] sm:h-[9.5rem] md:h-[11.5rem]">
+        <img
+          v-if="displayBanner && !bannerLoadFailed"
+          :src="displayBanner"
+          :alt="`${profile.username} banner`"
+          class="h-full w-full object-cover"
+          @error="onBannerError"
+        >
+        <div v-else class="h-full w-full bg-linear-to-r from-[#f1dea8] via-[#f0d8bb] to-[#edc7cc]" />
+        <div class="pointer-events-none absolute inset-0 bg-linear-to-b from-white/0 to-white/30" />
       </div>
 
-      <div class="px-6 md:px-10 pb-8 -mt-16 sm:-mt-20 relative">
-        <div class="flex flex-col sm:flex-row items-center sm:items-end gap-5 sm:gap-6">
-          <!-- Avatar with glow ring -->
-          <div class="relative group">
-            <div class="absolute -inset-1.5 bg-linear-to-br from-sky-400 via-blue-500 to-indigo-500 rounded-full blur opacity-30 group-hover:opacity-50 transition duration-500" />
-            <div class="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full ring-4 ring-white shadow-2xl overflow-hidden bg-linear-to-br from-sky-500 to-indigo-600 flex items-center justify-center">
-              <img v-if="profile.avatar" :src="profile.avatar" :alt="profile.username" class="w-full h-full object-cover" />
-              <span v-else class="text-4xl sm:text-5xl font-bold text-white select-none">{{ userInitial }}</span>
-            </div>
-          </div>
-
-          <!-- User info -->
-          <div class="flex-1 text-center sm:text-left pb-1">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-              {{ profile.nickname || profile.username }}
-            </h1>
-            <p class="text-sm text-gray-500 mt-1">@{{ profile.username }}</p>
-          </div>
+      <div class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6">
+        <div class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-[#d4d4c6] shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-[4.25rem] sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4">
+          <img
+            v-if="profile.avatar"
+            :src="profile.avatar"
+            :alt="profile.username"
+            class="h-full w-full object-cover"
+          >
+          <span v-else class="grid h-full w-full place-items-center text-[1.85rem] font-semibold leading-none text-slate-700 sm:text-[2rem]">
+            {{ userInitial }}
+          </span>
         </div>
 
-        <!-- Bio -->
-        <p v-if="profile.bio" class="mt-5 text-sm text-gray-600 leading-relaxed max-w-3xl">
-          {{ profile.bio }}
-        </p>
+        <button
+          type="button"
+          class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-500"
+          :aria-label="moreActionsLabel"
+        >
+          <MoreVertical :size="18" />
+        </button>
 
-        <!-- Meta pills -->
-        <div class="mt-5 flex flex-wrap items-center gap-2.5">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur ring-1 ring-black/5 text-xs font-medium text-gray-600 shadow-sm">
-            <Calendar :size="14" class="text-gray-400" />
+        <h1 class="mt-[3.9rem] truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-[4.8rem] sm:text-[1.28rem] md:text-[1.42rem]">
+          {{ profileDisplayName }}
+        </h1>
+
+        <p class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-slate-600 sm:text-[1rem]">
+          <span>@{{ profile.username }}</span>
+          <span class="text-slate-300" aria-hidden="true">•</span>
+          <span class="inline-flex items-center gap-1.5">
+            <Calendar :size="14" />
             {{ $t('profile.joined') }} {{ memberSince }}
           </span>
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50/80 backdrop-blur ring-1 ring-amber-200/50 text-xs font-medium text-amber-700 shadow-sm">
-            <Award :size="14" class="text-amber-500" />
-            {{ $t('profile.top_contributor') }}
-          </span>
+        </p>
+
+        <div class="mt-3 max-w-4xl">
+          <p
+            ref="bioTextRef"
+            :class="[
+              'break-words text-[0.88rem] leading-[1.55] text-slate-700 transition-all sm:text-[0.96rem] sm:leading-[1.6]',
+              bioCollapsible && !bioExpanded
+                ? 'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]'
+                : ''
+            ]"
+          >
+            {{ profileBio }}
+          </p>
+          <button
+            v-if="bioCollapsible"
+            type="button"
+            class="mt-1 border-none bg-transparent p-0 text-[0.8rem] font-semibold text-blue-600 hover:text-blue-700 hover:underline sm:text-[0.84rem]"
+            @click="bioExpanded = !bioExpanded"
+          >
+            {{ bioExpanded ? bioCollapseLabel : bioExpandLabel }}
+          </button>
         </div>
       </div>
-    </div>
+    </header>
   </div>
 </template>
 
-<script setup lang="ts">
-import { Calendar, Award } from 'lucide-vue-next'
-import type { PublicProfile } from '~/types/profile'
+<script setup>
+import { Calendar, MoreVertical } from 'lucide-vue-next'
 
-const props = defineProps<{
-  profile: PublicProfile
-}>()
+const props = defineProps({
+  profile: {
+    type: Object,
+    required: true
+  }
+})
+
+const { locale } = useI18n()
+
+const bannerLoadFailed = ref(false)
+const bioTextRef = ref(null)
+const bioExpanded = ref(false)
+const bioCollapsible = ref(false)
+const BIO_COLLAPSED_LINES = 3
+
+const profileDisplayName = computed(() => {
+  return props.profile.nickname || props.profile.username
+})
 
 const userInitial = computed(() => {
-  const name = props.profile.nickname || props.profile.username || 'U'
+  const name = profileDisplayName.value || 'U'
   return String(name).trim().slice(0, 1).toUpperCase()
+})
+
+const profileBio = computed(() => {
+  const text = String(props.profile.bio || '').trim()
+  return text || 'This user has not written a bio yet.'
+})
+
+const isZhLocale = computed(() => locale.value.startsWith('zh'))
+
+const moreActionsLabel = computed(() => {
+  return isZhLocale.value ? '更多操作' : 'More actions'
+})
+
+const bioExpandLabel = computed(() => {
+  return isZhLocale.value ? '展开' : 'Show more'
+})
+
+const bioCollapseLabel = computed(() => {
+  return isZhLocale.value ? '收起' : 'Show less'
+})
+
+const formatterLocale = computed(() => {
+  const map = {
+    'zh-Hans': 'zh-CN',
+    'zh-Hant': 'zh-TW',
+    en: 'en-US',
+    ja: 'ja-JP'
+  }
+  return map[locale.value] || 'en-US'
 })
 
 const memberSince = computed(() => {
   const d = new Date(props.profile.created_at)
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })
+  return d.toLocaleDateString(formatterLocale.value, { year: 'numeric', month: 'long' })
+})
+
+const displayBanner = computed(() => {
+  return (props.profile.banner || '').trim()
+})
+
+watch(displayBanner, () => {
+  bannerLoadFailed.value = false
+})
+
+const onBannerError = () => {
+  bannerLoadFailed.value = true
+}
+
+const updateBioCollapsible = () => {
+  const el = bioTextRef.value
+  if (!el) {
+    bioCollapsible.value = false
+    return
+  }
+
+  const lineHeight = Number.parseFloat(window.getComputedStyle(el).lineHeight)
+  if (!Number.isFinite(lineHeight) || lineHeight <= 0) {
+    bioCollapsible.value = false
+    return
+  }
+
+  const collapsedMaxHeight = lineHeight * BIO_COLLAPSED_LINES + 1
+  bioCollapsible.value = el.scrollHeight > collapsedMaxHeight
+  if (!bioCollapsible.value) {
+    bioExpanded.value = false
+  }
+}
+
+watch(profileBio, async () => {
+  bioExpanded.value = false
+  await nextTick()
+  updateBioCollapsible()
+})
+
+onMounted(async () => {
+  await nextTick()
+  updateBioCollapsible()
+  window.addEventListener('resize', updateBioCollapsible)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateBioCollapsible)
 })
 </script>

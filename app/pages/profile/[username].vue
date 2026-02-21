@@ -44,9 +44,10 @@ const _username = route.params.username as string
 
 const profile = ref<PublicProfile>({
   id: 1,
-  username: 'musiclover42',
+  username: _username || 'musiclover42',
   nickname: 'Melody Seeker',
   avatar: undefined,
+  banner: 'https://placehold.co/1500x500/0f172a/94a3b8?text=Profile+Banner',
   bio: 'Passionate about Japanese music, especially doujin circles and VOCALOID producers. Collecting CDs since 2018. Always looking for hidden gems in the Touhou music scene.',
   created_at: '2023-03-15T00:00:00Z',
   stats: {

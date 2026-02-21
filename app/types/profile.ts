@@ -3,6 +3,7 @@ export interface PublicProfile {
   username: string
   nickname?: string
   avatar?: string
+  banner?: string
   bio?: string
   created_at: string
   stats: ProfileStats
