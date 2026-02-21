@@ -109,54 +109,13 @@
       </Transition>
     </section>
 
-    <!-- Sessions -->
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100 flex items-center justify-between">
-        <div>
-          <h2 class="text-base font-semibold text-gray-900">登录会话</h2>
-          <p class="text-sm text-gray-500 mt-1">管理你的活跃登录设备</p>
-        </div>
-        <span class="text-xs font-medium text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
-          {{ sessions.length }} 个设备
-        </span>
-      </div>
-
-      <div class="divide-y divide-gray-100">
-        <div
-          v-for="session in sessions"
-          :key="session.id"
-          class="px-6 py-4 flex items-center justify-between gap-4"
-        >
-          <div class="flex items-center gap-3.5 min-w-0">
-            <div class="w-9 h-9 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
-              <component :is="session.icon" :size="16" class="text-gray-400" />
-            </div>
-            <div class="min-w-0">
-              <p class="text-sm font-medium text-gray-900 truncate">{{ session.device }}</p>
-              <p class="text-xs text-gray-400 truncate">{{ session.location }} · {{ session.lastActive }}</p>
-            </div>
-          </div>
-          <span v-if="session.current" class="shrink-0 px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-full">
-            当前
-          </span>
-          <button
-            v-else
-            type="button"
-            class="shrink-0 text-xs font-medium text-gray-400 hover:text-red-500 transition-colors"
-            @click="$emit('revokeSession', session.id)"
-          >
-            撤销
-          </button>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup>
-import { Lock, KeyRound, ChevronRight, Monitor, Smartphone } from 'lucide-vue-next'
+import { Lock, KeyRound, ChevronRight } from 'lucide-vue-next'
 
-const emit = defineEmits(['save', 'error', 'revokeSession'])
+const emit = defineEmits(['save', 'error'])
 
 const editing = ref(false)
 
@@ -215,10 +174,4 @@ const submitPassword = () => {
   resetForm()
   editing.value = false
 }
-
-// Mock sessions
-const sessions = ref([
-  { id: 1, device: 'Chrome · macOS', location: '上海', lastActive: '当前活跃', icon: Monitor, current: true },
-  { id: 2, device: 'Safari · iPhone', location: '上海', lastActive: '2 小时前', icon: Smartphone, current: false }
-])
 </script>
