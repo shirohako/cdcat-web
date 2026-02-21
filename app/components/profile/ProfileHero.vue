@@ -1,27 +1,41 @@
 <template>
   <div class="container mx-auto max-w-6xl px-4 pb-2 pt-8 md:px-6">
-    <header class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]">
-      <div class="relative h-[8.25rem] sm:h-[9.5rem] md:h-[11.5rem]">
+    <header
+      class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]"
+    >
+      <div class="relative h-33 sm:h-38 md:h-46">
         <img
           v-if="displayBanner && !bannerLoadFailed"
           :src="displayBanner"
           :alt="`${profile.username} banner`"
           class="h-full w-full object-cover"
           @error="onBannerError"
-        >
-        <div v-else class="h-full w-full bg-linear-to-r from-[#f1dea8] via-[#f0d8bb] to-[#edc7cc]" />
-        <div class="pointer-events-none absolute inset-0 bg-linear-to-b from-white/0 to-white/30" />
+        />
+        <div
+          v-else
+          class="h-full w-full bg-linear-to-r from-[#f1dea8] via-[#f0d8bb] to-[#edc7cc]"
+        />
+        <div
+          class="pointer-events-none absolute inset-0 bg-linear-to-b from-white/0 to-white/30"
+        />
       </div>
 
-      <div class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6">
-        <div class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-[#d4d4c6] shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-[4.25rem] sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4">
+      <div
+        class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6"
+      >
+        <div
+          class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-[#d4d4c6] shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-17 sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4"
+        >
           <img
             v-if="profile.avatar"
             :src="profile.avatar"
             :alt="profile.username"
             class="h-full w-full object-cover"
+          />
+          <span
+            v-else
+            class="grid h-full w-full place-items-center text-[1.85rem] font-semibold leading-none text-slate-700 sm:text-[2rem]"
           >
-          <span v-else class="grid h-full w-full place-items-center text-[1.85rem] font-semibold leading-none text-slate-700 sm:text-[2rem]">
             {{ userInitial }}
           </span>
         </div>
@@ -34,16 +48,20 @@
           <MoreVertical :size="18" />
         </button>
 
-        <h1 class="mt-[3.9rem] truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-[4.8rem] sm:text-[1.28rem] md:text-[1.42rem]">
+        <h1
+          class="mt-[3.9rem] truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-[4.8rem] sm:text-[1.28rem] md:text-[1.42rem]"
+        >
           {{ profileDisplayName }}
         </h1>
 
-        <p class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-slate-600 sm:text-[1rem]">
+        <p
+          class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-slate-600 sm:text-[1rem]"
+        >
           <span>@{{ profile.username }}</span>
           <span class="text-slate-300" aria-hidden="true">•</span>
           <span class="inline-flex items-center gap-1.5">
             <Calendar :size="14" />
-            {{ $t('profile.joined') }} {{ memberSince }}
+            {{ $t("profile.joined") }} {{ memberSince }}
           </span>
         </p>
 
@@ -51,10 +69,10 @@
           <p
             ref="bioTextRef"
             :class="[
-              'break-words text-[0.88rem] leading-[1.55] text-slate-700 transition-all sm:text-[0.96rem] sm:leading-[1.6]',
+              'wrap-break-word text-[0.88rem] leading-[1.55] text-slate-700 transition-all sm:text-[0.96rem] sm:leading-[1.6]',
               bioCollapsible && !bioExpanded
                 ? 'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]'
-                : ''
+                : '',
             ]"
           >
             {{ profileBio }}
@@ -74,111 +92,114 @@
 </template>
 
 <script setup>
-import { Calendar, MoreVertical } from 'lucide-vue-next'
+import { Calendar, MoreVertical } from "lucide-vue-next";
 
 const props = defineProps({
   profile: {
     type: Object,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const { locale } = useI18n()
+const { locale } = useI18n();
 
-const bannerLoadFailed = ref(false)
-const bioTextRef = ref(null)
-const bioExpanded = ref(false)
-const bioCollapsible = ref(false)
-const BIO_COLLAPSED_LINES = 3
+const bannerLoadFailed = ref(false);
+const bioTextRef = ref(null);
+const bioExpanded = ref(false);
+const bioCollapsible = ref(false);
+const BIO_COLLAPSED_LINES = 3;
 
 const profileDisplayName = computed(() => {
-  return props.profile.nickname || props.profile.username
-})
+  return props.profile.nickname || props.profile.username;
+});
 
 const userInitial = computed(() => {
-  const name = profileDisplayName.value || 'U'
-  return String(name).trim().slice(0, 1).toUpperCase()
-})
+  const name = profileDisplayName.value || "U";
+  return String(name).trim().slice(0, 1).toUpperCase();
+});
 
 const profileBio = computed(() => {
-  const text = String(props.profile.bio || '').trim()
-  return text || 'This user has not written a bio yet.'
-})
+  const text = String(props.profile.bio || "").trim();
+  return text || "This user has not written a bio yet.";
+});
 
-const isZhLocale = computed(() => locale.value.startsWith('zh'))
+const isZhLocale = computed(() => locale.value.startsWith("zh"));
 
 const moreActionsLabel = computed(() => {
-  return isZhLocale.value ? '更多操作' : 'More actions'
-})
+  return isZhLocale.value ? "更多操作" : "More actions";
+});
 
 const bioExpandLabel = computed(() => {
-  return isZhLocale.value ? '展开' : 'Show more'
-})
+  return isZhLocale.value ? "展开" : "Show more";
+});
 
 const bioCollapseLabel = computed(() => {
-  return isZhLocale.value ? '收起' : 'Show less'
-})
+  return isZhLocale.value ? "收起" : "Show less";
+});
 
 const formatterLocale = computed(() => {
   const map = {
-    'zh-Hans': 'zh-CN',
-    'zh-Hant': 'zh-TW',
-    en: 'en-US',
-    ja: 'ja-JP'
-  }
-  return map[locale.value] || 'en-US'
-})
+    "zh-Hans": "zh-CN",
+    "zh-Hant": "zh-TW",
+    en: "en-US",
+    ja: "ja-JP",
+  };
+  return map[locale.value] || "en-US";
+});
 
 const memberSince = computed(() => {
-  const d = new Date(props.profile.created_at)
-  return d.toLocaleDateString(formatterLocale.value, { year: 'numeric', month: 'long' })
-})
+  const d = new Date(props.profile.created_at);
+  return d.toLocaleDateString(formatterLocale.value, {
+    year: "numeric",
+    month: "long",
+  });
+});
 
 const displayBanner = computed(() => {
-  return (props.profile.banner || '').trim()
-})
+  return (props.profile.banner || "").trim();
+});
 
 watch(displayBanner, () => {
-  bannerLoadFailed.value = false
-})
+  bannerLoadFailed.value = false;
+});
 
 const onBannerError = () => {
-  bannerLoadFailed.value = true
-}
+  bannerLoadFailed.value = true;
+};
 
 const updateBioCollapsible = () => {
-  const el = bioTextRef.value
+  const el = bioTextRef.value;
   if (!el) {
-    bioCollapsible.value = false
-    return
+    bioCollapsible.value = false;
+    return;
   }
 
-  const lineHeight = Number.parseFloat(window.getComputedStyle(el).lineHeight)
+  const lineHeight = Number.parseFloat(window.getComputedStyle(el).lineHeight);
   if (!Number.isFinite(lineHeight) || lineHeight <= 0) {
-    bioCollapsible.value = false
-    return
+    bioCollapsible.value = false;
+    return;
   }
 
-  const collapsedMaxHeight = lineHeight * BIO_COLLAPSED_LINES + 1
-  bioCollapsible.value = el.scrollHeight > collapsedMaxHeight
+  const collapsedMaxHeight = lineHeight * BIO_COLLAPSED_LINES + 1;
+  bioCollapsible.value = el.scrollHeight > collapsedMaxHeight;
   if (!bioCollapsible.value) {
-    bioExpanded.value = false
+    bioExpanded.value = false;
   }
-}
+};
 
 watch(profileBio, async () => {
-  bioExpanded.value = false
-  await nextTick()
-  updateBioCollapsible()
-})
+  bioExpanded.value = false;
+  await nextTick();
+  updateBioCollapsible();
+});
 
 onMounted(async () => {
-  await nextTick()
-  updateBioCollapsible()
-  window.addEventListener('resize', updateBioCollapsible)
-})
+  await nextTick();
+  updateBioCollapsible();
+  window.addEventListener("resize", updateBioCollapsible);
+});
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateBioCollapsible)
-})
+  window.removeEventListener("resize", updateBioCollapsible);
+});
 </script>
