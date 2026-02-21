@@ -1,13 +1,13 @@
 <template>
   <section class="animate-fade-in-up-slow">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-        <Music :size="20" class="text-gray-400" />
-        {{ $t('profile.music_taste') }}
-      </h2>
-    </div>
-
     <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
+      <div class="mb-5 flex items-center justify-between">
+        <h2 class="flex items-center gap-2 text-base font-semibold leading-6 text-gray-900">
+          <Music :size="18" class="text-gray-400" />
+          喜欢的类型
+        </h2>
+      </div>
+
       <div class="flex flex-wrap gap-2">
         <span
           v-for="tag in tags"
@@ -40,20 +40,22 @@
   </section>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { Music } from 'lucide-vue-next'
-import type { ProfileTasteTag } from '~/types/profile'
 
-const props = defineProps<{
-  tags: ProfileTasteTag[]
-}>()
+const props = defineProps({
+  tags: {
+    type: Array,
+    required: true
+  }
+})
 
 const totalCount = computed(() =>
   props.tags.reduce((sum, t) => sum + t.count, 0)
 )
 
-function getTagClasses(color: string): string {
-  const map: Record<string, string> = {
+function getTagClasses(color) {
+  const map = {
     sky: 'bg-sky-50 text-sky-700 ring-sky-200/50',
     emerald: 'bg-emerald-50 text-emerald-700 ring-emerald-200/50',
     amber: 'bg-amber-50 text-amber-700 ring-amber-200/50',
@@ -66,8 +68,8 @@ function getTagClasses(color: string): string {
   return map[color] || 'bg-gray-50 text-gray-700 ring-gray-200/50'
 }
 
-function getTagDotClass(color: string): string {
-  const map: Record<string, string> = {
+function getTagDotClass(color) {
+  const map = {
     sky: 'bg-sky-500',
     emerald: 'bg-emerald-500',
     amber: 'bg-amber-500',
@@ -80,8 +82,8 @@ function getTagDotClass(color: string): string {
   return map[color] || 'bg-gray-500'
 }
 
-function getTagBarClass(color: string): string {
-  const map: Record<string, string> = {
+function getTagBarClass(color) {
+  const map = {
     sky: 'bg-sky-400',
     emerald: 'bg-emerald-400',
     amber: 'bg-amber-400',

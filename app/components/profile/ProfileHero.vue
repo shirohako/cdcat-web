@@ -10,7 +10,7 @@
           :alt="`${profile.username} banner`"
           class="h-full w-full object-cover"
           @error="onBannerError"
-        />
+        >
         <div
           v-else
           class="h-full w-full bg-linear-to-r from-[#f1dea8] via-[#f0d8bb] to-[#edc7cc]"
@@ -27,16 +27,17 @@
           class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-[#d4d4c6] shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-17 sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4"
         >
           <img
-            v-if="profile.avatar"
+            v-if="displayAvatar"
             :src="profile.avatar"
             :alt="profile.username"
             class="h-full w-full object-cover"
-          />
+            @error="onAvatarError"
+          >
           <span
             v-else
-            class="grid h-full w-full place-items-center text-[1.85rem] font-semibold leading-none text-slate-700 sm:text-[2rem]"
+            class="grid h-full w-full place-items-center text-slate-700"
           >
-            {{ userInitial }}
+            <Disc3 :size="30" class="text-slate-500 sm:h-9 sm:w-9" />
           </span>
         </div>
 
@@ -92,7 +93,7 @@
 </template>
 
 <script setup>
-import { Calendar, MoreVertical } from "lucide-vue-next";
+import { Calendar, Disc3, MoreVertical } from "lucide-vue-next";
 
 const props = defineProps({
   profile: {
@@ -104,6 +105,7 @@ const props = defineProps({
 const { locale } = useI18n();
 
 const bannerLoadFailed = ref(false);
+const avatarLoadFailed = ref(false);
 const bioTextRef = ref(null);
 const bioExpanded = ref(false);
 const bioCollapsible = ref(false);
@@ -113,9 +115,8 @@ const profileDisplayName = computed(() => {
   return props.profile.nickname || props.profile.username;
 });
 
-const userInitial = computed(() => {
-  const name = profileDisplayName.value || "U";
-  return String(name).trim().slice(0, 1).toUpperCase();
+const displayAvatar = computed(() => {
+  return String(props.profile.avatar || "").trim().length > 0 && !avatarLoadFailed.value;
 });
 
 const profileBio = computed(() => {
@@ -165,6 +166,17 @@ watch(displayBanner, () => {
 
 const onBannerError = () => {
   bannerLoadFailed.value = true;
+};
+
+watch(
+  () => props.profile.avatar,
+  () => {
+    avatarLoadFailed.value = false;
+  }
+);
+
+const onAvatarError = () => {
+  avatarLoadFailed.value = true;
 };
 
 const updateBioCollapsible = () => {

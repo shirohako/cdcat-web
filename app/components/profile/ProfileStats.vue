@@ -1,40 +1,46 @@
 <template>
-  <section class="animate-fade-in-up-slow">
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+  <section class="animate-fade-in-up-slow rounded-2xl border border-black/5 bg-white/75 p-5 shadow-sm backdrop-blur-xl">
+    <header class="mb-5 flex items-center justify-between gap-3">
+      <h2 class="text-base font-semibold leading-6 text-gray-900">我的音乐</h2>
+      <p class="shrink-0 text-xs text-gray-500">共5项目</p>
+    </header>
+
+    <div class="divide-y divide-gray-100">
       <div
         v-for="stat in statCards"
         :key="stat.label"
-        class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-4 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg group"
+        class="group flex items-center justify-between rounded-lg px-1 py-2.5 transition-colors hover:bg-gray-50/80"
       >
-        <div
-          class="w-10 h-10 rounded-xl mx-auto flex items-center justify-center transition-transform duration-300 group-hover:scale-110"
-          :class="stat.iconBg"
-        >
-          <component :is="stat.icon" :size="20" :class="stat.iconColor" />
+        <div class="flex min-w-0 items-center gap-2.5">
+          <span
+            class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+            :class="stat.iconBg"
+          >
+            <component :is="stat.icon" :size="15" :class="stat.iconColor" />
+          </span>
+          <p class="text-sm font-medium text-gray-700">{{ stat.label }}</p>
         </div>
-        <p class="text-2xl font-bold text-gray-900 mt-2 tabular-nums">{{ stat.value }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">{{ stat.label }}</p>
+        <p class="tabular-nums text-lg font-bold text-gray-900">{{ stat.value }}</p>
       </div>
     </div>
   </section>
 </template>
 
-<script setup lang="ts">
-import { Star, Heart, Bookmark, MessageCircle, GitPullRequest } from 'lucide-vue-next'
-import type { ProfileStats } from '~/types/profile'
+<script setup>
+import { Bookmark, CheckCircle, Headphones, Package, XCircle } from 'lucide-vue-next'
 
-const props = defineProps<{
-  stats: ProfileStats
-}>()
-
-const { t } = useI18n()
+const props = defineProps({
+  stats: {
+    type: Object,
+    required: true
+  }
+})
 
 const statCards = computed(() => [
-  { label: t('profile.stats.reviews'), value: props.stats.reviewsCount, icon: MessageCircle, iconBg: 'bg-blue-50', iconColor: 'text-blue-500' },
-  { label: t('profile.stats.avg_score'), value: props.stats.averageScore.toFixed(1), icon: Star, iconBg: 'bg-amber-50', iconColor: 'text-amber-500' },
-  { label: t('profile.stats.favorites'), value: props.stats.favoritesCount, icon: Heart, iconBg: 'bg-rose-50', iconColor: 'text-rose-500' },
-  { label: t('profile.stats.tracking'), value: props.stats.trackingCount, icon: Bookmark, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500' },
-  { label: t('profile.stats.discussions'), value: props.stats.discussionsCount, icon: MessageCircle, iconBg: 'bg-violet-50', iconColor: 'text-violet-500' },
-  { label: t('profile.stats.contributions'), value: props.stats.contributionsCount, icon: GitPullRequest, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-500' }
+  { label: '想听', value: props.stats.wantListenCount, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
+  { label: '听过', value: props.stats.listenedCount, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+  { label: '想购入', value: props.stats.wantPurchaseCount, icon: Bookmark, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+  { label: '已购入', value: props.stats.purchasedCount, icon: Package, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
+  { label: '抛弃', value: props.stats.droppedCount, icon: XCircle, iconBg: 'bg-rose-50', iconColor: 'text-rose-600' }
 ])
 </script>
