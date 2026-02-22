@@ -79,6 +79,10 @@
     "music_taste": "音楽の好み",
     "total": "合計",
     "genres": "ジャンル",
+    "not_found": "ユーザーが見つかりません",
+    "not_found_desc": "ユーザー {'@'}{username} は存在しないか、退会済みです",
+    "no_favorite_works": "お気に入り作品はまだありません",
+    "no_favorite_artists": "お気に入りアーティストはまだいません",
     "stats": {
       "reviews": "レビュー",
       "avg_score": "平均スコア",
@@ -93,6 +97,8 @@
     "discover": "アルバムを発見",
     "view": "表示",
     "previous": "前へ",
-    "next": "次へ"
+    "next": "次へ",
+    "back_home": "ホームに戻る",
+    "go_back": "戻る"
   }
 }

@@ -37,10 +37,10 @@ const props = defineProps({
 })
 
 const statCards = computed(() => [
-  { label: '想听', value: props.stats.wantListenCount, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
-  { label: '听过', value: props.stats.listenedCount, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-  { label: '想购入', value: props.stats.wantPurchaseCount, icon: Bookmark, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
-  { label: '已购入', value: props.stats.purchasedCount, icon: Package, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-  { label: '抛弃', value: props.stats.droppedCount, icon: XCircle, iconBg: 'bg-rose-50', iconColor: 'text-rose-600' }
+  { label: '想听', value: props.stats.plan_to_listen, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
+  { label: '听过', value: props.stats.completed, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+  { label: '想购入', value: props.stats.wishlist, icon: Bookmark, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+  { label: '已购入', value: props.stats.owned, icon: Package, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
+  { label: '抛弃', value: props.stats.dropped, icon: XCircle, iconBg: 'bg-rose-50', iconColor: 'text-rose-600' }
 ])
 </script>

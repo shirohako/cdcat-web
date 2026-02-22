@@ -2,23 +2,28 @@ export interface PublicProfile {
   id: number
   username: string
   nickname?: string
-  avatar?: string
-  banner?: string
-  bio?: string
-  created_at: string
-  stats: ProfileStats
-  favoriteWorks: ProfileFavoriteWork[]
-  favoriteArtists: ProfileFavoriteArtist[]
-  musicTaste: ProfileTasteTag[]
+  avatar?: string | null
+  banner?: string | null
+  bio?: string | null
+  joined_at: string
+  favorites: ProfileFavorites
+  tracking: ProfileTracking
+  favorite_works: ProfileFavoriteWork[]
+  favorite_artists: ProfileFavoriteArtist[]
 }
 
-export interface ProfileStats {
-  favoritesCount: number
-  wantListenCount: number
-  listenedCount: number
-  wantPurchaseCount: number
-  purchasedCount: number
-  droppedCount: number
+export interface ProfileFavorites {
+  works: number
+  artists: number
+  songs: number
+}
+
+export interface ProfileTracking {
+  plan_to_listen: number
+  completed: number
+  wishlist: number
+  owned: number
+  dropped: number
 }
 
 export interface ProfileFavoriteWork {
@@ -35,10 +40,4 @@ export interface ProfileFavoriteArtist {
   artistId: number
   artistName: string
   avatar?: string
-}
-
-export interface ProfileTasteTag {
-  name: string
-  count: number
-  color: string
 }

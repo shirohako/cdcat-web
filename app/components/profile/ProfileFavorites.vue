@@ -9,7 +9,16 @@
         <span class="text-xs text-gray-400">{{ totalCount }} {{ $t('profile.total') }}</span>
       </div>
 
-      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <!-- Empty state -->
+      <div v-if="!works.length" class="flex flex-col items-center justify-center py-10 text-center">
+        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
+          <Disc3 :size="26" class="text-amber-400" />
+        </div>
+        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_works') }}</p>
+      </div>
+
+      <!-- Works grid -->
+      <div v-else class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         <NuxtLink
           v-for="work in works"
           :key="work.id"

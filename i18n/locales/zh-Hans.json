@@ -79,6 +79,10 @@
     "music_taste": "音乐品味",
     "total": "总计",
     "genres": "种类型",
+    "not_found": "用户不存在",
+    "not_found_desc": "用户 {'@'}{username} 不存在或已被注销",
+    "no_favorite_works": "还没有收藏作品",
+    "no_favorite_artists": "还没有收藏艺术家",
     "stats": {
       "reviews": "评价",
       "avg_score": "平均分",
@@ -93,6 +97,8 @@
     "discover": "发现专辑",
     "view": "查看",
     "previous": "上一页",
-    "next": "下一页"
+    "next": "下一页",
+    "back_home": "返回首页",
+    "go_back": "返回上页"
   }
 }

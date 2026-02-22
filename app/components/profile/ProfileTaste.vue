@@ -10,7 +10,7 @@
 
       <div class="flex flex-wrap gap-2">
         <span
-          v-for="tag in tags"
+          v-for="tag in displayTags"
           :key="tag.name"
           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ring-1 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md cursor-default"
           :class="getTagClasses(tag.color)"
@@ -24,7 +24,7 @@
       <!-- Taste visualization bar -->
       <div class="mt-4 h-2.5 rounded-full overflow-hidden flex bg-gray-100">
         <div
-          v-for="tag in tags.slice(0, 5)"
+          v-for="tag in displayTags.slice(0, 5)"
           :key="'bar-' + tag.name"
           class="h-full transition-all duration-500"
           :class="getTagBarClass(tag.color)"
@@ -33,8 +33,8 @@
         />
       </div>
       <div class="flex justify-between mt-1.5 text-[10px] text-gray-400">
-        <span>{{ tags[0]?.name }}</span>
-        <span>{{ tags.length }} {{ $t('profile.genres') }}</span>
+        <span>{{ displayTags[0]?.name }}</span>
+        <span>{{ displayTags.length }} {{ $t('profile.genres') }}</span>
       </div>
     </div>
   </section>
@@ -46,12 +46,28 @@ import { Music } from 'lucide-vue-next'
 const props = defineProps({
   tags: {
     type: Array,
-    required: true
+    default: () => []
   }
 })
 
+// TODO: 接口暂未返回数据，使用模拟数据展示
+const mockTags = [
+  { name: 'Touhou Arrange', count: 42, color: 'sky' },
+  { name: 'VOCALOID', count: 31, color: 'emerald' },
+  { name: 'Doujin', count: 28, color: 'amber' },
+  { name: 'Anime OST', count: 19, color: 'rose' },
+  { name: 'Game Music', count: 15, color: 'violet' },
+  { name: 'Electronic', count: 12, color: 'indigo' },
+  { name: 'Rock', count: 9, color: 'orange' },
+  { name: 'Orchestral', count: 7, color: 'teal' }
+]
+
+const displayTags = computed(() =>
+  props.tags.length > 0 ? props.tags : mockTags
+)
+
 const totalCount = computed(() =>
-  props.tags.reduce((sum, t) => sum + t.count, 0)
+  displayTags.value.reduce((sum, t) => sum + t.count, 0)
 )
 
 function getTagClasses(color) {

@@ -9,7 +9,16 @@
         <span class="text-xs text-gray-400">{{ artists.length }} {{ $t('profile.total') }}</span>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+      <!-- Empty state -->
+      <div v-if="!artists.length" class="flex flex-col items-center justify-center py-10 text-center">
+        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-violet-50">
+          <Mic2 :size="26" class="text-violet-400" />
+        </div>
+        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_artists') }}</p>
+      </div>
+
+      <!-- Artists grid -->
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
         <NuxtLink
           v-for="artist in artists.slice(0, 6)"
           :key="artist.id"

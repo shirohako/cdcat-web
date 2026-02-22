@@ -24,7 +24,7 @@
         class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6"
       >
         <div
-          class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-[#d4d4c6] shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-17 sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4"
+          class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-17 sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4"
         >
           <img
             v-if="displayAvatar"
@@ -37,7 +37,7 @@
             v-else
             class="grid h-full w-full place-items-center text-slate-700"
           >
-            <Disc3 :size="30" class="text-slate-500 sm:h-9 sm:w-9" />
+            <User :size="30" class="text-slate-500 sm:h-9 sm:w-9" />
           </span>
         </div>
 
@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { Calendar, Disc3, MoreVertical } from "lucide-vue-next";
+import { Calendar, MoreVertical, User } from "lucide-vue-next";
 
 const props = defineProps({
   profile: {
@@ -149,7 +149,7 @@ const formatterLocale = computed(() => {
 });
 
 const memberSince = computed(() => {
-  const d = new Date(props.profile.created_at);
+  const d = new Date(props.profile.joined_at);
   return d.toLocaleDateString(formatterLocale.value, {
     year: "numeric",
     month: "long",

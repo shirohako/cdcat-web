@@ -79,6 +79,10 @@
     "music_taste": "Music Taste",
     "total": "total",
     "genres": "genres",
+    "not_found": "User not found",
+    "not_found_desc": "The user {'@'}{username} doesn't exist or has been deactivated",
+    "no_favorite_works": "No favorite works yet",
+    "no_favorite_artists": "No favorite artists yet",
     "stats": {
       "reviews": "Reviews",
       "avg_score": "Avg Score",
@@ -93,6 +97,8 @@
     "discover": "Discover Albums",
     "view": "View",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "back_home": "Back to Home",
+    "go_back": "Go Back"
   }
 }
