@@ -55,6 +55,18 @@ export const menuItems: MenuItem[] = [
     i18nKey: 'menu.discussion',
     path: '/discussions',
     icon: 'lucide:message-circle'
+  },
+  {
+    name: 'article',
+    i18nKey: 'menu.article',
+    path: '/articles',
+    icon: 'lucide:newspaper'
+  },
+  {
+    name: 'about',
+    i18nKey: 'menu.about',
+    path: '/about',
+    icon: 'lucide:info'
   }
 ]
 

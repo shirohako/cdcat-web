@@ -7,7 +7,9 @@
     "entry": "Entry",
     "series": "Series",
     "vinyl": "Vinyl",
-    "discussion": "Discussion"
+    "discussion": "Discussion",
+    "article": "Articles",
+    "about": "About"
   },
   "user": {
     "profile": "Profile",

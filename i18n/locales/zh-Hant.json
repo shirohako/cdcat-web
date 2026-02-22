@@ -7,7 +7,9 @@
     "entry": "條目",
     "series": "系列",
     "vinyl": "黑膠",
-    "discussion": "討論"
+    "discussion": "討論",
+    "article": "文章",
+    "about": "關於"
   },
   "user": {
     "profile": "個人資料",
