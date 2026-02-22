@@ -2,7 +2,7 @@
   <section class="animate-fade-in-up-slow rounded-2xl border border-black/5 bg-white/75 p-5 shadow-sm backdrop-blur-xl">
     <header class="mb-5 flex items-center justify-between gap-3">
       <h2 class="text-base font-semibold leading-6 text-gray-900">我的音乐</h2>
-      <p class="shrink-0 text-xs text-gray-500">共5项目</p>
+      <p class="shrink-0 text-xs text-gray-500">{{ totalCount }} 个收藏</p>
     </header>
 
     <div class="divide-y divide-gray-100">
@@ -35,6 +35,10 @@ const props = defineProps({
     required: true
   }
 })
+
+const totalCount = computed(() =>
+  (props.stats.plan_to_listen || 0) + (props.stats.completed || 0) + (props.stats.wishlist || 0) + (props.stats.owned || 0) + (props.stats.dropped || 0)
+)
 
 const statCards = computed(() => [
   { label: '想听', value: props.stats.plan_to_listen, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },

@@ -61,7 +61,10 @@
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination.last_page > 1" class="mt-6 flex justify-center">
+        <div class="mt-6 flex items-center justify-between text-xs text-gray-400">
+          <span>{{ pagination.current_page }} / {{ pagination.last_page }}</span>
+        </div>
+        <div class="mt-2 flex justify-center">
           <div class="flex items-center gap-1">
             <button
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
@@ -75,7 +78,7 @@
                 v-if="page !== '...'"
                 class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm transition-colors"
                 :class="page === pagination.current_page ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'"
-                @click="goToPage(page)"
+                @click="goToPage(page as number)"
               >
                 {{ page }}
               </button>
@@ -95,23 +98,23 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ArrowLeft, ChevronLeft, ChevronRight, Mic2 } from 'lucide-vue-next'
+import type { ProfileFavoriteArtistsResponse, PaginationInfo } from '~/types/profile'
 
-const props = defineProps({
-  username: {
-    type: String,
-    required: true
-  }
-})
+const props = defineProps<{
+  username: string
+}>()
 
-defineEmits(['back'])
+defineEmits<{
+  back: []
+}>()
 
 const { locale } = useI18n()
 
 const currentPage = ref(1)
 
-const { data: response, pending, error } = await useAPI(
+const { data: response, pending, error } = await useAPI<ProfileFavoriteArtistsResponse>(
   () => `/v1/profiles/${props.username}/favorites/artists`,
   {
     query: { page: currentPage },
@@ -121,17 +124,16 @@ const { data: response, pending, error } = await useAPI(
 
 const artists = computed(() => response.value?.artists || [])
 
-const pagination = computed(() => response.value?.pagination || {
-  total: 0, per_page: 30, current_page: 1, last_page: 1,
-})
+const defaultPagination: PaginationInfo = { total: 0, per_page: 30, current_page: 1, last_page: 1 }
+const pagination = computed(() => response.value?.pagination || defaultPagination)
 
 // --- Date formatting ---
 const formatterLocale = computed(() => {
-  const map = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP' }
+  const map: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP' }
   return map[locale.value] || 'zh-CN'
 })
 
-const formatDate = (dateValue) => {
+const formatDate = (dateValue: string) => {
   const text = String(dateValue || '').trim()
   if (!text) return '--'
   const d = new Date(text)
@@ -143,7 +145,7 @@ const formatDate = (dateValue) => {
 const visiblePages = computed(() => {
   const current = pagination.value.current_page
   const last = pagination.value.last_page
-  const pages = []
+  const pages: (number | string)[] = []
 
   if (last <= 7) {
     for (let i = 1; i <= last; i++) pages.push(i)
@@ -159,7 +161,7 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const goToPage = (page) => {
+const goToPage = (page: number) => {
   if (page < 1 || page > pagination.value.last_page) return
   currentPage.value = page
 }

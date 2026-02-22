@@ -51,3 +51,22 @@ export interface ProfileFavoriteArtist {
   image_url?: string | null
   favorited_at: string
 }
+
+// ==================== 分页响应 ====================
+
+export interface PaginationInfo {
+  total: number
+  per_page: number
+  current_page: number
+  last_page: number
+}
+
+export interface ProfileFavoriteWorksResponse {
+  works: ProfileFavoriteWork[]
+  pagination: PaginationInfo
+}
+
+export interface ProfileFavoriteArtistsResponse {
+  artists: ProfileFavoriteArtist[]
+  pagination: PaginationInfo
+}

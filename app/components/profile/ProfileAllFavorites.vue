@@ -35,40 +35,44 @@
         <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_works') }}</p>
       </div>
 
-      <!-- Works grid -->
+      <!-- Works list -->
       <template v-else>
-        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+        <div class="space-y-2">
           <NuxtLink
             v-for="work in works"
             :key="work.id"
             :to="`/works/${work.id}`"
-            class="group overflow-hidden rounded-xl bg-white/90 ring-1 ring-black/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+            class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white/85 px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
           >
-            <div class="relative aspect-square overflow-hidden bg-gray-100">
+            <div class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-black/5">
               <img
                 v-if="hasCover(work)"
                 :src="work.image_url"
                 :alt="work.title"
-                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
                 @error="onCoverError(work.id)"
               >
               <div v-else class="grid h-full w-full place-items-center bg-linear-to-br from-slate-50 to-slate-100">
-                <Disc3 :size="34" class="text-slate-500" />
+                <Disc3 :size="20" class="text-slate-400" />
               </div>
             </div>
-            <div class="px-2.5 pb-2.5 pt-2">
-              <p class="truncate text-xs font-semibold leading-4 text-gray-900">{{ work.title }}</p>
-              <p class="mt-1 inline-flex items-center gap-1 text-[11px] text-gray-500">
-                <Heart :size="12" />
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium text-gray-900 group-hover:text-blue-700 transition-colors">{{ work.title }}</p>
+              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-gray-400">
+                <Heart :size="11" />
                 <span>{{ formatDate(work.favorited_at) }}</span>
               </p>
             </div>
+            <ChevronRight :size="14" class="ml-auto text-gray-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all shrink-0" />
           </NuxtLink>
         </div>
 
         <!-- Pagination -->
-        <div v-if="pagination.last_page > 1" class="mt-6 flex justify-center">
+        <div class="mt-6 flex items-center justify-between text-xs text-gray-400">
+          <span>{{ pagination.current_page }} / {{ pagination.last_page }}</span>
+        </div>
+        <div class="mt-2 flex justify-center">
           <div class="flex items-center gap-1">
             <button
               class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
@@ -82,7 +86,7 @@
                 v-if="page !== '...'"
                 class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm transition-colors"
                 :class="page === pagination.current_page ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'"
-                @click="goToPage(page)"
+                @click="goToPage(page as number)"
               >
                 {{ page }}
               </button>
@@ -102,23 +106,23 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ArrowLeft, ChevronLeft, ChevronRight, Disc3, Heart } from 'lucide-vue-next'
+import type { ProfileFavoriteWork, ProfileFavoriteWorksResponse, PaginationInfo } from '~/types/profile'
 
-const props = defineProps({
-  username: {
-    type: String,
-    required: true
-  }
-})
+const props = defineProps<{
+  username: string
+}>()
 
-defineEmits(['back'])
+defineEmits<{
+  back: []
+}>()
 
 const { locale } = useI18n()
 
 const currentPage = ref(1)
 
-const { data: response, pending, error } = await useAPI(
+const { data: response, pending, error } = await useAPI<ProfileFavoriteWorksResponse>(
   () => `/v1/profiles/${props.username}/favorites/works`,
   {
     query: { page: currentPage },
@@ -128,31 +132,30 @@ const { data: response, pending, error } = await useAPI(
 
 const works = computed(() => response.value?.works || [])
 
-const pagination = computed(() => response.value?.pagination || {
-  total: 0, per_page: 30, current_page: 1, last_page: 1,
-})
+const defaultPagination: PaginationInfo = { total: 0, per_page: 30, current_page: 1, last_page: 1 }
+const pagination = computed(() => response.value?.pagination || defaultPagination)
 
 // --- Cover error handling ---
-const failedCoverIds = ref(new Set())
+const failedCoverIds = ref(new Set<number>())
 
-const onCoverError = (workId) => {
+const onCoverError = (workId: number) => {
   const next = new Set(failedCoverIds.value)
   next.add(workId)
   failedCoverIds.value = next
 }
 
-const hasCover = (work) => {
+const hasCover = (work: ProfileFavoriteWork) => {
   const cover = String(work?.image_url || '').trim()
   return cover.length > 0 && !failedCoverIds.value.has(work.id)
 }
 
 // --- Date formatting ---
 const formatterLocale = computed(() => {
-  const map = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP' }
+  const map: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP' }
   return map[locale.value] || 'zh-CN'
 })
 
-const formatDate = (dateValue) => {
+const formatDate = (dateValue: string) => {
   const text = String(dateValue || '').trim()
   if (!text) return '--'
   const d = new Date(text)
@@ -164,7 +167,7 @@ const formatDate = (dateValue) => {
 const visiblePages = computed(() => {
   const current = pagination.value.current_page
   const last = pagination.value.last_page
-  const pages = []
+  const pages: (number | string)[] = []
 
   if (last <= 7) {
     for (let i = 1; i <= last; i++) pages.push(i)
@@ -180,7 +183,7 @@ const visiblePages = computed(() => {
   return pages
 })
 
-const goToPage = (page) => {
+const goToPage = (page: number) => {
   if (page < 1 || page > pagination.value.last_page) return
   currentPage.value = page
 }

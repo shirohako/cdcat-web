@@ -153,6 +153,7 @@ const memberSince = computed(() => {
   return d.toLocaleDateString(formatterLocale.value, {
     year: "numeric",
     month: "long",
+    day: "numeric",
   });
 });
 
