@@ -70,3 +70,22 @@ export interface ProfileFavoriteArtistsResponse {
   artists: ProfileFavoriteArtist[]
   pagination: PaginationInfo
 }
+
+export interface ProfileFavoriteSong {
+  id: number
+  title: string
+  duration?: number
+  track_number?: number
+  disc_number?: number
+  work?: {
+    id: number
+    title: string
+    image_url?: string | null
+  }
+  favorited_at: string
+}
+
+export interface ProfileFavoriteSongsResponse {
+  songs: ProfileFavoriteSong[]
+  pagination: PaginationInfo
+}

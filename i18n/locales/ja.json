@@ -83,8 +83,11 @@
     "genres": "ジャンル",
     "not_found": "ユーザーが見つかりません",
     "not_found_desc": "ユーザー {'@'}{username} は存在しないか、退会済みです",
+    "favorite_songs": "お気に入り曲",
+    "favorite_songs_desc": "お気に入りに追加した曲",
     "no_favorite_works": "お気に入り作品はまだありません",
     "no_favorite_artists": "お気に入りアーティストはまだいません",
+    "no_favorite_songs": "お気に入り曲はまだありません",
     "stats": {
       "reviews": "レビュー",
       "avg_score": "平均スコア",

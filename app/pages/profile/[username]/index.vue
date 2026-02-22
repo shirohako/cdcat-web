@@ -28,9 +28,11 @@
             <!-- Left column -->
             <div class="lg:col-span-2 space-y-6">
               <template v-if="activeView === 'default'">
+                <ProfileSongs :count="profile.favorites.songs" @view-all="activeView = 'songs'" />
                 <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" @view-all="activeView = 'favorites'" />
                 <ProfileArtists :artists="profile.favorite_artists" @view-all="activeView = 'artists'" />
               </template>
+              <ProfileAllSongs v-else-if="activeView === 'songs'" :username="username" @back="activeView = 'default'" />
               <ProfileAllFavorites v-else-if="activeView === 'favorites'" :username="username" @back="activeView = 'default'" />
               <ProfileAllArtists v-else-if="activeView === 'artists'" :username="username" @back="activeView = 'default'" />
             </div>
@@ -52,7 +54,7 @@ import type { PublicProfile } from '~/types/profile'
 
 const route = useRoute()
 const username = route.params.username as string
-const activeView = ref<'default' | 'favorites' | 'artists'>('default')
+const activeView = ref<'default' | 'favorites' | 'artists' | 'songs'>('default')
 
 const { data: profile, pending, error } = await useAPI<PublicProfile>(
   `/v1/profiles/${username}`

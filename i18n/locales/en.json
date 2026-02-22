@@ -83,8 +83,11 @@
     "genres": "genres",
     "not_found": "User not found",
     "not_found_desc": "The user {'@'}{username} doesn't exist or has been deactivated",
+    "favorite_songs": "Favorite Songs",
+    "favorite_songs_desc": "Songs you've favorited",
     "no_favorite_works": "No favorite works yet",
     "no_favorite_artists": "No favorite artists yet",
+    "no_favorite_songs": "No favorite songs yet",
     "stats": {
       "reviews": "Reviews",
       "avg_score": "Avg Score",

@@ -83,8 +83,11 @@
     "genres": "種類型",
     "not_found": "用戶不存在",
     "not_found_desc": "用戶 {'@'}{username} 不存在或已被註銷",
+    "favorite_songs": "收藏曲目",
+    "favorite_songs_desc": "已收藏的歌曲",
     "no_favorite_works": "還沒有收藏作品",
     "no_favorite_artists": "還沒有收藏藝術家",
+    "no_favorite_songs": "還沒有收藏曲目",
     "stats": {
       "reviews": "評價",
       "avg_score": "平均分",
