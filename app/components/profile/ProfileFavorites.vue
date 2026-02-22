@@ -2,11 +2,15 @@
   <section class="animate-fade-in-up-slow">
     <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
       <div class="mb-5 flex items-center justify-between">
-        <h2 class="flex items-center gap-2 text-base font-semibold leading-6 text-gray-900">
-          <Disc3 :size="18" class="text-gray-400" />
+        <h2 class="flex items-baseline gap-2 text-base font-semibold leading-6 text-gray-900">
+          <Disc3 :size="18" class="relative top-0.5 text-gray-400" />
           {{ $t('profile.favorites') }}
+          <span class="text-xs font-normal text-gray-400">{{ totalCount }}</span>
         </h2>
-        <span class="text-xs text-gray-400">{{ totalCount }} {{ $t('profile.total') }}</span>
+        <NuxtLink v-if="works.length" to="#" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+          {{ $t('common.view_all') }}
+          <ChevronRight :size="14" />
+        </NuxtLink>
       </div>
 
       <!-- Empty state -->
@@ -22,14 +26,14 @@
         <NuxtLink
           v-for="work in works"
           :key="work.id"
-          :to="`/works/${work.workId}`"
+          :to="`/works/${work.id}`"
           class="group overflow-hidden rounded-xl bg-white/90 ring-1 ring-black/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
         >
           <div class="relative aspect-square overflow-hidden bg-gray-100">
             <img
               v-if="hasCover(work)"
-              :src="work.cover"
-              :alt="work.workTitle"
+              :src="work.image_url"
+              :alt="work.title"
               class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
               @error="onCoverError(work.id)"
@@ -41,11 +45,11 @@
 
           <div class="px-2.5 pb-2.5 pt-2">
             <p class="truncate text-xs font-semibold leading-4 text-gray-900">
-              {{ work.workTitle }}
+              {{ work.title }}
             </p>
             <p class="mt-1 inline-flex items-center gap-1 text-[11px] text-gray-500">
-              <Calendar :size="12" />
-              <span>{{ formatCollectedAt(work.releaseDate) }}</span>
+              <Heart :size="12" />
+              <span>{{ formatCollectedAt(work.favorited_at) }}</span>
             </p>
           </div>
         </NuxtLink>
@@ -55,7 +59,7 @@
 </template>
 
 <script setup>
-import { Calendar, Disc3 } from 'lucide-vue-next'
+import { ChevronRight, Disc3, Heart } from 'lucide-vue-next'
 const { locale } = useI18n()
 const failedCoverIds = ref(new Set())
 
@@ -96,7 +100,7 @@ const onCoverError = (workId) => {
 }
 
 const hasCover = (work) => {
-  const cover = String(work?.cover || '').trim()
+  const cover = String(work?.image_url || '').trim()
   return cover.length > 0 && !failedCoverIds.value.has(work.id)
 }
 </script>

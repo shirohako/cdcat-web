@@ -28,16 +28,26 @@ export interface ProfileTracking {
 
 export interface ProfileFavoriteWork {
   id: number
-  workId: number
-  workTitle: string
-  cover?: string
-  artists: string[]
-  releaseDate?: string
+  title: string
+  slug?: string | null
+  type: string
+  classification?: string | null
+  release_date?: string | null
+  catalog_number?: string | null
+  image_url?: string | null
+  disc_count: number
+  track_count: number
+  duration: number
+  favorites_count: number
+  reviews_count: number
+  favorited_at: string
 }
 
 export interface ProfileFavoriteArtist {
   id: number
-  artistId: number
-  artistName: string
-  avatar?: string
+  name: string
+  slug?: string | null
+  type: string
+  image_url?: string | null
+  favorited_at: string
 }
