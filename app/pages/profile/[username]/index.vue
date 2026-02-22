@@ -27,8 +27,12 @@
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left column -->
             <div class="lg:col-span-2 space-y-6">
-              <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" />
-              <ProfileArtists :artists="profile.favorite_artists" />
+              <template v-if="activeView === 'default'">
+                <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" @view-all="activeView = 'favorites'" />
+                <ProfileArtists :artists="profile.favorite_artists" @view-all="activeView = 'artists'" />
+              </template>
+              <ProfileAllFavorites v-else-if="activeView === 'favorites'" :username="username" @back="activeView = 'default'" />
+              <ProfileAllArtists v-else-if="activeView === 'artists'" :username="username" @back="activeView = 'default'" />
             </div>
 
             <!-- Right column -->
@@ -48,6 +52,7 @@ import type { PublicProfile } from '~/types/profile'
 
 const route = useRoute()
 const username = route.params.username as string
+const activeView = ref<'default' | 'favorites' | 'artists'>('default')
 
 const { data: profile, pending, error } = await useAPI<PublicProfile>(
   `/v1/profiles/${username}`

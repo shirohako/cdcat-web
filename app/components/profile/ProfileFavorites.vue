@@ -2,15 +2,17 @@
   <section class="animate-fade-in-up-slow">
     <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
       <div class="mb-5 flex items-center justify-between">
-        <h2 class="flex items-baseline gap-2 text-base font-semibold leading-6 text-gray-900">
-          <Disc3 :size="18" class="relative top-0.5 text-gray-400" />
+        <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
+          <Disc3 :size="18" class="text-gray-400" />
           {{ $t('profile.favorites') }}
-          <span class="text-xs font-normal text-gray-400">{{ totalCount }}</span>
+          <span v-if="totalCount" class="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-600 ring-1 ring-sky-200/60">
+            {{ totalCount }}
+          </span>
         </h2>
-        <NuxtLink v-if="works.length" to="#" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+        <button v-if="works.length" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('view-all')">
           {{ $t('common.view_all') }}
           <ChevronRight :size="14" />
-        </NuxtLink>
+        </button>
       </div>
 
       <!-- Empty state -->
@@ -73,6 +75,8 @@ defineProps({
     required: true
   }
 })
+
+defineEmits(['view-all'])
 
 const formatterLocale = computed(() => {
   const map = {

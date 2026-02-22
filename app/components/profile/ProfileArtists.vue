@@ -2,15 +2,17 @@
   <section class="animate-fade-in-up-slow">
     <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
       <div class="mb-5 flex items-center justify-between">
-        <h2 class="flex items-baseline gap-2 text-base font-semibold leading-6 text-gray-900">
-          <Mic2 :size="18" class="relative top-0.5 text-gray-400" />
+        <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
+          <Mic2 :size="18" class="text-gray-400" />
           {{ $t('profile.top_artists') }}
-          <span class="text-xs font-normal text-gray-400">{{ artists.length }}</span>
+          <span v-if="artists.length" class="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600 ring-1 ring-violet-200/60">
+            {{ artists.length }}
+          </span>
         </h2>
-        <NuxtLink v-if="artists.length" to="#" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors">
+        <button v-if="artists.length" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('view-all')">
           {{ $t('common.view_all') }}
           <ChevronRight :size="14" />
-        </NuxtLink>
+        </button>
       </div>
 
       <!-- Empty state -->
@@ -54,4 +56,6 @@ defineProps({
     required: true
   }
 })
+
+defineEmits(['view-all'])
 </script>
