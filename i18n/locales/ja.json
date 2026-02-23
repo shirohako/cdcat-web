@@ -88,6 +88,8 @@
     "no_favorite_works": "お気に入り作品はまだありません",
     "no_favorite_artists": "お気に入りアーティストはまだいません",
     "no_favorite_songs": "お気に入り曲はまだありません",
+    "reviews_desc": "投稿したアルバムレビュー",
+    "contributions_desc": "データベース編集の貢献",
     "stats": {
       "reviews": "レビュー",
       "avg_score": "平均スコア",

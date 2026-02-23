@@ -8,6 +8,8 @@ export interface PublicProfile {
   joined_at: string
   favorites: ProfileFavorites
   tracking: ProfileTracking
+  reviews_count: number
+  contributions_count: number
   favorite_works: ProfileFavoriteWork[]
   favorite_artists: ProfileFavoriteArtist[]
 }
@@ -70,6 +72,37 @@ export interface ProfileFavoriteArtistsResponse {
   artists: ProfileFavoriteArtist[]
   pagination: PaginationInfo
 }
+
+// ==================== Tracking ====================
+
+export interface ProfileTrackingWork {
+  id: number
+  title: string
+  slug?: string | null
+  type: string
+  classification?: string | null
+  release_date?: string | null
+  catalog_number?: string | null
+  image_url?: string | null
+  disc_count: number
+  track_count: number
+  duration: number
+  likes_count: number
+  reviews_count: number
+  is_favorited: boolean
+  tracking: {
+    status: number
+    created_at: string
+    updated_at: string
+  }
+}
+
+export interface ProfileTrackingResponse {
+  works: ProfileTrackingWork[]
+  pagination: PaginationInfo
+}
+
+// ==================== Favorite Songs ====================
 
 export interface ProfileFavoriteSong {
   id: number

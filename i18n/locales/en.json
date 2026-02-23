@@ -88,6 +88,8 @@
     "no_favorite_works": "No favorite works yet",
     "no_favorite_artists": "No favorite artists yet",
     "no_favorite_songs": "No favorite songs yet",
+    "reviews_desc": "Album reviews posted",
+    "contributions_desc": "Database edit contributions",
     "stats": {
       "reviews": "Reviews",
       "avg_score": "Avg Score",

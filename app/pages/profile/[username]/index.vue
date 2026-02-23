@@ -28,18 +28,19 @@
             <!-- Left column -->
             <div class="lg:col-span-2 space-y-6">
               <template v-if="activeView === 'default'">
-                <ProfileSongs :count="profile.favorites.songs" @view-all="activeView = 'songs'" />
+                <ProfileOverview :songs-count="profile.favorites.songs" :reviews-count="profile.reviews_count" :contributions-count="profile.contributions_count" @view-all-songs="activeView = 'songs'" />
                 <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" @view-all="activeView = 'favorites'" />
                 <ProfileArtists :artists="profile.favorite_artists" @view-all="activeView = 'artists'" />
               </template>
               <ProfileAllSongs v-else-if="activeView === 'songs'" :username="username" @back="activeView = 'default'" />
               <ProfileAllFavorites v-else-if="activeView === 'favorites'" :username="username" @back="activeView = 'default'" />
               <ProfileAllArtists v-else-if="activeView === 'artists'" :username="username" @back="activeView = 'default'" />
+              <ProfileAllTracking v-else-if="activeView === 'tracking'" :username="username" :initial-status="trackingStatus" @back="activeView = 'default'" />
             </div>
 
             <!-- Right column -->
             <div class="space-y-6">
-              <ProfileStats :stats="profile.tracking" />
+              <ProfileStats :stats="profile.tracking" @select-status="onSelectTrackingStatus" />
               <ProfileTaste />
             </div>
           </div>
@@ -54,7 +55,13 @@ import type { PublicProfile } from '~/types/profile'
 
 const route = useRoute()
 const username = route.params.username as string
-const activeView = ref<'default' | 'favorites' | 'artists' | 'songs'>('default')
+const activeView = ref<'default' | 'favorites' | 'artists' | 'songs' | 'tracking'>('default')
+const trackingStatus = ref(1)
+
+const onSelectTrackingStatus = (status: number) => {
+  trackingStatus.value = status
+  activeView.value = 'tracking'
+}
 
 const { data: profile, pending, error } = await useAPI<PublicProfile>(
   `/v1/profiles/${username}`

@@ -88,6 +88,8 @@
     "no_favorite_works": "还没有收藏作品",
     "no_favorite_artists": "还没有收藏艺术家",
     "no_favorite_songs": "还没有收藏曲目",
+    "reviews_desc": "发布的专辑评分",
+    "contributions_desc": "数据库编辑贡献",
     "stats": {
       "reviews": "评价",
       "avg_score": "平均分",
