@@ -69,7 +69,7 @@
           <AlbumArtistCard :artists="artistsData" />
 
           <!-- 追踪状态 -->
-          <AlbumTracking :work-id="workId" />
+          <AlbumTracking :work-id="workId" :initial-tracking="workData?.user_tracking ?? null" />
 
           <AlbumStats
             :views-count="workData?.views_count ?? 0"

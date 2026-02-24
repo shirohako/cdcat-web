@@ -55,6 +55,7 @@ import type { TrackingStatus } from '~/types/tracking'
 
 const props = defineProps<{
   workId: string | number
+  initialTracking?: { status: number; created_at?: string; updated_at?: string } | null
 }>()
 
 const { isAuthenticated } = useAuth()
@@ -63,8 +64,20 @@ const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 
+// 数字 -> 状态映射
+const numberToStatus: Record<number, TrackingStatus> = {
+  1: 'plan_to_listen',
+  2: 'completed',
+  3: 'wishlist',
+  4: 'owned',
+  5: 'dropped'
+}
+
 const loading = ref(false)
-const currentStatus = ref<TrackingStatus | null>(null)
+const initialStatus = props.initialTracking?.status
+  ? numberToStatus[props.initialTracking.status] ?? null
+  : null
+const currentStatus = ref<TrackingStatus | null>(initialStatus)
 
 const statusOptions = computed(() => [
   { status: 'plan_to_listen' as TrackingStatus, label: t('tracking.status.plan_to_listen'), icon: 'lucide:headphones' },
@@ -76,6 +89,8 @@ const statusOptions = computed(() => [
 
 const fetchCurrentStatus = async () => {
   if (!isAuthenticated.value) return
+  // 如果已有初始数据，跳过请求
+  if (currentStatus.value !== null) return
 
   loading.value = true
   try {
