@@ -21,6 +21,7 @@
       <AlbumHero
         :album-data="albumData"
         :work-id="workId"
+        :initial-favorited="workData?.is_favorited ?? false"
       />
 
     <!-- Album Details Section -->

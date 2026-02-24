@@ -109,8 +109,8 @@
                       <span>{{ work.views_count || 0 }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                      <Heart :size="14" class="text-gray-400 group-hover:text-red-400 transition-colors" />
-                      <span>{{ work.favorites_count || 0 }}</span>
+                      <Heart :size="14" :fill="work.is_favorited ? 'currentColor' : 'none'" :class="work.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
+                      <span>{{ work.likes_count || 0 }}</span>
                     </div>
                   </div>
                 </div>

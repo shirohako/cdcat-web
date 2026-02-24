@@ -84,7 +84,7 @@
                     <span class="font-medium">{{ artist.albums_count || 0 }}</span>
                   </div>
                   <div class="flex items-center gap-1">
-                    <Heart :size="12" class="text-gray-400 group-hover:text-red-400 transition-colors" />
+                    <Heart :size="12" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
                     <span class="font-medium">{{ artist.followers_count || 0 }}</span>
                   </div>
                 </div>

@@ -135,9 +135,13 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+  initialFavorited: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const isFavorited = ref(false)
+const isFavorited = ref(props.initialFavorited)
 const isToggling = ref(false)
 
 const toggleLike = async () => {

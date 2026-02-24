@@ -249,7 +249,7 @@ const artistId = route.params.id;
 const { data: artist } = await useAPI(`/v1/artists/${artistId}`);
 
 // Favorite state
-const isFavorited = ref(false)
+const isFavorited = ref(artist.value?.is_favorited ?? false)
 const isToggling = ref(false)
 
 const toggleLike = async () => {
