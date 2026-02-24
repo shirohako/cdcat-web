@@ -5,33 +5,80 @@
       Stats
     </h3>
     <div class="space-y-3">
-      <div class="flex justify-between">
-        <span class="text-gray-600">Viewed:</span>
-        <span class="font-bold">{{ stats.viewed }}</span>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <Eye :size="16" class="text-gray-400" />
+          Viewed
+        </span>
+        <span class="font-bold">{{ viewsCount }}</span>
       </div>
-      <div class="flex justify-between">
-        <span class="text-gray-600">Liked:</span>
-        <span class="font-bold">{{ stats.liked }}</span>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <Heart :size="16" class="text-red-400" />
+          Liked
+        </span>
+        <span class="font-bold">{{ likesCount }}</span>
       </div>
-      <div class="flex justify-between">
-        <span class="text-gray-600">Owned:</span>
-        <span class="font-bold">{{ stats.owned }}</span>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <Headphones :size="16" class="text-blue-400" />
+          Plan to Listen
+        </span>
+        <span class="font-bold">{{ trackingStats.plan_to_listen }}</span>
       </div>
-      <div class="flex justify-between">
-        <span class="text-gray-600">In Wishlist:</span>
-        <span class="font-bold">{{ stats.wishlist }}</span>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <CircleCheck :size="16" class="text-green-400" />
+          Completed
+        </span>
+        <span class="font-bold">{{ trackingStats.completed }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <Bookmark :size="16" class="text-yellow-400" />
+          Wishlist
+        </span>
+        <span class="font-bold">{{ trackingStats.wishlist }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <Package :size="16" class="text-purple-400" />
+          Owned
+        </span>
+        <span class="font-bold">{{ trackingStats.owned }}</span>
+      </div>
+      <div class="flex justify-between items-center">
+        <span class="text-gray-600 flex items-center gap-2">
+          <CircleX :size="16" class="text-gray-400" />
+          Dropped
+        </span>
+        <span class="font-bold">{{ trackingStats.dropped }}</span>
       </div>
     </div>
   </section>
 </template>
 
 <script setup>
-import { BarChart3 } from "lucide-vue-next";
+import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "lucide-vue-next";
 
 defineProps({
-  stats: {
+  viewsCount: {
+    type: Number,
+    default: 0,
+  },
+  likesCount: {
+    type: Number,
+    default: 0,
+  },
+  trackingStats: {
     type: Object,
-    required: true,
+    default: () => ({
+      plan_to_listen: 0,
+      completed: 0,
+      wishlist: 0,
+      owned: 0,
+      dropped: 0,
+    }),
   },
 });
 </script>

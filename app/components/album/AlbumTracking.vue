@@ -91,7 +91,7 @@ const fetchCurrentStatus = async () => {
 const handleStatusClick = async (status: TrackingStatus) => {
   // 未登录时跳转到登录页
   if (!isAuthenticated.value) {
-    router.push({ path: '/login', query: { redirect: route.fullPath } })
+    router.push({ path: '/auth/login', query: { redirect: route.fullPath } })
     return
   }
 

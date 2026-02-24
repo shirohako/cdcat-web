@@ -71,7 +71,11 @@
           <!-- 追踪状态 -->
           <AlbumTracking :work-id="workId" />
 
-          <AlbumStats :stats="stats" />
+          <AlbumStats
+            :views-count="workData?.views_count ?? 0"
+            :likes-count="workData?.likes_count ?? 0"
+            :tracking-stats="trackingStats"
+          />
 
           <AlbumRankings
             :all-time-rank="rankings.allTimeRank"
@@ -376,12 +380,13 @@ const bonuses = computed(() => {
   }));
 });
 
-const stats = {
-  viewed: 15,
-  liked: 3,
-  owned: 0,
+const trackingStats = computed(() => workData.value?.tracking_stats ?? {
+  plan_to_listen: 0,
+  completed: 0,
   wishlist: 0,
-};
+  owned: 0,
+  dropped: 0,
+});
 
 // 排行榜数据（测试数据）
 const rankings = {
