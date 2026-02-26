@@ -18,8 +18,8 @@
               <Music :size="24" />
             </div>
           </div>
-          <h1 class="text-3xl font-black text-slate-900 mb-2">欢迎回来</h1>
-          <p class="text-slate-600">登录到 CDCAT 继续探索音乐世界</p>
+          <h1 class="text-3xl font-black text-slate-900 mb-2">{{ $t('auth.login.title') }}</h1>
+          <p class="text-slate-600">{{ $t('auth.login.subtitle') }}</p>
         </div>
 
         <!-- Error Message -->
@@ -33,13 +33,13 @@
           <div class="flex flex-col gap-2">
             <label for="email" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Mail :size="16" />
-              <span>邮箱地址</span>
+              <span>{{ $t('auth.login.email') }}</span>
             </label>
             <input
               id="email"
               v-model="formData.email"
               type="email"
-              placeholder="example@email.com"
+              :placeholder="$t('auth.login.email_placeholder')"
               class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-sky-500 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.1)] focus:bg-white placeholder:text-slate-400"
               required
             />
@@ -49,14 +49,14 @@
           <div class="flex flex-col gap-2">
             <label for="password" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Lock :size="16" />
-              <span>密码</span>
+              <span>{{ $t('auth.login.password') }}</span>
             </label>
             <div class="relative">
               <input
                 id="password"
                 v-model="formData.password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="输入你的密码"
+                :placeholder="$t('auth.login.password_placeholder')"
                 class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-sky-500 focus:shadow-[0_0_0_3px_rgba(14,165,233,0.1)] focus:bg-white placeholder:text-slate-400 pr-12"
                 required
               />
@@ -79,13 +79,13 @@
                 type="checkbox"
                 class="w-4 h-4 rounded border-slate-300 text-sky-500 focus:ring-2 focus:ring-sky-500 focus:ring-offset-0 transition-all cursor-pointer"
               />
-              <span class="text-slate-600 group-hover:text-slate-900 transition-colors">记住我</span>
+              <span class="text-slate-600 group-hover:text-slate-900 transition-colors">{{ $t('auth.login.remember_me') }}</span>
             </label>
             <NuxtLink
               to="/forgot-password"
               class="text-sky-600 hover:text-sky-700 font-semibold transition-colors"
             >
-              忘记密码？
+              {{ $t('auth.login.forgot_password') }}
             </NuxtLink>
           </div>
 
@@ -97,7 +97,7 @@
           >
             <div v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <LogIn v-else :size="20" />
-            <span>{{ isLoading ? '登录中...' : '登录' }}</span>
+            <span>{{ isLoading ? $t('auth.login.logging_in') : $t('auth.login.login') }}</span>
             <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
         </form>
@@ -108,28 +108,32 @@
             <div class="w-full border-t border-slate-200"></div>
           </div>
           <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-white px-3 text-slate-500 font-semibold tracking-wider">或者使用</span>
+            <span class="bg-white px-3 text-slate-500 font-semibold tracking-wider">{{ $t('auth.login.or_use') }}</span>
           </div>
         </div>
 
         <!-- Social Login -->
         <div class="space-y-3 animate-[fade-in_0.8s_ease_0.05s_both]">
-          <button type="button" class="flex items-center justify-center gap-3 w-full py-3 px-6 bg-white/90 text-slate-700 font-semibold border border-slate-200 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-20px_rgba(15,23,42,0.3)]">
+          <button
+            type="button"
+            @click="handleGithubLogin"
+            class="flex items-center justify-center gap-3 w-full py-3 px-6 bg-white/90 text-slate-700 font-semibold border border-slate-200 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-20px_rgba(15,23,42,0.3)]"
+          >
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
             </svg>
-            <span>使用 GitHub 登录</span>
+            <span>{{ $t('auth.login.github_login') }}</span>
           </button>
         </div>
 
         <!-- Sign Up Link -->
         <div class="mt-6 text-center text-sm animate-[fade-in_0.9s_ease_0.1s_both]">
-          <span class="text-slate-600">还没有账号？</span>
+          <span class="text-slate-600">{{ $t('auth.login.no_account') }}</span>
           <NuxtLink
             to="/auth/register"
             class="ml-1 text-sky-600 hover:text-sky-700 font-semibold transition-colors"
           >
-            立即注册
+            {{ $t('auth.login.register_now') }}
           </NuxtLink>
         </div>
       </div>
@@ -141,8 +145,30 @@
           class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft :size="16" />
-          <span>返回首页</span>
+          <span>{{ $t('common.back_home') }}</span>
         </NuxtLink>
+      </div>
+    </div>
+
+    <div
+      v-if="showGithubDialog"
+      class="fixed inset-0 z-[120] bg-slate-900/35 backdrop-blur-xs flex items-center justify-center p-4"
+      @click.self="showGithubDialog = false"
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        class="w-full max-w-sm rounded-2xl border border-white/70 bg-white p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.55)]"
+      >
+        <h2 class="text-lg font-bold text-slate-900">{{ $t('auth.login.github_coming_soon_title') }}</h2>
+        <p class="mt-2 text-sm text-slate-600">{{ $t('auth.login.github_coming_soon_message') }}</p>
+        <button
+          type="button"
+          @click="showGithubDialog = false"
+          class="mt-5 w-full rounded-xl bg-linear-to-r from-sky-500 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5"
+        >
+          {{ $t('auth.login.github_coming_soon_confirm') }}
+        </button>
       </div>
     </div>
   </div>
@@ -154,6 +180,7 @@ import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft } from 'lu
 const router = useRouter()
 const route = useRoute()
 const { login } = useAuth()
+const { t } = useI18n()
 
 const formData = ref({
   email: '',
@@ -164,6 +191,11 @@ const formData = ref({
 const showPassword = ref(false)
 const isLoading = ref(false)
 const errorMessage = ref('')
+const showGithubDialog = ref(false)
+
+const handleGithubLogin = () => {
+  showGithubDialog.value = true
+}
 
 const handleLogin = async () => {
   if (isLoading.value) return
@@ -180,25 +212,26 @@ const handleLogin = async () => {
 
     if (result.success) {
       // 登录成功，检查是否有重定向参数
-      const redirectTo = route.query.redirect as string || '/'
+      const redirectQuery = route.query.redirect
+      const redirectTo = typeof redirectQuery === 'string' ? redirectQuery : '/'
       await router.push(redirectTo)
     } else {
       // 登录失败，显示错误信息
-      errorMessage.value = result.error || '登录失败，请重试'
+      errorMessage.value = result.error || t('auth.login.login_failed')
     }
   } catch (error: any) {
-    errorMessage.value = error.message || '登录失败，请重试'
+    errorMessage.value = error.message || t('auth.login.login_failed')
   } finally {
     isLoading.value = false
   }
 }
 
 useHead({
-  title: '登录 - CDCAT',
+  title: computed(() => `${t('user.login')} - CDCAT`),
   meta: [
     {
       name: 'description',
-      content: '登录到 CDCAT 继续探索日系音乐世界'
+      content: computed(() => t('auth.login.meta_description'))
     }
   ]
 })

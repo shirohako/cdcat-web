@@ -18,8 +18,8 @@
               <Music :size="24" />
             </div>
           </div>
-          <h1 class="text-3xl font-black text-slate-900 mb-2">创建账号</h1>
-          <p class="text-slate-600">加入 CDCAT，开启你的音乐探索之旅</p>
+          <h1 class="text-3xl font-black text-slate-900 mb-2">{{ $t('auth.register.title') }}</h1>
+          <p class="text-slate-600">{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <!-- Error Message -->
@@ -36,13 +36,13 @@
           <div class="flex flex-col gap-2">
             <label for="nickname" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <User :size="16" />
-              <span>昵称</span>
+              <span>{{ $t('auth.register.nickname') }}</span>
             </label>
             <input
               id="nickname"
               v-model="formData.nickname"
               type="text"
-              placeholder="取一个昵称吧"
+              :placeholder="$t('auth.register.nickname_placeholder')"
               maxlength="32"
               class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
               required
@@ -53,13 +53,13 @@
           <div class="flex flex-col gap-2">
             <label for="email" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Mail :size="16" />
-              <span>邮箱地址</span>
+              <span>{{ $t('auth.register.email') }}</span>
             </label>
             <input
               id="email"
               v-model="formData.email"
               type="email"
-              placeholder="example@email.com"
+              :placeholder="$t('auth.register.email_placeholder')"
               class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
               required
             />
@@ -69,14 +69,14 @@
           <div class="flex flex-col gap-2">
             <label for="verificationCode" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <ShieldCheck :size="16" />
-              <span>邮箱验证码</span>
+              <span>{{ $t('auth.register.verification_code') }}</span>
             </label>
             <div class="flex gap-2">
               <input
                 id="verificationCode"
                 v-model="formData.verificationCode"
                 type="text"
-                placeholder="输入验证码"
+                :placeholder="$t('auth.register.verification_code_placeholder')"
                 maxlength="6"
                 class="flex-1 py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
                 required
@@ -88,7 +88,7 @@
                 class="shrink-0 px-4 py-3 text-sm font-semibold rounded-xl border transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="countdown > 0 ? 'bg-slate-100 text-slate-400 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'"
               >
-                {{ countdown > 0 ? `${countdown}s` : '发送验证码' }}
+                {{ countdown > 0 ? `${countdown}s` : $t('auth.register.send_code') }}
               </button>
             </div>
           </div>
@@ -97,14 +97,14 @@
           <div class="flex flex-col gap-2">
             <label for="password" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Lock :size="16" />
-              <span>密码</span>
+              <span>{{ $t('auth.register.password') }}</span>
             </label>
             <div class="relative">
               <input
                 id="password"
                 v-model="formData.password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="至少 8 个字符"
+                :placeholder="$t('auth.register.password_placeholder')"
                 class="w-full py-3 px-4 pr-12 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
                 required
                 minlength="8"
@@ -128,7 +128,7 @@
               ></div>
             </div>
             <p class="text-xs text-slate-500 mt-1">
-              密码强度:
+              {{ $t('auth.register.password_strength') }}:
               <span :class="passwordStrengthColor">{{ passwordStrengthText }}</span>
             </p>
           </div>
@@ -137,14 +137,14 @@
           <div class="flex flex-col gap-2">
             <label for="confirmPassword" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Lock :size="16" />
-              <span>确认密码</span>
+              <span>{{ $t('auth.register.confirm_password') }}</span>
             </label>
             <div class="relative">
               <input
                 id="confirmPassword"
                 v-model="formData.confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
-                placeholder="再次输入密码"
+                :placeholder="$t('auth.register.confirm_password_placeholder')"
                 class="w-full py-3 px-4 pr-12 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
                 required
               />
@@ -161,7 +161,7 @@
               v-if="formData.confirmPassword && formData.password !== formData.confirmPassword"
               class="text-xs text-red-500 mt-1"
             >
-              密码不匹配
+              {{ $t('auth.register.password_mismatch') }}
             </p>
           </div>
 
@@ -169,7 +169,7 @@
           <div class="flex flex-col gap-2">
             <label for="birthday" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
               <Cake :size="16" />
-              <span>生日</span>
+              <span>{{ $t('auth.register.birthday') }}</span>
             </label>
             <input
               id="birthday"
@@ -178,7 +178,7 @@
               class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
               required
             />
-            <p class="text-xs text-slate-500 mt-1">生日将用于找回密码时的身份验证</p>
+            <p class="text-xs text-slate-500 mt-1">{{ $t('auth.register.birthday_hint') }}</p>
           </div>
 
           <!-- Terms & Conditions -->
@@ -191,13 +191,13 @@
               required
             />
             <label for="terms" class="text-sm text-slate-600 cursor-pointer">
-              我同意 CDCAT 的
+              {{ $t('auth.register.agree_prefix') }}
               <NuxtLink to="/terms" class="text-emerald-600 hover:text-emerald-700 font-semibold">
-                服务条款
+                {{ $t('auth.register.terms_of_service') }}
               </NuxtLink>
-              和
+              {{ $t('auth.register.and') }}
               <NuxtLink to="/privacy" class="text-emerald-600 hover:text-emerald-700 font-semibold">
-                隐私政策
+                {{ $t('auth.register.privacy_policy') }}
               </NuxtLink>
             </label>
           </div>
@@ -210,39 +210,19 @@
           >
             <div v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
             <UserPlus v-else :size="20" />
-            <span>{{ isLoading ? '注册中...' : '创建账号' }}</span>
+            <span>{{ isLoading ? $t('auth.register.creating_account') : $t('auth.register.create_account') }}</span>
             <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
           </button>
         </form>
 
-        <!-- Divider -->
-        <div class="relative my-6">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-slate-200"></div>
-          </div>
-          <div class="relative flex justify-center text-xs uppercase">
-            <span class="bg-white px-3 text-slate-500 font-semibold tracking-wider">或者使用</span>
-          </div>
-        </div>
-
-        <!-- Social Register -->
-        <div class="space-y-3 animate-[fade-in_0.8s_ease_0.05s_both]">
-          <button type="button" class="flex items-center justify-center gap-3 w-full py-3 px-6 bg-white/90 text-slate-700 font-semibold border border-slate-200 rounded-xl cursor-pointer transition-all duration-300 hover:bg-white hover:border-slate-300 hover:-translate-y-0.5 hover:shadow-[0_10px_30px_-20px_rgba(15,23,42,0.3)]">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
-            </svg>
-            <span>使用 GitHub 注册</span>
-          </button>
-        </div>
-
         <!-- Login Link -->
         <div class="mt-6 text-center text-sm animate-[fade-in_0.9s_ease_0.1s_both]">
-          <span class="text-slate-600">已经有账号了？</span>
+          <span class="text-slate-600">{{ $t('auth.register.have_account') }}</span>
           <NuxtLink
             to="/auth/login"
             class="ml-1 text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
           >
-            立即登录
+            {{ $t('auth.register.login_now') }}
           </NuxtLink>
         </div>
       </div>
@@ -254,7 +234,7 @@
           class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
         >
           <ArrowLeft :size="16" />
-          <span>返回首页</span>
+          <span>{{ $t('common.back_home') }}</span>
         </NuxtLink>
       </div>
     </div>
@@ -267,6 +247,7 @@ import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, 
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { register } = useAuth()
+const { t } = useI18n()
 
 const formData = ref({
   nickname: '',
@@ -287,18 +268,22 @@ const errorMessage = ref('')
 const errorDetails = ref<string[]>([])
 let countdownTimer: ReturnType<typeof setInterval> | null = null
 
-const fieldLabels: Record<string, string> = {
-  email: '邮箱',
-  password: '密码',
-  nickname: '昵称',
-  verification_code: '验证码',
-  birthday: '生日'
+const getFieldLabel = (field: string) => {
+  const labels: Record<string, string> = {
+    email: t('auth.register.field_labels.email'),
+    password: t('auth.register.field_labels.password'),
+    nickname: t('auth.register.field_labels.nickname'),
+    verification_code: t('auth.register.field_labels.verification_code'),
+    birthday: t('auth.register.field_labels.birthday')
+  }
+
+  return labels[field] || field
 }
 
 const setError = (message: string, details?: Record<string, string[]>) => {
   if (details && Object.keys(details).length) {
     errorDetails.value = Object.entries(details).flatMap(
-      ([field, messages]) => messages.map(msg => `${fieldLabels[field] || field}: ${msg}`)
+      ([field, messages]) => messages.map(msg => `${getFieldLabel(field)}: ${msg}`)
     )
   } else {
     errorDetails.value = []
@@ -328,7 +313,7 @@ const sendVerificationCode = async () => {
     }, 1000)
   } catch (error: any) {
     const apiError = error.details
-    setError(apiError?.message || error.message || '发送验证码失败，请重试', apiError?.details)
+    setError(apiError?.message || error.message || t('auth.register.send_code_failed'), apiError?.details)
   } finally {
     isSendingCode.value = false
   }
@@ -354,11 +339,11 @@ const passwordStrength = computed(() => {
 
 const passwordStrengthText = computed(() => {
   const strength = passwordStrength.value
-  if (strength === 0) return '弱'
-  if (strength === 1) return '较弱'
-  if (strength === 2) return '中等'
-  if (strength === 3) return '强'
-  return '很强'
+  if (strength === 0) return t('auth.register.strength_weak')
+  if (strength === 1) return t('auth.register.strength_fair')
+  if (strength === 2) return t('auth.register.strength_medium')
+  if (strength === 3) return t('auth.register.strength_strong')
+  return t('auth.register.strength_very_strong')
 })
 
 const passwordStrengthColor = computed(() => {
@@ -401,22 +386,22 @@ const handleRegister = async () => {
     if (result.success) {
       await router.push('/')
     } else {
-      setError(result.error || '注册失败，请重试', result.details)
+      setError(result.error || t('auth.register.register_failed'), result.details)
     }
   } catch (error: any) {
     const apiError = error.details
-    setError(apiError?.message || error.message || '注册失败，请重试', apiError?.details)
+    setError(apiError?.message || error.message || t('auth.register.register_failed'), apiError?.details)
   } finally {
     isLoading.value = false
   }
 }
 
 useHead({
-  title: '注册 - CDCAT',
+  title: computed(() => `${t('user.register')} - CDCAT`),
   meta: [
     {
       name: 'description',
-      content: '注册 CDCAT 账号，开启你的日系音乐探索之旅'
+      content: computed(() => t('auth.register.meta_description'))
     }
   ]
 })
