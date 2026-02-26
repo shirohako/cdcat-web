@@ -101,6 +101,39 @@
       "contributions": "貢献"
     }
   },
+  "auth": {
+    "forgot_password": {
+      "title": "パスワードをリセット",
+      "subtitle": "メールアドレスに認証コードを送信します",
+      "email": "メールアドレス",
+      "send_code": "コードを送信",
+      "sending": "送信中...",
+      "resend": "再送信",
+      "send_failed": "コードの送信に失敗しました。もう一度お試しください",
+      "step2_title": "パスワードをリセット",
+      "step2_subtitle": "認証コードと新しいパスワードを入力してください",
+      "change_email": "変更",
+      "verification_code": "認証コード",
+      "code_placeholder": "6桁のコードを入力",
+      "new_password": "新しいパスワード",
+      "password_placeholder": "8文字以上",
+      "confirm_password": "パスワード確認",
+      "confirm_placeholder": "パスワードを再入力",
+      "reset": "パスワードをリセット",
+      "resetting": "リセット中...",
+      "reset_failed": "パスワードのリセットに失敗しました。もう一度お試しください",
+      "success_title": "パスワードがリセットされました",
+      "success_message": "パスワードが正常にリセットされました。ログインページにリダイレクトします...",
+      "back_to_login": "ログインに戻る",
+      "password_mismatch": "パスワードが一致しません",
+      "password_strength": "パスワード強度",
+      "strength_weak": "弱い",
+      "strength_fair": "やや弱い",
+      "strength_medium": "普通",
+      "strength_strong": "強い",
+      "strength_very_strong": "非常に強い"
+    }
+  },
   "common": {
     "search": "検索...",
     "discover": "アルバムを発見",

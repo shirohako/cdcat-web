@@ -101,6 +101,39 @@
       "contributions": "Contributions"
     }
   },
+  "auth": {
+    "forgot_password": {
+      "title": "Reset Password",
+      "subtitle": "We'll send a verification code to your email",
+      "email": "Email Address",
+      "send_code": "Send Code",
+      "sending": "Sending...",
+      "resend": "Resend",
+      "send_failed": "Failed to send code, please try again",
+      "step2_title": "Reset Password",
+      "step2_subtitle": "Enter the verification code and your new password",
+      "change_email": "Change",
+      "verification_code": "Verification Code",
+      "code_placeholder": "Enter 6-digit code",
+      "new_password": "New Password",
+      "password_placeholder": "At least 8 characters",
+      "confirm_password": "Confirm Password",
+      "confirm_placeholder": "Re-enter your password",
+      "reset": "Reset Password",
+      "resetting": "Resetting...",
+      "reset_failed": "Failed to reset password, please try again",
+      "success_title": "Password Reset",
+      "success_message": "Your password has been reset successfully. Redirecting to login...",
+      "back_to_login": "Back to Login",
+      "password_mismatch": "Passwords do not match",
+      "password_strength": "Password strength",
+      "strength_weak": "Weak",
+      "strength_fair": "Fair",
+      "strength_medium": "Medium",
+      "strength_strong": "Strong",
+      "strength_very_strong": "Very Strong"
+    }
+  },
   "common": {
     "search": "Search...",
     "discover": "Discover Albums",

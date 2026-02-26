@@ -101,6 +101,39 @@
       "contributions": "贡献"
     }
   },
+  "auth": {
+    "forgot_password": {
+      "title": "找回密码",
+      "subtitle": "我们将发送验证码到你的邮箱",
+      "email": "邮箱地址",
+      "send_code": "发送验证码",
+      "sending": "发送中...",
+      "resend": "重新发送",
+      "send_failed": "发送验证码失败，请重试",
+      "step2_title": "重置密码",
+      "step2_subtitle": "输入验证码和新密码",
+      "change_email": "修改",
+      "verification_code": "验证码",
+      "code_placeholder": "输入 6 位验证码",
+      "new_password": "新密码",
+      "password_placeholder": "至少 8 个字符",
+      "confirm_password": "确认密码",
+      "confirm_placeholder": "再次输入密码",
+      "reset": "重置密码",
+      "resetting": "重置中...",
+      "reset_failed": "重置密码失败，请重试",
+      "success_title": "密码已重置",
+      "success_message": "你的密码已成功重置，即将跳转到登录页...",
+      "back_to_login": "返回登录",
+      "password_mismatch": "密码不匹配",
+      "password_strength": "密码强度",
+      "strength_weak": "弱",
+      "strength_fair": "较弱",
+      "strength_medium": "中等",
+      "strength_strong": "强",
+      "strength_very_strong": "很强"
+    }
+  },
   "common": {
     "search": "搜索...",
     "discover": "发现专辑",
