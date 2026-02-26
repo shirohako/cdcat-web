@@ -3,7 +3,7 @@
     <header
       class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]"
     >
-      <div class="relative h-33 sm:h-38 md:h-46">
+      <div class="relative h-38 sm:h-44 md:h-52">
         <img
           v-if="displayBanner && !bannerLoadFailed"
           :src="displayBanner"
@@ -24,7 +24,7 @@
         class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6"
       >
         <div
-          class="absolute -top-[3.2rem] left-4 h-[6.4rem] w-[6.4rem] overflow-hidden rounded-full border-[3px] border-white bg-linear-to-br from-slate-50 via-slate-100 to-slate-200 shadow-[0_8px_16px_-12px_rgba(15,23,42,0.4)] sm:-top-17 sm:left-6 sm:h-[8.4rem] sm:w-[8.4rem] sm:border-4"
+          class="absolute -top-22 left-4 h-30 w-30 overflow-hidden rounded-full border-3 border-white bg-gray-100 shadow-md sm:-top-28 sm:left-6 sm:h-38 sm:w-38 sm:border-4"
         >
           <img
             v-if="displayAvatar"
@@ -37,7 +37,7 @@
             v-else
             class="grid h-full w-full place-items-center text-slate-700"
           >
-            <User :size="30" class="text-slate-500 sm:h-9 sm:w-9" />
+            <User :size="30" class="text-gray-400 sm:h-9 sm:w-9" />
           </span>
         </div>
 
@@ -50,7 +50,7 @@
         </button>
 
         <h1
-          class="mt-[3.9rem] truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-[4.8rem] sm:text-[1.28rem] md:text-[1.42rem]"
+          class="mt-12 truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-14 sm:text-[1.28rem] md:text-[1.42rem]"
         >
           {{ profileDisplayName }}
         </h1>

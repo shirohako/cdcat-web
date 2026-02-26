@@ -35,7 +35,7 @@
         <div class="hidden md:block relative">
           <input
             type="text"
-            placeholder="搜索..."
+            :placeholder="$t('common.search')"
             class="w-64 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg
                    focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
                    transition-all duration-200"
@@ -147,7 +147,7 @@
                          hover:bg-gray-50 transition-colors duration-150"
                 >
                   <Icon :name="item.icon" class="w-4 h-4" />
-                  <span>{{ item.name }}</span>
+                  <span>{{ $t(item.i18nKey) }}</span>
                 </NuxtLink>
               </div>
               <div class="border-t border-gray-200">
@@ -157,7 +157,7 @@
                          hover:bg-red-50 transition-colors duration-150"
                 >
                   <Icon name="lucide:log-out" class="w-4 h-4" />
-                  <span>退出登录</span>
+                  <span>{{ $t('user.logout') }}</span>
                 </button>
               </div>
             </div>
@@ -170,13 +170,13 @@
             to="/auth/login"
             class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
           >
-            登录
+            {{ $t('user.login') }}
           </NuxtLink>
           <NuxtLink
             to="/auth/register"
             class="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200"
           >
-            注册
+            {{ $t('user.register') }}
           </NuxtLink>
         </div>
       </div>

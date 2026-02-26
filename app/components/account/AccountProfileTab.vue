@@ -53,6 +53,43 @@
           </div>
         </div>
 
+        <!-- Banner -->
+        <div class="grid gap-1.5 max-w-sm">
+          <label for="banner" class="text-sm font-medium text-gray-700">横幅背景</label>
+          <div class="flex gap-2">
+            <input
+              id="banner"
+              v-model="form.banner"
+              type="url"
+              class="input input-bordered flex-1 bg-white"
+              placeholder="https://example.com/banner.jpg"
+            />
+            <button
+              v-if="form.banner?.trim() && form.banner.trim() === originalBanner"
+              type="button"
+              class="btn btn-ghost btn-sm shrink-0 text-gray-500"
+              :disabled="isUpdatingBanner"
+              @click="clearBanner"
+            >
+              清除
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn btn-primary btn-sm shrink-0"
+              :disabled="isUpdatingBanner || !isBannerChanged"
+              @click="updateBanner"
+            >
+              <span v-if="isUpdatingBanner" class="loading loading-spinner loading-xs"></span>
+              <span v-else>保存</span>
+            </button>
+          </div>
+          <p class="text-xs text-gray-400">个人主页的横幅背景图片，留空或清除可使用默认背景</p>
+          <p v-if="bannerStatus" :class="bannerStatus.class">
+            {{ bannerStatus.message }}
+          </p>
+        </div>
+
         <!-- Username -->
         <div class="grid gap-1.5 max-w-sm">
           <label for="username" class="text-sm font-medium text-gray-700">用户名</label>
@@ -175,7 +212,8 @@ const form = reactive({
   username: props.user?.username || '',
   nickname: props.user?.nickname || '',
   bio: '',
-  avatar: props.user?.avatar || ''
+  avatar: props.user?.avatar || '',
+  banner: props.user?.banner || ''
 })
 
 const originalBio = ref('')
@@ -186,6 +224,71 @@ const nicknameStatus = ref(null)
 const isUpdatingNickname = ref(false)
 const bioStatus = ref(null)
 const isUpdatingBio = ref(false)
+
+// Banner
+const bannerStatus = ref(null)
+const isUpdatingBanner = ref(false)
+const originalBanner = ref(props.user?.banner || '')
+
+const isBannerChanged = computed(() => {
+  return (form.banner?.trim() || '') !== originalBanner.value
+})
+
+const updateBanner = async () => {
+  isUpdatingBanner.value = true
+  bannerStatus.value = null
+  const url = form.banner?.trim() || null
+
+  try {
+    await $api('/v1/me/banner', {
+      method: 'PUT',
+      body: { banner: url }
+    })
+
+    bannerStatus.value = {
+      class: 'text-xs text-emerald-600 font-medium',
+      message: '✓ 横幅背景更新成功'
+    }
+
+    originalBanner.value = url || ''
+    await fetchUser()
+  } catch (error) {
+    bannerStatus.value = {
+      class: 'text-xs text-red-600 font-medium',
+      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+    }
+  } finally {
+    isUpdatingBanner.value = false
+  }
+}
+
+const clearBanner = async () => {
+  isUpdatingBanner.value = true
+  bannerStatus.value = null
+
+  try {
+    await $api('/v1/me/banner', {
+      method: 'PUT',
+      body: { banner: null }
+    })
+
+    bannerStatus.value = {
+      class: 'text-xs text-emerald-600 font-medium',
+      message: '✓ 横幅背景已清除'
+    }
+
+    form.banner = ''
+    originalBanner.value = ''
+    await fetchUser()
+  } catch (error) {
+    bannerStatus.value = {
+      class: 'text-xs text-red-600 font-medium',
+      message: error?.data?.message || '✗ 清除失败，请稍后重试'
+    }
+  } finally {
+    isUpdatingBanner.value = false
+  }
+}
 
 // Avatar
 const showAvatarInput = ref(false)

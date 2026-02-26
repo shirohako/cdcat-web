@@ -18,6 +18,8 @@
     "revisions": "リビジョン一覧",
     "reviews": "マイレビュー",
     "account": "アカウント設定",
+    "login": "ログイン",
+    "register": "新規登録",
     "logout": "ログアウト"
   },
   "tracking": {

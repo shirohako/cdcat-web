@@ -18,6 +18,8 @@
     "revisions": "Revisions",
     "reviews": "My Reviews",
     "account": "Account Settings",
+    "login": "Sign In",
+    "register": "Sign Up",
     "logout": "Sign Out"
   },
   "tracking": {

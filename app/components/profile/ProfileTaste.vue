@@ -8,6 +8,11 @@
         </h2>
       </div>
 
+      <div v-if="isMockData" class="mb-4 flex items-center gap-2 rounded-xl bg-amber-50/80 px-3.5 py-2.5 text-xs text-amber-600 ring-1 ring-amber-200/50">
+        <Sparkles :size="14" class="shrink-0" />
+        <span>该功能正在开发中，以下为示例展示数据</span>
+      </div>
+
       <div class="flex flex-wrap gap-2">
         <span
           v-for="tag in displayTags"
@@ -41,7 +46,7 @@
 </template>
 
 <script setup>
-import { Music } from 'lucide-vue-next'
+import { Music, Sparkles } from 'lucide-vue-next'
 
 const props = defineProps({
   tags: {
@@ -61,6 +66,8 @@ const mockTags = [
   { name: 'Rock', count: 9, color: 'orange' },
   { name: 'Orchestral', count: 7, color: 'teal' }
 ]
+
+const isMockData = computed(() => props.tags.length === 0)
 
 const displayTags = computed(() =>
   props.tags.length > 0 ? props.tags : mockTags
