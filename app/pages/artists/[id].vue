@@ -23,20 +23,11 @@
       >
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <!-- Artist Avatar -->
-          <div class="relative group">
+          <div class="relative">
             <div
-              class="absolute -inset-1 bg-linear-to-r from-pink-400 via-purple-400 to-blue-400 rounded-full blur opacity-25 group-hover:opacity-40 transition duration-500"
-            />
-            <div class="relative">
-              <img
-                :src="artistData.avatar"
-                :alt="artistData.name"
-                class="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover shadow-2xl ring-4 ring-white"
-              />
-              <!-- Online Status Indicator -->
-              <div
-                class="absolute bottom-4 right-4 w-6 h-6 bg-green-400 rounded-full ring-4 ring-white"
-              />
+              class="w-28 h-28 md:w-40 md:h-40 rounded-full bg-gray-100 flex items-center justify-center shadow-xl ring-4 ring-white text-gray-300"
+            >
+              <Users :size="52" />
             </div>
           </div>
 
@@ -46,7 +37,7 @@
               class="flex items-center justify-center md:justify-start gap-3 mb-3"
             >
               <h1
-                class="text-4xl md:text-6xl font-bold bg-linear-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent"
+                class="text-2xl md:text-4xl font-bold bg-linear-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent"
               >
                 {{ artistData.name }}
               </h1>
@@ -139,87 +130,99 @@
     </div>
 
     <!-- Albums Grid Section -->
-    <div class="container mx-auto px-4 md:px-8 py-12 max-w-7xl">
-      <!-- Section Header -->
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="text-3xl font-bold text-gray-900">All Releases</h2>
-      </div>
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-7xl">
+      <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-white p-6 md:p-8">
+        <!-- Section Header -->
+        <div class="flex items-center gap-3 mb-8">
+          <div class="w-1 h-7 bg-linear-to-b from-pink-500 to-purple-500 rounded-full"></div>
+          <h2 class="text-2xl font-bold text-gray-900">All Releases</h2>
+          <span class="ml-1 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">{{ albums.length }}</span>
+        </div>
 
-      <!-- Albums Grid -->
-      <div
-        class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
-      >
-        <NuxtLink
-          v-for="album in albums"
-          :key="album.id"
-          :to="`/works/${album.id}`"
-          class="group cursor-pointer"
+        <!-- Albums Grid -->
+        <div
+          v-if="albums.length > 0"
+          class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
         >
-          <!-- Album Card -->
-          <div
-            class="relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+          <NuxtLink
+            v-for="album in albums"
+            :key="album.id"
+            :to="`/works/${album.id}`"
+            class="group cursor-pointer"
           >
-            <!-- Album Cover -->
-            <div class="relative aspect-square overflow-hidden">
-              <img
-                :src="album.cover"
-                :alt="album.title"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
+            <!-- Album Card -->
+            <div
+              class="relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+            >
+              <!-- Album Cover -->
+              <div class="relative aspect-square overflow-hidden">
+                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
+                  <Disc3 :size="48" />
+                </div>
 
-              <!-- Hover Overlay -->
-              <div
-                class="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4"
-              >
-                <button
-                  class="btn btn-sm bg-white/90 hover:bg-white text-gray-900 border-0 gap-2"
+                <!-- Hover Overlay -->
+                <div
+                  class="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4"
                 >
-                  <Play :size="16" />
-                  查看
-                </button>
-              </div>
-
-              <!-- Release Year Badge -->
-              <div
-                class="absolute top-3 right-3 px-3 py-1 bg-white/95 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 shadow-md"
-              >
-                {{ album.year }}
-              </div>
-            </div>
-
-            <!-- Album Info -->
-            <div class="p-4">
-              <h3
-                class="font-bold text-gray-900 mb-1 truncate group-hover:text-purple-600 transition-colors"
-              >
-                {{ album.title }}
-              </h3>
-              <p class="text-sm text-gray-500 mb-2">{{ album.format }}</p>
-
-              <!-- Artist Info (Clickable) -->
-              <div
-                v-for="albumArtist in album.artists"
-                :key="albumArtist.id"
-                class="flex items-center gap-1.5 mb-2 text-xs text-gray-600 hover:text-purple-600 transition-colors w-fit"
-              >
-                <Users :size="12" />
-                <span class="truncate font-medium">{{ albumArtist.name }}</span>
-              </div>
-
-              <!-- Mini Stats -->
-              <div class="flex items-center gap-3 text-xs text-gray-400">
-                <div class="flex items-center gap-1">
-                  <Heart :size="12" />
-                  {{ album.likes }}
+                  <button
+                    class="btn btn-sm bg-white/90 hover:bg-white text-gray-900 border-0 gap-2"
+                  >
+                    <Play :size="16" />
+                    查看
+                  </button>
                 </div>
-                <div class="flex items-center gap-1">
-                  <Eye :size="12" />
-                  {{ album.views }}
+
+                <!-- Release Year Badge -->
+                <div
+                  class="absolute top-3 right-3 px-3 py-1 bg-white/95 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 shadow-md"
+                >
+                  {{ album.year }}
                 </div>
               </div>
+
+              <!-- Album Info -->
+              <div class="p-4">
+                <h3
+                  class="font-bold text-gray-900 mb-1 truncate group-hover:text-purple-600 transition-colors"
+                >
+                  {{ album.title }}
+                </h3>
+                <p class="text-sm text-gray-500 mb-2">{{ album.format }}</p>
+
+                <!-- Artist Info (Clickable) -->
+                <div
+                  v-for="albumArtist in album.artists"
+                  :key="albumArtist.id"
+                  class="flex items-center gap-1.5 mb-2 text-xs text-gray-600 hover:text-purple-600 transition-colors w-fit"
+                >
+                  <Users :size="12" />
+                  <span class="truncate font-medium">{{ albumArtist.name }}</span>
+                </div>
+
+                <!-- Mini Stats -->
+                <div class="flex items-center gap-3 text-xs text-gray-400">
+                  <div class="flex items-center gap-1">
+                    <Heart :size="12" />
+                    {{ album.likes }}
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <Eye :size="12" />
+                    {{ album.views }}
+                  </div>
+                </div>
+              </div>
             </div>
+          </NuxtLink>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="flex flex-col items-center justify-center py-20 text-center">
+          <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 mb-5">
+            <Disc3 :size="36" />
           </div>
-        </NuxtLink>
+          <p class="text-gray-500 font-medium mb-1">No releases yet</p>
+          <p class="text-sm text-gray-400">This artist hasn't published any releases.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -277,9 +280,6 @@ const toggleLike = async () => {
 const artistData = computed(() => ({
   name: artist.value?.name || "Loading...",
   bio: "",
-  avatar:
-    artist.value?.image_url ||
-    "https://i.psray.net/i/2025/12/04/69318b0e98cbe.jpg",
   albumCount: artist.value?.albums_count || 0,
   followers: artist.value?.followers_count || 0,
   since: artist.value?.active_since || "N/A",
@@ -302,8 +302,7 @@ const albums = computed(() => {
     return {
       id: work.id,
       title: work.title,
-      cover:
-        work.image_url || "https://i.psray.net/i/2025/12/04/69318b0e98cbe.jpg",
+      cover: work.image_url,
       year: year,
       format: format,
       type: work.type || "album",

@@ -26,17 +26,32 @@
           <label class="label">
             <span class="label-text font-semibold">Type <span class="text-red-500">*</span></span>
           </label>
-          <select
-            v-model="formData.type"
-            class="select select-bordered w-full"
-            :class="{ 'select-error': errors.type }"
-            required
-          >
-            <option value="">Select type</option>
-            <option value="person">Person</option>
-            <option value="circle">Circle</option>
-            <option value="other">Other</option>
-          </select>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <button
+              v-for="opt in artistTypes"
+              :key="opt.value"
+              type="button"
+              class="group flex flex-col items-center gap-2.5 py-4 px-3 rounded-xl border-2 text-center transition-all duration-200 cursor-pointer"
+              :class="formData.type === opt.value
+                ? 'border-primary bg-primary/5'
+                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'"
+              @click="formData.type = opt.value"
+            >
+              <component
+                :is="opt.icon"
+                :size="20"
+                class="transition-colors duration-200 shrink-0"
+                :class="formData.type === opt.value ? 'text-primary' : 'text-gray-400 group-hover:text-gray-500'"
+              />
+              <div>
+                <p
+                  class="text-sm font-semibold leading-tight"
+                  :class="formData.type === opt.value ? 'text-primary' : 'text-gray-700'"
+                >{{ opt.label }}</p>
+                <p class="text-xs text-gray-400 mt-0.5 leading-snug">{{ opt.desc }}</p>
+              </div>
+            </button>
+          </div>
           <label v-if="errors.type" class="label">
             <span class="label-text-alt text-error">{{ errors.type }}</span>
           </label>
@@ -141,6 +156,8 @@
 </template>
 
 <script setup>
+import { User, Users, Building2, Sparkles, Music2 } from 'lucide-vue-next'
+
 const props = defineProps({
   // 初始数据（编辑模式使用）
   initialData: {
@@ -161,6 +178,14 @@ const props = defineProps({
 });
 
 const router = useRouter();
+
+const artistTypes = [
+  { value: 'person',  label: '个人',    icon: User,      desc: '独立音乐人或演唱者' },
+  { value: 'group',   label: '团队',    icon: Users,     desc: '由多人组成的乐队或组合' },
+  { value: 'company', label: '公司',    icon: Building2, desc: '唱片公司或音乐制作机构' },
+  { value: 'virtual', label: '虚拟艺人', icon: Sparkles,  desc: 'Vocaloid 或虚拟偶像等' },
+  { value: 'circle',  label: '同人社团', icon: Music2,    desc: '创作同人音乐的社团' },
+];
 
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.artistId);

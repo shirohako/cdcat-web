@@ -51,18 +51,9 @@
             <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border border-gray-100">
               <!-- 艺术家头像 -->
               <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
-                <img
-                  v-if="artist.image_url"
-                  :src="artist.image_url"
-                  :alt="artist.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  style="image-rendering: -webkit-optimize-contrast;"
-                />
-                <div v-else class="text-gray-300">
+                <div class="text-gray-300">
                   <Users :size="32" />
                 </div>
-                <!-- 渐变遮罩，增强对比度 -->
-                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
 
               <!-- 艺术家信息 -->
