@@ -62,12 +62,7 @@
           <label class="label">
             <span class="label-text font-semibold">Region</span>
           </label>
-          <input
-            v-model="formData.region"
-            type="text"
-            placeholder="e.g., Japan, China, Korea"
-            class="input input-bordered w-full"
-          />
+          <CommonRegionSelect v-model="formData.region" />
           <label class="label">
             <span class="label-text-alt text-gray-500">Country or region where the artist is based</span>
           </label>
@@ -320,6 +315,9 @@ const handleSubmit = async () => {
     formDataToSubmit.append('payload', JSON.stringify(payload));
     formDataToSubmit.append('resource_type', 'artist');
     formDataToSubmit.append('action', isEditMode.value ? 'update' : 'create');
+    if (isEditMode.value && props.artistId) {
+      formDataToSubmit.append('resource_id', props.artistId);
+    }
 
     // 发送到 revisions 接口
     const { $api } = useNuxtApp();
