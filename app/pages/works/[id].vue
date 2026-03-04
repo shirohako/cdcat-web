@@ -17,46 +17,46 @@
 
     <!-- 内容 -->
     <div v-else>
-      <!-- Album Hero Section -->
-      <AlbumHero
+      <!-- Work Hero Section -->
+      <WorkHero
         :album-data="albumData"
         :work-id="workId"
         :initial-favorited="workData?.is_favorited ?? false"
       />
 
-    <!-- Album Details Section -->
+    <!-- Work Details Section -->
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
-          <AlbumProducts
+          <WorkProducts
             v-if="products.length > 0"
             :products="products"
           />
 
-          <AlbumBonuses
+          <WorkBonuses
             v-if="bonuses.length > 0"
             :bonuses="bonuses"
           />
 
-          <AlbumDescriptions
+          <WorkDescriptions
             v-if="albumDescriptions.length > 0"
             :descriptions="albumDescriptions"
           />
-          <AlbumCredits
+          <WorkCredits
             v-if="credits.length > 0"
             :credits="credits"
           />
-          <AlbumTracklist
+          <WorkTracklist
             :songs="songs"
             :structure="albumStructure"
           />
 
           <!-- Reviews -->
-          <AlbumReviews :reviews="mockReviews" class="hidden" />
+          <WorkReviews :reviews="mockReviews" class="hidden" />
 
           <!-- Review Modal -->
-          <AlbumReviewModal
+          <WorkReviewModal
             v-model="showReviewModal"
             :work-id="workId"
             @saved="onReviewSaved"
@@ -66,18 +66,18 @@
         <!-- Right Column - Sidebar -->
         <div class="lg:col-span-1 space-y-6">
           <!-- 显示所有艺术家 -->
-          <AlbumArtistCard :artists="artistsData" />
+          <WorkArtistCard :artists="artistsData" />
 
           <!-- 追踪状态 -->
-          <AlbumTracking :work-id="workId" :initial-tracking="workData?.user_tracking ?? null" />
+          <WorkTracking :work-id="workId" :initial-tracking="workData?.user_tracking ?? null" />
 
-          <AlbumStats
+          <WorkStats
             :views-count="workData?.views_count ?? 0"
             :likes-count="workData?.likes_count ?? 0"
             :tracking-stats="trackingStats"
           />
 
-          <AlbumRankings
+          <WorkRankings
             :all-time-rank="rankings.allTimeRank"
             :all-time-total="rankings.allTimeTotal"
             :year2025-rank="rankings.year2025Rank"
@@ -89,10 +89,10 @@
           />
 
           <!-- Links -->
-          <AlbumLinks :links="links" />
+          <WorkLinks :links="links" />
 
           <!-- Data Contributors -->
-          <AlbumContributors />
+          <WorkContributors />
         </div>
       </div>
     </div>
@@ -101,6 +101,21 @@
 </template>
 
 <script setup>
+import WorkHero from '~/components/work/WorkHero.vue'
+import WorkProducts from '~/components/work/WorkProducts.vue'
+import WorkBonuses from '~/components/work/WorkBonuses.vue'
+import WorkDescriptions from '~/components/work/WorkDescriptions.vue'
+import WorkCredits from '~/components/work/WorkCredits.vue'
+import WorkTracklist from '~/components/work/WorkTracklist.vue'
+import WorkReviews from '~/components/work/WorkReviews.vue'
+import WorkReviewModal from '~/components/work/WorkReviewModal.vue'
+import WorkArtistCard from '~/components/work/WorkArtistCard.vue'
+import WorkTracking from '~/components/work/WorkTracking.vue'
+import WorkStats from '~/components/work/WorkStats.vue'
+import WorkRankings from '~/components/work/WorkRankings.vue'
+import WorkLinks from '~/components/work/WorkLinks.vue'
+import WorkContributors from '~/components/work/WorkContributors.vue'
+
 const { isAuthenticated } = useAuth()
 const router = useRouter()
 

@@ -60,7 +60,7 @@ useHead({
 
       <!-- 表单 -->
       <div v-else class="max-w-5xl">
-        <SeriesForm :initial-data="initialData" :series-id="seriesId" />
+        <RevisionsSeriesForm :initial-data="initialData" :series-id="seriesId" />
       </div>
     </div>
   </div>

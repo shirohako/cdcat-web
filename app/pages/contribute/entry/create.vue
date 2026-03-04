@@ -82,7 +82,7 @@ const isFromBangumi = computed(() => route.query.from === 'bangumi')
       </div>
 
       <!-- 表单 -->
-      <EntryForm :initial-data="importedData" />
+      <RevisionsEntryForm :initial-data="importedData" />
     </div>
   </div>
 </template>
