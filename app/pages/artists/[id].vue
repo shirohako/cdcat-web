@@ -3,19 +3,19 @@
     class="min-h-screen bg-linear-to-br from-gray-50 via-pink-50 to-purple-50"
   >
     <!-- Artist Hero Section -->
-    <div class="relative w-full overflow-hidden bg-white/60 backdrop-blur-sm">
-      <!-- Background Pattern -->
+    <div class="relative w-full overflow-hidden">
+      <!-- Banner -->
       <div
-        class="absolute inset-0 opacity-10"
-        style="
-          background-image: radial-gradient(
-            circle,
-            #ec4899 1px,
-            transparent 1px
-          );
-          background-size: 24px 24px;
-        "
+        class="absolute inset-0"
+        style="background-image: linear-gradient(109.6deg, rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2%)"
       />
+      <!-- Subtle dot pattern -->
+      <div
+        class="absolute inset-0 opacity-30"
+        style="background-image: radial-gradient(circle, #60a5fa 1px, transparent 1px); background-size: 28px 28px"
+      />
+      <!-- Bottom fade -->
+      <div class="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-50 to-transparent" />
 
       <!-- Content -->
       <div
@@ -25,7 +25,7 @@
           <!-- Artist Avatar -->
           <div class="relative">
             <div
-              class="w-28 h-28 md:w-40 md:h-40 rounded-full bg-gray-100 flex items-center justify-center shadow-xl ring-4 ring-white text-gray-300"
+              class="w-28 h-28 md:w-40 md:h-40 rounded-full bg-white/80 flex items-center justify-center shadow-xl ring-4 ring-white text-gray-300 backdrop-blur-sm"
             >
               <Users :size="52" />
             </div>
@@ -51,7 +51,7 @@
               class="flex flex-wrap justify-center md:justify-start gap-6 mb-6"
             >
               <div
-                class="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
+                class="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-sm"
               >
                 <Disc3 :size="20" class="text-pink-500" />
                 <span class="text-sm font-medium text-gray-700"
@@ -59,55 +59,41 @@
                 >
               </div>
               <div
-                class="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
+                class="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-sm"
               >
                 <Users :size="20" class="text-purple-500" />
                 <span class="text-sm font-medium text-gray-700"
                   >{{ artistData.followers }} Followers</span
                 >
               </div>
-              <div
-                class="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm"
-              >
-                <Calendar :size="20" class="text-blue-500" />
-                <span class="text-sm font-medium text-gray-700"
-                  >Since {{ artistData.since }}</span
-                >
-              </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="flex flex-wrap justify-center md:justify-start gap-3">
-              <NuxtLink
-                :to="`/contribute/artist/${artistId}`"
-                class="btn btn-md bg-linear-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0 gap-2 shadow-lg"
-              >
-                <Edit :size="18" />
-                Edit
-              </NuxtLink>
               <button
-                class="btn btn-md btn-outline border-gray-300 hover:bg-gray-50 gap-2"
+                class="btn btn-md gap-2"
+                :class="isFavorited
+                  ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600'
+                  : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'"
+                :disabled="isToggling"
+                @click="toggleLike"
               >
                 <UserPlus :size="18" />
-                Follow
+                {{ isFavorited ? 'Following' : 'Follow' }}
               </button>
               <button
-                class="btn btn-md btn-outline border-gray-300 hover:bg-gray-50 gap-2"
+                class="btn btn-md bg-white/60 hover:bg-white/90 border-white/80 text-gray-700 gap-2 backdrop-blur-sm"
               >
                 <Share2 :size="18" />
                 Share
               </button>
-              <button
-                class="btn btn-md gap-2"
-                :class="isFavorited
-                  ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
-                  : 'btn-outline border-gray-300 hover:bg-gray-50'"
-                :disabled="isToggling"
-                @click="toggleLike"
+              <NuxtLink
+                :to="`/contribute/artist/${artistId}`"
+                class="btn btn-md bg-white/60 hover:bg-white/90 border-white/80 text-gray-700 gap-2 backdrop-blur-sm"
               >
-                <Heart :size="18" :fill="isFavorited ? 'currentColor' : 'none'" />
-                {{ isFavorited ? 'Liked' : 'Like' }}
-              </button>
+                <Edit :size="18" />
+                Edit
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -232,7 +218,6 @@
 import {
   Disc3,
   Users,
-  Calendar,
   UserPlus,
   Share2,
   Heart,
@@ -279,7 +264,7 @@ const toggleLike = async () => {
 // Computed artist data with fallbacks
 const artistData = computed(() => ({
   name: artist.value?.name || "Loading...",
-  bio: "",
+  bio: artist.value?.bio || "暂无艺术家简介。",
   albumCount: artist.value?.albums_count || 0,
   followers: artist.value?.followers_count || 0,
   since: artist.value?.active_since || "N/A",
