@@ -22,7 +22,7 @@
 
     <form @submit.prevent="handleSubmit">
       <!-- Tab 1: Basic Information -->
-      <WorkFormBasicTab
+      <RevisionsWorkFormBasicTab
         v-show="currentTab === 'basic'"
         :form-data="formData"
         :errors="errors"
@@ -30,35 +30,35 @@
       />
 
       <!-- Tab 2: Artists -->
-      <WorkFormArtistsTab
+      <RevisionsWorkFormArtistsTab
         v-show="currentTab === 'artists'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 3: Discs & Tracks -->
-      <WorkFormTracksTab
+      <RevisionsWorkFormTracksTab
         v-show="currentTab === 'tracks'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 4: Credits -->
-      <WorkFormCreditsTab
+      <RevisionsWorkFormCreditsTab
         v-show="currentTab === 'credits'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 5: Links -->
-      <WorkFormLinksTab
+      <RevisionsWorkFormLinksTab
         v-show="currentTab === 'links'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 6: JSON Editor -->
-      <WorkFormJsonTab
+      <RevisionsWorkFormJsonTab
         v-show="currentTab === 'json'"
         :json-text="jsonDraft"
         :error="jsonError"
@@ -68,7 +68,7 @@
       />
 
       <!-- Tab 7: Preview JSON -->
-      <WorkFormPreviewTab
+      <RevisionsWorkFormPreviewTab
         v-show="currentTab === 'preview'"
         :submit-data="getSubmitData()"
       />
@@ -273,6 +273,8 @@ watch(() => props.initialData, (newData) => {
 const errors = ref({
   title: '',
   type: '',
+  release_date: '',
+  image_url: '',
 });
 
 // 提交状态
@@ -286,6 +288,8 @@ const validateForm = () => {
   errors.value = {
     title: '',
     type: '',
+    release_date: '',
+    image_url: '',
   };
 
   if (!formData.value.title || formData.value.title.trim() === '') {
@@ -295,6 +299,16 @@ const validateForm = () => {
 
   if (!formData.value.type) {
     errors.value.type = 'Work type is required';
+    isValid = false;
+  }
+
+  if (!formData.value.release_date) {
+    errors.value.release_date = 'Release date is required';
+    isValid = false;
+  }
+
+  if (!formData.value.image_url || formData.value.image_url.trim() === '') {
+    errors.value.image_url = 'Cover image URL is required';
     isValid = false;
   }
 

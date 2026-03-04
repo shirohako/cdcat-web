@@ -23,7 +23,7 @@
         </div>
 
         <!-- 表单组件 -->
-        <WorkForm
+        <RevisionsWorkForm
           v-if="!loadError"
           :initial-data="workData"
           :work-id="workId"

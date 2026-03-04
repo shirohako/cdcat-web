@@ -23,7 +23,7 @@
         </div>
 
         <!-- 表单组件 -->
-        <ArtistForm
+        <RevisionsArtistForm
           v-if="!loadError"
           :initial-data="artistData"
           :artist-id="artistId"

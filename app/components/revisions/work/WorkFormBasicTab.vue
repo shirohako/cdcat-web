@@ -107,15 +107,20 @@
     <!-- 发行日期 -->
     <div class="form-control">
       <label class="label">
-        <span class="label-text font-semibold">Release Date</span>
+        <span class="label-text font-semibold">Release Date <span class="text-red-500">*</span></span>
       </label>
       <input
         :value="formData.release_date"
         type="date"
         class="input input-bordered w-full"
+        :class="{ 'input-error': errors.release_date }"
+        required
         @input="$emit('update:formData', { ...formData, release_date: ($event.target as HTMLInputElement).value })"
       />
-      <label class="label">
+      <label v-if="errors.release_date" class="label">
+        <span class="label-text-alt text-error">{{ errors.release_date }}</span>
+      </label>
+      <label v-else class="label">
         <span class="label-text-alt text-gray-500">When was this work released</span>
       </label>
     </div>
@@ -123,16 +128,21 @@
     <!-- 封面图片 URL -->
     <div class="form-control">
       <label class="label">
-        <span class="label-text font-semibold">Cover Image URL</span>
+        <span class="label-text font-semibold">Cover Image URL <span class="text-red-500">*</span></span>
       </label>
       <input
         :value="formData.image_url"
         type="url"
         placeholder="https://example.com/cover.jpg"
         class="input input-bordered w-full"
+        :class="{ 'input-error': errors.image_url }"
+        required
         @input="$emit('update:formData', { ...formData, image_url: ($event.target as HTMLInputElement).value })"
       />
-      <label class="label">
+      <label v-if="errors.image_url" class="label">
+        <span class="label-text-alt text-error">{{ errors.image_url }}</span>
+      </label>
+      <label v-else class="label">
         <span class="label-text-alt text-gray-500">URL to the work's cover image</span>
       </label>
       <!-- 封面图片预览 -->
@@ -214,6 +224,8 @@ interface FormData {
 interface Errors {
   title?: string
   type?: string
+  release_date?: string
+  image_url?: string
 }
 
 defineProps<{

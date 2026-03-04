@@ -176,6 +176,20 @@
         </div>
       </div>
 
+      <!-- Error dialog -->
+      <dialog ref="errorDialog" class="modal">
+        <div class="modal-box">
+          <h3 class="font-bold text-lg text-error">操作失败</h3>
+          <p class="py-4 text-sm">{{ mutateError }}</p>
+          <div class="modal-action">
+            <button class="btn" @click="errorDialog.close()">关闭</button>
+          </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
       <div v-if="error" class="alert alert-error mt-6">
         <span>Failed to load: {{ error.message }}</span>
       </div>
@@ -254,6 +268,8 @@ const hasPrevious = computed(() => !!previous.value?.data);
 const activeTab = ref('diff');
 const isMutating = ref(false);
 const mutateAction = ref(null);
+const mutateError = ref('');
+const errorDialog = ref(null);
 
 watchEffect(() => {
   if (!hasPrevious.value && activeTab.value === 'diff') {
@@ -354,6 +370,8 @@ const mutateStatus = async (action) => {
     router.push({ path: '/revisions' });
   } catch (err) {
     console.error(`Failed to ${action} revision`, err);
+    mutateError.value = err?.data?.message || err?.message || `Failed to ${action} revision`;
+    errorDialog.value?.showModal();
   } finally {
     mutateAction.value = null;
     isMutating.value = false;

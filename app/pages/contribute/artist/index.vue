@@ -8,7 +8,7 @@
       </div>
 
       <!-- 表单组件 -->
-      <ArtistForm />
+      <RevisionsArtistForm />
     </div>
   </div>
 </template>
