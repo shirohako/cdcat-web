@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import { Check, Save, X } from 'lucide-vue-next'
-import type { MetaItem, RelatedItem, SeriesCreateForm, SeriesGroup } from '~/components/revisions/series/seriesFormTypes'
+import type { MetaItem, RelatedItem, SeriesCreateForm, SeriesGroup } from '~/components/revision/series/seriesFormTypes'
 
 const props = defineProps<{
   initialData?: Record<string, any>
@@ -397,30 +397,30 @@ const handleFormSubmit = () => {
 <template>
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-6">
     <form @submit.prevent="handleFormSubmit">
-      <RevisionsSeriesCreateTabs v-model="currentTab" :tabs="tabs" />
+      <RevisionSeriesCreateTabs v-model="currentTab" :tabs="tabs" />
 
-      <RevisionsSeriesBasicSection
+      <RevisionSeriesBasicSection
         v-show="currentTab === 'basic'"
         :form="form"
         :errors="errors"
         :on-add-meta="addMeta"
         :on-remove-meta="removeMeta"
       />
-      <RevisionsSeriesGroupsSection
+      <RevisionSeriesGroupsSection
         v-show="currentTab === 'groups'"
         :groups="form.groups"
         :on-add-group="addGroup"
         :on-remove-group="removeGroup"
         :on-move-group="moveGroup"
       />
-      <RevisionsSeriesRelatedEntriesSection
+      <RevisionSeriesRelatedEntriesSection
         v-show="currentTab === 'related-entries'"
         :items="form.relatedEntries"
         :group-options="groupOptions"
         :on-add="addRelatedEntry"
         :on-remove="removeRelatedEntry"
       />
-      <RevisionsSeriesRelatedWorksSection
+      <RevisionSeriesRelatedWorksSection
         v-show="currentTab === 'related-works'"
         :items="form.relatedWorks"
         :group-options="groupOptions"

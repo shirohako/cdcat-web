@@ -49,7 +49,7 @@ const isFromBangumi = computed(() => route.query.from === 'bangumi')
         </NuxtLink>
 
         <div class="flex items-center gap-4">
-          <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+          <div class="shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
             <Film class="w-6 h-6 text-primary" />
           </div>
           <div>
@@ -68,7 +68,7 @@ const isFromBangumi = computed(() => route.query.from === 'bangumi')
         <!-- Bangumi 导入提示 -->
         <div v-if="isFromBangumi && importedData" class="mt-4 p-4 bg-pink-50 border border-pink-200 rounded-lg">
           <div class="flex items-start gap-3">
-            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
+            <div class="shrink-0 w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
               <Icon name="lucide:download" class="w-4 h-4 text-pink-600" />
             </div>
             <div>
@@ -82,7 +82,7 @@ const isFromBangumi = computed(() => route.query.from === 'bangumi')
       </div>
 
       <!-- 表单 -->
-      <RevisionsEntryForm :initial-data="importedData" />
+      <RevisionEntryForm :initial-data="importedData" />
     </div>
   </div>
 </template>

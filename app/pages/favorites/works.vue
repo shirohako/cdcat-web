@@ -3,5 +3,5 @@
 </template>
 
 <script setup>
-import FavoriteWorksTab from '~/components/favorites/FavoriteWorksTab.vue'
+import FavoriteWorksTab from '~/components/favorite/FavoriteWorksTab.vue'
 </script>

@@ -22,7 +22,7 @@
 
     <form @submit.prevent="handleSubmit">
       <!-- Tab 1: Basic Information -->
-      <RevisionsWorkFormBasicTab
+      <RevisionWorkFormBasicTab
         v-show="currentTab === 'basic'"
         :form-data="formData"
         :errors="errors"
@@ -30,35 +30,35 @@
       />
 
       <!-- Tab 2: Artists -->
-      <RevisionsWorkFormArtistsTab
+      <RevisionWorkFormArtistsTab
         v-show="currentTab === 'artists'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 3: Discs & Tracks -->
-      <RevisionsWorkFormTracksTab
+      <RevisionWorkFormTracksTab
         v-show="currentTab === 'tracks'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 4: Credits -->
-      <RevisionsWorkFormCreditsTab
+      <RevisionWorkFormCreditsTab
         v-show="currentTab === 'credits'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 5: Links -->
-      <RevisionsWorkFormLinksTab
+      <RevisionWorkFormLinksTab
         v-show="currentTab === 'links'"
         :form-data="formData"
         @update:form-data="formData = $event"
       />
 
       <!-- Tab 6: JSON Editor -->
-      <RevisionsWorkFormJsonTab
+      <RevisionWorkFormJsonTab
         v-show="currentTab === 'json'"
         :json-text="jsonDraft"
         :error="jsonError"
@@ -68,7 +68,7 @@
       />
 
       <!-- Tab 7: Preview JSON -->
-      <RevisionsWorkFormPreviewTab
+      <RevisionWorkFormPreviewTab
         v-show="currentTab === 'preview'"
         :submit-data="getSubmitData()"
       />
