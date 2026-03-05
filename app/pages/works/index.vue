@@ -78,8 +78,8 @@
                 </h3>
 
                 <!-- 目录编号 -->
-                <div v-if="work.catalog_number" class="text-xs text-gray-500 mb-3 truncate">
-                  {{ work.catalog_number }}
+                <div class="text-xs text-gray-500 mb-3 truncate">
+                  {{ work.catalog_number || '\u00A0' }}
                 </div>
 
                 <!-- 详细信息 -->

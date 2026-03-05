@@ -19,7 +19,7 @@
 
       <!-- Content -->
       <div
-        class="relative container mx-auto px-4 md:px-8 py-12 md:py-20 max-w-7xl"
+        class="relative container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-7xl"
       >
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <!-- Artist Avatar -->
@@ -134,66 +134,64 @@
             v-for="album in albums"
             :key="album.id"
             :to="`/works/${album.id}`"
-            class="group cursor-pointer"
+            class="group"
           >
-            <!-- Album Card -->
-            <div
-              class="relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
-            >
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
               <!-- Album Cover -->
-              <div class="relative aspect-square overflow-hidden">
-                <div class="w-full h-full bg-gray-100 flex items-center justify-center text-gray-300">
-                  <Disc3 :size="48" />
+              <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
+                <img
+                  v-if="album.image_url"
+                  :src="album.image_url"
+                  :alt="album.title"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  style="image-rendering: -webkit-optimize-contrast;"
+                />
+                <div v-else class="text-gray-300">
+                  <Disc3 :size="64" />
                 </div>
-
-                <!-- Hover Overlay -->
-                <div
-                  class="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-4"
-                >
-                  <button
-                    class="btn btn-sm bg-white/90 hover:bg-white text-gray-900 border-0 gap-2"
-                  >
-                    <Play :size="16" />
-                    查看
-                  </button>
-                </div>
-
-                <!-- Release Year Badge -->
-                <div
-                  class="absolute top-3 right-3 px-3 py-1 bg-white/95 backdrop-blur-sm rounded-full text-xs font-semibold text-gray-700 shadow-md"
-                >
-                  {{ album.year }}
+                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <!-- Type Badge -->
+                <div v-if="album.type" class="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
+                  {{ formatType(album.type) }}
                 </div>
               </div>
 
               <!-- Album Info -->
-              <div class="p-4">
-                <h3
-                  class="font-bold text-gray-900 mb-1 truncate group-hover:text-purple-600 transition-colors"
-                >
+              <div class="p-4 bg-white">
+                <h3 class="font-bold text-base mb-2 truncate group-hover:text-blue-600 transition-colors">
                   {{ album.title }}
                 </h3>
-                <p class="text-sm text-gray-500 mb-2">{{ album.format }}</p>
 
-                <!-- Artist Info (Clickable) -->
-                <div
-                  v-for="albumArtist in album.artists"
-                  :key="albumArtist.id"
-                  class="flex items-center gap-1.5 mb-2 text-xs text-gray-600 hover:text-purple-600 transition-colors w-fit"
-                >
-                  <Users :size="12" />
-                  <span class="truncate font-medium">{{ albumArtist.name }}</span>
+                <div class="text-xs text-gray-500 mb-3 truncate">
+                  {{ album.catalog_number || '\u00A0' }}
                 </div>
 
-                <!-- Mini Stats -->
-                <div class="flex items-center gap-3 text-xs text-gray-400">
-                  <div class="flex items-center gap-1">
-                    <Heart :size="12" />
-                    {{ album.likes }}
+                <div class="space-y-2">
+                  <div v-if="album.release_date" class="flex items-center gap-1.5 text-xs text-gray-600">
+                    <Calendar :size="14" class="text-gray-400" />
+                    <span>{{ formatDate(album.release_date) }}</span>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <Eye :size="12" />
-                    {{ album.views }}
+
+                  <div class="flex items-center justify-between text-xs text-gray-600">
+                    <div class="flex items-center gap-1.5">
+                      <Disc :size="14" class="text-gray-400" />
+                      <span>{{ album.disc_count || 0 }} Disc{{ album.disc_count > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <Music :size="14" class="text-gray-400" />
+                      <span>{{ album.track_count || 0 }} Track{{ album.track_count > 1 ? 's' : '' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center justify-between text-xs text-gray-600 pt-1 border-t border-gray-100">
+                    <div class="flex items-center gap-1.5">
+                      <Eye :size="14" class="text-gray-400" />
+                      <span>{{ album.views }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <Heart :size="14" :fill="album.is_favorited ? 'currentColor' : 'none'" :class="album.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
+                      <span>{{ album.likes }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -217,11 +215,13 @@
 <script setup>
 import {
   Disc3,
+  Disc,
+  Music,
+  Calendar,
   Users,
   UserPlus,
   Share2,
   Heart,
-  Play,
   Eye,
   Edit,
 } from "lucide-vue-next";
@@ -274,29 +274,34 @@ const artistData = computed(() => ({
 const albums = computed(() => {
   if (!artist.value?.works) return [];
 
-  return artist.value.works.map((work) => {
-    // Extract year from release_date
-    const year = work.release_date
-      ? new Date(work.release_date).getFullYear().toString()
-      : "N/A";
-
-    // Format the disc and track info
-    const discInfo = `${work.disc_count} CD`;
-    const format = `${discInfo} • ${work.track_count} Tracks`;
-
-    return {
-      id: work.id,
-      title: work.title,
-      cover: work.image_url,
-      year: year,
-      format: format,
-      type: work.type || "album",
-      artists: work.artists || [], // Include artists data
-      likes: work.favorites_count || 0,
-      views: work.views_count || 0,
-    };
-  });
+  return artist.value.works.map((work) => ({
+    id: work.id,
+    title: work.title,
+    image_url: work.image_url,
+    type: work.type || "album",
+    catalog_number: work.catalog_number,
+    release_date: work.release_date,
+    disc_count: work.disc_count || 0,
+    track_count: work.track_count || 0,
+    is_favorited: work.is_favorited ?? false,
+    likes: work.favorites_count || 0,
+    views: work.views_count || 0,
+  }));
 });
+
+const formatType = (type) => {
+  const typeMap = { album: "Album", single: "Single", ep: "EP", compilation: "Compilation" };
+  return typeMap[type] || type;
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
 </script>
 
 <style scoped>
