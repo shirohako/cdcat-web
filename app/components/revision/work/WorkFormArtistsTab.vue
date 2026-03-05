@@ -1,40 +1,58 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-gray-900">Associated Artists</h2>
-      <button type="button" class="btn btn-sm btn-primary" @click="addArtist">
-        <Plus :size="16" />
-        Add Artist
-      </button>
+    <!-- 标题 + 说明 -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-bold text-gray-900">Associated Artists</h2>
+        <button type="button" class="btn btn-sm btn-primary gap-1" @click="addArtist">
+          <Plus :size="14" />
+          Add Artist
+        </button>
+      </div>
+      <p class="text-sm text-gray-500 leading-relaxed">
+        关联作品的主要创作者和歌手。填写对应的歌手 ID（应为数字）。<br />
+        若歌手或音乐人尚未收录于数据库，可前往
+        <NuxtLink to="/artists/create" class="text-primary hover:underline">艺术家页面</NuxtLink>
+        创建后再回来关联。
+      </p>
     </div>
 
-    <div v-if="formData.artists.length === 0" class="text-center py-8 text-gray-500">
-      No artists associated yet. Click "Add Artist" to start.
+    <!-- 空状态 -->
+    <div v-if="formData.artists.length === 0" class="flex flex-col items-center justify-center py-12 rounded-xl border-2 border-dashed border-gray-200 text-gray-400 gap-2">
+      <Users :size="32" class="opacity-40" />
+      <p class="text-sm">暂无关联艺术家</p>
     </div>
 
-    <div v-for="(artist, index) in formData.artists" :key="artist.id" class="border border-gray-200 rounded-lg p-4">
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text font-semibold">Artist ID</span>
-        </label>
-        <div class="flex items-center gap-2">
-          <input
-            v-model="artist.artist_id"
-            type="text"
-            placeholder="Enter artist ID"
-            class="input input-bordered input-sm flex-1"
-          />
-          <button type="button" class="btn btn-sm btn-error btn-outline" @click="removeArtist(index)">
-            <Trash2 :size="16" />
-          </button>
+    <!-- 艺术家列表 -->
+    <div v-else class="flex flex-col gap-2">
+      <div
+        v-for="(artist, index) in formData.artists"
+        :key="artist.id"
+        class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50 group"
+      >
+        <div class="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center shrink-0 text-xs font-semibold text-gray-500">
+          {{ index + 1 }}
         </div>
+        <input
+          v-model="artist.artist_id"
+          type="text"
+          placeholder="Artist ID（数字）"
+          class="input input-bordered input-sm flex-1 bg-white"
+        />
+        <button
+          type="button"
+          class="btn btn-sm btn-ghost text-gray-400 hover:text-error hover:bg-error/10"
+          @click="removeArtist(index)"
+        >
+          <Trash2 :size="15" />
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2 } from 'lucide-vue-next'
+import { Plus, Trash2, Users } from 'lucide-vue-next'
 
 interface Artist {
   id: string

@@ -1,17 +1,17 @@
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
+  <div class="bg-white rounded-xl shadow-sm border border-gray-100 px-3 py-4 md:px-4 md:py-5">
     <!-- Tabs 导航 -->
-    <div class="border-b border-gray-200 mb-6 -mx-6 md:-mx-8 px-6 md:px-8">
-      <div class="flex flex-wrap gap-2 md:gap-4">
+    <div class="mb-5 -mx-3 md:-mx-4 px-3 md:px-4 border-b border-gray-100">
+      <div class="flex flex-wrap gap-1">
         <button
           v-for="tab in tabs"
           :key="tab.id"
           type="button"
-          class="px-4 py-3 font-medium text-sm transition-colors relative"
+          class="px-3 py-2 text-sm font-medium rounded-t-md transition-all duration-150 relative -mb-px"
           :class="
             currentTab === tab.id
-              ? 'text-primary border-b-2 border-primary'
-              : 'text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300'
+              ? 'text-primary bg-primary/5 border border-gray-100 border-b-white'
+              : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50 border border-transparent'
           "
           @click="currentTab = tab.id"
         >
@@ -50,7 +50,28 @@
         @update:form-data="formData = $event"
       />
 
-      <!-- Tab 5: Links -->
+      <!-- Tab 5: Products -->
+      <RevisionWorkFormProductsTab
+        v-show="currentTab === 'products'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
+
+      <!-- Tab 6: Bonuses -->
+      <RevisionWorkFormBonusesTab
+        v-show="currentTab === 'bonuses'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
+
+      <!-- Tab 7: Meta -->
+      <RevisionWorkFormMetaTab
+        v-show="currentTab === 'meta'"
+        :form-data="formData"
+        @update:form-data="formData = $event"
+      />
+
+      <!-- Tab 8: Links -->
       <RevisionWorkFormLinksTab
         v-show="currentTab === 'links'"
         :form-data="formData"
@@ -73,14 +94,6 @@
         :submit-data="getSubmitData()"
       />
 
-      <!-- 错误提示 -->
-      <div v-if="submitError" class="alert alert-error mt-6">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ submitError }}</span>
-      </div>
-
       <!-- 操作按钮 -->
       <div class="mt-8 flex gap-3">
         <button
@@ -100,6 +113,20 @@
         </button>
       </div>
     </form>
+
+    <!-- 提交错误弹窗 -->
+    <dialog ref="errorDialog" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg text-error">提交失败</h3>
+        <p class="py-4 text-sm whitespace-pre-line">{{ submitError }}</p>
+        <div class="modal-action">
+          <button class="btn" @click="errorDialog.close()">关闭</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -135,6 +162,9 @@ const tabs = [
   { id: 'artists', label: 'Artists' },
   { id: 'tracks', label: 'Discs & Tracks' },
   { id: 'credits', label: 'Credits' },
+  { id: 'products', label: 'Products' },
+  { id: 'bonuses', label: 'Bonuses' },
+  { id: 'meta', label: 'Meta' },
   { id: 'links', label: 'Links' },
   { id: 'json', label: 'JSON Editor' },
   { id: 'preview', label: 'Preview' },
@@ -280,11 +310,11 @@ const errors = ref({
 // 提交状态
 const isSubmitting = ref(false);
 const submitError = ref('');
+const errorDialog = ref(null);
 
 
 // 验证表单
 const validateForm = () => {
-  let isValid = true;
   errors.value = {
     title: '',
     type: '',
@@ -292,27 +322,35 @@ const validateForm = () => {
     image_url: '',
   };
 
+  const missing = [];
+
   if (!formData.value.title || formData.value.title.trim() === '') {
     errors.value.title = 'Work title is required';
-    isValid = false;
+    missing.push('标题（Title）');
   }
 
   if (!formData.value.type) {
     errors.value.type = 'Work type is required';
-    isValid = false;
+    missing.push('类型（Type）');
   }
 
   if (!formData.value.release_date) {
     errors.value.release_date = 'Release date is required';
-    isValid = false;
+    missing.push('发行日期（Release Date）');
   }
 
   if (!formData.value.image_url || formData.value.image_url.trim() === '') {
     errors.value.image_url = 'Cover image URL is required';
-    isValid = false;
+    missing.push('封面图片（Cover Image URL）');
   }
 
-  return isValid;
+  if (missing.length > 0) {
+    submitError.value = `请填写以下必填项：\n${missing.map(s => `• ${s}`).join('\n')}`;
+    errorDialog.value?.showModal();
+    return false;
+  }
+
+  return true;
 };
 
 // 准备提交数据
@@ -635,7 +673,8 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error(`Failed to submit work ${isEditMode.value ? 'update' : 'creation'}:`, error);
-    submitError.value = error.data?.message || error.message || `Failed to submit. Please try again.`;
+    submitError.value = error.data?.message || error.message || 'Failed to submit. Please try again.';
+    errorDialog.value?.showModal();
   } finally {
     isSubmitting.value = false;
   }

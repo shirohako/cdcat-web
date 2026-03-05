@@ -1,11 +1,16 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-gray-900">Credits</h2>
-      <button type="button" class="btn btn-sm btn-primary" @click="addCredit">
-        <Plus :size="16" />
-        Add Credit
-      </button>
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-bold text-gray-900">Credits</h2>
+        <button type="button" class="btn btn-sm btn-primary gap-1" @click="addCredit">
+          <Plus :size="14" />
+          Add Credit
+        </button>
+      </div>
+      <p class="text-sm text-gray-500 leading-relaxed">
+        这里可以添加专辑的创作信息（如作词、作曲、编曲等），也可以为具体曲目单独添加创作信息。
+      </p>
     </div>
 
     <div v-if="formData.credits.length === 0" class="text-center py-8 text-gray-500">

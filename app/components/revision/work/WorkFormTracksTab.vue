@@ -1,11 +1,16 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-gray-900">Discs & Tracks</h2>
-      <button type="button" class="btn btn-sm btn-primary" @click="addDisc">
-        <Plus :size="16" />
-        Add Disc
-      </button>
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <h2 class="text-xl font-bold text-gray-900">Discs & Tracks</h2>
+        <button type="button" class="btn btn-sm btn-primary gap-1" @click="addDisc">
+          <Plus :size="14" />
+          Add Disc
+        </button>
+      </div>
+      <p class="text-sm text-gray-500 leading-relaxed">
+        这里可以添加收录的具体曲目信息，包括碟片结构与每张碟片内的曲目列表。
+      </p>
     </div>
 
     <div v-if="formData.structure.length === 0" class="text-center py-8 text-gray-500">
