@@ -4,7 +4,7 @@
     <img
       :src="albumData.backgroundImage"
       alt="Background"
-      class="absolute inset-0 w-full h-full object-cover opacity-30"
+      class="absolute inset-0 w-full h-full object-cover opacity-30 blur-[3px] scale-105"
     />
 
     <!-- Content Container -->
@@ -83,7 +83,7 @@
               <!-- Like: full row on large+, shares row with others below lg -->
               <div class="flex gap-1.5">
                 <button
-                  class="btn btn-xs flex-1 lg:flex-none gap-1.5 h-7 min-h-0"
+                  class="btn btn-xs flex-1 lg:flex-none lg:px-5 gap-1.5 h-7 lg:h-8 min-h-0"
                   :class="isFavorited
                     ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
                     : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
@@ -94,14 +94,14 @@
                   {{ isFavorited ? 'Liked' : 'Like' }}
                 </button>
                 <!-- Buy it + Edit: inline with Like below lg -->
-                <button class="btn btn-xs flex-1 lg:hidden h-7 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5">
+                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
                 <NuxtLink
                   v-if="workId"
                   :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
-                  class="btn btn-xs flex-1 lg:hidden h-7 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
+                  class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
                 >
                   <Edit :size="13" />
                   Edit
@@ -109,14 +109,14 @@
               </div>
               <!-- Buy it + Edit: own row on lg+ only -->
               <div class="hidden lg:flex gap-1.5">
-                <button class="btn btn-xs flex-none h-7 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0">
+                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
                 <NuxtLink
                   v-if="workId"
                   :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
-                  class="btn btn-xs flex-none h-7 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
+                  class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
                 >
                   <Edit :size="13" />
                   Edit
