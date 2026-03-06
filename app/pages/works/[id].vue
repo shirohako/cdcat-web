@@ -89,7 +89,7 @@
           <WorkLinks :links="links" />
 
           <!-- Data Contributors -->
-          <WorkContributors />
+          <WorkContributors :contributors="contributors" />
         </div>
       </div>
     </div>
@@ -231,6 +231,7 @@ const credits = computed(() => {
 });
 
 const links = computed(() => workData.value?.links || []);
+const contributors = computed(() => workData.value?.contributors ?? []);
 
 const products = computed(() => workData.value?.products ?? []);
 

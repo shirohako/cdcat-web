@@ -283,7 +283,12 @@ const transformBackendData = (data) => {
 
   // 处理 links
   if (data.links && Array.isArray(data.links)) {
-    transformed.links = data.links;
+    transformed.links = data.links.map((l, index) => ({
+      id: `link-${l.id || index}`,
+      link_id: l.id,
+      link_provider_id: l.link_provider_id ?? l.provider?.id ?? '',
+      url: l.url || '',
+    }));
   }
 
   return transformed;
@@ -541,11 +546,12 @@ const getSubmitData = () => {
   // 添加链接
   if (formData.value.links.length > 0) {
     payload.links = formData.value.links
-      .filter(l => l.url)
-      .map(l => ({
-        platform: l.platform,
-        url: l.url,
-      }));
+      .filter(l => l.link_provider_id && l.url)
+      .map(l => {
+        const item = { link_provider_id: l.link_provider_id, url: l.url };
+        if (l.link_id) item.id = l.link_id;
+        return item;
+      });
   }
 
   return payload;
@@ -708,10 +714,12 @@ const transformPayloadToFormData = (payload) => {
         }))
       : [],
     links: Array.isArray(payload.links)
-      ? payload.links.map((link) => ({
-        platform: link.platform || '',
-        url: link.url || '',
-      }))
+      ? payload.links.map((link, index) => ({
+          id: `link-${link.id || index}`,
+          link_id: link.id,
+          link_provider_id: link.link_provider_id || '',
+          url: link.url || '',
+        }))
       : [],
   };
 };
