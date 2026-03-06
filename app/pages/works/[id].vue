@@ -221,24 +221,18 @@ const albumStructure = computed(() => workData.value?.structure ?? []);
 
 const credits = computed(() => {
   const list = workData.value?.credits || [];
-  if (!list.length) return [];
-
   const groups = new Map();
   for (const item of list) {
+    const name = item.display_name || item.artist_name;
+    if (!name) continue;
     const role = item.role || 'Staff';
-    // 优先级：外层 display_name -> artist.name -> pivot.display_name
-    const name = item.display_name || item.artist?.name || item.artist?.pivot?.display_name || item.name;
-    if (name) {
-      const displayRole = role.charAt(0).toUpperCase() + role.slice(1);
-      if (!groups.has(displayRole)) groups.set(displayRole, []);
-      if (!groups.get(displayRole).includes(name)) groups.get(displayRole).push(name);
+    if (!groups.has(role)) groups.set(role, []);
+    const existing = groups.get(role);
+    if (!existing.find(a => a.artist_id === item.artist_id && a.name === name)) {
+      existing.push({ name, artist_id: item.artist_id });
     }
   }
-
-  return Array.from(groups.entries()).map(([role, names]) => ({
-    role,
-    names: names.join(', ')
-  }));
+  return Array.from(groups.entries()).map(([role, artists]) => ({ role, artists }));
 });
 
 const links = computed(() => workData.value?.links || []);

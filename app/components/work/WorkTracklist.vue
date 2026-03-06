@@ -51,7 +51,7 @@
               track.displayNumber
             }}</span>
             <button
-              v-if="isAuthenticated && track.songId"
+              v-if="track.songId"
               type="button"
               :disabled="!!toggleLoading[track.songId]"
               @click="handleToggleFavorite(track.songId)"
@@ -108,7 +108,7 @@ const { isAuthenticated } = useAuth();
 const { toggleFavoriteSong } = useFavorites();
 const route = useRoute();
 
-const showCredits = ref(true);
+const showCredits = ref(false);
 const favoritedSongs = ref({});
 const toggleLoading = ref({});
 
@@ -182,8 +182,8 @@ const processTracks = (list, discNumber) => {
         credits.forEach((c) => {
           const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : "Credit";
           // 优先级：外层 display_name -> artist.name -> pivot.display_name
-          const name = c.display_name || c.artist?.name || c.artist?.pivot?.display_name || c.name;
-          const artistId = c.artist_id || c.artist?.id;
+          const name = c.display_name || c.artist_name || null;
+          const artistId = c.artist_id || null;
           if (name) {
             if (!groups.has(role)) groups.set(role, []);
             // 检查是否已存在相同的 artist
