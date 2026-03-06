@@ -25,7 +25,6 @@
       <RevisionWorkFormBasicTab
         v-show="currentTab === 'basic'"
         :form-data="formData"
-        :errors="errors"
         @update:form-data="formData = $event"
       />
 
@@ -145,6 +144,8 @@ const props = defineProps({
       structure: [],
       artists: [],
       credits: [],
+      products: [],
+      bonuses: [],
       links: [],
     }),
   },
@@ -189,6 +190,8 @@ const transformBackendData = (data) => {
     structure: [],
     artists: [],
     credits: [],
+    products: [],
+    bonuses: [],
     links: [],
   };
 
@@ -242,6 +245,42 @@ const transformBackendData = (data) => {
     }));
   }
 
+  // 处理 products
+  if (data.products && Array.isArray(data.products)) {
+    transformed.products = data.products.map((p, index) => ({
+      id: `product-${p.id || index}`,
+      product_id: p.id,
+      name: p.name || '',
+      edition_type: p.edition_type || 'REGULAR',
+      limited_rule: p.limited_rule || '',
+      limited_name: p.limited_name || '',
+      release_date: p.release_date || '',
+      catalog_number: p.catalog_number || '',
+      barcode: p.barcode || '',
+      is_available: p.is_available ?? true,
+      medium: p.medium || 'PHYSICAL',
+      format: p.format || '',
+      is_hires: p.is_hires ?? false,
+      price: p.price != null ? String(p.price) : '',
+      currency: p.currency || '',
+      image_url: p.image_url || '',
+      sort_order: p.sort_order != null ? String(p.sort_order) : '0',
+    }));
+  }
+
+  // 处理 bonuses
+  if (data.bonuses && Array.isArray(data.bonuses)) {
+    transformed.bonuses = data.bonuses.map((b, index) => ({
+      id: `bonus-${b.id || index}`,
+      bonus_id: b.id,
+      type: b.type || '',
+      name: b.name || '',
+      description: b.description || '',
+      is_digital: b.is_digital ?? false,
+      image_url: b.image_url || '',
+    }));
+  }
+
   // 处理 links
   if (data.links && Array.isArray(data.links)) {
     transformed.links = data.links;
@@ -267,6 +306,8 @@ const initFormData = () => {
     structure: [],
     artists: [],
     credits: [],
+    products: [],
+    bonuses: [],
     links: [],
   };
 };
@@ -295,55 +336,64 @@ watch(() => props.initialData, (newData) => {
       structure: [],
       artists: [],
       credits: [],
+      products: [],
+      bonuses: [],
       links: [],
     };
   }
 }, { deep: true });
-
-// 表单验证错误
-const errors = ref({
-  title: '',
-  type: '',
-  release_date: '',
-  image_url: '',
-});
 
 // 提交状态
 const isSubmitting = ref(false);
 const submitError = ref('');
 const errorDialog = ref(null);
 
-
 // 验证表单
 const validateForm = () => {
-  errors.value = {
-    title: '',
-    type: '',
-    release_date: '',
-    image_url: '',
-  };
-
   const missing = [];
 
   if (!formData.value.title || formData.value.title.trim() === '') {
-    errors.value.title = 'Work title is required';
-    missing.push('标题（Title）');
+    missing.push('Basic Info → 标题（Title）');
   }
 
   if (!formData.value.type) {
-    errors.value.type = 'Work type is required';
-    missing.push('类型（Type）');
+    missing.push('Basic Info → 类型（Type）');
   }
 
   if (!formData.value.release_date) {
-    errors.value.release_date = 'Release date is required';
-    missing.push('发行日期（Release Date）');
+    missing.push('Basic Info → 发行日期（Release Date）');
   }
 
   if (!formData.value.image_url || formData.value.image_url.trim() === '') {
-    errors.value.image_url = 'Cover image URL is required';
-    missing.push('封面图片（Cover Image URL）');
+    missing.push('Basic Info → 封面图片（Cover Image URL）');
   }
+
+  formData.value.artists.forEach((artist, i) => {
+    if (!artist.artist_id || String(artist.artist_id).trim() === '') {
+      missing.push(`Artists → 第 ${i + 1} 个艺术家缺少 Artist ID`);
+    }
+  });
+
+  formData.value.credits.forEach((credit, i) => {
+    if (!credit.role || credit.role.trim() === '') {
+      missing.push(`Credits → 第 ${i + 1} 条 Credit 缺少 Role`);
+    }
+  });
+
+  formData.value.products.forEach((product, i) => {
+    if (!product.name || product.name.trim() === '') {
+      missing.push(`Products → 第 ${i + 1} 个产品缺少名称（Name）`);
+    }
+  });
+
+  formData.value.bonuses.forEach((bonus, i) => {
+    if (!bonus.type) {
+      missing.push(`Bonuses → 第 ${i + 1} 个特典缺少类型（Type）`);
+    }
+    if (!bonus.name || bonus.name.trim() === '') {
+      missing.push(`Bonuses → 第 ${i + 1} 个特典缺少名称（Name）`);
+    }
+  });
 
   if (missing.length > 0) {
     submitError.value = `请填写以下必填项：\n${missing.map(s => `• ${s}`).join('\n')}`;
@@ -446,6 +496,46 @@ const getSubmitData = () => {
         }
         return creditItem;
       });
+  }
+
+  // 添加 Products
+  if (formData.value.products.length > 0) {
+    payload.products = formData.value.products.map(p => {
+      const item = {
+        name: p.name || null,
+        edition_type: p.edition_type,
+        limited_rule: p.limited_rule || null,
+        limited_name: p.limited_name || null,
+        release_date: p.release_date || null,
+        catalog_number: p.catalog_number || null,
+        barcode: p.barcode || null,
+        is_available: p.is_available,
+        medium: p.medium,
+        format: p.format || null,
+        is_hires: p.is_hires,
+        price: p.price !== '' ? Number(p.price) : null,
+        currency: p.currency || null,
+        image_url: p.image_url || null,
+        sort_order: Number(p.sort_order) || 0,
+      };
+      if (p.product_id) item.id = p.product_id;
+      return item;
+    });
+  }
+
+  // 添加 Bonuses
+  if (formData.value.bonuses.length > 0) {
+    payload.bonuses = formData.value.bonuses.map(b => {
+      const item = {
+        type: b.type,
+        name: b.name,
+        description: b.description || null,
+        is_digital: b.is_digital ?? false,
+        image_url: b.image_url || null,
+      };
+      if (b.bonus_id) item.id = b.bonus_id;
+      return item;
+    });
   }
 
   // 添加链接
@@ -585,6 +675,38 @@ const transformPayloadToFormData = (payload) => {
         track: credit.track || '',
       }))
       : [],
+    products: Array.isArray(payload.products)
+      ? payload.products.map((p, index) => ({
+          id: `product-${p.id || index}`,
+          product_id: p.id,
+          name: p.name || '',
+          edition_type: p.edition_type || 'REGULAR',
+          limited_rule: p.limited_rule || '',
+          limited_name: p.limited_name || '',
+          release_date: p.release_date || '',
+          catalog_number: p.catalog_number || '',
+          barcode: p.barcode || '',
+          is_available: p.is_available ?? true,
+          medium: p.medium || 'PHYSICAL',
+          format: p.format || '',
+          is_hires: p.is_hires ?? false,
+          price: p.price != null ? String(p.price) : '',
+          currency: p.currency || '',
+          image_url: p.image_url || '',
+          sort_order: p.sort_order != null ? String(p.sort_order) : '0',
+        }))
+      : [],
+    bonuses: Array.isArray(payload.bonuses)
+      ? payload.bonuses.map((b, index) => ({
+          id: `bonus-${b.id || index}`,
+          bonus_id: b.id,
+          type: b.type || '',
+          name: b.name || '',
+          description: b.description || '',
+          is_digital: b.is_digital ?? false,
+          image_url: b.image_url || '',
+        }))
+      : [],
     links: Array.isArray(payload.links)
       ? payload.links.map((link) => ({
         platform: link.platform || '',
@@ -636,7 +758,6 @@ const handleSubmit = async () => {
   submitError.value = '';
 
   if (!validateForm()) {
-    currentTab.value = 'basic';
     return;
   }
 

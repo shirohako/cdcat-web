@@ -12,14 +12,9 @@
           type="text"
           placeholder="Enter work title"
           class="input input-bordered input-sm w-full bg-white mt-1"
-          :class="{ 'input-error': errors.title }"
-          required
           @input="$emit('update:formData', { ...formData, title: ($event.target as HTMLInputElement).value })"
         />
       </div>
-      <label v-if="errors.title" class="label">
-        <span class="label-text-alt text-error">{{ errors.title }}</span>
-      </label>
     </div>
 
     <!-- 作品类型 -->
@@ -84,9 +79,6 @@
           </div>
         </button>
       </div>
-      <label v-if="errors.type" class="label">
-        <span class="label-text-alt text-error">{{ errors.type }}</span>
-      </label>
     </div>
 
     <!-- 目录编号 -->
@@ -113,14 +105,9 @@
           :value="formData.release_date"
           type="date"
           class="input input-bordered input-sm w-full bg-white mt-1"
-          :class="{ 'input-error': errors.release_date }"
-          required
           @input="$emit('update:formData', { ...formData, release_date: ($event.target as HTMLInputElement).value })"
         />
       </div>
-      <label v-if="errors.release_date" class="label">
-        <span class="label-text-alt text-error">{{ errors.release_date }}</span>
-      </label>
     </div>
 
     <!-- 图片 -->
@@ -137,15 +124,12 @@
             type="url"
             placeholder="https://example.com/cover.jpg"
             class="input input-bordered input-sm w-full bg-white mt-1"
-            :class="{ 'input-error': errors.image_url }"
-            required
             @input="$emit('update:formData', { ...formData, image_url: ($event.target as HTMLInputElement).value })"
           />
           <div v-if="formData.image_url" class="mt-1 w-32 h-32 rounded-lg overflow-hidden border border-gray-200">
             <img :src="formData.image_url" alt="Cover Preview" class="w-full h-full object-cover" @error="imageError = true" />
           </div>
-          <p v-if="errors.image_url" class="text-xs text-error">{{ errors.image_url }}</p>
-          <p v-else-if="imageError" class="text-xs text-error">Failed to load image</p>
+          <p v-if="imageError" class="text-xs text-error">Failed to load image</p>
         </div>
 
         <div class="border-t border-gray-200" />
@@ -198,16 +182,8 @@ interface FormData {
   [key: string]: unknown
 }
 
-interface Errors {
-  title?: string
-  type?: string
-  release_date?: string
-  image_url?: string
-}
-
 defineProps<{
   formData: FormData
-  errors: Errors
 }>()
 
 defineEmits<{
