@@ -57,7 +57,7 @@
       </div>
       <div class="text-left">
         <p class="text-sm font-semibold text-gray-600">暂无特典信息</p>
-        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何购买特典</p>
+        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何特典情报</p>
       </div>
     </div>
   </section>
@@ -93,8 +93,8 @@
       </div>
 
       <!-- Description -->
-      <p v-if="activeBonus.description" class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-        {{ activeBonus.description }}
+      <p class="text-sm leading-relaxed whitespace-pre-line" :class="activeBonus.description ? 'text-gray-600' : 'text-gray-400'">
+        {{ activeBonus.description || '暂无详细说明' }}
       </p>
 
       <div class="modal-action mt-5">

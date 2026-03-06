@@ -105,7 +105,7 @@
       </div>
       <div class="text-left">
         <p class="text-sm font-semibold text-gray-600">暂无商品信息</p>
-        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何发售商品</p>
+        <p class="text-xs text-gray-500 mt-0.5">该作品尚未关联任何商品</p>
       </div>
     </div>
   </section>

@@ -1,103 +1,121 @@
 <template>
-  <section class="bg-white rounded-lg border border-gray-200 p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-2xl font-bold flex items-center gap-2">
-        <ListMusic :size="24" />
-        Tracklist
-      </h2>
-      <label class="flex items-center gap-2 cursor-pointer">
-        <span class="text-sm text-gray-600 flex items-center gap-1.5">
-          <Users :size="16" />
+  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Header -->
+    <div class="px-6 py-3 border-b border-gray-100 flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
+        <ListMusic :size="16" class="text-indigo-500" />
+      </div>
+      <h2 class="text-base font-bold text-gray-900">Tracklist</h2>
+      <!-- Credit toggle -->
+      <div class="ml-auto flex items-center gap-2">
+        <span class="text-xs text-gray-400 flex items-center gap-1">
+          <Users :size="12" />
           人员信息
         </span>
         <button
           type="button"
           @click="showCredits = !showCredits"
-          class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          :class="showCredits ? 'bg-blue-600' : 'bg-gray-300'"
+          class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
+          :class="showCredits ? 'bg-indigo-500' : 'bg-gray-200'"
         >
           <span
-            class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-            :class="showCredits ? 'translate-x-6' : 'translate-x-1'"
+            class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform"
+            :class="showCredits ? 'translate-x-4.5' : 'translate-x-0.75'"
           />
         </button>
-      </label>
-    </div>
-
-    <div v-if="discs.length" class="space-y-10">
-      <div v-for="disc in discs" :key="disc.discNumber">
-        <div class="bg-gray-100 px-4 py-3 mb-4 rounded-md flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <Disc3 :size="20" class="text-gray-700" />
-            <h3 class="text-lg font-bold text-gray-900">
-              Disc {{ disc.discNumber }}
-            </h3>
-            <span v-if="disc.title" class="text-base font-medium text-gray-700">
-              — {{ disc.title }}
-            </span>
-          </div>
-          <span class="text-sm text-gray-500">
-            {{ disc.tracks.length }} tracks
-          </span>
-        </div>
-
-        <div class="space-y-2">
-          <div
-            v-for="track in disc.tracks"
-            :key="track.uid"
-            class="flex items-center gap-2 p-3 hover:bg-gray-50 rounded transition"
-          >
-            <span class="text-gray-500 font-mono text-sm w-8 text-center">{{
-              track.displayNumber
-            }}</span>
-            <button
-              v-if="track.songId"
-              type="button"
-              :disabled="!!toggleLoading[track.songId]"
-              @click="handleToggleFavorite(track.songId)"
-              class="p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-              :title="favoritedSongs[track.songId] ? '取消收藏' : '收藏'"
-            >
-              <Heart
-                :size="16"
-                :fill="favoritedSongs[track.songId] ? 'currentColor' : 'none'"
-                :class="favoritedSongs[track.songId] ? 'text-red-500' : 'text-gray-400'"
-              />
-            </button>
-            <div class="flex-1">
-              <p class="font-medium">{{ track.title }}</p>
-              <p v-if="track.subtitle" class="text-sm text-gray-500 mt-0.5">
-                {{ track.subtitle }}
-              </p>
-              <p v-if="showCredits && track.artist" class="text-sm text-gray-500">
-                {{ track.artist }}
-              </p>
-              <div
-                v-if="showCredits && track.credits && track.credits.length"
-                class="mt-1 space-y-0.5"
-              >
-                <p v-for="(credit, idx) in track.credits" :key="idx" class="text-xs text-gray-400">
-                  <span class="font-medium">{{ credit.role }}:</span>
-                  <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
-                    <NuxtLink
-                      v-if="artist.artistId"
-                      :to="`/artists/${artist.artistId}`"
-                      class="hover:underline hover:text-gray-500 transition-colors"
-                    >
-                      {{ artist.name }}
-                    </NuxtLink>
-                    <span v-else>{{ artist.name }}</span>
-                    <span v-if="artistIdx < credit.artists.length - 1">, </span>
-                  </template>
-                </p>
-              </div>
-            </div>
-            <span class="text-gray-500 text-sm">{{ track.duration }}</span>
-          </div>
-        </div>
       </div>
     </div>
-    <p v-else class="text-sm text-gray-500">暂无曲目信息。</p>
+
+    <div v-if="discs.length">
+      <template v-for="(disc, discIdx) in discs" :key="disc.discNumber">
+        <!-- Disc label (only when multiple discs) -->
+        <div v-if="discs.length > 1" class="px-4 sm:px-5 py-2 bg-gray-50 border-b border-gray-100">
+          <!-- Main row -->
+          <div class="flex items-center gap-2">
+            <Disc3 :size="12" class="text-gray-400 shrink-0" />
+            <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Disc {{ disc.discNumber }}</span>
+            <!-- Title inline on sm+ -->
+            <span v-if="disc.title" class="hidden sm:inline text-[11px] text-gray-400 truncate">— {{ disc.title }}</span>
+            <!-- is_bonus badge -->
+            <div v-if="disc.isBonus" class="tooltip tooltip-bottom" data-tip="这是特典内容">
+              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-pink-100 text-pink-600 cursor-default select-none">特典</span>
+            </div>
+            <!-- is_counted badge -->
+            <div v-if="!disc.isCounted" class="tooltip tooltip-bottom" data-tip="不计入专辑曲目总数">
+              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-500 cursor-default select-none">附加内容</span>
+            </div>
+            <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold tabular-nums rounded-full bg-gray-200/80 text-gray-500 shrink-0">{{ disc.tracks.length }}</span>
+          </div>
+          <!-- Title on its own line on mobile -->
+          <p v-if="disc.title" class="sm:hidden text-[11px] text-gray-400 mt-0.5 pl-4.5">{{ disc.title }}</p>
+        </div>
+
+        <!-- Track rows -->
+        <div
+          v-for="track in disc.tracks"
+          :key="track.uid"
+          class="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 hover:bg-gray-50/70 transition-colors border-b border-gray-50 last:border-b-0 group"
+        >
+          <!-- Track number -->
+          <span class="text-gray-400 font-mono text-xs w-6 text-right shrink-0 select-none">{{ track.displayNumber }}</span>
+
+          <!-- Heart -->
+          <button
+            v-if="track.songId"
+            type="button"
+            :disabled="!!toggleLoading[track.songId]"
+            @click="handleToggleFavorite(track.songId)"
+            class="shrink-0 p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed sm:opacity-0 sm:group-hover:opacity-100"
+            :class="{ 'sm:opacity-100!': favoritedSongs[track.songId] }"
+            :title="favoritedSongs[track.songId] ? '取消收藏' : '收藏'"
+          >
+            <Heart
+              :size="14"
+              :fill="favoritedSongs[track.songId] ? 'currentColor' : 'none'"
+              :class="favoritedSongs[track.songId] ? 'text-red-500' : 'text-gray-400'"
+            />
+          </button>
+          <div v-else class="w-6 shrink-0" />
+
+          <!-- Title + credits -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 leading-snug truncate">{{ track.title }}</p>
+            <p v-if="track.subtitle" class="text-xs text-gray-400 mt-0.5">{{ track.subtitle }}</p>
+            <p v-if="showCredits && track.artist" class="text-xs text-gray-400 mt-0.5">{{ track.artist }}</p>
+            <div v-if="showCredits && track.credits && track.credits.length" class="mt-1 space-y-0.5">
+              <p v-for="(credit, idx) in track.credits" :key="idx" class="text-[11px] text-gray-400">
+                <span class="font-medium text-gray-500">{{ credit.role }}:</span>
+                <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
+                  <NuxtLink
+                    v-if="artist.artistId"
+                    :to="`/artists/${artist.artistId}`"
+                    class="hover:underline hover:text-gray-600 transition-colors"
+                  >{{ artist.name }}</NuxtLink>
+                  <span v-else>{{ artist.name }}</span>
+                  <span v-if="artistIdx < credit.artists.length - 1">, </span>
+                </template>
+              </p>
+            </div>
+          </div>
+
+          <!-- Duration -->
+          <span class="shrink-0 text-xs text-gray-400 tabular-nums">{{ track.duration }}</span>
+        </div>
+
+        <div v-if="discIdx < discs.length - 1" class="border-b border-gray-100" />
+      </template>
+    </div>
+
+    <!-- Empty state -->
+    <div v-else class="flex items-center justify-center gap-3 py-5 px-6">
+      <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
+        <ListMusic :size="15" class="text-indigo-400" />
+      </div>
+      <div class="text-left">
+        <p class="text-sm font-semibold text-gray-600">暂无曲目信息</p>
+        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何曲目</p>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -228,6 +246,8 @@ const discs = computed(() => {
       return {
         discNumber,
         title: disc.name || disc.title,
+        isBonus: disc.is_bonus ?? false,
+        isCounted: disc.is_counted ?? true,
         tracks: processTracks(songs, discNumber),
       };
     });
