@@ -9,21 +9,21 @@
 
     <!-- Content Container -->
     <div
-      class="relative container mx-auto px-4 md:px-8 pt-8 md:pt-16 pb-8 md:pb-16 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 max-w-7xl"
+      class="relative container mx-auto px-4 md:px-8 py-6 flex flex-col md:flex-row md:items-stretch justify-center gap-6 md:gap-10 max-w-7xl"
     >
       <!-- Album Cover -->
       <div class="shrink-0">
         <img
           :src="albumData.coverImage"
           :alt="albumData.title"
-          class="w-70 h-70 sm:w-[320px] sm:h-80 md:w-100 md:h-100 xl:w-112.5 xl:h-112.5 2xl:w-125 2xl:h-125 object-cover shadow-2xl"
+          class="w-60 h-60 sm:w-72 sm:h-72 md:w-100 md:h-100 object-cover shadow-2xl"
         />
       </div>
 
       <!-- Album Info Box with Frosted Glass Effect -->
       <div class="flex-1 flex items-stretch w-full md:w-auto">
         <div
-          class="backdrop-blur-[4.45px] rounded-lg p-6 md:p-8 flex flex-col justify-between w-full md:h-100 xl:h-112.5 2xl:h-125"
+          class="backdrop-blur-[4.45px] rounded-lg p-6 md:p-8 flex flex-col justify-between w-full"
           style="opacity: 0.94; background-color: rgba(198, 175, 175, 0.3)"
         >
           <div class="flex-1">
@@ -51,7 +51,7 @@
                 <Disc3 :size="18" class="text-gray-600" />
                 <span>{{ albumData.format }}</span>
               </div>
-              <div class="flex items-center gap-2">
+              <div v-if="albumData.catalogNumber" class="flex items-center gap-2">
                 <Hash :size="18" class="text-gray-600" />
                 <span>{{ albumData.catalogNumber }}</span>
               </div>
