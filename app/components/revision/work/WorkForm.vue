@@ -235,9 +235,10 @@ const transformBackendData = (data) => {
     transformed.credits = data.credits.map((credit, index) => ({
       id: `credit-${credit.id || index}`,
       credit_id: credit.id,
-      name: credit.name || '',
+      artist_id: String(credit.artist_id || ''),
+      display_name: credit.display_name || '',
       role: credit.role || '',
-      track: credit.track || '',
+      track: credit.meta?.track || credit.track || '',
     }));
   }
 
@@ -432,12 +433,13 @@ const getSubmitData = () => {
   // 添加 Credits
   if (formData.value.credits.length > 0) {
     payload.credits = formData.value.credits
-      .filter(c => c.name && c.role)
+      .filter(c => c.role)
       .map(c => {
         const creditItem = {
-          name: c.name,
+          artist_id: c.artist_id || null,
+          display_name: c.display_name || null,
           role: c.role,
-          track: c.track || null,
+          meta: c.track ? { track: c.track } : null,
         };
         if (c.credit_id) {
           creditItem.id = c.credit_id;

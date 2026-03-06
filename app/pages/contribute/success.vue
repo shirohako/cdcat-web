@@ -39,9 +39,9 @@
             <ArrowLeft :size="18" />
             Browse {{ resourceTypeLabel }}
           </NuxtLink>
-          <NuxtLink :to="contributeLink" class="btn btn-outline flex-1">
-            <Plus :size="18" />
-            Submit Another
+          <NuxtLink to="/revisions" class="btn btn-outline flex-1">
+            <ClipboardList :size="18" />
+            My Revisions
           </NuxtLink>
         </div>
       </div>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { CheckCircle, Clock, ArrowLeft, Plus } from 'lucide-vue-next';
+import { CheckCircle, Clock, ArrowLeft, ClipboardList } from 'lucide-vue-next';
 
 const route = useRoute();
 

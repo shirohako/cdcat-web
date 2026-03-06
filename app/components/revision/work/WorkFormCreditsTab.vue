@@ -18,16 +18,27 @@
     </div>
 
     <div v-for="(credit, index) in formData.credits" :key="credit.id" class="border border-gray-200 rounded-lg p-4">
-      <div class="flex items-start gap-4">
-        <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="flex items-center gap-4">
+        <div class="flex-1 grid grid-cols-2 md:grid-cols-4 gap-3">
           <div class="form-control">
             <label class="label">
-              <span class="label-text font-semibold">Name</span>
+              <span class="label-text font-semibold">Artist ID</span>
             </label>
             <input
-              v-model="credit.name"
+              v-model="credit.artist_id"
               type="text"
-              placeholder="Person or artist name"
+              placeholder="Artist ID"
+              class="input input-bordered input-sm w-full"
+            />
+          </div>
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-semibold">Display Name <span class="font-normal text-gray-400">(Optional)</span></span>
+            </label>
+            <input
+              v-model="credit.display_name"
+              type="text"
+              placeholder="Display name"
               class="input input-bordered input-sm w-full"
             />
           </div>
@@ -38,7 +49,7 @@
             <input
               v-model="credit.role"
               type="text"
-              placeholder="e.g., Vocal, Guitar, Mix"
+              placeholder="e.g. Vocal, Guitar, Mix"
               class="input input-bordered input-sm w-full"
             />
           </div>
@@ -49,7 +60,7 @@
             <input
               v-model="credit.track"
               type="text"
-              placeholder="Specific track or leave blank for all"
+              placeholder="e.g. 1.2 (Disc 1 Track 2)"
               class="input input-bordered input-sm w-full"
             />
           </div>
@@ -67,7 +78,8 @@ import { Plus, Trash2 } from 'lucide-vue-next'
 
 interface Credit {
   id: string
-  name: string
+  artist_id: string
+  display_name: string
   role: string
   track: string
 }
@@ -92,7 +104,8 @@ const addCredit = () => {
     ...props.formData.credits,
     {
       id: `credit-${creditIdCounter++}`,
-      name: '',
+      artist_id: '',
+      display_name: '',
       role: '',
       track: '',
     },
