@@ -154,18 +154,16 @@ const albumData = computed(() => {
   }
 
   const work = workData.value;
-  const discText = work.disc_count > 1 ? `${work.disc_count}CD` : "CD";
-  const format = `${discText} | ${work.track_count} Tracks`;
-
   return {
     title: work.title || "",
-    artists: work.artists || [], // 传递完整的 artists 数组，包含 pivot 数据
+    type: work.type || null,
+    artists: work.artists || [],
     releaseDate: work.release_date || "",
-    format: format,
+    discCount: work.disc_count || 0,
+    trackCount: work.track_count || 0,
     catalogNumber: work.catalog_number || "",
-    price: "", // API 中没有这个字段，保持为空字符串，会被隐藏
     coverImage: work.image_url || "",
-    backgroundImage: work.banner_url || work.image_url || "", // 优先使用 banner_url，否则使用 image_url
+    backgroundImage: work.banner_url || work.image_url || "",
   };
 });
 
