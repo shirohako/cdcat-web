@@ -5,22 +5,32 @@
 /* 字体定义 - 多语言优化 */
 @layer base {
   :root {
-    /* 西文字体 - 优先使用系统UI字体 */
-    --font-sans-en: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    /* 西文字体 - 优先使用系统UI字体，Win11 新增 Segoe UI Variable */
+    --font-sans-en: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
-    /* 中文字体 - 按系统优先级排列 */
-    --font-sans-zh: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei";
+    /* 简体中文 - macOS: PingFang SC, HarmonyOS, Windows: YaHei UI > YaHei, Android/Linux: Noto */
+    --font-sans-zh-hans: "PingFang SC", "HarmonyOS Sans SC",
+      "Microsoft YaHei UI", "Microsoft YaHei",
+      "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "WenQuanYi Micro Hei";
 
-    /* 日文字体 */
-    --font-sans-ja: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans CJK JP", "Source Han Sans JP";
+    /* 繁体中文 - macOS: PingFang TC, Windows: JhengHei UI > JhengHei, Android/Linux: Noto */
+    --font-sans-zh-hant: "PingFang TC", "HarmonyOS Sans TC",
+      "Microsoft JhengHei UI", "Microsoft JhengHei",
+      "Noto Sans CJK TC", "Noto Sans TC", "Source Han Sans TC";
+
+    /* 日文 - macOS: Hiragino, Windows: Yu Gothic UI > Meiryo UI, Android/Linux: Noto */
+    --font-sans-ja: "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+      "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Meiryo",
+      "Noto Sans CJK JP", "Noto Sans JP", "Source Han Sans JP";
 
     /* 等宽字体 */
     --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
   }
 
   body {
-    /* 组合字体栈 - 西文优先，然后是中文，日文，最后是通用后备 */
-    font-family: var(--font-sans-en), var(--font-sans-zh), var(--font-sans-ja), sans-serif;
+    /* 默认/英文：西文优先，简中兜底 */
+    font-family: var(--font-sans-en), var(--font-sans-zh-hans), var(--font-sans-ja), sans-serif;
 
     /* 字体渲染优化 */
     -webkit-font-smoothing: antialiased;
@@ -30,6 +40,28 @@
     /* 字体特性 */
     font-feature-settings: "kern" 1, "liga" 1;
     font-variant-ligatures: common-ligatures;
+    font-optical-sizing: auto;
+  }
+
+  /* 简体中文：中文字体优先 */
+  html[lang="zh-Hans"] body {
+    font-family: var(--font-sans-zh-hans), var(--font-sans-en), sans-serif;
+  }
+
+  /* 繁体中文：繁体字体优先（PingFang TC / JhengHei，与简中分开） */
+  html[lang="zh-Hant"] body {
+    font-family: var(--font-sans-zh-hant), var(--font-sans-en), sans-serif;
+  }
+
+  /* 日文：日文字体优先 */
+  html[lang="ja"] body {
+    font-family: var(--font-sans-ja), var(--font-sans-en), sans-serif;
+  }
+
+  /* CJK 禁止字体合成：防止浏览器对 CJK 字体伪造粗体/斜体导致字形变形 */
+  html[lang^="zh"] body,
+  html[lang="ja"] body {
+    font-synthesis: none;
   }
 
   /* 等宽字体应用 */
