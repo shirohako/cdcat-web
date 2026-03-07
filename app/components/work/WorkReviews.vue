@@ -1,127 +1,187 @@
 <template>
-  <section class="bg-white rounded-lg border border-gray-200 p-6">
-    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-      <MessageSquare :size="24" />
-      User Reviews
-    </h2>
+  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+        <MessageSquare :size="15" class="text-amber-500" />
+      </div>
+      <h2 class="text-base font-bold text-gray-900">Reviews</h2>
+      <span v-if="reviewsCount > 0" class="ml-auto text-xs text-gray-400">共 {{ reviewsCount }} 条</span>
+    </div>
 
-    <!-- Summary Section -->
-    <div class="mb-6 pb-6 border-b border-gray-200">
-      <div class="flex items-center gap-6">
-        <div class="text-center">
-          <div class="text-5xl font-bold mb-1" :class="getScoreColorClass(averageScore)">
-            {{ averageScore.toFixed(1) }}
-          </div>
-          <div class="text-sm text-gray-500">Based on {{ reviews.length }} reviews</div>
-        </div>
-        <div class="flex-1">
-          <div class="flex items-center gap-2 mb-1">
-            <div class="flex gap-0.5">
-              <Star
-                v-for="i in 10"
-                :key="i"
-                :size="16"
-                :class="i <= Math.round(averageScore) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'"
-              />
-            </div>
-            <span class="text-sm text-gray-600 font-medium">{{ averageScore.toFixed(1) }}/10</span>
-          </div>
-          <div class="text-xs text-gray-500">
-            {{ getScoreLabel(averageScore) }}
-          </div>
-        </div>
+    <!-- Empty state -->
+    <div v-if="allReviews.length === 0" class="flex items-center justify-center gap-3 py-5 px-6">
+      <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+        <MessageSquare :size="15" class="text-amber-400" />
+      </div>
+      <div class="text-left">
+        <p class="text-sm font-semibold text-gray-600">暂无评论</p>
+        <p class="text-xs text-gray-500 mt-0.5">还没有人评论，来写第一条吧</p>
       </div>
     </div>
 
-    <!-- Reviews List -->
-    <div class="space-y-3">
+    <!-- Review list -->
+    <div v-else class="divide-y divide-gray-50/80">
       <div
-        v-for="review in reviews"
+        v-for="review in allReviews"
         :key="review.id"
-        class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition"
+        class="px-6 py-5 hover:bg-gray-50/50 transition-colors"
       >
-        <div class="flex gap-3">
-          <!-- User Avatar -->
-          <div class="shrink-0">
-            <div class="w-11 h-11 rounded-full bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-              <span class="text-lg font-semibold text-white">{{ getUserInitial(review.author) }}</span>
+        <!-- Top row: avatar + content + rating -->
+        <div class="flex items-center gap-3">
+          <NuxtLink :to="`/profile/${review.user.username}`" class="shrink-0">
+            <div class="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center ring-2 ring-white shadow-sm overflow-hidden">
+              <UserRound :size="30" class="text-gray-400" />
+            </div>
+          </NuxtLink>
+
+          <div class="flex-1 min-w-0">
+            <!-- Name + date -->
+            <div class="flex items-center gap-2 mb-2">
+              <NuxtLink
+                :to="`/profile/${review.user.username}`"
+                class="text-sm font-semibold text-gray-800 hover:text-indigo-600 transition-colors truncate"
+              >
+                {{ review.user.nickname || review.user.username }}
+              </NuxtLink>
+              <time class="shrink-0 text-[11px] text-gray-400">{{ formatDate(review.created_at) }}</time>
+            </div>
+
+            <!-- Content -->
+            <p class="text-sm text-gray-600 leading-relaxed">{{ review.content }}</p>
+
+            <!-- Reactions -->
+            <div class="flex items-center gap-1 mt-3">
+              <button
+                v-for="reaction in reactions"
+                :key="reaction.key"
+                class="inline-flex items-center gap-1 px-2 py-1 rounded-sm text-[11px] transition-colors"
+                :class="reaction.color"
+                @click="reactionDialog.showModal()"
+              >
+                <component :is="reaction.icon" :size="12" />
+                <span>{{ reaction.label }}</span>
+                <span v-if="review[reaction.key] > 0">{{ review[reaction.key] }}</span>
+              </button>
             </div>
           </div>
 
-          <!-- Review Content -->
-          <div class="flex-1 min-w-0">
-            <!-- Header: Author, Score, Date -->
-            <div class="flex items-center gap-2 mb-2">
-              <h4 class="font-bold text-gray-900">{{ review.author }}</h4>
-
-              <!-- Score Badge (Metacritic style) - Optional -->
-              <div
-                v-if="review.score !== null && review.score !== undefined"
-                class="badge gap-1 font-bold text-white border-0 px-2.5 py-2.5"
-                :class="getScoreBadgeClass(review.score)"
-              >
-                {{ review.score }}
-              </div>
-
-              <span class="text-xs text-gray-400 ml-auto">{{ review.date }}</span>
-            </div>
-
-            <!-- Review Title -->
-            <h5 v-if="review.title" class="font-semibold text-gray-800 mb-1.5 text-sm">
-              {{ review.title }}
-            </h5>
-
-            <!-- Review Content -->
-            <p class="text-sm text-gray-600 leading-relaxed">{{ review.content }}</p>
+          <!-- Metacritic-style rating box -->
+          <div
+            v-if="review.rating != null"
+            class="shrink-0 w-10 h-10 rounded text-base flex items-center justify-center font-black text-white leading-none"
+            :class="ratingBadgeClass(review.rating)"
+          >
+            {{ review.rating }}
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Empty State -->
-    <p v-if="reviews.length === 0" class="text-gray-500 text-sm">No reviews yet.</p>
+  <!-- Reaction coming soon dialog -->
+  <dialog ref="reactionDialog" class="modal">
+    <div class="modal-box max-w-xs p-0 overflow-hidden">
+      <div class="flex flex-col items-center gap-4 px-8 pt-8 pb-6 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md">
+          <Smile :size="24" class="text-white" />
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-base">功能开发中</h3>
+          <p class="text-sm text-gray-400 mt-1.5">敬请期待。</p>
+        </div>
+        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="reactionDialog.close()">知道了</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
+
+    <!-- Load more -->
+    <div v-if="hasMore" class="px-6 py-3.5 border-t border-gray-100 flex justify-center">
+      <button
+        class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50"
+        :disabled="loadingMore"
+        @click="loadMore"
+      >
+        <span v-if="loadingMore" class="loading loading-spinner loading-xs"></span>
+        <ChevronDown v-else :size="13" />
+        {{ loadingMore ? '加载中…' : `查看更多 · 还有 ${remaining} 条` }}
+      </button>
+    </div>
   </section>
 </template>
 
 <script setup>
-import { MessageSquare, Star } from "lucide-vue-next";
+import { MessageSquare, ChevronDown, UserRound, ThumbsUp, ThumbsDown, Smile } from 'lucide-vue-next'
 
 const props = defineProps({
-  reviews: {
+  initialReviews: {
     type: Array,
     default: () => [],
   },
-});
+  reviewsCount: {
+    type: Number,
+    default: 0,
+  },
+  workId: {
+    type: [String, Number],
+    required: true,
+  },
+})
 
-// 计算平均分 (0-10 分制) - 只计算有分数的评论
-const averageScore = computed(() => {
-  const scoredReviews = props.reviews.filter(r => r.score !== null && r.score !== undefined);
-  if (scoredReviews.length === 0) return 0;
-  const sum = scoredReviews.reduce((acc, review) => acc + review.score, 0);
-  return sum / scoredReviews.length;
-});
+const { $api } = useNuxtApp()
 
-// 获取用户名首字母作为头像
-const getUserInitial = (name) => {
-  return name ? name.charAt(0).toUpperCase() : '?';
-};
+const reactionDialog = ref(null)
 
-// Metacritic 风格的评分徽章颜色 (0-10 分制)
-const getScoreBadgeClass = (score) => {
-  if (score >= 7) return 'bg-green-500';
-  if (score >= 5) return 'bg-yellow-500';
-  return 'bg-red-500';
-};
+const reactions = [
+  { key: 'useful_count',  label: '有帮助', icon: ThumbsUp,   color: 'text-blue-400 bg-blue-50 hover:text-blue-600 hover:bg-blue-100' },
+  { key: 'dislike_count', label: '没帮助', icon: ThumbsDown, color: 'text-rose-400 bg-rose-50 hover:text-rose-600 hover:bg-rose-100' },
+  { key: 'fun_count',     label: '欢乐',   icon: Smile,      color: 'text-green-600 bg-green-50 hover:text-green-700 hover:bg-green-100' },
+]
 
-const getScoreColorClass = (score) => {
-  if (score >= 7) return 'text-green-500';
-  if (score >= 5) return 'text-yellow-500';
-  return 'text-red-500';
-};
+const extraReviews = ref([])
+const currentPage = ref(1)
+const loadingMore = ref(false)
 
-const getScoreLabel = (score) => {
-  if (score >= 7) return 'Generally favorable reviews';
-  if (score >= 5) return 'Mixed or average reviews';
-  return 'Generally unfavorable reviews';
-};
+const allReviews = computed(() => [...props.initialReviews, ...extraReviews.value])
+const remaining = computed(() => props.reviewsCount - allReviews.value.length)
+const hasMore = computed(() => remaining.value > 0)
+
+const loadMore = async () => {
+  if (loadingMore.value || !hasMore.value) return
+  loadingMore.value = true
+  try {
+    const nextPage = currentPage.value + 1
+    const data = await $api(`/v1/works/${props.workId}/reviews`, {
+      params: { page: nextPage, per_page: 10 },
+    })
+    const newReviews = data?.data ?? data ?? []
+    extraReviews.value.push(...newReviews)
+    currentPage.value = nextPage
+  } catch (e) {
+    console.error('Failed to load reviews:', e)
+  } finally {
+    loadingMore.value = false
+  }
+}
+
+const ratingBadgeClass = (rating) => {
+  if (rating >= 8) return 'bg-emerald-500'
+  if (rating >= 6) return 'bg-yellow-500'
+  if (rating >= 4) return 'bg-orange-500'
+  return 'bg-red-600'
+}
+
+const formatDate = (iso) => {
+  if (!iso) return ''
+  const date = new Date(iso)
+  const now = new Date()
+  const diff = (now - date) / 1000
+  if (diff < 60) return '刚刚'
+  if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`
+  if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`
+  if (diff < 86400 * 30) return `${Math.floor(diff / 86400)} 天前`
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })
+}
 </script>

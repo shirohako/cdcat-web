@@ -50,7 +50,11 @@
           />
 
           <!-- Reviews -->
-          <WorkReviews :reviews="[]" class="hidden" />
+          <WorkReviews
+            :initial-reviews="initialReviews"
+            :reviews-count="reviewsCount"
+            :work-id="workId"
+          />
 
           <!-- Review Modal -->
           <WorkReviewModal
@@ -232,6 +236,8 @@ const credits = computed(() => {
 
 const links = computed(() => workData.value?.links || []);
 const contributors = computed(() => workData.value?.contributors ?? []);
+const initialReviews = computed(() => workData.value?.reviews ?? []);
+const reviewsCount = computed(() => workData.value?.reviews_count ?? 0);
 
 const products = computed(() => workData.value?.products ?? []);
 
@@ -263,71 +269,4 @@ const rankings = {
   genreName: "Rock",
 };
 
-// Mock review data (测试数据 - 0-10分制，支持无评分评论)
-const mockReviews = [
-  {
-    id: 1,
-    score: 9,
-    title: "A Masterpiece of Modern Music",
-    author: "MusicLover2024",
-    date: "Dec 15, 2024",
-    content: "This album is absolutely stunning. The production quality is top-notch, and every track flows seamlessly into the next. The artist's evolution is clear, and this might be their best work yet."
-  },
-  {
-    id: 2,
-    score: 8,
-    title: "Impressive and Refreshing",
-    author: "AudiophileJane",
-    date: "Dec 10, 2024",
-    content: "I was blown away by the creativity displayed here. While a couple of tracks didn't resonate with me, the majority of the album is exceptional. Highly recommended for fans of the genre."
-  },
-  {
-    id: 3,
-    score: null,
-    title: null,
-    author: "RandomFan",
-    date: "Dec 8, 2024",
-    content: "Just wanted to say this album got me through some tough times. Thank you for creating this beautiful music."
-  },
-  {
-    id: 4,
-    score: 7,
-    title: "Solid Album with Great Moments",
-    author: "CasualListener",
-    date: "Dec 5, 2024",
-    content: "A good album overall. Some tracks are absolutely brilliant, while others feel a bit formulaic. Still worth a listen, especially if you enjoyed their previous work."
-  },
-  {
-    id: 5,
-    score: 10,
-    title: "An Emotional Journey",
-    author: "SoundscapeExplorer",
-    date: "Nov 28, 2024",
-    content: "This album took me on an emotional rollercoaster. The lyrics are poignant, the melodies are haunting, and the overall atmosphere is captivating. Can't stop listening to it."
-  },
-  {
-    id: 6,
-    score: null,
-    title: "Thoughts on Track 3",
-    author: "IndieEnthusiast",
-    date: "Nov 25, 2024",
-    content: "The third track really resonated with me. The way the melody builds up and then drops is just perfect. Would love to hear more songs like this."
-  },
-  {
-    id: 7,
-    score: 6,
-    title: "Mixed Feelings",
-    author: "CriticReviewer",
-    date: "Nov 20, 2024",
-    content: "While there are some standout tracks, the album feels inconsistent. Some songs are experimental in a good way, others miss the mark. It's not bad, but it's not great either."
-  },
-  {
-    id: 8,
-    score: 9,
-    title: "Worth Every Second",
-    author: "VinylCollector",
-    date: "Nov 15, 2024",
-    content: "From start to finish, this album delivers. The attention to detail in the production is remarkable, and you can tell the artist poured their heart into this project. A must-have in any collection."
-  }
-];
 </script>

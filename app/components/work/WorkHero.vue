@@ -33,7 +33,7 @@
               </h1>
 
               <!-- Artists -->
-              <div class="flex flex-wrap justify-center md:justify-start gap-2 text-sm text-gray-700 mb-4 md:mb-5">
+              <div v-if="albumData.artists && albumData.artists.length > 0" class="flex flex-wrap justify-center md:justify-start gap-2 text-sm text-gray-700 mb-4 md:mb-5">
                 <NuxtLink
                   v-for="artist in albumData.artists"
                   :key="artist.id"
@@ -94,7 +94,7 @@
                   {{ isFavorited ? 'Liked' : 'Like' }}
                 </button>
                 <!-- Buy it + Edit: inline with Like below lg -->
-                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5">
+                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5" @click="buyDialog.showModal()">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
@@ -109,7 +109,7 @@
               </div>
               <!-- Buy it + Edit: own row on lg+ only -->
               <div class="hidden lg:flex gap-1.5">
-                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0">
+                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0" @click="buyDialog.showModal()">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
@@ -129,6 +129,26 @@
       </div>
     </div>
   </div>
+
+  <!-- Buy it dialog -->
+  <dialog ref="buyDialog" class="modal">
+    <div class="modal-box max-w-xs p-0 overflow-hidden">
+      <!-- Top accent -->
+<div class="flex flex-col items-center gap-4 px-8 pt-8 pb-6 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md">
+          <ShoppingCart :size="24" class="text-white" />
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-900 text-base">功能开发中</h3>
+          <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">敬请期待。</p>
+        </div>
+        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog.close()">知道了</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
 </template>
 
 <script setup>
@@ -177,6 +197,7 @@ const props = defineProps({
   },
 });
 
+const buyDialog = ref(null)
 const isFavorited = ref(props.initialFavorited)
 const isToggling = ref(false)
 
