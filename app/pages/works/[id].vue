@@ -79,13 +79,8 @@
           />
 
           <WorkRankings
-            :all-time-rank="rankings.allTimeRank"
-            :all-time-total="rankings.allTimeTotal"
-            :year2025-rank="rankings.year2025Rank"
-            :year2025-total="rankings.year2025Total"
-            :genre-rank="rankings.genreRank"
-            :genre-total="rankings.genreTotal"
-            :genre-name="rankings.genreName"
+            :user-score="workData?.average_rating ?? 0"
+            :rating-count="workData?.reviews_count ?? 0"
             @write-review="handleWriteReview"
           />
 
@@ -258,15 +253,5 @@ const trackingStats = computed(() => workData.value?.tracking_stats ?? {
   dropped: 0,
 });
 
-// 排行榜数据（测试数据）
-const rankings = {
-  allTimeRank: 142,
-  allTimeTotal: 15234,
-  year2025Rank: 8,
-  year2025Total: 856,
-  genreRank: 23,
-  genreTotal: 2341,
-  genreName: "Rock",
-};
 
 </script>
