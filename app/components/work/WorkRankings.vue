@@ -14,20 +14,52 @@
         <!-- Score box -->
         <div
           class="shrink-0 w-16 h-16 rounded-xl flex items-center justify-center font-black text-white leading-none shadow-sm"
-          :class="ratingCount > 0 ? (userScore >= 100 ? 'text-xl' : 'text-2xl') : 'text-sm tracking-widest'"
+          :class="ratingCount >= 5 ? (userScore >= 100 ? 'text-xl' : 'text-2xl') : 'text-sm tracking-widest'"
           :style="{ backgroundColor: scoreColor }"
         >
-          {{ ratingCount > 0 ? Math.round(userScore) : 'TBD' }}
+          {{ ratingCount >= 5 ? Math.round(userScore) : 'TBD' }}
         </div>
 
-        <!-- Labels -->
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-1 text-sm font-bold text-gray-700 uppercase tracking-wide mb-1">
-            <Star :size="13" fill="#eab308" color="#eab308" />
-            User Score
+        <!-- Labels + Rankings -->
+        <div class="flex-1 min-w-0 space-y-2">
+          <div>
+            <div class="flex items-center gap-1 text-sm font-bold text-gray-700 uppercase tracking-wide mb-0.5">
+              <Star :size="13" fill="#eab308" color="#eab308" />
+              User Score
+            </div>
+            <div class="text-sm text-gray-400">
+              {{ ratingCount >= 5 ? `${ratingCount} 个评分` : ratingCount > 0 ? `${ratingCount}/5 个评分` : '暂无评分' }}
+            </div>
           </div>
-          <div class="text-sm text-gray-400">
-            {{ ratingCount > 0 ? `${ratingCount} 个评分` : '暂无评分' }}
+
+          <!-- Rankings list -->
+          <div class="pt-1 border-t border-gray-100">
+            <template v-if="allTimeRank || yearRank || genreRank">
+              <div class="space-y-1">
+                <div v-if="allTimeRank" class="flex items-center justify-between">
+                  <span class="text-xs text-gray-400 uppercase tracking-wide">All-Time</span>
+                  <span class="text-xs font-bold text-gray-700">#{{ allTimeRank }}</span>
+                </div>
+                <div v-if="yearRank" class="flex items-center justify-between">
+                  <span class="text-xs text-gray-400 uppercase tracking-wide">{{ rankYear }}</span>
+                  <span class="text-xs font-bold text-gray-700">#{{ yearRank }}</span>
+                </div>
+                <div v-if="genreRank" class="flex items-center justify-between">
+                  <span class="text-xs text-gray-400 uppercase tracking-wide">{{ genreName }}</span>
+                  <span class="text-xs font-bold text-gray-700">#{{ genreRank }}</span>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="flex items-center gap-2 py-1">
+                <div class="flex gap-0.5">
+                  <div class="w-5 h-1.5 rounded-full bg-gray-200"></div>
+                  <div class="w-3 h-1.5 rounded-full bg-gray-100"></div>
+                  <div class="w-4 h-1.5 rounded-full bg-gray-100"></div>
+                </div>
+                <span class="text-xs text-gray-300">暂无排名数据</span>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -49,18 +81,17 @@ import { Trophy, Star, PenLine } from "lucide-vue-next";
 const emit = defineEmits(['writeReview']);
 
 const props = defineProps({
-  userScore: {
-    type: Number,
-    default: 0,
-  },
-  ratingCount: {
-    type: Number,
-    default: 0,
-  },
+  userScore: { type: Number, default: 0 },
+  ratingCount: { type: Number, default: 0 },
+  allTimeRank: { type: Number, default: null },
+  yearRank: { type: Number, default: null },
+  rankYear: { type: [String, Number], default: new Date().getFullYear() },
+  genreRank: { type: Number, default: null },
+  genreName: { type: String, default: null },
 });
 
 const scoreColor = computed(() => {
-  if (props.ratingCount === 0) return '#64748b';   // slate-500，TBD
+  if (props.ratingCount < 5) return '#1f2937';   // gray-800，TBD
   const s = props.userScore;
   if (s >= 80) return '#059669';   // emerald-600
   if (s >= 65) return '#2563eb';   // blue-600

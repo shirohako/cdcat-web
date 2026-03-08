@@ -127,7 +127,7 @@ const handleWriteReview = () => {
 }
 
 const onReviewSaved = () => {
-  // TODO: 刷新评价列表
+  refreshWorkData()
 }
 
 // 获取路由参数
@@ -135,7 +135,7 @@ const route = useRoute();
 const workId = route.params.id;
 
 // 从 API 获取作品数据
-const { data: workData, pending, error } = await useAPI(`/v1/works/${workId}`);
+const { data: workData, pending, error, refresh: refreshWorkData } = await useAPI(`/v1/works/${workId}`);
 
 // 处理 API 数据，转换为页面所需格式
 const albumData = computed(() => {

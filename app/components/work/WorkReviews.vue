@@ -141,7 +141,13 @@ const reactions = [
 ]
 
 const extraReviews = ref([])
+
 const currentPage = ref(1)
+
+watch(() => props.initialReviews, () => {
+  extraReviews.value = []
+  currentPage.value = 1
+})
 const loadingMore = ref(false)
 
 const allReviews = computed(() => [...props.initialReviews, ...extraReviews.value])

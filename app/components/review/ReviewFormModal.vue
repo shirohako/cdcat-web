@@ -152,9 +152,9 @@
                 @mouseenter="hoverScore = i"
                 @mouseleave="hoverScore = null"
               >
-                <Icon
-                  name="lucide:star"
-                  class="w-6 h-6 transition-colors duration-150"
+                <Star
+                  :size="22"
+                  class="transition-colors duration-150"
                   :class="getStarClass(i)"
                 />
               </button>
@@ -232,6 +232,7 @@
 </template>
 
 <script setup lang="ts">
+import { Star } from 'lucide-vue-next'
 import type { UserReview } from '~/types/reviews'
 
 interface SearchableAlbum {
@@ -336,7 +337,7 @@ const getStarClass = (index: number): string => {
   if (activeScore !== null && index <= activeScore) {
     return 'fill-yellow-400 text-yellow-400'
   }
-  return 'text-gray-300'
+  return 'fill-gray-200 text-gray-200'
 }
 
 const getScoreColorClass = (score: number): string => {

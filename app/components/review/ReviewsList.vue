@@ -69,7 +69,7 @@
               </div>
 
               <!-- Row 2: Artists -->
-              <p class="text-xs text-gray-500 mt-0.5 line-clamp-1">
+              <p v-if="review.artists.length > 0" class="text-xs text-gray-500 mt-0.5 line-clamp-1">
                 {{ review.artists.map(a => a.name).join(', ') }}
               </p>
 

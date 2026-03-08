@@ -78,6 +78,11 @@
           </select>
         </div>
 
+        <!-- Error State -->
+        <div v-if="loadError" class="px-6 py-4 text-sm text-red-500">
+          {{ loadError }}
+        </div>
+
         <!-- Reviews List -->
         <ReviewsList
           :reviews="reviews"
@@ -140,6 +145,8 @@
 
 <script setup lang="ts">
 import type { UserReview, ReviewStats, ReviewSortBy } from '~/types/reviews'
+import ReviewsList from '~/components/review/ReviewsList.vue'
+import ReviewsReviewFormModal from '~/components/review/ReviewFormModal.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -155,7 +162,8 @@ const { $api } = useNuxtApp()
 const reviews = ref<UserReview[]>([])
 const stats = ref<ReviewStats>({ totalReviews: 0, averageScore: 0, scoredCount: 0 })
 const isLoading = ref(false)
-const statsLoading = ref(false)
+const statsLoading = ref(true)
+const loadError = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
@@ -207,7 +215,9 @@ const sortQueryMap: Record<ReviewSortBy, string> = {
 // Load reviews
 const loadReviews = async () => {
   isLoading.value = true
+  loadError.value = ''
   try {
+    // $api plugin unwraps { success, data } → res = { reviews: [...], pagination: {...} }
     const res = await $api<any>('/v1/reviews/mine', {
       params: {
         page: currentPage.value,
@@ -215,18 +225,17 @@ const loadReviews = async () => {
         sort: sortQueryMap[sortBy.value],
       },
     })
-    const data = res.reviews ?? res.data?.reviews ?? []
-    const pagination = res.pagination ?? res.data?.pagination ?? {}
-    reviews.value = data.map(mapReview)
-    total.value = pagination.total ?? data.length
-
-    // 用当前数据计算统计
+    const reviewList: any[] = res?.reviews ?? []
+    const pagination = res?.pagination ?? {}
+    reviews.value = reviewList.map(mapReview)
+    total.value = pagination.total ?? reviewList.length
     stats.value = computeStats(reviews.value, total.value)
-    statsLoading.value = false
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to load reviews:', error)
+    loadError.value = error?.message || '加载评价失败，请刷新重试'
   } finally {
     isLoading.value = false
+    statsLoading.value = false
   }
 }
 
