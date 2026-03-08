@@ -74,7 +74,7 @@
     <div class="mt-auto shrink-0 border-t border-gray-200 p-4">
       <transition name="fade" mode="out-in">
         <div v-if="!isCollapsed" class="text-xs text-gray-400 text-center">
-          © 2025 CDCAT
+          © 2026 CDCAT
         </div>
         <div v-else class="flex justify-center">
           <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
