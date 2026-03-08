@@ -248,7 +248,7 @@ const docs = [
 const communities = [
   {
     name: 'QQ 交流群',
-    code: '群号：123456789',
+    code: '群号：1007357274',
     link: '#',
     icon: 'lucide:message-circle',
     tone: 'border-slate-200/80',
@@ -257,7 +257,7 @@ const communities = [
   },
   {
     name: 'Telegram 交流群',
-    code: '频道：t.me/cdcat_group',
+    code: '敬请期待',
     link: '#',
     icon: 'lucide:send',
     tone: 'border-slate-200/80',
@@ -266,7 +266,7 @@ const communities = [
   },
   {
     name: 'Discord 社区',
-    code: '邀请：discord.gg/cdcat',
+    code: '敬请期待',
     link: '#',
     icon: 'lucide:messages-square',
     tone: 'border-slate-200/80',

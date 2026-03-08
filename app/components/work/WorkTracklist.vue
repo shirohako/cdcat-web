@@ -54,10 +54,10 @@
         <div
           v-for="track in disc.tracks"
           :key="track.uid"
-          class="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2.5 hover:bg-gray-50/70 transition-colors border-b border-gray-50 last:border-b-0 group"
+          class="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 hover:bg-indigo-50/50 transition-all duration-150 border-b border-gray-100 last:border-b-0 group"
         >
           <!-- Track number -->
-          <span class="text-gray-400 font-mono text-xs w-6 text-right shrink-0 select-none">{{ track.displayNumber }}</span>
+          <span class="text-gray-400 group-hover:text-indigo-500 font-mono font-bold text-xs w-6 text-right shrink-0 select-none transition-colors duration-150">{{ track.displayNumber }}</span>
 
           <!-- Heart -->
           <button
@@ -81,20 +81,32 @@
           <div class="flex-1 min-w-0">
             <p class="text-sm font-medium text-gray-900 leading-snug truncate">{{ track.title }}</p>
             <p v-if="track.subtitle" class="text-xs text-gray-400 mt-0.5">{{ track.subtitle }}</p>
-            <p v-if="showCredits && track.artist" class="text-xs text-gray-400 mt-0.5">{{ track.artist }}</p>
-            <div v-if="showCredits && track.credits && track.credits.length" class="mt-1 space-y-0.5">
-              <p v-for="(credit, idx) in track.credits" :key="idx" class="text-[11px] text-gray-400">
-                <span class="font-medium text-gray-500">{{ credit.role }}:</span>
-                <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
-                  <NuxtLink
-                    v-if="artist.artistId"
-                    :to="`/artists/${artist.artistId}`"
-                    class="hover:underline hover:text-gray-600 transition-colors"
-                  >{{ artist.name }}</NuxtLink>
-                  <span v-else>{{ artist.name }}</span>
-                  <span v-if="artistIdx < credit.artists.length - 1">, </span>
-                </template>
-              </p>
+            <div
+              v-if="showCredits && (track.artist || track.credits?.length)"
+              class="mt-2 pt-2 border-t border-gray-100 space-y-1 text-xs"
+            >
+              <div v-if="track.artist" class="flex items-baseline gap-2">
+                <span class="shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-500">
+                  Artist
+                </span>
+                <span class="text-gray-600">{{ track.artist }}</span>
+              </div>
+              <div v-for="(credit, idx) in track.credits" :key="idx" class="flex items-baseline gap-2">
+                <span :class="['shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold', roleBadgeClass(credit.role)]">
+                  {{ credit.role }}
+                </span>
+                <span class="text-gray-600">
+                  <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
+                    <NuxtLink
+                      v-if="artist.artistId"
+                      :to="`/artists/${artist.artistId}`"
+                      class="hover:underline hover:text-gray-800 transition-colors"
+                    >{{ artist.name }}</NuxtLink>
+                    <span v-else>{{ artist.name }}</span>
+                    <span v-if="artistIdx < credit.artists.length - 1">, </span>
+                  </template>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -126,7 +138,38 @@ const { isAuthenticated } = useAuth();
 const { toggleFavoriteSong } = useFavorites();
 const route = useRoute();
 
-const showCredits = ref(false);
+const BADGE_PALETTE = [
+  'bg-indigo-100 text-indigo-700',
+  'bg-violet-100 text-violet-700',
+  'bg-sky-100 text-sky-700',
+  'bg-teal-100 text-teal-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-amber-100 text-amber-700',
+  'bg-orange-100 text-orange-700',
+  'bg-rose-100 text-rose-700',
+  'bg-pink-100 text-pink-700',
+  'bg-cyan-100 text-cyan-700',
+]
+
+const roleBadgeClass = (role) => {
+  let hash = 0
+  for (let i = 0; i < role.length; i++) {
+    hash = (hash * 31 + role.charCodeAt(i)) >>> 0
+  }
+  return BADGE_PALETTE[hash % BADGE_PALETTE.length]
+}
+
+const CREDITS_STORAGE_KEY = 'cdcat:tracklist:showCredits'
+const showCredits = ref(true);
+
+onMounted(() => {
+  const saved = localStorage.getItem(CREDITS_STORAGE_KEY)
+  if (saved !== null) showCredits.value = saved === 'true'
+})
+
+watch(showCredits, val => {
+  localStorage.setItem(CREDITS_STORAGE_KEY, String(val))
+})
 const favoritedSongs = ref({});
 const toggleLoading = ref({});
 
