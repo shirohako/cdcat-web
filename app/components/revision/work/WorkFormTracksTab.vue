@@ -117,7 +117,7 @@
                 class="input input-bordered input-sm w-full"
               />
             </div>
-            <button type="button" class="btn btn-xs btn-ghost text-error" @click="removeTrack(discIndex, songIndex)">
+            <button v-if="!song.id" type="button" class="btn btn-xs btn-ghost text-error" @click="removeTrack(discIndex, songIndex)">
               <X :size="16" />
             </button>
           </div>
@@ -131,7 +131,7 @@
 import { Plus, Trash2, X } from 'lucide-vue-next'
 
 interface Song {
-  id: string
+  id: string | number
   track_number: number
   title: string
   duration: string
@@ -162,7 +162,6 @@ const emit = defineEmits<{
 }>()
 
 let discIdCounter = 0
-let trackIdCounter = 0
 
 const addDisc = () => {
   const newStructure = [
@@ -197,11 +196,10 @@ const addTrack = (discIndex: number) => {
   disc.songs = [
     ...currentSongs,
     {
-      id: `track-${trackIdCounter++}`,
       track_number: currentSongs.length + 1,
       title: '',
       duration: '',
-    },
+    } as unknown as Song,
   ]
   newStructure[discIndex] = disc
   emit('update:formData', { ...props.formData, structure: newStructure })
