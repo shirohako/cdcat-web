@@ -61,13 +61,11 @@
   </section>
 </template>
 
-<script setup>
-import { Users, ChevronRight } from 'lucide-vue-next';
+<script setup lang="ts">
+import type { WorkArtistCardItem } from '~/types/work'
+import { Users, ChevronRight } from 'lucide-vue-next'
 
-defineProps({
-  artists: {
-    type: Array,
-    required: true,
-  },
-});
+defineProps<{
+  artists: WorkArtistCardItem[]
+}>()
 </script>

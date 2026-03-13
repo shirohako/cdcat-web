@@ -44,15 +44,15 @@
   </section>
 </template>
 
-<script setup>
-import { Users } from "lucide-vue-next";
+<script setup lang="ts">
+import type { WorkCreditGroup } from '~/types/work'
+import { Users } from "lucide-vue-next"
 
-defineProps({
-  credits: {
-    type: Array,
-    default: () => []
-  }
-});
+withDefaults(defineProps<{
+  credits: WorkCreditGroup[]
+}>(), {
+  credits: () => [],
+})
 
 const roleColors = [
   'bg-blue-50 text-blue-600 ring-1 ring-blue-100',

@@ -151,7 +151,8 @@
   </dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { WorkHeroData } from '~/types/work'
 import {
   Heart,
   ShoppingCart,
@@ -161,9 +162,9 @@ import {
   Hash,
   Edit,
   UserRound,
-} from "lucide-vue-next";
+} from "lucide-vue-next"
 
-const formatType = (type) => {
+const formatType = (type: string | null | undefined): string => {
   const map = {
     album: 'Album',
     single: 'Single',
@@ -182,20 +183,14 @@ const { isAuthenticated } = useAuth()
 const { $api } = useNuxtApp()
 const route = useRoute()
 
-const props = defineProps({
-  albumData: {
-    type: Object,
-    required: true,
-  },
-  workId: {
-    type: [String, Number],
-    default: null,
-  },
-  initialFavorited: {
-    type: Boolean,
-    default: false,
-  },
-});
+const props = withDefaults(defineProps<{
+  albumData: WorkHeroData
+  workId?: string | number | null
+  initialFavorited?: boolean
+}>(), {
+  workId: null,
+  initialFavorited: false,
+})
 
 const buyDialog = ref(null)
 const isFavorited = ref(props.initialFavorited)

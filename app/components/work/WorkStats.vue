@@ -58,27 +58,23 @@
   </section>
 </template>
 
-<script setup>
-import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "lucide-vue-next";
+<script setup lang="ts">
+import type { TrackingStats } from '~/types/work'
+import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "lucide-vue-next"
 
-defineProps({
-  viewsCount: {
-    type: Number,
-    default: 0,
-  },
-  likesCount: {
-    type: Number,
-    default: 0,
-  },
-  trackingStats: {
-    type: Object,
-    default: () => ({
-      plan_to_listen: 0,
-      completed: 0,
-      wishlist: 0,
-      owned: 0,
-      dropped: 0,
-    }),
-  },
-});
+withDefaults(defineProps<{
+  viewsCount: number
+  likesCount: number
+  trackingStats: TrackingStats
+}>(), {
+  viewsCount: 0,
+  likesCount: 0,
+  trackingStats: () => ({
+    plan_to_listen: 0,
+    completed: 0,
+    wishlist: 0,
+    owned: 0,
+    dropped: 0,
+  }),
+})
 </script>

@@ -131,12 +131,13 @@
   </section>
 </template>
 
-<script setup>
-import { ListMusic, Disc3, Users, Heart } from "lucide-vue-next";
+<script setup lang="ts">
+import type { WorkSong, WorkDisc, WorkCredit } from '~/types/work'
+import { ListMusic, Disc3, Users, Heart } from "lucide-vue-next"
 
-const { isAuthenticated } = useAuth();
-const { toggleFavoriteSong } = useFavorites();
-const route = useRoute();
+const { isAuthenticated } = useAuth()
+const { toggleFavoriteSong } = useFavorites()
+const route = useRoute()
 
 const BADGE_PALETTE = [
   'bg-indigo-100 text-indigo-700',
@@ -151,172 +152,159 @@ const BADGE_PALETTE = [
   'bg-cyan-100 text-cyan-700',
 ]
 
-const roleBadgeClass = (role) => {
+const roleBadgeClass = (role: string): string => {
   let hash = 0
   for (let i = 0; i < role.length; i++) {
     hash = (hash * 31 + role.charCodeAt(i)) >>> 0
   }
-  return BADGE_PALETTE[hash % BADGE_PALETTE.length]
+  return BADGE_PALETTE[hash % BADGE_PALETTE.length]!
 }
 
 const CREDITS_STORAGE_KEY = 'cdcat:tracklist:showCredits'
-const showCredits = ref(true);
+const showCredits = ref(true)
 
 onMounted(() => {
   const saved = localStorage.getItem(CREDITS_STORAGE_KEY)
   if (saved !== null) showCredits.value = saved === 'true'
 })
 
-watch(showCredits, val => {
+watch(showCredits, (val: boolean) => {
   localStorage.setItem(CREDITS_STORAGE_KEY, String(val))
 })
-const favoritedSongs = ref({});
-const toggleLoading = ref({});
 
-const handleToggleFavorite = async (songId) => {
+const favoritedSongs = ref<Record<number, boolean>>({})
+const toggleLoading = ref<Record<number, boolean>>({})
+
+const handleToggleFavorite = async (songId: number) => {
   if (!isAuthenticated.value) {
-    await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`);
-    return;
+    await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
+    return
   }
-  if (toggleLoading.value[songId]) return;
+  if (toggleLoading.value[songId]) return
 
-  toggleLoading.value = { ...toggleLoading.value, [songId]: true };
+  toggleLoading.value = { ...toggleLoading.value, [songId]: true }
   try {
-    const result = await toggleFavoriteSong(songId);
-    favoritedSongs.value = { ...favoritedSongs.value, [songId]: result.favorited };
+    const result = await toggleFavoriteSong(songId)
+    favoritedSongs.value = { ...favoritedSongs.value, [songId]: result.favorited }
   } catch {
     // 401 已由 api 插件处理
   } finally {
-    const { [songId]: _, ...rest } = toggleLoading.value;
-    toggleLoading.value = rest;
+    const { [songId]: _, ...rest } = toggleLoading.value
+    toggleLoading.value = rest
   }
-};
+}
 
-const props = defineProps({
-  songs: {
-    type: Array,
-    default: () => [],
-  },
-  structure: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = withDefaults(defineProps<{
+  songs: WorkSong[]
+  structure: WorkDisc[]
+}>(), {
+  songs: () => [],
+  structure: () => [],
+})
 
-const normalizeNumber = value => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
+const normalizeNumber = (value: unknown): number | null => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
 
-const formatDuration = value => {
-  const seconds = normalizeNumber(value);
-  if (seconds === null || seconds < 0) {
-    return "--";
-  }
+const formatDuration = (value: number | null | undefined): string => {
+  const seconds = normalizeNumber(value)
+  if (seconds === null || seconds < 0) return '--'
+  const minutes = Math.floor(seconds / 60)
+  const remainder = Math.floor(seconds % 60)
+  return `${minutes}:${remainder.toString().padStart(2, '0')}`
+}
 
-  const minutes = Math.floor(seconds / 60);
-  const remainder = Math.floor(seconds % 60);
-  return `${minutes}:${remainder.toString().padStart(2, "0")}`;
-};
+const trackSortValue = (song: WorkSong): number =>
+  normalizeNumber(song.track_number) ?? Number.MAX_SAFE_INTEGER
 
-const trackSortValue = song =>
-  normalizeNumber(song.track_number) ?? Number.MAX_SAFE_INTEGER;
-
-const processTracks = (list, discNumber) => {
+const processTracks = (list: WorkSong[], discNumber: number) => {
   return list
     .slice()
-    .sort((a, b) => trackSortValue(a) - trackSortValue(b))
-    .map(song => {
-      const trackNumber = normalizeNumber(song.track_number);
-      const artistNames = Array.isArray(song.artists)
-        ? song.artists
-            .map(artist => artist?.name)
+    .sort((a: WorkSong, b: WorkSong) => trackSortValue(a) - trackSortValue(b))
+    .map((song: WorkSong) => {
+      const trackNumber = normalizeNumber(song.track_number)
+      const artistNames = Array.isArray((song as any).artists)
+        ? (song as any).artists
+            .map((artist: { name?: string }) => artist?.name)
             .filter(Boolean)
-            .join(", ")
-        : song.artist_names || song.artist || song.artist_name || "";
+            .join(', ')
+        : (song as any).artist_names || (song as any).artist || (song as any).artist_name || ''
 
       // 处理歌曲 Credit
-      const credits = song.credits || [];
-      const formattedCredits = [];
+      const credits: WorkCredit[] = (song.credits as WorkCredit[]) || []
+      const formattedCredits: { role: string; artists: { name: string; artistId: number | null }[] }[] = []
       if (credits.length > 0) {
-        const groups = new Map();
-        credits.forEach((c) => {
-          const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : "Credit";
+        const groups = new Map<string, { name: string; artistId: number | null }[]>()
+        credits.forEach((c: WorkCredit) => {
+          const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : 'Credit'
           // 优先级：外层 display_name -> artist.name -> pivot.display_name
-          const name = c.display_name || c.artist_name || null;
-          const artistId = c.artist_id || null;
+          const name = c.display_name || c.artist_name || null
+          const artistId = c.artist_id || null
           if (name) {
-            if (!groups.has(role)) groups.set(role, []);
-            // 检查是否已存在相同的 artist
-            const existing = groups.get(role).find(item => item.name === name);
-            if (!existing) {
-              groups.get(role).push({ name, artistId });
-            }
+            if (!groups.has(role)) groups.set(role, [])
+            const existing = groups.get(role)!.find((item: { name: string }) => item.name === name)
+            if (!existing) groups.get(role)!.push({ name, artistId })
           }
-        });
+        })
         for (const [role, artists] of groups) {
-          formattedCredits.push({ role, artists });
+          formattedCredits.push({ role, artists })
         }
       }
 
       return {
         songId: song.id ?? null,
-        uid:
-          song.id ??
-          `disc-${discNumber}-${trackNumber ?? song.title ?? "track"}`,
-        displayNumber:
-          trackNumber !== null
-            ? trackNumber.toString().padStart(2, "0")
-            : "--",
-        title: song.title || "Untitled Track",
-        subtitle: song.meta?.subtitle || null,
+        uid: song.id ?? `disc-${discNumber}-${trackNumber ?? song.title ?? 'track'}`,
+        displayNumber: trackNumber !== null ? trackNumber.toString().padStart(2, '0') : '--',
+        title: song.title || 'Untitled Track',
+        subtitle: (song.meta as any)?.subtitle || null,
         credits: formattedCredits,
         artist: artistNames,
         duration: formatDuration(song.duration),
-      };
-    });
-};
+      }
+    })
+}
 
-const discs = computed(() => {
-  if (Array.isArray(props.structure) && props.structure.length > 0) {
-    return props.structure.map(disc => {
-      const discNumber = disc.disc_number;
-      const songs = Array.isArray(disc.songs)
-        ? disc.songs
-        : props.songs.filter(
-            s => (normalizeNumber(s.disc_number) ?? 1) === discNumber
-          );
+interface DiscItem {
+  discNumber: number
+  title: string | null
+  isBonus?: boolean
+  isCounted?: boolean
+  tracks: ReturnType<typeof processTracks>
+}
+
+const discs = computed<DiscItem[]>(() => {
+  if (props.structure.length > 0) {
+    return props.structure.map((disc: WorkDisc) => {
+      const discNumber = disc.disc_number
+      const songs = props.songs.filter(
+        (s: WorkSong) => (normalizeNumber(s.disc_number) ?? 1) === discNumber
+      )
       return {
         discNumber,
-        title: disc.name || disc.title,
+        title: disc.title ?? null,
         isBonus: disc.is_bonus ?? false,
         isCounted: disc.is_counted ?? true,
         tracks: processTracks(songs, discNumber),
-      };
-    });
+      }
+    })
   }
 
-  if (!Array.isArray(props.songs) || props.songs.length === 0) {
-    return [];
-  }
+  if (!props.songs.length) return []
 
-  const discMap = new Map();
-  props.songs.forEach(song => {
-    const discNumber = normalizeNumber(song.disc_number) ?? 1;
-    if (!discMap.has(discNumber)) {
-      discMap.set(discNumber, []);
-    }
-    discMap.get(discNumber).push(song);
-  });
+  const discMap = new Map<number, WorkSong[]>()
+  props.songs.forEach((song: WorkSong) => {
+    const discNumber = normalizeNumber(song.disc_number) ?? 1
+    if (!discMap.has(discNumber)) discMap.set(discNumber, [])
+    discMap.get(discNumber)!.push(song)
+  })
 
   return Array.from(discMap.entries())
     .sort((a, b) => a[0] - b[0])
-    .map(([discNumber, discSongs]) => {
-      return {
-        discNumber,
-        title: null,
-        tracks: processTracks(discSongs, discNumber),
-      };
-    });
-});
+    .map(([discNumber, discSongs]) => ({
+      discNumber,
+      title: null,
+      tracks: processTracks(discSongs, discNumber),
+    }))
+})
 </script>

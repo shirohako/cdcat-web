@@ -71,15 +71,15 @@
   </section>
 </template>
 
-<script setup>
-import { Link2, Globe, ExternalLink } from 'lucide-vue-next';
+<script setup lang="ts">
+import type { WorkLink } from '~/types/work'
+import { Link2, Globe, ExternalLink } from 'lucide-vue-next'
 
-const props = defineProps({
-  links: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = withDefaults(defineProps<{
+  links: WorkLink[]
+}>(), {
+  links: () => [],
+})
 
 const categoryOrder = ['official', 'streaming', 'shop', 'social', 'database', 'other'];
 

@@ -111,15 +111,15 @@
   </section>
 </template>
 
-<script setup>
-import { Disc3, Package, Lock, Wifi, CalendarDays } from 'lucide-vue-next';
+<script setup lang="ts">
+import type { WorkProduct } from '~/types/work'
+import { Disc3, Package, Lock, Wifi, CalendarDays } from 'lucide-vue-next'
 
-defineProps({
-  products: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = withDefaults(defineProps<{
+  products: WorkProduct[]
+}>(), {
+  products: () => [],
+})
 
 const mediumLabel = (medium) => {
   if (medium === 'DIGITAL') return 'Digital';

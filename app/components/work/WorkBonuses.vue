@@ -107,16 +107,20 @@
   </dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { WorkBonusWithProduct, WorkProduct } from '~/types/work'
 import {
   Gift, Disc3, Music, Image as ImageIcon, Ticket, Download,
   Package, BookOpen, Key, PenLine,
-} from 'lucide-vue-next';
+} from 'lucide-vue-next'
 
-const props = defineProps({
-  bonuses: { type: Array, default: () => [] },
-  products: { type: Array, default: () => [] },
-});
+const props = withDefaults(defineProps<{
+  bonuses: WorkBonusWithProduct[]
+  products: WorkProduct[]
+}>(), {
+  bonuses: () => [],
+  products: () => [],
+})
 
 const detailDialog = ref(null);
 const activeBonus = ref(null);
