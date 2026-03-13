@@ -172,7 +172,17 @@ watch(showCredits, (val: boolean) => {
   localStorage.setItem(CREDITS_STORAGE_KEY, String(val))
 })
 
-const favoritedSongs = ref<Record<number, boolean>>({})
+const props = withDefaults(defineProps<{
+  songs: WorkSong[]
+  structure: WorkDisc[]
+}>(), {
+  songs: () => [],
+  structure: () => [],
+})
+
+const favoritedSongs = ref<Record<number, boolean>>(
+  Object.fromEntries(props.songs.filter(s => s.is_favorited).map(s => [s.id, true]))
+)
 const toggleLoading = ref<Record<number, boolean>>({})
 
 const handleToggleFavorite = async (songId: number) => {
@@ -193,14 +203,6 @@ const handleToggleFavorite = async (songId: number) => {
     toggleLoading.value = rest
   }
 }
-
-const props = withDefaults(defineProps<{
-  songs: WorkSong[]
-  structure: WorkDisc[]
-}>(), {
-  songs: () => [],
-  structure: () => [],
-})
 
 const normalizeNumber = (value: unknown): number | null => {
   const parsed = Number(value)
