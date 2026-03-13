@@ -1,11 +1,36 @@
 <template>
-  <div class="min-h-screen relative overflow-hidden bg-linear-to-br from-amber-50 via-slate-50 to-sky-50 flex items-center justify-center p-4">
+  <div class="min-h-screen relative overflow-hidden bg-linear-to-br from-amber-50 via-slate-50 to-sky-50 flex flex-col items-center justify-center p-4 gap-4">
     <!-- Decorative Background -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
       <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"></div>
       <div class="absolute rounded-full bg-[radial-gradient(circle,rgba(56,189,248,0.15),transparent_70%)] blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"></div>
       <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-[radial-gradient(circle,rgba(244,165,96,0.15),transparent_70%)] [animation-delay:2s]"></div>
       <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-[radial-gradient(circle,rgba(16,185,129,0.15),transparent_70%)] [animation-delay:4s]"></div>
+    </div>
+
+    <!-- Beta Notice -->
+    <div class="relative z-10 w-full max-w-md animate-[fade-in_0.5s_ease_both]">
+      <div class="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50/60 px-4 py-3.5 shadow-[0_8px_24px_-10px_rgba(245,158,11,0.2)] backdrop-blur-sm">
+        <div class="flex items-center gap-2 mb-2.5">
+          <div class="w-6 h-6 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+            <TriangleAlert :size="13" class="text-amber-500" />
+          </div>
+          <span class="text-xs font-bold text-amber-900 tracking-wide">目前网站处于开发测试阶段</span>
+          <span class="text-[10px] font-medium text-amber-400 bg-amber-100 px-1.5 py-0.5 rounded-full">Beta</span>
+        </div>
+        <div class="pl-8 space-y-1.5">
+          <p class="text-xs text-amber-700/70">以下数据在正式环境发布前，可能被清除。</p>
+          <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
+            <span class="text-amber-400 mt-px">–</span>
+            添加的内容（专辑信息，艺术家信息）
+          </p>
+          <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
+            <span class="text-amber-400 mt-px">–</span>
+            用户账号数据（评论，收藏等）
+          </p>
+          <p class="text-[11px] text-amber-700/40 pt-0.5">正式版即将推出，感谢理解与支持 ✦</p>
+        </div>
+      </div>
     </div>
 
     <!-- Login Card -->
@@ -152,7 +177,7 @@
 
     <div
       v-if="showGithubDialog"
-      class="fixed inset-0 z-[120] bg-slate-900/35 backdrop-blur-xs flex items-center justify-center p-4"
+      class="fixed inset-0 z-120 bg-slate-900/35 backdrop-blur-xs flex items-center justify-center p-4"
       @click.self="showGithubDialog = false"
     >
       <div
@@ -175,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft } from 'lucide-vue-next'
+import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft, TriangleAlert } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
