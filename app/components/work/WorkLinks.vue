@@ -84,25 +84,24 @@ const props = withDefaults(defineProps<{
 const categoryOrder = ['official', 'streaming', 'shop', 'social', 'database', 'other'];
 
 const groupedLinks = computed(() => {
-  const groups = {};
+  const groups: Record<string, WorkLink[]> = {};
   for (const link of props.links) {
     const cat = link.provider?.category || 'other';
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(link);
   }
-  // Return in defined order
-  const result = {};
+  const result: Record<string, WorkLink[]> = {};
   for (const cat of categoryOrder) {
     if (groups[cat]?.length) result[cat] = groups[cat];
   }
   for (const cat of Object.keys(groups)) {
-    if (!result[cat]) result[cat] = groups[cat];
+    if (!result[cat]) result[cat] = groups[cat]!;
   }
   return result;
 });
 
-const categoryLabel = (category) => {
-  const map = {
+const categoryLabel = (category: string) => {
+  const map: Record<string, string> = {
     official: 'Official',
     streaming: 'Streaming',
     shop: 'Shop',
@@ -113,8 +112,8 @@ const categoryLabel = (category) => {
   return map[category] ?? category;
 };
 
-const categoryStyle = (category) => {
-  const map = {
+const categoryStyle = (category: string) => {
+  const map: Record<string, { bg: string; icon: string; label: string }> = {
     official:  { bg: 'bg-blue-50',   icon: 'text-blue-500',   label: 'text-blue-400' },
     streaming: { bg: 'bg-green-50',  icon: 'text-green-500',  label: 'text-green-500' },
     shop:      { bg: 'bg-orange-50', icon: 'text-orange-500', label: 'text-orange-400' },
@@ -122,17 +121,17 @@ const categoryStyle = (category) => {
     database:  { bg: 'bg-amber-50',  icon: 'text-amber-500',  label: 'text-amber-500' },
     other:     { bg: 'bg-gray-100',  icon: 'text-gray-400',   label: 'text-gray-400' },
   };
-  return map[category] ?? map.other;
+  return map[category] ?? map['other']!;
 };
 
-const formatProviderName = (name) => {
+const formatProviderName = (name: string) => {
   return name
     .split('_')
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 };
 
-const getDomain = (url) => {
+const getDomain = (url: string) => {
   try {
     return new URL(url).hostname.replace(/^www\./, '');
   } catch {

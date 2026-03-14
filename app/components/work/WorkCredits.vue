@@ -68,7 +68,7 @@ const roleColors = [
 const roleColorMap = new Map();
 let colorIndex = 0;
 
-const roleStyle = (role) => {
+const roleStyle = (role: string) => {
   if (!roleColorMap.has(role)) {
     roleColorMap.set(role, roleColors[colorIndex % roleColors.length]);
     colorIndex++;

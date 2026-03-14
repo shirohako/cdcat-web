@@ -98,7 +98,7 @@
       </p>
 
       <div class="modal-action mt-5">
-        <button class="btn btn-sm" @click="detailDialog.close()">关闭</button>
+        <button class="btn btn-sm" @click="detailDialog?.close()">关闭</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
@@ -109,6 +109,7 @@
 
 <script setup lang="ts">
 import type { WorkBonusWithProduct, WorkProduct } from '~/types/work'
+import type { Component } from 'vue'
 import {
   Gift, Disc3, Music, Image as ImageIcon, Ticket, Download,
   Package, BookOpen, Key, PenLine,
@@ -122,22 +123,22 @@ const props = withDefaults(defineProps<{
   products: () => [],
 })
 
-const detailDialog = ref(null);
-const activeBonus = ref(null);
+const detailDialog = ref<HTMLDialogElement | null>(null);
+const activeBonus = ref<WorkBonusWithProduct | null>(null);
 
-const openDetail = (bonus) => {
+const openDetail = (bonus: WorkBonusWithProduct) => {
   activeBonus.value = bonus;
   detailDialog.value?.showModal();
 };
 
-const linkedProduct = (productId) => {
+const linkedProduct = (productId: number | null) => {
   if (!productId) return null;
   const p = props.products.find(p => p.id === productId);
   return p ? (p.name || p.edition_type) : null;
 };
 
-const getBonusIcon = (type) => {
-  const map = {
+const getBonusIcon = (type: string) => {
+  const map: Record<string, Component> = {
     BONUS_TRACK: Music,
     BONUS_DISC: Disc3,
     BOOKLET: BookOpen,
@@ -151,8 +152,8 @@ const getBonusIcon = (type) => {
   return map[type] || Gift;
 };
 
-const getBonusTypeStyle = (type) => {
-  const map = {
+const getBonusTypeStyle = (type: string) => {
+  const map: Record<string, { bg: string; icon: string; badge: string }> = {
     BONUS_TRACK:    { bg: 'bg-blue-50',    icon: 'text-blue-500',   badge: 'bg-blue-100 text-blue-700' },
     BONUS_DISC:     { bg: 'bg-indigo-50',  icon: 'text-indigo-500', badge: 'bg-indigo-100 text-indigo-700' },
     BOOKLET:        { bg: 'bg-amber-50',   icon: 'text-amber-500',  badge: 'bg-amber-100 text-amber-700' },
@@ -166,8 +167,8 @@ const getBonusTypeStyle = (type) => {
   return map[type] || { bg: 'bg-gray-50', icon: 'text-gray-400', badge: 'bg-gray-100 text-gray-600' };
 };
 
-const formatBonusType = (type) => {
-  const map = {
+const formatBonusType = (type: string) => {
+  const map: Record<string, string> = {
     BONUS_TRACK: 'Bonus Track',
     BONUS_DISC: 'Bonus Disc',
     BOOKLET: 'Booklet',

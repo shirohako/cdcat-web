@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import type { WorkProduct } from '~/types/work'
+import type { WorkProduct, MediumType, EditionType } from '~/types/work'
 import { Disc3, Package, Lock, Wifi, CalendarDays } from 'lucide-vue-next'
 
 const props = withDefaults(defineProps<{
@@ -121,23 +121,23 @@ const props = withDefaults(defineProps<{
   products: () => [],
 })
 
-const mediumLabel = (medium) => {
+const mediumLabel = (medium: MediumType) => {
   if (medium === 'DIGITAL') return 'Digital';
   return 'Physical';
 };
 
-const mediumStyle = (medium) => {
+const mediumStyle = (medium: MediumType) => {
   if (medium === 'DIGITAL') return 'bg-blue-100 text-blue-700';
   return 'bg-gray-100 text-gray-600';
 };
 
-const formatEditionType = (type) => {
+const formatEditionType = (type: EditionType) => {
   if (type === 'LIMITED') return 'Limited Edition';
   return 'Regular Edition';
 };
 
-const limitedRuleLabel = (rule) => {
-  const map = {
+const limitedRuleLabel = (rule: string | null) => {
+  const map: Record<string, string> = {
     FIRST_PRESS: '初回限定',
     COUNT: '数量限定',
     PERIOD: '期间限定',
@@ -145,17 +145,19 @@ const limitedRuleLabel = (rule) => {
     EVENT: '活动限定',
     REGION: '地区限定',
   };
-  return map[rule] || '';
+  return rule ? (map[rule] || '') : '';
 };
 
-const formattedPrice = (product) => {
+const formattedPrice = (product: WorkProduct) => {
   if (!product.price || !product.currency) return null;
+  const numericPrice = parseFloat(product.price);
+  if (isNaN(numericPrice)) return `${product.currency} ${product.price}`;
   try {
     return new Intl.NumberFormat('ja-JP', {
       style: 'currency',
       currency: product.currency,
       minimumFractionDigits: 0,
-    }).format(product.price);
+    }).format(numericPrice);
   } catch {
     return `${product.currency} ${product.price}`;
   }

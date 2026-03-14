@@ -116,6 +116,14 @@
                 placeholder="Duration (e.g., 3:45)"
                 class="input input-bordered input-sm w-full"
               />
+              <label class="label cursor-pointer justify-start gap-2 py-0">
+                <input
+                  v-model="song.is_instrumental"
+                  type="checkbox"
+                  class="checkbox checkbox-sm"
+                />
+                <span class="label-text text-gray-600">纯音乐</span>
+              </label>
             </div>
             <button v-if="!song.id" type="button" class="btn btn-xs btn-ghost text-error" @click="removeTrack(discIndex, songIndex)">
               <X :size="16" />
@@ -135,6 +143,7 @@ interface Song {
   track_number: number
   title: string
   duration: string
+  is_instrumental: boolean
 }
 
 interface Disc {
@@ -199,6 +208,7 @@ const addTrack = (discIndex: number) => {
       track_number: currentSongs.length + 1,
       title: '',
       duration: '',
+      is_instrumental: false,
     } as unknown as Song,
   ]
   newStructure[discIndex] = disc

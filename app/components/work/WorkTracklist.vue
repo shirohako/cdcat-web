@@ -77,10 +77,20 @@
           </button>
           <div v-else class="w-6 shrink-0" />
 
-          <!-- Title + credits -->
+          <!-- Title + meta -->
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900 leading-snug truncate">{{ track.title }}</p>
-            <p v-if="track.subtitle" class="text-xs text-gray-400 mt-0.5">{{ track.subtitle }}</p>
+            <!-- 第一行：纯音乐图标 + 标题 -->
+            <div class="flex items-center gap-1.5 min-w-0">
+              <p class="text-sm font-medium text-gray-900 leading-snug">{{ track.title }}</p>
+              <div v-if="track.isInstrumental" class="tooltip tooltip-bottom shrink-0" data-tip="纯音乐">
+                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-100 text-violet-600">
+                  <Music2 :size="11" :stroke-width="2.5" />
+                </span>
+              </div>
+            </div>
+            <!-- 第二行：subtitle -->
+            <p v-if="track.subtitle" class="text-xs text-gray-400 mt-0.5 pl-4.5 truncate">{{ track.subtitle }}</p>
+            <!-- Credits -->
             <div
               v-if="showCredits && (track.artist || track.credits?.length)"
               class="mt-2 pt-2 border-t border-gray-100 space-y-1 text-xs"
@@ -110,8 +120,28 @@
             </div>
           </div>
 
-          <!-- Duration -->
-          <span class="shrink-0 text-xs text-gray-400 tabular-nums">{{ track.duration }}</span>
+          <!-- Duration + 歌词/翻译 -->
+          <div class="shrink-0 flex flex-col items-center sm:items-end justify-center gap-1">
+            <span class="text-xs text-gray-400 tabular-nums">{{ track.duration }}</span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
+                :class="track.hasLyrics ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                @click.stop="openLyrics(track)"
+              >
+                <FileText :size="10" /><span class="hidden sm:inline">歌词</span>
+              </button>
+              <button
+                type="button"
+                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
+                :class="track.translationsCount > 0 ? 'bg-teal-50 text-teal-500 hover:bg-teal-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                @click.stop="openTranslations(track)"
+              >
+                <Languages :size="10" /><span class="hidden sm:inline">翻译{{ track.translationsCount > 0 ? ` ${track.translationsCount}` : '' }}</span><span v-if="track.translationsCount > 0" class="sm:hidden">{{ track.translationsCount }}</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <div v-if="discIdx < discs.length - 1" class="border-b border-gray-100" />
@@ -129,11 +159,24 @@
       </div>
     </div>
   </section>
+
+  <!-- Modals -->
+  <WorkSongLyricsModal
+    v-model="showLyricsModal"
+    :song-id="activeSong.id"
+    :song-title="activeSong.title"
+  />
+  <WorkSongTranslationsModal
+    v-model="showTranslationsModal"
+    :song-id="activeSong.id"
+    :song-title="activeSong.title"
+    :translations-count="activeSong.translationsCount"
+  />
 </template>
 
 <script setup lang="ts">
 import type { WorkSong, WorkDisc, WorkCredit } from '~/types/work'
-import { ListMusic, Disc3, Users, Heart } from "lucide-vue-next"
+import { ListMusic, Disc3, Users, Heart, Music2, FileText, Languages } from "lucide-vue-next"
 
 const { isAuthenticated } = useAuth()
 const { toggleFavoriteSong } = useFavorites()
@@ -158,6 +201,24 @@ const roleBadgeClass = (role: string): string => {
     hash = (hash * 31 + role.charCodeAt(i)) >>> 0
   }
   return BADGE_PALETTE[hash % BADGE_PALETTE.length]!
+}
+
+const showLyricsModal = ref(false)
+const showTranslationsModal = ref(false)
+const activeSong = ref<{ id: number | null; title: string; translationsCount: number }>({
+  id: null,
+  title: '',
+  translationsCount: 0,
+})
+
+const openLyrics = (track: { songId: number | null; title: string }) => {
+  activeSong.value = { id: track.songId, title: track.title, translationsCount: 0 }
+  showLyricsModal.value = true
+}
+
+const openTranslations = (track: { songId: number | null; title: string; translationsCount: number }) => {
+  activeSong.value = { id: track.songId, title: track.title, translationsCount: track.translationsCount }
+  showTranslationsModal.value = true
 }
 
 const CREDITS_STORAGE_KEY = 'cdcat:tracklist:showCredits'
@@ -263,6 +324,9 @@ const processTracks = (list: WorkSong[], discNumber: number) => {
         credits: formattedCredits,
         artist: artistNames,
         duration: formatDuration(song.duration),
+        isInstrumental: song.is_instrumental ?? false,
+        hasLyrics: song.has_lyrics ?? false,
+        translationsCount: song.translations_count ?? 0,
       }
     })
 }

@@ -208,6 +208,7 @@ const transformBackendData = (data) => {
               track_number: song.track_number,
               title: song.title || '',
               duration: song.duration || '',
+              is_instrumental: song.is_instrumental ?? false,
             }))
         : [];
 
@@ -466,6 +467,7 @@ const getSubmitData = () => {
           track_number: songIndex + 1,
           title: song.title,
           duration: song.duration || null,
+          is_instrumental: song.is_instrumental ?? false,
         };
         if (song.song_id) {
           songItem.id = song.song_id;

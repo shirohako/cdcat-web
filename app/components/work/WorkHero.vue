@@ -8,7 +8,7 @@
     />
 
     <!-- Content Container -->
-    <div class="relative container mx-auto px-4 md:px-12 lg:px-20 xl:px-8 pb-7 md:py-10 max-w-7xl">
+    <div class="relative container mx-auto px-4 md:px-12 lg:px-20 xl:px-8 pt-5 pb-7 md:py-10 max-w-7xl">
       <div class="flex flex-col items-center md:flex-row md:items-stretch gap-6 md:gap-10 max-w-5xl mx-auto">
 
         <!-- Album Cover -->
@@ -94,7 +94,7 @@
                   {{ isFavorited ? 'Liked' : 'Like' }}
                 </button>
                 <!-- Buy it + Edit: inline with Like below lg -->
-                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5" @click="buyDialog.showModal()">
+                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5" @click="buyDialog?.showModal()">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
@@ -109,7 +109,7 @@
               </div>
               <!-- Buy it + Edit: own row on lg+ only -->
               <div class="hidden lg:flex gap-1.5">
-                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0" @click="buyDialog.showModal()">
+                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0" @click="buyDialog?.showModal()">
                   <ShoppingCart :size="13" />
                   Buy it
                 </button>
@@ -142,7 +142,7 @@
           <h3 class="font-bold text-gray-900 text-base">功能开发中</h3>
           <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">敬请期待。</p>
         </div>
-        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog.close()">知道了</button>
+        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog?.close()">知道了</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
@@ -165,7 +165,7 @@ import {
 } from "lucide-vue-next"
 
 const formatType = (type: string | null | undefined): string => {
-  const map = {
+  const map: Record<string, string> = {
     album: 'Album',
     single: 'Single',
     ep: 'EP',
@@ -174,9 +174,9 @@ const formatType = (type: string | null | undefined): string => {
     live: 'Live',
     soundtrack: 'Soundtrack',
     other: 'Other',
-  };
-  return map[type?.toLowerCase()] || type;
-};
+  }
+  return map[type?.toLowerCase() ?? ''] ?? type ?? ''
+}
 
 
 const { isAuthenticated } = useAuth()
@@ -192,7 +192,7 @@ const props = withDefaults(defineProps<{
   initialFavorited: false,
 })
 
-const buyDialog = ref(null)
+const buyDialog = ref<HTMLDialogElement | null>(null)
 const isFavorited = ref(props.initialFavorited)
 const isToggling = ref(false)
 
@@ -206,7 +206,7 @@ const toggleLike = async () => {
 
   isToggling.value = true
   try {
-    const result = await $api(`/v1/favorites/works/${props.workId}`, {
+    const result = await $api<{ favorited: boolean }>(`/v1/favorites/works/${props.workId}`, {
       method: 'POST',
     })
     isFavorited.value = result.favorited
