@@ -123,7 +123,7 @@
           <!-- Duration + 歌词/翻译 -->
           <div class="shrink-0 flex flex-col items-center sm:items-end justify-center gap-1">
             <span class="text-xs text-gray-400 tabular-nums">{{ track.duration }}</span>
-            <div class="flex items-center gap-1">
+            <div v-if="!track.isInstrumental" class="flex items-center gap-1">
               <button
                 type="button"
                 class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
