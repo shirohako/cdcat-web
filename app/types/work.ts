@@ -193,6 +193,42 @@ export interface Work {
   updated_at: string
 }
 
+// ── Lyrics ─────────────────────────────────────────────────────────────────
+
+/** 歌词条目（GET /songs/:id/lyrics 返回） */
+export interface LyricsItem {
+  id: number
+  song_id: number
+  language: string
+  content: string | null
+  format: string
+  is_primary: boolean
+  is_translation: boolean
+  is_ai_generated: boolean
+  authorship: string | null
+  source: string | null
+  submitter: {
+    id: number
+    username: string
+    nickname: string
+    avatar: string | null
+  } | null
+  created_at: string
+  updated_at: string
+}
+
+/** WorkSongLyricsForm 组件的表单数据 */
+export interface LyricsFormData {
+  language: string
+  content: string
+  format: string
+  is_primary: boolean
+  is_translation: boolean
+  is_ai_generated: boolean
+  authorship: string
+  source: string
+}
+
 // ── API Response ───────────────────────────────────────────────────────────
 
 /** 作品详情接口完整响应类型 */

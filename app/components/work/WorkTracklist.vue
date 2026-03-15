@@ -128,7 +128,7 @@
                 type="button"
                 class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
                 :class="track.hasLyrics ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
-                @click.stop="openLyrics(track)"
+                @click.stop="openLyrics(track, 'lyric')"
               >
                 <FileText :size="10" /><span class="hidden sm:inline">歌词</span>
               </button>
@@ -136,7 +136,7 @@
                 type="button"
                 class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
                 :class="track.translationsCount > 0 ? 'bg-teal-50 text-teal-500 hover:bg-teal-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
-                @click.stop="openTranslations(track)"
+                @click.stop="openLyrics(track, 'translation')"
               >
                 <Languages :size="10" /><span class="hidden sm:inline">翻译{{ track.translationsCount > 0 ? ` ${track.translationsCount}` : '' }}</span><span v-if="track.translationsCount > 0" class="sm:hidden">{{ track.translationsCount }}</span>
               </button>
@@ -160,17 +160,12 @@
     </div>
   </section>
 
-  <!-- Modals -->
+  <!-- Modal -->
   <WorkSongLyricsModal
     v-model="showLyricsModal"
     :song-id="activeSong.id"
     :song-title="activeSong.title"
-  />
-  <WorkSongTranslationsModal
-    v-model="showTranslationsModal"
-    :song-id="activeSong.id"
-    :song-title="activeSong.title"
-    :translations-count="activeSong.translationsCount"
+    :initial-filter="activeSong.filter"
   />
 </template>
 
@@ -204,21 +199,15 @@ const roleBadgeClass = (role: string): string => {
 }
 
 const showLyricsModal = ref(false)
-const showTranslationsModal = ref(false)
-const activeSong = ref<{ id: number | null; title: string; translationsCount: number }>({
+const activeSong = ref<{ id: number | null; title: string; filter: '' | 'lyric' | 'translation' }>({
   id: null,
   title: '',
-  translationsCount: 0,
+  filter: '',
 })
 
-const openLyrics = (track: { songId: number | null; title: string }) => {
-  activeSong.value = { id: track.songId, title: track.title, translationsCount: 0 }
+const openLyrics = (track: { songId: number | null; title: string }, filter: '' | 'lyric' | 'translation' = '') => {
+  activeSong.value = { id: track.songId, title: track.title, filter }
   showLyricsModal.value = true
-}
-
-const openTranslations = (track: { songId: number | null; title: string; translationsCount: number }) => {
-  activeSong.value = { id: track.songId, title: track.title, translationsCount: track.translationsCount }
-  showTranslationsModal.value = true
 }
 
 const CREDITS_STORAGE_KEY = 'cdcat:tracklist:showCredits'
