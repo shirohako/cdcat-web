@@ -45,6 +45,7 @@
 <script setup>
 import MarkdownIt from "markdown-it";
 import anchor from "markdown-it-anchor";
+import hexoTagPlugin from "~/utils/markdownTagPlugin.js";
 
 const route = useRoute();
 const articleId = route.params.id;
@@ -60,7 +61,8 @@ useHead(() => ({
 const md = new MarkdownIt({ html: false, breaks: true, linkify: true })
   .use(anchor, {
     slugify: (s) => s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, ''),
-  });
+  })
+  .use(hexoTagPlugin);
 
 const DOMPurify = import.meta.client ? (await import('dompurify')).default : null;
 
@@ -70,7 +72,7 @@ const renderedContent = computed(() => {
   const rendered = md.render(text);
   if (DOMPurify) {
     return DOMPurify.sanitize(rendered, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'img'],
+      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'img', 'div', 'span', 'i'],
       ALLOWED_ATTR: ['href', 'target', 'rel', 'id', 'class', 'src', 'alt'],
     });
   }
