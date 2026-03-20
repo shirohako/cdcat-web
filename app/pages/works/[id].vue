@@ -29,16 +29,16 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">
+          <WorkDescriptions
+            v-if="workData?.description"
+            :description="workData.description"
+          />
+
           <WorkProducts :products="products" />
 
           <WorkBonuses
             :bonuses="bonuses"
             :products="workData?.products ?? []"
-          />
-
-          <WorkDescriptions
-            v-if="albumDescriptions.length > 0"
-            :descriptions="albumDescriptions"
           />
           <WorkCredits
             v-if="credits.length > 0"
