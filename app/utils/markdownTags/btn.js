@@ -27,14 +27,36 @@ export function render(argsStr) {
 
 const COLORS = ['blue', 'pink', 'red', 'purple', 'orange', 'green']
 
-const COLOR_MAP = {
-  default: 'btn-primary',
-  blue: 'btn-info',
-  pink: 'btn-pink',
-  red: 'btn-error',
-  purple: 'btn-secondary',
-  orange: 'btn-warning',
-  green: 'btn-success',
+// Full class strings written out so Tailwind's scanner can detect them
+const COLOR_CLASSES = {
+  default: {
+    solid:   'bg-[#2F333C] !text-white hover:bg-[#3d4249]',
+    outline: 'border border-[#2F333C] !text-[#2F333C] hover:bg-[#2F333C] hover:!text-white',
+  },
+  blue: {
+    solid:   'bg-blue-600 !text-white hover:bg-blue-700',
+    outline: 'border border-blue-600 !text-blue-600 hover:bg-blue-600 hover:!text-white',
+  },
+  pink: {
+    solid:   'bg-pink-500 !text-white hover:bg-pink-600',
+    outline: 'border border-pink-500 !text-pink-500 hover:bg-pink-500 hover:!text-white',
+  },
+  red: {
+    solid:   'bg-red-600 !text-white hover:bg-red-700',
+    outline: 'border border-red-600 !text-red-600 hover:bg-red-600 hover:!text-white',
+  },
+  purple: {
+    solid:   'bg-purple-700 !text-white hover:bg-purple-800',
+    outline: 'border border-purple-700 !text-purple-700 hover:bg-purple-700 hover:!text-white',
+  },
+  orange: {
+    solid:   'bg-orange-500 !text-white hover:bg-orange-600',
+    outline: 'border border-orange-500 !text-orange-500 hover:bg-orange-500 hover:!text-white',
+  },
+  green: {
+    solid:   'bg-green-600 !text-white hover:bg-green-700',
+    outline: 'border border-green-600 !text-green-600 hover:bg-green-600 hover:!text-white',
+  },
 }
 
 function parseArgs(argsStr) {
@@ -54,16 +76,17 @@ function parseArgs(argsStr) {
 }
 
 function buildHtml({ url, text, icon, color, outline, block, larger, pos }) {
-  const classes = ['btn', COLOR_MAP[color] ?? 'btn-primary']
-  if (outline) classes.push('btn-outline')
-  if (larger) classes.push('btn-lg')
-  if (block) classes.push('btn-block')
+  const { solid, outline: outlineCls } = COLOR_CLASSES[color] ?? COLOR_CLASSES.default
+  const colorCls = outline ? outlineCls : solid
+  const sizeCls = larger ? 'px-5 py-2 text-sm' : 'px-4 py-1.5 text-sm'
+  const blockCls = block ? 'w-full justify-center' : 'inline-flex'
+  const baseCls = `btn-tag ${blockCls} items-center gap-1.5 rounded-md font-medium transition-colors no-underline ${sizeCls} ${colorCls}`
 
-  const iconHtml = icon ? `<i class="${e(icon)}"></i> ` : ''
-  const btn = `<a href="${e(url)}" class="${classes.join(' ')}" target="_blank" rel="noopener noreferrer">${iconHtml}${e(text)}</a>`
+  const iconHtml = icon ? `<i class="${e(icon)}"></i>` : ''
+  const btn = `<a href="${e(url)}" class="${baseCls}" target="_blank" rel="noopener noreferrer">${iconHtml}${e(text)}</a>`
 
-  if (pos === 'center') return `<div class="flex justify-center my-2">${btn}</div>`
-  if (pos === 'right') return `<div class="flex justify-end my-2">${btn}</div>`
+  if (pos === 'center') return `<div class="flex justify-center my-3">${btn}</div>`
+  if (pos === 'right')  return `<div class="flex justify-end my-3">${btn}</div>`
   return btn
 }
 
