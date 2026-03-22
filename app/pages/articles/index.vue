@@ -10,11 +10,21 @@
     <div class="relative container mx-auto px-4 md:px-8 py-10 max-w-5xl">
       <!-- 页面标题 -->
       <div class="mb-10">
-        <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-9 h-9 rounded-xl bg-linear-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm">
-            <BookOpen :size="18" class="text-white" />
+        <div class="flex items-center justify-between gap-4 mb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm shrink-0">
+              <BookOpen :size="18" class="text-white" />
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900">Articles</h1>
           </div>
-          <h1 class="text-3xl font-bold text-gray-900">Articles</h1>
+          <NuxtLink
+            v-if="isAuthenticated"
+            to="/articles/create"
+            class="btn btn-sm btn-primary shrink-0"
+          >
+            <PenLine :size="14" />
+            <span class="hidden sm:inline">新建文章</span>
+          </NuxtLink>
         </div>
         <p class="text-gray-500 text-sm ml-11.5">音乐相关文章与资讯</p>
       </div>
@@ -137,7 +147,9 @@
 </template>
 
 <script setup>
-import { FileText, Calendar, UserRound, BookOpen, Image as ImageIcon } from "lucide-vue-next";
+import { FileText, Calendar, UserRound, BookOpen, Image as ImageIcon, PenLine } from "lucide-vue-next";
+
+const { isAuthenticated } = useAuth();
 
 useHead({ title: 'Articles | CDCAT' });
 

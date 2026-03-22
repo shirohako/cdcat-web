@@ -50,17 +50,31 @@
       <ArrowLeft :size="14" class="group-hover:-translate-x-0.5 transition-transform duration-200" />
       返回
     </NuxtLink>
+
+    <!-- 编辑按钮（仅作者可见） -->
+    <NuxtLink
+      v-if="isAuthor"
+      :to="`/articles/${article.id}/edit`"
+      class="absolute top-4 right-4 md:right-8 inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white
+             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200"
+    >
+      <Pencil :size="14" />
+      编辑
+    </NuxtLink>
   </div>
 </template>
 
 <script setup>
-import { ArrowLeft, Calendar, UserRound, BookOpen, Clock } from "lucide-vue-next";
+import { ArrowLeft, Calendar, UserRound, BookOpen, Clock, Pencil } from "lucide-vue-next";
 
-defineProps({
+const props = defineProps({
   article: { type: Object, required: true },
   wordCount: { type: Number, default: 0 },
   readingTime: { type: Number, default: 1 },
 });
+
+const { user } = useAuth();
+const isAuthor = computed(() => !!user.value && user.value.username === props.article?.author?.username);
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
