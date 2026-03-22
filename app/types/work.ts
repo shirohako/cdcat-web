@@ -71,12 +71,24 @@ export interface WorkArtist {
 
 /** 原始制作人员条目（来自 Work.credits，可能含 song_id 用于关联曲目） */
 export interface WorkCredit {
+  id: number
   song_id: number | null
   artist_id: number | null
   role: string | null
   display_name: string | null
   artist_name: string | null
+  artist_image: string | null
+  order: number
+  meta: Record<string, any> | null
   artist?: WorkArtist | null  // 页面层根据 artist_id 注入
+}
+
+/** 关联文章（简要信息） */
+export interface WorkArticle {
+  id: number
+  title: string
+  cover_url: string | null
+  published_at: string | null
 }
 
 /** 曲目信息 */
@@ -174,17 +186,19 @@ export interface Work {
   rating_count: number
   ranking: number | null        // 排行榜名次
   tracking_stats: TrackingStats
-  descriptions: any[]           // 多语言简介，结构待定
+  description: string | null    // 简介
   structure: WorkDisc[]         // 碟片结构列表
   notes: string | null
   meta: Record<string, any> | null
   artists: WorkArtist[]
   songs: WorkSong[]
-  credits: any[]                // 制作人员，结构待定
+  credits: WorkCredit[]
   products: WorkProduct[]
   bonuses: WorkBonus[]
   entries: any[]                // 参赛/入榜记录，结构待定
   links: WorkLink[]
+  streaming: WorkLink[]
+  articles: WorkArticle[]
   reviews: any[]                // 评论列表，结构待定
   contributors: any[]           // 贡献者，结构待定
   is_favorited: boolean         // 当前用户是否收藏该作品

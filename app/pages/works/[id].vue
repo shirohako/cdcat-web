@@ -87,6 +87,9 @@
           <!-- Links -->
           <WorkLinks :links="links" />
 
+          <!-- Related Articles -->
+          <WorkArticles :articles="articles" />
+
           <!-- Data Contributors -->
           <WorkContributors :contributors="contributors" />
         </div>
@@ -103,6 +106,7 @@ import type {
   WorkDisc,
   WorkProduct,
   WorkLink,
+  WorkArticle,
   TrackingStats,
   WorkCreditGroup,
   WorkArtistCardItem,
@@ -123,6 +127,7 @@ import WorkStats from '~/components/work/WorkStats.vue'
 import WorkRankings from '~/components/work/WorkRankings.vue'
 import WorkLinks from '~/components/work/WorkLinks.vue'
 import WorkContributors from '~/components/work/WorkContributors.vue'
+import WorkArticles from '~/components/work/WorkArticles.vue'
 
 const { isAuthenticated } = useAuth()
 const router = useRouter()
@@ -189,7 +194,7 @@ const artistsData = computed<WorkArtistCardItem[]>(() => {
   }))
 })
 
-const albumDescriptions = computed(() => workData.value?.descriptions ?? [])
+const albumDescriptions = computed(() => workData.value?.description ?? null)
 
 const songs = computed<WorkSong[]>(() => {
   const list = workData.value?.songs ?? []
@@ -235,6 +240,7 @@ const credits = computed<WorkCreditGroup[]>(() => {
 })
 
 const links = computed<WorkLink[]>(() => workData.value?.links ?? [])
+const articles = computed<WorkArticle[]>(() => workData.value?.articles ?? [])
 const contributors = computed(() => workData.value?.contributors ?? [])
 const initialReviews = computed(() => workData.value?.reviews ?? [])
 const reviewsCount = computed<number>(() => workData.value?.reviews_count ?? 0)
