@@ -22,6 +22,7 @@
         :album-data="albumData"
         :work-id="workId"
         :initial-favorited="workData?.is_favorited ?? false"
+        :streaming="workData?.streaming ?? []"
       />
 
     <!-- Work Details Section -->

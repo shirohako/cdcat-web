@@ -78,8 +78,36 @@
               </div>
             </div>
 
+            <!-- Streaming Links -->
+            <div v-if="streaming && streaming.length > 0" class="mt-4 flex items-center justify-center md:justify-start gap-3 flex-wrap">
+              <p class="text-sm text-gray-600 shrink-0 flex items-center gap-1"><Headphones :size="13" class="text-gray-500" />流媒体</p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <a
+                  v-for="link in streaming"
+                  :key="link.id"
+                  :href="link.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group inline-flex items-center gap-1 px-3 py-2 rounded-sm text-[11px] font-medium text-gray-800 bg-black/6 transition-colors"
+                  :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.name).color + '22' } : {}"
+                  @mouseenter="hoveredLinkId = link.id"
+                  @mouseleave="hoveredLinkId = null"
+                >
+                  <Icon
+                    :name="getStreamingProvider(link.provider?.name).icon"
+                    size="16"
+                    class="shrink-0 transition-all duration-200"
+                    :style="hoveredLinkId === link.id
+                      ? { color: getStreamingProvider(link.provider?.name).color, filter: 'none' }
+                      : { filter: 'grayscale(1) brightness(0.25)' }"
+                  />
+                  {{ formatProviderName(link.provider?.name) }}
+                </a>
+              </div>
+            </div>
+
             <!-- Action Buttons -->
-            <div class="mt-5 md:mt-4 flex flex-col gap-1.5">
+            <div class="mt-3 flex flex-col gap-1.5">
               <!-- Like: full row on large+, shares row with others below lg -->
               <div class="flex gap-1.5">
                 <button
@@ -153,6 +181,7 @@
 
 <script setup lang="ts">
 import type { WorkHeroData } from '~/types/work'
+import { getStreamingProvider } from '~/utils/streamingProviders'
 import {
   Heart,
   ShoppingCart,
@@ -162,6 +191,7 @@ import {
   Hash,
   Edit,
   UserRound,
+  Headphones,
 } from "lucide-vue-next"
 
 const formatType = (type: string | null | undefined): string => {
@@ -187,12 +217,18 @@ const props = withDefaults(defineProps<{
   albumData: WorkHeroData
   workId?: string | number | null
   initialFavorited?: boolean
+  streaming?: { id: number; url: string; provider: { name: string } }[]
 }>(), {
   workId: null,
   initialFavorited: false,
+  streaming: () => [],
 })
 
+const formatProviderName = (name: string) =>
+  name.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+
 const buyDialog = ref<HTMLDialogElement | null>(null)
+const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.initialFavorited)
 const isToggling = ref(false)
 

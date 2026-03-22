@@ -20,6 +20,15 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
   ],
 
+  icon: {
+    customCollections: [
+      {
+        prefix: 'cdcat',
+        dir: './app/assets/icons',
+      },
+    ],
+  },
+
   i18n: {
     baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
     strategy: 'no_prefix',
