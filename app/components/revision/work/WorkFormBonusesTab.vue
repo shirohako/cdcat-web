@@ -1,5 +1,11 @@
 <template>
   <div class="space-y-6">
+    <CommonConfirmDialog
+      v-model="confirmDialog.show"
+      :title="confirmDialog.title"
+      :description="confirmDialog.description"
+      @confirm="confirmDialog.onConfirm"
+    />
     <div>
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-bold text-gray-900">Bonuses</h2>
@@ -166,8 +172,21 @@ const addBonus = () => {
   emit('update:formData', { ...props.formData, bonuses: newBonuses })
 }
 
+const confirmDialog = reactive({
+  show: false,
+  title: '',
+  description: '',
+  onConfirm: () => {},
+})
+
 const removeBonus = (index: number) => {
-  const newBonuses = props.formData.bonuses.filter((_, i) => i !== index)
-  emit('update:formData', { ...props.formData, bonuses: newBonuses })
+  const name = props.formData.bonuses[index]?.name || `Bonus ${index + 1}`
+  confirmDialog.title = `删除「${name}」`
+  confirmDialog.description = '此操作不可撤销，确认删除该特典？'
+  confirmDialog.onConfirm = () => {
+    const newBonuses = props.formData.bonuses.filter((_, i) => i !== index)
+    emit('update:formData', { ...props.formData, bonuses: newBonuses })
+  }
+  confirmDialog.show = true
 }
 </script>

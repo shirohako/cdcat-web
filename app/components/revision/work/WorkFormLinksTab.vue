@@ -1,5 +1,11 @@
 <template>
   <div class="space-y-6">
+    <CommonConfirmDialog
+      v-model="confirmDialog.show"
+      :title="confirmDialog.title"
+      :description="confirmDialog.description"
+      @confirm="confirmDialog.onConfirm"
+    />
     <div>
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-bold text-gray-900">Links</h2>
@@ -97,7 +103,7 @@ interface LinkProvider {
 interface LinkEntry {
   id: string
   link_id?: number
-  link_provider_id: number | ''
+  link_provider_id: number | string
   url: string
 }
 
@@ -121,8 +127,8 @@ const loadingProviders = ref(true)
 
 onMounted(async () => {
   try {
-    const data = await $api<LinkProvider[]>('/v1/link-providers')
-    providers.value = data ?? []
+    const data = await $api('/v1/link-providers')
+    providers.value = (Array.isArray(data) ? data : []) as LinkProvider[]
   } catch {
     providers.value = []
   } finally {
@@ -145,7 +151,7 @@ const groupedProviders = computed(() => {
     if (groups[cat]?.length) result[cat] = groups[cat]
   }
   for (const cat of Object.keys(groups)) {
-    if (!result[cat]) result[cat] = groups[cat]
+    if (!result[cat] && groups[cat]) result[cat] = groups[cat]!
   }
   return result
 })
@@ -169,13 +175,13 @@ const formatProviderName = (name: string) => {
     .join(' ')
 }
 
-let linkIdCounter = 0
+const linkIdCounter = ref(0)
 
 const addLink = () => {
   const newLinks: LinkEntry[] = [
     ...props.formData.links,
     {
-      id: `link-${linkIdCounter++}`,
+      id: `link-${linkIdCounter.value++}`,
       link_provider_id: '',
       url: '',
     },
@@ -183,8 +189,21 @@ const addLink = () => {
   emit('update:formData', { ...props.formData, links: newLinks })
 }
 
+const confirmDialog = reactive({
+  show: false,
+  title: '',
+  description: '',
+  onConfirm: () => {},
+})
+
 const removeLink = (index: number) => {
-  const newLinks = props.formData.links.filter((_, i) => i !== index)
-  emit('update:formData', { ...props.formData, links: newLinks })
+  const url = props.formData.links[index]?.url || `Link ${index + 1}`
+  confirmDialog.title = `删除链接`
+  confirmDialog.description = `确认删除「${url}」？`
+  confirmDialog.onConfirm = () => {
+    const newLinks = props.formData.links.filter((_, i) => i !== index)
+    emit('update:formData', { ...props.formData, links: newLinks })
+  }
+  confirmDialog.show = true
 }
 </script>

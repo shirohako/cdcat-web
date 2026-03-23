@@ -1,5 +1,11 @@
 <template>
   <div class="space-y-6">
+    <CommonConfirmDialog
+      v-model="confirmDialog.show"
+      :title="confirmDialog.title"
+      :description="confirmDialog.description"
+      @confirm="confirmDialog.onConfirm"
+    />
     <div>
       <div class="flex items-center justify-between mb-2">
         <h2 class="text-xl font-bold text-gray-900">Products</h2>
@@ -383,8 +389,21 @@ const addProduct = () => {
   emit('update:formData', { ...props.formData, products: newProducts })
 }
 
+const confirmDialog = reactive({
+  show: false,
+  title: '',
+  description: '',
+  onConfirm: () => {},
+})
+
 const removeProduct = (index: number) => {
-  const newProducts = props.formData.products.filter((_, i) => i !== index)
-  emit('update:formData', { ...props.formData, products: newProducts })
+  const name = props.formData.products[index]?.name || `Product ${index + 1}`
+  confirmDialog.title = `删除「${name}」`
+  confirmDialog.description = '此操作不可撤销，确认删除该版本规格？'
+  confirmDialog.onConfirm = () => {
+    const newProducts = props.formData.products.filter((_, i) => i !== index)
+    emit('update:formData', { ...props.formData, products: newProducts })
+  }
+  confirmDialog.show = true
 }
 </script>

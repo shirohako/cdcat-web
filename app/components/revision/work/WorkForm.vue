@@ -163,10 +163,10 @@ const tabs = [
   { id: 'artists', label: 'Artists' },
   { id: 'products', label: 'Products' },
   { id: 'bonuses', label: 'Bonuses' },
+  { id: 'links', label: 'Links' },
   { id: 'tracks', label: 'Discs & Tracks' },
   { id: 'credits', label: 'Credits' },
   { id: 'meta', label: 'Meta' },
-  { id: 'links', label: 'Links' },
   { id: 'json', label: 'JSON Editor' },
   { id: 'preview', label: 'Preview' },
 ];
