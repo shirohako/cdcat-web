@@ -7,10 +7,12 @@
           <h1 class="text-4xl font-bold mb-2">Works</h1>
           <p class="text-gray-600">Explore all music albums and works</p>
         </div>
-        <NuxtLink to="/contribute/work" class="btn btn-primary gap-2">
-          <Plus :size="20" />
-          <span class="hidden sm:inline">Create Work</span>
-        </NuxtLink>
+        <CommonButtonButton02 @click="navigateTo('/contribute/work')">
+          <template #icon>
+            <Plus :size="20" />
+          </template>
+          Create Work
+        </CommonButtonButton02>
       </div>
 
       <!-- 加载状态 -->
