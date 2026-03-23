@@ -65,6 +65,12 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
+    optimizeDeps: {
+      include: [
+        'countries-list',
+        'lucide-vue-next',
+      ],
+    },
   },
   css: ['~/assets/css/main.css'],
 })

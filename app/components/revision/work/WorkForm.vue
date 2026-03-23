@@ -161,10 +161,10 @@ const router = useRouter();
 const tabs = [
   { id: 'basic', label: 'Basic Info' },
   { id: 'artists', label: 'Artists' },
-  { id: 'tracks', label: 'Discs & Tracks' },
-  { id: 'credits', label: 'Credits' },
   { id: 'products', label: 'Products' },
   { id: 'bonuses', label: 'Bonuses' },
+  { id: 'tracks', label: 'Discs & Tracks' },
+  { id: 'credits', label: 'Credits' },
   { id: 'meta', label: 'Meta' },
   { id: 'links', label: 'Links' },
   { id: 'json', label: 'JSON Editor' },
@@ -226,11 +226,14 @@ const transformBackendData = (data) => {
     });
   }
 
-  // 处理 artists - 提取 artist_id
-  if (data.artists && Array.isArray(data.artists)) {
-    transformed.artists = data.artists.map((artist, index) => ({
-      id: `artist-${artist.id || index}`,
-      artist_id: String(artist.id || artist.artist_id || ''),
+  // 处理 artists - 兼容 related_artists（schema 格式）和 artists（旧格式）
+  const artistsSource = data.related_artists || data.artists
+  if (artistsSource && Array.isArray(artistsSource)) {
+    transformed.artists = artistsSource.map((artist, index) => ({
+      id: `artist-${artist.artist_id || artist.id || index}`,
+      artist_id: String(artist.artist_id || artist.id || ''),
+      display_name: artist.display_name || '',
+      pivot_id: artist.id ?? null,
     }));
   }
 
@@ -483,7 +486,9 @@ const getSubmitData = () => {
     payload.related_artists = formData.value.artists
       .filter(a => a.artist_id)
       .map(a => ({
+        ...(a.pivot_id ? { id: a.pivot_id } : {}),
         artist_id: a.artist_id,
+        display_name: a.display_name || null,
       }));
   }
 
@@ -672,6 +677,8 @@ const transformPayloadToFormData = (payload) => {
       ? (payload.related_artists ?? payload.artists).map((artist, index) => ({
           id: `artist-${artist.artist_id || artist.id || index}`,
           artist_id: String(artist.artist_id || artist.id || ''),
+          display_name: artist.display_name || '',
+          pivot_id: artist.pivot_id ?? null,
         }))
       : [],
     credits: Array.isArray(payload.credits)

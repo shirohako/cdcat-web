@@ -53,7 +53,7 @@ const workData = ref(null);
 onMounted(async () => {
   try {
     const { $api } = useNuxtApp();
-    const work = await $api(`/v1/works/${workId}`);
+    const work = await $api(`/v1/works/${workId}/schema`);
 
     if (work) {
       // 传递完整的 work 对象给 WorkForm 组件
