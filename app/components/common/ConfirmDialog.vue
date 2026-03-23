@@ -30,8 +30,12 @@
             class="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl p-6"
           >
             <!-- Icon -->
-            <div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center mb-4">
-              <Trash2 :size="18" class="text-error" />
+            <div
+              class="w-10 h-10 rounded-full flex items-center justify-center mb-4"
+              :class="variant === 'warning' ? 'bg-warning/10' : 'bg-error/10'"
+            >
+              <AlertTriangle v-if="variant === 'warning'" :size="18" class="text-warning" />
+              <Trash2 v-else :size="18" class="text-error" />
             </div>
 
             <!-- Title -->
@@ -42,20 +46,31 @@
 
             <!-- Actions -->
             <div class="flex gap-2 mt-5 justify-end">
-              <button
-                type="button"
-                class="btn btn-sm btn-ghost text-gray-500"
-                @click="onCancel"
-              >
-                取消
-              </button>
-              <button
-                type="button"
-                class="btn btn-sm btn-error"
-                @click="onConfirm"
-              >
-                确认删除
-              </button>
+              <template v-if="variant === 'warning'">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-warning"
+                  @click="onConfirm"
+                >
+                  知道了
+                </button>
+              </template>
+              <template v-else>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-ghost text-gray-500"
+                  @click="onCancel"
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-error"
+                  @click="onConfirm"
+                >
+                  确认删除
+                </button>
+              </template>
             </div>
           </div>
         </Transition>
@@ -65,12 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { Trash2 } from 'lucide-vue-next'
+import { Trash2, AlertTriangle } from 'lucide-vue-next'
 
 defineProps<{
   modelValue: boolean
   title: string
   description?: string
+  variant?: 'delete' | 'warning'
 }>()
 
 const emit = defineEmits<{

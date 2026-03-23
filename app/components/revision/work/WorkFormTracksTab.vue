@@ -7,7 +7,6 @@
         <button
           type="button"
           class="btn btn-sm btn-primary gap-1"
-          :disabled="showAddDiscForm"
           @click="openAddDiscForm"
         >
           <Plus :size="14" />
@@ -17,74 +16,6 @@
       <p class="text-sm text-gray-500 leading-relaxed">
         这里可以添加收录的具体曲目信息，包括碟片结构与每张碟片内的曲目列表。
       </p>
-    </div>
-
-    <!-- Inline Add Disc Form -->
-    <div v-if="showAddDiscForm" class="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-4">
-      <div class="flex items-center gap-2 mb-1">
-        <Disc3 :size="16" class="text-primary" />
-        <span class="text-sm font-semibold text-gray-800">新碟片信息</span>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div class="flex flex-col gap-1">
-          <span class="text-xs font-semibold text-gray-600">曲目数量 <span class="text-red-500">*</span></span>
-          <input
-            ref="trackCountInputRef"
-            v-model.number="newDiscForm.trackCount"
-            type="number"
-            min="1"
-            max="99"
-            class="input input-bordered input-sm w-full bg-white"
-            placeholder="e.g., 12"
-          />
-        </div>
-        <div class="flex flex-col gap-1">
-          <span class="text-xs font-semibold text-gray-600">碟片标题（可选）</span>
-          <input
-            v-model="newDiscForm.title"
-            type="text"
-            placeholder="e.g., Main Album, Bonus Disc"
-            class="input input-bordered input-sm w-full bg-white"
-          />
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <span class="text-xs font-semibold text-gray-600">Catalog Number（可选）</span>
-        <input
-          v-model="newDiscForm.catalog_number"
-          type="text"
-          placeholder="e.g., ABCD-1234"
-          class="input input-bordered input-sm w-full bg-white"
-        />
-      </div>
-
-      <div class="flex gap-4">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input v-model="newDiscForm.is_bonus" type="checkbox" class="checkbox checkbox-sm" />
-          <span class="text-sm text-gray-700">Bonus Disc</span>
-        </label>
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input v-model="newDiscForm.is_counted" type="checkbox" class="checkbox checkbox-sm" />
-          <span class="text-sm text-gray-700">Count in Total</span>
-        </label>
-      </div>
-
-      <div class="flex gap-2 justify-end border-t border-primary/20 pt-3">
-        <button type="button" class="btn btn-sm btn-ghost text-gray-500" @click="closeAddDiscForm">
-          取消
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm btn-primary gap-1"
-          :disabled="!newDiscForm.trackCount || newDiscForm.trackCount < 1"
-          @click="confirmAddDisc"
-        >
-          <Plus :size="13" />
-          添加 {{ newDiscForm.trackCount }} 首曲目
-        </button>
-      </div>
     </div>
 
     <!-- Empty State -->
@@ -168,7 +99,7 @@
           >
             <div>
               <span class="text-sm font-medium text-gray-700 block">Count in Total</span>
-              <span class="text-xs text-gray-400">勾选后记录入专辑总数量</span>
+              <span class="text-xs text-gray-400">如果是特典，并且不需要记录专辑音乐统计总数，请不要勾选。不懂保持勾选即可。</span>
             </div>
             <input v-model="disc.is_counted" type="checkbox" class="checkbox checkbox-sm shrink-0" />
           </label>
@@ -245,11 +176,71 @@
       </div>
     </div>
 
+    <!-- Add Disc Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="showAddDiscForm"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          @mousedown.self="closeAddDiscForm"
+        >
+          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <Transition
+            enter-active-class="transition-all duration-150"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-100"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="showAddDiscForm" class="relative z-10 w-full max-w-xs bg-white rounded-2xl shadow-xl p-6">
+              <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                <Disc3 :size="18" class="text-primary" />
+              </div>
+              <h3 class="text-base font-semibold text-gray-900 mb-1">添加碟片</h3>
+              <p class="text-sm text-gray-500 mb-4">请输入这张碟片的曲目数量。</p>
+              <input
+                ref="trackCountInputRef"
+                v-model.number="newDiscTrackCount"
+                type="number"
+                min="1"
+                max="99"
+                placeholder="e.g., 12"
+                class="input input-bordered input-sm w-full"
+                @keydown.enter="confirmAddDisc"
+              />
+              <div class="flex gap-2 mt-5 justify-end">
+                <button type="button" class="btn btn-sm btn-ghost text-gray-500" @click="closeAddDiscForm">
+                  取消
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  :disabled="!newDiscTrackCount || newDiscTrackCount < 1"
+                  @click="confirmAddDisc"
+                >
+                  确认
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Confirm Dialog -->
     <CommonConfirmDialog
       v-model="confirmDialog.show"
       :title="confirmDialog.title"
       :description="confirmDialog.description"
+      :variant="confirmDialog.variant"
       @confirm="confirmDialog.onConfirm()"
     />
   </div>
@@ -324,29 +315,22 @@ function updateDuration(discIndex: number, songIndex: number, value: string) {
 
 const showAddDiscForm = ref(false)
 const trackCountInputRef = ref<HTMLInputElement | null>(null)
-
-const newDiscForm = reactive({
-  trackCount: 12,
-  title: '',
-  catalog_number: '',
-  is_bonus: false,
-  is_counted: true,
-})
+const newDiscTrackCount = ref(12)
 
 let discIdCounter = 0
 
 function openAddDiscForm() {
+  newDiscTrackCount.value = 12
   showAddDiscForm.value = true
   nextTick(() => trackCountInputRef.value?.focus())
 }
 
 function closeAddDiscForm() {
   showAddDiscForm.value = false
-  Object.assign(newDiscForm, { trackCount: 12, title: '', catalog_number: '', is_bonus: false, is_counted: true })
 }
 
 function confirmAddDisc() {
-  const count = Math.max(1, Math.min(99, newDiscForm.trackCount || 1))
+  const count = Math.max(1, Math.min(99, newDiscTrackCount.value || 1))
   const songs: Song[] = Array.from({ length: count }, (_, i) => ({
     track_number: i + 1,
     title: '',
@@ -357,11 +341,11 @@ function confirmAddDisc() {
   const newDisc: Disc = {
     id: `disc-${discIdCounter++}`,
     disc_number: props.formData.structure.length + 1,
-    title: newDiscForm.title || null,
-    catalog_number: newDiscForm.catalog_number || null,
+    title: null,
+    catalog_number: null,
     length: null,
-    is_bonus: newDiscForm.is_bonus,
-    is_counted: newDiscForm.is_counted,
+    is_bonus: false,
+    is_counted: true,
     songs,
   }
 
@@ -418,19 +402,26 @@ function doSetTrackCount(discIndex: number, discId: string, newCount: number) {
 function applyTrackCount(discIndex: number, discId: string) {
   const disc = props.formData.structure[discIndex]
   if (!disc) return
-  const savedCount = disc.songs.filter(s => s.id).length
-  const newCount = Math.max(savedCount, Math.min(99, pendingTrackCounts[discId] ?? disc.songs.length))
-  // Clamp input display to minimum if user tried to go below
-  if (newCount !== (pendingTrackCounts[discId] ?? disc.songs.length)) {
-    pendingTrackCounts[discId] = newCount
-  }
+  const newCount = Math.max(0, Math.min(99, pendingTrackCounts[discId] ?? disc.songs.length))
   const currentCount = disc.songs.length
   if (newCount === currentCount) return
 
   if (newCount < currentCount) {
+    const savedCount = disc.songs.filter(s => s.id).length
+    if (newCount < savedCount) {
+      // Cannot delete saved songs — reset input and show warning only
+      pendingTrackCounts[discId] = savedCount
+      askConfirm(
+        '无法减少曲目',
+        `已有 ${savedCount} 首曲目保存在数据库中，无法将总数设定为更少。如需删除已保存的曲目，请联系管理员。`,
+        () => {},
+        'warning',
+      )
+      return
+    }
     askConfirm(
       '减少曲目',
-      `当前有 ${currentCount} 首曲目，设定为 ${newCount} 首将删除末尾 ${currentCount - newCount} 首。确认继续？`,
+      `当前有 ${currentCount} 首曲目，设定为 ${newCount} 首将删除末尾 ${currentCount - newCount} 首未保存的曲目。确认继续？`,
       () => doSetTrackCount(discIndex, discId, newCount),
     )
   }
@@ -452,17 +443,25 @@ const removeTrack = (discIndex: number, trackIndex: number) => {
 
 // ─── Confirm dialog ───────────────────────────────────────────────────────────
 
-const confirmDialog = reactive({
+const confirmDialog = reactive<{
+  show: boolean
+  title: string
+  description: string
+  variant: 'delete' | 'warning'
+  onConfirm: () => void
+}>({
   show: false,
   title: '',
   description: '',
+  variant: 'delete',
   onConfirm: () => {},
 })
 
-function askConfirm(title: string, description: string, onConfirm: () => void) {
+function askConfirm(title: string, description: string, onConfirm: () => void, variant: 'delete' | 'warning' = 'delete') {
   confirmDialog.title = title
   confirmDialog.description = description
   confirmDialog.onConfirm = onConfirm
+  confirmDialog.variant = variant
   confirmDialog.show = true
 }
 </script>
