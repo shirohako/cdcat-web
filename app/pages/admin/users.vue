@@ -30,30 +30,23 @@
 
       <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
-          <table class="w-full min-w-200 table-fixed text-left text-sm">
-            <colgroup>
-              <col>
-              <col class="w-36">
-              <col class="w-34">
-              <col class="w-40">
-              <col class="w-40">
-              <col class="w-20">
-            </colgroup>
-            <thead class="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-[0.14em] text-slate-500">
-              <tr>
-                <th class="px-4 py-3">User</th>
-                <th class="px-4 py-3">Role</th>
-                <th class="px-4 py-3">Status</th>
-                <th class="px-4 py-3">Joined</th>
-                <th class="px-4 py-3">Last Login</th>
-                <th class="px-4 py-3 text-right">Actions</th>
+          <table class="w-full min-w-200 text-left text-sm">
+            <thead>
+              <tr class="border-b border-slate-100 bg-slate-50/60">
+                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">用户</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">角色</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">状态</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">注册时间</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">最后登录</th>
+                <th v-if="canAssignRoles" class="w-24 px-4 py-3" />
               </tr>
             </thead>
 
-            <tbody>
+            <tbody class="divide-y divide-slate-100">
               <tr v-if="pending">
-                <td colspan="6" class="px-4 py-14 text-center text-slate-400">
-                  Loading...
+                <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
+                  <Icon name="lucide:loader-circle" class="mx-auto mb-2 h-5 w-5 animate-spin opacity-40" />
+                  加载中…
                 </td>
               </tr>
 
@@ -61,65 +54,68 @@
                 <tr
                   v-for="u in users"
                   :key="u.id"
-                  class="border-b border-slate-100 text-slate-700 transition hover:bg-slate-50"
+                  class="group transition-colors hover:bg-slate-50/70"
                 >
-                  <td class="px-4 py-3">
+                  <!-- 用户信息 -->
+                  <td class="px-5 py-3.5">
                     <div class="flex items-center gap-3">
                       <img
                         v-if="u.avatar"
                         :src="u.avatar"
-                        class="h-9 w-9 shrink-0 rounded-full object-cover"
+                        class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
                       />
-                      <div v-else class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200 text-xs font-bold text-slate-700">
+                      <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500">
                         {{ initials(u) }}
                       </div>
-                      <div>
-                        <p class="font-semibold text-slate-900">{{ u.nickname || u.username }}</p>
-                        <p class="text-xs text-slate-500">@{{ u.username }}</p>
-                        <p class="text-xs text-slate-500">{{ u.email }}</p>
+                      <div class="min-w-0">
+                        <p class="truncate font-medium text-slate-900">{{ u.nickname || u.username }}</p>
+                        <p class="truncate text-xs text-slate-400">{{ u.email }}</p>
                       </div>
                     </div>
                   </td>
 
-                  <td class="px-4 py-3">
+                  <!-- 角色 -->
+                  <td class="px-4 py-3.5">
                     <span
-                      class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-semibold capitalize"
+                      class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium capitalize"
                       :class="roleBadgeClass(u.roles)"
                     >
                       {{ u.roles || '—' }}
                     </span>
                   </td>
 
-                  <td class="px-4 py-3">
+                  <!-- 状态 -->
+                  <td class="px-4 py-3.5">
                     <span
-                      :class="statusClass(u.status)"
-                      class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+                      class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                      :class="u.status
+                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                        : 'border-slate-200 bg-slate-50 text-slate-500'"
                     >
-                      <span class="h-1.5 w-1.5 rounded-full" :class="u.status ? 'bg-emerald-500' : 'bg-rose-400'" />
-                      {{ u.status ? 'Active' : 'Suspended' }}
+                      <span class="h-1.5 w-1.5 rounded-full" :class="u.status ? 'bg-emerald-500' : 'bg-slate-300'" />
+                      {{ u.status ? '正常' : '已停用' }}
                     </span>
                   </td>
 
-                  <td class="px-4 py-3 text-slate-600">{{ formatDate(u.joined_at) }}</td>
-                  <td class="px-4 py-3 text-slate-600">{{ formatRelativeTime(u.last_seen_at) }}</td>
+                  <!-- 时间 -->
+                  <td class="px-4 py-3.5 text-xs tabular-nums text-slate-400">{{ formatDate(u.joined_at) }}</td>
+                  <td class="px-4 py-3.5 text-xs tabular-nums text-slate-400">{{ formatRelativeTime(u.last_seen_at) }}</td>
 
-                  <td class="px-4 py-3">
-                    <div class="flex justify-end gap-2">
-                      <button
-                        v-if="canAssignRoles"
-                        class="rounded-md border border-slate-300 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100"
-                        type="button"
-                        @click="openRoleModal(u)"
-                      >
-                        Role
-                      </button>
-                    </div>
+                  <!-- 操作 -->
+                  <td v-if="canAssignRoles" class="px-4 py-3.5">
+                    <button
+                      class="whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                      type="button"
+                      @click="openRoleModal(u)"
+                    >
+                      编辑角色
+                    </button>
                   </td>
                 </tr>
 
                 <tr v-if="users.length === 0">
-                  <td colspan="6" class="px-4 py-14 text-center text-slate-500">
-                    No users available.
+                  <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
+                    暂无用户
                   </td>
                 </tr>
               </template>
@@ -127,32 +123,27 @@
           </table>
         </div>
 
-        <footer class="flex flex-col gap-3 border-t border-slate-200 px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p class="text-slate-500">Showing {{ startItem }}-{{ endItem }} of {{ pagination.total }}</p>
-
-          <div class="flex items-center gap-2">
+        <footer class="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <p class="text-xs text-slate-400">
+            共 {{ pagination.total }} 位用户，当前第 {{ startItem }}–{{ endItem }} 条
+          </p>
+          <div class="flex items-center gap-1">
             <button
-              class="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               type="button"
               :disabled="page <= 1"
               @click="page -= 1"
             >
-              <Icon name="lucide:chevron-left" class="h-4 w-4" />
-              Prev
+              <Icon name="lucide:chevron-left" class="h-3.5 w-3.5" />
             </button>
-
-            <span class="rounded-md border border-slate-300 px-3 py-1.5 text-slate-700">
-              {{ page }} / {{ totalPages }}
-            </span>
-
+            <span class="px-2 text-xs text-slate-500">{{ page }} / {{ totalPages }}</span>
             <button
-              class="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
               type="button"
               :disabled="page >= totalPages"
               @click="page += 1"
             >
-              Next
-              <Icon name="lucide:chevron-right" class="h-4 w-4" />
+              <Icon name="lucide:chevron-right" class="h-3.5 w-3.5" />
             </button>
           </div>
         </footer>
@@ -398,14 +389,12 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
 
 // ===== 样式 =====
 const ROLE_BADGE: Record<string, string> = {
-  founder:     'bg-violet-100 text-violet-700',
-  moderator:   'bg-blue-100 text-blue-700',
-  contributor: 'bg-emerald-100 text-emerald-700',
-  member:      'bg-slate-100 text-slate-600',
+  founder:     'bg-violet-50 border-violet-200 text-violet-700',
+  moderator:   'bg-blue-50 border-blue-200 text-blue-700',
+  contributor: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+  member:      'bg-slate-50 border-slate-200 text-slate-600',
 }
-const roleBadgeClass = (role: string | null) => ROLE_BADGE[role ?? ''] ?? 'bg-slate-100 text-slate-500'
-const statusClass = (status: boolean) =>
-  status ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-600'
+const roleBadgeClass = (role: string | null) => ROLE_BADGE[role ?? ''] ?? 'bg-slate-50 border-slate-200 text-slate-400'
 
 const initials = (u: ApiUser) => {
   const name = u.nickname || u.username
