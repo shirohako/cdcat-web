@@ -134,10 +134,18 @@ export const useAuth = () => {
     }
   }
 
+  const hasPermission = (permission: string) =>
+    user.value?.permissions?.includes(permission) ?? false
+
+  const hasRole = (role: string) =>
+    user.value?.roles === role
+
   return {
     user: readonly(user),
     token: readonly(token),
     isAuthenticated,
+    hasPermission,
+    hasRole,
     initAuth,
     login,
     register,

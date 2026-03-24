@@ -150,6 +150,16 @@
                   <span>{{ $t(item.i18nKey) }}</span>
                 </NuxtLink>
               </div>
+              <div v-if="hasPermission('admin.access')" class="border-t border-gray-200">
+                <NuxtLink
+                  to="/admin/users"
+                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                  @click="showUserMenu = false"
+                >
+                  <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
+                  <span>后台仪表盘</span>
+                </NuxtLink>
+              </div>
               <div class="border-t border-gray-200">
                 <button
                   @click="handleLogout"
@@ -205,7 +215,7 @@ const emit = defineEmits<{
 }>()
 
 const { locale, locales, setLocale } = useI18n()
-const { user, isAuthenticated, logout } = useAuth()
+const { user, isAuthenticated, logout, hasPermission } = useAuth()
 
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
