@@ -127,6 +127,16 @@
               >
                 确认
               </button>
+              <div class="dropdown dropdown-end">
+                <button tabindex="0" type="button" class="btn btn-xs btn-outline gap-1">
+                  <Upload :size="12" />
+                  快速导入
+                </button>
+                <ul tabindex="0" class="dropdown-content z-10 menu menu-xs shadow bg-white rounded-lg border border-gray-200 w-36 p-1">
+                  <li><a @mousedown.prevent="openImportTextDialog(discIndex)">从文本导入</a></li>
+                  <li><a @mousedown.prevent="openImportCueDialog(discIndex)">从 CUE 导入</a></li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -235,6 +245,114 @@
       </Transition>
     </Teleport>
 
+    <!-- Import from Text Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="importTextDialog.show"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          @mousedown.self="importTextDialog.show = false"
+        >
+          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <Transition
+            enter-active-class="transition-all duration-150"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-100"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="importTextDialog.show" class="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-1">从文本导入标题</h3>
+              <p class="text-sm text-gray-500 mb-4">每行输入一个曲目标题，按顺序填入对应曲目。</p>
+              <textarea
+                ref="importTextareaRef"
+                v-model="importTextDialog.text"
+                rows="8"
+                placeholder="曲目一&#10;曲目二&#10;曲目三"
+                class="textarea textarea-bordered w-full text-sm bg-gray-50 resize-none"
+                @keydown.ctrl.enter="confirmImportText"
+              />
+              <div class="flex gap-2 mt-5 justify-end">
+                <button type="button" class="btn btn-sm btn-ghost text-gray-500" @click="importTextDialog.show = false">
+                  取消
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  :disabled="!importTextDialog.text.trim()"
+                  @click="confirmImportText"
+                >
+                  确认导入
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- Import from CUE Dialog -->
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition-opacity duration-150"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          v-if="importCueDialog.show"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+          @mousedown.self="importCueDialog.show = false"
+        >
+          <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+          <Transition
+            enter-active-class="transition-all duration-150"
+            enter-from-class="opacity-0 scale-95"
+            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition-all duration-100"
+            leave-from-class="opacity-100 scale-100"
+            leave-to-class="opacity-0 scale-95"
+          >
+            <div v-if="importCueDialog.show" class="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
+              <h3 class="text-base font-semibold text-gray-900 mb-1">从 CUE 导入标题</h3>
+              <p class="text-sm text-gray-500 mb-4">将 CUE 文件内容粘贴至此，将自动提取各曲目标题。</p>
+              <textarea
+                ref="importCueTextareaRef"
+                v-model="importCueDialog.text"
+                rows="10"
+                placeholder="粘贴 CUE 内容…"
+                class="textarea textarea-bordered w-full text-sm bg-gray-50 resize-none font-mono"
+                @keydown.ctrl.enter="confirmImportCue"
+              />
+              <div class="flex gap-2 mt-5 justify-end">
+                <button type="button" class="btn btn-sm btn-ghost text-gray-500" @click="importCueDialog.show = false">
+                  取消
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  :disabled="!importCueDialog.text.trim()"
+                  @click="confirmImportCue"
+                >
+                  确认导入
+                </button>
+              </div>
+            </div>
+          </Transition>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- Confirm Dialog -->
     <CommonConfirmDialog
       v-model="confirmDialog.show"
@@ -247,7 +365,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, X, Disc3 } from 'lucide-vue-next'
+import { Plus, Trash2, X, Disc3, Upload } from 'lucide-vue-next'
 
 interface Song {
   id?: string | number
@@ -439,6 +557,78 @@ const removeTrack = (discIndex: number, trackIndex: number) => {
     return { ...d, songs }
   })
   emit('update:formData', { ...props.formData, structure: newStructure })
+}
+
+// ─── Quick import ─────────────────────────────────────────────────────────────
+
+function applyTitles(discIndex: number, titles: string[]) {
+  const newStructure = props.formData.structure.map((d, di) => {
+    if (di !== discIndex) return d
+    return {
+      ...d,
+      songs: d.songs.map((s, si) =>
+        titles[si] !== undefined ? { ...s, title: titles[si]! } : s
+      ),
+    }
+  })
+  emit('update:formData', { ...props.formData, structure: newStructure })
+}
+
+// — Text import —
+
+const importTextDialog = reactive({
+  show: false,
+  discIndex: -1,
+  text: '',
+})
+const importTextareaRef = ref<HTMLTextAreaElement | null>(null)
+
+function openImportTextDialog(discIndex: number) {
+  importTextDialog.discIndex = discIndex
+  importTextDialog.text = ''
+  importTextDialog.show = true
+  nextTick(() => importTextareaRef.value?.focus())
+}
+
+function confirmImportText() {
+  const titles = importTextDialog.text
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l.length > 0)
+  applyTitles(importTextDialog.discIndex, titles)
+  importTextDialog.show = false
+}
+
+// — CUE import —
+
+const importCueDialog = reactive({
+  show: false,
+  discIndex: -1,
+  text: '',
+})
+const importCueTextareaRef = ref<HTMLTextAreaElement | null>(null)
+
+function openImportCueDialog(discIndex: number) {
+  importCueDialog.discIndex = discIndex
+  importCueDialog.text = ''
+  importCueDialog.show = true
+  nextTick(() => importCueTextareaRef.value?.focus())
+}
+
+function parseCueTitles(cue: string): string[] {
+  const titles: string[] = []
+  const trackBlocks = cue.split(/\bTRACK\s+\d+\s+AUDIO\b/i).slice(1)
+  for (const block of trackBlocks) {
+    const match = block.match(/^\s*TITLE\s+"([^"]+)"/im)
+    titles.push(match ? match[1]! : '')
+  }
+  return titles
+}
+
+function confirmImportCue() {
+  const titles = parseCueTitles(importCueDialog.text).filter(t => t.length > 0)
+  applyTitles(importCueDialog.discIndex, titles)
+  importCueDialog.show = false
 }
 
 // ─── Confirm dialog ───────────────────────────────────────────────────────────
