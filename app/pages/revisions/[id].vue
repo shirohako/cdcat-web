@@ -202,7 +202,7 @@ const router = useRouter();
 const route = useRoute();
 const { $api } = useNuxtApp();
 
-const { data, pending, error, refresh } = await useAsyncData(
+const { data, error } = await useAsyncData(
   () => `revision-${route.params.id}`,
   () => $api(`/v1/revisions/${route.params.id}`),
   { watch: [() => route.params.id] },
@@ -366,7 +366,7 @@ const mutateStatus = async (action) => {
   isMutating.value = true;
   mutateAction.value = action;
   try {
-    await $api(`/v1/revisions/${revision.value.id}/${action}`, { method: 'POST' });
+    await $api(`/v1/admin/revisions/${revision.value.id}/${action}`, { method: 'POST' });
     router.push({ path: '/revisions' });
   } catch (err) {
     console.error(`Failed to ${action} revision`, err);

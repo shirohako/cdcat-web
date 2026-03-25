@@ -2,15 +2,17 @@
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl">
       <!-- 页面标题 -->
-      <div class="mb-8 flex items-start justify-between">
+      <div class="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 class="text-4xl font-bold mb-2">Artists</h1>
-          <p class="text-gray-600">Explore all artists and circles</p>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Artists</h1>
+          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore all artists and circles</p>
         </div>
-        <NuxtLink to="/contribute/artist" class="btn btn-primary gap-2">
-          <Plus :size="20" />
-          <span class="hidden sm:inline">Create Artist</span>
-        </NuxtLink>
+        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/artist')">
+          <template #icon>
+            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
+          </template>
+          New
+        </CommonButtonButton02>
       </div>
 
       <!-- 加载状态 -->

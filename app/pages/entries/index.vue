@@ -2,15 +2,17 @@
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
       <!-- Page Header -->
-      <div class="mb-8 flex items-start justify-between gap-4">
+      <div class="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 class="text-4xl font-bold mb-2">Entries</h1>
-          <p class="text-gray-600">Explore anime, movies, TV shows and more</p>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Entries</h1>
+          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore anime, movies, TV shows and more</p>
         </div>
-        <NuxtLink to="/contribute/entry" class="btn btn-primary gap-2">
-          <Plus :size="18" />
-          创建条目
-        </NuxtLink>
+        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/entry')">
+          <template #icon>
+            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
+          </template>
+          New
+        </CommonButtonButton02>
       </div>
 
       <!-- Filter Tabs -->

@@ -68,7 +68,7 @@
                   class="btn btn-sm btn-error"
                   @click="onConfirm"
                 >
-                  确认删除
+                  {{ confirmText ?? '确认删除' }}
                 </button>
               </template>
             </div>
@@ -87,6 +87,7 @@ defineProps<{
   title: string
   description?: string
   variant?: 'delete' | 'warning'
+  confirmText?: string
 }>()
 
 const emit = defineEmits<{

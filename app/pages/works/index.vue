@@ -2,16 +2,16 @@
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
       <!-- 页面标题 -->
-      <div class="mb-8 flex items-start justify-between">
+      <div class="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 class="text-4xl font-bold mb-2">Works</h1>
-          <p class="text-gray-600">Explore all music albums and works</p>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Works</h1>
+          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore all music albums and works</p>
         </div>
-        <CommonButtonButton02 @click="navigateTo('/contribute/work')">
+        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/work')">
           <template #icon>
-            <Plus :size="20" />
+            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
           </template>
-          Create Work
+          New
         </CommonButtonButton02>
       </div>
 
@@ -33,17 +33,17 @@
       <!-- 作品列表 -->
       <div v-else>
         <!-- 统计信息 -->
-        <div class="mb-6 flex items-center justify-between">
-          <div class="text-sm text-gray-600">
+        <div class="mb-4 flex items-center justify-between">
+          <div class="text-xs text-gray-500 md:text-sm md:text-gray-600">
             Found {{ pagination.total }} works
-            <span v-if="pagination.total > 0" class="text-gray-500">
-              (Page {{ pagination.current_page }} of {{ pagination.last_page }})
+            <span v-if="pagination.total > 0" class="text-gray-400 md:text-gray-500">
+              ({{ pagination.current_page }}/{{ pagination.last_page }})
             </span>
           </div>
         </div>
 
         <!-- 专辑网格 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6">
           <NuxtLink
             v-for="work in worksData"
             :key="work.id"

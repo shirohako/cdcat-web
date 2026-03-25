@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Disc3, Film } from 'lucide-vue-next'
+import { Disc3, Film, Plus } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -88,14 +88,17 @@ const goToPage = (page: number) => {
 <template>
   <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
     <!-- 页面标题 -->
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <div class="mb-6 flex items-center justify-between gap-3">
       <div>
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">系列列表</h1>
-        <p class="text-gray-600">浏览所有游戏、动画、音乐系列作品</p>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Series</h1>
+        <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">浏览所有游戏、动画、音乐系列作品</p>
       </div>
-      <NuxtLink class="btn btn-primary btn-sm w-full md:w-auto" to="/contribute/series">
-        创建系列
-      </NuxtLink>
+      <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/series')">
+        <template #icon>
+          <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
+        </template>
+        New
+      </CommonButtonButton02>
     </div>
 
     <!-- 加载状态 -->

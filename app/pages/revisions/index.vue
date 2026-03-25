@@ -248,7 +248,8 @@
 
     <CommonConfirmDialog
       v-model="retractModal.open"
-      variant="warning"
+      variant="delete"
+      confirm-text="确认撤销"
       title="撤销修订"
       :description="`确认撤销「${retractModal.revision?.title ?? ''}」吗？撤销后该修订将不再进入审核流程。`"
       @confirm="doRetract"
@@ -282,7 +283,7 @@ const currentPage = computed(() => {
 
 const { $api } = useNuxtApp()
 
-const { data: response, pending, error } = await useAsyncData(
+const { data: response, pending, error, refresh } = await useAsyncData(
   'revisions-list',
   () => $api('/v1/revisions', { query: { page: currentPage.value } }),
   { watch: [currentPage] },
@@ -359,9 +360,8 @@ const confirmRetract = (revision) => {
 const doRetract = async () => {
   try {
     await $api(`/v1/revisions/${retractModal.revision.id}/retract`, { method: 'POST' })
-    const target = revisionsData.value.find(r => r.id === retractModal.revision.id)
-    if (target) target.status = 'retracted'
     showToast('修订已撤销')
+    await refresh()
   } catch (e) {
     const code = e?.code
     if (code === 'REVISION_NOT_OWNED') showToast('无法撤销他人的修订', 'error')
