@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-pink-50 flex items-center justify-center shrink-0">
         <Gift :size="16" class="text-pink-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Bonuses</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.bonuses') }}</h2>
       <span v-if="bonuses && bonuses.length > 1" class="ml-auto text-xs text-gray-400">{{ bonuses.length }} 项特典</span>
     </div>
 
@@ -56,8 +56,8 @@
         <Gift :size="15" class="text-pink-400" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">暂无特典信息</p>
-        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何特典情报</p>
+        <p class="text-sm font-semibold text-gray-600">{{ $t('work.empty.bonuses_title') }}</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ $t('work.empty.bonuses_desc') }}</p>
       </div>
     </div>
   </section>
@@ -94,7 +94,7 @@
 
       <!-- Description -->
       <p class="text-sm leading-relaxed whitespace-pre-line" :class="activeBonus.description ? 'text-gray-600' : 'text-gray-400'">
-        {{ activeBonus.description || '暂无详细说明' }}
+        {{ activeBonus.description || $t('work.empty.bonus_detail') }}
       </p>
 
       <div class="modal-action mt-5">

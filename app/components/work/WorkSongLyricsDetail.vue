@@ -71,7 +71,7 @@
         <!-- Empty content -->
         <div v-if="!item.content" class="flex flex-col items-center justify-center py-10 text-center">
           <FileText :size="32" class="text-gray-200 mb-2" />
-          <p class="text-sm text-gray-400">暂无内容</p>
+          <p class="text-sm text-gray-400">{{ $t('work.empty.content') }}</p>
         </div>
 
         <!-- LRC -->

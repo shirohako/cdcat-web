@@ -22,6 +22,102 @@
     "register": "註冊",
     "logout": "登出"
   },
+  "admin": {
+    "users": "用戶管理",
+    "revisions": "用戶修改申請"
+  },
+  "work": {
+    "section": {
+      "description": "簡介",
+      "products": "產品",
+      "bonuses": "特典",
+      "credits": "製作人員",
+      "tracklist": "曲目表",
+      "reviews": "評價",
+      "artists": "藝術家",
+      "rankings": "評分排行",
+      "links": "相關連結",
+      "articles": "相關文章",
+      "contributors": "貢獻者",
+      "stats": "統計"
+    },
+    "stats": {
+      "viewed": "瀏覽",
+      "liked": "喜歡",
+      "plan_to_listen": "想聽",
+      "completed": "聽過",
+      "wishlist": "想要",
+      "owned": "已入手",
+      "dropped": "不感興趣"
+    },
+    "tracklist": {
+      "credits_toggle": "人員資訊",
+      "lyric": "歌詞",
+      "translation": "翻譯",
+      "translation_with_count": "翻譯 {count}"
+    },
+    "actions": {
+      "write_review": "寫評價"
+    },
+    "empty": {
+      "products_title": "暫無商品資訊",
+      "products_desc": "該作品尚未關聯任何商品",
+      "bonuses_title": "暫無特典資訊",
+      "bonuses_desc": "該作品尚未新增任何特典情報",
+      "bonus_detail": "暫無詳細說明",
+      "credits": "暫無製作人員資訊。",
+      "tracklist_title": "暫無曲目資訊",
+      "tracklist_desc": "該作品尚未新增任何曲目",
+      "artists_title": "暫無藝術家資訊",
+      "artists_desc": "該作品尚未關聯任何藝術家",
+      "links_title": "暫無外部連結",
+      "links_desc": "該作品尚未新增任何連結",
+      "articles_title": "暫無相關文章",
+      "articles_desc": "該作品尚未關聯任何文章",
+      "contributors_title": "暫無貢獻者",
+      "contributors_desc": "成為第一個貢獻資料的人",
+      "reviews_title": "暫無評論",
+      "reviews_desc": "還沒有人評論，來寫第一條吧",
+      "lyrics_title": "暫無歌詞",
+      "lyrics_desc": "點擊右上角「提交歌詞或翻譯」來貢獻內容",
+      "content": "暫無內容",
+      "ratings": "暫無評分",
+      "rankings": "暫無排名資料"
+    }
+  },
+  "works": {
+    "title": "作品",
+    "subtitle": "瀏覽所有音樂專輯與作品",
+    "new": "新增",
+    "load_failed": "載入失敗：{message}",
+    "found": "共找到 {count} 個作品",
+    "page_indicator": "（{current}/{last}）",
+    "no_results": "沒有找到作品",
+    "disc_singular": "碟",
+    "disc_plural": "碟",
+    "track_singular": "曲",
+    "track_plural": "曲",
+    "type": {
+      "album": "專輯",
+      "single": "單曲",
+      "ep": "EP",
+      "compilation": "合輯"
+    }
+  },
+  "artists": {
+    "title": "藝術家",
+    "subtitle": "瀏覽所有藝術家與社團",
+    "new": "新增",
+    "load_failed": "載入失敗：{message}",
+    "found": "共找到 {count} 位藝術家",
+    "page_indicator": "（第 {current} / {last} 頁）",
+    "no_results": "沒有找到藝術家",
+    "type": {
+      "person": "個人",
+      "circle": "社團",
+      "other": "其他"
+    }
+  },
   "tracking": {
     "title": "我的追蹤",
     "description": "管理你想聽的專輯和收藏",

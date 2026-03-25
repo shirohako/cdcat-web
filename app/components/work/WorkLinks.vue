@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
         <Link2 :size="15" class="text-indigo-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Links</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.links') }}</h2>
       <span v-if="links && links.length > 0" class="ml-auto text-xs text-gray-400">{{ links.length }} 个</span>
     </div>
 
@@ -64,8 +64,8 @@
         <Link2 :size="15" class="text-indigo-300" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-500">暂无外部链接</p>
-        <p class="text-xs text-gray-400 mt-0.5">该作品尚未添加任何链接</p>
+        <p class="text-sm font-semibold text-gray-500">{{ $t('work.empty.links_title') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ $t('work.empty.links_desc') }}</p>
       </div>
     </div>
   </section>

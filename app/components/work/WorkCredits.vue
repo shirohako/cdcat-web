@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
         <Users :size="16" class="text-violet-600" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Credits</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.credits') }}</h2>
     </div>
 
     <!-- Credits Table -->
@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <p v-else class="px-6 py-10 text-sm text-gray-400 text-center">暂无制作人员信息。</p>
+    <p v-else class="px-6 py-10 text-sm text-gray-400 text-center">{{ $t('work.empty.credits') }}</p>
   </section>
 </template>
 

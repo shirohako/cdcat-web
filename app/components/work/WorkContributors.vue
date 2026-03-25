@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center shrink-0">
         <Database :size="15" class="text-teal-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Contributors</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.contributors') }}</h2>
       <span v-if="contributors.length > 0" class="ml-auto text-xs text-gray-400">{{ contributors.length }} 位</span>
     </div>
 
@@ -43,8 +43,8 @@
         <Database :size="15" class="text-teal-300" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-500">暂无贡献者</p>
-        <p class="text-xs text-gray-400 mt-0.5">成为第一个贡献数据的人</p>
+        <p class="text-sm font-semibold text-gray-500">{{ $t('work.empty.contributors_title') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ $t('work.empty.contributors_desc') }}</p>
       </div>
     </div>
   </section>

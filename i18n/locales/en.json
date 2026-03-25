@@ -22,6 +22,102 @@
     "register": "Sign Up",
     "logout": "Sign Out"
   },
+  "admin": {
+    "users": "User Management",
+    "revisions": "Revision Requests"
+  },
+  "work": {
+    "section": {
+      "description": "Description",
+      "products": "Products",
+      "bonuses": "Bonuses",
+      "credits": "Credits",
+      "tracklist": "Tracklist",
+      "reviews": "Reviews",
+      "artists": "Artists",
+      "rankings": "Rankings",
+      "links": "Links",
+      "articles": "Related Articles",
+      "contributors": "Contributors",
+      "stats": "Stats"
+    },
+    "stats": {
+      "viewed": "Viewed",
+      "liked": "Liked",
+      "plan_to_listen": "Plan to Listen",
+      "completed": "Completed",
+      "wishlist": "Wishlist",
+      "owned": "Owned",
+      "dropped": "Dropped"
+    },
+    "tracklist": {
+      "credits_toggle": "Credits",
+      "lyric": "Lyrics",
+      "translation": "Translation",
+      "translation_with_count": "Translations {count}"
+    },
+    "actions": {
+      "write_review": "Write Review"
+    },
+    "empty": {
+      "products_title": "No products",
+      "products_desc": "No products are linked to this work yet",
+      "bonuses_title": "No bonuses",
+      "bonuses_desc": "No bonus details have been added yet",
+      "bonus_detail": "No detailed description",
+      "credits": "No credits information.",
+      "tracklist_title": "No tracks",
+      "tracklist_desc": "No tracklist has been added yet",
+      "artists_title": "No artist info",
+      "artists_desc": "No artists are linked to this work yet",
+      "links_title": "No external links",
+      "links_desc": "No links have been added for this work yet",
+      "articles_title": "No related articles",
+      "articles_desc": "No articles are linked to this work yet",
+      "contributors_title": "No contributors",
+      "contributors_desc": "Be the first to contribute data",
+      "reviews_title": "No reviews yet",
+      "reviews_desc": "Be the first to write a review",
+      "lyrics_title": "No lyrics",
+      "lyrics_desc": "Click “Submit lyrics or translation” in the top right to contribute",
+      "content": "No content",
+      "ratings": "No ratings yet",
+      "rankings": "No ranking data"
+    }
+  },
+  "works": {
+    "title": "Works",
+    "subtitle": "Explore all music albums and works",
+    "new": "New",
+    "load_failed": "Load failed: {message}",
+    "found": "Found {count} works",
+    "page_indicator": "({current}/{last})",
+    "no_results": "No works found",
+    "disc_singular": "Disc",
+    "disc_plural": "Discs",
+    "track_singular": "Track",
+    "track_plural": "Tracks",
+    "type": {
+      "album": "Album",
+      "single": "Single",
+      "ep": "EP",
+      "compilation": "Compilation"
+    }
+  },
+  "artists": {
+    "title": "Artists",
+    "subtitle": "Explore all artists and circles",
+    "new": "New",
+    "load_failed": "Load failed: {message}",
+    "found": "Found {count} artists",
+    "page_indicator": "(Page {current} of {last})",
+    "no_results": "No artists found",
+    "type": {
+      "person": "Person",
+      "circle": "Circle",
+      "other": "Other"
+    }
+  },
   "tracking": {
     "title": "My Tracking",
     "description": "Manage your albums you want to listen and collections",

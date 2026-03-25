@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
         <Trophy :size="15" class="text-amber-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Rankings</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.rankings') }}</h2>
     </div>
 
     <!-- User Score -->
@@ -28,7 +28,7 @@
               User Score
             </div>
             <div class="text-sm text-gray-400">
-              {{ ratingCount >= 5 ? `${ratingCount} 个评分` : ratingCount > 0 ? `${ratingCount}/5 个评分` : '暂无评分' }}
+              {{ ratingCount >= 5 ? `${ratingCount} 个评分` : ratingCount > 0 ? `${ratingCount}/5 个评分` : $t('work.empty.ratings') }}
             </div>
           </div>
 
@@ -51,14 +51,14 @@
               </div>
             </template>
             <template v-else>
-              <div class="flex items-center gap-2 py-1">
-                <div class="flex gap-0.5">
-                  <div class="w-5 h-1.5 rounded-full bg-gray-200"></div>
-                  <div class="w-3 h-1.5 rounded-full bg-gray-100"></div>
-                  <div class="w-4 h-1.5 rounded-full bg-gray-100"></div>
+                <div class="flex items-center gap-2 py-1">
+                  <div class="flex gap-0.5">
+                    <div class="w-5 h-1.5 rounded-full bg-gray-200"></div>
+                    <div class="w-3 h-1.5 rounded-full bg-gray-100"></div>
+                    <div class="w-4 h-1.5 rounded-full bg-gray-100"></div>
+                  </div>
+                  <span class="text-xs text-gray-300">{{ $t('work.empty.rankings') }}</span>
                 </div>
-                <span class="text-xs text-gray-300">暂无排名数据</span>
-              </div>
             </template>
           </div>
         </div>
@@ -67,7 +67,7 @@
       <!-- Write review button -->
       <div class="mt-4">
         <CommonButtonButton01 class="w-full!" @click="emit('writeReview')">
-          写评价
+          {{ $t('work.actions.write_review') }}
           <template #icon><PenLine :size="14" /></template>
         </CommonButtonButton01>
       </div>

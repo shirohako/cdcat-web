@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
         <MessageSquare :size="15" class="text-amber-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Reviews</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.reviews') }}</h2>
       <span v-if="reviewsCount > 0" class="ml-auto text-xs text-gray-400">共 {{ reviewsCount }} 条</span>
     </div>
 
@@ -15,8 +15,8 @@
         <MessageSquare :size="15" class="text-amber-400" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">暂无评论</p>
-        <p class="text-xs text-gray-500 mt-0.5">还没有人评论，来写第一条吧</p>
+        <p class="text-sm font-semibold text-gray-600">{{ $t('work.empty.reviews_title') }}</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ $t('work.empty.reviews_desc') }}</p>
       </div>
     </div>
 

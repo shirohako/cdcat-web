@@ -4,14 +4,14 @@
       <!-- 页面标题 -->
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Works</h1>
-          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore all music albums and works</p>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('works.title') }}</h1>
+          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('works.subtitle') }}</p>
         </div>
         <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/work')">
           <template #icon>
             <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
           </template>
-          New
+          {{ $t('works.new') }}
         </CommonButtonButton02>
       </div>
 
@@ -26,7 +26,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>加载失败: {{ error.message }}</span>
+          <span>{{ $t('works.load_failed', { message: error.message }) }}</span>
         </div>
       </div>
 
@@ -35,9 +35,9 @@
         <!-- 统计信息 -->
         <div class="mb-4 flex items-center justify-between">
           <div class="text-xs text-gray-500 md:text-sm md:text-gray-600">
-            Found {{ pagination.total }} works
+            {{ $t('works.found', { count: pagination.total }) }}
             <span v-if="pagination.total > 0" class="text-gray-400 md:text-gray-500">
-              ({{ pagination.current_page }}/{{ pagination.last_page }})
+              {{ $t('works.page_indicator', { current: pagination.current_page, last: pagination.last_page }) }}
             </span>
           </div>
         </div>
@@ -96,11 +96,11 @@
                   <div class="flex items-center justify-between text-xs text-gray-600">
                     <div class="flex items-center gap-1.5">
                       <Disc :size="14" class="text-gray-400" />
-                      <span>{{ work.disc_count || 0 }} Disc{{ work.disc_count > 1 ? 's' : '' }}</span>
+                      <span>{{ work.disc_count || 0 }} {{ formatDiscLabel(work.disc_count || 0) }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                       <Music :size="14" class="text-gray-400" />
-                      <span>{{ work.track_count || 0 }} Track{{ work.track_count > 1 ? 's' : '' }}</span>
+                      <span>{{ work.track_count || 0 }} {{ formatTrackLabel(work.track_count || 0) }}</span>
                     </div>
                   </div>
 
@@ -126,7 +126,7 @@
           <div class="text-gray-400 mb-4">
             <Disc3 :size="64" class="mx-auto" />
           </div>
-          <p class="text-gray-500">No works found</p>
+          <p class="text-gray-500">{{ $t('works.no_results') }}</p>
         </div>
 
         <!-- 分页控件 -->
@@ -179,6 +179,7 @@ import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "lucide-vue-next"
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 // 获取当前页码
 const currentPage = computed(() => {
@@ -221,12 +222,20 @@ const pagination = computed(() => {
 // 格式化作品类型
 const formatType = (type) => {
   const typeMap = {
-    album: "Album",
-    single: "Single",
-    ep: "EP",
-    compilation: "Compilation",
+    album: t('works.type.album'),
+    single: t('works.type.single'),
+    ep: t('works.type.ep'),
+    compilation: t('works.type.compilation'),
   };
   return typeMap[type] || type;
+};
+
+const formatDiscLabel = (count) => {
+  return count === 1 ? 'Disc' : 'Discs';
+};
+
+const formatTrackLabel = (count) => {
+  return count === 1 ? t('works.track_singular') : t('works.track_plural');
 };
 
 // 格式化日期

@@ -5,12 +5,12 @@
       <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
         <ListMusic :size="16" class="text-indigo-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Tracklist</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.tracklist') }}</h2>
       <!-- Credit toggle -->
       <div class="ml-auto flex items-center gap-2">
         <span class="text-xs text-gray-400 flex items-center gap-1">
           <Users :size="12" />
-          人员信息
+          {{ $t('work.tracklist.credits_toggle') }}
         </span>
         <button
           type="button"
@@ -130,7 +130,7 @@
                 :class="track.hasLyrics ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 @click.stop="openLyrics(track, 'lyric')"
               >
-                <FileText :size="10" /><span class="hidden sm:inline">歌词</span>
+                <FileText :size="10" /><span class="hidden sm:inline">{{ $t('work.tracklist.lyric') }}</span>
               </button>
               <button
                 type="button"
@@ -138,7 +138,13 @@
                 :class="track.translationsCount > 0 ? 'bg-teal-50 text-teal-500 hover:bg-teal-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 @click.stop="openLyrics(track, 'translation')"
               >
-                <Languages :size="10" /><span class="hidden sm:inline">翻译{{ track.translationsCount > 0 ? ` ${track.translationsCount}` : '' }}</span><span v-if="track.translationsCount > 0" class="sm:hidden">{{ track.translationsCount }}</span>
+                <Languages :size="10" />
+                <span class="hidden sm:inline">
+                  {{ track.translationsCount > 0
+                    ? $t('work.tracklist.translation_with_count', { count: track.translationsCount })
+                    : $t('work.tracklist.translation') }}
+                </span>
+                <span v-if="track.translationsCount > 0" class="sm:hidden">{{ track.translationsCount }}</span>
               </button>
             </div>
           </div>
@@ -154,8 +160,8 @@
         <ListMusic :size="15" class="text-indigo-400" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">暂无曲目信息</p>
-        <p class="text-xs text-gray-500 mt-0.5">该作品尚未添加任何曲目</p>
+        <p class="text-sm font-semibold text-gray-600">{{ $t('work.empty.tracklist_title') }}</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ $t('work.empty.tracklist_desc') }}</p>
       </div>
     </div>
   </section>

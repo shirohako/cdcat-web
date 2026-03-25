@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
         <Package :size="16" class="text-blue-600" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Products</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.products') }}</h2>
       <span v-if="products && products.length > 1" class="ml-auto text-xs text-gray-400">{{ products.length }} 个版本</span>
     </div>
 
@@ -104,8 +104,8 @@
         <Package :size="15" class="text-blue-400" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">暂无商品信息</p>
-        <p class="text-xs text-gray-500 mt-0.5">该作品尚未关联任何商品</p>
+        <p class="text-sm font-semibold text-gray-600">{{ $t('work.empty.products_title') }}</p>
+        <p class="text-xs text-gray-500 mt-0.5">{{ $t('work.empty.products_desc') }}</p>
       </div>
     </div>
   </section>

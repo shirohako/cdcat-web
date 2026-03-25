@@ -15,8 +15,8 @@
     <!-- Empty -->
     <div v-else-if="!items.length" class="flex flex-col items-center justify-center py-12 px-6 text-center">
       <FileText :size="36" class="text-gray-200 mb-3" />
-      <p class="text-sm font-medium text-gray-500">暂无歌词</p>
-      <p class="text-xs text-gray-400 mt-1">点击右上角「提交歌词或翻译」来贡献内容</p>
+      <p class="text-sm font-medium text-gray-500">{{ $t('work.empty.lyrics_title') }}</p>
+      <p class="text-xs text-gray-400 mt-1">{{ $t('work.empty.lyrics_desc') }}</p>
     </div>
 
     <!-- List -->

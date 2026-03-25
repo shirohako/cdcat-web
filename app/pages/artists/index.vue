@@ -4,14 +4,14 @@
       <!-- 页面标题 -->
       <div class="mb-6 flex items-center justify-between gap-3">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Artists</h1>
-          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore all artists and circles</p>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('artists.title') }}</h1>
+          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('artists.subtitle') }}</p>
         </div>
         <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/artist')">
           <template #icon>
             <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
           </template>
-          New
+          {{ $t('artists.new') }}
         </CommonButtonButton02>
       </div>
 
@@ -26,7 +26,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>加载失败: {{ error.message }}</span>
+          <span>{{ $t('artists.load_failed', { message: error.message }) }}</span>
         </div>
       </div>
 
@@ -35,9 +35,9 @@
         <!-- 统计信息 -->
         <div class="mb-6 flex items-center justify-between">
           <div class="text-sm text-gray-600">
-            Found {{ pagination.total }} artists
+            {{ $t('artists.found', { count: pagination.total }) }}
             <span v-if="pagination.total > 0" class="text-gray-500">
-              (Page {{ pagination.current_page }} of {{ pagination.last_page }})
+              {{ $t('artists.page_indicator', { current: pagination.current_page, last: pagination.last_page }) }}
             </span>
           </div>
         </div>
@@ -91,7 +91,7 @@
           <div class="text-gray-400 mb-4">
             <Users :size="64" class="mx-auto" />
           </div>
-          <p class="text-gray-500">No artists found</p>
+          <p class="text-gray-500">{{ $t('artists.no_results') }}</p>
         </div>
 
         <!-- 分页控件 -->
@@ -144,6 +144,7 @@ import { Users, Disc3, Heart, Plus } from "lucide-vue-next";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 // 获取当前页码
 const currentPage = computed(() => {

@@ -13,7 +13,7 @@
             <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
               <MessageSquare :size="15" class="text-amber-500" />
             </div>
-            <h2 class="text-base font-bold text-gray-900">写评价</h2>
+            <h2 class="text-base font-bold text-gray-900">{{ $t('work.actions.write_review') }}</h2>
           </div>
           <button
             type="button"
@@ -181,6 +181,7 @@ const emit = defineEmits<{
 }>()
 
 const { $api } = useNuxtApp()
+const { t } = useI18n()
 
 const form = reactive({
   content: '',
@@ -196,7 +197,7 @@ const errorMessage = ref('')
 const canSubmit = computed(() => form.content.trim().length > 0)
 
 const renderedMarkdown = computed(() => {
-  if (!form.content.trim()) return '<p class="text-gray-300">暂无内容</p>'
+  if (!form.content.trim()) return `<p class="text-gray-300">${t('work.empty.content')}</p>`
   return renderSimpleMarkdown(form.content)
 })
 

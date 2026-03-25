@@ -22,6 +22,102 @@
     "register": "新規登録",
     "logout": "ログアウト"
   },
+  "admin": {
+    "users": "ユーザー管理",
+    "revisions": "ユーザー修正申請"
+  },
+  "work": {
+    "section": {
+      "description": "概要",
+      "products": "商品",
+      "bonuses": "特典",
+      "credits": "クレジット",
+      "tracklist": "トラックリスト",
+      "reviews": "レビュー",
+      "artists": "アーティスト",
+      "rankings": "ランキング",
+      "links": "リンク",
+      "articles": "関連記事",
+      "contributors": "貢献者",
+      "stats": "統計"
+    },
+    "stats": {
+      "viewed": "閲覧",
+      "liked": "いいね",
+      "plan_to_listen": "聴きたい",
+      "completed": "聴いた",
+      "wishlist": "ウィッシュリスト",
+      "owned": "所持",
+      "dropped": "興味なし"
+    },
+    "tracklist": {
+      "credits_toggle": "クレジット",
+      "lyric": "歌詞",
+      "translation": "翻訳",
+      "translation_with_count": "翻訳 {count}"
+    },
+    "actions": {
+      "write_review": "レビューを書く"
+    },
+    "empty": {
+      "products_title": "商品情報がありません",
+      "products_desc": "この作品には商品がまだ紐づいていません",
+      "bonuses_title": "特典情報がありません",
+      "bonuses_desc": "この作品には特典情報がまだ追加されていません",
+      "bonus_detail": "詳細説明はありません",
+      "credits": "クレジット情報がありません。",
+      "tracklist_title": "曲目情報がありません",
+      "tracklist_desc": "この作品には曲目がまだ追加されていません",
+      "artists_title": "アーティスト情報がありません",
+      "artists_desc": "この作品にはアーティストがまだ紐づいていません",
+      "links_title": "外部リンクがありません",
+      "links_desc": "この作品にはリンクがまだ追加されていません",
+      "articles_title": "関連記事はありません",
+      "articles_desc": "この作品には記事がまだ紐づいていません",
+      "contributors_title": "貢献者はいません",
+      "contributors_desc": "最初の貢献者になりましょう",
+      "reviews_title": "レビューはまだありません",
+      "reviews_desc": "最初のレビューを書いてみましょう",
+      "lyrics_title": "歌詞がありません",
+      "lyrics_desc": "右上の「歌詞・翻訳を投稿」から貢献できます",
+      "content": "内容がありません",
+      "ratings": "評価はまだありません",
+      "rankings": "ランキングデータがありません"
+    }
+  },
+  "works": {
+    "title": "作品",
+    "subtitle": "すべてのアルバムと作品を表示",
+    "new": "新規",
+    "load_failed": "読み込みに失敗しました：{message}",
+    "found": "{count} 件の作品が見つかりました",
+    "page_indicator": "（{current}/{last}）",
+    "no_results": "作品が見つかりません",
+    "disc_singular": "ディスク",
+    "disc_plural": "ディスク",
+    "track_singular": "トラック",
+    "track_plural": "トラック",
+    "type": {
+      "album": "アルバム",
+      "single": "シングル",
+      "ep": "EP",
+      "compilation": "コンピレーション"
+    }
+  },
+  "artists": {
+    "title": "アーティスト",
+    "subtitle": "すべてのアーティストとサークルを表示",
+    "new": "新規",
+    "load_failed": "読み込みに失敗しました：{message}",
+    "found": "{count} 件のアーティストが見つかりました",
+    "page_indicator": "（{current}/{last} ページ）",
+    "no_results": "アーティストが見つかりません",
+    "type": {
+      "person": "個人",
+      "circle": "サークル",
+      "other": "その他"
+    }
+  },
   "tracking": {
     "title": "マイトラッキング",
     "description": "聴きたいアルバムやコレクションを管理",

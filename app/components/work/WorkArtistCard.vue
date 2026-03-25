@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center shrink-0">
         <Users :size="15" class="text-purple-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Artists</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.artists') }}</h2>
       <span v-if="artists.length > 1" class="ml-auto text-xs text-gray-400">{{ artists.length }} 位</span>
     </div>
 
@@ -54,8 +54,8 @@
         <Users :size="15" class="text-purple-300" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-500">暂无艺术家信息</p>
-        <p class="text-xs text-gray-400 mt-0.5">该作品尚未关联任何艺术家</p>
+        <p class="text-sm font-semibold text-gray-500">{{ $t('work.empty.artists_title') }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">{{ $t('work.empty.artists_desc') }}</p>
       </div>
     </div>
   </section>

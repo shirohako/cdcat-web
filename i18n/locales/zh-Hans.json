@@ -22,6 +22,102 @@
     "register": "注册",
     "logout": "退出登录"
   },
+  "admin": {
+    "users": "用户管理",
+    "revisions": "用户修改申请"
+  },
+  "work": {
+    "section": {
+      "description": "简介",
+      "products": "产品",
+      "bonuses": "特典",
+      "credits": "制作人员",
+      "tracklist": "曲目表",
+      "reviews": "评价",
+      "artists": "艺术家",
+      "rankings": "评分排行",
+      "links": "相关链接",
+      "articles": "相关文章",
+      "contributors": "贡献者",
+      "stats": "统计"
+    },
+    "stats": {
+      "viewed": "浏览",
+      "liked": "喜欢",
+      "plan_to_listen": "想听",
+      "completed": "听过",
+      "wishlist": "想要",
+      "owned": "已入手",
+      "dropped": "不感兴趣"
+    },
+    "tracklist": {
+      "credits_toggle": "人员信息",
+      "lyric": "歌词",
+      "translation": "翻译",
+      "translation_with_count": "翻译 {count}"
+    },
+    "actions": {
+      "write_review": "写评价"
+    },
+    "empty": {
+      "products_title": "暂无商品信息",
+      "products_desc": "该作品尚未关联任何商品",
+      "bonuses_title": "暂无特典信息",
+      "bonuses_desc": "该作品尚未添加任何特典情报",
+      "bonus_detail": "暂无详细说明",
+      "credits": "暂无制作人员信息。",
+      "tracklist_title": "暂无曲目信息",
+      "tracklist_desc": "该作品尚未添加任何曲目",
+      "artists_title": "暂无艺术家信息",
+      "artists_desc": "该作品尚未关联任何艺术家",
+      "links_title": "暂无外部链接",
+      "links_desc": "该作品尚未添加任何链接",
+      "articles_title": "暂无相关文章",
+      "articles_desc": "该作品尚未关联任何文章",
+      "contributors_title": "暂无贡献者",
+      "contributors_desc": "成为第一个贡献数据的人",
+      "reviews_title": "暂无评论",
+      "reviews_desc": "还没有人评论，来写第一条吧",
+      "lyrics_title": "暂无歌词",
+      "lyrics_desc": "点击右上角「提交歌词或翻译」来贡献内容",
+      "content": "暂无内容",
+      "ratings": "暂无评分",
+      "rankings": "暂无排名数据"
+    }
+  },
+  "works": {
+    "title": "作品",
+    "subtitle": "浏览所有音乐专辑与作品",
+    "new": "新建",
+    "load_failed": "加载失败：{message}",
+    "found": "共找到 {count} 个作品",
+    "page_indicator": "（{current}/{last}）",
+    "no_results": "没有找到作品",
+    "disc_singular": "碟",
+    "disc_plural": "碟",
+    "track_singular": "曲",
+    "track_plural": "曲",
+    "type": {
+      "album": "专辑",
+      "single": "单曲",
+      "ep": "EP",
+      "compilation": "合辑"
+    }
+  },
+  "artists": {
+    "title": "艺术家",
+    "subtitle": "浏览所有艺术家与社团",
+    "new": "新建",
+    "load_failed": "加载失败：{message}",
+    "found": "共找到 {count} 位艺术家",
+    "page_indicator": "（第 {current} / {last} 页）",
+    "no_results": "没有找到艺术家",
+    "type": {
+      "person": "个人",
+      "circle": "社团",
+      "other": "其他"
+    }
+  },
   "tracking": {
     "title": "我的追踪",
     "description": "管理你想听的专辑和收藏",

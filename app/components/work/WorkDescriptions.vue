@@ -5,7 +5,7 @@
       <div class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
         <FileText :size="16" class="text-sky-500" />
       </div>
-      <h2 class="text-base font-bold text-gray-900">Description</h2>
+      <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.description') }}</h2>
     </div>
 
     <!-- Content -->

@@ -157,7 +157,7 @@
                   @click="showUserMenu = false"
                 >
                   <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
-                  <span>用户管理</span>
+                  <span>{{ $t('admin.users') }}</span>
                 </NuxtLink>
                 <NuxtLink
                   to="/admin/revisions"
@@ -165,7 +165,7 @@
                   @click="showUserMenu = false"
                 >
                   <Icon name="lucide:git-pull-request" class="w-4 h-4" />
-                  <span>用户修改申请</span>
+                  <span>{{ $t('admin.revisions') }}</span>
                 </NuxtLink>
               </div>
               <div class="border-t border-gray-200">
