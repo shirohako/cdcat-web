@@ -1,199 +1,189 @@
 <template>
-  <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl">
-      <button class="btn btn-ghost btn-sm mb-4" @click="router.back()">← Back</button>
+  <div class="min-h-screen bg-gray-50/50">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-5xl">
 
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8">
-        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div>
-            <div class="text-sm text-gray-500 flex flex-wrap items-center gap-2">
-              <span class="badge badge-outline">{{ formatType(revision.resource_type) }}</span>
-              <span>#{{ revision.id }}</span>
-              <span v-if="revision.revision_number" class="text-gray-400">· Rev {{ revision.revision_number }}</span>
-              <span
-                v-if="revision.status"
-                class="badge badge-sm"
-                :class="getStatusBadgeClass(revision.status)"
-              >
-                {{ formatStatus(revision.status) }}
-              </span>
-            </div>
-            <h1 class="text-2xl md:text-3xl font-semibold leading-tight mt-2">
-              {{ revision.title || 'Untitled revision' }}
-            </h1>
-            <div class="flex flex-wrap items-center gap-3 mt-3">
-              <span class="badge badge-sm" :class="getActionBadgeClass(revision.action)">
-                {{ formatAction(revision.action) }}
-              </span>
-              <span class="text-sm text-gray-500">
-                {{ formatDate(revision.created_at) }}
-              </span>
-            </div>
-          </div>
+      <!-- 返回 -->
+      <button
+        class="mb-6 flex items-center gap-1.5 text-sm text-gray-500 transition hover:text-gray-800"
+        @click="router.back()"
+      >
+        <ChevronLeft :size="15" />
+        返回
+      </button>
 
-          <!-- actions moved to bottom (approve/reject) -->
-        </div>
+      <!-- 错误 -->
+      <div v-if="error" class="flex flex-col items-center justify-center py-20 text-gray-400">
+        <AlertCircle :size="32" class="mb-3 opacity-40" />
+        <p class="text-sm">{{ error.message }}</p>
+      </div>
 
-        <div class="grid md:grid-cols-3 gap-4 mt-6">
-          <div class="stat bg-base-200 rounded-lg">
-            <div class="stat-title">Action</div>
-            <div class="stat-value text-lg">{{ formatAction(revision.action) }}</div>
-          </div>
-          <div class="stat bg-base-200 rounded-lg">
-            <div class="stat-title">Changes</div>
-            <div class="stat-value text-lg text-green-600">+{{ revision.additions || 0 }}</div>
-            <div class="stat-desc text-red-600">-{{ revision.deletions || 0 }}</div>
-          </div>
-          <div class="stat bg-base-200 rounded-lg">
-            <div class="stat-title">Submitter</div>
-            <div class="stat-value text-lg">{{ revision.submitter?.name || 'Unknown' }}</div>
-            <div class="stat-desc text-xs text-gray-500">ID: {{ revision.submitter?.id ?? '—' }}</div>
-          </div>
-        </div>
-
-        <div class="mt-8">
-          <div class="flex items-center justify-between gap-3 mb-3 flex-wrap">
-            <h2 class="text-lg font-semibold">Payload</h2>
-            <div class="join">
-              <button
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': activeTab === 'diff' }"
-                :disabled="!hasPrevious"
-                @click="activeTab = 'diff'"
-              >
-                Diff
-              </button>
-              <button
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': activeTab === 'current' }"
-                @click="activeTab = 'current'"
-              >
-                Current
-              </button>
-              <button
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': activeTab === 'previous' }"
-                :disabled="!hasPrevious"
-                @click="activeTab = 'previous'"
-              >
-                Previous
-              </button>
-            </div>
-          </div>
-
-          <template v-if="activeTab === 'diff'">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs text-gray-500">
-                Added = green · Changed = yellow · Removed = red
-              </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="text-sm text-gray-600">Previous</div>
-              <div class="text-sm text-gray-600">Current</div>
-            </div>
-
-            <div class="border border-gray-200 rounded-lg overflow-hidden">
-              <div class="grid grid-cols-1 md:grid-cols-2">
-                <div class="hidden md:block bg-gray-50 px-3 py-2 text-xs text-gray-500 border-b border-gray-200">
-                  Line
-                </div>
-                <div class="hidden md:block bg-gray-50 px-3 py-2 text-xs text-gray-500 border-b border-gray-200">
-                  Line
-                </div>
+      <template v-else>
+        <!-- Header -->
+        <div class="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div class="min-w-0 flex-1">
+              <!-- 面包屑标签 -->
+              <div class="mb-2 flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600">
+                  {{ formatType(revision.resource_type) }}
+                </span>
+                <span class="text-xs text-gray-400 font-mono">#{{ revision.id }}</span>
+                <span v-if="revision.revision_number" class="text-xs text-gray-400">Rev {{ revision.revision_number }}</span>
               </div>
-              <div class="divide-y divide-gray-100">
-                <div
-                  v-for="(row, idx) in diffRows"
-                  :key="idx"
-                  class="grid grid-cols-1 md:grid-cols-2"
+
+              <!-- 标题 -->
+              <h1 class="text-xl font-bold tracking-tight text-gray-900 md:text-2xl">
+                {{ revision.title || 'Untitled' }}
+              </h1>
+
+              <!-- 元信息 -->
+              <div class="mt-3 flex flex-wrap items-center gap-3">
+                <span
+                  class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium"
+                  :class="actionBadgeClass(revision.action)"
                 >
-                  <!-- Previous -->
-                  <div
-                    class="flex items-start gap-2 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all"
-                    :class="lineClass(row.left?.type)"
-                  >
-                    <span class="text-gray-400 min-w-10right" v-if="row.left">
-                      {{ row.left.lineNumber }}
-                    </span>
-                    <span v-else class="min-w-10" />
-                    <span>{{ row.left?.text }}</span>
-                  </div>
+                  {{ formatAction(revision.action) }}
+                </span>
+                <span
+                  class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                  :class="statusBadgeClass(revision.status)"
+                >
+                  <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(revision.status)" />
+                  {{ formatStatus(revision.status) }}
+                </span>
+                <span class="text-xs text-gray-400 tabular-nums">{{ formatDate(revision.created_at) }}</span>
+              </div>
+            </div>
 
-                  <!-- Current -->
-                  <div
-                    class="flex items-start gap-2 px-3 py-1.5 text-xs font-mono whitespace-pre-wrap break-all"
-                    :class="lineClass(row.right?.type)"
-                  >
-                    <span class="text-gray-400 min-w-10 text-right" v-if="row.right">
-                      {{ row.right.lineNumber }}
-                    </span>
-                    <span v-else class="min-w-10" />
-                    <span>{{ row.right?.text }}</span>
-                  </div>
+            <!-- 提交者 -->
+            <div class="flex items-center gap-2 sm:shrink-0">
+              <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-8 w-8 rounded-full object-cover" />
+              <div v-else class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500">
+                {{ revision.submitter?.nickname?.charAt(0) || revision.submitter?.username?.charAt(0) || '?' }}
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-800">{{ revision.submitter?.nickname || revision.submitter?.username || '—' }}</p>
+                <p class="text-xs text-gray-400">@{{ revision.submitter?.username || '—' }}</p>
+              </div>
+            </div>
+          </div>
+          <!-- Metadata -->
+          <div class="mt-4 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4 sm:grid-cols-3">
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">Checksum</p>
+              <p class="font-mono text-xs text-gray-700 break-all">{{ revision.checksum?.slice(0, 16) || '—' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">提交时间</p>
+              <p class="text-xs text-gray-700 tabular-nums">{{ formatDate(revision.created_at) || '—' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 mb-0.5">更新时间</p>
+              <p class="text-xs text-gray-700 tabular-nums">{{ formatDate(revision.updated_at) || '—' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payload -->
+        <div class="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+          <!-- Tab bar -->
+          <div class="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-3">
+            <h2 class="text-sm font-semibold text-gray-700">Payload</h2>
+            <div class="flex items-center gap-1">
+              <button
+                v-for="tab in payloadTabs"
+                :key="tab.value"
+                class="rounded-md px-3 py-1 text-xs font-medium transition"
+                :class="activeTab === tab.value
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'"
+                :disabled="tab.requiresPrevious && !hasPrevious"
+                @click="activeTab = tab.value"
+              >
+                {{ tab.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Diff -->
+          <template v-if="activeTab === 'diff'">
+            <div class="grid grid-cols-2 border-b border-gray-100 bg-gray-50/60">
+              <div class="px-4 py-2 text-xs font-medium text-gray-500 border-r border-gray-100">Previous</div>
+              <div class="px-4 py-2 text-xs font-medium text-gray-500">Current</div>
+            </div>
+            <div class="divide-y divide-gray-100 max-h-150 overflow-auto">
+              <div v-for="(row, idx) in diffRows" :key="idx" class="grid grid-cols-2">
+                <div
+                  class="flex items-start gap-2 px-3 py-1 text-xs font-mono whitespace-pre-wrap break-all border-r border-gray-100"
+                  :class="lineClass(row.left?.type)"
+                >
+                  <span class="w-8 shrink-0 text-right text-gray-300 select-none">{{ row.left?.lineNumber ?? '' }}</span>
+                  <span>{{ row.left?.text }}</span>
+                </div>
+                <div
+                  class="flex items-start gap-2 px-3 py-1 text-xs font-mono whitespace-pre-wrap break-all"
+                  :class="lineClass(row.right?.type)"
+                >
+                  <span class="w-8 shrink-0 text-right text-gray-300 select-none">{{ row.right?.lineNumber ?? '' }}</span>
+                  <span>{{ row.right?.text }}</span>
                 </div>
               </div>
             </div>
+            <div class="border-t border-gray-100 bg-gray-50/60 px-4 py-2 text-xs text-gray-400">
+              <span class="inline-flex items-center gap-1 mr-3"><span class="inline-block h-2 w-2 rounded-sm bg-green-200"></span> 新增</span>
+              <span class="inline-flex items-center gap-1 mr-3"><span class="inline-block h-2 w-2 rounded-sm bg-amber-200"></span> 修改</span>
+              <span class="inline-flex items-center gap-1"><span class="inline-block h-2 w-2 rounded-sm bg-red-200"></span> 删除</span>
+            </div>
           </template>
 
+          <!-- Current -->
           <template v-else-if="activeTab === 'current'">
-            <pre class="overflow-auto text-xs bg-white border border-gray-200 rounded-lg p-3 max-h-160">{{ prettyJson(revision.data) }}</pre>
+            <pre class="overflow-auto p-4 text-xs text-gray-700 max-h-150">{{ prettyJson(revision.data) }}</pre>
           </template>
 
+          <!-- Previous -->
           <template v-else-if="activeTab === 'previous'">
-            <template v-if="previous?.data">
-              <pre class="overflow-auto text-xs bg-white border border-gray-200 rounded-lg p-3 max-h-160">{{ prettyJson(previous.data) }}</pre>
-            </template>
-            <div v-else class="text-sm text-gray-500 bg-white border border-dashed border-gray-200 rounded-lg p-4 text-center">
-              No previous version available.
-            </div>
+            <pre v-if="previous?.data" class="overflow-auto p-4 text-xs text-gray-700 max-h-150">{{ prettyJson(previous.data) }}</pre>
+            <div v-else class="px-5 py-10 text-center text-sm text-gray-400">无历史版本</div>
           </template>
         </div>
 
-        <div class="mt-8">
-          <h2 class="text-lg font-semibold mb-2">Metadata</h2>
-          <div class="grid md:grid-cols-3 gap-4 text-sm">
-            <div class="p-3 bg-base-200 rounded-lg">
-              <p class="text-gray-500">Checksum</p>
-              <p class="font-mono break-all text-xs">{{ revision.checksum || '—' }}</p>
-            </div>
-            <div class="p-3 bg-base-200 rounded-lg">
-              <p class="text-gray-500">Updated</p>
-              <p>{{ formatDate(revision.updated_at) || '—' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <div v-if="revision.status === 'pending'" class="mt-10 flex flex-wrap gap-3">
-          <button class="btn btn-success" :disabled="isMutating" @click="approve">
-            <span v-if="isMutating && mutateAction === 'approve'" class="loading loading-spinner loading-xs mr-2"></span>
-            Approve
+        <!-- 审核操作 -->
+        <div v-if="revision.status === 'pending' && canReview" class="mt-4 flex items-center gap-3">
+          <button
+            class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
+            :disabled="isMutating"
+            @click="approve"
+          >
+            <span v-if="isMutating && mutateAction === 'approve'" class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
+            <CheckCircle v-else :size="14" />
+            通过
           </button>
-          <button class="btn btn-error btn-outline" :disabled="isMutating" @click="reject">
-            <span v-if="isMutating && mutateAction === 'reject'" class="loading loading-spinner loading-xs mr-2"></span>
-            Reject
+          <button
+            class="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+            :disabled="isMutating"
+            @click="reject"
+          >
+            <span v-if="isMutating && mutateAction === 'reject'" class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+            <XCircle v-else :size="14" />
+            拒绝
           </button>
         </div>
-      </div>
-
-      <!-- Error dialog -->
-      <dialog ref="errorDialog" class="modal">
-        <div class="modal-box">
-          <h3 class="font-bold text-lg text-error">操作失败</h3>
-          <p class="py-4 text-sm">{{ mutateError }}</p>
-          <div class="modal-action">
-            <button class="btn" @click="errorDialog.close()">关闭</button>
-          </div>
-        </div>
-        <form method="dialog" class="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
-
-      <div v-if="error" class="alert alert-error mt-6">
-        <span>Failed to load: {{ error.message }}</span>
-      </div>
+      </template>
     </div>
+
+    <!-- Toast -->
+    <Transition name="toast">
+      <div
+        v-if="toast.show"
+        class="fixed bottom-5 right-5 z-60 flex items-center gap-2 rounded-lg border bg-white px-3.5 py-2.5 text-sm font-medium shadow-lg"
+        :class="toast.type === 'error' ? 'border-red-200 text-red-700' : 'border-gray-200 text-gray-800'"
+      >
+        <AlertCircle v-if="toast.type === 'error'" :size="14" class="text-red-500" />
+        <CheckCircle v-else :size="14" class="text-emerald-500" />
+        {{ toast.message }}
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -201,6 +191,8 @@
 const router = useRouter();
 const route = useRoute();
 const { $api } = useNuxtApp();
+const { hasPermission } = useAuth()
+const canReview = hasPermission('revisions.review')
 
 const { data, error } = await useAsyncData(
   () => `revision-${route.params.id}`,
@@ -232,23 +224,23 @@ const formatStatus = (status) => {
   return map[status] || status || '—';
 };
 
-const getActionBadgeClass = (action) => {
-  const map = {
-    create: 'badge-success',
-    update: 'badge-info',
-    delete: 'badge-error',
-  };
-  return map[action] || 'badge-ghost';
-};
+const actionBadgeClass = (action) => ({
+  create: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+  update: 'bg-blue-50 border-blue-200 text-blue-700',
+  delete: 'bg-red-50 border-red-200 text-red-600',
+}[action] || 'bg-gray-50 border-gray-200 text-gray-600')
 
-const getStatusBadgeClass = (status) => {
-  const map = {
-    pending: 'badge-warning',
-    approved: 'badge-success',
-    rejected: 'badge-error',
-  };
-  return map[status] || 'badge-ghost';
-};
+const statusBadgeClass = (status) => ({
+  pending:  'bg-amber-50 border-amber-200 text-amber-700',
+  approved: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+  rejected: 'bg-gray-50 border-gray-200 text-gray-500',
+}[status] || 'bg-gray-50 border-gray-200 text-gray-500')
+
+const statusDotClass = (status) => ({
+  pending:  'bg-amber-400',
+  approved: 'bg-emerald-500',
+  rejected: 'bg-gray-300',
+}[status] || 'bg-gray-300')
 
 const formatDate = (value) => {
   if (!value) return '';
@@ -264,12 +256,24 @@ const formatDate = (value) => {
 
 const prettyJson = (obj) => JSON.stringify(obj ?? {}, null, 2);
 
+const payloadTabs = [
+  { value: 'diff', label: 'Diff', requiresPrevious: true },
+  { value: 'current', label: 'Current', requiresPrevious: false },
+  { value: 'previous', label: 'Previous', requiresPrevious: true },
+]
+
 const hasPrevious = computed(() => !!previous.value?.data);
 const activeTab = ref('diff');
 const isMutating = ref(false);
-const mutateAction = ref(null);
-const mutateError = ref('');
-const errorDialog = ref(null);
+const mutateAction = ref(null)
+
+const toast = reactive({ show: false, message: '', type: 'success' })
+let toastTimer = null
+const showToast = (message, type = 'success') => {
+  if (toastTimer) clearTimeout(toastTimer)
+  Object.assign(toast, { show: true, message, type })
+  toastTimer = setTimeout(() => { toast.show = false }, 2500)
+}
 
 watchEffect(() => {
   if (!hasPrevious.value && activeTab.value === 'diff') {
@@ -369,9 +373,7 @@ const mutateStatus = async (action) => {
     await $api(`/v1/admin/revisions/${revision.value.id}/${action}`, { method: 'POST' });
     router.push({ path: '/revisions' });
   } catch (err) {
-    console.error(`Failed to ${action} revision`, err);
-    mutateError.value = err?.data?.message || err?.message || `Failed to ${action} revision`;
-    errorDialog.value?.showModal();
+    showToast(err?.data?.message || err?.message || `操作失败`, 'error')
   } finally {
     mutateAction.value = null;
     isMutating.value = false;

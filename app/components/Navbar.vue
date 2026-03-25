@@ -157,7 +157,15 @@
                   @click="showUserMenu = false"
                 >
                   <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
-                  <span>后台仪表盘</span>
+                  <span>用户管理</span>
+                </NuxtLink>
+                <NuxtLink
+                  to="/admin/revisions"
+                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                  @click="showUserMenu = false"
+                >
+                  <Icon name="lucide:git-pull-request" class="w-4 h-4" />
+                  <span>用户修改申请</span>
                 </NuxtLink>
               </div>
               <div class="border-t border-gray-200">
