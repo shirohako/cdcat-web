@@ -155,6 +155,23 @@ const workId = route.params.id as string
 // 从 API 获取作品数据
 const { data: workData, pending, error, refresh: refreshWorkData } = await useAPI<Work>(`/v1/works/${workId}`)
 
+const seoTitle = computed(() => workData.value?.title || 'Work')
+const seoDescription = computed(() => {
+  const work = workData.value
+  if (work?.description) return work.description.slice(0, 160)
+  if (work?.title) return `Listen to ${work.title} on CDCAT.`
+  return 'Music work details on CDCAT.'
+})
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: computed(() => seoTitle.value ? `${seoTitle.value} | CDCAT` : 'CDCAT'),
+  ogDescription: seoDescription,
+  ogType: 'music.album',
+  ogImage: computed(() => workData.value?.image_url || undefined),
+  twitterCard: 'summary_large_image',
+})
+
 // 处理 API 数据，转换为页面所需格式
 const albumData = computed<WorkHeroData>(() => {
   if (!workData.value) {

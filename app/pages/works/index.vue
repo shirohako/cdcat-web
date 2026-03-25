@@ -181,6 +181,15 @@ const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
+useSeoMeta({
+  title: 'Works',
+  description: 'Explore all music albums, singles, EPs and compilations on CDCAT.',
+  ogTitle: 'Works | CDCAT',
+  ogDescription: 'Explore all music albums, singles, EPs and compilations on CDCAT.',
+  ogType: 'website',
+  twitterCard: 'summary',
+})
+
 // 获取当前页码
 const currentPage = computed(() => {
   const page = parseInt(route.query.page || '1') || 1;

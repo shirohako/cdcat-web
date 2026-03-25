@@ -144,7 +144,15 @@ import { Users, Disc3, Heart, Plus } from "lucide-vue-next";
 
 const route = useRoute();
 const router = useRouter();
-const { t } = useI18n();
+
+useSeoMeta({
+  title: 'Artists',
+  description: 'Browse all artists and their discographies on CDCAT.',
+  ogTitle: 'Artists | CDCAT',
+  ogDescription: 'Browse all artists and their discographies on CDCAT.',
+  ogType: 'website',
+  twitterCard: 'summary',
+})
 
 // 获取当前页码
 const currentPage = computed(() => {

@@ -236,6 +236,23 @@ const artistId = route.params.id;
 // Fetch artist data from API
 const { data: artist } = await useAPI(`/v1/artists/${artistId}`);
 
+const seoTitle = computed(() => artist.value?.name || 'Artist')
+const seoDescription = computed(() => {
+  const name = artist.value?.name
+  if (artist.value?.bio) return artist.value.bio.slice(0, 160)
+  if (name) return `Explore ${name}'s discography on CDCAT.`
+  return 'Artist details on CDCAT.'
+})
+useSeoMeta({
+  title: seoTitle,
+  description: seoDescription,
+  ogTitle: computed(() => seoTitle.value ? `${seoTitle.value} | CDCAT` : 'CDCAT'),
+  ogDescription: seoDescription,
+  ogType: 'profile',
+  ogImage: computed(() => artist.value?.image_url || undefined),
+  twitterCard: 'summary_large_image',
+})
+
 // Favorite state
 const isFavorited = ref(artist.value?.is_favorited ?? false)
 const isToggling = ref(false)
