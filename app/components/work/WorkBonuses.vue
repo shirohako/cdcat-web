@@ -45,7 +45,7 @@
         <!-- Detail button -->
         <button
           type="button"
-          class="shrink-0 text-[11px] text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors"
+          class="shrink-0 text-[11px] text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors cursor-pointer"
           @click="openDetail(bonus)"
         >详情</button>
       </div>

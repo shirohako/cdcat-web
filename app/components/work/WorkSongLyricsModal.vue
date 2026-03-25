@@ -8,52 +8,74 @@
       <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[88vh] flex flex-col">
 
         <!-- Header -->
-        <div class="shrink-0 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <!-- Back button (detail / create view) -->
-            <button
-              v-if="showCreate || activeDetailId !== null"
-              type="button"
-              class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              @click="showCreate ? (showCreate = false) : (activeDetailId = null)"
-            >
-              <ChevronLeft :size="18" class="text-gray-500" />
-            </button>
-            <div v-else class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
-              <FileText :size="15" class="text-sky-500" />
+        <div class="shrink-0 px-6 py-4 border-b border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <!-- Back button (detail / create view) -->
+              <button
+                v-if="showCreate || activeDetailId !== null"
+                type="button"
+                class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors shrink-0"
+                @click="showCreate ? (showCreate = false) : (activeDetailId = null)"
+              >
+                <ChevronLeft :size="18" class="text-gray-500" />
+              </button>
+              <div v-else class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
+                <FileText :size="15" class="text-sky-500" />
+              </div>
+              <div class="min-w-0">
+                <h2 class="text-base font-bold text-gray-900">
+                  {{ showCreate ? '提交歌词' : activeDetailId !== null ? '歌词详情' : '歌词 & 翻译' }}
+                </h2>
+                <p v-if="songTitle" class="text-xs text-gray-400 mt-0.5 truncate">{{ songTitle }}</p>
+              </div>
             </div>
-            <div>
-              <h2 class="text-base font-bold text-gray-900">
-                {{ showCreate ? '提交歌词' : activeDetailId !== null ? '歌词详情' : '歌词 & 翻译' }}
-              </h2>
-              <p v-if="songTitle" class="text-xs text-gray-400 mt-0.5">{{ songTitle }}</p>
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- Action buttons: visible on sm+ only -->
+              <template v-if="!showCreate && activeDetailId === null">
+                <button
+                  type="button"
+                  @click="fileInputRef?.click()"
+                  class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors"
+                >
+                  <Upload :size="13" />
+                  上传文件
+                </button>
+                <button
+                  type="button"
+                  @click="openCreate()"
+                  class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold transition-colors"
+                >
+                  <Plus :size="13" />
+                  提交歌词或翻译
+                </button>
+              </template>
+              <button
+                type="button"
+                class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+                @click="close()"
+              >
+                <X :size="18" class="text-gray-400" />
+              </button>
             </div>
           </div>
-          <div class="flex items-center gap-2">
-            <template v-if="!showCreate && activeDetailId === null">
-              <button
-                type="button"
-                @click="fileInputRef?.click()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors"
-              >
-                <Upload :size="13" />
-                上传文件
-              </button>
-              <button
-                type="button"
-                @click="openCreate()"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold transition-colors"
-              >
-                <Plus :size="13" />
-                提交歌词或翻译
-              </button>
-            </template>
+          <!-- Action buttons: mobile only, below title row -->
+          <div v-if="!showCreate && activeDetailId === null" class="sm:hidden flex gap-2 mt-3">
             <button
               type="button"
-              class="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
-              @click="close()"
+              @click="fileInputRef?.click()"
+              class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors"
             >
-              <X :size="18" class="text-gray-400" />
+              <Upload :size="13" />
+              上传文件
+            </button>
+            <button
+              type="button"
+              @click="openCreate()"
+              class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold transition-colors"
+            >
+              <Plus :size="13" />
+              提交歌词或翻译
             </button>
           </div>
         </div>

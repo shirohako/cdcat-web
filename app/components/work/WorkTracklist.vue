@@ -65,7 +65,7 @@
             type="button"
             :disabled="!!toggleLoading[track.songId]"
             @click="handleToggleFavorite(track.songId)"
-            class="shrink-0 p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed sm:opacity-0 sm:group-hover:opacity-100"
+            class="shrink-0 p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer sm:opacity-0 sm:group-hover:opacity-100"
             :class="{ 'sm:opacity-100!': favoritedSongs[track.songId] }"
             :title="favoritedSongs[track.songId] ? '取消收藏' : '收藏'"
           >
@@ -126,7 +126,7 @@
             <div v-if="!track.isInstrumental" class="flex items-center gap-1">
               <button
                 type="button"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
+                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors cursor-pointer"
                 :class="track.hasLyrics ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 @click.stop="openLyrics(track, 'lyric')"
               >
@@ -134,7 +134,7 @@
               </button>
               <button
                 type="button"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors"
+                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors cursor-pointer"
                 :class="track.translationsCount > 0 ? 'bg-teal-50 text-teal-500 hover:bg-teal-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 @click.stop="openLyrics(track, 'translation')"
               >
