@@ -1,409 +1,386 @@
 <template>
-  <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
-      <!-- 页面标题 -->
+  <div class="min-h-screen bg-gray-50/50">
+    <div class="container mx-auto px-4 py-8 max-w-5xl md:px-8">
+
       <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2">Revisions</h1>
-        <p class="text-gray-600">All submitted revisions pending review</p>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">我的编辑记录</h1>
+        <p class="mt-1 text-sm text-gray-500">你提交的所有词条编辑申请</p>
       </div>
 
-      <!-- 加载状态 -->
-      <div v-if="pending" class="flex items-center justify-center min-h-100">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
-
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-100">
-        <div class="alert alert-error max-w-md">
-          <AlertCircle :size="24" />
-          <span>Failed to load: {{ error.message }}</span>
+      <!-- 加载 -->
+      <div v-if="pending" class="flex items-center justify-center min-h-60">
+        <div class="flex flex-col items-center gap-3 text-gray-400">
+          <GitPullRequest :size="32" class="opacity-30" />
+          <p class="text-sm">加载中…</p>
         </div>
       </div>
 
-      <!-- 修订列表 -->
+      <!-- 错误 -->
+      <div v-else-if="error" class="flex items-center justify-center min-h-60">
+        <div class="flex flex-col items-center gap-3 text-gray-400">
+          <AlertCircle :size="32" class="opacity-40" />
+          <p class="text-sm">{{ error.message }}</p>
+        </div>
+      </div>
+
       <div v-else>
-        <!-- 统计信息 -->
-        <div class="mb-6 flex items-center justify-between">
-          <div class="text-sm text-gray-600">
-            Found {{ pagination.total }} revisions
-            <span v-if="pagination.total > 0" class="text-gray-500">
-              (Page {{ pagination.current_page }} of {{ pagination.last_page }})
-            </span>
-          </div>
+        <div class="mb-4 text-xs text-gray-400">
+          共 {{ pagination.total }} 条记录
         </div>
 
-        <!-- 列表 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <!-- Desktop table -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="table w-full">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="text-left">ID</th>
-                  <th class="text-left">Title</th>
-                <th class="text-left">Type</th>
-                <th class="text-left">Changes</th>
-                <th class="text-left">Submitter</th>
-                <th class="text-left">Status</th>
-                <th class="text-left">Detail</th>
-                <th class="text-left">Page</th>
+        <!-- Desktop 表格 -->
+        <div class="hidden md:block rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-100 bg-gray-50/60">
+                <th class="w-14 px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">ID</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">词条</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">修改主体</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">操作</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">提交者</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">状态</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">提交时间</th>
+                <th class="w-16 px-4 py-3" />
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-100">
               <tr
                 v-for="revision in revisionsData"
-                  :key="revision.id"
-                  class="hover:bg-gray-50 cursor-pointer"
-                >
-                  <td class="text-sm text-gray-500 font-mono">
-                    {{ revision.id }}
-                  </td>
-                  <td class="max-w-xs">
-                    <div class="truncate font-medium" :title="revision.title">
-                      {{ revision.title }}
+                :key="revision.id"
+                class="group hover:bg-gray-50/70 transition-colors"
+              >
+                <td class="px-5 py-3.5 text-xs font-mono text-gray-500">
+                  {{ revision.id }}
+                </td>
+                <!-- 词条标题 + checksum -->
+                <td class="px-4 py-3.5">
+                  <p class="font-medium text-gray-900 truncate max-w-xs" :title="revision.title">
+                    {{ revision.title }}
+                  </p>
+                  <p class="mt-0.5 font-mono text-[10px] text-gray-400" :title="revision.checksum">
+                    {{ revision.checksum?.slice(0, 12) }}
+                  </p>
+                </td>
+
+                <!-- 修改主体 -->
+                <td class="px-4 py-3.5">
+                  <span class="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600">
+                    {{ formatType(revision.resource_type) }}
+                    <template v-if="revision.action !== 'create' && revision.resource_id">
+                      <span class="text-gray-400">:</span>
+                      <span class="font-mono text-gray-500">{{ revision.resource_id }}</span>
+                    </template>
+                  </span>
+                </td>
+
+                <!-- 操作 -->
+                <td class="px-4 py-3.5">
+                  <span
+                    class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium"
+                    :class="actionBadgeClass(revision.action)"
+                  >
+                    {{ formatAction(revision.action) }}
+                  </span>
+                </td>
+
+                <!-- 提交者 -->
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-2">
+                    <img
+                      v-if="revision.submitter?.avatar"
+                      :src="revision.submitter.avatar"
+                      class="h-6 w-6 shrink-0 rounded-full object-cover"
+                    />
+                    <div v-else class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold text-gray-500">
+                      {{ revision.submitter?.nickname?.charAt(0) || revision.submitter?.username?.charAt(0) || '?' }}
                     </div>
-                    <div class="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                      <span class="badge badge-sm" :class="getActionBadgeClass(revision.action)">
-                        {{ formatAction(revision.action) }}
-                      </span>
-                      <span class="text-gray-400">•</span>
-                      <span>{{ formatDate(revision.created_at) }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge badge-outline badge-sm">
-                      {{ formatType(revision.resource_type) }}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="flex items-center gap-2 text-sm">
-                      <span class="text-green-600">+{{ revision.additions }}</span>
-                      <span class="text-red-600">-{{ revision.deletions }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="flex items-center gap-2">
-                      <div class="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center text-xs font-medium">
-                        {{ revision.submitter?.name?.charAt(0).toUpperCase() || '?' }}
-                      </div>
-                      <span class="text-sm">{{ revision.submitter?.name || 'Unknown' }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      class="badge badge-sm"
-                      :class="getStatusBadgeClass(revision.status)"
-                    >
-                      {{ formatStatus(revision.status) }}
-                    </span>
-                  </td>
-                  <td class="text-sm">
+                    <span class="text-xs text-gray-600">{{ revision.submitter?.nickname || revision.submitter?.username }}</span>
+                  </div>
+                </td>
+
+                <!-- 状态 -->
+                <td class="px-4 py-3.5">
+                  <span
+                    class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                    :class="statusBadgeClass(revision.status)"
+                  >
+                    <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(revision.status)" />
+                    {{ formatStatus(revision.status) }}
+                  </span>
+                </td>
+
+                <!-- 时间 -->
+                <td class="px-4 py-3.5 text-xs tabular-nums text-gray-500">
+                  {{ formatDate(revision.created_at) }}
+                </td>
+
+                <!-- 操作按钮 -->
+                <td class="px-4 py-3.5">
+                  <div class="flex items-center gap-1.5">
                     <button
-                      class="btn btn-primary btn-xs"
+                      class="whitespace-nowrap rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                       @click.stop="goToDetail(revision.id)"
                     >
-                      View
+                      详情
                     </button>
-                  </td>
-                  <td class="text-sm">
                     <button
-                      v-if="revision.resource_id"
-                      class="btn btn-secondary btn-xs"
-                      @click.stop="goToEntity(revision)"
+                      v-if="revision.status === 'pending'"
+                      class="whitespace-nowrap rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50 hover:text-red-600"
+                      @click.stop="confirmRetract(revision)"
                     >
-                      Open
+                      撤销
                     </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Mobile cards -->
-          <div class="grid gap-4 p-4 md:hidden">
-            <article
-              v-for="revision in revisionsData"
-              :key="revision.id"
-              class="border border-gray-200 rounded-xl p-4 shadow-[0_6px_16px_-10px_rgba(0,0,0,0.25)]"
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm text-gray-500">#{{ revision.id }} · {{ formatType(revision.resource_type) }}</p>
-                  <h2 class="font-semibold text-base leading-snug line-clamp-2" :title="revision.title">
-                    {{ revision.title }}
-                  </h2>
-                  <div class="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                    <span class="badge badge-sm" :class="getActionBadgeClass(revision.action)">
-                      {{ formatAction(revision.action) }}
-                    </span>
-                    <span class="text-gray-400">•</span>
-                    <span>{{ formatDate(revision.created_at) }}</span>
                   </div>
-                </div>
-              </div>
+                </td>
+              </tr>
 
-              <div class="mt-3 flex items-center gap-3 text-sm">
-                <div class="flex items-center gap-2">
-                  <span class="text-green-600 font-medium">+{{ revision.additions }}</span>
-                  <span class="text-red-600 font-medium">-{{ revision.deletions }}</span>
-                </div>
-                <span class="text-gray-300">•</span>
-                <span
-                  class="badge badge-ghost badge-sm"
-                  :class="getStatusBadgeClass(revision.status)"
-                >
-                  {{ formatStatus(revision.status) }}
-                </span>
-              </div>
+              <tr v-if="revisionsData.length === 0">
+                <td colspan="8" class="px-5 py-16 text-center">
+                  <GitPullRequest :size="28" class="mx-auto mb-3 text-gray-300" />
+                  <p class="text-sm text-gray-400">暂无编辑记录</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-              <div class="mt-3 flex items-center justify-between text-sm text-gray-600">
-                <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium">
-                    {{ revision.submitter?.name?.charAt(0).toUpperCase() || '?' }}
-                  </div>
-                  <span class="font-medium">{{ revision.submitter?.name || 'Unknown' }}</span>
-                </div>
-                <div class="text-right">
-                  <button
-                    class="btn btn-primary btn-xs mt-1"
-                    @click="goToDetail(revision.id)"
+        <!-- Mobile 卡片 -->
+        <div class="space-y-2.5 md:hidden">
+          <article
+            v-for="revision in revisionsData"
+            :key="revision.id"
+            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span
+                    class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium"
+                    :class="actionBadgeClass(revision.action)"
                   >
-                    查看详情
-                  </button>
-                  <button
-                    v-if="revision.resource_id"
-                    class="btn btn-secondary btn-xs mt-1"
-                    @click="goToEntity(revision)"
-                  >
-                    查看实体
-                  </button>
+                    {{ formatAction(revision.action) }}
+                  </span>
+                  <span class="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600">
+                    {{ formatType(revision.resource_type) }}
+                  </span>
                 </div>
+                <p class="mt-2 font-medium text-gray-900 line-clamp-2">{{ revision.title }}</p>
+                <p class="mt-1 text-xs text-gray-400">{{ formatDate(revision.created_at) }}</p>
               </div>
-            </article>
-          </div>
-
-          <!-- 空状态 -->
-          <div v-if="revisionsData.length === 0" class="text-center py-12">
-            <div class="text-gray-400 mb-4">
-              <GitPullRequest :size="64" class="mx-auto" />
+              <span
+                class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                :class="statusBadgeClass(revision.status)"
+              >
+                <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(revision.status)" />
+                {{ formatStatus(revision.status) }}
+              </span>
             </div>
-            <p class="text-gray-500">No revisions found</p>
+
+            <div class="mt-3 flex items-center gap-2 border-t border-gray-100 pt-3">
+              <button
+                class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
+                @click="goToDetail(revision.id)"
+              >
+                查看详情
+              </button>
+              <button
+                v-if="revision.resource_id"
+                class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
+                @click="goToEntity(revision)"
+              >
+                查看词条
+              </button>
+              <button
+                v-if="revision.status === 'pending'"
+                class="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
+                @click="confirmRetract(revision)"
+              >
+                撤销
+              </button>
+            </div>
+          </article>
+
+          <div v-if="revisionsData.length === 0" class="flex flex-col items-center py-16 text-gray-400">
+            <GitPullRequest :size="28" class="mb-3 opacity-40" />
+            <p class="text-sm">暂无编辑记录</p>
           </div>
         </div>
 
-        <!-- 分页控件 -->
-        <div v-if="pagination.last_page > 1" class="mt-8 flex justify-center">
-          <div class="join">
+        <!-- 分页 -->
+        <div v-if="pagination.last_page > 1" class="mt-6 flex items-center justify-between">
+          <p class="text-xs text-gray-400">
+            第 {{ (pagination.current_page - 1) * pagination.per_page + 1 }}–{{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }} 条
+          </p>
+          <div class="flex items-center gap-1">
             <button
-              class="join-item btn btn-sm"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               :disabled="pagination.current_page === 1"
               @click="goToPage(pagination.current_page - 1)"
             >
-              &laquo;
+              <ChevronLeft :size="13" />
             </button>
 
             <template v-for="page in visiblePages" :key="page">
               <button
                 v-if="page !== '...'"
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': page === pagination.current_page }"
+                class="inline-flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition"
+                :class="page === pagination.current_page
+                  ? 'border-gray-900 bg-gray-900 text-white'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
                 @click="goToPage(page)"
               >
                 {{ page }}
               </button>
-              <button
-                v-else
-                class="join-item btn btn-sm btn-disabled"
-              >
-                ...
-              </button>
+              <span v-else class="flex h-7 w-7 items-center justify-center text-xs text-gray-300">·</span>
             </template>
 
             <button
-              class="join-item btn btn-sm"
+              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
               :disabled="pagination.current_page === pagination.last_page"
               @click="goToPage(pagination.current_page + 1)"
             >
-              &raquo;
+              <ChevronRight :size="13" />
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <CommonConfirmDialog
+      v-model="retractModal.open"
+      variant="warning"
+      title="撤销修订"
+      :description="`确认撤销「${retractModal.revision?.title ?? ''}」吗？撤销后该修订将不再进入审核流程。`"
+      @confirm="doRetract"
+    />
+
+    <!-- Toast -->
+    <Transition name="toast">
+      <div
+        v-if="toast.show"
+        class="fixed bottom-5 right-5 z-60 flex items-center gap-2 rounded-lg border bg-white px-3.5 py-2.5 text-sm font-medium shadow-lg"
+        :class="toast.type === 'error' ? 'border-red-200 text-red-700' : 'border-gray-200 text-gray-800'"
+      >
+        <AlertCircle v-if="toast.type === 'error'" :size="14" class="text-red-500" />
+        <CheckCircle v-else :size="14" class="text-emerald-500" />
+        {{ toast.message }}
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { AlertCircle, GitPullRequest } from 'lucide-vue-next';
+import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from 'lucide-vue-next'
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
-// 获取当前页码
 const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1;
-  return page > 0 ? page : 1;
-});
+  const page = parseInt(route.query.page || '1') || 1
+  return page > 0 ? page : 1
+})
 
-const { $api } = useNuxtApp();
+const { $api } = useNuxtApp()
 
-// 从 API 获取修订列表
 const { data: response, pending, error } = await useAsyncData(
   'revisions-list',
-  () => $api('/v1/revisions', {
-    query: {
-      page: currentPage.value,
-    },
-  }),
-  {
-    watch: [currentPage],
-  },
-);
+  () => $api('/v1/revisions', { query: { page: currentPage.value } }),
+  { watch: [currentPage] },
+)
 
-// 处理修订数据
-const revisionsData = computed(() => {
-  return response.value?.revisions || [];
-});
+const revisionsData = computed(() => response.value?.revisions || [])
+const pagination = computed(() => response.value?.pagination ?? {
+  total: 0, per_page: 15, current_page: 1, last_page: 1,
+})
 
-// 分页信息
-const pagination = computed(() => {
-  if (!response.value?.pagination) {
-    return {
-      total: 0,
-      per_page: 15,
-      current_page: 1,
-      last_page: 1,
-    };
-  }
-  return response.value.pagination;
-});
+// ===== 格式化 =====
+const formatType = (type) => ({ work: 'Work', artist: 'Artist', series: 'Series', event: 'Event', entry: 'Entry' }[type] || type)
+const formatAction = (action) => ({ create: '新增', update: '编辑', delete: '删除' }[action] || action)
+const formatStatus = (status) => ({ pending: '待审核', approved: '已通过', rejected: '已拒绝' }[status] || status)
 
-// 格式化类型
-const formatType = (type) => {
-  const typeMap = {
-    work: 'Work',
-    artist: 'Artist',
-    series: 'Series',
-    event: 'Event',
-    entry: 'Entry',
-  };
-  return typeMap[type] || type;
-};
+const actionBadgeClass = (action) => ({
+  create: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+  update: 'bg-blue-50 border-blue-200 text-blue-700',
+  delete: 'bg-red-50 border-red-200 text-red-600',
+}[action] || 'bg-gray-50 border-gray-200 text-gray-600')
 
-// 格式化操作
-const formatAction = (action) => {
-  const actionMap = {
-    create: 'Create',
-    update: 'Update',
-    delete: 'Delete',
-  };
-  return actionMap[action] || action;
-};
+const statusBadgeClass = (status) => ({
+  pending:  'bg-amber-50 border-amber-200 text-amber-700',
+  approved: 'bg-emerald-50 border-emerald-200 text-emerald-700',
+  rejected: 'bg-gray-50 border-gray-200 text-gray-500',
+}[status] || 'bg-gray-50 border-gray-200 text-gray-500')
 
-// 获取操作类型的样式
-const getActionBadgeClass = (action) => {
-  const classMap = {
-    create: 'badge-success',
-    update: 'badge-info',
-    delete: 'badge-error',
-  };
-  return classMap[action] || 'badge-ghost';
-};
+const statusDotClass = (status) => ({
+  pending:  'bg-amber-400',
+  approved: 'bg-emerald-500',
+  rejected: 'bg-gray-300',
+}[status] || 'bg-gray-300')
 
-// 格式化状态
-const formatStatus = (status) => {
-  const statusMap = {
-    pending: 'Pending',
-    approved: 'Approved',
-    rejected: 'Rejected',
-  };
-  return statusMap[status] || status;
-};
+const formatDate = (d) => {
+  if (!d) return ''
+  const dt = new Date(d)
+  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+}
 
-// 获取状态的样式
-const getStatusBadgeClass = (status) => {
-  const classMap = {
-    pending: 'badge-warning',
-    approved: 'badge-success',
-    rejected: 'badge-error',
-  };
-  return classMap[status] || 'badge-ghost';
-};
-
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
-
-// 计算可见的页码
+// ===== 分页 =====
 const visiblePages = computed(() => {
-  const current = pagination.value.current_page;
-  const last = pagination.value.last_page;
-  const pages = [];
+  const current = pagination.value.current_page
+  const last = pagination.value.last_page
+  if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1)
+  const pages = [1]
+  if (current > 3) pages.push('...')
+  for (let i = Math.max(2, current - 1); i <= Math.min(last - 1, current + 1); i++) pages.push(i)
+  if (current < last - 2) pages.push('...')
+  pages.push(last)
+  return pages
+})
 
-  if (last <= 7) {
-    for (let i = 1; i <= last; i++) {
-      pages.push(i);
-    }
-  } else {
-    pages.push(1);
-    if (current > 3) {
-      pages.push('...');
-    }
-    const start = Math.max(2, current - 1);
-    const end = Math.min(last - 1, current + 1);
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    if (current < last - 2) {
-      pages.push('...');
-    }
-    pages.push(last);
-  }
-
-  return pages;
-});
-
-// 跳转到指定页码
 const goToPage = (page) => {
-  if (page < 1 || page > pagination.value.last_page) return;
+  if (page < 1 || page > pagination.value.last_page) return
+  router.push({ query: { ...route.query, page: page === 1 ? undefined : page } })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 
-  router.push({
-    query: {
-      ...route.query,
-      page: page === 1 ? undefined : page,
-    },
-  });
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// 跳转到详情页
-const goToDetail = (id) => {
-  if (!id) return;
-  router.push({ path: `/revisions/${id}` });
-};
-
-// 跳转到实体详情页
+const goToDetail = (id) => router.push(`/revisions/${id}`)
 const goToEntity = (revision) => {
-  if (!revision?.resource_id) return;
-  const type = revision.resource_type;
-  const id = revision.resource_id;
-  const routeMap = {
-    work: `/works/${id}`,
-    artist: `/artists/${id}`,
-    series: `/series/${id}`,
-    event: `/events/${id}`,
-    entry: `/entries/${id}`,
-  };
-  const target = routeMap[type] || `/revisions/${revision.id}`;
-  router.push({ path: target });
-};
+  const map = { work: 'works', artist: 'artists', series: 'series', event: 'events', entry: 'entries' }
+  const prefix = map[revision.resource_type]
+  router.push(prefix ? `/${prefix}/${revision.resource_id}` : `/revisions/${revision.id}`)
+}
+
+// ===== 撤销 =====
+const retractModal = reactive({ open: false, revision: null })
+
+const confirmRetract = (revision) => {
+  retractModal.revision = revision
+  retractModal.open = true
+}
+
+const doRetract = async () => {
+  try {
+    await $api(`/v1/revisions/${retractModal.revision.id}/retract`, { method: 'POST' })
+    const target = revisionsData.value.find(r => r.id === retractModal.revision.id)
+    if (target) target.status = 'retracted'
+    showToast('修订已撤销')
+  } catch (e) {
+    const code = e?.code
+    if (code === 'REVISION_NOT_OWNED') showToast('无法撤销他人的修订', 'error')
+    else if (code === 'REVISION_CANNOT_RETRACT') showToast('该修订已审核，无法撤销', 'error')
+    else showToast(e?.message || '撤销失败，请重试', 'error')
+  }
+}
+
+// ===== Toast =====
+const toast = reactive({ show: false, message: '', type: 'success' })
+let toastTimer = null
+const showToast = (message, type = 'success') => {
+  if (toastTimer) clearTimeout(toastTimer)
+  Object.assign(toast, { show: true, message, type })
+  toastTimer = setTimeout(() => { toast.show = false }, 2500)
+}
 </script>
+
+<style scoped>
+.toast-enter-active, .toast-leave-active { transition: all 0.2s ease; }
+.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(6px); }
+</style>
