@@ -55,8 +55,9 @@
                   </span>
                   <span
                     v-if="albumData.type"
-                    class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase bg-gray-800/10 text-gray-700"
+                    class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold tracking-wider uppercase bg-gray-800/10 text-gray-700"
                   >
+                    <Tag :size="9" class="shrink-0" />
                     {{ formatType(albumData.type) }}
                   </span>
                 </div>
@@ -79,16 +80,16 @@
             </div>
 
             <!-- Streaming Links -->
-            <div v-if="streaming && streaming.length > 0" class="mt-4 flex items-center justify-center md:justify-start gap-3 flex-wrap">
+            <div v-if="streaming && streaming.length > 0" class="mt-3 flex items-center justify-center md:justify-start gap-2 flex-wrap">
               <p class="text-sm text-gray-600 shrink-0 flex items-center gap-1"><Headphones :size="13" class="text-gray-500" />流媒体</p>
-              <div class="flex items-center gap-2 flex-wrap">
+              <div class="flex items-center gap-1.5 flex-wrap">
                 <a
                   v-for="link in streaming"
                   :key="link.id"
                   :href="link.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group inline-flex items-center gap-1 px-3 py-2 rounded-sm text-[11px] font-medium text-gray-800 bg-black/6 transition-colors"
+                  class="group inline-flex items-center gap-1 px-2.5 py-1.5 rounded-sm text-[11px] font-medium text-gray-800 bg-black/6 transition-colors"
                   :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.name).color + '22' } : {}"
                   @mouseenter="hoveredLinkId = link.id"
                   @mouseleave="hoveredLinkId = null"
@@ -192,6 +193,7 @@ import {
   Edit,
   UserRound,
   Headphones,
+  Tag,
 } from "lucide-vue-next"
 
 const formatType = (type: string | null | undefined): string => {

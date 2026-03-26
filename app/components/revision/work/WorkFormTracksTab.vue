@@ -165,7 +165,7 @@
             <input
               type="text"
               :value="secondsToMmss(song.duration)"
-              placeholder="3:45"
+              placeholder="0:00"
               class="input input-bordered input-xs w-full bg-gray-50 text-center tabular-nums"
               @change="updateDuration(discIndex, songIndex, ($event.target as HTMLInputElement).value)"
             />
@@ -325,7 +325,7 @@
           >
             <div v-if="importCueDialog.show" class="relative z-10 w-full max-w-sm bg-white rounded-2xl shadow-xl p-6">
               <h3 class="text-base font-semibold text-gray-900 mb-1">从 CUE 导入标题</h3>
-              <p class="text-sm text-gray-500 mb-4">将 CUE 文件内容粘贴至此，将自动提取各曲目标题。</p>
+              <p class="text-sm text-gray-500 mb-4">将 CUE 文件内容粘贴至此，将自动提取各曲目标题与时长。</p>
               <textarea
                 ref="importCueTextareaRef"
                 v-model="importCueDialog.text"
@@ -334,7 +334,11 @@
                 class="textarea textarea-bordered w-full text-sm bg-gray-50 resize-none font-mono"
                 @keydown.ctrl.enter="confirmImportCue"
               />
-              <div class="flex gap-2 mt-5 justify-end">
+              <p class="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                <Info :size="11" class="shrink-0" />
+                最后一首曲目的时长无法从 CUE 计算，请手动填写。
+              </p>
+              <div class="flex gap-2 mt-4 justify-end">
                 <button type="button" class="btn btn-sm btn-ghost text-gray-500" @click="importCueDialog.show = false">
                   取消
                 </button>
@@ -365,7 +369,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, X, Disc3, Upload } from 'lucide-vue-next'
+import { Plus, Trash2, X, Disc3, Upload, Info } from 'lucide-vue-next'
 
 interface Song {
   id?: string | number
@@ -615,19 +619,49 @@ function openImportCueDialog(discIndex: number) {
   nextTick(() => importCueTextareaRef.value?.focus())
 }
 
-function parseCueTitles(cue: string): string[] {
-  const titles: string[] = []
+interface CueTrack {
+  title: string
+  indexSeconds: number | null
+}
+
+function parseCueData(cue: string): CueTrack[] {
+  const tracks: CueTrack[] = []
   const trackBlocks = cue.split(/\bTRACK\s+\d+\s+AUDIO\b/i).slice(1)
   for (const block of trackBlocks) {
-    const match = block.match(/^\s*TITLE\s+"([^"]+)"/im)
-    titles.push(match ? match[1]! : '')
+    const titleMatch = block.match(/^\s*TITLE\s+"([^"]+)"/im)
+    const indexMatch = block.match(/\bINDEX\s+01\s+(\d+):(\d+):(\d+)/i)
+    let indexSeconds: number | null = null
+    if (indexMatch) {
+      const mm = parseInt(indexMatch[1]!)
+      const ss = parseInt(indexMatch[2]!)
+      const ff = parseInt(indexMatch[3]!)
+      indexSeconds = mm * 60 + ss + Math.round(ff / 75)
+    }
+    tracks.push({ title: titleMatch ? titleMatch[1]! : '', indexSeconds })
   }
-  return titles
+  return tracks
 }
 
 function confirmImportCue() {
-  const titles = parseCueTitles(importCueDialog.text).filter(t => t.length > 0)
-  applyTitles(importCueDialog.discIndex, titles)
+  const tracks = parseCueData(importCueDialog.text).filter(t => t.title.length > 0)
+  const discIndex = importCueDialog.discIndex
+  const newStructure = props.formData.structure.map((d, di) => {
+    if (di !== discIndex) return d
+    return {
+      ...d,
+      songs: d.songs.map((s, si) => {
+        const track = tracks[si]
+        if (!track) return s
+        const next = tracks[si + 1]
+        const duration =
+          track.indexSeconds !== null && next?.indexSeconds != null
+            ? next.indexSeconds - track.indexSeconds
+            : s.duration
+        return { ...s, title: track.title, duration }
+      }),
+    }
+  })
+  emit('update:formData', { ...props.formData, structure: newStructure })
   importCueDialog.show = false
 }
 

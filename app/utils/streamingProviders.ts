@@ -4,9 +4,10 @@ export interface StreamingProvider {
 }
 
 const streamingProviderMap: Record<string, StreamingProvider> = {
-  default:     { icon: 'cdcat:default-music-logo', color: '#6b7280' },
-  spotify:     { icon: 'cdcat:spotify',            color: '#1aa34a' },
-  apple_music: { icon: 'cdcat:apple-music',        color: '#fc3c44' },
+  default: { icon: 'cdcat:default-music-logo', color: '#6b7280' },
+  spotify: { icon: 'cdcat:spotify', color: '#1aa34a' },
+  apple_music: { icon: 'cdcat:apple-music', color: '#fc3c44' },
+  netease_music: { icon: 'cdcat:netease-music', color: '#fc3c44' },
   // 更多平台待补充
 }
 
