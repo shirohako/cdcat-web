@@ -69,6 +69,9 @@ export default defineNuxtConfig({
       include: [
         'countries-list',
         'lucide-vue-next',
+        'markdown-it-anchor',
+        'markdown-it',
+        'dompurify',
       ],
     },
   },
