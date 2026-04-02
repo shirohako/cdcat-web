@@ -199,8 +199,9 @@ const currentPage = computed(() => {
 // 从 API 获取作品列表
 const { data: worksResponse, pending, error } = await useAPI("/v1/works", {
   query: {
-    page: currentPage.value,
+    page: currentPage,
   },
+  watch: [currentPage],
 });
 
 // 处理作品数据
