@@ -89,18 +89,29 @@
           <!-- Tab bar -->
           <div class="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-3">
             <h2 class="text-sm font-semibold text-gray-700">Payload</h2>
-            <div class="flex items-center gap-1">
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1">
+                <button
+                  v-for="tab in payloadTabs"
+                  :key="tab.value"
+                  class="rounded-md px-3 py-1 text-xs font-medium transition"
+                  :class="activeTab === tab.value
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'"
+                  :disabled="tab.requiresPrevious && !hasPrevious"
+                  @click="activeTab = tab.value"
+                >
+                  {{ tab.label }}
+                </button>
+              </div>
               <button
-                v-for="tab in payloadTabs"
-                :key="tab.value"
-                class="rounded-md px-3 py-1 text-xs font-medium transition"
-                :class="activeTab === tab.value
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'"
-                :disabled="tab.requiresPrevious && !hasPrevious"
-                @click="activeTab = tab.value"
+                class="flex items-center gap-1 rounded-md border border-gray-200 px-2.5 py-1 text-xs text-gray-500 transition hover:bg-gray-50 hover:text-gray-700"
+                :title="activeTab === 'previous' ? '复制 Previous Payload' : '复制 Current Payload'"
+                @click="copyActivePayload"
               >
-                {{ tab.label }}
+                <CopyCheck v-if="copied" :size="13" class="text-emerald-500" />
+                <Copy v-else :size="13" />
+                Copy
               </button>
             </div>
           </div>
@@ -382,4 +393,21 @@ const mutateStatus = async (action) => {
 
 const approve = () => mutateStatus('approve');
 const reject = () => mutateStatus('reject');
+
+const copied = ref(false);
+let copiedTimer = null;
+
+const copyActivePayload = async () => {
+  const json = activeTab.value === 'previous'
+    ? prettyJson(previous.value?.data)
+    : prettyJson(revision.value?.data);
+  try {
+    await navigator.clipboard.writeText(json);
+    if (copiedTimer) clearTimeout(copiedTimer);
+    copied.value = true;
+    copiedTimer = setTimeout(() => { copied.value = false; }, 2000);
+  } catch {
+    showToast('复制失败', 'error');
+  }
+};
 </script>
