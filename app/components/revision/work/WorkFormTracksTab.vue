@@ -635,7 +635,7 @@ function parseCueData(cue: string): CueTrack[] {
       const mm = parseInt(indexMatch[1]!)
       const ss = parseInt(indexMatch[2]!)
       const ff = parseInt(indexMatch[3]!)
-      indexSeconds = mm * 60 + ss + Math.round(ff / 75)
+      indexSeconds = mm * 60 + ss + Math.floor(ff / 75)
     }
     tracks.push({ title: titleMatch ? titleMatch[1]! : '', indexSeconds })
   }
