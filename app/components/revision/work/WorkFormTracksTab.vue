@@ -621,7 +621,7 @@ function openImportCueDialog(discIndex: number) {
 
 interface CueTrack {
   title: string
-  indexSeconds: number | null
+  indexFrames: number | null
 }
 
 function parseCueData(cue: string): CueTrack[] {
@@ -630,14 +630,14 @@ function parseCueData(cue: string): CueTrack[] {
   for (const block of trackBlocks) {
     const titleMatch = block.match(/^\s*TITLE\s+"([^"]+)"/im)
     const indexMatch = block.match(/\bINDEX\s+01\s+(\d+):(\d+):(\d+)/i)
-    let indexSeconds: number | null = null
+    let indexFrames: number | null = null
     if (indexMatch) {
       const mm = parseInt(indexMatch[1]!)
       const ss = parseInt(indexMatch[2]!)
       const ff = parseInt(indexMatch[3]!)
-      indexSeconds = mm * 60 + ss + Math.floor(ff / 75)
+      indexFrames = mm * 60 * 75 + ss * 75 + ff
     }
-    tracks.push({ title: titleMatch ? titleMatch[1]! : '', indexSeconds })
+    tracks.push({ title: titleMatch ? titleMatch[1]! : '', indexFrames })
   }
   return tracks
 }
@@ -654,8 +654,8 @@ function confirmImportCue() {
         if (!track) return s
         const next = tracks[si + 1]
         const duration =
-          track.indexSeconds !== null && next?.indexSeconds != null
-            ? next.indexSeconds - track.indexSeconds
+          track.indexFrames !== null && next?.indexFrames != null
+            ? Math.floor((next.indexFrames - track.indexFrames) / 75)
             : s.duration
         return { ...s, title: track.title, duration }
       }),
