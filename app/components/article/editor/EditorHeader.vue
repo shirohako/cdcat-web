@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ArrowLeft, Check, Loader, Settings } from 'lucide-vue-next'
+import { ArrowLeft, Check, Loader, Settings } from '@lucide/vue'
 
 defineProps({
   backTo:       { type: String, required: true },

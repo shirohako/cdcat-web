@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Film, ArrowLeft } from 'lucide-vue-next'
+import { Film, ArrowLeft } from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'

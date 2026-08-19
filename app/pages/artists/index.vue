@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { Users, Disc3, Heart, Plus } from "lucide-vue-next";
+import { Users, Disc3, Heart, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();

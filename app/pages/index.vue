@@ -361,7 +361,7 @@ import {
   ListMusic,
   Flame,
   Globe2,
-} from "lucide-vue-next";
+} from "@lucide/vue";
 
 const portalLinks = [
   {

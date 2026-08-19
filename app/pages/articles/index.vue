@@ -147,7 +147,7 @@
 </template>
 
 <script setup>
-import { FileText, Calendar, UserRound, BookOpen, Image as ImageIcon, PenLine } from "lucide-vue-next";
+import { FileText, Calendar, UserRound, BookOpen, Image as ImageIcon, PenLine } from "@lucide/vue";
 
 const { isAuthenticated } = useAuth();
 

@@ -279,7 +279,7 @@
 </template>
 
 <script setup>
-import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from '@lucide/vue'
 
 definePageMeta({ middleware: 'auth' })
 

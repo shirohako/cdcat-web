@@ -27,6 +27,27 @@ export default defineNuxtConfig({
         dir: './app/assets/icons',
       },
     ],
+    clientBundle: {
+      scan: true,
+      includeCustomCollections: true,
+      icons: [
+        'lucide:layout-dashboard',
+        'lucide:disc-3',
+        'lucide:mic-2',
+        'lucide:calendar',
+        'lucide:film',
+        'lucide:library',
+        'lucide:disc',
+        'lucide:message-circle',
+        'lucide:newspaper',
+        'lucide:info',
+        'lucide:menu',
+        'lucide:panel-left-open',
+        'lucide:panel-left-close',
+        'lucide:search',
+        'lucide:languages',
+      ],
+    },
   },
 
   i18n: {
@@ -68,7 +89,7 @@ export default defineNuxtConfig({
     optimizeDeps: {
       include: [
         'countries-list',
-        'lucide-vue-next',
+        '@lucide/vue',
         'markdown-it-anchor',
         'markdown-it',
         'dompurify',

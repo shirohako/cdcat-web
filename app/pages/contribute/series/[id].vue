@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ArrowLeft, X } from 'lucide-vue-next'
+import { ArrowLeft, X } from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'
 })
 
 const route = useRoute()
+const { $api } = useNuxtApp()
 const seriesId = route.params.id as string
 
 // 加载状态
@@ -16,7 +17,6 @@ const initialData = ref<Record<string, any>>({})
 // 加载系列数据
 onMounted(async () => {
   try {
-    const { $api } = useNuxtApp()
     const data = await $api(`/v1/franchises/${seriesId}`)
     if (data) {
       initialData.value = data as Record<string, any>

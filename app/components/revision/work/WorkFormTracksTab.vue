@@ -369,7 +369,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, X, Disc3, Upload, Info } from 'lucide-vue-next'
+import { Plus, Trash2, X, Disc3, Upload, Info } from '@lucide/vue'
 
 interface Song {
   id?: string | number

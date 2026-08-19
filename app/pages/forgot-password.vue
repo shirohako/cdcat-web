@@ -266,7 +266,7 @@
 </template>
 
 <script setup lang="ts">
-import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, ShieldCheck, KeyRound, CheckCircle, LogIn } from 'lucide-vue-next'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, ShieldCheck, KeyRound, CheckCircle, LogIn } from '@lucide/vue'
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()

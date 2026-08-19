@@ -151,7 +151,7 @@
 </template>
 
 <script setup>
-import { User, Users, Building2, Sparkles, Music2 } from 'lucide-vue-next'
+import { User, Users, Building2, Sparkles, Music2 } from '@lucide/vue'
 
 const props = defineProps({
   // 初始数据（编辑模式使用）
@@ -173,6 +173,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const { $api } = useNuxtApp();
 
 const artistTypes = [
   { value: 'person',  label: '个人',    icon: User,      desc: '独立音乐人或演唱者' },
@@ -320,7 +321,6 @@ const handleSubmit = async () => {
     }
 
     // 发送到 revisions 接口
-    const { $api } = useNuxtApp();
     await $api('/v1/revisions', {
       method: 'POST',
       body: formDataToSubmit,

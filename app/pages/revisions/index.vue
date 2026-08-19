@@ -271,7 +271,7 @@
 </template>
 
 <script setup>
-import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from '@lucide/vue'
 
 const route = useRoute()
 const router = useRouter()

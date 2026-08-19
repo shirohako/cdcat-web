@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, ChevronLeft, ChevronRight, Heart, Music } from 'lucide-vue-next'
+import { ArrowLeft, ChevronLeft, ChevronRight, Heart, Music } from '@lucide/vue'
 import type { ProfileFavoriteSong, ProfileFavoriteSongsResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{

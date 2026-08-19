@@ -100,7 +100,7 @@
 
 <script setup lang="ts">
 import type { LyricsItem } from '~/types/work'
-import { FileText, AlertCircle, User, Star, Link2, Globe } from 'lucide-vue-next'
+import { FileText, AlertCircle, User, Star, Link2, Globe } from '@lucide/vue'
 
 defineProps<{
   pending: boolean

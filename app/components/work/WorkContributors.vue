@@ -51,7 +51,7 @@
 </template>
 
 <script setup>
-import { Database } from 'lucide-vue-next';
+import { Database } from '@lucide/vue';
 
 defineProps({
   contributors: {

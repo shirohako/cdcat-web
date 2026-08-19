@@ -449,7 +449,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, X, Search, Users, UserPlus, ChevronDown, Music, ListMusic, Disc3 } from 'lucide-vue-next'
+import { Plus, X, Search, Users, UserPlus, ChevronDown, Music, ListMusic, Disc3 } from '@lucide/vue'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

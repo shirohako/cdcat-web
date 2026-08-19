@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import type { WorkArtistCardItem } from '~/types/work'
-import { Users, ChevronRight } from 'lucide-vue-next'
+import { Users, ChevronRight } from '@lucide/vue'
 
 defineProps<{
   artists: WorkArtistCardItem[]

@@ -40,6 +40,7 @@ definePageMeta({
 })
 
 const route = useRoute();
+const { $api } = useNuxtApp();
 
 // 获取艺术家 ID
 const artistId = route.params.id;
@@ -52,7 +53,6 @@ const artistData = ref(null);
 // 加载艺术家数据
 onMounted(async () => {
   try {
-    const { $api } = useNuxtApp();
     const artist = await $api(`/v1/artists/${artistId}`);
 
     if (artist) {

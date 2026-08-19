@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { ArrowLeft, Home, SearchX, UserX } from 'lucide-vue-next'
+import { ArrowLeft, Home, SearchX, UserX } from '@lucide/vue'
 
 defineProps({
   username: {

@@ -175,7 +175,7 @@
 </template>
 
 <script setup>
-import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "lucide-vue-next";
+import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();

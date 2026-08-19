@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { ChevronRight, Disc3, Heart } from 'lucide-vue-next'
+import { ChevronRight, Disc3, Heart } from '@lucide/vue'
 const { locale } = useI18n()
 const failedCoverIds = ref(new Set())
 

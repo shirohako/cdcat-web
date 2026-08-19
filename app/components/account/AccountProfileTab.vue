@@ -199,7 +199,7 @@
 </template>
 
 <script setup>
-import { Camera, Save, User as UserIcon } from 'lucide-vue-next'
+import { Camera, Save, User as UserIcon } from '@lucide/vue'
 
 const props = defineProps({
   user: { type: Object, default: null }

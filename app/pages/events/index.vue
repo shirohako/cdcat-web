@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import { Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp } from "lucide-vue-next";
+import { Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp } from "@lucide/vue";
 
 const { data: groupResponse, pending, error } = await useAPI("/v1/events/series");
 

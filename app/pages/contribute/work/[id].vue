@@ -40,6 +40,7 @@ definePageMeta({
 })
 
 const route = useRoute();
+const { $api } = useNuxtApp();
 
 // 获取作品 ID
 const workId = route.params.id;
@@ -52,7 +53,6 @@ const workData = ref(null);
 // 加载作品数据
 onMounted(async () => {
   try {
-    const { $api } = useNuxtApp();
     const work = await $api(`/v1/works/${workId}/schema`);
 
     if (work) {

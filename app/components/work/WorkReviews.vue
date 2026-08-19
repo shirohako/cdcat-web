@@ -113,7 +113,7 @@
 </template>
 
 <script setup>
-import { MessageSquare, ChevronDown, UserRound, ThumbsUp, ThumbsDown, Smile } from 'lucide-vue-next'
+import { MessageSquare, ChevronDown, UserRound, ThumbsUp, ThumbsDown, Smile } from '@lucide/vue'
 
 const props = defineProps({
   initialReviews: {

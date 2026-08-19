@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, ChevronLeft, ChevronRight, Mic2 } from 'lucide-vue-next'
+import { ArrowLeft, ChevronLeft, ChevronRight, Mic2 } from '@lucide/vue'
 import type { ProfileFavoriteArtistsResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{

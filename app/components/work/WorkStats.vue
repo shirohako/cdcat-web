@@ -64,7 +64,7 @@
 
 <script setup lang="ts">
 import type { TrackingStats } from '~/types/work'
-import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "lucide-vue-next"
+import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "@lucide/vue"
 
 withDefaults(defineProps<{
   viewsCount: number

@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { ArrowLeft, Calendar, UserRound, BookOpen, Clock, Pencil } from "lucide-vue-next";
+import { ArrowLeft, Calendar, UserRound, BookOpen, Clock, Pencil } from "@lucide/vue";
 
 const props = defineProps({
   article: { type: Object, required: true },

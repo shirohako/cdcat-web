@@ -7,8 +7,11 @@ import type { ApiResponse, ApiErrorResponse } from '~/types/api'
  * 成功: { success: true, data: ..., meta?: {...} }
  * 失败: { success: false, error: { code, name, message } }
  */
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
+  const stateToken = useState<string | null>('auth:token')
+  const authTokenCookie = useCookie<string | null>('auth_token')
+  const authUserCookie = useCookie('auth_user')
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl as string,
@@ -17,10 +20,8 @@ export default defineNuxtPlugin(() => {
     onRequest({ options }) {
       // 从 useState 读取 token（与 useAuth composable 共享同一个 ref，写入即时生效）
       // 回退到 cookie（SSR 首次请求时 useState 可能未初始化）和环境变量
-      const stateToken = useState<string | null>('auth:token').value
-      const cookieToken = useCookie('auth_token').value
       const envToken = config.public.authToken
-      const token = stateToken || cookieToken || envToken
+      const token = stateToken.value || authTokenCookie.value || envToken
 
       if (token) {
         const headers = new Headers(options.headers)
@@ -91,12 +92,11 @@ export default defineNuxtPlugin(() => {
 
       // 401 未授权 - 清除 token 并跳转登录
       if (status === 401) {
-        const authToken = useCookie('auth_token')
-        const authUser = useCookie('auth_user')
-        authToken.value = null
-        authUser.value = null
+        stateToken.value = null
+        authTokenCookie.value = null
+        authUserCookie.value = null
 
-        await navigateTo('/auth/login')
+        await nuxtApp.runWithContext(() => navigateTo('/auth/login'))
         throw createApiError(errorMessage || '未授权，请重新登录')
       }
 

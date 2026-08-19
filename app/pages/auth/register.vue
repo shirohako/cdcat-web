@@ -242,7 +242,7 @@
 </template>
 
 <script setup lang="ts">
-import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, ShieldCheck, Cake } from 'lucide-vue-next'
+import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, ShieldCheck, Cake } from '@lucide/vue'
 
 const router = useRouter()
 const { $api } = useNuxtApp()

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Disc3, Film } from 'lucide-vue-next'
+import { Disc3, Film } from '@lucide/vue'
 
 const route = useRoute()
 const seriesId = computed(() => Number(route.params.id))

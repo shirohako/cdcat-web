@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, Bookmark, CheckCircle, ChevronLeft, ChevronRight, Disc3, Headphones, Package, XCircle } from 'lucide-vue-next'
+import { ArrowLeft, Bookmark, CheckCircle, ChevronLeft, ChevronRight, Disc3, Headphones, Package, XCircle } from '@lucide/vue'
 import type { ProfileTrackingWork, ProfileTrackingResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{

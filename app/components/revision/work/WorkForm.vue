@@ -156,6 +156,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const { $api } = useNuxtApp();
 
 // Tabs
 const tabs = [
@@ -782,8 +783,6 @@ const handleSubmit = async () => {
 
   try {
     const payload = getSubmitData();
-    const { $api } = useNuxtApp();
-
     // 构建 revision 请求数据
     const revisionData = {
       resource_type: 'work',

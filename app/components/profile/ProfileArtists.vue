@@ -48,7 +48,7 @@
 </template>
 
 <script setup>
-import { Mic2, ChevronRight } from 'lucide-vue-next'
+import { Mic2, ChevronRight } from '@lucide/vue'
 
 defineProps({
   artists: {

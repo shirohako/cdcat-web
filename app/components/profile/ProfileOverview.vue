@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { ChevronRight, GitCommitHorizontal, Music, Star } from 'lucide-vue-next'
+import { ChevronRight, GitCommitHorizontal, Music, Star } from '@lucide/vue'
 
 defineProps({
   songsCount: {

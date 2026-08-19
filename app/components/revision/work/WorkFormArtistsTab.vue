@@ -141,7 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, X, Users, Search } from 'lucide-vue-next'
+import { Plus, X, Users, Search } from '@lucide/vue'
 
 interface ArtistInfo {
   id: number | string

@@ -137,7 +137,7 @@
 
 <script setup lang="ts">
 import type { LyricsItem, LyricsFormData } from '~/types/work'
-import { FileText, X, Plus, Upload, ChevronLeft } from 'lucide-vue-next'
+import { FileText, X, Plus, Upload, ChevronLeft } from '@lucide/vue'
 
 const props = defineProps<{
   modelValue: boolean

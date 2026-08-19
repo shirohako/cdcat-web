@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import { Lock, KeyRound, ChevronRight } from 'lucide-vue-next'
+import { Lock, KeyRound, ChevronRight } from '@lucide/vue'
 
 const { $api } = useNuxtApp()
 

@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { Link2, Plus, Trash2 } from 'lucide-vue-next'
+import { Link2, Plus, Trash2 } from '@lucide/vue'
 import type { MetaItem, RelatedItem } from './seriesFormTypes'
 
 const props = defineProps<{

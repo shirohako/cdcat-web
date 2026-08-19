@@ -73,7 +73,7 @@
 
 <script setup lang="ts">
 import type { WorkLink } from '~/types/work'
-import { Link2, Globe, ExternalLink } from 'lucide-vue-next'
+import { Link2, Globe, ExternalLink } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   links: WorkLink[]

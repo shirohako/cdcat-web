@@ -145,7 +145,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { ArrowUpDown, GripVertical, Layers, Plus, Trash2 } from 'lucide-vue-next'
+import { ArrowUpDown, GripVertical, Layers, Plus, Trash2 } from '@lucide/vue'
 import type { MetaItem, SeriesGroup } from './seriesFormTypes'
 
 const props = defineProps<{

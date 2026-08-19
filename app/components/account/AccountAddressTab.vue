@@ -209,7 +209,7 @@
 </template>
 
 <script setup>
-import { Save, Plus, MapPin } from 'lucide-vue-next'
+import { Save, Plus, MapPin } from '@lucide/vue'
 
 defineProps({
   user: { type: Object, default: null }

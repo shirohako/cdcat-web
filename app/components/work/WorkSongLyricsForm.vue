@@ -139,7 +139,7 @@
 
 <script setup lang="ts">
 import type { LyricsFormData } from '~/types/work'
-import { Upload, FileText, Languages, AlertCircle } from 'lucide-vue-next'
+import { Upload, FileText, Languages, AlertCircle } from '@lucide/vue'
 
 const props = defineProps<{
   songId: number | null

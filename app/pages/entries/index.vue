@@ -192,7 +192,7 @@
 </template>
 
 <script setup>
-import { Film, Calendar, Heart, Eye, Music2, Plus } from "lucide-vue-next";
+import { Film, Calendar, Heart, Eye, Music2, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();

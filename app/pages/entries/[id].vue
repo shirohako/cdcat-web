@@ -325,7 +325,7 @@
 </template>
 
 <script setup>
-import { Film, Calendar, Clock, Heart, Eye, Music2, Info, ExternalLink, Disc, Link2 } from "lucide-vue-next";
+import { Film, Calendar, Clock, Heart, Eye, Music2, Info, ExternalLink, Disc, Link2 } from "@lucide/vue";
 
 // Get route params
 const route = useRoute();

@@ -177,7 +177,7 @@
 
 <script setup lang="ts">
 import type { WorkSong, WorkDisc, WorkCredit } from '~/types/work'
-import { ListMusic, Disc3, Users, Heart, Music2, FileText, Languages } from "lucide-vue-next"
+import { ListMusic, Disc3, Users, Heart, Music2, FileText, Languages } from "@lucide/vue"
 
 const { isAuthenticated } = useAuth()
 const { toggleFavoriteSong } = useFavorites()

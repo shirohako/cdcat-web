@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import type { WorkArticle } from '~/types/work'
-import { FileText } from 'lucide-vue-next'
+import { FileText } from '@lucide/vue'
 
 defineProps<{
   articles: WorkArticle[]

@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { Bookmark, CheckCircle, ChevronRight, Headphones, Package, XCircle } from 'lucide-vue-next'
+import { Bookmark, CheckCircle, ChevronRight, Headphones, Package, XCircle } from '@lucide/vue'
 
 const { t } = useI18n()
 

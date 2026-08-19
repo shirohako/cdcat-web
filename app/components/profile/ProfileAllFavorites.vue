@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, ChevronLeft, ChevronRight, Disc3, Heart } from 'lucide-vue-next'
+import { ArrowLeft, ChevronLeft, ChevronRight, Disc3, Heart } from '@lucide/vue'
 import type { ProfileFavoriteWork, ProfileFavoriteWorksResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{

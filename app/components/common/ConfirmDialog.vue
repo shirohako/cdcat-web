@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { Trash2, AlertTriangle } from 'lucide-vue-next'
+import { Trash2, AlertTriangle } from '@lucide/vue'
 
 defineProps<{
   modelValue: boolean

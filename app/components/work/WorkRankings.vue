@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { Trophy, Star, PenLine } from "lucide-vue-next";
+import { Trophy, Star, PenLine } from "@lucide/vue";
 
 const emit = defineEmits(['writeReview']);
 

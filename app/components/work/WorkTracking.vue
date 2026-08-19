@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { ListChecks } from 'lucide-vue-next'
+import { ListChecks } from '@lucide/vue'
 import type { TrackingStatus } from '~/types/tracking'
 
 const props = defineProps<{

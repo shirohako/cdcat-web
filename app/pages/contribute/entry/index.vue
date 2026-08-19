@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Film, Download, PenLine, ArrowRight } from 'lucide-vue-next'
+import { Film, Download, PenLine, ArrowRight } from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -10,6 +10,7 @@ useHead({
 })
 
 const router = useRouter()
+const { $api } = useNuxtApp()
 const showBangumiModal = ref(false)
 const bangumiId = ref('')
 const isLoading = ref(false)
@@ -36,7 +37,6 @@ const importFromBangumi = async () => {
   errorMessage.value = ''
 
   try {
-    const { $api } = useNuxtApp()
     const response = await $api<{ entry: Record<string, any> }>(`/v1/entries/preview/bangumi`, {
       query: { subject_id: bangumiId.value.trim() }
     })

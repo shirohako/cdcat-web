@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { X, ChevronDown } from 'lucide-vue-next'
+import { X, ChevronDown } from '@lucide/vue'
 
 const props = defineProps<{
   modelValue: string

@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import { UserRound } from "lucide-vue-next";
+import { UserRound } from "@lucide/vue";
 
 defineProps({
   author: { type: Object, required: true },

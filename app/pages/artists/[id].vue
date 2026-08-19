@@ -224,7 +224,7 @@ import {
   Heart,
   Eye,
   Edit,
-} from "lucide-vue-next";
+} from "@lucide/vue";
 
 const { isAuthenticated } = useAuth()
 const { $api } = useNuxtApp()

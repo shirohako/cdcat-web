@@ -153,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { Star, X, Pencil, Eye, Loader2, Globe, MessageSquare } from 'lucide-vue-next'
+import { Star, X, Pencil, Eye, Loader2, Globe, MessageSquare } from '@lucide/vue'
 
 const LANGUAGES = [
   { code: 'zh-Hans', label: '简体中文' },

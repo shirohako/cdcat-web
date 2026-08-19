@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
-import { Check, Save, X } from 'lucide-vue-next'
+import { Check, Save, X } from '@lucide/vue'
 import type { MetaItem, RelatedItem, SeriesCreateForm, SeriesGroup } from '~/components/revision/series/seriesFormTypes'
 
 const props = defineProps<{
@@ -9,6 +9,7 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+const { $api } = useNuxtApp()
 
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.seriesId)
@@ -358,7 +359,6 @@ const submitForm = async () => {
 
   isSubmitting.value = true
   try {
-    const { $api } = useNuxtApp()
     const formData = new FormData()
     formData.append('payload', JSON.stringify(submissionPayload.value))
     formData.append('resource_type', 'franchise')

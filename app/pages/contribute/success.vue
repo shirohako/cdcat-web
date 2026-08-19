@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { CheckCircle, Clock, ArrowLeft, ClipboardList } from 'lucide-vue-next';
+import { CheckCircle, Clock, ArrowLeft, ClipboardList } from '@lucide/vue';
 
 const route = useRoute();
 

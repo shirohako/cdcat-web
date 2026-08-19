@@ -200,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft, TriangleAlert } from 'lucide-vue-next'
+import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft, TriangleAlert } from '@lucide/vue'
 
 const router = useRouter()
 const route = useRoute()

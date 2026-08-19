@@ -113,7 +113,7 @@ import type { Component } from 'vue'
 import {
   Gift, Disc3, Music, Image as ImageIcon, Ticket, Download,
   Package, BookOpen, Key, PenLine,
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   bonuses: WorkBonusWithProduct[]

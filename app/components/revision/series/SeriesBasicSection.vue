@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Tag as TagIcon } from 'lucide-vue-next'
+import { Tag as TagIcon } from '@lucide/vue'
 import type { SeriesCreateForm } from './seriesFormTypes'
 
 const props = defineProps<{

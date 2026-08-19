@@ -309,7 +309,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, PackageOpen, Tag, Lock, CalendarDays, Disc3, Banknote, Image as ImageIcon, SlidersHorizontal } from 'lucide-vue-next'
+import { Plus, Trash2, PackageOpen, Tag, Lock, CalendarDays, Disc3, Banknote, Image as ImageIcon, SlidersHorizontal } from '@lucide/vue'
 import { getCountryDataList } from 'countries-list'
 
 export interface Product {

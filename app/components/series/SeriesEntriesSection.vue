@@ -156,7 +156,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Disc3, Film } from 'lucide-vue-next'
+import { Disc3, Film } from '@lucide/vue'
 
 type EntryItem = {
   id: number

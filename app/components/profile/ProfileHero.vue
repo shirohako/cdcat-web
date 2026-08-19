@@ -93,7 +93,7 @@
 </template>
 
 <script setup>
-import { Calendar, MoreVertical, User } from "lucide-vue-next";
+import { Calendar, MoreVertical, User } from "@lucide/vue";
 
 const props = defineProps({
   profile: {

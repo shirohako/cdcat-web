@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Disc3, Film, Plus } from 'lucide-vue-next'
+import { Disc3, Film, Plus } from '@lucide/vue'
 
 const route = useRoute()
 const router = useRouter()

@@ -155,7 +155,7 @@
 </template>
 
 <script setup>
-import { Save } from 'lucide-vue-next'
+import { Save } from '@lucide/vue'
 
 const emit = defineEmits(['save'])
 

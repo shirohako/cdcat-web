@@ -18,5 +18,5 @@
 </template>
 
 <script setup>
-import { ShieldCheck } from 'lucide-vue-next'
+import { ShieldCheck } from '@lucide/vue'
 </script>

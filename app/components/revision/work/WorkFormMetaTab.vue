@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-import { Tag } from 'lucide-vue-next'
+import { Tag } from '@lucide/vue'
 </script>

@@ -46,7 +46,7 @@
 
 <script setup lang="ts">
 import type { WorkCreditGroup } from '~/types/work'
-import { Users } from "lucide-vue-next"
+import { Users } from "@lucide/vue"
 
 withDefaults(defineProps<{
   credits: WorkCreditGroup[]

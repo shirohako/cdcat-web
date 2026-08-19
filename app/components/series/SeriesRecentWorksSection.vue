@@ -129,7 +129,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Disc3 } from 'lucide-vue-next'
+import { Disc3 } from '@lucide/vue'
 
 type WorkItem = {
   id: number

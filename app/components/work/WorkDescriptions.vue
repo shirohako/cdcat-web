@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { FileText } from "lucide-vue-next";
+import { FileText } from "@lucide/vue";
 import MarkdownIt from "markdown-it";
 
 const props = defineProps({

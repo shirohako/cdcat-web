@@ -90,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, Link2 } from 'lucide-vue-next'
+import { Plus, Trash2, Link2 } from '@lucide/vue'
 
 interface LinkProvider {
   id: number

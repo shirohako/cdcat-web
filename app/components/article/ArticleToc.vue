@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { List } from "lucide-vue-next";
+import { List } from "@lucide/vue";
 
 const props = defineProps({
   tocItems: { type: Array, default: () => [] },

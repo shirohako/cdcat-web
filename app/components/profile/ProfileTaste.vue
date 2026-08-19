@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { Music, Sparkles } from 'lucide-vue-next'
+import { Music, Sparkles } from '@lucide/vue'
 
 const props = defineProps({
   tags: {

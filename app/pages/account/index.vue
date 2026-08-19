@@ -166,7 +166,7 @@
 import {
   User as UserIcon, Mail, Lock, Bell, AlertTriangle, Settings, EyeOff,
   Check, Info as InfoIcon
-} from 'lucide-vue-next'
+} from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'

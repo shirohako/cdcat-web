@@ -113,7 +113,7 @@
 
 <script setup lang="ts">
 import type { WorkProduct, MediumType, EditionType } from '~/types/work'
-import { Disc3, Package, Lock, Wifi, CalendarDays } from 'lucide-vue-next'
+import { Disc3, Package, Lock, Wifi, CalendarDays } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   products: WorkProduct[]

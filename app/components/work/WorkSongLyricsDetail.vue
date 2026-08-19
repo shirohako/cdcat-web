@@ -98,7 +98,7 @@
 
 <script setup lang="ts">
 import type { LyricsItem } from '~/types/work'
-import { AlertCircle, Globe, Star, Link2, FileText } from 'lucide-vue-next'
+import { AlertCircle, Globe, Star, Link2, FileText } from '@lucide/vue'
 
 const props = defineProps<{
   lyricId: number

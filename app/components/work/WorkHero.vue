@@ -194,7 +194,7 @@ import {
   UserRound,
   Headphones,
   Tag,
-} from "lucide-vue-next"
+} from "@lucide/vue"
 
 const formatType = (type: string | null | undefined): string => {
   const map: Record<string, string> = {

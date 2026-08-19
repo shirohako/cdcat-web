@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import { Mail, ShieldCheck } from 'lucide-vue-next'
+import { Mail, ShieldCheck } from '@lucide/vue'
 
 defineProps({
   user: { type: Object, default: null }

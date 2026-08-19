@@ -129,7 +129,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus, Trash2, Gift } from 'lucide-vue-next'
+import { Plus, Trash2, Gift } from '@lucide/vue'
 
 export interface Bonus {
   id: string
