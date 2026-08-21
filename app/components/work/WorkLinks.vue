@@ -6,7 +6,7 @@
         <Link2 :size="15" class="text-indigo-500" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.links') }}</h2>
-      <span v-if="links && links.length > 0" class="ml-auto text-xs text-gray-400">{{ links.length }} 个</span>
+      <span v-if="links && links.length > 0" class="ml-auto text-xs text-gray-400">{{ $t('content_display.links', { count: links.length }) }}</span>
     </div>
 
     <!-- Links grouped by category -->

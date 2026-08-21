@@ -69,11 +69,11 @@
                 <div class="flex items-center gap-4">
                   <span v-if="albumData.discCount > 0" class="flex items-center gap-1.5">
                     <Disc3 :size="14" class="text-gray-500 shrink-0" />
-                    {{ albumData.discCount }} {{ albumData.discCount === 1 ? 'Disc' : 'Discs' }}
+                    {{ $t('content_display.disc_count', { count: albumData.discCount }) }}
                   </span>
                   <span v-if="albumData.trackCount > 0" class="flex items-center gap-1.5">
                     <Music :size="14" class="text-gray-500 shrink-0" />
-                    {{ albumData.trackCount }} Tracks
+                    {{ $t('content_display.track_count', { count: albumData.trackCount }) }}
                   </span>
                 </div>
               </div>
@@ -81,7 +81,7 @@
 
             <!-- Streaming Links -->
             <div v-if="streaming && streaming.length > 0" class="mt-3 flex items-center justify-center md:justify-start gap-2 flex-wrap">
-              <p class="text-sm text-gray-600 shrink-0 flex items-center gap-1"><Headphones :size="13" class="text-gray-500" />流媒体</p>
+              <p class="text-sm text-gray-600 shrink-0 flex items-center gap-1"><Headphones :size="13" class="text-gray-500" />{{ $t('content_display.streaming') }}</p>
               <div class="flex items-center gap-1.5 flex-wrap">
                 <a
                   v-for="link in streaming"
@@ -120,12 +120,12 @@
                   @click="toggleLike"
                 >
                   <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />
-                  {{ isFavorited ? 'Liked' : 'Like' }}
+                  {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
                 </button>
                 <!-- Buy it + Edit: inline with Like below lg -->
                 <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5" @click="buyDialog?.showModal()">
                   <ShoppingCart :size="13" />
-                  Buy it
+                  {{ $t('content_display.buy') }}
                 </button>
                 <NuxtLink
                   v-if="workId"
@@ -133,14 +133,14 @@
                   class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
                 >
                   <Edit :size="13" />
-                  Edit
+                  {{ $t('common.edit') }}
                 </NuxtLink>
               </div>
               <!-- Buy it + Edit: own row on lg+ only -->
               <div class="hidden lg:flex gap-1.5">
                 <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0" @click="buyDialog?.showModal()">
                   <ShoppingCart :size="13" />
-                  Buy it
+                  {{ $t('content_display.buy') }}
                 </button>
                 <NuxtLink
                   v-if="workId"
@@ -148,7 +148,7 @@
                   class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
                 >
                   <Edit :size="13" />
-                  Edit
+                  {{ $t('common.edit') }}
                 </NuxtLink>
               </div>
             </div>
@@ -168,14 +168,14 @@
           <ShoppingCart :size="24" class="text-white" />
         </div>
         <div>
-          <h3 class="font-bold text-gray-900 text-base">功能开发中</h3>
-          <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">敬请期待。</p>
+          <h3 class="font-bold text-gray-900 text-base">{{ $t('content_display.feature_developing') }}</h3>
+          <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">{{ $t('content_display.stay_tuned') }}</p>
         </div>
-        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog?.close()">知道了</button>
+        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog?.close()">{{ $t('common.got_it') }}</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button>close</button>
+      <button>{{ $t('common.close') }}</button>
     </form>
   </dialog>
 </template>

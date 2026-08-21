@@ -12,10 +12,10 @@
             <h1
               class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900"
             >
-              探索繁星璀璨的夜空，找到属于你的声音坐标
+              {{ t('home.hero_title') }}
             </h1>
             <p class="text-lg text-slate-600 max-w-2xl">
-              CDCAT 是一个面向重度听歌用户的音乐资料站点。
+              {{ t('home.hero_description') }}
             </p>
           </div>
 
@@ -25,7 +25,7 @@
               class="group inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-emerald-500 px-6 py-3 text-white font-semibold shadow-lg shadow-sky-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
             >
               <Music :size="20" />
-              浏览作品
+              {{ t('home.browse_works') }}
               <ArrowRight
                 :size="18"
                 class="transition-transform duration-300 group-hover:translate-x-1"
@@ -36,7 +36,7 @@
               class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 font-semibold text-slate-800 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg"
             >
               <Users :size="20" />
-              发现艺术家
+              {{ t('home.discover_artists') }}
             </NuxtLink>
           </div>
 
@@ -48,26 +48,26 @@
                 class="flex items-center gap-2 text-emerald-600 font-semibold"
               >
                 <Disc3 :size="18" />
-                <span>数据库</span>
+                <span>{{ t('home.database') }}</span>
               </div>
-              <p class="text-sm text-slate-600 mt-1">可以查询音乐作品的情报</p>
+              <p class="text-sm text-slate-600 mt-1">{{ t('home.database_desc') }}</p>
             </div>
             <div class="border border-slate-200/90 bg-white/80 rounded-[14px] py-3.5 px-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(15,23,42,0.5)]">
               <div class="flex items-center gap-2 text-sky-600 font-semibold">
                 <Search :size="18" />
-                <span>时光机</span>
+                <span>{{ t('home.timeline') }}</span>
               </div>
               <p class="text-sm text-slate-600 mt-1">
-                管理自己听过的，喜欢的歌曲
+                {{ t('home.timeline_desc') }}
               </p>
             </div>
             <div class="border border-slate-200/90 bg-white/80 rounded-[14px] py-3.5 px-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(15,23,42,0.5)]">
               <div class="flex items-center gap-2 text-amber-600 font-semibold">
                 <Radio :size="18" />
-                <span>交流地</span>
+                <span>{{ t('home.community') }}</span>
               </div>
               <p class="text-sm text-slate-600 mt-1">
-                这里也是 音乐/设备/作曲 的交流平台
+                {{ t('home.community_desc') }}
               </p>
             </div>
           </div>
@@ -78,7 +78,7 @@
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                  Beta Version
+                  {{ t('home.beta') }}
                 </p>
                 <p class="text-3xl font-black text-slate-900 mt-1">CDCAT</p>
               </div>
@@ -86,7 +86,7 @@
                 class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-semibold"
               >
                 <Sparkles :size="14" />
-                <span>内部测试版本</span>
+                <span>{{ t('home.beta') }}</span>
               </div>
             </div>
 
@@ -96,13 +96,13 @@
               >
                 <div class="flex items-center justify-between mb-3">
                   <p class="text-sm font-semibold text-slate-700">
-                    你想找什么？
+                    {{ t('home.search_question') }}
                   </p>
                   <div
                     class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold"
                   >
                     <Sparkles :size="14" />
-                    <span>搜索功能还不可用</span>
+                    <span>{{ t('home.search_unavailable') }}</span>
                   </div>
                 </div>
                 <div
@@ -110,19 +110,19 @@
                 >
                   <Search :size="18" class="text-slate-500" />
                   <span class="text-sm text-slate-500"
-                    >例如：东方红魔乡 / 初音未来 / M3-53</span
+                    >{{ t('home.search_example') }}</span
                   >
                 </div>
               </div>
 
-              <p class="text-sm font-semibold text-slate-700">发现更多：</p>
+              <p class="text-sm font-semibold text-slate-700">{{ t('home.discover_more') }}</p>
               <div class="grid grid-cols-2 gap-3">
                 <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
                   <div
                     class="flex items-center gap-2 text-sky-600 font-semibold"
                   >
                     <Library :size="16" />
-                    <span>找音乐</span>
+                    <span>{{ t('home.find_music') }}</span>
                   </div>
                 </div>
                 <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
@@ -130,7 +130,7 @@
                     class="flex items-center gap-2 text-amber-600 font-semibold"
                   >
                     <Mic2 :size="16" />
-                    <span>找音乐人</span>
+                    <span>{{ t('home.find_artists') }}</span>
                   </div>
                 </div>
                 <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
@@ -138,7 +138,7 @@
                     class="flex items-center gap-2 text-emerald-600 font-semibold"
                   >
                     <CalendarDays :size="16" />
-                    <span>设备评测</span>
+                    <span>{{ t('home.gear_reviews') }}</span>
                   </div>
                 </div>
                 <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
@@ -146,7 +146,7 @@
                     class="flex items-center gap-2 text-slate-800 font-semibold"
                   >
                     <Tag :size="16" />
-                    <span>交流</span>
+                    <span>{{ t('home.discussions') }}</span>
                   </div>
                 </div>
               </div>
@@ -161,9 +161,9 @@
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <h2 class="text-3xl font-bold text-slate-900">满足所有人的需求</h2>
+            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.for_everyone') }}</h2>
             <p class="text-slate-600 mt-1">
-              无论您是创作者，还是听众，都可以使用。
+              {{ t('home.for_everyone_desc') }}
             </p>
           </div>
         </div>
@@ -207,17 +207,17 @@
         >
           <div>
             <p class="text-sm uppercase tracking-[0.2em] text-slate-500">
-              What we offer
+              {{ t('home.offer_label') }}
             </p>
-            <h2 class="text-3xl font-bold text-slate-900">自有"纯净"数据</h2>
+            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.clean_data') }}</h2>
             <p class="text-slate-600 mt-1">
-              CDCAT 不会用爬虫自动化收集任何同类网站数据，所有数据来自用户提交。
+              {{ t('home.clean_data_desc') }}
             </p>
           </div>
           <div class="flex flex-wrap gap-2 text-xs text-slate-600">
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">任何人可编辑</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">开放接口</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">免费</span>
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.editable') }}</span>
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.open_api') }}</span>
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.free') }}</span>
           </div>
         </div>
 
@@ -245,11 +245,11 @@
         >
           <div>
             <p class="text-sm uppercase tracking-[0.2em] text-slate-500">
-              Curated topics
+              {{ t('home.topics_label') }}
             </p>
-            <h2 class="text-3xl font-bold text-slate-900">不仅仅是音乐</h2>
+            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.beyond_music') }}</h2>
             <p class="text-slate-600 mt-1">
-              音乐往往和游戏、动漫、电影、电视剧等内容一起被创作出来。我们完善的关联设计，方便从各个视角切入查看。
+              {{ t('home.beyond_music_desc') }}
             </p>
           </div>
         </div>
@@ -308,9 +308,9 @@
               <p class="text-sm uppercase tracking-[0.2em] text-slate-300">
                 Flow
               </p>
-              <h2 class="text-3xl font-bold">为收藏家定制的音乐站</h2>
+              <h2 class="text-3xl font-bold">{{ t('home.collector_title') }}</h2>
               <p class="text-slate-200/80 mt-2">
-                我们在专辑的基础上，提供商品，特典信息查看。
+                {{ t('home.collector_desc') }}
               </p>
             </div>
           </div>
@@ -363,80 +363,80 @@ import {
   Globe2,
 } from "@lucide/vue";
 
-const portalLinks = [
+const { t } = useI18n();
+
+const portalLinks = computed(() => [
   {
-    title: "听众",
-    desc: "可以在 CDCAT 记录，管理自己听过的音乐，创建歌单，分享喜欢的曲目。",
+    title: t('home.listener'),
+    desc: t('home.listener_desc'),
     icon: Library,
     tone: "bg-gradient-to-br from-sky-500 to-cyan-500",
   },
   {
-    title: "音乐创作者",
-    desc: "可以在 CDCAT 宣传自己的作品，添加售卖链接，和听众意见。",
+    title: t('home.creator'),
+    desc: t('home.creator_desc'),
     icon: Mic2,
     tone: "bg-gradient-to-br from-emerald-500 to-lime-500",
   },
-];
+]);
 
-const stats = [
-  { value: "0K+", label: "音乐作品", desc: "" },
-  { value: "0K+", label: "艺术家/社团", desc: "" },
-  { value: "0K+", label: "单曲", desc: "" },
-  { value: "0K+", label: "乐评", desc: "" },
-];
+const stats = computed(() => [
+  { value: "0K+", label: t('home.stats.works'), desc: "" },
+  { value: "0K+", label: t('home.stats.artists'), desc: "" },
+  { value: "0K+", label: t('home.stats.songs'), desc: "" },
+  { value: "0K+", label: t('home.stats.reviews'), desc: "" },
+]);
 
-const topics = [
+const topics = computed(() => [
   {
-    tag: "条目",
-    title: "寻找某个动画的所有音乐",
-    desc: "我们设计了条目，可以快速从Bangumi.tv 导入动画，任何专辑都可以关联到条目中。",
-    pills: ["动画", "游戏", "电视剧"],
+    tag: t('home.topic_entry_tag'),
+    title: t('home.topic_entry_title'),
+    desc: t('home.topic_entry_desc'),
+    pills: [t('home.anime'), t('home.games'), t('home.tv')],
     icon: Globe2,
     tone: "bg-gradient-to-br from-sky-500 to-blue-600",
   },
   {
-    tag: "系列",
-    title: "寻找有相同所有音乐",
-    desc: "多个同样IP下的多个游戏，动画。可以将多个专辑和条目，归档为一个系列，结构一目了然。",
-    pills: ["整合条目", "同主题"],
+    tag: t('home.topic_series_tag'),
+    title: t('home.topic_series_title'),
+    desc: t('home.topic_series_desc'),
+    pills: [t('home.combined_entries'), t('home.shared_theme')],
     icon: ListMusic,
     tone: "bg-gradient-to-br from-emerald-500 to-teal-600",
   },
-];
+]);
 
-const flow = [
+const flow = computed(() => [
   {
     tag: "Products",
-    title: "商品",
-    desc: "整合所有音乐关联的发型产品。无论是普通版本，限定版本，还是数字下载版本。轻松了解关系和价格。",
+    title: t('home.products'),
+    desc: t('home.products_desc'),
     icon: Search,
   },
   {
     tag: "Tokuten",
-    title: "特典",
-    desc: "限定特典，店铺特典，下载特典，期间限定特典。轻松了解商品信息。",
+    title: t('home.bonuses'),
+    desc: t('home.bonuses_desc'),
     icon: Library,
   },
   {
     tag: "Links",
-    title: "链接",
-    desc: "一键直达作者委托店铺，拒绝跳转到任何诈骗网站。",
+    title: t('home.links'),
+    desc: t('home.links_desc'),
     icon: Tag,
   },
-];
+]);
 
 useHead({
-  title: "CDCAT - 日系音乐门户 | 同人·VOCALOID·动漫·游戏",
+  title: computed(() => t('home.seo_title')),
   meta: [
     {
       name: "description",
-      content:
-        "CDCAT 是日系音乐情报门户，聚合同人音乐、VOCALOID、动漫游戏配乐与活动档案，提供细致的曲目信息与专题策展。",
+      content: computed(() => t('home.seo_description')),
     },
     {
       name: "keywords",
-      content:
-        "日系音乐,同人音乐,VOCALOID,东方Project,动漫OST,游戏音乐,音乐数据库,曲目索引",
+      content: computed(() => t('home.seo_keywords')),
     },
   ],
 });

@@ -15,7 +15,7 @@
       <input
         ref="inputRef"
         v-model="query"
-        :placeholder="selectedOption ? selectedOption.name : '请选择或输入语言代码…'"
+        :placeholder="selectedOption ? selectedOption.name : t('common.select_language_code')"
         class="flex-1 min-w-0 outline-none bg-transparent text-gray-800 placeholder-gray-400"
         @focus="openDropdown"
         @keydown.escape.prevent="close"
@@ -61,14 +61,14 @@
             @click="selectCustom"
           >
             <span class="font-mono text-xs font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded shrink-0">{{ query }}</span>
-            <span class="text-gray-400 text-xs">使用自定义代码</span>
+            <span class="text-gray-400 text-xs">{{ t('common.use_custom_code') }}</span>
           </button>
 
           <div v-if="!filteredOptions.length && !query" class="px-3 py-4 text-center text-xs text-gray-400">
-            输入关键词搜索
+            {{ t('common.search_language') }}
           </div>
           <div v-else-if="!filteredOptions.length && query && exactMatch" class="px-3 py-2 text-xs text-gray-400 text-center">
-            无更多匹配项
+            {{ t('common.no_more_matches') }}
           </div>
 
           <button
@@ -99,19 +99,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-// ── Language list ──────────────────────────────────────────────────────────
-// Special entries that Intl.DisplayNames handles poorly or needs overrides
-const SPECIAL: Record<string, string> = {
-  'ja-Latn': 'Romaji（日文罗马字）',
-  'zh-Hans': '简体中文',
-  'zh-Hant': '繁體中文',
-  'zh-HK':   '粤语（香港）',
-  'zh-TW':   '繁體中文（台灣）',
-  'pt-BR':   '葡萄牙语（巴西）',
-  'pt-PT':   '葡萄牙语（葡萄牙）',
-  'es-419':  '西班牙语（拉美）',
-  'sr-Latn': '塞尔维亚语（拉丁）',
-}
+const { t } = useI18n()
+const { languageName } = useLocaleFormatting()
 
 const ISO_CODES = [
   'ja', 'ko', 'zh', 'en', 'fr', 'de', 'es', 'it', 'pt', 'ru',
@@ -134,25 +123,11 @@ interface LangOption {
 }
 
 const buildOptions = (): LangOption[] => {
-  const displayNames = new Intl.DisplayNames(['zh-Hans'], { type: 'language' })
-
-  const special = Object.entries(SPECIAL).map(([code, name]) => ({ code, name }))
-
-  const iso = ISO_CODES.map(code => {
-    let name: string
-    try { name = displayNames.of(code) ?? code }
-    catch { name = code }
-    return { code, name }
-  })
-
-  // Deduplicate by code, special entries take priority
-  const seen = new Set(special.map(o => o.code))
-  const deduped = iso.filter(o => !seen.has(o.code))
-
-  return [...special, ...deduped]
+  const codes = ['ja-Latn', 'zh-Hans', 'zh-Hant', 'zh-HK', 'zh-TW', 'pt-BR', 'pt-PT', 'es-419', 'sr-Latn', ...ISO_CODES]
+  return [...new Set(codes)].map(code => ({ code, name: languageName(code) }))
 }
 
-const allOptions = buildOptions()
+const allOptions = computed(buildOptions)
 
 // ── State ──────────────────────────────────────────────────────────────────
 const isOpen = ref(false)
@@ -163,20 +138,20 @@ const inputRef = ref<HTMLInputElement | null>(null)
 const listRef = ref<HTMLElement | null>(null)
 
 const selectedOption = computed(() =>
-  allOptions.find(o => o.code === props.modelValue) ??
+  allOptions.value.find(o => o.code === props.modelValue) ??
   (props.modelValue ? { code: props.modelValue, name: props.modelValue } : null)
 )
 
 const filteredOptions = computed(() => {
-  if (!query.value) return allOptions
+  if (!query.value) return allOptions.value
   const q = query.value.toLowerCase()
-  return allOptions.filter(o =>
+  return allOptions.value.filter(o =>
     o.code.toLowerCase().includes(q) || o.name.toLowerCase().includes(q)
   )
 })
 
 const exactMatch = computed(() =>
-  allOptions.some(o => o.code.toLowerCase() === query.value.toLowerCase())
+  allOptions.value.some(o => o.code.toLowerCase() === query.value.toLowerCase())
 )
 
 // ── Actions ────────────────────────────────────────────────────────────────

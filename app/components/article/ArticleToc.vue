@@ -2,7 +2,7 @@
   <div v-if="tocItems.length > 0" class="bg-white rounded-2xl shadow-sm overflow-hidden sticky top-6">
     <div class="flex items-center gap-2 px-4 py-3 bg-linear-to-r from-violet-500 to-indigo-500">
       <List :size="14" class="text-white/90" />
-      <span class="text-sm font-semibold text-white">目录</span>
+      <span class="text-sm font-semibold text-white">{{ $t('article_ui.toc') }}</span>
     </div>
 
     <nav class="px-3 py-3 max-h-[60vh] overflow-y-auto toc-scroll">

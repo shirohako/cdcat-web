@@ -54,8 +54,9 @@ const props = defineProps({
   }
 })
 
-const titleText = '功能准备中'
-const descriptionText = '穿越虚无，终将迎来黎明破晓。'
-const videoAriaLabel = '加载动画'
-const backText = '返回上一页'
+const { t } = useI18n()
+const titleText = computed(() => t('common.coming_soon'))
+const descriptionText = computed(() => t('common.coming_soon_desc'))
+const videoAriaLabel = computed(() => t('common.loading_animation'))
+const backText = computed(() => t('common.go_back'))
 </script>

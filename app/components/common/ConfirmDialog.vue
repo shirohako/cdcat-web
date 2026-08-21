@@ -52,7 +52,7 @@
                   class="btn btn-sm btn-warning"
                   @click="onConfirm"
                 >
-                  知道了
+                  {{ $t('common.got_it') }}
                 </button>
               </template>
               <template v-else>
@@ -61,14 +61,14 @@
                   class="btn btn-sm btn-ghost text-gray-500"
                   @click="onCancel"
                 >
-                  取消
+                  {{ $t('common.cancel') }}
                 </button>
                 <button
                   type="button"
                   class="btn btn-sm btn-error"
                   @click="onConfirm"
                 >
-                  {{ confirmText ?? '确认删除' }}
+                  {{ confirmText ?? $t('common.confirm_delete') }}
                 </button>
               </template>
             </div>

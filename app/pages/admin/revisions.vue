@@ -5,9 +5,9 @@
       <!-- Header -->
       <header class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Admin Console</p>
-          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">修改申请</h1>
-          <p class="mt-1 text-sm text-slate-600">审核用户提交的所有词条编辑申请。</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{{ t('admin_pages.console') }}</p>
+          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">{{ t('admin_pages.revisions.title') }}</h1>
+          <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.revisions.description') }}</p>
         </div>
       </header>
 
@@ -36,7 +36,7 @@
       <div v-if="pending" class="flex items-center justify-center min-h-60">
         <div class="flex flex-col items-center gap-3 text-slate-400">
           <GitPullRequest :size="32" class="opacity-30" />
-          <p class="text-sm">加载中…</p>
+          <p class="text-sm">{{ t('common.loading') }}</p>
         </div>
       </div>
 
@@ -44,13 +44,13 @@
       <div v-else-if="error" class="flex items-center justify-center min-h-60">
         <div class="flex flex-col items-center gap-3 text-slate-400">
           <AlertCircle :size="32" class="opacity-40" />
-          <p class="text-sm">{{ error.message }}</p>
+          <p class="text-sm">{{ localizeError(error) }}</p>
         </div>
       </div>
 
       <div v-else>
         <div class="mb-3 text-xs text-slate-400">
-          共 {{ pagination.total }} 条记录
+          {{ t('common.items_total', { count: pagination.total }) }}
         </div>
 
         <!-- Desktop 表格 -->
@@ -59,12 +59,12 @@
             <thead>
               <tr class="border-b border-slate-100 bg-slate-50/60">
                 <th class="w-14 px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">ID</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">词条</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">修改主体</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">操作</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">提交者</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">状态</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">提交时间</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.entry') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.subject') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.action') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.submitter') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.status') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.revisions.submitted_at') }}</th>
                 <th class="w-32 px-4 py-3" />
               </tr>
             </thead>
@@ -122,20 +122,20 @@
                       class="whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
                       @click.stop="goToDetail(revision.id)"
                     >
-                      详情
+                      {{ t('common.details') }}
                     </button>
                     <template v-if="revision.status === 'pending'">
                       <button
                         class="whitespace-nowrap rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
                         @click.stop="openConfirm('approve', revision)"
                       >
-                        通过
+                        {{ t('admin_pages.revisions.approve') }}
                       </button>
                       <button
                         class="whitespace-nowrap rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
                         @click.stop="openConfirm('reject', revision)"
                       >
-                        拒绝
+                        {{ t('admin_pages.revisions.reject') }}
                       </button>
                     </template>
                   </div>
@@ -145,7 +145,7 @@
               <tr v-if="revisionsData.length === 0">
                 <td colspan="8" class="px-5 py-16 text-center">
                   <GitPullRequest :size="28" class="mx-auto mb-3 text-slate-300" />
-                  <p class="text-sm text-slate-400">暂无记录</p>
+                  <p class="text-sm text-slate-400">{{ t('common.no_records') }}</p>
                 </td>
               </tr>
             </tbody>
@@ -188,20 +188,20 @@
                 class="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:bg-slate-50"
                 @click="goToDetail(revision.id)"
               >
-                详情
+                {{ t('common.details') }}
               </button>
               <template v-if="revision.status === 'pending'">
                 <button
                   class="rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
                   @click="openConfirm('approve', revision)"
                 >
-                  通过
+                  {{ t('admin_pages.revisions.approve') }}
                 </button>
                 <button
                   class="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
                   @click="openConfirm('reject', revision)"
                 >
-                  拒绝
+                  {{ t('admin_pages.revisions.reject') }}
                 </button>
               </template>
             </div>
@@ -209,14 +209,14 @@
 
           <div v-if="revisionsData.length === 0" class="flex flex-col items-center py-16 text-slate-400">
             <GitPullRequest :size="28" class="mb-3 opacity-40" />
-            <p class="text-sm">暂无记录</p>
+            <p class="text-sm">{{ t('common.no_records') }}</p>
           </div>
         </div>
 
         <!-- 分页 -->
         <div v-if="pagination.last_page > 1" class="mt-6 flex items-center justify-between">
           <p class="text-xs text-slate-400">
-            第 {{ (pagination.current_page - 1) * pagination.per_page + 1 }}–{{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }} 条
+            {{ t('common.page_range', { total: pagination.total, start: (pagination.current_page - 1) * pagination.per_page + 1, end: Math.min(pagination.current_page * pagination.per_page, pagination.total) }) }}
           </p>
           <div class="flex items-center gap-1">
             <button
@@ -255,11 +255,11 @@
     <CommonConfirmDialog
       v-model="confirmModal.open"
       :variant="confirmModal.action === 'approve' ? 'confirm' : 'delete'"
-      :confirm-text="confirmModal.action === 'approve' ? '确认通过' : '确认拒绝'"
-      :title="confirmModal.action === 'approve' ? '通过修改申请' : '拒绝修改申请'"
+      :confirm-text="confirmModal.action === 'approve' ? t('admin_pages.revisions.confirm_approve') : t('admin_pages.revisions.confirm_reject')"
+      :title="confirmModal.action === 'approve' ? t('admin_pages.revisions.approve_title') : t('admin_pages.revisions.reject_title')"
       :description="confirmModal.action === 'approve'
-        ? `确认通过「${confirmModal.revision?.title ?? ''}」的修改申请？`
-        : `确认拒绝「${confirmModal.revision?.title ?? ''}」的修改申请？`"
+        ? t('admin_pages.revisions.approve_confirm', { title: confirmModal.revision?.title ?? '' })
+        : t('admin_pages.revisions.reject_confirm', { title: confirmModal.revision?.title ?? '' })"
       @confirm="doAction"
     />
 
@@ -287,6 +287,9 @@ const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { hasPermission } = useAuth()
+const { t } = useI18n()
+const { formatDate: formatLocalizedDate } = useLocaleFormatting()
+const { localizeError } = useLocalizedApiError()
 
 if (!hasPermission('revisions.view')) {
   await navigateTo('/', { replace: true })
@@ -294,12 +297,12 @@ if (!hasPermission('revisions.view')) {
 
 const selectedStatus = ref(route.query.status || 'all')
 
-const statusTabs = [
-  { value: 'all', label: '全部' },
-  { value: 'pending', label: '待审核' },
-  { value: 'approved', label: '已通过' },
-  { value: 'rejected', label: '已拒绝' },
-]
+const statusTabs = computed(() => [
+  { value: 'all', label: t('admin_pages.revisions.status_all') },
+  { value: 'pending', label: t('admin_pages.revisions.status_pending') },
+  { value: 'approved', label: t('admin_pages.revisions.status_approved') },
+  { value: 'rejected', label: t('admin_pages.revisions.status_rejected') },
+])
 
 const currentPage = computed(() => {
   const page = parseInt(route.query.page || '1') || 1
@@ -325,8 +328,8 @@ const pendingCount = computed(() => response.value?.pending_count ?? 0)
 
 // ===== 格式化 =====
 const formatType = (type) => ({ work: 'Work', artist: 'Artist', series: 'Series', event: 'Event', entry: 'Entry' }[type] || type)
-const formatAction = (action) => ({ create: '新增', update: '编辑', delete: '删除' }[action] || action)
-const formatStatus = (status) => ({ pending: '待审核', approved: '已通过', rejected: '已拒绝' }[status] || status)
+const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
+const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
 
 const actionBadgeClass = (action) => ({
   create: 'bg-emerald-50 border-emerald-200 text-emerald-700',
@@ -348,8 +351,7 @@ const statusDotClass = (status) => ({
 
 const formatDate = (d) => {
   if (!d) return ''
-  const dt = new Date(d)
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+  return formatLocalizedDate(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 // ===== 筛选 =====
@@ -391,10 +393,10 @@ const openConfirm = (action, revision) => {
 const doAction = async () => {
   try {
     await $api(`/v1/admin/revisions/${confirmModal.revision.id}/${confirmModal.action}`, { method: 'POST' })
-    showToast(confirmModal.action === 'approve' ? '已通过' : '已拒绝')
+    showToast(confirmModal.action === 'approve' ? t('admin_pages.revisions.approved_notice') : t('admin_pages.revisions.rejected_notice'))
     await refresh()
   } catch (e) {
-    showToast(e?.message || '操作失败', 'error')
+    showToast(localizeError(e, 'admin_pages.revisions.action_failed'), 'error')
   }
 }
 

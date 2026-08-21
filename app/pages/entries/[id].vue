@@ -123,7 +123,7 @@
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl font-bold flex items-center gap-2">
                   <Link2 :size="24" />
-                  关联条目
+                  {{ $t('content_display.linked_entries') }}
                 </h2>
               </div>
 
@@ -221,7 +221,7 @@
               <!-- Empty State -->
               <div v-else class="text-center py-8 text-gray-500">
                 <Disc :size="48" class="mx-auto mb-3 text-gray-300" />
-                <p>No related music works yet</p>
+                <p>{{ $t('content_display.no_related_works') }}</p>
               </div>
             </div>
 
@@ -252,22 +252,22 @@
           <div class="lg:col-span-1 space-y-6">
             <!-- Basic Info Card -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 class="text-lg font-bold mb-4">Information</h3>
+              <h3 class="text-lg font-bold mb-4">{{ $t('content_display.information') }}</h3>
               <div class="space-y-3">
                 <div v-if="entryData.type">
-                  <div class="text-sm text-gray-500 mb-1">Type</div>
+                  <div class="text-sm text-gray-500 mb-1">{{ $t('content_display.type') }}</div>
                   <div class="font-medium">{{ formatType(entryData.type) }}</div>
                 </div>
                 <div v-if="entryData.year">
-                  <div class="text-sm text-gray-500 mb-1">Year</div>
+                  <div class="text-sm text-gray-500 mb-1">{{ $t('content_display.year') }}</div>
                   <div class="font-medium">{{ entryData.year }}</div>
                 </div>
                 <div v-if="entryData.release_date">
-                  <div class="text-sm text-gray-500 mb-1">Release Date</div>
+                  <div class="text-sm text-gray-500 mb-1">{{ $t('content_display.release_date') }}</div>
                   <div class="font-medium">{{ formatDate(entryData.release_date) }}</div>
                 </div>
                 <div v-if="entryData.status">
-                  <div class="text-sm text-gray-500 mb-1">Status</div>
+                  <div class="text-sm text-gray-500 mb-1">{{ $t('content_display.status') }}</div>
                   <div class="font-medium">{{ entryData.status }}</div>
                 </div>
               </div>
@@ -275,26 +275,26 @@
 
             <!-- Stats Card -->
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 class="text-lg font-bold mb-4">Statistics</h3>
+              <h3 class="text-lg font-bold mb-4">{{ $t('content_display.statistics') }}</h3>
               <div class="space-y-3">
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2 text-gray-600">
                     <Eye :size="18" />
-                    <span>Views</span>
+                    <span>{{ $t('content_display.views') }}</span>
                   </div>
                   <span class="font-bold text-lg">{{ entryData.views_count || 0 }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2 text-gray-600">
                     <Heart :size="18" />
-                    <span>Favorites</span>
+                    <span>{{ $t('content_display.favorites') }}</span>
                   </div>
                   <span class="font-bold text-lg">{{ entryData.favorites_count || 0 }}</span>
                 </div>
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2 text-gray-600">
                     <Music2 :size="18" />
-                    <span>Music Works</span>
+                    <span>{{ $t('content_display.music_works') }}</span>
                   </div>
                   <span class="font-bold text-lg">{{ entryData.works_count || 0 }}</span>
                 </div>
@@ -303,7 +303,7 @@
 
             <!-- Quick Links Card -->
             <div v-if="entryData.bangumi_id" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+              <h3 class="text-lg font-bold mb-4">{{ $t('content_display.quick_links') }}</h3>
               <div class="space-y-2">
                 <a
                   :href="`https://bgm.tv/subject/${entryData.bangumi_id}`"
@@ -312,7 +312,7 @@
                   class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group border border-gray-200"
                 >
                   <Icon name="lucide:external-link" class="w-5 h-5 text-pink-500" />
-                  <span class="flex-1 font-medium text-gray-700 group-hover:text-pink-600">View on Bangumi</span>
+                  <span class="flex-1 font-medium text-gray-700 group-hover:text-pink-600">{{ $t('content_display.view_bangumi') }}</span>
                   <Icon name="lucide:arrow-up-right" class="w-4 h-4 text-gray-400 group-hover:text-pink-600" />
                 </a>
               </div>
@@ -329,6 +329,7 @@ import { Film, Calendar, Clock, Heart, Eye, Music2, Info, ExternalLink, Disc, Li
 
 // Get route params
 const route = useRoute();
+const { t } = useI18n();
 const entryId = route.params.id;
 
 // Fetch entry data from API
@@ -422,30 +423,16 @@ const getTypeIcon = (type) => {
 
 // Format entry type
 const formatType = (type) => {
-  const typeMap = {
-    anime: "Anime",
-    movie: "Movie",
-    tv: "TV Show",
-    game: "Game",
-    other: "Other",
-  };
-  return typeMap[type] || type;
+  const normalized = ['anime', 'movie', 'tv', 'game'].includes(type) ? type : 'other';
+  return t(`content_display.entry_type.${normalized}`);
 };
 
 // Format relation type label
 const formatRelationType = (relationType) => {
-  if (!relationType) return "其他";
-  const relationMap = {
-    prequel: "前传",
-    sequel: "续作",
-    spinoff: "衍生",
-    adaptation: "改编",
-    character: "角色",
-    crossover: "联动",
-  };
+  if (!relationType) return t('content_display.relation.other');
   const normalized = relationType.toLowerCase();
-  if (relationMap[normalized]) {
-    return relationMap[normalized];
+  if (['prequel', 'sequel', 'spinoff', 'adaptation', 'character', 'crossover'].includes(normalized)) {
+    return t(`content_display.relation.${normalized}`);
   }
   return relationType.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 };

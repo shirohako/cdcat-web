@@ -30,7 +30,7 @@
           <!-- Score -->
           <div>
             <label class="block text-sm font-semibold text-gray-700 mb-2">
-              评分 <span class="text-gray-400 font-normal text-xs ml-1">可选</span>
+              {{ $t('review_ui.score') }} <span class="text-gray-400 font-normal text-xs ml-1">{{ $t('collection_components.optional') }}</span>
             </label>
             <div class="flex items-center gap-3">
               <div class="flex gap-0.5">
@@ -55,7 +55,7 @@
                   type="button"
                   class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                   @click="form.score = null"
-                >清除</button>
+                >{{ $t('collection_components.clear') }}</button>
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@
             <label class="block text-sm font-semibold text-gray-700 mb-2">
               <span class="flex items-center gap-1.5">
                 <Globe :size="13" />
-                评价语言
+                {{ $t('review_ui.language') }}
               </span>
             </label>
             <select
@@ -82,7 +82,7 @@
           <div>
             <div class="flex items-center justify-between mb-2">
               <label class="text-sm font-semibold text-gray-700">
-                评价内容 <span class="text-red-400">*</span>
+                {{ $t('review_ui.content') }} <span class="text-red-400">*</span>
               </label>
               <div class="flex gap-0.5 bg-gray-100 rounded-lg p-0.5">
                 <button
@@ -91,7 +91,7 @@
                   :class="activeTab === 'write' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                   @click="activeTab = 'write'"
                 >
-                  <Pencil :size="11" />编辑
+                  <Pencil :size="11" />{{ $t('common.edit') }}
                 </button>
                 <button
                   type="button"
@@ -99,7 +99,7 @@
                   :class="activeTab === 'preview' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'"
                   @click="activeTab = 'preview'"
                 >
-                  <Eye :size="11" />预览
+                  <Eye :size="11" />{{ $t('article_ui.preview') }}
                 </button>
               </div>
             </div>
@@ -108,7 +108,7 @@
               v-show="activeTab === 'write'"
               v-model="form.content"
               class="w-full h-44 resize-none text-sm border border-gray-200 rounded-xl px-4 py-3 font-mono bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white transition-colors placeholder:text-gray-300"
-              placeholder="分享你对这张专辑的想法... 支持 Markdown 格式"
+              :placeholder="$t('review_ui.placeholder')"
               maxlength="5000"
             />
             <div
@@ -117,7 +117,7 @@
               v-html="renderedMarkdown"
             />
             <div class="flex items-center justify-between mt-1.5">
-              <span class="text-xs text-gray-400">支持 Markdown</span>
+              <span class="text-xs text-gray-400">{{ $t('review_ui.markdown') }}</span>
               <span class="text-xs" :class="form.content.length > 4500 ? 'text-orange-400' : 'text-gray-400'">
                 {{ form.content.length }} / 5000
               </span>
@@ -136,7 +136,7 @@
             type="button"
             class="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             @click="close"
-          >取消</button>
+          >{{ $t('common.cancel') }}</button>
           <button
             type="button"
             :disabled="!canSubmit || isSubmitting"
@@ -144,7 +144,7 @@
             @click="handleSubmit"
           >
             <Loader2 v-if="isSubmitting" :size="14" class="animate-spin" />
-            提交评价
+            {{ $t('review_ui.submit') }}
           </button>
         </div>
       </div>
@@ -155,18 +155,7 @@
 <script setup lang="ts">
 import { Star, X, Pencil, Eye, Loader2, Globe, MessageSquare } from '@lucide/vue'
 
-const LANGUAGES = [
-  { code: 'zh-Hans', label: '简体中文' },
-  { code: 'zh-Hant', label: '繁體中文' },
-  { code: 'ja', label: '日本語' },
-  { code: 'en', label: 'English' },
-  { code: 'ko', label: '한국어' },
-  { code: 'fr', label: 'Français' },
-  { code: 'de', label: 'Deutsch' },
-  { code: 'es', label: 'Español' },
-  { code: 'pt', label: 'Português' },
-  { code: 'ru', label: 'Русский' },
-] as const
+const LANGUAGE_CODES = ['zh-Hans', 'zh-Hant', 'ja', 'en', 'ko', 'fr', 'de', 'es', 'pt', 'ru'] as const
 
 interface Props {
   modelValue: boolean
@@ -182,6 +171,9 @@ const emit = defineEmits<{
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()
+const { languageName } = useLocaleFormatting()
+const { localizeError } = useLocalizedApiError()
+const LANGUAGES = computed(() => LANGUAGE_CODES.map(code => ({ code, label: languageName(code) })))
 
 const form = reactive({
   content: '',
@@ -258,7 +250,7 @@ async function handleSubmit() {
     emit('saved')
     close()
   } catch (e: any) {
-    errorMessage.value = e?.message || '提交失败，请稍后重试'
+    errorMessage.value = localizeError(e, 'collection_components.submit_failed')
   } finally {
     isSubmitting.value = false
   }

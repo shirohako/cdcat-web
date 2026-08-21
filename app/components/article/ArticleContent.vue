@@ -24,7 +24,7 @@
         class="inline-flex items-center gap-1.5 hover:text-violet-500 transition-colors group"
       >
         <ArrowLeft :size="14" class="group-hover:-translate-x-0.5 transition-transform duration-200" />
-        返回文章列表
+        {{ $t('article_ui.back_to_list') }}
       </NuxtLink>
       <span>{{ formattedDate }}</span>
     </div>
@@ -38,14 +38,14 @@ const props = defineProps({
   renderedContent: { type: String, default: "" },
   publishedAt: { type: String, default: "" },
 });
+const { formatDate } = useLocaleFormatting();
 
 const articleEl = ref(null);
 defineExpose({ articleEl });
 
 const formattedDate = computed(() => {
   if (!props.publishedAt) return "";
-  const d = new Date(props.publishedAt);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return formatDate(props.publishedAt, { year: 'numeric', month: '2-digit', day: '2-digit' });
 });
 </script>
 

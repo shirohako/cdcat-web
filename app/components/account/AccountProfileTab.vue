@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
       <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">个人资料</h2>
-        <p class="text-sm text-gray-500 mt-1">设置你的公开显示信息</p>
+        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.profile.title') }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.profile.description') }}</p>
       </div>
 
       <div class="p-6 space-y-8">
@@ -14,7 +14,7 @@
               <NuxtImg
                 v-if="avatarPreview"
                 :src="avatarPreview"
-                alt="头像"
+                :alt="t('account_pages.profile.avatar_alt')"
                 class="w-full h-full object-cover"
                 @error="avatarPreview = ''"
               />
@@ -29,7 +29,7 @@
             </button>
           </div>
           <div class="space-y-2 flex-1 max-w-sm">
-            <p class="text-sm font-medium text-gray-900">头像</p>
+            <p class="text-sm font-medium text-gray-900">{{ t('account_pages.profile.avatar') }}</p>
             <div v-if="showAvatarInput" class="flex gap-2">
               <input
                 v-model="form.avatar"
@@ -45,17 +45,17 @@
                 @click="updateAvatar"
               >
                 <span v-if="isUpdatingAvatar" class="loading loading-spinner loading-xs"></span>
-                <span v-else>保存</span>
+                <span v-else>{{ t('common.save') }}</span>
               </button>
             </div>
             <p v-if="avatarStatus" :class="avatarStatus.class">{{ avatarStatus.message }}</p>
-            <p v-else class="text-xs text-gray-400">点击头像输入图片 URL</p>
+            <p v-else class="text-xs text-gray-400">{{ t('account_pages.profile.avatar_hint') }}</p>
           </div>
         </div>
 
         <!-- Banner -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="banner" class="text-sm font-medium text-gray-700">横幅背景</label>
+          <label for="banner" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.banner') }}</label>
           <div class="flex gap-2">
             <input
               id="banner"
@@ -71,7 +71,7 @@
               :disabled="isUpdatingBanner"
               @click="clearBanner"
             >
-              清除
+              {{ t('account_pages.profile.clear') }}
             </button>
             <button
               v-else
@@ -81,10 +81,10 @@
               @click="updateBanner"
             >
               <span v-if="isUpdatingBanner" class="loading loading-spinner loading-xs"></span>
-              <span v-else>保存</span>
+              <span v-else>{{ t('common.save') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">个人主页的横幅背景图片，留空或清除可使用默认背景</p>
+          <p class="text-xs text-gray-400">{{ t('account_pages.profile.banner_hint') }}</p>
           <p v-if="bannerStatus" :class="bannerStatus.class">
             {{ bannerStatus.message }}
           </p>
@@ -92,7 +92,7 @@
 
         <!-- Username -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="username" class="text-sm font-medium text-gray-700">用户名</label>
+          <label for="username" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.username') }}</label>
           <div class="flex gap-2">
             <input
               id="username"
@@ -109,10 +109,10 @@
               @click="updateUsername"
             >
               <span v-if="isUpdatingUsername" class="loading loading-spinner loading-xs"></span>
-              <span v-else>更新</span>
+              <span v-else>{{ t('account_pages.profile.update') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">唯一标识，用于登录和资料链接，仅限字母、数字和下划线</p>
+          <p class="text-xs text-gray-400">{{ t('account_pages.profile.username_hint') }}</p>
           <p v-if="usernameStatus" :class="usernameStatus.class">
             {{ usernameStatus.message }}
           </p>
@@ -120,14 +120,14 @@
 
         <!-- Nickname -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="nickname" class="text-sm font-medium text-gray-700">昵称</label>
+          <label for="nickname" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.nickname') }}</label>
           <div class="flex gap-2">
             <input
               id="nickname"
               v-model="form.nickname"
               type="text"
               class="input input-bordered flex-1 bg-white"
-              placeholder="你的显示名称"
+              :placeholder="t('account_pages.profile.nickname_placeholder')"
             />
             <button
               type="button"
@@ -136,10 +136,10 @@
               @click="updateNickname"
             >
               <span v-if="isUpdatingNickname" class="loading loading-spinner loading-xs"></span>
-              <span v-else>更新</span>
+              <span v-else>{{ t('account_pages.profile.update') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">公开显示的名称，最多 20 个字符</p>
+          <p class="text-xs text-gray-400">{{ t('account_pages.profile.nickname_hint') }}</p>
           <p v-if="nicknameStatus" :class="nicknameStatus.class">
             {{ nicknameStatus.message }}
           </p>
@@ -148,8 +148,8 @@
         <!-- Bio -->
         <div class="grid gap-1.5">
           <div class="flex items-center justify-between">
-            <label for="bio" class="text-sm font-medium text-gray-700">个人简介</label>
-            <span class="text-xs text-gray-400">支持 Markdown</span>
+            <label for="bio" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.bio') }}</label>
+            <span class="text-xs text-gray-400">{{ t('account_pages.profile.markdown') }}</span>
           </div>
           <textarea
             id="bio"
@@ -157,20 +157,20 @@
             rows="4"
             class="textarea textarea-bordered w-full bg-white resize-none font-mono text-sm"
             :disabled="isLoadingBio"
-            placeholder="支持 Markdown 格式&#10;&#10;例如:&#10;**粗体**、*斜体*&#10;# 标题&#10;- 列表项&#10;[链接](url)&#10;&#10;最多 500 字符"
+            :placeholder="t('account_pages.profile.bio_placeholder')"
             maxlength="500"
           />
           <div class="grid gap-2">
             <div class="flex items-center justify-between">
-              <p class="text-xs text-gray-400">个性化介绍，可为空</p>
+              <p class="text-xs text-gray-400">{{ t('account_pages.profile.bio_hint') }}</p>
               <p class="text-xs text-gray-400">{{ form.bio?.length || 0 }}/500</p>
             </div>
             <div class="flex flex-wrap gap-2 text-xs text-gray-500">
-              <span class="px-2 py-1 bg-gray-50 rounded">**粗体**</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">*斜体*</span>
-              <span class="px-2 py-1 bg-gray-50 rounded"># 标题</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">- 列表</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">[链接](url)</span>
+              <span class="px-2 py-1 bg-gray-50 rounded">**{{ t('account_pages.profile.markdown_bold') }}**</span>
+              <span class="px-2 py-1 bg-gray-50 rounded">*{{ t('account_pages.profile.markdown_italic') }}*</span>
+              <span class="px-2 py-1 bg-gray-50 rounded"># {{ t('account_pages.profile.markdown_heading') }}</span>
+              <span class="px-2 py-1 bg-gray-50 rounded">- {{ t('account_pages.profile.markdown_list') }}</span>
+              <span class="px-2 py-1 bg-gray-50 rounded">[{{ t('account_pages.profile.markdown_link') }}](url)</span>
             </div>
           </div>
         </div>
@@ -190,7 +190,7 @@
           <span v-if="isUpdatingBio" class="loading loading-spinner loading-xs"></span>
           <template v-else>
             <Save :size="14" />
-            更新简介
+            {{ t('account_pages.profile.update_bio') }}
           </template>
         </button>
       </div>
@@ -207,6 +207,8 @@ const props = defineProps({
 
 const { $api } = useNuxtApp()
 const { fetchUser } = useAuth()
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 const form = reactive({
   username: props.user?.username || '',
@@ -247,7 +249,7 @@ const updateBanner = async () => {
 
     bannerStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 横幅背景更新成功'
+      message: t('account_pages.profile.banner_updated')
     }
 
     originalBanner.value = url || ''
@@ -255,7 +257,7 @@ const updateBanner = async () => {
   } catch (error) {
     bannerStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
     isUpdatingBanner.value = false
@@ -274,7 +276,7 @@ const clearBanner = async () => {
 
     bannerStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 横幅背景已清除'
+      message: t('account_pages.profile.banner_cleared')
     }
 
     form.banner = ''
@@ -283,7 +285,7 @@ const clearBanner = async () => {
   } catch (error) {
     bannerStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 清除失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.clear_failed')
     }
   } finally {
     isUpdatingBanner.value = false
@@ -320,7 +322,7 @@ const updateAvatar = async () => {
 
     avatarStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 头像更新成功'
+      message: t('account_pages.profile.avatar_updated')
     }
 
     originalAvatar.value = url
@@ -329,7 +331,7 @@ const updateAvatar = async () => {
   } catch (error) {
     avatarStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
     isUpdatingAvatar.value = false
@@ -377,13 +379,13 @@ const validateUsername = () => {
   if (isValid) {
     usernameStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 用户名有效'
+      message: t('account_pages.profile.username_available')
     }
     return true
   } else {
     usernameStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: '✗ 用户名格式不正确（3-20字符，仅限字母、数字、下划线）'
+      message: t('account_pages.profile.username_invalid')
     }
     return false
   }
@@ -407,7 +409,7 @@ const updateUsername = async () => {
 
     usernameStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 用户名更新成功'
+      message: t('account_pages.profile.username_updated')
     }
 
     // 刷新全局用户信息
@@ -415,7 +417,7 @@ const updateUsername = async () => {
   } catch (error) {
     usernameStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
     isUpdatingUsername.value = false
@@ -427,7 +429,7 @@ const updateNickname = async () => {
   if (!nickname) {
     nicknameStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: '✗ 昵称不能为空'
+      message: t('account_pages.profile.nickname_required')
     }
     return
   }
@@ -443,14 +445,14 @@ const updateNickname = async () => {
 
     nicknameStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 昵称更新成功'
+      message: t('account_pages.profile.nickname_updated')
     }
 
     await fetchUser()
   } catch (error) {
     nicknameStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
     isUpdatingNickname.value = false
@@ -469,7 +471,7 @@ const updateBio = async () => {
 
     bioStatus.value = {
       class: 'text-xs text-emerald-600 font-medium',
-      message: '✓ 简介更新成功'
+      message: t('account_pages.profile.bio_updated')
     }
 
     originalBio.value = form.bio || ''
@@ -477,7 +479,7 @@ const updateBio = async () => {
   } catch (error) {
     bioStatus.value = {
       class: 'text-xs text-red-600 font-medium',
-      message: error?.data?.message || '✗ 更新失败，请稍后重试'
+      message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
     isUpdatingBio.value = false

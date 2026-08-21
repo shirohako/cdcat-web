@@ -8,11 +8,11 @@
     <!-- Empty State -->
     <div v-else-if="artists.length === 0" class="flex flex-col items-center justify-center py-16">
       <Icon name="lucide:mic-2" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">还没有喜欢任何艺术家</p>
-      <p class="text-sm text-gray-400 mb-6">把喜欢的艺术家加入列表，随时查看</p>
+      <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_artists') }}</p>
+      <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_artists_hint') }}</p>
       <NuxtLink to="/artists" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
-        浏览艺术家
+        {{ $t('collection_components.browse_artists') }}
       </NuxtLink>
     </div>
 
@@ -30,7 +30,7 @@
             <NuxtLink
               :to="`/artists/${artist.id}`"
               class="shrink-0"
-              :aria-label="`查看艺术家：${artist.name}`"
+              :aria-label="$t('collection_components.view_artist', { name: artist.name })"
             >
               <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5">
                 <img
@@ -55,7 +55,7 @@
               </NuxtLink>
 
               <p v-if="artist.favorited_at" class="text-xs text-gray-400 mt-0.5">
-                已喜欢：{{ formatDate(artist.favorited_at) }}
+                {{ $t('collection_components.liked_date', { date: formatDate(artist.favorited_at) }) }}
               </p>
             </div>
 
@@ -64,8 +64,8 @@
               <NuxtLink
                 :to="`/artists/${artist.id}`"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
-                :aria-label="`查看艺术家：${artist.name}`"
-                title="查看"
+                :aria-label="$t('collection_components.view_artist', { name: artist.name })"
+                :title="$t('collection_components.view')"
               >
                 <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
@@ -74,7 +74,7 @@
                 :disabled="!!unlikeLoading[artist.id]"
                 @click="handleToggle(artist.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                :title="unliked[artist.id] ? '已取消喜欢' : '取消喜欢'"
+                :title="$t(unliked[artist.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
               >
                 <Icon
                   :name="unliked[artist.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -95,7 +95,7 @@
           class="btn btn-outline btn-sm gap-1"
         >
           <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          上一页
+          {{ $t('common.previous') }}
         </button>
 
         <div class="flex items-center gap-1">
@@ -117,7 +117,7 @@
           @click="nextPage"
           class="btn btn-outline btn-sm gap-1"
         >
-          下一页
+          {{ $t('common.next') }}
           <Icon name="lucide:chevron-right" class="w-4 h-4" />
         </button>
       </div>
@@ -129,6 +129,7 @@
 import type { FavoriteArtist } from '~/types/favorites'
 
 const { getFavoriteArtists, toggleFavoriteArtist } = useFavorites()
+const { formatDate } = useLocaleFormatting()
 
 const artists = ref<FavoriteArtist[]>([])
 const page = ref(1)
@@ -156,15 +157,6 @@ const visiblePages = computed(() => {
 
   return pages
 })
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-}
 
 const loadData = async () => {
   isLoading.value = true

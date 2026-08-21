@@ -1,10 +1,10 @@
 <template>
   <div class="flex flex-col min-w-0 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
     <div class="shrink-0 px-5 py-2 text-xs font-medium text-gray-400 border-b border-gray-100">
-      预览
+      {{ $t('article_ui.preview') }}
     </div>
     <div class="flex-1 overflow-y-auto px-8 py-6">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ title || '（无标题）' }}</h1>
+      <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ title || $t('article_ui.untitled') }}</h1>
       <article
         class="butterfly-post prose max-w-none
                prose-headings:font-bold prose-headings:text-gray-900

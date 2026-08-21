@@ -3,8 +3,8 @@
     <!-- Change Password -->
     <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
       <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">修改密码</h2>
-        <p class="text-sm text-gray-500 mt-1">定期更新密码以保护你的账户安全</p>
+        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.security.title') }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.security.description') }}</p>
       </div>
 
       <!-- Collapsed: trigger button -->
@@ -26,7 +26,7 @@
               <KeyRound :size="18" class="text-gray-400 group-hover:text-blue-500 transition-colors" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">点击修改密码</p>
+              <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{{ t('account_pages.security.open') }}</p>
             </div>
             <ChevronRight :size="16" class="text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
           </button>
@@ -37,26 +37,26 @@
           <div class="p-6">
             <div class="grid gap-5 max-w-sm">
             <div class="grid gap-1.5">
-              <label for="current-password" class="text-sm font-medium text-gray-700">当前密码</label>
+              <label for="current-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.current') }}</label>
               <input
                 id="current-password"
                 v-model="passwordForm.currentPassword"
                 type="password"
                 class="input input-bordered w-full bg-white"
-                placeholder="输入当前密码"
+                :placeholder="t('account_pages.security.current_placeholder')"
                 @keyup.enter="submitPassword"
               />
-              <p class="text-xs text-gray-400">为了你的账户安全，请输入当前密码</p>
+              <p class="text-xs text-gray-400">{{ t('account_pages.security.current_hint') }}</p>
             </div>
 
             <div class="grid gap-1.5">
-              <label for="new-password" class="text-sm font-medium text-gray-700">新密码</label>
+              <label for="new-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.new') }}</label>
               <input
                 id="new-password"
                 v-model="passwordForm.newPassword"
                 type="password"
                 class="input input-bordered w-full bg-white"
-                placeholder="至少 8 个字符"
+                :placeholder="t('account_pages.security.new_placeholder')"
                 @keyup.enter="submitPassword"
               />
               <div v-if="passwordForm.newPassword" class="space-y-1.5 mt-0.5">
@@ -73,23 +73,23 @@
             </div>
 
             <div class="grid gap-1.5">
-              <label for="confirm-password" class="text-sm font-medium text-gray-700">确认新密码</label>
+              <label for="confirm-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.confirm') }}</label>
               <input
                 id="confirm-password"
                 v-model="passwordForm.confirmPassword"
                 type="password"
                 class="input input-bordered w-full bg-white"
-                placeholder="再次输入新密码"
+                :placeholder="t('account_pages.security.confirm_placeholder')"
                 @keyup.enter="submitPassword"
               />
               <p
                 v-if="passwordForm.confirmPassword && passwordForm.confirmPassword !== passwordForm.newPassword"
                 class="text-xs text-red-500"
               >
-                ✗ 两次输入的密码不一致
+                {{ t('account_pages.security.mismatch') }}
               </p>
               <p v-else class="text-xs text-gray-400">
-                请再次输入新密码以确认
+                {{ t('account_pages.security.confirm_hint') }}
               </p>
             </div>
           </div>
@@ -104,7 +104,7 @@
 
         <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex justify-end gap-2">
           <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
-            取消
+            {{ t('common.cancel') }}
           </button>
           <button
             type="button"
@@ -115,7 +115,7 @@
             <span v-if="isSubmitting" class="loading loading-spinner loading-xs"></span>
             <template v-else>
               <Lock :size="14" />
-              更新密码
+              {{ t('account_pages.security.update') }}
             </template>
           </button>
         </div>
@@ -130,6 +130,8 @@
 import { Lock, KeyRound, ChevronRight } from '@lucide/vue'
 
 const { $api } = useNuxtApp()
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 const emit = defineEmits(['save', 'error'])
 
@@ -166,11 +168,11 @@ const strength = computed(() => {
   if (/[^A-Za-z0-9]/.test(p)) score++
 
   const map = {
-    0: { label: '非常弱', barColor: 'bg-red-400', textColor: 'text-red-500' },
-    1: { label: '弱', barColor: 'bg-orange-400', textColor: 'text-orange-500' },
-    2: { label: '一般', barColor: 'bg-yellow-400', textColor: 'text-yellow-600' },
-    3: { label: '强', barColor: 'bg-blue-400', textColor: 'text-blue-500' },
-    4: { label: '非常强', barColor: 'bg-emerald-400', textColor: 'text-emerald-500' }
+    0: { label: t('auth.register.strength_weak'), barColor: 'bg-red-400', textColor: 'text-red-500' },
+    1: { label: t('auth.register.strength_fair'), barColor: 'bg-orange-400', textColor: 'text-orange-500' },
+    2: { label: t('auth.register.strength_medium'), barColor: 'bg-yellow-400', textColor: 'text-yellow-600' },
+    3: { label: t('auth.register.strength_strong'), barColor: 'bg-blue-400', textColor: 'text-blue-500' },
+    4: { label: t('auth.register.strength_very_strong'), barColor: 'bg-emerald-400', textColor: 'text-emerald-500' }
   }
 
   return { level: score, ...map[score] }
@@ -178,15 +180,15 @@ const strength = computed(() => {
 
 const submitPassword = async () => {
   if (!passwordForm.currentPassword || !passwordForm.newPassword) {
-    errorMessage.value = '请填写完整信息'
+    errorMessage.value = t('account_pages.security.required')
     return
   }
   if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-    errorMessage.value = '两次输入的密码不一致'
+    errorMessage.value = t('account_pages.security.mismatch')
     return
   }
   if (passwordForm.newPassword.length < 8) {
-    errorMessage.value = '密码长度至少 8 个字符'
+    errorMessage.value = t('account_pages.security.too_short')
     return
   }
 
@@ -203,11 +205,11 @@ const submitPassword = async () => {
       }
     })
 
-    emit('save', '密码已更新')
+    emit('save', t('account_pages.security.updated'))
     resetForm()
     editing.value = false
   } catch (error) {
-    errorMessage.value = error?.message || '修改密码失败，请稍后重试'
+    errorMessage.value = localizeError(error, 'account_pages.security.update_failed')
   } finally {
     isSubmitting.value = false
   }

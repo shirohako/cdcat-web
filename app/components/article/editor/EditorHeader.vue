@@ -5,7 +5,7 @@
       class="shrink-0 inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
     >
       <ArrowLeft :size="16" />
-      返回
+      {{ $t('article_ui.back') }}
     </NuxtLink>
 
     <div class="w-px h-5 bg-gray-200 shrink-0" />
@@ -15,25 +15,25 @@
       :class="status === 'published'
         ? 'bg-violet-100 text-violet-700'
         : 'bg-amber-100 text-amber-600'"
-    >{{ status === 'published' ? '公开' : '草稿' }}</span>
+    >{{ status === 'published' ? $t('article_ui.published') : $t('article_ui.draft') }}</span>
 
     <input
       :value="title"
-      placeholder="文章标题"
+      :placeholder="$t('article_ui.title_placeholder')"
       class="flex-1 min-w-0 text-base font-semibold text-gray-900 bg-transparent outline-none placeholder:text-gray-300"
       @input="$emit('update:title', $event.target.value)"
     />
 
     <div class="shrink-0 flex items-center gap-2">
       <span v-if="saveStatus === 'saved'" class="text-xs text-green-500 flex items-center gap-1">
-        <Check :size="13" /> 已保存
+        <Check :size="13" /> {{ $t('article_ui.saved') }}
       </span>
-      <span v-else-if="saveStatus === 'error'" class="text-xs text-red-500">保存失败</span>
+      <span v-else-if="saveStatus === 'error'" class="text-xs text-red-500">{{ $t('article_ui.save_failed') }}</span>
 
       <button
         class="btn btn-sm btn-ghost"
         :class="settingsOpen && 'bg-gray-100'"
-        title="文章设置"
+        :title="$t('article_ui.settings')"
         @click="$emit('update:settingsOpen', !settingsOpen)"
       >
         <Settings :size="15" />
@@ -45,7 +45,7 @@
         @click="$emit('save')"
       >
         <Loader v-if="saving" :size="14" class="animate-spin" />
-        {{ saving ? '保存中' : '保存' }}
+        {{ saving ? $t('article_ui.saving') : $t('article_ui.save') }}
       </button>
     </div>
   </header>

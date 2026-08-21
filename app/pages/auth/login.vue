@@ -15,20 +15,20 @@
           <div class="w-6 h-6 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
             <TriangleAlert :size="13" class="text-amber-500" />
           </div>
-          <span class="text-xs font-bold text-amber-900 tracking-wide">目前网站处于开发测试阶段</span>
+          <span class="text-xs font-bold text-amber-900 tracking-wide">{{ $t('auth.login.beta.title') }}</span>
           <span class="text-[10px] font-medium text-amber-400 bg-amber-100 px-1.5 py-0.5 rounded-full">Beta</span>
         </div>
         <div class="pl-8 space-y-1.5">
-          <p class="text-xs text-amber-700/70">以下数据在正式环境发布前，可能被清除。</p>
+          <p class="text-xs text-amber-700/70">{{ $t('auth.login.beta.warning') }}</p>
           <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
             <span class="text-amber-400 mt-px">–</span>
-            添加的内容（专辑信息，艺术家信息）
+            {{ $t('auth.login.beta.content') }}
           </p>
           <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
             <span class="text-amber-400 mt-px">–</span>
-            用户账号数据（评论，收藏等）
+            {{ $t('auth.login.beta.accounts') }}
           </p>
-          <p class="text-[11px] text-amber-700/40 pt-0.5">正式版即将推出，感谢理解与支持 ✦</p>
+          <p class="text-[11px] text-amber-700/40 pt-0.5">{{ $t('auth.login.beta.thanks') }}</p>
         </div>
       </div>
     </div>
@@ -206,6 +206,7 @@ const router = useRouter()
 const route = useRoute()
 const { login } = useAuth()
 const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 const formData = ref({
   email: '',
@@ -245,7 +246,7 @@ const handleLogin = async () => {
       errorMessage.value = result.error || t('auth.login.login_failed')
     }
   } catch (error: any) {
-    errorMessage.value = error.message || t('auth.login.login_failed')
+    errorMessage.value = localizeError(error, 'auth.login.login_failed')
   } finally {
     isLoading.value = false
   }

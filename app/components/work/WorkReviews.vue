@@ -6,7 +6,7 @@
         <MessageSquare :size="15" class="text-amber-500" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.reviews') }}</h2>
-      <span v-if="reviewsCount > 0" class="ml-auto text-xs text-gray-400">共 {{ reviewsCount }} 条</span>
+      <span v-if="reviewsCount > 0" class="ml-auto text-xs text-gray-400">{{ $t('review_ui.count', { count: reviewsCount }) }}</span>
     </div>
 
     <!-- Empty state -->
@@ -86,14 +86,14 @@
           <Smile :size="24" class="text-white" />
         </div>
         <div>
-          <h3 class="font-bold text-gray-900 text-base">功能开发中</h3>
-          <p class="text-sm text-gray-400 mt-1.5">敬请期待。</p>
+          <h3 class="font-bold text-gray-900 text-base">{{ $t('content_display.feature_developing') }}</h3>
+          <p class="text-sm text-gray-400 mt-1.5">{{ $t('content_display.stay_tuned') }}</p>
         </div>
-        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="reactionDialog.close()">知道了</button>
+        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="reactionDialog.close()">{{ $t('common.got_it') }}</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button>close</button>
+      <button>{{ $t('common.close') }}</button>
     </form>
   </dialog>
 
@@ -106,7 +106,7 @@
       >
         <span v-if="loadingMore" class="loading loading-spinner loading-xs"></span>
         <ChevronDown v-else :size="13" />
-        {{ loadingMore ? '加载中…' : `查看更多 · 还有 ${remaining} 条` }}
+        {{ loadingMore ? $t('common.loading') : $t('review_ui.load_more', { count: remaining }) }}
       </button>
     </div>
   </section>
@@ -131,14 +131,16 @@ const props = defineProps({
 })
 
 const { $api } = useNuxtApp()
+const { t } = useI18n()
+const { intlLocale } = useLocaleFormatting()
 
 const reactionDialog = ref(null)
 
-const reactions = [
-  { key: 'useful_count',  label: '有帮助', icon: ThumbsUp,   color: 'text-blue-400 bg-blue-50 hover:text-blue-600 hover:bg-blue-100' },
-  { key: 'dislike_count', label: '没帮助', icon: ThumbsDown, color: 'text-rose-400 bg-rose-50 hover:text-rose-600 hover:bg-rose-100' },
-  { key: 'fun_count',     label: '欢乐',   icon: Smile,      color: 'text-green-600 bg-green-50 hover:text-green-700 hover:bg-green-100' },
-]
+const reactions = computed(() => [
+  { key: 'useful_count',  label: t('review_ui.helpful'), icon: ThumbsUp,   color: 'text-blue-400 bg-blue-50 hover:text-blue-600 hover:bg-blue-100' },
+  { key: 'dislike_count', label: t('review_ui.unhelpful'), icon: ThumbsDown, color: 'text-rose-400 bg-rose-50 hover:text-rose-600 hover:bg-rose-100' },
+  { key: 'fun_count',     label: t('review_ui.funny'), icon: Smile,      color: 'text-green-600 bg-green-50 hover:text-green-700 hover:bg-green-100' },
+])
 
 const extraReviews = ref([])
 
@@ -184,10 +186,10 @@ const formatDate = (iso) => {
   const date = new Date(iso)
   const now = new Date()
   const diff = (now - date) / 1000
-  if (diff < 60) return '刚刚'
-  if (diff < 3600) return `${Math.floor(diff / 60)} 分钟前`
-  if (diff < 86400) return `${Math.floor(diff / 3600)} 小时前`
-  if (diff < 86400 * 30) return `${Math.floor(diff / 86400)} 天前`
-  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' })
+  if (diff < 60) return t('review_ui.just_now')
+  if (diff < 3600) return t('review_ui.minutes_ago', { count: Math.floor(diff / 60) })
+  if (diff < 86400) return t('review_ui.hours_ago', { count: Math.floor(diff / 3600) })
+  if (diff < 86400 * 30) return t('review_ui.days_ago', { count: Math.floor(diff / 86400) })
+  return date.toLocaleDateString(intlLocale.value, { year: 'numeric', month: 'short', day: 'numeric' })
 }
 </script>

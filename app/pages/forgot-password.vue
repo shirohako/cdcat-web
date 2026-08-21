@@ -270,6 +270,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, ShieldCheck, KeyRound, 
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()
+const { localizeError, localizeFieldErrors } = useLocalizedApiError()
 const router = useRouter()
 
 const step = ref(1)
@@ -298,8 +299,9 @@ const fieldLabels = computed(() => ({
 
 const setError = (message: string, details?: Record<string, string[]>) => {
   if (details && Object.keys(details).length) {
-    errorDetails.value = Object.entries(details).flatMap(
-      ([field, messages]) => messages.map(msg => `${(fieldLabels.value as Record<string, string>)[field] || field}: ${msg}`)
+    errorDetails.value = localizeFieldErrors(
+      details,
+      field => (fieldLabels.value as Record<string, string>)[field] || field,
     )
   } else {
     errorDetails.value = []
@@ -333,8 +335,7 @@ const handleSendCode = async () => {
     startCountdown()
     step.value = 2
   } catch (error: any) {
-    const apiError = error.details
-    setError(apiError?.message || error.message || t('auth.forgot_password.send_failed'), apiError?.details)
+    setError(localizeError(error, 'auth.forgot_password.send_failed'), error.details?.details)
   } finally {
     isSendingCode.value = false
   }
@@ -401,8 +402,7 @@ const handleResetPassword = async () => {
       router.push('/auth/login')
     }, 3000)
   } catch (error: any) {
-    const apiError = error.details
-    setError(apiError?.message || error.message || t('auth.forgot_password.reset_failed'), apiError?.details)
+    setError(localizeError(error, 'auth.forgot_password.reset_failed'), error.details?.details)
   } finally {
     isLoading.value = false
   }

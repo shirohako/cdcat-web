@@ -13,7 +13,7 @@
     >
       <!-- 侧边栏头部 -->
       <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <span class="text-sm font-medium text-gray-700">文章设置</span>
+        <span class="text-sm font-medium text-gray-700">{{ $t('article_ui.settings') }}</span>
         <button class="text-gray-400 hover:text-gray-600 transition-colors" @click="$emit('update:open', false)">
           <X :size="15" />
         </button>
@@ -23,7 +23,7 @@
 
         <!-- 发布状态 -->
         <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">状态</label>
+          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ $t('article_ui.status') }}</label>
           <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
             <button
               type="button"
@@ -32,7 +32,7 @@
                 ? 'bg-gray-700 text-white'
                 : 'text-gray-500 hover:bg-gray-50'"
               @click="update('status', 'draft')"
-            >草稿</button>
+            >{{ $t('article_ui.draft') }}</button>
             <button
               type="button"
               class="flex-1 py-2 transition-colors border-l border-gray-200"
@@ -40,7 +40,7 @@
                 ? 'bg-violet-600 text-white'
                 : 'text-gray-500 hover:bg-gray-50'"
               @click="update('status', 'published')"
-            >公开</button>
+            >{{ $t('article_ui.published') }}</button>
           </div>
         </div>
 
@@ -48,10 +48,10 @@
 
         <!-- 封面图 -->
         <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">封面图</label>
+          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ $t('article_ui.cover') }}</label>
           <input
             :value="modelValue.cover_url"
-            placeholder="粘贴图片 URL…"
+            :placeholder="$t('article_ui.cover_placeholder')"
             class="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-violet-400 focus:bg-white transition-colors placeholder:text-gray-300"
             @input="update('cover_url', $event.target.value)"
           />
@@ -59,7 +59,7 @@
             v-if="modelValue.cover_url"
             class="rounded-lg overflow-hidden border border-gray-100 aspect-video bg-gray-50"
           >
-            <img :src="modelValue.cover_url" alt="封面预览" class="w-full h-full object-cover" />
+            <img :src="modelValue.cover_url" :alt="$t('article_ui.cover_preview')" class="w-full h-full object-cover" />
           </div>
         </div>
 
@@ -70,25 +70,25 @@
           <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">Slug</label>
           <input
             :value="modelValue.slug"
-            placeholder="自定义 URL 路径（可选）"
+            :placeholder="$t('article_ui.slug_placeholder')"
             class="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-violet-400 focus:bg-white transition-colors placeholder:text-gray-300 font-mono"
             @input="update('slug', $event.target.value)"
           />
-          <p class="text-xs text-gray-400">留空则自动生成</p>
+          <p class="text-xs text-gray-400">{{ $t('article_ui.slug_hint') }}</p>
         </div>
 
         <div class="h-px bg-gray-100" />
 
         <!-- 关联作品 -->
         <div class="space-y-2">
-          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">关联作品</label>
+          <label class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ $t('article_ui.related_works') }}</label>
           <input
             :value="modelValue.work_ids"
-            placeholder="输入 Work ID，多个用逗号隔开"
+            :placeholder="$t('article_ui.related_works_placeholder')"
             class="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-violet-400 focus:bg-white transition-colors placeholder:text-gray-300 font-mono"
             @input="update('work_ids', $event.target.value)"
           />
-          <p class="text-xs text-gray-400">例：1,2,3</p>
+          <p class="text-xs text-gray-400">{{ $t('article_ui.example_ids') }}</p>
         </div>
 
       </div>

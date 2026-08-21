@@ -3,13 +3,13 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
         <Disc3 class="w-5 h-5 text-purple-600" />
-        关联专辑
+        {{ $t('content_display.linked_works') }}
       </h2>
     </div>
 
     <div class="space-y-6">
       <section v-if="mode === 'time'" class="space-y-4">
-        <div v-if="worksByYear.length === 0" class="text-sm text-gray-500">暂无专辑。</div>
+        <div v-if="worksByYear.length === 0" class="text-sm text-gray-500">{{ $t('content_display.no_works') }}</div>
         <div v-for="bucket in worksByYear" :key="bucket.year" class="rounded-2xl border border-purple-100 bg-purple-50/40 p-5 space-y-4 shadow-sm">
           <div class="flex items-center gap-3">
             <span class="h-2.5 w-2.5 rounded-full bg-purple-500" />
@@ -48,7 +48,7 @@
       </section>
 
       <section v-else class="space-y-4">
-        <div v-if="groupedWorks.length === 0 && ungroupedWorks.length === 0" class="text-sm text-gray-500">暂无专辑。</div>
+        <div v-if="groupedWorks.length === 0 && ungroupedWorks.length === 0" class="text-sm text-gray-500">{{ $t('content_display.no_works') }}</div>
 
         <div v-for="group in groupedWorks" :key="group.id" class="rounded-2xl border border-amber-100 bg-amber-50/40 p-5 space-y-4 shadow-sm">
           <div class="flex items-center gap-3">
@@ -89,7 +89,7 @@
         <div v-if="ungroupedWorks.length" class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 space-y-4 shadow-sm">
           <div class="flex items-center gap-3">
             <span class="h-2.5 w-2.5 rounded-full bg-slate-400" />
-            <h3 class="text-lg font-bold text-slate-900 tracking-tight">未分组</h3>
+            <h3 class="text-lg font-bold text-slate-900 tracking-tight">{{ $t('content_display.ungrouped') }}</h3>
           </div>
           <div class="space-y-3">
             <NuxtLink
@@ -160,18 +160,20 @@ const props = withDefaults(defineProps<{
 })
 
 const mode = computed(() => props.mode)
+const { t } = useI18n()
+const { formatDate } = useLocaleFormatting()
 
 const worksByYear = computed(() => {
   const buckets = new Map<string, WorkItem[]>()
   props.works.forEach((work) => {
-    const year = work.release_date ? String(new Date(work.release_date).getFullYear()) : '未知时间'
+    const year = work.release_date ? String(new Date(work.release_date).getFullYear()) : t('content_display.unknown_date')
     if (!buckets.has(year)) buckets.set(year, [])
     buckets.get(year)!.push(work)
   })
   const entries = Array.from(buckets.entries())
   entries.sort((a, b) => {
-    if (a[0] === '未知时间') return 1
-    if (b[0] === '未知时间') return -1
+    if (a[0] === t('content_display.unknown_date')) return 1
+    if (b[0] === t('content_display.unknown_date')) return -1
     return Number(b[0]) - Number(a[0])
   })
   return entries.map(([year, items]) => ({ year, works: items }))
@@ -206,14 +208,6 @@ const ungroupedWorks = computed(() => {
   return props.works.filter((work) => !work.group_id)
 })
 
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  if (Number.isNaN(date.getTime())) return dateString
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
-}
 </script>
 
 <style scoped>

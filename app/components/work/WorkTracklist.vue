@@ -37,12 +37,12 @@
             <!-- Title inline on sm+ -->
             <span v-if="disc.title" class="hidden sm:inline text-[11px] text-gray-400 truncate">— {{ disc.title }}</span>
             <!-- is_bonus badge -->
-            <div v-if="disc.isBonus" class="tooltip tooltip-bottom" data-tip="这是特典内容">
-              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-pink-100 text-pink-600 cursor-default select-none">特典</span>
+            <div v-if="disc.isBonus" class="tooltip tooltip-bottom" :data-tip="$t('content_display.bonus_hint')">
+              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-pink-100 text-pink-600 cursor-default select-none">{{ $t('content_display.bonus') }}</span>
             </div>
             <!-- is_counted badge -->
-            <div v-if="!disc.isCounted" class="tooltip tooltip-bottom" data-tip="不计入专辑曲目总数">
-              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-500 cursor-default select-none">附加内容</span>
+            <div v-if="!disc.isCounted" class="tooltip tooltip-bottom" :data-tip="$t('content_display.extra_hint')">
+              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-500 cursor-default select-none">{{ $t('content_display.extra_content') }}</span>
             </div>
             <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold tabular-nums rounded-full bg-gray-200/80 text-gray-500 shrink-0">{{ disc.tracks.length }}</span>
           </div>
@@ -67,7 +67,7 @@
             @click="handleToggleFavorite(track.songId)"
             class="shrink-0 p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer sm:opacity-0 sm:group-hover:opacity-100"
             :class="{ 'sm:opacity-100!': favoritedSongs[track.songId] }"
-            :title="favoritedSongs[track.songId] ? '取消收藏' : '收藏'"
+            :title="$t(favoritedSongs[track.songId] ? 'content_display.unfavorite' : 'content_display.favorite')"
           >
             <Heart
               :size="14"
@@ -82,7 +82,7 @@
             <!-- 第一行：纯音乐图标 + 标题 -->
             <div class="flex items-center gap-1.5 min-w-0">
               <p class="text-sm font-medium text-gray-900 leading-snug">{{ track.title }}</p>
-              <div v-if="track.isInstrumental" class="tooltip tooltip-bottom shrink-0" data-tip="纯音乐">
+              <div v-if="track.isInstrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
                 <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-100 text-violet-600">
                   <Music2 :size="11" :stroke-width="2.5" />
                 </span>

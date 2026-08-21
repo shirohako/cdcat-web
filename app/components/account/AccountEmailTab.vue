@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
       <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">邮箱</h2>
-        <p class="text-sm text-gray-500 mt-1">用于登录和接收通知的邮箱</p>
+        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.email.title') }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.email.description') }}</p>
       </div>
 
       <div class="p-6 space-y-6">
@@ -21,17 +21,17 @@
             </div>
             <div class="min-w-0">
               <p class="text-sm font-medium text-gray-900 truncate">
-                {{ user?.email || '尚未绑定邮箱' }}
+                {{ user?.email || t('account_pages.email.not_linked') }}
               </p>
               <p
                 v-if="user?.email"
                 class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-0.5"
               >
                 <ShieldCheck :size="12" />
-                已验证
+                {{ t('account_pages.email.verified') }}
               </p>
               <p v-else class="text-xs text-gray-400 mt-0.5">
-                绑定邮箱后可用于登录与接收通知
+                {{ t('account_pages.email.link_hint') }}
               </p>
             </div>
           </div>
@@ -40,7 +40,7 @@
             class="shrink-0 px-3 py-1.5 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-xs font-medium whitespace-nowrap"
             @click="editing = true"
           >
-            {{ user?.email ? '更换' : '绑定' }}
+            {{ user?.email ? t('account_pages.email.change') : t('account_pages.email.link') }}
           </button>
         </div>
 
@@ -62,7 +62,7 @@
             <!-- New email -->
             <div class="grid gap-1.5">
               <label for="new-email" class="text-sm font-medium text-gray-700">
-                {{ user?.email ? '新邮箱地址' : '邮箱地址' }}
+                {{ user?.email ? t('account_pages.email.new_address') : t('account_pages.email.address') }}
               </label>
               <input
                 id="new-email"
@@ -71,12 +71,12 @@
                 class="input input-bordered w-full bg-white"
                 placeholder="your@email.com"
               />
-              <p class="text-xs text-gray-400">请输入有效的邮箱地址</p>
+              <p class="text-xs text-gray-400">{{ t('account_pages.email.invalid') }}</p>
             </div>
 
             <!-- Verification code -->
             <div class="grid gap-1.5">
-              <label for="email-code" class="text-sm font-medium text-gray-700">邮箱验证码</label>
+              <label for="email-code" class="text-sm font-medium text-gray-700">{{ t('account_pages.email.verification_code') }}</label>
               <div class="flex gap-2">
                 <input
                   id="email-code"
@@ -84,7 +84,7 @@
                   type="text"
                   maxlength="6"
                   class="input input-bordered flex-1 bg-white"
-                  placeholder="输入验证码"
+                  :placeholder="t('account_pages.email.code_placeholder')"
                   @keyup.enter="submit"
                 />
                 <button
@@ -95,10 +95,10 @@
                   @click="sendCode"
                 >
                   <span v-if="isSendingCode" class="loading loading-spinner loading-xs"></span>
-                  <span v-else>{{ countdown > 0 ? `${countdown}s` : '发送验证码' }}</span>
+                  <span v-else>{{ countdown > 0 ? `${countdown}s` : t('account_pages.email.send_code') }}</span>
                 </button>
               </div>
-              <p class="text-xs text-gray-400">验证码将发送至新邮箱</p>
+              <p class="text-xs text-gray-400">{{ t('account_pages.email.code_hint') }}</p>
             </div>
           </div>
         </Transition>
@@ -109,7 +109,7 @@
         class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex justify-end gap-2"
       >
         <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
-          取消
+          {{ t('common.cancel') }}
         </button>
         <button
           type="button"
@@ -120,7 +120,7 @@
           <span v-if="isSubmitting" class="loading loading-spinner loading-xs"></span>
           <template v-else>
             <Mail :size="14" />
-            确认更换
+            {{ t('account_pages.email.confirm_change') }}
           </template>
         </button>
       </div>
@@ -139,6 +139,8 @@ const emit = defineEmits(['save', 'error'])
 
 const { $api } = useNuxtApp()
 const { fetchUser } = useAuth()
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 const editing = ref(false)
 const errorMessage = ref('')
@@ -193,7 +195,7 @@ const sendCode = async () => {
       }
     }, 1000)
   } catch (error) {
-    errorMessage.value = error?.message || '发送验证码失败，请稍后重试'
+    errorMessage.value = localizeError(error, 'account_pages.email.send_failed')
   } finally {
     isSendingCode.value = false
   }
@@ -215,11 +217,11 @@ const submit = async () => {
     })
 
     await fetchUser()
-    emit('save', '邮箱更换成功')
+    emit('save', t('account_pages.email.change_success'))
     resetForm()
     editing.value = false
   } catch (error) {
-    errorMessage.value = error?.message || '更换邮箱失败，请稍后重试'
+    errorMessage.value = localizeError(error, 'account_pages.email.change_failed')
   } finally {
     isSubmitting.value = false
   }

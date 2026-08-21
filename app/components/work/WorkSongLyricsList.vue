@@ -9,7 +9,7 @@
     <!-- Error -->
     <div v-else-if="error" class="flex items-center justify-center gap-3 py-12 px-6">
       <AlertCircle :size="20" class="text-red-400 shrink-0" />
-      <p class="text-sm text-gray-500">加载失败，请重试</p>
+      <p class="text-sm text-gray-500">{{ $t('common.load_failed') }}</p>
     </div>
 
     <!-- Empty -->
@@ -44,7 +44,7 @@
         <div class="flex-1 min-w-0 space-y-1.5">
           <!-- Who -->
           <span class="text-sm font-semibold text-gray-800 truncate">
-            {{ item.submitter ? (item.submitter.nickname || item.submitter.username) : '匿名用户' }}
+            {{ item.submitter ? (item.submitter.nickname || item.submitter.username) : $t('lyrics_ui.anonymous') }}
           </span>
 
           <!-- Language + extra tags -->
@@ -56,17 +56,17 @@
             </span>
             <span v-if="item.is_primary" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-violet-50 text-violet-600">
               <Star :size="8" fill="currentColor" />
-              主歌词
+              {{ $t('lyrics_ui.primary') }}
             </span>
             <span v-if="item.is_ai_generated" class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-600">
-              AI 生成
+              {{ $t('lyrics_ui.ai_generated') }}
             </span>
             <span
               v-if="item.is_translation && item.authorship"
               class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold"
               :class="item.authorship === 'original' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'"
             >
-              {{ item.authorship === 'original' ? '原创' : '转载' }}
+              {{ $t(item.authorship === 'original' ? 'lyrics_ui.original' : 'lyrics_ui.reposted') }}
             </span>
             <a
               v-if="item.source"
@@ -88,7 +88,7 @@
             class="px-2 py-1 rounded-lg text-xs font-bold"
             :class="item.is_translation ? 'bg-teal-50 text-teal-600' : 'bg-sky-50 text-sky-600'"
           >
-            {{ item.is_translation ? '翻译' : '歌词' }}
+            {{ $t(item.is_translation ? 'lyrics_ui.translation' : 'lyrics_ui.lyrics') }}
           </span>
           <span class="text-[11px] text-gray-400 tabular-nums">{{ formatDate(item.created_at) }}</span>
         </div>

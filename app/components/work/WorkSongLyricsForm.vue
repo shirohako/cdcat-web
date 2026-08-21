@@ -5,12 +5,12 @@
     <div v-if="uploadedFileName" class="flex items-center gap-2 px-3 py-2 rounded-lg bg-sky-50 border border-sky-100 text-sky-700">
       <Upload :size="13" class="shrink-0" />
       <span class="text-xs font-medium truncate flex-1">{{ uploadedFileName }}</span>
-      <span class="text-[11px] text-sky-500">已自动识别参数</span>
+      <span class="text-[11px] text-sky-500">{{ $t('lyrics_ui.auto_detected') }}</span>
     </div>
 
     <!-- Type selector -->
     <div>
-      <label class="block text-xs font-semibold text-gray-600 mb-1.5">类型 <span class="text-red-400">*</span></label>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.type') }} <span class="text-red-400">*</span></label>
       <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm font-medium">
         <button
           type="button"
@@ -19,7 +19,7 @@
           :class="!form.is_translation ? 'bg-sky-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
         >
           <FileText :size="13" />
-          歌词
+          {{ $t('lyrics_ui.lyrics') }}
         </button>
         <button
           type="button"
@@ -28,7 +28,7 @@
           :class="form.is_translation ? 'bg-teal-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
         >
           <Languages :size="13" />
-          翻译
+          {{ $t('lyrics_ui.translation') }}
         </button>
       </div>
     </div>
@@ -36,29 +36,29 @@
     <!-- language + format row -->
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5">语言 <span class="text-red-400">*</span></label>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.language') }} <span class="text-red-400">*</span></label>
         <AppLanguageSelect v-model="form.language" />
       </div>
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5">格式</label>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.format') }}</label>
         <select
           v-model="form.format"
           class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent"
         >
-          <option value="plain">plain — 纯文本</option>
-          <option value="lrc">lrc — 带时间轴</option>
-          <option value="srt">srt — SRT 字幕</option>
+          <option value="plain">plain — {{ $t('lyrics_ui.plain') }}</option>
+          <option value="lrc">lrc — {{ $t('lyrics_ui.timed') }}</option>
+          <option value="srt">srt — {{ $t('lyrics_ui.subtitle') }}</option>
         </select>
       </div>
     </div>
 
     <!-- content -->
     <div>
-      <label class="block text-xs font-semibold text-gray-600 mb-1.5">歌词内容 <span class="text-red-400">*</span></label>
+      <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.content') }} <span class="text-red-400">*</span></label>
       <textarea
         v-model="form.content"
         rows="10"
-        placeholder="在此粘贴歌词内容…"
+        :placeholder="$t('lyrics_ui.content_placeholder')"
         class="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-800 font-mono leading-relaxed resize-y focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent placeholder-gray-300"
       />
     </div>
@@ -67,18 +67,18 @@
     <div class="flex flex-wrap gap-x-6 gap-y-3">
       <label class="flex items-center gap-2 cursor-pointer select-none">
         <input type="checkbox" v-model="form.is_primary" class="w-4 h-4 rounded accent-indigo-500" />
-        <span class="text-sm text-gray-700">主歌词</span>
+        <span class="text-sm text-gray-700">{{ $t('lyrics_ui.primary') }}</span>
       </label>
 <label class="flex items-center gap-2 cursor-pointer select-none">
         <input type="checkbox" v-model="form.is_ai_generated" class="w-4 h-4 rounded accent-amber-500" />
-        <span class="text-sm text-gray-700">AI 生成</span>
+        <span class="text-sm text-gray-700">{{ $t('lyrics_ui.ai_generated') }}</span>
       </label>
     </div>
 
     <!-- authorship + source (仅翻译时显示) -->
     <div v-if="form.is_translation" class="space-y-3">
       <div>
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5">是否转载 <span class="text-red-400">*</span></label>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.repost_question') }} <span class="text-red-400">*</span></label>
         <div
           class="inline-flex rounded-lg overflow-hidden text-sm font-medium border transition-colors"
           :class="submitAttempted && !form.authorship ? 'border-red-400' : 'border-gray-200'"
@@ -88,17 +88,17 @@
             @click="form.authorship = 'original'; form.source = ''"
             class="px-4 py-1.5 transition-colors"
             :class="form.authorship === 'original' ? 'bg-sky-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
-          >原创</button>
+          >{{ $t('lyrics_ui.original') }}</button>
           <button
             type="button"
             @click="form.authorship = 'repost'"
             class="px-4 py-1.5 border-l border-gray-200 transition-colors"
             :class="form.authorship === 'repost' ? 'bg-sky-500 text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
-          >转载</button>
+          >{{ $t('lyrics_ui.reposted') }}</button>
         </div>
       </div>
       <div v-if="form.authorship === 'repost'">
-        <label class="block text-xs font-semibold text-gray-600 mb-1.5">来源 URL / 描述</label>
+        <label class="block text-xs font-semibold text-gray-600 mb-1.5">{{ $t('lyrics_ui.source') }}</label>
         <input
           v-model="form.source"
           type="text"
@@ -123,7 +123,7 @@
         @click="emit('cancel')"
         class="px-4 py-2 rounded-lg text-sm font-medium text-gray-500 hover:bg-gray-100 transition-colors"
       >
-        取消
+        {{ $t('common.cancel') }}
       </button>
       <button
         type="submit"
@@ -131,7 +131,7 @@
         class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
       >
         <span v-if="pending" class="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-        提交
+        {{ $t('lyrics_ui.submit_lyrics') }}
       </button>
     </div>
   </form>
@@ -154,6 +154,7 @@ const emit = defineEmits<{
 
 const { $api } = useNuxtApp()
 const { showToast } = useToast()
+const { t } = useI18n()
 
 const defaultForm = (): LyricsFormData => ({
   language: '',
@@ -172,9 +173,9 @@ const submitAttempted = ref(false)
 
 const validationErrors = computed(() => {
   const errors: string[] = []
-  if (!form.language) errors.push('请选择语言')
-  if (!form.content?.trim()) errors.push('请填写歌词内容')
-  if (form.is_translation && !form.authorship) errors.push('请选择是否转载')
+  if (!form.language) errors.push(t('lyrics_ui.select_language'))
+  if (!form.content?.trim()) errors.push(t('lyrics_ui.content_required'))
+  if (form.is_translation && !form.authorship) errors.push(t('lyrics_ui.select_authorship'))
   return errors
 })
 
@@ -207,12 +208,12 @@ const handleSubmit = async () => {
         source: form.source || null,
       },
     })
-    showToast('歌词提交成功！', 'success')
+    showToast(t('lyrics_ui.submitted'), 'success')
     emit('submitted')
     Object.assign(form, defaultForm())
     submitAttempted.value = false
   } catch {
-    showToast('提交失败，请稍后重试', 'error')
+    showToast(t('lyrics_ui.submit_failed'), 'error')
   } finally {
     pending.value = false
   }

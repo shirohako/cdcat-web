@@ -22,7 +22,7 @@
               {{ $t('user.account') }}
             </h1>
             <p class="mt-1.5 text-sm text-gray-500">
-              管理你的账户信息和安全设置
+              {{ t('account_pages.description') }}
             </p>
           </div>
         </div>
@@ -43,7 +43,7 @@
 
       <div>
         <!-- Tabs -->
-        <nav class="relative mb-6" aria-label="Account settings">
+        <nav class="relative mb-6" :aria-label="t('account_pages.title')">
           <div
             ref="tabsScrollRef"
             class="flex items-center gap-1 overflow-x-auto rounded-2xl bg-white/70 backdrop-blur ring-1 ring-black/5 p-1.5 [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -73,7 +73,7 @@
             v-show="canScrollLeft"
             type="button"
             class="absolute inset-y-0 left-0 w-9 rounded-l-2xl bg-linear-to-r from-white/95 from-40% to-transparent flex items-center justify-start pl-1.5 text-gray-600 hover:text-gray-900 transition-colors"
-            aria-label="Scroll left"
+            :aria-label="t('common.previous')"
             @click="scrollTabs('left')"
           >
             <Icon name="lucide:chevron-left" class="w-4 h-4" />
@@ -82,7 +82,7 @@
             v-show="canScrollRight"
             type="button"
             class="absolute inset-y-0 right-0 w-9 rounded-r-2xl bg-linear-to-l from-white/95 from-40% to-transparent flex items-center justify-end pr-1.5 text-gray-600 hover:text-gray-900 transition-colors"
-            aria-label="Scroll right"
+            :aria-label="t('common.next')"
             @click="scrollTabs('right')"
           >
             <Icon name="lucide:chevron-right" class="w-4 h-4" />
@@ -96,7 +96,7 @@
             <AccountProfileTab
               v-if="activeTab === 'profile'"
               :user="user"
-              @save="showToast('个人资料已保存')"
+              @save="showToast(t('account_pages.profile_saved'))"
             />
           </KeepAlive>
 
@@ -110,7 +110,7 @@
           <AccountPreferencesTab
             v-if="activeTab === 'preferences'"
             :user="user"
-            @save="showToast('偏好设置已保存')"
+            @save="showToast(t('account_pages.preferences_saved'))"
           />
 
 <AccountSecurityTab
@@ -174,6 +174,7 @@ definePageMeta({
 
 const { user } = useAuth()
 const { toast, showToast } = useToast()
+const { t } = useI18n()
 
 const userDisplayName = computed(() => {
   return user?.value?.nickname || user?.value?.username || ''
@@ -184,15 +185,15 @@ const userInitial = computed(() => {
   return String(name).trim().slice(0, 1).toUpperCase()
 })
 
-const tabs = [
-  { key: 'profile', label: '个人资料', icon: UserIcon },
-  { key: 'email', label: '邮箱', icon: Mail },
-  { key: 'preferences', label: '偏好设置', icon: Settings },
-  { key: 'security', label: '安全设置', icon: Lock },
-  { key: 'notifications', label: '通知设置', icon: Bell },
-  { key: 'privacy', label: '隐私设置', icon: EyeOff },
-  { key: 'danger', label: '危险区域', icon: AlertTriangle }
-]
+const tabs = computed(() => [
+  { key: 'profile', label: t('account_pages.tabs.profile'), icon: UserIcon },
+  { key: 'email', label: t('account_pages.tabs.email'), icon: Mail },
+  { key: 'preferences', label: t('account_pages.tabs.preferences'), icon: Settings },
+  { key: 'security', label: t('account_pages.tabs.security'), icon: Lock },
+  { key: 'notifications', label: t('account_pages.tabs.notifications'), icon: Bell },
+  { key: 'privacy', label: t('account_pages.tabs.privacy'), icon: EyeOff },
+  { key: 'danger', label: t('account_pages.tabs.danger'), icon: AlertTriangle }
+])
 
 const activeTab = ref('profile')
 
@@ -222,6 +223,6 @@ onMounted(() => {
 })
 
 useHead({
-  title: 'Account Settings | CDCAT'
+  title: computed(() => `${t('account_pages.title')} | CDCAT`)
 })
 </script>

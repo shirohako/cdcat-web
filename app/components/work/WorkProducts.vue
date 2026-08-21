@@ -6,7 +6,7 @@
         <Package :size="16" class="text-blue-600" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.products') }}</h2>
-      <span v-if="products && products.length > 1" class="ml-auto text-xs text-gray-400">{{ products.length }} 个版本</span>
+      <span v-if="products && products.length > 1" class="ml-auto text-xs text-gray-400">{{ $t('content_display.versions', { count: products.length }) }}</span>
     </div>
 
     <!-- Product List -->
@@ -44,17 +44,17 @@
                 class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-amber-100 text-amber-700 shrink-0"
               >
                 <Lock :size="8" />
-                {{ limitedRuleLabel(product.limited_rule) || '限定版' }}
+                {{ limitedRuleLabel(product.limited_rule) || $t('content_display.limited') }}
               </span>
               <span
                 v-else
                 class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-100 text-gray-500 shrink-0"
-              >通常版</span>
+              >{{ $t('content_display.regular') }}</span>
               <!-- Out of Print -->
               <span
                 v-if="!product.is_available"
                 class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-400 shrink-0"
-              >绝版</span>
+              >{{ $t('content_display.out_of_print') }}</span>
             </div>
             <!-- Price -->
             <span v-if="formattedPrice(product)" class="shrink-0 text-sm font-bold text-gray-800 tabular-nums">
@@ -120,10 +120,12 @@ const props = withDefaults(defineProps<{
 }>(), {
   products: () => [],
 })
+const { t } = useI18n()
+const { intlLocale } = useLocaleFormatting()
 
 const mediumLabel = (medium: MediumType) => {
-  if (medium === 'DIGITAL') return 'Digital';
-  return 'Physical';
+  if (medium === 'DIGITAL') return t('content_display.digital');
+  return t('content_display.physical');
 };
 
 const mediumStyle = (medium: MediumType) => {
@@ -132,18 +134,18 @@ const mediumStyle = (medium: MediumType) => {
 };
 
 const formatEditionType = (type: EditionType) => {
-  if (type === 'LIMITED') return 'Limited Edition';
-  return 'Regular Edition';
+  if (type === 'LIMITED') return t('content_display.limited');
+  return t('content_display.regular');
 };
 
 const limitedRuleLabel = (rule: string | null) => {
   const map: Record<string, string> = {
-    FIRST_PRESS: '初回限定',
-    COUNT: '数量限定',
-    PERIOD: '期间限定',
-    SHOP: '店铺限定',
-    EVENT: '活动限定',
-    REGION: '地区限定',
+    FIRST_PRESS: t('content_display.limited_rule.first_press'),
+    COUNT: t('content_display.limited_rule.count'),
+    PERIOD: t('content_display.limited_rule.period'),
+    SHOP: t('content_display.limited_rule.shop'),
+    EVENT: t('content_display.limited_rule.event'),
+    REGION: t('content_display.limited_rule.region'),
   };
   return rule ? (map[rule] || '') : '';
 };
@@ -153,7 +155,7 @@ const formattedPrice = (product: WorkProduct) => {
   const numericPrice = parseFloat(product.price);
   if (isNaN(numericPrice)) return `${product.currency} ${product.price}`;
   try {
-    return new Intl.NumberFormat('ja-JP', {
+    return new Intl.NumberFormat(intlLocale.value, {
       style: 'currency',
       currency: product.currency,
       minimumFractionDigits: 0,

@@ -6,6 +6,7 @@ import type { LoginRequest, RegisterRequest, AuthResponse, User } from '~/types/
 export const useAuth = () => {
   const { $api } = useNuxtApp()
   const router = useRouter()
+  const { localizeError } = useLocalizedApiError()
 
   // 使用 cookie 存储 token 和用户信息
   const tokenCookie = useCookie<string | null>('auth_token', {
@@ -69,7 +70,7 @@ export const useAuth = () => {
     } catch (error: any) {
       return {
         success: false,
-        error: error.message || '登录失败，请重试'
+        error: localizeError(error, 'auth.login.login_failed')
       }
     }
   }
@@ -85,11 +86,10 @@ export const useAuth = () => {
       saveAuth(response)
       return { success: true, data: response }
     } catch (error: any) {
-      const apiError = error.details
       return {
         success: false,
-        error: apiError?.message || error.message || '注册失败，请重试',
-        details: apiError?.details as Record<string, string[]> | undefined
+        error: localizeError(error, 'auth.register.register_failed'),
+        details: error.details?.details as Record<string, unknown> | undefined
       }
     }
   }
@@ -107,7 +107,7 @@ export const useAuth = () => {
       clearAuth()
       return {
         success: false,
-        error: error.message || '登出失败'
+        error: localizeError(error)
       }
     }
   }
@@ -115,7 +115,7 @@ export const useAuth = () => {
   // 获取当前用户信息
   const fetchUser = async () => {
     if (!token.value) {
-      return { success: false, error: '未登录' }
+      return { success: false, error: localizeError({ status: 401 }) }
     }
 
     try {
@@ -129,7 +129,7 @@ export const useAuth = () => {
       clearAuth()
       return {
         success: false,
-        error: error.message || '获取用户信息失败'
+        error: localizeError(error)
       }
     }
   }

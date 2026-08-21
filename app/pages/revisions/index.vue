@@ -3,15 +3,15 @@
     <div class="container mx-auto px-4 py-8 max-w-5xl md:px-8">
 
       <div class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">我的编辑记录</h1>
-        <p class="mt-1 text-sm text-gray-500">你提交的所有词条编辑申请</p>
+        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ t('collection_pages.revisions.title') }}</h1>
+        <p class="mt-1 text-sm text-gray-500">{{ t('collection_pages.revisions.description') }}</p>
       </div>
 
       <!-- 加载 -->
       <div v-if="pending" class="flex items-center justify-center min-h-60">
         <div class="flex flex-col items-center gap-3 text-gray-400">
           <GitPullRequest :size="32" class="opacity-30" />
-          <p class="text-sm">加载中…</p>
+          <p class="text-sm">{{ t('common.loading') }}</p>
         </div>
       </div>
 
@@ -19,13 +19,13 @@
       <div v-else-if="error" class="flex items-center justify-center min-h-60">
         <div class="flex flex-col items-center gap-3 text-gray-400">
           <AlertCircle :size="32" class="opacity-40" />
-          <p class="text-sm">{{ error.message }}</p>
+          <p class="text-sm">{{ localizeError(error) }}</p>
         </div>
       </div>
 
       <div v-else>
         <div class="mb-4 text-xs text-gray-400">
-          共 {{ pagination.total }} 条记录
+          {{ t('common.items_total', { count: pagination.total }) }}
         </div>
 
         <!-- Desktop 表格 -->
@@ -34,12 +34,12 @@
             <thead>
               <tr class="border-b border-gray-100 bg-gray-50/60">
                 <th class="w-14 px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">ID</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">词条</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">修改主体</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">操作</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">提交者</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">状态</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">提交时间</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.entry') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.subject') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.action') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.submitter') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.status') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.submitted_at') }}</th>
                 <th class="w-16 px-4 py-3" />
               </tr>
             </thead>
@@ -121,14 +121,14 @@
                       class="whitespace-nowrap rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
                       @click.stop="goToDetail(revision.id)"
                     >
-                      详情
+                      {{ t('common.details') }}
                     </button>
                     <button
                       v-if="revision.status === 'pending'"
                       class="whitespace-nowrap rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50 hover:text-red-600"
                       @click.stop="confirmRetract(revision)"
                     >
-                      撤销
+                      {{ t('collection_pages.revisions.retract') }}
                     </button>
                   </div>
                 </td>
@@ -137,7 +137,7 @@
               <tr v-if="revisionsData.length === 0">
                 <td colspan="8" class="px-5 py-16 text-center">
                   <GitPullRequest :size="28" class="mx-auto mb-3 text-gray-300" />
-                  <p class="text-sm text-gray-400">暂无编辑记录</p>
+                  <p class="text-sm text-gray-400">{{ t('collection_pages.revisions.empty') }}</p>
                 </td>
               </tr>
             </tbody>
@@ -181,35 +181,35 @@
                 class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
                 @click="goToDetail(revision.id)"
               >
-                查看详情
+                {{ t('common.details') }}
               </button>
               <button
                 v-if="revision.resource_id"
                 class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
                 @click="goToEntity(revision)"
               >
-                查看词条
+                {{ t('collection_pages.revisions.view_entry') }}
               </button>
               <button
                 v-if="revision.status === 'pending'"
                 class="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
                 @click="confirmRetract(revision)"
               >
-                撤销
+                {{ t('collection_pages.revisions.retract') }}
               </button>
             </div>
           </article>
 
           <div v-if="revisionsData.length === 0" class="flex flex-col items-center py-16 text-gray-400">
             <GitPullRequest :size="28" class="mb-3 opacity-40" />
-            <p class="text-sm">暂无编辑记录</p>
+            <p class="text-sm">{{ t('collection_pages.revisions.empty') }}</p>
           </div>
         </div>
 
         <!-- 分页 -->
         <div v-if="pagination.last_page > 1" class="mt-6 flex items-center justify-between">
           <p class="text-xs text-gray-400">
-            第 {{ (pagination.current_page - 1) * pagination.per_page + 1 }}–{{ Math.min(pagination.current_page * pagination.per_page, pagination.total) }} 条
+            {{ t('common.page_range', { total: pagination.total, start: (pagination.current_page - 1) * pagination.per_page + 1, end: Math.min(pagination.current_page * pagination.per_page, pagination.total) }) }}
           </p>
           <div class="flex items-center gap-1">
             <button
@@ -249,9 +249,9 @@
     <CommonConfirmDialog
       v-model="retractModal.open"
       variant="delete"
-      confirm-text="确认撤销"
-      title="撤销修订"
-      :description="`确认撤销「${retractModal.revision?.title ?? ''}」吗？撤销后该修订将不再进入审核流程。`"
+      :confirm-text="t('collection_pages.revisions.retract_confirm_button')"
+      :title="t('collection_pages.revisions.retract_title')"
+      :description="t('collection_pages.revisions.retract_confirm', { title: retractModal.revision?.title ?? '' })"
       @confirm="doRetract"
     />
 
@@ -275,6 +275,9 @@ import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } f
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
+const { formatDate: formatLocalizedDate } = useLocaleFormatting()
+const { localizeError } = useLocalizedApiError()
 
 const currentPage = computed(() => {
   const page = parseInt(route.query.page || '1') || 1
@@ -296,8 +299,8 @@ const pagination = computed(() => response.value?.pagination ?? {
 
 // ===== 格式化 =====
 const formatType = (type) => ({ work: 'Work', artist: 'Artist', series: 'Series', event: 'Event', entry: 'Entry' }[type] || type)
-const formatAction = (action) => ({ create: '新增', update: '编辑', delete: '删除' }[action] || action)
-const formatStatus = (status) => ({ pending: '待审核', approved: '已通过', rejected: '已拒绝' }[status] || status)
+const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
+const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
 
 const actionBadgeClass = (action) => ({
   create: 'bg-emerald-50 border-emerald-200 text-emerald-700',
@@ -319,8 +322,7 @@ const statusDotClass = (status) => ({
 
 const formatDate = (d) => {
   if (!d) return ''
-  const dt = new Date(d)
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`
+  return formatLocalizedDate(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 // ===== 分页 =====
@@ -360,13 +362,10 @@ const confirmRetract = (revision) => {
 const doRetract = async () => {
   try {
     await $api(`/v1/revisions/${retractModal.revision.id}/retract`, { method: 'POST' })
-    showToast('修订已撤销')
+    showToast(t('collection_pages.revisions.retracted'))
     await refresh()
   } catch (e) {
-    const code = e?.code
-    if (code === 'REVISION_NOT_OWNED') showToast('无法撤销他人的修订', 'error')
-    else if (code === 'REVISION_CANNOT_RETRACT') showToast('该修订已审核，无法撤销', 'error')
-    else showToast(e?.message || '撤销失败，请重试', 'error')
+    showToast(localizeError(e, 'collection_pages.revisions.retract_failed'), 'error')
   }
 }
 

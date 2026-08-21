@@ -12,7 +12,7 @@
         <div class="max-w-4xl">
           <p class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-100/65 px-3 py-1 text-xs font-semibold tracking-wide text-sky-700">
             <Icon name="lucide:cat" class="h-3.5 w-3.5" />
-            ABOUT CDCAT
+            {{ t('about_page.label') }}
           </p>
           <h1 class="mt-4 flex items-center gap-2 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
             <span class="inline-flex rounded-xl bg-amber-100 p-1.5 md:p-2">
@@ -21,7 +21,7 @@
             CDCAT
           </h1>
           <p class="mt-4 text-[15px] leading-7 text-slate-700 md:text-base">
-            CDCAT 是一个面向重度听歌用户的音乐资料站点。
+            {{ t('about_page.intro') }}
           </p>
         </div>
 
@@ -48,10 +48,10 @@
               <span class="inline-flex rounded-lg bg-blue-100 p-1.5">
                 <Icon name="lucide:book-open-check" class="h-5 w-5 text-blue-700" />
               </span>
-              使用说明
+              {{ t('about_page.guides_title') }}
             </h2>
             <p class="mt-2 text-sm text-slate-600">
-              如果您想参与编辑，可能需要了解下面的内容。
+              {{ t('about_page.guides_desc') }}
             </p>
           </div>
         </div>
@@ -73,7 +73,7 @@
               :to="guide.link"
               class="mt-4 inline-flex items-center text-sm font-medium text-slate-900 transition-colors duration-150 group-hover:text-sky-700"
             >
-              查看
+              {{ t('common.view') }}
             </NuxtLink>
           </article>
         </div>
@@ -85,9 +85,9 @@
             <span class="inline-flex rounded-lg bg-indigo-100 p-1.5">
               <Icon name="lucide:file-code-2" class="h-5 w-5 text-indigo-700" />
             </span>
-            文档与仓库
+            {{ t('about_page.docs_title') }}
           </h2>
-          <p class="mt-2 text-sm text-slate-600">常用文档入口。</p>
+          <p class="mt-2 text-sm text-slate-600">{{ t('about_page.docs_desc') }}</p>
           <div class="mt-5 space-y-3">
             <NuxtLink
               v-for="doc in docs"
@@ -104,7 +104,7 @@
                   <p class="text-xs text-slate-500">{{ doc.desc }}</p>
                 </div>
               </div>
-              <span class="text-xs font-medium text-indigo-600">查看</span>
+              <span class="text-xs font-medium text-indigo-600">{{ t('common.view') }}</span>
             </NuxtLink>
           </div>
         </article>
@@ -114,9 +114,9 @@
             <span class="inline-flex rounded-lg bg-rose-100 p-1.5">
               <Icon name="lucide:messages-square" class="h-5 w-5 text-rose-700" />
             </span>
-            交流群与反馈
+            {{ t('about_page.community_title') }}
           </h2>
-          <p class="mt-2 text-sm text-slate-600">功能反馈与问题讨论。</p>
+          <p class="mt-2 text-sm text-slate-600">{{ t('about_page.community_desc') }}</p>
           <div class="mt-5 space-y-3">
             <div
               v-for="group in communities"
@@ -135,7 +135,7 @@
                   </div>
                 </div>
                 <NuxtLink :to="group.link" class="text-xs font-medium text-rose-700 hover:text-rose-800">
-                  查看
+                  {{ t('common.view') }}
                 </NuxtLink>
               </div>
             </div>
@@ -148,70 +148,72 @@
 </template>
 
 <script setup lang="ts">
-const highlights = [
+const { t } = useI18n()
+
+const highlights = computed(() => [
   {
-    title: '音乐档案馆',
-    desc: 'CDCAT希望保存每一个存在过的音乐信息数据，提供一个可查询的音乐数据库。互联网流媒体提供了便利生活，即使如此一些音乐资料越来越难找了，甚至消失在了时间的夹缝中，特别是同人等小众音乐，随着社团解散，大部分连官网都无法访问。我们希望将它们归档再整理，记录它们的存在。',
+    title: t('about_page.highlights.archive_title'),
+    desc: t('about_page.highlights.archive_desc'),
     icon: 'lucide:book-marked',
     tone: 'border-slate-200/80',
     iconBg: 'bg-sky-100',
     iconTone: 'text-sky-700'
   },
   {
-    title: '时间胶囊',
-    desc: '用户可以记录自己听过的、喜欢的歌曲。就像时光机器一样，我们把各种流媒体和音乐数据库功能加强整合，在这里你可以记录你的音乐轨迹。CDCAT不是资源分享类型网站，不会像某些流媒体没了版权就下架。你也可以用来分享你喜欢的歌曲/艺术家。ß',
+    title: t('about_page.highlights.timeline_title'),
+    desc: t('about_page.highlights.timeline_desc'),
     icon: 'lucide:disc-3',
     tone: 'border-slate-200/80',
     iconBg: 'bg-indigo-100',
     iconTone: 'text-indigo-700'
   },
   {
-    title: '创作者友好',
-    desc: '音乐不光是跨越国界的语言，它同样也是商品。一个专辑可能有通常版本，初回限定版本，受注限定生成版本，Hi-Res版本。各种店铺特典还不同，可能还存在DL曲目。我们希望把他们整理归类，在专辑详情页，让各种关系简单易懂。并且能关联作者委托店铺或社交链接，让你更容易支持他们的作品。',
+    title: t('about_page.highlights.creator_title'),
+    desc: t('about_page.highlights.creator_desc'),
     icon: 'lucide:badge-check',
     tone: 'border-slate-200/80',
     iconBg: 'bg-emerald-100',
     iconTone: 'text-emerald-700'
   },
   {
-    title: '开发者友好',
-    desc: '作为公开数据库，CDCAT 会提供公开 API 和文档，也欢迎任何人贡献编辑资料。CDCAT 不会采集其他网站数据作为基础数据，即便从零开始非常困难。我相信谁也不需要一个其他数据库的镜像网站。任何人都可以用我们的接口找歌词，匹配封面，甚至构建您自己的应用。',
+    title: t('about_page.highlights.developer_title'),
+    desc: t('about_page.highlights.developer_desc'),
     icon: 'lucide:file-code-2',
     tone: 'border-slate-200/80',
     iconBg: 'bg-amber-100',
     iconTone: 'text-amber-700'
   },
   {
-    title: '关联友好',
-    desc: '音乐往往和游戏、动漫、电影、电视剧等内容一起被创作出来。我们设计条目和系列等功能，方便从各个视角切入查看。音乐以外的关联条目，将依赖于别的数据库API接口生成导入维护，用户也可以自行创建编辑。',
+    title: t('about_page.highlights.relations_title'),
+    desc: t('about_page.highlights.relations_desc'),
     icon: 'lucide:list-checks',
     tone: 'border-slate-200/80',
     iconBg: 'bg-rose-100',
     iconTone: 'text-rose-700'
   },
   {
-    title: '综合音乐交流平台',
-    desc: '除了音乐以外，之后还会提供耳机音响外设等交流。我们希望推广实体CD收藏和黑胶。如果有机会拿到数字音乐贩卖权，也会提供DL版本购买和展示乐库，如果能像Steam那样喜加一也不错。对于独立音乐制作人和业余爱好者，希望能给他们提供一个技术，创作分享的平台。',
+    title: t('about_page.highlights.community_title'),
+    desc: t('about_page.highlights.community_desc'),
     icon: 'lucide:headphones',
     tone: 'border-slate-200/80',
     iconBg: 'bg-violet-100',
     iconTone: 'text-violet-700'
   },
   {
-    title: '深度了解音乐',
-    desc: '面向核心用户，后续会提供更多核心功能，关联音乐创作者访谈文章、上传 Booklet 等能力，挖掘音乐创作背后的故事。也会提供用户上传歌词功能，让所有人无障碍便利听歌。',
+    title: t('about_page.highlights.stories_title'),
+    desc: t('about_page.highlights.stories_desc'),
     icon: 'lucide:mic-2',
     tone: 'border-slate-200/80',
     iconBg: 'bg-cyan-100',
     iconTone: 'text-cyan-700'
   }
-]
+])
 
-const usageGuides = [
+const usageGuides = computed(() => [
   {
-    tag: '站点基础',
-    title: '用户组，权限，审核流程',
-    desc: '了解CDCAT的基本工作流程',
+    tag: t('about_page.guide_basics_tag'),
+    title: t('about_page.guide_basics_title'),
+    desc: t('about_page.guide_basics_desc'),
     link: '#',
     icon: 'lucide:plus-circle',
     tone: 'border-slate-200/80',
@@ -219,9 +221,9 @@ const usageGuides = [
     iconTone: 'text-cyan-700'
   },
   {
-    tag: '收集资料',
-    title: '如何从互联网寻找音乐资料',
-    desc: '贡献数据前，您应该先了解音乐',
+    tag: t('about_page.guide_research_tag'),
+    title: t('about_page.guide_research_title'),
+    desc: t('about_page.guide_research_desc'),
     link: '#',
     icon: 'lucide:scan-search',
     tone: 'border-slate-200/80',
@@ -229,26 +231,26 @@ const usageGuides = [
     iconTone: 'text-blue-700'
   },
   {
-    tag: '提交规范',
-    title: '提交新专辑/更正错误',
-    desc: '了解CDCAT如何处理音乐资料',
+    tag: t('about_page.guide_submit_tag'),
+    title: t('about_page.guide_submit_title'),
+    desc: t('about_page.guide_submit_desc'),
     link: '#',
     icon: 'lucide:badge-check',
     tone: 'border-slate-200/80',
     iconBg: 'bg-teal-100',
     iconTone: 'text-teal-700'
   },
-]
+])
 
-const docs = [
-  { name: 'API 文档', desc: '接口说明', link: '#', icon: 'lucide:braces', iconBg: 'bg-indigo-100', iconTone: 'text-indigo-700' },
-  { name: '前端仓库（Git）', desc: 'Nuxt 项目', link: '#', icon: 'lucide:github', iconBg: 'bg-blue-100', iconTone: 'text-blue-700' }
-]
+const docs = computed(() => [
+  { name: t('about_page.api_docs'), desc: t('about_page.api_docs_desc'), link: '#', icon: 'lucide:braces', iconBg: 'bg-indigo-100', iconTone: 'text-indigo-700' },
+  { name: t('about_page.frontend_repo'), desc: t('about_page.frontend_repo_desc'), link: '#', icon: 'lucide:github', iconBg: 'bg-blue-100', iconTone: 'text-blue-700' }
+])
 
-const communities = [
+const communities = computed(() => [
   {
-    name: 'QQ 交流群',
-    code: '群号：1007357274',
+    name: t('about_page.qq_group'),
+    code: t('about_page.qq_code'),
     link: '#',
     icon: 'lucide:message-circle',
     tone: 'border-slate-200/80',
@@ -256,8 +258,8 @@ const communities = [
     iconTone: 'text-rose-700'
   },
   {
-    name: 'Telegram 交流群',
-    code: '敬请期待',
+    name: t('about_page.telegram_group'),
+    code: t('common.coming_soon'),
     link: '#',
     icon: 'lucide:send',
     tone: 'border-slate-200/80',
@@ -265,17 +267,17 @@ const communities = [
     iconTone: 'text-orange-700'
   },
   {
-    name: 'Discord 社区',
-    code: '敬请期待',
+    name: t('about_page.discord_group'),
+    code: t('common.coming_soon'),
     link: '#',
     icon: 'lucide:messages-square',
     tone: 'border-slate-200/80',
     iconBg: 'bg-pink-100',
     iconTone: 'text-pink-700'
   }
-]
+])
 
 useHead({
-  title: 'About | CDCAT'
+  title: computed(() => `${t('about_page.label')} | CDCAT`)
 })
 </script>

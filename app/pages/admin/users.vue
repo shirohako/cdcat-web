@@ -3,9 +3,9 @@
     <div class="w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <header class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Admin Console</p>
-          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">User Management</h1>
-          <p class="mt-1 text-sm text-slate-600">Manage user accounts, roles, and status.</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{{ t('admin_pages.console') }}</p>
+          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">{{ t('admin_pages.users.title') }}</h1>
+          <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.users.description') }}</p>
         </div>
       </header>
 
@@ -33,11 +33,11 @@
           <table class="w-full min-w-200 text-left text-sm">
             <thead>
               <tr class="border-b border-slate-100 bg-slate-50/60">
-                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">用户</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">角色</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">状态</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">注册时间</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">最后登录</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.user') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.role') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.status') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.joined') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.last_login') }}</th>
                 <th v-if="canAssignRoles" class="w-24 px-4 py-3" />
               </tr>
             </thead>
@@ -46,7 +46,7 @@
               <tr v-if="pending">
                 <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
                   <Icon name="lucide:loader-circle" class="mx-auto mb-2 h-5 w-5 animate-spin opacity-40" />
-                  加载中…
+                  {{ t('common.loading') }}
                 </td>
               </tr>
 
@@ -93,7 +93,7 @@
                         : 'border-slate-200 bg-slate-50 text-slate-500'"
                     >
                       <span class="h-1.5 w-1.5 rounded-full" :class="u.status ? 'bg-emerald-500' : 'bg-slate-300'" />
-                      {{ u.status ? '正常' : '已停用' }}
+                      {{ u.status ? t('admin_pages.users.active') : t('admin_pages.users.disabled') }}
                     </span>
                   </td>
 
@@ -108,14 +108,14 @@
                       type="button"
                       @click="openRoleModal(u)"
                     >
-                      编辑角色
+                      {{ t('admin_pages.users.edit_role') }}
                     </button>
                   </td>
                 </tr>
 
                 <tr v-if="users.length === 0">
                   <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
-                    暂无用户
+                    {{ t('admin_pages.users.empty') }}
                   </td>
                 </tr>
               </template>
@@ -125,7 +125,7 @@
 
         <footer class="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
           <p class="text-xs text-slate-400">
-            共 {{ pagination.total }} 位用户，当前第 {{ startItem }}–{{ endItem }} 条
+            {{ t('common.page_range', { total: pagination.total, start: startItem, end: endItem }) }}
           </p>
           <div class="flex items-center gap-1">
             <button
@@ -159,7 +159,7 @@
           <!-- 标题 -->
           <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
-              <h2 class="text-sm font-semibold text-slate-900">分配角色</h2>
+              <h2 class="text-sm font-semibold text-slate-900">{{ t('admin_pages.users.assign_role') }}</h2>
               <p class="mt-0.5 text-xs text-slate-500">
                 {{ roleModal.user?.nickname || roleModal.user?.username }}
               </p>
@@ -197,7 +197,7 @@
                   class="mt-0.5 truncate text-xs"
                   :class="roleModal.selected === role.name ? 'text-slate-300' : 'text-slate-400'"
                 >
-                  {{ role.permissions.length }} permissions
+                  {{ t('admin_pages.users.permissions_count', { count: role.permissions.length }) }}
                 </p>
               </div>
               <Icon
@@ -218,7 +218,7 @@
               <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-100">
                 <Icon name="lucide:user-minus" class="h-3.5 w-3.5" />
               </div>
-              <p class="text-xs font-semibold">无角色</p>
+              <p class="text-xs font-semibold">{{ t('admin_pages.users.no_role') }}</p>
               <Icon
                 v-if="roleModal.selected === null"
                 name="lucide:check"
@@ -233,15 +233,15 @@
               class="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
               @click="closeRoleModal"
             >
-              取消
+              {{ t('common.cancel') }}
             </button>
             <button
               class="rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
               :disabled="roleModal.saving || roleModal.selected === roleModal.user?.roles"
               @click="saveRole"
             >
-              <span v-if="roleModal.saving">保存中…</span>
-              <span v-else>保存</span>
+              <span v-if="roleModal.saving">{{ t('common.saving') }}</span>
+              <span v-else>{{ t('common.save') }}</span>
             </button>
           </div>
         </div>
@@ -296,6 +296,9 @@ type RoleInfo = {
 
 const { $api } = useNuxtApp()
 const { hasPermission } = useAuth()
+const { t } = useI18n()
+const { intlLocale, formatDate: formatLocalizedDate } = useLocaleFormatting()
+const { localizeError } = useLocalizedApiError()
 
 const canAssignRoles = hasPermission('users.assign-roles')
 
@@ -338,7 +341,7 @@ const endItem = computed(() => {
 })
 
 const summary = computed(() => [
-  { label: 'Total Users', value: pagination.value.total, icon: 'lucide:users', help: 'All accounts in system' },
+  { label: t('admin_pages.users.total'), value: pagination.value.total, icon: 'lucide:users', help: t('admin_pages.users.total_help') },
 ])
 
 // ===== Role Modal =====
@@ -367,10 +370,10 @@ const saveRole = async () => {
     // 乐观更新本地数据
     const target = users.value.find(u => u.id === roleModal.user!.id)
     if (target) target.roles = roleModal.selected
-    showToast('角色已更新')
+    showToast(t('admin_pages.users.role_updated'))
     closeRoleModal()
   } catch (e: any) {
-    showToast(e.message || '更新失败', 'error')
+    showToast(localizeError(e, 'admin_pages.users.update_failed'), 'error')
   } finally {
     roleModal.saving = false
   }
@@ -402,23 +405,23 @@ const initials = (u: ApiUser) => {
 }
 const formatDate = (iso: string) => {
   if (!iso) return '—'
-  const d = new Date(iso)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  return formatLocalizedDate(iso, { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
 const formatRelativeTime = (iso: string) => {
-  if (!iso) return 'Never'
+  if (!iso) return '—'
   const diff = Date.now() - new Date(iso).getTime()
   const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'Just now'
-  if (mins < 60) return `${mins}m ago`
+  const formatter = new Intl.RelativeTimeFormat(intlLocale.value, { numeric: 'auto' })
+  if (mins < 1) return formatter.format(0, 'minute')
+  if (mins < 60) return formatter.format(-mins, 'minute')
   const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
+  if (hours < 24) return formatter.format(-hours, 'hour')
   const days = Math.floor(hours / 24)
-  if (days < 30) return `${days}d ago`
-  return `${Math.floor(days / 30)}mo ago`
+  if (days < 30) return formatter.format(-days, 'day')
+  return formatter.format(-Math.floor(days / 30), 'month')
 }
 
-useHead({ title: 'Admin Users' })
+useHead({ title: computed(() => `${t('admin_pages.users.title')} | CDCAT`) })
 </script>
 
 <style scoped>

@@ -15,7 +15,7 @@
             <div class="w-9 h-9 rounded-xl bg-linear-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm shrink-0">
               <BookOpen :size="18" class="text-white" />
             </div>
-            <h1 class="text-3xl font-bold text-gray-900">Articles</h1>
+            <h1 class="text-3xl font-bold text-gray-900">{{ $t('content_display.articles') }}</h1>
           </div>
           <NuxtLink
             v-if="isAuthenticated"
@@ -23,10 +23,10 @@
             class="btn btn-sm btn-primary shrink-0"
           >
             <PenLine :size="14" />
-            <span class="hidden sm:inline">新建文章</span>
+            <span class="hidden sm:inline">{{ $t('content_display.new_article') }}</span>
           </NuxtLink>
         </div>
-        <p class="text-gray-500 text-sm ml-11.5">音乐相关文章与资讯</p>
+        <p class="text-gray-500 text-sm ml-11.5">{{ $t('content_display.articles_desc') }}</p>
       </div>
 
       <!-- 加载状态 -->
@@ -40,7 +40,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>加载失败: {{ error.message }}</span>
+          <span>{{ $t('common.load_failed') }}</span>
         </div>
       </div>
 
@@ -49,7 +49,7 @@
         <div class="mb-5 flex items-center gap-2">
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-xs font-medium ring-1 ring-violet-100">
             <FileText :size="12" />
-            共 {{ pagination.total }} 篇
+            {{ $t('content_display.article_count', { count: pagination.total }) }}
           </span>
         </div>
 
@@ -112,7 +112,7 @@
           <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
             <FileText :size="28" class="text-gray-300" />
           </div>
-          <p class="text-gray-400 text-sm">暂无文章</p>
+          <p class="text-gray-400 text-sm">{{ $t('content_display.no_articles') }}</p>
         </div>
 
         <!-- 分页 -->

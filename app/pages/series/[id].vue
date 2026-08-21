@@ -4,11 +4,13 @@ import { Disc3, Film } from '@lucide/vue'
 const route = useRoute()
 const seriesId = computed(() => Number(route.params.id))
 
-const tabs = [
-  { id: 'entries', label: '已关联条目' },
-  { id: 'works-time', label: '专辑（按时间）' },
-  { id: 'works-group', label: '专辑（按分组）' }
-]
+const { t } = useI18n()
+const { localizedContent } = useLocaleFormatting()
+const tabs = computed(() => [
+  { id: 'entries', label: t('content_display.linked_entries') },
+  { id: 'works-time', label: t('content_display.works_by_time') },
+  { id: 'works-group', label: t('content_display.works_by_group') }
+])
 
 const currentTab = ref('entries')
 
@@ -86,7 +88,7 @@ const entryGroups = computed(() => {
   if (!series.value?.groups || !series.value?.entries) return []
   return series.value.groups.map(group => ({
     id: group.id,
-    name: group.meta.name_cn || group.meta.name,
+    name: localizedContent(group.meta, 'name'),
     entry_ids: series.value!.entries
       .filter(entry => entry.group_id === group.id)
       .map(entry => entry.id)
@@ -118,11 +120,11 @@ const entryGroups = computed(() => {
               <div class="flex items-center gap-4 text-white/90">
                 <div class="flex items-center gap-2">
                   <Film class="w-5 h-5" />
-                  <span>{{ series.entries_count }} 条目</span>
+                  <span>{{ $t('content_display.entries_count', { count: series.entries_count }) }}</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <Disc3 class="w-5 h-5" />
-                  <span>{{ series.works_count }} 专辑</span>
+                  <span>{{ $t('content_display.works_count', { count: series.works_count }) }}</span>
                 </div>
               </div>
             </div>

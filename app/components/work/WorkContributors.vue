@@ -6,7 +6,7 @@
         <Database :size="15" class="text-teal-500" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.contributors') }}</h2>
-      <span v-if="contributors.length > 0" class="ml-auto text-xs text-gray-400">{{ contributors.length }} 位</span>
+      <span v-if="contributors.length > 0" class="ml-auto text-xs text-gray-400">{{ $t('content_display.contributors', { count: contributors.length }) }}</span>
     </div>
 
     <!-- Contributor list -->

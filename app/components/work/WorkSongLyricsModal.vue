@@ -25,7 +25,7 @@
               </div>
               <div class="min-w-0">
                 <h2 class="text-base font-bold text-gray-900">
-                  {{ showCreate ? '提交歌词' : activeDetailId !== null ? '歌词详情' : '歌词 & 翻译' }}
+                  {{ $t(showCreate ? 'lyrics_ui.submit_lyrics' : activeDetailId !== null ? 'lyrics_ui.lyrics_detail' : 'lyrics_ui.lyrics_and_translations') }}
                 </h2>
                 <p v-if="songTitle" class="text-xs text-gray-400 mt-0.5 truncate">{{ songTitle }}</p>
               </div>
@@ -39,7 +39,7 @@
                   class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors"
                 >
                   <Upload :size="13" />
-                  上传文件
+                  {{ $t('lyrics_ui.upload_file') }}
                 </button>
                 <button
                   type="button"
@@ -47,7 +47,7 @@
                   class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold transition-colors"
                 >
                   <Plus :size="13" />
-                  提交歌词或翻译
+                  {{ $t('lyrics_ui.submit_lyrics_or_translation') }}
                 </button>
               </template>
               <button
@@ -67,7 +67,7 @@
               class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 text-gray-600 text-xs font-semibold transition-colors"
             >
               <Upload :size="13" />
-              上传文件
+              {{ $t('lyrics_ui.upload_file') }}
             </button>
             <button
               type="button"
@@ -75,7 +75,7 @@
               class="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold transition-colors"
             >
               <Plus :size="13" />
-              提交歌词或翻译
+              {{ $t('lyrics_ui.submit_lyrics_or_translation') }}
             </button>
           </div>
         </div>
@@ -153,6 +153,7 @@ const emit = defineEmits<{
 const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
 const route = useRoute()
+const { t } = useI18n()
 
 const showCreate = ref(false)
 const activeDetailId = ref<number | null>(null)
@@ -163,11 +164,11 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 // ── Filter ──
 type FilterValue = '' | 'lyric' | 'translation'
 
-const tabs: { label: string; value: FilterValue }[] = [
-  { label: '全部', value: '' },
-  { label: '歌词', value: 'lyric' },
-  { label: '翻译', value: 'translation' },
-]
+const tabs = computed<{ label: string; value: FilterValue }[]>(() => [
+  { label: t('lyrics_ui.all'), value: '' },
+  { label: t('lyrics_ui.lyrics'), value: 'lyric' },
+  { label: t('lyrics_ui.translation'), value: 'translation' },
+])
 
 const activeFilter = ref<FilterValue>('')
 

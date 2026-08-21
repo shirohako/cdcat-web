@@ -5,8 +5,8 @@
     v-bind="$attrs"
     @change="onchange"
   >
-    <option value="">Select a region...</option>
-    <option v-for="c in countries" :key="c.code" :value="c.name">
+    <option value="">{{ $t('account_pages.preferences.select_region') }}</option>
+    <option v-for="c in countries" :key="c.code" :value="c.value">
       {{ c.flag }} {{ c.name }}
     </option>
   </select>
@@ -54,12 +54,15 @@ const mainCountryCodes = [
   'AU', 'NZ',
 ]
 
-const countries = mainCountryCodes.map((code) => {
+const { regionName } = useLocaleFormatting()
+
+const countries = computed(() => mainCountryCodes.map((code) => {
   const data = getCountryData(code)
   return {
     code,
-    name: data.name,
+    name: regionName(code),
+    value: data.name,
     flag: getEmojiFlag(code),
   }
-}).sort((a, b) => a.name.localeCompare(b.name))
+}).sort((a, b) => a.name.localeCompare(b.name)))
 </script>

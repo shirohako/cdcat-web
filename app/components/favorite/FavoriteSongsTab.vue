@@ -8,11 +8,11 @@
     <!-- Empty State -->
     <div v-else-if="songs.length === 0" class="flex flex-col items-center justify-center py-16">
       <Icon name="lucide:music" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">还没有收藏任何歌曲</p>
-      <p class="text-sm text-gray-400 mb-6">收藏你喜欢的歌曲，随时随地享受音乐</p>
+      <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_songs') }}</p>
+      <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_songs_hint') }}</p>
       <NuxtLink to="/works" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
-        浏览专辑
+        {{ $t('collection_components.browse_works') }}
       </NuxtLink>
     </div>
 
@@ -23,10 +23,10 @@
         <table class="w-full text-sm">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">歌曲</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">所属专辑</th>
-              <th class="px-6 py-3 text-left font-semibold text-gray-700">收藏时间</th>
-              <th class="px-6 py-3 text-center font-semibold text-gray-700">操作</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-700">{{ $t('collection_components.song') }}</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-700">{{ $t('collection_components.album') }}</th>
+              <th class="px-6 py-3 text-left font-semibold text-gray-700">{{ $t('collection_components.favorited_at') }}</th>
+              <th class="px-6 py-3 text-center font-semibold text-gray-700">{{ $t('collection_components.actions') }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -83,7 +83,7 @@
                     :disabled="!!unlikeLoading[song.id]"
                     @click="handleToggle(song.id)"
                     class="transition-colors p-1 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    :title="unliked[song.id] ? '已取消收藏' : '取消收藏'"
+                    :title="$t(unliked[song.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
                   >
                     <Icon
                       :name="unliked[song.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -130,7 +130,7 @@
                 >
                   {{ song.work.title }}
                 </NuxtLink>
-                <span v-else>无专辑</span>
+                <span v-else>{{ $t('collection_components.no_album') }}</span>
               </p>
               <div class="flex gap-2 mt-2 text-xs text-gray-500">
                 <span>{{ formatDate(song.favorited_at) }}</span>
@@ -144,7 +144,7 @@
                 :disabled="!!unliked[song.id] || !!unlikeLoading[song.id]"
                 @click="handleToggle(song.id)"
                 class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
-                :title="unliked[song.id] ? '已取消收藏' : '取消收藏'"
+                :title="$t(unliked[song.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
               >
                 <Icon
                   :name="unliked[song.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -165,7 +165,7 @@
           class="btn btn-outline btn-sm gap-1"
         >
           <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          上一页
+          {{ $t('common.previous') }}
         </button>
 
         <div class="flex items-center gap-1">
@@ -187,7 +187,7 @@
           @click="nextPage"
           class="btn btn-outline btn-sm gap-1"
         >
-          下一页
+          {{ $t('common.next') }}
           <Icon name="lucide:chevron-right" class="w-4 h-4" />
         </button>
       </div>
@@ -199,6 +199,7 @@
 import type { FavoriteSong } from '~/types/favorites'
 
 const { getFavoriteSongs, toggleFavoriteSong } = useFavorites()
+const { formatDate } = useLocaleFormatting()
 
 const songs = ref<FavoriteSong[]>([])
 const page = ref(1)
@@ -226,15 +227,6 @@ const visiblePages = computed(() => {
 
   return pages
 })
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-}
 
 const loadData = async () => {
   isLoading.value = true

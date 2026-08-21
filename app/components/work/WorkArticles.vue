@@ -6,7 +6,7 @@
         <FileText :size="15" class="text-amber-500" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.articles') }}</h2>
-      <span v-if="articles.length > 0" class="ml-auto text-xs text-gray-400">{{ articles.length }} 篇</span>
+      <span v-if="articles.length > 0" class="ml-auto text-xs text-gray-400">{{ $t('content_display.article_count', { count: articles.length }) }}</span>
     </div>
 
     <!-- Article list -->

@@ -248,7 +248,14 @@
       "meta_description": "CDCATにログインして日本の音楽世界を探索し続けよう",
       "github_coming_soon_title": "GitHubログインは近日対応予定",
       "github_coming_soon_message": "この機能はまだ準備中です。しばらくお待ちください。",
-      "github_coming_soon_confirm": "OK"
+      "github_coming_soon_confirm": "OK",
+      "beta": {
+        "title": "現在ベータテスト中です",
+        "warning": "正式公開までに、次のデータが削除される場合があります。",
+        "content": "アルバムやアーティストなどの投稿データ",
+        "accounts": "レビューやお気に入りなどのアカウントデータ",
+        "thanks": "正式版の公開まで、今しばらくお待ちください ✦"
+      }
     },
     "register": {
       "title": "アカウント作成",
@@ -303,6 +310,157 @@
     "next": "次へ",
     "back_home": "ホームに戻る",
     "go_back": "戻る",
-    "view_all": "すべて表示"
+    "view_all": "すべて表示",
+    "loading": "読み込み中…",
+    "load_failed": "読み込めませんでした。しばらくしてからもう一度お試しください。",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "saving": "保存中…",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "close": "閉じる",
+    "confirm": "確認",
+    "details": "詳細",
+    "all": "すべて",
+    "none": "なし",
+    "other": "その他",
+    "unnamed": "名称未設定",
+    "anonymous": "匿名ユーザー",
+    "coming_soon": "近日公開",
+    "no_records": "データがありません",
+    "page_range": "全{total}件中 {start}〜{end}件を表示",
+    "items_total": "全{count}件", "got_it": "OK", "confirm_delete": "削除する", "coming_soon_desc": "長い夜の先には、きっと夜明けが待っています。", "loading_animation": "読み込みアニメーション", "select_language_code": "言語コードを選択または入力…", "use_custom_code": "カスタムコードを使用", "search_language": "キーワードで言語を検索", "no_more_matches": "ほかに一致する項目はありません"
+  },
+  "errors": {
+    "request_failed": "リクエストに失敗しました。もう一度お試しください。",
+    "network": "接続できませんでした。ネットワークを確認してもう一度お試しください。",
+    "unauthorized": "セッションの有効期限が切れました。もう一度ログインしてください。",
+    "forbidden": "この操作を行う権限がありません。",
+    "not_found": "指定されたデータが見つかりません。",
+    "server": "サーバーでエラーが発生しました。しばらくしてからもう一度お試しください。",
+    "invalid_field": "「{field}」を確認してください。",
+    "codes": {
+      "revision_not_owned": "ほかのユーザーの修正を取り下げることはできません。",
+      "revision_cannot_retract": "この修正はすでに審査済みのため、取り下げられません。"
+    }
+  },
+  "admin_pages": {
+    "console": "管理コンソール",
+    "users": {
+      "title": "ユーザー管理",
+      "description": "ユーザーアカウント、ロール、状態を管理します。",
+      "total": "ユーザー数",
+      "total_help": "システム内の全アカウント",
+      "user": "ユーザー",
+      "role": "ロール",
+      "status": "状態",
+      "joined": "登録日",
+      "last_login": "最終ログイン",
+      "active": "有効",
+      "disabled": "無効",
+      "edit_role": "ロールを編集",
+      "empty": "ユーザーがいません",
+      "assign_role": "ロールを割り当て",
+      "permissions_count": "{count}件の権限",
+      "no_role": "ロールなし",
+      "role_updated": "ロールを更新しました",
+      "update_failed": "ロールを更新できませんでした。"
+    },
+    "revisions": {
+      "title": "修正申請",
+      "description": "ユーザーから提出された項目の修正申請を審査します。",
+      "entry": "項目",
+      "subject": "変更対象",
+      "action": "操作",
+      "submitter": "申請者",
+      "status": "状態",
+      "submitted_at": "申請日時",
+      "approve": "承認",
+      "reject": "却下",
+      "approve_title": "修正申請を承認",
+      "reject_title": "修正申請を却下",
+      "approve_confirm": "「{title}」の修正申請を承認しますか？",
+      "reject_confirm": "「{title}」の修正申請を却下しますか？",
+      "confirm_approve": "承認する",
+      "confirm_reject": "却下する",
+      "approved_notice": "承認しました",
+      "rejected_notice": "却下しました",
+      "action_failed": "操作を完了できませんでした。",
+      "status_all": "すべて",
+      "status_pending": "審査待ち",
+      "status_approved": "承認済み",
+      "status_rejected": "却下済み",
+      "action_create": "新規作成",
+      "action_update": "編集",
+      "action_delete": "削除"
+    }
+  },
+  "article_ui": {
+    "back": "戻る", "published": "公開", "draft": "下書き", "title_placeholder": "記事タイトル", "saved": "保存済み", "save_failed": "保存に失敗しました", "settings": "記事設定", "save": "保存", "saving": "保存中", "write": "執筆", "preview": "プレビュー", "untitled": "無題", "start_writing": "本文を書き始める…", "link": "リンク", "image": "画像", "toolbar": { "h2": "見出し2", "h3": "見出し3", "bold": "太字", "italic": "斜体", "strike": "取り消し線", "inline_code": "インラインコード", "code_block": "コードブロック", "quote": "引用", "unordered_list": "箇条書き", "ordered_list": "番号付きリスト", "divider": "区切り線" }, "sample_text": "テキスト", "sample_content": "内容", "link_text": "リンクテキスト", "image_alt": "画像の説明", "status": "公開状態", "cover": "カバー画像", "cover_placeholder": "画像URLを貼り付け…", "cover_preview": "カバー画像のプレビュー", "slug_placeholder": "カスタムURL（任意）", "slug_hint": "空欄の場合は自動生成されます。", "related_works": "関連作品", "related_works_placeholder": "Work IDをカンマ区切りで入力", "example_ids": "例：1,2,3", "back_to_list": "記事一覧に戻る", "word_count": "約{count}文字", "reading_time": "読了目安 {count}分", "toc": "目次"
+  },
+  "collection_pages": {
+    "favorites": { "title": "お気に入り", "description": "お気に入りの作品、楽曲、アーティストを管理します。", "works": "お気に入りの作品", "songs": "お気に入りの楽曲", "artists": "お気に入りのアーティスト", "seo_title": "お気に入り | CDCAT" },
+    "reviews": { "title": "自分のレビュー", "description": "聴いた作品の感想と評価を共有しましょう。", "total": "レビュー数", "average": "平均評価", "scored": "評価済み", "count": "全{count}件", "sort_newest": "新しい順", "sort_oldest": "古い順", "sort_highest": "評価が高い順", "sort_lowest": "評価が低い順", "delete_title": "レビューを削除", "delete_confirm": "このレビューを削除しますか？この操作は取り消せません。", "load_failed": "レビューを読み込めませんでした。ページを再読み込みしてもう一度お試しください。", "seo_title": "自分のレビュー | CDCAT" },
+    "events": { "title": "イベント", "description": "シリーズ別に整理された同人・音楽イベント。", "event_count": "{count}件のイベント", "series_count": "{count}シリーズ", "official_site": "公式サイト", "collapse": "閉じる", "show_all": "すべて表示（残り{count}件）", "empty": "開催情報がありません", "no_description": "紹介文がありません。", "seo_description": "登録されている同人・音楽イベントを一覧で探せます。" },
+    "revisions": { "title": "自分の編集履歴", "description": "これまでに提出した項目の修正申請です。", "empty": "修正申請はまだありません", "retract": "取り下げ", "view_entry": "項目を表示", "retract_title": "修正を取り下げ", "retract_confirm_button": "取り下げる", "retract_confirm": "「{title}」の修正を取り下げますか？取り下げると審査対象から外れます。", "retracted": "修正を取り下げました", "retract_failed": "修正を取り下げられませんでした。もう一度お試しください。" }
+  },
+  "about_page": {
+    "label": "CDCATについて", "intro": "CDCATは、音楽を深く愛するリスナーのための音楽データベースです。", "highlights": {
+      "archive_title": "音楽を未来へ残すアーカイブ", "archive_desc": "CDCATは、サークルの解散や公式サイトの閉鎖によって失われやすいインディーズ・同人音楽をはじめ、あらゆる音楽情報を記録します。", "timeline_title": "自分だけのタイムカプセル", "timeline_desc": "聴いた曲や好きな曲を記録し、配信終了に左右されない音楽の足跡を残して、お気に入りの曲やアーティストを共有できます。", "creator_title": "クリエイターを支える情報設計", "creator_desc": "通常盤、限定盤、受注生産盤、ハイレゾ版、ダウンロード版、店舗特典、公式販売リンクを整理し、リスナーが作品を理解して応援しやすくします。", "developer_title": "開発者にもオープン", "developer_desc": "CDCATは公開APIとドキュメントを提供予定です。コミュニティが管理するデータを使って、歌詞検索やジャケット照合などのアプリを開発できます。", "relations_title": "豊富な関連情報", "relations_desc": "音楽をゲーム、アニメ、映画、ドラマ、項目、シリーズとつなぎ、さまざまな視点からたどれるようにします。", "community_title": "音楽を中心とした幅広いコミュニティ", "community_desc": "音楽情報に加えて、オーディオ機器、フィジカルメディア、デジタル配信、制作技術、創作活動についても交流できる場を目指します。", "stories_title": "音楽をもっと深く知る", "stories_desc": "今後はクリエイターへのインタビュー、ブックレット資料、投稿歌詞を結び付け、音楽が生まれた背景を伝えていきます。"
+    },
+    "guides_title": "利用ガイド", "guides_desc": "データ編集に参加する方は、まずこちらをご覧ください。", "guide_basics_tag": "サイトの基本", "guide_basics_title": "ロール、権限、審査の流れ", "guide_basics_desc": "CDCATで投稿が公開されるまでの流れを説明します。", "guide_research_tag": "資料調査", "guide_research_title": "インターネットで音楽情報を調べる方法", "guide_research_desc": "データを投稿する前に確認したい調査方法です。", "guide_submit_tag": "投稿ガイド", "guide_submit_title": "新しい作品の追加と誤りの修正", "guide_submit_desc": "CDCATが音楽情報を審査する方法を説明します。", "docs_title": "ドキュメントとリポジトリ", "docs_desc": "よく使うプロジェクト資料です。", "api_docs": "APIドキュメント", "api_docs_desc": "APIリファレンス", "frontend_repo": "フロントエンドリポジトリ（Git）", "frontend_repo_desc": "Nuxtプロジェクト", "community_title": "コミュニティとフィードバック", "community_desc": "機能の相談、問題の報告、ユーザー同士の交流にご利用ください。", "qq_group": "QQグループ", "qq_code": "グループID：1007357274", "telegram_group": "Telegramグループ", "discord_group": "Discordコミュニティ"
+  },
+  "home": {
+    "hero_title": "星降る音の世界で、あなたの座標を見つけよう", "hero_description": "CDCATは、音楽を深く愛するリスナーのための音楽データベースです。", "browse_works": "作品を探す", "discover_artists": "アーティストを探す", "database": "音楽データベース", "database_desc": "音楽作品の詳しい情報を検索できます。", "timeline": "リスニング履歴", "timeline_desc": "聴いた音楽やお気に入りの曲を記録できます。", "community": "コミュニティ", "community_desc": "音楽、オーディオ機器、作曲について語り合えます。", "beta": "ベータ版", "search_question": "何をお探しですか？", "search_unavailable": "検索機能は現在準備中です", "search_example": "例：東方紅魔郷 / 初音ミク / M3-53", "discover_more": "もっと見つける", "find_music": "音楽を探す", "find_artists": "音楽家を探す", "gear_reviews": "機材レビュー", "discussions": "交流する", "for_everyone": "リスナーにもクリエイターにも", "for_everyone_desc": "音楽を作る人も、聴く人も、CDCATを活用できます。", "listener": "リスナー", "listener_desc": "聴いた音楽を記録・管理し、プレイリストを作って、お気に入りの曲を共有できます。", "creator": "音楽クリエイター", "creator_desc": "作品を紹介し、販売リンクを掲載して、リスナーの声を受け取れます。", "offer_label": "CDCATの特徴", "clean_data": "独立したコミュニティ主導のデータ", "clean_data_desc": "CDCATは他のデータベースを自動収集しません。すべての情報はコミュニティによって投稿・管理されています。", "editable": "誰でも編集に参加", "open_api": "オープンAPI", "free": "無料で利用可能", "stats": { "works": "音楽作品", "artists": "アーティスト・サークル", "songs": "楽曲", "reviews": "レビュー" }, "topics_label": "特集テーマ", "beyond_music": "音楽のその先へ", "beyond_music_desc": "音楽はゲーム、アニメ、映画、ドラマなどと共に生まれます。豊富な関連情報から、さまざまな視点で作品をたどれます。", "topic_entry_tag": "作品項目", "topic_entry_title": "アニメに関連する音楽をまとめて探す", "topic_entry_desc": "Bangumi.tvからアニメやゲームの情報を取り込み、関連するリリースをひとつにつなげられます。", "anime": "アニメ", "games": "ゲーム", "tv": "ドラマ", "topic_series_tag": "シリーズ", "topic_series_title": "同じ作品シリーズの音楽を横断する", "topic_series_desc": "同じIPのゲーム、アニメ、項目、リリースを見やすいシリーズとして整理できます。", "combined_entries": "関連項目を統合", "shared_theme": "共通テーマ", "collector_title": "コレクターのための音楽データベース", "collector_desc": "アルバムだけでなく、商品形態や特典の詳しい情報も確認できます。", "products": "商品", "products_desc": "通常盤、限定盤、デジタル版をまとめ、形態ごとの関係や価格を確認できます。", "bonuses": "特典", "bonuses_desc": "初回特典、店舗特典、ダウンロード特典、期間限定特典を比較できます。", "links": "信頼できるリンク", "links_desc": "作者や正規販売店へ直接アクセスでき、紛らわしいサイトへの転送を避けられます。", "seo_title": "CDCAT — 同人・VOCALOID・アニメ・ゲームの音楽データベース", "seo_description": "CDCATで日本の音楽、同人作品、VOCALOID、アニメ・ゲーム音楽、イベント情報、詳細な楽曲クレジットを探せます。", "seo_keywords": "日本の音楽,同人音楽,VOCALOID,東方Project,アニメサントラ,ゲーム音楽,音楽データベース,楽曲クレジット"
+  },
+  "revision_entry": { "basic": "基本情報", "meta": "メタデータ", "name": "作品名", "name_placeholder": "作品名を入力", "slug_hint": "URLに使用する識別子です。空欄の場合は自動生成されます。", "type": "作品種別", "release_date": "公開日", "cover_url": "カバー画像URL", "cover_hint": "縦長の2:3比率の画像を推奨します。", "cover_preview": "カバー画像のプレビュー", "meta_desc": "description、banner_url、bangumi_idなどのメタデータをJSON形式で編集します。", "meta_hint": "有効なJSONオブジェクトを入力してください。", "meta_object": "MetaにはJSONオブジェクトを指定してください。", "json_error": "JSONを解析できませんでした。", "name_required": "作品名を入力してください。", "type_required": "作品種別を選択してください。", "cover_required": "カバー画像URLを入力してください。", "processing": "処理中…", "submit_changes": "変更を申請", "preview": "プレビュー", "review_notice": "申請内容は管理者の審査後に公開されます。", "preview_data": "申請内容のプレビュー", "submitting": "送信中…", "confirm_submit": "申請を確定", "back_edit": "編集に戻る", "compare": "変更内容を確認", "no_changes": "変更はありません。", "confirm_changes": "変更を確定", "confirm_question": "この内容で申請しますか？", "submit_failed": "申請できませんでした。もう一度お試しください。" },
+  "lyrics_ui": {
+    "lyrics": "歌詞", "translation": "翻訳", "lyrics_and_translations": "歌詞・翻訳", "lyrics_detail": "歌詞の詳細", "submit_lyrics": "歌詞を投稿", "submit_lyrics_or_translation": "歌詞または翻訳を投稿", "upload_file": "ファイルをアップロード", "all": "すべて", "primary": "メイン歌詞", "ai_generated": "AI生成", "original": "オリジナル", "reposted": "転載", "anonymous": "匿名", "auto_detected": "設定を自動検出しました", "type": "種別", "language": "言語", "format": "形式", "plain": "プレーンテキスト", "timed": "タイムタグ付き", "subtitle": "SRT字幕", "content": "歌詞本文", "content_placeholder": "ここに歌詞を貼り付けてください…", "repost_question": "著作区分", "source": "出典URLまたは説明", "select_language": "言語を選択してください。", "content_required": "歌詞を入力してください。", "select_authorship": "著作区分を選択してください。", "submitted": "歌詞を投稿しました。", "submit_failed": "投稿できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "review_ui": { "count": "全{count}件", "load_more": "もっと見る · 残り{count}件", "helpful": "参考になった", "unhelpful": "参考にならなかった", "funny": "面白い", "score": "評価", "language": "レビューの言語", "content": "レビュー本文", "placeholder": "この作品への感想を共有しましょう…Markdownを利用できます。", "markdown": "Markdown対応", "submit": "レビューを投稿", "just_now": "たった今", "minutes_ago": "{count}分前", "hours_ago": "{count}時間前", "days_ago": "{count}日前" },
+  "content_display": {
+    "articles": "記事", "new_article": "記事を作成", "articles_desc": "音楽に関する記事とニュース", "article_count": "全{count}件", "no_articles": "記事はまだありません",
+    "series": "シリーズ", "series_desc": "ゲーム・アニメ・音楽のシリーズを探す", "entries_count": "{count}作品", "works_count": "{count}リリース", "no_series": "シリーズはまだありません", "linked_entries": "関連作品", "works_by_time": "リリース（時系列）", "works_by_group": "リリース（グループ別）", "linked_works": "関連リリース", "no_works": "リリースはまだありません。", "ungrouped": "未分類", "unknown_date": "発売日不明",
+    "information": "基本情報", "type": "種別", "year": "年", "release_date": "公開日", "status": "ステータス", "statistics": "統計", "views": "閲覧数", "favorites": "お気に入り", "music_works": "音楽作品", "quick_links": "関連リンク", "view_bangumi": "Bangumiで見る", "no_related_works": "関連する音楽作品はまだありません",
+    "relation": { "other": "その他", "prequel": "前作", "sequel": "続編", "spinoff": "スピンオフ", "adaptation": "メディア展開", "character": "キャラクター", "crossover": "クロスオーバー" },
+    "entry_type": { "anime": "アニメ", "game": "ゲーム", "movie": "映画", "tv": "テレビシリーズ", "other": "その他" },
+    "bonus": "特典", "bonus_hint": "特典コンテンツです", "extra_content": "追加コンテンツ", "extra_hint": "作品の総トラック数には含まれません", "favorite": "お気に入り", "unfavorite": "お気に入りから削除", "instrumental": "インストゥルメンタル",
+    "versions": "全{count}形態", "limited": "限定盤", "regular": "通常盤", "out_of_print": "廃盤", "limited_rule": { "first_press": "初回限定", "count": "数量限定", "period": "期間限定", "shop": "店舗限定", "event": "イベント限定", "region": "地域限定" },
+    "bonuses": "特典{count}件", "details": "詳細", "streaming": "ストリーミング", "contributors": "{count}人", "links": "{count}件", "physical": "フィジカル", "digital": "デジタル", "disc_count": "ディスク{count}枚", "track_count": "全{count}曲", "like": "お気に入り", "liked": "お気に入り済み", "buy": "購入", "feature_developing": "機能を開発中です", "stay_tuned": "公開まで今しばらくお待ちください。"
+  },
+  "collection_components": {
+    "empty_works": "お気に入りの作品はまだありません", "empty_works_hint": "気になる作品をお気に入りに追加しましょう。", "browse_works": "作品を見る",
+    "empty_artists": "お気に入りのアーティストはまだいません", "empty_artists_hint": "好きなアーティストをフォローして、いつでも確認できます。", "browse_artists": "アーティストを見る",
+    "empty_songs": "お気に入りの楽曲はまだありません", "empty_songs_hint": "好きな楽曲を保存して、いつでも聴き返せます。",
+    "view_work": "作品を見る：{name}", "view_artist": "アーティストを見る：{name}", "view": "表示", "release_date": "発売：{date}", "favorited_date": "追加：{date}", "liked_date": "フォロー：{date}",
+    "unfavorited": "お気に入りから削除済み", "remove_favorite": "お気に入りから削除", "song": "楽曲", "album": "収録作品", "favorited_at": "追加日", "actions": "操作", "no_album": "作品情報なし",
+    "empty_reviews": "レビューはまだありません", "empty_reviews_hint": "最初のレビューを書いて、作品への感想を共有しましょう。", "discover_works": "作品を探す", "collapse": "閉じる", "expand": "もっと見る", "edited": "編集済み", "helpful": "参考になった", "unhelpful": "参考にならなかった", "funny": "面白い",
+    "write_review": "レビューを書く", "edit_review": "レビューを編集", "select_album": "作品を選択", "search_album": "作品名またはアーティスト名で検索…", "no_search_results": "一致する作品が見つかりません", "score": "評価（0〜10）", "optional": "任意", "clear": "クリア", "review_content": "レビュー本文", "review_placeholder": "この作品への感想を共有しましょう…", "update_review": "レビューを更新", "submit_review": "レビューを投稿", "submit_failed": "レビューを投稿できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "account_pages": {
+    "title": "アカウント設定",
+    "description": "アカウント情報とセキュリティ設定を管理します。",
+    "tabs": { "profile": "プロフィール", "email": "メールアドレス", "preferences": "環境設定", "security": "セキュリティ", "notifications": "通知", "privacy": "プライバシー", "danger": "危険な操作" },
+    "profile_saved": "プロフィールを保存しました",
+    "preferences_saved": "環境設定を保存しました",
+    "profile": {
+      "title": "プロフィール", "description": "公開プロフィールの表示内容を設定します。", "avatar": "プロフィール画像", "avatar_alt": "プロフィール画像", "avatar_hint": "画像を選択して画像URLを入力します。", "banner": "プロフィールバナー", "banner_hint": "プロフィール上部に表示されます。空欄にすると既定の背景を使用します。", "clear": "クリア", "username": "ユーザー名", "username_hint": "ログインとプロフィールURLに使う一意のIDです。半角英数字とアンダースコアのみ使用できます。", "nickname": "表示名", "nickname_placeholder": "表示名を入力", "nickname_hint": "プロフィールに公開される名前です。20文字まで入力できます。", "bio": "自己紹介", "markdown": "Markdown対応", "bio_placeholder": "Markdownで自己紹介を入力（500文字以内）", "bio_hint": "プロフィールに表示する任意の自己紹介です。", "update": "更新", "update_bio": "自己紹介を更新", "avatar_updated": "プロフィール画像を更新しました", "banner_updated": "プロフィールバナーを更新しました", "banner_cleared": "プロフィールバナーをクリアしました", "username_available": "このユーザー名は使用できます", "username_invalid": "3〜20文字の半角英数字またはアンダースコアを入力してください。", "username_updated": "ユーザー名を更新しました", "nickname_required": "表示名を入力してください。", "nickname_updated": "表示名を更新しました", "bio_updated": "自己紹介を更新しました", "update_failed": "更新できませんでした。しばらくしてからもう一度お試しください。", "clear_failed": "バナーをクリアできませんでした。しばらくしてからもう一度お試しください。", "markdown_bold": "太字", "markdown_italic": "斜体", "markdown_heading": "見出し", "markdown_list": "リスト項目", "markdown_link": "リンク"
+    },
+    "email": {
+      "title": "メールアドレス", "description": "ログインと通知の受信に使用します。", "not_linked": "メールアドレスが登録されていません", "verified": "確認済み", "link_hint": "登録するとログインと通知の受信に使用できます。", "change": "変更", "link": "登録", "new_address": "新しいメールアドレス", "address": "メールアドレス", "invalid": "有効なメールアドレスを入力してください。", "verification_code": "メール認証コード", "code_placeholder": "認証コードを入力", "send_code": "コードを送信", "code_hint": "新しいメールアドレスに認証コードを送信します。", "confirm_change": "変更を確定", "send_failed": "認証コードを送信できませんでした。しばらくしてからもう一度お試しください。", "change_success": "メールアドレスを更新しました", "change_failed": "メールアドレスを更新できませんでした。しばらくしてからもう一度お試しください。"
+    },
+    "preferences": {
+      "title": "環境設定", "description": "アカウントとコンテンツの設定をカスタマイズします。", "region": "アカウントの地域", "select_region": "地域を選択", "region_hint": "地域に応じたコンテンツと価格の表示に使用します。", "currency": "通貨", "select_currency": "通貨を選択", "currency_hint": "価格表示に使用します。既定値は地域に応じて設定されます。", "language": "優先言語", "select_language": "言語を選択", "language_hint": "画面と対応コンテンツをこの言語で表示します。", "gender": "性別", "male": "男性", "female": "女性", "other": "その他", "undisclosed": "回答しない", "adult_content": "成人向けコンテンツを表示", "adult_content_hint": "18歳以上を対象としたコンテンツが表示される場合があります。", "save": "設定を保存", "saved": "設定を保存しました", "save_failed": "設定を保存できませんでした。しばらくしてからもう一度お試しください。"
+    },
+    "security": {
+      "title": "パスワードを変更", "description": "定期的にパスワードを更新してアカウントを保護しましょう。", "open": "パスワードを変更", "current": "現在のパスワード", "current_placeholder": "現在のパスワードを入力", "current_hint": "アカウント保護のため、現在のパスワードを確認します。", "new": "新しいパスワード", "new_placeholder": "8文字以上", "confirm": "新しいパスワードを確認", "confirm_placeholder": "新しいパスワードをもう一度入力", "mismatch": "パスワードが一致しません。", "confirm_hint": "確認のため新しいパスワードをもう一度入力してください。", "update": "パスワードを更新", "required": "すべてのパスワード欄を入力してください。", "too_short": "パスワードは8文字以上で入力してください。", "updated": "パスワードを更新しました", "update_failed": "パスワードを更新できませんでした。しばらくしてからもう一度お試しください。"
+    },
+    "notifications": { "title": "通知設定", "description": "通知の受け取り方とタイミングを管理します。", "body": "通知設定は現在開発中です。公開後はこちらで通知方法や受信設定を変更できます。" },
+    "privacy": { "title": "プライバシー設定", "description": "プロフィールと個人情報の公開範囲を管理します。", "body": "プライバシー設定は現在開発中です。公開後はこちらで情報の公開範囲を細かく設定できます。" },
+    "danger": { "title": "危険な操作", "description": "以下の操作は取り消せません。十分ご注意ください。", "export": "データをエクスポート", "export_hint": "すべてのデータのコピーをダウンロードします。", "delete": "アカウントを削除", "delete_hint": "アカウントと関連するすべてのデータを完全に削除します。" },
+    "address": {
+      "title": "配送先住所", "description": "配送先住所を管理します。", "add": "住所を追加", "default": "既定の住所", "empty": "配送先住所がまだ登録されていません。", "add_now": "今すぐ追加", "edit_title": "住所を編集", "add_title": "新しい住所を追加", "recipient": "受取人", "recipient_placeholder": "受取人の名前を入力", "phone": "電話番号", "phone_placeholder": "電話番号を入力", "province": "都道府県", "province_placeholder": "例：東京都", "city": "市区町村", "city_placeholder": "例：渋谷区", "district": "地区", "district_placeholder": "例：神宮前", "details": "番地・建物名", "details_placeholder": "番地、建物名、部屋番号などを入力", "set_default": "既定の住所に設定", "save": "住所を保存", "incomplete": "必須の住所情報をすべて入力してください。", "updated": "住所を更新しました", "added": "住所を追加しました", "deleted": "住所を削除しました"
+    }
   }
 }

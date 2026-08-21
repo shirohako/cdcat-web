@@ -3,8 +3,8 @@
     <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl">
       <!-- Header -->
       <div class="mb-10">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">我的评价</h1>
-        <p class="mt-1.5 text-sm text-gray-500">分享你对听过专辑的感想和评分</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">{{ t('collection_pages.reviews.title') }}</h1>
+        <p class="mt-1.5 text-sm text-gray-500">{{ t('collection_pages.reviews.description') }}</p>
       </div>
 
       <!-- Stats Cards -->
@@ -25,7 +25,7 @@
         <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">评价总数</p>
+              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.total') }}</p>
               <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalReviews }}</p>
             </div>
             <Icon name="lucide:message-square-text" class="w-12 h-12 text-blue-100" />
@@ -36,7 +36,7 @@
         <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">平均评分</p>
+              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.average') }}</p>
               <p
                 class="text-3xl font-bold mt-2"
                 :class="stats.averageScore > 0 ? getScoreColorClass(stats.averageScore) : 'text-gray-900'"
@@ -52,7 +52,7 @@
         <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">已评分</p>
+              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.scored') }}</p>
               <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.scoredCount }}</p>
             </div>
             <Icon name="lucide:hash" class="w-12 h-12 text-green-100" />
@@ -65,16 +65,16 @@
         <!-- Sort Bar -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <p class="text-sm text-gray-500">
-            共 {{ total }} 条评价
+            {{ t('collection_pages.reviews.count', { count: total }) }}
           </p>
           <select
             v-model="sortBy"
             class="select select-bordered select-sm text-sm"
           >
-            <option value="date_desc">最新优先</option>
-            <option value="date_asc">最早优先</option>
-            <option value="score_desc">最高分</option>
-            <option value="score_asc">最低分</option>
+            <option value="date_desc">{{ t('collection_pages.reviews.sort_newest') }}</option>
+            <option value="date_asc">{{ t('collection_pages.reviews.sort_oldest') }}</option>
+            <option value="score_desc">{{ t('collection_pages.reviews.sort_highest') }}</option>
+            <option value="score_asc">{{ t('collection_pages.reviews.sort_lowest') }}</option>
           </select>
         </div>
 
@@ -105,8 +105,8 @@
               <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
                 <Icon name="lucide:trash-2" class="w-6 h-6 text-red-500" />
               </div>
-              <h3 class="text-lg font-bold text-gray-900">删除评价</h3>
-              <p class="text-sm text-gray-500 mt-2">确定要删除这条评价吗？此操作无法撤销。</p>
+              <h3 class="text-lg font-bold text-gray-900">{{ t('collection_pages.reviews.delete_title') }}</h3>
+              <p class="text-sm text-gray-500 mt-2">{{ t('collection_pages.reviews.delete_confirm') }}</p>
             </div>
             <div class="flex gap-3 mt-6">
               <button
@@ -115,7 +115,7 @@
                 :disabled="deleteConfirm.loading"
                 @click="cancelDelete"
               >
-                取消
+                {{ t('common.cancel') }}
               </button>
               <button
                 type="button"
@@ -124,7 +124,7 @@
                 @click="confirmDelete"
               >
                 <Icon v-if="deleteConfirm.loading" name="lucide:loader" class="w-4 h-4 animate-spin" />
-                删除
+                {{ t('common.delete') }}
               </button>
             </div>
           </div>
@@ -152,9 +152,10 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useHead({
-  title: 'My Reviews | CDCAT'
-})
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
+
+useHead({ title: computed(() => t('collection_pages.reviews.seo_title')) })
 
 const { $api } = useNuxtApp()
 
@@ -232,7 +233,7 @@ const loadReviews = async () => {
     stats.value = computeStats(reviews.value, total.value)
   } catch (error: any) {
     console.error('Failed to load reviews:', error)
-    loadError.value = error?.message || '加载评价失败，请刷新重试'
+    loadError.value = localizeError(error, 'collection_pages.reviews.load_failed')
   } finally {
     isLoading.value = false
     statsLoading.value = false

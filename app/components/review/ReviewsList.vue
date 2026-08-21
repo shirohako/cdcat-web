@@ -8,11 +8,11 @@
     <!-- Empty State -->
     <div v-else-if="reviews.length === 0" class="flex flex-col items-center justify-center py-16">
       <Icon name="lucide:message-square-text" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">还没有任何评价</p>
-      <p class="text-sm text-gray-400 mb-6">写下你的第一条评价，分享对专辑的看法</p>
+      <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_reviews') }}</p>
+      <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_reviews_hint') }}</p>
       <NuxtLink to="/works" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
-        发现专辑
+        {{ $t('collection_components.discover_works') }}
       </NuxtLink>
     </div>
 
@@ -87,7 +87,7 @@
                   class="text-xs text-blue-600 hover:text-blue-700 mt-1 font-medium"
                   @click="toggleExpand(review.id)"
                 >
-                  {{ expandedIds.has(review.id) ? '收起' : '展开' }}
+                  {{ $t(expandedIds.has(review.id) ? 'collection_components.collapse' : 'collection_components.expand') }}
                 </button>
               </div>
 
@@ -99,14 +99,14 @@
                     <span
                       v-if="review.updatedAt !== review.createdAt"
                       class="text-gray-300 ml-1"
-                    >(已编辑)</span>
+                    >({{ $t('collection_components.edited') }})</span>
                   </span>
                   <!-- Reaction counts -->
                   <div class="flex items-center gap-2.5 text-xs">
                     <span
                       v-if="review.reactions.helpful > 0"
                       class="inline-flex items-center gap-1 text-blue-500"
-                      title="有用"
+                      :title="$t('collection_components.helpful')"
                     >
                       <Icon name="lucide:thumbs-up" class="w-3 h-3" />
                       {{ review.reactions.helpful }}
@@ -114,7 +114,7 @@
                     <span
                       v-if="review.reactions.unhelpful > 0"
                       class="inline-flex items-center gap-1 text-red-400"
-                      title="无用"
+                      :title="$t('collection_components.unhelpful')"
                     >
                       <Icon name="lucide:thumbs-down" class="w-3 h-3" />
                       {{ review.reactions.unhelpful }}
@@ -122,7 +122,7 @@
                     <span
                       v-if="review.reactions.funny > 0"
                       class="inline-flex items-center gap-1 text-amber-500"
-                      title="欢乐"
+                      :title="$t('collection_components.funny')"
                     >
                       <Icon name="lucide:laugh" class="w-3 h-3" />
                       {{ review.reactions.funny }}
@@ -134,7 +134,7 @@
                     type="button"
                     class="inline-flex items-center justify-center w-8 h-8 rounded-full
                            transition-colors hover:bg-gray-100"
-                    title="编辑"
+                    :title="$t('common.edit')"
                     @click="emit('edit', review)"
                   >
                     <Icon name="lucide:pencil" class="w-4 h-4 text-gray-400 hover:text-blue-500 transition-colors" />
@@ -143,7 +143,7 @@
                     type="button"
                     class="inline-flex items-center justify-center w-8 h-8 rounded-full
                            transition-colors hover:bg-red-50"
-                    title="删除"
+                    :title="$t('common.delete')"
                     @click="emit('delete', review.id)"
                   >
                     <Icon name="lucide:trash-2" class="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
@@ -163,7 +163,7 @@
           @click="emit('page-change', currentPage - 1)"
         >
           <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          上一页
+          {{ $t('common.previous') }}
         </button>
 
         <div class="flex items-center gap-1">
@@ -185,7 +185,7 @@
           class="btn btn-outline btn-sm gap-1"
           @click="emit('page-change', currentPage + 1)"
         >
-          下一页
+          {{ $t('common.next') }}
           <Icon name="lucide:chevron-right" class="w-4 h-4" />
         </button>
       </div>
@@ -205,6 +205,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const { formatDate } = useLocaleFormatting()
 
 const emit = defineEmits<{
   edit: [review: UserReview]
@@ -237,15 +238,6 @@ const getScoreBadgeClass = (score: number): string => {
 }
 
 // Date formatting
-const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-}
-
 // Pagination
 const totalPages = computed(() => Math.ceil(props.total / props.pageSize))
 

@@ -2,7 +2,7 @@
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
     <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
       <Film class="w-5 h-5 text-emerald-600" />
-      系列条目
+      {{ $t('content_display.linked_entries') }}
     </h2>
 
     <template v-if="groupedEntries.length">
@@ -52,7 +52,7 @@
                 <div class="flex items-center justify-between gap-2">
                   <span class="flex items-center gap-1 text-xs text-gray-600">
                     <Disc3 class="w-3.5 h-3.5" />
-                    {{ entry.works_count }} 专辑
+                    {{ $t('content_display.works_count', { count: entry.works_count }) }}
                   </span>
                   <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
                     {{ getEntryTypeLabel(entry.type) }}
@@ -68,7 +68,7 @@
         <div class="flex items-center gap-3">
           <span class="h-2.5 w-2.5 rounded-full bg-slate-400" />
           <h3 class="text-lg font-bold text-slate-900 tracking-tight">
-            未分组
+            {{ $t('content_display.ungrouped') }}
           </h3>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
@@ -99,7 +99,7 @@
               <div class="flex items-center justify-between gap-2">
                 <span class="flex items-center gap-1 text-xs text-gray-600">
                   <Disc3 class="w-3.5 h-3.5" />
-                  {{ entry.works_count }} 专辑
+                  {{ $t('content_display.works_count', { count: entry.works_count }) }}
                 </span>
                 <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
                   {{ getEntryTypeLabel(entry.type) }}
@@ -140,7 +140,7 @@
             <div class="flex items-center justify-between gap-2">
               <span class="flex items-center gap-1 text-xs text-gray-600">
                 <Disc3 class="w-3.5 h-3.5" />
-                {{ entry.works_count }} 专辑
+                {{ $t('content_display.works_count', { count: entry.works_count }) }}
               </span>
               <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
                 {{ getEntryTypeLabel(entry.type) }}
@@ -179,6 +179,7 @@ const props = defineProps<{
   entriesCount: number
   groups?: EntryGroup[]
 }>()
+const { t } = useI18n()
 
 const groupedEntries = computed(() => {
   if (!props.groups || props.groups.length === 0) {
@@ -214,14 +215,8 @@ const getEntryTypeColor = (type: string) => {
 }
 
 const getEntryTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    anime: '动画',
-    game: '游戏',
-    movie: '电影',
-    tv: '剧集',
-    other: '其他'
-  }
-  return labels[type] || '其他'
+  const key = ['anime', 'game', 'movie', 'tv'].includes(type) ? type : 'other'
+  return t(`content_display.entry_type.${key}`)
 }
 </script>
 

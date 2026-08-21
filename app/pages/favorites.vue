@@ -3,13 +3,13 @@
     <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl">
       <!-- Header -->
       <div class="mb-10">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">我的收藏</h1>
-        <p class="mt-1.5 text-sm text-gray-500">管理你喜欢的专辑、歌曲和喜欢的艺术家</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">{{ t('collection_pages.favorites.title') }}</h1>
+        <p class="mt-1.5 text-sm text-gray-500">{{ t('collection_pages.favorites.description') }}</p>
       </div>
 
       <!-- Tabs Navigation + Content -->
       <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-        <nav class="flex flex-wrap gap-0 border-b border-gray-200" aria-label="Favorites tabs">
+        <nav class="flex flex-wrap gap-0 border-b border-gray-200" :aria-label="t('collection_pages.favorites.title')">
           <NuxtLink
             v-for="tab in tabs"
             :key="tab.key"
@@ -37,18 +37,19 @@ definePageMeta({
 })
 
 const route = useRoute()
+const { t } = useI18n()
 
-const tabs = [
-  { key: 'works', label: '我喜欢的专辑', icon: 'lucide:disc-3', to: '/favorites/works' },
-  { key: 'songs', label: '我喜欢的歌曲', icon: 'lucide:music', to: '/favorites/songs' },
-  { key: 'artists', label: '我喜欢的艺术家', icon: 'lucide:mic-2', to: '/favorites/artists' }
-]
+const tabs = computed(() => [
+  { key: 'works', label: t('collection_pages.favorites.works'), icon: 'lucide:disc-3', to: '/favorites/works' },
+  { key: 'songs', label: t('collection_pages.favorites.songs'), icon: 'lucide:music', to: '/favorites/songs' },
+  { key: 'artists', label: t('collection_pages.favorites.artists'), icon: 'lucide:mic-2', to: '/favorites/artists' }
+])
 
 const isActiveTab = (to: string) => {
   return route.path === to || route.path === to + '/'
 }
 
 useHead({
-  title: 'My Collections | CDCAT'
+  title: computed(() => t('collection_pages.favorites.seo_title'))
 })
 </script>

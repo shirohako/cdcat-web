@@ -8,11 +8,11 @@
     <!-- Empty State -->
     <div v-else-if="works.length === 0" class="flex flex-col items-center justify-center py-16">
       <Icon name="lucide:disc-3" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">还没有收藏任何专辑</p>
-      <p class="text-sm text-gray-400 mb-6">发现你喜欢的专辑，添加到收藏吧</p>
+      <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_works') }}</p>
+      <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_works_hint') }}</p>
       <NuxtLink to="/works" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
-        浏览专辑
+        {{ $t('collection_components.browse_works') }}
       </NuxtLink>
     </div>
 
@@ -30,7 +30,7 @@
             <NuxtLink
               :to="`/works/${work.id}`"
               class="shrink-0"
-              :aria-label="`查看专辑：${work.title}`"
+              :aria-label="$t('collection_components.view_work', { name: work.title })"
             >
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
                 <img
@@ -59,8 +59,8 @@
               </p>
 
               <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-400">
-                <span v-if="work.release_date">发行：{{ formatDate(work.release_date) }}</span>
-                <span v-if="work.favorited_at">收藏：{{ formatDate(work.favorited_at) }}</span>
+                <span v-if="work.release_date">{{ $t('collection_components.release_date', { date: formatDate(work.release_date) }) }}</span>
+                <span v-if="work.favorited_at">{{ $t('collection_components.favorited_date', { date: formatDate(work.favorited_at) }) }}</span>
               </div>
             </div>
 
@@ -69,8 +69,8 @@
               <NuxtLink
                 :to="`/works/${work.id}`"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
-                :aria-label="`查看专辑：${work.title}`"
-                title="查看"
+                :aria-label="$t('collection_components.view_work', { name: work.title })"
+                :title="$t('collection_components.view')"
               >
                 <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
               </NuxtLink>
@@ -79,7 +79,7 @@
                 :disabled="!!unlikeLoading[work.id]"
                 @click="handleToggle(work.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                :title="unliked[work.id] ? '已取消喜欢' : '取消喜欢'"
+                :title="$t(unliked[work.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
               >
                 <Icon
                   :name="unliked[work.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
@@ -100,7 +100,7 @@
           class="btn btn-outline btn-sm gap-1"
         >
           <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          上一页
+          {{ $t('common.previous') }}
         </button>
 
         <div class="flex items-center gap-1">
@@ -122,7 +122,7 @@
           @click="nextPage"
           class="btn btn-outline btn-sm gap-1"
         >
-          下一页
+          {{ $t('common.next') }}
           <Icon name="lucide:chevron-right" class="w-4 h-4" />
         </button>
       </div>
@@ -134,6 +134,7 @@
 import type { FavoriteWork } from '~/types/favorites'
 
 const { getFavoriteWorks, toggleFavoriteWork } = useFavorites()
+const { formatDate } = useLocaleFormatting()
 
 const works = ref<FavoriteWork[]>([])
 const page = ref(1)
@@ -161,15 +162,6 @@ const visiblePages = computed(() => {
 
   return pages
 })
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
-}
 
 const loadData = async () => {
   isLoading.value = true

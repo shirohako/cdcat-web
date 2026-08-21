@@ -12,6 +12,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   const stateToken = useState<string | null>('auth:token')
   const authTokenCookie = useCookie<string | null>('auth_token')
   const authUserCookie = useCookie('auth_user')
+  const translateError = (key: string) => nuxtApp.$i18n.t(key)
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl as string,
@@ -42,7 +43,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       // 处理失败响应
       if (!result.success) {
         const errorResponse = result as ApiErrorResponse
-        const error = new Error(errorResponse.error.message || '请求失败')
+        const error = new Error(translateError('errors.request_failed'))
         // 附加错误详情
         Object.assign(error, {
           code: errorResponse.error.code,
@@ -72,11 +73,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       const result = response._data as ApiErrorResponse
 
       // 尝试从响应中提取错误信息
-      let errorMessage = '网络请求失败'
-      if (result?.error?.message) {
-        errorMessage = result.error.message
-      }
-
       // 创建包含 API 错误详情的 Error
       const createApiError = (msg: string) => {
         const error = new Error(msg)
@@ -97,26 +93,26 @@ export default defineNuxtPlugin((nuxtApp) => {
         authUserCookie.value = null
 
         await nuxtApp.runWithContext(() => navigateTo('/auth/login'))
-        throw createApiError(errorMessage || '未授权，请重新登录')
+        throw createApiError(translateError('errors.unauthorized'))
       }
 
       // 403 禁止访问
       if (status === 403) {
-        throw createApiError(errorMessage || '没有访问权限')
+        throw createApiError(translateError('errors.forbidden'))
       }
 
       // 404 未找到
       if (status === 404) {
-        throw createApiError(errorMessage || '请求的资源不存在')
+        throw createApiError(translateError('errors.not_found'))
       }
 
       // 500 服务器错误
       if (status >= 500) {
-        throw createApiError(errorMessage || '服务器错误，请稍后重试')
+        throw createApiError(translateError('errors.server'))
       }
 
       // 其他错误
-      throw createApiError(errorMessage)
+      throw createApiError(translateError('errors.network'))
     },
   })
 

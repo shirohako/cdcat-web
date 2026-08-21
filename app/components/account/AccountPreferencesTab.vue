@@ -2,8 +2,8 @@
   <div class="space-y-6">
     <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
       <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">偏好设置</h2>
-        <p class="text-sm text-gray-500 mt-1">自定义你的账户偏好和个人信息</p>
+        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.preferences.title') }}</h2>
+        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.preferences.description') }}</p>
       </div>
 
       <div v-if="isLoading" class="p-6 flex items-center justify-center py-12">
@@ -14,66 +14,49 @@
         <div class="p-6 space-y-8">
           <!-- Region -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="region" class="text-sm font-medium text-gray-700">账户地区</label>
+            <label for="region" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.region') }}</label>
             <select
               id="region"
               v-model="form.region"
               class="select select-bordered w-full bg-white"
             >
-              <option value="">选择地区</option>
-              <option value="CN">中国</option>
-              <option value="HK">香港</option>
-              <option value="TW">台湾</option>
-              <option value="US">美国</option>
-              <option value="JP">日本</option>
-              <option value="KR">韩国</option>
-              <option value="SG">新加坡</option>
+              <option value="">{{ t('account_pages.preferences.select_region') }}</option>
+              <option v-for="code in regionCodes" :key="code" :value="code">{{ regionName(code) }}</option>
             </select>
-            <p class="text-xs text-gray-400">用于展示地区相关内容和价格</p>
+            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.region_hint') }}</p>
           </div>
 
           <!-- Currency -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="currency" class="text-sm font-medium text-gray-700">货币</label>
+            <label for="currency" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.currency') }}</label>
             <select
               id="currency"
               v-model="form.currency"
               class="select select-bordered w-full bg-white"
             >
-              <option value="">选择货币</option>
-              <option value="CNY">人民币（CNY）</option>
-              <option value="HKD">港币（HKD）</option>
-              <option value="TWD">新台币（TWD）</option>
-              <option value="USD">美元（USD）</option>
-              <option value="JPY">日元（JPY）</option>
-              <option value="KRW">韩元（KRW）</option>
-              <option value="SGD">新加坡元（SGD）</option>
-              <option value="EUR">欧元（EUR）</option>
+              <option value="">{{ t('account_pages.preferences.select_currency') }}</option>
+              <option v-for="code in currencyCodes" :key="code" :value="code">{{ currencyName(code) }} ({{ code }})</option>
             </select>
-            <p class="text-xs text-gray-400">用于价格显示（默认会跟随地区）</p>
+            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.currency_hint') }}</p>
           </div>
 
           <!-- Language -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="language" class="text-sm font-medium text-gray-700">首选语言</label>
+            <label for="language" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.language') }}</label>
             <select
               id="language"
               v-model="form.locale"
               class="select select-bordered w-full bg-white"
             >
-              <option value="">选择语言</option>
-              <option value="zh-CN">简体中文</option>
-              <option value="zh-TW">繁體中文</option>
-              <option value="en">English</option>
-              <option value="ja">日本語</option>
-              <option value="ko">한국어</option>
+              <option value="">{{ t('account_pages.preferences.select_language') }}</option>
+              <option v-for="code in languageCodes" :key="code" :value="code">{{ languageName(code) }}</option>
             </select>
-            <p class="text-xs text-gray-400">界面和内容将使用此语言显示</p>
+            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.language_hint') }}</p>
           </div>
 
           <!-- Gender -->
           <div class="grid gap-1.5 max-w-sm">
-            <label class="text-sm font-medium text-gray-700">性别</label>
+            <label class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.gender') }}</label>
             <div class="flex gap-3">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -82,7 +65,7 @@
                   :value="1"
                   class="radio radio-sm radio-primary"
                 />
-                <span class="text-sm text-gray-700">男</span>
+                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.male') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -91,7 +74,7 @@
                   :value="2"
                   class="radio radio-sm radio-primary"
                 />
-                <span class="text-sm text-gray-700">女</span>
+                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.female') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -100,7 +83,7 @@
                   :value="3"
                   class="radio radio-sm radio-primary"
                 />
-                <span class="text-sm text-gray-700">其他</span>
+                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.other') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
@@ -109,7 +92,7 @@
                   :value="0"
                   class="radio radio-sm radio-primary"
                 />
-                <span class="text-sm text-gray-700">不透露</span>
+                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.undisclosed') }}</span>
               </label>
             </div>
           </div>
@@ -118,14 +101,14 @@
           <div class="grid gap-1.5 max-w-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-700">显示成人内容</p>
-                <p class="text-xs text-gray-400 mt-0.5">开启后可能会看到 18+ / 成人向内容</p>
+                <p class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.adult_content') }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ t('account_pages.preferences.adult_content_hint') }}</p>
               </div>
               <input
                 v-model="form.show_adult_content"
                 type="checkbox"
                 class="toggle toggle-primary"
-                aria-label="显示成人内容"
+                :aria-label="t('account_pages.preferences.adult_content')"
               />
             </div>
           </div>
@@ -145,7 +128,7 @@
             <span v-if="isSaving" class="loading loading-spinner loading-xs"></span>
             <template v-else>
               <Save :size="14" />
-              保存设置
+              {{ t('account_pages.preferences.save') }}
             </template>
           </button>
         </div>
@@ -160,6 +143,12 @@ import { Save } from '@lucide/vue'
 const emit = defineEmits(['save'])
 
 const { $api } = useNuxtApp()
+const { t } = useI18n()
+const { regionName, currencyName, languageName } = useLocaleFormatting()
+const { localizeError } = useLocalizedApiError()
+const regionCodes = ['CN', 'HK', 'TW', 'US', 'JP', 'KR', 'SG']
+const currencyCodes = ['CNY', 'HKD', 'TWD', 'USD', 'JPY', 'KRW', 'SGD', 'EUR']
+const languageCodes = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko']
 
 const isLoading = ref(true)
 const isSaving = ref(false)
@@ -225,11 +214,11 @@ const saveSettings = async () => {
     })
 
     original.value = { ...form }
-    statusMessage.value = '设置已保存'
+    statusMessage.value = t('account_pages.preferences.saved')
     statusClass.value = 'text-emerald-600'
-    emit('save', '偏好设置已保存')
+    emit('save', t('account_pages.preferences_saved'))
   } catch (error) {
-    statusMessage.value = error?.message || '保存失败，请稍后重试'
+    statusMessage.value = localizeError(error, 'account_pages.preferences.save_failed')
     statusClass.value = 'text-red-600'
   } finally {
     isSaving.value = false

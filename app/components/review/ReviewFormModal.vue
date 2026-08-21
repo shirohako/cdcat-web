@@ -18,7 +18,7 @@
                rounded-t-2xl flex items-center justify-between z-10"
       >
         <h2 class="text-lg font-bold text-gray-900">
-          {{ isEditing ? '编辑评价' : '写评价' }}
+          {{ $t(isEditing ? 'collection_components.edit_review' : 'collection_components.write_review') }}
         </h2>
         <button
           type="button"
@@ -34,7 +34,7 @@
         <!-- 1. Album Selector (create mode only) -->
         <div v-if="!isEditing">
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            选择专辑 <span class="text-red-400">*</span>
+            {{ $t('collection_components.select_album') }} <span class="text-red-400">*</span>
           </label>
 
           <!-- Selected album display -->
@@ -73,7 +73,7 @@
                 v-model="albumQuery"
                 type="text"
                 class="input input-bordered w-full pl-10 text-sm"
-                placeholder="搜索专辑名称或艺术家..."
+                :placeholder="$t('collection_components.search_album')"
               />
               <Icon
                 v-if="isSearching"
@@ -114,7 +114,7 @@
               v-else-if="albumQuery.trim() && !isSearching && hasSearched"
               class="mt-2 text-center py-4 text-sm text-gray-400"
             >
-              未找到匹配的专辑
+              {{ $t('collection_components.no_search_results') }}
             </div>
           </template>
         </div>
@@ -137,8 +137,8 @@
         <!-- 2. Score Input (optional) -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            评分 (0-10)
-            <span class="text-gray-400 font-normal ml-1">(可选)</span>
+            {{ $t('collection_components.score') }}
+            <span class="text-gray-400 font-normal ml-1">({{ $t('collection_components.optional') }})</span>
           </label>
           <div class="flex items-center gap-3">
             <!-- Interactive stars -->
@@ -172,7 +172,7 @@
                 class="text-xs text-gray-400 hover:text-gray-600 transition-colors"
                 @click="form.score = null"
               >
-                清除
+                {{ $t('collection_components.clear') }}
               </button>
             </div>
           </div>
@@ -181,12 +181,12 @@
         <!-- 3. Review Content (required) -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            评价内容 <span class="text-red-400">*</span>
+            {{ $t('collection_components.review_content') }} <span class="text-red-400">*</span>
           </label>
           <textarea
             v-model="form.content"
             class="textarea textarea-bordered w-full text-sm h-40 resize-none"
-            placeholder="分享你对这张专辑的想法..."
+            :placeholder="$t('collection_components.review_placeholder')"
             maxlength="5000"
           />
           <p class="text-xs text-gray-400 mt-1 text-right">
@@ -210,7 +210,7 @@
           class="btn btn-ghost btn-sm"
           @click="emit('close')"
         >
-          取消
+          {{ $t('common.cancel') }}
         </button>
         <button
           type="button"
@@ -223,7 +223,7 @@
             name="lucide:loader"
             class="w-4 h-4 animate-spin"
           />
-          {{ isEditing ? '更新评价' : '提交评价' }}
+          {{ $t(isEditing ? 'collection_components.update_review' : 'collection_components.submit_review') }}
         </button>
       </div>
     </div>
@@ -258,6 +258,7 @@ const emit = defineEmits<{
 }>()
 
 const { $api } = useNuxtApp()
+const { localizeError } = useLocalizedApiError()
 
 const isEditing = computed(() => props.review !== null)
 
@@ -372,7 +373,7 @@ const handleSubmit = async () => {
     }
     emit('saved')
   } catch (e: any) {
-    errorMessage.value = e?.message || '提交失败，请稍后重试'
+    errorMessage.value = localizeError(e, 'collection_components.submit_failed')
   } finally {
     isSubmitting.value = false
   }

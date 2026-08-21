@@ -4,19 +4,19 @@
       <!-- Header -->
       <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Events</h1>
+          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">{{ t('collection_pages.events.title') }}</h1>
           <p class="text-gray-500 text-lg">
-            按系列归类的同人展会与音乐展
+            {{ t('collection_pages.events.description') }}
           </p>
         </div>
         <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-600">
           <div class="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
             <Calendar class="text-blue-500" :size="16" />
-            <span>{{ totalEvents }} 个活动</span>
+            <span>{{ t('collection_pages.events.event_count', { count: totalEvents }) }}</span>
           </div>
           <div class="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
             <MapPin class="text-rose-500" :size="16" />
-            <span>{{ groups.length }} 个系列</span>
+            <span>{{ t('collection_pages.events.series_count', { count: groups.length }) }}</span>
           </div>
         </div>
       </div>
@@ -32,7 +32,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>加载失败: {{ error.message }}</span>
+          <span>{{ localizeError(error) }}</span>
         </div>
       </div>
 
@@ -58,7 +58,7 @@
                 rel="noopener"
                 class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 hover:text-blue-600 transition-colors"
               >
-                官方站点
+                {{ t('collection_pages.events.official_site') }}
                 <ExternalLink :size="14" />
               </a>
             </div>
@@ -102,14 +102,14 @@
                 class="flex items-center gap-2 px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-sm"
                 @click="toggleSeries(group)"
               >
-                <span>{{ isSeriesExpanded(group) ? '收起' : `显示全部 (${hiddenEventsCount(group)} 个更多)` }}</span>
+                <span>{{ isSeriesExpanded(group) ? t('collection_pages.events.collapse') : t('collection_pages.events.show_all', { count: hiddenEventsCount(group) }) }}</span>
                 <component :is="isSeriesExpanded(group) ? ChevronUp : ChevronDown" :size="16" />
               </button>
             </div>
 
             <div v-if="(group.events || []).length === 0" class="col-span-full">
               <div class="flex items-center justify-center rounded-xl border border-dashed border-gray-200 p-4 text-sm text-gray-500 bg-gray-50">
-                暂无具体届次
+                {{ t('collection_pages.events.empty') }}
               </div>
             </div>
           </div>
@@ -121,6 +121,9 @@
 
 <script setup>
 import { Calendar, MapPin, ExternalLink, ChevronDown, ChevronUp } from "@lucide/vue";
+const { t } = useI18n();
+const { localizedContent, formatDate } = useLocaleFormatting();
+const { localizeError } = useLocalizedApiError();
 
 const { data: groupResponse, pending, error } = await useAPI("/v1/events/series");
 
@@ -162,34 +165,23 @@ const hiddenEventsCount = (group) => {
 };
 
 const groupDescription = (group) => {
-  const desc = group.description;
-  if (!desc) return "暂无介绍";
-  if (typeof desc === "string") return desc;
-  return desc["zh-Hans"] || desc["zh-CN"] || desc["en"] || "暂无介绍";
-};
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return localizedContent(group.description, t('collection_pages.events.no_description'));
 };
 
 const formatEventDate = (event) => {
-  const start = event?.start_date ? formatDate(event.start_date) : "";
-  const end = event?.end_date ? formatDate(event.end_date) : "";
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+  const start = event?.start_date ? formatDate(event.start_date, options) : "";
+  const end = event?.end_date ? formatDate(event.end_date, options) : "";
   if (start && end && start !== end) return `${start} ~ ${end}`;
   return start || end || "";
 };
 
 useHead({
-  title: "Events | CDCAT",
+  title: computed(() => `${t('collection_pages.events.title')} | CDCAT`),
   meta: [
     {
       name: "description",
-      content: "归档的同人展活动列表"
+      content: computed(() => t('collection_pages.events.seo_description'))
     }
   ]
 });

@@ -248,6 +248,7 @@ const router = useRouter()
 const { $api } = useNuxtApp()
 const { register } = useAuth()
 const { t } = useI18n()
+const { localizeError, localizeFieldErrors } = useLocalizedApiError()
 
 const formData = ref({
   nickname: '',
@@ -280,11 +281,9 @@ const getFieldLabel = (field: string) => {
   return labels[field] || field
 }
 
-const setError = (message: string, details?: Record<string, string[]>) => {
+const setError = (message: string, details?: Record<string, unknown>) => {
   if (details && Object.keys(details).length) {
-    errorDetails.value = Object.entries(details).flatMap(
-      ([field, messages]) => messages.map(msg => `${getFieldLabel(field)}: ${msg}`)
-    )
+    errorDetails.value = localizeFieldErrors(details, getFieldLabel)
   } else {
     errorDetails.value = []
   }
@@ -312,8 +311,7 @@ const sendVerificationCode = async () => {
       }
     }, 1000)
   } catch (error: any) {
-    const apiError = error.details
-    setError(apiError?.message || error.message || t('auth.register.send_code_failed'), apiError?.details)
+    setError(localizeError(error, 'auth.register.send_code_failed'), error.details?.details)
   } finally {
     isSendingCode.value = false
   }
@@ -389,8 +387,7 @@ const handleRegister = async () => {
       setError(result.error || t('auth.register.register_failed'), result.details)
     }
   } catch (error: any) {
-    const apiError = error.details
-    setError(apiError?.message || error.message || t('auth.register.register_failed'), apiError?.details)
+    setError(localizeError(error, 'auth.register.register_failed'), error.details?.details)
   } finally {
     isLoading.value = false
   }

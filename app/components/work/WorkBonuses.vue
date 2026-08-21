@@ -6,7 +6,7 @@
         <Gift :size="16" class="text-pink-500" />
       </div>
       <h2 class="text-base font-bold text-gray-900">{{ $t('work.section.bonuses') }}</h2>
-      <span v-if="bonuses && bonuses.length > 1" class="ml-auto text-xs text-gray-400">{{ bonuses.length }} 项特典</span>
+      <span v-if="bonuses && bonuses.length > 1" class="ml-auto text-xs text-gray-400">{{ $t('content_display.bonuses', { count: bonuses.length }) }}</span>
     </div>
 
     <!-- Bonus List -->
@@ -47,7 +47,7 @@
           type="button"
           class="shrink-0 text-[11px] text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 rounded px-2 py-0.5 transition-colors cursor-pointer"
           @click="openDetail(bonus)"
-        >详情</button>
+        >{{ $t('content_display.details') }}</button>
       </div>
     </div>
 
@@ -98,11 +98,11 @@
       </p>
 
       <div class="modal-action mt-5">
-        <button class="btn btn-sm" @click="detailDialog?.close()">关闭</button>
+        <button class="btn btn-sm" @click="detailDialog?.close()">{{ $t('common.close') }}</button>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button>close</button>
+      <button>{{ $t('common.close') }}</button>
     </form>
   </dialog>
 </template>

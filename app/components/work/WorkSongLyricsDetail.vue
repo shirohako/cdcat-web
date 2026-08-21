@@ -9,7 +9,7 @@
     <!-- Error -->
     <div v-else-if="error" class="flex-1 flex items-center justify-center gap-3 py-12 px-6">
       <AlertCircle :size="20" class="text-red-400 shrink-0" />
-      <p class="text-sm text-gray-500">加载失败，请重试</p>
+      <p class="text-sm text-gray-500">{{ $t('common.load_failed') }}</p>
     </div>
 
     <template v-else-if="item">
@@ -25,20 +25,20 @@
         <span
           class="px-2 py-0.5 rounded text-[11px] font-bold"
           :class="item.is_translation ? 'bg-teal-50 text-teal-600' : 'bg-sky-50 text-sky-600'"
-        >{{ item.is_translation ? '翻译' : '歌词' }}</span>
+        >{{ $t(item.is_translation ? 'lyrics_ui.translation' : 'lyrics_ui.lyrics') }}</span>
         <!-- Format -->
         <span class="px-2 py-0.5 rounded text-[11px] font-medium bg-gray-100 text-gray-500 uppercase tracking-wide">{{ item.format }}</span>
         <!-- Badges -->
         <span v-if="item.is_primary" class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded text-[11px] font-semibold bg-violet-50 text-violet-600">
           <Star :size="9" fill="currentColor" />
-          主歌词
+          {{ $t('lyrics_ui.primary') }}
         </span>
-        <span v-if="item.is_ai_generated" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-600">AI 生成</span>
+        <span v-if="item.is_ai_generated" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-50 text-amber-600">{{ $t('lyrics_ui.ai_generated') }}</span>
         <span
           v-if="item.is_translation && item.authorship"
           class="px-2 py-0.5 rounded text-[11px] font-semibold"
           :class="item.authorship === 'original' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'"
-        >{{ item.authorship === 'original' ? '原创' : '转载' }}</span>
+        >{{ $t(item.authorship === 'original' ? 'lyrics_ui.original' : 'lyrics_ui.reposted') }}</span>
         <!-- Submitter -->
         <div class="ml-auto flex items-center gap-1.5">
           <img
@@ -48,7 +48,7 @@
             class="w-4 h-4 rounded-full object-cover"
           />
           <span class="text-[11px] text-gray-400">
-            {{ item.submitter ? (item.submitter.nickname || item.submitter.username) : '匿名' }}
+            {{ item.submitter ? (item.submitter.nickname || item.submitter.username) : $t('lyrics_ui.anonymous') }}
           </span>
           <span class="text-[11px] text-gray-300">·</span>
           <span class="text-[11px] text-gray-400 tabular-nums">{{ formatDate(item.created_at) }}</span>

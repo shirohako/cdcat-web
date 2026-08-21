@@ -31,12 +31,12 @@
         <span class="opacity-40">|</span>
         <div class="flex items-center gap-1.5">
           <BookOpen :size="14" />
-          <span>约 {{ wordCount }} 字</span>
+          <span>{{ $t('article_ui.word_count', { count: wordCount }) }}</span>
         </div>
         <span class="opacity-40">|</span>
         <div class="flex items-center gap-1.5">
           <Clock :size="14" />
-          <span>阅读约 {{ readingTime }} 分钟</span>
+          <span>{{ $t('article_ui.reading_time', { count: readingTime }) }}</span>
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@
              bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200 group"
     >
       <ArrowLeft :size="14" class="group-hover:-translate-x-0.5 transition-transform duration-200" />
-      返回
+      {{ $t('article_ui.back') }}
     </NuxtLink>
 
     <!-- 编辑按钮（仅作者可见） -->
@@ -59,7 +59,7 @@
              bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200"
     >
       <Pencil :size="14" />
-      编辑
+      {{ $t('common.edit') }}
     </NuxtLink>
   </div>
 </template>
@@ -74,11 +74,7 @@ const props = defineProps({
 });
 
 const { user } = useAuth();
+const { formatDate } = useLocaleFormatting();
 const isAuthor = computed(() => !!user.value && user.value.username === props.article?.author?.username);
 
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
 </script>

@@ -90,8 +90,8 @@ const goToPage = (page: number) => {
     <!-- 页面标题 -->
     <div class="mb-6 flex items-center justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Series</h1>
-        <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">浏览所有游戏、动画、音乐系列作品</p>
+        <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('content_display.series') }}</h1>
+        <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('content_display.series_desc') }}</p>
       </div>
       <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/series')">
         <template #icon>
@@ -112,7 +112,7 @@ const goToPage = (page: number) => {
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <span>加载失败: {{ error.message }}</span>
+        <span>{{ $t('common.load_failed') }}</span>
       </div>
     </div>
 
@@ -148,11 +148,11 @@ const goToPage = (page: number) => {
             <div class="space-y-1.5 text-xs text-gray-600">
               <div class="flex items-center gap-1.5">
                 <Film class="w-3.5 h-3.5 text-gray-400" />
-                <span>{{ series.entries_count }} 条目</span>
+                <span>{{ $t('content_display.entries_count', { count: series.entries_count }) }}</span>
               </div>
               <div class="flex items-center gap-1.5">
                 <Disc3 class="w-3.5 h-3.5 text-gray-400" />
-                <span>{{ series.works_count }} 专辑</span>
+                <span>{{ $t('content_display.works_count', { count: series.works_count }) }}</span>
               </div>
             </div>
           </div>
@@ -164,7 +164,7 @@ const goToPage = (page: number) => {
         <div class="text-gray-400 mb-4">
           <Disc3 :size="64" class="mx-auto" />
         </div>
-        <p class="text-gray-500">暂无系列</p>
+        <p class="text-gray-500">{{ $t('content_display.no_series') }}</p>
       </div>
 
       <!-- 分页控制 -->

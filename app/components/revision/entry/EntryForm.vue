@@ -19,24 +19,23 @@ const props = defineProps<{
 
 const router = useRouter()
 const { $api } = useNuxtApp()
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.entryId)
 
 // 条目类型选项
-const typeOptions = [
-  { value: 'anime', label: '动画 (Anime)' },
-  { value: 'movie', label: '电影 (Movie)' },
-  { value: 'tv', label: '电视剧 (TV)' },
-  { value: 'game', label: '游戏 (Game)' },
-  { value: 'other', label: '其他 (Other)' }
-]
+const typeOptions = computed(() => ['anime', 'movie', 'tv', 'game', 'other'].map(value => ({
+  value,
+  label: t(`content_display.entry_type.${value}`),
+})))
 
 // 标签页
-const tabs = [
-  { id: 'basic', label: '基础信息', icon: 'lucide:tag' },
-  { id: 'meta', label: 'Meta', icon: 'lucide:code' }
-]
+const tabs = computed(() => [
+  { id: 'basic', label: t('revision_entry.basic'), icon: 'lucide:tag' },
+  { id: 'meta', label: t('revision_entry.meta'), icon: 'lucide:code' }
+])
 
 const currentTab = ref('basic')
 
@@ -97,13 +96,13 @@ const validateMetaJson = () => {
   try {
     const parsed = JSON.parse(metaJsonText.value)
     if (typeof parsed !== 'object' || Array.isArray(parsed)) {
-      metaJsonError.value = 'Meta 必须是一个 JSON 对象'
+      metaJsonError.value = t('revision_entry.meta_object')
       return false
     }
     form.meta = parsed
     return true
   } catch (e: any) {
-    metaJsonError.value = `JSON 解析错误: ${e.message}`
+    metaJsonError.value = t('revision_entry.json_error')
     return false
   }
 }
@@ -147,17 +146,17 @@ const validateForm = () => {
   errors.image_url = undefined
 
   if (!form.name.trim()) {
-    errors.name = '请输入条目名称'
+    errors.name = t('revision_entry.name_required')
     currentTab.value = 'basic'
     return false
   }
   if (!form.type) {
-    errors.type = '请选择条目类型'
+    errors.type = t('revision_entry.type_required')
     currentTab.value = 'basic'
     return false
   }
   if (!form.image_url.trim()) {
-    errors.image_url = '请输入封面图 URL'
+    errors.image_url = t('revision_entry.cover_required')
     currentTab.value = 'basic'
     return false
   }
@@ -229,7 +228,7 @@ const submitForm = async () => {
   submitMessage.value = ''
 
   if (!form.name.trim()) {
-    errors.name = '请输入条目名称'
+    errors.name = t('revision_entry.name_required')
     return
   }
 
@@ -253,8 +252,7 @@ const submitForm = async () => {
       }
     })
   } catch (error: unknown) {
-    const err = error as { data?: { message?: string }; message?: string }
-    submitMessage.value = err.data?.message || err.message || '提交失败，请重试'
+    submitMessage.value = localizeError(error, 'revision_entry.submit_failed')
   } finally {
     isSubmitting.value = false
   }
@@ -296,17 +294,17 @@ const handleFormSubmit = () => {
 
       <!-- 基础信息 Tab -->
       <div v-show="currentTab === 'basic'" class="space-y-6">
-        <h2 class="text-xl font-bold text-gray-900">基础信息</h2>
+        <h2 class="text-xl font-bold text-gray-900">{{ $t('revision_entry.basic') }}</h2>
 
         <!-- 名称 -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text font-medium">条目名称 <span class="text-error">*</span></span>
+            <span class="label-text font-medium">{{ $t('revision_entry.name') }} <span class="text-error">*</span></span>
           </label>
           <input
             v-model="form.name"
             type="text"
-            placeholder="输入条目名称"
+            :placeholder="$t('revision_entry.name_placeholder')"
             class="input input-bordered w-full"
             :class="{ 'input-error': errors.name }"
           />
@@ -327,14 +325,14 @@ const handleFormSubmit = () => {
             class="input input-bordered w-full"
           />
           <label class="label">
-            <span class="label-text-alt text-gray-500">URL 友好的标识符，留空则自动生成</span>
+            <span class="label-text-alt text-gray-500">{{ $t('revision_entry.slug_hint') }}</span>
           </label>
         </div>
 
         <!-- 类型 -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text font-medium">条目类型 <span class="text-error">*</span></span>
+            <span class="label-text font-medium">{{ $t('revision_entry.type') }} <span class="text-error">*</span></span>
           </label>
           <select
             v-model="form.type"
@@ -353,7 +351,7 @@ const handleFormSubmit = () => {
         <!-- 发行日期 -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text font-medium">发行日期</span>
+            <span class="label-text font-medium">{{ $t('revision_entry.release_date') }}</span>
           </label>
           <input
             v-model="form.release_date"
@@ -365,7 +363,7 @@ const handleFormSubmit = () => {
         <!-- 封面图 URL -->
         <div class="form-control">
           <label class="label">
-            <span class="label-text font-medium">封面图 URL <span class="text-error">*</span></span>
+            <span class="label-text font-medium">{{ $t('revision_entry.cover_url') }} <span class="text-error">*</span></span>
           </label>
           <input
             v-model="form.image_url"
@@ -378,13 +376,13 @@ const handleFormSubmit = () => {
             <span class="label-text-alt text-error">{{ errors.image_url }}</span>
           </label>
           <label v-else class="label">
-            <span class="label-text-alt text-gray-500">建议使用 2:3 竖向封面图</span>
+            <span class="label-text-alt text-gray-500">{{ $t('revision_entry.cover_hint') }}</span>
           </label>
           <!-- 封面预览 -->
           <div v-if="form.image_url" class="mt-2">
             <img
               :src="form.image_url"
-              alt="封面预览"
+              :alt="$t('revision_entry.cover_preview')"
               class="w-32 h-48 object-cover rounded-lg border border-gray-200"
               @error="($event.target as HTMLImageElement).style.display = 'none'"
             />
@@ -394,10 +392,10 @@ const handleFormSubmit = () => {
 
       <!-- Meta Tab -->
       <div v-show="currentTab === 'meta'" class="space-y-6">
-        <h2 class="text-xl font-bold text-gray-900">Meta</h2>
+        <h2 class="text-xl font-bold text-gray-900">{{ $t('revision_entry.meta') }}</h2>
 
         <p class="text-sm text-gray-500">
-          以 JSON 格式编辑条目的元数据，可包含 description、banner_url、bangumi_id 等字段。
+          {{ $t('revision_entry.meta_desc') }}
         </p>
 
         <div class="form-control">
@@ -407,7 +405,7 @@ const handleFormSubmit = () => {
             spellcheck="false"
             class="textarea textarea-bordered w-full font-mono text-sm bg-gray-50"
             placeholder='{
-  "description": "条目简介...",
+  "description": "...",
   "banner_url": "https://example.com/banner.jpg",
   "bangumi_id": 123456
 }'
@@ -417,7 +415,7 @@ const handleFormSubmit = () => {
             <span class="label-text-alt text-error">{{ metaJsonError }}</span>
           </label>
           <label v-else class="label">
-            <span class="label-text-alt text-gray-500">输入有效的 JSON 对象</span>
+            <span class="label-text-alt text-gray-500">{{ $t('revision_entry.meta_hint') }}</span>
           </label>
         </div>
       </div>
@@ -426,33 +424,33 @@ const handleFormSubmit = () => {
       <div class="flex flex-wrap items-center gap-3 pt-6 border-t border-gray-100">
         <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
           <Save class="w-4 h-4" />
-          {{ isSubmitting ? '处理中...' : (isEditMode ? '提交修改' : '预览') }}
+          {{ isSubmitting ? $t('revision_entry.processing') : (isEditMode ? $t('revision_entry.submit_changes') : $t('revision_entry.preview')) }}
         </button>
-        <span class="text-sm text-gray-500">提交后由管理员审核，审核通过后公开展示。</span>
+        <span class="text-sm text-gray-500">{{ $t('revision_entry.review_notice') }}</span>
       </div>
 
       <!-- 创建模式：预览 -->
       <div v-if="!isEditMode && showPreview" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-3 mt-6">
-        <h3 class="font-semibold text-gray-900">预览提交数据</h3>
+        <h3 class="font-semibold text-gray-900">{{ $t('revision_entry.preview_data') }}</h3>
         <div class="rounded-lg border border-blue-100 bg-white p-3 text-xs text-gray-700 font-mono whitespace-pre-wrap max-h-96 overflow-y-auto">
           {{ previewJson }}
         </div>
         <div class="flex items-center gap-2">
           <button type="button" class="btn btn-primary btn-sm" :disabled="isSubmitting" @click="submitForm">
-            {{ isSubmitting ? '提交中...' : '确认提交' }}
+            {{ isSubmitting ? $t('revision_entry.submitting') : $t('revision_entry.confirm_submit') }}
           </button>
           <button type="button" class="btn btn-ghost btn-sm" @click="showPreview = false">
-            返回编辑
+            {{ $t('revision_entry.back_edit') }}
           </button>
         </div>
       </div>
 
       <!-- 编辑模式：比对视图 -->
       <div v-if="isEditMode && showComparison" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-4 mt-6">
-        <h3 class="font-semibold text-gray-900">修改对比</h3>
+        <h3 class="font-semibold text-gray-900">{{ $t('revision_entry.compare') }}</h3>
 
         <div v-if="!hasChanges" class="text-sm text-gray-500">
-          没有检测到修改。
+          {{ $t('revision_entry.no_changes') }}
         </div>
 
         <div v-else class="rounded-lg border border-blue-100 bg-white p-3 text-xs font-mono overflow-x-auto max-h-96 overflow-y-auto">
@@ -472,31 +470,30 @@ const handleFormSubmit = () => {
 
         <div v-if="!confirmSubmit" class="flex items-center gap-2">
           <button type="button" class="btn btn-primary btn-sm" :disabled="!hasChanges" @click="proceedToConfirm">
-            确认修改
+            {{ $t('revision_entry.confirm_changes') }}
           </button>
           <button type="button" class="btn btn-ghost btn-sm" @click="closeComparison">
-            返回编辑
+            {{ $t('revision_entry.back_edit') }}
           </button>
         </div>
 
         <!-- 最终确认提交 -->
         <div v-else class="border-t border-blue-200 pt-4 space-y-3">
-          <p class="text-sm text-gray-700">确认要提交以上修改吗？</p>
+          <p class="text-sm text-gray-700">{{ $t('revision_entry.confirm_question') }}</p>
           <div class="flex items-center gap-2">
             <button type="button" class="btn btn-primary btn-sm" :disabled="isSubmitting" @click="submitForm">
-              {{ isSubmitting ? '提交中...' : '确认提交' }}
+              {{ isSubmitting ? $t('revision_entry.submitting') : $t('revision_entry.confirm_submit') }}
             </button>
             <button type="button" class="btn btn-ghost btn-sm" @click="confirmSubmit = false">
-              取消
+              {{ $t('common.cancel') }}
             </button>
           </div>
         </div>
       </div>
 
       <!-- 提交结果消息 -->
-      <div v-if="submitMessage" :class="submitMessage.includes('失败') ? 'alert alert-error' : 'alert alert-success'" class="mt-4">
-        <Check v-if="!submitMessage.includes('失败')" class="w-5 h-5" />
-        <X v-else class="w-5 h-5" />
+      <div v-if="submitMessage" class="alert alert-error mt-4">
+          <X class="w-5 h-5" />
         <span>{{ submitMessage }}</span>
       </div>
     </form>
