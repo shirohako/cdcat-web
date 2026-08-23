@@ -155,7 +155,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { Disc3, Film } from '@lucide/vue'
 
 type EntryItem = {

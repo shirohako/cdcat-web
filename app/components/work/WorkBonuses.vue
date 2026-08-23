@@ -109,7 +109,6 @@
 
 <script setup lang="ts">
 import type { WorkBonusWithProduct, WorkProduct } from '~/types/work'
-import type { Component } from 'vue'
 import {
   Gift, Disc3, Music, Image as ImageIcon, Ticket, Download,
   Package, BookOpen, Key, PenLine,
