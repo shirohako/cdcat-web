@@ -6,4 +6,4 @@ minimumReleaseAgeExclude:
   - '@lucide/vue@1.33.0'
   - daisyui@5.7.19
   - '@psray/editor@0.2.1'
-  - '@psray/markdown-editor@0.1.0 || 0.2.0'
+  - '@psray/markdown-editor@0.1.0 || 0.2.0 || 0.2.1'

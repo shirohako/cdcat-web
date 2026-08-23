@@ -15,7 +15,7 @@
     "@nuxt/icon": "^2.5.0",
     "@nuxt/image": "^2.1.0",
     "@nuxtjs/i18n": "^10.6.0",
-    "@psray/markdown-editor": "^0.2.0",
+    "@psray/markdown-editor": "^0.2.1",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
     "countries-list": "^3.4.1",
