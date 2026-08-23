@@ -1,8 +1,10 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
-@import "./tags/btn.css";
-@import "./tags/message.css";
+
+/* Tailwind v4 skips node_modules, so the Markdown editor's own utility
+   classes have to be pointed at explicitly. */
+@source "../../../node_modules/@psray/markdown-editor/dist";
 
 /* 字体定义 - 多语言优化 */
 @layer base {

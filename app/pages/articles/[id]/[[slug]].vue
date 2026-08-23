@@ -27,7 +27,7 @@
           <div class="flex-1 min-w-0">
             <ArticleContent
               ref="contentRef"
-              :rendered-content="renderedContent"
+              :content="article.content"
               :published-at="article.published_at"
             />
           </div>
@@ -43,10 +43,6 @@
 </template>
 
 <script setup>
-import MarkdownIt from "markdown-it";
-import anchor from "markdown-it-anchor";
-import hexoTagPlugin from "~/utils/markdownTagPlugin.js";
-
 const route = useRoute();
 const articleId = route.params.id;
 
@@ -57,42 +53,10 @@ useHead(() => ({
   title: article.value ? `${article.value.title} | CDCAT` : 'Article | CDCAT',
 }));
 
-// ── Markdown ──
-const md = new MarkdownIt({ html: false, breaks: true, linkify: true })
-  .use(anchor, {
-    slugify: (s) => s.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, ''),
-  })
-  .use(hexoTagPlugin);
-
-const DOMPurify = import.meta.client ? (await import('dompurify')).default : null;
-
-const renderedContent = computed(() => {
-  const text = article.value?.content;
-  if (!text) return "";
-  const rendered = md.render(text);
-  if (DOMPurify) {
-    return DOMPurify.sanitize(rendered, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'img', 'div', 'span', 'i'],
-      ALLOWED_ATTR: ['href', 'target', 'rel', 'id', 'class', 'src', 'alt'],
-    });
-  }
-  return rendered;
-});
-
 // ── TOC ──
-const tocItems = computed(() => {
-  const text = article.value?.content;
-  if (!text) return [];
-  return md.parse(text, {}).reduce((acc, token, i, tokens) => {
-    if (token.type !== 'heading_open') return acc;
-    const level = parseInt(token.tag.slice(1));
-    const text = tokens[i + 1]?.children?.map(t => t.content).join('') ?? '';
-    if (!text) return acc;
-    const id = text.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\u4e00-\u9fa5-]/g, '');
-    acc.push({ id, text, level });
-    return acc;
-  }, []);
-});
+// Comes from the same renderer that draws the article, so every entry's id is
+// guaranteed to match an anchor that actually exists in the rendered HTML.
+const tocItems = computed(() => markdownHeadings(article.value?.content ?? ''));
 
 // ── 统计 ──
 const wordCount = computed(() => (article.value?.content ?? '').replace(/\s+/g, '').length);

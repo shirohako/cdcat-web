@@ -9,45 +9,19 @@
     </div>
 
     <!-- Content -->
-    <div
-      class="px-6 py-5 prose prose-sm max-w-none text-gray-700"
-      v-html="renderedMarkdown"
-    />
+    <div class="px-6 py-5 text-gray-700">
+      <RichContent :content="description" format="markdown" />
+    </div>
   </section>
 </template>
 
 <script setup>
 import { FileText } from "@lucide/vue";
-import MarkdownIt from "markdown-it";
 
-const props = defineProps({
+defineProps({
   description: {
     type: String,
     default: "",
   },
-});
-
-const md = new MarkdownIt({
-  html: false,
-  breaks: true,
-  linkify: true,
-});
-
-const DOMPurify = import.meta.client ? (await import('dompurify')).default : null;
-
-const renderedMarkdown = computed(() => {
-  const text = props.description;
-  if (!text) return "";
-
-  const rendered = md.render(text);
-
-  if (DOMPurify) {
-    return DOMPurify.sanitize(rendered, {
-      ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-      ALLOWED_ATTR: ['href', 'target', 'rel']
-    });
-  }
-
-  return rendered;
 });
 </script>

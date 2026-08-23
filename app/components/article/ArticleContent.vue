@@ -1,21 +1,9 @@
 <template>
   <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
     <div class="px-6 md:px-10 py-8">
-      <article
-        ref="articleEl"
-        class="butterfly-post prose max-w-none
-               prose-headings:font-bold prose-headings:text-gray-900
-               prose-h1:text-2xl prose-h2:text-xl
-               prose-p:text-gray-600 prose-p:leading-[1.9]
-               prose-a:text-violet-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-               prose-strong:text-gray-800
-               prose-blockquote:not-italic prose-blockquote:text-gray-500
-               prose-code:text-violet-600 prose-code:bg-violet-50 prose-code:rounded prose-code:px-1.5 prose-code:py-0.5 prose-code:text-[0.85em] prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
-               prose-pre:bg-gray-900 prose-pre:rounded-xl prose-pre:shadow-md
-               prose-li:text-gray-600 prose-li:marker:text-violet-400
-               prose-hr:border-gray-100 prose-img:rounded-xl prose-img:shadow-md"
-        v-html="renderedContent"
-      />
+      <article ref="articleEl" class="butterfly-post">
+        <RichContent :content="content" format="markdown" />
+      </article>
     </div>
 
     <div class="border-t border-gray-100 px-6 md:px-10 py-5 flex items-center justify-between text-sm text-gray-400">
@@ -35,7 +23,7 @@
 import { ArrowLeft } from "@lucide/vue";
 
 const props = defineProps({
-  renderedContent: { type: String, default: "" },
+  content: { type: String, default: "" },
   publishedAt: { type: String, default: "" },
 });
 const { formatDate } = useLocaleFormatting();

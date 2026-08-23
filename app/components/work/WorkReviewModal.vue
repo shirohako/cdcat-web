@@ -80,46 +80,19 @@
 
           <!-- Content -->
           <div>
-            <div class="flex items-center justify-between mb-2">
-              <label class="text-sm font-semibold text-gray-700">
-                {{ $t('review_ui.content') }} <span class="text-red-400">*</span>
-              </label>
-              <div class="flex gap-0.5 bg-gray-100 rounded-lg p-0.5">
-                <button
-                  type="button"
-                  class="px-2.5 py-1 text-xs rounded-md transition-colors flex items-center gap-1"
-                  :class="activeTab === 'write' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                  @click="activeTab = 'write'"
-                >
-                  <Pencil :size="11" />{{ $t('common.edit') }}
-                </button>
-                <button
-                  type="button"
-                  class="px-2.5 py-1 text-xs rounded-md transition-colors flex items-center gap-1"
-                  :class="activeTab === 'preview' ? 'bg-white text-gray-800 font-medium shadow-sm' : 'text-gray-500 hover:text-gray-700'"
-                  @click="activeTab = 'preview'"
-                >
-                  <Eye :size="11" />{{ $t('article_ui.preview') }}
-                </button>
-              </div>
-            </div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">
+              {{ $t('review_ui.content') }} <span class="text-red-400">*</span>
+            </label>
 
-            <textarea
-              v-show="activeTab === 'write'"
+            <MarkdownEditor
               v-model="form.content"
-              class="w-full h-44 resize-none text-sm border border-gray-200 rounded-xl px-4 py-3 font-mono bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:bg-white transition-colors placeholder:text-gray-300"
+              :disabled="isSubmitting"
               :placeholder="$t('review_ui.placeholder')"
-              maxlength="5000"
-            />
-            <div
-              v-show="activeTab === 'preview'"
-              class="border border-gray-200 rounded-xl px-4 py-3 min-h-44 max-h-64 overflow-y-auto prose prose-sm max-w-none bg-gray-50"
-              v-html="renderedMarkdown"
             />
             <div class="flex items-center justify-between mt-1.5">
               <span class="text-xs text-gray-400">{{ $t('review_ui.markdown') }}</span>
-              <span class="text-xs" :class="form.content.length > 4500 ? 'text-orange-400' : 'text-gray-400'">
-                {{ form.content.length }} / 5000
+              <span class="text-xs" :class="form.content.length > MAX_CONTENT ? 'text-red-500' : form.content.length > 4500 ? 'text-orange-400' : 'text-gray-400'">
+                {{ form.content.length }} / {{ MAX_CONTENT }}
               </span>
             </div>
           </div>
@@ -153,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { Star, X, Pencil, Eye, Loader2, Globe, MessageSquare } from '@lucide/vue'
+import { Star, X, Loader2, Globe, MessageSquare } from '@lucide/vue'
 
 const LANGUAGE_CODES = ['zh-Hans', 'zh-Hant', 'ja', 'en', 'ko', 'fr', 'de', 'es', 'pt', 'ru'] as const
 
@@ -170,7 +143,6 @@ const emit = defineEmits<{
 }>()
 
 const { $api } = useNuxtApp()
-const { t } = useI18n()
 const { languageName } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 const LANGUAGES = computed(() => LANGUAGE_CODES.map(code => ({ code, label: languageName(code) })))
@@ -182,36 +154,13 @@ const form = reactive({
 })
 
 const hoverScore = ref<number | null>(null)
-const activeTab = ref<'write' | 'preview'>('write')
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 
-const canSubmit = computed(() => form.content.trim().length > 0)
+const MAX_CONTENT = 5000
 
-const renderedMarkdown = computed(() => {
-  if (!form.content.trim()) return `<p class="text-gray-300">${t('work.empty.content')}</p>`
-  return renderSimpleMarkdown(form.content)
-})
-
-function renderSimpleMarkdown(text: string): string {
-  let html = text
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>')
-  html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>')
-  html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>')
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
-  html = html.replace(/`(.+?)`/g, '<code>$1</code>')
-  html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>')
-  html = html.split(/\n\n+/).map(p => {
-    p = p.trim()
-    if (!p) return ''
-    if (/^<(h[1-3]|blockquote)>/.test(p)) return p
-    return `<p>${p.replace(/\n/g, '<br>')}</p>`
-  }).filter(Boolean).join('')
-  return html
-}
+const canSubmit = computed(() =>
+  form.content.trim().length > 0 && form.content.length <= MAX_CONTENT)
 
 function toggleScore(value: number) {
   form.score = form.score === value ? null : value
@@ -246,7 +195,6 @@ async function handleSubmit() {
     form.content = ''
     form.score = null
     form.language = 'zh-Hans'
-    activeTab.value = 'write'
     emit('saved')
     close()
   } catch (e: any) {

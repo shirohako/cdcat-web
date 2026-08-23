@@ -1,7 +1,0 @@
-/* {% btn %} tag */
-
-/* Override prose hover underline on btn-tag links */
-.butterfly-post a.btn-tag,
-.butterfly-post a.btn-tag:hover {
-  text-decoration: none !important;
-}

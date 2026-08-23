@@ -18,7 +18,15 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxtjs/i18n',
+    '@psray/markdown-editor',
   ],
+
+  markdownEditor: {
+    // Every locale below is one the package ships, so no localeMap is needed.
+    defaultLocale: 'en',
+    // The syntax guide lives on psray.net; this site does not host its own.
+    guideUrl: 'https://psray.net/docs/markdown',
+  },
 
   icon: {
     customCollections: [
@@ -90,9 +98,6 @@ export default defineNuxtConfig({
       include: [
         'countries-list',
         '@lucide/vue',
-        'markdown-it-anchor',
-        'markdown-it',
-        'dompurify',
       ],
     },
   },

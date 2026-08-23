@@ -11,30 +11,13 @@
       @save="save"
     />
 
-    <!-- 移动端 Tab -->
-    <div class="md:hidden shrink-0 flex border-b border-gray-200 bg-white">
-      <button
-        class="flex-1 py-2 text-sm font-medium transition-colors"
-        :class="mobileTab === 'write' ? 'text-violet-600 border-b-2 border-violet-600' : 'text-gray-500'"
-        @click="mobileTab = 'write'"
-      >编写</button>
-      <button
-        class="flex-1 py-2 text-sm font-medium transition-colors"
-        :class="mobileTab === 'preview' ? 'text-violet-600 border-b-2 border-violet-600' : 'text-gray-500'"
-        @click="mobileTab = 'preview'"
-      >预览</button>
-    </div>
-
     <div class="flex-1 flex min-h-0 p-4 gap-4">
-      <ArticleEditorPane
-        v-model="form.content"
-        :class="mobileTab === 'preview' ? 'hidden md:flex md:flex-1' : 'flex flex-1'"
-      />
-      <ArticleEditorPreview
-        :title="form.title"
-        :content="form.content"
-        :class="mobileTab === 'write' ? 'hidden md:flex md:flex-1' : 'flex flex-1'"
-      />
+      <div class="min-w-0 flex-1 overflow-y-auto">
+        <MarkdownEditor
+          v-model="form.content"
+          :placeholder="$t('article_ui.start_writing')"
+        />
+      </div>
       <ArticleEditorSettings
         v-model:open="settingsOpen"
         v-model="settings"
@@ -71,7 +54,6 @@ const settings = ref({
 })
 
 const settingsOpen = ref(false)
-const mobileTab    = ref('write')
 const saving     = ref(false)
 const saveStatus = ref(null)
 
