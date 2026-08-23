@@ -8,7 +8,7 @@
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
     </div>
 
-    <div class="relative container mx-auto px-4 md:px-6 py-10 max-w-6xl">
+    <div class="relative container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- Header -->
       <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div class="flex items-center gap-4">

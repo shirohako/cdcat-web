@@ -23,7 +23,7 @@
         <ProfileHero :profile="profile" />
 
         <!-- Two-column content -->
-        <div class="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
+        <div class="container mx-auto px-4 md:px-6 py-8 max-w-6xl 2xl:max-w-7xl">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left column -->
             <div class="lg:col-span-2 space-y-6">

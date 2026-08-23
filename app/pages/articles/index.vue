@@ -7,32 +7,30 @@
       <div class="absolute bottom-0 left-1/2 h-64 w-64 rounded-full bg-linear-to-br from-pink-200/25 to-rose-200/10 blur-3xl" />
     </div>
 
-    <div class="relative container mx-auto px-4 md:px-8 py-10 max-w-5xl">
-      <!-- 页面标题 -->
-      <div class="mb-10">
-        <div class="flex items-center justify-between gap-4 mb-3">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-violet-500 to-indigo-500 flex items-center justify-center shadow-sm shrink-0">
-              <BookOpen :size="18" class="text-white" />
-            </div>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $t('content_display.articles') }}</h1>
-          </div>
+    <div class="relative container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
+      <CollectionPageCard>
+        <template #header>
+      <CollectionPageHeader
+        :title="$t('content_display.articles')"
+        :description="$t('content_display.articles_desc')"
+        icon="lucide:newspaper"
+        tone="indigo"
+      >
+        <template #action>
           <NuxtLink
             v-if="isAuthenticated"
             to="/articles/create"
-            class="btn btn-sm btn-primary shrink-0"
+            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
           >
             <PenLine :size="14" />
             <span class="hidden sm:inline">{{ $t('content_display.new_article') }}</span>
           </NuxtLink>
-        </div>
-        <p class="text-gray-500 text-sm ml-11.5">{{ $t('content_display.articles_desc') }}</p>
-      </div>
+        </template>
+      </CollectionPageHeader>
+        </template>
 
       <!-- 加载状态 -->
-      <div v-if="pending" class="flex items-center justify-center min-h-60">
-        <span class="loading loading-spinner loading-lg text-violet-400"></span>
-      </div>
+      <CollectionLoadingSkeleton v-if="pending" variant="wide" />
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="flex items-center justify-center min-h-60">
@@ -44,17 +42,9 @@
         </div>
       </div>
 
-      <div v-else>
-        <!-- 统计信息 -->
-        <div class="mb-5 flex items-center gap-2">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-xs font-medium ring-1 ring-violet-100">
-            <FileText :size="12" />
-            {{ $t('content_display.article_count', { count: pagination.total }) }}
-          </span>
-        </div>
-
+      <div v-else class="collection-content-enter">
         <!-- 文章列表 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <NuxtLink
             v-for="article in articles"
             :key="article.id"
@@ -108,7 +98,7 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-if="articles.length === 0" class="text-center py-20">
+        <div v-if="articles.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
           <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
             <FileText :size="28" class="text-gray-300" />
           </div>
@@ -142,12 +132,13 @@
           </div>
         </div>
       </div>
+      </CollectionPageCard>
     </div>
   </div>
 </template>
 
 <script setup>
-import { FileText, Calendar, UserRound, BookOpen, Image as ImageIcon, PenLine } from "@lucide/vue";
+import { FileText, Calendar, UserRound, Image as ImageIcon, PenLine } from "@lucide/vue";
 
 const { isAuthenticated } = useAuth();
 
@@ -162,8 +153,9 @@ const currentPage = computed(() => {
   return page > 0 ? page : 1;
 });
 
-const { data: response, pending, error } = await useAPI("/v1/articles", {
-  query: { page: currentPage.value },
+const { data: response, pending, error } = useAPI("/v1/articles", {
+  lazy: true,
+  query: computed(() => ({ page: currentPage.value })),
 });
 
 const articles = computed(() => response.value?.articles ?? []);

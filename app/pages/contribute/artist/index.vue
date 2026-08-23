@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-4xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <!-- 页面标题 -->
       <div class="mb-8">
         <h1 class="text-4xl font-bold mb-2">Contribute New Artist</h1>

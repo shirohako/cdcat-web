@@ -19,7 +19,7 @@
 
       <!-- Content -->
       <div
-        class="relative container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-7xl"
+        class="relative container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-6xl 2xl:max-w-7xl"
       >
         <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
           <!-- Artist Avatar -->
@@ -104,7 +104,7 @@
     <div
       class="sticky top-16 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm"
     >
-      <div class="container mx-auto px-4 md:px-8 max-w-7xl">
+      <div class="container mx-auto px-4 md:px-8 max-w-6xl 2xl:max-w-7xl">
         <div class="flex gap-8 overflow-x-auto no-scrollbar">
           <button
             class="py-4 px-2 text-sm font-medium transition-all border-b-2 whitespace-nowrap border-purple-500 text-purple-600"
@@ -116,7 +116,7 @@
     </div>
 
     <!-- Albums Grid Section -->
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-7xl">
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
       <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-white p-6 md:p-8">
         <!-- Section Header -->
         <div class="flex items-center gap-3 mb-8">

@@ -11,7 +11,8 @@ const currentPage = computed(() => {
 })
 
 // 从 API 获取系列列表
-const { data: seriesResponse, pending, error } = await useAPI('/v1/franchises', {
+const { data: seriesResponse, pending, error } = useAPI('/v1/franchises', {
+  lazy: true,
   query: {
     page: currentPage.value,
   },
@@ -86,25 +87,29 @@ const goToPage = (page: number) => {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
-    <!-- 页面标题 -->
-    <div class="mb-6 flex items-center justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('content_display.series') }}</h1>
-        <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('content_display.series_desc') }}</p>
-      </div>
-      <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/series')">
-        <template #icon>
-          <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
-        </template>
-        New
-      </CommonButtonButton02>
-    </div>
+  <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
+    <CollectionPageCard>
+      <template #header>
+    <CollectionPageHeader
+      :title="$t('content_display.series')"
+      :description="$t('content_display.series_desc')"
+      icon="lucide:boxes"
+      tone="emerald"
+    >
+      <template #action>
+        <button
+          class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+          @click="navigateTo('/contribute/series')"
+        >
+          <Plus class="h-3.5 w-3.5" />
+          <span class="hidden sm:inline">{{ $t('common.new') }}</span>
+        </button>
+      </template>
+    </CollectionPageHeader>
+      </template>
 
     <!-- 加载状态 -->
-    <div v-if="pending" class="flex items-center justify-center min-h-100">
-      <span class="loading loading-spinner loading-lg"></span>
-    </div>
+    <CollectionLoadingSkeleton v-if="pending" variant="wide" />
 
     <!-- 错误状态 -->
     <div v-else-if="error" class="flex items-center justify-center min-h-100">
@@ -116,7 +121,7 @@ const goToPage = (page: number) => {
       </div>
     </div>
 
-    <div v-else>
+    <div v-else class="collection-content-enter">
       <!-- 系列卡片网格 -->
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
         <NuxtLink
@@ -160,7 +165,7 @@ const goToPage = (page: number) => {
       </div>
 
       <!-- 空状态 -->
-      <div v-if="seriesData.length === 0" class="text-center py-12">
+      <div v-if="seriesData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
         <div class="text-gray-400 mb-4">
           <Disc3 :size="64" class="mx-auto" />
         </div>
@@ -205,6 +210,7 @@ const goToPage = (page: number) => {
         </div>
       </div>
     </div>
+    </CollectionPageCard>
   </div>
 </template>
 

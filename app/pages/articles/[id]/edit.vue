@@ -11,7 +11,7 @@
       @save="save"
     />
 
-    <div class="flex-1 flex min-h-0 p-4 gap-4">
+    <div class="mx-auto flex min-h-0 w-full max-w-6xl flex-1 gap-4 p-4 2xl:max-w-7xl">
       <div class="min-w-0 flex-1 overflow-y-auto">
         <MarkdownEditor
           v-model="form.content"

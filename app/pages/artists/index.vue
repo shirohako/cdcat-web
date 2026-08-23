@@ -1,24 +1,32 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl">
-      <!-- 页面标题 -->
-      <div class="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('artists.title') }}</h1>
-          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('artists.subtitle') }}</p>
-        </div>
-        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/artist')">
-          <template #icon>
-            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
-          </template>
-          {{ $t('artists.new') }}
-        </CommonButtonButton02>
-      </div>
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
+      <CollectionPageCard>
+        <template #header>
+      <CollectionPageHeader
+        v-model="selectedType"
+        :title="$t('artists.title')"
+        :description="$t('artists.subtitle')"
+        icon="lucide:users-round"
+        tone="violet"
+        :filters="artistTypes"
+        :filter-label="$t('content_display.type')"
+        @update:model-value="selectType"
+      >
+        <template #action>
+          <button
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+            @click="navigateTo('/contribute/artist')"
+          >
+            <Plus class="h-3.5 w-3.5" />
+            <span class="hidden sm:inline">{{ $t('artists.new') }}</span>
+          </button>
+        </template>
+      </CollectionPageHeader>
+        </template>
 
       <!-- 加载状态 -->
-      <div v-if="pending" class="flex items-center justify-center min-h-100">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
+      <CollectionLoadingSkeleton v-if="pending" variant="compact" />
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="flex items-center justify-center min-h-100">
@@ -31,19 +39,9 @@
       </div>
 
       <!-- 艺术家列表 -->
-      <div v-else>
-        <!-- 统计信息 -->
-        <div class="mb-6 flex items-center justify-between">
-          <div class="text-sm text-gray-600">
-            {{ $t('artists.found', { count: pagination.total }) }}
-            <span v-if="pagination.total > 0" class="text-gray-500">
-              {{ $t('artists.page_indicator', { current: pagination.current_page, last: pagination.last_page }) }}
-            </span>
-          </div>
-        </div>
-
+      <div v-else class="collection-content-enter">
         <!-- 艺术家网格 -->
-        <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-9 gap-2.5 md:gap-3">
+        <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-5 md:grid-cols-6 md:gap-3 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-9">
           <NuxtLink
             v-for="artist in artistsData"
             :key="artist.id"
@@ -52,9 +50,9 @@
           >
             <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border border-gray-100">
               <!-- 艺术家头像 -->
-              <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
+              <div class="aspect-4/3 bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
                 <div class="text-gray-300">
-                  <Users :size="32" />
+                  <Users :size="26" />
                 </div>
               </div>
 
@@ -87,7 +85,7 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-if="artistsData.length === 0" class="text-center py-12">
+        <div v-if="artistsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
           <div class="text-gray-400 mb-4">
             <Users :size="64" class="mx-auto" />
           </div>
@@ -135,6 +133,7 @@
           </div>
         </div>
       </div>
+      </CollectionPageCard>
     </div>
   </div>
 </template>
@@ -144,6 +143,16 @@ import { Users, Disc3, Heart, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
+
+const artistTypes = computed(() => [
+  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
+  { value: 'person', label: t('artists.type.person'), icon: 'lucide:user-round' },
+  { value: 'circle', label: t('artists.type.circle'), icon: 'lucide:users-round' },
+  { value: 'other', label: t('artists.type.other'), icon: 'lucide:shapes' },
+]);
+
+const selectedType = ref(route.query.type || 'all');
 
 useSeoMeta({
   title: 'Artists',
@@ -161,12 +170,14 @@ const currentPage = computed(() => {
 });
 
 // 从 API 获取艺术家列表 - 使用 computed query 以响应路由变化
-const { data: artistsResponse, pending, error } = await useAPI("/v1/artists", {
+const { data: artistsResponse, pending, error } = useAPI("/v1/artists", {
+  lazy: true,
   query: computed(() => ({
     page: currentPage.value,
     per_page: 18,
+    type: selectedType.value === 'all' ? undefined : selectedType.value,
   })),
-  watch: [currentPage],
+  watch: [currentPage, selectedType],
 });
 
 // 处理艺术家数据
@@ -197,9 +208,9 @@ const pagination = computed(() => {
 // 格式化艺术家类型
 const formatType = (type) => {
   const typeMap = {
-    person: "Person",
-    circle: "Circle",
-    other: "Other",
+    person: t('artists.type.person'),
+    circle: t('artists.type.circle'),
+    other: t('artists.type.other'),
   };
   return typeMap[type] || type;
 };
@@ -255,5 +266,16 @@ const goToPage = (page) => {
 
   // 滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const selectType = (type) => {
+  selectedType.value = type;
+  router.push({
+    query: {
+      ...route.query,
+      type: type === 'all' ? undefined : type,
+      page: undefined,
+    },
+  });
 };
 </script>

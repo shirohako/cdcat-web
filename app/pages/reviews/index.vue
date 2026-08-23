@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50/80">
-    <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl">
+    <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- Header -->
       <div class="mb-10">
         <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">{{ t('collection_pages.reviews.title') }}</h1>

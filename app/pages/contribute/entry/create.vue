@@ -37,7 +37,7 @@ const isFromBangumi = computed(() => route.query.from === 'bangumi')
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-5xl">
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- 页面头部 -->
       <div class="mb-8">
         <NuxtLink

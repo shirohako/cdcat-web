@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto max-w-6xl px-4 pb-2 pt-8 md:px-6">
+  <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 pb-2 pt-8 md:px-6">
     <header
       class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]"
     >

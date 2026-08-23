@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-base-100 flex items-center justify-center">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-lg">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+    <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-8 md:px-8">
+      <div class="mx-auto max-w-lg bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
         <!-- 成功图标 -->
         <div class="mb-6">
           <div class="w-20 h-20 mx-auto bg-green-100 rounded-full flex items-center justify-center">

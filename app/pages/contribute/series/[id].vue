@@ -36,7 +36,7 @@ useHead({
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl">
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- Header -->
       <div class="mb-8">
         <NuxtLink :to="`/series/${seriesId}`" class="btn btn-ghost btn-sm gap-2 mb-4">

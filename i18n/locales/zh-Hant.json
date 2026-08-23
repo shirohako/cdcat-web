@@ -304,6 +304,7 @@
   },
   "common": {
     "search": "搜尋...",
+    "new": "新增",
     "discover": "發現專輯",
     "view": "查看",
     "previous": "上一頁",
@@ -674,6 +675,7 @@
     "no_articles": "目前沒有文章",
     "series": "系列",
     "series_desc": "瀏覽遊戲、動畫與音樂系列",
+    "entry_desc": "瀏覽動畫、電影、影集、遊戲等條目",
     "entries_count": "{count} 個條目",
     "works_count": "{count} 張專輯",
     "no_series": "目前沒有系列",

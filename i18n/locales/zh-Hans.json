@@ -304,6 +304,7 @@
   },
   "common": {
     "search": "搜索...",
+    "new": "新建",
     "discover": "发现专辑",
     "view": "查看",
     "previous": "上一页",
@@ -674,6 +675,7 @@
     "no_articles": "暂无文章",
     "series": "系列",
     "series_desc": "浏览游戏、动画和音乐系列",
+    "entry_desc": "浏览动画、电影、剧集、游戏等条目",
     "entries_count": "{count} 个条目",
     "works_count": "{count} 张专辑",
     "no_series": "暂无系列",

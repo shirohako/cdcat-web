@@ -304,6 +304,7 @@
   },
   "common": {
     "search": "Search...",
+    "new": "New",
     "discover": "Discover Albums",
     "view": "View",
     "previous": "Previous",
@@ -674,6 +675,7 @@
     "no_articles": "No articles yet",
     "series": "Series",
     "series_desc": "Browse game, anime, and music series",
+    "entry_desc": "Explore anime, films, series, games, and more",
     "entries_count": "{count} entries",
     "works_count": "{count} releases",
     "no_series": "No series yet",

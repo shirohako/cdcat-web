@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50/50">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-5xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
 
       <!-- 返回 -->
       <button

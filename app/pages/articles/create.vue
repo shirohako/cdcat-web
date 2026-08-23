@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex flex-col bg-gray-50 overflow-hidden">
-    <div class="mx-auto flex h-full w-full max-w-5xl flex-col">
+    <div class="mx-auto flex h-full w-full max-w-6xl 2xl:max-w-7xl flex-col">
 
       <ArticleEditorHeader
         v-model:title="form.title"

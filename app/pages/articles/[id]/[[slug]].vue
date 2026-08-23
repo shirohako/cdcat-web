@@ -22,7 +22,7 @@
         :reading-time="readingTime"
       />
 
-      <div class="container mx-auto px-4 md:px-6 py-8 max-w-6xl">
+      <div class="container mx-auto px-4 md:px-6 py-8 max-w-6xl 2xl:max-w-7xl">
         <div class="flex gap-6 items-start">
           <div class="flex-1 min-w-0">
             <ArticleContent

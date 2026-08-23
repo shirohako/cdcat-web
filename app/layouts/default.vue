@@ -22,7 +22,7 @@
         isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-52'
       ]"
     >
-      <div>
+      <div class="w-full">
         <slot />
       </div>
     </main>

@@ -1,24 +1,32 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
-      <!-- 页面标题 -->
-      <div class="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">{{ $t('works.title') }}</h1>
-          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">{{ $t('works.subtitle') }}</p>
-        </div>
-        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/work')">
-          <template #icon>
-            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
-          </template>
-          {{ $t('works.new') }}
-        </CommonButtonButton02>
-      </div>
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
+      <CollectionPageCard>
+        <template #header>
+      <CollectionPageHeader
+        v-model="selectedType"
+        :title="$t('works.title')"
+        :description="$t('works.subtitle')"
+        icon="lucide:disc-3"
+        tone="sky"
+        :filters="workTypes"
+        :filter-label="$t('content_display.type')"
+        @update:model-value="selectType"
+      >
+        <template #action>
+          <button
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+            @click="navigateTo('/contribute/work')"
+          >
+            <Plus class="h-3.5 w-3.5" />
+            <span class="hidden sm:inline">{{ $t('works.new') }}</span>
+          </button>
+        </template>
+      </CollectionPageHeader>
+        </template>
 
       <!-- 加载状态 -->
-      <div v-if="pending" class="flex items-center justify-center min-h-100">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
+      <CollectionLoadingSkeleton v-if="pending" variant="covers" />
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="flex items-center justify-center min-h-100">
@@ -31,17 +39,7 @@
       </div>
 
       <!-- 作品列表 -->
-      <div v-else>
-        <!-- 统计信息 -->
-        <div class="mb-4 flex items-center justify-between">
-          <div class="text-xs text-gray-500 md:text-sm md:text-gray-600">
-            {{ $t('works.found', { count: pagination.total }) }}
-            <span v-if="pagination.total > 0" class="text-gray-400 md:text-gray-500">
-              {{ $t('works.page_indicator', { current: pagination.current_page, last: pagination.last_page }) }}
-            </span>
-          </div>
-        </div>
-
+      <div v-else class="collection-content-enter">
         <!-- 专辑网格 -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6">
           <NuxtLink
@@ -122,7 +120,7 @@
         </div>
 
         <!-- 空状态 -->
-        <div v-if="worksData.length === 0" class="text-center py-12">
+        <div v-if="worksData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
           <div class="text-gray-400 mb-4">
             <Disc3 :size="64" class="mx-auto" />
           </div>
@@ -170,6 +168,7 @@
           </div>
         </div>
       </div>
+      </CollectionPageCard>
     </div>
   </div>
 </template>
@@ -180,6 +179,16 @@ import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "@lucide/vue";
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+
+const workTypes = computed(() => [
+  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
+  { value: 'album', label: t('works.type.album'), icon: 'lucide:disc-3' },
+  { value: 'single', label: t('works.type.single'), icon: 'lucide:music-2' },
+  { value: 'ep', label: t('works.type.ep'), icon: 'lucide:list-music' },
+  { value: 'compilation', label: t('works.type.compilation'), icon: 'lucide:library' },
+]);
+
+const selectedType = ref(route.query.type || 'all');
 
 useSeoMeta({
   title: 'Works',
@@ -197,11 +206,13 @@ const currentPage = computed(() => {
 });
 
 // 从 API 获取作品列表
-const { data: worksResponse, pending, error } = await useAPI("/v1/works", {
-  query: {
-    page: currentPage,
-  },
-  watch: [currentPage],
+const { data: worksResponse, pending, error } = useAPI("/v1/works", {
+  lazy: true,
+  query: computed(() => ({
+    page: currentPage.value,
+    type: selectedType.value === 'all' ? undefined : selectedType.value,
+  })),
+  watch: [currentPage, selectedType],
 });
 
 // 处理作品数据
@@ -311,5 +322,16 @@ const goToPage = (page) => {
 
   // 滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const selectType = (type) => {
+  selectedType.value = type;
+  router.push({
+    query: {
+      ...route.query,
+      type: type === 'all' ? undefined : type,
+      page: undefined,
+    },
+  });
 };
 </script>

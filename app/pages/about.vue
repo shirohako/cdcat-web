@@ -7,7 +7,7 @@
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(15,23,42,0.08)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
     </div>
 
-    <div class="relative container mx-auto max-w-6xl space-y-8 px-4 py-10 md:px-6 md:py-14">
+    <div class="relative container mx-auto max-w-6xl 2xl:max-w-7xl space-y-8 px-4 py-10 md:px-6 md:py-14">
       <section class="rounded-3xl border border-sky-100/80 bg-linear-to-br from-white via-sky-50/70 to-indigo-50/80 p-6 shadow-[0_30px_80px_-45px_rgba(15,23,42,0.5)] ring-1 ring-black/5 backdrop-blur-xl md:p-8">
         <div class="max-w-4xl">
           <p class="inline-flex items-center gap-1 rounded-full border border-sky-200 bg-sky-100/65 px-3 py-1 text-xs font-semibold tracking-wide text-sky-700">

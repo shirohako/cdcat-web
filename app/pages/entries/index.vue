@@ -1,39 +1,32 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
-      <!-- Page Header -->
-      <div class="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">Entries</h1>
-          <p class="mt-0.5 text-xs text-gray-500 md:mt-1 md:text-sm">Explore anime, movies, TV shows and more</p>
-        </div>
-        <CommonButtonButton02 class="shrink-0 text-xs sm:text-sm" @click="navigateTo('/contribute/entry')">
-          <template #icon>
-            <Plus class="w-3 h-3 sm:w-4 sm:h-4" />
-          </template>
-          New
-        </CommonButtonButton02>
-      </div>
-
-      <!-- Filter Tabs -->
-      <div class="mb-6">
-        <div class="tabs tabs-boxed inline-flex">
-          <a
-            v-for="type in entryTypes"
-            :key="type.value"
-            :class="['tab', selectedType === type.value ? 'tab-active' : '']"
-            @click="selectType(type.value)"
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
+      <CollectionPageCard>
+        <template #header>
+      <CollectionPageHeader
+        v-model="selectedType"
+        :title="$t('menu.entry')"
+        :description="$t('content_display.entry_desc')"
+        icon="lucide:panels-top-left"
+        tone="rose"
+        :filters="entryTypes"
+        :filter-label="$t('content_display.type')"
+        @update:model-value="selectType"
+      >
+        <template #action>
+          <button
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+            @click="navigateTo('/contribute/entry')"
           >
-            <Icon :name="type.icon" class="w-4 h-4 mr-2" />
-            {{ type.label }}
-          </a>
-        </div>
-      </div>
+            <Plus class="h-3.5 w-3.5" />
+            <span class="hidden sm:inline">{{ $t('common.new') }}</span>
+          </button>
+        </template>
+      </CollectionPageHeader>
+        </template>
 
       <!-- Loading State -->
-      <div v-if="pending" class="flex items-center justify-center min-h-100">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
+      <CollectionLoadingSkeleton v-if="pending" variant="list" />
 
       <!-- Error State -->
       <div v-else-if="error" class="flex items-center justify-center min-h-100">
@@ -46,17 +39,7 @@
       </div>
 
       <!-- Entries Content -->
-      <div v-else>
-        <!-- Stats -->
-        <div class="mb-6 flex items-center justify-between">
-          <div class="text-sm text-gray-600">
-            Found {{ pagination.total }} entries
-            <span v-if="pagination.total > 0" class="text-gray-500">
-              (Page {{ pagination.current_page }} of {{ pagination.last_page }})
-            </span>
-          </div>
-        </div>
-
+      <div v-else class="collection-content-enter">
         <!-- Entry List -->
         <div class="space-y-4">
           <NuxtLink
@@ -139,7 +122,7 @@
         </div>
 
         <!-- Empty State -->
-        <div v-if="entriesData.length === 0" class="text-center py-12">
+        <div v-if="entriesData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
           <div class="text-gray-400 mb-4">
             <Film :size="64" class="mx-auto" />
           </div>
@@ -187,6 +170,7 @@
           </div>
         </div>
       </div>
+      </CollectionPageCard>
     </div>
   </div>
 </template>
@@ -196,16 +180,17 @@ import { Film, Calendar, Heart, Eye, Music2, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 // Entry types
-const entryTypes = [
-  { value: 'all', label: 'All', icon: 'lucide:grid-3x3' },
-  { value: 'anime', label: 'Anime', icon: 'lucide:sparkles' },
-  { value: 'movie', label: 'Movie', icon: 'lucide:film' },
-  { value: 'tv', label: 'TV Show', icon: 'lucide:tv' },
-  { value: 'game', label: 'Game', icon: 'lucide:gamepad-2' },
-  { value: 'other', label: 'Other', icon: 'lucide:more-horizontal' }
-];
+const entryTypes = computed(() => [
+  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
+  { value: 'anime', label: t('content_display.entry_type.anime'), icon: 'lucide:sparkles' },
+  { value: 'movie', label: t('content_display.entry_type.movie'), icon: 'lucide:film' },
+  { value: 'tv', label: t('content_display.entry_type.tv'), icon: 'lucide:tv' },
+  { value: 'game', label: t('content_display.entry_type.game'), icon: 'lucide:gamepad-2' },
+  { value: 'other', label: t('content_display.entry_type.other'), icon: 'lucide:shapes' }
+]);
 
 // Selected type
 const selectedType = ref(route.query.type || 'all');
@@ -217,7 +202,8 @@ const currentPage = computed(() => {
 });
 
 // Fetch entries from API
-const { data: entriesResponse, pending, error } = await useAPI("/v1/entries", {
+const { data: entriesResponse, pending, error } = useAPI("/v1/entries", {
+  lazy: true,
   query: computed(() => ({
     page: currentPage.value,
     type: selectedType.value === 'all' ? undefined : selectedType.value
@@ -283,11 +269,11 @@ const pagination = computed(() => {
 // Format entry type
 const formatType = (type) => {
   const typeMap = {
-    anime: "Anime",
-    movie: "Movie",
-    tv: "TV Show",
-    game: "Game",
-    other: "Other",
+    anime: t('content_display.entry_type.anime'),
+    movie: t('content_display.entry_type.movie'),
+    tv: t('content_display.entry_type.tv'),
+    game: t('content_display.entry_type.game'),
+    other: t('content_display.entry_type.other'),
   };
   return typeMap[type] || type;
 };

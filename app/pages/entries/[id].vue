@@ -33,7 +33,7 @@
         </div>
 
         <!-- Hero Content -->
-        <div class="container mx-auto px-4 md:px-8 max-w-7xl h-full relative z-10">
+        <div class="container mx-auto px-4 md:px-8 max-w-6xl 2xl:max-w-7xl h-full relative z-10">
           <div class="flex items-end h-full pb-8">
             <div class="flex flex-col md:flex-row gap-6 items-end">
               <!-- Poster -->
@@ -103,7 +103,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
+      <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Left Column - Main Content -->
           <div class="lg:col-span-2 space-y-8">

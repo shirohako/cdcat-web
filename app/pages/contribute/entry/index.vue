@@ -62,7 +62,7 @@ const createFromScratch = () => {
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-4xl">
+    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- 页面标题 -->
       <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-slate-100">
-    <div class="w-full px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8 2xl:max-w-7xl">
       <header class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{{ t('admin_pages.console') }}</p>

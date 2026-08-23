@@ -110,7 +110,7 @@ const entryGroups = computed(() => {
 
       <!-- 系列主要信息 -->
       <div class="absolute bottom-0 left-0 right-0 p-8">
-        <div class="container mx-auto max-w-7xl">
+        <div class="container mx-auto max-w-6xl 2xl:max-w-7xl">
           <div class="flex items-end gap-6">
             <!-- 标题和基本信息 -->
             <div class="flex-1 pb-2">
@@ -134,7 +134,7 @@ const entryGroups = computed(() => {
     </div>
 
     <!-- 内容区域 -->
-    <div class="container mx-auto max-w-7xl px-4 md:px-8 py-8">
+    <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 py-8">
       <div class="space-y-6">
         <SeriesContentTabs v-model="currentTab" :tabs="tabs" />
 

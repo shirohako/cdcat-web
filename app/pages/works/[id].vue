@@ -26,7 +26,7 @@
       />
 
     <!-- Work Details Section -->
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-7xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column - Main Content -->
         <div class="lg:col-span-2 space-y-8">

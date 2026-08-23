@@ -3,7 +3,7 @@
     class="min-h-screen relative overflow-hidden bg-linear-to-br from-amber-50 via-slate-50 to-sky-50 text-slate-900"
   >
     <div
-      class="relative z-10 container mx-auto max-w-6xl px-4 md:px-8 py-16 md:py-24 space-y-16"
+      class="relative z-10 container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 py-16 md:py-24 space-y-16"
     >
       <!-- Hero -->
       <section class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">

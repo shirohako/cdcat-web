@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50/50">
-    <div class="container mx-auto px-4 py-8 max-w-5xl md:px-8">
+    <div class="container mx-auto px-4 py-8 max-w-6xl 2xl:max-w-7xl md:px-8">
 
       <div class="mb-8">
         <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ t('collection_pages.revisions.title') }}</h1>

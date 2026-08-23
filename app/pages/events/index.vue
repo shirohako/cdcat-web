@@ -1,30 +1,21 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl">
-      <!-- Header -->
-      <div class="mb-12 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-        <div>
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">{{ t('collection_pages.events.title') }}</h1>
-          <p class="text-gray-500 text-lg">
-            {{ t('collection_pages.events.description') }}
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center gap-3 text-sm font-medium text-gray-600">
-          <div class="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
-            <Calendar class="text-blue-500" :size="16" />
-            <span>{{ t('collection_pages.events.event_count', { count: totalEvents }) }}</span>
-          </div>
-          <div class="flex items-center gap-2 px-4 py-2.5 bg-white rounded-full border border-gray-200 shadow-sm">
-            <MapPin class="text-rose-500" :size="16" />
-            <span>{{ t('collection_pages.events.series_count', { count: groups.length }) }}</span>
-          </div>
-        </div>
-      </div>
+    <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
+      <CollectionPageCard>
+        <template #header>
+      <CollectionPageHeader
+        v-model="selectedGroup"
+        :title="t('collection_pages.events.title')"
+        :description="t('collection_pages.events.description')"
+        icon="lucide:calendar-days"
+        tone="amber"
+        :filters="groupFilters"
+        :filter-label="t('content_display.series')"
+      />
+        </template>
 
       <!-- Loading -->
-      <div v-if="pending" class="flex items-center justify-center min-h-60">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
+      <CollectionLoadingSkeleton v-if="pending" variant="sections" />
 
       <!-- Error -->
       <div v-else-if="error" class="flex items-center justify-center min-h-60">
@@ -37,9 +28,13 @@
       </div>
 
       <!-- Content -->
-      <div v-else class="space-y-10">
+      <div v-else class="collection-content-enter space-y-10">
+        <div v-if="filteredGroups.length === 0" class="flex min-h-72 items-center justify-center text-sm text-slate-400">
+          {{ t('collection_pages.events.empty') }}
+        </div>
+
         <section
-          v-for="group in groups"
+          v-for="group in filteredGroups"
           :key="group.slug"
           class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 md:p-8 transition-all duration-200"
         >
@@ -115,6 +110,7 @@
           </div>
         </section>
       </div>
+      </CollectionPageCard>
     </div>
   </div>
 </template>
@@ -125,7 +121,9 @@ const { t } = useI18n();
 const { localizedContent, formatDate } = useLocaleFormatting();
 const { localizeError } = useLocalizedApiError();
 
-const { data: groupResponse, pending, error } = await useAPI("/v1/events/series");
+const { data: groupResponse, pending, error } = useAPI("/v1/events/series", {
+  lazy: true,
+});
 
 const groups = computed(() => {
   const raw = groupResponse.value;
@@ -134,8 +132,20 @@ const groups = computed(() => {
   return [];
 });
 
-const totalEvents = computed(() => {
-  return groups.value.reduce((sum, group) => sum + (group.events || []).length, 0);
+const selectedGroup = ref('all');
+
+const groupFilters = computed(() => [
+  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
+  ...groups.value.map(group => ({
+    value: group.slug,
+    label: group.name,
+    icon: 'lucide:calendar-range',
+  })),
+]);
+
+const filteredGroups = computed(() => {
+  if (selectedGroup.value === 'all') return groups.value;
+  return groups.value.filter(group => group.slug === selectedGroup.value);
 });
 
 const DEFAULT_VISIBLE_EVENTS = 20;

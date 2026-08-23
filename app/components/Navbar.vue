@@ -272,6 +272,10 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
+button {
+  cursor: pointer;
+}
+
 .dropdown-enter-active {
   animation: dropdown-in 0.2s ease-out;
 }

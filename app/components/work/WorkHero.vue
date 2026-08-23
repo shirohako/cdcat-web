@@ -8,7 +8,7 @@
     />
 
     <!-- Content Container -->
-    <div class="relative container mx-auto px-4 md:px-12 lg:px-20 xl:px-8 pt-5 pb-7 md:py-10 max-w-7xl">
+    <div class="relative container mx-auto px-4 md:px-12 lg:px-20 xl:px-8 pt-5 pb-7 md:py-10 max-w-6xl 2xl:max-w-7xl">
       <div class="flex flex-col items-center md:flex-row md:items-stretch gap-6 md:gap-10 max-w-5xl mx-auto">
 
         <!-- Album Cover -->

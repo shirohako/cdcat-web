@@ -2,6 +2,27 @@
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
 
+@keyframes collection-content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.collection-content-enter {
+  animation: collection-content-reveal 320ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .collection-content-enter {
+    animation: none;
+  }
+}
+
 /* Tailwind v4 skips node_modules, so the Markdown editor's own utility
    classes have to be pointed at explicitly. */
 @source "../../../node_modules/@psray/markdown-editor/dist";

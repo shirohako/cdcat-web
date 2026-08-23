@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-4xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <!-- 加载状态 -->
       <div v-if="isLoading" class="flex items-center justify-center min-h-96">
         <span class="loading loading-spinner loading-lg"></span>

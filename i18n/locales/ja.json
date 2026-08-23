@@ -304,6 +304,7 @@
   },
   "common": {
     "search": "検索...",
+    "new": "新規作成",
     "discover": "アルバムを発見",
     "view": "表示",
     "previous": "前へ",
@@ -674,6 +675,7 @@
     "no_articles": "記事はまだありません",
     "series": "シリーズ",
     "series_desc": "ゲーム・アニメ・音楽のシリーズを探す",
+    "entry_desc": "アニメ、映画、ドラマ、ゲームなどの作品を探す",
     "entries_count": "{count}作品",
     "works_count": "{count}リリース",
     "no_series": "シリーズはまだありません",
