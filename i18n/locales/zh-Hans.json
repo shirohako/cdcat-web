@@ -101,7 +101,9 @@
       "album": "专辑",
       "single": "单曲",
       "ep": "EP",
-      "compilation": "合辑"
+      "compilation": "合辑",
+      "drama": "广播剧",
+      "radio": "广播节目"
     }
   },
   "artists": {

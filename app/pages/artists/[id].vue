@@ -101,42 +101,12 @@
         </header>
 
         <div class="min-h-80 p-4 sm:p-6">
-          <div v-if="albums.length" class="artist-release-grid grid gap-4 md:gap-5">
-            <NuxtLink
+          <div v-if="albums.length" class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
+            <WorkCard
               v-for="album in albums"
               :key="album.id"
-              :to="`/works/${album.id}`"
-              class="group min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-            >
-              <div class="relative flex aspect-square items-center justify-center overflow-hidden bg-slate-100">
-                <img
-                  v-if="album.image_url"
-                  :src="album.image_url"
-                  :alt="album.title"
-                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                >
-                <Disc3 v-else :size="42" class="text-slate-300" />
-                <span v-if="album.type" class="absolute right-2 top-2 rounded-md bg-slate-950/75 px-2 py-1 text-[10px] font-medium text-white">
-                  {{ formatType(album.type) }}
-                </span>
-              </div>
-
-              <div class="p-3.5">
-                <h3 class="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-sky-700">{{ album.title }}</h3>
-                <p class="mt-1 truncate text-xs text-slate-400">{{ album.catalog_number || '\u00A0' }}</p>
-
-                <div v-if="album.release_date" class="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
-                  <Calendar :size="13" class="text-slate-400" />
-                  {{ formatDate(album.release_date) }}
-                </div>
-
-                <div class="mt-2 flex items-center gap-5 text-xs text-slate-500">
-                  <span class="inline-flex items-center gap-1.5"><Disc :size="13" class="text-slate-400" />{{ album.disc_count }}</span>
-                  <span class="inline-flex items-center gap-1.5"><Music :size="13" class="text-slate-400" />{{ album.track_count }}</span>
-                  <span class="ml-auto inline-flex items-center gap-1.5"><Heart :size="13" class="text-slate-400" />{{ album.likes }}</span>
-                </div>
-              </div>
-            </NuxtLink>
+              :work="album"
+            />
           </div>
 
           <div v-else class="flex min-h-72 flex-col items-center justify-center text-center">
@@ -154,15 +124,11 @@
 
 <script setup>
 import {
-  Calendar,
   CalendarDays,
-  Disc,
   Disc3,
   Edit,
-  Heart,
   Library,
   MapPin,
-  Music,
   Share2,
   UserCheck,
   UserPlus,
@@ -183,7 +149,6 @@ const pageCssVariables = computed(() => ({
   '--artist-banner-desktop-height': `${artistPageConfig.banner.desktopHeight}px`,
   '--artist-avatar-mobile-size': `${artistPageConfig.avatar.mobileSize}px`,
   '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
-  '--artist-release-min-width': `${artistPageConfig.releases.minimumCardWidth}px`,
 }))
 
 const artistData = computed(() => ({
@@ -252,21 +217,10 @@ const albums = computed(() => (artist.value?.works || []).map(work => ({
   release_date: work.release_date,
   disc_count: work.disc_count || 0,
   track_count: work.track_count || 0,
-  likes: work.favorites_count || 0,
+  views_count: work.views_count || 0,
+  likes_count: work.likes_count || work.favorites_count || 0,
+  is_favorited: work.is_favorited || false,
 })))
-
-const formatType = type => ({
-  album: t('works.type.album'),
-  single: t('works.type.single'),
-  ep: t('works.type.ep'),
-  compilation: t('works.type.compilation'),
-})[type] || type
-
-const formatDate = (dateString) => {
-  if (!dateString) return ''
-  const date = new Date(dateString)
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
 </script>
 
 <style scoped>
@@ -277,10 +231,6 @@ const formatDate = (dateString) => {
 .artist-avatar {
   width: var(--artist-avatar-mobile-size);
   height: var(--artist-avatar-mobile-size);
-}
-
-.artist-release-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--artist-release-min-width)), 1fr));
 }
 
 @media (min-width: 768px) {

@@ -42,81 +42,11 @@
       <div v-else class="collection-content-enter">
         <!-- 专辑网格 -->
         <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
-          <NuxtLink
+          <WorkCard
             v-for="work in worksData"
             :key="work.id"
-            :to="`/works/${work.id}`"
-            class="group"
-          >
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
-              <!-- 专辑封面 -->
-              <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
-                <img
-                  v-if="work.image_url"
-                  :src="work.image_url"
-                  :alt="work.title"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  style="image-rendering: -webkit-optimize-contrast;"
-                >
-                <div v-else class="text-gray-300">
-                  <Disc3 :size="64" />
-                </div>
-                <!-- 渐变遮罩，增强对比度 -->
-                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                <!-- 类型标签 -->
-                <div v-if="work.type" class="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
-                  {{ formatType(work.type) }}
-                </div>
-              </div>
-
-              <!-- 专辑信息 -->
-              <div class="p-4 bg-white">
-                <!-- 标题 -->
-                <h3 class="mb-2 truncate text-sm font-bold transition-colors group-hover:text-blue-600">
-                  {{ work.title }}
-                </h3>
-
-                <!-- 目录编号 -->
-                <div class="text-xs text-gray-500 mb-3 truncate">
-                  {{ work.catalog_number || '\u00A0' }}
-                </div>
-
-                <!-- 详细信息 -->
-                <div class="space-y-2">
-                  <!-- 发行日期 -->
-                  <div v-if="work.release_date" class="flex items-center gap-1.5 text-xs text-gray-600">
-                    <Calendar :size="14" class="text-gray-400" />
-                    <span>{{ formatDate(work.release_date) }}</span>
-                  </div>
-
-                  <!-- 碟片/曲目数量 -->
-                  <div class="flex items-center gap-5 text-xs text-gray-600">
-                    <div class="flex items-center gap-1.5">
-                      <Disc :size="14" class="text-gray-400" />
-                      <span>{{ work.disc_count || 0 }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <Music :size="14" class="text-gray-400" />
-                      <span>{{ work.track_count || 0 }}</span>
-                    </div>
-                  </div>
-
-                  <!-- 浏览量和收藏数 -->
-                  <div class="flex items-center justify-between text-xs text-gray-600 pt-1 border-t border-gray-100">
-                    <div class="flex items-center gap-1.5">
-                      <Eye :size="14" class="text-gray-400" />
-                      <span>{{ work.views_count || 0 }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <Heart :size="14" :fill="work.is_favorited ? 'currentColor' : 'none'" :class="work.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
-                      <span>{{ work.likes_count || 0 }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </NuxtLink>
+            :work="work"
+          />
         </div>
 
         <!-- 空状态 -->
@@ -174,7 +104,7 @@
 </template>
 
 <script setup>
-import { Disc3, Disc, Music, Calendar, Heart, Eye, Plus } from "@lucide/vue";
+import { Disc3, Plus } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -186,6 +116,8 @@ const workTypes = computed(() => [
   { value: 'single', label: t('works.type.single'), icon: 'lucide:music-2' },
   { value: 'ep', label: t('works.type.ep'), icon: 'lucide:list-music' },
   { value: 'compilation', label: t('works.type.compilation'), icon: 'lucide:library' },
+  { value: 'drama', label: t('works.type.drama'), icon: 'lucide:audio-lines' },
+  { value: 'radio', label: t('works.type.radio'), icon: 'lucide:radio' },
 ]);
 
 const selectedType = ref(route.query.type || 'all');
@@ -239,29 +171,6 @@ const pagination = computed(() => {
 
   return worksResponse.value.pagination;
 });
-
-// 格式化作品类型
-const formatType = (type) => {
-  const typeMap = {
-    album: t('works.type.album'),
-    single: t('works.type.single'),
-    ep: t('works.type.ep'),
-    compilation: t('works.type.compilation'),
-  };
-  return typeMap[type] || type;
-};
-
-// 格式化日期
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-};
 
 // 计算可见的页码
 const visiblePages = computed(() => {

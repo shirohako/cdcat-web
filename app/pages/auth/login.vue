@@ -8,31 +8,6 @@
       <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-[radial-gradient(circle,rgba(16,185,129,0.15),transparent_70%)] [animation-delay:4s]"></div>
     </div>
 
-    <!-- Beta Notice -->
-    <div class="relative z-10 w-full max-w-md animate-[fade-in_0.5s_ease_both]">
-      <div class="rounded-2xl border border-amber-200 bg-linear-to-br from-amber-50 to-orange-50/60 px-4 py-3.5 shadow-[0_8px_24px_-10px_rgba(245,158,11,0.2)] backdrop-blur-sm">
-        <div class="flex items-center gap-2 mb-2.5">
-          <div class="w-6 h-6 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-            <TriangleAlert :size="13" class="text-amber-500" />
-          </div>
-          <span class="text-xs font-bold text-amber-900 tracking-wide">{{ $t('auth.login.beta.title') }}</span>
-          <span class="text-[10px] font-medium text-amber-400 bg-amber-100 px-1.5 py-0.5 rounded-full">Beta</span>
-        </div>
-        <div class="pl-8 space-y-1.5">
-          <p class="text-xs text-amber-700/70">{{ $t('auth.login.beta.warning') }}</p>
-          <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
-            <span class="text-amber-400 mt-px">–</span>
-            {{ $t('auth.login.beta.content') }}
-          </p>
-          <p class="text-xs text-amber-800/75 flex items-start gap-1.5">
-            <span class="text-amber-400 mt-px">–</span>
-            {{ $t('auth.login.beta.accounts') }}
-          </p>
-          <p class="text-[11px] text-amber-700/40 pt-0.5">{{ $t('auth.login.beta.thanks') }}</p>
-        </div>
-      </div>
-    </div>
-
     <!-- Login Card -->
     <div class="relative z-10 w-full max-w-md">
       <div class="bg-[linear-gradient(140deg,rgba(255,255,255,0.95),rgba(248,250,252,0.95))] border border-white/80 rounded-4xl p-10 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] backdrop-blur-md">
@@ -200,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft, TriangleAlert } from '@lucide/vue'
+import { Music, Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, ArrowLeft } from '@lucide/vue'
 
 const router = useRouter()
 const route = useRoute()

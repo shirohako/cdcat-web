@@ -101,7 +101,9 @@
       "album": "アルバム",
       "single": "シングル",
       "ep": "EP",
-      "compilation": "コンピレーション"
+      "compilation": "コンピレーション",
+      "drama": "ドラマCD",
+      "radio": "ラジオ"
     }
   },
   "artists": {

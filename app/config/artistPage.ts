@@ -8,7 +8,4 @@ export const artistPageConfig = {
     mobileSize: 84,
     desktopSize: 104,
   },
-  releases: {
-    minimumCardWidth: 180,
-  },
 } as const
