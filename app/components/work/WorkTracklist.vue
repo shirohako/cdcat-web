@@ -96,13 +96,16 @@
               class="mt-2 pt-2 border-t border-gray-100 space-y-1 text-xs"
             >
               <div v-if="track.artist" class="flex items-baseline gap-2">
-                <span class="shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold bg-gray-100 text-gray-500">
+                <span
+                  class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
+                  :class="getWorkRolePalette('Artist').badge"
+                >
                   Artist
                 </span>
                 <span class="text-gray-600">{{ track.artist }}</span>
               </div>
               <div v-for="(credit, idx) in track.credits" :key="idx" class="flex items-baseline gap-2">
-                <span :class="['shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold', roleBadgeClass(credit.role)]">
+                <span :class="['shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold', getWorkRolePalette(credit.role).badge]">
                   {{ credit.role }}
                 </span>
                 <span class="text-gray-600">
@@ -178,31 +181,11 @@
 <script setup lang="ts">
 import type { WorkSong, WorkDisc, WorkCredit } from '~/types/work'
 import { ListMusic, Disc3, Users, Heart, Music2, FileText, Languages } from "@lucide/vue"
+import { getWorkRolePalette } from '~/utils/workRolePalette'
 
 const { isAuthenticated } = useAuth()
 const { toggleFavoriteSong } = useFavorites()
 const route = useRoute()
-
-const BADGE_PALETTE = [
-  'bg-indigo-100 text-indigo-700',
-  'bg-violet-100 text-violet-700',
-  'bg-sky-100 text-sky-700',
-  'bg-teal-100 text-teal-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-orange-100 text-orange-700',
-  'bg-rose-100 text-rose-700',
-  'bg-pink-100 text-pink-700',
-  'bg-cyan-100 text-cyan-700',
-]
-
-const roleBadgeClass = (role: string): string => {
-  let hash = 0
-  for (let i = 0; i < role.length; i++) {
-    hash = (hash * 31 + role.charCodeAt(i)) >>> 0
-  }
-  return BADGE_PALETTE[hash % BADGE_PALETTE.length]!
-}
 
 const showLyricsModal = ref(false)
 const activeSong = ref<{ id: number | null; title: string; filter: '' | 'lyric' | 'translation' }>({
