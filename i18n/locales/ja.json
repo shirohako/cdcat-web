@@ -116,6 +116,17 @@
       "person": "個人",
       "circle": "サークル",
       "other": "その他"
+    },
+    "detail": {
+      "albums": "アルバム {count} 枚",
+      "followers": "フォロワー {count} 人",
+      "follow": "フォロー",
+      "following": "フォロー中",
+      "share": "共有",
+      "releases": "すべての作品",
+      "no_bio": "アーティスト紹介はまだありません。",
+      "no_releases": "作品はまだありません",
+      "no_releases_desc": "このアーティストに関連付けられた音楽作品はまだありません。"
     }
   },
   "tracking": {

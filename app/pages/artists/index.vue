@@ -26,7 +26,7 @@
         </template>
 
       <!-- 加载状态 -->
-      <CollectionLoadingSkeleton v-if="pending" variant="compact" />
+      <CollectionLoadingSkeleton v-if="pending" variant="artists" />
 
       <!-- 错误状态 -->
       <div v-else-if="error" class="flex items-center justify-center min-h-100">
@@ -41,43 +41,42 @@
       <!-- 艺术家列表 -->
       <div v-else class="collection-content-enter">
         <!-- 艺术家网格 -->
-        <div class="grid grid-cols-3 gap-2.5 sm:grid-cols-5 md:grid-cols-6 md:gap-3 lg:grid-cols-7 xl:grid-cols-8 2xl:grid-cols-9">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <NuxtLink
             v-for="artist in artistsData"
             :key="artist.id"
             :to="`/artists/${artist.id}`"
-            class="group"
+            class="group flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-slate-300 hover:bg-slate-50/70"
           >
-            <div class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 border border-gray-100">
-              <!-- 艺术家头像 -->
-              <div class="aspect-4/3 bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
-                <div class="text-gray-300">
-                  <Users :size="26" />
-                </div>
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+              <img
+                v-if="artist.image_url"
+                :src="artist.image_url"
+                :alt="artist.name"
+                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              >
+              <div v-else class="text-slate-300">
+                <Users :size="22" />
               </div>
+            </div>
 
-              <!-- 艺术家信息 -->
-              <div class="px-2.5 py-2 bg-white">
-                <h3 class="font-bold text-xs mb-1 truncate group-hover:text-blue-600 transition-colors">
-                  {{ artist.name }}
-                </h3>
+            <div class="min-w-0 flex-1">
+              <h3 class="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-sky-700">
+                {{ artist.name }}
+              </h3>
 
-                <div class="flex items-center gap-1 text-[10px] mb-1.5">
-                  <span v-if="artist.type" class="px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 font-medium">
-                    {{ formatType(artist.type) }}
-                  </span>
-                  <span v-if="artist.region" class="text-gray-500 truncate">{{ artist.region }}</span>
+              <p v-if="artist.region" class="mt-0.5 truncate text-xs text-slate-500">
+                {{ artist.region }}
+              </p>
+
+              <div class="mt-1.5 flex items-center gap-3.5 text-xs text-slate-500">
+                <div class="flex items-center gap-1.5">
+                  <Disc3 :size="13" class="text-slate-400" />
+                  <span class="font-medium">{{ artist.albums_count || 0 }}</span>
                 </div>
-
-                <div class="flex items-center justify-between text-[11px] text-gray-600">
-                  <div class="flex items-center gap-1">
-                    <Disc3 :size="12" class="text-gray-400" />
-                    <span class="font-medium">{{ artist.albums_count || 0 }}</span>
-                  </div>
-                  <div class="flex items-center gap-1">
-                    <Heart :size="12" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
-                    <span class="font-medium">{{ artist.followers_count || 0 }}</span>
-                  </div>
+                <div class="flex items-center gap-1.5">
+                  <Heart :size="13" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-rose-500' : 'text-slate-400 group-hover:text-rose-400'" class="transition-colors" />
+                  <span class="font-medium">{{ artist.followers_count || 0 }}</span>
                 </div>
               </div>
             </div>
@@ -204,16 +203,6 @@ const pagination = computed(() => {
 
   return artistsResponse.value.pagination;
 });
-
-// 格式化艺术家类型
-const formatType = (type) => {
-  const typeMap = {
-    person: t('artists.type.person'),
-    circle: t('artists.type.circle'),
-    other: t('artists.type.other'),
-  };
-  return typeMap[type] || type;
-};
 
 // 计算可见的页码
 const visiblePages = computed(() => {

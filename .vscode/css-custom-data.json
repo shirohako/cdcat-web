@@ -1,0 +1,13 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@source",
+      "description": "Explicitly registers source files for Tailwind CSS class detection."
+    },
+    {
+      "name": "@plugin",
+      "description": "Loads a legacy JavaScript plugin in Tailwind CSS."
+    }
+  ]
+}

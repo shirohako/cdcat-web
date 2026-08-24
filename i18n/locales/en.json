@@ -116,6 +116,17 @@
       "person": "Person",
       "circle": "Circle",
       "other": "Other"
+    },
+    "detail": {
+      "albums": "{count} albums",
+      "followers": "{count} followers",
+      "follow": "Follow",
+      "following": "Following",
+      "share": "Share",
+      "releases": "All releases",
+      "no_bio": "No artist biography yet.",
+      "no_releases": "No releases yet",
+      "no_releases_desc": "This artist has no linked music releases yet."
     }
   },
   "tracking": {

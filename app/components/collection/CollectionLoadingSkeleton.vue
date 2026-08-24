@@ -1,14 +1,30 @@
-<script setup lang="ts">
-withDefaults(defineProps<{
-  variant?: 'covers' | 'compact' | 'wide' | 'list' | 'sections'
-}>(), {
-  variant: 'covers',
+<script setup>
+defineProps({
+  variant: {
+    type: String,
+    default: 'covers',
+  },
 })
 </script>
 
 <template>
   <div role="status" aria-live="polite" aria-label="Loading" class="animate-pulse">
-    <div v-if="variant === 'list'" class="space-y-4">
+    <div v-if="variant === 'artists'" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div
+        v-for="item in 12"
+        :key="item"
+        class="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-white p-2.5"
+      >
+        <div class="h-14 w-14 shrink-0 rounded-full bg-slate-100" />
+        <div class="min-w-0 flex-1 space-y-2">
+          <div class="h-3.5 w-3/5 rounded-full bg-slate-200/80" />
+          <div class="h-2.5 w-2/5 rounded-full bg-slate-100" />
+          <div class="h-2.5 w-1/2 rounded-full bg-slate-100" />
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="variant === 'list'" class="space-y-4">
       <div
         v-for="item in 4"
         :key="item"
@@ -44,7 +60,7 @@ withDefaults(defineProps<{
         ? 'grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8'
         : variant === 'wide'
           ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6'"
+          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'"
     >
       <div
         v-for="item in variant === 'compact' ? 16 : 6"
@@ -53,7 +69,7 @@ withDefaults(defineProps<{
       >
         <div
           class="bg-slate-100"
-          :class="variant === 'wide' ? 'aspect-video' : variant === 'compact' ? 'aspect-4/3' : 'aspect-square'"
+          :class="variant === 'wide' ? 'aspect-video' : 'aspect-square'"
         />
         <div class="space-y-2.5 p-3.5">
           <div class="h-3.5 w-3/4 rounded-full bg-slate-200/80" />

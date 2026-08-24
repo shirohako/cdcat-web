@@ -116,6 +116,17 @@
       "person": "個人",
       "circle": "社團",
       "other": "其他"
+    },
+    "detail": {
+      "albums": "{count} 張專輯",
+      "followers": "{count} 位關注者",
+      "follow": "關注",
+      "following": "已關注",
+      "share": "分享",
+      "releases": "全部作品",
+      "no_bio": "暫無藝術家簡介。",
+      "no_releases": "暫無作品",
+      "no_releases_desc": "該藝術家尚未有關聯的音樂作品。"
     }
   },
   "tracking": {

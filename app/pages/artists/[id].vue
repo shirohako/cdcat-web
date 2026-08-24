@@ -1,335 +1,296 @@
 <template>
-  <div
-    class="min-h-screen bg-linear-to-br from-gray-50 via-pink-50 to-purple-50"
-  >
-    <!-- Artist Hero Section -->
-    <div class="relative w-full overflow-hidden">
-      <!-- Banner -->
-      <div
-        class="absolute inset-0"
-        style="background-image: linear-gradient(109.6deg, rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2%)"
-      />
-      <!-- Subtle dot pattern -->
-      <div
-        class="absolute inset-0 opacity-30"
-        style="background-image: radial-gradient(circle, #60a5fa 1px, transparent 1px); background-size: 28px 28px"
-      />
-      <!-- Bottom fade -->
-      <div class="absolute bottom-0 left-0 right-0 h-32 bg-linear-to-t from-gray-50 to-transparent" />
-
-      <!-- Content -->
-      <div
-        class="relative container mx-auto px-4 md:px-8 py-6 md:py-8 max-w-6xl 2xl:max-w-7xl"
-      >
-        <div class="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          <!-- Artist Avatar -->
-          <div class="relative">
-            <div
-              class="w-28 h-28 md:w-40 md:h-40 rounded-full bg-white/80 flex items-center justify-center shadow-xl ring-4 ring-white text-gray-300 backdrop-blur-sm"
+  <div class="min-h-screen bg-slate-50" :style="pageCssVariables">
+    <section class="mx-auto w-full max-w-6xl px-4 pt-6 2xl:max-w-7xl md:px-8 md:pt-8">
+      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
+        <div class="artist-banner bg-slate-200">
+          <img :src="bannerUrl" :alt="artistData.name" class="h-full w-full object-cover">
+        </div>
+        <div class="relative h-11 bg-white md:h-13">
+          <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-sm ring-1 ring-slate-200 md:left-6">
+            <img
+              v-if="artist?.image_url"
+              :src="artist.image_url"
+              :alt="artistData.name"
+              class="h-full w-full object-cover"
             >
-              <Users :size="52" />
-            </div>
-          </div>
-
-          <!-- Artist Info -->
-          <div class="flex-1 text-center md:text-left">
-            <div
-              class="flex items-center justify-center md:justify-start gap-3 mb-3"
-            >
-              <h1
-                class="text-2xl md:text-4xl font-bold bg-linear-to-r from-pink-500 via-purple-500 to-blue-500 bg-clip-text text-transparent"
-              >
-                {{ artistData.name }}
-              </h1>
-            </div>
-            <p class="text-lg md:text-xl text-gray-600 mb-6 max-w-2xl">
-              {{ artistData.bio }}
-            </p>
-
-            <!-- Artist Stats -->
-            <div
-              class="flex flex-wrap justify-center md:justify-start gap-6 mb-6"
-            >
-              <div
-                class="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-sm"
-              >
-                <Disc3 :size="20" class="text-pink-500" />
-                <span class="text-sm font-medium text-gray-700"
-                  >{{ artistData.albumCount }} Albums</span
-                >
-              </div>
-              <div
-                class="flex items-center gap-2 px-4 py-2 bg-white/70 backdrop-blur-sm rounded-full shadow-sm"
-              >
-                <Users :size="20" class="text-purple-500" />
-                <span class="text-sm font-medium text-gray-700"
-                  >{{ artistData.followers }} Followers</span
-                >
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex flex-wrap justify-center md:justify-start gap-3">
-              <button
-                class="btn btn-md gap-2"
-                :class="isFavorited
-                  ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600'
-                  : 'bg-white text-gray-900 border-gray-300 hover:bg-gray-50'"
-                :disabled="isToggling"
-                @click="toggleLike"
-              >
-                <UserPlus :size="18" />
-                {{ isFavorited ? 'Following' : 'Follow' }}
-              </button>
-              <button
-                class="btn btn-md bg-white/60 hover:bg-white/90 border-white/80 text-gray-700 gap-2 backdrop-blur-sm"
-              >
-                <Share2 :size="18" />
-                Share
-              </button>
-              <NuxtLink
-                :to="`/contribute/artist/${artistId}`"
-                class="btn btn-md bg-white/60 hover:bg-white/90 border-white/80 text-gray-700 gap-2 backdrop-blur-sm"
-              >
-                <Edit :size="18" />
-                Edit
-              </NuxtLink>
+            <div v-else class="flex h-full w-full items-center justify-center text-slate-300">
+              <Users class="h-7 w-7 md:h-9 md:w-9" />
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div
-      class="sticky top-16 z-10 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm"
-    >
-      <div class="container mx-auto px-4 md:px-8 max-w-6xl 2xl:max-w-7xl">
-        <div class="flex gap-8 overflow-x-auto no-scrollbar">
-          <button
-            class="py-4 px-2 text-sm font-medium transition-all border-b-2 whitespace-nowrap border-purple-500 text-purple-600"
-          >
-            All Releases
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Albums Grid Section -->
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
-      <div class="bg-white/70 backdrop-blur-sm rounded-3xl shadow-sm border border-white p-6 md:p-8">
-        <!-- Section Header -->
-        <div class="flex items-center gap-3 mb-8">
-          <div class="w-1 h-7 bg-linear-to-b from-pink-500 to-purple-500 rounded-full"></div>
-          <h2 class="text-2xl font-bold text-gray-900">All Releases</h2>
-          <span class="ml-1 px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-600 text-sm font-medium">{{ albums.length }}</span>
+        <div class="p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
+        <div v-if="pending" class="animate-pulse">
+          <div class="h-7 w-48 rounded bg-slate-200" />
+          <div class="mt-3 h-3 w-full max-w-xl rounded bg-slate-100" />
+          <div class="mt-2 h-3 w-2/3 max-w-md rounded bg-slate-100" />
         </div>
 
-        <!-- Albums Grid -->
-        <div
-          v-if="albums.length > 0"
-          class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6"
-        >
-          <NuxtLink
-            v-for="album in albums"
-            :key="album.id"
-            :to="`/works/${album.id}`"
-            class="group"
-          >
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100">
-              <!-- Album Cover -->
-              <div class="aspect-square bg-linear-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden relative">
+        <div v-else-if="error" class="flex min-h-28 items-center justify-center text-sm text-slate-500">
+          {{ $t('common.load_failed') }}
+        </div>
+
+        <div v-else class="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div class="min-w-0 flex-1">
+            <h1 class="text-lg font-bold tracking-tight text-slate-950 md:text-xl">{{ artistData.name }}</h1>
+            <p class="mt-1.5 max-w-3xl text-sm leading-6 text-slate-600">{{ artistData.bio }}</p>
+
+            <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
+              <span class="inline-flex items-center gap-2">
+                <Disc3 :size="16" class="text-slate-400" />
+                {{ $t('artists.detail.albums', { count: artistData.albumCount }) }}
+              </span>
+              <span class="inline-flex items-center gap-2">
+                <Users :size="16" class="text-slate-400" />
+                {{ $t('artists.detail.followers', { count: artistData.followers }) }}
+              </span>
+              <span v-if="artist?.region" class="inline-flex items-center gap-2">
+                <MapPin :size="16" class="text-slate-400" />
+                {{ artist.region }}
+              </span>
+              <span v-if="artist?.active_since" class="inline-flex items-center gap-2">
+                <CalendarDays :size="16" class="text-slate-400" />
+                {{ artist.active_since }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
+            <button
+              class="inline-flex h-9 items-center gap-2 rounded-md border px-4 text-xs font-semibold transition-colors disabled:cursor-wait disabled:opacity-60"
+              :class="isFavorited
+                ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-700'
+                : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'"
+              :disabled="isToggling"
+              @click="toggleLike"
+            >
+              <UserCheck v-if="isFavorited" :size="15" />
+              <UserPlus v-else :size="15" />
+              {{ isFavorited ? $t('artists.detail.following') : $t('artists.detail.follow') }}
+            </button>
+            <button
+              class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-100 hover:text-slate-800"
+              :title="$t('artists.detail.share')"
+              @click="handleShare"
+            >
+              <Share2 :size="15" />
+            </button>
+            <NuxtLink
+              :to="`/contribute/artist/${artistId}`"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:border-slate-300 hover:bg-slate-100 hover:text-slate-800"
+              :title="$t('common.edit')"
+            >
+              <Edit :size="15" />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <main class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 2xl:max-w-7xl md:px-8 md:pt-8">
+      <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
+        <header class="flex items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
+          <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+              <Library :size="17" />
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-slate-900">{{ $t('artists.detail.releases') }}</h2>
+            </div>
+          </div>
+        </header>
+
+        <div class="min-h-80 p-4 sm:p-6">
+          <div v-if="albums.length" class="artist-release-grid grid gap-4 md:gap-5">
+            <NuxtLink
+              v-for="album in albums"
+              :key="album.id"
+              :to="`/works/${album.id}`"
+              class="group min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+            >
+              <div class="relative flex aspect-square items-center justify-center overflow-hidden bg-slate-100">
                 <img
                   v-if="album.image_url"
                   :src="album.image_url"
                   :alt="album.title"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  style="image-rendering: -webkit-optimize-contrast;"
-                />
-                <div v-else class="text-gray-300">
-                  <Disc3 :size="64" />
-                </div>
-                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <!-- Type Badge -->
-                <div v-if="album.type" class="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                >
+                <Disc3 v-else :size="42" class="text-slate-300" />
+                <span v-if="album.type" class="absolute right-2 top-2 rounded-md bg-slate-950/75 px-2 py-1 text-[10px] font-medium text-white">
                   {{ formatType(album.type) }}
-                </div>
+                </span>
               </div>
 
-              <!-- Album Info -->
-              <div class="p-4 bg-white">
-                <h3 class="font-bold text-base mb-2 truncate group-hover:text-blue-600 transition-colors">
-                  {{ album.title }}
-                </h3>
+              <div class="p-3.5">
+                <h3 class="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-sky-700">{{ album.title }}</h3>
+                <p class="mt-1 truncate text-xs text-slate-400">{{ album.catalog_number || '\u00A0' }}</p>
 
-                <div class="text-xs text-gray-500 mb-3 truncate">
-                  {{ album.catalog_number || '\u00A0' }}
+                <div v-if="album.release_date" class="mt-3 flex items-center gap-1.5 text-xs text-slate-500">
+                  <Calendar :size="13" class="text-slate-400" />
+                  {{ formatDate(album.release_date) }}
                 </div>
 
-                <div class="space-y-2">
-                  <div v-if="album.release_date" class="flex items-center gap-1.5 text-xs text-gray-600">
-                    <Calendar :size="14" class="text-gray-400" />
-                    <span>{{ formatDate(album.release_date) }}</span>
-                  </div>
-
-                  <div class="flex items-center justify-between text-xs text-gray-600">
-                    <div class="flex items-center gap-1.5">
-                      <Disc :size="14" class="text-gray-400" />
-                      <span>{{ album.disc_count || 0 }} Disc{{ album.disc_count > 1 ? 's' : '' }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <Music :size="14" class="text-gray-400" />
-                      <span>{{ album.track_count || 0 }} Track{{ album.track_count > 1 ? 's' : '' }}</span>
-                    </div>
-                  </div>
-
-                  <div class="flex items-center justify-between text-xs text-gray-600 pt-1 border-t border-gray-100">
-                    <div class="flex items-center gap-1.5">
-                      <Eye :size="14" class="text-gray-400" />
-                      <span>{{ album.views }}</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                      <Heart :size="14" :fill="album.is_favorited ? 'currentColor' : 'none'" :class="album.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="transition-colors" />
-                      <span>{{ album.likes }}</span>
-                    </div>
-                  </div>
+                <div class="mt-2 flex items-center gap-5 text-xs text-slate-500">
+                  <span class="inline-flex items-center gap-1.5"><Disc :size="13" class="text-slate-400" />{{ album.disc_count }}</span>
+                  <span class="inline-flex items-center gap-1.5"><Music :size="13" class="text-slate-400" />{{ album.track_count }}</span>
+                  <span class="ml-auto inline-flex items-center gap-1.5"><Heart :size="13" class="text-slate-400" />{{ album.likes }}</span>
                 </div>
               </div>
-            </div>
-          </NuxtLink>
-        </div>
-
-        <!-- Empty State -->
-        <div v-else class="flex flex-col items-center justify-center py-20 text-center">
-          <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 mb-5">
-            <Disc3 :size="36" />
+            </NuxtLink>
           </div>
-          <p class="text-gray-500 font-medium mb-1">No releases yet</p>
-          <p class="text-sm text-gray-400">This artist hasn't published any releases.</p>
+
+          <div v-else class="flex min-h-72 flex-col items-center justify-center text-center">
+            <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-slate-300">
+              <Disc3 :size="26" />
+            </div>
+            <p class="mt-4 text-sm font-medium text-slate-600">{{ $t('artists.detail.no_releases') }}</p>
+            <p class="mt-1 text-xs text-slate-400">{{ $t('artists.detail.no_releases_desc') }}</p>
+          </div>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
 import {
-  Disc3,
-  Disc,
-  Music,
   Calendar,
-  Users,
-  UserPlus,
-  Share2,
-  Heart,
-  Eye,
+  CalendarDays,
+  Disc,
+  Disc3,
   Edit,
-} from "@lucide/vue";
+  Heart,
+  Library,
+  MapPin,
+  Music,
+  Share2,
+  UserCheck,
+  UserPlus,
+  Users,
+} from '@lucide/vue'
+import { artistPageConfig } from '~/config/artistPage'
 
 const { isAuthenticated } = useAuth()
 const { $api } = useNuxtApp()
+const { t } = useI18n()
+const route = useRoute()
+const artistId = route.params.id
+const { data: artist, pending, error } = await useAPI(`/v1/artists/${artistId}`)
 
-// Get artist ID from route
-const route = useRoute();
-const artistId = route.params.id;
+const bannerUrl = computed(() => artist.value?.banner_url || artistPageConfig.defaultBannerUrl)
+const pageCssVariables = computed(() => ({
+  '--artist-banner-mobile-height': `${artistPageConfig.banner.mobileHeight}px`,
+  '--artist-banner-desktop-height': `${artistPageConfig.banner.desktopHeight}px`,
+  '--artist-avatar-mobile-size': `${artistPageConfig.avatar.mobileSize}px`,
+  '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
+  '--artist-release-min-width': `${artistPageConfig.releases.minimumCardWidth}px`,
+}))
 
-// Fetch artist data from API
-const { data: artist } = await useAPI(`/v1/artists/${artistId}`);
+const artistData = computed(() => ({
+  name: artist.value?.name || 'Artist',
+  bio: artist.value?.bio || t('artists.detail.no_bio'),
+  albumCount: artist.value?.albums_count || 0,
+  followers: artist.value?.followers_count || 0,
+}))
 
 const seoTitle = computed(() => artist.value?.name || 'Artist')
 const seoDescription = computed(() => {
-  const name = artist.value?.name
   if (artist.value?.bio) return artist.value.bio.slice(0, 160)
-  if (name) return `Explore ${name}'s discography on CDCAT.`
+  if (artist.value?.name) return `Explore ${artist.value.name}'s discography on CDCAT.`
   return 'Artist details on CDCAT.'
 })
+
 useSeoMeta({
   title: seoTitle,
   description: seoDescription,
-  ogTitle: computed(() => seoTitle.value ? `${seoTitle.value} | CDCAT` : 'CDCAT'),
+  ogTitle: computed(() => `${seoTitle.value} | CDCAT`),
   ogDescription: seoDescription,
   ogType: 'profile',
-  ogImage: computed(() => artist.value?.image_url || undefined),
+  ogImage: computed(() => artist.value?.image_url || bannerUrl.value),
   twitterCard: 'summary_large_image',
 })
 
-// Favorite state
 const isFavorited = ref(artist.value?.is_favorited ?? false)
 const isToggling = ref(false)
+
+watch(() => artist.value?.is_favorited, (value) => {
+  if (value !== undefined) isFavorited.value = value
+})
 
 const toggleLike = async () => {
   if (!isAuthenticated.value) {
     await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
     return
   }
-
   if (isToggling.value) return
 
   isToggling.value = true
   try {
-    const result = await $api(`/v1/favorites/artists/${artistId}`, {
-      method: 'POST',
-    })
+    const result = await $api(`/v1/favorites/artists/${artistId}`, { method: 'POST' })
     isFavorited.value = result.favorited
-  } catch {
-    // 401 已由 api 插件处理
   } finally {
     isToggling.value = false
   }
 }
 
-// Computed artist data with fallbacks
-const artistData = computed(() => ({
-  name: artist.value?.name || "Loading...",
-  bio: artist.value?.bio || "暂无艺术家简介。",
-  albumCount: artist.value?.albums_count || 0,
-  followers: artist.value?.followers_count || 0,
-  since: artist.value?.active_since || "N/A",
-}));
+const handleShare = async () => {
+  if (!import.meta.client) return
+  const shareData = { title: artistData.value.name, url: window.location.href }
+  if (navigator.share) {
+    await navigator.share(shareData).catch(() => {})
+    return
+  }
+  await navigator.clipboard?.writeText(shareData.url)
+}
 
-// Transform works data from API to album format
-const albums = computed(() => {
-  if (!artist.value?.works) return [];
+const albums = computed(() => (artist.value?.works || []).map(work => ({
+  id: work.id,
+  title: work.title,
+  image_url: work.image_url,
+  type: work.type || 'album',
+  catalog_number: work.catalog_number,
+  release_date: work.release_date,
+  disc_count: work.disc_count || 0,
+  track_count: work.track_count || 0,
+  likes: work.favorites_count || 0,
+})))
 
-  return artist.value.works.map((work) => ({
-    id: work.id,
-    title: work.title,
-    image_url: work.image_url,
-    type: work.type || "album",
-    catalog_number: work.catalog_number,
-    release_date: work.release_date,
-    disc_count: work.disc_count || 0,
-    track_count: work.track_count || 0,
-    is_favorited: work.is_favorited ?? false,
-    likes: work.favorites_count || 0,
-    views: work.views_count || 0,
-  }));
-});
-
-const formatType = (type) => {
-  const typeMap = { album: "Album", single: "Single", ep: "EP", compilation: "Compilation" };
-  return typeMap[type] || type;
-};
+const formatType = type => ({
+  album: t('works.type.album'),
+  single: t('works.type.single'),
+  ep: t('works.type.ep'),
+  compilation: t('works.type.compilation'),
+})[type] || type
 
 const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
 </script>
 
 <style scoped>
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
+.artist-banner {
+  height: var(--artist-banner-mobile-height);
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+.artist-avatar {
+  width: var(--artist-avatar-mobile-size);
+  height: var(--artist-avatar-mobile-size);
+}
+
+.artist-release-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--artist-release-min-width)), 1fr));
+}
+
+@media (min-width: 768px) {
+  .artist-banner {
+    height: var(--artist-banner-desktop-height);
+  }
+
+  .artist-avatar {
+    width: var(--artist-avatar-desktop-size);
+    height: var(--artist-avatar-desktop-size);
+  }
 }
 </style>

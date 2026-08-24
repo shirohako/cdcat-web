@@ -29,6 +29,23 @@
 
 /* 字体定义 - 多语言优化 */
 @layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]):not(:disabled),
+  input[type="button"]:not(:disabled),
+  input[type="submit"]:not(:disabled),
+  input[type="reset"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"],
+  [role="button"]:disabled,
+  input[type="button"]:disabled,
+  input[type="submit"]:disabled,
+  input[type="reset"]:disabled {
+    cursor: not-allowed;
+  }
+
   :root {
     /* 西文字体 - 优先使用系统UI字体，Win11 新增 Segoe UI Variable */
     --font-sans-en: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,

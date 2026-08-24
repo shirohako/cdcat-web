@@ -41,7 +41,7 @@
       <!-- 作品列表 -->
       <div v-else class="collection-content-enter">
         <!-- 专辑网格 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5 md:gap-6">
+        <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
           <NuxtLink
             v-for="work in worksData"
             :key="work.id"
@@ -57,12 +57,12 @@
                   :alt="work.title"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   style="image-rendering: -webkit-optimize-contrast;"
-                />
+                >
                 <div v-else class="text-gray-300">
                   <Disc3 :size="64" />
                 </div>
                 <!-- 渐变遮罩，增强对比度 -->
-                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 <!-- 类型标签 -->
                 <div v-if="work.type" class="absolute top-2 right-2 px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm text-white text-xs font-medium">
@@ -73,7 +73,7 @@
               <!-- 专辑信息 -->
               <div class="p-4 bg-white">
                 <!-- 标题 -->
-                <h3 class="font-bold text-base mb-2 truncate group-hover:text-blue-600 transition-colors">
+                <h3 class="mb-2 truncate text-sm font-bold transition-colors group-hover:text-blue-600">
                   {{ work.title }}
                 </h3>
 
@@ -91,14 +91,14 @@
                   </div>
 
                   <!-- 碟片/曲目数量 -->
-                  <div class="flex items-center justify-between text-xs text-gray-600">
+                  <div class="flex items-center gap-5 text-xs text-gray-600">
                     <div class="flex items-center gap-1.5">
                       <Disc :size="14" class="text-gray-400" />
-                      <span>{{ work.disc_count || 0 }} {{ formatDiscLabel(work.disc_count || 0) }}</span>
+                      <span>{{ work.disc_count || 0 }}</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                       <Music :size="14" class="text-gray-400" />
-                      <span>{{ work.track_count || 0 }} {{ formatTrackLabel(work.track_count || 0) }}</span>
+                      <span>{{ work.track_count || 0 }}</span>
                     </div>
                   </div>
 
@@ -249,14 +249,6 @@ const formatType = (type) => {
     compilation: t('works.type.compilation'),
   };
   return typeMap[type] || type;
-};
-
-const formatDiscLabel = (count) => {
-  return count === 1 ? 'Disc' : 'Discs';
-};
-
-const formatTrackLabel = (count) => {
-  return count === 1 ? t('works.track_singular') : t('works.track_plural');
 };
 
 // 格式化日期

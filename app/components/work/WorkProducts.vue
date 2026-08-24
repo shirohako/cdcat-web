@@ -10,24 +10,26 @@
     </div>
 
     <!-- Product List -->
-    <div v-if="products && products.length" class="grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-gray-100">
+    <div v-if="products && products.length" class="grid grid-cols-1">
       <div
-        v-for="(product, index) in products"
+        v-for="product in products"
         :key="product.id"
-        class="flex items-center gap-4 px-5 py-4 group hover:bg-gray-50/60 transition-colors border-b border-gray-100"
-        :class="{ 'lg:border-b-0': index >= products.length - (products.length % 2 === 0 ? 2 : 1) }"
+        class="group flex items-center gap-4 border-b border-gray-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-gray-50/60"
       >
         <!-- Thumbnail -->
-        <div class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-100">
+        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-100">
           <img
             v-if="product.image_url"
             :src="product.image_url"
             :alt="product.name || 'Product'"
             class="w-full h-full object-cover"
-          />
-          <div v-else class="w-full h-full flex items-center justify-center">
-            <Disc3 :size="22" class="text-gray-300" />
-          </div>
+          >
+          <img
+            v-else
+            :src="pressedCdImageUrl"
+            :alt="product.name || 'Product'"
+            class="h-full w-full object-cover"
+          >
         </div>
 
         <!-- Content -->
@@ -122,6 +124,7 @@ const props = withDefaults(defineProps<{
 })
 const { t } = useI18n()
 const { intlLocale } = useLocaleFormatting()
+const pressedCdImageUrl = '/images/products/pressed-cd.png'
 
 const mediumLabel = (medium: MediumType) => {
   if (medium === 'DIGITAL') return t('content_display.digital');
