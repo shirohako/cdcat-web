@@ -158,7 +158,7 @@
       </div>
 
       <CommonPagination
-        class="mt-6"
+        class="mt-4"
         v-model:page="page"
         :total-pages="totalPages"
         :disabled="isLoading"

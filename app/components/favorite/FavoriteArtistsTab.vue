@@ -18,7 +18,7 @@
 
     <!-- Artists List -->
     <div v-else>
-      <div class="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
+      <div class="mb-4 space-y-3 sm:mb-5 sm:space-y-4">
         <div
           v-for="artist in artists"
           :key="artist.id"

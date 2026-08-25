@@ -17,7 +17,7 @@
           {{ formatType(work.type) }}
         </div>
         <div class="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-          <DiscAlbum :size="11" />
+          <Disc3 :size="11" />
           {{ work.disc_count || 0 }}
         </div>
         <div class="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
@@ -74,7 +74,7 @@
 </template>
 
 <script setup>
-import { Calendar, Disc3, DiscAlbum, Eye, Hash, Heart, Music } from '@lucide/vue'
+import { Calendar, Disc3, Eye, Hash, Heart, Music } from '@lucide/vue'
 
 defineProps({
   work: {

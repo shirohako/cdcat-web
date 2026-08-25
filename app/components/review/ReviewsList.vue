@@ -18,7 +18,7 @@
 
     <!-- Reviews List -->
     <div v-else>
-      <div class="space-y-4 mb-6 sm:mb-8">
+      <div class="mb-4 space-y-4 sm:mb-5">
         <div
           v-for="review in reviews"
           :key="review.id"

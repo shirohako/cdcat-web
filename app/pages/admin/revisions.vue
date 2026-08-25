@@ -214,7 +214,7 @@
         </div>
 
         <CommonPagination
-          class="mt-6"
+          class="mt-4"
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
           :disabled="pending"

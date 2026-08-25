@@ -140,7 +140,7 @@ const goToPage = (page: number) => {
       </div>
 
       <CommonPagination
-        class="mt-8"
+        class="mt-6"
         :page="pagination.current_page"
         :total-pages="pagination.last_page"
         :disabled="pending"

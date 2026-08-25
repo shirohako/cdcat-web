@@ -70,7 +70,7 @@
 
         <CommonPagination
           v-model:page="currentPage"
-          class="mt-6"
+          class="mt-4"
           :total-pages="pagination.last_page"
           :disabled="pending"
         />
