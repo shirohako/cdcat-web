@@ -39,41 +39,8 @@ const pagination = computed(() => {
   return (seriesResponse.value as any).pagination
 })
 
-const totalPages = computed(() => pagination.value.last_page)
-
-// 显示的页码（最多显示 7 个页码按钮）
-const visiblePages = computed(() => {
-  const pages: (number | string)[] = []
-  const total = totalPages.value
-  const current = pagination.value.current_page
-
-  if (total <= 7) {
-    for (let i = 1; i <= total; i++) {
-      pages.push(i)
-    }
-  } else {
-    if (current <= 4) {
-      for (let i = 1; i <= 5; i++) pages.push(i)
-      pages.push('...')
-      pages.push(total)
-    } else if (current >= total - 3) {
-      pages.push(1)
-      pages.push('...')
-      for (let i = total - 4; i <= total; i++) pages.push(i)
-    } else {
-      pages.push(1)
-      pages.push('...')
-      for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-      pages.push('...')
-      pages.push(total)
-    }
-  }
-
-  return pages
-})
-
 const goToPage = (page: number) => {
-  if (page < 1 || page > totalPages.value) return
+  if (page < 1 || page > pagination.value.last_page) return
 
   router.push({
     query: {
@@ -172,43 +139,13 @@ const goToPage = (page: number) => {
         <p class="text-gray-500">{{ $t('content_display.no_series') }}</p>
       </div>
 
-      <!-- 分页控制 -->
-      <div v-if="totalPages > 1" class="flex justify-center mt-8">
-        <div class="join">
-          <button
-            class="join-item btn btn-sm"
-            :disabled="pagination.current_page === 1"
-            @click="goToPage(pagination.current_page - 1)"
-          >
-            «
-          </button>
-
-          <template v-for="(page, index) in visiblePages" :key="index">
-            <button
-              v-if="page === '...'"
-              class="join-item btn btn-sm btn-disabled"
-            >
-              ...
-            </button>
-            <button
-              v-else
-              class="join-item btn btn-sm"
-              :class="{ 'btn-active': pagination.current_page === page }"
-              @click="goToPage(page as number)"
-            >
-              {{ page }}
-            </button>
-          </template>
-
-          <button
-            class="join-item btn btn-sm"
-            :disabled="pagination.current_page === totalPages"
-            @click="goToPage(pagination.current_page + 1)"
-          >
-            »
-          </button>
-        </div>
-      </div>
+      <CommonPagination
+        class="mt-8"
+        :page="pagination.current_page"
+        :total-pages="pagination.last_page"
+        :disabled="pending"
+        @update:page="goToPage"
+      />
     </div>
     </CollectionPageCard>
   </div>

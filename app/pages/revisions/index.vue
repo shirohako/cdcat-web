@@ -206,43 +206,13 @@
           </div>
         </div>
 
-        <!-- 分页 -->
-        <div v-if="pagination.last_page > 1" class="mt-6 flex items-center justify-between">
-          <p class="text-xs text-gray-400">
-            {{ t('common.page_range', { total: pagination.total, start: (pagination.current_page - 1) * pagination.per_page + 1, end: Math.min(pagination.current_page * pagination.per_page, pagination.total) }) }}
-          </p>
-          <div class="flex items-center gap-1">
-            <button
-              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-              :disabled="pagination.current_page === 1"
-              @click="goToPage(pagination.current_page - 1)"
-            >
-              <ChevronLeft :size="13" />
-            </button>
-
-            <template v-for="page in visiblePages" :key="page">
-              <button
-                v-if="page !== '...'"
-                class="inline-flex h-7 w-7 items-center justify-center rounded-md border text-xs font-medium transition"
-                :class="page === pagination.current_page
-                  ? 'border-gray-900 bg-gray-900 text-white'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'"
-                @click="goToPage(page)"
-              >
-                {{ page }}
-              </button>
-              <span v-else class="flex h-7 w-7 items-center justify-center text-xs text-gray-300">·</span>
-            </template>
-
-            <button
-              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-gray-200 text-gray-500 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
-              :disabled="pagination.current_page === pagination.last_page"
-              @click="goToPage(pagination.current_page + 1)"
-            >
-              <ChevronRight :size="13" />
-            </button>
-          </div>
-        </div>
+        <CommonPagination
+          class="mt-6"
+          :page="pagination.current_page"
+          :total-pages="pagination.last_page"
+          :disabled="pending"
+          @update:page="goToPage"
+        />
       </div>
     </div>
 
@@ -271,7 +241,7 @@
 </template>
 
 <script setup>
-import { AlertCircle, CheckCircle, GitPullRequest, ChevronLeft, ChevronRight } from '@lucide/vue'
+import { AlertCircle, CheckCircle, GitPullRequest } from '@lucide/vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -324,19 +294,6 @@ const formatDate = (d) => {
   if (!d) return ''
   return formatLocalizedDate(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
-
-// ===== 分页 =====
-const visiblePages = computed(() => {
-  const current = pagination.value.current_page
-  const last = pagination.value.last_page
-  if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1)
-  const pages = [1]
-  if (current > 3) pages.push('...')
-  for (let i = Math.max(2, current - 1); i <= Math.min(last - 1, current + 1); i++) pages.push(i)
-  if (current < last - 2) pages.push('...')
-  pages.push(last)
-  return pages
-})
 
 const goToPage = (page) => {
   if (page < 1 || page > pagination.value.last_page) return

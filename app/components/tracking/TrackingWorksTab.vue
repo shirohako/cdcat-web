@@ -128,40 +128,11 @@
         </div>
       </div>
 
-      <!-- Pagination -->
-      <div v-if="total > 0" class="flex items-center justify-center gap-2">
-        <button
-          :disabled="currentPage === 1"
-          @click="previousPage"
-          class="btn btn-outline btn-sm gap-1"
-        >
-          <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          {{ $t('common.previous') }}
-        </button>
-
-        <div class="flex items-center gap-1">
-          <button
-            v-for="pageNum in visiblePages"
-            :key="pageNum"
-            @click="goToPage(pageNum)"
-            :class="[
-              'btn btn-sm',
-              currentPage === pageNum ? 'btn-primary' : 'btn-outline'
-            ]"
-          >
-            {{ pageNum }}
-          </button>
-        </div>
-
-        <button
-          :disabled="currentPage === totalPages"
-          @click="nextPage"
-          class="btn btn-outline btn-sm gap-1"
-        >
-          {{ $t('common.next') }}
-          <Icon name="lucide:chevron-right" class="w-4 h-4" />
-        </button>
-      </div>
+      <CommonPagination
+        v-model:page="currentPage"
+        :total-pages="totalPages"
+        :disabled="isLoading"
+      />
     </div>
   </div>
 </template>
@@ -240,25 +211,6 @@ const statusTextColor = (status: TrackingStatus): string => {
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
-const visiblePages = computed(() => {
-  const pages: number[] = []
-  const maxVisible = 5
-  const half = Math.floor(maxVisible / 2)
-
-  let start = Math.max(1, currentPage.value - half)
-  let end = Math.min(totalPages.value, start + maxVisible - 1)
-
-  if (end - start < maxVisible - 1) {
-    start = Math.max(1, end - maxVisible + 1)
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
-
-  return pages
-})
-
 const loadWorks = async () => {
   isLoading.value = true
   try {
@@ -270,22 +222,6 @@ const loadWorks = async () => {
   } finally {
     isLoading.value = false
   }
-}
-
-const previousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-  }
-}
-
-const nextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++
-  }
-}
-
-const goToPage = (page: number) => {
-  currentPage.value = page
 }
 
 const handleStatusChange = async (trackingId: number, newStatus: TrackingStatus) => {

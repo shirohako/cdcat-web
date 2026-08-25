@@ -155,40 +155,12 @@
         </div>
       </div>
 
-      <!-- Pagination -->
-      <div v-if="totalPages > 1" class="flex items-center justify-center gap-2">
-        <button
-          :disabled="currentPage === 1"
-          class="btn btn-outline btn-sm gap-1"
-          @click="emit('page-change', currentPage - 1)"
-        >
-          <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          {{ $t('common.previous') }}
-        </button>
-
-        <div class="flex items-center gap-1">
-          <button
-            v-for="pageNum in visiblePages"
-            :key="pageNum"
-            :class="[
-              'btn btn-sm',
-              currentPage === pageNum ? 'btn-primary' : 'btn-outline'
-            ]"
-            @click="emit('page-change', pageNum)"
-          >
-            {{ pageNum }}
-          </button>
-        </div>
-
-        <button
-          :disabled="currentPage === totalPages"
-          class="btn btn-outline btn-sm gap-1"
-          @click="emit('page-change', currentPage + 1)"
-        >
-          {{ $t('common.next') }}
-          <Icon name="lucide:chevron-right" class="w-4 h-4" />
-        </button>
-      </div>
+      <CommonPagination
+        :page="currentPage"
+        :total-pages="totalPages"
+        :disabled="isLoading"
+        @update:page="emit('page-change', $event)"
+      />
     </div>
   </div>
 </template>
@@ -240,23 +212,4 @@ const getScoreBadgeClass = (score: number): string => {
 // Date formatting
 // Pagination
 const totalPages = computed(() => Math.ceil(props.total / props.pageSize))
-
-const visiblePages = computed(() => {
-  const pages: number[] = []
-  const maxVisible = 5
-  const half = Math.floor(maxVisible / 2)
-
-  let start = Math.max(1, props.currentPage - half)
-  let end = Math.min(totalPages.value, start + maxVisible - 1)
-
-  if (end - start < maxVisible - 1) {
-    start = Math.max(1, end - maxVisible + 1)
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
-
-  return pages
-})
 </script>

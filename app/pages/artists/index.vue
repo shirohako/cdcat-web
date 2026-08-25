@@ -91,46 +91,13 @@
           <p class="text-gray-500">{{ $t('artists.no_results') }}</p>
         </div>
 
-        <!-- 分页控件 -->
-        <div v-if="pagination.last_page > 1" class="mt-12 flex justify-center">
-          <div class="join">
-            <!-- 上一页按钮 -->
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === 1"
-              @click="goToPage(pagination.current_page - 1)"
-            >
-              «
-            </button>
-
-            <!-- 页码按钮 -->
-            <template v-for="page in visiblePages" :key="page">
-              <button
-                v-if="page !== '...'"
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': page === pagination.current_page }"
-                @click="goToPage(page)"
-              >
-                {{ page }}
-              </button>
-              <button
-                v-else
-                class="join-item btn btn-sm btn-disabled"
-              >
-                ...
-              </button>
-            </template>
-
-            <!-- 下一页按钮 -->
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === pagination.last_page"
-              @click="goToPage(pagination.current_page + 1)"
-            >
-              »
-            </button>
-          </div>
-        </div>
+        <CommonPagination
+          class="mt-12"
+          :page="pagination.current_page"
+          :total-pages="pagination.last_page"
+          :disabled="pending"
+          @update:page="goToPage"
+        />
       </div>
       </CollectionPageCard>
     </div>
@@ -202,44 +169,6 @@ const pagination = computed(() => {
   }
 
   return artistsResponse.value.pagination;
-});
-
-// 计算可见的页码
-const visiblePages = computed(() => {
-  const current = pagination.value.current_page;
-  const last = pagination.value.last_page;
-  const pages = [];
-
-  if (last <= 7) {
-    // 如果总页数小于等于 7，显示所有页码
-    for (let i = 1; i <= last; i++) {
-      pages.push(i);
-    }
-  } else {
-    // 总是显示第一页
-    pages.push(1);
-
-    if (current > 3) {
-      pages.push('...');
-    }
-
-    // 显示当前页附近的页码
-    const start = Math.max(2, current - 1);
-    const end = Math.min(last - 1, current + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    if (current < last - 2) {
-      pages.push('...');
-    }
-
-    // 总是显示最后一页
-    pages.push(last);
-  }
-
-  return pages;
 });
 
 // 跳转到指定页码

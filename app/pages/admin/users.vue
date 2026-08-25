@@ -123,29 +123,12 @@
           </table>
         </div>
 
-        <footer class="flex flex-col gap-3 border-t border-slate-100 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between">
-          <p class="text-xs text-slate-400">
-            {{ t('common.page_range', { total: pagination.total, start: startItem, end: endItem }) }}
-          </p>
-          <div class="flex items-center gap-1">
-            <button
-              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              type="button"
-              :disabled="page <= 1"
-              @click="page -= 1"
-            >
-              <Icon name="lucide:chevron-left" class="h-3.5 w-3.5" />
-            </button>
-            <span class="px-2 text-xs text-slate-500">{{ page }} / {{ totalPages }}</span>
-            <button
-              class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-slate-200 text-slate-500 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
-              type="button"
-              :disabled="page >= totalPages"
-              @click="page += 1"
-            >
-              <Icon name="lucide:chevron-right" class="h-3.5 w-3.5" />
-            </button>
-          </div>
+        <footer class="border-t border-slate-100 px-5 py-3.5">
+          <CommonPagination
+            v-model:page="page"
+            :total-pages="pagination.last_page"
+            :disabled="pending"
+          />
         </footer>
       </section>
     </div>
@@ -318,7 +301,6 @@ const { data: rolesData } = canAssignRoles
 
 const users = computed(() => data.value?.users ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
-const totalPages = computed(() => pagination.value.last_page)
 
 // 角色列表，按层级排序
 const ROLE_ORDER = ['founder', 'moderator', 'contributor', 'member']
@@ -329,15 +311,6 @@ const availableRoles = computed<RoleInfo[]>(() => {
     const bi = ROLE_ORDER.indexOf(b.name)
     return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
   })
-})
-
-const startItem = computed(() => {
-  if (!pagination.value.total) return 0
-  return (pagination.value.current_page - 1) * pagination.value.per_page + 1
-})
-const endItem = computed(() => {
-  if (!pagination.value.total) return 0
-  return Math.min(pagination.value.current_page * pagination.value.per_page, pagination.value.total)
 })
 
 const summary = computed(() => [

@@ -129,46 +129,13 @@
           <p class="text-gray-500">No entries found</p>
         </div>
 
-        <!-- Pagination -->
-        <div v-if="pagination.last_page > 1" class="mt-12 flex justify-center">
-          <div class="join">
-            <!-- Previous Button -->
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === 1"
-              @click="goToPage(pagination.current_page - 1)"
-            >
-              «
-            </button>
-
-            <!-- Page Numbers -->
-            <template v-for="page in visiblePages" :key="page">
-              <button
-                v-if="page !== '...'"
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': page === pagination.current_page }"
-                @click="goToPage(page)"
-              >
-                {{ page }}
-              </button>
-              <button
-                v-else
-                class="join-item btn btn-sm btn-disabled"
-              >
-                ...
-              </button>
-            </template>
-
-            <!-- Next Button -->
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === pagination.last_page"
-              @click="goToPage(pagination.current_page + 1)"
-            >
-              »
-            </button>
-          </div>
-        </div>
+        <CommonPagination
+          class="mt-12"
+          :page="pagination.current_page"
+          :total-pages="pagination.last_page"
+          :disabled="pending"
+          @update:page="goToPage"
+        />
       </div>
       </CollectionPageCard>
     </div>
@@ -310,35 +277,6 @@ const getEntryDescription = (entry) => {
 const getEntryImageUrl = (entry) => {
   return entry.image_url || "";
 };
-
-// Calculate visible pages
-const visiblePages = computed(() => {
-  const current = pagination.value.current_page;
-  const last = pagination.value.last_page;
-  const pages = [];
-
-  if (last <= 7) {
-    for (let i = 1; i <= last; i++) {
-      pages.push(i);
-    }
-  } else {
-    pages.push(1);
-    if (current > 3) {
-      pages.push('...');
-    }
-    const start = Math.max(2, current - 1);
-    const end = Math.min(last - 1, current + 1);
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    if (current < last - 2) {
-      pages.push('...');
-    }
-    pages.push(last);
-  }
-
-  return pages;
-});
 
 // Go to page
 const goToPage = (page) => {

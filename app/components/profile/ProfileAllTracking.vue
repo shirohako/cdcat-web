@@ -82,46 +82,19 @@
           </NuxtLink>
         </div>
 
-        <!-- Pagination -->
-        <div class="mt-6 flex items-center justify-between text-xs text-gray-400">
-          <span>{{ pagination.current_page }} / {{ pagination.last_page }}</span>
-        </div>
-        <div class="mt-2 flex justify-center">
-          <div class="flex items-center gap-1">
-            <button
-              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
-              :disabled="pagination.current_page === 1"
-              @click="goToPage(pagination.current_page - 1)"
-            >
-              <ChevronLeft :size="16" />
-            </button>
-            <template v-for="page in visiblePages" :key="page">
-              <button
-                v-if="page !== '...'"
-                class="inline-flex h-8 min-w-8 items-center justify-center rounded-lg px-2 text-sm transition-colors"
-                :class="page === pagination.current_page ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'"
-                @click="goToPage(page as number)"
-              >
-                {{ page }}
-              </button>
-              <span v-else class="inline-flex h-8 w-8 items-center justify-center text-sm text-gray-400">...</span>
-            </template>
-            <button
-              class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-sm text-gray-500 hover:bg-gray-100 disabled:opacity-30"
-              :disabled="pagination.current_page === pagination.last_page"
-              @click="goToPage(pagination.current_page + 1)"
-            >
-              <ChevronRight :size="16" />
-            </button>
-          </div>
-        </div>
+        <CommonPagination
+          v-model:page="currentPage"
+          class="mt-6"
+          :total-pages="pagination.last_page"
+          :disabled="pending"
+        />
       </template>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ArrowLeft, Bookmark, CheckCircle, ChevronLeft, ChevronRight, Disc3, Headphones, Package, XCircle } from '@lucide/vue'
+import { ArrowLeft, Bookmark, CheckCircle, ChevronRight, Disc3, Headphones, Package, XCircle } from '@lucide/vue'
 import type { ProfileTrackingWork, ProfileTrackingResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{
@@ -203,30 +176,5 @@ const formatDate = (dateValue: string) => {
   const d = new Date(text)
   if (Number.isNaN(d.getTime())) return '--'
   return d.toLocaleDateString(formatterLocale.value, { year: 'numeric', month: '2-digit', day: '2-digit' })
-}
-
-// --- Pagination ---
-const visiblePages = computed(() => {
-  const current = pagination.value.current_page
-  const last = pagination.value.last_page
-  const pages: (number | string)[] = []
-
-  if (last <= 7) {
-    for (let i = 1; i <= last; i++) pages.push(i)
-  } else {
-    pages.push(1)
-    if (current > 3) pages.push('...')
-    const start = Math.max(2, current - 1)
-    const end = Math.min(last - 1, current + 1)
-    for (let i = start; i <= end; i++) pages.push(i)
-    if (current < last - 2) pages.push('...')
-    pages.push(last)
-  }
-  return pages
-})
-
-const goToPage = (page: number) => {
-  if (page < 1 || page > pagination.value.last_page) return
-  currentPage.value = page
 }
 </script>

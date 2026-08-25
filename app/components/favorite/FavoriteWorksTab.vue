@@ -92,40 +92,11 @@
         </div>
       </div>
 
-      <!-- Pagination -->
-      <div class="flex items-center justify-center gap-2">
-        <button
-          :disabled="page === 1"
-          @click="previousPage"
-          class="btn btn-outline btn-sm gap-1"
-        >
-          <Icon name="lucide:chevron-left" class="w-4 h-4" />
-          {{ $t('common.previous') }}
-        </button>
-
-        <div class="flex items-center gap-1">
-          <button
-            v-for="p in visiblePages"
-            :key="p"
-            @click="goToPage(p)"
-            :class="[
-              'btn btn-sm',
-              page === p ? 'btn-primary' : 'btn-outline'
-            ]"
-          >
-            {{ p }}
-          </button>
-        </div>
-
-        <button
-          :disabled="page === totalPages"
-          @click="nextPage"
-          class="btn btn-outline btn-sm gap-1"
-        >
-          {{ $t('common.next') }}
-          <Icon name="lucide:chevron-right" class="w-4 h-4" />
-        </button>
-      </div>
+      <CommonPagination
+        v-model:page="page"
+        :total-pages="totalPages"
+        :disabled="isLoading"
+      />
     </div>
   </div>
 </template>
@@ -143,25 +114,6 @@ const totalItems = ref(0)
 const isLoading = ref(false)
 
 const totalPages = computed(() => Math.ceil(totalItems.value / perPage))
-
-const visiblePages = computed(() => {
-  const pages = []
-  const maxVisible = 5
-  const half = Math.floor(maxVisible / 2)
-
-  let start = Math.max(1, page.value - half)
-  let end = Math.min(totalPages.value, start + maxVisible - 1)
-
-  if (end - start < maxVisible - 1) {
-    start = Math.max(1, end - maxVisible + 1)
-  }
-
-  for (let i = start; i <= end; i++) {
-    pages.push(i)
-  }
-
-  return pages
-})
 
 const loadData = async () => {
   isLoading.value = true
@@ -191,18 +143,6 @@ const handleToggle = async (workId: number) => {
     const { [workId]: _, ...rest } = unlikeLoading.value
     unlikeLoading.value = rest
   }
-}
-
-const previousPage = () => {
-  if (page.value > 1) page.value -= 1
-}
-
-const nextPage = () => {
-  if (page.value < totalPages.value) page.value += 1
-}
-
-const goToPage = (p: number) => {
-  page.value = p
 }
 
 watch(() => page.value, async () => {

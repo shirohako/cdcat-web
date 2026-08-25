@@ -105,32 +105,13 @@
           <p class="text-gray-400 text-sm">{{ $t('content_display.no_articles') }}</p>
         </div>
 
-        <!-- 分页 -->
-        <div v-if="pagination.last_page > 1" class="mt-10 flex justify-center">
-          <div class="join">
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === 1"
-              @click="goToPage(pagination.current_page - 1)"
-            >«</button>
-
-            <template v-for="page in visiblePages" :key="page">
-              <button
-                v-if="page !== '...'"
-                class="join-item btn btn-sm"
-                :class="{ 'btn-active': page === pagination.current_page }"
-                @click="goToPage(page)"
-              >{{ page }}</button>
-              <button v-else class="join-item btn btn-sm btn-disabled">...</button>
-            </template>
-
-            <button
-              class="join-item btn btn-sm"
-              :disabled="pagination.current_page === pagination.last_page"
-              @click="goToPage(pagination.current_page + 1)"
-            >»</button>
-          </div>
-        </div>
+        <CommonPagination
+          class="mt-10"
+          :page="pagination.current_page"
+          :total-pages="pagination.last_page"
+          :disabled="pending"
+          @update:page="goToPage"
+        />
       </div>
       </CollectionPageCard>
     </div>
@@ -183,21 +164,6 @@ const formatDate = (dateString) => {
   const d = new Date(dateString);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
-
-const visiblePages = computed(() => {
-  const current = pagination.value.current_page;
-  const last = pagination.value.last_page;
-  if (last <= 7) return Array.from({ length: last }, (_, i) => i + 1);
-
-  const pages = [1];
-  if (current > 3) pages.push('...');
-  const start = Math.max(2, current - 1);
-  const end = Math.min(last - 1, current + 1);
-  for (let i = start; i <= end; i++) pages.push(i);
-  if (current < last - 2) pages.push('...');
-  pages.push(last);
-  return pages;
-});
 
 const goToPage = (page) => {
   if (page < 1 || page > pagination.value.last_page) return;

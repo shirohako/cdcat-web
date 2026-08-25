@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@import "./ui.css";
 @plugin "@tailwindcss/typography";
 
 @keyframes collection-content-reveal {
