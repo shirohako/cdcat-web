@@ -46,9 +46,9 @@
             v-for="artist in artistsData"
             :key="artist.id"
             :to="`/artists/${artist.id}`"
-            class="group flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-200 bg-white p-2.5 transition-colors hover:border-slate-300 hover:bg-slate-50/70"
+            class="group flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-200/70 bg-white p-2.5 transition-colors hover:border-slate-200 hover:bg-slate-50/70"
           >
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
               <img
                 v-if="artist.image_url"
                 :src="artist.image_url"

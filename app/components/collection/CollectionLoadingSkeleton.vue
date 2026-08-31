@@ -15,7 +15,7 @@ defineProps({
         :key="item"
         class="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-white p-2.5"
       >
-        <div class="h-14 w-14 shrink-0 rounded-full bg-slate-100" />
+        <div class="h-12 w-12 shrink-0 rounded-full bg-slate-100" />
         <div class="min-w-0 flex-1 space-y-2">
           <div class="h-3.5 w-3/5 rounded-full bg-slate-200/80" />
           <div class="h-2.5 w-2/5 rounded-full bg-slate-100" />

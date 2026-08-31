@@ -49,14 +49,6 @@
 
       <!-- Right Section: Language Switcher & User -->
       <div class="flex items-center gap-2">
-        <!-- Search Icon (Mobile) -->
-        <button
-          class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          aria-label="Search"
-        >
-          <Icon name="lucide:search" class="w-5 h-5 text-gray-700" />
-        </button>
-
         <!-- Language Switcher -->
         <div class="relative">
           <button
