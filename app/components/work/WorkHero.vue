@@ -108,49 +108,26 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="mt-3 flex flex-col gap-1.5">
-              <!-- Like: full row on large+, shares row with others below lg -->
-              <div class="flex gap-1.5">
-                <button
-                  class="btn btn-xs flex-1 lg:flex-none lg:px-5 gap-1.5 h-7 lg:h-8 min-h-0"
-                  :class="isFavorited
-                    ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
-                    : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
-                  :disabled="isToggling"
-                  @click="toggleLike"
-                >
-                  <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />
-                  {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
-                </button>
-                <!-- Buy it + Edit: inline with Like below lg -->
-                <button class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 bg-black hover:bg-gray-800 text-white border-0 gap-1.5" @click="buyDialog?.showModal()">
-                  <ShoppingCart :size="13" />
-                  {{ $t('content_display.buy') }}
-                </button>
-                <NuxtLink
-                  v-if="workId"
-                  :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
-                  class="btn btn-xs flex-1 lg:hidden h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
-                >
-                  <Edit :size="13" />
-                  {{ $t('common.edit') }}
-                </NuxtLink>
-              </div>
-              <!-- Buy it + Edit: own row on lg+ only -->
-              <div class="hidden lg:flex gap-1.5">
-                <button class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 gap-1.5 bg-black hover:bg-gray-800 text-white border-0" @click="buyDialog?.showModal()">
-                  <ShoppingCart :size="13" />
-                  {{ $t('content_display.buy') }}
-                </button>
-                <NuxtLink
-                  v-if="workId"
-                  :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
-                  class="btn btn-xs flex-none lg:px-5 h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
-                >
-                  <Edit :size="13" />
-                  {{ $t('common.edit') }}
-                </NuxtLink>
-              </div>
+            <div class="mt-3 flex gap-1.5">
+              <button
+                class="btn btn-xs flex-1 lg:flex-none lg:px-5 gap-1.5 h-7 lg:h-8 min-h-0"
+                :class="isFavorited
+                  ? 'bg-red-500 text-white border-red-500 hover:bg-red-600'
+                  : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
+                :disabled="isToggling"
+                @click="toggleLike"
+              >
+                <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />
+                {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
+              </button>
+              <NuxtLink
+                v-if="workId"
+                :to="isAuthenticated ? `/contribute/work/${workId}` : `/auth/login?redirect=/contribute/work/${workId}`"
+                class="btn btn-xs flex-1 lg:flex-none lg:px-5 h-7 lg:h-8 min-h-0 btn-outline border-gray-400 text-gray-700 hover:bg-gray-50 gap-1.5"
+              >
+                <Edit :size="13" />
+                {{ $t('common.edit') }}
+              </NuxtLink>
             </div>
           </div>
         </div>
@@ -158,26 +135,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Buy it dialog -->
-  <dialog ref="buyDialog" class="modal">
-    <div class="modal-box max-w-xs p-0 overflow-hidden">
-      <!-- Top accent -->
-<div class="flex flex-col items-center gap-4 px-8 pt-8 pb-6 text-center">
-        <div class="w-14 h-14 rounded-2xl bg-gray-900 flex items-center justify-center shadow-md">
-          <ShoppingCart :size="24" class="text-white" />
-        </div>
-        <div>
-          <h3 class="font-bold text-gray-900 text-base">{{ $t('content_display.feature_developing') }}</h3>
-          <p class="text-sm text-gray-400 mt-1.5 leading-relaxed">{{ $t('content_display.stay_tuned') }}</p>
-        </div>
-        <button class="btn btn-sm w-full bg-gray-900 hover:bg-gray-700 text-white border-0" @click="buyDialog?.close()">{{ $t('common.got_it') }}</button>
-      </div>
-    </div>
-    <form method="dialog" class="modal-backdrop">
-      <button>{{ $t('common.close') }}</button>
-    </form>
-  </dialog>
 </template>
 
 <script setup lang="ts">
@@ -185,7 +142,6 @@ import type { WorkHeroData } from '~/types/work'
 import { getStreamingProvider } from '~/utils/streamingProviders'
 import {
   Heart,
-  ShoppingCart,
   Calendar,
   Disc3,
   Music,
@@ -229,7 +185,6 @@ const props = withDefaults(defineProps<{
 const formatProviderName = (name: string) =>
   name.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
-const buyDialog = ref<HTMLDialogElement | null>(null)
 const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.initialFavorited)
 const isToggling = ref(false)
