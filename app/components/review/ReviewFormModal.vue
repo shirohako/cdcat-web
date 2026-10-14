@@ -293,9 +293,12 @@ const canSubmit = computed(() => {
 // Album search with debounce
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
+// 与后端校验一致：少于 2 个字符不搜索
+const MIN_SEARCH_LENGTH = 2
+
 watch(albumQuery, (query) => {
   if (searchTimer) clearTimeout(searchTimer)
-  if (!query.trim()) {
+  if (query.trim().length < MIN_SEARCH_LENGTH) {
     albumResults.value = []
     hasSearched.value = false
     return
@@ -303,8 +306,8 @@ watch(albumQuery, (query) => {
   isSearching.value = true
   searchTimer = setTimeout(async () => {
     try {
-      const res = await $api<any>('/v1/works', { params: { q: query, per_page: 5 } })
-      const list = res.data ?? res ?? []
+      const res = await $api<any>('/v1/works', { params: { search: query.trim(), per_page: 5 } })
+      const list = res.works ?? []
       albumResults.value = (Array.isArray(list) ? list : []).map((w: any) => ({
         id: w.id,
         title: w.title ?? '',
