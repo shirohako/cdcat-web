@@ -97,8 +97,7 @@ export const useAuth = () => {
   // 登出
   const logout = async () => {
     try {
-      // 可选：调用后端登出接口
-      // await $api('/v1/auth/logout', { method: 'POST' })
+      await $api('/v1/auth/logout', { method: 'POST', retry: 0 })
 
       clearAuth()
       await router.push('/')

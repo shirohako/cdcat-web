@@ -296,10 +296,14 @@ const revisionsData = computed(() => response.value?.revisions || [])
 const pagination = computed(() => response.value?.pagination ?? {
   total: 0, per_page: 15, current_page: 1, last_page: 1,
 })
-const pendingCount = computed(() => response.value?.pending_count ?? 0)
+const { data: pendingResponse, refresh: refreshPendingCount } = await useAsyncData(
+  'admin-revisions-pending-count',
+  () => $api('/v1/admin/revisions', { query: { status: 'pending', per_page: 1 } }),
+)
+const pendingCount = computed(() => pendingResponse.value?.pagination?.total ?? 0)
 
 // ===== 格式化 =====
-const formatType = (type) => ({ work: 'Work', artist: 'Artist', series: 'Series', event: 'Event', entry: 'Entry' }[type] || type)
+const formatType = (type) => ({ work: 'Work', artist: 'Artist', franchise: 'Franchise', entry: 'Entry' }[type] || type)
 const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
 const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
 
@@ -353,7 +357,7 @@ const doAction = async () => {
   try {
     await $api(`/v1/admin/revisions/${confirmModal.revision.id}/${confirmModal.action}`, { method: 'POST' })
     showToast(confirmModal.action === 'approve' ? t('admin_pages.revisions.approved_notice') : t('admin_pages.revisions.rejected_notice'))
-    await refresh()
+    await Promise.all([refresh(), refreshPendingCount()])
   } catch (e) {
     showToast(localizeError(e, 'admin_pages.revisions.action_failed'), 'error')
   }

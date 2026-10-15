@@ -336,7 +336,7 @@ const saveRole = async () => {
   if (!roleModal.user) return
   roleModal.saving = true
   try {
-    await $api(`/v1/users/${roleModal.user.id}/role`, {
+    await $api(`/v1/admin/users/${roleModal.user.id}/role`, {
       method: 'PUT',
       body: { role: roleModal.selected },
     })
