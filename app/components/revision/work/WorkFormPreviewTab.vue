@@ -12,7 +12,7 @@
       </div>
 
       <!-- 分开显示 Structure 和 Songs -->
-      <div v-if="submitData.structure && submitData.structure.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div v-if="Array.isArray(submitData.structure) && submitData.structure.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <h3 class="text-lg font-semibold mb-2">Structure (Discs)</h3>
           <div class="bg-gray-900 text-blue-400 p-4 rounded-lg overflow-auto max-h-64 font-mono text-sm">

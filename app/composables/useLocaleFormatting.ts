@@ -14,10 +14,10 @@ const CONTENT_LOCALE_KEYS: Record<string, string[]> = {
   ja: ['ja'],
 }
 
-export const useLocaleFormatting = () => {
+export const useLocaleFormatting = (localeOverride?: string) => {
   const { locale } = useI18n()
 
-  const intlLocale = computed(() => INTL_LOCALES[locale.value] || 'en-US')
+  const intlLocale = computed(() => localeOverride || INTL_LOCALES[locale.value] || 'en-US')
 
   const formatDate = (
     value: string | number | Date | null | undefined,

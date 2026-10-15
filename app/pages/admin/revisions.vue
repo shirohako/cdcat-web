@@ -12,7 +12,7 @@
       </header>
 
       <!-- Status Filter -->
-      <div class="mb-5 flex flex-wrap gap-2">
+      <AdminFilterBar>
         <button
           v-for="tab in statusTabs"
           :key="tab.value"
@@ -30,7 +30,7 @@
             {{ pendingCount }}
           </span>
         </button>
-      </div>
+      </AdminFilterBar>
 
       <!-- 加载 -->
       <div v-if="pending" class="flex items-center justify-center min-h-60">
@@ -99,7 +99,7 @@
 
                 <td class="px-4 py-3.5">
                   <div class="flex items-center gap-2">
-                    <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-6 w-6 shrink-0 rounded-full object-cover" />
+                    <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-6 w-6 shrink-0 rounded-full object-cover" >
                     <div v-else class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[10px] font-semibold text-slate-500">
                       {{ revision.submitter?.nickname?.charAt(0) || revision.submitter?.username?.charAt(0) || '?' }}
                     </div>
@@ -124,9 +124,10 @@
                     >
                       {{ t('common.details') }}
                     </button>
-                    <template v-if="revision.status === 'pending'">
+                    <template v-if="revision.status === 'pending' && hasPermission('revisions.review')">
                       <button
                         class="whitespace-nowrap rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
+                        :disabled="revision.action === 'delete' && !hasPermission('content.manage')"
                         @click.stop="openConfirm('approve', revision)"
                       >
                         {{ t('admin_pages.revisions.approve') }}
@@ -171,7 +172,7 @@
                 </div>
                 <p class="mt-2 font-medium text-slate-900 line-clamp-2">{{ revision.title }}</p>
                 <div class="mt-1 flex items-center gap-2">
-                  <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-4 w-4 rounded-full object-cover" />
+                  <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-4 w-4 rounded-full object-cover" >
                   <span class="text-xs text-slate-400">{{ revision.submitter?.nickname || revision.submitter?.username }}</span>
                   <span class="text-xs text-slate-300">·</span>
                   <span class="text-xs text-slate-400">{{ formatDate(revision.created_at) }}</span>
@@ -190,9 +191,10 @@
               >
                 {{ t('common.details') }}
               </button>
-              <template v-if="revision.status === 'pending'">
+              <template v-if="revision.status === 'pending' && hasPermission('revisions.review')">
                 <button
                   class="rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
+                  :disabled="revision.action === 'delete' && !hasPermission('content.manage')"
                   @click="openConfirm('approve', revision)"
                 >
                   {{ t('admin_pages.revisions.approve') }}
@@ -224,14 +226,15 @@
     </div>
 
     <!-- 确认弹窗 -->
-    <CommonConfirmDialog
+    <AdminConfirmDialog
       v-model="confirmModal.open"
-      :variant="confirmModal.action === 'approve' ? 'confirm' : 'delete'"
       :confirm-text="confirmModal.action === 'approve' ? t('admin_pages.revisions.confirm_approve') : t('admin_pages.revisions.confirm_reject')"
       :title="confirmModal.action === 'approve' ? t('admin_pages.revisions.approve_title') : t('admin_pages.revisions.reject_title')"
       :description="confirmModal.action === 'approve'
         ? t('admin_pages.revisions.approve_confirm', { title: confirmModal.revision?.title ?? '' })
         : t('admin_pages.revisions.reject_confirm', { title: confirmModal.revision?.title ?? '' })"
+      :busy="saving"
+      :reason-required="confirmModal.action === 'reject'"
       @confirm="doAction"
     />
 
@@ -253,21 +256,17 @@
 <script setup>
 import { AlertCircle, CheckCircle, GitPullRequest } from '@lucide/vue'
 
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { hasPermission } = useAuth()
-const { t } = useI18n()
-const { formatDate: formatLocalizedDate } = useLocaleFormatting()
-const { localizeError } = useLocalizedApiError()
+const { t } = useAdminI18n()
+const { formatDate: formatLocalizedDate } = useLocaleFormatting('zh-CN')
+const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-if (!hasPermission('revisions.view')) {
-  await navigateTo('/', { replace: true })
-}
-
-const selectedStatus = ref(route.query.status || 'all')
+const selectedStatus = computed(() => ['pending', 'approved', 'rejected'].includes(String(route.query.status)) ? String(route.query.status) : 'all')
 
 const statusTabs = computed(() => [
   { value: 'all', label: t('admin_pages.revisions.status_all') },
@@ -277,7 +276,7 @@ const statusTabs = computed(() => [
 ])
 
 const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1
+  const page = parseInt(String(route.query.page || '1')) || 1
   return page > 0 ? page : 1
 })
 
@@ -303,7 +302,7 @@ const { data: pendingResponse, refresh: refreshPendingCount } = await useAsyncDa
 const pendingCount = computed(() => pendingResponse.value?.pagination?.total ?? 0)
 
 // ===== 格式化 =====
-const formatType = (type) => ({ work: 'Work', artist: 'Artist', franchise: 'Franchise', entry: 'Entry' }[type] || type)
+const formatType = (type) => ['work', 'artist', 'franchise', 'entry'].includes(type) ? t(`admin_pages.types.${type}`) : type
 const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
 const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
 
@@ -332,7 +331,6 @@ const formatDate = (d) => {
 
 // ===== 筛选 =====
 const selectStatus = (status) => {
-  selectedStatus.value = status
   router.push({ query: { ...route.query, status: status === 'all' ? undefined : status, page: undefined } })
 }
 
@@ -353,13 +351,19 @@ const openConfirm = (action, revision) => {
   confirmModal.open = true
 }
 
-const doAction = async () => {
+const saving = ref(false)
+const doAction = async (reason) => {
+  if (saving.value || !confirmModal.revision) return
+  saving.value = true
   try {
-    await $api(`/v1/admin/revisions/${confirmModal.revision.id}/${confirmModal.action}`, { method: 'POST' })
+    await $api(`/v1/admin/revisions/${confirmModal.revision.id}/${confirmModal.action}`, { method: 'POST', body: { review_comment: reason || null } })
     showToast(confirmModal.action === 'approve' ? t('admin_pages.revisions.approved_notice') : t('admin_pages.revisions.rejected_notice'))
+    confirmModal.open = false
     await Promise.all([refresh(), refreshPendingCount()])
   } catch (e) {
     showToast(localizeError(e, 'admin_pages.revisions.action_failed'), 'error')
+  } finally {
+    saving.value = false
   }
 }
 
@@ -371,6 +375,8 @@ const showToast = (message, type = 'success') => {
   Object.assign(toast, { show: true, message, type })
   toastTimer = setTimeout(() => { toast.show = false }, 2500)
 }
+onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer) })
+useHead({ title: computed(() => t('admin_pages.revisions.title')) })
 </script>
 
 <style scoped>

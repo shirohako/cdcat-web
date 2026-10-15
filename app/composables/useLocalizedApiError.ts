@@ -13,15 +13,18 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   REVISION_CANNOT_RETRACT: 'errors.codes.revision_cannot_retract',
 }
 
-export const useLocalizedApiError = () => {
+export const useLocalizedApiError = (translate?: (key: string, params?: Record<string, unknown>) => string) => {
   // This composable is also used by plugins and route middleware, where Vue's
   // useI18n() has no component setup context. Nuxt's injected composer is safe
   // in all of those contexts and remains reactive when the locale changes.
   const nuxtApp = useNuxtApp()
-  const t = (key: string, params?: Record<string, unknown>) =>
-    params ? nuxtApp.$i18n.t(key, params) : nuxtApp.$i18n.t(key)
+  const t = (key: string, params?: Record<string, unknown>) => {
+    if (translate) return translate(key, params)
+    return params ? nuxtApp.$i18n.t(key, params) : nuxtApp.$i18n.t(key)
+  }
 
-  const localizeError = (error: ErrorLike | null | undefined, fallbackKey = 'errors.request_failed') => {
+  const localizeError = (input: unknown, fallbackKey = 'errors.request_failed') => {
+    const error = input && typeof input === 'object' ? input as ErrorLike : undefined
     const code = error?.code ?? error?.details?.code
     const codeKey = code === undefined ? undefined : ERROR_CODE_KEYS[String(code)]
     if (codeKey) return t(codeKey)

@@ -1,4 +1,5 @@
 import type { ApiResponse, ApiErrorResponse } from '~/types/api'
+import type { User } from '~/types/auth'
 
 /**
  * 自定义 API 插件
@@ -10,6 +11,7 @@ import type { ApiResponse, ApiErrorResponse } from '~/types/api'
 export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const stateToken = useState<string | null>('auth:token')
+  const stateUser = useState<User | null>('auth:user')
   const authTokenCookie = useCookie<string | null>('auth_token')
   const authUserCookie = useCookie('auth_user')
   const translateError = (key: string) => nuxtApp.$i18n.t(key)
@@ -32,6 +34,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // 响应拦截器 - 处理成功响应
     onResponse({ response }) {
+      // Let HTTP errors reach onResponseError, which also clears invalid sessions.
+      if (!response.ok) return
       const result = response._data as ApiResponse | ApiErrorResponse
 
       // 检查是否为标准响应格式
@@ -67,7 +71,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
 
     // 错误拦截器 - 处理 HTTP 错误
-    async onResponseError({ response }) {
+    onResponseError({ response }) {
       const status = response.status
       const result = response._data as ApiErrorResponse
 
@@ -75,6 +79,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       // 创建包含 API 错误详情的 Error
       const createApiError = (msg: string) => {
         const error = new Error(msg)
+        Object.assign(error, { status })
         if (result?.error) {
           Object.assign(error, {
             code: result.error.code,
@@ -85,13 +90,13 @@ export default defineNuxtPlugin((nuxtApp) => {
         return error
       }
 
-      // 401 未授权 - 清除 token 并跳转登录
-      if (status === 401) {
+      // Clear invalid sessions; route guards decide whether to show the login page.
+      if (status === 401 || result?.error?.name === 'USER_INACTIVE') {
         stateToken.value = null
+        stateUser.value = null
         authTokenCookie.value = null
         authUserCookie.value = null
 
-        await nuxtApp.runWithContext(() => navigateTo('/auth/login'))
         throw createApiError(translateError('errors.unauthorized'))
       }
 

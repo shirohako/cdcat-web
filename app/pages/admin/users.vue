@@ -28,7 +28,18 @@
         </article>
       </section>
 
+      <AdminFilterBar>
+        <form class="flex flex-wrap items-center gap-2" @submit.prevent="applyFilters()">
+          <input v-model="search" type="search" minlength="2" maxlength="100" :aria-label="t('admin_pages.search')" :placeholder="t('admin_pages.search')" class="w-64 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+          <select :value="selectedRole" :aria-label="t('admin_pages.users.role')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" @change="applyFilters(($event.target as HTMLSelectElement).value)">
+            <option value="">{{ t('admin_pages.all_roles') }}</option>
+            <option v-for="role in rolesData" :key="role.name" :value="role.name">{{ role.name }}</option>
+          </select>
+          <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">{{ t('admin_pages.filters') }}</button>
+        </form>
+      </AdminFilterBar>
       <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
+        <AdminListState :pending="pending" :error="error" :empty="users.length === 0" @retry="refresh()">
         <div class="overflow-x-auto">
           <table class="w-full min-w-200 text-left text-sm">
             <thead>
@@ -62,8 +73,9 @@
                       <img
                         v-if="u.avatar"
                         :src="u.avatar"
+                        alt=""
                         class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
-                      />
+                      >
                       <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500">
                         {{ initials(u) }}
                       </div>
@@ -104,8 +116,9 @@
                   <!-- 操作 -->
                   <td v-if="canAssignRoles" class="px-4 py-3.5">
                     <button
-                      class="whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700"
+                      class="whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-40"
                       type="button"
+                      :disabled="!u.can_manage"
                       @click="openRoleModal(u)"
                     >
                       {{ t('admin_pages.users.edit_role') }}
@@ -130,6 +143,7 @@
             :disabled="pending"
           />
         </footer>
+        </AdminListState>
       </section>
     </div>
 
@@ -250,6 +264,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'admin', middleware: 'admin' })
+
 type ApiUser = {
   id: number
   username: string
@@ -258,6 +274,8 @@ type ApiUser = {
   avatar: string | null
   status: boolean
   roles: string | null
+  role_level: number
+  can_manage: boolean
   joined_at: string
   last_seen_at: string
 }
@@ -273,45 +291,49 @@ type ApiResponse = {
 }
 
 type RoleInfo = {
+  level: number
   name: string
   permissions: string[]
 }
 
 const { $api } = useNuxtApp()
-const { hasPermission } = useAuth()
-const { t } = useI18n()
-const { intlLocale, formatDate: formatLocalizedDate } = useLocaleFormatting()
-const { localizeError } = useLocalizedApiError()
+const { hasPermission, user: currentUser } = useAuth()
+const { t } = useAdminI18n()
+const { intlLocale, formatDate: formatLocalizedDate } = useLocaleFormatting('zh-CN')
+const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const canAssignRoles = hasPermission('users.assign-roles')
-
-const page = ref(1)
+const canAssignRoles = computed(() => hasPermission('users.assign-roles'))
+const route = useRoute()
+const router = useRouter()
+const page = computed({
+  get: () => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1),
+  set: value => { router.push({ query: { ...route.query, page: value > 1 ? value : undefined } }) },
+})
+const search = ref(String(route.query.search || ''))
+const selectedRole = computed(() => String(route.query.role || ''))
+watch(() => route.query.search, value => { search.value = String(value || '') })
+const applyFilters = (role = selectedRole.value) => router.push({ query: {
+  ...route.query, search: search.value.trim() || undefined, role: role || undefined, page: undefined,
+} })
+const query = computed(() => ({ page: page.value, search: route.query.search || undefined, role: selectedRole.value || undefined }))
 
 // 用户列表
-const { data, pending } = await useAsyncData<ApiResponse>(
+const { data, pending, error, refresh } = await useAsyncData<ApiResponse>(
   'admin-users',
-  () => $api('/v1/admin/users', { query: { page: page.value } }),
-  { watch: [page] },
+  () => $api('/v1/admin/users', { query: query.value }),
+  { watch: [query] },
 )
 
-// 角色元数据（有 users.assign-roles 权限才需要）
-const { data: rolesData } = canAssignRoles
-  ? await useAsyncData<RoleInfo[]>('admin-roles', () => $api('/v1/admin/roles'))
-  : { data: ref(null) }
+const { data: rolesData } = await useAsyncData<RoleInfo[]>('admin-roles', () => $api('/v1/admin/roles'))
 
 const users = computed(() => data.value?.users ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
 
-// 角色列表，按层级排序
-const ROLE_ORDER = ['founder', 'moderator', 'contributor', 'member']
-const availableRoles = computed<RoleInfo[]>(() => {
-  const list: RoleInfo[] = (rolesData?.value ?? []).filter(r => r.name !== 'founder')
-  return [...list].sort((a, b) => {
-    const ai = ROLE_ORDER.indexOf(a.name)
-    const bi = ROLE_ORDER.indexOf(b.name)
-    return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi)
-  })
-})
+const availableRoles = computed(() => (rolesData.value ?? []).filter(role =>
+  role.name !== 'founder' && (currentUser.value?.roles === 'founder' || (
+    role.level < (currentUser.value?.role_level ?? 0) && role.permissions.every(hasPermission)
+  )),
+))
 
 const summary = computed(() => [
   { label: t('admin_pages.users.total'), value: pagination.value.total, icon: 'lucide:users', help: t('admin_pages.users.total_help') },
@@ -326,26 +348,25 @@ const roleModal = reactive({
 })
 
 const openRoleModal = (u: ApiUser) => {
+  if (!u.can_manage) return
   roleModal.user = u
   roleModal.selected = u.roles ?? null
   roleModal.open = true
 }
-const closeRoleModal = () => { roleModal.open = false }
+const closeRoleModal = () => { if (!roleModal.saving) roleModal.open = false }
 
 const saveRole = async () => {
-  if (!roleModal.user) return
+  if (!roleModal.user || roleModal.saving) return
   roleModal.saving = true
   try {
     await $api(`/v1/admin/users/${roleModal.user.id}/role`, {
       method: 'PUT',
       body: { role: roleModal.selected },
     })
-    // 乐观更新本地数据
-    const target = users.value.find(u => u.id === roleModal.user!.id)
-    if (target) target.roles = roleModal.selected
+    await refresh()
     showToast(t('admin_pages.users.role_updated'))
-    closeRoleModal()
-  } catch (e: any) {
+    roleModal.open = false
+  } catch (e) {
     showToast(localizeError(e, 'admin_pages.users.update_failed'), 'error')
   } finally {
     roleModal.saving = false
@@ -393,6 +414,8 @@ const formatRelativeTime = (iso: string) => {
   if (days < 30) return formatter.format(-days, 'day')
   return formatter.format(-Math.floor(days / 30), 'month')
 }
+
+onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer) })
 
 useHead({ title: computed(() => `${t('admin_pages.users.title')} | CDCAT`) })
 </script>

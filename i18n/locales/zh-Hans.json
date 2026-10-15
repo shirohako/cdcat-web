@@ -420,7 +420,33 @@
       "action_create": "新增",
       "action_update": "编辑",
       "action_delete": "删除"
-    }
+    },
+    "no_modules": "当前账号暂无已开放的管理模块。",
+    "back_to_site": "返回主站",
+    "open_menu": "展开菜单",
+    "close_menu": "关闭菜单",
+    "breadcrumb": "当前位置",
+    "filters": "筛选条件",
+    "load_failed": "加载失败，请重试。",
+    "retry": "重试",
+    "reason": "原因（必填）",
+    "confirm": "确认",
+    "search": "搜索用户名、昵称或邮箱",
+    "all_roles": "全部角色",
+    "types": {
+      "work": "作品",
+      "artist": "艺术家",
+      "entry": "条目",
+      "franchise": "系列"
+    },
+    "impact": "删除影响",
+    "blocked": "存在受保护的引用，不能删除。",
+    "before": "修改前",
+    "after": "修改后",
+    "field": "字段",
+    "no_changes": "没有变化",
+    "audit_empty": "暂无操作记录",
+    "close_menu_backdrop": "关闭菜单遮罩"
   },
   "article_ui": {
     "back": "返回",

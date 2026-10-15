@@ -4,6 +4,7 @@ export interface User {
   nickname: string
   email: string
   avatar?: string | null
+  role_level?: number
   roles: string
   permissions: string[]
   joined_at: string

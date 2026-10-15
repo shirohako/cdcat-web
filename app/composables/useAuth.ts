@@ -64,10 +64,11 @@ export const useAuth = () => {
 
       // 先保存 token
       saveToken(response.token)
+      user.value = null
+      userCookie.value = null
       // 再用 token 拉取完整用户数据
-      await fetchUser()
-      return { success: true }
-    } catch (error: any) {
+      return await fetchUser()
+    } catch (error) {
       return {
         success: false,
         error: localizeError(error, 'auth.login.login_failed')
@@ -85,11 +86,11 @@ export const useAuth = () => {
 
       saveAuth(response)
       return { success: true, data: response }
-    } catch (error: any) {
+    } catch (error) {
       return {
         success: false,
         error: localizeError(error, 'auth.register.register_failed'),
-        details: error.details?.details as Record<string, unknown> | undefined
+        details: (error as { details?: { details?: Record<string, unknown> } })?.details?.details
       }
     }
   }
@@ -102,7 +103,7 @@ export const useAuth = () => {
       clearAuth()
       await router.push('/')
       return { success: true }
-    } catch (error: any) {
+    } catch (error) {
       clearAuth()
       return {
         success: false,
@@ -123,9 +124,10 @@ export const useAuth = () => {
       userCookie.value = response
 
       return { success: true, data: response }
-    } catch (error: any) {
-      // 如果获取用户信息失败（可能 token 过期），清除认证状态
-      clearAuth()
+    } catch (error) {
+      // A temporary network/server failure must not discard a valid session.
+      const failure = error as { status?: number, name?: string }
+      if (failure?.status === 401 || failure?.name === 'USER_INACTIVE') clearAuth()
       return {
         success: false,
         error: localizeError(error)

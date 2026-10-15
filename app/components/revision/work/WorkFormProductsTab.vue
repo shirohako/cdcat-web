@@ -349,7 +349,7 @@ const emit = defineEmits<{
 const PRIORITY_CURRENCIES = ['JPY', 'USD', 'EUR', 'KRW', 'CNY', 'TWD', 'HKD', 'GBP', 'AUD', 'CAD']
 const displayNames = new Intl.DisplayNames(['zh-Hans'], { type: 'currency' })
 
-const allCurrencyCodes = [...new Set(
+const allCurrencyCodes: string[] = [...new Set(
   getCountryDataList().flatMap(c => c.currency),
 )].sort()
 

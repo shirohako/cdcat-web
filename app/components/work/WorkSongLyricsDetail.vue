@@ -143,7 +143,7 @@ const parsedLrc = computed<LrcLine[]>(() => {
   if (!item.value?.content) return []
   return item.value.content.split('\n').map(line => {
     const m = line.match(/^\[(\d{2}:\d{2}[.:]\d{2,3})\](.*)$/)
-    if (m) return { time: m[1], text: m[2].trim() }
+    if (m) return { time: m[1] ?? null, text: (m[2] ?? '').trim() }
     return { time: null, text: line }
   }).filter(l => l.text || l.time)
 })
