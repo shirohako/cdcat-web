@@ -373,7 +373,15 @@
       "revision_baseline_required": "This revision has no reliable baseline. Reopen the editor and submit again.",
       "content_delete_blocked": "Protected references prevent deletion.",
       "deletion_confirmation_required": "Preview the deletion impact and provide a reason.",
-      "deletion_impact_changed": "The deletion impact changed. Preview and submit again."
+      "deletion_impact_changed": "The deletion impact changed. Preview and submit again.",
+      "revision_already_processed": "This revision has already been processed.",
+      "revision_rollback_unavailable": "This version cannot be used for a rollback.",
+      "revision_rollback_blocked": "The target version references content that no longer exists.",
+      "artist_merge_blocked": "Pending revisions still reference the artist being merged.",
+      "artist_merge_impact_changed": "The merge impact changed. Preview it again.",
+      "registration_closed": "Registration is currently closed.",
+      "operation_in_progress": "The same operation is already running. Try again later.",
+      "job_not_retryable": "This failed job cannot be retried from the admin panel."
     }
   },
   "admin_pages": {

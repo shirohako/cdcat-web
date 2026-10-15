@@ -152,6 +152,10 @@ export async function createMockAPI(port) {
         pagination: { total: matches ? 1 : 0, per_page: 15, current_page: 1, last_page: 1 },
       })
     }
+    if (url.pathname === '/v1/admin/revisions/batch' && req.method === 'POST') {
+      state.revisionStatus = payload.action === 'reject' ? 'rejected' : 'approved'
+      return send({ results: payload.ids.map(id => ({ id, success: true })), succeeded: payload.ids.length, failed: 0 })
+    }
     if (/\/v1\/admin\/revisions\/7\/(approve|reject)$/.test(url.pathname)) {
       state.revisionStatus = url.pathname.endsWith('reject') ? 'rejected' : 'approved'
       return send({})

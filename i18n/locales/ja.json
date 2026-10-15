@@ -373,7 +373,15 @@
       "revision_baseline_required": "この修正には信頼できる基準がありません。編集画面を開き直して再送信してください。",
       "content_delete_blocked": "保護された参照があるため削除できません。",
       "deletion_confirmation_required": "削除の影響を確認して理由を入力してください。",
-      "deletion_impact_changed": "削除の影響が変わりました。再確認して送信してください。"
+      "deletion_impact_changed": "削除の影響が変わりました。再確認して送信してください。",
+      "revision_already_processed": "この修正はすでに処理されています。",
+      "revision_rollback_unavailable": "このバージョンにはロールバックできません。",
+      "revision_rollback_blocked": "対象バージョンが参照する内容はすでに存在しません。",
+      "artist_merge_blocked": "統合するアーティストを参照する審査待ちの修正があります。",
+      "artist_merge_impact_changed": "統合の影響が変わりました。再確認してください。",
+      "registration_closed": "現在、新規登録を停止しています。",
+      "operation_in_progress": "同じ操作を実行中です。しばらくしてから再試行してください。",
+      "job_not_retryable": "この失敗したジョブは管理画面から再試行できません。"
     }
   },
   "admin_pages": {

@@ -373,7 +373,15 @@
       "revision_baseline_required": "此修訂沒有可靠的編輯基準，請重新開啟編輯器提交。",
       "content_delete_blocked": "存在受保護的引用，無法刪除。",
       "deletion_confirmation_required": "請先預覽刪除影響並填寫原因。",
-      "deletion_impact_changed": "刪除影響已變更，請重新預覽並提交。"
+      "deletion_impact_changed": "刪除影響已變更，請重新預覽並提交。",
+      "revision_already_processed": "此修訂已被處理。",
+      "revision_rollback_unavailable": "此版本無法用於回滾。",
+      "revision_rollback_blocked": "目標版本引用的內容已不存在，無法回滾。",
+      "artist_merge_blocked": "仍有待審修訂引用要合併的藝術家。",
+      "artist_merge_impact_changed": "合併影響已變更，請重新預覽。",
+      "registration_closed": "目前暫停註冊。",
+      "operation_in_progress": "相同的操作正在進行，請稍後再試。",
+      "job_not_retryable": "此失敗任務無法在後台重試。"
     }
   },
   "admin_pages": {

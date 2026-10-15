@@ -154,6 +154,11 @@ const props = defineProps({
     type: [String, Number],
     default: null,
   },
+  // Where to go after a successful submit; a function receives the new revision id.
+  redirectTo: {
+    type: [String, Function],
+    default: null,
+  },
 });
 
 const router = useRouter();
@@ -729,12 +734,16 @@ const handleSubmit = async () => {
       revisionData.baseline_checksum = props.initialData?.baseline_checksum;
     }
 
-    await $api('/v1/revisions', {
+    const result = await $api('/v1/revisions', {
       method: 'POST',
       body: revisionData,
       headers: { Accept: 'application/json' },
     });
 
+    if (props.redirectTo) {
+      router.push(typeof props.redirectTo === 'function' ? props.redirectTo(result?.id) : props.redirectTo);
+      return;
+    }
     // 提交成功，跳转到成功页面
     router.push({
       path: '/contribute/success',

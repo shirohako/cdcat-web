@@ -18,6 +18,14 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   DELETION_IMPACT_CHANGED: 'errors.codes.deletion_impact_changed',
   REVISION_NOT_OWNED: 'errors.codes.revision_not_owned',
   REVISION_CANNOT_RETRACT: 'errors.codes.revision_cannot_retract',
+  REVISION_ALREADY_PROCESSED: 'errors.codes.revision_already_processed',
+  REVISION_ROLLBACK_UNAVAILABLE: 'errors.codes.revision_rollback_unavailable',
+  REVISION_ROLLBACK_BLOCKED: 'errors.codes.revision_rollback_blocked',
+  ARTIST_MERGE_BLOCKED: 'errors.codes.artist_merge_blocked',
+  ARTIST_MERGE_IMPACT_CHANGED: 'errors.codes.artist_merge_impact_changed',
+  REGISTRATION_CLOSED: 'errors.codes.registration_closed',
+  OPERATION_IN_PROGRESS: 'errors.codes.operation_in_progress',
+  JOB_NOT_RETRYABLE: 'errors.codes.job_not_retryable',
 }
 
 export const useLocalizedApiError = (translate?: (key: string, params?: Record<string, unknown>) => string) => {

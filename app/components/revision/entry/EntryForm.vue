@@ -14,6 +14,8 @@ interface EntryFormData {
 const props = defineProps<{
   initialData?: Record<string, any>
   entryId?: string | number
+  // Where to go after a successful submit; a function receives the new revision id.
+  redirectTo?: string | ((revisionId: number) => string)
 }>()
 
 const router = useRouter()
@@ -237,11 +239,15 @@ const submitForm = async () => {
       formData.append('resource_id', String(props.entryId));
       if (props.initialData?.baseline_checksum) formData.append('baseline_checksum', props.initialData.baseline_checksum);
     }
-    await $api('/v1/revisions', {
+    const result = await $api<{ id: number }>('/v1/revisions', {
       method: 'POST',
       body: formData
     })
 
+    if (props.redirectTo) {
+      await router.push(typeof props.redirectTo === 'function' ? props.redirectTo(result.id) : props.redirectTo)
+      return
+    }
     // 提交成功，跳转到成功页面
     router.push({
       path: '/contribute/success',
