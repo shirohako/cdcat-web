@@ -312,7 +312,9 @@
         "nickname": "暱稱",
         "verification_code": "驗證碼",
         "birthday": "生日"
-      }
+      },
+      "closed_title": "暫停註冊",
+      "closed_message": "網站目前暫停新用戶註冊，請稍後再來。已有帳號可以正常登入。"
     }
   },
   "common": {
@@ -984,5 +986,8 @@
       "added": "地址已新增",
       "deleted": "地址已刪除"
     }
+  },
+  "site": {
+    "dismiss_announcement": "關閉公告"
   }
 }

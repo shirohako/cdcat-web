@@ -187,3 +187,66 @@ export interface AdminEvent {
   main_visual_url: string | null
   released_works_count: number
 }
+
+export interface AdminReview {
+  id: number
+  work_id: number
+  user_id: number
+  rating: number | null
+  content: string
+  language: string | null
+  useful_count: number
+  dislike_count: number
+  fun_count: number
+  work: { id: number, title: string } | null
+  user: AdminUserRef | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminArticleItem {
+  id: number
+  title: string
+  slug: string | null
+  status: 'draft' | 'published'
+  cover_url: string | null
+  works_count: number
+  excerpt: string
+  author: AdminUserRef | null
+  published_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminArticle extends Omit<AdminArticleItem, 'works_count' | 'excerpt'> {
+  content: string
+  works: { id: number, title: string }[]
+}
+
+export interface AdminLyric {
+  id: number
+  song_id: number
+  language: string
+  format: 'plain' | 'lrc' | 'srt'
+  content?: string
+  excerpt?: string
+  is_primary: boolean
+  is_translation: boolean
+  is_ai_generated: boolean
+  authorship: string | null
+  source: string | null
+  song: { id: number, title: string, work_id: number } | null
+  work: { id: number, title: string } | null
+  submitter: { id: number, username: string, nickname: string | null } | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminSiteSettings {
+  settings: {
+    registration_open: boolean
+    announcement: { content: string, level: 'info' | 'warning', enabled: boolean, ends_at: string | null, version: number }
+  }
+  updated: Record<string, { updated_at: string | null, updated_by: { id: number, username: string, nickname: string | null } | null }>
+  public: { registration_open: boolean, announcement: unknown }
+}

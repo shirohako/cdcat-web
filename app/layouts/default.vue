@@ -22,6 +22,7 @@
         isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-52'
       ]"
     >
+      <SiteAnnouncement />
       <div class="w-full">
         <slot />
       </div>

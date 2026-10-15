@@ -312,7 +312,9 @@
         "nickname": "Nickname",
         "verification_code": "Verification code",
         "birthday": "Birthday"
-      }
+      },
+      "closed_title": "Registration paused",
+      "closed_message": "New sign-ups are currently paused. Please come back later. Existing accounts can still sign in."
     }
   },
   "common": {
@@ -984,5 +986,8 @@
       "added": "Address added",
       "deleted": "Address deleted"
     }
+  },
+  "site": {
+    "dismiss_announcement": "Dismiss announcement"
   }
 }

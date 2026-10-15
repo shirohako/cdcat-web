@@ -30,8 +30,14 @@
           </ul>
         </div>
 
+        <!-- Registration paused by the site settings -->
+        <div v-if="site?.registration_open === false" role="alert" class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
+          <p class="font-bold text-amber-900">{{ $t('auth.register.closed_title') }}</p>
+          <p class="mt-1 text-sm text-amber-800">{{ $t('auth.register.closed_message') }}</p>
+        </div>
+
         <!-- Register Form -->
-        <form @submit.prevent="handleRegister" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
+        <form v-else @submit.prevent="handleRegister" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
           <!-- Nickname Input -->
           <div class="flex flex-col gap-2">
             <label for="nickname" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
@@ -247,6 +253,7 @@ import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, 
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { register } = useAuth()
+const { site } = useSite()
 const { t } = useI18n()
 const { localizeError, localizeFieldErrors } = useLocalizedApiError()
 

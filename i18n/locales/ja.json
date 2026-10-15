@@ -312,7 +312,9 @@
         "nickname": "ニックネーム",
         "verification_code": "認証コード",
         "birthday": "生年月日"
-      }
+      },
+      "closed_title": "新規登録を停止中",
+      "closed_message": "現在、新規登録を停止しています。しばらくしてから再度お越しください。既存のアカウントはログインできます。"
     }
   },
   "common": {
@@ -984,5 +986,8 @@
       "added": "住所を追加しました",
       "deleted": "住所を削除しました"
     }
+  },
+  "site": {
+    "dismiss_announcement": "お知らせを閉じる"
   }
 }
