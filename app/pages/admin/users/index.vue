@@ -35,6 +35,13 @@
             <option value="">{{ t('admin_pages.all_roles') }}</option>
             <option v-for="role in rolesData" :key="role.name" :value="role.name">{{ role.name }}</option>
           </select>
+          <select v-model="status" :aria-label="t('admin_pages.users.status')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            <option value="">{{ t('admin_pages.all_statuses') }}</option><option value="active">{{ t('admin_pages.users.active') }}</option><option value="disabled">{{ t('admin_pages.users.disabled') }}</option>
+          </select>
+          <select v-model="sortBy" :aria-label="t('admin_pages.sort_by')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            <option v-for="option in sortOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
+          </select>
+          <select v-model="sortOrder" :aria-label="t('admin_pages.sort_order')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="desc">{{ t('admin_pages.descending') }}</option><option value="asc">{{ t('admin_pages.ascending') }}</option></select>
           <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">{{ t('admin_pages.filters') }}</button>
         </form>
       </AdminFilterBar>
@@ -47,6 +54,8 @@
                 <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.user') }}</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.role') }}</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.status') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.user_detail.reviews') }}</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.user_detail.contributions') }}</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.joined') }}</th>
                 <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.last_login') }}</th>
                 <th v-if="canAssignRoles" class="w-24 px-4 py-3" />
@@ -55,7 +64,7 @@
 
             <tbody class="divide-y divide-slate-100">
               <tr v-if="pending">
-                <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
+                <td :colspan="canAssignRoles ? 8 : 7" class="px-5 py-16 text-center text-sm text-slate-400">
                   <Icon name="lucide:loader-circle" class="mx-auto mb-2 h-5 w-5 animate-spin opacity-40" />
                   {{ t('common.loading') }}
                 </td>
@@ -80,7 +89,7 @@
                         {{ initials(u) }}
                       </div>
                       <div class="min-w-0">
-                        <p class="truncate font-medium text-slate-900">{{ u.nickname || u.username }}</p>
+                        <NuxtLink :to="`/admin/users/${u.id}`" class="truncate font-medium text-slate-900 underline decoration-slate-200 underline-offset-4">{{ u.nickname || u.username }}</NuxtLink>
                         <p class="truncate text-xs text-slate-400">{{ u.email }}</p>
                       </div>
                     </div>
@@ -109,6 +118,8 @@
                     </span>
                   </td>
 
+                  <td class="px-4 py-3.5 tabular-nums text-slate-600">{{ u.reviews_count }}</td>
+                  <td class="px-4 py-3.5 tabular-nums text-slate-600">{{ u.contributions_count }}</td>
                   <!-- 时间 -->
                   <td class="px-4 py-3.5 text-xs tabular-nums text-slate-400">{{ formatDate(u.joined_at) }}</td>
                   <td class="px-4 py-3.5 text-xs tabular-nums text-slate-400">{{ formatRelativeTime(u.last_seen_at) }}</td>
@@ -127,7 +138,7 @@
                 </tr>
 
                 <tr v-if="users.length === 0">
-                  <td :colspan="canAssignRoles ? 6 : 5" class="px-5 py-16 text-center text-sm text-slate-400">
+                  <td :colspan="canAssignRoles ? 8 : 7" class="px-5 py-16 text-center text-sm text-slate-400">
                     {{ t('admin_pages.users.empty') }}
                   </td>
                 </tr>
@@ -276,6 +287,8 @@ type ApiUser = {
   roles: string | null
   role_level: number
   can_manage: boolean
+  reviews_count: number
+  contributions_count: number
   joined_at: string
   last_seen_at: string
 }
@@ -310,12 +323,22 @@ const page = computed({
   set: value => { router.push({ query: { ...route.query, page: value > 1 ? value : undefined } }) },
 })
 const search = ref(String(route.query.search || ''))
+const status = ref(String(route.query.status || ''))
+const sortBy = ref(String(route.query.sort_by || 'id'))
+const sortOrder = ref(String(route.query.sort_order || 'desc'))
+const sortOptions = computed(() => [
+  { value: 'id', label: 'ID' }, { value: 'username', label: t('admin_pages.user_detail.username') },
+  { value: 'joined_at', label: t('admin_pages.users.joined') }, { value: 'last_seen_at', label: t('admin_pages.users.last_login') },
+  { value: 'reviews_count', label: t('admin_pages.user_detail.reviews') }, { value: 'contributions_count', label: t('admin_pages.user_detail.contributions') },
+])
+watch(() => route.query, value => { status.value = String(value.status || ''); sortBy.value = String(value.sort_by || 'id'); sortOrder.value = String(value.sort_order || 'desc') })
 const selectedRole = computed(() => String(route.query.role || ''))
 watch(() => route.query.search, value => { search.value = String(value || '') })
 const applyFilters = (role = selectedRole.value) => router.push({ query: {
   ...route.query, search: search.value.trim() || undefined, role: role || undefined, page: undefined,
+  status: status.value || undefined, sort_by: sortBy.value === 'id' ? undefined : sortBy.value, sort_order: sortOrder.value === 'desc' ? undefined : sortOrder.value,
 } })
-const query = computed(() => ({ page: page.value, search: route.query.search || undefined, role: selectedRole.value || undefined }))
+const query = computed(() => ({ page: page.value, search: route.query.search || undefined, role: selectedRole.value || undefined, status: route.query.status || undefined, sort_by: route.query.sort_by || undefined, sort_order: route.query.sort_order || undefined }))
 
 // 用户列表
 const { data, pending, error, refresh } = await useAsyncData<ApiResponse>(

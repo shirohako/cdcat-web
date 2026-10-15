@@ -12,7 +12,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   }
   if (!hasPermission('admin.access')) return navigateTo('/', { replace: true })
 
-  const requiredPermission = adminMenu.find(item => to.path === item.path || to.path.startsWith(`${item.path}/`))?.permission
+  const requiredPermission = adminMenu.find(item => to.path === item.path || (item.path !== '/admin' && to.path.startsWith(`${item.path}/`)))?.permission
   if (requiredPermission && !hasPermission(requiredPermission)) {
     return navigateTo('/admin', { replace: true })
   }

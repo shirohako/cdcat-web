@@ -6,7 +6,7 @@ const { hasPermission, user } = useAuth()
 const { t } = useAdminI18n()
 const open = ref(false)
 const links = computed(() => adminMenu.filter(item => hasPermission(item.permission)))
-const current = computed(() => links.value.find(item => route.path.startsWith(item.path)))
+const current = computed(() => links.value.find(item => route.path === item.path || (item.path !== '/admin' && route.path.startsWith(`${item.path}/`))))
 watch(() => route.path, () => { open.value = false })
 useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
 </script>
@@ -24,7 +24,7 @@ useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
         </button>
       </div>
       <nav class="space-y-1 p-3" :aria-label="t('admin_pages.console')">
-        <NuxtLink v-for="item in links" :key="item.path" :to="item.path" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-100" active-class="bg-slate-100 font-semibold">
+        <NuxtLink v-for="item in links" :key="item.path" :to="item.path" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-100" :class="current?.path === item.path ? 'bg-slate-100 font-semibold' : ''">
           <Icon :name="item.icon" class="size-4" />{{ t(item.label) }}
         </NuxtLink>
       </nav>

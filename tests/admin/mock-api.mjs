@@ -17,15 +17,16 @@ export const workSchema = {
 
 export async function createMockAPI(port) {
   const permissions = {
-    founder: ['admin.access', 'users.manage', 'users.assign-roles', 'revisions.view', 'revisions.review', 'content.manage'],
+    founder: ['admin.access', 'users.manage', 'users.assign-roles', 'revisions.view', 'revisions.review', 'content.manage', 'roles.manage', 'audit.view', 'system.logs'],
+    moderator: ['admin.access', 'users.manage', 'revisions.view', 'revisions.review'],
     contributor: ['admin.access', 'revisions.view', 'revisions.review'],
     member: ['content.submit'],
   }
-  const state = { revisionStatus: 'pending', role: 'member', revoked: false, meFailure: null, requests: [], legacy: false, destructive: false, submissionFailure: null, blockers: [] }
+  const state = { revisionStatus: 'pending', role: 'member', revoked: false, meFailure: null, requests: [], legacy: false, destructive: false, submissionFailure: null, blockers: [], userStatus: true, userProfile: {}, sessions: 2, roleRecords: null, dashboardFailure: false, userProtected: false }
   const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', 'authorization,content-type')
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
     if (req.method === 'OPTIONS') return res.writeHead(204).end()
     let body = ''
     for await (const part of req) body += part
@@ -84,12 +85,58 @@ export async function createMockAPI(port) {
         data: { name: '新系列' }, snapshot_version: state.legacy ? null : 1, requires_reconfirmation: state.legacy, requires_content_manage: false },
       previous: state.legacy ? null : { data: { name: '原系列' }, checksum: baseline },
     })
-    if (url.pathname === '/v1/admin/roles') return send(Object.entries(permissions).map(([name, list]) => ({ name, permissions: list, level: { founder: 100, contributor: 20, member: 0 }[name] })))
+    if (url.pathname === '/v1/admin/dashboard') {
+      if (state.dashboardFailure) return fail(500, 'INTERNAL_ERROR')
+      const data = {
+        generated_at: '2026-10-16T00:00:00Z',
+        metrics: ['users', 'works', 'artists', 'entries', 'franchises', 'songs', 'reviews', 'articles', 'lyrics', 'events'].map(key => ({ key, total: 10, new_7: 2, new_30: 4, daily: Array.from({ length: 30 }, (_, i) => ({ date: `2026-09-${String(i + 1).padStart(2, '0')}`, count: i % 3 })) })),
+      }
+      if (permissions[token]?.includes('revisions.view')) data.pending_revisions = 1
+      if (permissions[token]?.includes('audit.view')) data.recent_actions = [{ id: 1, actor_name: 'admin', action: 'users.update', reason: '审核资料', result: 'success', created_at: '2026-10-16T00:00:00Z' }]
+      if (permissions[token]?.includes('system.logs')) data.operations = { failed_jobs: 2, scheduler: { status: 'unknown', last_seen_at: null }, worker: { status: 'unknown', last_seen_at: null } }
+      return send(data)
+    }
+    state.roleRecords ??= Object.entries(permissions).map(([name, list], index) => ({ id: index + 1, name, permissions: [...list], level: { founder: 100, moderator: 50, contributor: 20, member: 0 }[name] }))
+    if (url.pathname === '/v1/admin/permissions/catalog') return send([...new Set(Object.values(permissions).flat())].map(name => ({ name, group: name.startsWith('users') || name.startsWith('roles') ? '用户' : '后台', description: name === 'roles.manage' ? '管理角色及权限' : name, assignable: token === 'founder' || permissions[token]?.includes(name) })))
+    if (url.pathname === '/v1/admin/roles' && req.method === 'POST') {
+      const role = { id: 10 + state.roleRecords.length, ...payload }
+      state.roleRecords.push(role)
+      return send({ id: role.id, name: role.name })
+    }
+    const roleMatch = url.pathname.match(/^\/v1\/admin\/roles\/(\d+)$/)
+    if (roleMatch) {
+      const role = state.roleRecords.find(role => role.id === Number(roleMatch[1]))
+      if (req.method === 'PUT') Object.assign(role, payload)
+      if (req.method === 'DELETE') {
+        if (state.role === role.name && !payload.replacement_role_id) return fail(422, 'VALIDATION_FAILED')
+        if (state.role === role.name) state.role = state.roleRecords.find(item => item.id === payload.replacement_role_id)?.name
+        state.roleRecords = state.roleRecords.filter(item => item.id !== role.id)
+      }
+      return send({})
+    }
+    if (url.pathname === '/v1/admin/roles') return send(state.roleRecords.map(role => ({ ...role, users_count: role.name === state.role || role.name === 'founder' ? 1 : 0, can_manage: role.name !== 'founder' && token === 'founder', can_delete: !['founder', 'member'].includes(role.name) && token === 'founder' })))
+    if (url.pathname === '/v1/admin/users/2' && req.method === 'GET') return send({
+      id: 2, username: 'member', nickname: '测试用户', email: 'member@example.test', birthday: '2000-01-01', avatar: null, banner: null, bio: '用户简介',
+      status: state.userStatus, roles: state.role, role_names: [state.role], role_level: 0, can_manage: !state.userProtected, permissions: ['content.submit'], contributions_count: 3, reviews_count: 2,
+      joined_at: '2026-01-01T00:00:00Z', last_seen_at: null,
+      login_sessions: Array.from({ length: state.sessions }, () => ({ created_at: '2026-01-01T00:00:00Z', last_used_at: null })), login_sessions_total: state.sessions,
+      ...state.userProfile,
+    })
+    if (url.pathname === '/v1/admin/users/2' && req.method === 'PUT') {
+      if (payload.status !== undefined) state.userStatus = payload.status
+      else Object.assign(state.userProfile, payload)
+      return send({})
+    }
+    if (url.pathname === '/v1/admin/users/2/activity') return send({ items: [{ id: 7, title: `${url.searchParams.get('type')} 测试记录`, status: url.searchParams.get('type') === 'articles' ? 'draft' : 'pending', created_at: '2026-01-01T00:00:00Z' }], pagination: { total: 1, per_page: 15, current_page: 1, last_page: 1 } })
+    if (/^\/v1\/admin\/users\/2\/(revoke-tokens|send-reset|clear-verification-limit)$/.test(url.pathname)) {
+      if (url.pathname.endsWith('revoke-tokens')) state.sessions = 0
+      return send({ audit_id: 10 })
+    }
     if (url.pathname === '/v1/admin/users') {
       if (url.searchParams.get('search') === 'failure') return fail(500, 'INTERNAL_ERROR')
       const users = url.searchParams.get('search') === 'empty' ? [] : [{
         id: 2, username: 'member', nickname: '测试用户', email: 'member@example.test',
-        roles: state.role, role_level: 0, can_manage: true, status: true,
+        roles: state.role, role_level: 0, can_manage: !state.userProtected, status: state.userStatus, reviews_count: 2, contributions_count: 3,
         joined_at: '2026-01-01T00:00:00Z', last_seen_at: null,
       }]
       return send({ users, pagination: { total: users.length, per_page: 15, current_page: 1, last_page: 1 } })
