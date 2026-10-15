@@ -142,24 +142,14 @@
                   <span>{{ $t(item.i18nKey) }}</span>
                 </NuxtLink>
               </div>
-              <div v-if="hasPermission('admin.access')" class="border-t border-gray-200">
+              <div v-if="hasPermission('admin.access')" class="border-t border-gray-200 py-2">
                 <NuxtLink
-                  v-if="hasPermission('users.manage')"
-                  to="/admin/users"
+                  to="/admin"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   @click="showUserMenu = false"
                 >
                   <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
-                  <span>{{ $t('admin.users') }}</span>
-                </NuxtLink>
-                <NuxtLink
-                  v-if="hasPermission('revisions.view')"
-                  to="/admin/revisions"
-                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
-                  @click="showUserMenu = false"
-                >
-                  <Icon name="lucide:git-pull-request" class="w-4 h-4" />
-                  <span>{{ $t('admin.revisions') }}</span>
+                  <span>{{ $t('admin.console') }}</span>
                 </NuxtLink>
               </div>
               <div class="border-t border-gray-200">

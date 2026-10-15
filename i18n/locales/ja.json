@@ -23,8 +23,7 @@
     "logout": "ログアウト"
   },
   "admin": {
-    "users": "ユーザー管理",
-    "revisions": "ユーザー修正申請"
+    "console": "管理画面"
   },
   "work": {
     "section": {

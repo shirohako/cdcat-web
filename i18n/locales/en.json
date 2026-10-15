@@ -23,8 +23,7 @@
     "logout": "Sign Out"
   },
   "admin": {
-    "users": "User Management",
-    "revisions": "Revision Requests"
+    "console": "Admin Console"
   },
   "work": {
     "section": {
