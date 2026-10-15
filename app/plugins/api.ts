@@ -122,7 +122,15 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   return {
     provide: {
-      api,
+      api: api as ApiFetch,
     },
   }
 })
+
+/**
+ * The API is external to Nitro, so skip Nitro's typed-route inference: matching every URL
+ * literal against internal routes is slow and can exceed the compiler's recursion limit.
+ * The result type still comes from the explicit type argument or the assignment target.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- same default as ofetch's $Fetch
+type ApiFetch = <T = any>(request: string, options?: Parameters<typeof $fetch>[1]) => Promise<T>

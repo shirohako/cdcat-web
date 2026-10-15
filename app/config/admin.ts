@@ -10,6 +10,8 @@ export const adminMenu = [
   { path: '/admin/users', permission: 'users.manage', label: 'admin_pages.users.title', icon: 'lucide:users' },
   { path: '/admin/roles', permission: 'roles.manage', label: 'admin_pages.roles.title', icon: 'lucide:shield-check' },
   { path: '/admin/settings', permission: 'system.settings', label: 'admin_pages.settings.title', icon: 'lucide:settings' },
+  { path: '/admin/audit', permission: 'audit.view', label: 'admin_pages.audit.title', icon: 'lucide:scroll-text' },
+  { path: '/admin/system', permission: 'system.logs', label: 'admin_pages.system.title', icon: 'lucide:activity' },
 ]
 
 export const adminContentTypes = ['work', 'artist', 'entry', 'franchise', 'song'] as const

@@ -250,3 +250,60 @@ export interface AdminSiteSettings {
   updated: Record<string, { updated_at: string | null, updated_by: { id: number, username: string, nickname: string | null } | null }>
   public: { registration_open: boolean, announcement: unknown }
 }
+
+export interface AdminAuditLog {
+  id: number
+  actor_id: number | null
+  actor_name: string | null
+  action: string
+  target_type: string
+  target_id: number | null
+  reason: string | null
+  result: 'submitted' | 'success' | 'failed' | string
+  ip: string | null
+  created_at: string
+  updated_at: string
+  before?: Record<string, unknown> | unknown[]
+  after?: Record<string, unknown> | unknown[]
+  summary?: Record<string, unknown> | unknown[]
+}
+
+export interface AdminHeartbeat {
+  status: 'healthy' | 'stale' | 'unknown'
+  last_seen_at: string | null
+}
+
+export interface AdminSystemStatus {
+  checks: Record<string, { status: string, latency_ms?: number, error?: string }>
+  heartbeats: { scheduler: AdminHeartbeat, worker: AdminHeartbeat }
+  queues: { name: string, connection: string, size: number | null, error: string | null }[]
+  failed_jobs: number
+  schedule: {
+    name: string
+    job: string | null
+    expression: string
+    next_run_at: string
+    last_run: { status: string, finished_at: string | null, last_success_at: string | null, error: string | null } | null
+  }[]
+}
+
+export interface AdminFailedJob {
+  id: number
+  uuid: string
+  queue: string
+  connection: string
+  job: string | null
+  template: string | null
+  retryable: boolean
+  error: string
+  failed_at: string | null
+  exception?: string
+}
+
+export interface AdminLogEntry {
+  time: string
+  channel: string
+  level: string
+  message: string
+  context: string
+}

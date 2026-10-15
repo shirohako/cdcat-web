@@ -76,7 +76,7 @@ const deleteOpen = ref(false)
 const startDelete = async (item: AdminContentItem) => {
   message.value = ''
   try {
-    impact.value = await $api(`/v1/admin/content/${type.value}/${item.id}/deletion-impact`)
+    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${type.value}/${item.id}/deletion-impact`)
     deleting.value = item
     deleteOpen.value = true
   } catch (e) {

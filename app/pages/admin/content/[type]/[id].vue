@@ -10,6 +10,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
+const { hasPermission } = useAuth()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
@@ -59,7 +60,7 @@ const deleteOpen = ref(false)
 const startDelete = async () => {
   message.value = ''
   try {
-    impact.value = await $api(`/v1/admin/content/${type.value}/${id.value}/deletion-impact`)
+    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${type.value}/${id.value}/deletion-impact`)
     deleteOpen.value = true
   } catch (e) {
     message.value = localizeError(e)
@@ -121,7 +122,10 @@ useHead({ title: computed(() => `${name.value} | CDCAT`) })
         <p class="text-xs text-slate-500">{{ t(`admin_pages.types.${type}`) }} #{{ id }}</p>
         <h1 class="mt-1 text-2xl font-bold">{{ name }}</h1>
       </div>
-      <NuxtLink :to="`/${paths.front}/${id}`" target="_blank" class="text-sm underline">{{ t('admin_pages.preview_front') }}</NuxtLink>
+      <div class="flex gap-4 text-sm">
+        <NuxtLink v-if="hasPermission('audit.view')" :to="{ path: '/admin/audit', query: { target_type: type, target_id: id } }" class="underline">{{ t('admin_pages.audit.title') }}</NuxtLink>
+        <NuxtLink :to="`/${paths.front}/${id}`" target="_blank" class="underline">{{ t('admin_pages.preview_front') }}</NuxtLink>
+      </div>
     </header>
     <nav class="flex gap-2 border-b border-slate-200 text-sm">
       <button v-for="item in ['edit', 'history', 'actions']" :key="item" type="button" :aria-pressed="tab === item" class="-mb-px border-b-2 px-3 py-2" :class="tab === item ? 'border-slate-900 font-semibold' : 'border-transparent text-slate-500'" @click="tab = item">{{ t(`admin_pages.content.tab_${item}`) }}</button>

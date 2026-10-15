@@ -39,6 +39,7 @@ export function useAPI<T>(
 
   return useFetch(url, {
     ...options,
-    $fetch: $api,
+    // $api is a real $fetch instance; the plugin only narrows its call signature.
+    $fetch: $api as unknown as typeof $fetch,
   })
 }
