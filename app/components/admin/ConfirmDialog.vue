@@ -6,7 +6,8 @@ const props = withDefaults(defineProps<{
   confirmText?: string
   reasonRequired?: boolean
   busy?: boolean
-}>(), { reasonRequired: false, busy: false, description: '', confirmText: '' })
+  confirmDisabled?: boolean
+}>(), { reasonRequired: false, busy: false, confirmDisabled: false, description: '', confirmText: '' })
 const emit = defineEmits<{ 'update:modelValue': [value: boolean], confirm: [reason: string] }>()
 const { t } = useAdminI18n()
 const dialog = useTemplateRef('dialog')
@@ -23,7 +24,7 @@ watch(() => props.modelValue, async (value) => {
 }, { immediate: true })
 const close = () => { if (!props.busy) emit('update:modelValue', false) }
 const confirm = () => {
-  if (!props.busy && (!props.reasonRequired || reason.value.trim())) emit('confirm', reason.value.trim())
+  if (!props.busy && !props.confirmDisabled && (!props.reasonRequired || reason.value.trim())) emit('confirm', reason.value.trim())
 }
 </script>
 
@@ -39,7 +40,7 @@ const confirm = () => {
       </label>
       <div class="mt-5 flex justify-end gap-2">
         <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-50" @click="close">{{ t('common.cancel') }}</button>
-        <button type="submit" :disabled="busy || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? t('common.saving') : (confirmText || t('admin_pages.confirm')) }}</button>
+        <button type="submit" :disabled="busy || confirmDisabled || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? t('common.saving') : (confirmText || t('admin_pages.confirm')) }}</button>
       </div>
     </form>
   </dialog>

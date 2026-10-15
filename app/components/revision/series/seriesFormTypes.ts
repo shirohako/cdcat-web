@@ -1,15 +1,19 @@
 export interface MetaItem {
   key: string
   value: string
+  json?: boolean
 }
 
 export interface SeriesGroup {
   uid: number
+  name?: string | null
+  order?: number
   id: string
   meta: MetaItem[]
 }
 
 export interface RelatedItem {
+  order?: number
   id: string
   group_id: string
   meta: MetaItem[]

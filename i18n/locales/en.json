@@ -368,7 +368,12 @@
     "invalid_field": "Please check {field}.",
     "codes": {
       "revision_not_owned": "You cannot withdraw someone else’s revision.",
-      "revision_cannot_retract": "This revision has already been reviewed and cannot be withdrawn."
+      "revision_cannot_retract": "This revision has already been reviewed and cannot be withdrawn.",
+      "revision_stale": "The content changed. Reload its latest version before submitting.",
+      "revision_baseline_required": "This revision has no reliable baseline. Reopen the editor and submit again.",
+      "content_delete_blocked": "Protected references prevent deletion.",
+      "deletion_confirmation_required": "Preview the deletion impact and provide a reason.",
+      "deletion_impact_changed": "The deletion impact changed. Preview and submit again."
     }
   },
   "admin_pages": {
@@ -420,7 +425,9 @@
       "action_create": "Create",
       "action_update": "Edit",
       "action_delete": "Delete"
-    }
+    },
+    "baseline_missing": "This revision has no reliable baseline. Reopen the editor and submit again.",
+    "reopen_editor": "Reopen editor"
   },
   "article_ui": {
     "back": "Back",
@@ -634,7 +641,8 @@
     "no_changes": "No changes detected.",
     "confirm_changes": "Confirm changes",
     "confirm_question": "Submit these changes?",
-    "submit_failed": "Could not submit. Please try again."
+    "submit_failed": "Could not submit. Please try again.",
+    "edit_title": "Edit entry"
   },
   "lyrics_ui": {
     "lyrics": "Lyrics",

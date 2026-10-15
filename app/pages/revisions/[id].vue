@@ -18,6 +18,10 @@
       </div>
 
       <template v-else>
+        <div v-if="revision.requires_reconfirmation" role="alert" class="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <p>{{ $t('admin_pages.baseline_missing') }}</p>
+          <NuxtLink v-if="editLink" :to="editLink" class="mt-2 inline-block underline">{{ $t('admin_pages.reopen_editor') }}</NuxtLink>
+        </div>
         <!-- Header -->
         <div class="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
           <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -163,7 +167,7 @@
         <div v-if="revision.status === 'pending' && canReview" class="mt-4 flex items-center gap-3">
           <button
             class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-50"
-            :disabled="isMutating"
+            :disabled="isMutating || revision.requires_reconfirmation || (revision.requires_content_manage && !hasPermission('content.manage'))"
             @click="approve"
           >
             <span v-if="isMutating && mutateAction === 'approve'" class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-emerald-400 border-t-transparent" />
@@ -182,6 +186,10 @@
         </div>
       </template>
     </div>
+
+    <AdminConfirmDialog v-model="reviewDialog" :busy="isMutating" :title="t(reviewAction === 'approve' ? 'admin_pages.revisions.approve_title' : 'admin_pages.revisions.reject_title')" :reason-required="reviewAction === 'reject' || Boolean(deletionImpact)" @confirm="confirmReview">
+      <AdminImpactPreview v-if="deletionImpact" :impact="deletionImpact" />
+    </AdminConfirmDialog>
 
     <!-- Toast -->
     <Transition name="toast">
@@ -203,7 +211,9 @@ const router = useRouter();
 const route = useRoute();
 const { $api } = useNuxtApp();
 const { hasPermission } = useAuth()
-const canReview = hasPermission('revisions.review')
+const canReview = computed(() => hasPermission('admin.access') && hasPermission('revisions.review'))
+const { t } = useI18n()
+const { localizeError } = useLocalizedApiError()
 
 const { data, error } = await useAsyncData(
   () => `revision-${route.params.id}`,
@@ -211,15 +221,21 @@ const { data, error } = await useAsyncData(
   { watch: [() => route.params.id] },
 );
 
-const revision = computed(() => data.value?.revision || {});
+const revision = computed(() => {
+  const value = data.value?.revision || {};
+  return value.after_snapshot ? { ...value, data: value.after_snapshot } : value;
+});
+const editLink = computed(() => {
+  const type = { work: 'work', artist: 'artist', entry: 'entry', franchise: 'series' }[revision.value.resource_type];
+  return type && revision.value.resource_id ? `/contribute/${type}/${revision.value.resource_id}` : null;
+});
 const previous = computed(() => data.value?.previous || null);
 
 const formatType = (type) => {
   const typeMap = {
     work: 'Work',
     artist: 'Artist',
-    series: 'Series',
-    event: 'Event',
+    franchise: 'Franchise',
     entry: 'Entry',
   };
   return typeMap[type] || type || '—';
@@ -376,23 +392,51 @@ const lineClass = (type) => {
   }
 };
 
-const mutateStatus = async (action) => {
+const mutateStatus = async (action, reason) => {
   if (!revision.value?.id) return;
   isMutating.value = true;
   mutateAction.value = action;
   try {
-    await $api(`/v1/admin/revisions/${revision.value.id}/${action}`, { method: 'POST' });
-    router.push({ path: '/revisions' });
+    await $api(`/v1/admin/revisions/${revision.value.id}/${action}`, { method: 'POST', body: { review_comment: reason || null } });
+    reviewDialog.value = false;
+    router.push({ path: '/admin/revisions' });
   } catch (err) {
-    showToast(err?.data?.message || err?.message || `操作失败`, 'error')
+    showToast(localizeError(err), 'error')
   } finally {
     mutateAction.value = null;
     isMutating.value = false;
   }
 };
 
-const approve = () => mutateStatus('approve');
-const reject = () => mutateStatus('reject');
+const reviewDialog = ref(false);
+const reviewAction = ref('approve');
+const deletionImpact = ref(null);
+const approve = async () => {
+  if (revision.value.requires_reconfirmation || isMutating.value) return;
+  deletionImpact.value = null;
+  if (revision.value.requires_content_manage) {
+    if (!hasPermission('content.manage')) return;
+    isMutating.value = true;
+    try {
+      const current = new Set((revision.value.data.related_songs || []).map(song => String(song.id)));
+      const removed = (previous.value?.data?.related_songs || []).filter(song => !current.has(String(song.id))).map(song => song.id);
+      deletionImpact.value = await $api(`/v1/admin/content/${revision.value.resource_type}/${revision.value.resource_id}/deletion-impact`, {
+        query: revision.value.action === 'update' ? { 'song_ids[]': removed } : undefined,
+      });
+      if (deletionImpact.value.blockers.length || deletionImpact.value.checksum !== revision.value.impact_checksum) {
+        showToast(t('errors.codes.deletion_impact_changed'), 'error');
+        return;
+      }
+    } catch (error) {
+      showToast(localizeError(error), 'error');
+      return;
+    } finally { isMutating.value = false; }
+  }
+  reviewAction.value = 'approve';
+  reviewDialog.value = true;
+};
+const reject = () => { deletionImpact.value = null; reviewAction.value = 'reject'; reviewDialog.value = true; };
+const confirmReview = reason => mutateStatus(reviewAction.value, reason);
 
 const copied = ref(false);
 let copiedTimer = null;

@@ -127,7 +127,7 @@
                     <template v-if="revision.status === 'pending' && hasPermission('revisions.review')">
                       <button
                         class="whitespace-nowrap rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
-                        :disabled="revision.action === 'delete' && !hasPermission('content.manage')"
+                        :disabled="revision.requires_reconfirmation || ((revision.requires_content_manage || revision.action === 'delete') && !hasPermission('content.manage'))"
                         @click.stop="openConfirm('approve', revision)"
                       >
                         {{ t('admin_pages.revisions.approve') }}
@@ -194,7 +194,7 @@
               <template v-if="revision.status === 'pending' && hasPermission('revisions.review')">
                 <button
                   class="rounded-md border border-emerald-200 px-2.5 py-1 text-xs font-medium text-emerald-600 transition hover:bg-emerald-50"
-                  :disabled="revision.action === 'delete' && !hasPermission('content.manage')"
+                  :disabled="revision.requires_reconfirmation || ((revision.requires_content_manage || revision.action === 'delete') && !hasPermission('content.manage'))"
                   @click="openConfirm('approve', revision)"
                 >
                   {{ t('admin_pages.revisions.approve') }}
@@ -346,6 +346,7 @@ const goToDetail = (id) => router.push(`/revisions/${id}`)
 const confirmModal = reactive({ open: false, action: 'approve', revision: null })
 
 const openConfirm = (action, revision) => {
+  if (action === 'approve' && revision.requires_content_manage) return goToDetail(revision.id)
   confirmModal.action = action
   confirmModal.revision = revision
   confirmModal.open = true

@@ -17,7 +17,7 @@ const initialData = ref<Record<string, any>>({})
 // 加载系列数据
 onMounted(async () => {
   try {
-    const data = await $api(`/v1/franchises/${seriesId}`)
+    const data = await $api(`/v1/franchises/${seriesId}/schema`)
     if (data) {
       initialData.value = data as Record<string, any>
     }

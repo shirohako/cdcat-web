@@ -368,7 +368,12 @@
     "invalid_field": "「{field}」を確認してください。",
     "codes": {
       "revision_not_owned": "ほかのユーザーの修正を取り下げることはできません。",
-      "revision_cannot_retract": "この修正はすでに審査済みのため、取り下げられません。"
+      "revision_cannot_retract": "この修正はすでに審査済みのため、取り下げられません。",
+      "revision_stale": "内容が変更されています。最新の内容を読み込んでから再送信してください。",
+      "revision_baseline_required": "この修正には信頼できる基準がありません。編集画面を開き直して再送信してください。",
+      "content_delete_blocked": "保護された参照があるため削除できません。",
+      "deletion_confirmation_required": "削除の影響を確認して理由を入力してください。",
+      "deletion_impact_changed": "削除の影響が変わりました。再確認して送信してください。"
     }
   },
   "admin_pages": {
@@ -420,7 +425,9 @@
       "action_create": "新規作成",
       "action_update": "編集",
       "action_delete": "削除"
-    }
+    },
+    "baseline_missing": "この修正には信頼できる基準がありません。編集画面を開き直して再送信してください。",
+    "reopen_editor": "編集画面を開き直す"
   },
   "article_ui": {
     "back": "戻る",
@@ -634,7 +641,8 @@
     "no_changes": "変更はありません。",
     "confirm_changes": "変更を確定",
     "confirm_question": "この内容で申請しますか？",
-    "submit_failed": "申請できませんでした。もう一度お試しください。"
+    "submit_failed": "申請できませんでした。もう一度お試しください。",
+    "edit_title": "項目を編集"
   },
   "lyrics_ui": {
     "lyrics": "歌詞",

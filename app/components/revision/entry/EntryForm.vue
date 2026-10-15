@@ -76,11 +76,7 @@ const initFormFromData = (data: any) => {
 }
 
 // 监听 initialData 变化
-watch(() => props.initialData, (newData) => {
-  if (newData && Object.keys(newData).length > 0) {
-    initFormFromData(newData)
-  }
-}, { immediate: true, deep: true })
+
 
 const isSubmitting = ref(false)
 const submitMessage = ref('')
@@ -237,6 +233,10 @@ const submitForm = async () => {
     formData.append('payload', JSON.stringify(submissionPayload.value))
     formData.append('resource_type', 'entry')
     formData.append('action', isEditMode.value ? 'update' : 'create')
+    if (isEditMode.value && props.entryId) {
+      formData.append('resource_id', String(props.entryId));
+      if (props.initialData?.baseline_checksum) formData.append('baseline_checksum', props.initialData.baseline_checksum);
+    }
     await $api('/v1/revisions', {
       method: 'POST',
       body: formData
@@ -265,6 +265,11 @@ const handleFormSubmit = () => {
     openPreview()
   }
 }
+watch(() => props.initialData, (newData) => {
+  if (newData && Object.keys(newData).length > 0) {
+    initFormFromData(newData)
+  }
+}, { immediate: true, deep: true })
 </script>
 
 <template>

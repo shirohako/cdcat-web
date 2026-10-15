@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright-core'
-import { createMockAPI } from './mock-api.mjs'
+import { baseline, createMockAPI, impactChecksum } from './mock-api.mjs'
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
 const port = Number(process.env.ADMIN_TEST_PORT || 4318)
@@ -53,7 +53,7 @@ after(async () => {
 })
 
 beforeEach(() => {
-  Object.assign(api.state, { revisionStatus: 'pending', role: 'member', revoked: false, meFailure: null, requests: [] })
+  Object.assign(api.state, { revisionStatus: 'pending', role: 'member', revoked: false, meFailure: null, requests: [], legacy: false, destructive: false, submissionFailure: null, blockers: [] })
   errors.length = 0
 })
 
@@ -184,5 +184,173 @@ test('login reports a profile fetch failure instead of navigating as a successfu
   await page.locator('.bg-red-50 p').waitFor()
   assert.equal(new URL(page.url()).pathname, '/auth/login')
   assert.ok(api.state.requests.some(request => request.path === '/v1/me' && request.token === 'founder'))
+  assert.deepEqual(errors, [])
+})
+
+function submission() {
+  const request = api.state.requests.find(request => request.path === '/v1/revisions' && request.method === 'POST')
+  assert.ok(request, 'editor submitted a revision')
+  assert.equal(request.payload.baseline_checksum, baseline)
+  return { ...request.payload, payload: JSON.parse(request.payload.payload) }
+}
+
+test('artist edits submit the resource ID and the baseline from the protected schema', async () => {
+  const { page } = await session('member')
+  await visit(page, '/contribute/artist/2')
+  await page.getByPlaceholder('Enter artist name').fill('新艺术家')
+  await page.locator('form button[type="submit"]').click()
+  await page.waitForURL('**/contribute/success?**')
+  assert.equal(submission().resource_id, '2')
+  assert.equal(submission().payload.name, '新艺术家')
+  assert.deepEqual(errors, [])
+})
+
+test('entry edit initializes, shows the comparison, and submits with its baseline', async () => {
+  const { page } = await session('member')
+  await visit(page, '/contribute/entry/3')
+  await page.locator('form input[type="text"]').first().fill('新条目')
+  await page.locator('form button[type="submit"]').click()
+  await page.getByRole('button', { name: /Confirm changes|确认修改/ }).click()
+  await page.getByRole('button', { name: /Confirm submission|确认提交/ }).click()
+  await page.waitForURL('**/contribute/success?**')
+  assert.equal(submission().resource_id, '3')
+  assert.equal(submission().payload.meta.year, 2026)
+  assert.deepEqual(errors, [])
+})
+
+test('series JSON editing preserves typed metadata, groups, and relation order', async () => {
+  const { page } = await session('member')
+  await visit(page, '/contribute/series/4')
+  await page.getByRole('button', { name: 'JSON 编辑', exact: true }).click()
+  const editor = page.getByPlaceholder('输入系列 JSON...')
+  const payload = JSON.parse(await editor.inputValue())
+  payload.name = '新系列'
+  await editor.fill(JSON.stringify(payload))
+  await page.getByRole('button', { name: '验证并同步', exact: true }).click()
+  await page.getByRole('button', { name: '提交修改', exact: true }).click()
+  await page.getByRole('button', { name: '确认修改', exact: true }).click()
+  await page.getByRole('button', { name: '确认提交', exact: true }).click()
+  await page.waitForURL('**/contribute/success?**')
+  const sent = submission()
+  assert.equal(sent.resource_id, '4')
+  assert.equal(sent.payload.meta.year, 2026)
+  assert.deepEqual(sent.payload.meta.tags, ['tag'])
+  assert.equal(sent.payload.groups[0].name, '分组名')
+  assert.equal(sent.payload.groups[0].order, 5)
+  assert.equal(sent.payload.related_entries[0].order, 8)
+  assert.deepEqual(sent.payload.related_entries[0].meta.tags, ['a'])
+  assert.deepEqual(errors, [])
+})
+
+async function workEditor(page) {
+  await visit(page, '/contribute/work/1')
+  await page.getByRole('button', { name: 'JSON Editor', exact: true }).click()
+  const editor = page.locator('textarea[spellcheck="false"]')
+  await editor.waitFor({ state: 'visible' })
+  return editor
+}
+
+test('work JSON round trip keeps child identities, track credits, prices, and hidden metadata', async () => {
+  const { page } = await session('member')
+  const editor = await workEditor(page)
+  const draft = JSON.parse(await editor.inputValue())
+  draft.baseline_checksum = 'a'.repeat(64)
+  await editor.fill(JSON.stringify(draft))
+  await page.getByRole('button', { name: 'Validate & Apply', exact: true }).click()
+  await page.getByRole('button', { name: 'Update Work', exact: true }).click()
+  await page.waitForURL('**/contribute/success?**')
+  const sent = submission()
+  assert.equal(String(sent.resource_id), '1')
+  const payload = sent.payload
+  assert.equal(payload.related_songs[0].id, 11)
+  assert.equal(payload.related_songs[0].is_instrumental, true)
+  assert.deepEqual(payload.related_songs[0].meta, { isrc: 'JP123' })
+  assert.equal(payload.related_artists[0].id, 21)
+  assert.equal(payload.credits[0].id, 31)
+  assert.equal(payload.credits[0].song_id, 11)
+  assert.equal(payload.credits[0].artist_id, '2')
+  assert.deepEqual(payload.credits[0].meta, { track: '1.1', source: 'booklet' })
+  assert.equal(payload.credits[1].id, 32)
+  assert.equal(payload.credits[1].order, 5)
+  assert.deepEqual(payload.credits[1].meta, [])
+  assert.equal(payload.credits[2].id, 33)
+  assert.equal(payload.credits[2].meta, null)
+  assert.equal(payload.products[0].price, 123.45)
+  assert.deepEqual(payload.products[0].meta, { shops: ['shop'] })
+  assert.deepEqual(payload.bonuses[0].meta, { pages: 12 })
+  assert.deepEqual(payload.links[0].meta, { locale: 'ja' })
+  assert.deepEqual(payload.meta, { aliases: ['别名'] })
+  assert.deepEqual(errors, [])
+})
+
+test('removing the last song previews impact and requires a reason before submitting empty collections', async () => {
+  const { page } = await session('member')
+  const editor = await workEditor(page)
+  const payload = JSON.parse(await editor.inputValue())
+  Object.assign(payload, { structure: [], related_songs: [], related_artists: [], products: [], bonuses: [], links: [], credits: payload.credits.filter(credit => credit.song_id) })
+  await editor.fill(JSON.stringify(payload))
+  await page.getByRole('button', { name: 'Validate & Apply', exact: true }).click()
+  await page.getByRole('button', { name: 'Update Work', exact: true }).click()
+  const dialog = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: '删除影响' }) })
+  await dialog.waitFor()
+  assert.equal(await dialog.locator('button[type="submit"]').isDisabled(), true)
+  assert.equal(api.state.requests.filter(request => request.path === '/v1/revisions').length, 0)
+  const preview = api.state.requests.find(request => request.path === '/v1/revisions/deletion-preview')
+  assert.deepEqual(preview.payload.song_ids, [11])
+  await dialog.getByRole('textbox').fill('删除误录的曲目')
+  await dialog.locator('button[type="submit"]').click()
+  await page.waitForURL('**/contribute/success?**')
+  const sent = submission()
+  assert.equal(sent.impact_checksum, impactChecksum)
+  assert.equal(sent.comment, '删除误录的曲目')
+  for (const key of ['structure', 'related_songs', 'related_artists', 'credits', 'products', 'bonuses', 'links']) assert.deepEqual(sent.payload[key], [])
+  assert.deepEqual(errors, [])
+})
+
+test('legacy pending revisions cannot be approved and offer reopening the current editor', async () => {
+  api.state.legacy = true
+  const { page } = await session('founder')
+  await visit(page, '/revisions/7')
+  await page.getByRole('alert').waitFor()
+  assert.equal(await page.getByRole('button', { name: '通过', exact: true }).isDisabled(), true)
+  assert.equal(await page.locator('a[href="/contribute/series/4"]').count(), 1)
+  assert.deepEqual(errors, [])
+})
+
+test('a stale work submission displays the actionable API error and retains the draft', async () => {
+  api.state.submissionFailure = 'REVISION_STALE'
+  const { page } = await session('member')
+  await workEditor(page)
+  await page.getByRole('button', { name: 'Update Work', exact: true }).click()
+  const dialog = page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: '提交失败' }) })
+  await dialog.waitFor()
+  assert.match(await dialog.textContent(), /changed|变化|更新/)
+  assert.equal(new URL(page.url()).pathname, '/contribute/work/1')
+  assert.deepEqual(errors, [])
+})
+
+test('destructive review previews the exact songs and requires confirmation before approval', async () => {
+  api.state.destructive = true
+  const { page } = await session('founder')
+  await visit(page, '/revisions/7')
+  await page.getByRole('button', { name: '通过', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.waitFor()
+  assert.equal(await dialog.locator('button[type="submit"]').isDisabled(), true)
+  const preview = api.state.requests.find(request => request.path === '/v1/admin/content/work/1/deletion-impact')
+  assert.equal(preview.query['song_ids[]'], '11')
+  await dialog.getByRole('textbox').fill('已核对曲目和歌词的删除范围')
+  await dialog.locator('button[type="submit"]').click()
+  await page.waitForURL('**/admin/revisions')
+  const approved = api.state.requests.find(request => request.path === '/v1/admin/revisions/7/approve')
+  assert.equal(approved.payload.review_comment, '已核对曲目和歌词的删除范围')
+  assert.deepEqual(errors, [])
+})
+
+test('contributors cannot approve a song removal from revision details', async () => {
+  api.state.destructive = true
+  const { page } = await session('contributor')
+  await visit(page, '/revisions/7')
+  assert.equal(await page.getByRole('button', { name: '通过', exact: true }).isDisabled(), true)
   assert.deepEqual(errors, [])
 })

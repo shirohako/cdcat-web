@@ -174,6 +174,7 @@ const props = defineProps({
 
 const router = useRouter();
 const { $api } = useNuxtApp();
+const { localizeError } = useLocalizedApiError();
 
 const artistTypes = [
   { value: 'person',  label: '个人',    icon: User,      desc: '独立音乐人或演唱者' },
@@ -286,6 +287,9 @@ const getSubmitPayload = () => {
     payload.bio = formData.value.bio.trim();
   }
 
+  payload.region = formData.value.region.trim() || null;
+  payload.image_url = formData.value.image_url.trim() || null;
+  payload.bio = formData.value.bio.trim() || null;
   return payload;
 };
 
@@ -317,7 +321,8 @@ const handleSubmit = async () => {
     formDataToSubmit.append('resource_type', 'artist');
     formDataToSubmit.append('action', isEditMode.value ? 'update' : 'create');
     if (isEditMode.value && props.artistId) {
-      formDataToSubmit.append('resource_id', props.artistId);
+      formDataToSubmit.append('resource_id', String(props.artistId));
+      if (props.initialData?.baseline_checksum) formDataToSubmit.append('baseline_checksum', props.initialData.baseline_checksum);
     }
 
     // 发送到 revisions 接口
@@ -337,7 +342,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error(`Failed to ${isEditMode.value ? 'update' : 'create'} artist:`, error);
-    submitError.value = error.data?.message || error.message || `Failed to ${isEditMode.value ? 'update' : 'create'} artist. Please try again.`;
+    submitError.value = localizeError(error);
   } finally {
     isSubmitting.value = false;
   }

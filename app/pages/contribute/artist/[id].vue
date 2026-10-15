@@ -53,7 +53,7 @@ const artistData = ref(null);
 // 加载艺术家数据
 onMounted(async () => {
   try {
-    const artist = await $api(`/v1/artists/${artistId}`);
+    const artist = await $api(`/v1/artists/${artistId}/schema`);
 
     if (artist) {
       // 传递完整的 artist 对象给 ArtistForm 组件

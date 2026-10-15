@@ -126,6 +126,7 @@
         <button>close</button>
       </form>
     </dialog>
+    <RevisionDeletionConfirmation v-if="workId && removedSongIds.length" ref="deletionDialog" :work-id="workId" :song-ids="removedSongIds" @confirmed="confirmSongDeletion" />
   </div>
 </template>
 
@@ -181,6 +182,10 @@ const isEditMode = computed(() => !!props.workId);
 const transformBackendData = (data) => {
   const transformed = {
     work_id: data.id,
+    slug: data.slug ?? null,
+    classification: data.classification ?? null,
+    meta: data.meta ?? null,
+    release_event_id: data.release_event_id ?? null,
     title: data.title || '',
     type: data.type || '',
     catalog_number: data.catalog_number || '',
@@ -196,36 +201,36 @@ const transformBackendData = (data) => {
     links: [],
   };
 
-  // 处理 structure - 合并 disc 结构和 songs
-  if (data.structure && Array.isArray(data.structure)) {
-    transformed.structure = data.structure.map((disc, index) => {
-      const discSongs = (data.related_songs || data.songs)
-        ? (data.related_songs || data.songs)
-            .filter(song => song.disc_number === disc.disc_number)
-            .sort((a, b) => a.track_number - b.track_number)
-            .map((song, songIndex) => ({
-              id: `track-${song.id || songIndex}`,
-              song_id: song.id,
-              track_number: song.track_number,
-              title: song.title || '',
-              duration: song.duration || '',
-              is_instrumental: song.is_instrumental ?? false,
-            }))
-        : [];
-
-      return {
-        id: `disc-${disc.disc_number || index}`,
-        structure_id: disc.id,
-        disc_number: disc.disc_number,
-        title: disc.title || null,
-        catalog_number: disc.catalog_number || null,
-        length: disc.length || null,
-        is_bonus: disc.is_bonus ?? false,
-        is_counted: disc.is_counted ?? true,
-        songs: discSongs,
-      };
-    });
-  }
+  // Use the same conversion for server snapshots and the JSON editor.
+  const normalizeNumber = (value, fallback) => Number(value) > 0 ? Number(value) : fallback;
+  const songs = data.related_songs || data.songs || [];
+  const discs = new Map((data.structure || []).map((disc, index) => [normalizeNumber(disc.disc_number, index + 1), disc]));
+  songs.forEach(song => {
+    const number = normalizeNumber(song.disc_number, 1);
+    if (!discs.has(number)) discs.set(number, {});
+  });
+  transformed.structure = [...discs].map(([number, disc]) => ({
+    ...disc,
+    id: `disc-${number}`,
+    structure_id: disc.id,
+    disc_number: number,
+    title: disc.title || null,
+    catalog_number: disc.catalog_number || null,
+    length: disc.length || null,
+    is_bonus: disc.is_bonus ?? false,
+    is_counted: disc.is_counted ?? true,
+    songs: songs.filter(song => normalizeNumber(song.disc_number, 1) === number)
+      .sort((a, b) => a.track_number - b.track_number)
+      .map((song, index) => ({
+        id: `track-${song.id || `${number}-${index}`}`,
+        song_id: song.id,
+        track_number: normalizeNumber(song.track_number, index + 1),
+        title: song.title || '',
+        duration: song.duration || '',
+        is_instrumental: song.is_instrumental ?? false,
+        meta: song.meta ?? null,
+      })),
+  }));
 
   // 处理 artists - 兼容 related_artists（schema 格式）和 artists（旧格式）
   const artistsSource = data.related_artists || data.artists
@@ -243,10 +248,14 @@ const transformBackendData = (data) => {
     transformed.credits = data.credits.map((credit, index) => ({
       id: `credit-${credit.id || index}`,
       credit_id: credit.id,
+      order: credit.order,
       artist_id: String(credit.artist_id || ''),
       display_name: credit.display_name || '',
       role: credit.role || '',
       track: credit.meta?.track || credit.track || '',
+      original_track: credit.meta?.track || credit.track || '',
+      song_id: credit.song_id ?? null,
+      meta: credit.meta ?? null,
     }));
   }
 
@@ -270,6 +279,7 @@ const transformBackendData = (data) => {
       currency: p.currency || '',
       image_url: p.image_url || '',
       sort_order: p.sort_order != null ? String(p.sort_order) : '0',
+      meta: p.meta ?? null,
     }));
   }
 
@@ -283,6 +293,7 @@ const transformBackendData = (data) => {
       description: b.description || '',
       is_digital: b.is_digital ?? false,
       image_url: b.image_url || '',
+      meta: b.meta ?? null,
     }));
   }
 
@@ -293,6 +304,7 @@ const transformBackendData = (data) => {
       link_id: l.id,
       link_provider_id: l.link_provider_id ?? l.provider?.id ?? '',
       url: l.url || '',
+      meta: l.meta ?? null,
     }));
   }
 
@@ -356,6 +368,18 @@ watch(() => props.initialData, (newData) => {
 // 提交状态
 const isSubmitting = ref(false);
 const submitError = ref('');
+const { localizeError } = useLocalizedApiError();
+const deletionDialog = ref(null);
+const deletionConfirmation = ref(null);
+const removedSongIds = computed(() => {
+  if (!props.workId) return [];
+  const ids = new Set(formData.value.structure.flatMap(disc => disc.songs.map(song => String(song.song_id))));
+  return (props.initialData?.related_songs || []).filter(song => !ids.has(String(song.id))).map(song => Number(song.id));
+});
+const confirmSongDeletion = async (confirmation) => {
+  deletionConfirmation.value = confirmation;
+  try { await handleSubmit(); } finally { deletionConfirmation.value = null; }
+};
 const errorDialog = ref(null);
 
 // 验证表单
@@ -419,6 +443,10 @@ const getSubmitData = () => {
   const payload = {
     title: formData.value.title.trim(),
     type: formData.value.type,
+    slug: formData.value.slug ?? null,
+    classification: formData.value.classification ?? null,
+    meta: formData.value.meta ?? null,
+    release_event_id: formData.value.release_event_id ?? null,
   };
 
   // 如果是编辑模式，添加 work ID
@@ -451,7 +479,7 @@ const getSubmitData = () => {
   if (formData.value.structure.length > 0) {
     payload.structure = formData.value.structure.map((disc, discIndex) => {
       const structureItem = {
-        disc_number: discIndex + 1,
+        disc_number: disc.disc_number ?? discIndex + 1,
         title: disc.title || null,
         catalog_number: disc.catalog_number || null,
         length: disc.length || null,
@@ -467,11 +495,12 @@ const getSubmitData = () => {
     const relatedSongs = formData.value.structure.flatMap((disc, discIndex) =>
       disc.songs.map((song, songIndex) => {
         const songItem = {
-          disc_number: discIndex + 1,
-          track_number: songIndex + 1,
+          disc_number: disc.disc_number ?? discIndex + 1,
+          track_number: song.track_number ?? songIndex + 1,
           title: song.title,
           duration: song.duration || null,
           is_instrumental: song.is_instrumental ?? false,
+          meta: song.meta ?? null,
         };
         if (song.song_id) {
           songItem.id = song.song_id;
@@ -497,12 +526,20 @@ const getSubmitData = () => {
   if (formData.value.credits.length > 0) {
     payload.credits = formData.value.credits
       .filter(c => c.role)
-      .map(c => {
+      .map((c, order) => {
+        let meta = c.meta ?? null;
+        if (c.track) meta = { ...meta, track: c.track };
+        else if (meta && Object.hasOwn(meta, 'track')) {
+          meta = { ...meta };
+          delete meta.track;
+        }
         const creditItem = {
           artist_id: c.artist_id || null,
           display_name: c.display_name || null,
           role: c.role,
-          meta: c.track ? { track: c.track } : null,
+          meta,
+          order: c.order ?? order,
+          song_id: c.track === c.original_track ? c.song_id : null,
         };
         if (c.credit_id) {
           creditItem.id = c.credit_id;
@@ -530,6 +567,7 @@ const getSubmitData = () => {
         currency: p.currency || null,
         image_url: p.image_url || null,
         sort_order: Number(p.sort_order) || 0,
+        meta: p.meta ?? null,
       };
       if (p.product_id) item.id = p.product_id;
       return item;
@@ -545,6 +583,7 @@ const getSubmitData = () => {
         description: b.description || null,
         is_digital: b.is_digital ?? false,
         image_url: b.image_url || null,
+        meta: b.meta ?? null,
       };
       if (b.bonus_id) item.id = b.bonus_id;
       return item;
@@ -556,12 +595,24 @@ const getSubmitData = () => {
     payload.links = formData.value.links
       .filter(l => l.link_provider_id && l.url)
       .map(l => {
-        const item = { link_provider_id: l.link_provider_id, url: l.url };
+        const item = { link_provider_id: l.link_provider_id, url: l.url, meta: l.meta ?? null };
         if (l.link_id) item.id = l.link_id;
         return item;
       });
   }
 
+  // Collections are explicit so removing the last item also reaches the backend.
+  for (const key of ['structure', 'related_songs', 'related_artists', 'credits', 'products', 'bonuses', 'links']) payload[key] ??= [];
+  const original = props.initialData || {};
+  for (const key of ['related_songs', 'products', 'bonuses', 'links']) {
+    const records = new Map((original[key] || []).map(item => [String(item.id), item]));
+    payload[key] = payload[key].map(item => ({ ...records.get(String(item.id)), ...item }));
+  }
+  const songs = new Set(payload.related_songs.map(item => String(item.id)));
+  payload.credits = payload.credits.filter(item => !item.song_id || songs.has(String(item.song_id)));
+  payload.description = formData.value.description.trim() || null;
+  payload.banner_url = formData.value.banner_url.trim() || null;
+  payload.catalog_number = formData.value.catalog_number.trim() || null;
   return payload;
 };
 
@@ -611,129 +662,6 @@ const validateJsonPayload = (payload) => {
   return '';
 };
 
-const transformPayloadToFormData = (payload) => {
-  const structure = Array.isArray(payload.structure) ? payload.structure : [];
-  const songsSource = payload.related_songs ?? payload.songs;
-  const songs = Array.isArray(songsSource) ? songsSource : [];
-  const discNumberSet = new Set();
-  const normalizeNumber = (value, fallback) => {
-    const num = Number(value);
-    return Number.isFinite(num) && num > 0 ? num : fallback;
-  };
-
-  structure.forEach((disc, index) => {
-    const discNumber = normalizeNumber(disc.disc_number ?? disc.discNumber, index + 1);
-    discNumberSet.add(discNumber);
-  });
-
-  songs.forEach((song) => {
-    const discNumber = normalizeNumber(song.disc_number, 1);
-    discNumberSet.add(discNumber);
-  });
-
-  const discNumbers = Array.from(discNumberSet).sort((a, b) => a - b);
-  const structureMap = new Map();
-  structure.forEach((disc, index) => {
-    const discNumber = normalizeNumber(disc.disc_number ?? disc.discNumber, index + 1);
-    structureMap.set(discNumber, disc);
-  });
-
-  const mappedStructure = discNumbers.map((discNumber, discIndex) => {
-    const disc = structureMap.get(discNumber) || {};
-    const discSongs = songs
-      .filter((song) => normalizeNumber(song.disc_number, 1) === discNumber)
-      .sort((a, b) => normalizeNumber(a.track_number, 0) - normalizeNumber(b.track_number, 0))
-      .map((song, songIndex) => ({
-        id: `track-${song.id ?? `${discNumber}-${songIndex}`}`,
-        song_id: song.id,
-        track_number: normalizeNumber(song.track_number, songIndex + 1),
-        title: song.title ? String(song.title) : '',
-        duration: song.duration ? String(song.duration) : '',
-      }));
-
-    return {
-      id: `disc-${disc.disc_number ?? discNumber ?? discIndex + 1}`,
-      structure_id: disc.id,
-      disc_number: discNumber || discIndex + 1,
-      title: disc.title || null,
-      catalog_number: disc.catalog_number || null,
-      length: disc.length || null,
-      is_bonus: disc.is_bonus ?? false,
-      is_counted: disc.is_counted ?? true,
-      songs: discSongs,
-    };
-  });
-
-  return {
-    work_id: payload.id ?? null,
-    title: payload.title ? String(payload.title) : '',
-    type: payload.type ? String(payload.type) : '',
-    catalog_number: payload.catalog_number ? String(payload.catalog_number) : '',
-    release_date: payload.release_date ? String(payload.release_date) : '',
-    image_url: payload.image_url ? String(payload.image_url) : '',
-    banner_url: payload.banner_url ? String(payload.banner_url) : '',
-    description: payload.description ? String(payload.description) : '',
-    structure: mappedStructure,
-    artists: Array.isArray(payload.related_artists ?? payload.artists)
-      ? (payload.related_artists ?? payload.artists).map((artist, index) => ({
-          id: `artist-${artist.artist_id || artist.id || index}`,
-          artist_id: String(artist.artist_id || artist.id || ''),
-          display_name: artist.display_name || '',
-          pivot_id: artist.pivot_id ?? null,
-        }))
-      : [],
-    credits: Array.isArray(payload.credits)
-      ? payload.credits.map((credit, index) => ({
-        id: `credit-${credit.id || index}`,
-        credit_id: credit.id,
-        name: credit.name || '',
-        role: credit.role || '',
-        track: credit.track || '',
-      }))
-      : [],
-    products: Array.isArray(payload.products)
-      ? payload.products.map((p, index) => ({
-          id: `product-${p.id || index}`,
-          product_id: p.id,
-          name: p.name || '',
-          edition_type: p.edition_type || 'REGULAR',
-          limited_rule: p.limited_rule || '',
-          limited_name: p.limited_name || '',
-          release_date: p.release_date || '',
-          catalog_number: p.catalog_number || '',
-          barcode: p.barcode || '',
-          is_available: p.is_available ?? true,
-          medium: p.medium || 'PHYSICAL',
-          format: p.format || '',
-          is_hires: p.is_hires ?? false,
-          price: p.price != null ? String(p.price) : '',
-          currency: p.currency || '',
-          image_url: p.image_url || '',
-          sort_order: p.sort_order != null ? String(p.sort_order) : '0',
-        }))
-      : [],
-    bonuses: Array.isArray(payload.bonuses)
-      ? payload.bonuses.map((b, index) => ({
-          id: `bonus-${b.id || index}`,
-          bonus_id: b.id,
-          type: b.type || '',
-          name: b.name || '',
-          description: b.description || '',
-          is_digital: b.is_digital ?? false,
-          image_url: b.image_url || '',
-        }))
-      : [],
-    links: Array.isArray(payload.links)
-      ? payload.links.map((link, index) => ({
-          id: `link-${link.id || index}`,
-          link_id: link.id,
-          link_provider_id: link.link_provider_id || '',
-          url: link.url || '',
-        }))
-      : [],
-  };
-};
-
 const applyJsonDraft = () => {
   jsonError.value = '';
   jsonSuccess.value = '';
@@ -764,7 +692,7 @@ const applyJsonDraft = () => {
   }
 
   isApplyingJson.value = true;
-  formData.value = transformPayloadToFormData(payload);
+  formData.value = transformBackendData(payload);
   jsonSuccess.value = 'JSON applied to form data.';
   nextTick(() => {
     isApplyingJson.value = false;
@@ -782,17 +710,23 @@ const handleSubmit = async () => {
   isSubmitting.value = true;
 
   try {
+    if (removedSongIds.value.length && !deletionConfirmation.value) {
+      await deletionDialog.value?.preview();
+      return;
+    }
     const payload = getSubmitData();
     // 构建 revision 请求数据
     const revisionData = {
       resource_type: 'work',
       action: isEditMode.value ? 'update' : 'create',
       payload: JSON.stringify(payload),
+      ...(deletionConfirmation.value ? { impact_checksum: deletionConfirmation.value.checksum, comment: deletionConfirmation.value.reason } : {}),
     };
 
     // 如果是更新，添加 resource_id
     if (isEditMode.value && props.workId) {
       revisionData.resource_id = props.workId;
+      revisionData.baseline_checksum = props.initialData?.baseline_checksum;
     }
 
     await $api('/v1/revisions', {
@@ -812,7 +746,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error(`Failed to submit work ${isEditMode.value ? 'update' : 'creation'}:`, error);
-    submitError.value = error.data?.message || error.message || 'Failed to submit. Please try again.';
+    submitError.value = localizeError(error);
     errorDialog.value?.showModal();
   } finally {
     isSubmitting.value = false;

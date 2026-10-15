@@ -368,7 +368,12 @@
     "invalid_field": "請檢查「{field}」。",
     "codes": {
       "revision_not_owned": "無法撤回其他人的修訂。",
-      "revision_cannot_retract": "此修訂已完成審核，無法撤回。"
+      "revision_cannot_retract": "此修訂已完成審核，無法撤回。",
+      "revision_stale": "內容已變更，請重新讀取最新內容後提交。",
+      "revision_baseline_required": "此修訂沒有可靠的編輯基準，請重新開啟編輯器提交。",
+      "content_delete_blocked": "存在受保護的引用，無法刪除。",
+      "deletion_confirmation_required": "請先預覽刪除影響並填寫原因。",
+      "deletion_impact_changed": "刪除影響已變更，請重新預覽並提交。"
     }
   },
   "admin_pages": {
@@ -420,7 +425,9 @@
       "action_create": "新增",
       "action_update": "編輯",
       "action_delete": "刪除"
-    }
+    },
+    "baseline_missing": "此修訂沒有可靠的編輯基準，請重新開啟編輯器提交。",
+    "reopen_editor": "重新開啟編輯器"
   },
   "article_ui": {
     "back": "返回",
@@ -634,7 +641,8 @@
     "no_changes": "沒有偵測到修改。",
     "confirm_changes": "確認修改",
     "confirm_question": "確定要提交以上修改嗎？",
-    "submit_failed": "提交失敗，請再試一次。"
+    "submit_failed": "提交失敗，請再試一次。",
+    "edit_title": "編輯條目"
   },
   "lyrics_ui": {
     "lyrics": "歌詞",

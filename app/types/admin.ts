@@ -1,4 +1,5 @@
 export interface DeletionImpact {
+  checksum?: string
   counts: { label: string, count: number }[]
   blockers: string[]
 }

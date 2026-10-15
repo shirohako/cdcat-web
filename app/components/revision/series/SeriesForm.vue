@@ -9,6 +9,7 @@ const props = defineProps<{
 
 const router = useRouter()
 const { $api } = useNuxtApp()
+const { localizeError } = useLocalizedApiError()
 
 // 判断是否为编辑模式
 const isEditMode = computed(() => !!props.seriesId)
@@ -70,7 +71,8 @@ const convertMetaToArray = (meta: Record<string, any> | undefined): MetaItem[] =
   }
   return Object.entries(meta).map(([key, value]) => ({
     key,
-    value: typeof value === 'string' ? value : JSON.stringify(value)
+    value: typeof value === 'string' ? value : JSON.stringify(value),
+    json: typeof value !== 'string'
   }))
 }
 
@@ -86,6 +88,8 @@ const initFormFromSchema = (data: any) => {
     form.groups = data.groups.map((group: any) => ({
       uid: nextId(),
       id: group.id || '',
+      name: group.name ?? null,
+      order: group.order,
       meta: convertMetaToArray(group.meta)
     }))
   } else {
@@ -98,6 +102,7 @@ const initFormFromSchema = (data: any) => {
     form.relatedEntries = entriesData.map((entry: any) => ({
       id: String(entry.id || ''),
       group_id: entry.group_id || '',
+      order: entry.order,
       meta: convertMetaToArray(entry.meta)
     }))
   } else {
@@ -110,24 +115,17 @@ const initFormFromSchema = (data: any) => {
     form.relatedWorks = worksData.map((work: any) => ({
       id: String(work.id || ''),
       group_id: work.group_id || '',
+      order: work.order,
       meta: convertMetaToArray(work.meta)
     }))
   } else {
     form.relatedWorks = []
   }
 
-  // 保存原始 JSON 用于比对
-  if (isEditMode.value) {
-    originalJson.value = JSON.stringify(buildSubmissionPayload(), null, 2)
-  }
 }
 
 // 监听 initialData 变化
-watch(() => props.initialData, (newData) => {
-  if (newData && Object.keys(newData).length > 0) {
-    initFormFromSchema(newData)
-  }
-}, { immediate: true, deep: true })
+
 
 const isSubmitting = ref(false)
 const submitMessage = ref('')
@@ -159,6 +157,7 @@ const moveGroup = (fromIndex: number, toIndex: number) => {
   const [group] = form.groups.splice(fromIndex, 1)
   if (!group) return
   form.groups.splice(toIndex, 0, group)
+  form.groups.forEach((item, order) => { item.order = order })
 }
 
 const normalizeRelatedGroups = () => {
@@ -207,11 +206,13 @@ const removeRelatedWork = (index: number) => {
 }
 
 const buildMetaObject = (meta: MetaItem[]) => {
-  const output: Record<string, string> = {}
+  const output: Record<string, unknown> = {}
   meta.forEach((item) => {
     const key = item.key.trim()
     if (!key) return
-    output[key] = item.value
+    let value: unknown = item.value
+    if (item.json) { try { value = JSON.parse(item.value) } catch { /* Explicit text replaces the original JSON value. */ } }
+    output[key] = value
   })
   return output
 }
@@ -222,19 +223,23 @@ const buildSubmissionPayload = () => ({
   meta: buildMetaObject(form.meta),
   groups: form.groups.map((group) => ({
     id: group.id,
+    name: group.name,
+    order: group.order,
     meta: buildMetaObject(group.meta)
   })),
   related_entries: form.relatedEntries
     .filter((item) => item.id.trim())
-    .map((item) => ({
+    .map((item, order) => ({
       id: item.id,
+      order: item.order ?? order,
       group_id: item.group_id || null,
       meta: buildMetaObject(item.meta)
     })),
   related_works: form.relatedWorks
     .filter((item) => item.id.trim())
-    .map((item) => ({
+    .map((item, order) => ({
       id: item.id,
+      order: item.order ?? order,
       group_id: item.group_id || null,
       meta: buildMetaObject(item.meta)
     }))
@@ -362,6 +367,10 @@ const submitForm = async () => {
     formData.append('payload', JSON.stringify(submissionPayload.value))
     formData.append('resource_type', 'franchise')
     formData.append('action', isEditMode.value ? 'update' : 'create')
+    if (isEditMode.value && props.seriesId) {
+      formData.append('resource_id', String(props.seriesId));
+      if (props.initialData?.baseline_checksum) formData.append('baseline_checksum', props.initialData.baseline_checksum);
+    }
     await $api('/v1/revisions', {
       method: 'POST',
       body: formData
@@ -376,8 +385,7 @@ const submitForm = async () => {
       }
     })
   } catch (error: unknown) {
-    const err = error as { data?: { message?: string }; message?: string }
-    submitMessage.value = err.data?.message || err.message || '提交失败，请重试'
+    submitMessage.value = localizeError(error)
   } finally {
     isSubmitting.value = false
   }
@@ -391,6 +399,12 @@ const handleFormSubmit = () => {
     openPreview()
   }
 }
+watch(() => props.initialData, (newData) => {
+  if (newData && Object.keys(newData).length > 0) {
+    initFormFromSchema(newData)
+    originalJson.value = JSON.stringify(buildSubmissionPayload(), null, 2)
+  }
+}, { immediate: true, deep: true })
 </script>
 
 <template>
@@ -529,9 +543,8 @@ const handleFormSubmit = () => {
       </div>
 
       <!-- 提交结果消息 -->
-      <div v-if="submitMessage" :class="submitMessage.includes('失败') ? 'alert alert-error' : 'alert alert-success'" class="mt-4">
-        <Check v-if="!submitMessage.includes('失败')" class="w-5 h-5" />
-        <X v-else class="w-5 h-5" />
+      <div v-if="submitMessage" class="alert alert-error mt-4">
+        <X class="w-5 h-5" />
         <span>{{ submitMessage }}</span>
       </div>
     </form>
