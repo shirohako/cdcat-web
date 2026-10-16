@@ -542,7 +542,11 @@
       "healthy": "正常",
       "stale": "已超时",
       "unknown": "未知（尚无有效心跳）",
-      "heartbeat_note": "无有效心跳时无法确认运行状态，请结合实际进程和任务执行记录核查。"
+      "heartbeat_note": "无有效心跳时无法确认运行状态，请结合实际进程和任务执行记录核查。",
+      "go_review": "去审核",
+      "pending_help": "按提交时间排列，可批量处理",
+      "all_logs": "全部日志",
+      "view_system": "运行状态"
     },
     "roles": {
       "title": "角色与权限",
@@ -943,7 +947,16 @@
       "all_levels": "全部级别",
       "log_truncated": "文件较大，只显示末尾部分。",
       "context": "详细信息"
-    }
+    },
+    "groups": {
+      "overview": "概览",
+      "content": "内容",
+      "community": "社区",
+      "users": "用户",
+      "system": "系统"
+    },
+    "search_menu": "搜索菜单",
+    "no_menu_match": "没有匹配的菜单"
   },
   "article_ui": {
     "back": "返回",
