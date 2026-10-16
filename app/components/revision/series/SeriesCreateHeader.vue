@@ -1,20 +1,20 @@
 <template>
-  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+  <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
     <div>
-      <p class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-        <Sparkles class="w-4 h-4" />
-        {{ badge }}
+      <p class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-600">
+        <Sparkles class="h-4 w-4" />
+        {{ badge || $t('catalog.contribute.series_badge') }}
       </p>
-      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mt-3">
-        {{ title }}
+      <h1 class="mt-3 text-3xl font-bold text-gray-900 md:text-4xl">
+        {{ title || $t('catalog.contribute.series_title') }}
       </h1>
-      <p class="text-gray-600 mt-2">
-        {{ description }}
+      <p class="mt-2 text-gray-600">
+        {{ description || $t('catalog.contribute.series_desc') }}
       </p>
     </div>
 
     <NuxtLink class="btn btn-outline btn-sm" :to="backTo">
-      {{ backLabel }}
+      {{ backLabel || $t('catalog.contribute.series_back') }}
     </NuxtLink>
   </div>
 </template>
@@ -22,26 +22,17 @@
 <script setup lang="ts">
 import { Sparkles } from '@lucide/vue'
 
-defineProps({
-  badge: {
-    type: String,
-    default: '新建系列'
-  },
-  title: {
-    type: String,
-    default: '创建系列'
-  },
-  description: {
-    type: String,
-    default: '填写系列的基础信息和展示素材，提交后将进入审核。'
-  },
-  backTo: {
-    type: String,
-    default: '/series'
-  },
-  backLabel: {
-    type: String,
-    default: '返回系列列表'
-  }
+withDefaults(defineProps<{
+  badge?: string
+  title?: string
+  description?: string
+  backTo?: string
+  backLabel?: string
+}>(), {
+  badge: '',
+  title: '',
+  description: '',
+  backTo: '/series',
+  backLabel: '',
 })
 </script>

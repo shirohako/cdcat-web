@@ -1,4 +1,21 @@
 import type { ApiResponse } from './api'
+import type { EntryType, EntryWorkRelation } from './entry'
+
+/** 作品关联的条目，含条目所属系列 */
+export interface WorkEntry {
+  id: number
+  name: string
+  slug: string | null
+  type: EntryType
+  format: string | null
+  image_url: string | null
+  release_date: string | null
+  relation_type: EntryWorkRelation
+  character_name: string | null
+  episode: number | null
+  note: string | null
+  franchises: Array<{ id: number, name: string, slug: string | null, parent_id: number | null }>
+}
 
 // ── String Literal Types ────────────────────────────────────────────────────
 
@@ -195,7 +212,7 @@ export interface Work {
   credits: WorkCredit[]
   products: WorkProduct[]
   bonuses: WorkBonus[]
-  entries: any[]                // 参赛/入榜记录，结构待定
+  entries: WorkEntry[]          // 关联的原作条目（动画、游戏等）
   links: WorkLink[]
   streaming: WorkLink[]
   articles: WorkArticle[]

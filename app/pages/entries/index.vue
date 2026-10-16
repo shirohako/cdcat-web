@@ -1,303 +1,163 @@
+<script setup lang="ts">
+import { Calendar, Film, Music2, Plus, Search } from '@lucide/vue'
+import { ENTRY_FORMATS, ENTRY_TYPES, ENTRY_TYPE_ICONS, type EntrySummary, type EntryType, type Pagination } from '~/types/entry'
+
+const route = useRoute()
+const router = useRouter()
+const { t } = useI18n()
+const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, formatReleaseDate } = useEntryDisplay()
+
+useHead({ title: computed(() => t('menu.entry')) })
+
+const selectedType = computed(() => (ENTRY_TYPES as readonly string[]).includes(route.query.type as string) ? route.query.type as EntryType : 'all')
+const selectedFormat = computed(() => (route.query.format as string) || '')
+const search = computed(() => (route.query.search as string) || '')
+const currentPage = computed(() => Math.max(1, Number.parseInt(route.query.page as string || '1') || 1))
+const searchInput = ref(search.value)
+watch(search, (value) => { searchInput.value = value })
+
+const typeFilters = computed(() => [
+  { value: 'all', label: t('catalog.all'), icon: 'lucide:layout-grid' },
+  ...ENTRY_TYPES.map(type => ({ value: type, label: typeLabel(type), icon: ENTRY_TYPE_ICONS[type] })),
+])
+const formats = computed(() => selectedType.value === 'all' ? [] : ENTRY_FORMATS[selectedType.value])
+
+const { data, pending, error } = useAPI<{ entries: EntrySummary[], pagination: Pagination }>('/v1/entries', {
+  lazy: true,
+  query: computed(() => ({
+    page: currentPage.value,
+    per_page: 20,
+    type: selectedType.value === 'all' ? undefined : selectedType.value,
+    format: selectedFormat.value || undefined,
+    search: search.value.trim().length >= 2 ? search.value.trim() : undefined,
+  })),
+})
+
+const entries = computed(() => data.value?.entries || [])
+const pagination = computed(() => data.value?.pagination || { total: 0, per_page: 20, current_page: 1, last_page: 1 })
+
+const updateQuery = (changes: Record<string, string | number | undefined>) => {
+  router.push({ query: { ...route.query, page: undefined, ...changes } })
+}
+const selectType = (type: string) => updateQuery({ type: type === 'all' ? undefined : type, format: undefined })
+const selectFormat = (format: string) => updateQuery({ format: format === selectedFormat.value ? undefined : format })
+const submitSearch = () => updateQuery({ search: searchInput.value.trim() || undefined })
+const goToPage = (page: number) => {
+  if (page < 1 || page > pagination.value.last_page) return
+  router.push({ query: { ...route.query, page: page === 1 ? undefined : page } })
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+</script>
+
 <template>
   <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
+    <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-      <CollectionPageHeader
-        v-model="selectedType"
-        :title="$t('menu.entry')"
-        :description="$t('content_display.entry_desc')"
-        icon="lucide:panels-top-left"
-        tone="rose"
-        :filters="entryTypes"
-        :filter-label="$t('content_display.type')"
-        @update:model-value="selectType"
-      >
-        <template #action>
-          <button
-            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-            @click="navigateTo('/contribute/entry')"
+          <CollectionPageHeader
+            :model-value="selectedType"
+            :title="$t('menu.entry')"
+            :description="$t('content_display.entry_desc')"
+            icon="lucide:panels-top-left"
+            tone="rose"
+            :filters="typeFilters"
+            :filter-label="$t('catalog.type')"
+            @update:model-value="selectType"
           >
-            <Plus class="h-3.5 w-3.5" />
-            <span class="hidden sm:inline">{{ $t('common.new') }}</span>
-          </button>
-        </template>
-      </CollectionPageHeader>
-        </template>
-
-      <!-- Loading State -->
-      <CollectionLoadingSkeleton v-if="pending" variant="list" />
-
-      <!-- Error State -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-100">
-        <div class="alert alert-error max-w-md">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Failed to load: {{ error.message }}</span>
-        </div>
-      </div>
-
-      <!-- Entries Content -->
-      <div v-else class="collection-content-enter">
-        <!-- Entry List -->
-        <div class="space-y-4">
-          <NuxtLink
-            v-for="entry in entriesData"
-            :key="entry.id"
-            :to="`/entries/${entry.id}`"
-            class="group block"
-          >
-            <div class="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
-              <div class="flex gap-4 p-4">
-                <!-- Poster Image -->
-                <div class="w-24 h-36 shrink-0 bg-linear-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden relative">
-                  <img
-                    v-if="getEntryImageUrl(entry)"
-                    :src="getEntryImageUrl(entry)"
-                    :alt="getEntryTitle(entry)"
-                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    style="image-rendering: -webkit-optimize-contrast;"
-                  />
-                  <div v-else class="flex items-center justify-center h-full text-gray-300">
-                    <Film :size="40" />
-                  </div>
-
-                  <!-- Type Badge -->
-                  <div v-if="entry.type" class="absolute top-1 right-1 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-white text-[10px] font-medium">
-                    {{ formatType(entry.type) }}
-                  </div>
-                </div>
-
-                <!-- Entry Info -->
-                <div class="flex-1 min-w-0 flex flex-col justify-between">
-                  <!-- Top Section -->
-                  <div>
-                    <!-- Title and Year -->
-                    <div class="flex items-start justify-between gap-2 mb-2">
-                      <h3 class="font-bold text-lg group-hover:text-blue-600 transition-colors line-clamp-2">
-                        {{ getEntryTitle(entry) }}
-                      </h3>
-                      <span v-if="getEntryYear(entry)" class="shrink-0 px-2 py-1 rounded bg-gray-100 text-gray-700 text-sm font-medium">
-                        {{ getEntryYear(entry) }}
-                      </span>
-                    </div>
-
-                    <!-- Description (if available) -->
-                    <p v-if="getEntryDescription(entry)" class="text-sm text-gray-600 line-clamp-2 mb-3">
-                      {{ getEntryDescription(entry) }}
-                    </p>
-                  </div>
-
-                  <!-- Bottom Section - Meta Info -->
-                  <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                    <!-- Release Date -->
-                    <div v-if="entry.release_date" class="flex items-center gap-1.5">
-                      <Calendar :size="16" class="text-gray-400" />
-                      <span>{{ formatDate(entry.release_date) }}</span>
-                    </div>
-
-                    <!-- Related Works Count -->
-                    <div v-if="entry.works_count !== undefined" class="flex items-center gap-1.5">
-                      <Music2 :size="16" class="text-gray-400" />
-                      <span>{{ entry.works_count }} Music Work{{ entry.works_count !== 1 ? 's' : '' }}</span>
-                    </div>
-
-                    <!-- Stats -->
-                    <div class="flex items-center gap-4 ml-auto">
-                      <div class="flex items-center gap-1.5">
-                        <Eye :size="16" class="text-gray-400" />
-                        <span>{{ entry.views_count || 0 }}</span>
-                      </div>
-                      <div class="flex items-center gap-1.5">
-                        <Heart :size="16" class="text-gray-400 group-hover:text-red-400 transition-colors" />
-                        <span>{{ entry.favorites_count || 0 }}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <template #action>
+              <button
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+                @click="navigateTo('/contribute/entry')"
+              >
+                <Plus class="h-3.5 w-3.5" />
+                <span class="hidden sm:inline">{{ $t('common.new') }}</span>
+              </button>
+            </template>
+          </CollectionPageHeader>
+          <div class="flex flex-col gap-2.5 border-b border-slate-100 px-4 py-3 sm:flex-row sm:items-center sm:px-6">
+            <form class="flex min-w-0 flex-1 items-center gap-2" role="search" @submit.prevent="submitSearch">
+              <label class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg bg-white px-3 ring-1 ring-slate-200 focus-within:ring-rose-300">
+                <Search class="h-4 w-4 shrink-0 text-slate-400" />
+                <input v-model="searchInput" type="search" class="min-w-0 flex-1 bg-transparent text-sm outline-none" :placeholder="$t('catalog.search_placeholder')" :aria-label="$t('catalog.search')" >
+              </label>
+              <button type="submit" class="h-9 shrink-0 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-700">{{ $t('catalog.search') }}</button>
+            </form>
+            <div v-if="formats.length" class="flex gap-1.5 overflow-x-auto">
+              <button
+                v-for="format in formats"
+                :key="format"
+                type="button"
+                class="h-8 shrink-0 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors"
+                :class="selectedFormat === format ? 'bg-rose-600 text-white ring-rose-600' : 'bg-white text-slate-500 ring-slate-200 hover:text-slate-900'"
+                :aria-pressed="selectedFormat === format"
+                @click="selectFormat(format)"
+              >
+                {{ formatLabel(format) }}
+              </button>
             </div>
-          </NuxtLink>
-        </div>
-
-        <!-- Empty State -->
-        <div v-if="entriesData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="text-gray-400 mb-4">
-            <Film :size="64" class="mx-auto" />
           </div>
-          <p class="text-gray-500">No entries found</p>
+        </template>
+
+        <CollectionLoadingSkeleton v-if="pending" variant="list" />
+
+        <div v-else-if="error" class="flex min-h-72 items-center justify-center text-sm text-red-600">
+          {{ $t('common.load_failed') }}
         </div>
 
-        <CommonPagination
-          class="mt-6"
-          :page="pagination.current_page"
-          :total-pages="pagination.last_page"
-          :disabled="pending"
-          @update:page="goToPage"
-        />
-      </div>
+        <div v-else class="collection-content-enter">
+          <div class="space-y-3">
+            <NuxtLink v-for="entry in entries" :key="entry.id" :to="`/entries/${entry.id}`" class="group block">
+              <article class="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg">
+                <div class="relative h-32 w-22 shrink-0 overflow-hidden rounded-lg bg-linear-to-br from-gray-50 to-gray-100">
+                  <img v-if="entry.image_url" :src="entry.image_url" :alt="displayName(entry)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
+                  <div v-else class="flex h-full items-center justify-center text-gray-300">
+                    <Film :size="36" />
+                  </div>
+                </div>
+
+                <div class="flex min-w-0 flex-1 flex-col justify-between gap-2">
+                  <div>
+                    <div class="mb-1 flex flex-wrap items-center gap-2">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-700">
+                        <Icon :name="ENTRY_TYPE_ICONS[entry.type] || 'lucide:shapes'" class="h-3 w-3" />
+                        {{ typeWithFormat(entry.type, entry.format) }}
+                      </span>
+                      <span v-for="platform in (entry.platforms || []).slice(0, 3)" :key="platform" class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ platform }}</span>
+                    </div>
+                    <h3 class="line-clamp-2 text-lg font-bold transition-colors group-hover:text-rose-600">{{ displayName(entry) }}</h3>
+                    <p v-if="originalName(entry)" class="truncate text-sm text-gray-500">{{ originalName(entry) }}</p>
+                    <p v-if="entry.description" class="mt-1 line-clamp-2 text-sm text-gray-600">{{ entry.description }}</p>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                    <span v-if="entry.release_date" class="flex items-center gap-1.5">
+                      <Calendar :size="15" class="text-gray-400" />
+                      {{ formatReleaseDate(entry.release_date, entry.release_date_precision) }}
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                      <Music2 :size="15" class="text-gray-400" />
+                      {{ $t('catalog.works_count', { count: entry.works_count ?? 0 }) }}
+                    </span>
+                  </div>
+                </div>
+              </article>
+            </NuxtLink>
+          </div>
+
+          <div v-if="!entries.length" class="flex min-h-72 flex-col items-center justify-center text-center">
+            <Film :size="56" class="mx-auto mb-4 text-gray-300" />
+            <p class="text-gray-500">{{ $t('catalog.no_entries') }}</p>
+          </div>
+
+          <CommonPagination
+            class="mt-6"
+            :page="pagination.current_page"
+            :total-pages="pagination.last_page"
+            :disabled="pending"
+            @update:page="goToPage"
+          />
+        </div>
       </CollectionPageCard>
     </div>
   </div>
 </template>
-
-<script setup>
-import { Film, Calendar, Heart, Eye, Music2, Plus } from "@lucide/vue";
-
-const route = useRoute();
-const router = useRouter();
-const { t } = useI18n();
-
-// Entry types
-const entryTypes = computed(() => [
-  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
-  { value: 'anime', label: t('content_display.entry_type.anime'), icon: 'lucide:sparkles' },
-  { value: 'movie', label: t('content_display.entry_type.movie'), icon: 'lucide:film' },
-  { value: 'tv', label: t('content_display.entry_type.tv'), icon: 'lucide:tv' },
-  { value: 'game', label: t('content_display.entry_type.game'), icon: 'lucide:gamepad-2' },
-  { value: 'other', label: t('content_display.entry_type.other'), icon: 'lucide:shapes' }
-]);
-
-// Selected type
-const selectedType = ref(route.query.type || 'all');
-
-// Current page
-const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1;
-  return page > 0 ? page : 1;
-});
-
-// Fetch entries from API
-const { data: entriesResponse, pending, error } = useAPI("/v1/entries", {
-  lazy: true,
-  query: computed(() => ({
-    page: currentPage.value,
-    type: selectedType.value === 'all' ? undefined : selectedType.value
-  })),
-});
-
-// Process entries data
-const entriesData = computed(() => {
-  if (!entriesResponse.value) {
-    return [];
-  }
-
-  // API plugin auto-unwraps the `data` field from { success: true, data: {...} }
-  const response = entriesResponse.value;
-
-  // If it's an array, return directly
-  if (Array.isArray(response)) {
-    return response;
-  }
-
-  // If it's an object, look for entries or data array
-  return response.entries || response.data || [];
-});
-
-// Pagination info
-const pagination = computed(() => {
-  if (!entriesResponse.value) {
-    return {
-      total: 0,
-      per_page: 24,
-      current_page: 1,
-      last_page: 1,
-    };
-  }
-
-  const response = entriesResponse.value;
-
-  // If response is an array, no pagination info
-  if (Array.isArray(response)) {
-    return {
-      total: response.length,
-      per_page: response.length,
-      current_page: 1,
-      last_page: 1,
-    };
-  }
-
-  // Look for pagination in response.pagination or response.meta
-  const paginationData = response.pagination || response.meta;
-
-  if (!paginationData) {
-    return {
-      total: 0,
-      per_page: 24,
-      current_page: 1,
-      last_page: 1,
-    };
-  }
-
-  return paginationData;
-});
-
-// Format entry type
-const formatType = (type) => {
-  const typeMap = {
-    anime: t('content_display.entry_type.anime'),
-    movie: t('content_display.entry_type.movie'),
-    tv: t('content_display.entry_type.tv'),
-    game: t('content_display.entry_type.game'),
-    other: t('content_display.entry_type.other'),
-  };
-  return typeMap[type] || type;
-};
-
-// Format date
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-// Helper functions to extract data from different API response formats
-const getEntryTitle = (entry) => {
-  const meta = entry.meta || {};
-  return meta.bangumi_name_cn || meta.bangumi_name || entry.name || entry.title || "";
-};
-
-const getEntryYear = (entry) => {
-  if (entry.year) return entry.year;
-  if (entry.release_date) {
-    return new Date(entry.release_date).getFullYear();
-  }
-  return null;
-};
-
-const getEntryDescription = (entry) => {
-  const meta = entry.meta || {};
-  return meta.description || entry.description || "";
-};
-
-const getEntryImageUrl = (entry) => {
-  return entry.image_url || "";
-};
-
-// Go to page
-const goToPage = (page) => {
-  if (page < 1 || page > pagination.value.last_page) return;
-  router.push({
-    query: {
-      ...route.query,
-      page: page === 1 ? undefined : page,
-    },
-  });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-// Select type filter
-const selectType = (type) => {
-  selectedType.value = type;
-  router.push({
-    query: {
-      type: type === 'all' ? undefined : type,
-      page: undefined, // Reset to first page
-    },
-  });
-};
-</script>

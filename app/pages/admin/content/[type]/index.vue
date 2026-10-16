@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { adminContentRoutes, adminContentTypes } from '~/config/admin'
 import type { AdminContentItem, AdminContentType, AdminPagination } from '~/types/admin'
+import { ENTRY_TYPES } from '~/types/entry'
 
 definePageMeta({
   layout: 'admin', middleware: 'admin',
@@ -11,6 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
+const { typeLabel, typeWithFormat } = useEntryDisplay()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
 const type = computed(() => String(route.params.type) as AdminContentType)
@@ -37,14 +39,14 @@ const items = computed(() => data.value?.items ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
 const label = (item: AdminContentItem) => String(item.title ?? item.name ?? `#${item.id}`)
 const editable = computed(() => type.value !== 'song')
-const recountable = computed(() => ['work', 'artist', 'franchise'].includes(type.value))
+const recountable = computed(() => ['work', 'artist'].includes(type.value))
 const frontLink = (item: AdminContentItem) => type.value === 'song'
   ? `/works/${(item.work as { id: number } | null)?.id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
 const detail = (item: AdminContentItem) => [
   ...(type.value === 'work' ? [item.catalog_number, item.type, item.release_date] : []),
   ...(type.value === 'artist' ? [item.type && t(`admin_pages.content.artist_types.${item.type}`), item.region, item.is_active === false ? t('admin_pages.content.inactive') : null] : []),
-  ...(type.value === 'entry' ? [item.type, item.release_date, t('admin_pages.content.works_count', { count: item.works_count })] : []),
-  ...(type.value === 'franchise' ? [t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.works_count', { count: item.works_count })] : []),
+  ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, t('admin_pages.content.works_count', { count: item.works_count })] : []),
+  ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.works_count', { count: item.works_count })] : []),
   ...(type.value === 'song' ? [(item.work as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, t('admin_pages.content.lyrics_count', { count: item.lyrics_count })] : []),
 ].filter(Boolean).join(' · ')
 
@@ -86,7 +88,11 @@ useHead({ title: computed(() => `${t(`admin_pages.content.tabs.${type.value}`)} 
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.content.search')" :aria-label="t('admin_pages.content.search')" class="w-60 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <input v-if="type === 'work' || type === 'entry'" v-model="filters.type" maxlength="100" :placeholder="t('admin_pages.content.type')" :aria-label="t('admin_pages.content.type')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <input v-if="type === 'work'" v-model="filters.type" maxlength="100" :placeholder="t('admin_pages.content.type')" :aria-label="t('admin_pages.content.type')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <select v-if="type === 'entry'" v-model="filters.type" :aria-label="t('admin_pages.content.type')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <option value="">{{ t('admin_pages.content.type') }}</option>
+          <option v-for="entryType in ENTRY_TYPES" :key="entryType" :value="entryType">{{ typeLabel(entryType) }}</option>
+        </select>
         <input v-if="type === 'work'" v-model="filters.classification" maxlength="100" :placeholder="t('admin_pages.content.classification')" :aria-label="t('admin_pages.content.classification')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <template v-if="type === 'artist'">
           <select v-model="filters.type" :aria-label="t('admin_pages.content.type')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">

@@ -1,229 +1,48 @@
+<script setup lang="ts">
+import { Disc3, Film } from '@lucide/vue'
+import { ENTRY_TYPES, type EntrySummary, type EntryType } from '~/types/entry'
+
+// A series' own entries, grouped by type automatically; the API already orders them by sort_order and date.
+const props = defineProps<{ entries: EntrySummary[] }>()
+
+const { displayName, typeLabel, formatLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
+
+const groups = computed(() => ENTRY_TYPES
+  .map(type => ({ type, entries: props.entries.filter(entry => entry.type === type) }))
+  .filter(group => group.entries.length) as Array<{ type: EntryType, entries: EntrySummary[] }>)
+</script>
+
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-      <Film class="w-5 h-5 text-emerald-600" />
-      {{ $t('content_display.linked_entries') }}
-    </h2>
-
-    <template v-if="groupedEntries.length">
-      <div class="space-y-6">
-        <div
-          v-for="group in groupedEntries"
-          :key="group.id"
-          class="rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5 space-y-4 shadow-sm"
-        >
-          <div class="flex flex-wrap items-center gap-3">
-            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-            <span v-if="group.code" class="px-2 py-0.5 rounded-full bg-white text-emerald-700 text-xs font-semibold border border-emerald-200">
-              {{ group.code }}
-            </span>
-            <h3 class="text-lg font-bold text-slate-900 tracking-tight">
-              {{ group.name }}
-            </h3>
-            <span v-if="group.year" class="text-xs text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full border border-emerald-200">
-              {{ group.year }}
-            </span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-            <NuxtLink
-              v-for="entry in group.entries"
-              :key="entry.id"
-              :to="`/entries/${entry.id}`"
-              class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
-            >
-              <!-- 条目封面 -->
-              <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
-                <img
-                  v-if="entry.image_url"
-                  :src="entry.image_url"
-                  :alt="entry.name"
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div v-else class="w-full h-full flex items-center justify-center">
-                  <Film class="w-8 h-8 text-gray-400" />
-                </div>
-              </div>
-
-              <!-- 条目信息 -->
-              <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
-                  {{ entry.name }}
-                </h3>
-                <div class="flex items-center justify-between gap-2">
-                  <span class="flex items-center gap-1 text-xs text-gray-600">
-                    <Disc3 class="w-3.5 h-3.5" />
-                    {{ $t('content_display.works_count', { count: entry.works_count }) }}
-                  </span>
-                  <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
-                    {{ getEntryTypeLabel(entry.type) }}
-                  </span>
-                </div>
-              </div>
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="ungroupedEntries.length" class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 space-y-4 shadow-sm">
-        <div class="flex items-center gap-3">
-          <span class="h-2.5 w-2.5 rounded-full bg-slate-400" />
-          <h3 class="text-lg font-bold text-slate-900 tracking-tight">
-            {{ $t('content_display.ungrouped') }}
-          </h3>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
-          <NuxtLink
-            v-for="entry in ungroupedEntries"
-            :key="entry.id"
-            :to="`/entries/${entry.id}`"
-            class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
-          >
-            <!-- 条目封面 -->
-            <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
-              <img
-                v-if="entry.image_url"
-                :src="entry.image_url"
-                :alt="entry.name"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <Film class="w-8 h-8 text-gray-400" />
-              </div>
-            </div>
-
-            <!-- 条目信息 -->
-            <div class="flex-1 min-w-0">
-              <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
-                {{ entry.name }}
-              </h3>
-              <div class="flex items-center justify-between gap-2">
-                <span class="flex items-center gap-1 text-xs text-gray-600">
-                  <Disc3 class="w-3.5 h-3.5" />
-                  {{ $t('content_display.works_count', { count: entry.works_count }) }}
-                </span>
-                <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
-                  {{ getEntryTypeLabel(entry.type) }}
-                </span>
-              </div>
-            </div>
-          </NuxtLink>
-        </div>
-      </div>
-    </template>
-
-    <template v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+  <div class="space-y-6">
+    <section v-for="group in groups" :key="group.type">
+      <h3 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
+        <Icon :name="typeIcon(group.type)" class="h-4 w-4 text-emerald-600" />
+        {{ typeLabel(group.type) }}
+        <span class="font-normal text-slate-400">{{ group.entries.length }}</span>
+      </h3>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         <NuxtLink
-          v-for="entry in entries"
+          v-for="entry in group.entries"
           :key="entry.id"
           :to="`/entries/${entry.id}`"
-          class="group flex flex-col gap-3 p-3 rounded-xl border border-gray-100 hover:border-blue-300 hover:shadow-md transition-all duration-300 bg-white/90"
+          class="group flex flex-col gap-2 rounded-xl border border-gray-100 bg-white p-2.5 transition-all duration-300 hover:border-emerald-300 hover:shadow-md"
         >
-          <!-- 条目封面 -->
-          <div class="w-full aspect-4/5 rounded-lg overflow-hidden bg-gray-100">
-            <img
-              v-if="entry.image_url"
-              :src="entry.image_url"
-              :alt="entry.name"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-            />
-            <div v-else class="w-full h-full flex items-center justify-center">
-              <Film class="w-8 h-8 text-gray-400" />
-            </div>
+          <div class="aspect-3/4 w-full overflow-hidden rounded-lg bg-gray-100">
+            <img v-if="entry.image_url" :src="entry.image_url" :alt="displayName(entry)" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" >
+            <div v-else class="flex h-full w-full items-center justify-center"><Film class="h-8 w-8 text-gray-300" /></div>
           </div>
-
-          <!-- 条目信息 -->
-          <div class="flex-1 min-w-0">
-            <h3 class="text-sm font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-2 mb-1">
-              {{ entry.name }}
-            </h3>
-            <div class="flex items-center justify-between gap-2">
-              <span class="flex items-center gap-1 text-xs text-gray-600">
-                <Disc3 class="w-3.5 h-3.5" />
-                {{ $t('content_display.works_count', { count: entry.works_count }) }}
-              </span>
-              <span :class="['text-xs px-2 py-0.5 rounded-full border shrink-0', getEntryTypeColor(entry.type)]">
-                {{ getEntryTypeLabel(entry.type) }}
-              </span>
-            </div>
+          <div class="min-w-0">
+            <h4 class="line-clamp-2 text-sm font-medium text-gray-800 transition-colors group-hover:text-emerald-700">{{ displayName(entry) }}</h4>
+            <p class="mt-0.5 truncate text-xs text-gray-500">
+              {{ [formatLabel(entry.format), formatReleaseDate(entry.release_date, entry.release_date_precision)].filter(Boolean).join(' · ') }}
+            </p>
+            <p v-if="entry.works_count" class="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+              <Disc3 class="h-3 w-3" />{{ $t('catalog.works_count', { count: entry.works_count }) }}
+            </p>
           </div>
         </NuxtLink>
       </div>
-    </template>
-
+    </section>
+    <p v-if="!groups.length" class="py-6 text-center text-sm text-gray-500">{{ $t('catalog.no_entries') }}</p>
   </div>
 </template>
-
-<script setup lang="ts">
-import { Disc3, Film } from '@lucide/vue'
-
-type EntryItem = {
-  id: number
-  name: string
-  type: string
-  image_url?: string
-  works_count: number
-}
-
-type EntryGroup = {
-  id: string
-  name: string
-  code?: string
-  year?: string
-  entry_ids: number[]
-}
-
-const props = defineProps<{
-  entries: EntryItem[]
-  entriesCount: number
-  groups?: EntryGroup[]
-}>()
-const { t } = useI18n()
-
-const groupedEntries = computed(() => {
-  if (!props.groups || props.groups.length === 0) {
-    return []
-  }
-  const entryMap = new Map(props.entries.map((entry) => [entry.id, entry]))
-  return props.groups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    code: group.code,
-    year: group.year,
-    entries: group.entry_ids.map((id) => entryMap.get(id)).filter(Boolean) as EntryItem[]
-  }))
-})
-
-const ungroupedEntries = computed(() => {
-  if (!props.groups || props.groups.length === 0) {
-    return props.entries
-  }
-  const groupedIds = new Set(props.groups.flatMap((group) => group.entry_ids))
-  return props.entries.filter((entry) => !groupedIds.has(entry.id))
-})
-
-const getEntryTypeColor = (type: string) => {
-  const colors: Record<string, string> = {
-    anime: 'bg-pink-50 text-pink-600 border-pink-200',
-    game: 'bg-blue-50 text-blue-600 border-blue-200',
-    movie: 'bg-purple-50 text-purple-600 border-purple-200',
-    tv: 'bg-emerald-50 text-emerald-600 border-emerald-200',
-    other: 'bg-gray-50 text-gray-600 border-gray-200'
-  }
-  return colors[type] || colors.other
-}
-
-const getEntryTypeLabel = (type: string) => {
-  const key = ['anime', 'game', 'movie', 'tv'].includes(type) ? type : 'other'
-  return t(`content_display.entry_type.${key}`)
-}
-</script>
-
-<style scoped>
-.line-clamp-1 {
-  display: -webkit-box;
-  line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

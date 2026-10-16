@@ -1,558 +1,309 @@
 <script setup lang="ts">
-import { Check, Save, X } from '@lucide/vue'
-import type { MetaItem, RelatedItem, SeriesCreateForm, SeriesGroup } from '~/components/revision/series/seriesFormTypes'
+import { ArrowDown, ArrowUp, Check, Trash2, X } from '@lucide/vue'
+import type { EditableLink } from '~/components/revision/LinksEditor.vue'
+import type { PickedItem } from '~/components/revision/ContentPicker.vue'
+import type { FranchiseDetail, FranchiseSchema, Title } from '~/types/entry'
+
+interface Member { id: number }
 
 const props = defineProps<{
-  initialData?: Record<string, any>
+  initialData?: FranchiseSchema | Record<string, unknown> | null
   seriesId?: string | number
   // Where to go after a successful submit; a function receives the new revision id.
   redirectTo?: string | ((revisionId: number) => string)
 }>()
 
-const router = useRouter()
 const { $api } = useNuxtApp()
-const { localizeError } = useLocalizedApiError()
+const { t } = useI18n()
 
-// 判断是否为编辑模式
-const isEditMode = computed(() => !!props.seriesId)
+const isEditMode = computed(() => props.seriesId !== undefined && props.seriesId !== '')
 
-let seed = 0
-const nextId = () => Date.now() + seed++
-let groupSeed = 1
-const createGroupId = () => `group-${groupSeed++}`
-
-const createEmptyRelated = (): RelatedItem => ({
-  id: '',
-  group_id: '',
-  meta: [createEmptyMeta()]
-})
-
-const createEmptyMeta = (): MetaItem => ({
-  key: '',
-  value: ''
-})
-
-const createEmptyGroup = (): SeriesGroup => ({
-  uid: nextId(),
-  id: createGroupId(),
-  meta: [createEmptyMeta()]
-})
-
-// 编辑模式下多一个 JSON 编辑 tab
-const tabs = computed(() => {
-  const baseTabs = [
-    { id: 'basic', label: '基础信息', icon: 'lucide:tag' },
-    { id: 'groups', label: '系列分组', icon: 'lucide:layers' },
-    { id: 'related-entries', label: '关联条目', icon: 'lucide:film' },
-    { id: 'related-works', label: '关联专辑', icon: 'lucide:disc-3' }
-  ]
-  if (isEditMode.value) {
-    baseTabs.push({ id: 'json', label: 'JSON 编辑', icon: 'lucide:code' })
-  }
-  return baseTabs
-})
-
+const tabs = computed(() => [
+  { id: 'basic', label: t('catalog.form.tab_basic'), icon: 'lucide:tag' },
+  { id: 'entries', label: t('catalog.form.tab_entries'), icon: 'lucide:film' },
+  { id: 'works', label: t('catalog.form.tab_works'), icon: 'lucide:disc-3' },
+  { id: 'links', label: t('catalog.form.tab_links'), icon: 'lucide:globe' },
+  { id: 'meta', label: t('catalog.form.tab_meta'), icon: 'lucide:code' },
+  ...(isEditMode.value ? [{ id: 'json', label: t('catalog.form.tab_json'), icon: 'lucide:braces' }] : []),
+])
 const currentTab = ref('basic')
 
-const form = reactive<SeriesCreateForm>({
-  name: '',
+const form = reactive({
+  titles: [] as Title[],
+  slug: '',
+  parent_id: null as number | null,
+  description: '',
   image_url: '',
-  meta: [createEmptyMeta()],
-  groups: [],
-  relatedEntries: [],
-  relatedWorks: []
+  banner_url: '',
+  sort_order: 0 as number | string,
+  links: [] as EditableLink[],
+  entries: [] as Member[],
+  works: [] as Member[],
 })
+const metaText = ref('{}')
+const metaError = ref('')
+const errors = reactive<{ titles?: string }>({})
+const original = ref<string>()
 
-// 原始数据用于比对（编辑模式）
-const originalJson = ref('')
+const labels = reactive<Record<string, { label: string, subtitle?: string, image_url: string | null }>>({})
+const labelOf = (kind: 'entry' | 'work' | 'franchise', id: number) => labels[`${kind}:${id}`]
 
-// 将 schema 数据转换为表单格式
-const convertMetaToArray = (meta: Record<string, any> | undefined): MetaItem[] => {
-  if (!meta || Object.keys(meta).length === 0) {
-    return [createEmptyMeta()]
+const parseMeta = (): Record<string, unknown> | null => {
+  try {
+    const parsed = JSON.parse(metaText.value || '{}')
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null
+    return parsed
+  } catch {
+    return null
   }
-  return Object.entries(meta).map(([key, value]) => ({
-    key,
-    value: typeof value === 'string' ? value : JSON.stringify(value),
-    json: typeof value !== 'string'
-  }))
 }
 
-const initFormFromSchema = (data: any) => {
-  if (!data) return
+const payload = computed(() => {
+  const meta = parseMeta()
+  return {
+    titles: form.titles
+      .filter(title => title.title.trim())
+      .map(title => ({ title: title.title.trim(), locale: title.locale || null, kind: title.kind, is_primary: title.is_primary })),
+    slug: form.slug.trim() || null,
+    parent_id: form.parent_id,
+    description: form.description.trim() || null,
+    image_url: form.image_url.trim() || null,
+    banner_url: form.banner_url.trim() || null,
+    sort_order: Number(form.sort_order) || 0,
+    meta: meta && Object.keys(meta).length ? meta : null,
+    links: form.links
+      .filter(link => link.link_provider_id !== '' && link.url.trim())
+      .map(link => ({ ...(link.id ? { id: link.id } : {}), link_provider_id: Number(link.link_provider_id), url: link.url.trim(), ...(link.meta ? { meta: link.meta } : {}) })),
+    related_entries: form.entries.map((member, index) => ({ id: member.id, sort_order: index })),
+    related_works: form.works.map((member, index) => ({ id: member.id, sort_order: index })),
+  }
+})
 
-  form.name = data.name || ''
+const byOrder = (items: Array<{ id: number | string, sort_order?: number }> = []) =>
+  [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0)).map(item => ({ id: Number(item.id) }))
+
+const init = (data: FranchiseSchema) => {
+  form.titles = data.titles?.length
+    ? data.titles.map((title): Title => ({ title: title.title || '', locale: title.locale ?? null, kind: title.kind || 'official', is_primary: !!title.is_primary }))
+    : data.name ? [{ title: data.name, locale: null, kind: 'official', is_primary: true }] : []
+  form.slug = data.slug || ''
+  form.parent_id = data.parent_id ? Number(data.parent_id) : null
+  form.description = data.description || ''
   form.image_url = data.image_url || ''
-  form.meta = convertMetaToArray(data.meta)
-
-  // 转换 groups
-  if (data.groups && Array.isArray(data.groups)) {
-    form.groups = data.groups.map((group: any) => ({
-      uid: nextId(),
-      id: group.id || '',
-      name: group.name ?? null,
-      order: group.order,
-      meta: convertMetaToArray(group.meta)
-    }))
-  } else {
-    form.groups = []
-  }
-
-  // 转换 related_entries (支持 entries 或 related_entries 字段)
-  const entriesData = data.related_entries || data.entries
-  if (entriesData && Array.isArray(entriesData)) {
-    form.relatedEntries = entriesData.map((entry: any) => ({
-      id: String(entry.id || ''),
-      group_id: entry.group_id || '',
-      order: entry.order,
-      meta: convertMetaToArray(entry.meta)
-    }))
-  } else {
-    form.relatedEntries = []
-  }
-
-  // 转换 related_works (支持 works 或 related_works 字段)
-  const worksData = data.related_works || data.works
-  if (worksData && Array.isArray(worksData)) {
-    form.relatedWorks = worksData.map((work: any) => ({
-      id: String(work.id || ''),
-      group_id: work.group_id || '',
-      order: work.order,
-      meta: convertMetaToArray(work.meta)
-    }))
-  } else {
-    form.relatedWorks = []
-  }
-
+  form.banner_url = data.banner_url || ''
+  form.sort_order = data.sort_order ?? 0
+  metaText.value = JSON.stringify(data.meta || {}, null, 2)
+  form.links = (data.links || []).map(link => ({ id: link.id, link_provider_id: link.link_provider_id ?? '', url: link.url || '', meta: link.meta ?? null }))
+  form.entries = byOrder(data.related_entries)
+  form.works = byOrder(data.related_works)
 }
 
-// 监听 initialData 变化
+const baselineChecksum = computed(() => (props.initialData as FranchiseSchema | null | undefined)?.baseline_checksum)
 
-
-const isSubmitting = ref(false)
-const submitMessage = ref('')
-const showPreview = ref(false)
-const showComparison = ref(false)
-const confirmSubmit = ref(false)
-const errors = reactive<{ name?: string; image_url?: string }>({})
-
-// JSON 编辑器状态
-const jsonText = ref('')
-const jsonError = ref('')
-const jsonSuccess = ref('')
-
-const groupOptions = computed(() => form.groups.map((group) => group.id).filter((id) => id.trim()))
-
-const addGroup = () => {
-  form.groups.push(createEmptyGroup())
-}
-
-const removeGroup = (index: number) => {
-  if (index < 0 || index >= form.groups.length) return
-  form.groups.splice(index, 1)
-}
-
-const moveGroup = (fromIndex: number, toIndex: number) => {
-  if (fromIndex === toIndex) return
-  if (fromIndex < 0 || toIndex < 0) return
-  if (fromIndex >= form.groups.length || toIndex >= form.groups.length) return
-  const [group] = form.groups.splice(fromIndex, 1)
-  if (!group) return
-  form.groups.splice(toIndex, 0, group)
-  form.groups.forEach((item, order) => { item.order = order })
-}
-
-const normalizeRelatedGroups = () => {
-  const validIds = new Set(groupOptions.value)
-  const normalize = (items: RelatedItem[]) => {
-    items.forEach((item) => {
-      if (item.group_id && !validIds.has(item.group_id)) {
-        item.group_id = ''
-      }
-    })
-  }
-  normalize(form.relatedEntries)
-  normalize(form.relatedWorks)
-}
-
-watch(groupOptions, normalizeRelatedGroups)
-
-const addMeta = () => {
-  form.meta.push(createEmptyMeta())
-}
-
-const removeMeta = (index: number) => {
-  if (form.meta.length === 1) {
-    form.meta[0] = createEmptyMeta()
-    return
-  }
-  form.meta.splice(index, 1)
-}
-
-const addRelatedEntry = () => {
-  form.relatedEntries.push(createEmptyRelated())
-}
-
-const removeRelatedEntry = (index: number) => {
-  if (index < 0 || index >= form.relatedEntries.length) return
-  form.relatedEntries.splice(index, 1)
-}
-
-const addRelatedWork = () => {
-  form.relatedWorks.push(createEmptyRelated())
-}
-
-const removeRelatedWork = (index: number) => {
-  if (index < 0 || index >= form.relatedWorks.length) return
-  form.relatedWorks.splice(index, 1)
-}
-
-const buildMetaObject = (meta: MetaItem[]) => {
-  const output: Record<string, unknown> = {}
-  meta.forEach((item) => {
-    const key = item.key.trim()
-    if (!key) return
-    let value: unknown = item.value
-    if (item.json) { try { value = JSON.parse(item.value) } catch { /* Explicit text replaces the original JSON value. */ } }
-    output[key] = value
-  })
-  return output
-}
-
-const buildSubmissionPayload = () => ({
-  name: form.name,
-  image_url: form.image_url,
-  meta: buildMetaObject(form.meta),
-  groups: form.groups.map((group) => ({
-    id: group.id,
-    name: group.name,
-    order: group.order,
-    meta: buildMetaObject(group.meta)
-  })),
-  related_entries: form.relatedEntries
-    .filter((item) => item.id.trim())
-    .map((item, order) => ({
-      id: item.id,
-      order: item.order ?? order,
-      group_id: item.group_id || null,
-      meta: buildMetaObject(item.meta)
-    })),
-  related_works: form.relatedWorks
-    .filter((item) => item.id.trim())
-    .map((item, order) => ({
-      id: item.id,
-      order: item.order ?? order,
-      group_id: item.group_id || null,
-      meta: buildMetaObject(item.meta)
-    }))
-})
-
-const submissionPayload = computed(() => buildSubmissionPayload())
-const currentJson = computed(() => JSON.stringify(submissionPayload.value, null, 2))
-const previewJson = computed(() => JSON.stringify(submissionPayload.value, null, 2))
-
-// 同步 JSON 到文本框（编辑模式）
-watch(currentJson, (newVal) => {
-  if (currentTab.value === 'json') {
-    jsonText.value = newVal
+watch(() => props.initialData, (data) => {
+  if (data && Object.keys(data).length) {
+    init(data as FranchiseSchema)
+    if (isEditMode.value) original.value = JSON.stringify(payload.value, null, 2)
   }
 }, { immediate: true })
 
-// 切换到 JSON tab 时同步
-watch(currentTab, (tab) => {
-  if (tab === 'json') {
-    jsonText.value = currentJson.value
-    jsonError.value = ''
-    jsonSuccess.value = ''
+onMounted(async () => {
+  if (!isEditMode.value) return
+  try {
+    const series = await $api<FranchiseDetail>(`/v1/franchises/${props.seriesId}`)
+    for (const entry of series.entries) labels[`entry:${entry.id}`] = { label: entry.name, image_url: entry.image_url }
+    for (const work of series.works) labels[`work:${work.id}`] = { label: work.title, image_url: work.image_url }
+    if (series.parent) labels[`franchise:${series.parent.id}`] = { label: series.parent.name, image_url: null }
+  } catch {
+    // Rows still show their ids.
   }
 })
 
-// 验证并应用 JSON 到表单
-const validateAndApplyJson = () => {
-  jsonError.value = ''
-  jsonSuccess.value = ''
+// Looks the list up on each call: init() replaces form.entries / form.works.
+const addMember = (field: 'entries' | 'works', kind: 'entry' | 'work') => (item: PickedItem) => {
+  labels[`${kind}:${item.id}`] = { label: item.label, subtitle: item.subtitle, image_url: item.image_url }
+  form[field].push({ id: item.id })
+}
+const addEntry = addMember('entries', 'entry')
+const addWork = addMember('works', 'work')
+const setParent = (item: PickedItem) => {
+  labels[`franchise:${item.id}`] = { label: item.label, image_url: item.image_url }
+  form.parent_id = item.id
+}
+const move = (list: Member[], index: number, offset: number) => {
+  const target = index + offset
+  if (target < 0 || target >= list.length) return
+  const [item] = list.splice(index, 1)
+  list.splice(target, 0, item!)
+}
 
+const selfId = computed(() => Number(props.seriesId) || 0)
+
+// JSON tab (edit mode): edit the payload directly and apply it back to the form.
+const jsonText = ref('')
+const jsonState = ref<{ ok: boolean, message: string } | null>(null)
+watch(currentTab, (tab) => {
+  if (tab === 'json') {
+    jsonText.value = JSON.stringify(payload.value, null, 2)
+    jsonState.value = null
+  }
+})
+const applyJson = () => {
   try {
-    const parsed = JSON.parse(jsonText.value)
-    initFormFromSchema(parsed)
-    jsonSuccess.value = 'JSON 已验证并同步到表单'
-  } catch (e: any) {
-    jsonError.value = `JSON 解析错误: ${e.message}`
+    init(JSON.parse(jsonText.value) as FranchiseSchema)
+    jsonState.value = { ok: true, message: t('catalog.form.json_applied') }
+  } catch {
+    jsonState.value = { ok: false, message: t('revision_entry.json_error') }
   }
 }
 
-// 验证表单
-const validateForm = () => {
-  errors.name = undefined
-  errors.image_url = undefined
-
-  if (!form.name.trim()) {
-    errors.name = '请输入系列名称'
+const validate = () => {
+  errors.titles = undefined
+  metaError.value = ''
+  const titles = payload.value.titles
+  if (!titles.length) {
+    errors.titles = t('catalog.form.title_required')
+  } else if (titles.filter(title => title.is_primary).length !== 1) {
+    errors.titles = t('catalog.form.primary_required')
+  }
+  if (errors.titles) {
     currentTab.value = 'basic'
     return false
   }
-  if (!form.image_url.trim()) {
-    errors.image_url = '请输入封面图 URL'
-    currentTab.value = 'basic'
+  if (!parseMeta()) {
+    metaError.value = t('revision_entry.meta_object')
+    currentTab.value = 'meta'
     return false
   }
   return true
 }
-
-// 创建模式：打开预览
-const openPreview = () => {
-  submitMessage.value = ''
-  if (!validateForm()) return
-  showPreview.value = true
-}
-
-// 编辑模式：打开比对
-const openComparison = () => {
-  submitMessage.value = ''
-  if (!validateForm()) return
-  showComparison.value = true
-  confirmSubmit.value = false
-}
-
-const closeComparison = () => {
-  showComparison.value = false
-  confirmSubmit.value = false
-}
-
-const proceedToConfirm = () => {
-  confirmSubmit.value = true
-}
-
-// 计算 JSON 差异行（编辑模式）
-const diffLines = computed(() => {
-  const oldLines = originalJson.value.split('\n')
-  const newLines = currentJson.value.split('\n')
-  const result: Array<{ type: 'same' | 'added' | 'removed'; content: string }> = []
-
-  let oldIdx = 0
-  let newIdx = 0
-
-  while (oldIdx < oldLines.length || newIdx < newLines.length) {
-    const oldLine = oldLines[oldIdx]
-    const newLine = newLines[newIdx]
-
-    if (oldLine === newLine) {
-      result.push({ type: 'same', content: oldLine || '' })
-      oldIdx++
-      newIdx++
-    } else if (oldLine !== undefined && (newLine === undefined || !newLines.slice(newIdx).includes(oldLine))) {
-      result.push({ type: 'removed', content: oldLine })
-      oldIdx++
-    } else {
-      result.push({ type: 'added', content: newLine || '' })
-      newIdx++
-    }
-  }
-
-  return result
-})
-
-const hasChanges = computed(() => originalJson.value !== currentJson.value)
-
-// 提交表单
-const submitForm = async () => {
-  submitMessage.value = ''
-
-  if (!form.name.trim()) {
-    errors.name = '请输入系列名称'
-    return
-  }
-
-  isSubmitting.value = true
-  try {
-    const formData = new FormData()
-    formData.append('payload', JSON.stringify(submissionPayload.value))
-    formData.append('resource_type', 'franchise')
-    formData.append('action', isEditMode.value ? 'update' : 'create')
-    if (isEditMode.value && props.seriesId) {
-      formData.append('resource_id', String(props.seriesId));
-      if (props.initialData?.baseline_checksum) formData.append('baseline_checksum', props.initialData.baseline_checksum);
-    }
-    const result = await $api<{ id: number }>('/v1/revisions', {
-      method: 'POST',
-      body: formData
-    })
-
-    if (props.redirectTo) {
-      await router.push(typeof props.redirectTo === 'function' ? props.redirectTo(result.id) : props.redirectTo)
-      return
-    }
-    // 提交成功，跳转到成功页面
-    router.push({
-      path: '/contribute/success',
-      query: {
-        type: 'series',
-        action: isEditMode.value ? 'update' : 'create'
-      }
-    })
-  } catch (error: unknown) {
-    submitMessage.value = localizeError(error)
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-// 表单提交处理
-const handleFormSubmit = () => {
-  if (isEditMode.value) {
-    openComparison()
-  } else {
-    openPreview()
-  }
-}
-watch(() => props.initialData, (newData) => {
-  if (newData && Object.keys(newData).length > 0) {
-    initFormFromSchema(newData)
-    originalJson.value = JSON.stringify(buildSubmissionPayload(), null, 2)
-  }
-}, { immediate: true, deep: true })
 </script>
 
 <template>
-  <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 space-y-6">
-    <form @submit.prevent="handleFormSubmit">
-      <RevisionSeriesCreateTabs v-model="currentTab" :tabs="tabs" />
+  <div class="space-y-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
+    <RevisionSeriesCreateTabs v-model="currentTab" :tabs="tabs" />
 
-      <RevisionSeriesBasicSection
-        v-show="currentTab === 'basic'"
-        :form="form"
-        :errors="errors"
-        :on-add-meta="addMeta"
-        :on-remove-meta="removeMeta"
-      />
-      <RevisionSeriesGroupsSection
-        v-show="currentTab === 'groups'"
-        :groups="form.groups"
-        :on-add-group="addGroup"
-        :on-remove-group="removeGroup"
-        :on-move-group="moveGroup"
-      />
-      <RevisionSeriesRelatedEntriesSection
-        v-show="currentTab === 'related-entries'"
-        :items="form.relatedEntries"
-        :group-options="groupOptions"
-        :on-add="addRelatedEntry"
-        :on-remove="removeRelatedEntry"
-      />
-      <RevisionSeriesRelatedWorksSection
-        v-show="currentTab === 'related-works'"
-        :items="form.relatedWorks"
-        :group-options="groupOptions"
-        :on-add="addRelatedWork"
-        :on-remove="removeRelatedWork"
-      />
+    <!-- 基础信息 -->
+    <div v-show="currentTab === 'basic'" class="space-y-6">
+      <RevisionTitlesEditor v-model="form.titles" :error="errors.titles" />
 
-      <!-- JSON 编辑器（仅编辑模式） -->
-      <div v-if="isEditMode" v-show="currentTab === 'json'" class="space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <h2 class="text-xl font-bold text-gray-900">JSON 编辑器</h2>
+      <div class="space-y-2">
+        <span class="label-text font-medium">{{ $t('catalog.form.parent') }}</span>
+        <div v-if="form.parent_id" class="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+          <NuxtLink :to="`/series/${form.parent_id}`" target="_blank" class="flex-1 truncate text-sm font-medium hover:text-primary">
+            {{ labelOf('franchise', form.parent_id)?.label || $t('catalog.form.unknown_item', { id: form.parent_id }) }}
+          </NuxtLink>
+          <button type="button" class="btn btn-ghost btn-xs text-gray-400 hover:text-error" :aria-label="$t('catalog.form.remove')" @click="form.parent_id = null">
+            <Trash2 class="h-4 w-4" />
+          </button>
         </div>
-
-        <p class="text-sm text-gray-500">
-          直接编辑 JSON，点击验证按钮同步到表单。
-        </p>
-
-        <textarea
-          v-model="jsonText"
-          rows="20"
-          spellcheck="false"
-          class="textarea textarea-bordered w-full font-mono text-xs bg-gray-50"
-          placeholder='输入系列 JSON...'
+        <RevisionContentPicker
+          v-else
+          kind="franchise"
+          :exclude="[selfId]"
+          :extra-query="{ top_level: 1 }"
+          :placeholder="`${$t('catalog.form.search_series')} · ${$t('catalog.form.no_parent')}`"
+          @select="setParent"
         />
+        <p class="text-xs text-gray-500">{{ $t('catalog.form.parent_hint') }}</p>
+      </div>
 
-        <div class="flex flex-wrap gap-3 items-center">
-          <button type="button" class="btn btn-sm btn-primary" @click="validateAndApplyJson">
-            验证并同步
-          </button>
-          <span v-if="jsonSuccess" class="text-sm text-green-600 flex items-center gap-1">
-            <Check class="w-4 h-4" /> {{ jsonSuccess }}
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="form-control">
+          <span class="label-text mb-1 font-medium">{{ $t('catalog.form.slug') }}</span>
+          <input v-model="form.slug" type="text" class="input input-bordered w-full" placeholder="final-fantasy" >
+          <span class="mt-1 text-xs text-gray-500">{{ $t('catalog.form.slug_hint') }}</span>
+        </label>
+        <label v-if="form.parent_id" class="form-control">
+          <span class="label-text mb-1 font-medium">{{ $t('catalog.form.sort_order') }}</span>
+          <input v-model="form.sort_order" type="number" min="0" class="input input-bordered w-full" >
+        </label>
+      </div>
+
+      <label class="form-control">
+        <span class="label-text mb-1 font-medium">{{ $t('catalog.form.description') }}</span>
+        <textarea v-model="form.description" rows="5" class="textarea textarea-bordered w-full" />
+      </label>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <label class="form-control">
+          <span class="label-text mb-1 font-medium">{{ $t('catalog.form.image_url') }}</span>
+          <input v-model="form.image_url" type="url" class="input input-bordered w-full" placeholder="https://" >
+          <img v-if="form.image_url" :src="form.image_url" alt="" class="mt-2 h-24 w-40 rounded-lg border border-gray-200 object-cover" >
+        </label>
+        <label class="form-control">
+          <span class="label-text mb-1 font-medium">{{ $t('catalog.form.banner_url') }}</span>
+          <input v-model="form.banner_url" type="url" class="input input-bordered w-full" placeholder="https://" >
+          <img v-if="form.banner_url" :src="form.banner_url" alt="" class="mt-2 h-24 w-full rounded-lg border border-gray-200 object-cover" >
+        </label>
+      </div>
+    </div>
+
+    <!-- 条目 / 系列整体作品 -->
+    <div
+      v-for="section in [
+        { id: 'entries', kind: 'entry' as const, list: form.entries, add: addEntry, hint: $t('catalog.form.series_entries_hint'), placeholder: $t('catalog.form.search_entry'), path: '/entries' },
+        { id: 'works', kind: 'work' as const, list: form.works, add: addWork, hint: $t('catalog.form.series_works_hint'), placeholder: $t('catalog.form.search_work'), path: '/works' },
+      ]"
+      v-show="currentTab === section.id"
+      :key="section.id"
+      class="space-y-3"
+    >
+      <p class="text-sm text-gray-500">{{ section.hint }}</p>
+      <RevisionContentPicker :kind="section.kind" :exclude="section.list.map(member => member.id)" :placeholder="section.placeholder" @select="section.add" />
+      <ol class="space-y-2">
+        <li v-for="(member, index) in section.list" :key="member.id" class="flex items-center gap-3 rounded-lg border border-gray-200 p-2.5">
+          <span class="w-6 text-center text-xs text-gray-400">{{ index + 1 }}</span>
+          <img v-if="labelOf(section.kind, member.id)?.image_url" :src="labelOf(section.kind, member.id)!.image_url!" alt="" class="h-10 w-10 rounded object-cover" >
+          <span v-else class="h-10 w-10 rounded bg-gray-100" />
+          <span class="min-w-0 flex-1">
+            <NuxtLink :to="`${section.path}/${member.id}`" target="_blank" class="block truncate text-sm font-medium hover:text-primary">
+              {{ labelOf(section.kind, member.id)?.label || $t('catalog.form.unknown_item', { id: member.id }) }}
+            </NuxtLink>
+            <span v-if="labelOf(section.kind, member.id)?.subtitle" class="block truncate text-xs text-gray-500">{{ labelOf(section.kind, member.id)?.subtitle }}</span>
           </span>
-          <span v-else-if="jsonError" class="text-sm text-red-600 flex items-center gap-1">
-            <X class="w-4 h-4" /> {{ jsonError }}
-          </span>
-        </div>
+          <button type="button" class="btn btn-ghost btn-xs" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="move(section.list, index, -1)"><ArrowUp class="h-4 w-4" /></button>
+          <button type="button" class="btn btn-ghost btn-xs" :disabled="index === section.list.length - 1" :aria-label="$t('catalog.form.move_down')" @click="move(section.list, index, 1)"><ArrowDown class="h-4 w-4" /></button>
+          <button type="button" class="btn btn-ghost btn-xs text-gray-400 hover:text-error" :aria-label="$t('catalog.form.remove')" @click="section.list.splice(index, 1)"><Trash2 class="h-4 w-4" /></button>
+        </li>
+      </ol>
+    </div>
+
+    <!-- 外部链接 -->
+    <div v-show="currentTab === 'links'">
+      <RevisionLinksEditor v-model="form.links" />
+    </div>
+
+    <!-- 元数据 -->
+    <div v-show="currentTab === 'meta'" class="space-y-2">
+      <p class="text-sm text-gray-500">{{ $t('catalog.form.meta_hint') }}</p>
+      <textarea v-model="metaText" rows="12" spellcheck="false" class="textarea textarea-bordered w-full bg-gray-50 font-mono text-sm" />
+      <p v-if="metaError" class="text-sm text-error">{{ metaError }}</p>
+    </div>
+
+    <!-- JSON（仅编辑模式） -->
+    <div v-if="isEditMode" v-show="currentTab === 'json'" class="space-y-3">
+      <p class="text-sm text-gray-500">{{ $t('catalog.form.json_hint') }}</p>
+      <textarea v-model="jsonText" rows="20" spellcheck="false" class="textarea textarea-bordered w-full bg-gray-50 font-mono text-xs" />
+      <div class="flex flex-wrap items-center gap-3">
+        <button type="button" class="btn btn-sm btn-primary" @click="applyJson">{{ $t('catalog.form.apply_json') }}</button>
+        <span v-if="jsonState" class="flex items-center gap-1 text-sm" :class="jsonState.ok ? 'text-green-600' : 'text-red-600'">
+          <Check v-if="jsonState.ok" class="h-4 w-4" />
+          <X v-else class="h-4 w-4" />
+          {{ jsonState.message }}
+        </span>
       </div>
+    </div>
 
-      <!-- 提交按钮 -->
-      <div class="flex flex-wrap items-center gap-3 pt-6">
-        <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
-          <Save class="w-4 h-4" />
-          {{ isSubmitting ? '处理中...' : (isEditMode ? '提交修改' : '预览') }}
-        </button>
-        <span class="text-sm text-gray-500">提交后由管理员审核，审核通过后公开展示。</span>
-      </div>
-
-      <!-- 创建模式：预览 -->
-      <div v-if="!isEditMode && showPreview" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-3 mt-6">
-        <div class="rounded-lg border border-blue-100 bg-white p-3 text-xs text-gray-700 font-mono whitespace-pre-wrap">
-          {{ previewJson }}
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" class="btn btn-primary btn-sm" :disabled="isSubmitting" @click="submitForm">
-            {{ isSubmitting ? '提交中...' : '确认提交' }}
-          </button>
-          <button type="button" class="btn btn-ghost btn-sm" @click="showPreview = false">
-            返回编辑
-          </button>
-        </div>
-      </div>
-
-      <!-- 编辑模式：比对视图 -->
-      <div v-if="isEditMode && showComparison" class="border border-blue-100 bg-blue-50/50 rounded-lg p-4 space-y-4 mt-6">
-        <h3 class="font-semibold text-gray-900">修改对比</h3>
-
-        <div v-if="!hasChanges" class="text-sm text-gray-500">
-          没有检测到修改。
-        </div>
-
-        <div v-else class="rounded-lg border border-blue-100 bg-white p-3 text-xs font-mono overflow-x-auto max-h-96 overflow-y-auto">
-          <div
-            v-for="(line, idx) in diffLines"
-            :key="idx"
-            :class="{
-              'bg-green-100 text-green-800': line.type === 'added',
-              'bg-red-100 text-red-800': line.type === 'removed',
-              'text-gray-700': line.type === 'same'
-            }"
-            class="whitespace-pre"
-          >
-            <span class="select-none opacity-50 mr-2">{{ line.type === 'added' ? '+' : line.type === 'removed' ? '-' : ' ' }}</span>{{ line.content }}
-          </div>
-        </div>
-
-        <div v-if="!confirmSubmit" class="flex items-center gap-2">
-          <button type="button" class="btn btn-primary btn-sm" :disabled="!hasChanges" @click="proceedToConfirm">
-            确认修改
-          </button>
-          <button type="button" class="btn btn-ghost btn-sm" @click="closeComparison">
-            返回编辑
-          </button>
-        </div>
-
-        <!-- 最终确认提交 -->
-        <div v-else class="border-t border-blue-200 pt-4 space-y-3">
-          <p class="text-sm text-gray-700">确认要提交以上修改吗？</p>
-          <div class="flex items-center gap-2">
-            <button type="button" class="btn btn-primary btn-sm" :disabled="isSubmitting" @click="submitForm">
-              {{ isSubmitting ? '提交中...' : '确认提交' }}
-            </button>
-            <button type="button" class="btn btn-ghost btn-sm" @click="confirmSubmit = false">
-              取消
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 提交结果消息 -->
-      <div v-if="submitMessage" class="alert alert-error mt-4">
-        <X class="w-5 h-5" />
-        <span>{{ submitMessage }}</span>
-      </div>
-    </form>
+    <RevisionSubmitFlow
+      :payload="payload"
+      resource-type="franchise"
+      :resource-id="seriesId"
+      :baseline-checksum="baselineChecksum"
+      :original="original"
+      :validate="validate"
+      :redirect-to="redirectTo"
+      success-type="series"
+    />
   </div>
 </template>

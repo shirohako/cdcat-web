@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, X } from '@lucide/vue'
+import { ArrowLeft } from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -7,61 +7,30 @@ definePageMeta({
 
 const route = useRoute()
 const { $api } = useNuxtApp()
-const seriesId = route.params.id as string
+const { t } = useI18n()
+const seriesId = String(route.params.id)
 
-// 加载状态
-const loading = ref(true)
-const loadError = ref('')
-const initialData = ref<Record<string, any>>({})
-
-// 加载系列数据
-onMounted(async () => {
-  try {
-    const data = await $api(`/v1/franchises/${seriesId}/schema`)
-    if (data) {
-      initialData.value = data as Record<string, any>
-    }
-  } catch (error: any) {
-    console.error('Failed to load series data:', error)
-    loadError.value = error.message || '加载失败'
-  } finally {
-    loading.value = false
-  }
-})
-
-useHead({
-  title: '编辑系列'
-})
+const { data, pending, error, refresh } = await useAsyncData(`edit-series-${seriesId}`, () => $api<Record<string, unknown>>(`/v1/franchises/${seriesId}/schema`))
+useHead({ title: computed(() => t('catalog.contribute.edit_series')) })
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
-      <!-- Header -->
       <div class="mb-8">
-        <NuxtLink :to="`/series/${seriesId}`" class="btn btn-ghost btn-sm gap-2 mb-4">
-          <ArrowLeft class="w-4 h-4" />
-          返回系列详情
+        <NuxtLink :to="`/series/${seriesId}`" class="btn btn-ghost btn-sm mb-4 gap-2">
+          <ArrowLeft class="h-4 w-4" />
+          {{ $t('catalog.contribute.back_series') }}
         </NuxtLink>
-        <h1 class="text-2xl font-bold text-gray-900">编辑系列</h1>
-        <p class="text-gray-500 mt-1">修改系列信息，提交后由管理员审核。</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $t('catalog.contribute.edit_series') }}</h1>
+        <p class="mt-1 text-gray-500">{{ $t('catalog.contribute.edit_series_desc') }}</p>
       </div>
 
-      <!-- Loading 状态 -->
-      <div v-if="loading" class="flex items-center justify-center py-20">
-        <span class="loading loading-spinner loading-lg"></span>
-      </div>
-
-      <!-- 错误状态 -->
-      <div v-else-if="loadError" class="alert alert-error">
-        <X class="w-5 h-5" />
-        <span>加载失败: {{ loadError }}</span>
-      </div>
-
-      <!-- 表单 -->
-      <div v-else class="max-w-5xl">
-        <RevisionSeriesForm :initial-data="initialData" :series-id="seriesId" />
-      </div>
+      <AdminListState :pending="pending" :error="error" @retry="refresh()">
+        <div class="max-w-5xl">
+          <RevisionSeriesForm v-if="data" :initial-data="data" :series-id="seriesId" />
+        </div>
+      </AdminListState>
     </div>
   </div>
 </template>

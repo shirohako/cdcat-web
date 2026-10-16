@@ -1,163 +1,127 @@
 <script setup lang="ts">
-import { Disc3, Film } from '@lucide/vue'
+import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
+import type { FranchiseDetail } from '~/types/entry'
 
 const route = useRoute()
-const seriesId = computed(() => Number(route.params.id))
-
 const { t } = useI18n()
-const { localizedContent } = useLocaleFormatting()
-const tabs = computed(() => [
-  { id: 'entries', label: t('content_display.linked_entries') },
-  { id: 'works-time', label: t('content_display.works_by_time') },
-  { id: 'works-group', label: t('content_display.works_by_group') }
-])
+const { displayName, originalName } = useEntryDisplay()
 
+const { data: series, pending, error } = await useAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
+
+useHead({ title: computed(() => series.value ? displayName(series.value) : '') })
+
+const tabs = computed(() => [
+  { id: 'entries', label: t('catalog.series_entries') },
+  { id: 'works', label: t('catalog.series_works') },
+])
 const currentTab = ref('entries')
 
-interface FranchiseGroup {
-  id: string
-  order: number
-  meta: {
-    name: string
-    name_cn?: string
-    name_ja?: string
-  }
-}
-
-interface FranchiseEntry {
-  id: number
-  name: string
-  slug: string
-  type: string
-  source: string
-  release_date?: string
-  group_id?: string
-  order: number
-  image_url?: string
-  meta?: {
-    description?: string
-    catalog_number?: string
-  }
-}
-
-interface FranchiseWork {
-  id: number
-  title: string
-  type: string
-  image_url?: string
-  catalog_number?: string
-  release_date?: string
-  group_id?: string
-}
-
-interface Franchise {
-  id: number
-  name: string
-  image_url?: string
-  meta?: Record<string, any>
-  groups: FranchiseGroup[]
-  groups_count: number
-  entries_count: number
-  works_count: number
-  entries: FranchiseEntry[]
-  works: FranchiseWork[]
-  created_at: string
-  updated_at: string
-}
-
-const { $api } = useNuxtApp()
-const { data: series } = await useAsyncData(
-  `franchise-${seriesId.value}`,
-  () => $api<Franchise>(`/v1/franchises/${seriesId.value}`)
-)
-
-// 转换 entries 为组件需要的格式
-const entriesForComponent = computed(() => {
-  if (!series.value?.entries) return []
-  return series.value.entries.map(entry => ({
-    id: entry.id,
-    name: entry.name,
-    type: entry.type,
-    image_url: entry.image_url,
-    works_count: 0
-  }))
-})
-
-// 转换 groups 为组件需要的 entry_groups 格式
-const entryGroups = computed(() => {
-  if (!series.value?.groups || !series.value?.entries) return []
-  return series.value.groups.map(group => ({
-    id: group.id,
-    name: localizedContent(group.meta, 'name'),
-    entry_ids: series.value!.entries
-      .filter(entry => entry.group_id === group.id)
-      .map(entry => entry.id)
-  }))
-})
+const providerLabel = (name?: string) => (name || '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 </script>
 
 <template>
-  <div v-if="series" class="min-h-screen bg-gray-50">
-    <!-- Banner 区域 -->
-    <div class="relative h-80 bg-linear-to-br from-blue-500 to-purple-600 overflow-hidden">
-      <img
-        v-if="series.image_url"
-        :src="series.image_url"
-        :alt="series.name"
-        class="w-full h-full object-cover opacity-30"
-      />
-      <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/30 to-transparent" />
+  <div class="min-h-screen bg-gray-50">
+    <div v-if="pending" class="flex min-h-screen items-center justify-center">
+      <span class="loading loading-spinner loading-lg" />
+    </div>
 
-      <!-- 系列主要信息 -->
-      <div class="absolute bottom-0 left-0 right-0 p-8">
-        <div class="container mx-auto max-w-6xl 2xl:max-w-7xl">
-          <div class="flex items-end gap-6">
-            <!-- 标题和基本信息 -->
-            <div class="flex-1 pb-2">
-              <h1 class="text-4xl font-bold text-white mb-2">
-                {{ series.name }}
-              </h1>
-              <div class="flex items-center gap-4 text-white/90">
-                <div class="flex items-center gap-2">
-                  <Film class="w-5 h-5" />
-                  <span>{{ $t('content_display.entries_count', { count: series.entries_count }) }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <Disc3 class="w-5 h-5" />
-                  <span>{{ $t('content_display.works_count', { count: series.works_count }) }}</span>
-                </div>
-              </div>
+    <div v-else-if="error || !series" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
+      <Boxes :size="56" class="text-gray-300" />
+      <p>{{ $t('catalog.not_found') }}</p>
+    </div>
+
+    <template v-else>
+      <div class="relative h-80 overflow-hidden bg-linear-to-br from-emerald-600 to-slate-800">
+        <img v-if="series.banner_url || series.image_url" :src="series.banner_url || series.image_url!" alt="" class="h-full w-full object-cover opacity-40" >
+        <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
+
+        <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+          <div class="container mx-auto max-w-6xl 2xl:max-w-7xl">
+            <NuxtLink v-if="series.parent" :to="`/series/${series.parent.id}`" class="mb-2 inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white">
+              <Layers class="h-4 w-4" />
+              {{ series.parent.name }} ›
+            </NuxtLink>
+            <h1 class="text-3xl font-bold text-white md:text-4xl">{{ displayName(series) }}</h1>
+            <p v-if="originalName(series)" class="mt-1 text-white/75">{{ originalName(series) }}</p>
+            <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-white/90">
+              <span v-if="series.children_count" class="flex items-center gap-2"><Layers class="h-5 w-5" />{{ $t('catalog.children_count', { count: series.children_count }) }}</span>
+              <span class="flex items-center gap-2"><Film class="h-5 w-5" />{{ $t('catalog.entries_count', { count: series.entries_count ?? 0 }) }}</span>
+              <span class="flex items-center gap-2"><Disc3 class="h-5 w-5" />{{ $t('catalog.works_count', { count: series.works_count ?? 0 }) }}</span>
+              <NuxtLink :to="`/contribute/series/${series.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 text-sm text-white hover:bg-white/25">
+                <Pencil class="h-4 w-4" />
+                {{ $t('catalog.edit') }}
+              </NuxtLink>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 内容区域 -->
-    <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 py-8">
-      <div class="space-y-6">
+      <div class="container mx-auto max-w-6xl space-y-6 px-4 py-8 md:px-8 2xl:max-w-7xl">
+        <div v-if="series.description || series.links.length" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section v-if="series.description" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-2">
+            <h2 class="mb-3 text-lg font-bold">{{ $t('catalog.description') }}</h2>
+            <p class="whitespace-pre-wrap leading-relaxed text-gray-700">{{ series.description }}</p>
+          </section>
+          <section v-if="series.links.length" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h2 class="mb-3 text-lg font-bold">{{ $t('catalog.links') }}</h2>
+            <a
+              v-for="link in series.links"
+              :key="link.id"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+            >
+              <ExternalLink :size="16" class="text-gray-400 group-hover:text-emerald-700" />
+              <span class="truncate text-gray-700 group-hover:text-emerald-700">{{ providerLabel(link.provider?.name) || link.url }}</span>
+            </a>
+          </section>
+        </div>
+
         <SeriesContentTabs v-model="currentTab" :tabs="tabs" />
 
-        <SeriesEntriesSection
-          v-show="currentTab === 'entries'"
-          :entries="entriesForComponent"
-          :entries-count="series.entries_count"
-          :groups="entryGroups"
-        />
-        <SeriesRecentWorksSection
-          v-show="currentTab === 'works-time'"
-          mode="time"
-          :works="series.works"
-          :works-count="series.works_count"
-        />
-        <SeriesRecentWorksSection
-          v-show="currentTab === 'works-group'"
-          mode="group"
-          :works="series.works"
-          :works-count="series.works_count"
-          :groups="series.groups"
-        />
+        <div v-show="currentTab === 'entries'" class="space-y-6">
+          <!-- Sub-series first, each with its own entries -->
+          <section
+            v-for="child in series.children"
+            :key="child.id"
+            class="space-y-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5 shadow-sm"
+          >
+            <NuxtLink :to="`/series/${child.id}`" class="group flex flex-wrap items-center gap-3">
+              <span class="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-700">{{ $t('catalog.sub_series') }}</span>
+              <h2 class="text-lg font-bold tracking-tight text-slate-900 group-hover:text-emerald-700">{{ displayName(child) }}</h2>
+              <span class="text-xs text-slate-500">
+                {{ $t('catalog.entries_count', { count: child.entries_count ?? 0 }) }} · {{ $t('catalog.works_count', { count: child.works_count ?? 0 }) }}
+              </span>
+            </NuxtLink>
+            <SeriesEntriesSection :entries="child.entries" />
+          </section>
+
+          <section v-if="series.entries.length || !series.children.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <SeriesEntriesSection :entries="series.entries" />
+          </section>
+
+          <section v-if="series.works.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+            <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
+              <Disc3 class="h-4 w-4 text-emerald-600" />
+              {{ $t('catalog.whole_series_works') }}
+            </h2>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+              <NuxtLink v-for="work in series.works" :key="work.id" :to="`/works/${work.id}`" class="group">
+                <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                  <img v-if="work.image_url" :src="work.image_url" :alt="work.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" >
+                  <div v-else class="flex h-full items-center justify-center"><Disc3 class="h-8 w-8 text-gray-300" /></div>
+                </div>
+                <h3 class="mt-2 line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-emerald-700">{{ work.title }}</h3>
+              </NuxtLink>
+            </div>
+          </section>
+        </div>
+
+        <section v-if="currentTab === 'works'" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <SeriesWorksSection :series-id="series.id" />
+        </section>
       </div>
-    </div>
+    </template>
   </div>
 </template>

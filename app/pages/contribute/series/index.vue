@@ -3,9 +3,8 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useHead({
-  title: '创建系列'
-})
+const { t } = useI18n()
+useHead({ title: computed(() => t('catalog.contribute.series_title')) })
 </script>
 
 <template>

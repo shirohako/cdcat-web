@@ -39,7 +39,7 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Recount =====
-const recountable = computed(() => ['work', 'artist', 'franchise'].includes(type.value))
+const recountable = computed(() => ['work', 'artist'].includes(type.value))
 const recount = async () => {
   busy.value = true
   message.value = ''
