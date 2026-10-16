@@ -13,6 +13,16 @@
         :filter-label="$t('content_display.type')"
         @update:model-value="selectType"
       >
+        <!-- 活动筛选；活动系列页的「N 张专辑」也跳到这里（?event=<id>） -->
+        <template #filter-end="{ activeClass, idleClass }">
+          <EventFilterChip
+            :model-value="eventId"
+            :label="t('works.event_filter_label')"
+            :active-class="activeClass"
+            :idle-class="idleClass"
+            @update:model-value="selectEvent"
+          />
+        </template>
         <template #action>
           <button
             class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
@@ -89,6 +99,12 @@ const workTypes = computed(() => [
 
 const selectedType = ref(route.query.type || 'all');
 
+// ?event=<id> narrows the list to works first released at that event.
+const eventId = computed(() => {
+  const id = Number.parseInt(route.query.event || '');
+  return id > 0 ? id : null;
+});
+
 useSeoMeta({
   title: 'Works',
   description: 'Explore all music albums, singles, EPs and compilations on CDCAT.',
@@ -110,8 +126,9 @@ const { data: worksResponse, pending, error } = useAPI("/v1/works", {
   query: computed(() => ({
     page: currentPage.value,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
+    release_event_id: eventId.value ?? undefined,
   })),
-  watch: [currentPage, selectedType],
+  watch: [currentPage, selectedType, eventId],
 });
 
 // 处理作品数据
@@ -152,6 +169,16 @@ const goToPage = (page) => {
 
   // 滚动到顶部
   window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const selectEvent = (id) => {
+  router.push({
+    query: {
+      ...route.query,
+      event: id ?? undefined,
+      page: undefined,
+    },
+  });
 };
 
 const selectType = (type) => {

@@ -110,6 +110,20 @@
       </div>
     </div>
 
+    <!-- 发行活动 -->
+    <div class="form-control">
+      <div class="px-3 py-2.5 rounded-lg bg-gray-50 flex flex-col gap-1">
+        <span class="text-sm font-semibold text-gray-700">Release Event</span>
+        <p class="text-xs text-gray-400 leading-relaxed tracking-wide">作品首次发行的即卖会或活动，例如 Comic Market 107、M3-2025 Autumn。可按名称搜索，或从发行日期当天的活动中选择；选填。</p>
+        <EventPicker
+          class="mt-1"
+          :model-value="formData.release_event_id"
+          :release-date="formData.release_date"
+          @update:model-value="$emit('update:formData', { ...formData, release_event_id: $event })"
+        />
+      </div>
+    </div>
+
     <!-- 图片 -->
     <div class="form-control">
       <div class="px-3 py-2.5 rounded-lg bg-gray-50 flex flex-col gap-4">
@@ -176,6 +190,7 @@ interface FormData {
   type: string
   catalog_number: string
   release_date: string
+  release_event_id: number | null
   image_url: string
   banner_url: string
   description: string

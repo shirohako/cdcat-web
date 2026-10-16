@@ -26,6 +26,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const idleFilterClass = 'bg-white text-slate-500 ring-slate-200 shadow-xs hover:text-slate-900 hover:ring-slate-300'
+
 const toneStyles = computed(() => ({
   sky: {
     icon: 'bg-sky-50 text-sky-600 ring-sky-100',
@@ -95,13 +97,18 @@ const toneStyles = computed(() => ({
           class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150"
           :class="modelValue === filter.value
             ? toneStyles.active
-            : 'bg-white text-slate-500 ring-slate-200 shadow-xs hover:text-slate-900 hover:ring-slate-300'"
+            : idleFilterClass"
           :aria-pressed="modelValue === filter.value"
           @click="emit('update:modelValue', filter.value)"
         >
           <Icon v-if="filter.icon" :name="filter.icon" class="h-3.5 w-3.5" />
           {{ filter.label }}
         </button>
+      </div>
+
+      <!-- Extra filters (e.g. an event chip) get the same chip classes so they match the row. -->
+      <div v-if="$slots['filter-end']" class="shrink-0">
+        <slot name="filter-end" :active-class="toneStyles.active" :idle-class="idleFilterClass" />
       </div>
     </div>
   </section>
