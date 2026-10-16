@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { adminContentRoutes, adminContentTypes } from '~/config/admin'
-import type { AdminContentItem, AdminContentType, AdminPagination, DeletionImpact } from '~/types/admin'
+import type { AdminContentItem, AdminContentType, AdminPagination } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin', middleware: 'admin',
@@ -64,36 +64,6 @@ const recount = async (ids: number[]) => {
     await refresh()
   } catch (e) {
     message.value = localizeError(e)
-  } finally {
-    busy.value = false
-  }
-}
-
-// ===== Delete =====
-const deleting = ref<AdminContentItem | null>(null)
-const impact = ref<DeletionImpact & { baseline_checksum?: string } | null>(null)
-const deleteOpen = ref(false)
-const startDelete = async (item: AdminContentItem) => {
-  message.value = ''
-  try {
-    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${type.value}/${item.id}/deletion-impact`)
-    deleting.value = item
-    deleteOpen.value = true
-  } catch (e) {
-    message.value = localizeError(e)
-  }
-}
-const confirmDelete = async (reason: string) => {
-  if (busy.value || !deleting.value || !impact.value) return
-  busy.value = true
-  try {
-    await $api(`/v1/admin/content/${type.value}/${deleting.value.id}`, { method: 'DELETE', body: { reason, impact_checksum: impact.value.checksum, baseline_checksum: impact.value.baseline_checksum } })
-    deleteOpen.value = false
-    notice.value = t('admin_pages.content.deleted', { name: label(deleting.value) })
-    await refresh()
-  } catch (e) {
-    message.value = localizeError(e)
-    deleteOpen.value = false
   } finally {
     busy.value = false
   }
@@ -178,8 +148,6 @@ useHead({ title: computed(() => `${t(`admin_pages.content.tabs.${type.value}`)} 
                 <td class="px-3 py-3">
                   <div class="flex justify-end gap-3 whitespace-nowrap text-xs">
                     <NuxtLink :to="frontLink(item)" target="_blank" class="text-slate-500 underline">{{ t('admin_pages.preview_front') }}</NuxtLink>
-                    <button v-if="recountable" type="button" :disabled="busy" class="text-slate-600" @click="recount([item.id])">{{ t('admin_pages.content.recount') }}</button>
-                    <button v-if="editable" type="button" class="text-red-700" @click="startDelete(item)">{{ t('common.delete') }}</button>
                   </div>
                 </td>
               </tr>
@@ -189,11 +157,5 @@ useHead({ title: computed(() => `${t(`admin_pages.content.tabs.${type.value}`)} 
         <footer class="border-t border-slate-100 px-5 py-3"><CommonPagination v-model:page="page" :total-pages="pagination.last_page" :disabled="pending" /></footer>
       </AdminListState>
     </section>
-
-    <AdminConfirmDialog
-v-model="deleteOpen" :busy="busy" reason-required :confirm-disabled="Boolean(impact?.blockers.length)"
-      :title="t('admin_pages.content.delete_title', { name: deleting ? label(deleting) : '' })" :description="t('admin_pages.content.delete_help')" @confirm="confirmDelete">
-      <AdminImpactPreview v-if="impact" :impact="impact" />
-    </AdminConfirmDialog>
   </div>
 </template>
