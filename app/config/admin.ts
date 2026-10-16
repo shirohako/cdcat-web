@@ -1,7 +1,12 @@
 export const adminMenu = [
   { path: '/admin', permission: 'admin.access', label: 'admin_pages.dashboard.title', icon: 'lucide:layout-dashboard' },
   { path: '/admin/revisions', permission: 'revisions.view', label: 'admin_pages.revisions.title', icon: 'lucide:git-pull-request' },
-  { path: '/admin/content', permission: 'content.manage', label: 'admin_pages.content.title', icon: 'lucide:library' },
+  // Items sharing a group are listed under one sidebar heading.
+  { path: '/admin/content/work', permission: 'content.manage', label: 'admin_pages.content.tabs.work', icon: 'lucide:disc-3', group: 'admin_pages.content.title' },
+  { path: '/admin/content/artist', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'admin_pages.content.title' },
+  { path: '/admin/content/entry', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'admin_pages.content.title' },
+  { path: '/admin/content/franchise', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'admin_pages.content.title' },
+  { path: '/admin/content/song', permission: 'content.manage', label: 'admin_pages.content.tabs.song', icon: 'lucide:music', group: 'admin_pages.content.title' },
   { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days' },
   { path: '/admin/link-providers', permission: 'content.manage', label: 'admin_pages.link_providers.title', icon: 'lucide:link' },
   { path: '/admin/reviews', permission: 'reviews.manage', label: 'admin_pages.reviews.title', icon: 'lucide:message-square' },

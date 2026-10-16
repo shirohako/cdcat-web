@@ -106,15 +106,12 @@ useHead({ title: computed(() => `${t(`admin_pages.content.tabs.${type.value}`)} 
   <div class="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-bold">{{ t('admin_pages.content.title') }}</h1>
-        <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.content.description') }}</p>
+        <p class="text-xs font-semibold text-slate-500">{{ t('admin_pages.content.title') }}</p>
+        <h1 class="mt-1 text-3xl font-bold">{{ t(`admin_pages.content.tabs.${type}`) }}</h1>
+        <p class="mt-2 text-sm text-slate-600">{{ t(`admin_pages.content.descriptions.${type}`) }}</p>
       </div>
       <NuxtLink v-if="editable" :to="`/admin/content/${type}/new`" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">{{ t('admin_pages.content.create', { type: t(`admin_pages.content.tabs.${type}`) }) }}</NuxtLink>
     </header>
-
-    <nav class="flex flex-wrap gap-2 text-sm" :aria-label="t('admin_pages.content.title')">
-      <NuxtLink v-for="item in adminContentTypes" :key="item" :to="`/admin/content/${item}`" class="rounded-lg border px-3 py-1.5" :class="item === type ? 'border-slate-900 bg-slate-900 text-white' : 'bg-white'">{{ t(`admin_pages.content.tabs.${item}`) }}</NuxtLink>
-    </nav>
 
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">

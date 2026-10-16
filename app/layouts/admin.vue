@@ -24,9 +24,12 @@ useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
         </button>
       </div>
       <nav class="space-y-1 p-3" :aria-label="t('admin_pages.console')">
-        <NuxtLink v-for="item in links" :key="item.path" :to="item.path" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-100" :class="current?.path === item.path ? 'bg-slate-100 font-semibold' : ''">
-          <Icon :name="item.icon" class="size-4" />{{ t(item.label) }}
-        </NuxtLink>
+        <template v-for="(item, index) in links" :key="item.path">
+          <p v-if="item.group && item.group !== links[index - 1]?.group" class="px-3 pb-1 pt-3 text-xs font-semibold text-slate-400">{{ t(item.group) }}</p>
+          <NuxtLink :to="item.path" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm hover:bg-slate-100" :class="[current?.path === item.path ? 'bg-slate-100 font-semibold' : '', item.group ? 'pl-5' : '']">
+            <Icon :name="item.icon" class="size-4" />{{ t(item.label) }}
+          </NuxtLink>
+        </template>
       </nav>
       <NuxtLink to="/" class="absolute bottom-6 left-6 text-sm text-slate-500 hover:text-slate-900">{{ t('admin_pages.back_to_site') }}</NuxtLink>
     </aside>
@@ -37,6 +40,7 @@ useHead({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] })
         </button>
         <nav class="flex items-center gap-2 text-sm" :aria-label="t('admin_pages.breadcrumb')">
           <NuxtLink to="/admin" class="text-slate-500">{{ t('admin_pages.console') }}</NuxtLink>
+          <template v-if="current?.group"><span aria-hidden="true">/</span><span class="text-slate-500">{{ t(current.group) }}</span></template>
           <template v-if="current"><span aria-hidden="true">/</span><span aria-current="page">{{ t(current.label) }}</span></template>
         </nav>
         <span class="ml-auto truncate text-sm text-slate-500">{{ user?.nickname || user?.username }}</span>
