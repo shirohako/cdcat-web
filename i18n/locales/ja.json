@@ -494,8 +494,10 @@
       "event_count": "{count}件のイベント",
       "series_count": "{count}シリーズ",
       "official_site": "公式サイト",
-      "collapse": "閉じる",
-      "show_all": "すべて表示（残り{count}件）",
+      "no_series": "イベントシリーズがありません",
+      "latest": "直近 {date}",
+      "back": "イベントシリーズ一覧",
+      "not_found": "イベントシリーズが見つかりません",
       "empty": "開催情報がありません",
       "no_description": "紹介文がありません。",
       "seo_description": "登録されている同人・音楽イベントを一覧で探せます。"

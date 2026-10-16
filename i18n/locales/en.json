@@ -494,8 +494,10 @@
       "event_count": "{count} events",
       "series_count": "{count} series",
       "official_site": "Official website",
-      "collapse": "Show less",
-      "show_all": "Show all ({count} more)",
+      "no_series": "No event series yet",
+      "latest": "Latest {date}",
+      "back": "All event series",
+      "not_found": "Event series not found",
       "empty": "No editions listed",
       "no_description": "No description available.",
       "seo_description": "Browse archived doujin and music events."

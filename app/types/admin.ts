@@ -170,13 +170,14 @@ export interface AdminEventSeries {
   slug: string
   location: string
   website: string | null
+  banner_url: string | null
   description: Record<string, unknown> | null
   events_count: number
 }
 
 export interface AdminEvent {
   id: number
-  event_series_id: number
+  event_series_id: number | null
   series: { id: number, name: string, slug: string } | null
   name: string
   slug: string

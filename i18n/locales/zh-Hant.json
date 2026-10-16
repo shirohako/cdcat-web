@@ -494,8 +494,10 @@
       "event_count": "{count} 場活動",
       "series_count": "{count} 個系列",
       "official_site": "官方網站",
-      "collapse": "收合",
-      "show_all": "顯示全部（還有 {count} 場）",
+      "no_series": "目前沒有活動系列",
+      "latest": "最近一屆 {date}",
+      "back": "全部活動系列",
+      "not_found": "找不到這個活動系列",
       "empty": "目前沒有場次",
       "no_description": "目前沒有介紹。",
       "seo_description": "瀏覽已收錄的同人展與音樂活動。"
