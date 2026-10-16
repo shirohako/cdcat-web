@@ -26,7 +26,7 @@ cp .env.example .env
 Edit `.env` as needed:
 
 - `NUXT_PUBLIC_BASE_URL` (your site URL, used by SEO/i18n)
-- `NUXT_PUBLIC_API_BASE_URL` (backend API base URL)
+- `NUXT_PUBLIC_API_BASE_URL` (backend API base URL; development: `https://api.dev.cdcat.net`)
 - `PORT` (server port for production preview/server)
 
 ## Development
