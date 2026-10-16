@@ -91,7 +91,7 @@ useHead({
         <kbd class="hidden rounded border border-slate-700 px-1.5 font-mono text-[11px] lg:inline">⌘K</kbd>
       </label>
 
-      <nav class="-mx-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-1" :aria-label="t('admin_pages.console')">
+      <nav class="admin-nav -mx-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-1" :aria-label="t('admin_pages.console')">
         <div v-for="group in groups" :key="group.key" class="flex flex-col gap-0.5">
           <button
             type="button" :aria-expanded="group.expanded" :aria-controls="`admin-group-${group.key}`"
@@ -149,5 +149,33 @@ useHead({
 .admin-shell {
   font-family: 'IBM Plex Sans', var(--font-sans-zh-hans), sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* A thin dark scrollbar that only shows while the menu is hovered or focused. */
+.admin-nav {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  scrollbar-gutter: stable;
+}
+.admin-nav:hover,
+.admin-nav:focus-within {
+  scrollbar-color: #2f343d transparent;
+}
+.admin-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.admin-nav::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: transparent;
+}
+.admin-nav:hover::-webkit-scrollbar-thumb,
+.admin-nav:focus-within::-webkit-scrollbar-thumb {
+  background: #2f343d;
+}
+.admin-nav::-webkit-scrollbar-thumb:hover {
+  background: #4b5160;
 }
 </style>
