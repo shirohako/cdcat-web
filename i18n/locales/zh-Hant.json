@@ -92,6 +92,7 @@
     "found": "共找到 {count} 個作品",
     "page_indicator": "（{current}/{last}）",
     "no_results": "沒有找到作品",
+    "event_filter_label": "活動",
     "disc_singular": "碟",
     "disc_plural": "碟",
     "track_singular": "曲",
@@ -498,6 +499,12 @@
       "latest": "最近一屆 {date}",
       "back": "全部活動系列",
       "not_found": "找不到這個活動系列",
+      "sort_label": "排序",
+      "sorts": {
+        "newest": "最新在前",
+        "oldest": "最早在前",
+        "works": "專輯最多"
+      },
       "empty": "目前沒有場次",
       "no_description": "目前沒有介紹。",
       "seo_description": "瀏覽已收錄的同人展與音樂活動。"
@@ -990,5 +997,12 @@
   },
   "site": {
     "dismiss_announcement": "關閉公告"
+  },
+  "event_picker": {
+    "placeholder": "搜尋活動，例如 C107 或 M3-2025",
+    "searching": "搜尋中…",
+    "no_results": "沒有符合的活動",
+    "on_release_date": "發行日期當天的活動：",
+    "clear": "清除"
   }
 }

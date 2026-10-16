@@ -92,6 +92,7 @@
     "found": "{count} 件の作品が見つかりました",
     "page_indicator": "（{current}/{last}）",
     "no_results": "作品が見つかりません",
+    "event_filter_label": "イベント",
     "disc_singular": "ディスク",
     "disc_plural": "ディスク",
     "track_singular": "トラック",
@@ -498,6 +499,12 @@
       "latest": "直近 {date}",
       "back": "イベントシリーズ一覧",
       "not_found": "イベントシリーズが見つかりません",
+      "sort_label": "並び順",
+      "sorts": {
+        "newest": "新しい順",
+        "oldest": "古い順",
+        "works": "リリースが多い順"
+      },
       "empty": "開催情報がありません",
       "no_description": "紹介文がありません。",
       "seo_description": "登録されている同人・音楽イベントを一覧で探せます。"
@@ -990,5 +997,12 @@
   },
   "site": {
     "dismiss_announcement": "お知らせを閉じる"
+  },
+  "event_picker": {
+    "placeholder": "イベントを検索（例：C107、M3-2025）",
+    "searching": "検索中…",
+    "no_results": "該当するイベントがありません",
+    "on_release_date": "発売日に開催のイベント：",
+    "clear": "クリア"
   }
 }

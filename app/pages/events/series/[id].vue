@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Calendar, CalendarDays, ExternalLink, MapPin } from '@lucide/vue'
+import { ArrowLeft, Calendar, CalendarDays, Disc3, ExternalLink, MapPin } from '@lucide/vue'
 
 interface SeriesEvent {
   id: number
@@ -9,6 +9,13 @@ interface SeriesEvent {
   end_date: string | null
   venue: string | null
   location: string | null
+  main_visual_url: string | null
+  released_works_count: number
+}
+
+interface SeriesEventPage {
+  events: SeriesEvent[]
+  pagination: { total: number, per_page: number, current_page: number, last_page: number }
 }
 
 interface EventSeriesDetail {
@@ -19,11 +26,12 @@ interface EventSeriesDetail {
   description: Record<string, string> | null
   website: string | null
   banner_url: string | null
+  visual_orientation: 'portrait' | 'landscape'
   events_count: number
-  events: SeriesEvent[]
 }
 
 const route = useRoute()
+const router = useRouter()
 const seriesId = Number(route.params.id)
 
 const { t } = useI18n()
@@ -32,7 +40,39 @@ const { localizeError } = useLocalizedApiError()
 
 const { data: series, pending, error } = await useAPI<EventSeriesDetail>(`/v1/events/series/${seriesId}`)
 
+// 24 fills whole rows in every grid (2/3/4 portrait columns, 1/2/3 landscape).
+const PER_PAGE = 24
+const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
+const SORTS = {
+  newest: { sort_by: 'start_date', sort_order: 'desc' },
+  oldest: { sort_by: 'start_date', sort_order: 'asc' },
+  works: { sort_by: 'released_works_count', sort_order: 'desc' },
+} as const
+type SortKey = keyof typeof SORTS
+const sortKeys = Object.keys(SORTS) as SortKey[]
+// Changing the order starts again from the first page.
+const sort = computed<SortKey>({
+  get: () => (sortKeys as string[]).includes(String(route.query.sort)) ? route.query.sort as SortKey : 'newest',
+  set: value => { router.push({ query: { ...route.query, sort: value === 'newest' ? undefined : value, page: undefined } }) },
+})
+const { data: eventPage, pending: eventsPending, error: eventsError } = await useAPI<SeriesEventPage>('/v1/events', {
+  query: computed(() => ({ series_id: seriesId, page: page.value, per_page: PER_PAGE, ...SORTS[sort.value] })),
+})
+const events = computed(() => eventPage.value?.events ?? [])
+const lastPage = computed(() => eventPage.value?.pagination.last_page ?? 1)
+const eventsList = ref<HTMLElement | null>(null)
+const goToPage = (value: number) => {
+  router.push({ query: { ...route.query, page: value > 1 ? value : undefined } })
+  eventsList.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 const description = computed(() => series.value ? localizedContent(series.value.description, t('collection_pages.events.no_description')) : '')
+
+// The series decides the visual format (Comic Market and M3 portrait catalogs, TGS landscape),
+// so every card in a series shares one ratio and a missing visual keeps its slot.
+const landscape = computed(() => series.value?.visual_orientation === 'landscape')
+const visualRatio = computed(() => landscape.value ? '16 / 9' : '5 / 7')
+const gridClass = computed(() => landscape.value ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4')
 
 const formatEventDate = (event: SeriesEvent) => {
   const options = { year: 'numeric', month: '2-digit', day: '2-digit' } as const
@@ -92,32 +132,67 @@ useHead({
           </div>
         </section>
 
-        <div v-if="series.events.length === 0" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+        <div v-if="series.events_count" class="flex flex-wrap items-center justify-between gap-3">
+          <p class="text-sm text-gray-500">{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</p>
+          <label class="flex items-center gap-2 text-sm text-gray-600">
+            {{ t('collection_pages.events.sort_label') }}
+            <select v-model="sort" class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700">
+              <option v-for="key in sortKeys" :key="key" :value="key">{{ t(`collection_pages.events.sorts.${key}`) }}</option>
+            </select>
+          </label>
+        </div>
+
+        <div v-if="eventsError" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+          {{ localizeError(eventsError) }}
+        </div>
+
+        <div v-else-if="!eventsPending && events.length === 0" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
           {{ t('collection_pages.events.empty') }}
         </div>
 
-        <div v-else class="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <div v-else ref="eventsList" class="grid scroll-mt-6 gap-4 transition-opacity" :class="[gridClass, { 'opacity-60': eventsPending }]">
           <div
-            v-for="event in series.events"
+            v-for="event in events"
             :key="event.id"
-            class="flex flex-col justify-between rounded-xl border border-gray-200 bg-white p-5"
+            class="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white"
           >
-            <div>
-              <span class="mb-3 inline-block rounded-md bg-gray-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gray-500">{{ event.slug }}</span>
-              <h2 class="mb-4 text-lg font-bold leading-snug text-gray-900">{{ event.name || event.slug }}</h2>
-            </div>
-            <div class="space-y-2 text-sm text-gray-600">
-              <div class="flex items-center gap-2">
-                <Calendar :size="15" class="shrink-0 text-gray-400" />
-                <span class="truncate font-medium">{{ formatEventDate(event) }}</span>
+            <div class="bg-gray-50" :style="{ aspectRatio: visualRatio }">
+              <img v-if="event.main_visual_url" :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
+              <div v-else class="flex h-full w-full items-center justify-center">
+                <CalendarDays class="h-10 w-10 text-gray-300" />
               </div>
-              <div v-if="event.venue || event.location" class="flex items-center gap-2">
-                <MapPin :size="15" class="shrink-0 text-gray-400" />
-                <span class="truncate" :title="[event.venue, event.location].filter(Boolean).join(' · ')">{{ [event.venue, event.location].filter(Boolean).join(' · ') }}</span>
+            </div>
+            <div class="flex flex-1 flex-col justify-between p-5">
+              <div>
+                <span class="mb-3 inline-block rounded-md bg-gray-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gray-500">{{ event.slug }}</span>
+                <h2 class="mb-4 text-lg font-bold leading-snug text-gray-900">{{ event.name || event.slug }}</h2>
+              </div>
+              <div class="space-y-2 text-sm text-gray-600">
+                <div class="flex items-center gap-2">
+                  <Calendar :size="15" class="shrink-0 text-gray-400" />
+                  <span class="truncate font-medium">{{ formatEventDate(event) }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <Disc3 :size="15" class="shrink-0 text-gray-400" />
+                  <NuxtLink
+                    v-if="event.released_works_count"
+                    :to="{ path: '/works', query: { event: event.id } }"
+                    class="text-blue-600 underline decoration-blue-200 underline-offset-4 hover:decoration-blue-500"
+                  >
+                    {{ t('content_display.works_count', { count: event.released_works_count }) }}
+                  </NuxtLink>
+                  <span v-else class="text-gray-400">{{ t('content_display.works_count', { count: 0 }) }}</span>
+                </div>
+                <div v-if="event.venue || event.location" class="flex items-center gap-2">
+                  <MapPin :size="15" class="shrink-0 text-gray-400" />
+                  <span class="truncate" :title="[event.venue, event.location].filter(Boolean).join(' · ')">{{ [event.venue, event.location].filter(Boolean).join(' · ') }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <CommonPagination :page="page" :total-pages="lastPage" :disabled="eventsPending" @update:page="goToPage" />
       </template>
     </div>
   </div>

@@ -92,6 +92,7 @@
     "found": "共找到 {count} 个作品",
     "page_indicator": "（{current}/{last}）",
     "no_results": "没有找到作品",
+    "event_filter_label": "活动",
     "disc_singular": "碟",
     "disc_plural": "碟",
     "track_singular": "曲",
@@ -772,7 +773,19 @@
       "end_date": "结束日期",
       "venue": "场馆",
       "location": "地点",
-      "visual": "主视觉 URL",
+      "visual": "主视觉 / 场刊封面 URL",
+      "visual_help": "这一届的场刊封面或主视觉。填入后会自动识别图片尺寸和横竖方向。",
+      "visual_size": "{width} × {height} · {orientation}",
+      "visual_size_unknown": "图片加载后自动识别尺寸；加载失败时不记录尺寸。",
+      "visual_mismatch": "图片方向和系列设定的「{orientation}」不一致，前台会按系列比例留白显示。",
+      "visual_filter": "配图",
+      "all_visuals": "全部配图",
+      "missing_visual": "缺配图",
+      "orientation": {
+        "portrait": "竖图",
+        "landscape": "横图",
+        "square": "方图"
+      },
       "released_works": "发行作品",
       "delete_help": "永久删除并写入操作日志。"
     },
@@ -786,6 +799,12 @@
       "website": "官网",
       "banner": "横幅图 URL",
       "banner_help": "建议 16:9 横图；Logo 会完整显示，不裁切。",
+      "orientation": "每届配图方向",
+      "orientation_help": "决定前台系列页里每届活动配图的版式，同一系列统一比例。",
+      "orientations": {
+        "portrait": "竖版（5:7，场刊封面）",
+        "landscape": "横版（16:9）"
+      },
       "events_count": "活动数",
       "delete_help": "永久删除并写入操作日志。"
     },
@@ -1025,6 +1044,12 @@
       "latest": "最近一届 {date}",
       "back": "全部活动系列",
       "not_found": "没有找到这个活动系列",
+      "sort_label": "排序",
+      "sorts": {
+        "newest": "最新在前",
+        "oldest": "最早在前",
+        "works": "专辑最多"
+      },
       "empty": "暂无具体届次",
       "no_description": "暂无介绍。",
       "seo_description": "浏览归档的同人展会与音乐活动。"
@@ -1517,5 +1542,12 @@
   },
   "site": {
     "dismiss_announcement": "关闭公告"
+  },
+  "event_picker": {
+    "placeholder": "搜索活动，例如 C107 或 M3-2025",
+    "searching": "搜索中…",
+    "no_results": "没有找到匹配的活动",
+    "on_release_date": "发行日期当天的活动：",
+    "clear": "清除"
   }
 }

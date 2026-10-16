@@ -92,6 +92,7 @@
     "found": "Found {count} works",
     "page_indicator": "({current}/{last})",
     "no_results": "No works found",
+    "event_filter_label": "Event",
     "disc_singular": "Disc",
     "disc_plural": "Discs",
     "track_singular": "Track",
@@ -498,6 +499,12 @@
       "latest": "Latest {date}",
       "back": "All event series",
       "not_found": "Event series not found",
+      "sort_label": "Sort",
+      "sorts": {
+        "newest": "Newest first",
+        "oldest": "Oldest first",
+        "works": "Most releases"
+      },
       "empty": "No editions listed",
       "no_description": "No description available.",
       "seo_description": "Browse archived doujin and music events."
@@ -990,5 +997,12 @@
   },
   "site": {
     "dismiss_announcement": "Dismiss announcement"
+  },
+  "event_picker": {
+    "placeholder": "Search events, e.g. C107 or M3-2025",
+    "searching": "Searching…",
+    "no_results": "No matching events",
+    "on_release_date": "Events on the release date:",
+    "clear": "Clear"
   }
 }

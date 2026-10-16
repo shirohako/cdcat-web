@@ -171,6 +171,7 @@ export interface AdminEventSeries {
   location: string
   website: string | null
   banner_url: string | null
+  visual_orientation: 'portrait' | 'landscape'
   description: Record<string, unknown> | null
   events_count: number
 }
@@ -186,6 +187,8 @@ export interface AdminEvent {
   venue: string | null
   location: string | null
   main_visual_url: string | null
+  main_visual_width: number | null
+  main_visual_height: number | null
   released_works_count: number
 }
 

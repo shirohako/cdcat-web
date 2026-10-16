@@ -15,7 +15,7 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Series form =====
-const emptySeries = () => ({ id: 0, name: '', slug: '', location: '', website: '', banner_url: '' })
+const emptySeries = () => ({ id: 0, name: '', slug: '', location: '', website: '', banner_url: '', visual_orientation: 'portrait' as AdminEventSeries['visual_orientation'] })
 const seriesForm = reactive(emptySeries())
 const seriesOpen = ref(false)
 const editSeries = (item?: AdminEventSeries) => {
@@ -27,7 +27,7 @@ const saveSeries = async () => {
   busy.value = true
   message.value = ''
   try {
-    const body = { name: seriesForm.name, slug: seriesForm.slug, location: seriesForm.location, website: seriesForm.website || null, banner_url: seriesForm.banner_url || null }
+    const body = { name: seriesForm.name, slug: seriesForm.slug, location: seriesForm.location, website: seriesForm.website || null, banner_url: seriesForm.banner_url || null, visual_orientation: seriesForm.visual_orientation }
     await $api(seriesForm.id ? `/v1/admin/event-series/${seriesForm.id}` : '/v1/admin/event-series', { method: seriesForm.id ? 'PUT' : 'POST', body })
     seriesOpen.value = false
     notice.value = t('admin_pages.saved')
@@ -85,6 +85,7 @@ useHead({ title: computed(() => `${t('admin_pages.event_series.title')} | CDCAT`
         <label class="block">Slug<input v-model="seriesForm.slug" required maxlength="255" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" :class="input"></label>
         <label class="block">{{ t('admin_pages.event_series.location') }}<input v-model="seriesForm.location" required maxlength="255" :class="input"></label>
         <label class="block">{{ t('admin_pages.event_series.website') }}<input v-model="seriesForm.website" type="url" maxlength="2048" :class="input"></label>
+        <label class="block">{{ t('admin_pages.event_series.orientation') }}<select v-model="seriesForm.visual_orientation" :class="input"><option v-for="value in ['portrait', 'landscape']" :key="value" :value="value">{{ t(`admin_pages.event_series.orientations.${value}`) }}</option></select><span class="mt-1 block text-xs text-slate-500">{{ t('admin_pages.event_series.orientation_help') }}</span></label>
         <label class="block sm:col-span-2">{{ t('admin_pages.event_series.banner') }}<input v-model="seriesForm.banner_url" type="url" maxlength="2048" placeholder="https://" :class="input"><span class="mt-1 block text-xs text-slate-500">{{ t('admin_pages.event_series.banner_help') }}</span></label>
         <img v-if="seriesForm.banner_url" :src="seriesForm.banner_url" alt="" class="aspect-video w-full max-w-sm rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
@@ -102,7 +103,7 @@ useHead({ title: computed(() => `${t('admin_pages.event_series.title')} | CDCAT`
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">{{ t('admin_pages.event_series.name') }}</th><th class="px-4 py-3">{{ t('admin_pages.event_series.location') }}</th><th class="px-4 py-3">{{ t('admin_pages.event_series.events_count') }}</th><th class="px-4 py-3" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="item in series" :key="item.id">
-                <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="item.banner_url" :src="item.banner_url" alt="" loading="lazy" class="aspect-video w-16 shrink-0 rounded bg-slate-50 object-contain"><div v-else class="aspect-video w-16 shrink-0 rounded bg-slate-100" /><div>{{ item.name }}<p class="text-xs font-normal text-slate-500">{{ item.slug }}</p></div></div></td>
+                <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="item.banner_url" :src="item.banner_url" alt="" loading="lazy" class="aspect-video w-16 shrink-0 rounded bg-slate-50 object-contain"><div v-else class="aspect-video w-16 shrink-0 rounded bg-slate-100" /><div>{{ item.name }}<p class="text-xs font-normal text-slate-500">{{ item.slug }} · {{ t(`admin_pages.event_series.orientations.${item.visual_orientation}`) }}</p></div></div></td>
                 <td class="px-4 py-3">{{ item.location }}</td>
                 <td class="px-4 py-3 tabular-nums"><NuxtLink v-if="item.events_count" :to="{ path: '/admin/events', query: { series_id: item.id } }" class="underline decoration-slate-300 underline-offset-4">{{ item.events_count }}</NuxtLink><span v-else class="text-slate-400">0</span></td>
                 <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><button type="button" class="underline" @click="editSeries(item)">{{ t('common.edit') }}</button><button type="button" class="text-red-700" @click="startDelete(item)">{{ t('common.delete') }}</button></div></td>
