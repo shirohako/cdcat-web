@@ -56,7 +56,7 @@ const runBatch = async (reason: string) => {
   }
 }
 
-const typeLabel = (type: string) => ['work', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
+const typeLabel = (type: string) => ['album', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
 const statusClass: Record<string, string> = { pending: 'border-amber-200 bg-amber-50 text-amber-800', approved: 'border-emerald-200 bg-emerald-50 text-emerald-700', rejected: 'border-slate-200 bg-slate-50 text-slate-500' }
 const actionClass: Record<string, string> = { create: 'text-emerald-700', update: 'text-blue-700', delete: 'text-red-700' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
@@ -79,7 +79,7 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
         </select>
         <select v-model="filters.type" :aria-label="t('admin_pages.revisions.subject')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.all_types') }}</option>
-          <option v-for="type in ['work', 'artist', 'entry', 'franchise']" :key="type" :value="type">{{ typeLabel(type) }}</option>
+          <option v-for="type in ['album', 'artist', 'entry', 'franchise']" :key="type" :value="type">{{ typeLabel(type) }}</option>
         </select>
         <select v-model="filters.action" :aria-label="t('admin_pages.revisions.action')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.all_actions') }}</option>

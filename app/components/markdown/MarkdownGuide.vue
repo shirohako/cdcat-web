@@ -109,15 +109,15 @@ const containerExamples = computed<Record<MarkdownContainerName, string>>(() => 
 // against the references the API returns with it.
 const discussionEnv = computed<MarkdownEnv>(() => ({
   references: {
-    users: { example_user: { id: 0, username: 'example_user', nickname: t('markdown.help.discussion.sampleUser'), avatar: null } },
+    users: { example_user: { id: 0, username: 'example_user', nickname: t('markdown.help.discussion.sampleUser'), avatar_url: null } },
     posts: { 1024: { id: 1024, topic_id: 1, topic_title: '', floor: 12, parent_floor: null, user: { username: 'example_user', nickname: t('markdown.help.discussion.sampleUser') }, status: 'visible' } },
-    works: { 1: { type: 'work', id: 1, title: t('markdown.help.discussion.sampleWork'), image_url: null, date: '2002-08-11' } },
+    albums: { 1: { type: 'album', id: 1, title: t('markdown.help.discussion.sampleAlbum'), image_url: null, date: '2002-08-11' } },
   },
 }))
 const discussionExamples = computed(() => [
   { label: t('markdown.help.discussion.mention'), hint: t('markdown.help.discussion.mentionHint'), source: '@example_user' },
   { label: t('markdown.help.discussion.quote'), hint: t('markdown.help.discussion.quoteHint'), source: `::: quote post:1024\n${t('markdown.help.advanced.examples.tipBody')}\n:::` },
-  { label: t('markdown.help.discussion.ref'), hint: t('markdown.help.discussion.refHint'), source: '[[work:1]]\n\n…[[work:1]]…' },
+  { label: t('markdown.help.discussion.ref'), hint: t('markdown.help.discussion.refHint'), source: '[[album:1]]\n\n…[[album:1]]…' },
 ])
 
 function containerExample(name: MarkdownContainerName) {

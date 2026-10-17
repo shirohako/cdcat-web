@@ -6,15 +6,15 @@ import type { ContentLinkSummary, ContentLinkType } from '~/types/article'
 /** The content an article links to, as cards pointing at each item's page. */
 defineProps<{ links: ContentLinkSummary[] }>()
 const { t } = useI18n()
-const icons: Record<ContentLinkType, Component> = { work: Disc3, artist: Mic2, entry: Film, series: Library, event: Calendar }
+const icons: Record<ContentLinkType, Component> = { album: Disc3, artist: Mic2, entry: Film, franchise: Library, event: Calendar }
 
 // Events have no page of their own yet; they open their series.
 const href = (link: ContentLinkSummary) => ({
-  work: `/works/${link.id}`,
+  album: `/albums/${link.id}`,
   artist: `/artists/${link.id}`,
   entry: `/entries/${link.id}`,
-  series: `/series/${link.id}`,
-  event: link.event_series_id ? `/events/series/${link.event_series_id}` : '/events',
+  franchise: `/franchises/${link.id}`,
+  event: link.event_series_id ? `/event-series/${link.event_series_id}` : '/events',
 })[link.type]
 </script>
 

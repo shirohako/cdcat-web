@@ -45,10 +45,10 @@ export interface AdminUserDetail {
   nickname: string
   email: string
   birthday: string
-  avatar: string | null
-  banner: string | null
+  avatar_url: string | null
+  banner_url: string | null
   bio: string | null
-  status: boolean
+  is_active: boolean
   roles: string | null
   role_names: string[]
   role_level: number
@@ -66,8 +66,8 @@ export interface AdminUserActivity {
   id: number
   title: string | null
   status?: string
-  work_id?: number | null
-  song_id?: number
+  album_id?: number | null
+  track_id?: number
   resource_id?: number | null
   resource_type?: string
   language?: string
@@ -93,12 +93,12 @@ export interface AdminUserRef {
   id: number
   username: string
   nickname: string | null
-  avatar: string | null
+  avatar_url: string | null
 }
 
 export interface AdminRevision {
   id: number
-  resource_type: 'work' | 'artist' | 'entry' | 'franchise' | string
+  resource_type: 'album' | 'artist' | 'entry' | 'franchise' | string
   resource_id: number | null
   revision_number: number
   action: 'create' | 'update' | 'delete'
@@ -132,11 +132,11 @@ export interface AdminRollbackPreview {
   current: Record<string, unknown>
   target: Record<string, unknown>
   baseline_checksum: string
-  removed_song_ids: number[]
+  removed_track_ids: number[]
   impact: DeletionImpact | null
 }
 
-export type AdminContentType = 'work' | 'artist' | 'entry' | 'franchise' | 'song'
+export type AdminContentType = 'album' | 'artist' | 'entry' | 'franchise' | 'track'
 
 export interface AdminContentItem {
   id: number
@@ -164,7 +164,7 @@ export interface AdminLinkProvider {
   icon_url: string | null
   url_pattern: string | null
   category: string
-  display_order: number
+  sort_order: number
   links_count: number
 }
 
@@ -193,12 +193,12 @@ export interface AdminEvent {
   main_visual_url: string | null
   main_visual_width: number | null
   main_visual_height: number | null
-  released_works_count: number
+  released_albums_count: number
 }
 
 export interface AdminReview {
   id: number
-  work_id: number
+  album_id: number
   user_id: number
   rating: number | null
   content: string
@@ -206,7 +206,7 @@ export interface AdminReview {
   useful_count: number
   dislike_count: number
   fun_count: number
-  work: { id: number, title: string } | null
+  album: { id: number, title: string } | null
   user: AdminUserRef | null
   created_at: string
   updated_at: string
@@ -276,7 +276,7 @@ export interface AdminWordFilter {
 
 export interface AdminLyric {
   id: number
-  song_id: number
+  track_id: number
   language: string
   format: 'plain' | 'lrc' | 'srt'
   content?: string
@@ -286,8 +286,8 @@ export interface AdminLyric {
   is_ai_generated: boolean
   authorship: string | null
   source: string | null
-  song: { id: number, title: string, work_id: number } | null
-  work: { id: number, title: string } | null
+  track: { id: number, title: string, album_id: number } | null
+  album: { id: number, title: string } | null
   submitter: { id: number, username: string, nickname: string | null } | null
   created_at: string
   updated_at: string

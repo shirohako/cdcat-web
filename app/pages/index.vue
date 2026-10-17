@@ -21,11 +21,11 @@
 
           <div class="flex flex-col sm:flex-row gap-3 animate-rise-delayed">
             <NuxtLink
-              to="/works"
+              to="/albums"
               class="group inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-emerald-500 px-6 py-3 text-white font-semibold shadow-lg shadow-sky-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
             >
               <Music :size="20" />
-              {{ t('home.browse_works') }}
+              {{ t('home.browse_albums') }}
               <ArrowRight
                 :size="18"
                 class="transition-transform duration-300 group-hover:translate-x-1"
@@ -380,9 +380,9 @@ const portalLinks = computed(() => [
 ]);
 
 const stats = computed(() => [
-  { value: "0K+", label: t('home.stats.works'), desc: "" },
+  { value: "0K+", label: t('home.stats.albums'), desc: "" },
   { value: "0K+", label: t('home.stats.artists'), desc: "" },
-  { value: "0K+", label: t('home.stats.songs'), desc: "" },
+  { value: "0K+", label: t('home.stats.tracks'), desc: "" },
   { value: "0K+", label: t('home.stats.reviews'), desc: "" },
 ]);
 

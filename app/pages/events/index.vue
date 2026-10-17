@@ -15,7 +15,7 @@ const { t } = useI18n()
 const { formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
-const { data, pending, error } = useAPI<EventSeriesSummary[]>('/v1/events/series', { lazy: true })
+const { data, pending, error } = useAPI<EventSeriesSummary[]>('/v1/event-series', { lazy: true })
 const seriesList = computed(() => Array.isArray(data.value) ? data.value : [])
 
 const latestDate = (series: EventSeriesSummary) => series.latest_start_date
@@ -58,7 +58,7 @@ useHead({
             <NuxtLink
               v-for="series in seriesList"
               :key="series.id"
-              :to="`/events/series/${series.id}`"
+              :to="`/event-series/${series.id}`"
               class="group block overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div class="relative aspect-video overflow-hidden bg-gray-50">

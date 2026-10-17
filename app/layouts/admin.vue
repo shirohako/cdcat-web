@@ -119,7 +119,7 @@ useHead({
       </nav>
 
       <div class="flex items-center gap-2.5 border-t border-[#1f2329] px-1.5 pt-3">
-        <img v-if="user?.avatar" :src="user.avatar" alt="" class="size-8 rounded-full object-cover">
+        <img v-if="user?.avatar_url" :src="user.avatar_url" alt="" class="size-8 rounded-full object-cover">
         <span v-else class="flex size-8 items-center justify-center rounded-full bg-slate-700 text-[13px] font-semibold text-white">{{ initial }}</span>
         <span class="flex min-w-0 flex-1 flex-col text-[13px] leading-tight">
           <span class="truncate text-slate-100">{{ user?.nickname || user?.username }}</span>

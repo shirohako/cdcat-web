@@ -14,8 +14,8 @@ const statusClass: Record<string, string> = { ok: 'text-emerald-700', healthy: '
 const time = (value: string | null | undefined) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(value)) : '—'
 
 // ===== Cache =====
-const targets = ['work_contributors', 'dashboard', 'permissions', 'site_settings'] as const
-const cache = reactive({ targets: [] as string[], work_id: '', reason: '' })
+const targets = ['album_contributors', 'dashboard', 'permissions', 'site_settings'] as const
+const cache = reactive({ targets: [] as string[], album_id: '', reason: '' })
 const busy = ref(false)
 const message = ref('')
 const notice = ref('')
@@ -26,7 +26,7 @@ const clearCache = async () => {
   notice.value = ''
   try {
     const result = await $api<{ cleared: Record<string, number> }>('/v1/admin/system/cache/clear', { method: 'POST', body: {
-      targets: cache.targets, work_id: cache.work_id ? Number(cache.work_id) : null, reason: cache.reason || null,
+      targets: cache.targets, album_id: cache.album_id ? Number(cache.album_id) : null, reason: cache.reason || null,
     } })
     notice.value = t('admin_pages.system.cache_cleared', { detail: Object.entries(result.cleared).map(([key, count]) => `${t(`admin_pages.system.cache_targets.${key}`)} ${count}`).join('、') })
     cache.targets = []
@@ -136,7 +136,7 @@ useHead({ title: computed(() => t('admin_pages.system.title')) })
         <div class="mt-3 space-y-2">
           <label v-for="target in targets" :key="target" class="flex items-center gap-2"><input v-model="cache.targets" type="checkbox" :value="target">{{ t(`admin_pages.system.cache_targets.${target}`) }}</label>
         </div>
-        <label v-if="cache.targets.includes('work_contributors')" class="mt-3 block">{{ t('admin_pages.system.work_id_optional') }}<input v-model="cache.work_id" inputmode="numeric" pattern="[0-9]*" class="mt-1 w-40 rounded-lg border border-slate-300 px-3 py-2"></label>
+        <label v-if="cache.targets.includes('album_contributors')" class="mt-3 block">{{ t('admin_pages.system.album_id_optional') }}<input v-model="cache.album_id" inputmode="numeric" pattern="[0-9]*" class="mt-1 w-40 rounded-lg border border-slate-300 px-3 py-2"></label>
         <label class="mt-3 block">{{ t('admin_pages.optional_reason') }}<input v-model="cache.reason" maxlength="2000" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
         <button type="submit" :disabled="busy || !cache.targets.length" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">{{ t('admin_pages.system.clear') }}</button>
       </form>

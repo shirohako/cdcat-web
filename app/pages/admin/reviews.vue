@@ -9,7 +9,7 @@ const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const filterKeys = ['search', 'work_id', 'user_id', 'rating', 'has_rating', 'sort_by', 'sort_order'] as const
+const filterKeys = ['search', 'album_id', 'user_id', 'rating', 'has_rating', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -54,7 +54,7 @@ useHead({ title: computed(() => t('admin_pages.reviews.title')) })
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.reviews.search')" :aria-label="t('admin_pages.reviews.search')" :class="[field, 'w-56']">
-        <input v-model="filters.work_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.work_id')" :aria-label="t('admin_pages.content.work_id')" :class="[field, 'w-28']">
+        <input v-model="filters.album_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.album_id')" :aria-label="t('admin_pages.content.album_id')" :class="[field, 'w-28']">
         <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" :class="[field, 'w-28']">
         <select v-model="filters.rating" :aria-label="t('admin_pages.reviews.rating')" :class="field">
           <option value="">{{ t('admin_pages.reviews.any_rating') }}</option>
@@ -76,7 +76,7 @@ useHead({ title: computed(() => t('admin_pages.reviews.title')) })
       <ul class="space-y-3">
         <li v-for="review in data?.items" :key="review.id" class="rounded-xl border border-slate-200 bg-white p-4">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <NuxtLink :to="`/works/${review.work_id}`" target="_blank" class="font-medium underline decoration-slate-200 underline-offset-4">{{ review.work?.title ?? `#${review.work_id}` }}</NuxtLink>
+            <NuxtLink :to="`/albums/${review.album_id}`" target="_blank" class="font-medium underline decoration-slate-200 underline-offset-4">{{ review.album?.title ?? `#${review.album_id}` }}</NuxtLink>
             <NuxtLink v-if="review.user" :to="`/admin/users/${review.user.id}`" class="text-slate-600">{{ review.user.nickname || review.user.username }}</NuxtLink>
             <span v-if="review.rating !== null" class="rounded bg-amber-50 px-2 py-0.5 text-xs text-amber-800">{{ t('admin_pages.reviews.score', { score: review.rating }) }}</span>
             <span class="text-xs text-slate-500">{{ time(review.created_at) }}</span>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'admin', middleware: 'admin' })
-await navigateTo('/admin/content/work', { replace: true })
+await navigateTo('/admin/content/albums', { replace: true })
 </script>
 
 <template>

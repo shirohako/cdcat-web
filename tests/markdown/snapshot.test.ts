@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { markdownHeadings, renderMarkdown } from '../../app/utils/markdown'
 
 // The snapshot was recorded when the renderer moved in from @psray/markdown-editor
-// 0.2.1 and matched that package byte for byte; since the discussion work external
+// 0.2.1 and matched that package byte for byte; since the discussion album external
 // links carry `nofollow ugc` and images load lazily without a referrer. A diff here
 // is a rendering change.
 const fixture = readFileSync(new URL('./fixtures/all-syntax.md', import.meta.url), 'utf8')

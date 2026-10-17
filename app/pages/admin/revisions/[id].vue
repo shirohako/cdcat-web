@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { adminContentRoutes } from '~/config/admin'
-import type { AdminRevision, AdminRollbackPreview, DeletionImpact } from '~/types/admin'
+import type { AdminContentType, AdminRevision, AdminRollbackPreview, DeletionImpact } from '~/types/admin'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
@@ -18,9 +18,9 @@ const revision = computed(() => data.value?.revision)
 const before = computed(() => revision.value?.action === 'delete' ? (revision.value.data ?? {}) : (data.value?.previous?.data ?? {}))
 const after = computed(() => revision.value?.action === 'delete' ? {} : (revision.value?.after_snapshot ?? revision.value?.data ?? {}))
 const view = ref<'diff' | 'raw'>('diff')
-const routes = computed(() => revision.value ? adminContentRoutes[revision.value.resource_type] : undefined)
+const routes = computed(() => revision.value ? adminContentRoutes[revision.value.resource_type as AdminContentType] : undefined)
 const entityLink = computed(() => revision.value?.resource_id && routes.value && revision.value.action !== 'delete' && hasPermission('content.manage')
-  ? `/admin/content/${revision.value.resource_type}/${revision.value.resource_id}` : null)
+  ? `/admin/content/${routes.value.api}/${revision.value.resource_id}` : null)
 const frontLink = computed(() => revision.value?.resource_id && routes.value && revision.value.action !== 'delete' ? `/${routes.value.front}/${revision.value.resource_id}` : null)
 
 // ===== Review =====
@@ -32,10 +32,10 @@ const busy = ref(false)
 const message = ref('')
 const notice = ref('')
 const deletionImpact = ref<DeletionImpact | null>(null)
-const removedSongIds = computed(() => {
+const removedTrackIds = computed(() => {
   const ids = (list: unknown) => Array.isArray(list) ? list.map(item => Number((item as { id?: number }).id)).filter(Boolean) : []
-  const kept = new Set(ids(after.value.related_songs))
-  return revision.value?.action === 'update' ? ids(before.value.related_songs).filter(songId => !kept.has(songId)) : []
+  const kept = new Set(ids(after.value.related_tracks))
+  return revision.value?.action === 'update' ? ids(before.value.related_tracks).filter(trackId => !kept.has(trackId)) : []
 })
 const openReview = async (action: 'approve' | 'reject') => {
   reviewAction.value = action
@@ -44,8 +44,8 @@ const openReview = async (action: 'approve' | 'reject') => {
   const current = revision.value
   if (action === 'approve' && current?.requires_content_manage && current.resource_id) {
     try {
-      deletionImpact.value = await $api<DeletionImpact>(`/v1/admin/content/${current.resource_type}/${current.resource_id}/deletion-impact`,
-        { query: current.action === 'delete' ? {} : { 'song_ids[]': removedSongIds.value } })
+      deletionImpact.value = await $api<DeletionImpact>(`/v1/admin/content/${adminContentRoutes[current.resource_type as AdminContentType].api}/${current.resource_id}/deletion-impact`,
+        { query: current.action === 'delete' ? {} : { 'track_ids[]': removedTrackIds.value } })
     } catch (e) {
       message.value = localizeError(e)
       return
@@ -107,7 +107,7 @@ const confirmRollback = async (reason: string) => {
 }
 
 const time = (value: string | null | undefined) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'
-const typeLabel = (type: string) => ['work', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
+const typeLabel = (type: string) => ['album', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
 useHead({ title: computed(() => revision.value?.title ?? t('admin_pages.revisions.detail')) })
 </script>
 

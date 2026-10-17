@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { adminContentRoutes, adminContentTypes } from '~/config/admin'
+import { adminContentRoutes, adminContentTypeOf } from '~/config/admin'
 import type { AdminContentItem, AdminContentType, AdminPagination } from '~/types/admin'
 import { ENTRY_TYPES } from '~/types/entry'
 
 definePageMeta({
   layout: 'admin', middleware: 'admin',
-  validate: route => (adminContentTypes as readonly string[]).includes(String(route.params.type)),
+  validate: route => Boolean(adminContentTypeOf(route.params.type)),
 })
 
 const route = useRoute()
@@ -15,15 +15,16 @@ const { t } = useAdminI18n()
 const { typeLabel, typeWithFormat } = useEntryDisplay()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const type = computed(() => String(route.params.type) as AdminContentType)
+const type = computed(() => adminContentTypeOf(route.params.type)!)
+const segment = computed(() => adminContentRoutes[type.value].api)
 const sorts: Record<AdminContentType, string[]> = {
-  work: ['id', 'title', 'release_date', 'created_at', 'updated_at', 'reviews_count', 'views_count', 'rating'],
+  album: ['id', 'title', 'release_date', 'created_at', 'updated_at', 'reviews_count', 'views_count', 'rating'],
   artist: ['id', 'name', 'albums_count', 'followers_count', 'created_at', 'updated_at'],
   entry: ['id', 'name', 'release_date', 'created_at', 'updated_at'],
-  franchise: ['id', 'name', 'entries_count', 'works_count', 'created_at', 'updated_at'],
-  song: ['id', 'title', 'created_at'],
+  franchise: ['id', 'name', 'entries_count', 'albums_count', 'created_at', 'updated_at'],
+  track: ['id', 'title', 'created_at'],
 }
-const filterKeys = ['search', 'type', 'classification', 'region', 'is_active', 'work_id', 'sort_by', 'sort_order'] as const
+const filterKeys = ['search', 'type', 'classification', 'region', 'is_active', 'album_id', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -34,20 +35,20 @@ const applyFilters = () => router.push({ query: Object.fromEntries(filterKeys.fi
 const query = computed(() => ({ page: page.value, ...Object.fromEntries(filterKeys.map(key => [key, route.query[key] || undefined])) }))
 
 const { data, pending, error, refresh } = await useAsyncData(() => `admin-content-${type.value}`,
-  () => $api<{ items: AdminContentItem[], pagination: AdminPagination }>(`/v1/admin/content/${type.value}`, { query: query.value }), { watch: [query, type] })
+  () => $api<{ items: AdminContentItem[], pagination: AdminPagination }>(`/v1/admin/content/${segment.value}`, { query: query.value }), { watch: [query, type] })
 const items = computed(() => data.value?.items ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
 const label = (item: AdminContentItem) => String(item.title ?? item.name ?? `#${item.id}`)
-const editable = computed(() => type.value !== 'song')
-const recountable = computed(() => ['work', 'artist'].includes(type.value))
-const frontLink = (item: AdminContentItem) => type.value === 'song'
-  ? `/works/${(item.work as { id: number } | null)?.id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
+const editable = computed(() => type.value !== 'track')
+const recountable = computed(() => ['album', 'artist'].includes(type.value))
+const frontLink = (item: AdminContentItem) => type.value === 'track'
+  ? `/albums/${(item.album as { id: number } | null)?.id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
 const detail = (item: AdminContentItem) => [
-  ...(type.value === 'work' ? [item.catalog_number, item.type, item.release_date] : []),
+  ...(type.value === 'album' ? [item.catalog_number, item.type, item.release_date] : []),
   ...(type.value === 'artist' ? [item.type && t(`admin_pages.content.artist_types.${item.type}`), item.region, item.is_active === false ? t('admin_pages.content.inactive') : null] : []),
-  ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, t('admin_pages.content.works_count', { count: item.works_count })] : []),
-  ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.works_count', { count: item.works_count })] : []),
-  ...(type.value === 'song' ? [(item.work as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, t('admin_pages.content.lyrics_count', { count: item.lyrics_count })] : []),
+  ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
+  ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
+  ...(type.value === 'track' ? [(item.album as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, t('admin_pages.content.lyrics_count', { count: item.lyrics_count })] : []),
 ].filter(Boolean).join(' · ')
 
 // ===== Recount =====
@@ -61,7 +62,7 @@ const recount = async (ids: number[]) => {
   busy.value = true
   message.value = ''
   try {
-    const result = await $api<{ results: { id: number, changed: string[] }[] }>(`/v1/admin/content/${type.value}/recount`, { method: 'POST', body: { ids } })
+    const result = await $api<{ results: { id: number, changed: string[] }[] }>(`/v1/admin/content/${segment.value}/recount`, { method: 'POST', body: { ids } })
     notice.value = t('admin_pages.content.recounted', { count: result.results.length, changed: result.results.filter(item => item.changed.length).length })
     await refresh()
   } catch (e) {
@@ -82,18 +83,18 @@ useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
         <h1 class="mt-1 text-3xl font-bold">{{ t(`admin_pages.content.tabs.${type}`) }}</h1>
         <p class="mt-2 text-sm text-slate-600">{{ t(`admin_pages.content.descriptions.${type}`) }}</p>
       </div>
-      <NuxtLink v-if="editable" :to="`/admin/content/${type}/new`" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">{{ t('admin_pages.content.create', { type: t(`admin_pages.content.tabs.${type}`) }) }}</NuxtLink>
+      <NuxtLink v-if="editable" :to="`/admin/content/${segment}/new`" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">{{ t('admin_pages.content.create', { type: t(`admin_pages.content.tabs.${type}`) }) }}</NuxtLink>
     </header>
 
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.content.search')" :aria-label="t('admin_pages.content.search')" class="w-60 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <input v-if="type === 'work'" v-model="filters.type" maxlength="100" :placeholder="t('admin_pages.content.type')" :aria-label="t('admin_pages.content.type')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <input v-if="type === 'album'" v-model="filters.type" maxlength="100" :placeholder="t('admin_pages.content.type')" :aria-label="t('admin_pages.content.type')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <select v-if="type === 'entry'" v-model="filters.type" :aria-label="t('admin_pages.content.type')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.content.type') }}</option>
           <option v-for="entryType in ENTRY_TYPES" :key="entryType" :value="entryType">{{ typeLabel(entryType) }}</option>
         </select>
-        <input v-if="type === 'work'" v-model="filters.classification" maxlength="100" :placeholder="t('admin_pages.content.classification')" :aria-label="t('admin_pages.content.classification')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <input v-if="type === 'album'" v-model="filters.classification" maxlength="100" :placeholder="t('admin_pages.content.classification')" :aria-label="t('admin_pages.content.classification')" class="w-32 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <template v-if="type === 'artist'">
           <select v-model="filters.type" :aria-label="t('admin_pages.content.type')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
             <option value="">{{ t('admin_pages.content.all_types') }}</option>
@@ -104,7 +105,7 @@ useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
             <option value="">{{ t('admin_pages.all_statuses') }}</option><option value="1">{{ t('admin_pages.content.active') }}</option><option value="0">{{ t('admin_pages.content.inactive') }}</option>
           </select>
         </template>
-        <input v-if="type === 'song'" v-model="filters.work_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.work_id')" :aria-label="t('admin_pages.content.work_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <input v-if="type === 'track'" v-model="filters.album_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.album_id')" :aria-label="t('admin_pages.content.album_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <select v-model="filters.sort_by" :aria-label="t('admin_pages.sort_by')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.content.default_sort') }}</option>
           <option v-for="sort in sorts[type]" :key="sort" :value="sort">{{ t(`admin_pages.content.sorts.${sort}`) }}</option>
@@ -143,8 +144,8 @@ useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
                   <div class="flex items-center gap-3">
                     <img v-if="item.image_url" :src="String(item.image_url)" alt="" loading="lazy" class="size-9 shrink-0 rounded object-cover">
                     <div class="min-w-0">
-                      <NuxtLink v-if="editable" :to="`/admin/content/${type}/${item.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ label(item) }}</NuxtLink>
-                      <NuxtLink v-else :to="`/admin/content/work/${(item.work as { id: number } | null)?.id}?tab=edit`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ label(item) }}</NuxtLink>
+                      <NuxtLink v-if="editable" :to="`/admin/content/${segment}/${item.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ label(item) }}</NuxtLink>
+                      <NuxtLink v-else :to="`/admin/content/albums/${(item.album as { id: number } | null)?.id}?tab=edit`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ label(item) }}</NuxtLink>
                       <p class="truncate text-xs text-slate-500">{{ detail(item) }}</p>
                     </div>
                   </div>

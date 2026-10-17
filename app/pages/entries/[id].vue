@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } from '@lucide/vue'
-import { ENTRY_RELATIONS, ENTRY_WORK_RELATIONS, type EntryDetail, type EntryWork, type RelatedEntry } from '~/types/entry'
+import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
 
 const route = useRoute()
 const { languageName } = useLocaleFormatting()
-const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, workRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
+const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
 
 const { data: entry, pending, error } = await useAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
 
@@ -20,7 +20,7 @@ const groupBy = <T extends { relation_type: string }>(items: T[], order: readonl
   for (const item of items) groups.set(item.relation_type, [...(groups.get(item.relation_type) || []), item])
   return [...groups.entries()].sort(([a], [b]) => order.indexOf(a) - order.indexOf(b))
 }
-const workGroups = computed(() => groupBy<EntryWork>(entry.value?.works || [], ENTRY_WORK_RELATIONS))
+const albumGroups = computed(() => groupBy<EntryAlbum>(entry.value?.albums || [], ENTRY_ALBUM_RELATIONS))
 const relationGroups = computed(() => groupBy<RelatedEntry>(entry.value?.related_entries || [], ENTRY_RELATIONS))
 
 const providerLabel = (name?: string) => (name || '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
@@ -63,7 +63,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                 <NuxtLink
                   v-for="franchise in entry.franchises"
                   :key="franchise.id"
-                  :to="`/series/${franchise.id}`"
+                  :to="`/franchises/${franchise.id}`"
                   class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/30 px-3 py-1 text-sm backdrop-blur-sm hover:bg-emerald-500/50"
                 >
                   <Layers class="h-3.5 w-3.5" />
@@ -85,7 +85,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                 </span>
                 <span class="flex items-center gap-2">
                   <Music2 :size="18" />
-                  {{ $t('catalog.works_count', { count: entry.works_count ?? entry.works.length }) }}
+                  {{ $t('catalog.albums_count', { count: entry.albums_count ?? entry.albums.length }) }}
                 </span>
                 <NuxtLink :to="`/contribute/entry/${entry.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 text-sm hover:bg-white/25">
                   <Pencil class="h-4 w-4" />
@@ -109,24 +109,24 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
             <section class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
               <h2 class="mb-6 flex items-center gap-2 text-xl font-bold">
                 <Music2 :size="22" />
-                {{ $t('catalog.related_works') }}
+                {{ $t('catalog.related_albums') }}
               </h2>
-              <div v-if="workGroups.length" class="space-y-6">
-                <div v-for="[relation, works] in workGroups" :key="relation">
-                  <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">{{ workRelationLabel(relation) }}</h3>
+              <div v-if="albumGroups.length" class="space-y-6">
+                <div v-for="[relation, albums] in albumGroups" :key="relation">
+                  <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">{{ albumRelationLabel(relation) }}</h3>
                   <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-                    <NuxtLink v-for="work in works" :key="work.id" :to="`/works/${work.id}`" class="group">
+                    <NuxtLink v-for="album in albums" :key="album.id" :to="`/albums/${album.id}`" class="group">
                       <div class="overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-shadow hover:shadow-md">
                         <div class="flex aspect-square items-center justify-center overflow-hidden bg-gray-100">
-                          <img v-if="work.image_url" :src="work.image_url" :alt="work.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
+                          <img v-if="album.image_url" :src="album.image_url" :alt="album.title" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
                           <Disc v-else :size="44" class="text-gray-400" />
                         </div>
                         <div class="p-3">
-                          <h4 class="line-clamp-2 text-sm font-semibold transition-colors group-hover:text-primary">{{ work.title }}</h4>
+                          <h4 class="line-clamp-2 text-sm font-semibold transition-colors group-hover:text-primary">{{ album.title }}</h4>
                           <p class="mt-1 truncate text-xs text-gray-500">
-                            {{ [work.character_name, work.episode ? $t('catalog.episode_n', { n: work.episode }) : null, work.release_date].filter(Boolean).join(' · ') }}
+                            {{ [album.character_name, album.episode ? $t('catalog.episode_n', { n: album.episode }) : null, album.release_date].filter(Boolean).join(' · ') }}
                           </p>
-                          <p v-if="work.note" class="mt-0.5 truncate text-xs text-gray-400">{{ work.note }}</p>
+                          <p v-if="album.note" class="mt-0.5 truncate text-xs text-gray-400">{{ album.note }}</p>
                         </div>
                       </div>
                     </NuxtLink>
@@ -135,7 +135,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
               </div>
               <div v-else class="py-8 text-center text-gray-500">
                 <Disc :size="44" class="mx-auto mb-3 text-gray-300" />
-                <p>{{ $t('catalog.no_works') }}</p>
+                <p>{{ $t('catalog.no_albums') }}</p>
               </div>
             </section>
 

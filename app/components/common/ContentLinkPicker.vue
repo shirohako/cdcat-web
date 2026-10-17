@@ -4,7 +4,7 @@ import type { Component } from 'vue'
 import { CONTENT_LINK_TYPES, type ContentLinkSummary, type ContentLinkType } from '~/types/article'
 
 /**
- * Picks works, artists, entries, series and events to link, searching each type through its
+ * Picks albums, artists, entries, series and events to link, searching each type through its
  * existing list endpoint. Shared by the article writer and, later, discussion topics.
  */
 const props = withDefaults(defineProps<{ max?: number, disabled?: boolean }>(), { max: 10, disabled: false })
@@ -13,17 +13,17 @@ const { t } = useI18n()
 const { $api } = useNuxtApp()
 
 const TYPE_META: Record<ContentLinkType, { icon: Component, endpoint: string, list: string }> = {
-  work: { icon: Disc3, endpoint: '/v1/works', list: 'works' },
+  album: { icon: Disc3, endpoint: '/v1/albums', list: 'albums' },
   artist: { icon: Mic2, endpoint: '/v1/artists', list: 'artists' },
   entry: { icon: Film, endpoint: '/v1/entries', list: 'entries' },
-  series: { icon: Library, endpoint: '/v1/franchises', list: 'franchises' },
+  franchise: { icon: Library, endpoint: '/v1/franchises', list: 'franchises' },
   event: { icon: Calendar, endpoint: '/v1/events', list: 'events' },
 }
 
 type SearchRow = { id: number, title?: string, name?: string, image_url?: string | null, main_visual_url?: string | null,
   release_date?: string | null, start_date?: string | null, type?: string | null, event_series_id?: number | null }
 
-const type = ref<ContentLinkType>('work')
+const type = ref<ContentLinkType>('album')
 const query = ref('')
 const results = ref<ContentLinkSummary[]>([])
 const searching = ref(false)

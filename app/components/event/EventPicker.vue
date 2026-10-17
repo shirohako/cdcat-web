@@ -55,8 +55,8 @@
 import { CalendarDays, Search, X } from '@lucide/vue'
 import type { EventOption } from '~/composables/useEventSearch'
 
-// Form-style event chooser for the work editor, with release-date suggestions.
-// The works list uses the chip-style EventFilterChip instead.
+// Form-style event chooser for the album editor, with release-date suggestions.
+// The albums list uses the chip-style EventFilterChip instead.
 const props = defineProps<{
   modelValue: number | null
   releaseDate?: string
@@ -70,7 +70,7 @@ const { $api } = useNuxtApp()
 const { t } = useI18n()
 const describe = describeEvent
 
-// An existing work only carries the id, so resolve the name for display.
+// An existing album only carries the id, so resolve the name for display.
 const { selected } = useEventLookup(toRef(props, 'modelValue'))
 const { search, results, searching } = useEventSearch()
 const choose = (event: EventOption | null) => {

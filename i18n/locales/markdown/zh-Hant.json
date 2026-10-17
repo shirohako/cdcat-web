@@ -175,7 +175,7 @@
           "checklistDone": "新專輯",
           "checklistPending": "會場限定特典",
           "checklistOptional": "舊作補貨",
-          "stepsFirst": "打開作品頁，進入「歌詞」",
+          "stepsFirst": "打開專輯頁，進入「歌詞」",
           "stepsSecond": "選擇曲目並貼上歌詞",
           "stepsThird": "送出後等待審核",
           "spoilerTitle": "隱藏曲",
@@ -210,20 +210,20 @@
         "quote": "引用貼文",
         "quoteHint": "點貼文下方的「引用」會自動插入。選取一段文字再點，只引用選取的部分。",
         "ref": "資料庫內容",
-        "refHint": "輸入 [[ 會彈出搜尋。單獨成段時顯示為卡片，寫在句子裡時顯示為連結。貼上本站作品、藝術家等頁面的網址，會自動換成這種寫法。",
-        "refTypes": "可用類型：work（作品）、artist（藝術家）、entry（條目）、series（系列）、event（活動）、song（歌曲）、topic（討論）、article（文章）。",
-        "sampleWork": "東方紅魔鄉 原聲集",
+        "refHint": "輸入 [[ 會彈出搜尋。單獨成段時顯示為卡片，寫在句子裡時顯示為連結。貼上本站專輯、藝術家等頁面的網址，會自動換成這種寫法。",
+        "refTypes": "可用類型：album（專輯）、artist（藝術家）、entry（條目）、franchise（系列）、event（活動）、track（曲目）、topic（討論）、article（文章）。",
+        "sampleAlbum": "東方紅魔鄉 原聲集",
         "sampleUser": "範例使用者"
       }
     },
     "refs": {
       "types": {
-        "work": "作品",
+        "album": "專輯",
         "artist": "藝術家",
         "entry": "條目",
-        "series": "系列",
+        "franchise": "系列",
         "event": "活動",
-        "song": "歌曲",
+        "track": "歌曲",
         "topic": "討論",
         "article": "文章"
       },

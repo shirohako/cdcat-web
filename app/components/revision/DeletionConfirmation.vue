@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DeletionImpact } from '~/types/admin'
-const props = defineProps<{ workId: string | number, songIds: number[] }>()
+const props = defineProps<{ albumId: string | number, trackIds: number[] }>()
 const emit = defineEmits<{ confirmed: [value: { checksum: string, reason: string }] }>()
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
@@ -12,7 +12,7 @@ const preview = async () => {
   pending.value = true
   error.value = false
   try {
-    impact.value = await $api('/v1/revisions/deletion-preview', { method: 'POST', body: { resource_type: 'work', resource_id: props.workId, song_ids: props.songIds } })
+    impact.value = await $api('/v1/revisions/deletion-preview', { method: 'POST', body: { resource_type: 'album', resource_id: props.albumId, track_ids: props.trackIds } })
     open.value = true
   } catch { error.value = true }
   finally { pending.value = false }

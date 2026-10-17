@@ -136,7 +136,7 @@ const goToPage = (page: number) => {
                     </span>
                     <span class="flex items-center gap-1.5">
                       <Music2 :size="15" class="text-gray-400" />
-                      {{ $t('catalog.works_count', { count: entry.works_count ?? 0 }) }}
+                      {{ $t('catalog.albums_count', { count: entry.albums_count ?? 0 }) }}
                     </span>
                   </div>
                 </div>

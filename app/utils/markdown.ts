@@ -28,7 +28,7 @@ export interface MarkdownReferenceUser {
   id: number
   username: string
   nickname: string | null
-  avatar: string | null
+  avatar_url: string | null
 }
 
 /** A post named by `::: quote post:ID`. */
@@ -51,20 +51,20 @@ export interface MarkdownReferenceObject {
   date?: string | null
   kind?: string | null
   slug?: string | null
-  work_id?: number
-  work_title?: string | null
+  album_id?: number
+  album_title?: string | null
   event_series_id?: number | null
   replies_count?: number
   category?: { name: string } | null
   author?: { username: string, nickname: string | null } | null
 }
 
-export const MARKDOWN_REF_TYPES = ['work', 'artist', 'entry', 'series', 'event', 'song', 'topic', 'article'] as const
+export const MARKDOWN_REF_TYPES = ['album', 'artist', 'entry', 'franchise', 'event', 'track', 'topic', 'article'] as const
 export type MarkdownRefType = typeof MARKDOWN_REF_TYPES[number]
 
 /** The plural keys `references` groups objects under. */
 export const MARKDOWN_REF_GROUPS: Record<MarkdownRefType, string> = {
-  work: 'works', artist: 'artists', entry: 'entries', series: 'series', event: 'events', song: 'songs', topic: 'topics', article: 'articles',
+  album: 'albums', artist: 'artists', entry: 'entries', franchise: 'franchises', event: 'events', track: 'tracks', topic: 'topics', article: 'articles',
 }
 
 export interface MarkdownReferences {
@@ -541,7 +541,7 @@ md.renderer.rules.cdcat_mention = (tokens, idx) => {
   return `<a class="markdown-mention" href="/profile/${encodeURIComponent(user.username)}" title="${escapeHtml(user.nickname || user.username)}">@${escapeHtml(written)}</a>`
 }
 
-const REF = /^\[\[(work|artist|entry|series|event|song|topic|article):(\d{1,18})\]\]/
+const REF = /^\[\[(album|artist|entry|series|event|track|topic|article):(\d{1,18})\]\]/
 
 function refRule(state: StateInline, silent: boolean) {
   if (state.src.charCodeAt(state.pos) !== 0x5B || state.src.charCodeAt(state.pos + 1) !== 0x5B) return false
@@ -574,12 +574,12 @@ md.core.ruler.push('cdcat_ref_cards', (state) => {
 })
 
 const REF_ICONS: Record<MarkdownRefType, string> = {
-  work: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/>',
+  album: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="2"/>',
   artist: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/>',
   entry: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7.5h4"/><path d="M3 12h18"/><path d="M3 16.5h4"/><path d="M17 3v18"/><path d="M17 7.5h4"/><path d="M17 16.5h4"/>',
-  series: '<path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/>',
+  franchise: '<path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/>',
   event: '<rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
-  song: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+  track: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
   topic: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
   article: '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/>',
 }
@@ -590,12 +590,12 @@ const refIcon = (type: MarkdownRefType, className: string) =>
 /** Where a database token links. Events have no page of their own; they open their series. */
 export function markdownRefHref(type: MarkdownRefType, item: MarkdownReferenceObject): string {
   switch (type) {
-    case 'work': return `/works/${item.id}`
+    case 'album': return `/albums/${item.id}`
     case 'artist': return `/artists/${item.id}`
     case 'entry': return `/entries/${item.id}`
-    case 'series': return `/series/${item.id}`
-    case 'event': return item.event_series_id ? `/events/series/${item.event_series_id}` : '/events'
-    case 'song': return item.work_id ? `/works/${item.work_id}` : '/works'
+    case 'franchise': return `/franchises/${item.id}`
+    case 'event': return item.event_series_id ? `/event-series/${item.event_series_id}` : '/events'
+    case 'track': return item.album_id ? `/albums/${item.album_id}` : '/albums'
     case 'topic': return `/discussions/${item.id}`
     case 'article': return `/articles/${item.id}${item.slug ? `/${encodeURIComponent(item.slug)}` : ''}`
   }
@@ -608,7 +608,7 @@ function refItem(env: unknown, type: MarkdownRefType, id: number) {
 const refTypeLabel = (type: MarkdownRefType) => mdT(`markdown.refs.types.${type}`)
 
 function refMeta(type: MarkdownRefType, item: MarkdownReferenceObject) {
-  if (type === 'song') return item.work_title ?? ''
+  if (type === 'track') return item.album_title ?? ''
   if (type === 'topic') return [item.category?.name, item.replies_count !== undefined ? mdT('markdown.refs.replies', { count: item.replies_count }) : ''].filter(Boolean).join(' · ')
   if (type === 'article') return [item.author?.nickname || item.author?.username, item.date].filter(Boolean).join(' · ')
   return item.date ?? ''

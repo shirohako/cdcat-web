@@ -32,7 +32,7 @@
             <p class="text-sm font-medium text-gray-900">{{ t('account_pages.profile.avatar') }}</p>
             <div v-if="showAvatarInput" class="flex gap-2">
               <input
-                v-model="form.avatar"
+                v-model="form.avatar_url"
                 type="url"
                 class="input input-bordered input-sm flex-1 bg-white text-sm"
                 placeholder="https://example.com/avatar.jpg"
@@ -59,7 +59,7 @@
           <div class="flex gap-2">
             <input
               id="banner"
-              v-model="form.banner"
+              v-model="form.banner_url"
               type="url"
               class="input input-bordered flex-1 bg-white"
               placeholder="https://example.com/banner.jpg"
@@ -214,8 +214,8 @@ const form = reactive({
   username: props.user?.username || '',
   nickname: props.user?.nickname || '',
   bio: '',
-  avatar: props.user?.avatar || '',
-  banner: props.user?.banner || ''
+  avatar_url: props.user?.avatar_url || '',
+  banner_url: props.user?.banner_url || ''
 })
 
 const originalBio = ref('')
@@ -239,12 +239,12 @@ const isBannerChanged = computed(() => {
 const updateBanner = async () => {
   isUpdatingBanner.value = true
   bannerStatus.value = null
-  const url = form.banner?.trim() || null
+  const url = form.banner_url?.trim() || null
 
   try {
     await $api('/v1/me/banner', {
       method: 'PUT',
-      body: { banner: url }
+      body: { banner_url: url }
     })
 
     bannerStatus.value = {
@@ -271,7 +271,7 @@ const clearBanner = async () => {
   try {
     await $api('/v1/me/banner', {
       method: 'PUT',
-      body: { banner: null }
+      body: { banner_url: null }
     })
 
     bannerStatus.value = {
@@ -279,7 +279,7 @@ const clearBanner = async () => {
       message: t('account_pages.profile.banner_cleared')
     }
 
-    form.banner = ''
+    form.banner_url = ''
     originalBanner.value = ''
     await fetchUser()
   } catch (error) {
@@ -294,30 +294,30 @@ const clearBanner = async () => {
 
 // Avatar
 const showAvatarInput = ref(false)
-const avatarPreview = ref(props.user?.avatar || '')
+const avatarPreview = ref(props.user?.avatar_url || '')
 const avatarStatus = ref(null)
 const isUpdatingAvatar = ref(false)
-const originalAvatar = ref(props.user?.avatar || '')
+const originalAvatar = ref(props.user?.avatar_url || '')
 
 const isAvatarChanged = computed(() => {
-  return form.avatar.trim() !== originalAvatar.value
+  return form.avatar_url.trim() !== originalAvatar.value
 })
 
 const onAvatarUrlInput = () => {
   avatarStatus.value = null
-  const url = form.avatar.trim()
+  const url = form.avatar_url.trim()
   avatarPreview.value = url || originalAvatar.value
 }
 
 const updateAvatar = async () => {
-  const url = form.avatar.trim()
+  const url = form.avatar_url.trim()
   isUpdatingAvatar.value = true
   avatarStatus.value = null
 
   try {
     await $api('/v1/me/avatar', {
       method: 'PUT',
-      body: { avatar: url }
+      body: { avatar_url: url }
     })
 
     avatarStatus.value = {

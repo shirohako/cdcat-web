@@ -1,3 +1,4 @@
+import type { AdminContentType } from '~/types/admin'
 export const adminGroups = [
   { key: 'overview', label: 'admin_pages.groups.overview' },
   { key: 'content', label: 'admin_pages.groups.content' },
@@ -25,11 +26,11 @@ export const allowedBy = (permission: string | string[], has: (name: string) => 
 export const adminMenu: AdminMenuItem[] = [
   { path: '/admin', permission: 'admin.access', label: 'admin_pages.dashboard.title', icon: 'lucide:layout-dashboard', group: 'overview' },
   { path: '/admin/revisions', permission: 'revisions.view', label: 'admin_pages.revisions.title', icon: 'lucide:git-pull-request', group: 'overview' },
-  { path: '/admin/content/work', permission: 'content.manage', label: 'admin_pages.content.tabs.work', icon: 'lucide:disc-3', group: 'content' },
-  { path: '/admin/content/artist', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'content' },
-  { path: '/admin/content/entry', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'content' },
-  { path: '/admin/content/franchise', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'content' },
-  { path: '/admin/content/song', permission: 'content.manage', label: 'admin_pages.content.tabs.song', icon: 'lucide:music', group: 'content' },
+  { path: '/admin/content/albums', permission: 'content.manage', label: 'admin_pages.content.tabs.album', icon: 'lucide:disc-3', group: 'content' },
+  { path: '/admin/content/artists', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'content' },
+  { path: '/admin/content/entries', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'content' },
+  { path: '/admin/content/franchises', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'content' },
+  { path: '/admin/content/tracks', permission: 'content.manage', label: 'admin_pages.content.tabs.track', icon: 'lucide:music', group: 'content' },
   { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'content' },
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
   { path: '/admin/reviews', permission: 'reviews.manage', label: 'admin_pages.reviews.title', icon: 'lucide:message-square', group: 'community' },
@@ -54,12 +55,23 @@ export const findAdminMenuItem = (path: string, items: AdminMenuItem[] = adminMe
   items.find(item => item.path === path)
   ?? items.filter(item => item.path !== '/admin' && path.startsWith(`${item.path}/`)).sort((a, b) => b.path.length - a.path.length)[0]
 
-export const adminContentTypes = ['work', 'artist', 'entry', 'franchise', 'song'] as const
+export const adminContentTypes = ['album', 'artist', 'entry', 'franchise', 'track'] as const
 
-/** Paths of the public pages and edit schemas for each revisionable content type. */
-export const adminContentRoutes: Record<string, { api: string, front: string }> = {
-  work: { api: 'works', front: 'works' },
+/**
+ * Per content type (the singular morph alias, as in `resource_type`): the plural URL segment the
+ * admin pages share with the API (`/admin/content/albums`, `/v1/albums/{id}/schema`) and the public page.
+ */
+export const adminContentRoutes: Record<AdminContentType, { api: string, front: string }> = {
+  album: { api: 'albums', front: 'albums' },
   artist: { api: 'artists', front: 'artists' },
   entry: { api: 'entries', front: 'entries' },
-  franchise: { api: 'franchises', front: 'series' },
+  franchise: { api: 'franchises', front: 'franchises' },
+  track: { api: 'tracks', front: 'albums' },
 }
+
+/** The content type of an admin URL segment such as `albums`. */
+export const adminContentTypeOf = (segment: unknown): AdminContentType | undefined =>
+  adminContentTypes.find(type => adminContentRoutes[type].api === segment)
+
+/** Types edited through revisions; tracks are edited with their album. */
+export const isRevisionable = (type: AdminContentType | undefined): type is Exclude<AdminContentType, 'track'> => Boolean(type) && type !== 'track'

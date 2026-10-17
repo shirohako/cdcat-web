@@ -4,41 +4,23 @@
  */
 
 import type {
-  TrackingWork,
+  TrackingAlbum,
   TrackingStatus,
   TrackingStats,
-  GetTrackingWorksResponse
+  GetTrackingAlbumsResponse
 } from '~/types/tracking'
 
-// 状态映射: 字符串 <-> 数字
-// 1=plan_to_listen(想听) 2=completed(听过) 3=wishlist(想买) 4=owned(已购入) 5=dropped(不感兴趣)
-const statusToNumber: Record<TrackingStatus, number> = {
-  plan_to_listen: 1,
-  completed: 2,
-  wishlist: 3,
-  owned: 4,
-  dropped: 5
-}
-
-const numberToStatus: Record<number, TrackingStatus> = {
-  1: 'plan_to_listen',
-  2: 'completed',
-  3: 'wishlist',
-  4: 'owned',
-  5: 'dropped'
-}
-
 /**
- * 将 API 返回的 work+tracking 数据映射为前端 TrackingWork 类型
- * API 返回的是 work 对象，tracking 信息嵌套在 work.tracking 中
+ * 将 API 返回的 album+tracking 数据映射为前端 TrackingAlbum 类型
+ * API 返回的是 album 对象，tracking 信息嵌套在 album.tracking 中
  */
-const mapApiTracking = (item: any): TrackingWork => {
+const mapApiTracking = (item: any): TrackingAlbum => {
   const tracking = item.tracking || {}
   const statusRaw = tracking.status ?? item.status
   return {
     id: item.id,
-    workId: item.id,
-    workTitle: item.title ?? '',
+    albumId: item.id,
+    albumTitle: item.title ?? '',
     image_url: item.image_url ?? '',
     release_date: item.release_date ?? '',
     catalog_number: item.catalog_number ?? '',
@@ -46,7 +28,7 @@ const mapApiTracking = (item: any): TrackingWork => {
     track_count: item.track_count ?? 0,
     type: item.type ?? 'album',
     artists: item.artists ?? [],
-    status: typeof statusRaw === 'number' ? numberToStatus[statusRaw] : statusRaw,
+    status: statusRaw,
     statusUpdatedAt: tracking.updated_at ?? '',
     addedAt: tracking.created_at ?? ''
   }
@@ -61,20 +43,20 @@ export const useTracking = () => {
    * @param page 分页页码
    * @param pageSize 每页数量
    */
-  const getTrackingWorks = async (
+  const getTrackingAlbums = async (
     status: TrackingStatus,
     page: number = 1,
     pageSize: number = 12
-  ): Promise<GetTrackingWorksResponse> => {
-    const response = await $api<any>('/v1/tracking/works', {
+  ): Promise<GetTrackingAlbumsResponse> => {
+    const response = await $api<any>('/v1/me/tracking/albums', {
       params: {
-        status: statusToNumber[status],
+        status,
         page,
         per_page: pageSize
       }
     })
 
-    const items = response.works ?? response.data ?? []
+    const items = response.albums ?? response.data ?? []
     const pagination = response.pagination ?? {}
 
     return {
@@ -89,7 +71,7 @@ export const useTracking = () => {
    * 获取追踪统计信息
    */
   const getTrackingStats = async (): Promise<TrackingStats> => {
-    const response = await $api<any>('/v1/tracking/stats')
+    const response = await $api<any>('/v1/me/tracking/stats')
 
     const stats = response.stats ?? response
 
@@ -104,16 +86,14 @@ export const useTracking = () => {
   }
 
   /**
-   * 获取专辑的追踪状态（基于 workId）
-   * @param workId 专辑 ID
+   * 获取专辑的追踪状态（基于 albumId）
+   * @param albumId 专辑 ID
    */
-  const getWorkTracking = async (workId: number): Promise<{ status: TrackingStatus | null; trackingId: number | null }> => {
+  const getAlbumTracking = async (albumId: number): Promise<{ status: TrackingStatus | null; trackingId: number | null }> => {
     try {
-      const response = await $api<any>(`/v1/tracking/works/${workId}`)
-      const status = typeof response.status === 'number'
-        ? numberToStatus[response.status]
-        : response.status
-      return { status, trackingId: response.id }
+      const response = await $api<any>(`/v1/me/tracking/albums/${albumId}`)
+      const tracking = response.tracking ?? response
+      return { status: tracking?.status ?? null, trackingId: tracking?.id ?? null }
     } catch (error: any) {
       if (error.statusCode === 404) {
         return { status: null, trackingId: null }
@@ -123,28 +103,28 @@ export const useTracking = () => {
   }
 
   /**
-   * 设置或更新专辑的追踪状态（基于 workId）
-   * @param workId 专辑 ID
+   * 设置或更新专辑的追踪状态（基于 albumId）
+   * @param albumId 专辑 ID
    * @param status 追踪状态
    */
-  const setWorkTracking = async (workId: number, status: TrackingStatus): Promise<{ status: TrackingStatus; id: number }> => {
-    const response = await $api<any>(`/v1/tracking/works/${workId}`, {
-      method: 'POST',
-      body: { status: statusToNumber[status] }
+  const setAlbumTracking = async (albumId: number, status: TrackingStatus): Promise<{ status: TrackingStatus; id: number }> => {
+    const response = await $api<any>(`/v1/me/tracking/albums/${albumId}`, {
+      method: 'PUT',
+      body: { status }
     })
     return {
-      status: typeof response.status === 'number' ? numberToStatus[response.status] : response.status,
+      status: response.status,
       id: response.id
     }
   }
 
   /**
-   * 删除专辑的追踪记录（基于 workId）
-   * @param workId 专辑 ID
+   * 删除专辑的追踪记录（基于 albumId）
+   * @param albumId 专辑 ID
    */
-  const deleteWorkTracking = async (workId: number): Promise<boolean> => {
+  const deleteAlbumTracking = async (albumId: number): Promise<boolean> => {
     try {
-      await $api(`/v1/tracking/works/${workId}`, { method: 'DELETE' })
+      await $api(`/v1/me/tracking/albums/${albumId}`, { method: 'DELETE' })
       return true
     } catch {
       return false
@@ -152,10 +132,10 @@ export const useTracking = () => {
   }
 
   return {
-    getTrackingWorks,
+    getTrackingAlbums,
     getTrackingStats,
-    setWorkTracking,
-    getWorkTracking,
-    deleteWorkTracking
+    setAlbumTracking,
+    getAlbumTracking,
+    deleteAlbumTracking
   }
 }

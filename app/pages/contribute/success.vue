@@ -54,14 +54,14 @@ import { CheckCircle, Clock, ArrowLeft, ClipboardList } from '@lucide/vue';
 
 const route = useRoute();
 
-const resourceType = computed(() => route.query.type || 'work');
+const resourceType = computed(() => route.query.type || 'album');
 const isUpdate = computed(() => route.query.action === 'update');
 
 const resourceTypeLabel = computed(() => {
   const labels = {
-    work: 'Works',
+    album: 'Albums',
     artist: 'Artists',
-    series: 'Series',
+    franchise: 'Franchise',
   };
   return labels[resourceType.value] || 'Items';
 });
@@ -71,9 +71,9 @@ const resourceLabel = computed(() => {
     return 'update';
   }
   const labels = {
-    work: 'work',
+    album: 'album',
     artist: 'artist',
-    series: 'series',
+    franchise: 'franchise',
   };
   return labels[resourceType.value] || 'submission';
 });
@@ -83,27 +83,27 @@ const pageTitle = computed(() => {
     return 'Update Submitted';
   }
   const titles = {
-    work: 'Work Submitted',
+    album: 'Album Submitted',
     artist: 'Artist Submitted',
-    series: 'Series Submitted',
+    franchise: 'Franchise Submitted',
   };
   return titles[resourceType.value] || 'Submitted Successfully';
 });
 
 const browseLink = computed(() => {
   const links = {
-    work: '/works',
+    album: '/albums',
     artist: '/artists',
-    series: '/series',
+    franchise: '/franchises',
   };
   return links[resourceType.value] || '/';
 });
 
 const contributeLink = computed(() => {
   const links = {
-    work: '/contribute/work',
+    album: '/contribute/album',
     artist: '/contribute/artist',
-    series: '/contribute/series',
+    franchise: '/contribute/franchise',
   };
   return links[resourceType.value] || '/contribute';
 });

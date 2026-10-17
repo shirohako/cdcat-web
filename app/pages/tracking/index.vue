@@ -60,7 +60,7 @@
 
         <!-- Tab Content -->
         <KeepAlive>
-          <TrackingWorksTab
+          <TrackingAlbumsTab
             :key="activeTab"
             :status="activeTab"
             @update:stats="loadStats"

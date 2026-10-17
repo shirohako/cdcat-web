@@ -177,9 +177,9 @@ const deleteConfirm = reactive({ show: false, reviewId: 0, loading: false })
 function mapReview(raw: any): UserReview {
   return {
     id: raw.id,
-    workId: raw.work_id,
-    workTitle: raw.work?.title ?? '',
-    workImageUrl: raw.work?.image_url ?? '',
+    albumId: raw.album_id,
+    albumTitle: raw.album?.title ?? '',
+    albumImageUrl: raw.album?.image_url ?? '',
     artists: [],
     content: raw.content ?? '',
     score: raw.rating ?? null,
@@ -219,7 +219,7 @@ const loadReviews = async () => {
   loadError.value = ''
   try {
     // $api plugin unwraps { success, data } → res = { reviews: [...], pagination: {...} }
-    const res = await $api<any>('/v1/reviews/mine', {
+    const res = await $api<any>('/v1/me/reviews', {
       params: {
         page: currentPage.value,
         per_page: pageSize.value,

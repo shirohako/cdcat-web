@@ -122,12 +122,12 @@
         <!-- Edit mode: show album info as read-only -->
         <div v-if="isEditing && review" class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
           <img
-            :src="review.workImageUrl"
-            :alt="review.workTitle"
+            :src="review.albumImageUrl"
+            :alt="review.albumTitle"
             class="w-12 h-12 rounded-md object-cover"
           />
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-semibold text-gray-900 truncate">{{ review.workTitle }}</p>
+            <p class="text-sm font-semibold text-gray-900 truncate">{{ review.albumTitle }}</p>
             <p class="text-xs text-gray-500 truncate">
               {{ review.artists.map(a => a.name).join(', ') }}
             </p>
@@ -306,8 +306,8 @@ watch(albumQuery, (query) => {
   isSearching.value = true
   searchTimer = setTimeout(async () => {
     try {
-      const res = await $api<any>('/v1/works', { params: { search: query.trim(), per_page: 5 } })
-      const list = res.works ?? []
+      const res = await $api<any>('/v1/albums', { params: { search: query.trim(), per_page: 5 } })
+      const list = res.albums ?? []
       albumResults.value = (Array.isArray(list) ? list : []).map((w: any) => ({
         id: w.id,
         title: w.title ?? '',
@@ -358,7 +358,7 @@ const handleSubmit = async () => {
 
   try {
     if (isEditing.value && props.review) {
-      await $api(`/v1/works/${props.review.workId}/reviews`, {
+      await $api(`/v1/albums/${props.review.albumId}/reviews`, {
         method: 'POST',
         body: {
           content: form.content.trim(),
@@ -366,7 +366,7 @@ const handleSubmit = async () => {
         },
       })
     } else if (selectedAlbum.value) {
-      await $api(`/v1/works/${selectedAlbum.value.id}/reviews`, {
+      await $api(`/v1/albums/${selectedAlbum.value.id}/reviews`, {
         method: 'POST',
         body: {
           content: form.content.trim(),

@@ -80,8 +80,8 @@
                   <td class="px-5 py-3.5">
                     <div class="flex items-center gap-3">
                       <img
-                        v-if="u.avatar"
-                        :src="u.avatar"
+                        v-if="u.avatar_url"
+                        :src="u.avatar_url"
                         alt=""
                         class="h-8 w-8 shrink-0 rounded-full object-cover ring-1 ring-slate-200"
                       >
@@ -109,12 +109,12 @@
                   <td class="px-4 py-3.5">
                     <span
                       class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
-                      :class="u.status
+                      :class="u.is_active
                         ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                         : 'border-slate-200 bg-slate-50 text-slate-500'"
                     >
-                      <span class="h-1.5 w-1.5 rounded-full" :class="u.status ? 'bg-emerald-500' : 'bg-slate-300'" />
-                      {{ u.status ? t('admin_pages.users.active') : t('admin_pages.users.disabled') }}
+                      <span class="h-1.5 w-1.5 rounded-full" :class="u.is_active ? 'bg-emerald-500' : 'bg-slate-300'" />
+                      {{ u.is_active ? t('admin_pages.users.active') : t('admin_pages.users.disabled') }}
                     </span>
                   </td>
 
@@ -282,8 +282,8 @@ type ApiUser = {
   username: string
   nickname: string
   email: string
-  avatar: string | null
-  status: boolean
+  avatar_url: string | null
+  is_active: boolean
   roles: string | null
   role_level: number
   can_manage: boolean
@@ -338,7 +338,7 @@ const applyFilters = (role = selectedRole.value) => router.push({ query: {
   ...route.query, search: search.value.trim() || undefined, role: role || undefined, page: undefined,
   status: status.value || undefined, sort_by: sortBy.value === 'id' ? undefined : sortBy.value, sort_order: sortOrder.value === 'desc' ? undefined : sortOrder.value,
 } })
-const query = computed(() => ({ page: page.value, search: route.query.search || undefined, role: selectedRole.value || undefined, status: route.query.status || undefined, sort_by: route.query.sort_by || undefined, sort_order: route.query.sort_order || undefined }))
+const query = computed(() => ({ page: page.value, search: route.query.search || undefined, role: selectedRole.value || undefined, is_active: route.query.status === 'active' ? 1 : route.query.status === 'disabled' ? 0 : undefined, sort_by: route.query.sort_by || undefined, sort_order: route.query.sort_order || undefined }))
 
 // 用户列表
 const { data, pending, error, refresh } = await useAsyncData<ApiResponse>(

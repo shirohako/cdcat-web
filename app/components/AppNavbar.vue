@@ -104,11 +104,11 @@
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden
                      ring-2 ring-transparent group-hover:ring-gray-300 transition-all duration-200"
-              :class="user?.avatar ? '' : 'bg-gray-900'"
+              :class="user?.avatar_url ? '' : 'bg-gray-900'"
             >
               <NuxtImg
-                v-if="user?.avatar"
-                :src="user.avatar"
+                v-if="user?.avatar_url"
+                :src="user.avatar_url"
                 alt="avatar"
                 class="w-full h-full object-cover"
               />

@@ -1,9 +1,11 @@
+import type { TrackingStatus } from './tracking'
+
 export interface PublicProfile {
   id: number
   username: string
   nickname?: string
-  avatar?: string | null
-  banner?: string | null
+  avatar_url?: string | null
+  banner_url?: string | null
   bio?: string | null
   joined_at: string
   favorites: ProfileFavorites
@@ -12,14 +14,14 @@ export interface PublicProfile {
   discussion_topics_count: number
   discussion_posts_count: number
   contributions_count: number
-  favorite_works: ProfileFavoriteWork[]
+  favorite_albums: ProfileFavoriteAlbum[]
   favorite_artists: ProfileFavoriteArtist[]
 }
 
 export interface ProfileFavorites {
-  works: number
+  albums: number
   artists: number
-  songs: number
+  tracks: number
 }
 
 export interface ProfileTracking {
@@ -30,7 +32,7 @@ export interface ProfileTracking {
   dropped: number
 }
 
-export interface ProfileFavoriteWork {
+export interface ProfileFavoriteAlbum {
   id: number
   title: string
   slug?: string | null
@@ -65,8 +67,8 @@ export interface PaginationInfo {
   last_page: number
 }
 
-export interface ProfileFavoriteWorksResponse {
-  works: ProfileFavoriteWork[]
+export interface ProfileFavoriteAlbumsResponse {
+  albums: ProfileFavoriteAlbum[]
   pagination: PaginationInfo
 }
 
@@ -77,7 +79,7 @@ export interface ProfileFavoriteArtistsResponse {
 
 // ==================== Tracking ====================
 
-export interface ProfileTrackingWork {
+export interface ProfileTrackingAlbum {
   id: number
   title: string
   slug?: string | null
@@ -89,30 +91,30 @@ export interface ProfileTrackingWork {
   disc_count: number
   track_count: number
   duration: number
-  likes_count: number
+  favorites_count: number
   reviews_count: number
   is_favorited: boolean
   tracking: {
-    status: number
+    status: TrackingStatus
     created_at: string
     updated_at: string
   }
 }
 
 export interface ProfileTrackingResponse {
-  works: ProfileTrackingWork[]
+  albums: ProfileTrackingAlbum[]
   pagination: PaginationInfo
 }
 
-// ==================== Favorite Songs ====================
+// ==================== Favorite Tracks ====================
 
-export interface ProfileFavoriteSong {
+export interface ProfileFavoriteTrack {
   id: number
   title: string
   duration?: number
   track_number?: number
   disc_number?: number
-  work?: {
+  album?: {
     id: number
     title: string
     image_url?: string | null
@@ -120,7 +122,7 @@ export interface ProfileFavoriteSong {
   favorited_at: string
 }
 
-export interface ProfileFavoriteSongsResponse {
-  songs: ProfileFavoriteSong[]
+export interface ProfileFavoriteTracksResponse {
+  tracks: ProfileFavoriteTrack[]
   pagination: PaginationInfo
 }

@@ -61,7 +61,7 @@
 
             <!-- 提交者 -->
             <div class="flex items-center gap-2 sm:shrink-0">
-              <img v-if="revision.submitter?.avatar" :src="revision.submitter.avatar" class="h-8 w-8 rounded-full object-cover" />
+              <img v-if="revision.submitter?.avatar_url" :src="revision.submitter.avatar_url" class="h-8 w-8 rounded-full object-cover" />
               <div v-else class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-xs font-semibold text-gray-500">
                 {{ revision.submitter?.nickname?.charAt(0) || revision.submitter?.username?.charAt(0) || '?' }}
               </div>
@@ -207,6 +207,8 @@
 </template>
 
 <script setup>
+import { adminContentRoutes } from '~/config/admin'
+
 const router = useRouter();
 const route = useRoute();
 const { $api } = useNuxtApp();
@@ -226,14 +228,14 @@ const revision = computed(() => {
   return value.after_snapshot ? { ...value, data: value.after_snapshot } : value;
 });
 const editLink = computed(() => {
-  const type = { work: 'work', artist: 'artist', entry: 'entry', franchise: 'series' }[revision.value.resource_type];
+  const type = { album: 'album', artist: 'artist', entry: 'entry', franchise: 'franchise' }[revision.value.resource_type];
   return type && revision.value.resource_id ? `/contribute/${type}/${revision.value.resource_id}` : null;
 });
 const previous = computed(() => data.value?.previous || null);
 
 const formatType = (type) => {
   const typeMap = {
-    work: 'Work',
+    album: 'Album',
     artist: 'Artist',
     franchise: 'Franchise',
     entry: 'Entry',
@@ -418,10 +420,10 @@ const approve = async () => {
     if (!hasPermission('content.manage')) return;
     isMutating.value = true;
     try {
-      const current = new Set((revision.value.data.related_songs || []).map(song => String(song.id)));
-      const removed = (previous.value?.data?.related_songs || []).filter(song => !current.has(String(song.id))).map(song => song.id);
-      deletionImpact.value = await $api(`/v1/admin/content/${revision.value.resource_type}/${revision.value.resource_id}/deletion-impact`, {
-        query: revision.value.action === 'update' ? { 'song_ids[]': removed } : undefined,
+      const current = new Set((revision.value.data.related_tracks || []).map(track => String(track.id)));
+      const removed = (previous.value?.data?.related_tracks || []).filter(track => !current.has(String(track.id))).map(track => track.id);
+      deletionImpact.value = await $api(`/v1/admin/content/${adminContentRoutes[revision.value.resource_type].api}/${revision.value.resource_id}/deletion-impact`, {
+        query: revision.value.action === 'update' ? { 'track_ids[]': removed } : undefined,
       });
       if (deletionImpact.value.blockers.length || deletionImpact.value.checksum !== revision.value.impact_checksum) {
         showToast(t('errors.codes.deletion_impact_changed'), 'error');

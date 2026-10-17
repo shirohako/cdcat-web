@@ -17,7 +17,7 @@ export const menuItems: MenuItem[] = [
   {
     name: 'album',
     i18nKey: 'menu.album',
-    path: '/works',
+    path: '/albums',
     icon: 'lucide:disc-3'
   },
   {
@@ -39,9 +39,9 @@ export const menuItems: MenuItem[] = [
     icon: 'lucide:film'
   },
   {
-    name: 'series',
+    name: 'franchises',
     i18nKey: 'menu.series',
-    path: '/series',
+    path: '/franchises',
     icon: 'lucide:library'
   },
   {

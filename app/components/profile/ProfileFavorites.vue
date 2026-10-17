@@ -9,36 +9,36 @@
             {{ totalCount }}
           </span>
         </h2>
-        <button v-if="works.length" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('view-all')">
+        <button v-if="albums.length" class="inline-flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('view-all')">
           {{ $t('common.view_all') }}
           <ChevronRight :size="14" />
         </button>
       </div>
 
       <!-- Empty state -->
-      <div v-if="!works.length" class="flex flex-col items-center justify-center py-10 text-center">
+      <div v-if="!albums.length" class="flex flex-col items-center justify-center py-10 text-center">
         <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
           <Disc3 :size="26" class="text-amber-400" />
         </div>
-        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_works') }}</p>
+        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_albums') }}</p>
       </div>
 
-      <!-- Works grid -->
+      <!-- Albums grid -->
       <div v-else class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         <NuxtLink
-          v-for="work in works"
-          :key="work.id"
-          :to="`/works/${work.id}`"
+          v-for="album in albums"
+          :key="album.id"
+          :to="`/albums/${album.id}`"
           class="group overflow-hidden rounded-xl bg-white/90 ring-1 ring-black/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
         >
           <div class="relative aspect-square overflow-hidden bg-gray-100">
             <img
-              v-if="hasCover(work)"
-              :src="work.image_url"
-              :alt="work.title"
+              v-if="hasCover(album)"
+              :src="album.image_url"
+              :alt="album.title"
               class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               loading="lazy"
-              @error="onCoverError(work.id)"
+              @error="onCoverError(album.id)"
             >
             <div v-else class="grid h-full w-full place-items-center bg-linear-to-br from-slate-50 to-slate-100">
               <Disc3 :size="34" class="text-slate-500" />
@@ -47,11 +47,11 @@
 
           <div class="px-2.5 pb-2.5 pt-2">
             <p class="truncate text-xs font-semibold leading-4 text-gray-900">
-              {{ work.title }}
+              {{ album.title }}
             </p>
             <p class="mt-1 inline-flex items-center gap-1 text-[11px] text-gray-500">
               <Heart :size="12" />
-              <span>{{ formatCollectedAt(work.favorited_at) }}</span>
+              <span>{{ formatCollectedAt(album.favorited_at) }}</span>
             </p>
           </div>
         </NuxtLink>
@@ -66,7 +66,7 @@ const { locale } = useI18n()
 const failedCoverIds = ref(new Set())
 
 defineProps({
-  works: {
+  albums: {
     type: Array,
     required: true
   },
@@ -97,14 +97,14 @@ const formatCollectedAt = (dateValue) => {
   return d.toLocaleDateString(formatterLocale.value, { year: 'numeric', month: '2-digit', day: '2-digit' })
 }
 
-const onCoverError = (workId) => {
+const onCoverError = (albumId) => {
   const next = new Set(failedCoverIds.value)
-  next.add(workId)
+  next.add(albumId)
   failedCoverIds.value = next
 }
 
-const hasCover = (work) => {
-  const cover = String(work?.image_url || '').trim()
-  return cover.length > 0 && !failedCoverIds.value.has(work.id)
+const hasCover = (album) => {
+  const cover = String(album?.image_url || '').trim()
+  return cover.length > 0 && !failedCoverIds.value.has(album.id)
 }
 </script>

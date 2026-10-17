@@ -14,10 +14,10 @@ export interface Artist {
 }
 
 // 追踪专辑信息
-export interface TrackingWork {
+export interface TrackingAlbum {
   id: number // 追踪记录 ID
-  workId: number // 专辑 ID
-  workTitle: string // 专辑标题
+  albumId: number // 专辑 ID
+  albumTitle: string // 专辑标题
   image_url: string // 专辑封面
   release_date: string // 发行日期
   catalog_number: string // 编号
@@ -41,8 +41,8 @@ export interface TrackingStats {
 }
 
 // API 请求/响应类型
-export interface GetTrackingWorksResponse {
-  data: TrackingWork[]
+export interface GetTrackingAlbumsResponse {
+  data: TrackingAlbum[]
   total: number
   page: number
   pageSize: number
@@ -55,7 +55,7 @@ export interface UpdateTrackingStatusRequest {
 
 export interface UpdateTrackingStatusResponse {
   success: boolean
-  tracking: TrackingWork
+  tracking: TrackingAlbum
 }
 
 export interface RemoveTrackingRequest {
@@ -68,11 +68,11 @@ export interface RemoveTrackingResponse {
 }
 
 export interface CreateTrackingRequest {
-  workId: number
+  albumId: number
   status: TrackingStatus
 }
 
 export interface CreateTrackingResponse {
   success: boolean
-  tracking: TrackingWork
+  tracking: TrackingAlbum
 }

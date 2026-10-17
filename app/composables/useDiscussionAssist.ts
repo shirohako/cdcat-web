@@ -2,7 +2,7 @@ import type { MarkdownEnv } from '~/utils/markdown'
 import type { MarkdownCompleter, MarkdownCompletionItem } from '~/utils/markdownEditor'
 import type { DiscussionReferences, DiscussionSuggestion } from '~/types/discussion'
 
-const REF_TYPES = ['work', 'artist', 'entry', 'series', 'event', 'song', 'topic', 'article'] as const
+const REF_TYPES = ['album', 'artist', 'entry', 'franchise', 'event', 'track', 'topic', 'article'] as const
 
 /**
  * What the Markdown editor needs for discussions: preview references and `@` / `[[`

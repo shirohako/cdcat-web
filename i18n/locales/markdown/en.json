@@ -175,7 +175,7 @@
           "checklistDone": "The new album",
           "checklistPending": "Venue-only bonus",
           "checklistOptional": "Restocked back catalogue",
-          "stepsFirst": "Open the work page and go to Lyrics",
+          "stepsFirst": "Open the album page and go to Lyrics",
           "stepsSecond": "Pick the track and paste the lyrics",
           "stepsThird": "Submit and wait for review",
           "spoilerTitle": "Hidden track",
@@ -210,20 +210,20 @@
         "quote": "Quote a post",
         "quoteHint": "\"Quote\" under a post inserts this for you. Select part of a post first to quote just that part.",
         "ref": "Database entries",
-        "refHint": "Typing [[ opens a search. On a line of its own it shows as a card; inside a sentence, as a link. Pasting the address of a work, artist or other page here turns it into one.",
-        "refTypes": "Types: work, artist, entry, series, event, song, topic, article.",
-        "sampleWork": "Embodiment of Scarlet Devil OST",
+        "refHint": "Typing [[ opens a search. On a line of its own it shows as a card; inside a sentence, as a link. Pasting the address of an album, artist or other page here turns it into one.",
+        "refTypes": "Types: album, artist, entry, franchise, event, track, topic, article.",
+        "sampleAlbum": "Embodiment of Scarlet Devil OST",
         "sampleUser": "Example User"
       }
     },
     "refs": {
       "types": {
-        "work": "Work",
+        "album": "Work",
         "artist": "Artist",
         "entry": "Entry",
-        "series": "Series",
+        "franchise": "Series",
         "event": "Event",
-        "song": "Song",
+        "track": "Song",
         "topic": "Topic",
         "article": "Article"
       },

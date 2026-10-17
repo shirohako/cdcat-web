@@ -175,7 +175,7 @@
           "checklistDone": "新譜",
           "checklistPending": "会場限定特典",
           "checklistOptional": "旧譜の再販",
-          "stepsFirst": "作品ページを開き「歌詞」へ",
+          "stepsFirst": "アルバムページを開き「歌詞」へ",
           "stepsSecond": "曲を選んで歌詞を貼り付け",
           "stepsThird": "送信して審査を待つ",
           "spoilerTitle": "隠しトラック",
@@ -210,20 +210,20 @@
         "quote": "投稿の引用",
         "quoteHint": "投稿の「引用」を押すと自動で挿入されます。先に一部を選択すると、その部分だけを引用します。",
         "ref": "データベースの内容",
-        "refHint": "[[ を入力すると検索が開きます。1 行だけで書くとカード、文中に書くとリンクになります。作品やアーティストなどのページの URL を貼り付けると、この記法に置き換わります。",
-        "refTypes": "使える種類：work（作品）、artist（アーティスト）、entry（エントリー）、series（シリーズ）、event（イベント）、song（楽曲）、topic（トピック）、article（記事）。",
-        "sampleWork": "東方紅魔郷 サウンドトラック",
+        "refHint": "[[ を入力すると検索が開きます。1 行だけで書くとカード、文中に書くとリンクになります。アルバムやアーティストなどのページの URL を貼り付けると、この記法に置き換わります。",
+        "refTypes": "使える種類：album（アルバム）、artist（アーティスト）、entry（エントリー）、franchise（シリーズ）、event（イベント）、track（楽曲）、topic（トピック）、article（記事）。",
+        "sampleAlbum": "東方紅魔郷 サウンドトラック",
         "sampleUser": "サンプルユーザー"
       }
     },
     "refs": {
       "types": {
-        "work": "作品",
+        "album": "アルバム",
         "artist": "アーティスト",
         "entry": "エントリー",
-        "series": "シリーズ",
+        "franchise": "シリーズ",
         "event": "イベント",
-        "song": "楽曲",
+        "track": "楽曲",
         "topic": "トピック",
         "article": "記事"
       },

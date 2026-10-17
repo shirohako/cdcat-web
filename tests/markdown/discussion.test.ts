@@ -5,16 +5,16 @@ import { markdownQuote, siteUrlToToken } from '../../app/utils/markdownEditor'
 const env: MarkdownEnv = {
   references: {
     users: {
-      alice: { id: 1, username: 'Alice', nickname: 'Alice <b>A</b>', avatar: null },
+      alice: { id: 1, username: 'Alice', nickname: 'Alice <b>A</b>', avatar_url: null },
     },
     posts: {
       12: { id: 12, topic_id: 3, topic_title: 'T', floor: 5, parent_floor: null, user: { username: 'bob', nickname: 'Bob "B"' }, status: 'visible' },
       13: { id: 13, topic_id: 3, topic_title: 'T', floor: null, parent_floor: 5, user: { username: 'bob', nickname: null }, status: 'visible' },
       14: { id: 14, topic_id: 3, topic_title: 'T', floor: 6, parent_floor: null, user: null, status: 'deleted' },
     },
-    works: {
-      7: { type: 'work', id: 7, title: '<script>x</script> Album', image_url: 'https://img.example/a.jpg', date: '2024-12-30' },
-      8: { type: 'work', id: 8, title: 'Plain', image_url: 'http://insecure.example/a.jpg' },
+    albums: {
+      7: { type: 'album', id: 7, title: '<script>x</script> Album', image_url: 'https://img.example/a.jpg', date: '2024-12-30' },
+      8: { type: 'album', id: 8, title: 'Plain', image_url: 'http://insecure.example/a.jpg' },
     },
     events: { 2: { type: 'event', id: 2, title: 'M3', event_series_id: 9 } },
     articles: { 4: { type: 'article', id: 4, title: 'Notes', slug: 'liner-notes' } },
@@ -43,8 +43,8 @@ describe('Mentions', () => {
 
 describe('Database tokens', () => {
   it('turns a token alone in a paragraph into a card and escapes the title', () => {
-    const html = renderMarkdown('[[work:7]]', env)
-    expect(html).toContain('<a class="markdown-ref-card markdown-ref-card-work" href="/works/7">')
+    const html = renderMarkdown('[[album:7]]', env)
+    expect(html).toContain('<a class="markdown-ref-card markdown-ref-card-album" href="/albums/7">')
     expect(html).toContain('&lt;script&gt;x&lt;/script&gt; Album')
     expect(html).not.toContain('<script>')
     expect(html).toContain('<img src="https://img.example/a.jpg" alt="" loading="lazy" referrerpolicy="no-referrer">')
@@ -52,18 +52,18 @@ describe('Database tokens', () => {
   })
 
   it('keeps tokens inside sentences and list items inline', () => {
-    expect(renderMarkdown('See [[work:8]] here', env)).toContain('<p>See <a class="markdown-ref markdown-ref-work" href="/works/8">')
-    expect(renderMarkdown('- [[work:8]]\n- [[work:7]]', env)).not.toContain('markdown-ref-card')
+    expect(renderMarkdown('See [[album:8]] here', env)).toContain('<p>See <a class="markdown-ref markdown-ref-album" href="/albums/8">')
+    expect(renderMarkdown('- [[album:8]]\n- [[album:7]]', env)).not.toContain('markdown-ref-card')
   })
 
   it('drops non-https card images and links events to their series', () => {
-    expect(renderMarkdown('[[work:8]]', env)).not.toContain('insecure.example')
-    expect(renderMarkdown('[[event:2]]', env)).toContain('href="/events/series/9"')
+    expect(renderMarkdown('[[album:8]]', env)).not.toContain('insecure.example')
+    expect(renderMarkdown('[[event:2]]', env)).toContain('href="/event-series/9"')
     expect(renderMarkdown('[[article:4]]', env)).toContain('href="/articles/4/liner-notes"')
   })
 
   it('greys out tokens without a summary', () => {
-    expect(renderMarkdown('Gone: [[song:99]]', env)).toContain('<span class="markdown-ref markdown-ref-missing">')
+    expect(renderMarkdown('Gone: [[track:99]]', env)).toContain('<span class="markdown-ref markdown-ref-missing">')
     expect(renderMarkdown('[[topic:5]]')).toContain('markdown-ref-missing')
     expect(renderMarkdown('[[nope:5]]', env)).toContain('[[nope:5]]')
   })
@@ -88,7 +88,7 @@ describe('Quotes', () => {
 describe('Links and images', () => {
   it('marks external links nofollow ugc and keeps site links in the tab', () => {
     expect(renderMarkdown('[a](https://example.com)')).toContain('<a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">')
-    expect(renderMarkdown('[a](/works/1)')).toContain('<a href="/works/1">')
+    expect(renderMarkdown('[a](/albums/1)')).toContain('<a href="/albums/1">')
   })
 
   it('shows only https and site images, lazily and without a referrer', () => {
@@ -106,11 +106,11 @@ describe('Editor helpers', () => {
   })
 
   it('turns site page addresses into tokens', () => {
-    expect(siteUrlToToken('https://dev.cdcat.net/works/12', 'localhost:3000')).toBe('[[work:12]]')
+    expect(siteUrlToToken('https://dev.cdcat.net/albums/12', 'localhost:3000')).toBe('[[album:12]]')
     expect(siteUrlToToken('/articles/4/liner-notes')).toBe('[[article:4]]')
     expect(siteUrlToToken('http://localhost:3000/discussions/8?post=3', 'localhost:3000')).toBe('[[topic:8]]')
-    expect(siteUrlToToken('https://example.com/works/12', 'cdcat.net')).toBeNull()
-    expect(siteUrlToToken('see /works/12')).toBeNull()
+    expect(siteUrlToToken('https://example.com/albums/12', 'cdcat.net')).toBeNull()
+    expect(siteUrlToToken('see /albums/12')).toBeNull()
     expect(siteUrlToToken('/events/1')).toBeNull()
   })
 })

@@ -1,11 +1,11 @@
 /**
  * Favorites 数据模型和接口定义
- * 用户收藏功能：可收藏专辑(work)、歌曲(song)、艺术家(artist)
+ * 用户收藏功能：可收藏专辑(album)、歌曲(track)、艺术家(artist)
  */
 
 // ==================== TypeScript 类型定义 ====================
 
-export interface FavoriteWork {
+export interface FavoriteAlbum {
   id: number
   title: string
   catalog_number?: string
@@ -15,13 +15,13 @@ export interface FavoriteWork {
   favorited_at: string
 }
 
-export interface FavoriteSong {
+export interface FavoriteTrack {
   id: number
   title: string
   duration?: number
   track_number?: number
   disc_number?: number
-  work?: {
+  album?: {
     id: number
     title: string
     image_url?: string

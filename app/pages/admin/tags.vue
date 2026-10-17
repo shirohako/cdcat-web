@@ -11,7 +11,7 @@ const appliedSearch = ref('')
 const { data, pending, error, refresh } = await useAsyncData('admin-tags',
   () => $api<{ items: AdminTag[], pagination: AdminPagination }>('/v1/admin/tags', { query: { search: appliedSearch.value || undefined, per_page: 100 } }), { watch: [appliedSearch] })
 
-const empty = () => ({ id: 0, name: '', slug: '', description: '', name_en: '', name_ja: '', staff_only: false })
+const empty = () => ({ id: 0, name: '', slug: '', description: '', name_en: '', name_ja: '', is_staff_only: false })
 const form = reactive(empty())
 const busy = ref(false)
 const message = ref('')
@@ -19,7 +19,7 @@ const notice = ref('')
 const editing = computed(() => form.id > 0)
 
 function edit(tag: AdminTag) {
-  Object.assign(form, { id: tag.id, name: tag.name, slug: tag.slug, description: tag.description ?? '', staff_only: tag.staff_only,
+  Object.assign(form, { id: tag.id, name: tag.name, slug: tag.slug, description: tag.description ?? '', is_staff_only: tag.is_staff_only,
     name_en: tag.translations?.en?.name ?? '', name_ja: tag.translations?.ja?.name ?? '' })
 }
 const reset = () => Object.assign(form, empty())
@@ -39,7 +39,7 @@ async function run(action: () => Promise<unknown>, done: string) {
 
 const save = () => run(async () => {
   const translations = Object.fromEntries(([['en', form.name_en], ['ja', form.name_ja]] as const).filter(([, name]) => name.trim()).map(([code, name]) => [code, { name: name.trim() }]))
-  const body = { name: form.name.trim(), slug: form.slug.trim(), description: form.description.trim() || null, staff_only: form.staff_only, translations }
+  const body = { name: form.name.trim(), slug: form.slug.trim(), description: form.description.trim() || null, is_staff_only: form.is_staff_only, translations }
   await $api(editing.value ? `/v1/admin/tags/${form.id}` : '/v1/admin/tags', { method: editing.value ? 'PUT' : 'POST', body })
   reset()
 }, t('admin_pages.saved'))
@@ -82,7 +82,7 @@ useHead({ title: computed(() => t('admin_pages.tags.title')) })
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-2">{{ t('admin_pages.tags.name') }}</th><th class="px-4 py-2">Slug</th><th class="px-4 py-2">{{ t('admin_pages.tags.articles') }}</th><th class="px-4 py-2">{{ t('admin_pages.tags.topics') }}</th><th class="px-4 py-2" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="tag in data?.items" :key="tag.id">
-                <td class="px-4 py-2">{{ tag.name }}<span v-if="tag.staff_only" class="ml-1.5 rounded bg-amber-50 px-1 text-[11px] text-amber-700">{{ t('admin_pages.tags.staff_only') }}</span></td>
+                <td class="px-4 py-2">{{ tag.name }}<span v-if="tag.is_staff_only" class="ml-1.5 rounded bg-amber-50 px-1 text-[11px] text-amber-700">{{ t('admin_pages.tags.staff_only') }}</span></td>
                 <td class="px-4 py-2 font-mono text-xs text-slate-500">{{ tag.slug }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.articles_count }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.discussion_topics_count }}</td>
@@ -103,7 +103,7 @@ useHead({ title: computed(() => t('admin_pages.tags.title')) })
         <label class="block">{{ t('admin_pages.tags.name_en') }}<input v-model="form.name_en" maxlength="50" :class="field"></label>
         <label class="block">{{ t('admin_pages.tags.name_ja') }}<input v-model="form.name_ja" maxlength="50" :class="field"></label>
         <label class="block">{{ t('admin_pages.tags.tag_description') }}<textarea v-model="form.description" maxlength="500" rows="2" :class="field" /></label>
-        <label class="flex items-center gap-2"><input v-model="form.staff_only" type="checkbox">{{ t('admin_pages.tags.staff_only_help') }}</label>
+        <label class="flex items-center gap-2"><input v-model="form.is_staff_only" type="checkbox">{{ t('admin_pages.tags.staff_only_help') }}</label>
         <div class="flex justify-end gap-2">
           <button v-if="editing" type="button" class="rounded-lg border px-3 py-2" @click="reset">{{ t('common.cancel') }}</button>
           <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ t('common.save') }}</button>

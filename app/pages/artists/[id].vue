@@ -102,10 +102,10 @@
 
         <div class="min-h-80 p-4 sm:p-6">
           <div v-if="albums.length" class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
-            <WorkCard
+            <AlbumCard
               v-for="album in albums"
               :key="album.id"
-              :work="album"
+              :album="album"
             />
           </div>
 
@@ -194,7 +194,7 @@ const toggleLike = async () => {
 
   isToggling.value = true
   try {
-    const result = await $api(`/v1/favorites/artists/${artistId}`, { method: 'POST' })
+    const result = await $api(`/v1/me/favorites/artists/${artistId}`, { method: isFavorited.value ? 'DELETE' : 'PUT' })
     isFavorited.value = result.favorited
   } finally {
     isToggling.value = false
@@ -211,18 +211,18 @@ const handleShare = async () => {
   await navigator.clipboard?.writeText(shareData.url)
 }
 
-const albums = computed(() => (artist.value?.works || []).map(work => ({
-  id: work.id,
-  title: work.title,
-  image_url: work.image_url,
-  type: work.type || 'album',
-  catalog_number: work.catalog_number,
-  release_date: work.release_date,
-  disc_count: work.disc_count || 0,
-  track_count: work.track_count || 0,
-  views_count: work.views_count || 0,
-  likes_count: work.likes_count || work.favorites_count || 0,
-  is_favorited: work.is_favorited || false,
+const albums = computed(() => (artist.value?.albums || []).map(album => ({
+  id: album.id,
+  title: album.title,
+  image_url: album.image_url,
+  type: album.type || 'album',
+  catalog_number: album.catalog_number,
+  release_date: album.release_date,
+  disc_count: album.disc_count || 0,
+  track_count: album.track_count || 0,
+  views_count: album.views_count || 0,
+  favorites_count: album.favorites_count || 0,
+  is_favorited: album.is_favorited || false,
 })))
 </script>
 

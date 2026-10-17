@@ -9,9 +9,9 @@ export interface PickedItem {
   image_url: string | null
 }
 
-// Searches entries, works or series by name and emits the chosen one.
+// Searches entries, albums or series by name and emits the chosen one.
 const props = defineProps<{
-  kind: 'entry' | 'work' | 'franchise'
+  kind: 'entry' | 'album' | 'franchise'
   exclude?: number[]
   placeholder?: string
   /** Extra query parameters, e.g. { top_level: 1 } to offer only top-level series. */
@@ -53,12 +53,12 @@ const search = async (term: string) => {
         image_url: franchise.image_url,
       }))
     } else {
-      const data = await $api<{ works: Array<{ id: number, title: string, catalog_number: string | null, release_date: string | null, image_url: string | null }> }>('/v1/works', { query: { search: term, per_page: 10 } })
-      items = data.works.map(work => ({
-        id: work.id,
-        label: work.title,
-        subtitle: [work.catalog_number, work.release_date].filter(Boolean).join(' · '),
-        image_url: work.image_url,
+      const data = await $api<{ albums: Array<{ id: number, title: string, catalog_number: string | null, release_date: string | null, image_url: string | null }> }>('/v1/albums', { query: { search: term, per_page: 10 } })
+      items = data.albums.map(album => ({
+        id: album.id,
+        label: album.title,
+        subtitle: [album.catalog_number, album.release_date].filter(Boolean).join(' · '),
+        image_url: album.image_url,
       }))
     }
     if (current === requestId) results.value = items.filter(item => !props.exclude?.includes(item.id))

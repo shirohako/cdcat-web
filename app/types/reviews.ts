@@ -23,9 +23,9 @@ export interface ReviewReactions {
 // 用户评价
 export interface UserReview {
   id: number
-  workId: number
-  workTitle: string
-  workImageUrl: string
+  albumId: number
+  albumTitle: string
+  albumImageUrl: string
   artists: ReviewArtist[]
   content: string             // 评价内容
   score: number | null        // 0-10 分，null 表示未评分
@@ -61,7 +61,7 @@ export interface SearchableAlbum {
 
 // 创建评价请求
 export interface CreateReviewRequest {
-  workId: number
+  albumId: number
   content: string
   score: number | null
   language?: string

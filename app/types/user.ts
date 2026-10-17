@@ -3,7 +3,7 @@ export interface User {
   username: string
   nickname: string
   email: string
-  avatar?: string | null
+  avatar_url?: string | null
   role_level?: number
   roles: string
   permissions: string[]

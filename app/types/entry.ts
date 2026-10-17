@@ -33,10 +33,10 @@ export const ENTRY_RELATIONS = [
 ] as const
 export type EntryRelation = typeof ENTRY_RELATIONS[number]
 
-export const ENTRY_WORK_RELATIONS = [
+export const ENTRY_ALBUM_RELATIONS = [
   'opening', 'ending', 'insert_song', 'theme_song', 'character_song', 'image_song', 'ost', 'drama', 'other',
 ] as const
-export type EntryWorkRelation = typeof ENTRY_WORK_RELATIONS[number]
+export type EntryAlbumRelation = typeof ENTRY_ALBUM_RELATIONS[number]
 
 export const TITLE_KINDS = ['official', 'alias', 'abbreviation'] as const
 export type TitleKind = typeof TITLE_KINDS[number]
@@ -78,17 +78,17 @@ export interface EntrySummary extends NamedItem {
   description?: string | null
   image_url: string | null
   banner_url?: string | null
-  works_count?: number
+  albums_count?: number
   sort_order?: number
 }
 
-export interface EntryWork {
+export interface EntryAlbum {
   id: number
   title: string
   image_url: string | null
   release_date: string | null
   catalog_number: string | null
-  relation_type: EntryWorkRelation
+  relation_type: EntryAlbumRelation
   character_name: string | null
   episode: number | null
   note: string | null
@@ -110,7 +110,7 @@ export interface RelatedEntry {
 export interface EntryDetail extends EntrySummary {
   meta: Record<string, unknown> | null
   links: LinkItem[]
-  works: EntryWork[]
+  albums: EntryAlbum[]
   franchises: Array<{ id: number, name: string, slug: string | null, image_url: string | null, parent: { id: number, name: string, slug: string | null } | null }>
   related_entries: RelatedEntry[]
 }
@@ -123,26 +123,26 @@ export interface FranchiseSummary extends NamedItem {
   image_url: string | null
   banner_url: string | null
   entries_count?: number
-  works_count?: number
+  albums_count?: number
   children_count?: number
   parent?: { id: number, name: string, slug: string | null } | null
 }
 
-export interface FranchiseWork {
+export interface FranchiseAlbum {
   id: number
   title: string
   image_url: string | null
   release_date: string | null
   catalog_number: string | null
   sort_order?: number
-  entries?: Array<{ id: number, name: string, type: EntryType, relation_type: EntryWorkRelation }>
+  entries?: Array<{ id: number, name: string, type: EntryType, relation_type: EntryAlbumRelation }>
 }
 
 export interface FranchiseDetail extends FranchiseSummary {
   links: LinkItem[]
   children: Array<FranchiseSummary & { entries: EntrySummary[] }>
   entries: EntrySummary[]
-  works: FranchiseWork[]
+  albums: FranchiseAlbum[]
 }
 
 export interface Pagination {
@@ -186,7 +186,7 @@ export interface EntrySchema extends SchemaCommon {
   release_date?: string | null
   release_date_precision?: DatePrecision
   episodes?: number | null
-  related_works?: Array<{ id: number | string, relation_type?: EntryWorkRelation, character_name?: string | null, episode?: number | null, note?: string | null }>
+  related_albums?: Array<{ id: number | string, relation_type?: EntryAlbumRelation, character_name?: string | null, episode?: number | null, note?: string | null }>
   related_entries?: Array<{ id: number | string, relation_type?: EntryRelation, note?: string | null }>
 }
 
@@ -194,5 +194,5 @@ export interface FranchiseSchema extends SchemaCommon {
   parent_id?: number | null
   sort_order?: number
   related_entries?: Array<{ id: number | string, sort_order?: number }>
-  related_works?: Array<{ id: number | string, sort_order?: number }>
+  related_albums?: Array<{ id: number | string, sort_order?: number }>
 }

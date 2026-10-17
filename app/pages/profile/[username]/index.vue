@@ -28,13 +28,13 @@
             <!-- Left column -->
             <div class="lg:col-span-2 space-y-6">
               <template v-if="activeView === 'default'">
-                <ProfileOverview :songs-count="profile.favorites.songs" :reviews-count="profile.reviews_count" :contributions-count="profile.contributions_count" @view-all-songs="activeView = 'songs'" />
-                <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" @view-all="activeView = 'favorites'" />
+                <ProfileOverview :tracks-count="profile.favorites.tracks" :reviews-count="profile.reviews_count" :contributions-count="profile.contributions_count" @view-all-tracks="activeView = 'tracks'" />
+                <ProfileFavorites :albums="profile.favorite_albums" :total-count="profile.favorites.albums" @view-all="activeView = 'favorites'" />
                 <ProfileArtists :artists="profile.favorite_artists" @view-all="activeView = 'artists'" />
                 <ProfileArticles :username="username" />
                 <ProfileDiscussions :username="username" :topics-count="profile.discussion_topics_count" :posts-count="profile.discussion_posts_count" />
               </template>
-              <ProfileAllSongs v-else-if="activeView === 'songs'" :username="username" @back="activeView = 'default'" />
+              <ProfileAllTracks v-else-if="activeView === 'tracks'" :username="username" @back="activeView = 'default'" />
               <ProfileAllFavorites v-else-if="activeView === 'favorites'" :username="username" @back="activeView = 'default'" />
               <ProfileAllArtists v-else-if="activeView === 'artists'" :username="username" @back="activeView = 'default'" />
               <ProfileAllTracking v-else-if="activeView === 'tracking'" :username="username" :initial-status="trackingStatus" @back="activeView = 'default'" />
@@ -54,13 +54,14 @@
 
 <script setup lang="ts">
 import type { PublicProfile } from '~/types/profile'
+import type { TrackingStatus } from '~/types/tracking'
 
 const route = useRoute()
 const username = route.params.username as string
-const activeView = ref<'default' | 'favorites' | 'artists' | 'songs' | 'tracking'>('default')
-const trackingStatus = ref(1)
+const activeView = ref<'default' | 'favorites' | 'artists' | 'tracks' | 'tracking'>('default')
+const trackingStatus = ref<TrackingStatus>('plan_to_listen')
 
-const onSelectTrackingStatus = (status: number) => {
+const onSelectTrackingStatus = (status: TrackingStatus) => {
   trackingStatus.value = status
   activeView.value = 'tracking'
 }

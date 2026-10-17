@@ -11,7 +11,7 @@ const { ago } = useRelativeTime()
 const page = ref(1)
 type Bookmark = { id: number, created_at: string, post: DiscussionPostSummary, topic: DiscussionPostSummary['topic'] }
 const { data, pending, refresh } = await useAsyncData('favorite-discussions',
-  () => $api<{ bookmarks: Bookmark[], pagination: Pagination }>('/v1/favorites/discussions', { query: { page: page.value } }), { watch: [page] })
+  () => $api<{ bookmarks: Bookmark[], pagination: Pagination }>('/v1/me/discussions/bookmarks', { query: { page: page.value } }), { watch: [page] })
 const error = ref('')
 
 async function remove(bookmark: Bookmark) {

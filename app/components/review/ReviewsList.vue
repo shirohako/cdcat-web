@@ -10,9 +10,9 @@
       <Icon name="lucide:message-square-text" class="w-16 h-16 text-gray-300 mb-4" />
       <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_reviews') }}</p>
       <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_reviews_hint') }}</p>
-      <NuxtLink to="/works" class="btn btn-primary btn-sm gap-2">
+      <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
-        {{ $t('collection_components.discover_works') }}
+        {{ $t('collection_components.discover_albums') }}
       </NuxtLink>
     </div>
 
@@ -28,15 +28,15 @@
           <div class="flex gap-3 sm:gap-4">
             <!-- Album Cover -->
             <NuxtLink
-              :to="`/works/${review.workId}`"
+              :to="`/albums/${review.albumId}`"
               class="shrink-0"
-              :aria-label="review.workTitle"
+              :aria-label="review.albumTitle"
             >
               <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
                 <img
-                  v-if="review.workImageUrl"
-                  :src="review.workImageUrl"
-                  :alt="review.workTitle"
+                  v-if="review.albumImageUrl"
+                  :src="review.albumImageUrl"
+                  :alt="review.albumTitle"
                   class="w-full h-full object-cover"
                   loading="lazy"
                 />
@@ -51,11 +51,11 @@
               <!-- Row 1: Album title + Score badge -->
               <div class="flex items-center gap-2 flex-wrap">
                 <NuxtLink
-                  :to="`/works/${review.workId}`"
+                  :to="`/albums/${review.albumId}`"
                   class="font-semibold text-sm sm:text-base text-gray-900
                          hover:text-blue-700 transition-colors line-clamp-1"
                 >
-                  {{ review.workTitle }}
+                  {{ review.albumTitle }}
                 </NuxtLink>
                 <!-- Metacritic score badge -->
                 <div

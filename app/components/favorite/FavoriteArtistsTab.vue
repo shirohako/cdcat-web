@@ -99,7 +99,7 @@
 <script setup lang="ts">
 import type { FavoriteArtist } from '~/types/favorites'
 
-const { getFavoriteArtists, toggleFavoriteArtist } = useFavorites()
+const { getFavoriteArtists, setFavoriteArtist } = useFavorites()
 const { formatDate } = useLocaleFormatting()
 
 const artists = ref<FavoriteArtist[]>([])
@@ -130,7 +130,7 @@ const handleToggle = async (artistId: number) => {
   if (unlikeLoading.value[artistId]) return
   unlikeLoading.value = { ...unlikeLoading.value, [artistId]: true }
   try {
-    const result = await toggleFavoriteArtist(artistId)
+    const result = await setFavoriteArtist(artistId, !!unliked.value[artistId])
     unliked.value = { ...unliked.value, [artistId]: !result.favorited }
   } catch (error) {
     console.error('Failed to toggle artist favorite:', error)

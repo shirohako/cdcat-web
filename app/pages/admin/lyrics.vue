@@ -9,7 +9,7 @@ const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const filterKeys = ['search', 'language', 'format', 'is_ai_generated', 'is_translation', 'submitted_by', 'work_id', 'song_id'] as const
+const filterKeys = ['search', 'language', 'format', 'is_ai_generated', 'is_translation', 'submitted_by', 'album_id', 'track_id'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -21,7 +21,7 @@ const query = computed(() => ({ page: page.value, ...Object.fromEntries(filterKe
 const { data, pending, error, refresh } = await useAsyncData('admin-lyrics',
   () => $api<{ items: AdminLyric[], pagination: AdminPagination }>('/v1/admin/lyrics', { query: query.value }), { watch: [query] })
 
-const empty = () => ({ id: 0, song_id: '', language: 'ja', format: 'plain', content: '', is_primary: false, is_translation: false, is_ai_generated: false, authorship: '', source: '', reason: '' })
+const empty = () => ({ id: 0, track_id: '', language: 'ja', format: 'plain', content: '', is_primary: false, is_translation: false, is_ai_generated: false, authorship: '', source: '', reason: '' })
 const form = reactive(empty())
 const formOpen = ref(false)
 const busy = ref(false)
@@ -30,13 +30,13 @@ const notice = ref('')
 const edit = async (lyric?: AdminLyric) => {
   message.value = ''
   if (!lyric) {
-    Object.assign(form, empty(), { song_id: String(route.query.song_id ?? '') })
+    Object.assign(form, empty(), { track_id: String(route.query.track_id ?? '') })
     formOpen.value = true
     return
   }
   try {
     const full = await $api<AdminLyric>(`/v1/admin/lyrics/${lyric.id}`)
-    Object.assign(form, empty(), { ...full, song_id: String(full.song_id), authorship: full.authorship ?? '', source: full.source ?? '', content: full.content ?? '' })
+    Object.assign(form, empty(), { ...full, track_id: String(full.track_id), authorship: full.authorship ?? '', source: full.source ?? '', content: full.content ?? '' })
     formOpen.value = true
   } catch (e) {
     message.value = localizeError(e)
@@ -48,7 +48,7 @@ const save = async () => {
   try {
     const body = { language: form.language, format: form.format, content: form.content, is_primary: form.is_primary, is_translation: form.is_translation,
       is_ai_generated: form.is_ai_generated, authorship: form.authorship || null, source: form.source || null, reason: form.reason || null }
-    await $api(form.id ? `/v1/admin/lyrics/${form.id}` : '/v1/admin/lyrics', { method: form.id ? 'PUT' : 'POST', body: form.id ? body : { ...body, song_id: Number(form.song_id) } })
+    await $api(form.id ? `/v1/admin/lyrics/${form.id}` : '/v1/admin/lyrics', { method: form.id ? 'PUT' : 'POST', body: form.id ? body : { ...body, track_id: Number(form.track_id) } })
     formOpen.value = false
     notice.value = t('admin_pages.saved')
     await refresh()
@@ -97,7 +97,7 @@ useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
         <select v-model="filters.is_ai_generated" :aria-label="t('admin_pages.lyrics.ai')" :class="field"><option value="">{{ t('admin_pages.lyrics.ai') }}</option><option value="1">{{ t('admin_pages.lyrics.ai_yes') }}</option><option value="0">{{ t('admin_pages.lyrics.ai_no') }}</option></select>
         <select v-model="filters.is_translation" :aria-label="t('admin_pages.lyrics.translation')" :class="field"><option value="">{{ t('admin_pages.lyrics.translation') }}</option><option value="1">{{ t('admin_pages.lyrics.translation_yes') }}</option><option value="0">{{ t('admin_pages.lyrics.translation_no') }}</option></select>
         <input v-model="filters.submitted_by" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.lyrics.submitter_id')" :aria-label="t('admin_pages.lyrics.submitter_id')" :class="[field, 'w-28']">
-        <input v-model="filters.work_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.work_id')" :aria-label="t('admin_pages.content.work_id')" :class="[field, 'w-24']">
+        <input v-model="filters.album_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.album_id')" :aria-label="t('admin_pages.content.album_id')" :class="[field, 'w-24']">
         <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
       </form>
     </AdminFilterBar>
@@ -107,7 +107,7 @@ useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
     <section v-if="formOpen" class="rounded-xl border border-slate-200 bg-white p-5">
       <h2 class="font-semibold">{{ form.id ? t('admin_pages.lyrics.edit', { id: form.id }) : t('admin_pages.lyrics.create') }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-3" @submit.prevent="save">
-        <label class="block">{{ t('admin_pages.lyrics.song_id') }}<input v-model="form.song_id" required :disabled="Boolean(form.id)" inputmode="numeric" pattern="[0-9]+" :class="input"></label>
+        <label class="block">{{ t('admin_pages.lyrics.track_id') }}<input v-model="form.track_id" required :disabled="Boolean(form.id)" inputmode="numeric" pattern="[0-9]+" :class="input"></label>
         <label class="block">{{ t('admin_pages.lyrics.language') }}<input v-model="form.language" required maxlength="10" :class="input"></label>
         <label class="block">{{ t('admin_pages.lyrics.format') }}<select v-model="form.format" :class="input"><option v-for="format in ['plain', 'lrc', 'srt']" :key="format" :value="format">{{ format }}</option></select></label>
         <label class="block">{{ t('admin_pages.lyrics.authorship') }}<select v-model="form.authorship" :class="input"><option value="">—</option><option value="original">{{ t('admin_pages.lyrics.original') }}</option><option value="repost">{{ t('admin_pages.lyrics.repost') }}</option></select></label>
@@ -131,11 +131,11 @@ useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
       <AdminListState :pending="pending" :error="error" :empty="!data?.items.length" @retry="refresh()">
         <div class="overflow-x-auto">
           <table class="w-full min-w-200 text-left text-sm">
-            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.song') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.language') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.excerpt') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.submitter') }}</th><th class="px-4 py-3" /></tr></thead>
+            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">ID</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.track') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.language') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.excerpt') }}</th><th class="px-4 py-3">{{ t('admin_pages.lyrics.submitter') }}</th><th class="px-4 py-3" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="lyric in data?.items" :key="lyric.id">
                 <td class="px-4 py-3 font-mono text-xs text-slate-500">{{ lyric.id }}</td>
-                <td class="px-4 py-3"><p class="font-medium">{{ lyric.song?.title ?? `#${lyric.song_id}` }}</p><NuxtLink v-if="lyric.work" :to="`/works/${lyric.work.id}`" target="_blank" class="text-xs text-slate-500 underline">{{ lyric.work.title }}</NuxtLink></td>
+                <td class="px-4 py-3"><p class="font-medium">{{ lyric.track?.title ?? `#${lyric.track_id}` }}</p><NuxtLink v-if="lyric.album" :to="`/albums/${lyric.album.id}`" target="_blank" class="text-xs text-slate-500 underline">{{ lyric.album.title }}</NuxtLink></td>
                 <td class="px-4 py-3 text-xs">{{ lyric.language }} · {{ lyric.format }}<span v-if="lyric.is_translation"> · {{ t('admin_pages.lyrics.translation_yes') }}</span><span v-if="lyric.is_ai_generated" class="text-amber-700"> · AI</span></td>
                 <td class="max-w-xs truncate px-4 py-3 text-xs text-slate-600">{{ lyric.excerpt }}</td>
                 <td class="px-4 py-3 text-xs">{{ lyric.submitter?.nickname || lyric.submitter?.username || '—' }}</td>

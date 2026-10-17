@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { adminContentRoutes } from '~/config/admin'
+import { adminContentRoutes, adminContentTypeOf, isRevisionable } from '~/config/admin'
 import type { AdminMergePreview, AdminPagination, AdminRevision, DeletionImpact } from '~/types/admin'
 
 definePageMeta({
   layout: 'admin', middleware: 'admin',
-  validate: route => Boolean(adminContentRoutes[String(route.params.type)]) && /^\d+$/.test(String(route.params.id)),
+  validate: route => isRevisionable(adminContentTypeOf(route.params.type)) && /^\d+$/.test(String(route.params.id)),
 })
 
 const route = useRoute()
@@ -14,9 +14,9 @@ const { hasPermission } = useAuth()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const type = computed(() => String(route.params.type))
+const type = computed(() => adminContentTypeOf(route.params.type)!)
 const id = computed(() => String(route.params.id))
-const paths = computed(() => adminContentRoutes[type.value]!)
+const paths = computed(() => adminContentRoutes[type.value])
 const tab = computed({
   get: () => ['edit', 'history', 'actions'].includes(String(route.query.tab)) ? String(route.query.tab) : 'edit',
   set: value => { router.replace({ query: { ...route.query, tab: value === 'edit' ? undefined : value } }) },
@@ -30,7 +30,7 @@ const name = computed(() => String(schema.value?.title ?? schema.value?.name ?? 
 const historyPage = ref(1)
 const { data: history, pending: historyPending, error: historyError, refresh: refreshHistory } = await useAsyncData(
   () => `admin-content-history-${type.value}-${id.value}`,
-  () => $api<{ revisions: AdminRevision[], pagination: AdminPagination }>(`/v1/revisions/${type.value}/${id.value}/history`, { query: { page: historyPage.value } }),
+  () => $api<{ revisions: AdminRevision[], pagination: AdminPagination }>(`/v1/${paths.value.api}/${id.value}/revisions`, { query: { page: historyPage.value } }),
   { watch: [historyPage, type, id], lazy: true },
 )
 
@@ -39,12 +39,12 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Recount =====
-const recountable = computed(() => ['work', 'artist'].includes(type.value))
+const recountable = computed(() => ['album', 'artist'].includes(type.value))
 const recount = async () => {
   busy.value = true
   message.value = ''
   try {
-    const result = await $api<{ results: { changed: string[] }[] }>(`/v1/admin/content/${type.value}/recount`, { method: 'POST', body: { ids: [Number(id.value)] } })
+    const result = await $api<{ results: { changed: string[] }[] }>(`/v1/admin/content/${paths.value.api}/recount`, { method: 'POST', body: { ids: [Number(id.value)] } })
     const changed = result.results[0]?.changed ?? []
     notice.value = changed.length ? t('admin_pages.content.recount_changed', { fields: changed.join('、') }) : t('admin_pages.content.recount_unchanged')
   } catch (e) {
@@ -60,7 +60,7 @@ const deleteOpen = ref(false)
 const startDelete = async () => {
   message.value = ''
   try {
-    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${type.value}/${id.value}/deletion-impact`)
+    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${paths.value.api}/${id.value}/deletion-impact`)
     deleteOpen.value = true
   } catch (e) {
     message.value = localizeError(e)
@@ -70,9 +70,9 @@ const confirmDelete = async (reason: string) => {
   if (busy.value || !impact.value) return
   busy.value = true
   try {
-    await $api(`/v1/admin/content/${type.value}/${id.value}`, { method: 'DELETE', body: { reason, impact_checksum: impact.value.checksum, baseline_checksum: impact.value.baseline_checksum } })
+    await $api(`/v1/admin/content/${paths.value.api}/${id.value}`, { method: 'DELETE', body: { reason, impact_checksum: impact.value.checksum, baseline_checksum: impact.value.baseline_checksum } })
     deleteOpen.value = false
-    await router.push(`/admin/content/${type.value}`)
+    await router.push(`/admin/content/${paths.value.api}`)
   } catch (e) {
     message.value = localizeError(e)
     deleteOpen.value = false
@@ -89,7 +89,7 @@ const previewMerge = async () => {
   message.value = ''
   merge.value = null
   try {
-    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/artist/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value } })
+    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/artists/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value } })
   } catch (e) {
     message.value = localizeError(e)
   }
@@ -98,9 +98,9 @@ const confirmMerge = async (reason: string) => {
   if (busy.value || !merge.value) return
   busy.value = true
   try {
-    await $api(`/v1/admin/content/artist/${id.value}/merge`, { method: 'POST', body: { target_id: merge.value.target.id, reason, checksum: merge.value.checksum } })
+    await $api(`/v1/admin/content/artists/${id.value}/merge`, { method: 'POST', body: { target_id: merge.value.target.id, reason, checksum: merge.value.checksum } })
     mergeOpen.value = false
-    await router.push(`/admin/content/artist/${merge.value.target.id}`)
+    await router.push(`/admin/content/artists/${merge.value.target.id}`)
   } catch (e) {
     message.value = localizeError(e)
     mergeOpen.value = false
@@ -116,7 +116,7 @@ useHead({ title: computed(() => name.value) })
 
 <template>
   <div class="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
-    <NuxtLink :to="`/admin/content/${type}`" class="text-sm text-slate-500 hover:text-slate-900">← {{ t('admin_pages.back_list') }}</NuxtLink>
+    <NuxtLink :to="`/admin/content/${paths.api}`" class="text-sm text-slate-500 hover:text-slate-900">← {{ t('admin_pages.back_list') }}</NuxtLink>
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p class="text-xs text-slate-500">{{ t(`admin_pages.types.${type}`) }} #{{ id }}</p>
@@ -136,10 +136,10 @@ useHead({ title: computed(() => name.value) })
     <AdminListState v-if="tab === 'edit'" :pending="pending" :error="error" @retry="refresh()">
       <div v-if="schema" class="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
         <p class="mb-4 text-sm text-slate-500">{{ t('admin_pages.content.edit_help') }}</p>
-        <RevisionWorkForm v-if="type === 'work'" :initial-data="schema" :work-id="id" :redirect-to="toRevision" />
+        <RevisionAlbumForm v-if="type === 'album'" :initial-data="schema" :album-id="id" :redirect-to="toRevision" />
         <RevisionArtistForm v-else-if="type === 'artist'" :initial-data="schema" :artist-id="id" :redirect-to="toRevision" />
         <RevisionEntryForm v-else-if="type === 'entry'" :initial-data="schema" :entry-id="id" :redirect-to="toRevision" />
-        <RevisionSeriesForm v-else-if="type === 'franchise'" :initial-data="schema" :series-id="id" :redirect-to="toRevision" />
+        <RevisionFranchiseForm v-else-if="type === 'franchise'" :initial-data="schema" :franchise-id="id" :redirect-to="toRevision" />
       </div>
     </AdminListState>
 

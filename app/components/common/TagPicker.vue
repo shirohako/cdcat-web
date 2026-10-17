@@ -11,7 +11,7 @@ const filter = ref('')
 
 const available = computed(() => {
   const term = filter.value.trim().toLowerCase()
-  return tags.value.filter(tag => (props.allowStaff || !tag.staff_only)
+  return tags.value.filter(tag => (props.allowStaff || !tag.is_staff_only)
     && !model.value.some(selected => selected.id === tag.id)
     && (!term || tagName(tag).toLowerCase().includes(term) || tag.slug.includes(term)))
 })
@@ -25,7 +25,7 @@ const remove = (tag: TagSummary) => { model.value = model.value.filter(selected 
   <div class="space-y-2">
     <div v-if="model.length" class="flex flex-wrap gap-1.5">
       <span v-for="tag in model" :key="tag.id" class="inline-flex items-center gap-1 rounded-full bg-violet-50 py-0.5 pl-2.5 pr-1 text-xs font-medium text-violet-700 ring-1 ring-violet-200">
-        <Lock v-if="tag.staff_only" :size="10" />
+        <Lock v-if="tag.is_staff_only" :size="10" />
         {{ tagName(tag) }}
         <button
           type="button" class="grid size-4 place-items-center rounded-full hover:bg-violet-100 disabled:opacity-40" :disabled="disabled"

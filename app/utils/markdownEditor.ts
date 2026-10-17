@@ -17,14 +17,14 @@ export type MarkdownCompleter = (kind: 'mention' | 'ref', query: string) => Prom
 
 /** Site paths that paste as database tokens, by their first path segment. */
 const SITE_PATHS: Record<string, string> = {
-  works: 'work', artists: 'artist', entries: 'entry', series: 'series', discussions: 'topic', articles: 'article',
+  albums: 'album', artists: 'artist', entries: 'entry', franchises: 'franchise', discussions: 'topic', articles: 'article',
 }
 
 /** Hosts whose page addresses count as the site's own, besides the current one. */
 export const MARKDOWN_SITE_HOSTS = ['cdcat.net', 'www.cdcat.net', 'dev.cdcat.net']
 
 /**
- * A pasted address of a work, artist, entry, series, topic or article page becomes
+ * A pasted address of an album, artist, entry, series, topic or article page becomes
  * `[[type:id]]`. Relative paths and the site's own hosts qualify; anything else
  * returns null and pastes as usual.
  */
@@ -45,7 +45,7 @@ export function siteUrlToToken(text: string | null | undefined, currentHost = ''
   else if (!value.startsWith('/')) {
     return null
   }
-  const match = /^\/(works|artists|entries|series|discussions|articles)\/(\d+)(?:\/[^/?#]*)?(?:[?#].*)?$/.exec(path)
+  const match = /^\/(albums|artists|entries|series|discussions|articles)\/(\d+)(?:\/[^/?#]*)?(?:[?#].*)?$/.exec(path)
   return match ? `[[${SITE_PATHS[match[1]!]}:${match[2]}]]` : null
 }
 

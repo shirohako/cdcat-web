@@ -1,5 +1,5 @@
 <script setup>
 definePageMeta({
-  redirect: '/favorites/works'
+  redirect: '/favorites/albums'
 })
 </script>

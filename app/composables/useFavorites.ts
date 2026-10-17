@@ -4,46 +4,48 @@
  */
 
 import type {
-  FavoriteWork,
-  FavoriteSong,
+  FavoriteAlbum,
+  FavoriteTrack,
   FavoriteArtist,
 } from '~/types/favorites'
+
+export type FavoriteType = 'albums' | 'artists' | 'tracks'
 
 export const useFavorites = () => {
   const { $api } = useNuxtApp()
 
+  const setFavorite = async (type: FavoriteType, id: number, favorited: boolean): Promise<{ favorited: boolean }> => {
+    return await $api(`/v1/me/favorites/${type}/${id}`, { method: favorited ? 'PUT' : 'DELETE' }) as { favorited: boolean }
+  }
+
   // 获取用户收藏的专辑列表（真实 API）
-  const getFavoriteWorks = async (
+  const getFavoriteAlbums = async (
     page: number = 1,
     perPage: number = 15
-  ): Promise<{ works: FavoriteWork[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/favorites/works', {
+  ): Promise<{ albums: FavoriteAlbum[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
+    return await $api('/v1/me/favorites/albums', {
       params: { page, per_page: perPage }
     }) as any
   }
 
-  // 切换专辑收藏状态（真实 API）
-  const toggleFavoriteWork = async (workId: number): Promise<{ favorited: boolean }> => {
-    return await $api(`/v1/favorites/works/${workId}`, {
-      method: 'POST'
-    }) as any
+  // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变
+  const setFavoriteAlbum = async (albumId: number, favorited: boolean): Promise<{ favorited: boolean }> => {
+    return await setFavorite('albums', albumId, favorited)
   }
 
   // 获取用户收藏的歌曲列表（真实 API）
-  const getFavoriteSongs = async (
+  const getFavoriteTracks = async (
     page: number = 1,
     perPage: number = 15
-  ): Promise<{ songs: FavoriteSong[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/favorites/songs', {
+  ): Promise<{ tracks: FavoriteTrack[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
+    return await $api('/v1/me/favorites/tracks', {
       params: { page, per_page: perPage }
     }) as any
   }
 
-  // 切换歌曲收藏状态（真实 API）
-  const toggleFavoriteSong = async (songId: number): Promise<{ favorited: boolean }> => {
-    return await $api(`/v1/favorites/songs/${songId}`, {
-      method: 'POST'
-    }) as any
+  // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变
+  const setFavoriteTrack = async (trackId: number, favorited: boolean): Promise<{ favorited: boolean }> => {
+    return await setFavorite('tracks', trackId, favorited)
   }
 
   // 获取用户关注的艺术家列表（真实 API）
@@ -51,24 +53,23 @@ export const useFavorites = () => {
     page: number = 1,
     perPage: number = 15
   ): Promise<{ artists: FavoriteArtist[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/favorites/artists', {
+    return await $api('/v1/me/favorites/artists', {
       params: { page, per_page: perPage }
     }) as any
   }
 
-  // 切换艺术家收藏状态（真实 API）
-  const toggleFavoriteArtist = async (artistId: number): Promise<{ favorited: boolean }> => {
-    return await $api(`/v1/favorites/artists/${artistId}`, {
-      method: 'POST'
-    }) as any
+  // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变
+  const setFavoriteArtist = async (artistId: number, favorited: boolean): Promise<{ favorited: boolean }> => {
+    return await setFavorite('artists', artistId, favorited)
   }
 
   return {
-    getFavoriteWorks,
-    toggleFavoriteWork,
-    getFavoriteSongs,
-    toggleFavoriteSong,
+    setFavorite,
+    getFavoriteAlbums,
+    setFavoriteAlbum,
+    getFavoriteTracks,
+    setFavoriteTrack,
     getFavoriteArtists,
-    toggleFavoriteArtist,
+    setFavoriteArtist,
   }
 }

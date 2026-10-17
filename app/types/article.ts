@@ -6,7 +6,7 @@ export type ArticleType = typeof ARTICLE_TYPES[number]
 export const ARTICLE_STATUSES = ['draft', 'pending', 'published', 'rejected', 'unpublished'] as const
 export type ArticleStatus = typeof ARTICLE_STATUSES[number]
 
-export const CONTENT_LINK_TYPES = ['work', 'artist', 'entry', 'series', 'event'] as const
+export const CONTENT_LINK_TYPES = ['album', 'artist', 'entry', 'franchise', 'event'] as const
 export type ContentLinkType = typeof CONTENT_LINK_TYPES[number]
 
 export const ARTICLE_REPORT_REASONS = ['spam', 'abuse', 'spoiler', 'infringement', 'illegal', 'other'] as const
@@ -16,7 +16,7 @@ export interface UserSummary {
   id: number
   username: string
   nickname: string | null
-  avatar: string | null
+  avatar_url: string | null
 }
 
 export interface TagSummary {
@@ -24,7 +24,7 @@ export interface TagSummary {
   name: string
   slug: string
   translations: Record<string, { name?: string | null, description?: string | null }> | null
-  staff_only: boolean
+  is_staff_only: boolean
 }
 
 export interface ContentLink {

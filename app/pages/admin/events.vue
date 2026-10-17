@@ -156,13 +156,13 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
       <AdminListState :pending="pending" :error="error" :empty="!events?.events.length" @retry="refresh()">
         <div class="overflow-x-auto">
           <table class="w-full min-w-175 text-left text-sm">
-            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">{{ t('admin_pages.events.name') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.series') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.start_date') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.released_works') }}</th><th class="px-4 py-3" /></tr></thead>
+            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">{{ t('admin_pages.events.name') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.series') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.start_date') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.released_albums') }}</th><th class="px-4 py-3" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="event in events?.events" :key="event.id">
                 <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="event.main_visual_url" :src="event.main_visual_url" alt="" loading="lazy" :style="{ aspectRatio: imageAspectRatio(event.main_visual_width, event.main_visual_height) }" class="h-12 w-auto max-w-20 shrink-0 rounded bg-slate-50 object-contain"><div>{{ event.name }}<p class="text-xs font-normal text-slate-500">{{ event.slug }}<template v-if="event.venue"> · {{ event.venue }}</template></p></div></div></td>
                 <td class="px-4 py-3">{{ event.series?.name ?? '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ event.start_date }}<template v-if="event.end_date && event.end_date !== event.start_date"> ~ {{ event.end_date }}</template></td>
-                <td class="px-4 py-3 tabular-nums">{{ event.released_works_count }}</td>
+                <td class="px-4 py-3 tabular-nums">{{ event.released_albums_count }}</td>
                 <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><button type="button" class="underline" @click="editEvent(event)">{{ t('common.edit') }}</button><button type="button" class="text-red-700" @click="startDelete(event)">{{ t('common.delete') }}</button></div></td>
               </tr>
             </tbody>

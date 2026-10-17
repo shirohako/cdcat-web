@@ -87,8 +87,8 @@
                 <td class="px-4 py-3.5">
                   <div class="flex items-center gap-2">
                     <img
-                      v-if="revision.submitter?.avatar"
-                      :src="revision.submitter.avatar"
+                      v-if="revision.submitter?.avatar_url"
+                      :src="revision.submitter.avatar_url"
                       class="h-6 w-6 shrink-0 rounded-full object-cover"
                     />
                     <div v-else class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold text-gray-500">
@@ -258,7 +258,7 @@ const { $api } = useNuxtApp()
 
 const { data: response, pending, error, refresh } = await useAsyncData(
   'revisions-list',
-  () => $api('/v1/revisions', { query: { page: currentPage.value } }),
+  () => $api('/v1/me/revisions', { query: { page: currentPage.value } }),
   { watch: [currentPage] },
 )
 
@@ -268,7 +268,7 @@ const pagination = computed(() => response.value?.pagination ?? {
 })
 
 // ===== 格式化 =====
-const formatType = (type) => ({ work: 'Work', artist: 'Artist', series: 'Series', event: 'Event', entry: 'Entry' }[type] || type)
+const formatType = (type) => ({ album: 'Album', artist: 'Artist', franchise: 'Franchise', event: 'Event', entry: 'Entry' }[type] || type)
 const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
 const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
 
@@ -303,7 +303,7 @@ const goToPage = (page) => {
 
 const goToDetail = (id) => router.push(`/revisions/${id}`)
 const goToEntity = (revision) => {
-  const map = { work: 'works', artist: 'artists', series: 'series', event: 'events', entry: 'entries' }
+  const map = { album: 'albums', artist: 'artists', franchise: 'franchises', event: 'events', entry: 'entries' }
   const prefix = map[revision.resource_type]
   router.push(prefix ? `/${prefix}/${revision.resource_id}` : `/revisions/${revision.id}`)
 }

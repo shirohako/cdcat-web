@@ -28,7 +28,7 @@
         >
           <img
             v-if="displayAvatar"
-            :src="profile.avatar"
+            :src="profile.avatar_url"
             :alt="profile.username"
             class="h-full w-full object-cover"
             @error="onAvatarError"
@@ -116,7 +116,7 @@ const profileDisplayName = computed(() => {
 });
 
 const displayAvatar = computed(() => {
-  return String(props.profile.avatar || "").trim().length > 0 && !avatarLoadFailed.value;
+  return String(props.profile.avatar_url || "").trim().length > 0 && !avatarLoadFailed.value;
 });
 
 const profileBio = computed(() => {
@@ -158,7 +158,7 @@ const memberSince = computed(() => {
 });
 
 const displayBanner = computed(() => {
-  return (props.profile.banner || "").trim();
+  return (props.profile.banner_url || "").trim();
 });
 
 watch(displayBanner, () => {
@@ -170,7 +170,7 @@ const onBannerError = () => {
 };
 
 watch(
-  () => props.profile.avatar,
+  () => props.profile.avatar_url,
   () => {
     avatarLoadFailed.value = false;
   }

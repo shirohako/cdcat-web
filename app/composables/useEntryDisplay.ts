@@ -32,7 +32,7 @@ export const useEntryDisplay = () => {
   const typeLabel = (type: string | null | undefined) => type ? label(`catalog.entry_type.${type}`, type) : ''
   const formatLabel = (format: string | null | undefined) => format ? label(`catalog.format.${format}`, format) : ''
   const relationLabel = (relation: string) => label(`catalog.relation.${relation}`, relation)
-  const workRelationLabel = (relation: string | null | undefined) => label(`catalog.work_relation.${relation || 'other'}`, relation || '')
+  const albumRelationLabel = (relation: string | null | undefined) => label(`catalog.album_relation.${relation || 'other'}`, relation || '')
   const typeIcon = (type: string | null | undefined) => ENTRY_TYPE_ICONS[type as EntryType] || 'lucide:shapes'
 
   /** "Anime · TV", or just the type when there is no format. */
@@ -52,5 +52,5 @@ export const useEntryDisplay = () => {
     return new Intl.DateTimeFormat(intlLocale.value, options).format(value)
   }
 
-  return { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, workRelationLabel, typeIcon, formatReleaseDate }
+  return { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate }
 }

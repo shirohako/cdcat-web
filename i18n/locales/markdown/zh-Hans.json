@@ -175,7 +175,7 @@
           "checklistDone": "新专辑",
           "checklistPending": "会场限定特典",
           "checklistOptional": "旧作补货",
-          "stepsFirst": "打开作品页，进入「歌词」",
+          "stepsFirst": "打开专辑页，进入「歌词」",
           "stepsSecond": "选择曲目并粘贴歌词",
           "stepsThird": "提交后等待审核",
           "spoilerTitle": "隐藏曲",
@@ -210,20 +210,20 @@
         "quote": "引用帖子",
         "quoteHint": "点帖子下面的「引用」会自动插入。选中一段文字再点，只引用选中的部分。",
         "ref": "数据库内容",
-        "refHint": "输入 [[ 会弹出搜索。单独成段时显示为卡片，写在句子里时显示为链接。粘贴本站作品、艺术家等页面的地址，会自动换成这种写法。",
-        "refTypes": "可用类型：work（作品）、artist（艺术家）、entry（条目）、series（系列）、event（活动）、song（歌曲）、topic（讨论）、article（文章）。",
-        "sampleWork": "东方红魔乡 原声集",
+        "refHint": "输入 [[ 会弹出搜索。单独成段时显示为卡片，写在句子里时显示为链接。粘贴本站专辑、艺术家等页面的地址，会自动换成这种写法。",
+        "refTypes": "可用类型：album（专辑）、artist（艺术家）、entry（条目）、franchise（系列）、event（活动）、track（曲目）、topic（讨论）、article（文章）。",
+        "sampleAlbum": "东方红魔乡 原声集",
         "sampleUser": "示例用户"
       }
     },
     "refs": {
       "types": {
-        "work": "作品",
+        "album": "专辑",
         "artist": "艺术家",
         "entry": "条目",
-        "series": "系列",
+        "franchise": "系列",
         "event": "活动",
-        "song": "歌曲",
+        "track": "歌曲",
         "topic": "讨论",
         "article": "文章"
       },

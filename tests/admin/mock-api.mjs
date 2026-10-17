@@ -2,17 +2,17 @@ import http from 'node:http'
 
 export const baseline = 'd'.repeat(64)
 export const impactChecksum = 'e'.repeat(64)
-export const workSchema = {
-  id: 1, title: '完整作品', type: 'album', release_date: '2026-01-01', image_url: 'https://example.test/cover.jpg',
-  slug: 'complete-work', meta: { aliases: ['别名'] }, release_event_id: null,
+export const albumSchema = {
+  id: 1, title: '完整专辑', type: 'album', release_date: '2026-01-01', image_url: 'https://example.test/cover.jpg',
+  slug: 'complete-album', meta: { aliases: ['别名'] }, release_event_id: null,
   snapshot_version: 1, baseline_checksum: baseline,
   structure: [{ disc_number: 1, title: 'Disc One' }],
-  related_songs: [{ id: 11, disc_number: 1, track_number: 1, title: '曲目一', duration: '3:00', is_instrumental: true, meta: { isrc: 'JP123' } }],
+  related_tracks: [{ id: 11, disc_number: 1, track_number: 1, title: '曲目一', duration: '3:00', is_instrumental: true, meta: { isrc: 'JP123' } }],
   related_artists: [{ id: 21, artist_id: 2, display_name: '演唱者' }],
-  credits: [{ id: 31, artist_id: 2, song_id: 11, display_name: '作曲者', role: 'Composer', order: 0, meta: { track: '1.1', source: 'booklet' } }, { id: 32, artist_id: 2, song_id: null, display_name: '制作人', role: 'Producer', order: 5, meta: [] }, { id: 33, artist_id: 2, song_id: null, display_name: '母带', role: 'Mastering', order: 9, meta: null }],
+  credits: [{ id: 31, artist_id: 2, track_id: 11, display_name: '作曲者', role: 'Composer', order: 0, meta: { track: '1.1', source: 'booklet' } }, { id: 32, artist_id: 2, track_id: null, display_name: '制作人', role: 'Producer', order: 5, meta: [] }, { id: 33, artist_id: 2, track_id: null, display_name: '母带', role: 'Mastering', order: 9, meta: null }],
   products: [{ id: 41, name: '通常盘', edition_type: 'REGULAR', medium: 'PHYSICAL', price: 123.45, currency: 'JPY', meta: { shops: ['shop'] } }],
   bonuses: [{ id: 51, type: 'BOOKLET', name: '歌词本', meta: { pages: 12 } }],
-  links: [{ id: 61, link_provider_id: 1, url: 'https://example.test/work', meta: { locale: 'ja' } }],
+  links: [{ id: 61, link_provider_id: 1, url: 'https://example.test/album', meta: { locale: 'ja' } }],
 }
 
 export async function createMockAPI(port) {
@@ -55,13 +55,13 @@ export async function createMockAPI(port) {
     }
     if (url.pathname === '/v1/auth/login') return send({ token: 'founder' })
     if (url.pathname === '/v1/auth/logout') return send({})
-    if (url.pathname === '/v1/works/1/schema') return send(workSchema)
+    if (url.pathname === '/v1/albums/1/schema') return send(albumSchema)
     if (url.pathname === '/v1/artists/2/schema') return send({ id: 2, name: '原艺术家', type: 'person', bio: '简介', links: [], snapshot_version: 1, baseline_checksum: baseline })
-    if (url.pathname === '/v1/entries/3/schema') return send({ id: 3, name: '原条目', type: 'anime', image_url: 'https://example.test/entry.jpg', meta: { year: 2026 }, related_works: [{ id: 1 }], snapshot_version: 1, baseline_checksum: baseline })
+    if (url.pathname === '/v1/entries/3/schema') return send({ id: 3, name: '原条目', type: 'anime', image_url: 'https://example.test/entry.jpg', meta: { year: 2026 }, related_albums: [{ id: 1 }], snapshot_version: 1, baseline_checksum: baseline })
     if (url.pathname === '/v1/franchises/4/schema') return send({
       id: 4, name: '原系列', image_url: 'https://example.test/series.jpg', meta: { year: 2026, tags: ['tag'] },
       groups: [{ id: 'g1', name: '分组名', order: 5, meta: { edition: 1 } }],
-      related_entries: [{ id: 3, group_id: 'g1', order: 8, meta: { tags: ['a'] } }], related_works: [{ id: 1, group_id: 'g1', order: 9 }],
+      related_entries: [{ id: 3, group_id: 'g1', order: 8, meta: { tags: ['a'] } }], related_albums: [{ id: 1, group_id: 'g1', order: 9 }],
       snapshot_version: 1, baseline_checksum: baseline,
     })
     if (url.pathname === '/v1/artists/lookup') return send({ artists: [{ id: 2, name: '原艺术家', type: 'person' }] })
@@ -71,14 +71,14 @@ export async function createMockAPI(port) {
       if (state.submissionFailure) return fail(409, state.submissionFailure)
       return send({ id: 99, requires_reconfirmation: false })
     }
-    if (url.pathname === '/v1/admin/content/work/1/deletion-impact') {
-      if (url.searchParams.get('song_ids[]') !== '11') return fail(422, 'VALIDATION_FAILED')
+    if (url.pathname === '/v1/admin/content/album/1/deletion-impact') {
+      if (url.searchParams.get('track_ids[]') !== '11') return fail(422, 'VALIDATION_FAILED')
       return send({ counts: [{ label: '曲目', count: 1 }], blockers: state.blockers, checksum: impactChecksum })
     }
     if (url.pathname === '/v1/revisions/7' && state.destructive) return send({
-      revision: { id: 7, resource_type: 'work', resource_id: 1, action: 'update', title: '删除误录曲目', status: 'pending',
-        data: { related_songs: [] }, requires_reconfirmation: false, requires_content_manage: true, impact_checksum: impactChecksum },
-      previous: { data: { related_songs: [{ id: 11 }] }, checksum: baseline },
+      revision: { id: 7, resource_type: 'album', resource_id: 1, action: 'update', title: '删除误录曲目', status: 'pending',
+        data: { related_tracks: [] }, requires_reconfirmation: false, requires_content_manage: true, impact_checksum: impactChecksum },
+      previous: { data: { related_tracks: [{ id: 11 }] }, checksum: baseline },
     })
     if (url.pathname === '/v1/revisions/7') return send({
       revision: { id: 7, resource_type: 'franchise', resource_id: 4, action: 'update', title: '测试系列修订', status: state.revisionStatus,
@@ -89,7 +89,7 @@ export async function createMockAPI(port) {
       if (state.dashboardFailure) return fail(500, 'INTERNAL_ERROR')
       const data = {
         generated_at: '2026-10-16T00:00:00Z',
-        metrics: ['users', 'works', 'artists', 'entries', 'franchises', 'songs', 'reviews', 'articles', 'lyrics', 'events'].map(key => ({ key, total: 10, new_7: 2, new_30: 4, daily: Array.from({ length: 30 }, (_, i) => ({ date: `2026-09-${String(i + 1).padStart(2, '0')}`, count: i % 3 })) })),
+        metrics: ['users', 'albums', 'artists', 'entries', 'franchises', 'tracks', 'reviews', 'articles', 'lyrics', 'events'].map(key => ({ key, total: 10, new_7: 2, new_30: 4, daily: Array.from({ length: 30 }, (_, i) => ({ date: `2026-09-${String(i + 1).padStart(2, '0')}`, count: i % 3 })) })),
       }
       if (permissions[token]?.includes('revisions.view')) data.pending_revisions = 1
       if (permissions[token]?.includes('audit.view')) data.recent_actions = [{ id: 1, actor_name: 'admin', action: 'users.update', reason: '审核资料', result: 'success', created_at: '2026-10-16T00:00:00Z' }]
@@ -116,7 +116,7 @@ export async function createMockAPI(port) {
     }
     if (url.pathname === '/v1/admin/roles') return send(state.roleRecords.map(role => ({ ...role, users_count: role.name === state.role || role.name === 'founder' ? 1 : 0, can_manage: role.name !== 'founder' && token === 'founder', can_delete: !['founder', 'member'].includes(role.name) && token === 'founder' })))
     if (url.pathname === '/v1/admin/users/2' && req.method === 'GET') return send({
-      id: 2, username: 'member', nickname: '测试用户', email: 'member@example.test', birthday: '2000-01-01', avatar: null, banner: null, bio: '用户简介',
+      id: 2, username: 'member', nickname: '测试用户', email: 'member@example.test', birthday: '2000-01-01', avatar_url: null, banner_url: null, bio: '用户简介',
       status: state.userStatus, roles: state.role, role_names: [state.role], role_level: 0, can_manage: !state.userProtected, permissions: ['content.submit'], contributions_count: 3, reviews_count: 2,
       joined_at: '2026-01-01T00:00:00Z', last_seen_at: null,
       login_sessions: Array.from({ length: state.sessions }, () => ({ created_at: '2026-01-01T00:00:00Z', last_used_at: null })), login_sessions_total: state.sessions,
@@ -160,7 +160,7 @@ export async function createMockAPI(port) {
       state.revisionStatus = url.pathname.endsWith('reject') ? 'rejected' : 'approved'
       return send({})
     }
-    return send({ works: [], pagination: { total: 0, last_page: 1 }, stats: {}, entries: [], artists: [], franchises: [] })
+    return send({ albums: [], pagination: { total: 0, last_page: 1 }, stats: {}, entries: [], artists: [], franchises: [] })
   })
   await new Promise((resolve, reject) => {
     server.once('error', reject)

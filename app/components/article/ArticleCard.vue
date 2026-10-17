@@ -33,7 +33,7 @@ const date = computed(() => props.article.published_at ? new Intl.DateTimeFormat
       </div>
       <div class="flex items-center gap-2 border-t border-gray-50 pt-3 text-xs text-gray-400">
         <div class="grid size-5 shrink-0 place-items-center overflow-hidden rounded-full bg-violet-50 ring-1 ring-gray-100">
-          <img v-if="article.author?.avatar" :src="article.author.avatar" :alt="article.author.nickname ?? ''" class="size-full object-cover">
+          <img v-if="article.author?.avatar_url" :src="article.author.avatar_url" :alt="article.author.nickname ?? ''" class="size-full object-cover">
           <UserRound v-else :size="11" class="text-violet-400" />
         </div>
         <span class="truncate font-medium text-gray-500">{{ article.author?.nickname || article.author?.username }}</span>

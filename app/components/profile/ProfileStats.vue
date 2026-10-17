@@ -49,10 +49,10 @@ const totalCount = computed(() =>
 )
 
 const statCards = computed(() => [
-  { status: 1, label: t('tracking.status.plan_to_listen'), value: props.stats.plan_to_listen, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
-  { status: 2, label: t('tracking.status.completed'), value: props.stats.completed, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
-  { status: 3, label: t('tracking.status.wishlist'), value: props.stats.wishlist, icon: Bookmark, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
-  { status: 4, label: t('tracking.status.owned'), value: props.stats.owned, icon: Package, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
-  { status: 5, label: t('tracking.status.dropped'), value: props.stats.dropped, icon: XCircle, iconBg: 'bg-rose-50', iconColor: 'text-rose-600' }
+  { status: 'plan_to_listen', label: t('tracking.status.plan_to_listen'), value: props.stats.plan_to_listen, icon: Headphones, iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
+  { status: 'completed', label: t('tracking.status.completed'), value: props.stats.completed, icon: CheckCircle, iconBg: 'bg-emerald-50', iconColor: 'text-emerald-600' },
+  { status: 'wishlist', label: t('tracking.status.wishlist'), value: props.stats.wishlist, icon: Bookmark, iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+  { status: 'owned', label: t('tracking.status.owned'), value: props.stats.owned, icon: Package, iconBg: 'bg-indigo-50', iconColor: 'text-indigo-600' },
+  { status: 'dropped', label: t('tracking.status.dropped'), value: props.stats.dropped, icon: XCircle, iconBg: 'bg-rose-50', iconColor: 'text-rose-600' }
 ])
 </script>

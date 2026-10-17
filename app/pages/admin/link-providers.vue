@@ -8,7 +8,7 @@ const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 const { data, pending, error, refresh } = await useAsyncData('admin-link-providers', () => $api<AdminLinkProvider[]>('/v1/admin/link-providers'))
 
-const empty = () => ({ id: 0, name: '', category: 'other', icon_url: '', url_pattern: '', display_order: 0 })
+const empty = () => ({ id: 0, name: '', category: 'other', icon_url: '', url_pattern: '', sort_order: 0 })
 const form = reactive(empty())
 const formOpen = ref(false)
 const busy = ref(false)
@@ -24,7 +24,7 @@ const save = async () => {
   busy.value = true
   message.value = ''
   try {
-    const body = { name: form.name, category: form.category, icon_url: form.icon_url || null, url_pattern: form.url_pattern || null, display_order: Number(form.display_order) || 0 }
+    const body = { name: form.name, category: form.category, icon_url: form.icon_url || null, url_pattern: form.url_pattern || null, sort_order: Number(form.sort_order) || 0 }
     await $api(form.id ? `/v1/admin/link-providers/${form.id}` : '/v1/admin/link-providers', { method: form.id ? 'PUT' : 'POST', body })
     formOpen.value = false
     notice.value = t('admin_pages.saved')
@@ -42,7 +42,7 @@ const deleteOpen = ref(false)
 const startDelete = async (provider: AdminLinkProvider) => {
   message.value = ''
   try {
-    impact.value = await $api<DeletionImpact>(`/v1/admin/content/link_provider/${provider.id}/deletion-impact`)
+    impact.value = await $api<DeletionImpact>(`/v1/admin/content/link-providers/${provider.id}/deletion-impact`)
     deleting.value = provider
     deleteOpen.value = true
   } catch (e) {
@@ -85,7 +85,7 @@ useHead({ title: computed(() => t('admin_pages.link_providers.title')) })
         <label class="block">{{ t('admin_pages.link_providers.category') }}<input v-model="form.category" required maxlength="50" pattern="[a-z0-9_\-]+" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"><span class="mt-1 block text-xs text-slate-500">{{ t('admin_pages.link_providers.category_help') }}</span></label>
         <label class="block">{{ t('admin_pages.link_providers.icon') }}<input v-model="form.icon_url" maxlength="2048" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
         <label class="block">{{ t('admin_pages.link_providers.pattern') }}<input v-model="form.url_pattern" maxlength="2048" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
-        <label class="block">{{ t('admin_pages.link_providers.order') }}<input v-model.number="form.display_order" type="number" min="0" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
+        <label class="block">{{ t('admin_pages.link_providers.order') }}<input v-model.number="form.sort_order" type="number" min="0" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
           <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="formOpen = false">{{ t('common.cancel') }}</button>
@@ -103,7 +103,7 @@ useHead({ title: computed(() => t('admin_pages.link_providers.title')) })
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="provider in data" :key="provider.id">
-                <td class="px-4 py-3 tabular-nums">{{ provider.display_order }}</td>
+                <td class="px-4 py-3 tabular-nums">{{ provider.sort_order }}</td>
                 <td class="px-4 py-3 font-medium">{{ provider.name }}<p v-if="provider.icon_url" class="truncate text-xs font-normal text-slate-500">{{ provider.icon_url }}</p></td>
                 <td class="px-4 py-3">{{ provider.category }}</td>
                 <td class="max-w-60 truncate px-4 py-3 font-mono text-xs">{{ provider.url_pattern || '—' }}</td>

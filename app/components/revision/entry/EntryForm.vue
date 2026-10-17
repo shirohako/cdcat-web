@@ -3,11 +3,11 @@ import { ArrowDown, ArrowUp, Trash2 } from '@lucide/vue'
 import type { EditableLink } from '~/components/revision/LinksEditor.vue'
 import type { PickedItem } from '~/components/revision/ContentPicker.vue'
 import {
-  DATE_PRECISIONS, ENTRY_FORMATS, ENTRY_RELATIONS, ENTRY_TYPES, ENTRY_WORK_RELATIONS,
-  type DatePrecision, type EntryDetail, type EntryRelation, type EntrySchema, type EntryType, type EntryWorkRelation, type Title,
+  DATE_PRECISIONS, ENTRY_FORMATS, ENTRY_RELATIONS, ENTRY_TYPES, ENTRY_ALBUM_RELATIONS,
+  type DatePrecision, type EntryDetail, type EntryRelation, type EntrySchema, type EntryType, type EntryAlbumRelation, type Title,
 } from '~/types/entry'
 
-interface WorkRow { id: number, relation_type: EntryWorkRelation, character_name: string, episode: string, note: string }
+interface AlbumRow { id: number, relation_type: EntryAlbumRelation, character_name: string, episode: string, note: string }
 interface RelationRow { id: number, relation_type: EntryRelation, note: string }
 
 const props = defineProps<{
@@ -20,7 +20,7 @@ const props = defineProps<{
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()
-const { typeLabel, formatLabel, relationLabel, workRelationLabel } = useEntryDisplay()
+const { typeLabel, formatLabel, relationLabel, albumRelationLabel } = useEntryDisplay()
 
 const isEditMode = computed(() => props.entryId !== undefined && props.entryId !== '')
 
@@ -45,7 +45,7 @@ const form = reactive({
   image_url: '',
   banner_url: '',
   links: [] as EditableLink[],
-  works: [] as WorkRow[],
+  albums: [] as AlbumRow[],
   relations: [] as RelationRow[],
 })
 const metaText = ref('{}')
@@ -53,9 +53,9 @@ const metaError = ref('')
 const errors = reactive<{ titles?: string }>({})
 const original = ref<string>()
 
-// Names of linked works and entries; the schema only carries ids.
+// Names of linked albums and entries; the schema only carries ids.
 const labels = reactive<Record<string, { label: string, image_url: string | null }>>({})
-const labelOf = (kind: 'work' | 'entry', id: number) => labels[`${kind}:${id}`]
+const labelOf = (kind: 'album' | 'entry', id: number) => labels[`${kind}:${id}`]
 
 const formats = computed(() => ENTRY_FORMATS[form.type] || [])
 const hasPlatforms = computed(() => form.type === 'game')
@@ -95,7 +95,7 @@ const payload = computed(() => {
     links: form.links
       .filter(link => link.link_provider_id !== '' && link.url.trim())
       .map(link => ({ ...(link.id ? { id: link.id } : {}), link_provider_id: Number(link.link_provider_id), url: link.url.trim(), ...(link.meta ? { meta: link.meta } : {}) })),
-    related_works: form.works.map(row => ({
+    related_albums: form.albums.map(row => ({
       id: row.id,
       relation_type: row.relation_type,
       character_name: row.character_name.trim() || null,
@@ -122,7 +122,7 @@ const init = (data: EntrySchema) => {
   form.banner_url = data.banner_url || ''
   metaText.value = JSON.stringify(data.meta || {}, null, 2)
   form.links = (data.links || []).map(link => ({ id: link.id, link_provider_id: link.link_provider_id ?? '', url: link.url || '', meta: link.meta ?? null }))
-  form.works = (data.related_works || []).map(row => ({
+  form.albums = (data.related_albums || []).map(row => ({
     id: Number(row.id), relation_type: row.relation_type || 'other', character_name: row.character_name || '', episode: row.episode == null ? '' : String(row.episode), note: row.note || '',
   }))
   form.relations = (data.related_entries || []).map(row => ({ id: Number(row.id), relation_type: row.relation_type || 'related', note: row.note || '' }))
@@ -139,16 +139,16 @@ onMounted(async () => {
   if (!isEditMode.value) return
   try {
     const entry = await $api<EntryDetail>(`/v1/entries/${props.entryId}`)
-    for (const work of entry.works) labels[`work:${work.id}`] = { label: work.title, image_url: work.image_url }
+    for (const album of entry.albums) labels[`album:${album.id}`] = { label: album.title, image_url: album.image_url }
     for (const related of entry.related_entries) labels[`entry:${related.id}`] = { label: related.name, image_url: related.image_url }
   } catch {
     // Rows still show their ids.
   }
 })
 
-const addWork = (item: PickedItem) => {
-  labels[`work:${item.id}`] = { label: item.label, image_url: item.image_url }
-  form.works.push({ id: item.id, relation_type: 'ost', character_name: '', episode: '', note: '' })
+const addAlbum = (item: PickedItem) => {
+  labels[`album:${item.id}`] = { label: item.label, image_url: item.image_url }
+  form.albums.push({ id: item.id, relation_type: 'ost', character_name: '', episode: '', note: '' })
 }
 const addRelation = (item: PickedItem) => {
   labels[`entry:${item.id}`] = { label: item.label, image_url: item.image_url }
@@ -163,7 +163,7 @@ function move<T>(list: T[], index: number, offset: number) {
 
 const selfId = computed(() => Number(props.entryId) || 0)
 const excludedEntries = computed(() => [selfId.value])
-const excludedWorks = computed(() => form.works.map(row => row.id))
+const excludedAlbums = computed(() => form.albums.map(row => row.id))
 
 const validate = () => {
   errors.titles = undefined
@@ -190,7 +190,7 @@ const validate = () => {
 
 <template>
   <div class="space-y-6 rounded-xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
-    <RevisionSeriesCreateTabs v-model="currentTab" :tabs="tabs" />
+    <RevisionFranchiseCreateTabs v-model="currentTab" :tabs="tabs" />
 
     <!-- 基础信息 -->
     <div v-show="currentTab === 'basic'" class="space-y-6">
@@ -261,23 +261,23 @@ const validate = () => {
     <div v-show="currentTab === 'relations'" class="space-y-8">
       <section class="space-y-3">
         <div>
-          <h3 class="font-medium text-gray-900">{{ $t('catalog.form.related_works') }}</h3>
-          <p class="text-xs text-gray-500">{{ $t('catalog.form.related_works_hint') }}</p>
+          <h3 class="font-medium text-gray-900">{{ $t('catalog.form.related_albums') }}</h3>
+          <p class="text-xs text-gray-500">{{ $t('catalog.form.related_albums_hint') }}</p>
         </div>
-        <RevisionContentPicker kind="work" :exclude="excludedWorks" :placeholder="$t('catalog.form.search_work')" @select="addWork" />
-        <div v-for="(row, index) in form.works" :key="`work-${row.id}`" class="rounded-lg border border-gray-200 p-3">
+        <RevisionContentPicker kind="album" :exclude="excludedAlbums" :placeholder="$t('catalog.form.search_album')" @select="addAlbum" />
+        <div v-for="(row, index) in form.albums" :key="`album-${row.id}`" class="rounded-lg border border-gray-200 p-3">
           <div class="flex items-center gap-3">
-            <img v-if="labelOf('work', row.id)?.image_url" :src="labelOf('work', row.id)!.image_url!" alt="" class="h-10 w-10 rounded object-cover" >
-            <NuxtLink :to="`/works/${row.id}`" target="_blank" class="min-w-0 flex-1 truncate text-sm font-medium hover:text-primary">
-              {{ labelOf('work', row.id)?.label || $t('catalog.form.unknown_item', { id: row.id }) }}
+            <img v-if="labelOf('album', row.id)?.image_url" :src="labelOf('album', row.id)!.image_url!" alt="" class="h-10 w-10 rounded object-cover" >
+            <NuxtLink :to="`/albums/${row.id}`" target="_blank" class="min-w-0 flex-1 truncate text-sm font-medium hover:text-primary">
+              {{ labelOf('album', row.id)?.label || $t('catalog.form.unknown_item', { id: row.id }) }}
             </NuxtLink>
-            <button type="button" class="btn btn-ghost btn-xs text-gray-400 hover:text-error" :aria-label="$t('catalog.form.remove')" @click="form.works.splice(index, 1)">
+            <button type="button" class="btn btn-ghost btn-xs text-gray-400 hover:text-error" :aria-label="$t('catalog.form.remove')" @click="form.albums.splice(index, 1)">
               <Trash2 class="h-4 w-4" />
             </button>
           </div>
           <div class="mt-2 grid grid-cols-1 gap-2 md:grid-cols-4">
             <select v-model="row.relation_type" class="select select-bordered select-sm w-full" :aria-label="$t('catalog.form.relation_type')">
-              <option v-for="relation in ENTRY_WORK_RELATIONS" :key="relation" :value="relation">{{ workRelationLabel(relation) }}</option>
+              <option v-for="relation in ENTRY_ALBUM_RELATIONS" :key="relation" :value="relation">{{ albumRelationLabel(relation) }}</option>
             </select>
             <input v-model="row.character_name" type="text" class="input input-bordered input-sm w-full" :placeholder="$t('catalog.form.character_name')" >
             <input v-model="row.episode" type="number" min="0" class="input input-bordered input-sm w-full" :placeholder="$t('catalog.form.episode')" >

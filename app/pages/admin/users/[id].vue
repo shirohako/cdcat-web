@@ -11,11 +11,11 @@ const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, 
 const id = computed(() => String(route.params.id))
 const { data: user, pending, error, refresh } = await useAsyncData(() => `admin-user-${id.value}`, () => $api<AdminUserDetail>(`/v1/admin/users/${id.value}`), { watch: [id] })
 const canManage = computed(() => hasPermission('users.manage') && Boolean(user.value?.can_manage))
-const profile = reactive({ username: '', nickname: '', email: '', birthday: '', avatar: '', banner: '', bio: '' })
+const profile = reactive({ username: '', nickname: '', email: '', birthday: '', avatar_url: '', banner_url: '', bio: '' })
 const fields = [
   { key: 'username', type: 'text', required: true }, { key: 'nickname', type: 'text', required: true },
   { key: 'email', type: 'email', required: true }, { key: 'birthday', type: 'date', required: true },
-  { key: 'avatar', type: 'url', required: false }, { key: 'banner', type: 'url', required: false },
+  { key: 'avatar_url', type: 'url', required: false }, { key: 'banner_url', type: 'url', required: false },
 ] as const
 watch(user, value => {
   if (value) for (const key of Object.keys(profile) as (keyof typeof profile)[]) profile[key] = value[key] ?? ''
@@ -29,7 +29,7 @@ const save = async () => {
   busy.value = true
   notice.value = ''
   try {
-    await $api(`/v1/admin/users/${id.value}`, { method: 'PUT', body: { ...profile, avatar: profile.avatar || null, banner: profile.banner || null, bio: profile.bio || null } })
+    await $api(`/v1/admin/users/${id.value}`, { method: 'PUT', body: { ...profile, avatar_url: profile.avatar_url || null, banner_url: profile.banner_url || null, bio: profile.bio || null } })
     await refresh()
     failure.value = false; notice.value = t('admin_pages.saved')
   } catch (error) { showError(error) }
@@ -47,7 +47,7 @@ const { data: activity, pending: activityPending, error: activityError, refresh:
 const activityLink = (item: AdminUserActivity) => {
   if (activityType.value === 'revisions') return hasPermission('revisions.view') ? `/revisions/${item.id}` : null
   if (activityType.value === 'articles') return item.status === 'published' ? `/articles/${item.id}` : null
-  return item.work_id ? `/works/${item.work_id}` : null
+  return item.album_id ? `/albums/${item.album_id}` : null
 }
 const selectType = (type: ActivityType) => router.push({ query: { ...route.query, type, page: undefined } })
 const { data: roles, pending: rolesPending, error: rolesError, refresh: refreshRoles } = await useAsyncData('admin-user-role-options', () => hasPermission('users.assign-roles') ? $api<AdminRole[]>('/v1/admin/roles') : Promise.resolve([]))
@@ -66,7 +66,7 @@ const confirmAction = async (reason: string) => {
   busy.value = true
   actionError.value = ''
   try {
-    if (action.value === 'enable' || action.value === 'disable') await $api(`/v1/admin/users/${id.value}`, { method: 'PUT', body: { status: action.value === 'enable', reason } })
+    if (action.value === 'enable' || action.value === 'disable') await $api(`/v1/admin/users/${id.value}`, { method: 'PUT', body: { is_active: action.value === 'enable', reason } })
     else if (action.value === 'role') await $api(`/v1/admin/users/${id.value}/role`, { method: 'PUT', body: { role: selectedRole.value || null, reason: reason || null } })
     else {
       const paths = { revoke: 'revoke-tokens', send_reset: 'send-reset', clear_limit: 'clear-verification-limit' }
@@ -90,7 +90,7 @@ useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
     <AdminListState :pending="pending" :error="error" @retry="refresh()">
       <template v-if="user">
         <section class="rounded-xl border border-slate-200 bg-white p-5">
-          <div class="flex flex-wrap items-start justify-between gap-4"><div><h2 class="text-lg font-semibold">{{ t('admin_pages.user_detail.profile') }}</h2><p class="mt-2 text-sm text-slate-600">@{{ user.username }} · {{ user.roles || t('admin_pages.users.no_role') }} · {{ t(user.status ? 'admin_pages.users.active' : 'admin_pages.users.disabled') }}</p></div><dl class="flex gap-6 text-sm"><div><dt class="text-slate-500">{{ t('admin_pages.user_detail.contributions') }}</dt><dd class="mt-1 text-2xl font-semibold">{{ user.contributions_count }}</dd></div><div><dt class="text-slate-500">{{ t('admin_pages.user_detail.reviews') }}</dt><dd class="mt-1 text-2xl font-semibold">{{ user.reviews_count }}</dd></div></dl></div>
+          <div class="flex flex-wrap items-start justify-between gap-4"><div><h2 class="text-lg font-semibold">{{ t('admin_pages.user_detail.profile') }}</h2><p class="mt-2 text-sm text-slate-600">@{{ user.username }} · {{ user.roles || t('admin_pages.users.no_role') }} · {{ t(user.is_active ? 'admin_pages.users.active' : 'admin_pages.users.disabled') }}</p></div><dl class="flex gap-6 text-sm"><div><dt class="text-slate-500">{{ t('admin_pages.user_detail.contributions') }}</dt><dd class="mt-1 text-2xl font-semibold">{{ user.contributions_count }}</dd></div><div><dt class="text-slate-500">{{ t('admin_pages.user_detail.reviews') }}</dt><dd class="mt-1 text-2xl font-semibold">{{ user.reviews_count }}</dd></div></dl></div>
           <p v-if="!canManage" class="mt-4 text-sm text-amber-800">{{ t('admin_pages.user_detail.protected') }}</p>
           <p v-if="user.role_names.length > 1" class="mt-4 text-sm text-amber-800">{{ t('admin_pages.user_detail.legacy_roles') }}</p>
           <form class="mt-6 space-y-5" @submit.prevent="save">
@@ -99,7 +99,7 @@ useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
             <button v-if="canManage" type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-50">{{ t('admin_pages.user_detail.save_profile') }}</button>
           </form>
           <div v-if="canManage" class="mt-6 flex flex-wrap gap-3 border-t pt-5 text-sm">
-            <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction(user.status ? 'disable' : 'enable')">{{ t(user.status ? 'admin_pages.user_detail.disable' : 'admin_pages.user_detail.enable') }}</button>
+            <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction(user.is_active ? 'disable' : 'enable')">{{ t(user.is_active ? 'admin_pages.user_detail.disable' : 'admin_pages.user_detail.enable') }}</button>
             <button v-if="hasPermission('users.assign-roles')" type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction('role')">{{ t('admin_pages.users.assign_role') }}</button>
             <button v-for="operation in (['revoke', 'send_reset', 'clear_limit'] as const)" :key="operation" type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction(operation)">{{ t(`admin_pages.user_detail.${operation}`) }}</button>
           </div>

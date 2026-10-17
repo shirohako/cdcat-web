@@ -3,7 +3,7 @@
     <NuxtLink :to="`/profile/${author.username}`" class="group">
       <div class="w-16 h-16 rounded-full bg-violet-50 flex items-center justify-center overflow-hidden mx-auto mb-3
                   ring-4 ring-violet-100 group-hover:ring-violet-300 transition-all duration-200">
-        <img v-if="author.avatar" :src="author.avatar" :alt="author.nickname" class="w-full h-full object-cover" />
+        <img v-if="author.avatar_url" :src="author.avatar_url" :alt="author.nickname" class="w-full h-full object-cover" />
         <UserRound v-else :size="28" class="text-violet-400" />
       </div>
       <p class="font-semibold text-gray-800 group-hover:text-violet-600 transition-colors text-sm">

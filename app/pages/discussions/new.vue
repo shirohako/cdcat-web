@@ -4,7 +4,7 @@ import type { ContentLinkSummary, ContentLinkType, TagSummary } from '~/types/ar
 import type { DiscussionCategoryDetail, DiscussionReferences } from '~/types/discussion'
 
 /**
- * Starts a topic. `?category=` preselects the category and `?link=work:123` links
+ * Starts a topic. `?category=` preselects the category and `?link=album:123` links
  * the content the reader came from. The category's template prefills the text,
  * and everything is kept as a local draft until it is posted.
  */
@@ -30,10 +30,10 @@ onMounted(async () => {
   load()
   const fromQuery = Number(route.query.category)
   if (fromQuery && choices.value.some(category => category.id === fromQuery)) draft.value.category_id = fromQuery
-  const link = /^(work|artist|entry|series|event):(\d+)$/.exec(String(route.query.link ?? ''))
+  const link = /^(album|artist|entry|series|event):(\d+)$/.exec(String(route.query.link ?? ''))
   if (link && !draft.value.links.some(item => item.type === link[1] && item.id === Number(link[2]))) {
     try {
-      const plural = { work: 'works', artist: 'artists', entry: 'entries', series: 'series', event: 'events' }[link[1] as ContentLinkType]
+      const plural = { album: 'albums', artist: 'artists', entry: 'entries', franchise: 'franchises', event: 'events' }[link[1] as ContentLinkType]
       const response = await $api<{ references: DiscussionReferences }>('/v1/discussions/references', { method: 'POST', body: { raw: `[[${link[1]}:${link[2]}]]` } })
       const item = response.references[plural]?.[link[2]!] as ContentLinkSummary | undefined
       if (item) draft.value.links = [...draft.value.links, { type: link[1] as ContentLinkType, id: Number(link[2]), title: item.title, image_url: item.image_url ?? null, date: item.date ?? null, kind: item.kind ?? null }]
