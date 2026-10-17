@@ -10,7 +10,7 @@ const { data, pending, error, refresh } = await useAsyncData(() => `admin-role-$
   if (!role) throw createError({ statusCode: 404 })
   return { role, catalog }
 }, { watch: [() => route.params.id] })
-useHead({ title: computed(() => `${t('admin_pages.roles.edit')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.roles.edit')) })
 </script>
 
 <template>

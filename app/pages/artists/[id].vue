@@ -118,6 +118,9 @@
           </div>
         </div>
       </section>
+
+      <ArticleRelatedArticles v-if="artist" :id="artist.id" class="mt-6" type="artist" />
+      <DiscussionRelatedDiscussions v-if="artist" :id="artist.id" class="mt-6" type="artist" />
     </main>
   </div>
 </template>

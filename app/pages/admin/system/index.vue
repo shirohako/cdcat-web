@@ -64,7 +64,7 @@ const sendTestMail = async () => {
   }
 }
 onUnmounted(() => { if (poll) clearTimeout(poll) })
-useHead({ title: computed(() => `${t('admin_pages.system.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.system.title')) })
 </script>
 
 <template>

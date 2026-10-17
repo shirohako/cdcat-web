@@ -13,8 +13,8 @@
         <!-- Mobile Menu Toggle -->
         <button
           class="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-          @click="toggleMobileMenu"
           aria-label="Toggle mobile menu"
+          @click="toggleMobileMenu"
         >
           <Icon name="lucide:menu" class="w-5 h-5 text-gray-700" />
         </button>
@@ -22,8 +22,8 @@
         <!-- Desktop Sidebar Toggle -->
         <button
           class="hidden lg:block p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
-          @click="toggleSidebar"
           aria-label="Toggle sidebar"
+          @click="toggleSidebar"
         >
           <Icon
             :name="isCollapsed ? 'lucide:panel-left-open' : 'lucide:panel-left-close'"
@@ -53,8 +53,8 @@
         <div class="relative">
           <button
             class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
-            @click="toggleLanguageMenu"
             aria-label="Switch language"
+            @click="toggleLanguageMenu"
           >
             <Icon
               name="lucide:languages"
@@ -70,19 +70,19 @@
                      overflow-hidden"
             >
               <button
-                v-for="locale in availableLocales"
-                :key="locale.code"
-                @click="switchLanguage(locale.code)"
+                v-for="option in availableLocales"
+                :key="option.code"
                 :class="[
                   'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors duration-150',
-                  currentLocale === locale.code
+                  currentLocale === option.code
                     ? 'bg-gray-900 text-white'
                     : 'text-gray-700 hover:bg-gray-50'
                 ]"
+                @click="switchLanguage(option.code)"
               >
-                <span>{{ locale.name }}</span>
+                <span>{{ option.name }}</span>
                 <Icon
-                  v-if="currentLocale === locale.code"
+                  v-if="currentLocale === option.code"
                   name="lucide:check"
                   class="w-4 h-4"
                 />
@@ -91,13 +91,15 @@
           </transition>
         </div>
 
+        <NotificationBell v-if="isAuthenticated" />
+
         <!-- User Menu or Login/Register Buttons -->
         <div v-if="isAuthenticated" class="relative">
           <button
             class="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg
                    transition-colors duration-200 group"
-            @click="toggleUserMenu"
             aria-label="User menu"
+            @click="toggleUserMenu"
           >
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden
@@ -154,9 +156,9 @@
               </div>
               <div class="border-t border-gray-200">
                 <button
-                  @click="handleLogout"
                   class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600
                          hover:bg-red-50 transition-colors duration-150"
+                  @click="handleLogout"
                 >
                   <Icon name="lucide:log-out" class="w-4 h-4" />
                   <span>{{ $t('user.logout') }}</span>
@@ -189,7 +191,7 @@
       v-if="showLanguageMenu || showUserMenu"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
-    ></div>
+    />
   </header>
 </template>
 

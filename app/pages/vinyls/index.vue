@@ -14,7 +14,8 @@
 </template>
 
 <script setup>
+const { t } = useI18n()
 useHead({
-  title: 'Vinyl | CDCAT'
+  title: computed(() => t('menu.vinyl'))
 })
 </script>

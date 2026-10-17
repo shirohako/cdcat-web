@@ -19,7 +19,7 @@ const { data: log, pending: logPending, error: logError, refresh: refreshLog } =
 const levels = ['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency']
 const levelClass = (value: string) => ['error', 'critical', 'alert', 'emergency'].includes(value) ? 'text-red-700' : value === 'warning' ? 'text-amber-700' : 'text-slate-500'
 const size = (bytes: number) => bytes > 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.ceil(bytes / 1024)} KB`
-useHead({ title: computed(() => `${t('admin_pages.system.logs')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.system.logs')) })
 </script>
 
 <template>

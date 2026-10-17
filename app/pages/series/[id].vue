@@ -116,6 +116,9 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
               </NuxtLink>
             </div>
           </section>
+
+          <ArticleRelatedArticles :id="series.id" type="series" />
+          <DiscussionRelatedDiscussions :id="series.id" type="series" />
         </div>
 
         <section v-if="currentTab === 'works'" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">

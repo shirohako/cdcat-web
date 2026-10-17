@@ -10,11 +10,16 @@ export type AdminGroupKey = typeof adminGroups[number]['key']
 
 export interface AdminMenuItem {
   path: string
-  permission: string
+  /** One permission, or several of which any one is enough. */
+  permission: string | string[]
   label: string
   icon: string
   group: AdminGroupKey
 }
+
+/** Whether `has` grants a menu entry's permission (any one of a list). */
+export const allowedBy = (permission: string | string[], has: (name: string) => boolean) =>
+  Array.isArray(permission) ? permission.some(has) : has(permission)
 
 /** Sidebar entries in display order; the route guard reads the permission of the longest matching path. */
 export const adminMenu: AdminMenuItem[] = [
@@ -29,6 +34,12 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
   { path: '/admin/reviews', permission: 'reviews.manage', label: 'admin_pages.reviews.title', icon: 'lucide:message-square', group: 'community' },
   { path: '/admin/articles', permission: 'articles.manage', label: 'admin_pages.articles.title', icon: 'lucide:newspaper', group: 'community' },
+  { path: '/admin/reports', permission: ['articles.manage', 'discussions.moderate'], label: 'admin_pages.reports.title', icon: 'lucide:flag', group: 'community' },
+  { path: '/admin/discussions/categories', permission: 'discussions.manage', label: 'admin_pages.discussions.categories.title', icon: 'lucide:folder-tree', group: 'community' },
+  { path: '/admin/discussions/posts', permission: 'discussions.moderate', label: 'admin_pages.discussions.posts.title', icon: 'lucide:messages-square', group: 'community' },
+  { path: '/admin/discussions/restrictions', permission: 'discussions.moderate', label: 'admin_pages.discussions.restrictions.title', icon: 'lucide:mic-off', group: 'community' },
+  { path: '/admin/tags', permission: 'tags.manage', label: 'admin_pages.tags.title', icon: 'lucide:tags', group: 'community' },
+  { path: '/admin/word-filters', permission: 'filters.manage', label: 'admin_pages.word_filters.title', icon: 'lucide:shield-ban', group: 'community' },
   { path: '/admin/lyrics', permission: 'lyrics.manage', label: 'admin_pages.lyrics.title', icon: 'lucide:file-music', group: 'community' },
   { path: '/admin/users', permission: 'users.manage', label: 'admin_pages.users.title', icon: 'lucide:users', group: 'users' },
   { path: '/admin/roles', permission: 'roles.manage', label: 'admin_pages.roles.title', icon: 'lucide:shield-check', group: 'users' },

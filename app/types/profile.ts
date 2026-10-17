@@ -9,6 +9,8 @@ export interface PublicProfile {
   favorites: ProfileFavorites
   tracking: ProfileTracking
   reviews_count: number
+  discussion_topics_count: number
+  discussion_posts_count: number
   contributions_count: number
   favorite_works: ProfileFavoriteWork[]
   favorite_artists: ProfileFavoriteArtist[]

@@ -47,7 +47,7 @@ const updated = (key: string) => {
   return t('admin_pages.settings.updated', { time, name: meta.updated_by?.nickname || meta.updated_by?.username || '—' })
 }
 const input = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
-useHead({ title: computed(() => `${t('admin_pages.settings.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.settings.title')) })
 </script>
 
 <template>

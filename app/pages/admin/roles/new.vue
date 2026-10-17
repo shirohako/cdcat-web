@@ -4,7 +4,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const { data, pending, error, refresh } = await useAsyncData('admin-permission-catalog', () => $api<AdminPermission[]>('/v1/admin/permissions/catalog'))
-useHead({ title: computed(() => `${t('admin_pages.roles.create')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.roles.create')) })
 </script>
 
 <template>

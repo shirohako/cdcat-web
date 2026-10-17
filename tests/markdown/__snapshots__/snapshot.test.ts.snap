@@ -1,0 +1,121 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`all-syntax fixture > lists unchanged headings 1`] = `
+[
+  {
+    "id": "標題-title",
+    "level": 1,
+    "line": 0,
+    "text": "標題 Title",
+  },
+  {
+    "id": "東方-紅魔郷",
+    "level": 2,
+    "line": 2,
+    "text": "東方 紅魔郷",
+  },
+  {
+    "id": "東方-紅魔郷-1",
+    "level": 2,
+    "line": 4,
+    "text": "東方 紅魔郷",
+  },
+  {
+    "id": "ünïcødé--symbols",
+    "level": 3,
+    "line": 6,
+    "text": "Ünïcødé & symbols!",
+  },
+]
+`;
+
+exports[`all-syntax fixture > renders unchanged 1`] = `
+"<h1 id="標題-title">標題 Title</h1>
+<h2 id="東方-紅魔郷">東方 紅魔郷</h2>
+<h2 id="東方-紅魔郷-1">東方 紅魔郷</h2>
+<h3 id="ünïcødé--symbols">Ünïcødé &amp; symbols!</h3>
+<h4>!!!</h4>
+<p>Paragraph with <strong>bold</strong>, <em>italic</em>, <s>strike</s>, <mark>mark</mark>, <code>code</code>, <span class="markdown-inline-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="Click to reveal inline spoiler"><span class="markdown-inline-spoiler-content">spoiler <strong>nested</strong></span></span>, <a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">link</a>, an autolink <a href="https://example.org" target="_blank" rel="nofollow ugc noopener noreferrer">https://example.org</a> and <a href="mailto:foo@example.com" target="_blank" rel="nofollow ugc noopener noreferrer">foo@example.com</a>.<br>
+A soft line break<br>
+continues here.</p>
+<p><span class="markdown-text-color text-rose-600">Red <strong>text</strong></span> <span class="markdown-text-size text-lg">Large</span> <span class="markdown-text-underline markdown-underline-blue">Underlined</span> <span class="markdown-text-color text-violet-600 markdown-text-size text-xl markdown-text-underline markdown-underline-green">Combo</span><br>
+<span class="markdown-text-size text-lg">Outer <span class="markdown-text-color text-rose-600">inner</span></span> [unknown]{color=nope} [handler]{onclick=alert(1)} <span class="markdown-text-color text-rose-600">Outer <span class="markdown-inline-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="Click to reveal inline spoiler"><span class="markdown-inline-spoiler-content">hidden <strong>bold</strong></span></span></span></p>
+<p><img src="/logo.png" alt="Logo" class="markdown-sized-image" width="320" height="180" loading="lazy" referrerpolicy="no-referrer"> <img src="https://example.com/a.png" alt="Too wide" loading="lazy" referrerpolicy="no-referrer">{width=99999} <img src="https://example.com/b.png" alt="Plain" loading="lazy" referrerpolicy="no-referrer"></p>
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox" checked=""type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Done</label></li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Pending <strong>bold</strong> and <span class="markdown-text-color text-rose-600 markdown-text-size text-lg">Styled <strong>nested</strong></span></label></li>
+<li>plain item
+<ul>
+<li>nested item</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>one</li>
+<li>two</li>
+</ol>
+<blockquote>
+<p>quote<br>
+continues</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Column A</th>
+<th style="text-align:center">Column B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td style="text-align:center"><strong>2</strong></td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-js">const x = '&lt;b&gt;not bold&lt;/b&gt;'
+</code></pre>
+<div class="markdown-container markdown-container-callout border-sky-200 bg-sky-50/80 text-sky-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-sky-500 text-white" aria-hidden="true">i</span><strong>Information</strong></div><div class="markdown-container-body">
+<p>Info body</p>
+</div></div>
+<div class="markdown-container markdown-container-callout border-emerald-200 bg-emerald-50/80 text-emerald-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-emerald-500 text-white" aria-hidden="true">✓</span><strong>Custom tip</strong></div><div class="markdown-container-body">
+<p>Tip body</p>
+</div></div>
+<div class="markdown-container markdown-container-callout border-amber-200 bg-amber-50/80 text-amber-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-amber-500 text-white" aria-hidden="true">!</span><strong>Warning</strong></div><div class="markdown-container-body">
+<p>Warning body</p>
+</div></div>
+<div class="markdown-container markdown-container-callout border-rose-200 bg-rose-50/80 text-rose-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-rose-500 text-white" aria-hidden="true">!</span><strong>&lt;img src=x onerror=alert(1)&gt;</strong></div><div class="markdown-container-body">
+<p>Danger body</p>
+</div></div>
+<details class="markdown-container markdown-container-details"><summary><span>Click to open</span></summary><div class="markdown-container-body">
+<p>Hidden body</p>
+</div></details>
+<details class="markdown-container markdown-container-details markdown-container-spoiler"><summary><span class="markdown-spoiler-icons" aria-hidden="true"><svg class="markdown-spoiler-eye markdown-spoiler-eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.73 7.9 7.23 5.5 12 5.5s8.27 2.4 9.94 6.15a1 1 0 0 1 0 .7C20.27 16.1 16.77 18.5 12 18.5s-8.27-2.4-9.94-6.15Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="markdown-spoiler-eye markdown-spoiler-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M6.7 6.7C4.6 8 3.1 9.8 2.1 12a1 1 0 0 0 0 .7c1.7 3.7 5.2 6.1 9.9 6.1 1.5 0 2.9-.2 4.1-.7"/><path d="M10.7 5.6c.4-.1.9-.1 1.3-.1 4.8 0 8.3 2.4 9.9 6.2a1 1 0 0 1 0 .7 12 12 0 0 1-2.1 3.1"/></svg></span><span>Ending</span></summary><div class="markdown-container-body">
+<p>Spoiler body</p>
+</div></details>
+<div class="markdown-container markdown-container-checklist" role="group" aria-label="必殺技"><div class="markdown-checklist-heading"><svg class="markdown-checklist-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 11 3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><strong>必殺技</strong><span class="markdown-checklist-progress" aria-live="polite" aria-label="1 of 2 completed"><span class="markdown-checklist-progress-value">1 / 2</span></span></div><div class="markdown-checklist-body">
+<ul class="contains-task-list">
+<li class="task-list-item enabled"><input class="task-list-item-checkbox" checked=""type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Learned</label></li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> **<strong>仁華**</strong> オシュト + ルクオン</label></li>
+</ul>
+</div></div>
+<div class="markdown-container markdown-container-steps" role="group" aria-label="Steps">
+<ol>
+<li>First</li>
+<li>Second</li>
+</ol>
+</div>
+<details class="markdown-container markdown-container-details"><summary><span>Outer</span></summary><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout border-amber-200 bg-amber-50/80 text-amber-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-amber-500 text-white" aria-hidden="true">!</span><strong>Inner</strong></div><div class="markdown-container-body">
+<p>Nested body</p>
+</div></div>
+</div></details>
+<p>::: unknown<br>
+Not a container<br>
+:::</p>
+<p>&lt;script&gt;alert(1)&lt;/script&gt;<br>
+&lt;div onclick=“x”&gt;raw html&lt;/div&gt;</p>
+<p>[js](javascript:alert(1)) [data](data:text/html,&lt;b&gt;x&lt;/b&gt;) [vb](vbscript:msgbox(1))</p>
+<p>“Smart quotes” – dashes… © ™ ±</p>
+<p>||unclosed spoiler</p>
+"
+`;

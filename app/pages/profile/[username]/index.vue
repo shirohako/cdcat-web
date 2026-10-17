@@ -31,6 +31,8 @@
                 <ProfileOverview :songs-count="profile.favorites.songs" :reviews-count="profile.reviews_count" :contributions-count="profile.contributions_count" @view-all-songs="activeView = 'songs'" />
                 <ProfileFavorites :works="profile.favorite_works" :total-count="profile.favorites.works" @view-all="activeView = 'favorites'" />
                 <ProfileArtists :artists="profile.favorite_artists" @view-all="activeView = 'artists'" />
+                <ProfileArticles :username="username" />
+                <ProfileDiscussions :username="username" :topics-count="profile.discussion_topics_count" :posts-count="profile.discussion_posts_count" />
               </template>
               <ProfileAllSongs v-else-if="activeView === 'songs'" :username="username" @back="activeView = 'default'" />
               <ProfileAllFavorites v-else-if="activeView === 'favorites'" :username="username" @back="activeView = 'default'" />
@@ -71,8 +73,8 @@ const { data: profile, pending, error } = await useAPI<PublicProfile>(
 
 useHead({
   title: computed(() => {
-    if (!profile.value) return 'CDCAT'
-    return `${profile.value.nickname || profile.value.username} | CDCAT`
+    if (!profile.value) return ''
+    return profile.value.nickname || profile.value.username
   })
 })
 

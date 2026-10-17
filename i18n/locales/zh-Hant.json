@@ -20,7 +20,9 @@
     "account": "帳戶設定",
     "login": "登入",
     "register": "註冊",
-    "logout": "登出"
+    "logout": "登出",
+    "articles": "我的文章",
+    "notifications": "通知"
   },
   "admin": {
     "console": "管理後台"
@@ -358,7 +360,8 @@
     "select_language_code": "請選擇或輸入語言代碼…",
     "use_custom_code": "使用自訂代碼",
     "search_language": "輸入關鍵字搜尋語言",
-    "no_more_matches": "沒有更多符合項目"
+    "no_more_matches": "沒有更多符合項目",
+    "retry": "重試"
   },
   "errors": {
     "request_failed": "要求失敗，請再試一次。",
@@ -383,7 +386,25 @@
       "artist_merge_impact_changed": "合併影響已變更，請重新預覽。",
       "registration_closed": "目前暫停註冊。",
       "operation_in_progress": "相同的操作正在進行，請稍後再試。",
-      "job_not_retryable": "此失敗任務無法在後台重試。"
+      "job_not_retryable": "此失敗任務無法在後台重試。",
+      "article_not_found": "文章不存在或尚未發布。",
+      "article_draft_conflict": "這篇草稿已在別處修改，請重新載入。",
+      "article_invalid_state": "文章目前的狀態不允許這個操作。",
+      "article_pending_limit": "你已有 3 篇文章在審核中，請等待審核結果。",
+      "content_blocked": "內容包含不允許的詞語。",
+      "already_reported": "你已經檢舉過，正在等待處理。",
+      "rate_limit_exceeded": "操作太頻繁，請稍後再試。",
+      "discussion_category_not_found": "版塊不存在。",
+      "discussion_topic_not_found": "主題不存在或已被刪除。",
+      "discussion_post_not_found": "貼文不存在或已被刪除。",
+      "discussion_topic_locked": "主題已鎖定，不能回覆或編輯。",
+      "discussion_category_closed": "這個版塊現在不能發主題。",
+      "discussion_silenced": "你已被禁言，暫時不能發帖。",
+      "discussion_duplicate_post": "剛剛已經發過同樣的內容了。",
+      "discussion_new_user_limit": "新使用者的貼文最多 2 個連結、不能插圖片、最多提及 3 人。",
+      "discussion_own_reaction": "不能給自己的貼文點表情。",
+      "discussion_topic_has_replies": "已經有其他人回覆，不能刪除主題。如需刪除請檢舉給版主。",
+      "user_block_not_allowed": "不能封鎖這個使用者。"
     }
   },
   "admin_pages": {
@@ -462,7 +483,202 @@
     "back_to_list": "返回文章列表",
     "word_count": "約 {count} 字",
     "reading_time": "閱讀時間約 {count} 分鐘",
-    "toc": "目錄"
+    "toc": "目錄",
+    "write": "寫文章",
+    "untitled": "無標題",
+    "featured": "編輯推薦",
+    "has_changes": "有未發布的修改",
+    "views": "{count} 次瀏覽",
+    "minutes": "{count} 分鐘",
+    "types": {
+      "review": "評測",
+      "feature": "專題",
+      "interview": "訪談",
+      "news": "資訊",
+      "guide": "指南",
+      "translation": "譯文",
+      "essay": "隨筆",
+      "other": "其他"
+    },
+    "statuses": {
+      "draft": "草稿",
+      "pending": "審核中",
+      "published": "已發布",
+      "rejected": "被退回",
+      "unpublished": "已下架"
+    },
+    "link_types": {
+      "work": "作品",
+      "artist": "藝術家",
+      "entry": "條目",
+      "series": "系列",
+      "event": "活動"
+    },
+    "fields": {
+      "title": "標題",
+      "type": "類型",
+      "tags": "標籤",
+      "summary": "摘要",
+      "summary_placeholder": "用一兩句話介紹這篇文章",
+      "summary_hint": "顯示在列表和分享卡片上；不填則取內文開頭。",
+      "cover": "封面",
+      "cover_https": "請填寫 https 開頭的圖片網址。",
+      "cover_preview": "封面預覽",
+      "cover_broken": "圖片無法載入，請檢查網址。",
+      "links": "關聯內容",
+      "links_hint": "文章會出現在這些作品、藝術家、條目、系列頁面的「相關文章」裡。",
+      "advanced": "進階設定",
+      "slug": "自訂連結",
+      "slug_hint": "選填。小寫字母、數字和連字號，會出現在文章網址的末尾。"
+    },
+    "links": {
+      "type": "內容類型",
+      "search": "搜尋{type}…",
+      "full": "最多關聯 {max} 個",
+      "no_results": "沒有找到。",
+      "search_failed": "搜尋失敗，請重試。",
+      "remove": "移除 {title}"
+    },
+    "tags": {
+      "filter": "篩選標籤…",
+      "full": "最多 {max} 個標籤",
+      "no_match": "沒有符合的標籤。",
+      "empty": "標籤庫還是空的。",
+      "remove": "移除 {name}"
+    },
+    "writer": {
+      "new_title": "寫文章",
+      "edit_title": "編輯文章",
+      "mode": "編輯模式",
+      "modes": {
+        "edit": "寫作",
+        "split": "分割",
+        "preview": "預覽"
+      },
+      "outline": "大綱",
+      "outline_empty": "用 ## 標題劃分段落後，這裡會顯示大綱。",
+      "saving": "儲存中…",
+      "unsaved": "有未儲存的修改",
+      "save_failed": "儲存失敗",
+      "not_saved": "尚未儲存",
+      "saved": "已儲存",
+      "saved_at": "已儲存 {time}",
+      "actions": {
+        "submit": "提交審核",
+        "resubmit": "重新提交",
+        "publish": "發布",
+        "publish_changes": "發布修改",
+        "withdraw": "撤回審核"
+      },
+      "discard": "放棄修改",
+      "discard_title": "放棄修改？",
+      "discard_description": "工作稿會被刪除，回到線上的版本。這一步無法復原。",
+      "discarded": "已放棄修改",
+      "withdrawn": "已撤回，可以繼續編輯",
+      "submitted": "已提交審核",
+      "published": "已發布",
+      "notice_pending": "文章正在審核中，暫時不能修改。需要修改時，請先撤回審核。",
+      "notice_rejected": "文章被退回：",
+      "notice_unpublished": "文章已被下架：",
+      "notice_published": "你正在編輯已發布的文章，點擊「發布修改」後才會取代線上內容。",
+      "backup_found": "發現一份 {time} 未儲存到伺服器的本機內容。",
+      "backup_restore": "還原",
+      "backup_dismiss": "捨棄",
+      "conflict_title": "草稿在別處被修改過",
+      "conflict_description": "伺服器上有一份 {time} 儲存的較新版本，可能來自另一個視窗。要保留哪一份？",
+      "conflict_keep_mine": "保留我的內容",
+      "conflict_use_server": "使用伺服器上的版本",
+      "leave_confirm": "還有內容沒有儲存成功，確定離開嗎？"
+    },
+    "submit": {
+      "submit_title": "提交審核",
+      "submit_description": "審核通過後文章才會公開。之後再修改無需審核。",
+      "submit_confirm": "提交",
+      "publish_title": "發布",
+      "publish_description": "內容會立即公開，舊版本會保留在版本紀錄裡。",
+      "publish_confirm": "發布",
+      "checks": {
+        "title": "標題 2–100 字",
+        "type": "選擇文章類型",
+        "content": "內文至少 300 字",
+        "summary": "填寫摘要",
+        "cover": "設定封面"
+      },
+      "optional": "建議",
+      "note": "給審核人的留言（選填）",
+      "note_placeholder": "例如資料來源、轉載授權等"
+    },
+    "errors": {
+      "title": "標題需要 2–100 字。",
+      "type": "請選擇文章類型。",
+      "content": "內文太短或太長。",
+      "summary": "摘要太長。",
+      "cover_url": "封面網址無效。",
+      "links": "有關聯的內容不存在。",
+      "tag_ids": "有標籤無法使用。",
+      "slug": "這個連結已被使用或格式不正確。",
+      "blocked": "內容包含不允許的詞語，請修改後再試。",
+      "pending_limit": "你已有 3 篇文章在審核中，請等待審核結果。",
+      "conflict": "草稿在別處被修改過，請選擇要保留的版本。",
+      "invalid_state": "文章目前的狀態不允許這個操作，請重新整理後再試。",
+      "revision": "草稿版本已過期，請重新整理後再試。",
+      "note": "留言最多 1000 字。"
+    },
+    "mine": {
+      "title": "我的文章",
+      "description": "草稿會自動儲存。第一次發布需要審核，之後的修改立即生效。",
+      "filter": "依狀態篩選",
+      "all": "全部",
+      "empty": "這裡還沒有文章。",
+      "reason": "原因：",
+      "updated": "更新於 {time}",
+      "view": "查看",
+      "deleted": "已刪除",
+      "delete_title": "刪除文章",
+      "delete_description": "「{title}」和它的所有版本都會被永久刪除。"
+    },
+    "list": {
+      "featured": "編輯推薦",
+      "all_types": "全部類型",
+      "all_tags": "全部標籤",
+      "sort": "排序",
+      "latest": "最新",
+      "popular": "最熱",
+      "search": "搜尋文章",
+      "no_match": "沒有符合條件的文章。"
+    },
+    "reader": {
+      "links": "關聯內容",
+      "updated": "更新於 {date}",
+      "manage": "管理",
+      "more_by": "{name} 的其他文章"
+    },
+    "report": {
+      "title": "檢舉",
+      "reason": "原因",
+      "reasons": {
+        "spam": "廣告",
+        "abuse": "人身攻擊或引戰",
+        "spoiler": "未標示劇透",
+        "infringement": "侵權（例如未經授權轉載）",
+        "illegal": "違法內容",
+        "other": "其他"
+      },
+      "note": "補充說明（選填）",
+      "note_required": "請說明檢舉原因",
+      "submit": "送出檢舉",
+      "done": "已收到你的檢舉，會盡快處理。",
+      "already": "你已經檢舉過這篇文章，正在等待處理。",
+      "too_many": "檢舉太頻繁，請稍後再試。"
+    },
+    "related": {
+      "title": "相關文章",
+      "all": "全部文章"
+    },
+    "profile": {
+      "title": "文章",
+      "all": "查看全部"
+    }
   },
   "collection_pages": {
     "favorites": {
@@ -471,7 +687,7 @@
       "works": "喜愛的專輯",
       "songs": "喜愛的歌曲",
       "artists": "喜愛的音樂人",
-      "seo_title": "我的收藏 | CDCAT"
+      "seo_title": "我的收藏"
     },
     "reviews": {
       "title": "我的評論",
@@ -487,7 +703,7 @@
       "delete_title": "刪除評論",
       "delete_confirm": "確定要刪除這則評論嗎？此操作無法復原。",
       "load_failed": "無法載入評論，請重新整理後再試。",
-      "seo_title": "我的評論 | CDCAT"
+      "seo_title": "我的評論"
     },
     "events": {
       "title": "活動",
@@ -950,13 +1166,24 @@
     },
     "notifications": {
       "title": "通知設定",
-      "description": "管理通知方式與接收偏好。",
-      "body": "通知設定功能正在開發中，上線後即可在此自訂通知方式與接收偏好。"
+      "description": "決定哪些動態會出現在站內通知裡。",
+      "reactions": "表情回應通知",
+      "reactions_help": "有人對你的貼文點表情時通知你。同一則貼文的回應會合併成一則。",
+      "saved": "已儲存",
+      "levels_hint": "主題和版塊的通知等級（關注、一般、靜音）在討論區對應頁面上設定。"
     },
     "privacy": {
       "title": "隱私設定",
       "description": "控制個人資料的顯示範圍與隱私。",
-      "body": "隱私設定功能正在開發中，上線後即可細部控制誰能查看你的資料。"
+      "blocks_title": "封鎖名單",
+      "blocks_description": "被封鎖的人的貼文會摺疊顯示，他發起的主題不出現在你的列表裡，他的回覆、提及和回應不會通知你。對方不會知道。",
+      "username_placeholder": "輸入使用者名稱",
+      "block": "封鎖",
+      "unblock": "解除封鎖",
+      "blocked": "已封鎖 {name}",
+      "unblocked": "已解除封鎖 {name}",
+      "blocked_on": "封鎖於 {date}",
+      "no_blocks": "你還沒有封鎖任何人。"
     },
     "danger": {
       "title": "危險操作",
@@ -1016,7 +1243,24 @@
       "stage": "舞台劇",
       "other": "其他"
     },
-    "format": "形式",
+    "format": {
+      "tv": "TV",
+      "movie": "劇場版",
+      "ova": "OVA",
+      "web": "WEB",
+      "special": "特別篇",
+      "full": "本體",
+      "dlc": "DLC",
+      "expansion": "資料片",
+      "series": "連續劇",
+      "novel": "小說",
+      "light_novel": "輕小說",
+      "other": "其他",
+      "serial": "連載",
+      "oneshot": "短篇",
+      "musical": "音樂劇",
+      "play": "話劇"
+    },
     "relation": {
       "sequel": "續作",
       "prequel": "前作",
@@ -1057,6 +1301,7 @@
     "search_placeholder": "搜尋名稱、別名、簡稱",
     "search": "搜尋",
     "type": "類型",
+    "format_label": "形式",
     "platforms": "平台",
     "episodes": "話數",
     "episodes_count": "{count} 話",
@@ -1187,6 +1432,348 @@
       "streaming": "串流",
       "social": "社群媒體",
       "other": "其他"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "bell_unread": "通知，{count} 則未讀",
+    "mark_all": "全部標為已讀",
+    "view_all": "查看全部通知",
+    "empty": "目前沒有通知",
+    "reason": "原因：",
+    "filters": {
+      "all": "全部",
+      "unread": "未讀"
+    },
+    "types": {
+      "article_approved": "你的文章「{title}」已通過審核並發布",
+      "article_rejected": "你的文章「{title}」被退回",
+      "article_unpublished": "你的文章「{title}」被下架",
+      "article_republished": "你的文章「{title}」已恢復上線",
+      "article_featured": "你的文章「{title}」被設為編輯推薦",
+      "article_edited": "版主編輯了你的文章「{title}」",
+      "article_deleted": "你的文章「{title}」被刪除",
+      "report_accepted": "你對「{title}」的檢舉已處理",
+      "report_dismissed": "你對「{title}」的檢舉經核實未處置",
+      "discussion_topic_reply": "{actor} 回覆了你的主題「{title}」",
+      "discussion_topic_reply_many": "{actor} 等 {count} 人回覆了你的主題「{title}」",
+      "discussion_watching": "{actor} 回覆了你關注的主題「{title}」",
+      "discussion_watching_many": "{actor} 等 {count} 人回覆了你關注的主題「{title}」",
+      "discussion_floor_reply": "{actor} 回覆了你在「{title}」的 #{floor}",
+      "discussion_reply": "{actor} 在「{title}」中回覆了你",
+      "discussion_mention": "{actor} 在「{title}」中提到了你",
+      "discussion_quote": "{actor} 在「{title}」中引用了你的貼文",
+      "discussion_reaction": "{actor} 回應了你在「{title}」的貼文",
+      "discussion_reaction_many": "{actor} 等 {count} 人回應了你在「{title}」的貼文",
+      "discussion_accepted": "你在「{title}」的回覆被採納為解答",
+      "discussion_new_topic": "{actor} 在你關注的版塊發佈了「{title}」",
+      "discussion_moderation": {
+        "hidden": "你在「{title}」的貼文被摺疊",
+        "deleted": "你在「{title}」的內容被刪除",
+        "edited": "版主編輯了你在「{title}」的內容",
+        "moved": "你的主題「{title}」被移動到其他版塊",
+        "silenced": "你在討論區被禁言"
+      }
+    },
+    "reason_line": "原因：{reason}"
+  },
+  "discussions": {
+    "title": "討論區",
+    "description": "聊專輯、找歌、分享收藏，也聊展會和資料庫編輯。",
+    "back": "返回討論區",
+    "breadcrumb": "位置",
+    "new_topic": "發起主題",
+    "categories": "版塊",
+    "all_topics": "全部主題",
+    "popular_tags": "熱門標籤",
+    "status": {
+      "pinned": "置頂",
+      "featured": "精華",
+      "locked": "已鎖定",
+      "solved": "已解決"
+    },
+    "list": {
+      "tabs": "主題列表",
+      "tab": {
+        "latest": "最新",
+        "new": "新帖",
+        "hot": "熱門",
+        "featured": "精華",
+        "unread": "未讀",
+        "watching": "關注"
+      },
+      "status": "解決狀態",
+      "status_all": "全部",
+      "status_unsolved": "未解決",
+      "status_solved": "已解決",
+      "empty": "這裡還沒有主題。",
+      "empty_unread": "沒有未讀的新回覆。",
+      "empty_watching": "你還沒有關注任何主題。",
+      "unread_count": "{count} 則新回覆",
+      "new_topic": "沒看過的主題"
+    },
+    "category": {
+      "topics": "{count} 個主題",
+      "question": "問答版塊：可以採納最佳解答",
+      "moderators_only": "只有版主能發主題",
+      "staff": "僅版主可見",
+      "archived": "已封存"
+    },
+    "tag": {
+      "label": "標籤"
+    },
+    "levels": {
+      "watching": "關注",
+      "normal": "一般",
+      "muted": "靜音",
+      "topic_help": {
+        "watching": "每則新回覆都通知我",
+        "normal": "只在有人回覆、提及或引用我時通知",
+        "muted": "不通知，也不出現在未讀裡"
+      },
+      "category_help": {
+        "watching": "有新主題時通知我",
+        "normal": "不通知",
+        "muted": "這個版塊的主題不出現在討論區首頁"
+      }
+    },
+    "fields": {
+      "title": "標題",
+      "category": "版塊",
+      "tags": "標籤",
+      "links": "關聯內容"
+    },
+    "topic": {
+      "replies": "{count} 回覆",
+      "views": "{count} 瀏覽",
+      "article": "文章：{title}",
+      "only_op": "只看樓主",
+      "newest_first": "倒序",
+      "jump": "跳到樓層",
+      "new_replies": "有 {count} 則新回覆，點擊查看",
+      "edit_title": "編輯主題",
+      "saved": "主題已更新",
+      "invalid": "標題要 4–120 個字。",
+      "delete": "刪除主題",
+      "delete_title": "刪除這個主題？",
+      "delete_help": "刪除後其他人將看不到這個主題。只有在沒有其他人回覆時才能刪除。",
+      "deleted": "主題已刪除",
+      "deleted_notice": "這個主題已被刪除（{reason}），只有版主能看到。",
+      "hidden_notice": "這個主題已被摺疊，不會出現在列表裡。"
+    },
+    "post": {
+      "op": "樓主",
+      "moderator": "版主",
+      "edited": "已編輯",
+      "reply": "回覆",
+      "quote": "引用",
+      "replied_to": "回覆",
+      "more": "更多操作",
+      "copy_link": "複製連結",
+      "link_copied": "連結已複製",
+      "bookmark": "收藏",
+      "unbookmark": "取消收藏",
+      "bookmarked": "已收藏",
+      "unbookmarked": "已取消收藏",
+      "history": "編輯紀錄",
+      "view_all_replies": "查看全部 {count} 則回覆",
+      "deleted": "已刪除",
+      "deleted_by_author": "該樓已被作者刪除",
+      "deleted_by_moderator": "該樓已被版主刪除",
+      "hidden": "該樓已被摺疊",
+      "hidden_reason": "該樓已被摺疊：{reason}",
+      "auto_hidden": "收到多次檢舉，等待版主處理",
+      "blocked": "你已封鎖該使用者",
+      "expand": "展開",
+      "collapse": "收起",
+      "delete_title": "刪除這則貼文？",
+      "delete_floor_help": "樓層會留下「已被作者刪除」的佔位，樓層號不變，下面的回覆照常顯示。",
+      "delete_first_help": "一樓會留下佔位，主題和回覆保留。要刪除整個主題，請在沒有他人回覆時使用「刪除主題」。",
+      "delete_reply_help": "刪除後這則回覆將不再顯示。"
+    },
+    "answer": {
+      "badge": "最佳解答",
+      "accept": "採納為解答",
+      "unaccept": "取消採納",
+      "accepted": "已採納為解答",
+      "unaccepted": "已取消採納",
+      "summary": "最佳解答：#{floor} {name}"
+    },
+    "reactions": {
+      "add": "新增表情回應",
+      "label": "{emoji} {count}",
+      "and_more": "{names} 等 {count} 人",
+      "names": {
+        "thumbs_up": "讚",
+        "heart": "喜歡",
+        "joy": "笑哭",
+        "open_mouth": "驚訝",
+        "cry": "難過",
+        "tada": "慶祝",
+        "fire": "火熱",
+        "eyes": "圍觀",
+        "thinking": "思考",
+        "pray": "拜託",
+        "clap": "鼓掌",
+        "hundred": "滿分",
+        "notes": "好聽",
+        "headphones": "在聽",
+        "smitten": "心動",
+        "sweat_smile": "尷尬"
+      }
+    },
+    "composer": {
+      "title": "回覆主題",
+      "floor_placeholder": "寫下你的想法… 支援 Markdown，輸入 {'@'} 提及使用者，輸入 [[ 插入資料庫內容",
+      "reply_placeholder": "寫回覆…",
+      "send_floor": "發表回覆",
+      "send_reply": "回覆",
+      "shortcut": "Ctrl / ⌘ + Enter 送出",
+      "replying_to": "回覆 {name}",
+      "posted": "回覆已發表",
+      "login": "登入後參與討論",
+      "locked": "主題已鎖定，不能再回覆。",
+      "closed": "這裡暫時不能回覆。",
+      "silenced_until": "你已被禁言至 {date}。原因：{reason}",
+      "silenced_forever": "你已被永久禁言。原因：{reason}",
+      "rate_limited": "發得太快了，請 {seconds} 秒後再試。",
+      "length": "內容需要 {min}–{max} 個字。"
+    },
+    "report": {
+      "title": "檢舉",
+      "reason": "原因",
+      "note": "補充說明（選填）",
+      "note_required": "請說明原因",
+      "submit": "送出檢舉",
+      "done": "檢舉已送出，版主會盡快處理。",
+      "already": "你已經檢舉過這則貼文，正在等待處理。",
+      "reasons": {
+        "spam": "廣告",
+        "abuse": "人身攻擊或引戰",
+        "spoiler": "未標劇透",
+        "off_topic": "離題或灌水",
+        "infringement": "侵權",
+        "illegal": "違法",
+        "other": "其他"
+      }
+    },
+    "history": {
+      "title": "編輯紀錄",
+      "edit_number": "第 {n} 次編輯",
+      "reason": "原因：{reason}",
+      "hidden": "已隱藏",
+      "hide": "隱藏這個版本",
+      "show": "顯示這個版本",
+      "hidden_text": "這個版本已被版主隱藏。",
+      "hidden_done": "已隱藏這個版本",
+      "shown_done": "已顯示這個版本",
+      "empty": "沒有編輯紀錄。",
+      "changed_title": "標題：{before} → {after}",
+      "changed_category": "版塊：{before} → {after}",
+      "changed_tags": "標籤：{before} → {after}",
+      "changed_links": "修改了關聯內容"
+    },
+    "moderation": {
+      "title": "管理",
+      "post_title": "管理 {floor}",
+      "reply": "樓中樓",
+      "topic_title": "管理主題",
+      "actions": {
+        "hide": "摺疊",
+        "unhide": "取消摺疊",
+        "delete": "刪除",
+        "restore": "恢復",
+        "edit": "編輯",
+        "silence": "禁言作者"
+      },
+      "help": {
+        "hide": "對外顯示「該樓已被摺疊」和原因，只有作者和版主能展開。摺疊一樓時主題也會從列表裡消失。",
+        "unhide": "恢復正常顯示。",
+        "delete": "對外顯示佔位（樓中樓直接不顯示）。原文保留，可以恢復。",
+        "restore": "恢復為正常顯示。",
+        "edit": "修改會記入編輯紀錄，作者會收到通知和原因。",
+        "silence": "禁言期間可以看帖、點表情、收藏和檢舉，不能發帖、回覆和編輯。"
+      },
+      "reason": "原因（必填，會通知作者）",
+      "reason_optional": "原因（選填）",
+      "reason_required": "請填寫原因",
+      "duration": "禁言時長",
+      "days": "{count} 天",
+      "forever": "永久",
+      "done": "操作已完成",
+      "silenced": "已禁言 {name}",
+      "pin": "置頂",
+      "pin_scopes": {
+        "none": "不置頂",
+        "category": "版塊內",
+        "global": "全站"
+      },
+      "pin_until": "截止時間（選填）",
+      "featured": "設為精華",
+      "locked": "鎖定（不能再回覆）",
+      "delete_topic": "刪除主題",
+      "restore_topic": "恢復主題"
+    },
+    "new": {
+      "title": "發起主題",
+      "choose_category": "選擇版塊",
+      "title_placeholder": "一句話說清楚你想聊什麼",
+      "optional": "（選填）",
+      "links_hint": "主題會出現在這些頁面的「相關討論」裡",
+      "draft_hint": "內容會自動儲存在這台裝置上",
+      "submit": "發佈主題",
+      "posted": "主題已發佈",
+      "question_hint": "這是問答版塊：之後可以採納最有幫助的回覆為解答。",
+      "invalid": {
+        "title": "標題要 4–120 個字。",
+        "raw": "正文需要 2–20000 個字。",
+        "category_id": "請選擇可以發主題的版塊。",
+        "tag_ids": "標籤無效或超過 5 個。",
+        "links": "關聯內容無效或超過 10 個。",
+        "other": "請檢查填寫的內容。"
+      }
+    },
+    "search": {
+      "title": "搜尋討論",
+      "title_for": "搜尋「{q}」",
+      "placeholder": "搜尋主題和貼文…",
+      "submit": "搜尋",
+      "scope": {
+        "topics": "主題",
+        "posts": "貼文"
+      },
+      "all_categories": "全部版塊",
+      "hint": "輸入至少兩個字開始搜尋。",
+      "results": "共 {count} 筆結果",
+      "empty": "沒有找到相關內容。",
+      "reply_under": "#{floor} 的樓中樓"
+    },
+    "related": {
+      "title": "相關討論",
+      "start": "發起討論",
+      "empty": "還沒有相關討論。",
+      "more": "查看全部 {count} 個討論"
+    },
+    "profile": {
+      "title": "討論",
+      "topics": "主題 {count}",
+      "posts": "回覆 {count}",
+      "no_topics": "還沒有發起過主題。",
+      "no_posts": "還沒有回覆過。",
+      "in_topic": "在「{title}」中"
+    },
+    "bookmarks": {
+      "tab": "貼文",
+      "empty": "還沒有收藏的貼文。",
+      "saved": "收藏於 {time}",
+      "unavailable": "這則貼文已不可見"
+    },
+    "comments": {
+      "title": "留言",
+      "open_topic": "在討論區開啟",
+      "reactions": "回應這篇文章",
+      "empty": "還沒有留言，來說兩句吧。",
+      "login": "登入後發表留言"
     }
   }
 }

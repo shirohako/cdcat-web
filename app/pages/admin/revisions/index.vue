@@ -60,7 +60,7 @@ const typeLabel = (type: string) => ['work', 'artist', 'entry', 'franchise'].inc
 const statusClass: Record<string, string> = { pending: 'border-amber-200 bg-amber-50 text-amber-800', approved: 'border-emerald-200 bg-emerald-50 text-emerald-700', rejected: 'border-slate-200 bg-slate-50 text-slate-500' }
 const actionClass: Record<string, string> = { create: 'text-emerald-700', update: 'text-blue-700', delete: 'text-red-700' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
-useHead({ title: computed(() => `${t('admin_pages.revisions.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.revisions.title')) })
 </script>
 
 <template>

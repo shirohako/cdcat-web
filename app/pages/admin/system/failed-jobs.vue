@@ -66,7 +66,7 @@ const confirmDelete = async (reason: string) => {
 }
 const label = (job: AdminFailedJob) => `${(job.job ?? '—').replace('App\\Jobs\\', '')}${job.template ? ` · ${job.template}` : ''}`
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(value)) : '—'
-useHead({ title: computed(() => `${t('admin_pages.system.failed_jobs')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.system.failed_jobs')) })
 </script>
 
 <template>

@@ -17,15 +17,19 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/eslint',
     '@nuxtjs/i18n',
-    '@psray/markdown-editor',
   ],
 
-  markdownEditor: {
-    // Every locale below is one the package ships, so no localeMap is needed.
-    defaultLocale: 'en',
-    // The syntax guide lives on psray.net; this site does not host its own.
-    guideUrl: 'https://psray.net/docs/markdown',
+  routeRules: {
+    // The writing page moved when articles gained review; keep old links working.
+    '/articles/create': { redirect: { to: '/articles/new', statusCode: 301 } },
   },
+
+  // The Markdown editor keeps its upstream file names (MarkdownEditor,
+  // RichContent, MarkdownGuide), so its folder is registered without a prefix.
+  components: [
+    { path: '~/components/markdown', pathPrefix: false },
+    '~/components',
+  ],
 
   icon: {
     customCollections: [
@@ -60,30 +64,31 @@ export default defineNuxtConfig({
   i18n: {
     baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
     strategy: 'no_prefix',
+    // Each locale also loads the Markdown editor's messages (`markdown.*`).
     locales: [
       {
         code: 'zh-Hans',
         language: 'zh-Hans',
         name: '简体中文',
-        file: 'zh-Hans.json',
+        files: ['zh-Hans.json', 'markdown/zh-Hans.json'],
       },
       {
         code: 'zh-Hant',
         language: 'zh-Hant',
         name: '繁體中文',
-        file: 'zh-Hant.json',
+        files: ['zh-Hant.json', 'markdown/zh-Hant.json'],
       },
       {
         code: 'en',
         language: 'en',
         name: 'English',
-        file: 'en.json',
+        files: ['en.json', 'markdown/en.json'],
       },
       {
         code: 'ja',
         language: 'ja',
         name: '日本語',
-        file: 'ja.json',
+        files: ['ja.json', 'markdown/ja.json'],
       }
     ],
     defaultLocale: 'en',
@@ -97,8 +102,13 @@ export default defineNuxtConfig({
       include: [
         'countries-list',
         '@lucide/vue',
+        'lucide',
+        'markdown-it',
+        'markdown-it-container',
+        'markdown-it-mark',
+        'markdown-it-task-lists',
       ],
     },
   },
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/markdown.css'],
 })

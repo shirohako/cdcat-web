@@ -182,7 +182,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                   <dd class="font-medium">{{ typeLabel(entry.type) }}</dd>
                 </div>
                 <div v-if="entry.format">
-                  <dt class="text-gray-500">{{ $t('catalog.format') }}</dt>
+                  <dt class="text-gray-500">{{ $t('catalog.format_label') }}</dt>
                   <dd class="font-medium">{{ formatLabel(entry.format) }}</dd>
                 </div>
                 <div v-if="entry.release_date">
@@ -230,6 +230,9 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                 </a>
               </div>
             </section>
+
+            <ArticleRelatedArticles :id="entry.id" type="entry" />
+            <DiscussionRelatedDiscussions :id="entry.id" type="entry" />
           </aside>
         </div>
       </div>

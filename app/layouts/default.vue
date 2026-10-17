@@ -1,14 +1,14 @@
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Sidebar -->
-    <Sidebar
+    <AppSidebar
       :is-collapsed="isSidebarCollapsed"
       :is-mobile-open="isMobileMenuOpen"
       @close-mobile="isMobileMenuOpen = false"
     />
 
     <!-- Navbar -->
-    <Navbar
+    <AppNavbar
       :is-collapsed="isSidebarCollapsed"
       :is-mobile-menu-open="isMobileMenuOpen"
       @toggle-sidebar="toggleSidebar"
@@ -57,12 +57,12 @@ useHead({
     lang: locale.value
   },
   link: computed(() => {
-    const links: any[] = []
+    const links: { rel: 'alternate', hreflang: string, href: string }[] = []
     const baseUrl = config.public.baseUrl
     const currentPath = route.path
 
     // 为每个语言添加 hreflang 链接（包含 lang 参数）
-    locales.value.forEach((loc: any) => {
+    locales.value.forEach((loc) => {
       const langCode = loc.code
       links.push({
         rel: 'alternate',

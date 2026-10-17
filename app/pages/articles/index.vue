@@ -1,173 +1,120 @@
+<script setup lang="ts">
+import { FileText, FolderOpen, PenLine, Search, Sparkles } from '@lucide/vue'
+import { ARTICLE_TYPES, type ArticleCard, type ArticleType, type Pagination } from '~/types/article'
+
+const route = useRoute()
+const router = useRouter()
+const { t } = useI18n()
+const { $api } = useNuxtApp()
+const { isAuthenticated } = useAuth()
+const { tags, tagName } = useTags()
+
+const type = computed(() => (ARTICLE_TYPES as readonly string[]).includes(String(route.query.type)) ? String(route.query.type) as ArticleType : null)
+const tag = computed(() => route.query.tag ? String(route.query.tag) : null)
+const sort = computed(() => route.query.sort === 'popular' ? 'popular' : 'latest')
+const search = computed(() => route.query.search ? String(route.query.search) : '')
+const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
+const filtered = computed(() => type.value || tag.value || search.value)
+const searchInput = ref(search.value)
+watch(search, (value) => { searchInput.value = value })
+
+const update = (changes: Record<string, string | null | undefined>) => {
+  const query: Record<string, string> = {}
+  for (const [key, value] of Object.entries({ ...route.query, page: undefined, ...changes })) {
+    if (value) query[key] = String(value)
+  }
+  router.push({ query })
+}
+const submitSearch = () => update({ search: searchInput.value.trim().length >= 2 ? searchInput.value.trim() : null })
+
+const { data, pending, error, refresh } = await useAsyncData('articles-list',
+  () => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', {
+    query: { type: type.value ?? undefined, tag: tag.value ?? undefined, sort: sort.value, search: search.value || undefined, page: page.value },
+  }), { watch: [type, tag, sort, search, page] })
+
+const { data: featured } = await useAsyncData('articles-featured',
+  () => $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { featured: 1, per_page: 3 } }).then(response => response.articles),
+  { default: () => [] })
+
+useHead({ title: computed(() => t('content_display.articles')) })
+</script>
+
 <template>
   <div class="relative min-h-screen bg-base-100">
-    <!-- 背景装饰 -->
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div class="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-linear-to-br from-violet-200/40 to-indigo-200/20 blur-3xl" />
-      <div class="absolute top-10 -right-20 h-72 w-72 rounded-full bg-linear-to-br from-sky-200/35 to-cyan-200/15 blur-3xl" />
+      <div class="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-linear-to-br from-violet-200/40 to-indigo-200/20 blur-3xl" />
+      <div class="absolute -right-20 top-10 h-72 w-72 rounded-full bg-linear-to-br from-sky-200/35 to-cyan-200/15 blur-3xl" />
       <div class="absolute bottom-0 left-1/2 h-64 w-64 rounded-full bg-linear-to-br from-pink-200/25 to-rose-200/10 blur-3xl" />
     </div>
 
-    <div class="relative container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
+    <div class="container relative mx-auto max-w-6xl px-4 py-10 md:px-8 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-      <CollectionPageHeader
-        :title="$t('content_display.articles')"
-        :description="$t('content_display.articles_desc')"
-        icon="lucide:newspaper"
-        tone="indigo"
-      >
-        <template #action>
-          <NuxtLink
-            v-if="isAuthenticated"
-            to="/articles/create"
-            class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-          >
-            <PenLine :size="14" />
-            <span class="hidden sm:inline">{{ $t('content_display.new_article') }}</span>
-          </NuxtLink>
-        </template>
-      </CollectionPageHeader>
+          <CollectionPageHeader :title="t('content_display.articles')" :description="t('content_display.articles_desc')" icon="lucide:newspaper" tone="indigo">
+            <template #action>
+              <div class="flex items-center gap-2">
+                <NuxtLink v-if="isAuthenticated" to="/articles/mine" class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 sm:h-9 sm:px-3.5">
+                  <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
+                </NuxtLink>
+                <NuxtLink v-if="isAuthenticated" to="/articles/new" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5">
+                  <PenLine :size="14" /><span class="hidden sm:inline">{{ t('content_display.new_article') }}</span>
+                </NuxtLink>
+              </div>
+            </template>
+          </CollectionPageHeader>
         </template>
 
-      <!-- 加载状态 -->
-      <CollectionLoadingSkeleton v-if="pending" variant="wide" />
-
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-60">
-        <div class="alert alert-error max-w-md">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>{{ $t('common.load_failed') }}</span>
-        </div>
-      </div>
-
-      <div v-else class="collection-content-enter">
-        <!-- 文章列表 -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          <NuxtLink
-            v-for="article in articles"
-            :key="article.id"
-            :to="`/articles/${article.id}/${article.slug}`"
-            class="group flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden
-                   hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-          >
-            <!-- 封面 -->
-            <div class="relative aspect-video overflow-hidden bg-gray-50">
-              <img
-                v-if="article.cover_url"
-                :src="article.cover_url"
-                :alt="article.title"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <ImageIcon :size="28" class="text-gray-200" />
-              </div>
-              <!-- 渐变遮罩 -->
-              <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            </div>
-
-            <!-- 内容 -->
-            <div class="flex flex-col flex-1 p-4">
-              <!-- 标题 -->
-              <h2 class="text-sm font-bold text-gray-900 leading-snug mb-2 line-clamp-2
-                         group-hover:text-violet-600 transition-colors duration-200">
-                {{ article.title }}
-              </h2>
-
-              <!-- 摘要 -->
-              <p class="text-xs text-gray-400 leading-relaxed line-clamp-3 mb-4 flex-1">
-                {{ excerpt(article.content) }}
-              </p>
-
-              <!-- 元信息 -->
-              <div class="flex items-center gap-2.5 pt-3 border-t border-gray-50">
-                <div class="w-5 h-5 rounded-full bg-violet-50 flex items-center justify-center overflow-hidden shrink-0 ring-1 ring-gray-100">
-                  <img v-if="article.author.avatar" :src="article.author.avatar" :alt="article.author.nickname" class="w-full h-full object-cover" />
-                  <UserRound v-else :size="11" class="text-violet-400" />
-                </div>
-                <span class="text-xs text-gray-500 font-medium truncate">{{ article.author.nickname || article.author.username }}</span>
-                <span class="text-gray-200 ml-auto shrink-0">·</span>
-                <div class="flex items-center gap-1 text-xs text-gray-400 shrink-0">
-                  <Calendar :size="11" />
-                  <span>{{ formatDate(article.published_at) }}</span>
-                </div>
-              </div>
-            </div>
-          </NuxtLink>
-        </div>
-
-        <!-- 空状态 -->
-        <div v-if="articles.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center mx-auto mb-4">
-            <FileText :size="28" class="text-gray-300" />
+        <section v-if="featured.length && !filtered && page === 1" class="mb-8">
+          <h2 class="mb-3 inline-flex items-center gap-1.5 text-sm font-bold text-slate-700"><Sparkles :size="15" class="text-violet-500" />{{ t('article_ui.list.featured') }}</h2>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <ArticleCard v-for="article in featured" :key="article.id" :article="article" />
           </div>
-          <p class="text-gray-400 text-sm">{{ $t('content_display.no_articles') }}</p>
+        </section>
+
+        <div class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" class="rounded-full px-3 py-1 text-xs font-medium transition" :class="!type ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'" @click="update({ type: null })">
+              {{ t('article_ui.list.all_types') }}
+            </button>
+            <button
+              v-for="value in ARTICLE_TYPES" :key="value" type="button" class="rounded-full px-3 py-1 text-xs font-medium transition"
+              :class="type === value ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'" @click="update({ type: value })">
+              {{ t(`article_ui.types.${value}`) }}
+            </button>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
+            <select :value="tag ?? ''" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600" :aria-label="t('article_ui.fields.tags')" @change="update({ tag: ($event.target as HTMLSelectElement).value || null })">
+              <option value="">{{ t('article_ui.list.all_tags') }}</option>
+              <option v-for="item in tags" :key="item.id" :value="item.slug">#{{ tagName(item) }} ({{ item.articles_count }})</option>
+            </select>
+            <select :value="sort" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600" :aria-label="t('article_ui.list.sort')" @change="update({ sort: ($event.target as HTMLSelectElement).value === 'popular' ? 'popular' : null })">
+              <option value="latest">{{ t('article_ui.list.latest') }}</option>
+              <option value="popular">{{ t('article_ui.list.popular') }}</option>
+            </select>
+            <form class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 focus-within:border-violet-400" role="search" @submit.prevent="submitSearch">
+              <Search :size="13" class="text-slate-400" />
+              <input v-model="searchInput" type="search" maxlength="100" class="w-36 bg-transparent text-xs outline-none placeholder:text-slate-300" :placeholder="t('article_ui.list.search')">
+            </form>
+          </div>
         </div>
 
-        <CommonPagination
-          class="mt-6"
-          :page="pagination.current_page"
-          :total-pages="pagination.last_page"
-          :disabled="pending"
-          @update:page="goToPage"
-        />
-      </div>
+        <CollectionLoadingSkeleton v-if="pending" variant="wide" />
+        <div v-else-if="error" class="flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-slate-500">
+          {{ t('common.load_failed') }}<button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
+        </div>
+        <div v-else class="collection-content-enter">
+          <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
+          </div>
+          <div v-else class="flex min-h-72 flex-col items-center justify-center text-center">
+            <div class="mx-auto mb-4 grid size-16 place-items-center rounded-2xl bg-gray-50"><FileText :size="28" class="text-gray-300" /></div>
+            <p class="text-sm text-gray-400">{{ filtered ? t('article_ui.list.no_match') : t('content_display.no_articles') }}</p>
+          </div>
+          <CommonPagination
+            v-if="data && data.pagination.last_page > 1" class="mt-6" :page="data.pagination.current_page" :total-pages="data.pagination.last_page"
+            :disabled="pending" @update:page="value => update({ page: value > 1 ? String(value) : null })" />
+        </div>
       </CollectionPageCard>
     </div>
   </div>
 </template>
-
-<script setup>
-import { FileText, Calendar, UserRound, Image as ImageIcon, PenLine } from "@lucide/vue";
-
-const { isAuthenticated } = useAuth();
-
-useHead({ title: 'Articles | CDCAT' });
-
-const route = useRoute();
-const router = useRouter();
-
-
-const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1;
-  return page > 0 ? page : 1;
-});
-
-const { data: response, pending, error } = useAPI("/v1/articles", {
-  lazy: true,
-  query: computed(() => ({ page: currentPage.value })),
-});
-
-const articles = computed(() => response.value?.articles ?? []);
-
-const pagination = computed(() => response.value?.pagination ?? {
-  total: 0, per_page: 15, current_page: 1, last_page: 1,
-});
-
-const excerpt = (content) => {
-  if (!content) return "";
-  return content
-    .replace(/#{1,6}\s+/g, '')
-    .replace(/\*\*(.+?)\*\*/g, '$1')
-    .replace(/\*(.+?)\*/g, '$1')
-    .replace(/\[(.+?)\]\(.+?\)/g, '$1')
-    .replace(/`(.+?)`/g, '$1')
-    .replace(/>\s+/g, '')
-    .replace(/\n+/g, ' ')
-    .trim()
-    .slice(0, 120);
-};
-
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const d = new Date(dateString);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-};
-
-const goToPage = (page) => {
-  if (page < 1 || page > pagination.value.last_page) return;
-  router.push({ query: { ...route.query, page: page === 1 ? undefined : page } });
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
-</script>

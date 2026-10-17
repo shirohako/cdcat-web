@@ -220,7 +220,7 @@ const handleLogin = async () => {
       // 登录失败，显示错误信息
       errorMessage.value = result.error || t('auth.login.login_failed')
     }
-  } catch (error: any) {
+  } catch (error) {
     errorMessage.value = localizeError(error, 'auth.login.login_failed')
   } finally {
     isLoading.value = false
@@ -228,7 +228,7 @@ const handleLogin = async () => {
 }
 
 useHead({
-  title: computed(() => `${t('user.login')} - CDCAT`),
+  title: computed(() => t('user.login')),
   meta: [
     {
       name: 'description',

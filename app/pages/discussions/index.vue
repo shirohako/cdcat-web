@@ -1,20 +1,34 @@
-<template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div class="absolute -top-28 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-sky-200/45 to-indigo-200/20 blur-3xl" />
-      <div class="absolute -top-20 -right-24 h-80 w-80 rounded-full bg-linear-to-br from-amber-200/40 to-rose-200/15 blur-3xl" />
-      <div class="absolute -bottom-44 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-emerald-200/35 to-cyan-200/15 blur-3xl" />
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
-    </div>
+<script setup lang="ts">
+import { Search } from '@lucide/vue'
 
-    <div class="relative container mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-10 md:px-6">
-      <ComingSoon />
+/** The forum home: the category navigation and the latest topics from every category. */
+const { t } = useI18n()
+const router = useRouter()
+const query = ref('')
+const search = () => { if (query.value.trim().length >= 2) router.push({ path: '/discussions/search', query: { q: query.value.trim() } }) }
+useSeoMeta({ title: () => t('discussions.title'), description: () => t('discussions.description') })
+</script>
+
+<template>
+  <div class="relative min-h-[calc(100vh-4rem)] bg-slate-50/60">
+    <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
+      <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]">{{ t('discussions.title') }}</h1>
+          <p class="mt-1 text-sm text-slate-500">{{ t('discussions.description') }}</p>
+        </div>
+        <form class="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-sky-400 lg:flex" role="search" @submit.prevent="search">
+          <Search :size="15" class="text-slate-400" />
+          <input v-model="query" type="search" maxlength="100" class="w-64 bg-transparent text-sm outline-none placeholder:text-slate-400" :placeholder="t('discussions.search.placeholder')">
+        </form>
+      </header>
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <DiscussionSidebar class="lg:sticky lg:top-20 lg:w-64 lg:shrink-0" />
+        <main class="min-w-0 flex-1">
+          <DiscussionListView />
+        </main>
+      </div>
     </div>
+    <DiscussionNotice />
   </div>
 </template>
-
-<script setup lang="ts">
-useHead({
-  title: 'Discussion | CDCAT'
-})
-</script>

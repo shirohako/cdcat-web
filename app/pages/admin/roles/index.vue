@@ -23,7 +23,7 @@ const confirm = async (reason: string) => {
   } catch (error) { message.value = localizeError(error) }
   finally { busy.value = false }
 }
-useHead({ title: computed(() => `${t('admin_pages.roles.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.roles.title')) })
 </script>
 
 <template>

@@ -77,7 +77,7 @@
           © 2026 CDCAT
         </div>
         <div v-else class="flex justify-center">
-          <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+          <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"/>
         </div>
       </transition>
     </div>
@@ -89,7 +89,7 @@
       v-if="isMobileOpen"
       class="fixed inset-0 bg-black/50 z-30 lg:hidden"
       @click="closeMobile"
-    ></div>
+    />
   </transition>
 </template>
 

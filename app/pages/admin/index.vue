@@ -23,7 +23,7 @@ const shortTime = (value: string) => {
   return new Intl.DateTimeFormat('zh-CN', today ? { timeStyle: 'short' } : { month: 'numeric', day: 'numeric' }).format(date)
 }
 const heartbeatClass: Record<string, string> = { healthy: 'text-emerald-700', stale: 'text-amber-700', unknown: 'text-slate-500' }
-useHead({ title: computed(() => `${t('admin_pages.dashboard.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.dashboard.title')) })
 </script>
 
 <template>
@@ -56,6 +56,14 @@ useHead({ title: computed(() => `${t('admin_pages.dashboard.title')} | CDCAT`) }
               <span class="rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-medium text-slate-900">{{ t('admin_pages.dashboard.go_review') }}</span>
             </div>
             <p class="mt-4 text-xs text-slate-400">{{ t('admin_pages.dashboard.pending_help') }}</p>
+          </NuxtLink>
+          <NuxtLink v-if="data.pending_articles !== undefined" to="/admin/articles?status=pending" class="rounded-xl bg-[#0f1115] p-4 text-white shadow-sm transition-transform hover:-translate-y-0.5">
+            <p class="text-[13px] text-slate-400">{{ t('admin_pages.dashboard.pending_articles') }}</p>
+            <div class="mt-1.5 flex items-baseline justify-between gap-2">
+              <span class="font-mono text-[28px] font-semibold tabular-nums">{{ data.pending_articles }}</span>
+              <span class="rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-medium text-slate-900">{{ t('admin_pages.dashboard.go_review') }}</span>
+            </div>
+            <p class="mt-4 text-xs text-slate-400">{{ t('admin_pages.dashboard.pending_reports', { count: data.pending_reports ?? 0 }) }}</p>
           </NuxtLink>
           <article v-for="metric in data.metrics" :key="metric.key" class="rounded-xl bg-white p-4 shadow-[0_1px_2px_rgba(17,24,39,.06),0_4px_16px_rgba(17,24,39,.04)]">
             <p class="text-[13px] text-slate-600">{{ t(`admin_pages.dashboard.${metric.key}`) }}</p>

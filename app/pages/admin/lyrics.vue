@@ -77,7 +77,7 @@ const confirmDelete = async (reason: string) => {
 }
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
 const input = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
-useHead({ title: computed(() => `${t('admin_pages.lyrics.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
 </script>
 
 <template>

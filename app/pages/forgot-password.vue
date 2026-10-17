@@ -334,8 +334,8 @@ const handleSendCode = async () => {
     })
     startCountdown()
     step.value = 2
-  } catch (error: any) {
-    setError(localizeError(error, 'auth.forgot_password.send_failed'), error.details?.details)
+  } catch (error) {
+    setError(localizeError(error, 'auth.forgot_password.send_failed'), (error as { details?: { details?: Record<string, string[]> } }).details?.details)
   } finally {
     isSendingCode.value = false
   }
@@ -401,8 +401,8 @@ const handleResetPassword = async () => {
     setTimeout(() => {
       router.push('/auth/login')
     }, 3000)
-  } catch (error: any) {
-    setError(localizeError(error, 'auth.forgot_password.reset_failed'), error.details?.details)
+  } catch (error) {
+    setError(localizeError(error, 'auth.forgot_password.reset_failed'), (error as { details?: { details?: Record<string, string[]> } }).details?.details)
   } finally {
     isLoading.value = false
   }
@@ -413,7 +413,7 @@ onUnmounted(() => {
 })
 
 useHead({
-  title: computed(() => `${t('auth.forgot_password.title')} - CDCAT`),
+  title: computed(() => t('auth.forgot_password.title')),
   meta: [
     {
       name: 'description',

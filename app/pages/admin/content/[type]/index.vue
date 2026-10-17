@@ -71,7 +71,7 @@ const recount = async (ids: number[]) => {
   }
 }
 const time = (value: unknown) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short' }).format(new Date(String(value))) : '—'
-useHead({ title: computed(() => `${t(`admin_pages.content.tabs.${type.value}`)} | CDCAT`) })
+useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
 </script>
 
 <template>

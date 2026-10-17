@@ -78,12 +78,12 @@ definePageMeta({
   middleware: 'auth'
 })
 
-useHead({
-  title: 'My Tracking | CDCAT'
-})
-
 const { getTrackingStats } = useTracking()
 const { t } = useI18n()
+
+useHead({
+  title: computed(() => t('user.tracking'))
+})
 
 const activeTab = ref<TrackingStatus>('plan_to_listen')
 

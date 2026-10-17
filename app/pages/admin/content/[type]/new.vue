@@ -10,7 +10,7 @@ const route = useRoute()
 const { t } = useAdminI18n()
 const type = computed(() => String(route.params.type))
 const toRevision = (revisionId: number) => `/admin/revisions/${revisionId}`
-useHead({ title: computed(() => `${t('admin_pages.content.create', { type: t(`admin_pages.types.${type.value}`) })} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.content.create', { type: t(`admin_pages.types.${type.value}`) })) })
 </script>
 
 <template>

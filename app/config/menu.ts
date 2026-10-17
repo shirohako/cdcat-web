@@ -76,5 +76,7 @@ export const userMenuItems = [
   { name: 'tracking', i18nKey: 'user.tracking', icon: 'lucide:bookmark', path: '/tracking' },
   { name: 'revisions', i18nKey: 'user.revisions', icon: 'lucide:git-pull-request', path: '/revisions' },
   { name: 'reviews', i18nKey: 'user.reviews', icon: 'lucide:message-square-text', path: '/reviews' },
+  { name: 'articles', i18nKey: 'user.articles', icon: 'lucide:newspaper', path: '/articles/mine' },
+  { name: 'notifications', i18nKey: 'user.notifications', icon: 'lucide:bell', path: '/notifications' },
   { name: 'account', i18nKey: 'user.account', icon: 'lucide:settings', path: '/account' }
 ]

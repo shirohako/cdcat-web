@@ -109,7 +109,7 @@ const confirmDelete = async (reason: string) => {
   }
 }
 const input = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
-useHead({ title: computed(() => `${t('admin_pages.events.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.events.title')) })
 </script>
 
 <template>

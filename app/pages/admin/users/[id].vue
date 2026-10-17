@@ -80,7 +80,7 @@ const confirmAction = async (reason: string) => {
   finally { busy.value = false }
 }
 const time = (value: string | null | undefined) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'
-useHead({ title: computed(() => `${t('admin_pages.user_detail.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
 </script>
 
 <template>

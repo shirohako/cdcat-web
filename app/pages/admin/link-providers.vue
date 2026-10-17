@@ -63,7 +63,7 @@ const confirmDelete = async (reason: string) => {
     busy.value = false
   }
 }
-useHead({ title: computed(() => `${t('admin_pages.link_providers.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.link_providers.title')) })
 </script>
 
 <template>

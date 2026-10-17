@@ -9,7 +9,7 @@ const { $api } = useNuxtApp()
 const { t, te } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const targetTypes = ['work', 'artist', 'entry', 'franchise', 'revision', 'user', 'role', 'article', 'review', 'lyric', 'event', 'event_series', 'link_provider', 'setting', 'system']
+const targetTypes = ['work', 'artist', 'entry', 'franchise', 'revision', 'user', 'role', 'article', 'review', 'lyric', 'event', 'event_series', 'link_provider', 'setting', 'tag', 'word_filter', 'system']
 const filterKeys = ['actor', 'action', 'target_type', 'target_id', 'result', 'from', 'to'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
@@ -44,7 +44,7 @@ const action = (value: string) => {
 const resultClass: Record<string, string> = { success: 'text-emerald-700', failed: 'text-red-700', submitted: 'text-amber-700' }
 const time = (value: string) => new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(value))
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
-useHead({ title: computed(() => `${t('admin_pages.audit.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.audit.title')) })
 </script>
 
 <template>

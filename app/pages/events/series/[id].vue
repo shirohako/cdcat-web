@@ -83,7 +83,7 @@ const formatEventDate = (event: SeriesEvent) => {
 }
 
 useHead({
-  title: computed(() => `${series.value?.name ?? t('collection_pages.events.title')} | CDCAT`),
+  title: computed(() => series.value?.name ?? t('collection_pages.events.title')),
   meta: [{ name: 'description', content: computed(() => description.value || t('collection_pages.events.seo_description')) }],
 })
 </script>

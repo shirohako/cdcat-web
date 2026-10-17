@@ -111,7 +111,7 @@ const confirmMerge = async (reason: string) => {
 
 const statusClass: Record<string, string> = { pending: 'text-amber-700', approved: 'text-emerald-700', rejected: 'text-slate-500' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
-useHead({ title: computed(() => `${name.value} | CDCAT`) })
+useHead({ title: computed(() => name.value) })
 </script>
 
 <template>

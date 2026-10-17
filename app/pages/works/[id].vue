@@ -91,6 +91,9 @@
           <!-- Related Articles -->
           <WorkArticles :articles="articles" />
 
+          <!-- Related Discussions -->
+          <DiscussionRelatedDiscussions v-if="workData" :id="workData.id" type="work" />
+
           <!-- Data Contributors -->
           <WorkContributors :contributors="contributors" />
         </div>
@@ -211,8 +214,6 @@ const artistsData = computed<WorkArtistCardItem[]>(() => {
     avatar: artist.image_url || '',
   }))
 })
-
-const albumDescriptions = computed(() => workData.value?.description ?? null)
 
 const songs = computed<WorkSong[]>(() => {
   const list = workData.value?.songs ?? []

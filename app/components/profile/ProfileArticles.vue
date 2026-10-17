@@ -1,0 +1,28 @@
+<script setup lang="ts">
+import { Newspaper } from '@lucide/vue'
+import type { ArticleCard, Pagination } from '~/types/article'
+
+/** A user's published articles on their profile; hidden when they have none. */
+const props = defineProps<{ username: string }>()
+const { t } = useI18n()
+const { $api } = useNuxtApp()
+const { data } = await useAsyncData(`profile-articles-${props.username}`,
+  () => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', { query: { user: props.username, per_page: 4 } }),
+  { watch: [() => props.username] })
+</script>
+
+<template>
+  <section v-if="data?.articles.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <header class="mb-4 flex items-center gap-2">
+      <Newspaper :size="16" class="text-violet-500" />
+      <h2 class="text-base font-bold text-gray-900">{{ t('article_ui.profile.title') }}</h2>
+      <span class="text-xs text-gray-400">{{ data.pagination.total }}</span>
+      <NuxtLink v-if="data.pagination.total > data.articles.length" :to="{ path: '/articles', query: { user: username } }" class="ml-auto text-xs text-gray-400 hover:text-violet-600">
+        {{ t('article_ui.profile.all') }}
+      </NuxtLink>
+    </header>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
+    </div>
+  </section>
+</template>

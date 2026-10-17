@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { adminGroups, adminMenu, findAdminMenuItem, type AdminGroupKey } from '~/config/admin'
+import { adminGroups, adminMenu, allowedBy, findAdminMenuItem, type AdminGroupKey } from '~/config/admin'
 
 const route = useRoute()
 const { $api } = useNuxtApp()
@@ -9,7 +9,7 @@ const open = ref(false)
 const query = ref('')
 const searchInput = useTemplateRef('searchInput')
 
-const links = computed(() => adminMenu.filter(item => hasPermission(item.permission)))
+const links = computed(() => adminMenu.filter(item => allowedBy(item.permission, hasPermission)))
 const current = computed(() => findAdminMenuItem(route.path, links.value))
 const currentGroup = computed(() => adminGroups.find(group => group.key === current.value?.group))
 

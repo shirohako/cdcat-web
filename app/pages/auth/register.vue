@@ -317,8 +317,8 @@ const sendVerificationCode = async () => {
         countdownTimer = null
       }
     }, 1000)
-  } catch (error: any) {
-    setError(localizeError(error, 'auth.register.send_code_failed'), error.details?.details)
+  } catch (error) {
+    setError(localizeError(error, 'auth.register.send_code_failed'), (error as { details?: { details?: Record<string, unknown> } }).details?.details)
   } finally {
     isSendingCode.value = false
   }
@@ -393,15 +393,15 @@ const handleRegister = async () => {
     } else {
       setError(result.error || t('auth.register.register_failed'), result.details)
     }
-  } catch (error: any) {
-    setError(localizeError(error, 'auth.register.register_failed'), error.details?.details)
+  } catch (error) {
+    setError(localizeError(error, 'auth.register.register_failed'), (error as { details?: { details?: Record<string, unknown> } }).details?.details)
   } finally {
     isLoading.value = false
   }
 }
 
 useHead({
-  title: computed(() => `${t('user.register')} - CDCAT`),
+  title: computed(() => t('user.register')),
   meta: [
     {
       name: 'description',

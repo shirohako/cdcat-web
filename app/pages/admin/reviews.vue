@@ -42,7 +42,7 @@ const confirm = async (reason: string) => {
 }
 const time = (value: string) => new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value))
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
-useHead({ title: computed(() => `${t('admin_pages.reviews.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.reviews.title')) })
 </script>
 
 <template>

@@ -223,6 +223,6 @@ onMounted(() => {
 })
 
 useHead({
-  title: computed(() => `${t('account_pages.title')} | CDCAT`)
+  title: computed(() => t('account_pages.title'))
 })
 </script>

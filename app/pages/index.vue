@@ -359,7 +359,6 @@ import {
   Tag,
   Users,
   ListMusic,
-  Flame,
   Globe2,
 } from "@lucide/vue";
 
@@ -429,6 +428,7 @@ const flow = computed(() => [
 
 useHead({
   title: computed(() => t('home.seo_title')),
+  titleTemplate: '%s',
   meta: [
     {
       name: "description",

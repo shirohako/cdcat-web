@@ -42,7 +42,8 @@ const { t } = useI18n()
 const tabs = computed(() => [
   { key: 'works', label: t('collection_pages.favorites.works'), icon: 'lucide:disc-3', to: '/favorites/works' },
   { key: 'songs', label: t('collection_pages.favorites.songs'), icon: 'lucide:music', to: '/favorites/songs' },
-  { key: 'artists', label: t('collection_pages.favorites.artists'), icon: 'lucide:mic-2', to: '/favorites/artists' }
+  { key: 'artists', label: t('collection_pages.favorites.artists'), icon: 'lucide:mic-2', to: '/favorites/artists' },
+  { key: 'discussions', label: t('discussions.bookmarks.tab'), icon: 'lucide:message-circle', to: '/favorites/discussions' }
 ])
 
 const isActiveTab = (to: string) => {

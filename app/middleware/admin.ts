@@ -1,4 +1,4 @@
-import { findAdminMenuItem } from '~/config/admin'
+import { allowedBy, findAdminMenuItem } from '~/config/admin'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   const { token, fetchUser, hasPermission } = useAuth()
@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!hasPermission('admin.access')) return navigateTo('/', { replace: true })
 
   const requiredPermission = findAdminMenuItem(to.path)?.permission
-  if (requiredPermission && !hasPermission(requiredPermission)) {
+  if (requiredPermission && !allowedBy(requiredPermission, hasPermission)) {
     return navigateTo('/admin', { replace: true })
   }
 })

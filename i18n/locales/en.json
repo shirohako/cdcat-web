@@ -20,7 +20,9 @@
     "account": "Account Settings",
     "login": "Sign In",
     "register": "Sign Up",
-    "logout": "Sign Out"
+    "logout": "Sign Out",
+    "articles": "My articles",
+    "notifications": "Notifications"
   },
   "admin": {
     "console": "Admin Console"
@@ -358,7 +360,8 @@
     "select_language_code": "Select or enter a language code…",
     "use_custom_code": "Use custom code",
     "search_language": "Type to search languages",
-    "no_more_matches": "No more matches"
+    "no_more_matches": "No more matches",
+    "retry": "Retry"
   },
   "errors": {
     "request_failed": "The request failed. Please try again.",
@@ -383,7 +386,25 @@
       "artist_merge_impact_changed": "The merge impact changed. Preview it again.",
       "registration_closed": "Registration is currently closed.",
       "operation_in_progress": "The same operation is already running. Try again later.",
-      "job_not_retryable": "This failed job cannot be retried from the admin panel."
+      "job_not_retryable": "This failed job cannot be retried from the admin panel.",
+      "article_not_found": "This article does not exist or is not published.",
+      "article_draft_conflict": "This draft was changed elsewhere. Reload it before saving.",
+      "article_invalid_state": "The article cannot do this in its current state.",
+      "article_pending_limit": "You already have 3 articles in review. Please wait for the results.",
+      "content_blocked": "The content contains words that are not allowed.",
+      "already_reported": "You have already reported this. It is waiting to be reviewed.",
+      "rate_limit_exceeded": "Too many requests. Please try again later.",
+      "discussion_category_not_found": "That category does not exist.",
+      "discussion_topic_not_found": "The topic does not exist or was deleted.",
+      "discussion_post_not_found": "The post does not exist or was deleted.",
+      "discussion_topic_locked": "The topic is locked.",
+      "discussion_category_closed": "New topics cannot be posted in this category.",
+      "discussion_silenced": "You are silenced and cannot post for now.",
+      "discussion_duplicate_post": "You posted the same text a moment ago.",
+      "discussion_new_user_limit": "New members can include up to 2 links, no images and up to 3 mentions per post.",
+      "discussion_own_reaction": "You cannot react to your own post.",
+      "discussion_topic_has_replies": "Others have replied, so the topic cannot be deleted. Report it to a moderator instead.",
+      "user_block_not_allowed": "This user cannot be blocked."
     }
   },
   "admin_pages": {
@@ -462,7 +483,202 @@
     "back_to_list": "Back to articles",
     "word_count": "About {count} words",
     "reading_time": "About {count} min read",
-    "toc": "Contents"
+    "toc": "Contents",
+    "write": "Write",
+    "untitled": "Untitled",
+    "featured": "Editors' pick",
+    "has_changes": "unpublished changes",
+    "views": "{count} views",
+    "minutes": "{count} min",
+    "types": {
+      "review": "Review",
+      "feature": "Feature",
+      "interview": "Interview",
+      "news": "News",
+      "guide": "Guide",
+      "translation": "Translation",
+      "essay": "Essay",
+      "other": "Other"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "pending": "In review",
+      "published": "Published",
+      "rejected": "Returned",
+      "unpublished": "Taken down"
+    },
+    "link_types": {
+      "work": "Album",
+      "artist": "Artist",
+      "entry": "Entry",
+      "series": "Series",
+      "event": "Event"
+    },
+    "fields": {
+      "title": "Title",
+      "type": "Type",
+      "tags": "Tags",
+      "summary": "Summary",
+      "summary_placeholder": "A sentence or two about this article",
+      "summary_hint": "Shown in lists and share cards. Left empty, the opening of the text is used.",
+      "cover": "Cover",
+      "cover_https": "Enter an image address starting with https.",
+      "cover_preview": "Cover preview",
+      "cover_broken": "The image cannot be loaded. Check the address.",
+      "links": "Linked content",
+      "links_hint": "The article appears under “Related articles” on these album, artist, entry and series pages.",
+      "advanced": "Advanced",
+      "slug": "Custom link",
+      "slug_hint": "Optional. Lowercase letters, digits and hyphens, added to the end of the address."
+    },
+    "links": {
+      "type": "Content type",
+      "search": "Search {type}…",
+      "full": "Up to {max} links",
+      "no_results": "Nothing found.",
+      "search_failed": "Search failed. Try again.",
+      "remove": "Remove {title}"
+    },
+    "tags": {
+      "filter": "Filter tags…",
+      "full": "Up to {max} tags",
+      "no_match": "No matching tags.",
+      "empty": "The tag library is empty.",
+      "remove": "Remove {name}"
+    },
+    "writer": {
+      "new_title": "New article",
+      "edit_title": "Edit article",
+      "mode": "Editing mode",
+      "modes": {
+        "edit": "Write",
+        "split": "Split",
+        "preview": "Preview"
+      },
+      "outline": "Outline",
+      "outline_empty": "Divide the text with ## headings to see an outline here.",
+      "saving": "Saving…",
+      "unsaved": "Unsaved changes",
+      "save_failed": "Save failed",
+      "not_saved": "Not saved yet",
+      "saved": "Saved",
+      "saved_at": "Saved at {time}",
+      "actions": {
+        "submit": "Submit for review",
+        "resubmit": "Resubmit",
+        "publish": "Publish",
+        "publish_changes": "Publish changes",
+        "withdraw": "Withdraw"
+      },
+      "discard": "Discard changes",
+      "discard_title": "Discard changes?",
+      "discard_description": "The working copy is deleted and the live version stays. This cannot be undone.",
+      "discarded": "Changes discarded",
+      "withdrawn": "Withdrawn. You can keep editing.",
+      "submitted": "Submitted for review",
+      "published": "Published",
+      "notice_pending": "This article is in review and cannot be edited. Withdraw it to make changes.",
+      "notice_rejected": "Returned by a moderator: ",
+      "notice_unpublished": "Taken down: ",
+      "notice_published": "You are editing a published article. Readers see your changes once you publish them.",
+      "backup_found": "Found local text from {time} that never reached the server.",
+      "backup_restore": "Restore",
+      "backup_dismiss": "Discard",
+      "conflict_title": "This draft changed elsewhere",
+      "conflict_description": "The server has a newer copy saved at {time}, perhaps from another window. Which one do you want to keep?",
+      "conflict_keep_mine": "Keep mine",
+      "conflict_use_server": "Use the server copy",
+      "leave_confirm": "Some changes have not been saved. Leave anyway?"
+    },
+    "submit": {
+      "submit_title": "Submit for review",
+      "submit_description": "The article goes public once approved. Later edits need no review.",
+      "submit_confirm": "Submit",
+      "publish_title": "Publish",
+      "publish_description": "The content goes public right away; the old version stays in the history.",
+      "publish_confirm": "Publish",
+      "checks": {
+        "title": "Title of 2–100 characters",
+        "type": "Article type chosen",
+        "content": "At least 300 characters of text",
+        "summary": "Summary written",
+        "cover": "Cover set"
+      },
+      "optional": "Suggested",
+      "note": "Note to the reviewer (optional)",
+      "note_placeholder": "e.g. sources or permission to repost"
+    },
+    "errors": {
+      "title": "The title needs 2–100 characters.",
+      "type": "Choose an article type.",
+      "content": "The text is too short or too long.",
+      "summary": "The summary is too long.",
+      "cover_url": "The cover address is invalid.",
+      "links": "Some linked content no longer exists.",
+      "tag_ids": "Some tags cannot be used.",
+      "slug": "This link is taken or malformed.",
+      "blocked": "The content contains words that are not allowed. Edit it and try again.",
+      "pending_limit": "You already have 3 articles in review. Please wait for the results.",
+      "conflict": "This draft changed elsewhere. Choose which version to keep.",
+      "invalid_state": "The article cannot do this in its current state. Reload and try again.",
+      "revision": "The draft is out of date. Reload and try again.",
+      "note": "The note can be at most 1,000 characters."
+    },
+    "mine": {
+      "title": "My articles",
+      "description": "Drafts save automatically. The first publication is reviewed; later edits take effect at once.",
+      "filter": "Filter by status",
+      "all": "All",
+      "empty": "No articles here yet.",
+      "reason": "Reason: ",
+      "updated": "Updated {time}",
+      "view": "View",
+      "deleted": "Deleted",
+      "delete_title": "Delete article",
+      "delete_description": "“{title}” and all its versions will be deleted for good."
+    },
+    "list": {
+      "featured": "Editors' picks",
+      "all_types": "All types",
+      "all_tags": "All tags",
+      "sort": "Sort",
+      "latest": "Latest",
+      "popular": "Most read",
+      "search": "Search articles",
+      "no_match": "No articles match."
+    },
+    "reader": {
+      "links": "Linked content",
+      "updated": "Updated {date}",
+      "manage": "Manage",
+      "more_by": "More by {name}"
+    },
+    "report": {
+      "title": "Report",
+      "reason": "Reason",
+      "reasons": {
+        "spam": "Spam or advertising",
+        "abuse": "Harassment or flame bait",
+        "spoiler": "Unmarked spoilers",
+        "infringement": "Infringement, e.g. reposted without permission",
+        "illegal": "Illegal content",
+        "other": "Something else"
+      },
+      "note": "Details (optional)",
+      "note_required": "Tell us what is wrong",
+      "submit": "Send report",
+      "done": "Thanks — the moderators will look at it.",
+      "already": "You have already reported this article.",
+      "too_many": "Too many reports. Try again later."
+    },
+    "related": {
+      "title": "Related articles",
+      "all": "All articles"
+    },
+    "profile": {
+      "title": "Articles",
+      "all": "View all"
+    }
   },
   "collection_pages": {
     "favorites": {
@@ -471,7 +687,7 @@
       "works": "Favorite releases",
       "songs": "Favorite tracks",
       "artists": "Favorite artists",
-      "seo_title": "My Favorites | CDCAT"
+      "seo_title": "My Favorites"
     },
     "reviews": {
       "title": "My Reviews",
@@ -487,7 +703,7 @@
       "delete_title": "Delete review",
       "delete_confirm": "Delete this review? This action cannot be undone.",
       "load_failed": "Unable to load your reviews. Please refresh and try again.",
-      "seo_title": "My Reviews | CDCAT"
+      "seo_title": "My Reviews"
     },
     "events": {
       "title": "Events",
@@ -950,13 +1166,24 @@
     },
     "notifications": {
       "title": "Notifications",
-      "description": "Manage how and when you receive notifications.",
-      "body": "Notification preferences are under development. You’ll be able to customize them here when they launch."
+      "description": "Choose what shows up in your in-site notifications.",
+      "reactions": "Reactions",
+      "reactions_help": "Notify me when someone reacts to my posts. Reactions to one post are grouped together.",
+      "saved": "Saved",
+      "levels_hint": "Watching, normal and muted levels for topics and categories are set on those pages."
     },
     "privacy": {
       "title": "Privacy",
       "description": "Control the visibility of your profile and personal data.",
-      "body": "Privacy controls are under development. You’ll be able to fine-tune who can see your information when they launch."
+      "blocks_title": "Blocked users",
+      "blocks_description": "Blocked people's posts fold, their topics leave your lists, and their replies, mentions and reactions stop notifying you. They are not told.",
+      "username_placeholder": "Username",
+      "block": "Block",
+      "unblock": "Unblock",
+      "blocked": "{name} is blocked",
+      "unblocked": "{name} is unblocked",
+      "blocked_on": "blocked {date}",
+      "no_blocks": "You have not blocked anyone."
     },
     "danger": {
       "title": "Danger Zone",
@@ -1016,7 +1243,24 @@
       "stage": "Stage",
       "other": "Other"
     },
-    "format": "Format",
+    "format": {
+      "tv": "TV",
+      "movie": "Film",
+      "ova": "OVA",
+      "web": "Web",
+      "special": "Special",
+      "full": "Full game",
+      "dlc": "DLC",
+      "expansion": "Expansion",
+      "series": "Series",
+      "novel": "Novel",
+      "light_novel": "Light novel",
+      "other": "Other",
+      "serial": "Serial",
+      "oneshot": "One-shot",
+      "musical": "Musical",
+      "play": "Play"
+    },
     "relation": {
       "sequel": "Sequel",
       "prequel": "Prequel",
@@ -1057,6 +1301,7 @@
     "search_placeholder": "Search names, aliases, abbreviations",
     "search": "Search",
     "type": "Type",
+    "format_label": "Format",
     "platforms": "Platforms",
     "episodes": "Episodes",
     "episodes_count": "{count} episodes",
@@ -1187,6 +1432,348 @@
       "streaming": "Streaming",
       "social": "Social",
       "other": "Other"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "bell_unread": "Notifications, {count} unread",
+    "mark_all": "Mark all as read",
+    "view_all": "View all notifications",
+    "empty": "No notifications",
+    "reason": "Reason: ",
+    "filters": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "types": {
+      "article_approved": "Your article “{title}” was approved and published",
+      "article_rejected": "Your article “{title}” was returned",
+      "article_unpublished": "Your article “{title}” was taken down",
+      "article_republished": "Your article “{title}” is live again",
+      "article_featured": "Your article “{title}” is an editors' pick",
+      "article_edited": "A moderator edited your article “{title}”",
+      "article_deleted": "Your article “{title}” was deleted",
+      "report_accepted": "Your report on “{title}” was acted on",
+      "report_dismissed": "Your report on “{title}” was reviewed; no action was needed",
+      "discussion_topic_reply": "{actor} replied to your topic \"{title}\"",
+      "discussion_topic_reply_many": "{actor} and {count} others replied to your topic \"{title}\"",
+      "discussion_watching": "{actor} replied in \"{title}\", which you watch",
+      "discussion_watching_many": "{actor} and {count} others replied in \"{title}\", which you watch",
+      "discussion_floor_reply": "{actor} replied to your post #{floor} in \"{title}\"",
+      "discussion_reply": "{actor} replied to you in \"{title}\"",
+      "discussion_mention": "{actor} mentioned you in \"{title}\"",
+      "discussion_quote": "{actor} quoted your post in \"{title}\"",
+      "discussion_reaction": "{actor} reacted to your post in \"{title}\"",
+      "discussion_reaction_many": "{actor} and {count} others reacted to your post in \"{title}\"",
+      "discussion_accepted": "Your reply in \"{title}\" was accepted as the answer",
+      "discussion_new_topic": "{actor} started \"{title}\" in a category you watch",
+      "discussion_moderation": {
+        "hidden": "Your post in \"{title}\" was folded",
+        "deleted": "Your content in \"{title}\" was deleted",
+        "edited": "A moderator edited your content in \"{title}\"",
+        "moved": "Your topic \"{title}\" was moved to another category",
+        "silenced": "You were silenced in discussions"
+      }
+    },
+    "reason_line": "Reason: {reason}"
+  },
+  "discussions": {
+    "title": "Discussions",
+    "description": "Talk about albums, track down songs, share your collection, and plan for events.",
+    "back": "Back to discussions",
+    "breadcrumb": "Location",
+    "new_topic": "New topic",
+    "categories": "Categories",
+    "all_topics": "All topics",
+    "popular_tags": "Popular tags",
+    "status": {
+      "pinned": "Pinned",
+      "featured": "Featured",
+      "locked": "Locked",
+      "solved": "Solved"
+    },
+    "list": {
+      "tabs": "Topic list",
+      "tab": {
+        "latest": "Latest",
+        "new": "New",
+        "hot": "Hot",
+        "featured": "Featured",
+        "unread": "Unread",
+        "watching": "Watching"
+      },
+      "status": "Answer status",
+      "status_all": "All",
+      "status_unsolved": "Unsolved",
+      "status_solved": "Solved",
+      "empty": "No topics here yet.",
+      "empty_unread": "No unread replies.",
+      "empty_watching": "You are not watching any topics yet.",
+      "unread_count": "{count} new replies",
+      "new_topic": "You have not opened this topic yet"
+    },
+    "category": {
+      "topics": "{count} topics",
+      "question": "Q&A: the best answer can be accepted",
+      "moderators_only": "Only moderators start topics",
+      "staff": "Moderators only",
+      "archived": "Archived"
+    },
+    "tag": {
+      "label": "Tag"
+    },
+    "levels": {
+      "watching": "Watching",
+      "normal": "Normal",
+      "muted": "Muted",
+      "topic_help": {
+        "watching": "Notify me of every new reply",
+        "normal": "Notify me when someone replies to, mentions or quotes me",
+        "muted": "Never notify me, and keep it out of Unread"
+      },
+      "category_help": {
+        "watching": "Notify me of new topics",
+        "normal": "No notifications",
+        "muted": "Keep its topics off the discussions home"
+      }
+    },
+    "fields": {
+      "title": "Title",
+      "category": "Category",
+      "tags": "Tags",
+      "links": "Linked content"
+    },
+    "topic": {
+      "replies": "{count} replies",
+      "views": "{count} views",
+      "article": "Article: {title}",
+      "only_op": "Original poster only",
+      "newest_first": "Newest first",
+      "jump": "Go to floor",
+      "new_replies": "{count} new replies — show them",
+      "edit_title": "Edit topic",
+      "saved": "Topic updated",
+      "invalid": "Titles are 4–120 characters.",
+      "delete": "Delete topic",
+      "delete_title": "Delete this topic?",
+      "delete_help": "Nobody else will see the topic. You can only delete it while nobody else has replied.",
+      "deleted": "Topic deleted",
+      "deleted_notice": "This topic was deleted ({reason}); only moderators can see it.",
+      "hidden_notice": "This topic is folded and does not appear in lists."
+    },
+    "post": {
+      "op": "OP",
+      "moderator": "Moderator",
+      "edited": "edited",
+      "reply": "Reply",
+      "quote": "Quote",
+      "replied_to": "replying to",
+      "more": "More actions",
+      "copy_link": "Copy link",
+      "link_copied": "Link copied",
+      "bookmark": "Bookmark",
+      "unbookmark": "Remove bookmark",
+      "bookmarked": "Bookmarked",
+      "unbookmarked": "Bookmark removed",
+      "history": "Edit history",
+      "view_all_replies": "View all {count} replies",
+      "deleted": "Deleted",
+      "deleted_by_author": "Deleted by the author",
+      "deleted_by_moderator": "Deleted by a moderator",
+      "hidden": "Folded by a moderator",
+      "hidden_reason": "Folded by a moderator: {reason}",
+      "auto_hidden": "Reported several times; waiting for a moderator",
+      "blocked": "You blocked this user",
+      "expand": "Show",
+      "collapse": "Hide",
+      "delete_title": "Delete this post?",
+      "delete_floor_help": "The floor keeps a \"deleted by the author\" placeholder and its number; replies under it stay.",
+      "delete_first_help": "Floor #1 keeps a placeholder and the topic stays. To delete the whole topic, use \"Delete topic\" while nobody else has replied.",
+      "delete_reply_help": "The reply will no longer be shown."
+    },
+    "answer": {
+      "badge": "Accepted answer",
+      "accept": "Accept as answer",
+      "unaccept": "Unaccept",
+      "accepted": "Answer accepted",
+      "unaccepted": "Answer unaccepted",
+      "summary": "Accepted answer: #{floor} by {name}"
+    },
+    "reactions": {
+      "add": "Add a reaction",
+      "label": "{emoji} {count}",
+      "and_more": "{names} and others ({count})",
+      "names": {
+        "thumbs_up": "Thumbs up",
+        "heart": "Love",
+        "joy": "Laughing",
+        "open_mouth": "Surprised",
+        "cry": "Sad",
+        "tada": "Celebrate",
+        "fire": "Fire",
+        "eyes": "Watching",
+        "thinking": "Thinking",
+        "pray": "Please",
+        "clap": "Applause",
+        "hundred": "Perfect",
+        "notes": "Sounds good",
+        "headphones": "Listening",
+        "smitten": "Smitten",
+        "sweat_smile": "Awkward"
+      }
+    },
+    "composer": {
+      "title": "Reply to topic",
+      "floor_placeholder": "Share your thoughts… Markdown works; type {'@'} to mention someone and [[ to insert database content",
+      "reply_placeholder": "Write a reply…",
+      "send_floor": "Post reply",
+      "send_reply": "Reply",
+      "shortcut": "Ctrl / ⌘ + Enter to send",
+      "replying_to": "Replying to {name}",
+      "posted": "Reply posted",
+      "login": "Sign in to join the discussion",
+      "locked": "This topic is locked.",
+      "closed": "Replies are closed here for now.",
+      "silenced_until": "You are silenced until {date}. Reason: {reason}",
+      "silenced_forever": "You are silenced permanently. Reason: {reason}",
+      "rate_limited": "You are posting too fast; try again in {seconds} seconds.",
+      "length": "Write between {min} and {max} characters."
+    },
+    "report": {
+      "title": "Report",
+      "reason": "Reason",
+      "note": "More details (optional)",
+      "note_required": "Please explain",
+      "submit": "Send report",
+      "done": "Thanks — moderators will take a look.",
+      "already": "You already reported this post; it is awaiting review.",
+      "reasons": {
+        "spam": "Spam",
+        "abuse": "Harassment or flame bait",
+        "spoiler": "Unmarked spoilers",
+        "off_topic": "Off topic or filler",
+        "infringement": "Copyright infringement",
+        "illegal": "Illegal",
+        "other": "Other"
+      }
+    },
+    "history": {
+      "title": "Edit history",
+      "edit_number": "Edit {n}",
+      "reason": "Reason: {reason}",
+      "hidden": "Hidden",
+      "hide": "Hide this version",
+      "show": "Show this version",
+      "hidden_text": "A moderator hid this version.",
+      "hidden_done": "Version hidden",
+      "shown_done": "Version shown",
+      "empty": "No edits recorded.",
+      "changed_title": "Title: {before} → {after}",
+      "changed_category": "Category: {before} → {after}",
+      "changed_tags": "Tags: {before} → {after}",
+      "changed_links": "Changed the linked content"
+    },
+    "moderation": {
+      "title": "Moderate",
+      "post_title": "Moderate {floor}",
+      "reply": "reply",
+      "topic_title": "Moderate topic",
+      "actions": {
+        "hide": "Fold",
+        "unhide": "Unfold",
+        "delete": "Delete",
+        "restore": "Restore",
+        "edit": "Edit",
+        "silence": "Silence author"
+      },
+      "help": {
+        "hide": "Shows \"folded\" with the reason; only the author and moderators can expand it. Folding #1 also takes the topic out of lists.",
+        "unhide": "Shows the post normally again.",
+        "delete": "Leaves a placeholder (sub-replies disappear). The text is kept and can be restored.",
+        "restore": "Shows the post normally again.",
+        "edit": "The edit is recorded in the history; the author is told why.",
+        "silence": "Silenced members can still read, react, bookmark and report, but cannot post, reply or edit."
+      },
+      "reason": "Reason (required; sent to the author)",
+      "reason_optional": "Reason (optional)",
+      "reason_required": "Please give a reason",
+      "duration": "Duration",
+      "days": "{count} days",
+      "forever": "Permanent",
+      "done": "Done",
+      "silenced": "{name} is silenced",
+      "pin": "Pin",
+      "pin_scopes": {
+        "none": "Not pinned",
+        "category": "In its category",
+        "global": "Everywhere"
+      },
+      "pin_until": "Until (optional)",
+      "featured": "Feature",
+      "locked": "Lock (no more replies)",
+      "delete_topic": "Delete topic",
+      "restore_topic": "Restore topic"
+    },
+    "new": {
+      "title": "New topic",
+      "choose_category": "Choose a category",
+      "title_placeholder": "Say what you want to talk about in one line",
+      "optional": "(optional)",
+      "links_hint": "The topic appears under Related discussions on these pages",
+      "draft_hint": "Your text is saved on this device as you type",
+      "submit": "Post topic",
+      "posted": "Topic posted",
+      "question_hint": "This is a Q&A category: you can later accept the most helpful reply as the answer.",
+      "invalid": {
+        "title": "Titles are 4–120 characters.",
+        "raw": "The text must be 2–20,000 characters.",
+        "category_id": "Choose a category you can post in.",
+        "tag_ids": "Invalid tags, or more than 5.",
+        "links": "Invalid links, or more than 10.",
+        "other": "Please check what you entered."
+      }
+    },
+    "search": {
+      "title": "Search discussions",
+      "title_for": "Search for \"{q}\"",
+      "placeholder": "Search topics and posts…",
+      "submit": "Search",
+      "scope": {
+        "topics": "Topics",
+        "posts": "Posts"
+      },
+      "all_categories": "All categories",
+      "hint": "Type at least two characters to search.",
+      "results": "{count} results",
+      "empty": "Nothing found.",
+      "reply_under": "reply under #{floor}"
+    },
+    "related": {
+      "title": "Related discussions",
+      "start": "Start a discussion",
+      "empty": "No discussions yet.",
+      "more": "See all {count} discussions"
+    },
+    "profile": {
+      "title": "Discussions",
+      "topics": "Topics {count}",
+      "posts": "Replies {count}",
+      "no_topics": "No topics yet.",
+      "no_posts": "No replies yet.",
+      "in_topic": "in \"{title}\""
+    },
+    "bookmarks": {
+      "tab": "Posts",
+      "empty": "No bookmarked posts yet.",
+      "saved": "Saved {time}",
+      "unavailable": "This post is no longer available"
+    },
+    "comments": {
+      "title": "Comments",
+      "open_topic": "Open in discussions",
+      "reactions": "React to this article",
+      "empty": "No comments yet. Be the first.",
+      "login": "Sign in to comment"
     }
   }
 }

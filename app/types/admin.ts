@@ -1,3 +1,5 @@
+import type { ArticleDetail, ArticleVersion, ArticleVersionContent, ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
+
 export interface DeletionImpact {
   checksum?: string
   counts: { label: string, count: number }[]
@@ -77,6 +79,8 @@ export interface AdminDashboard {
   generated_at: string
   metrics: { key: string, total: number, new_7: number, new_30: number, daily: { date: string, count: number }[] }[]
   pending_revisions?: number
+  pending_articles?: number
+  pending_reports?: number
   recent_actions?: AdminAuditEntry[]
   operations?: {
     failed_jobs: number
@@ -208,23 +212,66 @@ export interface AdminReview {
   updated_at: string
 }
 
-export interface AdminArticleItem {
+export interface AdminArticleItem extends MyArticle {
+  author: UserSummary | null
+  pending_reports: number
+}
+
+export interface AdminArticle extends AdminArticleItem {
+  live: (Pick<ArticleDetail, 'type' | 'title' | 'cover_url' | 'content' | 'word_count' | 'links' | 'tags'> & { summary: string | null }) | null
+  open_version: (ArticleVersionContent & { links: ContentLinkSummary[], tags: TagSummary[] }) | null
+  last_rejected_version_id: number | null
+  versions: ArticleVersion[]
+  reports: AdminReportEntry[]
+}
+
+export interface AdminReportEntry {
   id: number
-  title: string
-  slug: string | null
-  status: 'draft' | 'published'
-  cover_url: string | null
-  works_count: number
-  excerpt: string
-  author: AdminUserRef | null
-  published_at: string | null
+  reason: string
+  note: string | null
+  reporter: UserSummary | null
   created_at: string
   updated_at: string
 }
 
-export interface AdminArticle extends Omit<AdminArticleItem, 'works_count' | 'excerpt'> {
-  content: string
-  works: { id: number, title: string }[]
+export interface AdminReportGroup {
+  target:
+    | { type: 'article', id: number, title: string | null, status: string | null, author: UserSummary | null }
+    | { type: 'post', id: number, title: string | null, status: string | null, author: UserSummary | null, topic_id: number | null, floor: number | null, parent_floor: number | null, excerpt: string | null }
+  reports_count: number
+  reasons: Record<string, number>
+  reports: AdminReportEntry[]
+}
+
+export interface AdminHandledReport extends Omit<AdminReportEntry, 'updated_at'> {
+  article_id: number | null
+  post_id: number | null
+  post: { id: number, floor: number | null, topic: { id: number, title: string } | null } | null
+  status: 'accepted' | 'dismissed'
+  resolution: string | null
+  resolution_note: string | null
+  article: { id: number, title: string | null } | null
+  handler: { id: number, username: string, nickname: string | null } | null
+  handled_at: string | null
+  updated_at: string
+}
+
+export interface AdminTag extends TagSummary {
+  description: string | null
+  articles_count: number
+  discussion_topics_count: number
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminWordFilter {
+  id: number
+  word: string
+  action: 'block' | 'flag'
+  note: string | null
+  created_by: number | null
+  created_at: string
+  updated_at: string
 }
 
 export interface AdminLyric {
@@ -310,4 +357,56 @@ export interface AdminLogEntry {
   level: string
   message: string
   context: string
+}
+
+export interface AdminDiscussionCategory {
+  id: number
+  parent_id: number | null
+  name: string
+  slug: string
+  description: string | null
+  translations: Record<string, { name?: string | null, description?: string | null }> | null
+  color: string | null
+  icon: string | null
+  sort_order: number
+  kind: 'discussion' | 'question'
+  topic_permission: 'everyone' | 'moderators'
+  visibility: 'public' | 'staff'
+  is_archived: boolean
+  topic_template: string | null
+  show_in_latest: boolean
+  topics_count: number
+  is_system: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminDiscussionPost {
+  id: number
+  floor: number | null
+  parent_id: number | null
+  parent_floor: number | null
+  status: 'visible' | 'hidden' | 'deleted'
+  status_reason: string | null
+  user: UserSummary | null
+  excerpt: string
+  raw: string
+  edit_count: number
+  topic: { id: number, title: string, status: string, category: { id: number, name: string, slug: string, color: string | null } | null } | null
+  ip_address?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface AdminDiscussionRestriction {
+  id: number
+  user: UserSummary | null
+  reason: string
+  ends_at: string | null
+  active: boolean
+  created_by: { id: number, username: string, nickname: string | null } | null
+  revoked_by: { id: number, username: string, nickname: string | null } | null
+  revoked_at: string | null
+  created_at: string
+  updated_at: string
 }

@@ -23,7 +23,7 @@ const latestDate = (series: EventSeriesSummary) => series.latest_start_date
   : ''
 
 useHead({
-  title: computed(() => `${t('collection_pages.events.title')} | CDCAT`),
+  title: computed(() => t('collection_pages.events.title')),
   meta: [{ name: 'description', content: computed(() => t('collection_pages.events.seo_description')) }],
 })
 </script>

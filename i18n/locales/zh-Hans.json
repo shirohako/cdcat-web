@@ -20,7 +20,9 @@
     "account": "账户设置",
     "login": "登录",
     "register": "注册",
-    "logout": "退出登录"
+    "logout": "退出登录",
+    "articles": "我的文章",
+    "notifications": "通知"
   },
   "admin": {
     "console": "管理后台"
@@ -358,7 +360,8 @@
     "select_language_code": "请选择或输入语言代码…",
     "use_custom_code": "使用自定义代码",
     "search_language": "输入关键词搜索语言",
-    "no_more_matches": "没有更多匹配项"
+    "no_more_matches": "没有更多匹配项",
+    "retry": "重试"
   },
   "errors": {
     "request_failed": "请求失败，请重试。",
@@ -383,7 +386,25 @@
       "artist_merge_impact_changed": "合并影响已变化，请重新预览。",
       "registration_closed": "当前暂停注册。",
       "operation_in_progress": "相同的操作正在进行，请稍后再试。",
-      "job_not_retryable": "这个失败任务不能在后台重试。"
+      "job_not_retryable": "这个失败任务不能在后台重试。",
+      "article_not_found": "文章不存在或尚未发布。",
+      "article_draft_conflict": "这篇草稿已在别处修改，请重新加载。",
+      "article_invalid_state": "文章当前的状态不允许这个操作。",
+      "article_pending_limit": "你已有 3 篇文章在审核中，请等待审核结果。",
+      "content_blocked": "内容包含不允许的词语。",
+      "already_reported": "你已经举报过，正在等待处理。",
+      "rate_limit_exceeded": "操作太频繁，请稍后再试。",
+      "discussion_category_not_found": "版块不存在。",
+      "discussion_topic_not_found": "主题不存在或已被删除。",
+      "discussion_post_not_found": "帖子不存在或已被删除。",
+      "discussion_topic_locked": "主题已锁定，不能回复或编辑。",
+      "discussion_category_closed": "这个版块现在不能发主题。",
+      "discussion_silenced": "你已被禁言，暂时不能发帖。",
+      "discussion_duplicate_post": "刚刚已经发过同样的内容了。",
+      "discussion_new_user_limit": "新用户的帖子最多 2 个链接、不能插图片、最多提及 3 人。",
+      "discussion_own_reaction": "不能给自己的帖子点表情。",
+      "discussion_topic_has_replies": "已经有其他人回复，不能删除主题。如需删除请举报给版主。",
+      "user_block_not_allowed": "不能屏蔽这个用户。"
     }
   },
   "admin_pages": {
@@ -547,7 +568,9 @@
       "go_review": "去审核",
       "pending_help": "按提交时间排列，可批量处理",
       "all_logs": "全部日志",
-      "view_system": "运行状态"
+      "view_system": "运行状态",
+      "pending_articles": "待审文章",
+      "pending_reports": "{count} 篇文章有待处理举报"
     },
     "roles": {
       "title": "角色与权限",
@@ -660,7 +683,22 @@
       "system_retry_job": "重试失败任务",
       "system_delete_failed_job": "删除失败任务",
       "system_cache_clear": "清除缓存",
-      "system_test_mail": "发送测试邮件"
+      "system_test_mail": "发送测试邮件",
+      "articles_approve": "通过文章",
+      "articles_reject": "退回文章",
+      "articles_unpublish": "下架文章",
+      "articles_republish": "恢复文章",
+      "articles_feature": "设为编辑推荐",
+      "articles_unfeature": "取消编辑推荐",
+      "articles_slug": "修改文章链接",
+      "tags_create": "新建标签",
+      "tags_update": "修改标签",
+      "tags_delete": "删除标签",
+      "tags_merge": "合并标签",
+      "word_filters_create": "新增关键词",
+      "word_filters_update": "修改关键词",
+      "word_filters_delete": "删除关键词",
+      "reports_resolve": "处理举报"
     },
     "apply": "应用",
     "reset": "重置",
@@ -827,7 +865,7 @@
     },
     "articles": {
       "title": "文章管理",
-      "description": "检索全站文章（包括草稿），可以编辑内容、下架或删除，作者保持不变。",
+      "description": "审核新文章，管理已发布的文章：下架、恢复、编辑推荐、编辑和删除都会写入操作日志并通知作者。",
       "search": "搜索标题",
       "article": "文章",
       "article_title": "标题",
@@ -840,7 +878,100 @@
       "content": "正文（Markdown）",
       "draft_or_unpublished": "草稿 / 下架",
       "delete_title": "删除文章",
-      "delete_help": "永久删除文章，解除作品关联并刷新作品的文章数，完整内容写入操作日志。"
+      "delete_help": "永久删除文章及其全部版本、关联、标签和举报，并刷新相关作品的文章数。删除前的内容写入操作日志。",
+      "type": "类型",
+      "all_types": "全部类型",
+      "untitled": "无标题",
+      "featured": "编辑推荐",
+      "has_changes": "有未发布的修改",
+      "reports": "举报",
+      "submitted_at": "提交时间",
+      "status_reason": "原因：",
+      "summary": "摘要",
+      "tags": "标签",
+      "links": "关联内容",
+      "slug": "自定义链接",
+      "submit_note": "作者留言",
+      "versions": "版本记录",
+      "live": "线上",
+      "compare_previous": "和上一版对比",
+      "comparison": "版本对比：{before} → {after}",
+      "diff_folded": "…… 省略 {count} 行未改动的内容 ……",
+      "nothing_to_show": "没有可显示的内容。",
+      "show_submission": "待审内容",
+      "show_draft": "工作稿",
+      "show_live": "线上版本",
+      "views": {
+        "rendered": "渲染",
+        "source": "原文",
+        "diff": "与上次退回对比"
+      },
+      "approve": "通过",
+      "approve_title": "通过并发布",
+      "approve_help": "文章会立即公开，作者会收到通知。",
+      "approved": "已通过并发布",
+      "reject": "退回",
+      "reject_title": "退回文章",
+      "reject_help": "原因会通知作者，作者修改后可以重新提交。",
+      "rejected_done": "已退回",
+      "reject_presets": {
+        "too_short": "内容过短，请补充后再提交。",
+        "off_topic": "与本站音乐主题无关。",
+        "formatting": "排版需要整理，请调整段落和标题。",
+        "infringement": "涉及侵权，请提供转载授权或改为原创内容。"
+      },
+      "unpublish": "下架",
+      "unpublish_title": "下架文章",
+      "unpublish_help": "文章不再公开，并取消编辑推荐。作者修改后需要重新审核。",
+      "unpublished_done": "已下架",
+      "republish": "恢复上线",
+      "republished_done": "已恢复上线",
+      "feature": "设为推荐",
+      "unfeature": "取消推荐",
+      "edit_live": "编辑线上版本",
+      "edited_done": "已保存，修改立即生效",
+      "deleted_done": "已删除",
+      "pending_reports": "{count} 条待处理举报",
+      "handle_reports": "去处理举报",
+      "tabs": {
+        "pending": "待审核",
+        "reported": "有举报",
+        "published": "已发布",
+        "rejected": "被退回",
+        "unpublished": "已下架",
+        "draft": "草稿",
+        "all": "全部"
+      },
+      "statuses": {
+        "draft": "草稿",
+        "pending": "审核中",
+        "published": "已发布",
+        "rejected": "被退回",
+        "unpublished": "已下架"
+      },
+      "version_statuses": {
+        "draft": "工作稿",
+        "pending": "待审",
+        "rejected": "被退回",
+        "published": "已发布"
+      },
+      "types": {
+        "review": "评测",
+        "feature": "专题",
+        "interview": "访谈",
+        "news": "资讯",
+        "guide": "指南",
+        "translation": "译文",
+        "essay": "随笔",
+        "other": "其他"
+      },
+      "link_types": {
+        "work": "作品",
+        "artist": "艺术家",
+        "entry": "条目",
+        "series": "系列",
+        "event": "活动"
+      }
     },
     "lyrics": {
       "title": "歌词管理",
@@ -917,6 +1048,8 @@
         "event_series": "活动系列",
         "link_provider": "链接提供方",
         "setting": "站点设置",
+        "tag": "标签",
+        "word_filter": "过滤关键词",
         "system": "系统"
       }
     },
@@ -982,7 +1115,201 @@
       "system": "系统"
     },
     "search_menu": "搜索菜单",
-    "no_menu_match": "没有匹配的菜单"
+    "no_menu_match": "没有匹配的菜单",
+    "tags": {
+      "title": "标签库",
+      "description": "文章和讨论区共用的标签。用户只能从这里选；可以合并写法不同的重复标签。",
+      "search": "搜索标签",
+      "name": "名称",
+      "articles": "文章数",
+      "staff_only": "仅管理者",
+      "staff_only_help": "只有管理者可以使用这个标签",
+      "create": "新建标签",
+      "edit": "编辑标签",
+      "slug_help": "小写字母、数字和连字符，用在筛选地址里。",
+      "name_en": "英文名称（可选）",
+      "name_ja": "日文名称（可选）",
+      "tag_description": "说明（可选）",
+      "merge": "合并",
+      "merge_title": "合并「{name}」",
+      "merge_help": "这个标签下的文章和草稿会改用目标标签，然后删除这个标签。",
+      "merge_target": "选择目标标签",
+      "merged": "已合并",
+      "delete_title": "删除「{name}」",
+      "delete_help": "会从所有文章和草稿上移除这个标签。",
+      "deleted": "已删除",
+      "topics": "讨论"
+    },
+    "word_filters": {
+      "title": "关键词过滤",
+      "description": "提交审核和发布修改时检查标题、摘要和正文。屏蔽：拒绝保存；标记：照常保存，同时生成一条举报。关键词按全角转半角、忽略大小写匹配。",
+      "word": "关键词",
+      "action": "动作",
+      "actions": {
+        "block": "屏蔽",
+        "flag": "标记"
+      },
+      "note": "备注",
+      "add": "添加",
+      "all": "全部",
+      "switch": "切换动作",
+      "deleted": "已删除"
+    },
+    "reports": {
+      "title": "举报处理",
+      "description": "按被举报的内容汇总。同一对象的待处理举报一起结案，举报人会收到结果通知。",
+      "tabs": {
+        "pending": "待处理",
+        "handled": "已处理"
+      },
+      "clear_filter": "显示全部",
+      "count": "{count} 条举报",
+      "dismiss": "驳回",
+      "accept_only": "认可（不处置）",
+      "accept_unpublish": "认可并下架",
+      "accept_delete": "认可并删除",
+      "system": "关键词过滤",
+      "reasons": {
+        "spam": "广告",
+        "abuse": "人身攻击或引战",
+        "spoiler": "未标剧透",
+        "off_topic": "离题或灌水",
+        "infringement": "侵权",
+        "illegal": "违法",
+        "other": "其他",
+        "filter": "关键词命中"
+      },
+      "outcomes": {
+        "accepted": "已认可",
+        "dismissed": "已驳回"
+      },
+      "resolutions": {
+        "unpublish": "下架",
+        "delete": "删除",
+        "none": "不处置",
+        "hide": "折叠"
+      },
+      "confirm": {
+        "dismiss": "驳回这些举报",
+        "none": "认可举报，不处置",
+        "unpublish": "认可举报并下架文章",
+        "delete": "认可举报并删除文章",
+        "post_hide": "认可举报并折叠帖子",
+        "post_delete": "认可举报并删除帖子"
+      },
+      "confirm_help": "同一篇文章的所有待处理举报都会结案。",
+      "resolved": "已处理",
+      "accept_hide": "认可并折叠",
+      "accept_delete_post": "认可并删除",
+      "types": {
+        "all": "全部",
+        "article": "文章",
+        "post": "帖子"
+      },
+      "confirm_help_post": "同一条帖子的所有待处理举报都会结案。被自动折叠的帖子在驳回后会恢复。",
+      "silence": "同时禁言作者",
+      "silence_none": "不禁言"
+    },
+    "discussions": {
+      "categories": {
+        "title": "讨论版块",
+        "description": "最多两层。拖动调整同级顺序；还有主题的版块不能删除，要先移走。",
+        "drag_hint": "拖动条目调整同级版块的顺序",
+        "save_order": "保存排序",
+        "ordered": "排序已保存",
+        "deleted": "版块已删除",
+        "create": "新建版块",
+        "edit": "编辑版块",
+        "name": "名称",
+        "parent": "上级版块",
+        "top_level": "（顶级版块）",
+        "category_description": "说明",
+        "color": "颜色",
+        "icon": "图标（lucide 名称）",
+        "kind": "类型",
+        "kinds": {
+          "discussion": "普通",
+          "question": "问答"
+        },
+        "visibility": "可见范围",
+        "visibilities": {
+          "public": "公开",
+          "staff": "仅版主"
+        },
+        "moderators_only": "仅版主发主题",
+        "moderators_only_help": "只有版主能发主题（其他人可以回复）",
+        "show_in_latest": "出现在讨论区首页的「最新」里",
+        "not_in_latest": "不进「最新」",
+        "archived": "已归档",
+        "archive_help": "归档：不能再发主题和回复",
+        "system": "系统版块",
+        "topics": "{count} 个主题",
+        "template": "发帖模板",
+        "template_placeholder": "发主题时预填到编辑器里，例如：\n曲目信息：\n试听链接：\n出处：",
+        "delete_title": "删除版块「{name}」？",
+        "delete_help": "版块里没有主题和子版块时才能删除。"
+      },
+      "posts": {
+        "title": "帖子检索",
+        "description": "全站帖子，包括已折叠和已删除的。有用户管理权限时还能按 IP 查找。",
+        "search": "搜索正文",
+        "user": "用户名",
+        "category": "版块 slug",
+        "topic_id": "主题 ID",
+        "edits": "编辑 {count} 次",
+        "reason": "原因：{reason}"
+      },
+      "restrictions": {
+        "title": "禁言",
+        "description": "当前和历史禁言。禁言期间可以看帖、点表情、收藏和举报，不能发帖、回复和编辑。",
+        "tabs": {
+          "active": "生效中",
+          "all": "全部"
+        },
+        "user": "用户",
+        "until": "截止",
+        "by": "由 {name} 设置",
+        "revoked_at": "{time} 由 {name} 解除",
+        "revoke": "解除",
+        "revoke_title": "解除对 {name} 的禁言？",
+        "revoked": "已解除禁言",
+        "create": "新建禁言",
+        "username": "用户名",
+        "duration": "时长",
+        "help": "只能禁言等级比你低的用户。当事人会收到通知和原因。",
+        "submit": "禁言",
+        "created": "已禁言"
+      },
+      "post_statuses": {
+        "visible": "正常",
+        "hidden": "已折叠",
+        "deleted": "已删除"
+      },
+      "actions": {
+        "hide": "折叠",
+        "unhide": "取消折叠",
+        "delete": "删除",
+        "restore": "恢复",
+        "purge": "清理广告号"
+      },
+      "confirm": {
+        "hide": "折叠这条帖子",
+        "unhide": "取消折叠",
+        "delete": "删除这条帖子",
+        "restore": "恢复这条帖子",
+        "purge": "清理 {name} 的账号"
+      },
+      "confirm_help": {
+        "hide": "对外显示「已被折叠」和原因。",
+        "unhide": "帖子恢复正常显示。",
+        "delete": "原文保留，可以恢复。",
+        "restore": "帖子恢复正常显示。",
+        "purge": "永久禁言，并删除该用户的全部主题和帖子。要禁用整个账号，请到用户管理操作。"
+      },
+      "days": "{count} 天",
+      "forever": "永久",
+      "reply_under": "#{floor} 的楼中楼"
+    }
   },
   "article_ui": {
     "back": "返回",
@@ -1007,7 +1334,202 @@
     "back_to_list": "返回文章列表",
     "word_count": "约 {count} 字",
     "reading_time": "阅读约 {count} 分钟",
-    "toc": "目录"
+    "toc": "目录",
+    "write": "写文章",
+    "untitled": "无标题",
+    "featured": "编辑推荐",
+    "has_changes": "有未发布的修改",
+    "views": "{count} 次浏览",
+    "minutes": "{count} 分钟",
+    "types": {
+      "review": "评测",
+      "feature": "专题",
+      "interview": "访谈",
+      "news": "资讯",
+      "guide": "指南",
+      "translation": "译文",
+      "essay": "随笔",
+      "other": "其他"
+    },
+    "statuses": {
+      "draft": "草稿",
+      "pending": "审核中",
+      "published": "已发布",
+      "rejected": "被退回",
+      "unpublished": "已下架"
+    },
+    "link_types": {
+      "work": "作品",
+      "artist": "艺术家",
+      "entry": "条目",
+      "series": "系列",
+      "event": "活动"
+    },
+    "fields": {
+      "title": "标题",
+      "type": "类型",
+      "tags": "标签",
+      "summary": "摘要",
+      "summary_placeholder": "一两句话介绍这篇文章",
+      "summary_hint": "显示在列表和分享卡片上；不填则取正文开头。",
+      "cover": "封面",
+      "cover_https": "请填写 https 开头的图片地址。",
+      "cover_preview": "封面预览",
+      "cover_broken": "图片无法加载，请检查地址。",
+      "links": "关联内容",
+      "links_hint": "文章会出现在这些作品、艺术家、条目、系列页面的「相关文章」里。",
+      "advanced": "高级设置",
+      "slug": "自定义链接",
+      "slug_hint": "可选。小写字母、数字和连字符，会出现在文章地址的末尾。"
+    },
+    "links": {
+      "type": "内容类型",
+      "search": "搜索{type}…",
+      "full": "最多关联 {max} 个",
+      "no_results": "没有找到。",
+      "search_failed": "搜索失败，请重试。",
+      "remove": "移除 {title}"
+    },
+    "tags": {
+      "filter": "筛选标签…",
+      "full": "最多 {max} 个标签",
+      "no_match": "没有匹配的标签。",
+      "empty": "标签库还是空的。",
+      "remove": "移除 {name}"
+    },
+    "writer": {
+      "new_title": "写文章",
+      "edit_title": "编辑文章",
+      "mode": "编辑模式",
+      "modes": {
+        "edit": "写作",
+        "split": "分屏",
+        "preview": "预览"
+      },
+      "outline": "大纲",
+      "outline_empty": "用 ## 标题划分段落后，这里会显示大纲。",
+      "saving": "保存中…",
+      "unsaved": "有未保存的修改",
+      "save_failed": "保存失败",
+      "not_saved": "尚未保存",
+      "saved": "已保存",
+      "saved_at": "已保存 {time}",
+      "actions": {
+        "submit": "提交审核",
+        "resubmit": "重新提交",
+        "publish": "发布",
+        "publish_changes": "发布修改",
+        "withdraw": "撤回审核"
+      },
+      "discard": "放弃修改",
+      "discard_title": "放弃修改？",
+      "discard_description": "工作稿会被删除，回到线上的版本。这一步无法撤销。",
+      "discarded": "已放弃修改",
+      "withdrawn": "已撤回，可以继续编辑",
+      "submitted": "已提交审核",
+      "published": "已发布",
+      "notice_pending": "文章正在审核中，暂时不能修改。需要修改时，请先撤回审核。",
+      "notice_rejected": "文章被退回：",
+      "notice_unpublished": "文章已被下架：",
+      "notice_published": "你正在编辑已发布的文章，点击「发布修改」后才会替换线上内容。",
+      "backup_found": "发现一份 {time} 未保存到服务器的本地内容。",
+      "backup_restore": "恢复",
+      "backup_dismiss": "丢弃",
+      "conflict_title": "草稿在别处被修改过",
+      "conflict_description": "服务器上有一份 {time} 保存的更新版本，可能来自另一个窗口。要保留哪一份？",
+      "conflict_keep_mine": "保留我的内容",
+      "conflict_use_server": "使用服务器上的版本",
+      "leave_confirm": "还有内容没保存成功，确定离开吗？"
+    },
+    "submit": {
+      "submit_title": "提交审核",
+      "submit_description": "审核通过后文章才会公开。之后再修改无需审核。",
+      "submit_confirm": "提交",
+      "publish_title": "发布",
+      "publish_description": "内容会立即公开，旧版本会保留在版本记录里。",
+      "publish_confirm": "发布",
+      "checks": {
+        "title": "标题 2–100 字",
+        "type": "选择文章类型",
+        "content": "正文至少 300 字",
+        "summary": "填写摘要",
+        "cover": "设置封面"
+      },
+      "optional": "建议",
+      "note": "给审核人的留言（可选）",
+      "note_placeholder": "比如资料来源、转载授权等"
+    },
+    "errors": {
+      "title": "标题需要 2–100 字。",
+      "type": "请选择文章类型。",
+      "content": "正文太短或太长。",
+      "summary": "摘要太长。",
+      "cover_url": "封面地址无效。",
+      "links": "有关联的内容不存在。",
+      "tag_ids": "有标签不可用。",
+      "slug": "这个链接已被占用或格式不对。",
+      "blocked": "内容包含不允许的词语，请修改后再试。",
+      "pending_limit": "你已有 3 篇文章在审核中，请等待审核结果。",
+      "conflict": "草稿在别处被修改过，请选择要保留的版本。",
+      "invalid_state": "文章当前的状态不允许这个操作，请刷新后重试。",
+      "revision": "草稿版本已过期，请刷新后重试。",
+      "note": "留言最多 1000 字。"
+    },
+    "mine": {
+      "title": "我的文章",
+      "description": "草稿会自动保存。第一次发布需要审核，之后的修改立即生效。",
+      "filter": "按状态筛选",
+      "all": "全部",
+      "empty": "这里还没有文章。",
+      "reason": "原因：",
+      "updated": "更新于 {time}",
+      "view": "查看",
+      "deleted": "已删除",
+      "delete_title": "删除文章",
+      "delete_description": "「{title}」和它的所有版本都会被永久删除。"
+    },
+    "list": {
+      "featured": "编辑推荐",
+      "all_types": "全部类型",
+      "all_tags": "全部标签",
+      "sort": "排序",
+      "latest": "最新",
+      "popular": "最热",
+      "search": "搜索文章",
+      "no_match": "没有符合条件的文章。"
+    },
+    "reader": {
+      "links": "关联内容",
+      "updated": "更新于 {date}",
+      "manage": "管理",
+      "more_by": "{name} 的其他文章"
+    },
+    "report": {
+      "title": "举报",
+      "reason": "原因",
+      "reasons": {
+        "spam": "广告",
+        "abuse": "人身攻击或引战",
+        "spoiler": "未标剧透",
+        "infringement": "侵权（如未经授权转载）",
+        "illegal": "违法内容",
+        "other": "其他"
+      },
+      "note": "补充说明（可选）",
+      "note_required": "请说明举报原因",
+      "submit": "提交举报",
+      "done": "已收到你的举报，会尽快处理。",
+      "already": "你已经举报过这篇文章，正在等待处理。",
+      "too_many": "举报太频繁，请稍后再试。"
+    },
+    "related": {
+      "title": "相关文章",
+      "all": "全部文章"
+    },
+    "profile": {
+      "title": "文章",
+      "all": "查看全部"
+    }
   },
   "collection_pages": {
     "favorites": {
@@ -1016,7 +1538,7 @@
       "works": "我喜欢的专辑",
       "songs": "我喜欢的歌曲",
       "artists": "我喜欢的艺术家",
-      "seo_title": "我的收藏 | CDCAT"
+      "seo_title": "我的收藏"
     },
     "reviews": {
       "title": "我的评价",
@@ -1032,7 +1554,7 @@
       "delete_title": "删除评价",
       "delete_confirm": "确定要删除这条评价吗？此操作无法撤销。",
       "load_failed": "评价加载失败，请刷新后重试。",
-      "seo_title": "我的评价 | CDCAT"
+      "seo_title": "我的评价"
     },
     "events": {
       "title": "活动",
@@ -1495,13 +2017,24 @@
     },
     "notifications": {
       "title": "通知设置",
-      "description": "管理通知方式和接收偏好。",
-      "body": "通知设置功能正在开发中，上线后你可以在这里自定义通知方式和接收偏好。"
+      "description": "决定哪些动态会出现在站内通知里。",
+      "reactions": "表情回应通知",
+      "reactions_help": "有人对你的帖子点表情时通知你。同一条帖子的回应会合并成一条。",
+      "saved": "已保存",
+      "levels_hint": "主题和版块的通知级别（关注、普通、静音）在讨论区对应页面上设置。"
     },
     "privacy": {
       "title": "隐私设置",
       "description": "控制个人信息可见性和数据隐私。",
-      "body": "隐私设置功能正在开发中，上线后你可以精细控制个人信息的可见范围。"
+      "blocks_title": "屏蔽列表",
+      "blocks_description": "被屏蔽的人的帖子会折叠显示，他发起的主题不出现在你的列表里，他的回复、提及和回应不会通知你。对方不会知道。",
+      "username_placeholder": "输入用户名",
+      "block": "屏蔽",
+      "unblock": "取消屏蔽",
+      "blocked": "已屏蔽 {name}",
+      "unblocked": "已取消屏蔽 {name}",
+      "blocked_on": "屏蔽于 {date}",
+      "no_blocks": "你还没有屏蔽任何人。"
     },
     "danger": {
       "title": "危险操作",
@@ -1561,7 +2094,24 @@
       "stage": "舞台剧",
       "other": "其他"
     },
-    "format": "形式",
+    "format": {
+      "tv": "TV",
+      "movie": "剧场版",
+      "ova": "OVA",
+      "web": "WEB",
+      "special": "特别篇",
+      "full": "本体",
+      "dlc": "DLC",
+      "expansion": "资料片",
+      "series": "连续剧",
+      "novel": "小说",
+      "light_novel": "轻小说",
+      "other": "其他",
+      "serial": "连载",
+      "oneshot": "短篇",
+      "musical": "音乐剧",
+      "play": "话剧"
+    },
     "relation": {
       "sequel": "续作",
       "prequel": "前作",
@@ -1602,6 +2152,7 @@
     "search_placeholder": "搜索名称、别名、简称",
     "search": "搜索",
     "type": "类型",
+    "format_label": "形式",
     "platforms": "平台",
     "episodes": "话数",
     "episodes_count": "{count} 话",
@@ -1732,6 +2283,348 @@
       "streaming": "流媒体",
       "social": "社交媒体",
       "other": "其他"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "bell_unread": "通知，{count} 条未读",
+    "mark_all": "全部标为已读",
+    "view_all": "查看全部通知",
+    "empty": "暂无通知",
+    "reason": "原因：",
+    "filters": {
+      "all": "全部",
+      "unread": "未读"
+    },
+    "types": {
+      "article_approved": "你的文章「{title}」已通过审核并发布",
+      "article_rejected": "你的文章「{title}」被退回",
+      "article_unpublished": "你的文章「{title}」被下架",
+      "article_republished": "你的文章「{title}」已恢复上线",
+      "article_featured": "你的文章「{title}」被设为编辑推荐",
+      "article_edited": "版主编辑了你的文章「{title}」",
+      "article_deleted": "你的文章「{title}」被删除",
+      "report_accepted": "你对「{title}」的举报已处理",
+      "report_dismissed": "你对「{title}」的举报经核实未处置",
+      "discussion_topic_reply": "{actor} 回复了你的主题「{title}」",
+      "discussion_topic_reply_many": "{actor} 等 {count} 人回复了你的主题「{title}」",
+      "discussion_watching": "{actor} 回复了你关注的主题「{title}」",
+      "discussion_watching_many": "{actor} 等 {count} 人回复了你关注的主题「{title}」",
+      "discussion_floor_reply": "{actor} 回复了你在「{title}」的 #{floor}",
+      "discussion_reply": "{actor} 在「{title}」中回复了你",
+      "discussion_mention": "{actor} 在「{title}」中提到了你",
+      "discussion_quote": "{actor} 在「{title}」中引用了你的帖子",
+      "discussion_reaction": "{actor} 回应了你在「{title}」的帖子",
+      "discussion_reaction_many": "{actor} 等 {count} 人回应了你在「{title}」的帖子",
+      "discussion_accepted": "你在「{title}」的回复被采纳为答案",
+      "discussion_new_topic": "{actor} 在你关注的版块发布了「{title}」",
+      "discussion_moderation": {
+        "hidden": "你在「{title}」的帖子被折叠",
+        "deleted": "你在「{title}」的内容被删除",
+        "edited": "版主编辑了你在「{title}」的内容",
+        "moved": "你的主题「{title}」被移动到其他版块",
+        "silenced": "你在讨论区被禁言"
+      }
+    },
+    "reason_line": "原因：{reason}"
+  },
+  "discussions": {
+    "title": "讨论区",
+    "description": "聊专辑、找歌、分享收藏，也聊展会和数据库编辑。",
+    "back": "返回讨论区",
+    "breadcrumb": "位置",
+    "new_topic": "发起主题",
+    "categories": "版块",
+    "all_topics": "全部主题",
+    "popular_tags": "热门标签",
+    "status": {
+      "pinned": "置顶",
+      "featured": "精华",
+      "locked": "已锁定",
+      "solved": "已解决"
+    },
+    "list": {
+      "tabs": "主题列表",
+      "tab": {
+        "latest": "最新",
+        "new": "新帖",
+        "hot": "热门",
+        "featured": "精华",
+        "unread": "未读",
+        "watching": "关注"
+      },
+      "status": "解决状态",
+      "status_all": "全部",
+      "status_unsolved": "未解决",
+      "status_solved": "已解决",
+      "empty": "这里还没有主题。",
+      "empty_unread": "没有未读的新回复。",
+      "empty_watching": "你还没有关注任何主题。",
+      "unread_count": "{count} 条新回复",
+      "new_topic": "没看过的主题"
+    },
+    "category": {
+      "topics": "{count} 个主题",
+      "question": "问答版块：可以采纳最佳答案",
+      "moderators_only": "只有版主能发主题",
+      "staff": "仅版主可见",
+      "archived": "已归档"
+    },
+    "tag": {
+      "label": "标签"
+    },
+    "levels": {
+      "watching": "关注",
+      "normal": "普通",
+      "muted": "静音",
+      "topic_help": {
+        "watching": "每条新回复都通知我",
+        "normal": "只在有人回复、提及或引用我时通知",
+        "muted": "不通知，也不出现在未读里"
+      },
+      "category_help": {
+        "watching": "有新主题时通知我",
+        "normal": "不通知",
+        "muted": "这个版块的主题不出现在讨论区首页"
+      }
+    },
+    "fields": {
+      "title": "标题",
+      "category": "版块",
+      "tags": "标签",
+      "links": "关联内容"
+    },
+    "topic": {
+      "replies": "{count} 回复",
+      "views": "{count} 浏览",
+      "article": "文章：{title}",
+      "only_op": "只看楼主",
+      "newest_first": "倒序",
+      "jump": "跳到楼层",
+      "new_replies": "有 {count} 条新回复，点击查看",
+      "edit_title": "编辑主题",
+      "saved": "主题已更新",
+      "invalid": "标题要 4–120 个字。",
+      "delete": "删除主题",
+      "delete_title": "删除这个主题？",
+      "delete_help": "删除后其他人将看不到这个主题。只有在没有其他人回复时才能删除。",
+      "deleted": "主题已删除",
+      "deleted_notice": "这个主题已被删除（{reason}），只有版主能看到。",
+      "hidden_notice": "这个主题已被折叠，不会出现在列表里。"
+    },
+    "post": {
+      "op": "楼主",
+      "moderator": "版主",
+      "edited": "已编辑",
+      "reply": "回复",
+      "quote": "引用",
+      "replied_to": "回复",
+      "more": "更多操作",
+      "copy_link": "复制链接",
+      "link_copied": "链接已复制",
+      "bookmark": "收藏",
+      "unbookmark": "取消收藏",
+      "bookmarked": "已收藏",
+      "unbookmarked": "已取消收藏",
+      "history": "编辑历史",
+      "view_all_replies": "查看全部 {count} 条回复",
+      "deleted": "已删除",
+      "deleted_by_author": "该楼已被作者删除",
+      "deleted_by_moderator": "该楼已被版主删除",
+      "hidden": "该楼已被折叠",
+      "hidden_reason": "该楼已被折叠：{reason}",
+      "auto_hidden": "收到多次举报，等待版主处理",
+      "blocked": "你已屏蔽该用户",
+      "expand": "展开",
+      "collapse": "收起",
+      "delete_title": "删除这条帖子？",
+      "delete_floor_help": "楼层会留下「已被作者删除」的占位，楼层号不变，下面的回复照常显示。",
+      "delete_first_help": "一楼会留下占位，主题和回复保留。要删除整个主题，请在没有他人回复时使用「删除主题」。",
+      "delete_reply_help": "删除后这条回复将不再显示。"
+    },
+    "answer": {
+      "badge": "最佳答案",
+      "accept": "采纳为答案",
+      "unaccept": "取消采纳",
+      "accepted": "已采纳为答案",
+      "unaccepted": "已取消采纳",
+      "summary": "最佳答案：#{floor} {name}"
+    },
+    "reactions": {
+      "add": "添加表情回应",
+      "label": "{emoji} {count}",
+      "and_more": "{names} 等 {count} 人",
+      "names": {
+        "thumbs_up": "赞",
+        "heart": "喜欢",
+        "joy": "笑哭",
+        "open_mouth": "惊讶",
+        "cry": "难过",
+        "tada": "庆祝",
+        "fire": "火热",
+        "eyes": "围观",
+        "thinking": "思考",
+        "pray": "拜托",
+        "clap": "鼓掌",
+        "hundred": "满分",
+        "notes": "好听",
+        "headphones": "在听",
+        "smitten": "心动",
+        "sweat_smile": "尴尬"
+      }
+    },
+    "composer": {
+      "title": "回复主题",
+      "floor_placeholder": "写下你的想法… 支持 Markdown，输入 {'@'} 提及用户，输入 [[ 插入数据库内容",
+      "reply_placeholder": "写回复…",
+      "send_floor": "发表回复",
+      "send_reply": "回复",
+      "shortcut": "Ctrl / ⌘ + Enter 发送",
+      "replying_to": "回复 {name}",
+      "posted": "回复已发表",
+      "login": "登录后参与讨论",
+      "locked": "主题已锁定，不能再回复。",
+      "closed": "这里暂时不能回复。",
+      "silenced_until": "你已被禁言至 {date}。原因：{reason}",
+      "silenced_forever": "你已被永久禁言。原因：{reason}",
+      "rate_limited": "发得太快了，请 {seconds} 秒后再试。",
+      "length": "内容需要 {min}–{max} 个字。"
+    },
+    "report": {
+      "title": "举报",
+      "reason": "原因",
+      "note": "补充说明（可选）",
+      "note_required": "请说明原因",
+      "submit": "提交举报",
+      "done": "举报已提交，版主会尽快处理。",
+      "already": "你已经举报过这条帖子，正在等待处理。",
+      "reasons": {
+        "spam": "广告",
+        "abuse": "人身攻击或引战",
+        "spoiler": "未标剧透",
+        "off_topic": "离题或灌水",
+        "infringement": "侵权",
+        "illegal": "违法",
+        "other": "其他"
+      }
+    },
+    "history": {
+      "title": "编辑历史",
+      "edit_number": "第 {n} 次编辑",
+      "reason": "原因：{reason}",
+      "hidden": "已隐藏",
+      "hide": "隐藏这个版本",
+      "show": "显示这个版本",
+      "hidden_text": "这个版本已被版主隐藏。",
+      "hidden_done": "已隐藏这个版本",
+      "shown_done": "已显示这个版本",
+      "empty": "没有编辑记录。",
+      "changed_title": "标题：{before} → {after}",
+      "changed_category": "版块：{before} → {after}",
+      "changed_tags": "标签：{before} → {after}",
+      "changed_links": "修改了关联内容"
+    },
+    "moderation": {
+      "title": "管理",
+      "post_title": "管理 {floor}",
+      "reply": "楼中楼",
+      "topic_title": "管理主题",
+      "actions": {
+        "hide": "折叠",
+        "unhide": "取消折叠",
+        "delete": "删除",
+        "restore": "恢复",
+        "edit": "编辑",
+        "silence": "禁言作者"
+      },
+      "help": {
+        "hide": "对外显示「该楼已被折叠」和原因，只有作者和版主能展开。折叠一楼时主题也会从列表里消失。",
+        "unhide": "恢复正常显示。",
+        "delete": "对外显示占位（楼中楼直接不显示）。原文保留，可以恢复。",
+        "restore": "恢复为正常显示。",
+        "edit": "修改会记入编辑历史，作者会收到通知和原因。",
+        "silence": "禁言期间可以看帖、点表情、收藏和举报，不能发帖、回复和编辑。"
+      },
+      "reason": "原因（必填，会通知作者）",
+      "reason_optional": "原因（可选）",
+      "reason_required": "请填写原因",
+      "duration": "禁言时长",
+      "days": "{count} 天",
+      "forever": "永久",
+      "done": "操作已完成",
+      "silenced": "已禁言 {name}",
+      "pin": "置顶",
+      "pin_scopes": {
+        "none": "不置顶",
+        "category": "版块内",
+        "global": "全站"
+      },
+      "pin_until": "截止时间（可选）",
+      "featured": "设为精华",
+      "locked": "锁定（不能再回复）",
+      "delete_topic": "删除主题",
+      "restore_topic": "恢复主题"
+    },
+    "new": {
+      "title": "发起主题",
+      "choose_category": "选择版块",
+      "title_placeholder": "一句话说清楚你想聊什么",
+      "optional": "（可选）",
+      "links_hint": "主题会出现在这些页面的「相关讨论」里",
+      "draft_hint": "内容会自动保存在这台设备上",
+      "submit": "发布主题",
+      "posted": "主题已发布",
+      "question_hint": "这是问答版块：之后可以采纳最有帮助的回复为答案。",
+      "invalid": {
+        "title": "标题要 4–120 个字。",
+        "raw": "正文需要 2–20000 个字。",
+        "category_id": "请选择可以发主题的版块。",
+        "tag_ids": "标签无效或超过 5 个。",
+        "links": "关联内容无效或超过 10 个。",
+        "other": "请检查填写的内容。"
+      }
+    },
+    "search": {
+      "title": "搜索讨论",
+      "title_for": "搜索「{q}」",
+      "placeholder": "搜索主题和帖子…",
+      "submit": "搜索",
+      "scope": {
+        "topics": "主题",
+        "posts": "帖子"
+      },
+      "all_categories": "全部版块",
+      "hint": "输入至少两个字开始搜索。",
+      "results": "共 {count} 条结果",
+      "empty": "没有找到相关内容。",
+      "reply_under": "#{floor} 的楼中楼"
+    },
+    "related": {
+      "title": "相关讨论",
+      "start": "发起讨论",
+      "empty": "还没有相关讨论。",
+      "more": "查看全部 {count} 个讨论"
+    },
+    "profile": {
+      "title": "讨论",
+      "topics": "主题 {count}",
+      "posts": "回复 {count}",
+      "no_topics": "还没有发起过主题。",
+      "no_posts": "还没有回复过。",
+      "in_topic": "在「{title}」中"
+    },
+    "bookmarks": {
+      "tab": "帖子",
+      "empty": "还没有收藏的帖子。",
+      "saved": "收藏于 {time}",
+      "unavailable": "这条帖子已不可见"
+    },
+    "comments": {
+      "title": "评论",
+      "open_topic": "在讨论区打开",
+      "reactions": "回应这篇文章",
+      "empty": "还没有评论，来说两句吧。",
+      "login": "登录后发表评论"
     }
   }
 }

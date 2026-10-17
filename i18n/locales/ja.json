@@ -20,7 +20,9 @@
     "account": "アカウント設定",
     "login": "ログイン",
     "register": "新規登録",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "articles": "自分の記事",
+    "notifications": "通知"
   },
   "admin": {
     "console": "管理画面"
@@ -358,7 +360,8 @@
     "select_language_code": "言語コードを選択または入力…",
     "use_custom_code": "カスタムコードを使用",
     "search_language": "キーワードで言語を検索",
-    "no_more_matches": "ほかに一致する項目はありません"
+    "no_more_matches": "ほかに一致する項目はありません",
+    "retry": "再試行"
   },
   "errors": {
     "request_failed": "リクエストに失敗しました。もう一度お試しください。",
@@ -383,7 +386,25 @@
       "artist_merge_impact_changed": "統合の影響が変わりました。再確認してください。",
       "registration_closed": "現在、新規登録を停止しています。",
       "operation_in_progress": "同じ操作を実行中です。しばらくしてから再試行してください。",
-      "job_not_retryable": "この失敗したジョブは管理画面から再試行できません。"
+      "job_not_retryable": "この失敗したジョブは管理画面から再試行できません。",
+      "article_not_found": "記事が存在しないか、まだ公開されていません。",
+      "article_draft_conflict": "この下書きは別の場所で変更されました。読み込み直してください。",
+      "article_invalid_state": "記事の現在の状態ではこの操作はできません。",
+      "article_pending_limit": "審査中の記事がすでに 3 件あります。結果をお待ちください。",
+      "content_blocked": "使用できない語句が含まれています。",
+      "already_reported": "すでに報告済みです。対応をお待ちください。",
+      "rate_limit_exceeded": "操作が多すぎます。しばらくしてからお試しください。",
+      "discussion_category_not_found": "カテゴリーが存在しません。",
+      "discussion_topic_not_found": "トピックが存在しないか、削除されました。",
+      "discussion_post_not_found": "投稿が存在しないか、削除されました。",
+      "discussion_topic_locked": "このトピックはロックされています。",
+      "discussion_category_closed": "このカテゴリーには現在トピックを作成できません。",
+      "discussion_silenced": "発言が制限されているため投稿できません。",
+      "discussion_duplicate_post": "同じ内容を少し前に投稿しています。",
+      "discussion_new_user_limit": "新規ユーザーの投稿はリンク 2 個まで、画像なし、メンション 3 人までです。",
+      "discussion_own_reaction": "自分の投稿にはリアクションできません。",
+      "discussion_topic_has_replies": "他の人が返信しているため削除できません。モデレーターに通報してください。",
+      "user_block_not_allowed": "このユーザーはブロックできません。"
     }
   },
   "admin_pages": {
@@ -462,7 +483,202 @@
     "back_to_list": "記事一覧に戻る",
     "word_count": "約{count}文字",
     "reading_time": "読了目安 {count}分",
-    "toc": "目次"
+    "toc": "目次",
+    "write": "記事を書く",
+    "untitled": "無題",
+    "featured": "編集部のおすすめ",
+    "has_changes": "未公開の変更あり",
+    "views": "{count} 回閲覧",
+    "minutes": "{count} 分",
+    "types": {
+      "review": "レビュー",
+      "feature": "特集",
+      "interview": "インタビュー",
+      "news": "ニュース",
+      "guide": "ガイド",
+      "translation": "翻訳",
+      "essay": "エッセイ",
+      "other": "その他"
+    },
+    "statuses": {
+      "draft": "下書き",
+      "pending": "審査中",
+      "published": "公開中",
+      "rejected": "差し戻し",
+      "unpublished": "非公開"
+    },
+    "link_types": {
+      "work": "作品",
+      "artist": "アーティスト",
+      "entry": "原作",
+      "series": "シリーズ",
+      "event": "イベント"
+    },
+    "fields": {
+      "title": "タイトル",
+      "type": "種類",
+      "tags": "タグ",
+      "summary": "概要",
+      "summary_placeholder": "この記事を一、二文で紹介",
+      "summary_hint": "一覧や共有カードに表示されます。空欄なら本文の冒頭を使います。",
+      "cover": "カバー画像",
+      "cover_https": "https で始まる画像の URL を入力してください。",
+      "cover_preview": "カバーのプレビュー",
+      "cover_broken": "画像を読み込めません。URL を確認してください。",
+      "links": "関連コンテンツ",
+      "links_hint": "記事はこれらの作品・アーティスト・原作・シリーズのページの「関連記事」に表示されます。",
+      "advanced": "詳細設定",
+      "slug": "カスタムリンク",
+      "slug_hint": "任意。英小文字・数字・ハイフンで、記事の URL の末尾に付きます。"
+    },
+    "links": {
+      "type": "コンテンツの種類",
+      "search": "{type}を検索…",
+      "full": "最大 {max} 件まで",
+      "no_results": "見つかりません。",
+      "search_failed": "検索に失敗しました。もう一度お試しください。",
+      "remove": "{title} を外す"
+    },
+    "tags": {
+      "filter": "タグを絞り込む…",
+      "full": "タグは最大 {max} 個まで",
+      "no_match": "一致するタグがありません。",
+      "empty": "タグはまだありません。",
+      "remove": "{name} を外す"
+    },
+    "writer": {
+      "new_title": "記事を書く",
+      "edit_title": "記事を編集",
+      "mode": "編集モード",
+      "modes": {
+        "edit": "執筆",
+        "split": "分割",
+        "preview": "プレビュー"
+      },
+      "outline": "アウトライン",
+      "outline_empty": "## の見出しで段落を区切ると、ここにアウトラインが表示されます。",
+      "saving": "保存中…",
+      "unsaved": "未保存の変更があります",
+      "save_failed": "保存に失敗しました",
+      "not_saved": "まだ保存されていません",
+      "saved": "保存済み",
+      "saved_at": "{time} に保存",
+      "actions": {
+        "submit": "審査に出す",
+        "resubmit": "再提出",
+        "publish": "公開",
+        "publish_changes": "変更を公開",
+        "withdraw": "審査を取り下げる"
+      },
+      "discard": "変更を破棄",
+      "discard_title": "変更を破棄しますか？",
+      "discard_description": "作業中の版を削除し、公開中の版に戻ります。元に戻せません。",
+      "discarded": "変更を破棄しました",
+      "withdrawn": "取り下げました。編集を続けられます。",
+      "submitted": "審査に出しました",
+      "published": "公開しました",
+      "notice_pending": "審査中のため編集できません。変更するには審査を取り下げてください。",
+      "notice_rejected": "差し戻されました：",
+      "notice_unpublished": "非公開になりました：",
+      "notice_published": "公開中の記事を編集しています。「変更を公開」を押すまで読者には反映されません。",
+      "backup_found": "サーバーに保存されていない {time} のローカルの内容があります。",
+      "backup_restore": "復元",
+      "backup_dismiss": "破棄",
+      "conflict_title": "下書きが別の場所で変更されました",
+      "conflict_description": "サーバーに {time} に保存された新しい版があります（別のウィンドウかもしれません）。どちらを残しますか？",
+      "conflict_keep_mine": "自分の内容を残す",
+      "conflict_use_server": "サーバーの版を使う",
+      "leave_confirm": "保存されていない変更があります。ページを離れますか？"
+    },
+    "submit": {
+      "submit_title": "審査に出す",
+      "submit_description": "承認されると公開されます。その後の編集に審査は不要です。",
+      "submit_confirm": "提出",
+      "publish_title": "公開",
+      "publish_description": "すぐに公開されます。前の版は履歴に残ります。",
+      "publish_confirm": "公開",
+      "checks": {
+        "title": "タイトル 2〜100 文字",
+        "type": "記事の種類を選択",
+        "content": "本文 300 文字以上",
+        "summary": "概要を記入",
+        "cover": "カバーを設定"
+      },
+      "optional": "推奨",
+      "note": "審査担当へのメモ（任意）",
+      "note_placeholder": "出典や転載の許可など"
+    },
+    "errors": {
+      "title": "タイトルは 2〜100 文字にしてください。",
+      "type": "記事の種類を選んでください。",
+      "content": "本文が短すぎるか長すぎます。",
+      "summary": "概要が長すぎます。",
+      "cover_url": "カバー画像の URL が無効です。",
+      "links": "存在しない関連コンテンツがあります。",
+      "tag_ids": "使用できないタグがあります。",
+      "slug": "このリンクは使用済みか、形式が正しくありません。",
+      "blocked": "使用できない語句が含まれています。修正してからお試しください。",
+      "pending_limit": "審査中の記事がすでに 3 件あります。結果をお待ちください。",
+      "conflict": "下書きが別の場所で変更されました。残す版を選んでください。",
+      "invalid_state": "記事の現在の状態ではこの操作はできません。再読み込みしてお試しください。",
+      "revision": "下書きの版が古くなっています。再読み込みしてお試しください。",
+      "note": "メモは 1000 文字以内にしてください。"
+    },
+    "mine": {
+      "title": "自分の記事",
+      "description": "下書きは自動保存されます。初回の公開は審査があり、その後の編集はすぐに反映されます。",
+      "filter": "状態で絞り込む",
+      "all": "すべて",
+      "empty": "まだ記事がありません。",
+      "reason": "理由：",
+      "updated": "{time} 更新",
+      "view": "表示",
+      "deleted": "削除しました",
+      "delete_title": "記事を削除",
+      "delete_description": "「{title}」とすべての版が完全に削除されます。"
+    },
+    "list": {
+      "featured": "編集部のおすすめ",
+      "all_types": "すべての種類",
+      "all_tags": "すべてのタグ",
+      "sort": "並び替え",
+      "latest": "新着",
+      "popular": "人気",
+      "search": "記事を検索",
+      "no_match": "条件に合う記事はありません。"
+    },
+    "reader": {
+      "links": "関連コンテンツ",
+      "updated": "{date} 更新",
+      "manage": "管理",
+      "more_by": "{name} のほかの記事"
+    },
+    "report": {
+      "title": "報告",
+      "reason": "理由",
+      "reasons": {
+        "spam": "宣伝・スパム",
+        "abuse": "誹謗中傷・荒らし",
+        "spoiler": "ネタバレの表示なし",
+        "infringement": "権利侵害（無断転載など）",
+        "illegal": "違法な内容",
+        "other": "その他"
+      },
+      "note": "補足（任意）",
+      "note_required": "報告の理由を書いてください",
+      "submit": "報告する",
+      "done": "報告を受け付けました。確認します。",
+      "already": "この記事はすでに報告済みです。",
+      "too_many": "報告が多すぎます。しばらくしてからお試しください。"
+    },
+    "related": {
+      "title": "関連記事",
+      "all": "すべての記事"
+    },
+    "profile": {
+      "title": "記事",
+      "all": "すべて見る"
+    }
   },
   "collection_pages": {
     "favorites": {
@@ -471,7 +687,7 @@
       "works": "お気に入りの作品",
       "songs": "お気に入りの楽曲",
       "artists": "お気に入りのアーティスト",
-      "seo_title": "お気に入り | CDCAT"
+      "seo_title": "お気に入り"
     },
     "reviews": {
       "title": "自分のレビュー",
@@ -487,7 +703,7 @@
       "delete_title": "レビューを削除",
       "delete_confirm": "このレビューを削除しますか？この操作は取り消せません。",
       "load_failed": "レビューを読み込めませんでした。ページを再読み込みしてもう一度お試しください。",
-      "seo_title": "自分のレビュー | CDCAT"
+      "seo_title": "自分のレビュー"
     },
     "events": {
       "title": "イベント",
@@ -950,13 +1166,24 @@
     },
     "notifications": {
       "title": "通知設定",
-      "description": "通知の受け取り方とタイミングを管理します。",
-      "body": "通知設定は現在開発中です。公開後はこちらで通知方法や受信設定を変更できます。"
+      "description": "サイト内通知に表示する内容を選びます。",
+      "reactions": "リアクションの通知",
+      "reactions_help": "自分の投稿にリアクションがあったら通知します。同じ投稿へのリアクションはまとめて表示されます。",
+      "saved": "保存しました",
+      "levels_hint": "トピックやカテゴリーの通知レベル（ウォッチ・通常・ミュート）は各ページで設定できます。"
     },
     "privacy": {
       "title": "プライバシー設定",
       "description": "プロフィールと個人情報の公開範囲を管理します。",
-      "body": "プライバシー設定は現在開発中です。公開後はこちらで情報の公開範囲を細かく設定できます。"
+      "blocks_title": "ブロックリスト",
+      "blocks_description": "ブロックした人の投稿は折りたたまれ、その人のトピックは一覧に表示されず、返信・メンション・リアクションも通知されません。相手には知らされません。",
+      "username_placeholder": "ユーザー名",
+      "block": "ブロック",
+      "unblock": "ブロック解除",
+      "blocked": "{name} をブロックしました",
+      "unblocked": "{name} のブロックを解除しました",
+      "blocked_on": "{date} にブロック",
+      "no_blocks": "まだ誰もブロックしていません。"
     },
     "danger": {
       "title": "危険な操作",
@@ -1016,7 +1243,24 @@
       "stage": "舞台",
       "other": "その他"
     },
-    "format": "形式",
+    "format": {
+      "tv": "TV",
+      "movie": "劇場版",
+      "ova": "OVA",
+      "web": "WEB",
+      "special": "特別編",
+      "full": "本編",
+      "dlc": "DLC",
+      "expansion": "拡張版",
+      "series": "連続ドラマ",
+      "novel": "小説",
+      "light_novel": "ライトノベル",
+      "other": "その他",
+      "serial": "連載",
+      "oneshot": "読み切り",
+      "musical": "ミュージカル",
+      "play": "演劇"
+    },
     "relation": {
       "sequel": "続編",
       "prequel": "前作",
@@ -1057,6 +1301,7 @@
     "search_placeholder": "名称・別名・略称で検索",
     "search": "検索",
     "type": "種類",
+    "format_label": "形式",
     "platforms": "プラットフォーム",
     "episodes": "話数",
     "episodes_count": "全 {count} 話",
@@ -1187,6 +1432,348 @@
       "streaming": "ストリーミング",
       "social": "SNS",
       "other": "その他"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "bell_unread": "通知（未読 {count} 件）",
+    "mark_all": "すべて既読にする",
+    "view_all": "すべての通知を見る",
+    "empty": "通知はありません",
+    "reason": "理由：",
+    "filters": {
+      "all": "すべて",
+      "unread": "未読"
+    },
+    "types": {
+      "article_approved": "記事「{title}」が承認され、公開されました",
+      "article_rejected": "記事「{title}」が差し戻されました",
+      "article_unpublished": "記事「{title}」が非公開になりました",
+      "article_republished": "記事「{title}」が再公開されました",
+      "article_featured": "記事「{title}」が編集部のおすすめに選ばれました",
+      "article_edited": "モデレーターが記事「{title}」を編集しました",
+      "article_deleted": "記事「{title}」が削除されました",
+      "report_accepted": "「{title}」への報告が対応されました",
+      "report_dismissed": "「{title}」への報告を確認しましたが、対応は不要と判断されました",
+      "discussion_topic_reply": "{actor} さんがトピック「{title}」に返信しました",
+      "discussion_topic_reply_many": "{actor} さんほか {count} 人がトピック「{title}」に返信しました",
+      "discussion_watching": "{actor} さんがウォッチ中の「{title}」に返信しました",
+      "discussion_watching_many": "{actor} さんほか {count} 人がウォッチ中の「{title}」に返信しました",
+      "discussion_floor_reply": "{actor} さんが「{title}」の #{floor} に返信しました",
+      "discussion_reply": "{actor} さんが「{title}」であなたに返信しました",
+      "discussion_mention": "{actor} さんが「{title}」であなたをメンションしました",
+      "discussion_quote": "{actor} さんが「{title}」であなたの投稿を引用しました",
+      "discussion_reaction": "{actor} さんが「{title}」のあなたの投稿にリアクションしました",
+      "discussion_reaction_many": "{actor} さんほか {count} 人が「{title}」のあなたの投稿にリアクションしました",
+      "discussion_accepted": "「{title}」でのあなたの返信がベストアンサーに選ばれました",
+      "discussion_new_topic": "{actor} さんがウォッチ中のカテゴリーに「{title}」を投稿しました",
+      "discussion_moderation": {
+        "hidden": "「{title}」のあなたの投稿が折りたたまれました",
+        "deleted": "「{title}」のあなたの投稿が削除されました",
+        "edited": "モデレーターが「{title}」のあなたの投稿を編集しました",
+        "moved": "あなたのトピック「{title}」が別のカテゴリーに移動されました",
+        "silenced": "ディスカッションでの発言が制限されました"
+      }
+    },
+    "reason_line": "理由：{reason}"
+  },
+  "discussions": {
+    "title": "ディスカッション",
+    "description": "アルバムの感想、曲探し、コレクション自慢、イベントやデータベース編集の話まで。",
+    "back": "ディスカッションへ戻る",
+    "breadcrumb": "現在地",
+    "new_topic": "トピックを作成",
+    "categories": "カテゴリー",
+    "all_topics": "すべてのトピック",
+    "popular_tags": "人気のタグ",
+    "status": {
+      "pinned": "固定",
+      "featured": "注目",
+      "locked": "ロック中",
+      "solved": "解決済み"
+    },
+    "list": {
+      "tabs": "トピック一覧",
+      "tab": {
+        "latest": "最新",
+        "new": "新着",
+        "hot": "人気",
+        "featured": "注目",
+        "unread": "未読",
+        "watching": "ウォッチ中"
+      },
+      "status": "解決状況",
+      "status_all": "すべて",
+      "status_unsolved": "未解決",
+      "status_solved": "解決済み",
+      "empty": "まだトピックがありません。",
+      "empty_unread": "未読の返信はありません。",
+      "empty_watching": "ウォッチ中のトピックはまだありません。",
+      "unread_count": "新しい返信 {count} 件",
+      "new_topic": "まだ開いていないトピック"
+    },
+    "category": {
+      "topics": "{count} 件のトピック",
+      "question": "Q&A：ベストアンサーを選べます",
+      "moderators_only": "トピック作成はモデレーターのみ",
+      "staff": "モデレーター限定",
+      "archived": "アーカイブ済み"
+    },
+    "tag": {
+      "label": "タグ"
+    },
+    "levels": {
+      "watching": "ウォッチ",
+      "normal": "通常",
+      "muted": "ミュート",
+      "topic_help": {
+        "watching": "新しい返信をすべて通知",
+        "normal": "自分への返信・メンション・引用だけ通知",
+        "muted": "通知せず、未読にも表示しない"
+      },
+      "category_help": {
+        "watching": "新しいトピックを通知",
+        "normal": "通知しない",
+        "muted": "このカテゴリーのトピックをトップに表示しない"
+      }
+    },
+    "fields": {
+      "title": "タイトル",
+      "category": "カテゴリー",
+      "tags": "タグ",
+      "links": "関連コンテンツ"
+    },
+    "topic": {
+      "replies": "返信 {count}",
+      "views": "閲覧 {count}",
+      "article": "記事：{title}",
+      "only_op": "スレ主のみ",
+      "newest_first": "新しい順",
+      "jump": "番号へ移動",
+      "new_replies": "新しい返信が {count} 件あります",
+      "edit_title": "トピックを編集",
+      "saved": "トピックを更新しました",
+      "invalid": "タイトルは 4〜120 文字です。",
+      "delete": "トピックを削除",
+      "delete_title": "このトピックを削除しますか？",
+      "delete_help": "他の人から見えなくなります。他の人の返信がない場合のみ削除できます。",
+      "deleted": "トピックを削除しました",
+      "deleted_notice": "このトピックは削除されました（{reason}）。モデレーターにのみ表示されています。",
+      "hidden_notice": "このトピックは折りたたまれ、一覧に表示されません。"
+    },
+    "post": {
+      "op": "スレ主",
+      "moderator": "モデレーター",
+      "edited": "編集済み",
+      "reply": "返信",
+      "quote": "引用",
+      "replied_to": "返信先",
+      "more": "その他の操作",
+      "copy_link": "リンクをコピー",
+      "link_copied": "リンクをコピーしました",
+      "bookmark": "ブックマーク",
+      "unbookmark": "ブックマークを解除",
+      "bookmarked": "ブックマークしました",
+      "unbookmarked": "ブックマークを解除しました",
+      "history": "編集履歴",
+      "view_all_replies": "返信 {count} 件をすべて表示",
+      "deleted": "削除しました",
+      "deleted_by_author": "投稿者により削除されました",
+      "deleted_by_moderator": "モデレーターにより削除されました",
+      "hidden": "モデレーターにより折りたたまれました",
+      "hidden_reason": "折りたたまれました：{reason}",
+      "auto_hidden": "複数の通報があり、モデレーターの対応待ちです",
+      "blocked": "ブロック中のユーザーです",
+      "expand": "表示",
+      "collapse": "閉じる",
+      "delete_title": "この投稿を削除しますか？",
+      "delete_floor_help": "番号はそのままで「投稿者により削除」と表示され、下の返信は残ります。",
+      "delete_first_help": "1 番目は削除済み表示になり、トピックと返信は残ります。トピックごと削除するには、他の人の返信がないうちに「トピックを削除」を使ってください。",
+      "delete_reply_help": "この返信は表示されなくなります。"
+    },
+    "answer": {
+      "badge": "ベストアンサー",
+      "accept": "ベストアンサーにする",
+      "unaccept": "ベストアンサーを解除",
+      "accepted": "ベストアンサーにしました",
+      "unaccepted": "ベストアンサーを解除しました",
+      "summary": "ベストアンサー：#{floor} {name}"
+    },
+    "reactions": {
+      "add": "リアクションを追加",
+      "label": "{emoji} {count}",
+      "and_more": "{names} ほか（計 {count} 人）",
+      "names": {
+        "thumbs_up": "いいね",
+        "heart": "好き",
+        "joy": "爆笑",
+        "open_mouth": "びっくり",
+        "cry": "悲しい",
+        "tada": "おめでとう",
+        "fire": "熱い",
+        "eyes": "見てる",
+        "thinking": "考え中",
+        "pray": "お願い",
+        "clap": "拍手",
+        "hundred": "満点",
+        "notes": "いい曲",
+        "headphones": "聴いてる",
+        "smitten": "きゅん",
+        "sweat_smile": "苦笑い"
+      }
+    },
+    "composer": {
+      "title": "トピックに返信",
+      "floor_placeholder": "考えを書いてみましょう… Markdown 対応。{'@'} でメンション、[[ でデータベースの内容を挿入できます",
+      "reply_placeholder": "返信を書く…",
+      "send_floor": "返信を投稿",
+      "send_reply": "返信",
+      "shortcut": "Ctrl / ⌘ + Enter で送信",
+      "replying_to": "{name} への返信",
+      "posted": "返信を投稿しました",
+      "login": "ログインして参加する",
+      "locked": "このトピックはロックされています。",
+      "closed": "現在ここには返信できません。",
+      "silenced_until": "{date} まで発言が制限されています。理由：{reason}",
+      "silenced_forever": "発言が無期限に制限されています。理由：{reason}",
+      "rate_limited": "投稿が速すぎます。{seconds} 秒後にもう一度お試しください。",
+      "length": "{min}〜{max} 文字で入力してください。"
+    },
+    "report": {
+      "title": "通報",
+      "reason": "理由",
+      "note": "補足（任意）",
+      "note_required": "理由を書いてください",
+      "submit": "通報する",
+      "done": "通報しました。モデレーターが確認します。",
+      "already": "この投稿はすでに通報済みで、対応待ちです。",
+      "reasons": {
+        "spam": "スパム",
+        "abuse": "誹謗中傷・荒らし",
+        "spoiler": "ネタバレ表記なし",
+        "off_topic": "話題と無関係",
+        "infringement": "権利侵害",
+        "illegal": "違法",
+        "other": "その他"
+      }
+    },
+    "history": {
+      "title": "編集履歴",
+      "edit_number": "{n} 回目の編集",
+      "reason": "理由：{reason}",
+      "hidden": "非表示",
+      "hide": "この版を非表示",
+      "show": "この版を表示",
+      "hidden_text": "この版はモデレーターにより非表示です。",
+      "hidden_done": "この版を非表示にしました",
+      "shown_done": "この版を表示しました",
+      "empty": "編集履歴はありません。",
+      "changed_title": "タイトル：{before} → {after}",
+      "changed_category": "カテゴリー：{before} → {after}",
+      "changed_tags": "タグ：{before} → {after}",
+      "changed_links": "関連コンテンツを変更"
+    },
+    "moderation": {
+      "title": "管理",
+      "post_title": "{floor} を管理",
+      "reply": "返信",
+      "topic_title": "トピックを管理",
+      "actions": {
+        "hide": "折りたたむ",
+        "unhide": "折りたたみを解除",
+        "delete": "削除",
+        "restore": "復元",
+        "edit": "編集",
+        "silence": "投稿者の発言を制限"
+      },
+      "help": {
+        "hide": "「折りたたまれました」と理由を表示し、投稿者とモデレーターだけが開けます。1 番目を折りたたむとトピックも一覧から消えます。",
+        "unhide": "通常の表示に戻します。",
+        "delete": "削除済み表示になります（返信は表示されなくなります）。本文は残り、復元できます。",
+        "restore": "通常の表示に戻します。",
+        "edit": "編集は履歴に残り、投稿者に理由が通知されます。",
+        "silence": "制限中も閲覧・リアクション・ブックマーク・通報はできますが、投稿・返信・編集はできません。"
+      },
+      "reason": "理由（必須・投稿者に通知されます）",
+      "reason_optional": "理由（任意）",
+      "reason_required": "理由を入力してください",
+      "duration": "期間",
+      "days": "{count} 日",
+      "forever": "無期限",
+      "done": "完了しました",
+      "silenced": "{name} の発言を制限しました",
+      "pin": "固定",
+      "pin_scopes": {
+        "none": "固定しない",
+        "category": "カテゴリー内",
+        "global": "サイト全体"
+      },
+      "pin_until": "期限（任意）",
+      "featured": "注目にする",
+      "locked": "ロック（返信不可）",
+      "delete_topic": "トピックを削除",
+      "restore_topic": "トピックを復元"
+    },
+    "new": {
+      "title": "トピックを作成",
+      "choose_category": "カテゴリーを選ぶ",
+      "title_placeholder": "話したいことを一行で",
+      "optional": "（任意）",
+      "links_hint": "これらのページの「関連ディスカッション」に表示されます",
+      "draft_hint": "入力内容はこの端末に自動保存されます",
+      "submit": "投稿する",
+      "posted": "トピックを投稿しました",
+      "question_hint": "Q&A カテゴリーです。後で最も役立った返信をベストアンサーにできます。",
+      "invalid": {
+        "title": "タイトルは 4〜120 文字です。",
+        "raw": "本文は 2〜20000 文字です。",
+        "category_id": "投稿できるカテゴリーを選んでください。",
+        "tag_ids": "タグが無効か、5 個を超えています。",
+        "links": "関連コンテンツが無効か、10 個を超えています。",
+        "other": "入力内容を確認してください。"
+      }
+    },
+    "search": {
+      "title": "ディスカッションを検索",
+      "title_for": "「{q}」の検索結果",
+      "placeholder": "トピックや投稿を検索…",
+      "submit": "検索",
+      "scope": {
+        "topics": "トピック",
+        "posts": "投稿"
+      },
+      "all_categories": "すべてのカテゴリー",
+      "hint": "2 文字以上入力して検索します。",
+      "results": "{count} 件",
+      "empty": "見つかりませんでした。",
+      "reply_under": "#{floor} への返信"
+    },
+    "related": {
+      "title": "関連ディスカッション",
+      "start": "ディスカッションを始める",
+      "empty": "まだディスカッションはありません。",
+      "more": "{count} 件をすべて見る"
+    },
+    "profile": {
+      "title": "ディスカッション",
+      "topics": "トピック {count}",
+      "posts": "返信 {count}",
+      "no_topics": "まだトピックはありません。",
+      "no_posts": "まだ返信はありません。",
+      "in_topic": "「{title}」にて"
+    },
+    "bookmarks": {
+      "tab": "投稿",
+      "empty": "ブックマークした投稿はまだありません。",
+      "saved": "{time}に保存",
+      "unavailable": "この投稿は表示できません"
+    },
+    "comments": {
+      "title": "コメント",
+      "open_topic": "ディスカッションで開く",
+      "reactions": "この記事にリアクション",
+      "empty": "まだコメントはありません。",
+      "login": "ログインしてコメントする"
     }
   }
 }

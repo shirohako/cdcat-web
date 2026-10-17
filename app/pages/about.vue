@@ -278,6 +278,6 @@ const communities = computed(() => [
 ])
 
 useHead({
-  title: computed(() => `${t('about_page.label')} | CDCAT`)
+  title: computed(() => t('menu.about'))
 })
 </script>

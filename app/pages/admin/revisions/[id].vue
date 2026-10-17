@@ -108,7 +108,7 @@ const confirmRollback = async (reason: string) => {
 
 const time = (value: string | null | undefined) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'
 const typeLabel = (type: string) => ['work', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
-useHead({ title: computed(() => `${revision.value?.title ?? t('admin_pages.revisions.detail')} | CDCAT`) })
+useHead({ title: computed(() => revision.value?.title ?? t('admin_pages.revisions.detail')) })
 </script>
 
 <template>

@@ -440,7 +440,7 @@ const formatRelativeTime = (iso: string) => {
 
 onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer) })
 
-useHead({ title: computed(() => `${t('admin_pages.users.title')} | CDCAT`) })
+useHead({ title: computed(() => t('admin_pages.users.title')) })
 </script>
 
 <style scoped>
