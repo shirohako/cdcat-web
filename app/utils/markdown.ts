@@ -3,8 +3,7 @@ import container from 'markdown-it-container'
 import mark from 'markdown-it-mark'
 import taskLists from 'markdown-it-task-lists'
 import { mdT } from './markdownI18n'
-import type StateInline from 'markdown-it/lib/rules_inline/state_inline.mjs'
-import type Token from 'markdown-it/lib/token.mjs'
+import type { StateInline, Token } from 'markdown-it'
 
 export type MarkdownContainerName =
   | 'details'
@@ -672,7 +671,7 @@ const defaultLinkOpen = md.renderer.rules.link_open
   ?? ((tokens, idx, options, _env, self) => self.renderToken(tokens, idx, options))
 md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   const token = tokens[idx]!
-  if (!isSiteLink(token.attrGet('href') ?? '')) {
+  if (!isSiteLink(String(token.attrGet('href') ?? ''))) {
     token.attrSet('target', '_blank')
     token.attrSet('rel', 'nofollow ugc noopener noreferrer')
   }
@@ -685,7 +684,7 @@ md.core.ruler.push('cdcat_image_policy', (state) => {
   for (const blockToken of state.tokens) {
     for (const [index, child] of (blockToken.children ?? []).entries()) {
       if (child.type !== 'image') continue
-      const src = child.attrGet('src') ?? ''
+      const src = String(child.attrGet('src') ?? '')
       if (src.startsWith('https://') || isSiteLink(src)) continue
       const text = new state.Token('text', '', 0)
       text.content = child.content || src
