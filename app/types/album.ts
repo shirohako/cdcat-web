@@ -1,6 +1,175 @@
+// Albums, discs, tracks, editions and bonuses. Backend: docs/api/albums.md, data model docs/catalog/README.md.
+
 import type { ApiResponse } from './api'
-import type { EntryType, EntryAlbumRelation } from './entry'
+import type { CatalogAttribute, CatalogCredit, CatalogImage, CatalogLink, CatalogTitle, CatalogTitleKind, UserSummary } from './catalog'
+import type { DatePrecision, EntryAlbumRelation, EntryType } from './entry'
 import type { TrackingStatus } from './tracking'
+import type { WorkSimple } from './work'
+
+export const ALBUM_TYPES = ['album', 'ep', 'single', 'compilation', 'drama', 'radio'] as const
+export type AlbumType = typeof ALBUM_TYPES[number]
+
+/** VGMdb-style categories; an empty list means a composer's discography album. */
+export const ALBUM_CATEGORIES = [
+  'game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'multimedia_franchise', 'game_adjacent', 'event',
+] as const
+export type AlbumCategory = typeof ALBUM_CATEGORIES[number]
+
+export const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other'] as const
+export type DiscFormat = typeof DISC_FORMATS[number]
+
+export const IMAGE_KINDS = [
+  'cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'other',
+] as const
+export type ImageKind = typeof IMAGE_KINDS[number]
+
+export const ALBUM_RELATIONS = ['reissue', 'reissue_of', 'remaster', 'remaster_of', 'other_format', 'related'] as const
+export type AlbumRelation = typeof ALBUM_RELATIONS[number]
+
+export const LABEL_ROLES = ['label', 'publisher', 'distributor', 'manufacturer', 'other'] as const
+export type LabelRole = typeof LABEL_ROLES[number]
+
+export type EditionType = 'regular' | 'limited'
+export type MediumType = 'physical' | 'digital'
+
+/** Album cards and lists (AlbumSimpleResource); the PT site reads the same shape. */
+export interface AlbumSimple {
+  id: number
+  title: string
+  slug: string | null
+  type: AlbumType
+  categories: AlbumCategory[]
+  release_date: string | null
+  release_date_precision: DatePrecision
+  catalog_number: string | null
+  image_url: string | null
+  disc_count: number
+  track_count: number
+  duration: number
+  disc_formats: DiscFormat[]
+  is_adult: boolean
+  favorites_count: number
+  reviews_count: number
+  views_count: number
+  is_favorited: boolean
+}
+
+/** 用户收听状态统计（各状态的人数） */
+export interface TrackingStats {
+  plan_to_listen: number
+  completed: number
+  wishlist: number
+  owned: number
+  dropped: number
+}
+
+export interface AlbumArtistRef {
+  id: number
+  name: string
+  type: string | null
+  image_url: string | null
+  credited_as: string | null
+  /** Joins this artist to the next one, e.g. " feat. " or " × ". */
+  join_phrase: string | null
+}
+
+export interface AlbumLabelRef {
+  id: number
+  name: string
+  image_url: string | null
+  role: LabelRole
+  credited_as: string | null
+}
+
+export interface AlbumTrack {
+  id: number
+  disc_number: number
+  track_number: number
+  /** Printed number such as "A1" on vinyl; show `track_number` when null. */
+  number_label: string | null
+  title: string
+  titles: CatalogTitle[]
+  duration: number | null
+  is_instrumental: boolean
+  isrc: string | null
+  favorites_count: number
+  is_favorited: boolean
+  work: WorkSimple | null
+  credits: CatalogCredit[]
+  attributes: CatalogAttribute[]
+  links: CatalogLink[]
+}
+
+export interface AlbumDisc {
+  id: number
+  position: number
+  title: string | null
+  titles: CatalogTitle[]
+  format: DiscFormat
+  /** The bonus this disc comes with; null for the album's own discs. */
+  bonus_id: number | null
+  tracks: AlbumTrack[]
+}
+
+/** A language the tracklist can be shown in, with how many tracks have a name in it. */
+export interface TracklistLanguage {
+  locale: string
+  kind: CatalogTitleKind
+  count: number
+  total: number
+}
+
+export interface AlbumProduct {
+  id: number
+  name: string | null
+  edition_type: EditionType
+  limited_rule: string | null
+  limited_name: string | null
+  medium: MediumType
+  catalog_number: string | null
+  barcode: string | null
+  release_date: string | null
+  release_date_precision: DatePrecision | null
+  region: string | null
+  price: string | null
+  currency: string | null
+  is_hires: boolean
+  is_available: boolean
+  sort_order: number
+  disc_ids: number[]
+  /** e.g. "2CD+BD"; "DL" for download editions. */
+  format_label: string | null
+}
+
+export interface AlbumBonus {
+  id: number
+  name: string
+  type: string
+  description: string | null
+  is_digital: boolean
+  shop: string | null
+  availability: string | null
+  note: string | null
+  sort_order: number
+  event: { id: number, name: string, slug: string | null } | null
+  /** Editions it comes with; empty means every edition. */
+  product_ids: number[]
+  disc_ids: number[]
+}
+
+export interface AlbumImage {
+  id: number
+  kind: ImageKind
+  /** e.g. "p. 01-02" for booklet pages */
+  label: string | null
+  caption: string | null
+  product_id: number | null
+  bonus_id: number | null
+  disc_id: number | null
+  sort_order: number
+  image: CatalogImage | null
+  attributes: CatalogAttribute[]
+}
 
 /** 专辑关联的条目，含条目所属系列 */
 export interface AlbumEntry {
@@ -18,90 +187,12 @@ export interface AlbumEntry {
   franchises: Array<{ id: number, name: string, slug: string | null, parent_id: number | null }>
 }
 
-// ── String Literal Types ────────────────────────────────────────────────────
-
-/** 专辑类型：合辑 / 专辑 / 单曲 / EP */
-export type AlbumType = 'compilation' | 'album' | 'single' | 'ep' | string
-
-/** 【关联商品】版本类型：普通版 / 限定版（AlbumProduct.edition_type） */
-export type EditionType = 'regular' | 'limited' | string
-
-/** 【关联商品】发行载体：实体 / 数字（AlbumProduct.medium） */
-export type MediumType = 'physical' | 'digital' | string
-
-/** 【关联特典】内容类型：数字内容 / 实体特典（AlbumBonus.type） */
-export type BonusType = 'digital_content' | 'physical_bonus' | string
-
-/** 【关联艺术家】类型：个人 / 团队 / 公司 / 虚拟 / 同人社团 */
-export type ArtistType = 'person' | 'group' | 'company' | 'virtual' | 'circle' | string
-
-/** 【关联艺链接】分类：官网 / 流媒体 / 购买渠道 */
-export type LinkCategory = 'official' | 'streaming' | 'purchase' | string
-
-// ── Sub-types ──────────────────────────────────────────────────────────────
-
-/** 用户收听状态统计（各状态的人数） */
-export interface TrackingStats {
-  plan_to_listen: number  // 想听
-  completed: number       // 听过
-  wishlist: number        // 愿望单
-  owned: number           // 已拥有
-  dropped: number         // 放弃
+export interface AlbumRelationItem {
+  album: AlbumSimple
+  relation_type: AlbumRelation
+  note: string | null
 }
 
-/** 碟片信息（来自 structure 字段） */
-export interface AlbumDisc {
-  disc_number: number
-  title: string | null
-  catalog_number: string | null
-  length: number | null       // 碟片时长（秒），可能为 null
-  is_bonus: boolean           // 是否为特典碟
-  is_counted: boolean         // 是否计入曲目统计
-}
-
-/** 艺术家与专辑的关联中间表数据 */
-export interface ArtistPivot {
-  album_id: number
-  artist_id: number
-  display_name: string | null // 在该专辑中的显示名（覆盖默认名称）
-  created_at: string
-  updated_at: string
-}
-
-/** 专辑关联的艺术家（含 pivot 中间表） */
-export interface AlbumArtist {
-  id: number
-  name: string
-  slug: string | null
-  bio: string | null
-  type: ArtistType
-  region: string | null
-  is_active: boolean
-  meta: Record<string, any> | null
-  followers_count: number
-  albums_count: number
-  active_since: string | null
-  image_url: string | null
-  created_at: string
-  updated_at: string
-  pivot: ArtistPivot
-}
-
-/** 原始制作人员条目（来自 Album.credits，可能含 track_id 用于关联曲目） */
-export interface AlbumCredit {
-  id: number
-  track_id: number | null
-  artist_id: number | null
-  role: string | null
-  display_name: string | null
-  artist_name: string | null
-  artist_image: string | null
-  sort_order: number
-  meta: Record<string, any> | null
-  artist?: AlbumArtist | null  // 页面层根据 artist_id 注入
-}
-
-/** 关联文章（简要信息） */
 export interface AlbumArticle {
   id: number
   title: string
@@ -109,199 +200,84 @@ export interface AlbumArticle {
   published_at: string | null
 }
 
-/** 曲目信息 */
-export interface AlbumTrack {
-  id: number
-  album_id: number
-  title: string
-  disc_number: number
-  track_number: number
-  duration: number | null     // 时长（秒）
-  is_instrumental: boolean    // 是否为纯音乐
-  has_lyrics: boolean         // 是否有歌词
-  translations_count: number
-  favorites_count: number
-  meta: Record<string, any> | null
-  created_at: string
-  updated_at: string
-  is_favorited: boolean       // 当前用户是否收藏
-  credits?: AlbumCredit[]      // 页面层注入的曲目 credit 信息
-}
-
-/** 商品版本信息（对应不同发售形态，如初回盘、通常盘） */
-export interface AlbumProduct {
-  id: number
-  name: string
-  edition_type: EditionType
-  limited_rule: string | null   // 限定规则说明
-  limited_name: string | null   // 限定版名称
-  catalog_number: string | null
-  barcode: string | null
-  medium: MediumType
-  format: string | null         // 格式描述，如 "2 CD"、"Blu-ray"
-  is_hires: boolean             // 是否为高解析度音频
-  price: string | null          // 定价（字符串保留精度）
-  currency: string | null       // 货币代码，如 "JPY"
-  release_date: string | null
-  is_available: boolean         // 是否仍在销售
-  image_url: string | null
-  sort_order: number
-  meta: Record<string, any> | null
-}
-
-/** 特典内容（附赠品） */
-export interface AlbumBonus {
-  id: number
-  product_id: number | null     // 关联商品，null 表示通用特典
-  name: string
-  type: BonusType
-  description: string | null
-  is_digital: boolean
-  image_url: string | null
-  meta: Record<string, any> | null
-}
-
-/** 外链来源平台信息 */
-export interface LinkProvider {
-  id: number
-  name: string
-  icon_url: string | null
-  category: LinkCategory
-}
-
-/** 专辑相关外部链接（官网、流媒体等） */
-export interface AlbumLink {
-  id: number
-  url: string
-  is_verified: boolean
-  meta: Record<string, any> | null
-  provider: LinkProvider
-  created_at: string
-  updated_at: string
-}
-
-// ── Album Detail ────────────────────────────────────────────────────────────
-
-/** 专辑详情（GET /albums/:id 返回的 data 字段） */
+/** GET /albums/{id} */
 export interface Album {
   id: number
   title: string
+  titles: CatalogTitle[]
   slug: string | null
   type: AlbumType
-  classification: string | null
+  categories: AlbumCategory[]
   release_date: string | null
+  release_date_precision: DatePrecision
+  release_event: { id: number, name: string, slug: string | null, main_visual_url: string | null, start_date: string | null } | null
+  description: string | null
+  is_adult: boolean
+  banner_url: string | null
   catalog_number: string | null
   image_url: string | null
-  banner_url: string | null
+  cover: CatalogImage | null
   disc_count: number
   track_count: number
-  duration: number              // 总时长（秒），0 表示未知
-  release_event_id: number | null
+  duration: number
+  disc_formats: DiscFormat[]
+  artists: AlbumArtistRef[]
+  labels: AlbumLabelRef[]
+  discs: AlbumDisc[]
+  tracklist_languages: TracklistLanguage[]
+  credits: CatalogCredit[]
+  products: AlbumProduct[]
+  bonuses: AlbumBonus[]
+  images: AlbumImage[]
+  attributes: CatalogAttribute[]
+  links: CatalogLink[]
+  streaming: CatalogLink[]
+  entries: AlbumEntry[]
+  franchises: Array<{ id: number, name: string, slug: string | null, image_url: string | null }>
+  relations: AlbumRelationItem[]
+  tracking_stats: TrackingStats
   favorites_count: number
   reviews_count: number
   views_count: number
-  rating: number                // 平均评分
+  shouts_count: number
+  rating: number
   rating_count: number
-  ranking: number | null        // 排行榜名次
-  tracking_stats: TrackingStats
-  description: string | null    // 简介
-  structure: AlbumDisc[]         // 碟片结构列表
-  notes: string | null
-  meta: Record<string, any> | null
-  artists: AlbumArtist[]
-  tracks: AlbumTrack[]
-  credits: AlbumCredit[]
-  products: AlbumProduct[]
-  bonuses: AlbumBonus[]
-  entries: AlbumEntry[]          // 关联的原作条目（动画、游戏等）
-  links: AlbumLink[]
-  streaming: AlbumLink[]
-  articles: AlbumArticle[]
-  reviews: any[]                // 评论列表，结构待定
-  contributors: any[]           // 贡献者，结构待定
-  is_favorited: boolean         // 当前用户是否收藏该专辑
-  user_tracking: { status: TrackingStatus; created_at: string; updated_at: string } | null // 当前用户的收听状态
+  ranking: number | null
+  articles?: AlbumArticle[]
+  reviews?: unknown[]
+  contributors: Array<Omit<UserSummary, 'id'>>
+  is_favorited: boolean
+  user_tracking: { status: TrackingStatus, created_at: string, updated_at: string } | null
+  version: number
   created_at: string
   updated_at: string
 }
 
-// ── Lyrics ─────────────────────────────────────────────────────────────────
-
-/** 歌词条目（GET /tracks/:id/lyrics 返回） */
-export interface LyricsItem {
-  id: number
-  track_id: number
-  language: string
-  content: string | null
-  format: string
-  is_primary: boolean
-  is_translation: boolean
-  is_ai_generated: boolean
-  authorship: string | null
-  source: string | null
-  submitter: {
-    id: number
-    username: string
-    nickname: string
-    avatar_url: string | null
-  } | null
-  created_at: string
-  updated_at: string
-}
-
-/** AlbumTrackLyricsForm 组件的表单数据 */
-export interface LyricsFormData {
-  language: string
-  content: string
-  format: string
-  is_primary: boolean
-  is_translation: boolean
-  is_ai_generated: boolean
-  authorship: string
-  source: string
-}
-
-// ── API Response ───────────────────────────────────────────────────────────
-
-/** 专辑详情接口完整响应类型 */
 export type AlbumResponse = ApiResponse<Album>
 
-// ── Component-level derived types ──────────────────────────────────────────
-
-/** AlbumCredits 组件：单条制作人员展示项 */
-export interface AlbumCreditItem {
-  name: string
-  artist_id: number | null
-}
-
-/** AlbumCredits 组件：按职能分组的制作人员 */
-export interface AlbumCreditGroup {
-  role: string
-  artists: AlbumCreditItem[]
-}
-
-/** AlbumArtistCard 组件：转换后的艺术家展示数据 */
-export interface AlbumArtistCardItem {
+/** A track on its own page (GET /tracks/{id}) and in favorites lists. */
+export interface TrackDetail {
   id: number
-  name: string
-  displayName: string   // 优先用 pivot.display_name，否则 name
-  avatar: string
-}
-
-/** AlbumBonuses 组件：特典 + 关联商品（页面层组装） */
-export interface AlbumBonusWithProduct extends AlbumBonus {
-  product: AlbumProduct | null
-}
-
-/** AlbumHero 组件：转换后的专辑头部展示数据 */
-export interface AlbumHeroData {
+  album_id: number
+  disc_id: number
+  disc_number: number | null
+  track_number: number
+  number_label: string | null
   title: string
-  type: string | null
-  artists: AlbumArtist[]
-  releaseDate: string
-  discCount: number
-  trackCount: number
-  catalogNumber: string
-  coverImage: string
-  backgroundImage: string
+  titles?: CatalogTitle[]
+  duration: number | null
+  is_instrumental: boolean
+  isrc: string | null
+  work_id: number
+  has_lyrics: boolean
+  translations_count: number
+  favorites_count: number
+  is_favorited: boolean
+  work?: WorkSimple | null
+  album?: AlbumSimple
+  credits?: Array<Omit<CatalogCredit, 'category'>>
+  attributes?: CatalogAttribute[]
+  links?: CatalogLink[]
+  created_at: string
+  updated_at: string
 }

@@ -1,29 +1,13 @@
 <script setup lang="ts">
-import { adminContentRoutes, adminContentTypeOf, isRevisionable } from '~/config/admin'
+import { adminContentTypeOf, adminEditorPath } from '~/config/admin'
 
-definePageMeta({
-  layout: 'admin', middleware: 'admin',
-  validate: route => isRevisionable(adminContentTypeOf(route.params.type)),
-})
+// New content is made in the same editors contributors use; with auto-approve it goes live at once.
+definePageMeta({ layout: 'admin', middleware: 'admin', validate: route => !!adminEditorPath(adminContentTypeOf(route.params.type) ?? 'track') })
 
 const route = useRoute()
-const { t } = useAdminI18n()
-const type = computed(() => adminContentTypeOf(route.params.type)!)
-const segment = computed(() => adminContentRoutes[type.value].api)
-const toRevision = (revisionId: number) => `/admin/revisions/${revisionId}`
-useHead({ title: computed(() => t('admin_pages.content.create', { type: t(`admin_pages.types.${type.value}`) })) })
+await navigateTo(adminEditorPath(adminContentTypeOf(route.params.type)!)!, { replace: true })
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
-    <NuxtLink :to="`/admin/content/${segment}`" class="text-sm text-slate-500 hover:text-slate-900">← {{ t('admin_pages.back_list') }}</NuxtLink>
-    <h1 class="text-2xl font-bold">{{ t('admin_pages.content.create', { type: t(`admin_pages.types.${type}`) }) }}</h1>
-    <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-      <p class="mb-4 text-sm text-slate-500">{{ t('admin_pages.content.create_help') }}</p>
-      <RevisionAlbumForm v-if="type === 'album'" :redirect-to="toRevision" />
-      <RevisionArtistForm v-else-if="type === 'artist'" :redirect-to="toRevision" />
-      <RevisionEntryForm v-else-if="type === 'entry'" :redirect-to="toRevision" />
-      <RevisionFranchiseForm v-else-if="type === 'franchise'" :redirect-to="toRevision" />
-    </div>
-  </div>
+  <div />
 </template>

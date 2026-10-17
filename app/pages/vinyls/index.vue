@@ -1,21 +1,30 @@
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
-    <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div class="absolute -top-28 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-sky-200/45 to-indigo-200/20 blur-3xl" />
-      <div class="absolute -top-20 -right-24 h-80 w-80 rounded-full bg-linear-to-br from-amber-200/40 to-rose-200/15 blur-3xl" />
-      <div class="absolute -bottom-44 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-emerald-200/35 to-cyan-200/15 blur-3xl" />
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
-    </div>
-
-    <div class="relative container mx-auto max-w-6xl 2xl:max-w-7xl px-4 py-10 md:px-6">
-      <ComingSoon />
+  <div class="min-h-screen bg-base-100">
+    <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
+      <header class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">{{ $t('menu.vinyl') }}</h1>
+        <p class="text-sm text-gray-500">{{ $t('albums.vinyl_subtitle') }}</p>
+      </header>
+      <div v-if="pending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
+      <div v-else class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
+        <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
+      </div>
+      <p v-if="!pending && !albums.length" class="py-16 text-center text-sm text-gray-400">{{ $t('albums.no_results') }}</p>
+      <CommonPagination class="mt-6" :page="page" :total-pages="lastPage" :disabled="pending" @update:page="page = $event" />
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { AlbumSimple } from '~/types/album'
+
 const { t } = useI18n()
-useHead({
-  title: computed(() => t('menu.vinyl'))
+const page = ref(1)
+/** Vinyl is not an album type: an LP is its own album whose discs have the vinyl format. */
+const { data, pending } = await useAPI<{ albums: AlbumSimple[], pagination: { last_page: number } }>('/v1/albums', {
+  query: computed(() => ({ format: 'vinyl', page: page.value })),
 })
+const albums = computed(() => data.value?.albums ?? [])
+const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
+useHead({ title: computed(() => t('menu.vinyl')) })
 </script>

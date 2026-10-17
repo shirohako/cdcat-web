@@ -45,8 +45,9 @@ const page = computed({
 const activityQuery = computed(() => ({ type: activityType.value, page: page.value }))
 const { data: activity, pending: activityPending, error: activityError, refresh: refreshActivity } = await useAsyncData(() => `admin-user-activity-${id.value}`, () => $api<{ items: AdminUserActivity[], pagination: AdminPagination }>(`/v1/admin/users/${id.value}/activity`, { query: activityQuery.value }), { watch: [id, activityQuery] })
 const activityLink = (item: AdminUserActivity) => {
-  if (activityType.value === 'revisions') return hasPermission('revisions.view') ? `/revisions/${item.id}` : null
+  if (activityType.value === 'revisions') return hasPermission('revisions.view') ? `/admin/revisions/${item.id}` : null
   if (activityType.value === 'articles') return item.status === 'published' ? `/articles/${item.id}` : null
+  if (activityType.value === 'lyrics') return item.work_id ? `/works/${item.work_id}` : null
   return item.album_id ? `/albums/${item.album_id}` : null
 }
 const selectType = (type: ActivityType) => router.push({ query: { ...route.query, type, page: undefined } })

@@ -1,0 +1,175 @@
+<template>
+  <CatalogSection :title="$t('shouts.title')" :icon="MessageSquareQuote" tone="rose">
+    <template #actions>{{ $t('shouts.count', { count: total }) }}</template>
+
+    <div class="space-y-3 border-b border-gray-100 px-5 py-4">
+      <template v-if="isAuthenticated">
+        <div v-if="editing || !mine">
+          <textarea
+            v-model="draft"
+            rows="2"
+            :maxlength="SHOUT_MAX_LENGTH"
+            class="textarea w-full text-sm"
+            :placeholder="$t('shouts.placeholder')"
+          />
+          <div class="mt-1 flex items-center gap-2">
+            <span class="text-[11px] tabular-nums text-gray-400">{{ draft.length }} / {{ SHOUT_MAX_LENGTH }}</span>
+            <span v-if="errorMessage" class="text-xs text-error">{{ errorMessage }}</span>
+            <button v-if="mine" type="button" class="btn btn-ghost btn-xs ml-auto" @click="editing = false">{{ $t('common.cancel') }}</button>
+            <button type="button" class="btn btn-primary btn-xs" :class="{ 'ml-auto': !mine }" :disabled="saving || !draft.trim()" @click="save">
+              {{ $t(mine ? 'shouts.update' : 'shouts.post') }}
+            </button>
+          </div>
+        </div>
+        <div v-else class="rounded-lg bg-rose-50/60 px-3 py-2 text-sm">
+          <p class="mb-1 text-[11px] font-semibold text-rose-500">{{ $t('shouts.mine') }}</p>
+          <p class="whitespace-pre-line text-gray-800">{{ mine.content }}</p>
+          <div class="mt-1 flex gap-3 text-[11px]">
+            <button type="button" class="hover:underline text-gray-500" @click="startEdit">{{ $t('common.edit') }}</button>
+            <button type="button" class="hover:underline text-error" @click="remove">{{ $t('common.delete') }}</button>
+          </div>
+        </div>
+      </template>
+      <p v-else class="text-sm text-gray-500">
+        <NuxtLink :to="`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`" class="link">{{ $t('shouts.login') }}</NuxtLink>
+      </p>
+    </div>
+
+    <ul v-if="shouts.length" class="divide-y divide-gray-50">
+      <li v-for="shout in shouts" :key="shout.id" class="flex gap-3 px-5 py-3">
+        <NuxtLink :to="`/profile/${shout.user?.username}`" class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-100">
+          <img v-if="shout.user?.avatar_url" :src="shout.user.avatar_url" :alt="shout.user.nickname" class="h-full w-full object-cover">
+        </NuxtLink>
+        <div class="min-w-0 flex-1">
+          <p class="flex flex-wrap items-center gap-x-2 text-xs">
+            <NuxtLink :to="`/profile/${shout.user?.username}`" class="font-semibold text-gray-700 hover:underline">{{ shout.user?.nickname || shout.user?.username }}</NuxtLink>
+            <span v-if="shout.tracking_status" class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">{{ $t(`album.stats.${shout.tracking_status}`) }}</span>
+            <time class="text-gray-400" :datetime="shout.updated_at" :title="exact(shout.updated_at)">{{ ago(shout.updated_at) }}</time>
+            <button
+              v-if="isAuthenticated && shout.user?.username !== user?.username"
+              type="button"
+              class="ml-auto text-gray-300 hover:text-gray-500"
+              :title="$t('shouts.report')"
+              @click="reporting = shout"
+            ><Flag :size="12" /></button>
+          </p>
+          <p class="mt-0.5 whitespace-pre-line wrap-break-word text-sm text-gray-800">{{ shout.content }}</p>
+        </div>
+      </li>
+    </ul>
+    <p v-else-if="!pending" class="px-5 py-6 text-center text-sm text-gray-400">{{ $t('shouts.empty') }}</p>
+
+    <div v-if="page < lastPage" class="border-t border-gray-50 px-5 py-2 text-center">
+      <button type="button" class="btn btn-ghost btn-xs" :disabled="pending" @click="loadMore">{{ $t('shouts.more') }}</button>
+    </div>
+  </CatalogSection>
+
+  <dialog class="modal" :open="!!reporting">
+    <div class="modal-box max-w-sm">
+      <h3 class="mb-3 font-bold">{{ $t('shouts.report') }}</h3>
+      <select v-model="reportReason" class="select select-sm mb-2 w-full">
+        <option v-for="reason in REPORT_REASONS" :key="reason" :value="reason">{{ $t(`shouts.reasons.${reason}`) }}</option>
+      </select>
+      <textarea v-model="reportNote" rows="2" class="textarea w-full text-sm" :placeholder="$t('shouts.report_note')" />
+      <div class="modal-action">
+        <button type="button" class="btn btn-ghost btn-sm" @click="reporting = null">{{ $t('common.cancel') }}</button>
+        <button type="button" class="btn btn-sm btn-error" @click="report">{{ $t('shouts.report') }}</button>
+      </div>
+    </div>
+    <div class="modal-backdrop" @click="reporting = null" />
+  </dialog>
+  <CommonToast :toast="toast" />
+</template>
+
+<script setup lang="ts">
+import type { Shout, ShoutPage } from '~/types/shout'
+import { SHOUT_MAX_LENGTH } from '~/types/shout'
+import { Flag, MessageSquareQuote } from '@lucide/vue'
+
+const props = defineProps<{ resource: 'albums' | 'artists', id: number }>()
+
+const REPORT_REASONS = ['spam', 'abuse', 'spoiler', 'off_topic', 'infringement', 'illegal', 'other'] as const
+
+const { $api } = useNuxtApp()
+const { t } = useI18n()
+const route = useRoute()
+const { isAuthenticated, user } = useAuth()
+const { ago, exact } = useRelativeTime()
+const { localizeError } = useLocalizedApiError()
+const { toast, showToast } = useToast()
+
+const shouts = ref<Shout[]>([])
+const mine = ref<Shout | null>(null)
+const total = ref(0)
+const page = ref(1)
+const lastPage = ref(1)
+const pending = ref(false)
+
+const load = async (at = 1) => {
+  pending.value = true
+  try {
+    const result = await $api<ShoutPage>(`/v1/${props.resource}/${props.id}/shouts`, { params: { page: at } })
+    shouts.value = at === 1 ? result.shouts : [...shouts.value, ...result.shouts]
+    mine.value = result.mine
+    total.value = result.pagination.total
+    page.value = result.pagination.current_page
+    lastPage.value = result.pagination.last_page
+  } finally {
+    pending.value = false
+  }
+}
+const loadMore = () => load(page.value + 1)
+onMounted(() => load())
+
+const draft = ref('')
+const editing = ref(false)
+const saving = ref(false)
+const errorMessage = ref('')
+
+const startEdit = () => {
+  draft.value = mine.value?.content ?? ''
+  editing.value = true
+}
+
+const save = async () => {
+  saving.value = true
+  errorMessage.value = ''
+  try {
+    mine.value = await $api<Shout>(`/v1/${props.resource}/${props.id}/shout`, { method: 'PUT', body: { content: draft.value } })
+    editing.value = false
+    draft.value = ''
+    await load()
+  } catch (error) {
+    errorMessage.value = localizeError(error)
+  } finally {
+    saving.value = false
+  }
+}
+
+const remove = async () => {
+  if (!confirm(t('shouts.delete_confirm'))) return
+  try {
+    await $api(`/v1/${props.resource}/${props.id}/shout`, { method: 'DELETE' })
+    mine.value = null
+    await load()
+  } catch (error) {
+    showToast(localizeError(error), 'error')
+  }
+}
+
+const reporting = ref<Shout | null>(null)
+const reportReason = ref<typeof REPORT_REASONS[number]>('spam')
+const reportNote = ref('')
+const report = async () => {
+  if (!reporting.value) return
+  try {
+    await $api(`/v1/shouts/${reporting.value.id}/reports`, { method: 'POST', body: { reason: reportReason.value, note: reportNote.value || null } })
+    showToast(t('shouts.reported'))
+  } catch (error) {
+    showToast(localizeError(error), 'error')
+  } finally {
+    reporting.value = null
+    reportNote.value = ''
+  }
+}
+</script>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { adminContentRoutes, adminContentTypeOf, isRevisionable } from '~/config/admin'
-import type { AdminMergePreview, AdminPagination, AdminRevision, DeletionImpact } from '~/types/admin'
+import type { AdminMergePreview, AdminPagination, AdminRestorePreview, DeletionImpact } from '~/types/admin'
+import type { CatalogType, ContentVersion } from '~/types/catalog'
+import type { Revision } from '~/types/revision'
+import { adminContentRoutes, adminContentTypeOf, adminEditorPath, isRevisionable, mergeableContentTypes } from '~/config/admin'
 
 definePageMeta({
   layout: 'admin', middleware: 'admin',
@@ -17,21 +19,61 @@ const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, 
 const type = computed(() => adminContentTypeOf(route.params.type)!)
 const id = computed(() => String(route.params.id))
 const paths = computed(() => adminContentRoutes[type.value])
+const editor = computed(() => adminEditorPath(type.value, id.value))
 const tab = computed({
-  get: () => ['edit', 'history', 'actions'].includes(String(route.query.tab)) ? String(route.query.tab) : 'edit',
-  set: value => { router.replace({ query: { ...route.query, tab: value === 'edit' ? undefined : value } }) },
+  get: () => ['history', 'revisions', 'actions'].includes(String(route.query.tab)) ? String(route.query.tab) : 'history',
+  set: value => { router.replace({ query: { ...route.query, tab: value === 'history' ? undefined : value } }) },
 })
-const toRevision = (revisionId: number) => `/admin/revisions/${revisionId}`
 
-const { data: schema, pending, error, refresh } = await useAsyncData(() => `admin-content-schema-${type.value}-${id.value}`,
-  () => $api<Record<string, unknown>>(`/v1/${paths.value.api}/${id.value}/schema`), { watch: [type, id] })
-const name = computed(() => String(schema.value?.title ?? schema.value?.name ?? `#${id.value}`))
+const { data: current, pending, error, refresh } = await useAsyncData(() => `admin-content-${type.value}-${id.value}`,
+  () => $api<{ document: Record<string, unknown>, version: number }>(`/v1/${paths.value.api}/${id.value}/document`), { watch: [type, id] })
+const name = computed(() => String(current.value?.document.title ?? current.value?.document.name ?? `${t(`admin_pages.types.${type.value}`)} #${id.value}`))
 
-const historyPage = ref(1)
-const { data: history, pending: historyPending, error: historyError, refresh: refreshHistory } = await useAsyncData(
-  () => `admin-content-history-${type.value}-${id.value}`,
-  () => $api<{ revisions: AdminRevision[], pagination: AdminPagination }>(`/v1/${paths.value.api}/${id.value}/revisions`, { query: { page: historyPage.value } }),
-  { watch: [historyPage, type, id], lazy: true },
+// ===== Versions and restore =====
+const versionPage = ref(1)
+const { data: versions, pending: versionsPending, error: versionsError, refresh: refreshVersions } = await useAsyncData(
+  () => `admin-content-versions-${type.value}-${id.value}`,
+  () => $api<{ versions: ContentVersion[], pagination: AdminPagination }>(`/v1/${paths.value.api}/${id.value}/versions`, { query: { page: versionPage.value } }),
+  { watch: [versionPage, type, id], lazy: true },
+)
+
+const restore = ref<AdminRestorePreview | null>(null)
+const restoreOpen = ref(false)
+const previewRestore = async (version: number) => {
+  message.value = ''
+  restore.value = null
+  try {
+    restore.value = await $api<AdminRestorePreview>(`/v1/admin/content/${paths.value.api}/${id.value}/restore-preview`, { query: { version } })
+  } catch (failure) {
+    message.value = localizeError(failure)
+  }
+}
+watch(() => route.query.restore, (value) => { if (value && /^\d+$/.test(String(value))) previewRestore(Number(value)) }, { immediate: true })
+const confirmRestore = async (reason: string) => {
+  if (busy.value || !restore.value) return
+  busy.value = true
+  try {
+    const result = await $api<{ revision_id: number, version: number }>(`/v1/admin/content/${paths.value.api}/${id.value}/restore`, {
+      method: 'POST', body: { version: restore.value.version, reason, impact_checksum: restore.value.impact?.checksum ?? null },
+    })
+    restoreOpen.value = false
+    restore.value = null
+    notice.value = t('admin_pages.content.restored', { version: result.version })
+    await router.replace({ query: { ...route.query, restore: undefined } })
+    await Promise.all([refresh(), refreshVersions()])
+  } catch (failure) {
+    message.value = localizeError(failure)
+    restoreOpen.value = false
+  } finally {
+    busy.value = false
+  }
+}
+
+// ===== Revisions that edit it =====
+const { data: revisions, pending: revisionsPending, error: revisionsError, refresh: refreshRevisions } = await useAsyncData(
+  () => `admin-content-revisions-${type.value}-${id.value}`,
+  () => $api<{ revisions: Revision[] }>('/v1/admin/revisions', { query: { type: type.value, resource_id: id.value, per_page: 30 } }),
+  { watch: [type, id], lazy: true },
 )
 
 const busy = ref(false)
@@ -39,7 +81,7 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Recount =====
-const recountable = computed(() => ['album', 'artist'].includes(type.value))
+const recountable = computed(() => ['album', 'artist', 'label', 'work'].includes(type.value))
 const recount = async () => {
   busy.value = true
   message.value = ''
@@ -47,114 +89,156 @@ const recount = async () => {
     const result = await $api<{ results: { changed: string[] }[] }>(`/v1/admin/content/${paths.value.api}/recount`, { method: 'POST', body: { ids: [Number(id.value)] } })
     const changed = result.results[0]?.changed ?? []
     notice.value = changed.length ? t('admin_pages.content.recount_changed', { fields: changed.join('、') }) : t('admin_pages.content.recount_unchanged')
-  } catch (e) {
-    message.value = localizeError(e)
+  } catch (failure) {
+    message.value = localizeError(failure)
   } finally {
     busy.value = false
   }
 }
 
 // ===== Delete =====
-const impact = ref<DeletionImpact & { baseline_checksum?: string } | null>(null)
+const impact = ref<DeletionImpact | null>(null)
 const deleteOpen = ref(false)
 const startDelete = async () => {
   message.value = ''
   try {
-    impact.value = await $api<DeletionImpact & { baseline_checksum?: string }>(`/v1/admin/content/${paths.value.api}/${id.value}/deletion-impact`)
+    impact.value = await $api<DeletionImpact>(`/v1/admin/content/${paths.value.api}/${id.value}/deletion-impact`)
     deleteOpen.value = true
-  } catch (e) {
-    message.value = localizeError(e)
+  } catch (failure) {
+    message.value = localizeError(failure)
   }
 }
 const confirmDelete = async (reason: string) => {
   if (busy.value || !impact.value) return
   busy.value = true
   try {
-    await $api(`/v1/admin/content/${paths.value.api}/${id.value}`, { method: 'DELETE', body: { reason, impact_checksum: impact.value.checksum, baseline_checksum: impact.value.baseline_checksum } })
+    await $api(`/v1/admin/content/${paths.value.api}/${id.value}`, { method: 'DELETE', body: { reason, impact_checksum: impact.value.checksum } })
     deleteOpen.value = false
     await router.push(`/admin/content/${paths.value.api}`)
-  } catch (e) {
-    message.value = localizeError(e)
+  } catch (failure) {
+    message.value = localizeError(failure)
     deleteOpen.value = false
   } finally {
     busy.value = false
   }
 }
 
-// ===== Merge (artists) =====
-const mergeTarget = ref('')
+// ===== Merge (artists, labels, works) =====
+const mergeable = computed(() => mergeableContentTypes.includes(type.value))
+const mergeKind = computed(() => type.value as 'artist' | 'label' | 'work')
+const mergeTarget = ref<{ id: number, label: string } | null>(null)
 const merge = ref<AdminMergePreview | null>(null)
 const mergeOpen = ref(false)
 const previewMerge = async () => {
+  if (!mergeTarget.value) return
   message.value = ''
   merge.value = null
   try {
-    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/artists/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value } })
-  } catch (e) {
-    message.value = localizeError(e)
+    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/${paths.value.api}/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value.id } })
+  } catch (failure) {
+    message.value = localizeError(failure)
   }
 }
 const confirmMerge = async (reason: string) => {
-  if (busy.value || !merge.value) return
+  if (busy.value || !merge.value || !mergeTarget.value) return
   busy.value = true
   try {
-    await $api(`/v1/admin/content/artists/${id.value}/merge`, { method: 'POST', body: { target_id: merge.value.target.id, reason, checksum: merge.value.checksum } })
+    await $api(`/v1/admin/content/${paths.value.api}/${id.value}/merge`, { method: 'POST', body: { target_id: mergeTarget.value.id, reason, checksum: merge.value.checksum } })
     mergeOpen.value = false
-    await router.push(`/admin/content/artists/${merge.value.target.id}`)
-  } catch (e) {
-    message.value = localizeError(e)
+    await router.push(`/admin/content/${paths.value.api}/${mergeTarget.value.id}`)
+  } catch (failure) {
+    message.value = localizeError(failure)
     mergeOpen.value = false
   } finally {
     busy.value = false
   }
 }
 
-const statusClass: Record<string, string> = { pending: 'text-amber-700', approved: 'text-emerald-700', rejected: 'text-slate-500' }
+const canRestore = computed(() => hasPermission('revisions.rollback'))
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
+const latest = computed(() => current.value?.version ?? 0)
 useHead({ title: computed(() => name.value) })
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
     <NuxtLink :to="`/admin/content/${paths.api}`" class="text-sm text-slate-500 hover:text-slate-900">← {{ t('admin_pages.back_list') }}</NuxtLink>
-    <header class="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p class="text-xs text-slate-500">{{ t(`admin_pages.types.${type}`) }} #{{ id }}</p>
-        <h1 class="mt-1 text-2xl font-bold">{{ name }}</h1>
-      </div>
-      <div class="flex gap-4 text-sm">
-        <NuxtLink v-if="hasPermission('audit.view')" :to="{ path: '/admin/audit', query: { target_type: type, target_id: id } }" class="underline">{{ t('admin_pages.audit.title') }}</NuxtLink>
-        <NuxtLink :to="`/${paths.front}/${id}`" target="_blank" class="underline">{{ t('admin_pages.preview_front') }}</NuxtLink>
-      </div>
-    </header>
+    <AdminListState :pending="pending" :error="error" @retry="refresh()">
+      <header class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-xs text-slate-500">{{ t(`admin_pages.types.${type}`) }} #{{ id }} · {{ t('admin_pages.content.current_version', { version: latest }) }}</p>
+          <h1 class="mt-1 text-2xl font-bold">{{ name }}</h1>
+        </div>
+        <div class="flex flex-wrap gap-3 text-sm">
+          <NuxtLink v-if="editor" :to="editor" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white">{{ t('admin_pages.content.open_editor') }}</NuxtLink>
+          <NuxtLink v-if="hasPermission('audit.view')" :to="{ path: '/admin/audit', query: { target_type: type, target_id: id } }" class="underline">{{ t('admin_pages.audit.title') }}</NuxtLink>
+          <NuxtLink :to="type === 'lyric' ? `/lyrics/${id}/versions` : `/${paths.front}/${id}`" target="_blank" class="underline">{{ t('admin_pages.preview_front') }}</NuxtLink>
+        </div>
+      </header>
+    </AdminListState>
+
     <nav class="flex gap-2 border-b border-slate-200 text-sm">
-      <button v-for="item in ['edit', 'history', 'actions']" :key="item" type="button" :aria-pressed="tab === item" class="-mb-px border-b-2 px-3 py-2" :class="tab === item ? 'border-slate-900 font-semibold' : 'border-transparent text-slate-500'" @click="tab = item">{{ t(`admin_pages.content.tab_${item}`) }}</button>
+      <button v-for="item in ['history', 'revisions', 'actions']" :key="item" type="button" :aria-pressed="tab === item" class="-mb-px border-b-2 px-3 py-2" :class="tab === item ? 'border-slate-900 font-semibold' : 'border-transparent text-slate-500'" @click="tab = item">{{ t(`admin_pages.content.tab_${item}`) }}</button>
     </nav>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <AdminListState v-if="tab === 'edit'" :pending="pending" :error="error" @retry="refresh()">
-      <div v-if="schema" class="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-        <p class="mb-4 text-sm text-slate-500">{{ t('admin_pages.content.edit_help') }}</p>
-        <RevisionAlbumForm v-if="type === 'album'" :initial-data="schema" :album-id="id" :redirect-to="toRevision" />
-        <RevisionArtistForm v-else-if="type === 'artist'" :initial-data="schema" :artist-id="id" :redirect-to="toRevision" />
-        <RevisionEntryForm v-else-if="type === 'entry'" :initial-data="schema" :entry-id="id" :redirect-to="toRevision" />
-        <RevisionFranchiseForm v-else-if="type === 'franchise'" :initial-data="schema" :franchise-id="id" :redirect-to="toRevision" />
-      </div>
-    </AdminListState>
+    <template v-if="tab === 'history'">
+      <section v-if="restore" class="rounded-xl border border-amber-200 bg-white p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h2 class="font-semibold">{{ t('admin_pages.content.restore_title', { version: restore.version, current: restore.current_version }) }}</h2>
+          <button type="button" class="text-sm text-slate-500" @click="restore = null">{{ t('common.close') }}</button>
+        </div>
+        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.content.restore_help') }}</p>
+        <ul v-if="restore.problems.length" role="alert" class="mt-3 list-inside list-disc text-sm text-red-700">
+          <li v-for="problem in restore.problems" :key="problem.path"><span class="font-mono text-xs">{{ problem.path }}</span> {{ problem.message }}</li>
+        </ul>
+        <AdminImpactPreview v-if="restore.impact" :impact="restore.impact" />
+        <div class="mt-4">
+          <p v-if="!restore.changes.length" class="text-sm text-slate-500">{{ t('admin_pages.no_changes') }}</p>
+          <CatalogDiffView v-else :type="type as CatalogType" :changes="restore.changes" :references="restore.references" />
+        </div>
+        <button v-if="canRestore" type="button" :disabled="busy || !!restore.problems.length || !restore.changes.length || !!restore.impact?.blockers.length" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-40" @click="restoreOpen = true">{{ t('admin_pages.content.restore_confirm') }}</button>
+      </section>
 
-    <section v-else-if="tab === 'history'" class="rounded-xl border border-slate-200 bg-white">
-      <AdminListState :pending="historyPending" :error="historyError" :empty="!history?.revisions.length" @retry="refreshHistory()">
+      <section class="rounded-xl border border-slate-200 bg-white">
+        <AdminListState :pending="versionsPending" :error="versionsError" :empty="!versions?.versions.length" @retry="refreshVersions()">
+          <ol class="divide-y divide-slate-100">
+            <li v-for="version in versions?.versions" :key="version.version" class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
+              <div class="min-w-0">
+                <p class="font-medium">
+                  {{ t('admin_pages.content.version', { version: version.version }) }}
+                  <span class="ml-1 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{{ t(`admin_pages.content.causes.${version.cause}`) }}</span>
+                  <span v-if="version.is_deleted" class="ml-1 text-xs text-red-700">{{ t('admin_pages.content.deleted_version') }}</span>
+                </p>
+                <p class="mt-1 text-xs text-slate-500">
+                  {{ version.actor?.nickname || version.actor?.username || t('admin_pages.content.system') }} · {{ time(version.created_at) }}
+                  <template v-if="version.revision_id"> · <NuxtLink :to="`/admin/revisions/${version.revision_id}`" class="underline">#{{ version.revision_id }}</NuxtLink></template>
+                  <template v-if="version.reason"> · {{ version.reason }}</template>
+                </p>
+              </div>
+              <div class="flex gap-3 text-xs">
+                <NuxtLink :to="`/${paths.api}/${id}/versions?version=${version.version}`" target="_blank" class="underline">{{ t('admin_pages.content.view_version') }}</NuxtLink>
+                <button v-if="canRestore && version.version !== latest && !version.is_deleted" type="button" class="underline" @click="previewRestore(version.version)">{{ t('admin_pages.content.restore_preview') }}</button>
+              </div>
+            </li>
+          </ol>
+          <footer v-if="versions" class="border-t border-slate-100 px-5 py-3"><CommonPagination v-model:page="versionPage" :total-pages="versions.pagination.last_page" :disabled="versionsPending" /></footer>
+        </AdminListState>
+      </section>
+    </template>
+
+    <section v-else-if="tab === 'revisions'" class="rounded-xl border border-slate-200 bg-white">
+      <AdminListState :pending="revisionsPending" :error="revisionsError" :empty="!revisions?.revisions.length" @retry="refreshRevisions()">
         <ol class="divide-y divide-slate-100">
-          <li v-for="revision in history?.revisions" :key="revision.id" class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
+          <li v-for="revision in revisions?.revisions" :key="revision.id" class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
             <div class="min-w-0">
-              <NuxtLink :to="`/admin/revisions/${revision.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ t('admin_pages.revisions.revision_number', { number: revision.revision_number }) }} · {{ revision.title }}</NuxtLink>
-              <p class="mt-1 text-xs text-slate-500">{{ revision.submitter?.nickname || revision.submitter?.username }} · {{ time(revision.created_at) }}<template v-if="revision.rollback_of_id"> · {{ t('admin_pages.revisions.rollback_of', { id: revision.rollback_of_id }) }}</template></p>
+              <NuxtLink :to="`/admin/revisions/${revision.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">#{{ revision.id }} · {{ revision.summary || revision.title }}</NuxtLink>
+              <p class="mt-1 text-xs text-slate-500">{{ revision.submitter?.nickname || revision.submitter?.username }} · {{ time(revision.submitted_at ?? revision.created_at) }}</p>
             </div>
-            <span class="text-xs" :class="statusClass[revision.status]">{{ t(`admin_pages.revisions.status_${revision.status}`) }}</span>
+            <RevisionStatusBadge :status="revision.status" />
           </li>
         </ol>
-        <footer v-if="history" class="border-t border-slate-100 px-5 py-3"><CommonPagination v-model:page="historyPage" :total-pages="history.pagination.last_page" :disabled="historyPending" /></footer>
       </AdminListState>
     </section>
 
@@ -164,21 +248,22 @@ useHead({ title: computed(() => name.value) })
         <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.content.recount_help') }}</p>
         <button type="button" :disabled="busy" class="mt-4 rounded-lg border px-4 py-2 text-sm disabled:opacity-40" @click="recount">{{ t('admin_pages.content.recount') }}</button>
       </section>
-      <section v-if="type === 'artist'" class="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 class="font-semibold">{{ t('admin_pages.content.merge') }}</h2>
+      <section v-if="mergeable" class="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 class="font-semibold">{{ t('admin_pages.content.merge_title', { type: t(`admin_pages.types.${type}`) }) }}</h2>
         <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.content.merge_help') }}</p>
-        <form class="mt-4 flex gap-2" @submit.prevent="previewMerge">
-          <input v-model="mergeTarget" required inputmode="numeric" pattern="[0-9]+" :placeholder="t('admin_pages.content.merge_target')" :aria-label="t('admin_pages.content.merge_target')" class="w-40 rounded-lg border border-slate-300 px-3 py-2 text-sm">
-          <button type="submit" class="rounded-lg border px-4 py-2 text-sm">{{ t('admin_pages.content.merge_preview') }}</button>
-        </form>
-        <div v-if="merge" class="mt-4 text-sm">
-          <p>{{ t('admin_pages.content.merge_summary', { source: merge.source.name, target: merge.target.name, id: merge.target.id }) }}</p>
-          <dl class="mt-2 space-y-1"><div v-for="item in merge.counts" :key="item.key" class="flex justify-between gap-4"><dt>{{ item.label }}</dt><dd>{{ item.count }}</dd></div></dl>
-          <div v-if="merge.pending_revisions.length" role="alert" class="mt-3 text-red-700">
-            <p>{{ t('admin_pages.content.merge_blocked') }}</p>
-            <ul class="mt-1 list-inside list-disc"><li v-for="item in merge.pending_revisions" :key="item.id"><NuxtLink :to="`/admin/revisions/${item.id}`" class="underline">#{{ item.id }} {{ item.title }}</NuxtLink></li></ul>
-          </div>
-          <button type="button" :disabled="Boolean(merge.pending_revisions.length)" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="mergeOpen = true">{{ t('admin_pages.content.merge_confirm') }}</button>
+        <div class="mt-4 flex flex-wrap items-center gap-2">
+          <span v-if="mergeTarget" class="rounded-lg bg-slate-100 px-3 py-2 text-sm">{{ mergeTarget.label }} #{{ mergeTarget.id }} <button type="button" class="ml-1 text-slate-500" @click="mergeTarget = null; merge = null">×</button></span>
+          <EditorEntityPicker v-else :kind="mergeKind" :exclude="[Number(id)]" class="min-w-64" :placeholder="t('admin_pages.content.merge_target')" @select="mergeTarget = { id: $event.id, label: $event.label }" />
+          <button type="button" :disabled="!mergeTarget" class="rounded-lg border px-4 py-2 text-sm disabled:opacity-40" @click="previewMerge">{{ t('admin_pages.content.merge_preview') }}</button>
+        </div>
+        <div v-if="merge && mergeTarget" class="mt-4 text-sm">
+          <p>{{ t('admin_pages.content.merge_summary', { source: name, target: mergeTarget.label, id: mergeTarget.id }) }}</p>
+          <dl class="mt-2 space-y-1">
+            <div v-for="(count, key) in merge.affected" :key="`a-${key}`" class="flex justify-between gap-4"><dt>{{ t('admin_pages.content.merge_affected', { type: t(`admin_pages.types.${key}`) }) }}</dt><dd>{{ count }}</dd></div>
+            <div v-for="(count, key) in merge.external" :key="`e-${key}`" class="flex justify-between gap-4"><dt class="text-slate-500">{{ key }}</dt><dd>{{ count }}</dd></div>
+          </dl>
+          <ul v-if="merge.blockers.length" role="alert" class="mt-3 list-inside list-disc text-red-700"><li v-for="blocker in merge.blockers" :key="blocker">{{ blocker }}</li></ul>
+          <button type="button" :disabled="Boolean(merge.blockers.length)" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="mergeOpen = true">{{ t('admin_pages.content.merge_confirm') }}</button>
         </div>
       </section>
       <section class="rounded-xl border border-red-200 bg-white p-5">
@@ -191,6 +276,7 @@ useHead({ title: computed(() => name.value) })
     <AdminConfirmDialog v-model="deleteOpen" :busy="busy" reason-required :confirm-disabled="Boolean(impact?.blockers.length)" :title="t('admin_pages.content.delete_title', { name })" :description="t('admin_pages.content.delete_help')" @confirm="confirmDelete">
       <AdminImpactPreview v-if="impact" :impact="impact" />
     </AdminConfirmDialog>
-    <AdminConfirmDialog v-model="mergeOpen" :busy="busy" reason-required :title="t('admin_pages.content.merge')" :description="merge ? t('admin_pages.content.merge_summary', { source: merge.source.name, target: merge.target.name, id: merge.target.id }) : ''" @confirm="confirmMerge" />
+    <AdminConfirmDialog v-model="mergeOpen" :busy="busy" reason-required :title="t('admin_pages.content.merge_confirm')" :description="merge && mergeTarget ? t('admin_pages.content.merge_summary', { source: name, target: mergeTarget.label, id: mergeTarget.id }) : ''" @confirm="confirmMerge" />
+    <AdminConfirmDialog v-model="restoreOpen" :busy="busy" reason-required :title="t('admin_pages.content.restore_confirm')" :description="t('admin_pages.content.restore_dialog')" @confirm="confirmRestore" />
   </div>
 </template>

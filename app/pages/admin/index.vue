@@ -55,7 +55,18 @@ useHead({ title: computed(() => t('admin_pages.dashboard.title')) })
               <span class="font-mono text-[28px] font-semibold tabular-nums">{{ data.pending_revisions }}</span>
               <span class="rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-medium text-slate-900">{{ t('admin_pages.dashboard.go_review') }}</span>
             </div>
-            <p class="mt-4 text-xs text-slate-400">{{ t('admin_pages.dashboard.pending_help') }}</p>
+            <p class="mt-4 text-xs text-slate-400">
+              {{ t('admin_pages.dashboard.pending_help') }}
+              <template v-if="data.conflicted_revisions"> · <span class="text-rose-300">{{ t('admin_pages.dashboard.conflicted', { count: data.conflicted_revisions }) }}</span></template>
+            </p>
+          </NuxtLink>
+          <NuxtLink v-if="data.unchecked_lyrics !== undefined" to="/admin/lyrics" class="rounded-xl bg-[#0f1115] p-4 text-white shadow-sm transition-transform hover:-translate-y-0.5">
+            <p class="text-[13px] text-slate-400">{{ t('admin_pages.dashboard.unchecked_lyrics') }}</p>
+            <div class="mt-1.5 flex items-baseline justify-between gap-2">
+              <span class="font-mono text-[28px] font-semibold tabular-nums">{{ data.unchecked_lyrics }}</span>
+              <span class="rounded-md bg-amber-400 px-1.5 py-0.5 text-xs font-medium text-slate-900">{{ t('admin_pages.dashboard.go_patrol') }}</span>
+            </div>
+            <p class="mt-4 text-xs text-slate-400">{{ t('admin_pages.dashboard.pending_lyric_revisions', { count: data.pending_lyric_revisions ?? 0 }) }}</p>
           </NuxtLink>
           <NuxtLink v-if="data.pending_articles !== undefined" to="/admin/articles?status=pending" class="rounded-xl bg-[#0f1115] p-4 text-white shadow-sm transition-transform hover:-translate-y-0.5">
             <p class="text-[13px] text-slate-400">{{ t('admin_pages.dashboard.pending_articles') }}</p>

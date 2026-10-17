@@ -16,17 +16,10 @@
         :key="product.id"
         class="group flex items-center gap-4 border-b border-gray-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-gray-50/60"
       >
-        <!-- Thumbnail -->
+        <!-- Thumbnail: the edition's own cover when there is one -->
         <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-100">
           <img
-            v-if="product.image_url"
-            :src="product.image_url"
-            :alt="product.name || 'Product'"
-            class="w-full h-full object-cover"
-          >
-          <img
-            v-else
-            :src="pressedCdImageUrl"
+            :src="editionCovers[product.id] || pressedCdImageUrl"
             :alt="product.name || 'Product'"
             class="h-full w-full object-cover"
           >
@@ -89,12 +82,16 @@
               v-if="product.is_hires"
               class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-violet-100 text-violet-700"
             >Hi-Res</span>
-            <!-- Format -->
-            <span v-if="product.format" class="text-xs text-gray-500">{{ product.format }}</span>
+            <!-- Format, e.g. 2CD+BD, and the discs it contains -->
+            <span v-if="product.format_label" class="text-xs font-semibold text-gray-600">{{ product.format_label }}</span>
+            <span v-if="product.disc_ids.length && discNumbers.size > 1" class="text-[11px] text-gray-400">
+              {{ $t('album.products.contains_discs', { discs: product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).join(', ') }) }}
+            </span>
+            <span v-if="product.region" class="text-[11px] text-gray-400">{{ regionName(product.region) }}</span>
             <!-- Release Date -->
             <span v-if="product.release_date" class="ml-auto flex items-center gap-1 text-[11px] text-gray-400">
               <CalendarDays :size="11" />
-              {{ product.release_date }}
+              {{ formatDate(product.release_date, product.release_date_precision) }}
             </span>
           </div>
         </div>
@@ -114,16 +111,27 @@
 </template>
 
 <script setup lang="ts">
-import type { AlbumProduct, MediumType, EditionType } from '~/types/album'
+import type { AlbumDisc, AlbumImage, AlbumProduct, MediumType, EditionType } from '~/types/album'
 import { Disc3, Package, Lock, Wifi, CalendarDays } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
-  products: AlbumProduct[]
+  products?: AlbumProduct[]
+  discs?: AlbumDisc[]
+  images?: AlbumImage[]
 }>(), {
   products: () => [],
+  discs: () => [],
+  images: () => [],
 })
 const { t } = useI18n()
-const { intlLocale } = useLocaleFormatting()
+const { intlLocale, regionName } = useLocaleFormatting()
+const { formatDate } = useCatalogDisplay()
+
+const discNumbers = computed(() => new Map(props.discs.map(disc => [disc.id, disc.position])))
+/** Covers that belong to one edition, e.g. the regular edition's own jacket. */
+const editionCovers = computed(() => Object.fromEntries(props.images
+  .filter(image => image.kind === 'cover' && image.product_id && image.image)
+  .map(image => [image.product_id, image.image!.thumbnail_url])))
 const pressedCdImageUrl = '/images/products/pressed-cd.png'
 
 const mediumLabel = (medium: MediumType) => {

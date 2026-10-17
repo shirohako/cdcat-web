@@ -1,342 +1,122 @@
 <template>
   <div class="min-h-screen bg-gray-50/50">
-    <div class="container mx-auto px-4 py-8 max-w-6xl 2xl:max-w-7xl md:px-8">
+    <div class="container mx-auto max-w-5xl px-4 py-8 md:px-8">
+      <header class="mb-6 flex flex-wrap items-end gap-3">
+        <div class="min-w-0 flex-1">
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ $t('collection_pages.revisions.title') }}</h1>
+          <p class="mt-1 text-sm text-gray-500">{{ $t('collection_pages.revisions.description') }}</p>
+        </div>
+        <NuxtLink to="/contribute/album" class="btn btn-primary btn-sm gap-1"><Plus :size="14" />{{ $t('revision_page.new_album') }}</NuxtLink>
+      </header>
 
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ t('collection_pages.revisions.title') }}</h1>
-        <p class="mt-1 text-sm text-gray-500">{{ t('collection_pages.revisions.description') }}</p>
+      <nav class="mb-5 flex gap-1 overflow-x-auto pb-1">
+        <button
+          v-for="value in FILTERS"
+          :key="value"
+          type="button"
+          class="shrink-0 rounded-full px-3 py-1.5 text-sm"
+          :class="status === value ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50'"
+          @click="setStatus(value)"
+        >{{ value === 'all' ? $t('revision_page.all') : $t(`revision_page.status.${value}`) }}</button>
+      </nav>
+
+      <div v-if="pending" class="flex min-h-60 items-center justify-center"><span class="loading loading-spinner" /></div>
+      <p v-else-if="error" class="alert alert-error">{{ localizeError(error) }}</p>
+      <div v-else-if="!revisions.length" class="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
+        <GitPullRequest :size="28" class="mx-auto mb-3 text-gray-300" />
+        <p class="text-sm text-gray-500">{{ $t('revision_page.empty') }}</p>
       </div>
 
-      <!-- 加载 -->
-      <div v-if="pending" class="flex items-center justify-center min-h-60">
-        <div class="flex flex-col items-center gap-3 text-gray-400">
-          <GitPullRequest :size="32" class="opacity-30" />
-          <p class="text-sm">{{ t('common.loading') }}</p>
-        </div>
-      </div>
-
-      <!-- 错误 -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-60">
-        <div class="flex flex-col items-center gap-3 text-gray-400">
-          <AlertCircle :size="32" class="opacity-40" />
-          <p class="text-sm">{{ localizeError(error) }}</p>
-        </div>
-      </div>
-
-      <div v-else>
-        <div class="mb-4 text-xs text-gray-400">
-          {{ t('common.items_total', { count: pagination.total }) }}
-        </div>
-
-        <!-- Desktop 表格 -->
-        <div class="hidden md:block rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b border-gray-100 bg-gray-50/60">
-                <th class="w-14 px-5 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">ID</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.entry') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.subject') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.action') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.submitter') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.status') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-gray-500">{{ t('admin_pages.revisions.submitted_at') }}</th>
-                <th class="w-16 px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr
-                v-for="revision in revisionsData"
-                :key="revision.id"
-                class="group hover:bg-gray-50/70 transition-colors"
-              >
-                <td class="px-5 py-3.5 text-xs font-mono text-gray-500">
-                  {{ revision.id }}
-                </td>
-                <!-- 词条标题 + checksum -->
-                <td class="px-4 py-3.5">
-                  <p class="font-medium text-gray-900 truncate max-w-xs" :title="revision.title">
-                    {{ revision.title }}
-                  </p>
-                  <p class="mt-0.5 font-mono text-[10px] text-gray-400" :title="revision.checksum">
-                    {{ revision.checksum?.slice(0, 12) }}
-                  </p>
-                </td>
-
-                <!-- 修改主体 -->
-                <td class="px-4 py-3.5">
-                  <span class="inline-flex items-center gap-1 rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600">
-                    {{ formatType(revision.resource_type) }}
-                    <template v-if="revision.action !== 'create' && revision.resource_id">
-                      <span class="text-gray-400">:</span>
-                      <span class="font-mono text-gray-500">{{ revision.resource_id }}</span>
-                    </template>
-                  </span>
-                </td>
-
-                <!-- 操作 -->
-                <td class="px-4 py-3.5">
-                  <span
-                    class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium"
-                    :class="actionBadgeClass(revision.action)"
-                  >
-                    {{ formatAction(revision.action) }}
-                  </span>
-                </td>
-
-                <!-- 提交者 -->
-                <td class="px-4 py-3.5">
-                  <div class="flex items-center gap-2">
-                    <img
-                      v-if="revision.submitter?.avatar_url"
-                      :src="revision.submitter.avatar_url"
-                      class="h-6 w-6 shrink-0 rounded-full object-cover"
-                    />
-                    <div v-else class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[10px] font-semibold text-gray-500">
-                      {{ revision.submitter?.nickname?.charAt(0) || revision.submitter?.username?.charAt(0) || '?' }}
-                    </div>
-                    <span class="text-xs text-gray-600">{{ revision.submitter?.nickname || revision.submitter?.username }}</span>
-                  </div>
-                </td>
-
-                <!-- 状态 -->
-                <td class="px-4 py-3.5">
-                  <span
-                    class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
-                    :class="statusBadgeClass(revision.status)"
-                  >
-                    <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(revision.status)" />
-                    {{ formatStatus(revision.status) }}
-                  </span>
-                </td>
-
-                <!-- 时间 -->
-                <td class="px-4 py-3.5 text-xs tabular-nums text-gray-500">
-                  {{ formatDate(revision.created_at) }}
-                </td>
-
-                <!-- 操作按钮 -->
-                <td class="px-4 py-3.5">
-                  <div class="flex items-center gap-1.5">
-                    <button
-                      class="whitespace-nowrap rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
-                      @click.stop="goToDetail(revision.id)"
-                    >
-                      {{ t('common.details') }}
-                    </button>
-                    <button
-                      v-if="revision.status === 'pending'"
-                      class="whitespace-nowrap rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50 hover:text-red-600"
-                      @click.stop="confirmRetract(revision)"
-                    >
-                      {{ t('collection_pages.revisions.retract') }}
-                    </button>
-                  </div>
-                </td>
-              </tr>
-
-              <tr v-if="revisionsData.length === 0">
-                <td colspan="8" class="px-5 py-16 text-center">
-                  <GitPullRequest :size="28" class="mx-auto mb-3 text-gray-300" />
-                  <p class="text-sm text-gray-400">{{ t('collection_pages.revisions.empty') }}</p>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Mobile 卡片 -->
-        <div class="space-y-2.5 md:hidden">
-          <article
-            v-for="revision in revisionsData"
-            :key="revision.id"
-            class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span
-                    class="inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-medium"
-                    :class="actionBadgeClass(revision.action)"
-                  >
-                    {{ formatAction(revision.action) }}
-                  </span>
-                  <span class="inline-flex items-center rounded-md border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs font-medium text-gray-600">
-                    {{ formatType(revision.resource_type) }}
-                  </span>
-                </div>
-                <p class="mt-2 font-medium text-gray-900 line-clamp-2">{{ revision.title }}</p>
-                <p class="mt-1 text-xs text-gray-400">{{ formatDate(revision.created_at) }}</p>
-              </div>
-              <span
-                class="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
-                :class="statusBadgeClass(revision.status)"
-              >
-                <span class="h-1.5 w-1.5 rounded-full" :class="statusDotClass(revision.status)" />
-                {{ formatStatus(revision.status) }}
-              </span>
+      <ul v-else class="space-y-3">
+        <li v-for="revision in revisions" :key="revision.id" class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+          <div class="flex flex-wrap items-start gap-3">
+            <div class="min-w-0 flex-1">
+              <NuxtLink :to="`/revisions/${revision.id}`" class="font-semibold text-gray-900 hover:underline">{{ heading(revision) }}</NuxtLink>
+              <p v-if="revision.summary" class="mt-0.5 line-clamp-2 text-sm text-gray-600">{{ revision.summary }}</p>
+              <p class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
+                <span v-if="revision.kind === 'lyric'" class="rounded bg-sky-50 px-1.5 py-0.5 text-sky-700">{{ $t('revision_page.kind.lyric') }}</span>
+                <span v-for="item in revision.items" :key="item.ref" class="rounded bg-gray-100 px-1.5 py-0.5">
+                  {{ $t(`revision_page.action.${item.action}`) }} · {{ enumLabel('catalog_type', item.resource_type) }}<template v-if="item.resource_id"> #{{ item.resource_id }}</template>
+                </span>
+                <span class="text-gray-400">#{{ revision.id }} · {{ ago(revision.updated_at) }}</span>
+              </p>
             </div>
-
-            <div class="mt-3 flex items-center gap-2 border-t border-gray-100 pt-3">
-              <button
-                class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
-                @click="goToDetail(revision.id)"
-              >
-                {{ t('common.details') }}
-              </button>
-              <button
-                v-if="revision.resource_id"
-                class="rounded-md border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-500 transition hover:bg-gray-50"
-                @click="goToEntity(revision)"
-              >
-                {{ t('collection_pages.revisions.view_entry') }}
-              </button>
-              <button
-                v-if="revision.status === 'pending'"
-                class="rounded-md border border-red-200 px-2.5 py-1 text-xs font-medium text-red-500 transition hover:bg-red-50"
-                @click="confirmRetract(revision)"
-              >
-                {{ t('collection_pages.revisions.retract') }}
-              </button>
-            </div>
-          </article>
-
-          <div v-if="revisionsData.length === 0" class="flex flex-col items-center py-16 text-gray-400">
-            <GitPullRequest :size="28" class="mb-3 opacity-40" />
-            <p class="text-sm">{{ t('collection_pages.revisions.empty') }}</p>
+            <RevisionStatusBadge :status="revision.status" />
           </div>
-        </div>
+          <p v-if="revision.review_comment && ['changes_requested', 'rejected'].includes(revision.status)" class="mt-3 whitespace-pre-line rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            <span class="font-medium">{{ $t('revision_page.review_comment') }}：</span>{{ revision.review_comment }}
+          </p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <NuxtLink v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
+            <NuxtLink :to="`/revisions/${revision.id}`" class="btn btn-ghost btn-sm">{{ $t('common.details') }}</NuxtLink>
+            <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</button>
+            <button v-if="revision.status === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy === revision.id" @click="remove(revision)">{{ $t('revision_page.delete_draft') }}</button>
+          </div>
+        </li>
+      </ul>
 
-        <CommonPagination
-          class="mt-4"
-          :page="pagination.current_page"
-          :total-pages="pagination.last_page"
-          :disabled="pending"
-          @update:page="goToPage"
-        />
-      </div>
+      <div v-if="lastPage > 1" class="mt-6"><CommonPagination v-model:page="page" :total-pages="lastPage" :disabled="pending" /></div>
+      <p v-if="message" class="mt-4 text-sm text-error">{{ message }}</p>
     </div>
-
-    <CommonConfirmDialog
-      v-model="retractModal.open"
-      variant="delete"
-      :confirm-text="t('collection_pages.revisions.retract_confirm_button')"
-      :title="t('collection_pages.revisions.retract_title')"
-      :description="t('collection_pages.revisions.retract_confirm', { title: retractModal.revision?.title ?? '' })"
-      @confirm="doRetract"
-    />
-
-    <!-- Toast -->
-    <Transition name="toast">
-      <div
-        v-if="toast.show"
-        class="fixed bottom-5 right-5 z-60 flex items-center gap-2 rounded-lg border bg-white px-3.5 py-2.5 text-sm font-medium shadow-lg"
-        :class="toast.type === 'error' ? 'border-red-200 text-red-700' : 'border-gray-200 text-gray-800'"
-      >
-        <AlertCircle v-if="toast.type === 'error'" :size="14" class="text-red-500" />
-        <CheckCircle v-else :size="14" class="text-emerald-500" />
-        {{ toast.message }}
-      </div>
-    </Transition>
   </div>
 </template>
 
-<script setup>
-import { AlertCircle, CheckCircle, GitPullRequest } from '@lucide/vue'
+<script setup lang="ts">
+import type { Revision, RevisionStatus } from '~/types/revision'
+import { GitPullRequest, Plus } from '@lucide/vue'
+import { editorPath, isOpenRevision } from '~/utils/revisionLinks'
+
+definePageMeta({ middleware: 'auth' })
+
+const FILTERS = ['all', 'draft', 'pending', 'changes_requested', 'approved', 'rejected', 'withdrawn'] as const
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
-const { formatDate: formatLocalizedDate } = useLocaleFormatting()
+const { $api } = useNuxtApp()
+const { ago } = useRelativeTime()
+const { enumLabel } = useCatalogDisplay()
 const { localizeError } = useLocalizedApiError()
 
-const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1
-  return page > 0 ? page : 1
-})
-
-const { $api } = useNuxtApp()
-
-const { data: response, pending, error, refresh } = await useAsyncData(
-  'revisions-list',
-  () => $api('/v1/me/revisions', { query: { page: currentPage.value } }),
-  { watch: [currentPage] },
-)
-
-const revisionsData = computed(() => response.value?.revisions || [])
-const pagination = computed(() => response.value?.pagination ?? {
-  total: 0, per_page: 15, current_page: 1, last_page: 1,
-})
-
-// ===== 格式化 =====
-const formatType = (type) => ({ album: 'Album', artist: 'Artist', franchise: 'Franchise', event: 'Event', entry: 'Entry' }[type] || type)
-const formatAction = (action) => ({ create: t('admin_pages.revisions.action_create'), update: t('admin_pages.revisions.action_update'), delete: t('admin_pages.revisions.action_delete') }[action] || action)
-const formatStatus = (status) => ({ pending: t('admin_pages.revisions.status_pending'), approved: t('admin_pages.revisions.status_approved'), rejected: t('admin_pages.revisions.status_rejected') }[status] || status)
-
-const actionBadgeClass = (action) => ({
-  create: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-  update: 'bg-blue-50 border-blue-200 text-blue-700',
-  delete: 'bg-red-50 border-red-200 text-red-600',
-}[action] || 'bg-gray-50 border-gray-200 text-gray-600')
-
-const statusBadgeClass = (status) => ({
-  pending:  'bg-amber-50 border-amber-200 text-amber-700',
-  approved: 'bg-emerald-50 border-emerald-200 text-emerald-700',
-  rejected: 'bg-gray-50 border-gray-200 text-gray-500',
-}[status] || 'bg-gray-50 border-gray-200 text-gray-500')
-
-const statusDotClass = (status) => ({
-  pending:  'bg-amber-400',
-  approved: 'bg-emerald-500',
-  rejected: 'bg-gray-300',
-}[status] || 'bg-gray-300')
-
-const formatDate = (d) => {
-  if (!d) return ''
-  return formatLocalizedDate(d, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+const status = computed(() => (FILTERS as readonly string[]).includes(String(route.query.status)) ? String(route.query.status) as typeof FILTERS[number] : 'all')
+const page = ref(Number(route.query.page) || 1)
+const setStatus = (value: typeof FILTERS[number]) => {
+  page.value = 1
+  router.replace({ query: { ...route.query, status: value === 'all' ? undefined : value, page: undefined } })
 }
 
-const goToPage = (page) => {
-  if (page < 1 || page > pagination.value.last_page) return
-  router.push({ query: { ...route.query, page: page === 1 ? undefined : page } })
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+const { data, pending, error, refresh } = await useAsyncData('me:revisions', () => $api<{ revisions: Revision[], pagination: { last_page: number } }>('/v1/me/revisions', {
+  query: { status: status.value === 'all' ? undefined : status.value, page: page.value, per_page: 20 },
+}), { watch: [status, page], server: false })
+
+const revisions = computed(() => data.value?.revisions ?? [])
+const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
+
+/** "album: 名前" from the server, with the type in the UI language. */
+const heading = (revision: Revision) => {
+  const match = revision.title?.match(/^([a-z]+): (.*)$/)
+  if (match) return `${enumLabel('catalog_type', match[1]!)} · ${match[2]}`
+  return revision.title || `#${revision.id}`
 }
 
-const goToDetail = (id) => router.push(`/revisions/${id}`)
-const goToEntity = (revision) => {
-  const map = { album: 'albums', artist: 'artists', franchise: 'franchises', event: 'events', entry: 'entries' }
-  const prefix = map[revision.resource_type]
-  router.push(prefix ? `/${prefix}/${revision.resource_id}` : `/revisions/${revision.id}`)
-}
-
-// ===== 撤销 =====
-const retractModal = reactive({ open: false, revision: null })
-
-const confirmRetract = (revision) => {
-  retractModal.revision = revision
-  retractModal.open = true
-}
-
-const doRetract = async () => {
+const busy = ref<number | null>(null)
+const message = ref('')
+const act = async (revision: Revision, question: string, request: () => Promise<unknown>) => {
+  if (!confirm(question)) return
+  busy.value = revision.id
+  message.value = ''
   try {
-    await $api(`/v1/revisions/${retractModal.revision.id}/retract`, { method: 'POST' })
-    showToast(t('collection_pages.revisions.retracted'))
+    await request()
     await refresh()
-  } catch (e) {
-    showToast(localizeError(e, 'collection_pages.revisions.retract_failed'), 'error')
+  } catch (failure) {
+    message.value = localizeError(failure)
+  } finally {
+    busy.value = null
   }
 }
+const withdraw = (revision: Revision) => act(revision, t('revision_page.withdraw_confirm'), () => $api(`/v1/revisions/${revision.id}/withdraw`, { method: 'POST' }))
+const remove = (revision: Revision) => act(revision, t('revision_page.delete_confirm'), () => $api(`/v1/revisions/${revision.id}`, { method: 'DELETE' }))
 
-// ===== Toast =====
-const toast = reactive({ show: false, message: '', type: 'success' })
-let toastTimer = null
-const showToast = (message, type = 'success') => {
-  if (toastTimer) clearTimeout(toastTimer)
-  Object.assign(toast, { show: true, message, type })
-  toastTimer = setTimeout(() => { toast.show = false }, 2500)
-}
+const statusTitle = computed(() => status.value === 'all' ? '' : ` · ${t(`revision_page.status.${status.value as RevisionStatus}`)}`)
+useSeoMeta({ title: () => `${t('collection_pages.revisions.title')}${statusTitle.value}`, robots: 'noindex' })
 </script>
-
-<style scoped>
-.toast-enter-active, .toast-leave-active { transition: all 0.2s ease; }
-.toast-enter-from, .toast-leave-to { opacity: 0; transform: translateY(6px); }
-</style>

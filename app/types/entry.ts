@@ -1,5 +1,7 @@
 // Entries (anime, games, films …) and series (franchises). Design: backend docs/entries/README.md.
 
+import type { CatalogTitle } from './catalog'
+
 export const ENTRY_TYPES = ['anime', 'game', 'movie', 'tv', 'book', 'manga', 'stage', 'other'] as const
 export type EntryType = typeof ENTRY_TYPES[number]
 
@@ -38,25 +40,13 @@ export const ENTRY_ALBUM_RELATIONS = [
 ] as const
 export type EntryAlbumRelation = typeof ENTRY_ALBUM_RELATIONS[number]
 
-export const TITLE_KINDS = ['official', 'alias', 'abbreviation'] as const
-export type TitleKind = typeof TITLE_KINDS[number]
-
-/** Locales offered in the title editor; any BCP 47 tag is accepted by the API. */
-export const TITLE_LOCALES = ['ja', 'ja-Latn', 'zh-Hans', 'zh-Hant', 'en', 'ko'] as const
-
 export const DATE_PRECISIONS = ['day', 'month', 'year'] as const
 export type DatePrecision = typeof DATE_PRECISIONS[number]
 
-export interface Title {
-  title: string
-  locale: string | null
-  kind: TitleKind
-  is_primary: boolean
-}
-
 export interface NamedItem {
   name: string
-  titles?: Title[]
+  /** Other names; the primary name is `name`. */
+  titles?: CatalogTitle[]
 }
 
 export interface LinkItem {
@@ -150,49 +140,4 @@ export interface Pagination {
   per_page: number
   current_page: number
   last_page: number
-}
-
-// Revision schemas (GET /entries/{id}/schema, /franchises/{id}/schema) and Bangumi previews, as the forms read them.
-export interface SchemaTitle {
-  title?: string
-  locale?: string | null
-  kind?: TitleKind
-  is_primary?: boolean
-}
-
-export interface SchemaLink {
-  id?: number
-  link_provider_id?: number
-  url?: string
-  meta?: Record<string, unknown> | null
-}
-
-interface SchemaCommon {
-  name?: string
-  titles?: SchemaTitle[]
-  slug?: string | null
-  description?: string | null
-  image_url?: string | null
-  banner_url?: string | null
-  meta?: Record<string, unknown> | null
-  links?: SchemaLink[]
-  baseline_checksum?: string
-}
-
-export interface EntrySchema extends SchemaCommon {
-  type?: string
-  format?: string | null
-  platforms?: string[] | null
-  release_date?: string | null
-  release_date_precision?: DatePrecision
-  episodes?: number | null
-  related_albums?: Array<{ id: number | string, relation_type?: EntryAlbumRelation, character_name?: string | null, episode?: number | null, note?: string | null }>
-  related_entries?: Array<{ id: number | string, relation_type?: EntryRelation, note?: string | null }>
-}
-
-export interface FranchiseSchema extends SchemaCommon {
-  parent_id?: number | null
-  sort_order?: number
-  related_entries?: Array<{ id: number | string, sort_order?: number }>
-  related_albums?: Array<{ id: number | string, sort_order?: number }>
 }

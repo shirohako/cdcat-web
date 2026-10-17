@@ -17,7 +17,7 @@
           <span class="text-[10px] font-bold tracking-widest uppercase" :class="categoryStyle(category).label">
             {{ categoryLabel(category) }}
           </span>
-          <div class="flex-1 h-px bg-gray-100"></div>
+          <div class="flex-1 h-px bg-gray-100"/>
         </div>
 
         <!-- Links in this category -->
@@ -40,7 +40,7 @@
           <!-- Name + domain -->
           <div class="flex-1 min-w-0">
             <p class="text-sm font-medium text-gray-800 leading-snug">
-              {{ formatProviderName(link.provider.name) }}
+              {{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}
             </p>
             <p class="text-[11px] text-gray-400 truncate leading-none mt-0.5">
               {{ getDomain(link.url) }}
@@ -54,7 +54,7 @@
           />
         </a>
 
-        <div class="h-1"></div>
+        <div class="h-1"/>
       </template>
     </div>
 
@@ -72,11 +72,11 @@
 </template>
 
 <script setup lang="ts">
-import type { AlbumLink } from '~/types/album'
+import type { CatalogLink } from '~/types/catalog'
 import { Link2, Globe, ExternalLink } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
-  links: AlbumLink[]
+  links?: CatalogLink[]
 }>(), {
   links: () => [],
 })
@@ -84,13 +84,13 @@ const props = withDefaults(defineProps<{
 const categoryOrder = ['official', 'streaming', 'shop', 'social', 'database', 'other'];
 
 const groupedLinks = computed(() => {
-  const groups: Record<string, AlbumLink[]> = {};
+  const groups: Record<string, CatalogLink[]> = {};
   for (const link of props.links) {
     const cat = link.provider?.category || 'other';
     if (!groups[cat]) groups[cat] = [];
     groups[cat].push(link);
   }
-  const result: Record<string, AlbumLink[]> = {};
+  const result: Record<string, CatalogLink[]> = {};
   for (const cat of categoryOrder) {
     if (groups[cat]?.length) result[cat] = groups[cat];
   }

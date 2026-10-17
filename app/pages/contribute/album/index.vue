@@ -1,26 +1,14 @@
 <template>
-  <div class="min-h-screen bg-base-100">
-    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
-      <!-- 页面标题 -->
-      <div class="mb-8">
-        <h1 class="text-4xl font-bold mb-2">Contribute New Album</h1>
-        <p class="text-gray-600">Add a new album, single, or compilation to the database</p>
-      </div>
-
-      <!-- 表单组件 -->
-      <RevisionAlbumForm />
-    </div>
-  </div>
+  <EditorAlbumEditor :key="String(route.query.revision ?? '')" :revision-id="revisionId" />
 </template>
 
-<script setup>
-// 应用认证中间件，保护此页面
-definePageMeta({
-  middleware: 'auth'
-})
+<script setup lang="ts">
+// A new album; ?revision=<id> continues a saved draft of one.
+definePageMeta({ middleware: 'auth' })
 
-// 设置页面元数据
-useHead({
-  title: 'Contribute New Album',
-});
+const route = useRoute()
+const { t } = useI18n()
+const revisionId = computed(() => Number(route.query.revision) || null)
+
+useSeoMeta({ title: () => t('editor.album.new_title'), robots: 'noindex' })
 </script>

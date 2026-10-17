@@ -28,20 +28,26 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/revisions', permission: 'revisions.view', label: 'admin_pages.revisions.title', icon: 'lucide:git-pull-request', group: 'overview' },
   { path: '/admin/content/albums', permission: 'content.manage', label: 'admin_pages.content.tabs.album', icon: 'lucide:disc-3', group: 'content' },
   { path: '/admin/content/artists', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'content' },
+  { path: '/admin/content/labels', permission: 'content.manage', label: 'admin_pages.content.tabs.label', icon: 'lucide:building-2', group: 'content' },
+  { path: '/admin/content/works', permission: 'content.manage', label: 'admin_pages.content.tabs.work', icon: 'lucide:music-4', group: 'content' },
   { path: '/admin/content/entries', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'content' },
   { path: '/admin/content/franchises', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'content' },
   { path: '/admin/content/tracks', permission: 'content.manage', label: 'admin_pages.content.tabs.track', icon: 'lucide:music', group: 'content' },
+  { path: '/admin/content/lyrics', permission: 'content.manage', label: 'admin_pages.content.tabs.lyric', icon: 'lucide:file-text', group: 'content' },
+  { path: '/admin/credit-roles', permission: 'content.manage', label: 'admin_pages.credit_roles.title', icon: 'lucide:contact', group: 'content' },
+  { path: '/admin/attribute-definitions', permission: 'content.manage', label: 'admin_pages.attribute_definitions.title', icon: 'lucide:list-checks', group: 'content' },
   { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'content' },
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
   { path: '/admin/reviews', permission: 'reviews.manage', label: 'admin_pages.reviews.title', icon: 'lucide:message-square', group: 'community' },
   { path: '/admin/articles', permission: 'articles.manage', label: 'admin_pages.articles.title', icon: 'lucide:newspaper', group: 'community' },
-  { path: '/admin/reports', permission: ['articles.manage', 'discussions.moderate'], label: 'admin_pages.reports.title', icon: 'lucide:flag', group: 'community' },
+  { path: '/admin/reports', permission: ['articles.manage', 'discussions.moderate', 'shouts.manage'], label: 'admin_pages.reports.title', icon: 'lucide:flag', group: 'community' },
   { path: '/admin/discussions/categories', permission: 'discussions.manage', label: 'admin_pages.discussions.categories.title', icon: 'lucide:folder-tree', group: 'community' },
   { path: '/admin/discussions/posts', permission: 'discussions.moderate', label: 'admin_pages.discussions.posts.title', icon: 'lucide:messages-square', group: 'community' },
-  { path: '/admin/discussions/restrictions', permission: 'discussions.moderate', label: 'admin_pages.discussions.restrictions.title', icon: 'lucide:mic-off', group: 'community' },
+  { path: '/admin/discussions/restrictions', permission: ['discussions.moderate', 'lyrics.manage', 'shouts.manage'], label: 'admin_pages.discussions.restrictions.title', icon: 'lucide:mic-off', group: 'community' },
   { path: '/admin/tags', permission: 'tags.manage', label: 'admin_pages.tags.title', icon: 'lucide:tags', group: 'community' },
   { path: '/admin/word-filters', permission: 'filters.manage', label: 'admin_pages.word_filters.title', icon: 'lucide:shield-ban', group: 'community' },
   { path: '/admin/lyrics', permission: 'lyrics.manage', label: 'admin_pages.lyrics.title', icon: 'lucide:file-music', group: 'community' },
+  { path: '/admin/shouts', permission: 'shouts.manage', label: 'admin_pages.shouts.title', icon: 'lucide:message-circle', group: 'community' },
   { path: '/admin/users', permission: 'users.manage', label: 'admin_pages.users.title', icon: 'lucide:users', group: 'users' },
   { path: '/admin/roles', permission: 'roles.manage', label: 'admin_pages.roles.title', icon: 'lucide:shield-check', group: 'users' },
   { path: '/admin/settings', permission: 'system.settings', label: 'admin_pages.settings.title', icon: 'lucide:settings', group: 'system' },
@@ -55,23 +61,36 @@ export const findAdminMenuItem = (path: string, items: AdminMenuItem[] = adminMe
   items.find(item => item.path === path)
   ?? items.filter(item => item.path !== '/admin' && path.startsWith(`${item.path}/`)).sort((a, b) => b.path.length - a.path.length)[0]
 
-export const adminContentTypes = ['album', 'artist', 'entry', 'franchise', 'track'] as const
+export const adminContentTypes = ['album', 'artist', 'label', 'work', 'entry', 'franchise', 'track', 'lyric'] as const
 
 /**
  * Per content type (the singular morph alias, as in `resource_type`): the plural URL segment the
- * admin pages share with the API (`/admin/content/albums`, `/v1/albums/{id}/schema`) and the public page.
+ * admin pages share with the API (`/admin/content/albums`, `/v1/albums/{id}/versions`) and the public page.
  */
 export const adminContentRoutes: Record<AdminContentType, { api: string, front: string }> = {
   album: { api: 'albums', front: 'albums' },
   artist: { api: 'artists', front: 'artists' },
+  label: { api: 'labels', front: 'labels' },
+  work: { api: 'works', front: 'works' },
   entry: { api: 'entries', front: 'entries' },
   franchise: { api: 'franchises', front: 'franchises' },
-  track: { api: 'tracks', front: 'albums' },
+  track: { api: 'tracks', front: 'tracks' },
+  lyric: { api: 'lyrics', front: 'lyrics' },
+}
+
+/** Types whose duplicates can be merged into another entity. */
+export const mergeableContentTypes: AdminContentType[] = ['artist', 'label', 'work']
+
+/** The editor of an entity; tracks are edited with their album and lyrics on their song's page. */
+export const adminEditorPath = (type: AdminContentType, id?: number | string | null) => {
+  if (type === 'track' || type === 'lyric') return null
+  if (!id) return type === 'entry' ? '/contribute/entry' : `/contribute/${type}`
+  return `/contribute/${type}/${id}`
 }
 
 /** The content type of an admin URL segment such as `albums`. */
 export const adminContentTypeOf = (segment: unknown): AdminContentType | undefined =>
   adminContentTypes.find(type => adminContentRoutes[type].api === segment)
 
-/** Types edited through revisions; tracks are edited with their album. */
+/** Types with their own versions; tracks are edited with their album. */
 export const isRevisionable = (type: AdminContentType | undefined): type is Exclude<AdminContentType, 'track'> => Boolean(type) && type !== 'track'

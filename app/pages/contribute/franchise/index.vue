@@ -1,20 +1,16 @@
-<script setup lang="ts">
-definePageMeta({
-  middleware: 'auth'
-})
-
-const { t } = useI18n()
-useHead({ title: computed(() => t('catalog.contribute.series_title')) })
-</script>
-
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
-      <RevisionFranchiseCreateHeader />
-
-      <div class="max-w-5xl">
-        <RevisionFranchiseForm />
-      </div>
-    </div>
-  </div>
+  <EditorEntityEditor :key="String(route.query.revision ?? '')" type="franchise" :revision-id="revisionId">
+    <EditorEntityFranchiseFields />
+  </EditorEntityEditor>
 </template>
+
+<script setup lang="ts">
+// A new franchise; ?revision=<id> continues a saved draft.
+definePageMeta({ middleware: 'auth' })
+
+const route = useRoute()
+const { t } = useI18n()
+const revisionId = computed(() => Number(route.query.revision) || null)
+
+useSeoMeta({ title: () => t('editor.entity.new_title', { type: t('catalog.catalog_type.franchise') }), robots: 'noindex' })
+</script>

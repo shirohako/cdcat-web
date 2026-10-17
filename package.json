@@ -11,7 +11,8 @@
     "typecheck": "nuxt typecheck",
     "lint": "eslint .",
     "test:admin": "node --test --test-concurrency=1 tests/admin/smoke.test.mjs",
-    "test:markdown": "vitest run"
+    "test:markdown": "vitest run",
+    "test:catalog": "vitest run tests/catalog"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.20.3",

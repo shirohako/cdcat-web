@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import type { AdminBatchResult, AdminPagination, AdminRevision } from '~/types/admin'
+import type { AdminBatchResult, AdminPagination } from '~/types/admin'
+import type { Revision } from '~/types/revision'
+import { REVISION_STATUSES } from '~/types/revision'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
+
+const TYPES = ['album', 'artist', 'label', 'work', 'lyric', 'entry', 'franchise'] as const
+const FLAGS = ['has_conflicts', 'requires_content_manage', 'unchecked'] as const
 
 const route = useRoute()
 const router = useRouter()
@@ -10,8 +15,9 @@ const { hasPermission } = useAuth()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const filterKeys = ['search', 'type', 'status', 'action', 'submitter', 'from', 'to', 'is_auto_approved', 'resource_id'] as const
-const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
+const filterKeys = ['search', 'status', 'kind', 'origin', 'type', 'action', 'resource_id', 'submitter', 'from', 'to', 'is_auto_approved', ...FLAGS] as const
+type FilterKey = typeof filterKeys[number]
+const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<FilterKey, string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
   get: () => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1),
@@ -22,25 +28,26 @@ const resetFilters = () => router.push({ query: {} })
 const query = computed(() => ({ page: page.value, ...Object.fromEntries(filterKeys.map(key => [key, route.query[key] || undefined])) }))
 
 const { data, pending, error, refresh } = await useAsyncData('admin-revisions-list',
-  () => $api<{ revisions: AdminRevision[], pagination: AdminPagination }>('/v1/admin/revisions', { query: query.value }), { watch: [query] })
+  () => $api<{ revisions: Revision[], pagination: AdminPagination }>('/v1/admin/revisions', { query: query.value }), { watch: [query] })
 const { data: pendingData, refresh: refreshPending } = await useAsyncData('admin-revisions-pending-count',
   () => $api<{ pagination: AdminPagination }>('/v1/admin/revisions', { query: { status: 'pending', per_page: 1 } }))
 const revisions = computed(() => data.value?.revisions ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
 
-const canReview = computed(() => hasPermission('revisions.review'))
-const selectable = (revision: AdminRevision) => canReview.value && revision.status === 'pending'
+const canReview = computed(() => hasPermission('revisions.review') || hasPermission('lyrics.manage'))
+const selectable = (revision: Revision) => canReview.value && (revision.status === 'pending' || (revision.status === 'approved' && !revision.checked_at))
 const selected = ref<number[]>([])
 watch(revisions, () => { selected.value = [] })
 const allSelected = computed(() => revisions.value.some(selectable) && revisions.value.filter(selectable).every(item => selected.value.includes(item.id)))
 const toggleAll = () => { selected.value = allSelected.value ? [] : revisions.value.filter(selectable).map(item => item.id) }
 
-const batchAction = ref<'approve' | 'reject'>('approve')
+type BatchAction = 'approve' | 'request_changes' | 'reject' | 'check'
+const batchAction = ref<BatchAction>('approve')
 const batchOpen = ref(false)
 const busy = ref(false)
 const message = ref('')
 const batchResult = ref<AdminBatchResult | null>(null)
-const openBatch = (action: 'approve' | 'reject') => { batchAction.value = action; batchResult.value = null; batchOpen.value = true }
+const openBatch = (action: BatchAction) => { batchAction.value = action; batchResult.value = null; batchOpen.value = true }
 const runBatch = async (reason: string) => {
   if (busy.value || !selected.value.length) return
   busy.value = true
@@ -56,8 +63,17 @@ const runBatch = async (reason: string) => {
   }
 }
 
-const typeLabel = (type: string) => ['album', 'artist', 'entry', 'franchise'].includes(type) ? t(`admin_pages.types.${type}`) : type
-const statusClass: Record<string, string> = { pending: 'border-amber-200 bg-amber-50 text-amber-800', approved: 'border-emerald-200 bg-emerald-50 text-emerald-700', rejected: 'border-slate-200 bg-slate-50 text-slate-500' }
+const typeLabel = (type: string) => t(`admin_pages.types.${type}`)
+/** "album: 名前" from the server, with the type in Chinese. */
+const heading = (revision: Revision) => {
+  const match = revision.title?.match(/^([a-z]+): (.*)$/)
+  return match ? `${typeLabel(match[1]!)} · ${match[2]}` : (revision.title || `#${revision.id}`)
+}
+const statusClass: Record<string, string> = {
+  pending: 'border-amber-200 bg-amber-50 text-amber-800', changes_requested: 'border-orange-200 bg-orange-50 text-orange-800',
+  approved: 'border-emerald-200 bg-emerald-50 text-emerald-700', rejected: 'border-slate-200 bg-slate-50 text-slate-500',
+  withdrawn: 'border-slate-200 bg-white text-slate-400', draft: 'border-slate-200 bg-white text-slate-400',
+}
 const actionClass: Record<string, string> = { create: 'text-emerald-700', update: 'text-blue-700', delete: 'text-red-700' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 useHead({ title: computed(() => t('admin_pages.revisions.title')) })
@@ -75,15 +91,24 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.revisions.search')" :aria-label="t('admin_pages.revisions.search')" class="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <select v-model="filters.status" :aria-label="t('admin_pages.revisions.status')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.status_all') }}</option>
-          <option v-for="status in ['pending', 'approved', 'rejected']" :key="status" :value="status">{{ t(`admin_pages.revisions.status_${status}`) }}</option>
+          <option v-for="status in REVISION_STATUSES.filter(item => item !== 'draft')" :key="status" :value="status">{{ t(`admin_pages.revisions.status_${status}`) }}</option>
+        </select>
+        <select v-model="filters.kind" :aria-label="t('admin_pages.revisions.kind')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <option value="">{{ t('admin_pages.revisions.all_kinds') }}</option>
+          <option value="catalog">{{ t('admin_pages.revisions.kind_catalog') }}</option>
+          <option value="lyric">{{ t('admin_pages.revisions.kind_lyric') }}</option>
         </select>
         <select v-model="filters.type" :aria-label="t('admin_pages.revisions.subject')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.all_types') }}</option>
-          <option v-for="type in ['album', 'artist', 'entry', 'franchise']" :key="type" :value="type">{{ typeLabel(type) }}</option>
+          <option v-for="type in TYPES" :key="type" :value="type">{{ typeLabel(type) }}</option>
         </select>
         <select v-model="filters.action" :aria-label="t('admin_pages.revisions.action')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.all_actions') }}</option>
           <option v-for="action in ['create', 'update', 'delete']" :key="action" :value="action">{{ t(`admin_pages.revisions.action_${action}`) }}</option>
+        </select>
+        <select v-model="filters.origin" :aria-label="t('admin_pages.revisions.origin')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <option value="">{{ t('admin_pages.revisions.all_origins') }}</option>
+          <option v-for="origin in ['manual', 'import', 'client', 'system']" :key="origin" :value="origin">{{ t(`admin_pages.revisions.origin_${origin}`) }}</option>
         </select>
         <select v-model="filters.is_auto_approved" :aria-label="t('admin_pages.revisions.auto')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.auto_any') }}</option>
@@ -93,6 +118,9 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
         <input v-model="filters.submitter" maxlength="100" :placeholder="t('admin_pages.revisions.submitter_placeholder')" :aria-label="t('admin_pages.revisions.submitter')" class="w-40 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <label class="flex items-center gap-1">{{ t('admin_pages.from') }}<input v-model="filters.from" type="date" class="rounded-lg border border-slate-300 bg-white px-2 py-2"></label>
         <label class="flex items-center gap-1">{{ t('admin_pages.to') }}<input v-model="filters.to" type="date" class="rounded-lg border border-slate-300 bg-white px-2 py-2"></label>
+        <label v-for="flag in FLAGS" :key="flag" class="flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <input type="checkbox" :checked="filters[flag] === '1'" @change="filters[flag] = ($event.target as HTMLInputElement).checked ? '1' : ''">{{ t(`admin_pages.revisions.flag_${flag}`) }}
+        </label>
         <span v-if="filters.resource_id" class="rounded-lg bg-slate-200 px-3 py-2">{{ t('admin_pages.revisions.resource_filter', { id: filters.resource_id }) }}</span>
         <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
         <button type="button" class="rounded-lg border bg-white px-3 py-2" @click="resetFilters">{{ t('admin_pages.reset') }}</button>
@@ -102,10 +130,13 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
     <div class="flex flex-wrap items-center gap-3 text-sm">
       <span class="text-slate-500">{{ t('common.items_total', { count: pagination.total }) }}</span>
       <NuxtLink :to="{ query: { status: 'pending' } }" class="rounded-full bg-amber-50 px-3 py-1 text-amber-800">{{ t('admin_pages.revisions.pending_count', { count: pendingData?.pagination.total ?? 0 }) }}</NuxtLink>
+      <NuxtLink :to="{ query: { status: 'pending', has_conflicts: '1' } }" class="rounded-full bg-rose-50 px-3 py-1 text-rose-800">{{ t('admin_pages.revisions.flag_has_conflicts') }}</NuxtLink>
       <template v-if="canReview">
         <span class="ml-auto text-slate-500">{{ t('admin_pages.revisions.selected', { count: selected.length }) }}</span>
         <button type="button" :disabled="!selected.length" class="rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-emerald-700 disabled:opacity-40" @click="openBatch('approve')">{{ t('admin_pages.revisions.batch_approve') }}</button>
+        <button type="button" :disabled="!selected.length" class="rounded-lg border border-orange-300 bg-white px-3 py-1.5 text-orange-700 disabled:opacity-40" @click="openBatch('request_changes')">{{ t('admin_pages.revisions.batch_request_changes') }}</button>
         <button type="button" :disabled="!selected.length" class="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-red-700 disabled:opacity-40" @click="openBatch('reject')">{{ t('admin_pages.revisions.batch_reject') }}</button>
+        <button type="button" :disabled="!selected.length" class="rounded-lg border bg-white px-3 py-1.5 disabled:opacity-40" @click="openBatch('check')">{{ t('admin_pages.revisions.batch_check') }}</button>
       </template>
     </div>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -116,7 +147,9 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
         <button type="button" class="text-slate-500" @click="batchResult = null">{{ t('common.close') }}</button>
       </div>
       <ul v-if="batchResult.failed" class="mt-2 space-y-1 text-red-700">
-        <li v-for="item in batchResult.results.filter(result => !result.success)" :key="item.id">#{{ item.id }}：{{ localizeError({ name: item.error?.name }, 'admin_pages.revisions.action_failed') }}</li>
+        <li v-for="item in batchResult.results.filter(result => !result.success)" :key="item.id">
+          <NuxtLink :to="`/admin/revisions/${item.id}`" class="underline">#{{ item.id }}</NuxtLink>：{{ localizeError({ name: item.error?.name }, 'admin_pages.revisions.action_failed') }}
+        </li>
       </ul>
     </section>
 
@@ -140,18 +173,26 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
                 <td class="px-4 py-3"><input v-if="selectable(revision)" v-model="selected" type="checkbox" :value="revision.id" :aria-label="t('admin_pages.revisions.select', { id: revision.id })"></td>
                 <td class="px-3 py-3 font-mono text-xs text-slate-500">{{ revision.id }}</td>
                 <td class="px-3 py-3">
-                  <NuxtLink :to="`/admin/revisions/${revision.id}`" class="font-medium text-slate-900 underline decoration-slate-200 underline-offset-4">{{ revision.title }}</NuxtLink>
+                  <NuxtLink :to="`/admin/revisions/${revision.id}`" class="font-medium text-slate-900 underline decoration-slate-200 underline-offset-4">{{ heading(revision) }}</NuxtLink>
+                  <p v-if="revision.summary" class="mt-0.5 max-w-md truncate text-xs text-slate-500">{{ revision.summary }}</p>
                   <div class="mt-1 flex flex-wrap gap-2 text-xs">
-                    <span :class="actionClass[revision.action]">{{ t(`admin_pages.revisions.action_${revision.action}`) }}</span>
+                    <span v-if="revision.kind === 'lyric'" class="text-sky-700">{{ t('admin_pages.revisions.kind_lyric') }}</span>
+                    <span v-if="revision.origin !== 'manual'" class="text-slate-500">{{ t(`admin_pages.revisions.origin_${revision.origin}`) }}</span>
                     <span v-if="revision.is_auto_approved" class="text-slate-500">{{ t('admin_pages.revisions.auto_yes') }}</span>
-                    <span v-if="revision.rollback_of_id" class="text-violet-700">{{ t('admin_pages.revisions.rollback_of', { id: revision.rollback_of_id }) }}</span>
-                    <span v-if="revision.requires_reconfirmation" class="text-amber-700">{{ t('admin_pages.revisions.needs_reconfirmation') }}</span>
+                    <span v-if="revision.has_conflicts" class="text-rose-700">{{ t('admin_pages.revisions.flag_has_conflicts') }}</span>
+                    <span v-if="revision.requires_content_manage" class="text-amber-700">{{ t('admin_pages.revisions.flag_requires_content_manage') }}</span>
+                    <span v-if="revision.status === 'approved' && revision.is_auto_approved && !revision.checked_at" class="text-violet-700">{{ t('admin_pages.revisions.flag_unchecked') }}</span>
                   </div>
                 </td>
-                <td class="px-3 py-3 text-xs">{{ typeLabel(revision.resource_type) }}<span v-if="revision.resource_id" class="font-mono text-slate-400"> #{{ revision.resource_id }}</span></td>
+                <td class="px-3 py-3 text-xs">
+                  <p v-for="item in revision.items" :key="item.ref">
+                    <span :class="actionClass[item.action]">{{ t(`admin_pages.revisions.action_${item.action}`) }}</span>
+                    {{ typeLabel(item.resource_type) }}<span v-if="item.resource_id" class="font-mono text-slate-400"> #{{ item.resource_id }}</span>
+                  </p>
+                </td>
                 <td class="px-3 py-3 text-xs">{{ revision.submitter?.nickname || revision.submitter?.username || '—' }}</td>
-                <td class="px-3 py-3"><span class="rounded-full border px-2 py-0.5 text-xs" :class="statusClass[revision.status]">{{ t(`admin_pages.revisions.status_${revision.status}`) }}</span></td>
-                <td class="px-3 py-3 text-xs tabular-nums text-slate-500">{{ time(revision.created_at) }}</td>
+                <td class="px-3 py-3"><span class="whitespace-nowrap rounded-full border px-2 py-0.5 text-xs" :class="statusClass[revision.status]">{{ t(`admin_pages.revisions.status_${revision.status}`) }}</span></td>
+                <td class="px-3 py-3 text-xs tabular-nums text-slate-500">{{ time(revision.submitted_at ?? revision.created_at) }}</td>
               </tr>
             </tbody>
           </table>
@@ -161,9 +202,13 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
     </section>
 
     <AdminConfirmDialog
-v-model="batchOpen" :busy="busy" :reason-required="batchAction === 'reject'"
-      :title="t(batchAction === 'approve' ? 'admin_pages.revisions.batch_approve' : 'admin_pages.revisions.batch_reject')"
-      :description="t('admin_pages.revisions.batch_confirm', { count: selected.length })" @confirm="runBatch">
+      v-model="batchOpen"
+      :busy="busy"
+      :reason-required="batchAction === 'reject' || batchAction === 'request_changes'"
+      :title="t(`admin_pages.revisions.batch_${batchAction}`)"
+      :description="t('admin_pages.revisions.batch_confirm', { count: selected.length })"
+      @confirm="runBatch"
+    >
       <p class="mt-3 text-xs text-slate-500">{{ t('admin_pages.revisions.batch_help') }}</p>
     </AdminConfirmDialog>
   </div>

@@ -1,354 +1,224 @@
 <template>
-  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-    <!-- Header -->
-    <div class="px-6 py-3 border-b border-gray-100 flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-        <ListMusic :size="16" class="text-indigo-500" />
-      </div>
-      <h2 class="text-base font-bold text-gray-900">{{ $t('album.section.tracklist') }}</h2>
-      <!-- Credit toggle -->
-      <div class="ml-auto flex items-center gap-2">
-        <span class="text-xs text-gray-400 flex items-center gap-1">
-          <Users :size="12" />
-          {{ $t('album.tracklist.credits_toggle') }}
-        </span>
-        <button
-          type="button"
-          @click="showCredits = !showCredits"
-          class="relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none"
-          :class="showCredits ? 'bg-indigo-500' : 'bg-gray-200'"
-        >
-          <span
-            class="inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform"
-            :class="showCredits ? 'translate-x-4.5' : 'translate-x-0.75'"
-          />
-        </button>
-      </div>
-    </div>
+  <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic" tone="indigo">
+    <template #actions>
+      <select
+        v-if="languages.length"
+        v-model="languageKey"
+        class="select select-sm h-8 text-xs max-w-44 text-xs text-gray-600"
+        :aria-label="$t('album.tracklist.language')"
+      >
+        <option value="">{{ $t('album.tracklist.original') }}</option>
+        <option v-for="language in languages" :key="language.key" :value="language.key">
+          {{ language.label }} ({{ language.count }}/{{ language.total }})
+        </option>
+      </select>
+      <NuxtLink
+        v-if="albumId"
+        :to="{ path: `/contribute/album/${albumId}`, query: { mode: 'translate', locale } }"
+        class="hidden items-center gap-1 hover:text-gray-600 sm:flex"
+        :title="$t('editor.mode_translate')"
+      ><Languages :size="12" />{{ $t('album.tracklist.translate') }}</NuxtLink>
+      <span class="hidden items-center gap-1 sm:flex"><Users :size="12" />{{ $t('album.tracklist.credits_toggle') }}</span>
+      <input v-model="showCredits" type="checkbox" class="toggle scale-75" :aria-label="$t('album.tracklist.credits_toggle')">
+    </template>
 
     <div v-if="discs.length">
-      <template v-for="(disc, discIdx) in discs" :key="disc.discNumber">
-        <!-- Disc label (only when multiple discs) -->
-        <div v-if="discs.length > 1" class="px-4 sm:px-5 py-2 bg-gray-50 border-b border-gray-100">
-          <!-- Main row -->
-          <div class="flex items-center gap-2">
-            <Disc3 :size="12" class="text-gray-400 shrink-0" />
-            <span class="text-[11px] font-bold text-gray-500 uppercase tracking-wider shrink-0">Disc {{ disc.discNumber }}</span>
-            <!-- Title inline on sm+ -->
-            <span v-if="disc.title" class="hidden sm:inline text-[11px] text-gray-400 truncate">— {{ disc.title }}</span>
-            <!-- is_bonus badge -->
-            <div v-if="disc.isBonus" class="tooltip tooltip-bottom" :data-tip="$t('content_display.bonus_hint')">
-              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-pink-100 text-pink-600 cursor-default select-none">{{ $t('content_display.bonus') }}</span>
-            </div>
-            <!-- is_counted badge -->
-            <div v-if="!disc.isCounted" class="tooltip tooltip-bottom" :data-tip="$t('content_display.extra_hint')">
-              <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-500 cursor-default select-none">{{ $t('content_display.extra_content') }}</span>
-            </div>
-            <span class="ml-auto px-1.5 py-0.5 text-[10px] font-bold tabular-nums rounded-full bg-gray-200/80 text-gray-500 shrink-0">{{ disc.tracks.length }}</span>
-          </div>
-          <!-- Title on its own line on mobile -->
-          <p v-if="disc.title" class="sm:hidden text-[11px] text-gray-400 mt-0.5 pl-4.5">{{ disc.title }}</p>
+      <template v-for="disc in discs" :key="disc.id">
+        <div v-if="discs.length > 1 || disc.bonus || disc.format !== 'cd' || disc.title" :id="`disc-${disc.id}`" class="flex scroll-mt-20 items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-2 sm:px-5">
+          <Disc3 :size="12" class="shrink-0 text-gray-400" />
+          <span class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-500">Disc {{ disc.position }}</span>
+          <span v-if="disc.format !== 'cd'" class="shrink-0 rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-bold text-gray-600">{{ enumLabel('disc_format', disc.format) }}</span>
+          <span v-if="disc.shownTitle" class="truncate text-[11px] text-gray-500">— {{ disc.shownTitle }}</span>
+          <span
+            v-if="disc.bonus"
+            class="tooltip tooltip-bottom shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600"
+            :data-tip="disc.bonus.name"
+          >{{ $t('content_display.bonus') }}</span>
+          <span class="ml-auto shrink-0 rounded-full bg-gray-200/80 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-gray-500">{{ disc.tracks.length }}</span>
         </div>
 
-        <!-- Track rows -->
         <div
           v-for="track in disc.tracks"
-          :key="track.uid"
-          class="flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 hover:bg-indigo-50/50 transition-all duration-150 border-b border-gray-100 last:border-b-0 group"
+          :id="`track-${track.id}`"
+          :key="track.id"
+          class="group flex items-center gap-2 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-indigo-50/50 sm:gap-3 sm:px-5"
         >
-          <!-- Track number -->
-          <span class="text-gray-400 group-hover:text-indigo-500 font-mono font-bold text-xs w-6 text-right shrink-0 select-none transition-colors duration-150">{{ track.displayNumber }}</span>
+          <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-gray-400 group-hover:text-indigo-500">{{ track.number }}</span>
 
-          <!-- Heart -->
           <button
-            v-if="track.trackId"
             type="button"
-            :disabled="!!toggleLoading[track.trackId]"
-            @click="handleToggleFavorite(track.trackId)"
-            class="shrink-0 p-1 rounded-full transition-colors hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer sm:opacity-0 sm:group-hover:opacity-100"
-            :class="{ 'sm:opacity-100!': favoritedTracks[track.trackId] }"
-            :title="$t(favoritedTracks[track.trackId] ? 'content_display.unfavorite' : 'content_display.favorite')"
+            :disabled="!!toggling[track.id]"
+            class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100"
+            :class="{ 'sm:opacity-100!': favorited[track.id] }"
+            :title="$t(favorited[track.id] ? 'content_display.unfavorite' : 'content_display.favorite')"
+            @click="toggleFavorite(track.id)"
           >
-            <Heart
-              :size="14"
-              :fill="favoritedTracks[track.trackId] ? 'currentColor' : 'none'"
-              :class="favoritedTracks[track.trackId] ? 'text-red-500' : 'text-gray-400'"
-            />
+            <Heart :size="14" :fill="favorited[track.id] ? 'currentColor' : 'none'" :class="favorited[track.id] ? 'text-red-500' : 'text-gray-400'" />
           </button>
-          <div v-else class="w-6 shrink-0" />
 
-          <!-- Title + meta -->
-          <div class="flex-1 min-w-0">
-            <!-- 第一行：纯音乐图标 + 标题 -->
-            <div class="flex items-center gap-1.5 min-w-0">
-              <p class="text-sm font-medium text-gray-900 leading-snug">{{ track.title }}</p>
-              <div v-if="track.isInstrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
-                <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-violet-100 text-violet-600">
-                  <Music2 :size="11" :stroke-width="2.5" />
-                </span>
-              </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex min-w-0 flex-wrap items-center gap-1.5">
+              <NuxtLink :to="`/tracks/${track.id}`" class="text-sm font-medium leading-snug hover:underline" :class="track.translated === false ? 'text-gray-500' : 'text-gray-900'">
+                {{ track.shownTitle }}
+              </NuxtLink>
+              <span v-if="track.is_instrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-600"><Music2 :size="11" :stroke-width="2.5" /></span>
+              </span>
+              <NuxtLink
+                v-if="track.work && track.work.tracks_count > 1"
+                :to="`/works/${track.work.id}`"
+                class="tooltip tooltip-bottom shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 hover:bg-indigo-100 hover:text-indigo-600"
+                :data-tip="$t('album.tracklist.other_recordings_hint')"
+              >{{ $t('album.tracklist.other_recordings', { count: track.work.tracks_count - 1 }) }}</NuxtLink>
             </div>
-            <!-- 第二行：subtitle -->
-            <p v-if="track.subtitle" class="text-xs text-gray-400 mt-0.5 pl-4.5 truncate">{{ track.subtitle }}</p>
-            <!-- Credits -->
-            <div
-              v-if="showCredits && (track.artist || track.credits?.length)"
-              class="mt-2 pt-2 border-t border-gray-100 space-y-1 text-xs"
-            >
-              <div v-if="track.artist" class="flex items-baseline gap-2">
-                <span
-                  class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold"
-                  :class="getAlbumRolePalette('Artist').badge"
-                >
-                  Artist
-                </span>
-                <span class="text-gray-600">{{ track.artist }}</span>
-              </div>
-              <div v-for="(credit, idx) in track.credits" :key="idx" class="flex items-baseline gap-2">
-                <span :class="['shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold', getAlbumRolePalette(credit.role).badge]">
-                  {{ credit.role }}
+            <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-gray-400">{{ track.subtitle }}</p>
+
+            <div v-if="showCredits && (track.creditGroups.length || track.attributes.length)" class="mt-2 space-y-1 border-t border-gray-100 pt-2 text-xs">
+              <div v-for="group in track.creditGroups" :key="group.role" class="flex items-baseline gap-2">
+                <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold" :class="getAlbumRolePalette(group.category).badge">
+                  {{ roleName(group.role) }}
                 </span>
                 <span class="text-gray-600">
-                  <template v-for="(artist, artistIdx) in credit.artists" :key="artistIdx">
-                    <NuxtLink
-                      v-if="artist.artistId"
-                      :to="`/artists/${artist.artistId}`"
-                      class="hover:underline hover:text-gray-800 transition-colors"
-                    >{{ artist.name }}</NuxtLink>
-                    <span v-else>{{ artist.name }}</span>
-                    <span v-if="artistIdx < credit.artists.length - 1">, </span>
+                  <template v-for="(person, index) in group.people" :key="index">
+                    <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="hover:text-gray-800 hover:underline">{{ person.name }}</NuxtLink>
+                    <span v-else>{{ person.name }}</span>
+                    <span v-if="person.detail" class="text-gray-400"> ({{ person.detail }})</span>
+                    <span v-if="index < group.people.length - 1">, </span>
                   </template>
                 </span>
               </div>
+              <CatalogAttributeList v-if="track.attributes.length" :attributes="track.attributes" class="pt-1" />
             </div>
           </div>
 
-          <!-- Duration + 歌词/翻译 -->
-          <div class="shrink-0 flex flex-col items-center sm:items-end justify-center gap-1">
-            <span class="text-xs text-gray-400 tabular-nums">{{ track.duration }}</span>
-            <div v-if="!track.isInstrumental" class="flex items-center gap-1">
-              <button
-                type="button"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors cursor-pointer"
-                :class="track.hasLyrics ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
-                @click.stop="openLyrics(track, 'lyric')"
-              >
-                <FileText :size="10" /><span class="hidden sm:inline">{{ $t('album.tracklist.lyric') }}</span>
-              </button>
-              <button
-                type="button"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium transition-colors cursor-pointer"
-                :class="track.translationsCount > 0 ? 'bg-teal-50 text-teal-500 hover:bg-teal-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
-                @click.stop="openLyrics(track, 'translation')"
-              >
-                <Languages :size="10" />
-                <span class="hidden sm:inline">
-                  {{ track.translationsCount > 0
-                    ? $t('album.tracklist.translation_with_count', { count: track.translationsCount })
-                    : $t('album.tracklist.translation') }}
-                </span>
-                <span v-if="track.translationsCount > 0" class="sm:hidden">{{ track.translationsCount }}</span>
-              </button>
-            </div>
+          <div class="flex shrink-0 flex-col items-center justify-center gap-1 sm:items-end">
+            <span class="text-xs tabular-nums text-gray-400">{{ formatDuration(track.duration) || '--' }}</span>
+            <button
+              v-if="track.work && !track.is_instrumental"
+              type="button"
+              class="inline-flex cursor-pointer items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors"
+              :class="track.work.lyrics_count ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+              @click="openLyrics(track)"
+            >
+              <FileText :size="10" />
+              <span class="hidden sm:inline">{{ $t('album.tracklist.lyric') }}</span>
+              <span v-if="track.work.translations_count" class="text-teal-500">+{{ track.work.translations_count }}</span>
+            </button>
           </div>
         </div>
-
-        <div v-if="discIdx < discs.length - 1" class="border-b border-gray-100" />
       </template>
     </div>
 
-    <!-- Empty state -->
-    <div v-else class="flex items-center justify-center gap-3 py-5 px-6">
-      <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0">
-        <ListMusic :size="15" class="text-indigo-400" />
-      </div>
+    <div v-else class="flex items-center justify-center gap-3 px-6 py-5">
+      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100"><ListMusic :size="15" class="text-indigo-400" /></div>
       <div class="text-left">
         <p class="text-sm font-semibold text-gray-600">{{ $t('album.empty.tracklist_title') }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">{{ $t('album.empty.tracklist_desc') }}</p>
+        <p class="mt-0.5 text-xs text-gray-500">{{ $t('album.empty.tracklist_desc') }}</p>
       </div>
     </div>
-  </section>
+  </CatalogSection>
 
-  <!-- Modal -->
-  <AlbumTrackLyricsModal
-    v-model="showLyricsModal"
-    :track-id="activeTrack.id"
-    :track-title="activeTrack.title"
-    :initial-filter="activeTrack.filter"
-  />
+  <LyricsModal v-model="showLyrics" :work-id="lyricsTarget.workId" :title="lyricsTarget.title" />
 </template>
 
 <script setup lang="ts">
-import type { AlbumTrack, AlbumDisc, AlbumCredit } from '~/types/album'
-import { ListMusic, Disc3, Users, Heart, Music2, FileText, Languages } from "@lucide/vue"
+import type { AlbumBonus, AlbumDisc, AlbumTrack, TracklistLanguage } from '~/types/album'
+import { Disc3, FileText, Heart, Languages, ListMusic, Music2, Users } from '@lucide/vue'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
 
+const props = defineProps<{
+  discs: AlbumDisc[]
+  bonuses: AlbumBonus[]
+  languages: TracklistLanguage[]
+  /** Shows the link to the tracklist translator */
+  albumId?: number
+}>()
+
+const { locale } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavoriteTrack } = useFavorites()
 const route = useRoute()
+const { titleIn, localeName, enumLabel, formatDuration } = useCatalogDisplay()
+const { roleName, roleCategory, roleOrder } = useCatalogSchema()
 
-const showLyricsModal = ref(false)
-const activeTrack = ref<{ id: number | null; title: string; filter: '' | 'lyric' | 'translation' }>({
-  id: null,
-  title: '',
-  filter: '',
+const UI_LOCALES: Record<string, string[]> = { 'zh-Hans': ['zh-Hans', 'zh-CN'], 'zh-Hant': ['zh-Hant', 'zh-TW'], en: ['en'], ja: ['ja'] }
+
+const languages = computed(() => props.languages.map(language => ({
+  ...language,
+  key: `${language.locale}|${language.kind}`,
+  label: `${localeName(language.locale)}${language.kind === 'transliteration' ? '' : ` · ${enumLabel('title_kind', language.kind)}`}`,
+})))
+
+/** Starts in the UI language when the tracklist has an official name or a translation in it. */
+const languageKey = ref(languages.value.find(language => language.kind !== 'transliteration' && (UI_LOCALES[locale.value] ?? [locale.value]).includes(language.locale))?.key ?? '')
+const chosen = computed(() => {
+  if (!languageKey.value) return null
+  const [code, kind] = languageKey.value.split('|') as [string, string]
+  return { locale: code, kind }
 })
-
-const openLyrics = (track: { trackId: number | null; title: string }, filter: '' | 'lyric' | 'translation' = '') => {
-  activeTrack.value = { id: track.trackId, title: track.title, filter }
-  showLyricsModal.value = true
-}
 
 const CREDITS_STORAGE_KEY = 'cdcat:tracklist:showCredits'
 const showCredits = ref(true)
-
 onMounted(() => {
   const saved = localStorage.getItem(CREDITS_STORAGE_KEY)
   if (saved !== null) showCredits.value = saved === 'true'
 })
+watch(showCredits, value => localStorage.setItem(CREDITS_STORAGE_KEY, String(value)))
 
-watch(showCredits, (val: boolean) => {
-  localStorage.setItem(CREDITS_STORAGE_KEY, String(val))
-})
+interface CreditGroup { role: string, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }
 
-const props = withDefaults(defineProps<{
-  tracks: AlbumTrack[]
-  structure: AlbumDisc[]
-}>(), {
-  tracks: () => [],
-  structure: () => [],
-})
+const creditGroups = (track: AlbumTrack): CreditGroup[] => {
+  const groups = new Map<string, CreditGroup>()
+  for (const credit of track.credits) {
+    const group = groups.get(credit.role) ?? { role: credit.role, category: credit.category ?? roleCategory(credit.role), people: [] }
+    group.people.push({ name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail })
+    groups.set(credit.role, group)
+  }
+  return [...groups.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
+}
 
-const favoritedTracks = ref<Record<number, boolean>>(
-  Object.fromEntries(props.tracks.filter(s => s.is_favorited).map(s => [s.id, true]))
-)
-const toggleLoading = ref<Record<number, boolean>>({})
+const discs = computed(() => props.discs.map(disc => ({
+  ...disc,
+  shownTitle: titleIn(disc.titles, chosen.value) ?? disc.title,
+  bonus: props.bonuses.find(bonus => bonus.id === disc.bonus_id) ?? null,
+  tracks: [...disc.tracks].sort((a, b) => a.track_number - b.track_number).map((track) => {
+    const translated = titleIn(track.titles, chosen.value)
+    return {
+      ...track,
+      number: track.number_label || String(track.track_number).padStart(2, '0'),
+      shownTitle: translated ?? track.title,
+      /** false when a language is chosen but this track has no name in it */
+      translated: chosen.value ? translated !== null : null,
+      subtitle: translated && translated !== track.title ? track.title : '',
+      creditGroups: creditGroups(track),
+    }
+  }),
+})))
 
-const handleToggleFavorite = async (trackId: number) => {
+const favorited = ref<Record<number, boolean>>(Object.fromEntries(props.discs.flatMap(disc => disc.tracks).filter(track => track.is_favorited).map(track => [track.id, true])))
+const toggling = ref<Record<number, boolean>>({})
+
+const toggleFavorite = async (trackId: number) => {
   if (!isAuthenticated.value) {
     await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
     return
   }
-  if (toggleLoading.value[trackId]) return
-
-  toggleLoading.value = { ...toggleLoading.value, [trackId]: true }
+  if (toggling.value[trackId]) return
+  toggling.value = { ...toggling.value, [trackId]: true }
   try {
-    const result = await setFavoriteTrack(trackId, !favoritedTracks.value[trackId])
-    favoritedTracks.value = { ...favoritedTracks.value, [trackId]: result.favorited }
+    const result = await setFavoriteTrack(trackId, !favorited.value[trackId])
+    favorited.value = { ...favorited.value, [trackId]: result.favorited }
   } catch {
     // 401 已由 api 插件处理
   } finally {
-    const { [trackId]: _, ...rest } = toggleLoading.value
-    toggleLoading.value = rest
+    toggling.value = { ...toggling.value, [trackId]: false }
   }
 }
 
-const normalizeNumber = (value: unknown): number | null => {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : null
+const showLyrics = ref(false)
+const lyricsTarget = ref<{ workId: number | null, title: string }>({ workId: null, title: '' })
+const openLyrics = (track: { work: AlbumTrack['work'], shownTitle: string }) => {
+  lyricsTarget.value = { workId: track.work?.id ?? null, title: track.shownTitle }
+  showLyrics.value = true
 }
-
-const formatDuration = (value: number | null | undefined): string => {
-  const seconds = normalizeNumber(value)
-  if (seconds === null || seconds < 0) return '--'
-  const minutes = Math.floor(seconds / 60)
-  const remainder = Math.floor(seconds % 60)
-  return `${minutes}:${remainder.toString().padStart(2, '0')}`
-}
-
-const trackSortValue = (track: AlbumTrack): number =>
-  normalizeNumber(track.track_number) ?? Number.MAX_SAFE_INTEGER
-
-const processTracks = (list: AlbumTrack[], discNumber: number) => {
-  return list
-    .slice()
-    .sort((a: AlbumTrack, b: AlbumTrack) => trackSortValue(a) - trackSortValue(b))
-    .map((track: AlbumTrack) => {
-      const trackNumber = normalizeNumber(track.track_number)
-      const artistNames = Array.isArray((track as any).artists)
-        ? (track as any).artists
-            .map((artist: { name?: string }) => artist?.name)
-            .filter(Boolean)
-            .join(', ')
-        : (track as any).artist_names || (track as any).artist || (track as any).artist_name || ''
-
-      // 处理歌曲 Credit
-      const credits: AlbumCredit[] = (track.credits as AlbumCredit[]) || []
-      const formattedCredits: { role: string; artists: { name: string; artistId: number | null }[] }[] = []
-      if (credits.length > 0) {
-        const groups = new Map<string, { name: string; artistId: number | null }[]>()
-        credits.forEach((c: AlbumCredit) => {
-          const role = c.role ? c.role.charAt(0).toUpperCase() + c.role.slice(1) : 'Credit'
-          // 优先级：外层 display_name -> artist.name -> pivot.display_name
-          const name = c.display_name || c.artist_name || null
-          const artistId = c.artist_id || null
-          if (name) {
-            if (!groups.has(role)) groups.set(role, [])
-            const existing = groups.get(role)!.find((item: { name: string }) => item.name === name)
-            if (!existing) groups.get(role)!.push({ name, artistId })
-          }
-        })
-        for (const [role, artists] of groups) {
-          formattedCredits.push({ role, artists })
-        }
-      }
-
-      return {
-        trackId: track.id ?? null,
-        uid: track.id ?? `disc-${discNumber}-${trackNumber ?? track.title ?? 'track'}`,
-        displayNumber: trackNumber !== null ? trackNumber.toString().padStart(2, '0') : '--',
-        title: track.title || 'Untitled Track',
-        subtitle: (track.meta as any)?.subtitle || null,
-        credits: formattedCredits,
-        artist: artistNames,
-        duration: formatDuration(track.duration),
-        isInstrumental: track.is_instrumental ?? false,
-        hasLyrics: track.has_lyrics ?? false,
-        translationsCount: track.translations_count ?? 0,
-      }
-    })
-}
-
-interface DiscItem {
-  discNumber: number
-  title: string | null
-  isBonus?: boolean
-  isCounted?: boolean
-  tracks: ReturnType<typeof processTracks>
-}
-
-const discs = computed<DiscItem[]>(() => {
-  if (props.structure.length > 0) {
-    return props.structure.map((disc: AlbumDisc) => {
-      const discNumber = disc.disc_number
-      const tracks = props.tracks.filter(
-        (s: AlbumTrack) => (normalizeNumber(s.disc_number) ?? 1) === discNumber
-      )
-      return {
-        discNumber,
-        title: disc.title ?? null,
-        isBonus: disc.is_bonus ?? false,
-        isCounted: disc.is_counted ?? true,
-        tracks: processTracks(tracks, discNumber),
-      }
-    })
-  }
-
-  if (!props.tracks.length) return []
-
-  const discMap = new Map<number, AlbumTrack[]>()
-  props.tracks.forEach((track: AlbumTrack) => {
-    const discNumber = normalizeNumber(track.disc_number) ?? 1
-    if (!discMap.has(discNumber)) discMap.set(discNumber, [])
-    discMap.get(discNumber)!.push(track)
-  })
-
-  return Array.from(discMap.entries())
-    .sort((a, b) => a[0] - b[0])
-    .map(([discNumber, discTracks]) => ({
-      discNumber,
-      title: null,
-      tracks: processTracks(discTracks, discNumber),
-    }))
-})
 </script>

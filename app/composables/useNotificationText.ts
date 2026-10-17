@@ -5,9 +5,22 @@ const GROUPED = ['discussion.topic_reply', 'discussion.watching', 'discussion.re
 
 /** How a notification reads, what extra line it shows, and where clicking it goes. */
 export const useNotificationText = () => {
-  const { t } = useI18n()
+  const { t, te } = useI18n()
+
+  /** Revision titles come as "album: 名前"; the type is shown in the UI language. */
+  const revisionTitle = (title: unknown) => {
+    const match = String(title ?? '').match(/^([a-z]+): (.*)$/)
+    return match ? `${te(`catalog.catalog_type.${match[1]}`) ? t(`catalog.catalog_type.${match[1]}`) : match[1]} · ${match[2]}` : String(title ?? '')
+  }
 
   const text = (notification: NotificationItem) => {
+    if (notification.type === 'user.restricted') {
+      const scope = String(notification.data.scope ?? 'discussions')
+      return t(te(`notifications.types.user_restricted.${scope}`) ? `notifications.types.user_restricted.${scope}` : 'notifications.types.user_restricted.discussions')
+    }
+    if (notification.type.startsWith('revision.')) {
+      return t(`notifications.types.${notification.type.replace('.', '_')}`, { title: revisionTitle(notification.data.title) })
+    }
     const title = notification.data.title || t('article_ui.untitled')
     if (notification.type === 'report.resolved') {
       return t(notification.data.decision === 'accept' ? 'notifications.types.report_accepted' : 'notifications.types.report_dismissed', { title })
@@ -28,6 +41,7 @@ export const useNotificationText = () => {
   /** A second line: the moderator's reason, or for discussion activity an excerpt of the post. */
   const detail = (notification: NotificationItem) => {
     if (notification.data.reason) return t('notifications.reason_line', { reason: notification.data.reason })
+    if (notification.type.startsWith('revision.') && notification.data.comment) return t('notifications.comment_line', { comment: notification.data.comment })
     if (notification.type.startsWith('discussion.') && typeof notification.data.excerpt === 'string') return notification.data.excerpt
     return null
   }
@@ -42,6 +56,7 @@ export const useNotificationText = () => {
     }
     if (type === 'discussion_topic') return notification.data.action === 'deleted' ? null : `/discussions/${id}`
     if (type === 'user') return null
+    if (type === 'revision') return `/revisions/${id}`
     if (type !== 'article' || notification.type === 'article.deleted') return null
     if (notification.type === 'report.resolved') return notification.data.resolution === 'delete' ? null : `/articles/${id}`
     // The author fixes rejected or edited work in the writer; everything else opens the article.

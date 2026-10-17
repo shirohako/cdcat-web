@@ -1,3 +1,4 @@
+import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText } from './catalog'
 import type { ArticleDetail, ArticleVersion, ArticleVersionContent, ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
 
 export interface DeletionImpact {
@@ -67,9 +68,9 @@ export interface AdminUserActivity {
   title: string | null
   status?: string
   album_id?: number | null
-  track_id?: number
-  resource_id?: number | null
-  resource_type?: string
+  work_id?: number | null
+  kind?: string
+  items?: Array<{ resource_type: string, resource_id: number | null, action: string }>
   language?: string
   rating?: number | null
   created_at: string
@@ -79,6 +80,9 @@ export interface AdminDashboard {
   generated_at: string
   metrics: { key: string, total: number, new_7: number, new_30: number, daily: { date: string, count: number }[] }[]
   pending_revisions?: number
+  conflicted_revisions?: number
+  pending_lyric_revisions?: number
+  unchecked_lyrics?: number
   pending_articles?: number
   pending_reports?: number
   recent_actions?: AdminAuditEntry[]
@@ -96,47 +100,13 @@ export interface AdminUserRef {
   avatar_url: string | null
 }
 
-export interface AdminRevision {
-  id: number
-  resource_type: 'album' | 'artist' | 'entry' | 'franchise' | string
-  resource_id: number | null
-  revision_number: number
-  action: 'create' | 'update' | 'delete'
-  title: string
-  data?: Record<string, unknown>
-  after_snapshot?: Record<string, unknown> | null
-  checksum?: string | null
-  baseline_checksum: string | null
-  impact_checksum?: string | null
-  requires_content_manage: boolean
-  requires_reconfirmation: boolean
-  is_auto_approved: boolean
-  rollback_of_id: number | null
-  status: 'pending' | 'approved' | 'rejected'
-  comment: string | null
-  review_comment: string | null
-  submitter?: AdminUserRef
-  reviewer?: AdminUserRef
-  reviewed_at: string | null
-  created_at: string
-  updated_at: string
-}
-
 export interface AdminBatchResult {
   results: { id: number, success: boolean, error?: { name: string, message: string } }[]
   succeeded: number
   failed: number
 }
 
-export interface AdminRollbackPreview {
-  current: Record<string, unknown>
-  target: Record<string, unknown>
-  baseline_checksum: string
-  removed_track_ids: number[]
-  impact: DeletionImpact | null
-}
-
-export type AdminContentType = 'album' | 'artist' | 'entry' | 'franchise' | 'track'
+export type AdminContentType = 'album' | 'artist' | 'label' | 'work' | 'entry' | 'franchise' | 'track' | 'lyric'
 
 export interface AdminContentItem {
   id: number
@@ -150,12 +120,71 @@ export interface AdminContentItem {
   [key: string]: unknown
 }
 
+/** GET /admin/content/{type}/{id}/merge-preview */
 export interface AdminMergePreview {
-  source: { id: number, name: string }
-  target: { id: number, name: string }
-  counts: { key: string, label: string, count: number }[]
-  pending_revisions: { id: number, title: string }[]
+  /** Entities that reference the source and get a version each, by type */
+  affected: Record<string, number>
+  /** Rows outside documents that are moved over: favorites, article links … */
+  external: Record<string, number>
+  blockers: string[]
   checksum: string
+}
+
+/** GET /admin/content/{type}/{id}/restore-preview */
+export interface AdminRestorePreview {
+  version: number
+  current_version: number
+  changes: ChangeOp[]
+  summary: ChangeSummary
+  problems: Array<{ path: string, message: string }>
+  impact: DeletionImpact | null
+  references: CatalogReferences
+}
+
+/** GET /admin/credit-roles */
+export interface AdminCreditRole {
+  key: string
+  category: string
+  names: LocalizedText
+  aliases: string[] | null
+  is_album_role: boolean
+  is_track_role: boolean
+  is_work_role: boolean
+  sort_order: number
+  is_active: boolean
+  usage: { album: number, track: number, work: number }
+}
+
+/** GET /admin/attribute-definitions */
+export interface AdminAttributeDefinition {
+  key: string
+  names: LocalizedText
+  description: LocalizedText | null
+  group: string | null
+  value_type: string
+  choices: Array<{ value: string, names: LocalizedText }> | null
+  reference_types: string[] | null
+  applies_to: string[]
+  is_multiple: boolean
+  sort_order: number
+  is_active: boolean
+  values_count: number
+}
+
+/** GET /admin/shouts */
+export interface AdminShout {
+  id: number
+  album_id: number | null
+  artist_id: number | null
+  user_id: number
+  content: string
+  is_hidden: boolean
+  hidden_at: string | null
+  album: { id: number, title: string } | null
+  artist: { id: number, name: string } | null
+  user: AdminUserRef | null
+  created_at: string | null
+  updated_at: string | null
 }
 
 export interface AdminLinkProvider {
@@ -238,6 +267,7 @@ export interface AdminReportGroup {
   target:
     | { type: 'article', id: number, title: string | null, status: string | null, author: UserSummary | null }
     | { type: 'post', id: number, title: string | null, status: string | null, author: UserSummary | null, topic_id: number | null, floor: number | null, parent_floor: number | null, excerpt: string | null }
+    | { type: 'shout', id: number, title: string | null, status: 'hidden' | 'visible' | null, author: UserSummary | null, album_id: number | null, artist_id: number | null, excerpt: string | null }
   reports_count: number
   reasons: Record<string, number>
   reports: AdminReportEntry[]
@@ -247,6 +277,8 @@ export interface AdminHandledReport extends Omit<AdminReportEntry, 'updated_at'>
   article_id: number | null
   post_id: number | null
   post: { id: number, floor: number | null, topic: { id: number, title: string } | null } | null
+  shout_id?: number | null
+  shout?: { id: number, album_id: number | null, artist_id: number | null, content: string } | null
   status: 'accepted' | 'dismissed'
   resolution: string | null
   resolution_note: string | null
@@ -270,25 +302,6 @@ export interface AdminWordFilter {
   action: 'block' | 'flag'
   note: string | null
   created_by: number | null
-  created_at: string
-  updated_at: string
-}
-
-export interface AdminLyric {
-  id: number
-  track_id: number
-  language: string
-  format: 'plain' | 'lrc' | 'srt'
-  content?: string
-  excerpt?: string
-  is_primary: boolean
-  is_translation: boolean
-  is_ai_generated: boolean
-  authorship: string | null
-  source: string | null
-  track: { id: number, title: string, album_id: number } | null
-  album: { id: number, title: string } | null
-  submitter: { id: number, username: string, nickname: string | null } | null
   created_at: string
   updated_at: string
 }

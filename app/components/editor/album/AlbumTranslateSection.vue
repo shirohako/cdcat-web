@@ -1,0 +1,101 @@
+<template>
+  <CatalogSection :title="$t('editor.translate.title')" :icon="Languages" tone="emerald">
+    <template #actions>{{ $t('editor.translate.progress', { done: done, total: rows.length }) }}</template>
+    <div class="space-y-4 p-3 sm:p-5">
+      <p class="text-xs text-gray-500">{{ $t('editor.translate.hint') }}</p>
+      <div class="flex flex-wrap items-end gap-3">
+        <label class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('editor.translate.language') }}</span>
+          <select v-model="locale" class="select select-sm w-48">
+            <option v-for="code in LOCALES" :key="code" :value="code">{{ localeName(code) }}</option>
+          </select>
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('catalog.field.kind') }}</span>
+          <select v-model="kind" class="select select-sm w-40">
+            <option v-for="value in KINDS" :key="value" :value="value">{{ enumLabel('title_kind', value) }}</option>
+          </select>
+        </label>
+        <p class="pb-2 text-[11px] text-gray-400">{{ $t(`editor.translate.kind_hint.${kind}`) }}</p>
+      </div>
+
+      <div class="overflow-hidden rounded-xl border border-gray-200">
+        <div v-for="row in rows" :key="row.key">
+          <div v-if="row.heading" class="border-b border-gray-100 bg-gray-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">{{ row.heading }}</div>
+          <div class="grid items-center gap-2 border-b border-gray-100 px-3 py-1.5 last:border-b-0 sm:grid-cols-2" :class="{ 'bg-amber-50/40': !nameOf(row) }">
+            <p class="flex min-w-0 items-baseline gap-2 text-sm text-gray-700">
+              <span v-if="row.number" class="w-8 shrink-0 text-right font-mono text-xs text-gray-400">{{ row.number }}</span>
+              <span class="truncate" :title="row.original">{{ row.original }}</span>
+            </p>
+            <input
+              :value="nameOf(row)"
+              class="input input-sm w-full"
+              :lang="locale"
+              :placeholder="row.original"
+              @input="set(row, ($event.target as HTMLInputElement).value)"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </CatalogSection>
+</template>
+
+<script setup lang="ts">
+import type { TitleCollection } from '~/utils/albumDocument'
+import type { RowId } from '~/types/document'
+import { Languages } from '@lucide/vue'
+import { setTitleIn, sortedDiscs, titleIn, tracksOn } from '~/utils/albumDocument'
+
+/**
+ * 翻译曲目表: names of the album, its discs and tracks in one language, submitted together as
+ * one revision (docs/catalog/editing.md#曲目表翻译). Blank inputs remove that name.
+ */
+const props = defineProps<{ initialLocale?: string }>()
+
+const LOCALES = ['zh-Hans', 'zh-Hant', 'en', 'ja', 'ja-Latn', 'ja-Hrkt', 'ko']
+const KINDS = ['translation', 'official', 'transliteration'] as const
+
+const editor = useAlbumEditor()
+const { t, locale: uiLocale } = useI18n()
+const { enumLabel, localeName } = useCatalogDisplay()
+
+const album = computed(() => editor.album.value)
+const locale = ref(props.initialLocale && LOCALES.includes(props.initialLocale) ? props.initialLocale : LOCALES.includes(uiLocale.value) && uiLocale.value !== 'ja' ? uiLocale.value : 'en')
+const kind = ref<typeof KINDS[number]>('translation')
+watch(locale, (code) => { if (code.endsWith('-Latn') || code.endsWith('-Hrkt')) kind.value = 'transliteration' })
+
+interface Row {
+  key: string
+  collection: TitleCollection
+  owner: { field: 'disc_id' | 'track_id', id: RowId } | null
+  original: string
+  number?: string
+  heading?: string
+}
+
+const rows = computed<Row[]>(() => {
+  const discs = sortedDiscs(album.value)
+  const list: Row[] = [{ key: 'album', collection: 'titles', owner: null, original: album.value.title, heading: t('editor.translate.album_title') }]
+  for (const disc of discs) {
+    const heading = discs.length > 1 || disc.title ? t('editor.album.disc_n', { n: disc.position }) : undefined
+    let first = true
+    if (disc.title) {
+      list.push({ key: `d${disc.id}`, collection: 'disc_titles', owner: { field: 'disc_id', id: disc.id }, original: disc.title, heading, number: '◎' })
+      first = false
+    }
+    for (const track of tracksOn(album.value, disc.id)) {
+      list.push({
+        key: `t${track.id}`, collection: 'track_titles', owner: { field: 'track_id', id: track.id }, original: track.title,
+        number: track.number_label || String(track.track_number).padStart(2, '0'), heading: first ? (heading ?? t('editor.translate.tracks')) : undefined,
+      })
+      first = false
+    }
+  }
+  return list
+})
+
+const nameOf = (row: Row) => titleIn(album.value, row.collection, row.owner, locale.value, kind.value)
+const set = (row: Row, text: string) => setTitleIn(album.value, row.collection, row.owner, locale.value, kind.value, text)
+const done = computed(() => rows.value.filter(row => nameOf(row).trim()).length)
+</script>

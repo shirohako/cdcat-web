@@ -22,6 +22,14 @@
             :idle-class="idleClass"
             @update:model-value="selectEvent"
           />
+          <select :value="category ?? ''" class="select select-sm h-8 text-xs h-8 text-xs" :aria-label="t('albums.category_filter')" @change="selectFilter('category', ($event.target as HTMLSelectElement).value)">
+            <option value="">{{ t('albums.category_filter') }}</option>
+            <option v-for="value in ALBUM_CATEGORIES" :key="value" :value="value">{{ enumLabel('album_category', value) }}</option>
+          </select>
+          <select :value="format ?? ''" class="select select-sm h-8 text-xs h-8 text-xs" :aria-label="t('albums.format_filter')" @change="selectFilter('format', ($event.target as HTMLSelectElement).value)">
+            <option value="">{{ t('albums.format_filter') }}</option>
+            <option v-for="value in DISC_FORMATS" :key="value" :value="value">{{ enumLabel('disc_format', value) }}</option>
+          </select>
         </template>
         <template #action>
           <button
@@ -80,8 +88,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { Disc3, Plus } from "@lucide/vue";
+import type { AlbumSimple } from '~/types/album'
+import { ALBUM_CATEGORIES, DISC_FORMATS } from '~/types/album'
 
 const route = useRoute();
 const router = useRouter();
@@ -97,13 +107,17 @@ const albumTypes = computed(() => [
   { value: 'radio', label: t('albums.type.radio'), icon: 'lucide:radio' },
 ]);
 
-const selectedType = ref(route.query.type || 'all');
+const { enumLabel } = useCatalogDisplay()
+
+const selectedType = ref(String(route.query.type || 'all'));
 
 // ?event=<id> narrows the list to albums first released at that event.
 const eventId = computed(() => {
-  const id = Number.parseInt(route.query.event || '');
+  const id = Number.parseInt(String(route.query.event || ''));
   return id > 0 ? id : null;
 });
+const category = computed(() => route.query.category ? String(route.query.category) : null)
+const format = computed(() => route.query.format ? String(route.query.format) : null)
 
 useSeoMeta({
   title: 'Albums',
@@ -116,19 +130,21 @@ useSeoMeta({
 
 // 获取当前页码
 const currentPage = computed(() => {
-  const page = parseInt(route.query.page || '1') || 1;
+  const page = parseInt(String(route.query.page || '1')) || 1;
   return page > 0 ? page : 1;
 });
 
 // 从 API 获取专辑列表
-const { data: albumsResponse, pending, error } = useAPI("/v1/albums", {
+const { data: albumsResponse, pending, error } = useAPI<{ albums: AlbumSimple[], pagination: { total: number, per_page: number, current_page: number, last_page: number } }>("/v1/albums", {
   lazy: true,
   query: computed(() => ({
     page: currentPage.value,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     release_event_id: eventId.value ?? undefined,
+    category: category.value ?? undefined,
+    format: format.value ?? undefined,
   })),
-  watch: [currentPage, selectedType, eventId],
+  watch: [currentPage, selectedType, eventId, category, format],
 });
 
 // 处理专辑数据
@@ -157,7 +173,7 @@ const pagination = computed(() => {
 });
 
 // 跳转到指定页码
-const goToPage = (page) => {
+const goToPage = (page: number) => {
   if (page < 1 || page > pagination.value.last_page) return;
 
   router.push({
@@ -171,7 +187,11 @@ const goToPage = (page) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const selectEvent = (id) => {
+const selectFilter = (name: 'category' | 'format', value: string) => {
+  router.push({ query: { ...route.query, [name]: value || undefined, page: undefined } });
+};
+
+const selectEvent = (id: number | null) => {
   router.push({
     query: {
       ...route.query,
@@ -181,7 +201,7 @@ const selectEvent = (id) => {
   });
 };
 
-const selectType = (type) => {
+const selectType = (type: string) => {
   selectedType.value = type;
   router.push({
     query: {
