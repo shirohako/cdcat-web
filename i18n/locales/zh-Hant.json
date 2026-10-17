@@ -132,7 +132,8 @@
     },
     "category_filter": "類別",
     "format_filter": "介質",
-    "vinyl_subtitle": "以黑膠發行的專輯"
+    "vinyl_subtitle": "以黑膠發行的專輯",
+    "search_placeholder": "在專輯裡搜尋"
   },
   "artists": {
     "title": "藝術家",
@@ -390,7 +391,8 @@
     "use_custom_code": "使用自訂代碼",
     "search_language": "輸入關鍵字搜尋語言",
     "no_more_matches": "沒有更多符合項目",
-    "retry": "重試"
+    "retry": "重試",
+    "type_to_confirm": "輸入 {phrase} 以確認"
   },
   "errors": {
     "request_failed": "要求失敗，請再試一次。",
@@ -438,7 +440,10 @@
       "merge_blocked": "有修訂正在編輯要合併的項目，暫時不能合併。",
       "merge_impact_changed": "合併的影響範圍變了，請重新預覽。",
       "image_invalid": "無法使用這張圖片。請檢查格式、大小、尺寸或連結。",
-      "user_silenced": "你暫時被限制發布這類內容。"
+      "user_silenced": "你暫時被限制發布這類內容。",
+      "content_pending": "內容還在審核中，通過審核後才能這樣做。",
+      "revision_item_applied": "這一項已經上線，請直接編輯內容本身。",
+      "duplicate_suspected": "可能和已有的專輯重複，請先確認。"
     }
   },
   "admin_pages": {
@@ -828,7 +833,6 @@
     "community_desc": "在這裡交流音樂、音響設備與作曲。",
     "beta": "內部測試版本",
     "search_question": "想找什麼？",
-    "search_unavailable": "搜尋功能尚未開放",
     "search_example": "例如：東方紅魔鄉 / 初音未來 / M3-53",
     "discover_more": "探索更多",
     "find_music": "找音樂",
@@ -2499,7 +2503,8 @@
       "work_relations_hint": "從這首樂曲的角度填寫原曲、改編、翻唱、混音和組曲。",
       "work_entries": "出處",
       "work_entries_hint": "這首歌出自的遊戲、動畫等作品，例如某個遊戲的 BGM。"
-    }
+    },
+    "pending_notice": "新建的內容提交後立即上線，標記為「審核中」；對已有內容的修改要等審核通過。"
   },
   "revision_page": {
     "action": {
@@ -2558,7 +2563,75 @@
       "rejected": "駁回",
       "withdrawn": "撤回",
       "checked": "管理員已巡查",
-      "rebased": "處理了衝突"
+      "rebased": "處理了衝突",
+      "applied": "提交時已上線",
+      "discarded": "刪除了已上線的內容"
+    },
+    "resubmit": "再次提交",
+    "applied": "已上線（待審核）",
+    "applied_hint": "這一項在提交時就已上線，標記為審核中；要修改請直接編輯內容",
+    "live_content": "這條修訂已上線、正在等待審核的內容",
+    "withdraw_live_title": "撤回並刪除已上線的內容？",
+    "withdraw_live_desc": "這條修訂放上線的內容會按下面的計畫刪除；還被其他內容使用的會保留。",
+    "plan": {
+      "blocked": "現在不能刪除：",
+      "delete": "將刪除 {count} 項",
+      "keep": "將保留 {count} 項",
+      "release": "保留並視為已通過",
+      "move": "保留，改掛到提交 #{id}",
+      "because": "原因：{names} 還在使用它"
+    }
+  },
+  "pending": {
+    "badge": "審核中",
+    "badge_title": "提交後已上線，正在等待審核",
+    "notice": "此頁面正在等待管理人員審核。提交的內容尚未經過核實，可能不準確。",
+    "notice_own": "審核前你可以繼續修改，修改會直接生效。",
+    "view_revision": "查看提交 #{id}",
+    "review": "去審核 #{id}",
+    "locked": "通過審核後開放",
+    "show_toggle": "顯示審核中",
+    "submitted": "已提交。審核通過前，頁面會顯示「審核中」。"
+  },
+  "search": {
+    "title": "搜尋",
+    "placeholder": "搜尋專輯、曲目、藝術家…",
+    "results_for": "「{q}」的搜尋結果",
+    "view_all": "查看全部結果",
+    "more": "查看全部 {count} 筆",
+    "no_results": "沒有找到相關內容",
+    "hint": "簡體、繁體、日文漢字和假名都能互相搜到，也可以搜品番和條碼",
+    "too_short": "至少輸入 2 個字元",
+    "include_pending": "包含審核中",
+    "matched": "符合：{text}",
+    "all": "全部",
+    "searching": "搜尋中…",
+    "shortcut": "按 / 鍵搜尋",
+    "capped": "超過 {count} 筆",
+    "disc_track": "碟 {disc} · 第 {track} 首",
+    "types": {
+      "album": "專輯",
+      "track": "曲目",
+      "artist": "藝術家",
+      "label": "廠牌",
+      "work": "樂曲",
+      "entry": "條目",
+      "franchise": "系列"
+    }
+  },
+  "duplicates": {
+    "title": "可能已經有人錄過這張專輯",
+    "strong_hint": "下面的專輯和你填的品番、條碼或外部連結相同。如果是同一張，請去補充那一張；確認不是同一張時，逐個勾選「不是同一張」。",
+    "weak_hint": "下面的專輯標題相同或相近，請確認不是同一張。",
+    "not_same": "不是同一張",
+    "must_confirm": "提交前請確認每個強匹配都不是同一張專輯。",
+    "checking": "正在查重…",
+    "open": "打開",
+    "reasons": {
+      "catalog_number": "品番相同：{value}",
+      "barcode": "條碼相同：{value}",
+      "link": "外部連結相同：{value}",
+      "title": "標題相近：{value}"
     }
   }
 }

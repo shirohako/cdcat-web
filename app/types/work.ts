@@ -1,7 +1,7 @@
 // Works (乐曲): the song a track is a recording of. Backend: docs/api/works.md.
 
 import type { AlbumSimple } from './album'
-import type { CatalogAttribute, CatalogCredit, CatalogLink, CatalogTitle } from './catalog'
+import type { CatalogAttribute, CatalogCredit, CatalogLink, CatalogTitle, PendingFields } from './catalog'
 import type { LyricSummary } from './lyric'
 
 export const WORK_RELATIONS = [
@@ -20,6 +20,8 @@ export interface WorkSimple {
   has_lyrics: boolean
   lyrics_count: number
   translations_count: number
+  /** Awaiting review. */
+  is_pending?: boolean
 }
 
 export interface WorkTrack {
@@ -33,7 +35,7 @@ export interface WorkTrack {
 }
 
 /** GET /works/{id} */
-export interface Work extends WorkSimple {
+export interface Work extends WorkSimple, PendingFields {
   titles: CatalogTitle[]
   description: string | null
   credits: Array<Omit<CatalogCredit, 'category'>>

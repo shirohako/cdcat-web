@@ -85,11 +85,14 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
     catch { backup.value = null }
   }
 
-  /** Continues a saved draft, or a revision sent back for changes. */
+  /**
+   * Continues a saved draft, or a revision sent back for changes. Items that went live at
+   * submission (applied_at) are not part of the draft any more: that content is edited directly.
+   */
   async function loadRevision(id: number) {
     const revision = await $api<Revision>(`/v1/revisions/${id}`)
     adopt(revision)
-    start((revision.items ?? []).map(item => ({
+    start((revision.items ?? []).filter(item => !item.applied_at).map(item => ({
       ref: item.ref,
       resource_type: item.resource_type,
       action: item.action,
@@ -97,13 +100,15 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
       ...(item.base_version !== null ? { base_version: item.base_version } : {}),
       ...(item.document ? { document: item.document } : {}),
       ...(item.impact_checksum ? { impact_checksum: item.impact_checksum } : {}),
+      ...(item.acknowledged_duplicate_ids?.length ? { acknowledged_duplicate_ids: item.acknowledged_duplicate_ids } : {}),
     })), { summary: revision.summary ?? '', sources: revision.sources })
     return revision
   }
 
   const adopt = (revision: Revision) => {
     revisionId.value = revision.id
-    serverRefs = new Set((revision.items ?? []).map(item => item.ref))
+    // Applied items are never sent back, so they are not "removed" by leaving the draft either.
+    serverRefs = new Set((revision.items ?? []).filter(item => !item.applied_at).map(item => item.ref))
     lockVersion.value = revision.lock_version
     status.value = revision.status
     savedAt.value = revision.updated_at

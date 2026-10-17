@@ -78,6 +78,7 @@
           </aside>
 
           <main class="min-w-0 space-y-6">
+            <EditorAlbumDuplicateCandidates v-if="!albumId" ref="duplicatePanel" />
             <EditorAlbumBasicSection v-if="active === 'basic'" />
             <EditorAlbumPeopleSection v-else-if="active === 'people'" />
             <EditorAlbumTracksSection v-else-if="active === 'tracks'" />
@@ -97,7 +98,7 @@
                     </li>
                   </ul>
                 </div>
-                <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="itemLabels" @submitted="submitted" @errors="setErrors" />
+                <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="itemLabels" @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" />
               </div>
             </CatalogSection>
 
@@ -122,7 +123,7 @@ import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '
 import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AggregateRef, AlbumDocument, WorkDocument } from '~/types/document'
-import type { Revision } from '~/types/revision'
+import type { DuplicateCandidate, Revision } from '~/types/revision'
 import { ArrowLeft, ArrowRight, Contact, Gift, History, Images, Info, Languages, ListMusic, Network, Package, PencilLine, Send, Users, Circle, CircleCheck } from '@lucide/vue'
 import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
@@ -163,6 +164,7 @@ const reviewComment = ref<string | null>(null)
 const openDrafts = ref<Revision[]>([])
 /** Documents as loaded, by item ref, for the change preview; null for new items. */
 const originals = reactive<Record<string, Record<string, unknown> | null>>({})
+const duplicatePanel = ref<{ show: (candidates: DuplicateCandidate[]) => Promise<void> } | null>(null)
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
@@ -395,6 +397,11 @@ const openRevision = async (id: number) => {
   if (!['draft', 'changes_requested'].includes(revision.status)) throw new Error(t('editor.not_editable'))
   const main = revision.items?.find(item => item.resource_type === 'album' && (albumId ? item.resource_id === albumId : item.action === 'create'))
   if (!main) throw new Error(t('editor.album.revision_mismatch'))
+  // The album went live at submission: it is edited directly now, not through this revision.
+  if (main.applied_at && main.resource_id) {
+    await navigateTo(`/contribute/album/${main.resource_id}`, { replace: true })
+    return
+  }
   mainRef.value = main.ref
   reviewComment.value = revision.review_comment
   await Promise.all((revision.items ?? []).map(async (item) => {
@@ -410,7 +417,8 @@ const openRevision = async (id: number) => {
 const findOpenDrafts = async (id: number) => {
   try {
     const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: 'album', resource_id: id, per_page: 10 } })
-    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status))
+    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status)
+      && !revision.items?.some(item => item.resource_type === 'album' && item.resource_id === id && item.applied_at))
   } catch { /* the banner is optional */ }
 }
 
@@ -438,6 +446,10 @@ const submitted = (revision: Revision) => {
   if (revision.status === 'approved') {
     showToast(t('editor.published'))
     router.push(`/albums/${main?.resource_id ?? albumId}`)
+  } else if (main?.applied_at && main.resource_id) {
+    // A member's new album is live at once, marked as awaiting review.
+    showToast(t('pending.submitted'))
+    router.push(`/albums/${main.resource_id}`)
   } else {
     router.push(`/revisions/${revision.id}`)
   }

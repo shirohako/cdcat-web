@@ -46,6 +46,7 @@
           <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-gray-400 group-hover:text-indigo-500">{{ track.number }}</span>
 
           <button
+            v-if="!locked"
             type="button"
             :disabled="!!toggling[track.id]"
             class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100"
@@ -132,6 +133,8 @@ const props = defineProps<{
   languages: TracklistLanguage[]
   /** Shows the link to the tracklist translator */
   albumId?: number
+  /** Albums awaiting review cannot be favorited yet. */
+  locked?: boolean
 }>()
 
 const { locale } = useI18n()

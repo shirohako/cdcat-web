@@ -30,6 +30,18 @@
             <option value="">{{ t('albums.format_filter') }}</option>
             <option v-for="value in DISC_FORMATS" :key="value" :value="value">{{ enumLabel('disc_format', value) }}</option>
           </select>
+          <form class="relative" role="search" @submit.prevent="applySearch">
+            <Search class="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+            <input
+              v-model="searchInput"
+              type="search"
+              class="input input-sm h-8 w-40 pl-7 text-xs sm:w-52"
+              :placeholder="t('albums.search_placeholder')"
+              :aria-label="t('albums.search_placeholder')"
+              @blur="applySearch"
+            >
+          </form>
+          <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
         </template>
         <template #action>
           <button
@@ -89,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { Disc3, Plus } from "@lucide/vue";
+import { Disc3, Plus, Search } from "@lucide/vue";
 import type { AlbumSimple } from '~/types/album'
 import { ALBUM_CATEGORIES, DISC_FORMATS } from '~/types/album'
 
@@ -118,6 +130,14 @@ const eventId = computed(() => {
 });
 const category = computed(() => route.query.category ? String(route.query.category) : null)
 const format = computed(() => route.query.format ? String(route.query.format) : null)
+const { includePending, setIncludePending } = usePendingToggle()
+// The list endpoint needs at least two characters to search.
+const searchQuery = computed(() => {
+  const value = String(route.query.q || '').trim()
+  return value.replace(/\s/g, '').length >= 2 ? value : null
+})
+const searchInput = ref(String(route.query.q || ''))
+watch(() => route.query.q, value => { searchInput.value = String(value || '') })
 
 useSeoMeta({
   title: 'Albums',
@@ -143,8 +163,10 @@ const { data: albumsResponse, pending, error } = useAPI<{ albums: AlbumSimple[],
     release_event_id: eventId.value ?? undefined,
     category: category.value ?? undefined,
     format: format.value ?? undefined,
+    search: searchQuery.value ?? undefined,
+    include_pending: includePending.value ? 1 : undefined,
   })),
-  watch: [currentPage, selectedType, eventId, category, format],
+  watch: [currentPage, selectedType, eventId, category, format, searchQuery, includePending],
 });
 
 // 处理专辑数据
@@ -190,6 +212,13 @@ const goToPage = (page: number) => {
 const selectFilter = (name: 'category' | 'format', value: string) => {
   router.push({ query: { ...route.query, [name]: value || undefined, page: undefined } });
 };
+
+const applySearch = () => {
+  const value = searchInput.value.trim()
+  if (value === String(route.query.q || '')) return
+  router.push({ query: { ...route.query, q: value || undefined, page: undefined } })
+};
+
 
 const selectEvent = (id: number | null) => {
   router.push({

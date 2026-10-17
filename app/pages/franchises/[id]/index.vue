@@ -56,6 +56,8 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
         </div>
       </div>
 
+      <CatalogPendingBanner :pending="series.is_pending" :revision="series.pending_revision" />
+
       <div class="container mx-auto max-w-6xl space-y-6 px-4 py-8 md:px-8 2xl:max-w-7xl">
         <div v-if="series.description || series.links.length" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <section v-if="series.description" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-2">
@@ -117,8 +119,10 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
             </div>
           </section>
 
-          <ArticleRelatedArticles :id="series.id" type="franchise" />
-          <DiscussionRelatedDiscussions :id="series.id" type="franchise" />
+          <template v-if="!series.is_pending">
+            <ArticleRelatedArticles :id="series.id" type="franchise" />
+            <DiscussionRelatedDiscussions :id="series.id" type="franchise" />
+          </template>
         </div>
 
         <section v-if="currentTab === 'albums'" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">

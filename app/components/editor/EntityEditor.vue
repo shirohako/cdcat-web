@@ -136,6 +136,11 @@ const open = async () => {
     if (!['draft', 'changes_requested'].includes(revision.status)) throw new Error(t('editor.not_editable'))
     const main = revision.items?.find(item => item.resource_type === props.type && (id ? item.resource_id === id : item.action === 'create'))
     if (!main) throw new Error(t('editor.entity.revision_mismatch'))
+    // Content that went live at submission is edited directly now, not through this revision.
+    if (main.applied_at && main.resource_id) {
+      await navigateTo(`/contribute/${props.type}/${main.resource_id}`, { replace: true })
+      return
+    }
     mainRef.value = main.ref
     reviewComment.value = revision.review_comment
     originals[main.ref] = null
@@ -161,7 +166,8 @@ const open = async () => {
 const findOpenDrafts = async () => {
   try {
     const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: props.type, resource_id: id, per_page: 10 } })
-    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status))
+    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status)
+      && !revision.items?.some(item => item.resource_type === props.type && item.resource_id === id && item.applied_at))
   } catch { /* the banner is optional */ }
 }
 
@@ -186,6 +192,10 @@ const submitted = (revision: Revision) => {
   if (revision.status === 'approved') {
     showToast(t('editor.published'))
     router.push(`/${resource}/${main?.resource_id ?? id}`)
+  } else if (main?.applied_at && main.resource_id) {
+    // New content of members is live at once, marked as awaiting review.
+    showToast(t('pending.submitted'))
+    router.push(`/${resource}/${main.resource_id}`)
   } else {
     router.push(`/revisions/${revision.id}`)
   }

@@ -13,6 +13,9 @@
         :filter-label="$t('content_display.type')"
         @update:model-value="selectType"
       >
+        <template #filter-end>
+          <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
+        </template>
         <template #action>
           <button
             class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
@@ -136,14 +139,16 @@ const currentPage = computed(() => {
 });
 
 // 从 API 获取艺术家列表 - 使用 computed query 以响应路由变化
+const { includePending, setIncludePending } = usePendingToggle()
 const { data: artistsResponse, pending, error } = useAPI("/v1/artists", {
   lazy: true,
   query: computed(() => ({
     page: currentPage.value,
     per_page: 18,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
+    include_pending: includePending.value ? 1 : undefined,
   })),
-  watch: [currentPage, selectedType],
+  watch: [currentPage, selectedType, includePending],
 });
 
 // 处理艺术家数据

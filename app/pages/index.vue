@@ -94,25 +94,24 @@
               <div
                 class="rounded-2xl bg-white/70 border border-white/60 shadow-sm p-4"
               >
-                <div class="flex items-center justify-between mb-3">
-                  <p class="text-sm font-semibold text-slate-700">
-                    {{ t('home.search_question') }}
-                  </p>
-                  <div
-                    class="inline-flex items-center gap-1 text-xs text-emerald-600 font-semibold"
-                  >
-                    <Sparkles :size="14" />
-                    <span>{{ t('home.search_unavailable') }}</span>
-                  </div>
-                </div>
-                <div
-                  class="rounded-xl border border-slate-200 bg-white px-4 py-3 flex items-center gap-3 shadow-[0_10px_30px_-24px_rgba(15,23,42,0.6)]"
+                <p class="mb-3 text-sm font-semibold text-slate-700">
+                  {{ t('home.search_question') }}
+                </p>
+                <form
+                  role="search"
+                  class="rounded-xl border border-slate-200 bg-white px-4 py-3 flex items-center gap-3 shadow-[0_10px_30px_-24px_rgba(15,23,42,0.6)] focus-within:ring-2 focus-within:ring-slate-900"
+                  @submit.prevent="submitSearch"
                 >
-                  <Search :size="18" class="text-slate-500" />
-                  <span class="text-sm text-slate-500"
-                    >{{ t('home.search_example') }}</span
+                  <Search :size="18" class="shrink-0 text-slate-500" />
+                  <input
+                    v-model="searchText"
+                    type="search"
+                    maxlength="100"
+                    :placeholder="t('home.search_example')"
+                    :aria-label="t('search.title')"
+                    class="min-w-0 flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none"
                   >
-                </div>
+                </form>
               </div>
 
               <p class="text-sm font-semibold text-slate-700">{{ t('home.discover_more') }}</p>
@@ -363,6 +362,12 @@ import {
 } from "@lucide/vue";
 
 const { t } = useI18n();
+
+const searchText = ref('');
+const submitSearch = () => {
+  const text = searchText.value.trim();
+  if (text) navigateTo({ path: '/search', query: { q: text } });
+};
 
 const portalLinks = computed(() => [
   {

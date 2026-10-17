@@ -123,18 +123,36 @@ const confirmDelete = async (reason: string) => {
   }
 }
 
-// ===== Merge (artists, labels, works) =====
+// ===== Merge (albums, artists, labels, works) =====
 const mergeable = computed(() => mergeableContentTypes.includes(type.value))
-const mergeKind = computed(() => type.value as 'artist' | 'label' | 'work')
+const mergeKind = computed(() => type.value as 'album' | 'artist' | 'label' | 'work')
 const mergeTarget = ref<{ id: number, label: string } | null>(null)
 const merge = ref<AdminMergePreview | null>(null)
 const mergeOpen = ref(false)
+/** Albums: the track mapping sent with the preview and the merge; empty means the default by position. */
+const trackMap = ref<Record<string, number | null>>({})
+const trackMapQuery = computed(() => Object.fromEntries(Object.entries(trackMap.value).map(([source, target]) => [`track_map[${source}]`, target ?? ''])))
+const resetMerge = () => { mergeTarget.value = null; merge.value = null; trackMap.value = {} }
+const changeTrackMap = (value: Record<string, number | null>) => { trackMap.value = value; previewMerge() }
+// A duplicate found while reviewing opens here with the album to keep chosen (?merge_target=).
+watch(() => route.query.merge_target, async (value) => {
+  if (type.value !== 'album' || !value || !/^\d+$/.test(String(value)) || String(value) === id.value) return
+  try {
+    const target = await $api<{ document: Record<string, unknown> }>(`/v1/albums/${value}/document`)
+    mergeTarget.value = { id: Number(value), label: String(target.document.title ?? `#${value}`) }
+    trackMap.value = {}
+    await previewMerge()
+  } catch (failure) {
+    message.value = localizeError(failure)
+  }
+}, { immediate: true })
 const previewMerge = async () => {
   if (!mergeTarget.value) return
   message.value = ''
   merge.value = null
   try {
-    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/${paths.value.api}/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value.id } })
+    merge.value = await $api<AdminMergePreview>(`/v1/admin/content/${paths.value.api}/${id.value}/merge-preview`, { query: { target_id: mergeTarget.value.id, ...trackMapQuery.value } })
+    if (merge.value.track_map) trackMap.value = { ...merge.value.track_map }
   } catch (failure) {
     message.value = localizeError(failure)
   }
@@ -143,7 +161,7 @@ const confirmMerge = async (reason: string) => {
   if (busy.value || !merge.value || !mergeTarget.value) return
   busy.value = true
   try {
-    await $api(`/v1/admin/content/${paths.value.api}/${id.value}/merge`, { method: 'POST', body: { target_id: mergeTarget.value.id, reason, checksum: merge.value.checksum } })
+    await $api(`/v1/admin/content/${paths.value.api}/${id.value}/merge`, { method: 'POST', body: { target_id: mergeTarget.value.id, reason, checksum: merge.value.checksum, ...(merge.value.track_map ? { track_map: trackMap.value } : {}) } })
     mergeOpen.value = false
     await router.push(`/admin/content/${paths.value.api}/${mergeTarget.value.id}`)
   } catch (failure) {
@@ -250,18 +268,33 @@ useHead({ title: computed(() => name.value) })
       </section>
       <section v-if="mergeable" class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">{{ t('admin_pages.content.merge_title', { type: t(`admin_pages.types.${type}`) }) }}</h2>
-        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.content.merge_help') }}</p>
+        <p class="mt-1 text-sm text-slate-600">{{ t(type === 'album' ? 'admin_pages.content.merge_help_album' : 'admin_pages.content.merge_help') }}</p>
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <span v-if="mergeTarget" class="rounded-lg bg-slate-100 px-3 py-2 text-sm">{{ mergeTarget.label }} #{{ mergeTarget.id }} <button type="button" class="ml-1 text-slate-500" @click="mergeTarget = null; merge = null">×</button></span>
-          <EditorEntityPicker v-else :kind="mergeKind" :exclude="[Number(id)]" class="min-w-64" :placeholder="t('admin_pages.content.merge_target')" @select="mergeTarget = { id: $event.id, label: $event.label }" />
+          <span v-if="mergeTarget" class="rounded-lg bg-slate-100 px-3 py-2 text-sm">{{ mergeTarget.label }} #{{ mergeTarget.id }} <button type="button" class="ml-1 text-slate-500" @click="resetMerge">×</button></span>
+          <EditorEntityPicker v-else :kind="mergeKind" :exclude="[Number(id)]" exclude-pending class="min-w-64" :placeholder="t('admin_pages.content.merge_target')" @select="mergeTarget = { id: Number($event.id), label: $event.label }; trackMap = {}" />
           <button type="button" :disabled="!mergeTarget" class="rounded-lg border px-4 py-2 text-sm disabled:opacity-40" @click="previewMerge">{{ t('admin_pages.content.merge_preview') }}</button>
         </div>
         <div v-if="merge && mergeTarget" class="mt-4 text-sm">
           <p>{{ t('admin_pages.content.merge_summary', { source: name, target: mergeTarget.label, id: mergeTarget.id }) }}</p>
           <dl class="mt-2 space-y-1">
             <div v-for="(count, key) in merge.affected" :key="`a-${key}`" class="flex justify-between gap-4"><dt>{{ t('admin_pages.content.merge_affected', { type: t(`admin_pages.types.${key}`) }) }}</dt><dd>{{ count }}</dd></div>
-            <div v-for="(count, key) in merge.external" :key="`e-${key}`" class="flex justify-between gap-4"><dt class="text-slate-500">{{ key }}</dt><dd>{{ count }}</dd></div>
+            <div v-for="(count, key) in (merge.moves ? {} : merge.external)" :key="`e-${key}`" class="flex justify-between gap-4"><dt class="text-slate-500">{{ key }}</dt><dd>{{ count }}</dd></div>
           </dl>
+          <dl v-if="merge.absorb && Object.keys(merge.absorb).length" class="mt-3 grid max-w-md gap-1">
+            <div v-for="(count, key) in merge.absorb" :key="`b-${key}`" class="flex justify-between gap-4"><dt>{{ t(`admin_pages.content.merge_absorb_${key}`) }}</dt><dd>{{ count }}</dd></div>
+          </dl>
+          <dl v-if="merge.moves && Object.values(merge.moves).some(Boolean)" class="mt-3 grid max-w-md gap-1">
+            <dt class="font-medium">{{ t('admin_pages.content.merge_moves') }}</dt>
+            <div v-for="(count, key) in merge.moves" v-show="count" :key="`m-${key}`" class="flex justify-between gap-4">
+              <dt class="text-slate-500">{{ key }}</dt><dd>{{ count }}<span v-if="merge.dropped?.[key]" class="ml-1 text-amber-700">{{ t('admin_pages.content.merge_dropped', { count: merge.dropped[key] }) }}</span></dd>
+            </div>
+          </dl>
+          <ul v-if="merge.warnings?.length" class="mt-3 list-inside list-disc text-amber-800"><li v-for="warning in merge.warnings" :key="warning">{{ warning }}</li></ul>
+          <div v-if="merge.source_tracks?.length" class="mt-4">
+            <h3 class="font-medium">{{ t('admin_pages.content.merge_tracks') }}</h3>
+            <p class="mt-0.5 text-xs text-slate-500">{{ t('admin_pages.content.merge_tracks_help') }}</p>
+            <AdminMergeTrackMap class="mt-2" :source-tracks="merge.source_tracks" :target-tracks="merge.target_tracks ?? []" :model-value="trackMap" :disabled="busy" @update:model-value="changeTrackMap" />
+          </div>
           <ul v-if="merge.blockers.length" role="alert" class="mt-3 list-inside list-disc text-red-700"><li v-for="blocker in merge.blockers" :key="blocker">{{ blocker }}</li></ul>
           <button type="button" :disabled="Boolean(merge.blockers.length)" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="mergeOpen = true">{{ t('admin_pages.content.merge_confirm') }}</button>
         </div>
@@ -273,10 +306,10 @@ useHead({ title: computed(() => name.value) })
       </section>
     </div>
 
-    <AdminConfirmDialog v-model="deleteOpen" :busy="busy" reason-required :confirm-disabled="Boolean(impact?.blockers.length)" :title="t('admin_pages.content.delete_title', { name })" :description="t('admin_pages.content.delete_help')" @confirm="confirmDelete">
+    <AdminConfirmDialog v-model="deleteOpen" :busy="busy" reason-required :confirm-phrase="`#${id}`" :confirm-disabled="Boolean(impact?.blockers.length)" :title="t('admin_pages.content.delete_title', { name })" :description="t('admin_pages.content.delete_help')" @confirm="confirmDelete">
       <AdminImpactPreview v-if="impact" :impact="impact" />
     </AdminConfirmDialog>
-    <AdminConfirmDialog v-model="mergeOpen" :busy="busy" reason-required :title="t('admin_pages.content.merge_confirm')" :description="merge && mergeTarget ? t('admin_pages.content.merge_summary', { source: name, target: mergeTarget.label, id: mergeTarget.id }) : ''" @confirm="confirmMerge" />
+    <AdminConfirmDialog v-model="mergeOpen" :busy="busy" reason-required :confirm-phrase="mergeTarget ? `#${mergeTarget.id}` : ''" :title="t('admin_pages.content.merge_confirm')" :description="merge && mergeTarget ? t('admin_pages.content.merge_summary', { source: name, target: mergeTarget.label, id: mergeTarget.id }) : ''" @confirm="confirmMerge" />
     <AdminConfirmDialog v-model="restoreOpen" :busy="busy" reason-required :title="t('admin_pages.content.restore_confirm')" :description="t('admin_pages.content.restore_dialog')" @confirm="confirmRestore" />
   </div>
 </template>

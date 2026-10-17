@@ -43,7 +43,7 @@
       </button>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</button>
       <button v-if="draft.revisionId.value && draft.status.value === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" @click="discard">{{ $t('editor.discard') }}</button>
-      <span class="text-xs text-gray-400">{{ $t(canAutoApprove ? 'editor.publish_notice' : 'editor.review_notice') }}</span>
+      <span class="text-xs text-gray-400">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
   </div>
 </template>
@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import type { CatalogType } from '~/types/catalog'
 import type { useRevisionDraft } from '~/composables/useRevisionDraft'
-import type { Revision, RevisionConflict } from '~/types/revision'
+import type { DuplicateCandidate, Revision, RevisionConflict } from '~/types/revision'
 import type { DiffCollection } from '~/utils/documentDiff'
 import { documentDiff } from '~/utils/documentDiff'
 import { errorName, revisionConflicts, revisionFieldErrors } from '~/utils/revisionErrors'
@@ -63,7 +63,7 @@ const props = defineProps<{
   /** Names of items for the preview, by ref. */
   labels?: Record<string, string>
 }>()
-const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>] }>()
+const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]] }>()
 
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
@@ -72,6 +72,8 @@ const { enumLabel } = useCatalogDisplay()
 const { localizeError } = useLocalizedApiError()
 
 const canAutoApprove = computed(() => hasPermission('revisions.auto-approve'))
+/** New content goes live at submission, marked as awaiting review (docs/catalog/editing.md#待审内容). */
+const creates = computed(() => props.draft.items.value.some(item => item.action === 'create'))
 // The draft's own refs; edits go straight into the revision being saved.
 const { summary, sources } = props.draft
 const setSources = (text: string) => { sources.value = text.split('\n') }
@@ -118,6 +120,10 @@ const submit = async () => {
     const name = errorName(error)
     if (name === 'REVISION_CONFLICT') conflicts.value = revisionConflicts(error)
     else if (name === 'VALIDATION_FAILED') errors.value = revisionFieldErrors(error)
+    else if (name === 'DUPLICATE_SUSPECTED') {
+      const details = (error as { details?: { details?: { candidates?: DuplicateCandidate[] } } }).details?.details
+      emit('duplicates', details?.candidates ?? [])
+    }
     if (!conflicts.value.length && !errors.value.length) message.value = localizeError(error)
   } finally {
     emit('errors', errors.value)

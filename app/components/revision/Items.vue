@@ -7,6 +7,11 @@
         <NuxtLink v-if="link(item)" :to="link(item)!" class="min-w-0 truncate text-sm font-medium text-gray-900 hover:underline">{{ name(item) }}</NuxtLink>
         <span v-else class="min-w-0 truncate text-sm font-medium text-gray-900">{{ name(item) }}</span>
         <span v-if="item.restore_of_version" class="text-xs text-gray-500">{{ $t('revision_page.restores', { version: item.restore_of_version }) }}</span>
+        <span
+          v-if="item.applied_at && !approved"
+          class="rounded-md border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700"
+          :title="$t('revision_page.applied_hint')"
+        >{{ $t('revision_page.applied') }}</span>
         <NuxtLink
           v-if="item.result_version && item.resource_id"
           :to="`${versionsPath(item)}?version=${item.result_version}`"
@@ -29,7 +34,7 @@ import { CATALOG_RESOURCES } from '~/types/catalog'
 import { entityPath } from '~/utils/revisionLinks'
 
 /** The items of a revision with their changes, as the submitter and reviewers see them. */
-const props = defineProps<{ items: RevisionItem[], references: CatalogReferences }>()
+const props = defineProps<{ items: RevisionItem[], references: CatalogReferences, approved?: boolean }>()
 
 const { t } = useI18n()
 const { enumLabel } = useCatalogDisplay()

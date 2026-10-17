@@ -15,19 +15,21 @@ const searchInput = ref(search.value)
 watch(search, (value) => { searchInput.value = value })
 
 // Top-level series only, unless searching (then sub-series match too).
+const { includePending, setIncludePending } = usePendingToggle()
 const { data, pending, error } = useAPI<{ franchises: FranchiseSummary[], pagination: Pagination }>('/v1/franchises', {
   lazy: true,
   query: computed(() => ({
     page: currentPage.value,
     per_page: 24,
     search: search.value.trim().length >= 2 ? search.value.trim() : undefined,
+    include_pending: includePending.value ? 1 : undefined,
   })),
 })
 
 const seriesList = computed(() => data.value?.franchises || [])
 const pagination = computed(() => data.value?.pagination || { total: 0, per_page: 24, current_page: 1, last_page: 1 })
 
-const submitSearch = () => router.push({ query: { search: searchInput.value.trim() || undefined } })
+const submitSearch = () => router.push({ query: { search: searchInput.value.trim() || undefined, pending: route.query.pending } })
 const goToPage = (page: number) => {
   if (page < 1 || page > pagination.value.last_page) return
   router.push({ query: { ...route.query, page: page === 1 ? undefined : page } })
@@ -61,6 +63,7 @@ const goToPage = (page: number) => {
             <input v-model="searchInput" type="search" class="min-w-0 flex-1 bg-transparent text-sm outline-none" :placeholder="$t('catalog.search_placeholder')" :aria-label="$t('catalog.search')" >
           </label>
           <button type="submit" class="h-9 shrink-0 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-700">{{ $t('catalog.search') }}</button>
+          <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
         </form>
       </template>
 

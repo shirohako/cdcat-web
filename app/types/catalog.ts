@@ -12,6 +12,15 @@ export const CATALOG_RESOURCES: Record<CatalogType, string> = {
   album: 'albums', artist: 'artists', label: 'labels', work: 'works', lyric: 'lyrics', entry: 'entries', franchise: 'franchises',
 }
 
+/**
+ * Content that went live at submission and awaits review (docs/catalog/editing.md#待审内容).
+ * `pending_revision` is only shown to its submitter and to revisions.view.
+ */
+export interface PendingFields {
+  is_pending?: boolean
+  pending_revision?: { id: number, status: string } | null
+}
+
 export const TITLE_KINDS = ['official', 'translation', 'transliteration', 'alias', 'abbreviation'] as const
 export type CatalogTitleKind = typeof TITLE_KINDS[number]
 

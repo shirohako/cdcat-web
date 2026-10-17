@@ -132,7 +132,8 @@
     },
     "category_filter": "カテゴリー",
     "format_filter": "メディア",
-    "vinyl_subtitle": "アナログレコードで発売された作品"
+    "vinyl_subtitle": "アナログレコードで発売された作品",
+    "search_placeholder": "アルバムを検索"
   },
   "artists": {
     "title": "アーティスト",
@@ -390,7 +391,8 @@
     "use_custom_code": "カスタムコードを使用",
     "search_language": "キーワードで言語を検索",
     "no_more_matches": "ほかに一致する項目はありません",
-    "retry": "再試行"
+    "retry": "再試行",
+    "type_to_confirm": "確認のため {phrase} と入力してください"
   },
   "errors": {
     "request_failed": "リクエストに失敗しました。もう一度お試しください。",
@@ -438,7 +440,10 @@
       "merge_blocked": "統合する項目を編集中の修正があるため、統合できません。",
       "merge_impact_changed": "統合の影響範囲が変わりました。もう一度プレビューしてください。",
       "image_invalid": "この画像は使えません。形式、サイズ、寸法、またはリンクを確認してください。",
-      "user_silenced": "現在この投稿は制限されています。"
+      "user_silenced": "現在この投稿は制限されています。",
+      "content_pending": "このコンテンツは承認待ちです。承認後に利用できます。",
+      "revision_item_applied": "この項目は既に反映されています。コンテンツ自体を編集してください。",
+      "duplicate_suspected": "既存のアルバムと重複している可能性があります。確認してください。"
     }
   },
   "admin_pages": {
@@ -828,7 +833,6 @@
     "community_desc": "音楽、オーディオ機器、作曲について語り合えます。",
     "beta": "ベータ版",
     "search_question": "何をお探しですか？",
-    "search_unavailable": "検索機能は現在準備中です",
     "search_example": "例：東方紅魔郷 / 初音ミク / M3-53",
     "discover_more": "もっと見つける",
     "find_music": "音楽を探す",
@@ -2499,7 +2503,8 @@
       "work_relations_hint": "この楽曲から見た原曲、アレンジ、カバー、リミックス、メドレー。",
       "work_entries": "出典",
       "work_entries_hint": "この曲が使われたゲームやアニメなどの作品（ゲームの BGM など）。"
-    }
+    },
+    "pending_notice": "新しい項目は投稿するとすぐに公開され、「承認待ち」と表示されます。既存の内容への変更は承認後に反映されます。"
   },
   "revision_page": {
     "action": {
@@ -2558,7 +2563,75 @@
       "rejected": "却下",
       "withdrawn": "取り下げ",
       "checked": "モデレーターが確認",
-      "rebased": "競合を解決"
+      "rebased": "競合を解決",
+      "applied": "投稿時に公開",
+      "discarded": "公開済みのコンテンツを削除"
+    },
+    "resubmit": "再提出",
+    "applied": "公開済み（承認待ち）",
+    "applied_hint": "この項目は投稿時に公開され、承認待ちになっています。変更する場合はコンテンツ自体を編集してください",
+    "live_content": "この修正で公開され、承認を待っているコンテンツ",
+    "withdraw_live_title": "取り下げて、公開済みのコンテンツを削除しますか？",
+    "withdraw_live_desc": "この修正で公開されたコンテンツは下の計画どおりに削除されます。ほかのコンテンツが使っているものは残ります。",
+    "plan": {
+      "blocked": "今は削除できません：",
+      "delete": "{count} 件を削除",
+      "keep": "{count} 件を残す",
+      "release": "残して承認済みにする",
+      "move": "残して投稿 #{id} に移す",
+      "because": "理由：{names} がまだ使っています"
+    }
+  },
+  "pending": {
+    "badge": "承認待ち",
+    "badge_title": "投稿済みで、スタッフの承認を待っています",
+    "notice": "このページはスタッフの承認待ちです。投稿内容はまだ確認されておらず、不正確な場合があります。",
+    "notice_own": "承認されるまでは、あなたの編集はすぐに反映されます。",
+    "view_revision": "投稿 #{id} を見る",
+    "review": "#{id} を審査する",
+    "locked": "承認後に利用できます",
+    "show_toggle": "承認待ちも表示",
+    "submitted": "投稿しました。承認されるまで、ページには「承認待ち」と表示されます。"
+  },
+  "search": {
+    "title": "検索",
+    "placeholder": "アルバム・曲・アーティストを検索…",
+    "results_for": "「{q}」の検索結果",
+    "view_all": "すべての結果を見る",
+    "more": "{count} 件すべて見る",
+    "no_results": "見つかりませんでした",
+    "hint": "簡体字・繁体字・日本の漢字、ひらがなとカタカナは区別せずに検索できます。品番やバーコードでも検索できます",
+    "too_short": "2 文字以上入力してください",
+    "include_pending": "承認待ちを含む",
+    "matched": "一致：{text}",
+    "all": "すべて",
+    "searching": "検索中…",
+    "shortcut": "/ キーで検索",
+    "capped": "{count} 件以上",
+    "disc_track": "Disc {disc} · {track} 曲目",
+    "types": {
+      "album": "アルバム",
+      "track": "曲",
+      "artist": "アーティスト",
+      "label": "レーベル",
+      "work": "楽曲",
+      "entry": "作品",
+      "franchise": "シリーズ"
+    }
+  },
+  "duplicates": {
+    "title": "このアルバムは既に登録されているかもしれません",
+    "strong_hint": "下のアルバムは、入力した品番・バーコード・外部リンクのいずれかが同じです。同じアルバムなら、そちらに情報を追加してください。別のアルバムであれば、それぞれ「別のアルバム」にチェックしてください。",
+    "weak_hint": "タイトルが同じか近いアルバムがあります。別のアルバムか確認してください。",
+    "not_same": "別のアルバム",
+    "must_confirm": "送信する前に、強い一致のアルバムがすべて別物であることを確認してください。",
+    "checking": "重複を確認中…",
+    "open": "開く",
+    "reasons": {
+      "catalog_number": "品番が同じ：{value}",
+      "barcode": "バーコードが同じ：{value}",
+      "link": "外部リンクが同じ：{value}",
+      "title": "タイトルが近い：{value}"
     }
   }
 }

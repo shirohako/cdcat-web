@@ -22,6 +22,7 @@ const typeFilters = computed(() => [
 ])
 const formats = computed(() => selectedType.value === 'all' ? [] : ENTRY_FORMATS[selectedType.value])
 
+const { includePending, setIncludePending } = usePendingToggle()
 const { data, pending, error } = useAPI<{ entries: EntrySummary[], pagination: Pagination }>('/v1/entries', {
   lazy: true,
   query: computed(() => ({
@@ -30,6 +31,7 @@ const { data, pending, error } = useAPI<{ entries: EntrySummary[], pagination: P
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     format: selectedFormat.value || undefined,
     search: search.value.trim().length >= 2 ? search.value.trim() : undefined,
+    include_pending: includePending.value ? 1 : undefined,
   })),
 })
 
@@ -82,6 +84,7 @@ const goToPage = (page: number) => {
               </label>
               <button type="submit" class="h-9 shrink-0 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-700">{{ $t('catalog.search') }}</button>
             </form>
+            <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             <div v-if="formats.length" class="flex gap-1.5 overflow-x-auto">
               <button
                 v-for="format in formats"

@@ -97,6 +97,8 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
         </div>
       </div>
 
+      <CatalogPendingBanner :pending="entry.is_pending" :revision="entry.pending_revision" />
+
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div class="space-y-8 lg:col-span-2">
@@ -231,8 +233,10 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
               </div>
             </section>
 
-            <ArticleRelatedArticles :id="entry.id" type="entry" />
-            <DiscussionRelatedDiscussions :id="entry.id" type="entry" />
+            <template v-if="!entry.is_pending">
+              <ArticleRelatedArticles :id="entry.id" type="entry" />
+              <DiscussionRelatedDiscussions :id="entry.id" type="entry" />
+            </template>
           </aside>
         </div>
       </div>

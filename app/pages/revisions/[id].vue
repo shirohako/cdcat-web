@@ -25,11 +25,24 @@
 
         <div v-if="mine" class="mb-5 flex flex-wrap gap-2">
           <NuxtLink v-if="isOpenRevision(revision.status) && editor" :to="editor" class="btn btn-primary btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
-          <button v-if="revision.status === 'draft'" type="button" class="btn btn-sm" :disabled="busy" @click="submit">{{ $t('revision_page.submit') }}</button>
-          <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
+          <button v-if="revision.status === 'draft' || revision.status === 'changes_requested'" type="button" class="btn btn-sm" :disabled="busy" @click="submit">
+            {{ $t(revision.status === 'draft' ? 'revision_page.submit' : 'revision_page.resubmit') }}
+          </button>
+          <button v-if="revision.status === 'pending' || revision.status === 'changes_requested'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
           <button v-if="revision.status === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="remove">{{ $t('revision_page.delete_draft') }}</button>
         </div>
         <p v-if="message" class="mb-4 text-sm text-error">{{ message }}</p>
+
+        <!-- New content this revision put live; it waits for this review (docs/catalog/editing.md#待审内容). -->
+        <div v-if="liveContent.length" class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p class="font-semibold">{{ $t('revision_page.live_content') }}</p>
+          <ul class="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+            <li v-for="entry in liveContent" :key="`${entry.type}:${entry.id}`">
+              <span class="text-xs text-amber-700">{{ enumLabel('catalog_type', entry.type) }}</span>
+              <NuxtLink :to="entityPath(entry.type, entry.id) ?? '#'" class="ml-1 hover:underline">{{ entry.label }}</NuxtLink>
+            </li>
+          </ul>
+        </div>
 
         <div v-if="revision.review_comment" class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p class="font-semibold">{{ $t('revision_page.review_comment') }}<span v-if="revision.reviewer" class="font-normal"> · {{ revision.reviewer.nickname || revision.reviewer.username }}</span></p>
@@ -56,7 +69,7 @@
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
           <div class="min-w-0 space-y-3">
             <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400">{{ $t('revision_page.items') }}</h2>
-            <RevisionItems :items="revision.items ?? []" :references="revision.references ?? {}" />
+            <RevisionItems :items="revision.items ?? []" :references="revision.references ?? {}" :approved="revision.status === 'approved'" />
           </div>
           <aside class="space-y-5">
             <div v-if="revision.sources.length">
@@ -76,15 +89,27 @@
         </div>
       </template>
     </div>
+
+    <CommonConfirmDialog
+      v-model="withdrawOpen"
+      wide
+      :title="$t('revision_page.withdraw_live_title')"
+      :description="$t('revision_page.withdraw_live_desc')"
+      :confirm-text="$t('revision_page.withdraw')"
+      :confirm-phrase="`#${route.params.id}`"
+      @confirm="confirmWithdraw"
+    >
+      <RevisionRemovalPlan v-if="removal" class="mt-4 max-h-72 overflow-y-auto" :plan="removal" />
+    </CommonConfirmDialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CatalogType } from '~/types/catalog'
-import type { Revision } from '~/types/revision'
+import type { RemovalPlan, Revision } from '~/types/revision'
 import { ArrowLeft } from '@lucide/vue'
 import { errorName, revisionFieldErrors } from '~/utils/revisionErrors'
-import { editorPath, isOpenRevision } from '~/utils/revisionLinks'
+import { editorPath, entityPath, isOpenRevision } from '~/utils/revisionLinks'
 
 const route = useRoute()
 const router = useRouter()
@@ -133,8 +158,28 @@ const run = async (request: () => Promise<unknown>, after?: () => unknown) => {
     busy.value = false
   }
 }
+const liveContent = computed(() => Object.entries(revision.value?.pending_content ?? {})
+  .flatMap(([type, rows]) => (rows ?? []).map(row => ({ type: type as CatalogType, ...row }))))
+
 const submit = () => run(() => $api(`/v1/revisions/${route.params.id}/submit`, { method: 'POST' }))
-const withdraw = () => confirm(t('revision_page.withdraw_confirm')) && run(() => $api(`/v1/revisions/${route.params.id}/withdraw`, { method: 'POST' }))
+
+// Withdrawing a revision whose content is live removes that content: confirm its plan first.
+const withdrawOpen = ref(false)
+const removal = ref<RemovalPlan | null>(null)
+const withdraw = async () => {
+  if (!revision.value?.has_applied_items) {
+    if (confirm(t('revision_page.withdraw_confirm'))) await run(() => $api(`/v1/revisions/${route.params.id}/withdraw`, { method: 'POST' }))
+    return
+  }
+  message.value = ''
+  try {
+    removal.value = (await $api<{ removal: RemovalPlan | null }>(`/v1/revisions/${route.params.id}/pending-content`)).removal
+    withdrawOpen.value = true
+  } catch (failure) {
+    message.value = localizeError(failure)
+  }
+}
+const confirmWithdraw = () => run(() => $api(`/v1/revisions/${route.params.id}/withdraw`, { method: 'POST', body: { impact_checksum: removal.value?.checksum } }))
 const remove = () => confirm(t('revision_page.delete_confirm')) && run(() => $api(`/v1/revisions/${route.params.id}`, { method: 'DELETE' }), () => router.push('/revisions'))
 
 useSeoMeta({ title: () => heading.value, robots: 'noindex' })

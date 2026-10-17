@@ -1,9 +1,9 @@
 // Labels (厂牌). Backend: docs/api/labels.md.
 
 import type { DatePrecision } from './entry'
-import type { CatalogAttribute, CatalogLink, CatalogTitle } from './catalog'
+import type { CatalogAttribute, CatalogLink, CatalogTitle, PendingFields } from './catalog'
 
-export interface Label {
+export interface Label extends PendingFields {
   id: number
   name: string
   slug: string | null

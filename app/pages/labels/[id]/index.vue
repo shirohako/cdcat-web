@@ -5,6 +5,7 @@
       <div v-else-if="error || !label" class="alert alert-error mx-auto max-w-md"><span>{{ $t('labels.not_found') }}</span></div>
 
       <template v-else>
+        <CatalogPendingBanner inline :pending="label.is_pending" :revision="label.pending_revision" />
         <header class="mb-6 flex flex-wrap items-start gap-4">
           <div class="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
             <img v-if="label.image_url" :src="label.image_url" :alt="label.name" class="h-full w-full object-contain">

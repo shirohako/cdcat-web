@@ -48,6 +48,7 @@
                     <Hash :size="12" class="shrink-0 text-gray-400" />
                     {{ album.catalog_number }}
                   </span>
+                  <CatalogPendingBadge v-if="album.is_pending" />
                   <span class="inline-flex items-center gap-1 rounded bg-gray-800/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-700">
                     <Tag :size="9" class="shrink-0" />
                     {{ typeLabel }}
@@ -127,7 +128,8 @@
               <button
                 class="btn btn-xs h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
                 :class="isFavorited ? 'border-red-500 bg-red-500 text-white hover:bg-red-600' : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
-                :disabled="isToggling"
+                :disabled="isToggling || (album.is_pending && !isFavorited)"
+                :title="album.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleLike"
               >
                 <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />

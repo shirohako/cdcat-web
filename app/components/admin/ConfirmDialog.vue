@@ -7,16 +7,21 @@ const props = withDefaults(defineProps<{
   reasonRequired?: boolean
   busy?: boolean
   confirmDisabled?: boolean
-}>(), { reasonRequired: false, busy: false, confirmDisabled: false, description: '', confirmText: '' })
+  /** Typed second confirmation (e.g. "#12") for deletions and merges. */
+  confirmPhrase?: string
+}>(), { reasonRequired: false, busy: false, confirmDisabled: false, description: '', confirmText: '', confirmPhrase: '' })
 const emit = defineEmits<{ 'update:modelValue': [value: boolean], confirm: [reason: string] }>()
 const { t } = useAdminI18n()
 const dialog = useTemplateRef('dialog')
 const reason = ref('')
+const typed = ref('')
+const phraseMatches = computed(() => !props.confirmPhrase || typed.value.trim() === props.confirmPhrase)
 const titleId = useId()
 watch(() => props.modelValue, async (value) => {
   await nextTick()
   if (value) {
     reason.value = ''
+    typed.value = ''
     if (!dialog.value?.open) dialog.value?.showModal()
   } else {
     dialog.value?.close()
@@ -24,7 +29,7 @@ watch(() => props.modelValue, async (value) => {
 }, { immediate: true })
 const close = () => { if (!props.busy) emit('update:modelValue', false) }
 const confirm = () => {
-  if (!props.busy && !props.confirmDisabled && (!props.reasonRequired || reason.value.trim())) emit('confirm', reason.value.trim())
+  if (!props.busy && !props.confirmDisabled && phraseMatches.value && (!props.reasonRequired || reason.value.trim())) emit('confirm', reason.value.trim())
 }
 </script>
 
@@ -38,9 +43,13 @@ const confirm = () => {
         {{ t('admin_pages.reason') }}
         <textarea v-model="reason" required maxlength="2000" :disabled="busy" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 p-2" />
       </label>
+      <label v-if="confirmPhrase" class="mt-4 block text-sm">
+        {{ t('admin_pages.type_to_confirm', { phrase: confirmPhrase }) }}
+        <input v-model="typed" type="text" autocomplete="off" :disabled="busy" :placeholder="confirmPhrase" class="mt-2 w-full rounded-lg border border-slate-300 p-2 font-mono">
+      </label>
       <div class="mt-5 flex justify-end gap-2">
         <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-50" @click="close">{{ t('common.cancel') }}</button>
-        <button type="submit" :disabled="busy || confirmDisabled || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? t('common.saving') : (confirmText || t('admin_pages.confirm')) }}</button>
+        <button type="submit" :disabled="busy || confirmDisabled || !phraseMatches || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? t('common.saving') : (confirmText || t('admin_pages.confirm')) }}</button>
       </div>
     </form>
   </dialog>

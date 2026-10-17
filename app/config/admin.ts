@@ -79,7 +79,7 @@ export const adminContentRoutes: Record<AdminContentType, { api: string, front: 
 }
 
 /** Types whose duplicates can be merged into another entity. */
-export const mergeableContentTypes: AdminContentType[] = ['artist', 'label', 'work']
+export const mergeableContentTypes: AdminContentType[] = ['album', 'artist', 'label', 'work']
 
 /** The editor of an entity; tracks are edited with their album and lyrics on their song's page. */
 export const adminEditorPath = (type: AdminContentType, id?: number | string | null) => {

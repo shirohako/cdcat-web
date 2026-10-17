@@ -5,6 +5,7 @@
       <div v-else-if="error || !work" class="alert alert-error mx-auto max-w-md"><span>{{ $t('works.not_found') }}</span></div>
 
       <template v-else>
+        <CatalogPendingBanner inline :pending="work.is_pending" :revision="work.pending_revision" />
         <header class="mb-6 flex flex-wrap items-start gap-4">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500"><Music :size="26" /></div>
           <div class="min-w-0 flex-1">

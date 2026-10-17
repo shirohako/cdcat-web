@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { Revision } from '~/types/revision'
+import type { CatalogType } from '~/types/catalog'
+import type { RemovalPlan, Revision } from '~/types/revision'
 import { errorName } from '~/utils/revisionErrors'
+import { entityPath } from '~/utils/revisionLinks'
 
 definePageMeta({ layout: 'admin', middleware: 'admin', validate: route => /^\d+$/.test(String(route.params.id)) })
 
@@ -30,9 +32,30 @@ const preview = computed(() => (revision.value?.preview ?? []).map(item => ({
 })).filter(item => item.conflicts.length || item.errorList.length || item.impact))
 const show = (value: unknown) => value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value)
 
+/** Content the revision put live at submission, awaiting this review (docs/catalog/editing.md#待审内容). */
+const liveContent = computed(() => Object.entries(revision.value?.pending_content ?? {})
+  .flatMap(([type, rows]) => (rows ?? []).map(row => ({ type: type as CatalogType, ...row }))))
+/** Possible duplicates of the revision's new albums, with the album each was submitted as. */
+const duplicateGroups = computed(() => Object.entries(revision.value?.duplicates ?? {}).filter(([, candidates]) => candidates.length).map(([ref, candidates]) => {
+  const item = revision.value?.items?.find(entry => entry.ref === ref)
+  return { ref, albumId: item?.applied_at ? item.resource_id : null, acknowledged: item?.acknowledged_duplicate_ids ?? [], candidates }
+}))
+
 type Decision = 'approve' | 'request_changes' | 'reject'
 const decision = ref<Decision | null>(null)
 const dialogOpen = computed({ get: () => decision.value !== null, set: (value) => { if (!value) decision.value = null } })
+// Rejecting removes the content the revision put live; the plan is shown and confirmed first.
+const removal = ref<RemovalPlan | null>(null)
+const removes = computed(() => decision.value === 'reject' && !!removal.value && (removal.value.delete.length > 0 || removal.value.keep.length > 0))
+watch(decision, async (value) => {
+  removal.value = null
+  if (value !== 'reject' || !revision.value?.has_applied_items) return
+  try {
+    removal.value = (await $api<{ removal: RemovalPlan | null }>(`/v1/revisions/${revision.value.id}/pending-content`)).removal
+  } catch (failure) {
+    message.value = localizeError(failure, 'admin_pages.revisions.action_failed')
+  }
+})
 const approveComment = ref('')
 const busy = ref(false)
 const message = ref('')
@@ -48,7 +71,7 @@ const decide = async (reason: string) => {
       method: 'POST',
       body: decision.value === 'approve'
         ? { review_comment: approveComment.value.trim() || null, lock_version: revision.value.lock_version }
-        : { review_comment: reason },
+        : { review_comment: reason, ...(decision.value === 'reject' && removal.value ? { impact_checksum: removal.value.checksum } : {}) },
     })
     notice.value = t(`admin_pages.revisions.done_${decision.value}`)
     decision.value = null
@@ -121,6 +144,42 @@ useHead({ title: computed(() => heading.value) })
           <p class="mt-1 whitespace-pre-line">{{ revision.review_comment }}</p>
         </div>
 
+        <div v-if="liveContent.length" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p class="font-semibold">{{ t('admin_pages.revisions.live_content') }}</p>
+          <p class="mt-0.5 text-xs text-amber-800">{{ t('admin_pages.revisions.live_content_help') }}</p>
+          <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            <li v-for="entry in liveContent" :key="`${entry.type}:${entry.id}`">
+              <span class="text-xs text-amber-700">{{ t(`admin_pages.types.${entry.type}`) }}</span>
+              <NuxtLink :to="entityPath(entry.type, entry.id) ?? '#'" target="_blank" class="ml-1 underline">{{ entry.label }}</NuxtLink>
+            </li>
+          </ul>
+        </div>
+
+        <section v-for="group in duplicateGroups" :key="group.ref" class="rounded-xl border bg-white p-4 text-sm" :class="group.candidates.some(c => c.strength === 'strong') ? 'border-amber-300' : 'border-slate-200'">
+          <h2 class="font-semibold">{{ t('admin_pages.revisions.duplicates_title') }}</h2>
+          <ul class="mt-2 divide-y divide-slate-100">
+            <li v-for="candidate in group.candidates" :key="candidate.album_id" class="flex flex-wrap items-center gap-3 py-2">
+              <img v-if="candidate.album.image_url" :src="candidate.album.image_url" alt="" class="h-10 w-10 rounded object-cover">
+              <div class="min-w-0 flex-1">
+                <NuxtLink :to="`/albums/${candidate.album.id}`" target="_blank" class="flex items-center gap-1.5 font-medium underline">
+                  <span class="truncate">#{{ candidate.album.id }} {{ candidate.album.title }}</span>
+                  <CatalogPendingBadge v-if="candidate.album.is_pending" />
+                </NuxtLink>
+                <p class="text-xs text-slate-500">
+                  {{ candidate.strength === 'strong' ? t('admin_pages.revisions.duplicate_strong') : t('admin_pages.revisions.duplicate_weak') }} ·
+                  {{ candidate.reasons.map(reason => `${reason.kind}: ${reason.value}`).join('；') }}
+                  <span v-if="group.acknowledged.includes(candidate.album_id)" class="text-amber-700"> · {{ t('admin_pages.revisions.duplicate_acknowledged') }}</span>
+                </p>
+              </div>
+              <NuxtLink
+                v-if="group.albumId && !candidate.album.is_pending && hasPermission('content.manage')"
+                :to="{ path: `/admin/content/albums/${group.albumId}`, query: { tab: 'actions', merge_target: candidate.album.id } }"
+                class="rounded-lg border px-3 py-1.5 text-xs hover:bg-slate-50"
+              >{{ t('admin_pages.revisions.merge_into') }}</NuxtLink>
+            </li>
+          </ul>
+        </section>
+
         <section v-for="item in preview" :key="item.ref" class="rounded-xl border border-rose-200 bg-white p-4 text-sm">
           <h2 class="font-semibold text-rose-800">{{ t('admin_pages.revisions.preview_title', { type: t(`admin_pages.types.${item.type}`), ref: item.ref }) }}</h2>
           <div v-if="item.conflicts.length" class="mt-2">
@@ -146,7 +205,7 @@ useHead({ title: computed(() => heading.value) })
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <section class="min-w-0 space-y-3">
             <h2 class="font-semibold">{{ t('admin_pages.revisions.changes') }}</h2>
-            <RevisionItems :items="revision.items ?? []" :references="revision.references ?? {}" />
+            <RevisionItems :items="revision.items ?? []" :references="revision.references ?? {}" :approved="revision.status === 'approved'" />
           </section>
           <aside class="space-y-5 text-sm">
             <div v-if="revision.sources.length">
@@ -172,9 +231,12 @@ useHead({ title: computed(() => heading.value) })
       :busy="busy"
       :reason-required="decision !== 'approve'"
       :title="decision ? t(`admin_pages.revisions.${decision === 'request_changes' ? 'request_changes' : decision}`) : ''"
-      :description="decision ? t(`admin_pages.revisions.confirm_${decision}`) : ''"
+      :description="decision ? t(removes ? 'admin_pages.revisions.confirm_reject_live' : `admin_pages.revisions.confirm_${decision}`) : ''"
+      :confirm-phrase="removes ? `#${revision?.id}` : ''"
+      :confirm-disabled="decision === 'reject' && (!!revision?.has_applied_items && !removal || !!removal?.blockers.length)"
       @confirm="decide"
     >
+      <RevisionRemovalPlan v-if="removes && removal" class="mt-4 max-h-72 overflow-y-auto" :plan="removal" />
       <label v-if="decision === 'approve'" class="mt-4 block text-sm">
         {{ t('admin_pages.revisions.optional_comment') }}
         <textarea v-model="approveComment" maxlength="2000" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 p-2" />

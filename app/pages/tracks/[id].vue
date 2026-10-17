@@ -5,6 +5,7 @@
       <div v-else-if="error || !track" class="alert alert-error mx-auto max-w-md"><span>{{ $t('tracks.not_found') }}</span></div>
 
       <template v-else>
+        <CatalogPendingBanner inline :pending="track.is_pending" />
         <NuxtLink v-if="track.album" :to="`/albums/${track.album.id}#track-${track.id}`" class="mb-6 flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3 hover:shadow-sm">
           <img v-if="track.album.image_url" :src="track.album.image_url" :alt="track.album.title" class="h-14 w-14 rounded object-cover">
           <div class="min-w-0">
@@ -69,6 +70,11 @@ const { localName, formatDate, formatDuration } = useCatalogDisplay()
 const { roleName } = useCatalogSchema()
 
 const { data: track, pending, error } = await useAPI<TrackDetail>(`/v1/tracks/${route.params.id}`)
+
+// Tracks of a merged album answer 301 with the track they were mapped to.
+if (track.value && String(track.value.id) !== String(route.params.id)) {
+  await navigateTo({ path: `/tracks/${track.value.id}`, query: route.query }, { replace: true, redirectCode: 301 })
+}
 const shownTitle = computed(() => track.value ? localName(track.value.title, track.value.titles) : '')
 
 useHead({ title: computed(() => shownTitle.value || 'Track') })

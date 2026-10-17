@@ -12,6 +12,7 @@
         >
         <div v-else class="text-gray-300"><Disc3 :size="64" /></div>
         <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        <CatalogPendingBadge v-if="album.is_pending" overlay class="absolute left-2 top-2" />
         <div class="absolute right-2 top-2 flex gap-1">
           <span v-for="format in badges" :key="format" class="rounded-md bg-gray-900/80 px-2 py-1 text-[11px] font-bold text-white backdrop-blur-sm">{{ enumLabel('disc_format', format) }}</span>
           <span class="rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">{{ typeLabel }}</span>
@@ -54,7 +55,7 @@ import { Calendar, Disc3, Eye, Hash, Heart, Music } from '@lucide/vue'
 
 const props = defineProps<{
   album: Pick<AlbumSimple, 'id' | 'title' | 'type' | 'image_url' | 'catalog_number' | 'release_date' | 'disc_count' | 'track_count' | 'views_count' | 'favorites_count'>
-    & Partial<Pick<AlbumSimple, 'release_date_precision' | 'disc_formats' | 'is_favorited'>>
+    & Partial<Pick<AlbumSimple, 'release_date_precision' | 'disc_formats' | 'is_favorited' | 'is_pending'>>
 }>()
 
 const { t, te } = useI18n()

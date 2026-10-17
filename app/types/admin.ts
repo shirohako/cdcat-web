@@ -128,6 +128,24 @@ export interface AdminMergePreview {
   external: Record<string, number>
   blockers: string[]
   checksum: string
+  /** Albums only (docs/catalog/editing.md#合并专辑): source track id => kept track id, or null when it has none */
+  track_map?: Record<string, number | null>
+  source_tracks?: AdminMergeTrack[]
+  target_tracks?: AdminMergeTrack[]
+  /** New other names, links, entries, relations and track names the kept album takes over */
+  absorb?: Record<string, number>
+  /** Rows moved to the kept album, by table */
+  moves?: Record<string, number>
+  /** Rows dropped because the same user has one on the kept album too, by table */
+  dropped?: Record<string, number>
+  warnings?: string[]
+}
+
+export interface AdminMergeTrack {
+  id: number
+  disc_number: number
+  track_number: number
+  title: string
 }
 
 /** GET /admin/content/{type}/{id}/restore-preview */

@@ -1,6 +1,6 @@
 // Artists. Backend: docs/api/artists.md.
 
-import type { CatalogAttribute, CatalogLink, CatalogTitle } from './catalog'
+import type { CatalogAttribute, CatalogLink, CatalogTitle, PendingFields } from './catalog'
 import type { DatePrecision } from './entry'
 
 export const ARTIST_TYPES = ['person', 'group', 'company', 'virtual', 'circle', 'character'] as const
@@ -10,7 +10,7 @@ export type ArtistType = typeof ARTIST_TYPES[number]
 export const ARTIST_RELATIONS = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'persona_of', 'has_persona', 'subunit_of', 'has_subunit', 'related'] as const
 export type ArtistRelation = typeof ARTIST_RELATIONS[number]
 
-export interface ArtistDetail {
+export interface ArtistDetail extends PendingFields {
   id: number
   name: string
   slug: string | null

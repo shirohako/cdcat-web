@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-slate-50" :style="pageCssVariables">
+    <CatalogPendingBanner :pending="artist?.is_pending" :revision="artist?.pending_revision" />
     <section class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
         <div class="artist-banner bg-slate-200">
@@ -23,6 +24,7 @@
                 {{ shownName }}
                 <span v-if="artist.type" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{{ enumLabel('artist_type', artist.type) }}</span>
                 <span v-if="!artist.is_active" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">{{ $t('artists.detail.inactive') }}</span>
+                <CatalogPendingBadge v-if="artist.is_pending" />
               </h1>
               <p v-if="originalName" class="mt-0.5 text-sm text-slate-500">{{ originalName }}</p>
               <p class="mt-1.5 max-w-3xl whitespace-pre-line text-sm leading-6 text-slate-600">{{ artist.bio || $t('artists.detail.no_bio') }}</p>
@@ -40,7 +42,8 @@
               <button
                 class="inline-flex h-9 items-center gap-2 rounded-md border px-4 text-xs font-semibold transition-colors disabled:cursor-wait disabled:opacity-60"
                 :class="isFavorited ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-700' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'"
-                :disabled="isToggling"
+                :disabled="isToggling || (artist.is_pending && !isFavorited)"
+                :title="artist.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFollow"
               >
                 <UserCheck v-if="isFavorited" :size="15" /><UserPlus v-else :size="15" />
@@ -86,9 +89,12 @@
           </div>
         </section>
 
-        <ShoutBox :id="artist.id" resource="artists" />
-        <ArticleRelatedArticles :id="artist.id" type="artist" />
-        <DiscussionRelatedDiscussions :id="artist.id" type="artist" />
+        <!-- Artists awaiting review can only be viewed: following, shouts and links open after approval. -->
+        <template v-if="!artist.is_pending">
+          <ShoutBox :id="artist.id" resource="artists" />
+          <ArticleRelatedArticles :id="artist.id" type="artist" />
+          <DiscussionRelatedDiscussions :id="artist.id" type="artist" />
+        </template>
       </div>
 
       <aside class="space-y-6">

@@ -15,11 +15,15 @@ const EDITORS: Partial<Record<CatalogType, string>> = {
 /** Whether the submitter can still change the revision. */
 export const isOpenRevision = (status: RevisionStatus) => status === 'draft' || status === 'changes_requested'
 
-/** Where to continue a draft or a revision sent back; null for lyrics, which are edited on their song's page. */
-export const editorPath = (revision: { id: number, items?: ItemLike[] }) => {
+/**
+ * Where to continue a draft or a revision sent back; null for lyrics, which are edited on their song's
+ * page. Once its main item went live at submission (applied_at), the entity itself is edited instead.
+ */
+export const editorPath = (revision: { id: number, items?: Array<ItemLike & { applied_at?: string | null }> }) => {
   const item = mainItem(revision.items)
   const base = item ? EDITORS[item.resource_type] : undefined
   if (!item || !base) return null
+  if (item.applied_at && item.resource_id) return { path: `${base}/${item.resource_id}`, query: {} }
   const path = item.action === 'create' ? (item.resource_type === 'entry' ? `${base}/create` : base) : `${base}/${item.resource_id}`
   return { path, query: { revision: String(revision.id) } }
 }

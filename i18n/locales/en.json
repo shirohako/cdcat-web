@@ -132,7 +132,8 @@
     },
     "category_filter": "Category",
     "format_filter": "Media",
-    "vinyl_subtitle": "Albums released on vinyl"
+    "vinyl_subtitle": "Albums released on vinyl",
+    "search_placeholder": "Search albums"
   },
   "artists": {
     "title": "Artists",
@@ -390,7 +391,8 @@
     "use_custom_code": "Use custom code",
     "search_language": "Type to search languages",
     "no_more_matches": "No more matches",
-    "retry": "Retry"
+    "retry": "Retry",
+    "type_to_confirm": "Type {phrase} to confirm"
   },
   "errors": {
     "request_failed": "The request failed. Please try again.",
@@ -438,7 +440,10 @@
       "merge_blocked": "The merge is blocked by a revision that edits the item being merged.",
       "merge_impact_changed": "What the merge affects has changed. Preview it again.",
       "image_invalid": "The image could not be used. Check its format, size and dimensions, or the link.",
-      "user_silenced": "You are restricted from posting this for now."
+      "user_silenced": "You are restricted from posting this for now.",
+      "content_pending": "This content is awaiting approval; you can do this once it is approved.",
+      "revision_item_applied": "This item is already live; edit the content itself instead.",
+      "duplicate_suspected": "This may duplicate an existing album; please confirm first."
     }
   },
   "admin_pages": {
@@ -828,7 +833,6 @@
     "community_desc": "Discuss music, audio gear, and composition.",
     "beta": "Beta version",
     "search_question": "What are you looking for?",
-    "search_unavailable": "Search is not available yet",
     "search_example": "Try: Touhou Koumakyou / Hatsune Miku / M3-53",
     "discover_more": "Discover more",
     "find_music": "Find music",
@@ -2499,7 +2503,8 @@
       "work_relations_hint": "Original songs, arrangements, covers, remixes and medleys, seen from this song.",
       "work_entries": "Source",
       "work_entries_hint": "The game, anime or other work the song comes from, e.g. a game's BGM."
-    }
+    },
+    "pending_notice": "New content goes live as soon as you submit it, marked “Pending”; changes to existing content wait for approval."
   },
   "revision_page": {
     "action": {
@@ -2558,7 +2563,75 @@
       "rejected": "Rejected",
       "withdrawn": "Withdrawn",
       "checked": "Checked by a moderator",
-      "rebased": "Conflicts resolved"
+      "rebased": "Conflicts resolved",
+      "applied": "Went live at submission",
+      "discarded": "Removed the live content"
+    },
+    "resubmit": "Submit again",
+    "applied": "Live (pending review)",
+    "applied_hint": "This item went live at submission and is marked as pending; edit the content itself to change it",
+    "live_content": "Content this revision put live, awaiting review",
+    "withdraw_live_title": "Withdraw and remove the live content?",
+    "withdraw_live_desc": "The content this revision put live is removed as planned below; anything other content still uses is kept.",
+    "plan": {
+      "blocked": "This cannot be removed now:",
+      "delete": "Removes {count}",
+      "keep": "Keeps {count}",
+      "release": "kept and treated as approved",
+      "move": "kept and moved to submission #{id}",
+      "because": "Still used by {names}"
+    }
+  },
+  "pending": {
+    "badge": "Pending",
+    "badge_title": "Live, awaiting staff approval",
+    "notice": "This page is awaiting staff approval. The submission is yet to be verified and may be inaccurate.",
+    "notice_own": "Until it is reviewed, your edits to it take effect at once.",
+    "view_revision": "View submission #{id}",
+    "review": "Review #{id}",
+    "locked": "Available after approval",
+    "show_toggle": "Show pending",
+    "submitted": "Submitted. The page is marked “Pending” until it is approved."
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search albums, tracks, artists…",
+    "results_for": "Results for “{q}”",
+    "view_all": "See all results",
+    "more": "See all {count}",
+    "no_results": "Nothing found",
+    "hint": "Simplified, traditional and Japanese kanji, kana, catalog numbers and barcodes all work",
+    "too_short": "Type at least 2 characters",
+    "include_pending": "Include pending",
+    "matched": "Matched: {text}",
+    "all": "All",
+    "searching": "Searching…",
+    "shortcut": "Press / to search",
+    "capped": "{count}+",
+    "disc_track": "Disc {disc} · Track {track}",
+    "types": {
+      "album": "Albums",
+      "track": "Tracks",
+      "artist": "Artists",
+      "label": "Labels",
+      "work": "Works",
+      "entry": "Entries",
+      "franchise": "Series"
+    }
+  },
+  "duplicates": {
+    "title": "This album may already be in the catalog",
+    "strong_hint": "These albums share a catalog number, a barcode or an external link with yours. If it is the same album, add to that one instead; otherwise tick “Not the same album” for each.",
+    "weak_hint": "These albums have the same or a similar title. Make sure yours is a different one.",
+    "not_same": "Not the same album",
+    "must_confirm": "Confirm that every strong match is a different album before submitting.",
+    "checking": "Checking for duplicates…",
+    "open": "Open",
+    "reasons": {
+      "catalog_number": "Same catalog number: {value}",
+      "barcode": "Same barcode: {value}",
+      "link": "Same external link: {value}",
+      "title": "Similar title: {value}"
     }
   }
 }

@@ -29,6 +29,10 @@ export interface RevisionItem {
   restore_of_version: number | null
   result_version: number | null
   impact_checksum: string | null
+  /** Written at submission (new content goes live marked pending); null when it waits for approval. */
+  applied_at: string | null
+  /** For new albums: the possible duplicates the submitter confirmed are different albums. */
+  acknowledged_duplicate_ids: number[]
   changes: ChangeOp[]
   conflicts: RevisionConflict[]
   document: Record<string, unknown> | null
@@ -43,6 +47,40 @@ export interface RevisionEvent {
 
 export interface DeletionImpact {
   counts: Array<{ label: string, count: number }>
+  blockers: string[]
+  checksum: string
+}
+
+/** An album that a new album may duplicate (POST /albums/duplicate-candidates). */
+export interface DuplicateCandidate {
+  album_id: number
+  strength: 'strong' | 'weak'
+  reasons: Array<{ kind: 'catalog_number' | 'barcode' | 'link' | 'title', value: string }>
+  album: {
+    id: number
+    title: string
+    catalog_number: string | null
+    image_url: string | null
+    release_date: string | null
+    release_date_precision: string | null
+    is_pending: boolean
+  }
+}
+
+/** Content a revision put live, by type. */
+export type PendingContent = Partial<Record<CatalogType, Array<{ id: number, label: string }>>>
+
+/** What rejecting or withdrawing a revision with live content removes (GET /revisions/{id}/pending-content). */
+export interface RemovalPlan {
+  delete: Array<{ type: CatalogType, id: number, label: string, counts: Array<{ label: string, count: number }> }>
+  keep: Array<{
+    type: CatalogType
+    id: number
+    label: string
+    action: 'release' | 'move'
+    move_to: number | null
+    reasons: Array<{ type: string, id: number, label: string }>
+  }>
   blockers: string[]
   checksum: string
 }
@@ -68,6 +106,8 @@ export interface Revision {
   is_auto_approved: boolean
   has_conflicts: boolean
   requires_content_manage: boolean
+  /** Some items went live at submission. */
+  has_applied_items: boolean
   lock_version: number
   review_comment: string | null
   submitter?: UserSummary | null
@@ -79,6 +119,9 @@ export interface Revision {
   events?: RevisionEvent[]
   references?: CatalogReferences
   preview?: RevisionPreviewItem[]
+  pending_content?: PendingContent
+  /** Possible duplicates of each new album, by item ref. */
+  duplicates?: Record<string, DuplicateCandidate[]>
   created_at: string
   updated_at: string
 }
@@ -92,6 +135,7 @@ export interface RevisionItemInput {
   base_version?: number
   document?: Record<string, unknown>
   impact_checksum?: string
+  acknowledged_duplicate_ids?: number[]
 }
 
 export interface RevisionPayload {

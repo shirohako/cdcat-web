@@ -1,6 +1,6 @@
 // Entries (anime, games, films …) and series (franchises). Design: backend docs/entries/README.md.
 
-import type { CatalogTitle } from './catalog'
+import type { CatalogTitle, PendingFields } from './catalog'
 
 export const ENTRY_TYPES = ['anime', 'game', 'movie', 'tv', 'book', 'manga', 'stage', 'other'] as const
 export type EntryType = typeof ENTRY_TYPES[number]
@@ -56,7 +56,7 @@ export interface LinkItem {
   [key: string]: unknown
 }
 
-export interface EntrySummary extends NamedItem {
+export interface EntrySummary extends NamedItem, PendingFields {
   id: number
   slug: string | null
   type: EntryType
@@ -105,7 +105,7 @@ export interface EntryDetail extends EntrySummary {
   related_entries: RelatedEntry[]
 }
 
-export interface FranchiseSummary extends NamedItem {
+export interface FranchiseSummary extends NamedItem, PendingFields {
   id: number
   slug: string | null
   parent_id: number | null

@@ -6,7 +6,7 @@ import { REVISION_STATUSES } from '~/types/revision'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const TYPES = ['album', 'artist', 'label', 'work', 'lyric', 'entry', 'franchise'] as const
-const FLAGS = ['has_conflicts', 'requires_content_manage', 'unchecked'] as const
+const FLAGS = ['has_conflicts', 'requires_content_manage', 'unchecked', 'applied'] as const
 
 const route = useRoute()
 const router = useRouter()
@@ -179,6 +179,7 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
                     <span v-if="revision.kind === 'lyric'" class="text-sky-700">{{ t('admin_pages.revisions.kind_lyric') }}</span>
                     <span v-if="revision.origin !== 'manual'" class="text-slate-500">{{ t(`admin_pages.revisions.origin_${revision.origin}`) }}</span>
                     <span v-if="revision.is_auto_approved" class="text-slate-500">{{ t('admin_pages.revisions.auto_yes') }}</span>
+                    <span v-if="revision.has_applied_items && ['pending', 'changes_requested'].includes(revision.status)" class="text-amber-700">{{ t('admin_pages.revisions.flag_applied') }}</span>
                     <span v-if="revision.has_conflicts" class="text-rose-700">{{ t('admin_pages.revisions.flag_has_conflicts') }}</span>
                     <span v-if="revision.requires_content_manage" class="text-amber-700">{{ t('admin_pages.revisions.flag_requires_content_manage') }}</span>
                     <span v-if="revision.status === 'approved' && revision.is_auto_approved && !revision.checked_at" class="text-violet-700">{{ t('admin_pages.revisions.flag_unchecked') }}</span>

@@ -26,7 +26,7 @@
           <img v-if="item.image_url" :src="item.image_url" alt="" class="h-8 w-8 shrink-0 rounded object-cover">
           <span v-else class="h-8 w-8 shrink-0 rounded bg-gray-100" />
           <span class="min-w-0">
-            <span class="block truncate text-sm text-gray-900">{{ item.label }}</span>
+            <span class="flex min-w-0 items-center gap-1.5"><span class="truncate text-sm text-gray-900">{{ item.label }}</span><CatalogPendingBadge v-if="item.is_pending" /></span>
             <span v-if="item.subtitle" class="block truncate text-[11px] text-gray-500">{{ item.subtitle }}</span>
           </span>
           <span class="ml-auto shrink-0 text-[11px] text-gray-400">#{{ item.id }}</span>
@@ -54,6 +54,8 @@ export interface PickedEntity {
   image_url: string | null
   /** The artist's or entry's type, e.g. game */
   type?: string | null
+  /** Awaiting review: still worth picking, so nobody enters it twice. */
+  is_pending?: boolean
 }
 
 const props = defineProps<{
@@ -61,6 +63,8 @@ const props = defineProps<{
   placeholder?: string
   exclude?: Array<number | string | null>
   allowCreate?: boolean
+  /** Leave out content awaiting review (e.g. merge targets); editors include it by default. */
+  excludePending?: boolean
 }>()
 const emit = defineEmits<{ select: [item: PickedEntity], create: [name: string] }>()
 
@@ -87,6 +91,7 @@ interface Row {
   release_date?: string | null
   release_date_precision?: DatePrecision | null
   parent?: { name: string } | null
+  is_pending?: boolean
 }
 const endpoints: Record<PickerKind, { url: string, key: string, map: (row: Row) => PickedEntity }> = {
   artist: { url: '/v1/artists', key: 'artists', map: row => ({ id: row.id, label: row.name ?? '', subtitle: row.type ? enumLabel('artist_type', row.type) : '', image_url: row.image_url ?? null, type: row.type }) },
@@ -103,9 +108,11 @@ const search = async (term: string) => {
   searching.value = true
   try {
     const endpoint = endpoints[props.kind]
-    const data = await $api<Record<string, Row[]>>(endpoint.url, { query: { search: term, per_page: 10 } })
+    const query = { search: term, per_page: 10, ...(props.excludePending || props.kind === 'event' ? {} : { include_pending: 1 }) }
+    const data = await $api<Record<string, Row[]>>(endpoint.url, { query })
     if (current === requestId) {
-      results.value = (data[endpoint.key] ?? []).map(endpoint.map).filter(item => !props.exclude?.includes(item.id))
+      results.value = (data[endpoint.key] ?? []).map(row => ({ ...endpoint.map(row), is_pending: row.is_pending ?? false }))
+        .filter(item => !props.exclude?.includes(item.id))
     }
   } catch {
     if (current === requestId) results.value = []

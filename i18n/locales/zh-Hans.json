@@ -132,7 +132,8 @@
     },
     "category_filter": "类别",
     "format_filter": "介质",
-    "vinyl_subtitle": "以黑胶发行的专辑"
+    "vinyl_subtitle": "以黑胶发行的专辑",
+    "search_placeholder": "在专辑里搜索"
   },
   "artists": {
     "title": "艺术家",
@@ -390,7 +391,8 @@
     "use_custom_code": "使用自定义代码",
     "search_language": "输入关键词搜索语言",
     "no_more_matches": "没有更多匹配项",
-    "retry": "重试"
+    "retry": "重试",
+    "type_to_confirm": "输入 {phrase} 以确认"
   },
   "errors": {
     "request_failed": "请求失败，请重试。",
@@ -438,7 +440,10 @@
       "merge_blocked": "有修订正在编辑要合并的条目，暂时不能合并。",
       "merge_impact_changed": "合并的影响范围变了，请重新预览。",
       "image_invalid": "无法使用这张图片。请检查格式、大小、尺寸或链接。",
-      "user_silenced": "你暂时被限制发布这类内容。"
+      "user_silenced": "你暂时被限制发布这类内容。",
+      "content_pending": "内容还在审核中，通过审核后才能这样做。",
+      "revision_item_applied": "这一项已经上线，请直接编辑内容本身。",
+      "duplicate_suspected": "可能和已有的专辑重复，请先确认。"
     }
   },
   "admin_pages": {
@@ -571,7 +576,16 @@
       "conflict_invalid": "合并后无效",
       "conflict_entity_gone": "实体已删除或合并",
       "sources": "来源",
-      "timeline": "时间线"
+      "timeline": "时间线",
+      "flag_applied": "已上线待审",
+      "live_content": "已上线、等待本次审核的内容",
+      "live_content_help": "这些内容在提交时已经公开，页面上标着「审核中」。通过后去掉标记；驳回会删除它们。",
+      "confirm_reject_live": "驳回后提交人不能再修改这条修订，提交时已上线的内容按下面的计划删除或保留。",
+      "duplicates_title": "疑似重复的专辑",
+      "duplicate_strong": "强匹配",
+      "duplicate_weak": "标题相近",
+      "duplicate_acknowledged": "提交人已确认不是同一张",
+      "merge_into": "合并到这张"
     },
     "no_modules": "当前账号暂无已开放的管理模块。",
     "back_to_site": "返回主站",
@@ -945,7 +959,21 @@
       "restore_dialog": "恢复会立即生效，并留在版本历史里。请填写原因。",
       "restored": "已恢复，当前为第 {version} 版。",
       "merge_title": "合并到另一个{type}",
-      "merge_affected": "受影响的{type}"
+      "merge_affected": "受影响的{type}",
+      "merge_help_album": "以要保留的专辑为准：补进这张专辑的标题、其他名称、链接、关联条目和相关专辑，以及对应曲目的名称；收藏、追踪、评分、留言、文章和讨论的关联、种子转到保留方，同一用户只留一份。这张专辑的版本、品番、图片和制作人员不会保留。旧 ID 和对应上的曲目会跳转到保留方。",
+      "merge_absorb_titles": "新增的其他名称",
+      "merge_absorb_links": "新增的链接",
+      "merge_absorb_entries": "新增的关联条目",
+      "merge_absorb_relations": "新增的相关专辑",
+      "merge_absorb_track_titles": "新增的曲目名称",
+      "merge_moves": "转到保留方的数据",
+      "merge_dropped": "（其中 {count} 条重复，删除）",
+      "merge_tracks": "曲目对应",
+      "merge_tracks_help": "默认按碟号和曲号对应，标黄的是标题不一致或没有对应的。没有对应的曲目，它的收藏会删除。",
+      "merge_track_source": "这张专辑的曲目",
+      "merge_track_target": "对应到保留方的曲目",
+      "merge_track_target_for": "“{title}”对应的曲目",
+      "merge_track_none": "不对应（收藏会删除）"
     },
     "link_providers": {
       "title": "链接提供方",
@@ -1601,7 +1629,8 @@
       "done_hide": "已隐藏",
       "done_unhide": "已取消隐藏",
       "done_delete": "已删除"
-    }
+    },
+    "type_to_confirm": "请输入 {phrase} 确认"
   },
   "article_ui": {
     "back": "返回",
@@ -1937,7 +1966,6 @@
     "community_desc": "在这里交流音乐、音频设备与作曲。",
     "beta": "内部测试版本",
     "search_question": "你想找什么？",
-    "search_unavailable": "搜索功能暂未开放",
     "search_example": "例如：东方红魔乡 / 初音未来 / M3-53",
     "discover_more": "发现更多",
     "find_music": "找音乐",
@@ -3608,7 +3636,8 @@
       "work_relations_hint": "从这首乐曲的角度填写原曲、改编、翻唱、混音和组曲。",
       "work_entries": "出处",
       "work_entries_hint": "这首歌出自的游戏、动画等作品，比如某个游戏的 BGM。"
-    }
+    },
+    "pending_notice": "新建的内容提交后立即上线，标记为「审核中」；对已有内容的修改要等审核通过。"
   },
   "revision_page": {
     "action": {
@@ -3667,7 +3696,75 @@
       "rejected": "驳回",
       "withdrawn": "撤回",
       "checked": "管理员已巡查",
-      "rebased": "处理了冲突"
+      "rebased": "处理了冲突",
+      "applied": "提交时已上线",
+      "discarded": "删除了已上线的内容"
+    },
+    "resubmit": "再次提交",
+    "applied": "已上线（待审核）",
+    "applied_hint": "这一项在提交时就已上线，标记为审核中；要修改请直接编辑内容",
+    "live_content": "这条修订已上线、正在等待审核的内容",
+    "withdraw_live_title": "撤回并删除已上线的内容？",
+    "withdraw_live_desc": "这条修订放上线的内容会按下面的计划删除；还被其他内容使用的会保留。",
+    "plan": {
+      "blocked": "现在不能删除：",
+      "delete": "将删除 {count} 项",
+      "keep": "将保留 {count} 项",
+      "release": "保留并视为已通过",
+      "move": "保留，改挂到提交 #{id}",
+      "because": "原因：{names} 还在使用它"
+    }
+  },
+  "pending": {
+    "badge": "审核中",
+    "badge_title": "提交后已上线，正在等待审核",
+    "notice": "此页面正在等待管理人员审核。提交的内容尚未经过核实，可能不准确。",
+    "notice_own": "审核前你可以继续修改，修改会直接生效。",
+    "view_revision": "查看提交 #{id}",
+    "review": "去审核 #{id}",
+    "locked": "通过审核后开放",
+    "show_toggle": "显示审核中",
+    "submitted": "已提交。审核通过前，页面会显示「审核中」。"
+  },
+  "search": {
+    "title": "搜索",
+    "placeholder": "搜索专辑、曲目、艺术家…",
+    "results_for": "“{q}”的搜索结果",
+    "view_all": "查看全部结果",
+    "more": "查看全部 {count} 条",
+    "no_results": "没有找到相关内容",
+    "hint": "简体、繁体、日文汉字和假名都能互相搜到，也可以搜品番和条码",
+    "too_short": "至少输入 2 个字符",
+    "include_pending": "包含审核中",
+    "matched": "匹配：{text}",
+    "all": "全部",
+    "searching": "搜索中…",
+    "shortcut": "按 / 键搜索",
+    "capped": "超过 {count} 条",
+    "disc_track": "碟 {disc} · 第 {track} 首",
+    "types": {
+      "album": "专辑",
+      "track": "曲目",
+      "artist": "艺术家",
+      "label": "厂牌",
+      "work": "乐曲",
+      "entry": "条目",
+      "franchise": "系列"
+    }
+  },
+  "duplicates": {
+    "title": "可能已经有人录过这张专辑",
+    "strong_hint": "下面的专辑和你填的品番、条码或外部链接相同。如果是同一张，请去补充那一张；确认不是同一张时，逐个勾选「不是同一张」。",
+    "weak_hint": "下面的专辑标题相同或相近，请确认不是同一张。",
+    "not_same": "不是同一张",
+    "must_confirm": "提交前请确认每个强匹配都不是同一张专辑。",
+    "checking": "正在查重…",
+    "open": "打开",
+    "reasons": {
+      "catalog_number": "品番相同：{value}",
+      "barcode": "条码相同：{value}",
+      "link": "外部链接相同：{value}",
+      "title": "标题相近：{value}"
     }
   }
 }

@@ -1,7 +1,7 @@
 // Albums, discs, tracks, editions and bonuses. Backend: docs/api/albums.md, data model docs/catalog/README.md.
 
 import type { ApiResponse } from './api'
-import type { CatalogAttribute, CatalogCredit, CatalogImage, CatalogLink, CatalogTitle, CatalogTitleKind, UserSummary } from './catalog'
+import type { CatalogAttribute, CatalogCredit, CatalogImage, CatalogLink, CatalogTitle, CatalogTitleKind, PendingFields, UserSummary } from './catalog'
 import type { DatePrecision, EntryAlbumRelation, EntryType } from './entry'
 import type { TrackingStatus } from './tracking'
 import type { WorkSimple } from './work'
@@ -52,6 +52,8 @@ export interface AlbumSimple {
   reviews_count: number
   views_count: number
   is_favorited: boolean
+  /** Awaiting review; see PendingFields. */
+  is_pending?: boolean
 }
 
 /** 用户收听状态统计（各状态的人数） */
@@ -201,7 +203,7 @@ export interface AlbumArticle {
 }
 
 /** GET /albums/{id} */
-export interface Album {
+export interface Album extends PendingFields {
   id: number
   title: string
   titles: CatalogTitle[]
@@ -273,6 +275,8 @@ export interface TrackDetail {
   translations_count: number
   favorites_count: number
   is_favorited: boolean
+  /** Its album awaits review. */
+  is_pending?: boolean
   work?: WorkSimple | null
   album?: AlbumSimple
   credits?: Array<Omit<CatalogCredit, 'category'>>
