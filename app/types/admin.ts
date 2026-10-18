@@ -346,6 +346,7 @@ export interface AdminSiteSettings {
     registration_open: boolean
     announcement: { content: string, level: 'info' | 'warning', enabled: boolean, ends_at: string | null, version: number }
     article_content_min: number
+    image_cleanup_days: number
   }
   updated: Record<string, { updated_at: string | null, updated_by: { id: number, username: string, nickname: string | null } | null }>
   public: { registration_open: boolean, announcement: unknown }
@@ -459,4 +460,50 @@ export interface AdminDiscussionRestriction {
   revoked_at: string | null
   created_at: string
   updated_at: string
+}
+
+type AdminUserName = { id: number, username: string, nickname: string | null }
+
+/** An upload as GET /v1/admin/images lists it; in use when `unused_since` is null. */
+export interface AdminImage {
+  id: number
+  url: string
+  thumbnail_url: string
+  medium_url: string
+  width: number
+  height: number
+  mime: string
+  size: number
+  sha256: string
+  source_url: string | null
+  uploader: AdminUserName | null
+  album_images_count: number
+  unused_since: string | null
+  cleanup_at: string | null
+  created_at: string | null
+}
+
+export interface AdminImageSummary {
+  total: number
+  total_size: number
+  unused: number
+  unused_size: number
+  due: number
+  retention_days: number
+  last_cleanup: { ran_at: string, days: number, checked: number, in_use: number, marked: number, removed: number, removed_bytes: number } | null
+}
+
+export type AdminImageUseType = 'album' | 'artist' | 'label' | 'entry' | 'franchise' | 'event' | 'event_series' | 'user' | 'article' | 'album_review' | 'discussion_post'
+
+/** GET /v1/admin/images/{id}: the uses are read live. */
+export interface AdminImageDetail extends AdminImage {
+  disk: string
+  path: string
+  variants: { size: number, url: string }[]
+  in_use: boolean
+  usage: {
+    albums: { id: number, album_id: number, title: string, kind: string, label: string | null, product_id: number | null, bonus_id: number | null, disc_id: number | null }[]
+    addresses: { type: AdminImageUseType, id: number, name: string | null, field: string, album_id?: number, topic_id?: number, floor_number?: number | null }[]
+    revisions: { id: number, status: string, title: string | null, submitter: AdminUserName | null, submitted_at: string | null }[]
+  }
 }

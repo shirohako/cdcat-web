@@ -744,7 +744,8 @@
       "draft": "草稿",
       "legacy_roles": "该用户仍有多个存量角色，请使用单角色收敛命令处理。",
       "confirm_action": "确认对 {name} 执行此操作？",
-      "invalid": "参数校验失败，请检查填写的资料或 IP 地址。"
+      "invalid": "参数校验失败，请检查填写的资料或 IP 地址。",
+      "images": "TA 上传的图片"
     },
     "audit_results": {
       "submitted": "已提交",
@@ -1210,7 +1211,10 @@
       "updated": "{name} 于 {time} 修改",
       "articles": "文章",
       "article_content_min": "发布所需的最少字数",
-      "article_content_min_help": "按正文纯文本计算（不含空白和 Markdown 标记）。发布、以及更新已发布或已隐藏的文章时检查，草稿不受限制。0 表示不限制。"
+      "article_content_min_help": "按正文纯文本计算（不含空白和 Markdown 标记）。发布、以及更新已发布或已隐藏的文章时检查，草稿不受限制。0 表示不限制。",
+      "images": "图片",
+      "image_cleanup_days": "未使用图片保留天数",
+      "image_cleanup_days_help": "当前没有内容在用的图片，未使用超过这个天数后，会在每天的清理中删除（1–365 天）。调小后，下一次清理会删除未使用超过新天数的所有图片。"
     },
     "audit": {
       "title": "操作日志",
@@ -1628,7 +1632,92 @@
       "done_unhide": "已取消隐藏",
       "done_delete": "已删除"
     },
-    "type_to_confirm": "请输入 {phrase} 确认"
+    "type_to_confirm": "请输入 {phrase} 确认",
+    "images": {
+      "title": "图片",
+      "description": "上传到本站的图片。当前没有内容在用的图片，未使用超过保留天数后，会在每天的清理中删除。",
+      "total": "全部图片",
+      "unused": "未使用",
+      "due": "下次清理将删除",
+      "retention": "保留天数",
+      "retention_value": "{days} 天",
+      "change_retention": "修改",
+      "last_cleanup": "上次清理",
+      "last_cleanup_value": "{time}，删除 {removed} 张，原图共 {size}",
+      "never_cleaned": "还没有运行过",
+      "count_size": "{count} 张 · {size}",
+      "search": "ID、sha256 开头或来源链接",
+      "status": "状态",
+      "statuses": {
+        "in_use": "在用",
+        "unused": "未使用"
+      },
+      "cleanup_at": "{date} 后清理",
+      "mime": "格式",
+      "all_mimes": "全部格式",
+      "uploader_id": "上传人 ID",
+      "sorts": {
+        "created_at": "上传时间",
+        "size": "文件大小",
+        "unused_since": "最先清理"
+      },
+      "album_images": "{count} 处专辑图片",
+      "detail_title": "图片 #{id}",
+      "original": "原图",
+      "variant": "{size} px 缩略图",
+      "meta": {
+        "dimensions": "尺寸",
+        "size": "大小",
+        "mime": "格式",
+        "sha256": "sha256",
+        "path": "路径",
+        "source": "来源链接",
+        "uploader": "上传人",
+        "uploaded_at": "上传时间",
+        "status": "状态",
+        "files": "文件"
+      },
+      "unused_since": "{time} 起未使用",
+      "usage": "用在哪里",
+      "usage_help": "实时查询专辑图片、各处图片地址和正文、未结束的修订。历史版本和已结束的修订不算。",
+      "usage_none": "当前没有内容在用。",
+      "usage_albums": "专辑图片",
+      "usage_addresses": "图片地址和正文",
+      "usage_revisions": "未结束的修订",
+      "use_types": {
+        "album": "专辑",
+        "artist": "艺术家",
+        "label": "厂牌",
+        "entry": "条目",
+        "franchise": "系列",
+        "event": "活动",
+        "event_series": "活动系列",
+        "user": "用户",
+        "article": "文章",
+        "album_review": "评论",
+        "discussion_post": "讨论帖"
+      },
+      "fields": {
+        "image_url": "图片",
+        "banner_url": "横幅",
+        "description": "简介",
+        "main_visual_url": "主视觉",
+        "key_visuals": "视觉图",
+        "avatar_url": "头像",
+        "bio": "个人简介",
+        "cover_url": "封面",
+        "content": "正文",
+        "raw": "正文"
+      },
+      "scope_product": "版本 #{id}",
+      "scope_bonus": "特典 #{id}",
+      "scope_disc": "碟 #{id}",
+      "floor": "{floor} 楼",
+      "edit_album": "编辑专辑",
+      "delete": "删除图片",
+      "delete_help": "永久删除这张图片和它的缩略图。如果历史版本或已结束的修订用过它，之后恢复到这些版本会被拒绝。",
+      "delete_blocked": "这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。"
+    }
   },
   "article_ui": {
     "back": "返回",
@@ -3537,7 +3626,8 @@
       "scope_album": "整张专辑",
       "already_added": "这张图片已经在图库里了。",
       "upload_file": "上传",
-      "remove": "移除"
+      "remove": "移除",
+      "missing": "图片已被清理，请重新上传"
     },
     "crop": {
       "title": "裁切成正方形",

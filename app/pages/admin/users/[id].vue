@@ -106,7 +106,10 @@ useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
           </div>
         </section>
         <section class="mt-6 rounded-xl border border-slate-200 bg-white p-5">
-          <h2 class="text-lg font-semibold">{{ t('admin_pages.user_detail.activity') }}</h2>
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-semibold">{{ t('admin_pages.user_detail.activity') }}</h2>
+            <NuxtLink v-if="hasPermission('content.manage')" :to="`/admin/images?uploaded_by=${user.id}`" class="text-sm underline">{{ t('admin_pages.user_detail.images') }}</NuxtLink>
+          </div>
           <div class="my-4 flex flex-wrap gap-2"><button v-for="type in types" :key="type" type="button" :aria-pressed="activityType === type" class="rounded-lg border px-4 py-2 text-sm" :class="activityType === type ? 'bg-slate-900 text-white' : ''" @click="selectType(type)">{{ t(`admin_pages.user_detail.activity_${type}`) }}</button></div>
           <AdminListState :pending="activityPending" :error="activityError" :empty="!activity?.items.length" @retry="refreshActivity()">
             <ul class="divide-y divide-slate-100"><li v-for="item in activity?.items" :key="item.id" class="flex flex-wrap items-center justify-between gap-3 py-4 text-sm"><div><NuxtLink v-if="activityLink(item)" :to="activityLink(item)!" class="font-medium underline">{{ item.title || `#${item.id}` }}</NuxtLink><span v-else class="font-medium">{{ item.title || `#${item.id}` }}</span><span class="ml-3 text-xs text-slate-500">{{ item.status === 'draft' ? t('admin_pages.user_detail.draft') : item.status === 'published' ? t('admin_pages.user_detail.published') : item.status }} {{ item.language }}</span></div><time class="text-xs text-slate-500">{{ time(item.created_at) }}</time></li></ul>

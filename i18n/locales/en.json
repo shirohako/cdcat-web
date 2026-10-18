@@ -2412,7 +2412,8 @@
       "scope_album": "The album",
       "already_added": "This image is already in the gallery.",
       "upload_file": "Upload",
-      "remove": "Remove"
+      "remove": "Remove",
+      "missing": "This image was removed. Upload it again."
     },
     "crop": {
       "title": "Crop to a square",

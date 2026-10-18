@@ -14,11 +14,11 @@ const toLocalInput = (iso: string | null) => {
   const date = new Date(iso)
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
 }
-const form = reactive({ registration_open: true, content: '', level: 'info' as 'info' | 'warning', enabled: false, ends_at: '', article_content_min: 100, reason: '' })
+const form = reactive({ registration_open: true, content: '', level: 'info' as 'info' | 'warning', enabled: false, ends_at: '', article_content_min: 100, image_cleanup_days: 30, reason: '' })
 watch(data, (value) => {
   if (!value) return
-  const { registration_open, announcement, article_content_min } = value.settings
-  Object.assign(form, { registration_open, content: announcement.content, level: announcement.level, enabled: announcement.enabled, ends_at: toLocalInput(announcement.ends_at), article_content_min, reason: '' })
+  const { registration_open, announcement, article_content_min, image_cleanup_days } = value.settings
+  Object.assign(form, { registration_open, content: announcement.content, level: announcement.level, enabled: announcement.enabled, ends_at: toLocalInput(announcement.ends_at), article_content_min, image_cleanup_days, reason: '' })
 }, { immediate: true })
 const busy = ref(false)
 const message = ref('')
@@ -32,6 +32,7 @@ const save = async () => {
       registration_open: form.registration_open,
       announcement: { content: form.content, level: form.level, enabled: form.enabled, ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null },
       article_content_min: form.article_content_min,
+      image_cleanup_days: form.image_cleanup_days,
       reason: form.reason || null,
     } })
     notice.value = t('admin_pages.saved')
@@ -88,6 +89,14 @@ useHead({ title: computed(() => t('admin_pages.settings.title')) })
           </label>
           <p class="mt-2 text-xs text-slate-500">{{ t('admin_pages.settings.article_content_min_help') }}</p>
           <p v-if="updated('article_content_min')" class="mt-1 text-xs text-slate-400">{{ updated('article_content_min') }}</p>
+        </section>
+        <section class="rounded-xl border border-slate-200 bg-white p-5">
+          <h2 class="font-semibold">{{ t('admin_pages.settings.images') }}</h2>
+          <label class="mt-3 block max-w-xs">{{ t('admin_pages.settings.image_cleanup_days') }}
+            <input v-model.number="form.image_cleanup_days" type="number" min="1" max="365" required :class="input">
+          </label>
+          <p class="mt-2 text-xs text-slate-500">{{ t('admin_pages.settings.image_cleanup_days_help') }}</p>
+          <p v-if="updated('image_cleanup_days')" class="mt-1 text-xs text-slate-400">{{ updated('image_cleanup_days') }}</p>
         </section>
         <label class="block">{{ t('admin_pages.optional_reason') }}<input v-model="form.reason" maxlength="2000" :class="input"></label>
         <div class="flex items-center justify-end gap-3">

@@ -7,7 +7,8 @@
       <img v-if="coverImage" :src="coverImage.medium_url" alt="" class="h-full w-full object-cover">
       <div v-else class="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-gray-400">
         <ImagePlus :size="28" />
-        <span class="text-xs">{{ $t('editor.image.cover_needed') }}</span>
+        <!-- The cover row points at an upload that images:prune or an admin removed. -->
+        <span class="text-xs" :class="{ 'text-rose-500': cover?.image_id }">{{ $t(cover?.image_id ? 'editor.image.missing' : 'editor.image.cover_needed') }}</span>
       </div>
       <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-white/70"><span class="loading loading-spinner" /></div>
     </div>

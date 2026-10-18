@@ -2,6 +2,7 @@
   <li v-if="image" class="flex gap-3 rounded-xl border p-3" :class="errors.length ? 'border-rose-200 bg-rose-50/40' : 'border-gray-200'">
     <a :href="file?.url" target="_blank" rel="noopener" class="block h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-100">
       <img v-if="file" :src="file.thumbnail_url" alt="" class="h-full w-full object-cover" loading="lazy">
+      <span v-else class="flex h-full items-center justify-center p-2 text-center text-[11px] text-rose-500">{{ $t('editor.image.missing') }}</span>
     </a>
     <div class="min-w-0 flex-1 space-y-2">
       <div class="flex flex-wrap items-center gap-2">
