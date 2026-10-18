@@ -10,7 +10,7 @@
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-center gap-1.5">
                   <span class="truncate text-sm font-medium text-gray-900">{{ entryName(row.entry_id) }}</span>
-                  <span class="shrink-0 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] text-rose-700">{{ enumLabel('entry_album_relation', row.relation_type) }}</span>
+                  <span class="shrink-0 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] text-rose-700">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
                 </span>
                 <span v-if="details(row)" class="block truncate text-[11px] text-gray-500">{{ details(row) }}</span>
               </span>
@@ -55,7 +55,7 @@
               :class="form.relation_type === value ? 'border-rose-400 bg-rose-50 font-medium text-rose-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
               :aria-pressed="form.relation_type === value"
               @click="form.relation_type = value"
-            >{{ enumLabel('entry_album_relation', value) }}</button>
+            >{{ enumLabel('entry_album_relation', value) }}<span v-if="labelEn('entry_album_relation', value)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', value) }}</span></button>
           </div>
         </div>
         <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_7rem]">
@@ -93,6 +93,7 @@ const editor = useAlbumEditor()
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
+const { labelEn } = useEnglishLabels()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})

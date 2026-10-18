@@ -109,9 +109,8 @@ import { firstProduct } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
-const { enumLabel, enumLabelEn } = useCatalogDisplay()
-const { locale } = useI18n()
-const { $i18n } = useNuxtApp()
+const { enumLabel } = useCatalogDisplay()
+const { labelEn } = useEnglishLabels()
 
 const album = computed(() => editor.album.value)
 const references = editor.references
@@ -124,14 +123,8 @@ const suggestedCategories = computed(() => [...new Set(album.value.entries
   .map(row => typeof row.entry_id === 'number' ? ENTRY_CATEGORIES[String((references.entry?.[String(row.entry_id)] as { type?: string } | undefined)?.type)] : undefined)
   .filter((value): value is string => !!value && !album.value.categories.includes(value)))])
 
-// Outside the English UI each category also shows its English name. Only the UI language's
-// messages are loaded up front, so the English ones are fetched here.
-const categoryEn = (value: string) => locale.value === 'en' ? '' : enumLabelEn('album_category', value)
-const loadEnglish = () => {
-  if (locale.value !== 'en') $i18n.loadLocaleMessages('en')
-}
-onMounted(loadEnglish)
-watch(locale, loadEnglish)
+// Outside the English UI each category also shows its English name.
+const categoryEn = (value: string) => labelEn('album_category', value)
 
 const toggleCategory = (value: string) => {
   const categories = album.value.categories
