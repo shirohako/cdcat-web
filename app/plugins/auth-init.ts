@@ -1,17 +1,21 @@
 /**
- * 认证初始化插件
- * 在应用启动时自动获取最新的用户信息
+ * Checks the session when the app starts. The server does it while rendering the page, which also
+ * renews the auth cookies (see useAuthCookies). In the browser the page must never wait for the API
+ * before it becomes usable, so a page the server did not render checks in the background.
  */
-export default defineNuxtPlugin(async () => {
+export default defineNuxtPlugin(async (nuxtApp) => {
   const { fetchUser, token } = useAuth()
+  if (!token.value) return
 
-  // 如果有 token，自动获取最新用户信息
-  if (token.value) {
+  if (import.meta.server) {
     try {
       await fetchUser()
     } catch (error) {
-      // fetchUser 内部已经处理了错误（清除认证状态），这里只需静默处理
+      // fetchUser clears the session itself when it is invalid; anything else is only logged.
       console.error('Failed to fetch user:', error)
     }
+    return
   }
+  if (nuxtApp.payload.serverRendered) return
+  void fetchUser().catch(error => console.error('Failed to fetch user:', error))
 })
