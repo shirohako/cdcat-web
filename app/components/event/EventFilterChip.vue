@@ -26,7 +26,7 @@
     </button>
 
     <!-- 搜索浮层 -->
-    <div v-if="open" class="absolute right-0 top-full z-20 mt-2 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-lg sm:w-80">
+    <div v-if="open" class="absolute top-full z-20 mt-2 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-lg sm:w-80" :class="align === 'start' ? 'left-0' : 'right-0'">
       <div class="relative">
         <Icon name="lucide:search" class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
         <input
@@ -62,12 +62,14 @@
 import type { EventOption } from '~/composables/useEventSearch'
 
 // Event filter styled as a filter-bar chip; the header passes the type chips' classes so both match.
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: number | null
   label: string
   activeClass: string
   idleClass: string
-}>()
+  /** Which edge of the chip the search panel lines up with; `start` for a chip at the left of the bar. */
+  align?: 'start' | 'end'
+}>(), { align: 'end' })
 
 const emit = defineEmits<{
   'update:modelValue': [value: number | null]

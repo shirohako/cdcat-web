@@ -133,7 +133,12 @@
     "category_filter": "Category",
     "format_filter": "Media",
     "vinyl_subtitle": "Albums released on vinyl",
-    "search_placeholder": "Search albums"
+    "search_placeholder": "Search albums",
+    "filters": "Filter",
+    "all_categories": "All categories",
+    "all_formats": "All media",
+    "clear_filter": "Clear {name}",
+    "clear_filters": "Clear filters"
   },
   "artists": {
     "title": "Artists",

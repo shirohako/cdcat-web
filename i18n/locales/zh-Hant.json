@@ -133,7 +133,12 @@
     "category_filter": "類別",
     "format_filter": "介質",
     "vinyl_subtitle": "以黑膠發行的專輯",
-    "search_placeholder": "在專輯裡搜尋"
+    "search_placeholder": "在專輯裡搜尋",
+    "filters": "篩選",
+    "all_categories": "全部類別",
+    "all_formats": "全部介質",
+    "clear_filter": "清除{name}篩選",
+    "clear_filters": "清除篩選"
   },
   "artists": {
     "title": "藝術家",

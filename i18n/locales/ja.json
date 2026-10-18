@@ -133,7 +133,12 @@
     "category_filter": "カテゴリー",
     "format_filter": "メディア",
     "vinyl_subtitle": "アナログレコードで発売された作品",
-    "search_placeholder": "アルバムを検索"
+    "search_placeholder": "アルバムを検索",
+    "filters": "絞り込み",
+    "all_categories": "すべてのカテゴリー",
+    "all_formats": "すべてのメディア",
+    "clear_filter": "{name}を解除",
+    "clear_filters": "絞り込みを解除"
   },
   "artists": {
     "title": "アーティスト",
