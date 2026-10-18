@@ -2,6 +2,7 @@
   <div class="relative w-full h-72 md:h-96 overflow-hidden select-none">
     <img
       v-if="article.banner_url || article.cover_url"
+      v-img-fade
       :src="article.banner_url || article.cover_url"
       :alt="article.title"
       class="absolute inset-0 w-full h-full object-cover scale-105"

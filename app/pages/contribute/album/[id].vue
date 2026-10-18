@@ -1,21 +1,24 @@
 <template>
-  <ClientOnly>
-    <LazyEditorAlbumEditor
-      :key="`${albumId}:${route.query.revision ?? ''}`"
-      :album-id="albumId"
-      :revision-id="revisionId"
-      :mode="route.query.mode === 'translate' ? 'translate' : 'edit'"
-      :locale="typeof route.query.locale === 'string' ? route.query.locale : undefined"
-    />
-    <template #fallback>
-      <!-- The editor's own loading state, so nothing moves when it takes over. -->
-      <div class="min-h-screen bg-gray-50/60">
-        <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
-          <div class="flex min-h-96 items-center justify-center"><span class="loading loading-spinner loading-lg" /></div>
+  <div>
+    <!-- One root element for the page transition; ClientOnly swaps its fallback for the editor inside it. -->
+    <ClientOnly>
+      <LazyEditorAlbumEditor
+        :key="`${albumId}:${route.query.revision ?? ''}`"
+        :album-id="albumId"
+        :revision-id="revisionId"
+        :mode="route.query.mode === 'translate' ? 'translate' : 'edit'"
+        :locale="typeof route.query.locale === 'string' ? route.query.locale : undefined"
+      />
+      <template #fallback>
+        <!-- The editor's own loading state, so nothing moves when it takes over. -->
+        <div class="min-h-screen bg-gray-50/60">
+          <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
+            <SkeletonForm :fields="5" class="min-h-96" />
+          </div>
         </div>
-      </div>
-    </template>
-  </ClientOnly>
+      </template>
+    </ClientOnly>
+  </div>
 </template>
 
 <script setup lang="ts">

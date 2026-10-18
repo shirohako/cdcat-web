@@ -3,10 +3,7 @@
     <div class="container mx-auto max-w-5xl px-4 py-8 md:px-8">
       <NuxtLink to="/revisions" class="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"><ArrowLeft :size="14" />{{ $t('revision_page.back') }}</NuxtLink>
 
-      <div v-if="pending" class="flex min-h-60 items-center justify-center"><span class="loading loading-spinner" /></div>
-      <p v-else-if="error || !revision" class="alert alert-error">{{ localizeError(error) }}</p>
-
-      <template v-else>
+      <div v-if="revision" :class="revealClass">
         <header class="mb-5 flex flex-wrap items-start gap-3">
           <div class="min-w-0 flex-1">
             <h1 class="text-2xl font-bold text-gray-900">{{ heading }}</h1>
@@ -89,7 +86,9 @@
             </div>
           </aside>
         </div>
-      </template>
+      </div>
+      <p v-else-if="status === 'error'" class="alert alert-error">{{ localizeError(error) }}</p>
+      <SkeletonRevision v-else />
     </div>
 
     <CommonConfirmDialog
@@ -122,7 +121,9 @@ const { ago, exact } = useRelativeTime()
 const { enumLabel } = useCatalogDisplay()
 const { localizeError } = useLocalizedApiError()
 
-const { data: revision, pending, error, refresh } = await useAsyncData(`revision:${route.params.id}`, () => $api<Revision>(`/v1/revisions/${route.params.id}`), { server: false })
+// Fetched fresh and only in the browser; server and browser both start out with the skeleton.
+const { data: revision, status, error, refresh, revealClass } = await usePageData(`revision:${route.params.id}`,
+  ({ signal }) => $api<Revision>(`/v1/revisions/${route.params.id}`, { signal }), { cache: false, server: false })
 
 const mine = computed(() => !!revision.value && revision.value.submitter?.id === user.value?.id)
 const editor = computed(() => revision.value ? editorPath(revision.value) : null)

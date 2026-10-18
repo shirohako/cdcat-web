@@ -17,19 +17,21 @@ const { isAuthenticated } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const notice = useDiscussionNotice()
 const page = ref(1)
-const { data, pending, error } = await useAsyncData(`article-comments-${props.topicId}`,
-  () => $api<DiscussionTopicPage>(`/v1/discussions/topics/${props.topicId}`, { query: { page: page.value } }), { watch: [page] })
+// Comments change too often to show an earlier copy, so no revisit cache.
+const { data, pending, status, error, refresh } = await usePageData(`article-comments-${props.topicId}`,
+  ({ signal }) => $api<DiscussionTopicPage>(`/v1/discussions/topics/${props.topicId}`, { query: { page: page.value }, signal }), { cache: false, watch: [page] })
 
-const topic = ref<DiscussionTopicDetail>(data.value?.topic as DiscussionTopicDetail)
-const floors = ref<DiscussionPost[]>(data.value?.floors ?? [])
-const references = ref<DiscussionReferences>(data.value?.references ?? {})
+// Filled from the data whenever it arrives: during the server render, or later after client-side navigation.
+const topic = ref<DiscussionTopicDetail>() as Ref<DiscussionTopicDetail>
+const floors = ref<DiscussionPost[]>([])
+const references = ref<DiscussionReferences>({})
 const focusId = ref<number | null>(null)
 watch(data, (value) => {
   if (!value) return
   topic.value = value.topic
   floors.value = value.floors
   references.value = value.references
-})
+}, { immediate: true })
 const first = computed(() => floors.value.find(floor => floor.floor === 1) ?? null)
 const comments = computed(() => floors.value.filter(floor => floor.floor !== 1))
 const composer = ref<{ insert: (text: string) => void } | null>(null)
@@ -96,14 +98,14 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
 </script>
 
 <template>
-  <section id="comments" class="space-y-4 rounded-2xl bg-white p-5 shadow-sm">
+  <section id="comments" class="scroll-mt-20 space-y-4 rounded-2xl bg-white p-5 shadow-sm">
     <header class="flex flex-wrap items-center gap-2">
       <MessageCircle :size="18" class="text-sky-500" />
       <h2 class="text-base font-bold text-gray-900">{{ t('discussions.comments.title') }}</h2>
       <span v-if="topic" class="text-sm text-gray-400">{{ topic.replies_count }}</span>
     </header>
-    <p v-if="error" class="text-sm text-gray-500">{{ localizeError(error) }}</p>
-    <template v-else-if="topic">
+    <template v-if="topic">
+      <CommonLoadError v-if="status === 'error'" @retry="refresh()" />
       <div v-if="first" class="flex items-center gap-3 border-b border-gray-100 pb-4">
         <span class="text-xs text-gray-400">{{ t('discussions.comments.reactions') }}</span>
         <DiscussionReactions :post-id="first.id" :reactions="first.reactions" :can-react="first.can.react" @update:reactions="value => replacePost({ ...first!, reactions: value })" />
@@ -129,6 +131,17 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
         <p v-else class="text-center text-sm text-gray-500">{{ t('discussions.composer.closed') }}</p>
       </div>
     </template>
+    <p v-else-if="status === 'error'" class="text-sm text-gray-500">{{ localizeError(error) }}</p>
+    <SkeletonStatus v-else class="space-y-3">
+      <div v-for="row in 2" :key="row" class="flex gap-3 rounded-2xl border border-slate-200/80 p-4">
+        <div class="skeleton size-9 shrink-0 rounded-full" />
+        <div class="flex-1 space-y-2.5">
+          <div class="skeleton h-3 w-24 rounded-full" />
+          <div class="skeleton h-3 w-full rounded-full" />
+          <div class="skeleton h-3 rounded-full" :class="row === 1 ? 'w-2/3' : 'w-1/2'" />
+        </div>
+      </div>
+    </SkeletonStatus>
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />
     <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" @removed="removePost" />
   </section>

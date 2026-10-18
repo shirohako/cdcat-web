@@ -28,14 +28,25 @@ const update = (changes: Record<string, string | null | undefined>) => {
 }
 const submitSearch = () => update({ search: searchInput.value.trim().length >= 2 ? searchInput.value.trim() : null })
 
-const { data, pending, error, refresh } = await useAsyncData('articles-list',
-  () => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', {
+const { data, status, refresh, loading, refetching, revealKey, revealClass } = await usePageData(
+  () => `articles-list-${JSON.stringify([type.value, sort.value, search.value, page.value])}`,
+  ({ signal, background }) => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', {
     query: { type: type.value ?? undefined, sort: sort.value, search: search.value || undefined, page: page.value },
-  }), { watch: [type, sort, search, page] })
+    signal,
+    progress: !background,
+  }),
+)
 
-const { data: featured } = await useAsyncData('articles-featured',
-  () => $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { featured: 1, per_page: 3 } }).then(response => response.articles),
-  { default: () => [] })
+// Featured articles only show on the first, unfiltered page, so they're only asked for there. Not awaited:
+// the server loads them alongside the list.
+const showFeatured = computed(() => !filtered.value && page.value === 1)
+const { data: featuredData, loading: featuredLoading } = usePageData(
+  () => showFeatured.value ? 'articles-featured' : 'articles-featured-off',
+  async ({ signal, background }) => showFeatured.value
+    ? (await $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { featured: 1, per_page: 3 }, signal, progress: !background })).articles
+    : [],
+)
+const featured = computed(() => featuredData.value ?? [])
 
 useHead({ title: computed(() => t('content_display.articles')) })
 </script>
@@ -65,9 +76,10 @@ useHead({ title: computed(() => t('content_display.articles')) })
           </CollectionPageHeader>
         </template>
 
-        <section v-if="featured.length && !filtered && page === 1" class="mb-8">
+        <section v-if="showFeatured && (featured.length || featuredLoading)" class="mb-8">
           <h2 class="mb-3 inline-flex items-center gap-1.5 text-sm font-bold text-slate-700"><Sparkles :size="15" class="text-violet-500" />{{ t('article_ui.list.featured') }}</h2>
-          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <CollectionLoadingSkeleton v-if="featuredLoading" variant="articles" :count="3" grid-class="grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" />
+          <div v-else class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <ArticleCard v-for="article in featured" :key="article.id" :article="article" />
           </div>
         </section>
@@ -95,11 +107,12 @@ useHead({ title: computed(() => t('content_display.articles')) })
           </div>
         </div>
 
-        <CollectionLoadingSkeleton v-if="pending" variant="wide" />
-        <div v-else-if="error" class="flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-slate-500">
+        <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
+        <CollectionLoadingSkeleton v-if="loading" variant="articles" />
+        <div v-else-if="status === 'error' && !data" class="flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-slate-500">
           {{ t('common.load_failed') }}<button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
         </div>
-        <div v-else class="collection-content-enter">
+        <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
           </div>
@@ -109,7 +122,7 @@ useHead({ title: computed(() => t('content_display.articles')) })
           </div>
           <CommonPagination
             v-if="data && data.pagination.last_page > 1" class="mt-6" :page="data.pagination.current_page" :total-pages="data.pagination.last_page"
-            :disabled="pending" @update:page="value => update({ page: value > 1 ? String(value) : null })" />
+            :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })" />
         </div>
       </CollectionPageCard>
     </div>

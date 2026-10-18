@@ -12,10 +12,12 @@ const relation = ref('')
 const page = ref(1)
 watch(relation, () => { page.value = 1 })
 
-const { data, pending } = useAsyncData(
+const { data, loading, refetching, revealKey, revealClass } = usePageData(
   () => `franchise-albums-${props.franchiseId}-${relation.value}-${page.value}`,
-  () => $api<{ albums: FranchiseAlbum[], pagination: Pagination }>(`/v1/franchises/${props.franchiseId}/albums`, {
+  ({ signal, background }) => $api<{ albums: FranchiseAlbum[], pagination: Pagination }>(`/v1/franchises/${props.franchiseId}/albums`, {
     query: { page: page.value, relation_type: relation.value || undefined },
+    signal,
+    progress: !background,
   }),
 )
 
@@ -39,9 +41,21 @@ const pagination = computed(() => data.value?.pagination || { total: 0, per_page
       </button>
     </div>
 
-    <div v-if="pending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
+    <SkeletonStatus v-if="loading" class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <div v-for="item in 12" :key="item">
+        <div class="skeleton aspect-square rounded-lg" />
+        <div class="skeleton mt-2 h-3.5 w-4/5 rounded-full" />
+        <div class="skeleton mt-1.5 h-3 w-1/2 rounded-full" />
+      </div>
+    </SkeletonStatus>
     <template v-else>
-      <div v-if="albums.length" class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <div
+        v-if="albums.length"
+        :key="revealKey"
+        class="grid grid-cols-2 gap-4 transition-opacity sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6"
+        :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
+        :inert="refetching"
+      >
         <NuxtLink v-for="album in albums" :key="album.id" :to="`/albums/${album.id}`" class="group">
           <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
             <img v-if="album.image_url" :src="album.image_url" :alt="album.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" >
@@ -59,7 +73,7 @@ const pagination = computed(() => data.value?.pagination || { total: 0, per_page
       <CommonPagination
         :page="pagination.current_page"
         :total-pages="pagination.last_page"
-        :disabled="pending"
+        :disabled="refetching"
         @update:page="page = $event"
       />
     </template>

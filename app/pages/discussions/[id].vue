@@ -29,8 +29,9 @@ const query = computed(() => ({
   author: route.query.author === 'op' ? 'op' : undefined,
   order: route.query.order === 'desc' ? 'desc' : undefined,
 }))
-const { data, error, refresh, pending } = await useAsyncData(() => `discussion-topic-${topicId.value}`,
-  () => $api<DiscussionTopicPage>(`/v1/discussions/topics/${topicId.value}`, { query: query.value }), { watch: [query] })
+// Always fetched fresh (no revisit cache): replies, read positions and polling all start from it.
+const { data, status, error, refresh, pending } = await usePageData(() => `discussion-topic-${topicId.value}`,
+  ({ signal }) => $api<DiscussionTopicPage>(`/v1/discussions/topics/${topicId.value}`, { query: query.value, signal }), { cache: false, watch: [query] })
 
 // An article's comment topic lives on the article page; go there while the article is on the site.
 const articlePath = (value: DiscussionTopicPage | null | undefined) => {
@@ -39,6 +40,12 @@ const articlePath = (value: DiscussionTopicPage | null | undefined) => {
 }
 if (articlePath(data.value)) await navigateTo(articlePath(data.value)!, { replace: true, redirectCode: 302 })
 watch(data, (value) => { if (articlePath(value)) void navigateTo(articlePath(value)!, { replace: true }) })
+const redirecting = computed(() => !!articlePath(data.value))
+
+// A link to a post (?post=, ?floor=, ?unread=1) scrolls to that post itself (scrollToFocus), not to the top.
+definePageMeta({
+  scrollToTop: to => !(to.query.post || to.query.floor || to.query.unread),
+})
 
 const topic = ref<DiscussionTopicDetail>(data.value?.topic as DiscussionTopicDetail)
 const floors = ref<DiscussionPost[]>(data.value?.floors ?? [])
@@ -160,9 +167,12 @@ function sendRead(keepalive = false) {
   $api(`/v1/discussions/topics/${topicId.value}/read`, { method: 'PUT', body: { post_id: seenMax }, progress: false }).catch(() => { reportedMax = 0 })
 }
 
+/** The page sits outside the document until the previous page has faded out; DOM work waits for it. */
+let mounted = false
+
 function observe() {
   observer?.disconnect()
-  if (!tracking.value) return
+  if (!mounted || !tracking.value) return
   observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue
@@ -192,11 +202,12 @@ const onLeave = () => sendRead(true)
 
 async function scrollToFocus() {
   await nextTick()
-  if (!focusId.value) return
+  if (!mounted || !focusId.value) return
   document.getElementById(`post-${focusId.value}`)?.scrollIntoView({ block: 'center' })
 }
 
 onMounted(() => {
+  mounted = true
   observe()
   void scrollToFocus()
   readTimer = setInterval(() => sendRead(), 5000)
@@ -289,11 +300,13 @@ useHead(() => ({
 <template>
   <div class="relative min-h-[calc(100vh-4rem)] bg-slate-50/60">
     <div class="container mx-auto max-w-5xl px-4 py-6 md:px-6">
-      <div v-if="error" class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+      <div v-if="status === 'error' && !topic" class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
         <p class="text-sm text-slate-500">{{ localizeError(error) }}</p>
         <NuxtLink to="/discussions" class="mt-3 inline-block text-sm text-sky-700 hover:underline">{{ t('discussions.back') }}</NuxtLink>
       </div>
-      <template v-else-if="topic">
+      <template v-else-if="topic && !redirecting">
+        <!-- A page of floors that failed to load: the previous floors stay below. -->
+        <CommonLoadError v-if="status === 'error'" class="mb-3" @retry="refresh()" />
         <nav class="mb-3 flex flex-wrap items-center gap-1 text-xs text-slate-400" :aria-label="t('discussions.breadcrumb')">
           <NuxtLink to="/discussions" class="hover:text-slate-600">{{ t('discussions.title') }}</NuxtLink>
           <template v-if="topic.category?.parent">
@@ -394,6 +407,8 @@ useHead(() => ({
           </p>
         </section>
       </template>
+      <!-- Also while moving on to the article this topic belongs to. -->
+      <SkeletonDiscussionTopic v-else />
     </div>
 
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />

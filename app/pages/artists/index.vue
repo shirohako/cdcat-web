@@ -28,21 +28,24 @@
       </CollectionPageHeader>
         </template>
 
+      <!-- A failed refetch keeps the last results below this. -->
+      <CommonLoadError v-if="status === 'error' && artistsResponse" class="mb-4" @retry="refresh()" />
+
       <!-- 加载状态 -->
-      <CollectionLoadingSkeleton v-if="pending" variant="artists" />
+      <CollectionLoadingSkeleton v-if="loading" variant="artists" />
 
       <!-- 错误状态 -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-100">
+      <div v-else-if="status === 'error' && !artistsResponse" class="flex items-center justify-center min-h-100">
         <div class="alert alert-error max-w-md">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>{{ $t('artists.load_failed', { message: error.message }) }}</span>
+          <span>{{ $t('artists.load_failed', { message: error?.message ?? '' }) }}</span>
         </div>
       </div>
 
       <!-- 艺术家列表 -->
-      <div v-else class="collection-content-enter">
+      <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
         <!-- 艺术家网格 -->
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <NuxtLink
@@ -94,7 +97,7 @@
           class="mt-6"
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
-          :disabled="pending"
+          :disabled="refetching"
           @update:page="goToPage"
         />
       </div>
@@ -117,7 +120,8 @@ const artistTypes = computed(() => [
   { value: 'other', label: t('artists.type.other'), icon: 'lucide:shapes' },
 ]);
 
-const selectedType = ref(route.query.type || 'all');
+// From the URL, so back and forward switch the type too.
+const selectedType = computed(() => route.query.type || 'all');
 
 useSeoMeta({
   title: 'Artists',
@@ -136,15 +140,13 @@ const currentPage = computed(() => {
 
 // 从 API 获取艺术家列表 - 使用 computed query 以响应路由变化
 const { includePending, setIncludePending } = usePendingToggle()
-const { data: artistsResponse, pending, error } = useAPI("/v1/artists", {
-  lazy: true,
+const { data: artistsResponse, status, error, refresh, loading, refetching, revealKey, revealClass } = usePageAPI("/v1/artists", {
   query: computed(() => ({
     page: currentPage.value,
     per_page: 18,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     include_pending: includePending.value ? 1 : undefined,
   })),
-  watch: [currentPage, selectedType, includePending],
 });
 
 // 处理艺术家数据
@@ -188,7 +190,6 @@ const goToPage = (page) => {
 };
 
 const selectType = (type) => {
-  selectedType.value = type;
   router.push({
     query: {
       ...route.query,

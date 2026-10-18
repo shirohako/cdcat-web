@@ -1,10 +1,7 @@
 <template>
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
-      <div v-if="pending" class="flex justify-center py-20"><span class="loading loading-spinner loading-lg" /></div>
-      <div v-else-if="error || !label" class="alert alert-error mx-auto max-w-md"><span>{{ $t('labels.not_found') }}</span></div>
-
-      <template v-else>
+      <div v-if="label" :class="revealClass">
         <CatalogPendingBanner inline :pending="label.is_pending" :revision="label.pending_revision" />
         <header class="mb-6 flex flex-wrap items-start gap-4">
           <div class="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-gray-100 bg-gray-50">
@@ -30,12 +27,18 @@
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <section class="lg:col-span-2">
-            <div v-if="albumsPending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
-            <div v-else-if="albums.length" class="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-3">
+            <CollectionLoadingSkeleton v-if="albumsLoading" grid-class="grid-cols-2 gap-5 sm:grid-cols-3" :count="6" />
+            <div
+              v-else-if="albums.length"
+              :key="albumsRevealKey"
+              class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 lg:grid-cols-3"
+              :class="[albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
+              :inert="albumsRefetching"
+            >
               <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
             </div>
             <p v-else class="py-10 text-center text-sm text-gray-400">{{ $t('artists.detail.no_releases') }}</p>
-            <CommonPagination class="mt-6" :page="page" :total-pages="lastPage" :disabled="albumsPending" @update:page="page = $event" />
+            <CommonPagination class="mt-6" :page="page" :total-pages="lastPage" :disabled="albumsRefetching" @update:page="page = $event" />
           </section>
           <aside class="space-y-6">
             <CatalogSection :title="$t('album.section.information')" :icon="Info" tone="sky">
@@ -56,7 +59,9 @@
             <AlbumLinks :links="label.links ?? []" />
           </aside>
         </div>
-      </template>
+      </div>
+      <div v-else-if="status === 'error'" class="alert alert-error mx-auto max-w-md"><span>{{ $t('labels.not_found') }}</span></div>
+      <SkeletonCatalogDetail v-else hero="tile" />
     </div>
   </div>
 </template>
@@ -72,14 +77,19 @@ const { regionName } = useLocaleFormatting()
 const { localName, formatDate } = useCatalogDisplay()
 
 const labelId = Number(route.params.id)
-const { data: label, pending, error } = await useAPI<Label>(`/v1/labels/${labelId}`)
+const { data: label, status, revealClass } = await usePageAPI<Label>(`/v1/labels/${labelId}`)
 const shownName = computed(() => label.value ? localName(label.value.name, label.value.titles) : '')
 
-const page = ref(1)
-const { data: albumData, pending: albumsPending } = useAsyncData(
+const page = useQueryPage()
+const {
+  data: albumData,
+  loading: albumsLoading,
+  refetching: albumsRefetching,
+  revealKey: albumsRevealKey,
+  revealClass: albumsRevealClass,
+} = usePageData(
   () => `label:${labelId}:albums:${page.value}`,
-  () => $api<{ albums: AlbumSimple[], pagination: { last_page: number } }>(`/v1/labels/${labelId}/albums`, { params: { page: page.value } }),
-  { watch: [page] },
+  ({ signal, background }) => $api<{ albums: AlbumSimple[], pagination: { last_page: number } }>(`/v1/labels/${labelId}/albums`, { params: { page: page.value }, signal, progress: !background }),
 )
 const albums = computed(() => albumData.value?.albums ?? [])
 const lastPage = computed(() => albumData.value?.pagination.last_page ?? 1)

@@ -74,7 +74,7 @@
         </div>
 
         <div class="relative">
-          <div class="border border-white/80 bg-[linear-gradient(140deg,rgba(255,255,255,0.9),rgba(241,245,249,0.9))] shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] rounded-4xl p-5 backdrop-blur-sm animate-[fade-in_0.6s_ease_both]">
+          <div class="border border-white/80 bg-[linear-gradient(140deg,rgba(255,255,255,0.9),rgba(241,245,249,0.9))] shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] rounded-4xl p-5 backdrop-blur-sm animate-[fade-in_0.6s_ease_backwards]">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
@@ -455,17 +455,18 @@ useHead({
   background-size: 32px 32px;
 }
 
+/* `backwards`, not `both`: hidden during the delay, and no transform left behind afterwards. */
 .animate-rise {
-  animation: fade-in 0.7s ease both;
+  animation: fade-in 0.7s ease backwards;
 }
 
 .animate-rise-delayed {
-  animation: fade-in 0.8s ease both;
+  animation: fade-in 0.8s ease backwards;
   animation-delay: 0.05s;
 }
 
 .animate-rise-slower {
-  animation: fade-in 0.9s ease both;
+  animation: fade-in 0.9s ease backwards;
   animation-delay: 0.1s;
 }
 

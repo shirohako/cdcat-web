@@ -31,15 +31,21 @@
             :class="(type ?? 'all') === tab.value ? 'border-gray-900 font-semibold text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'"
           >
             {{ tab.label }}<span v-if="tab.count !== null" class="ml-1 text-xs text-gray-400">{{ tab.count }}</span>
+            <span v-else-if="overviewLoading && tab.value !== 'all'" class="skeleton ml-1 inline-block h-2.5 w-4 rounded-full align-middle" aria-hidden="true" />
           </NuxtLink>
         </nav>
 
         <p v-if="!searchable(q)" class="py-12 text-center text-gray-500">{{ $t('search.too_short') }}</p>
-        <CollectionLoadingSkeleton v-else-if="pending" variant="list" />
-        <p v-else-if="error" class="py-12 text-center text-red-600">{{ localizeError(error) }}</p>
+        <SkeletonRows v-else-if="loading" page class="mt-4" :count="6" thumb="square" />
+        <p v-else-if="failed && !shown" class="py-12 text-center text-red-600">{{ localizeError(error) }}</p>
 
         <!-- 全部：每类前几条 -->
-        <div v-else-if="!type" class="mt-4 space-y-6">
+        <div
+          v-else-if="!type"
+          class="mt-4 space-y-6 transition-opacity"
+          :class="[overviewRevealClass, { 'pointer-events-none opacity-60': refetching }]"
+          :inert="refetching"
+        >
           <p v-if="!groups.length" class="py-12 text-center text-gray-500">{{ $t('search.no_results') }}</p>
           <section v-for="group in groups" :key="group.type">
             <h2 class="flex items-center justify-between text-sm font-semibold text-gray-700">
@@ -56,8 +62,15 @@
 
         <!-- 单一类型：分页 -->
         <div v-else class="mt-4">
+          <CommonLoadError v-if="failed" class="mb-4" @retry="refreshPaged()" />
           <p v-if="!results.length" class="py-12 text-center text-gray-500">{{ $t('search.no_results') }}</p>
-          <ul v-else class="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+          <ul
+            v-else
+            :key="pagedRevealKey"
+            class="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white transition-opacity"
+            :class="[pagedRevealClass, { 'pointer-events-none opacity-60': refetching }]"
+            :inert="refetching"
+          >
             <li v-for="item in results" :key="item.id" class="hover:bg-gray-50"><SearchResultItem :result="item" /></li>
           </ul>
           <CommonPagination
@@ -65,7 +78,7 @@
             class="mt-6"
             :page="paged.pagination.current_page"
             :total-pages="paged.pagination.last_page"
-            :disabled="pending"
+            :disabled="refetching"
             @update:page="goToPage"
           />
         </div>
@@ -101,19 +114,28 @@ const apply = () => {
 }
 const goToPage = (value: number) => router.push({ query: { ...route.query, page: value > 1 ? value : undefined } })
 
-// The overview is kept while a type is open, so the tabs keep their counts.
-const { data: overview, pending: overviewPending, error: overviewError } = await useAsyncData('search-overview',
-  () => searchable(q.value)
-    ? $api<SearchGroupsResponse>('/v1/search', { query: { q: q.value, limit: 5, include_pending: includePending.value ? 1 : 0 } })
-    : Promise.resolve(null),
-  { watch: [q, includePending] })
-const { data: paged, pending: pagedPending, error: pagedError } = await useAsyncData('search-page',
-  () => type.value && searchable(q.value)
-    ? $api<SearchPageResponse>('/v1/search', { query: { q: q.value, type: type.value, page: page.value, include_pending: includePending.value ? 1 : 0 } })
-    : Promise.resolve(null),
-  { watch: [q, type, page, includePending] })
+// The overview is kept while a type is open, so the tabs keep their counts. The type page isn't awaited:
+// the server loads both at once.
+const {
+  data: overview, status: overviewStatus, error: overviewError, loading: overviewLoading,
+  refetching: overviewRefetching, revealClass: overviewRevealClass,
+} = await usePageData(() => `search-overview-${JSON.stringify([q.value, includePending.value])}`,
+  ({ signal, background }) => searchable(q.value)
+    ? $api<SearchGroupsResponse>('/v1/search', { query: { q: q.value, limit: 5, include_pending: includePending.value ? 1 : 0 }, signal, progress: !background })
+    : Promise.resolve(null))
+const {
+  data: paged, status: pagedStatus, error: pagedError, refresh: refreshPaged, loading: pagedLoading,
+  refetching: pagedRefetching, revealKey: pagedRevealKey, revealClass: pagedRevealClass,
+} = usePageData(() => `search-page-${JSON.stringify([q.value, type.value, page.value, includePending.value])}`,
+  ({ signal, background }) => type.value && searchable(q.value)
+    ? $api<SearchPageResponse>('/v1/search', { query: { q: q.value, type: type.value, page: page.value, include_pending: includePending.value ? 1 : 0 }, signal, progress: !background })
+    : Promise.resolve(null))
 
-const pending = computed(() => type.value ? pagedPending.value : overviewPending.value)
+/** The part on screen: the overview, or one type's page. */
+const shown = computed(() => type.value ? paged.value : overview.value)
+const loading = computed(() => type.value ? pagedLoading.value : overviewLoading.value)
+const refetching = computed(() => type.value ? pagedRefetching.value : overviewRefetching.value)
+const failed = computed(() => (type.value ? pagedStatus.value : overviewStatus.value) === 'error')
 const error = computed(() => type.value ? pagedError.value : overviewError.value)
 const groups = computed(() => (overview.value?.groups ?? []).filter(group => group.items.length))
 const results = computed(() => paged.value?.results ?? [])

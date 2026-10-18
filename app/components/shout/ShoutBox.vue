@@ -57,7 +57,16 @@
         </div>
       </li>
     </ul>
-    <p v-else-if="!pending" class="px-5 py-6 text-center text-sm text-gray-400">{{ $t('shouts.empty') }}</p>
+    <SkeletonStatus v-else-if="pending" class="divide-y divide-gray-50">
+      <div v-for="row in 2" :key="row" class="flex gap-3 px-5 py-3">
+        <div class="skeleton size-8 shrink-0 rounded-full" />
+        <div class="flex-1 space-y-2 pt-0.5">
+          <div class="skeleton h-2.5 w-28 rounded-full" />
+          <div class="skeleton h-3 rounded-full" :class="row === 1 ? 'w-3/4' : 'w-1/2'" />
+        </div>
+      </div>
+    </SkeletonStatus>
+    <p v-else class="px-5 py-6 text-center text-sm text-gray-400">{{ $t('shouts.empty') }}</p>
 
     <div v-if="page < lastPage" class="border-t border-gray-50 px-5 py-2 text-center">
       <button type="button" class="btn btn-ghost btn-xs" :disabled="pending" @click="loadMore">{{ $t('shouts.more') }}</button>
@@ -103,7 +112,8 @@ const mine = ref<Shout | null>(null)
 const total = ref(0)
 const page = ref(1)
 const lastPage = ref(1)
-const pending = ref(false)
+// True until the first page is in, so the empty note doesn't flash first.
+const pending = ref(true)
 
 const load = async (at = 1) => {
   pending.value = true
@@ -119,7 +129,9 @@ const load = async (at = 1) => {
   }
 }
 const loadMore = () => load(page.value + 1)
-onMounted(() => load())
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) load()
+else onMounted(() => load())
 
 const draft = ref('')
 const editing = ref(false)

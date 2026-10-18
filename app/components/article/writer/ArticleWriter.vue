@@ -240,7 +240,13 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       </div>
     </header>
 
-    <div v-if="loading" class="grid flex-1 place-items-center"><Loader2 :size="24" class="animate-spin text-slate-300" /></div>
+    <SkeletonStatus v-if="loading" page class="mx-auto w-full max-w-3xl flex-1 space-y-4 px-6 py-10">
+      <div class="skeleton h-9 w-2/3 rounded-md" />
+      <div class="skeleton h-4 w-1/3 rounded-full" />
+      <div class="space-y-2.5 pt-4">
+        <div v-for="line in 6" :key="line" class="skeleton h-3.5 rounded-full" :class="line === 6 ? 'w-1/2' : 'w-full'" />
+      </div>
+    </SkeletonStatus>
     <div v-else-if="loadError" class="grid flex-1 place-items-center p-6 text-center">
       <div>
         <AlertTriangle :size="28" class="mx-auto text-amber-500" />

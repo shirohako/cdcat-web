@@ -38,7 +38,7 @@ const { t } = useI18n()
 const { localizedContent, formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
-const { data: series, pending, error } = await useAPI<EventSeriesDetail>(`/v1/event-series/${seriesId}`)
+const { data: series, status, error, revealClass } = await usePageAPI<EventSeriesDetail>(`/v1/event-series/${seriesId}`)
 
 // 24 fills whole rows in every grid (2/3/4 portrait columns, 1/2/3 landscape).
 const PER_PAGE = 24
@@ -55,7 +55,16 @@ const sort = computed<SortKey>({
   get: () => (sortKeys as string[]).includes(String(route.query.sort)) ? route.query.sort as SortKey : 'newest',
   set: value => { router.push({ query: { ...route.query, sort: value === 'newest' ? undefined : value, page: undefined } }) },
 })
-const { data: eventPage, pending: eventsPending, error: eventsError } = await useAPI<SeriesEventPage>('/v1/events', {
+// Not awaited: on the server it loads alongside the series rather than after it.
+const {
+  data: eventPage,
+  status: eventsStatus,
+  error: eventsError,
+  loading: eventsLoading,
+  refetching: eventsRefetching,
+  revealKey: eventsRevealKey,
+  revealClass: eventsRevealClass,
+} = usePageAPI<SeriesEventPage>('/v1/events', {
   query: computed(() => ({ series_id: seriesId, page: page.value, per_page: PER_PAGE, ...SORTS[sort.value] })),
 })
 const events = computed(() => eventPage.value?.events ?? [])
@@ -96,18 +105,10 @@ useHead({
         {{ t('collection_pages.events.back') }}
       </NuxtLink>
 
-      <CollectionLoadingSkeleton v-if="pending" />
-
-      <div v-else-if="error || !series" class="flex min-h-60 items-center justify-center">
-        <div class="alert alert-error max-w-md">
-          <span>{{ error?.statusCode === 404 || !series ? t('collection_pages.events.not_found') : localizeError(error) }}</span>
-        </div>
-      </div>
-
-      <template v-else>
+      <div v-if="series" class="space-y-6" :class="revealClass">
         <section class="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:flex-row md:p-8">
           <div class="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-gray-50 md:w-80 lg:w-96">
-            <img v-if="series.banner_url" :src="series.banner_url" :alt="series.name" class="h-full w-full object-contain">
+            <img v-if="series.banner_url" v-img-fade :src="series.banner_url" :alt="series.name" class="h-full w-full object-contain">
             <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-br from-amber-50 to-gray-100">
               <CalendarDays class="h-12 w-12 text-amber-300" />
             </div>
@@ -142,22 +143,27 @@ useHead({
           </label>
         </div>
 
-        <div v-if="eventsError" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+        <div v-if="eventsStatus === 'error'" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
           {{ localizeError(eventsError) }}
         </div>
 
-        <div v-else-if="!eventsPending && events.length === 0" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
-          {{ t('collection_pages.events.empty') }}
-        </div>
+        <CollectionLoadingSkeleton v-if="eventsLoading" variant="events" :portrait="!landscape" />
 
-        <div v-else ref="eventsList" class="grid scroll-mt-6 gap-4 transition-opacity" :class="[gridClass, { 'opacity-60': eventsPending }]">
+        <div
+          v-else-if="events.length"
+          ref="eventsList"
+          :key="eventsRevealKey"
+          class="grid scroll-mt-6 gap-4 transition-opacity"
+          :class="[gridClass, eventsRevealClass, { 'pointer-events-none opacity-60': eventsRefetching }]"
+          :inert="eventsRefetching"
+        >
           <div
             v-for="event in events"
             :key="event.id"
             class="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white"
           >
             <div class="bg-gray-50" :style="{ aspectRatio: visualRatio }">
-              <img v-if="event.main_visual_url" :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
+              <img v-if="event.main_visual_url" v-img-fade :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
               <div v-else class="flex h-full w-full items-center justify-center">
                 <CalendarDays class="h-10 w-10 text-gray-300" />
               </div>
@@ -192,8 +198,23 @@ useHead({
           </div>
         </div>
 
-        <CommonPagination :page="page" :total-pages="lastPage" :disabled="eventsPending" @update:page="goToPage" />
-      </template>
+        <div v-else-if="eventsStatus !== 'error'" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+          {{ t('collection_pages.events.empty') }}
+        </div>
+
+        <CommonPagination :page="page" :total-pages="lastPage" :disabled="eventsRefetching" @update:page="goToPage" />
+      </div>
+
+      <div v-else-if="status === 'error'" class="flex min-h-60 items-center justify-center">
+        <div class="alert alert-error max-w-md">
+          <span>{{ error?.statusCode === 404 ? t('collection_pages.events.not_found') : localizeError(error) }}</span>
+        </div>
+      </div>
+
+      <div v-else class="space-y-6">
+        <SkeletonCatalogDetail hero="series" :sections="0" />
+        <CollectionLoadingSkeleton variant="events" portrait />
+      </div>
     </div>
   </div>
 </template>

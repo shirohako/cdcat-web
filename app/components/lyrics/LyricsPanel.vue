@@ -1,7 +1,13 @@
 <template>
   <div>
-    <div v-if="pending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
-    <p v-else-if="error" class="py-6 text-center text-sm text-error">{{ localizeError(error) }}</p>
+    <SkeletonStatus v-if="loading" class="space-y-3 py-2">
+      <div class="flex gap-2">
+        <div class="skeleton h-6 w-16 rounded-md" />
+        <div class="skeleton h-6 w-20 rounded-md" />
+      </div>
+      <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
+    </SkeletonStatus>
+    <p v-else-if="status === 'error' && !data" class="py-6 text-center text-sm text-error">{{ localizeError(error) }}</p>
 
     <template v-else-if="editing">
       <LyricsForm
@@ -85,7 +91,8 @@ const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
 const { toast, showToast } = useToast()
 
-const { data, pending, error, refresh } = useAsyncData(`work:${props.workId}:lyrics`, () => $api<{ lyrics: LyricSummary[] }>(`/v1/works/${props.workId}/lyrics`))
+const { data, status, error, loading, refresh } = usePageData(`work:${props.workId}:lyrics`,
+  ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/works/${props.workId}/lyrics`, { signal, progress: !background }))
 const kindOrder = { original: 0, transliteration: 1, translation: 2 } as const
 const lyrics = computed(() => [...(data.value?.lyrics ?? [])].sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.language.localeCompare(b.language)))
 const originals = computed(() => lyrics.value.filter(lyric => lyric.kind === 'original'))

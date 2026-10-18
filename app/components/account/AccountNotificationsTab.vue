@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bell, Loader2 } from '@lucide/vue'
+import { Bell } from '@lucide/vue'
 
 /** Notification switches. Discussions add the first one: whether reactions to your posts notify you. */
 const { t } = useI18n()
@@ -11,7 +11,7 @@ const saving = ref(false)
 const message = ref('')
 const failed = ref(false)
 
-onMounted(async () => {
+async function load() {
   try {
     const settings = await $api<{ notification_preferences?: { reactions?: boolean } }>('/v1/me/settings')
     reactions.value = settings.notification_preferences?.reactions ?? true
@@ -23,7 +23,10 @@ onMounted(async () => {
   finally {
     loading.value = false
   }
-})
+}
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) load()
+else onMounted(load)
 
 async function toggle() {
   saving.value = true
@@ -53,7 +56,14 @@ async function toggle() {
         <p class="mt-1 text-sm text-gray-500">{{ t('account_pages.notifications.description') }}</p>
       </div>
       <div class="p-6">
-        <div v-if="loading" class="flex justify-center py-6"><Loader2 :size="18" class="animate-spin text-gray-400" /></div>
+        <SkeletonStatus v-if="loading" class="flex items-start gap-4">
+          <div class="skeleton size-10 shrink-0 rounded-xl" />
+          <div class="flex-1 space-y-2">
+            <div class="skeleton h-3.5 w-1/3 rounded-full" />
+            <div class="skeleton h-3 w-2/3 rounded-full" />
+          </div>
+          <div class="skeleton h-6 w-11 shrink-0 rounded-full" />
+        </SkeletonStatus>
         <div v-else class="flex items-start gap-4">
           <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-50"><Bell :size="18" class="text-blue-500" /></div>
           <div class="min-w-0 flex-1">

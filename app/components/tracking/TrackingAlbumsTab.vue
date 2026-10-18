@@ -1,9 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 md:p-8">
-    <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
-    </div>
+    <!-- Loading State: until there is something to show -->
+    <SkeletonRows v-if="isLoading && !albums.length" page :count="5" thumb="square" cards />
 
     <!-- Empty State -->
     <div v-else-if="albums.length === 0" class="flex flex-col items-center justify-center py-16">
@@ -17,7 +15,7 @@
     </div>
 
     <!-- Albums List -->
-    <div v-else>
+    <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': isLoading }" :inert="isLoading">
       <div class="mb-4 space-y-3 sm:mb-5 sm:space-y-4">
         <div
           v-for="album in albums"
@@ -153,7 +151,8 @@ const { getTrackingAlbums, setAlbumTracking, deleteAlbumTracking } = useTracking
 const { t } = useI18n()
 
 const albums = ref<TrackingAlbum[]>([])
-const isLoading = ref(false)
+// True from the start, so the empty state doesn't show before the first load.
+const isLoading = ref(true)
 const currentPage = ref(1)
 const pageSize = ref(12)
 const total = ref(0)
@@ -274,11 +273,13 @@ watch(
   }
 )
 
-onMounted(() => {
-  loadAlbums()
-})
-
+// First load: at once on client-side navigation, after hydration on a server-rendered page. Then again each
+// time KeepAlive shows this tab again; its first activation is the mount itself.
+if (import.meta.client && !useNuxtApp().isHydrating) loadAlbums()
+else onMounted(loadAlbums)
+let activated = false
 onActivated(() => {
-  loadAlbums()
+  if (activated) loadAlbums()
+  activated = true
 })
 </script>

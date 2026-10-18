@@ -8,7 +8,7 @@
       </div>
 
       <!-- Stats Cards -->
-      <div v-if="!statsLoading" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <div v-if="statsLoaded" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <button
           v-for="card in statCards"
           :key="card.status"
@@ -27,17 +27,17 @@
       </div>
 
       <!-- Loading Stats -->
-      <div v-else class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+      <SkeletonStatus v-else class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <div v-for="i in 5" :key="i" class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <div class="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-              <div class="h-9 w-10 bg-gray-200 rounded animate-pulse mt-3"></div>
+              <div class="skeleton h-4 w-16 rounded" />
+              <div class="skeleton mt-3 h-9 w-10 rounded" />
             </div>
-            <div class="w-12 h-12 bg-gray-100 rounded-full animate-pulse"></div>
+            <div class="skeleton size-12 rounded-full" />
           </div>
         </div>
-      </div>
+      </SkeletonStatus>
 
       <!-- Tabs + Content Card -->
       <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
@@ -96,7 +96,8 @@ const stats = ref<TrackingStats>({
   total: 0
 })
 
-const statsLoading = ref(false)
+/** The cards show once the numbers are in; later reloads (after a status change) update them in place. */
+const statsLoaded = ref(false)
 
 const tabs: { status: TrackingStatus; label: string; icon: string }[] = [
   { status: 'plan_to_listen', label: t('tracking.tab.plan_to_listen'), icon: 'lucide:headphones' },
@@ -115,17 +116,16 @@ const statCards = [
 ]
 
 const loadStats = async () => {
-  statsLoading.value = true
   try {
     stats.value = await getTrackingStats()
   } catch (error) {
     console.error('Failed to load tracking stats:', error)
   } finally {
-    statsLoading.value = false
+    statsLoaded.value = true
   }
 }
 
-onMounted(() => {
-  loadStats()
-})
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) loadStats()
+else onMounted(loadStats)
 </script>

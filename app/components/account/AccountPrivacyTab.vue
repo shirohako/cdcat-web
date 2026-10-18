@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2, UserX } from '@lucide/vue'
+import { UserX } from '@lucide/vue'
 import type { UserSummary } from '~/types/article'
 
 /**
@@ -29,7 +29,9 @@ async function load() {
     loading.value = false
   }
 }
-onMounted(load)
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) load()
+else onMounted(load)
 
 async function run(request: () => Promise<unknown>, done: string) {
   busy.value = true
@@ -70,7 +72,7 @@ const unblock = (user: UserSummary) => run(() => $api(`/v1/me/blocks/${encodeURI
           <button type="submit" class="btn btn-sm" :disabled="busy || !username.trim()">{{ t('account_pages.privacy.block') }}</button>
         </form>
         <p v-if="message" class="text-sm" :class="failed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ message }}</p>
-        <div v-if="loading" class="flex justify-center py-6"><Loader2 :size="18" class="animate-spin text-gray-400" /></div>
+        <SkeletonRows v-if="loading" :count="3" thumb="round" />
         <ul v-else-if="blocks.length" class="divide-y divide-gray-100 rounded-xl border border-gray-100">
           <li v-for="item in blocks" :key="item.user?.id" class="flex items-center gap-3 px-4 py-2.5">
             <DiscussionAvatar :user="item.user" size="sm" />

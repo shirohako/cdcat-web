@@ -16,7 +16,7 @@ const date = computed(() => props.article.published_at ? new Intl.DateTimeFormat
   <NuxtLink :to="href" class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
     <div class="relative aspect-video overflow-hidden bg-gray-50">
       <img
-        v-if="article.cover_url" :src="article.cover_url" :alt="article.title" loading="lazy" referrerpolicy="no-referrer"
+        v-if="article.cover_url" v-img-fade :src="article.cover_url" :alt="article.title" loading="lazy" referrerpolicy="no-referrer"
         class="size-full object-cover transition-transform duration-500 group-hover:scale-105">
       <div v-else class="grid size-full place-items-center"><ImageIcon :size="28" class="text-gray-200" /></div>
       <span v-if="article.type" class="absolute left-2.5 top-2.5 rounded-md bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur">

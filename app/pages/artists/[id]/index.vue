@@ -8,17 +8,12 @@
         </div>
         <div class="relative h-11 bg-white md:h-13">
           <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-sm ring-1 ring-slate-200 md:left-6">
-            <img v-if="artist?.image_url" :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
+            <img v-if="artist?.image_url" v-img-fade :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
             <div v-else class="flex h-full w-full items-center justify-center text-slate-300"><Users class="h-7 w-7 md:h-9 md:w-9" /></div>
           </div>
         </div>
         <div class="p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
-          <div v-if="pending" class="animate-pulse">
-            <div class="h-7 w-48 rounded bg-slate-200" />
-            <div class="mt-3 h-3 w-full max-w-xl rounded bg-slate-100" />
-          </div>
-          <div v-else-if="error || !artist" class="flex min-h-28 items-center justify-center text-sm text-slate-500">{{ $t('common.load_failed') }}</div>
-          <div v-else class="flex flex-col gap-4 sm:flex-row sm:items-start">
+          <div v-if="artist" class="flex flex-col gap-4 sm:flex-row sm:items-start" :class="revealClass">
             <div class="min-w-0 flex-1">
               <h1 class="flex flex-wrap items-center gap-2 text-lg font-bold tracking-tight text-slate-950 md:text-xl">
                 {{ shownName }}
@@ -52,11 +47,20 @@
               </NuxtLink>
             </div>
           </div>
+          <div v-else-if="status === 'error'" class="flex min-h-28 items-center justify-center text-sm text-slate-500">{{ $t('common.load_failed') }}</div>
+          <SkeletonStatus v-else page>
+            <div class="skeleton h-7 w-48 rounded" />
+            <div class="skeleton mt-3 h-3 w-full max-w-xl rounded" />
+            <div class="mt-4 flex gap-5">
+              <div class="skeleton h-4 w-24 rounded-full" />
+              <div class="skeleton h-4 w-20 rounded-full" />
+            </div>
+          </SkeletonStatus>
         </div>
       </div>
     </section>
 
-    <main v-if="artist" class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 lg:grid-cols-3 2xl:max-w-7xl">
+    <main v-if="artist" class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 lg:grid-cols-3 2xl:max-w-7xl" :class="revealClass">
       <div class="space-y-6 lg:col-span-2">
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
           <header class="flex flex-wrap items-center gap-2 border-b border-slate-100 px-4 py-3 sm:px-6">
@@ -72,15 +76,21 @@
             >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
           </header>
           <div class="min-h-60 p-4 sm:p-6">
-            <div v-if="albumsPending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
-            <div v-else-if="albums.length" class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
+            <CollectionLoadingSkeleton v-if="albumsLoading" grid-class="grid-cols-2 gap-5 sm:grid-cols-3 md:gap-6 lg:grid-cols-4" :count="8" />
+            <div
+              v-else-if="albums.length"
+              :key="albumsRevealKey"
+              class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 md:gap-6 lg:grid-cols-4"
+              :class="[albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
+              :inert="albumsRefetching"
+            >
               <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
             </div>
             <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
               <Disc3 :size="26" class="text-slate-300" />
               <p class="mt-3 text-sm font-medium text-slate-600">{{ $t('artists.detail.no_releases') }}</p>
             </div>
-            <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsPending" @update:page="albumPage = $event" />
+            <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsRefetching" @update:page="albumPage = $event" />
           </div>
         </section>
 
@@ -124,6 +134,9 @@
         <AlbumLinks :links="artist.links ?? []" />
       </aside>
     </main>
+    <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
+      <SkeletonCatalogDetail hero="none" :sections="2" />
+    </div>
   </div>
 </template>
 
@@ -134,6 +147,7 @@ import { Disc3, Edit, History, Info, Library, Network, UserCheck, UserPlus, User
 import { artistPageConfig } from '~/config/artistPage'
 
 const route = useRoute()
+const router = useRouter()
 const { $api } = useNuxtApp()
 const { t } = useI18n()
 const { isAuthenticated } = useAuth()
@@ -142,7 +156,7 @@ const { localName, enumLabel } = useCatalogDisplay()
 const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)
-const { data: artist, pending, error } = await useAPI<ArtistDetail>(`/v1/artists/${artistId}`)
+const { data: artist, status, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`)
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
@@ -154,20 +168,29 @@ const pageCssVariables = {
   '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
 }
 
-// Discography: every album, as album artist, or by credited role.
-const role = ref<string | null>(null)
-const albumPage = ref(1)
-const { data: albumData, pending: albumsPending } = useAsyncData(
+// Discography: every album, as album artist, or by credited role. Role and page live in the URL (?role=, ?page=).
+const role = computed(() => route.query.role ? String(route.query.role) : null)
+const albumPage = useQueryPage()
+const {
+  data: albumData,
+  loading: albumsLoading,
+  refetching: albumsRefetching,
+  revealKey: albumsRevealKey,
+  revealClass: albumsRevealClass,
+} = usePageData(
   () => `artist:${artistId}:albums:${role.value ?? 'all'}:${albumPage.value}`,
-  () => $api<{ albums: AlbumSimple[], pagination: { last_page: number }, roles: Record<string, number> }>(`/v1/artists/${artistId}/albums`, {
+  ({ signal, background }) => $api<{ albums: AlbumSimple[], pagination: { last_page: number }, roles: Record<string, number> }>(`/v1/artists/${artistId}/albums`, {
     params: { page: albumPage.value, ...(role.value ? { role: role.value } : {}) },
+    signal,
+    progress: !background,
   }),
-  { watch: [role, albumPage] },
 )
 const albums = computed(() => albumData.value?.albums ?? [])
 const albumLastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
-const roleCounts = ref<Record<string, number>>({})
-watch(() => albumData.value?.roles, (roles) => { if (roles) roleCounts.value = roles }, { immediate: true })
+// The tabs keep the last known counts while another role's list loads.
+const lastRoles = shallowRef<Record<string, number>>({})
+watch(() => albumData.value?.roles, (roles) => { if (roles) lastRoles.value = roles })
+const roleCounts = computed(() => albumData.value?.roles ?? lastRoles.value)
 const roleTabs = computed(() => [
   { role: null, label: t('common.all'), count: artist.value?.albums_count ?? 0 },
   ...Object.entries(roleCounts.value)
@@ -176,11 +199,10 @@ const roleTabs = computed(() => [
     .map(([key, count]) => ({ role: key, label: key === 'artist' ? t('artists.detail.as_artist') : roleName(key), count })),
 ])
 const selectRole = (value: string | null) => {
-  role.value = value
-  albumPage.value = 1
+  router.push({ query: { ...route.query, role: value ?? undefined, page: undefined } })
 }
 
-const isFavorited = ref(artist.value?.is_favorited ?? false)
+const isFavorited = computed(() => artist.value?.is_favorited ?? false)
 const isToggling = ref(false)
 const toggleFollow = async () => {
   if (!isAuthenticated.value) {
@@ -190,7 +212,8 @@ const toggleFollow = async () => {
   if (isToggling.value) return
   isToggling.value = true
   try {
-    isFavorited.value = (await setFavorite('artists', artistId, !isFavorited.value)).favorited
+    const { favorited } = await setFavorite('artists', artistId, !isFavorited.value)
+    mutate(current => ({ ...current, is_favorited: favorited }))
   } finally {
     isToggling.value = false
   }

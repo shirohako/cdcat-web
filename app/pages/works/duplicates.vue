@@ -7,11 +7,12 @@
         <p class="mt-1 max-w-3xl text-sm text-gray-500">{{ $t('works.duplicates.hint') }}</p>
       </header>
 
-      <div v-if="pending" class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
-      <p v-else-if="error" class="alert alert-error">{{ localizeError(error) }}</p>
+      <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
+      <SkeletonRows v-if="loading" page cards :count="4" />
+      <p v-else-if="status === 'error' && !data" class="alert alert-error">{{ localizeError(error) }}</p>
       <p v-else-if="!groups.length" class="rounded-xl border border-dashed border-gray-300 px-6 py-14 text-center text-sm text-gray-500">{{ $t('works.duplicates.empty') }}</p>
 
-      <ul v-else class="space-y-4">
+      <ul v-else class="space-y-4 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
         <li v-for="group in groups" :key="group.title_key" class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
           <p class="border-b border-gray-100 bg-gray-50 px-4 py-2 font-mono text-[11px] text-gray-400">{{ group.title_key }}</p>
           <ul class="divide-y divide-gray-100">
@@ -39,7 +40,7 @@
         </li>
       </ul>
 
-      <CommonPagination v-if="lastPage > 1" class="mt-6" :page="page" :total-pages="lastPage" :disabled="pending" @update:page="page = $event" />
+      <CommonPagination v-if="lastPage > 1" class="mt-6" :page="page" :total-pages="lastPage" :disabled="refetching" @update:page="page = $event" />
       <p v-if="message" class="mt-4 text-sm text-error">{{ message }}</p>
     </div>
   </div>
@@ -62,9 +63,12 @@ const { hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 
 const page = ref(1)
-const { data, pending, error, refresh } = await useAsyncData('works:duplicates', () => $api<{ groups: DuplicateGroup[], pagination: { last_page: number } }>('/v1/works/duplicates', {
-  query: { page: page.value, per_page: 20 },
-}), { watch: [page], server: false })
+// A work queue: always fetched fresh, and only in the browser.
+const { data, status, error, refresh, loading, refetching } = await usePageData(() => `works:duplicates-${page.value}`,
+  ({ signal }) => $api<{ groups: DuplicateGroup[], pagination: { last_page: number } }>('/v1/works/duplicates', {
+    query: { page: page.value, per_page: 20 },
+    signal,
+  }), { cache: false, server: false })
 const groups = computed(() => data.value?.groups ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
 const canDismiss = computed(() => hasPermission('content.submit'))

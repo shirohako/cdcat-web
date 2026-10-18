@@ -46,14 +46,15 @@
         >{{ value === 'all' ? $t('revision_page.all') : $t(`revision_page.status.${value}`) }}</button>
       </nav>
 
-      <div v-if="pending" class="flex min-h-60 items-center justify-center"><span class="loading loading-spinner" /></div>
-      <p v-else-if="error" class="alert alert-error">{{ localizeError(error) }}</p>
+      <CommonLoadError v-if="loadStatus === 'error' && data" class="mb-4" @retry="refresh()" />
+      <SkeletonRows v-if="loading" page cards :count="4" />
+      <p v-else-if="loadStatus === 'error' && !data" class="alert alert-error">{{ localizeError(error) }}</p>
       <div v-else-if="!revisions.length" class="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center">
         <GitPullRequest :size="28" class="mx-auto mb-3 text-gray-300" />
         <p class="text-sm text-gray-500">{{ $t('revision_page.empty') }}</p>
       </div>
 
-      <ul v-else class="space-y-3">
+      <ul v-else class="space-y-3 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
         <li v-for="revision in revisions" :key="revision.id" class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
           <div class="flex flex-wrap items-start gap-3">
             <div class="min-w-0 flex-1">
@@ -80,7 +81,7 @@
         </li>
       </ul>
 
-      <div v-if="lastPage > 1" class="mt-6"><CommonPagination v-model:page="page" :total-pages="lastPage" :disabled="pending" /></div>
+      <div v-if="lastPage > 1" class="mt-6"><CommonPagination v-model:page="page" :total-pages="lastPage" :disabled="refetching" /></div>
       <p v-if="message" class="mt-4 text-sm text-error">{{ message }}</p>
     </div>
   </div>
@@ -125,9 +126,15 @@ const setStatus = (value: typeof FILTERS[number]) => {
   router.replace({ query: { ...route.query, status: value === 'all' ? undefined : value, page: undefined } })
 }
 
-const { data, pending, error, refresh } = await useAsyncData('me:revisions', () => $api<{ revisions: Revision[], pagination: { last_page: number } }>('/v1/me/revisions', {
-  query: { status: status.value === 'all' ? undefined : status.value, page: page.value, per_page: 20 },
-}), { watch: [status, page], server: false })
+// The reader's own revisions: always fetched fresh, and only in the browser.
+const { data, status: loadStatus, error, refresh, loading, refetching } = await usePageData(
+  () => `me:revisions-${status.value}-${page.value}`,
+  ({ signal }) => $api<{ revisions: Revision[], pagination: { last_page: number } }>('/v1/me/revisions', {
+    query: { status: status.value === 'all' ? undefined : status.value, page: page.value, per_page: 20 },
+    signal,
+  }),
+  { cache: false, server: false },
+)
 
 const revisions = computed(() => data.value?.revisions ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)

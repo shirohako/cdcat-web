@@ -16,8 +16,7 @@ watch(search, (value) => { searchInput.value = value })
 
 // Top-level series only, unless searching (then sub-series match too).
 const { includePending, setIncludePending } = usePendingToggle()
-const { data, pending, error } = useAPI<{ franchises: FranchiseSummary[], pagination: Pagination }>('/v1/franchises', {
-  lazy: true,
+const { data, status, refresh, loading, refetching, revealKey, revealClass } = usePageAPI<{ franchises: FranchiseSummary[], pagination: Pagination }>('/v1/franchises', {
   query: computed(() => ({
     page: currentPage.value,
     per_page: 24,
@@ -67,13 +66,15 @@ const goToPage = (page: number) => {
         </form>
       </template>
 
-      <CollectionLoadingSkeleton v-if="pending" variant="wide" />
+      <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
 
-      <div v-else-if="error" class="flex min-h-72 items-center justify-center text-sm text-red-600">
+      <CollectionLoadingSkeleton v-if="loading" variant="wide" />
+
+      <div v-else-if="status === 'error' && !data" class="flex min-h-72 items-center justify-center text-sm text-red-600">
         {{ $t('common.load_failed') }}
       </div>
 
-      <div v-else class="collection-content-enter">
+      <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
         <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
           <NuxtLink
             v-for="series in seriesList"
@@ -82,7 +83,7 @@ const goToPage = (page: number) => {
             class="group block overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
           >
             <div class="relative aspect-video overflow-hidden bg-gray-100">
-              <img v-if="series.image_url" :src="series.image_url" :alt="displayName(series)" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" >
+              <img v-if="series.image_url" v-img-fade :src="series.image_url" :alt="displayName(series)" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" >
               <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-br from-emerald-50 to-gray-100">
                 <Boxes class="h-12 w-12 text-emerald-300" />
               </div>
@@ -110,7 +111,7 @@ const goToPage = (page: number) => {
           class="mt-6"
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
-          :disabled="pending"
+          :disabled="refetching"
           @update:page="goToPage"
         />
       </div>

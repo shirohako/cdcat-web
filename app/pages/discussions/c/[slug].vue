@@ -9,7 +9,7 @@ const { isAuthenticated } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { categoryName, categoryDescription } = useDiscussionCategories()
 const slug = computed(() => String(route.params.slug))
-const { data: category, error } = await useAPI<DiscussionCategoryDetail>(() => `/v1/discussions/categories/${slug.value}`, { watch: [slug] })
+const { data: category, status, error, revealClass } = await usePageAPI<DiscussionCategoryDetail>(() => `/v1/discussions/categories/${slug.value}`)
 const tone = computed(() => categoryTone(category.value?.color))
 const level = ref<NotificationLevel | null>(null)
 watch(category, (value) => { level.value = value?.notification_level ?? null }, { immediate: true })
@@ -25,11 +25,12 @@ useSeoMeta({
 <template>
   <div class="relative min-h-[calc(100vh-4rem)] bg-slate-50/60">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
-      <div v-if="error" class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">{{ localizeError(error) }}</div>
-      <div v-else-if="category" class="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <DiscussionSidebar class="lg:sticky lg:top-20 lg:w-64 lg:shrink-0" :active-slug="category.slug" :new-topic-query="newTopic" />
+      <div v-if="status === 'error' && !category" class="rounded-2xl border border-slate-200 bg-white p-10 text-center text-sm text-slate-500">{{ localizeError(error) }}</div>
+      <!-- The sidebar and the topics don't need the category first: they render and load right away. -->
+      <div v-else class="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <DiscussionSidebar class="lg:sticky lg:top-20 lg:w-64 lg:shrink-0" :active-slug="category?.slug ?? slug" :new-topic-query="newTopic" />
         <main class="min-w-0 flex-1 space-y-5">
-          <header class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
+          <header v-if="category" class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white" :class="revealClass">
             <div class="h-1.5" :class="tone.dot" />
             <div class="flex flex-wrap items-start gap-4 p-5">
               <div class="min-w-0 flex-1">
@@ -68,7 +69,15 @@ useSeoMeta({
               </NuxtLink>
             </div>
           </header>
-          <DiscussionListView :category="category.slug" :question="category.kind === 'question'" :show-category="category.children.length > 0" />
+          <SkeletonStatus v-else page class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white">
+            <div class="h-1.5 bg-slate-200" />
+            <div class="space-y-2.5 p-5">
+              <div class="skeleton h-7 w-48 rounded-md" />
+              <div class="skeleton h-3.5 w-2/3 rounded-full" />
+              <div class="skeleton h-3 w-24 rounded-full" />
+            </div>
+          </SkeletonStatus>
+          <DiscussionListView :category="category?.slug ?? slug" :question="category?.kind === 'question'" :show-category="(category?.children.length ?? 0) > 0" />
         </main>
       </div>
     </div>

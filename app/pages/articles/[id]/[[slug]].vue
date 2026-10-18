@@ -1,14 +1,6 @@
 <template>
   <div class="min-h-screen bg-[#f5f5f5]">
-    <div v-if="pending" class="flex min-h-screen items-center justify-center">
-      <span class="loading loading-spinner loading-lg text-violet-400" />
-    </div>
-
-    <div v-else-if="error" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-gray-500">
-      {{ localizeError(error) }}
-    </div>
-
-    <template v-else-if="article">
+    <div v-if="article" :class="revealClass">
       <ArticleHero :article="article" :word-count="article.word_count" :reading-time="readingTime" />
 
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
@@ -47,7 +39,13 @@
         {{ t('article_ui.report.done') }}
       </p>
       <DiscussionNotice />
-    </template>
+    </div>
+
+    <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-gray-500">
+      {{ localizeError(error) }}
+    </div>
+
+    <SkeletonArticle v-else />
   </div>
 </template>
 
@@ -65,7 +63,7 @@ const { typeName } = useArticleTypes()
 const config = useRuntimeConfig()
 const articleId = String(route.params.id)
 
-const { data: article, pending, error } = await useAPI<ArticleDetail>(`/v1/articles/${articleId}`)
+const { data: article, status, error, revealClass } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
 
 // Contents and anchors come from the same renderer that draws the article, so they always match.
 const tocItems = computed(() => markdownHeadings(article.value?.content ?? ''))
@@ -75,11 +73,14 @@ const reportOpen = ref(false)
 const reported = ref(false)
 watch(reported, (value) => { if (value) setTimeout(() => { reported.value = false }, 3000) })
 
-const { data: moreByAuthor } = await useAsyncData(`articles-more-${articleId}`, async () => {
-  if (!article.value?.author) return []
-  const response = await $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { user: article.value.author.username, per_page: 4 } })
+// Not awaited: it only needs the author, and the page shouldn't wait for it on the server either.
+const author = computed(() => article.value?.author?.username ?? '')
+const { data: moreData } = usePageData(() => `articles-more-${articleId}-${author.value}`, async ({ signal, background }) => {
+  if (!author.value) return []
+  const response = await $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { user: author.value, per_page: 4 }, signal, progress: !background })
   return response.articles.filter(item => item.id !== article.value?.id).slice(0, 3)
-}, { default: () => [], watch: [article] })
+})
+const moreByAuthor = computed(() => moreData.value ?? [])
 
 const canonical = computed(() => article.value && config.public.baseUrl
   ? `${String(config.public.baseUrl).replace(/\/$/, '')}/articles/${article.value.id}${article.value.slug ? `/${article.value.slug}` : ''}` : undefined)

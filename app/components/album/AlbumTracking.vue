@@ -59,6 +59,8 @@ const props = defineProps<{
   initialTracking?: { status: TrackingStatus; created_at?: string; updated_at?: string } | null
 }>()
 
+const emit = defineEmits<{ tracked: [status: TrackingStatus | null] }>()
+
 const { isAuthenticated } = useAuth()
 const { getAlbumTracking, setAlbumTracking, deleteAlbumTracking } = useTracking()
 const { t } = useI18n()
@@ -66,8 +68,11 @@ const router = useRouter()
 const route = useRoute()
 
 const loading = ref(false)
-const initialStatus = props.initialTracking?.status ?? null
-const currentStatus = ref<TrackingStatus | null>(initialStatus)
+const currentStatus = ref<TrackingStatus | null>(props.initialTracking?.status ?? null)
+// The page may swap in a fresher copy of the album after this has rendered (revisit cache).
+watch(() => props.initialTracking?.status ?? null, (status) => {
+  if (!loading.value) currentStatus.value = status
+})
 
 const statusOptions = computed(() => [
   {
@@ -147,6 +152,7 @@ const handleStatusClick = async (status: TrackingStatus) => {
   try {
     await setAlbumTracking(Number(props.albumId), status)
     currentStatus.value = status
+    emit('tracked', status)
   } catch (error) {
     console.error('Failed to update tracking status:', error)
   } finally {
@@ -161,6 +167,7 @@ const handleRemoveTracking = async () => {
   try {
     await deleteAlbumTracking(Number(props.albumId))
     currentStatus.value = null
+    emit('tracked', null)
   } catch (error) {
     console.error('Failed to remove tracking:', error)
   } finally {
@@ -168,9 +175,10 @@ const handleRemoveTracking = async () => {
   }
 }
 
-onMounted(() => {
-  fetchCurrentStatus()
-})
+// On client-side navigation start at once; after a server render, wait until hydration is done so the
+// first render matches the server's.
+if (import.meta.client && !useNuxtApp().isHydrating) fetchCurrentStatus()
+else onMounted(fetchCurrentStatus)
 
 watch(() => props.albumId, () => {
   fetchCurrentStatus()

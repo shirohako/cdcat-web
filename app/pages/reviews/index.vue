@@ -8,17 +8,17 @@
       </div>
 
       <!-- Stats Cards -->
-      <div v-if="statsLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <SkeletonStatus v-if="statsLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div v-for="i in 3" :key="i" class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <div class="h-4 w-20 bg-gray-200 rounded animate-pulse" />
-              <div class="h-9 w-12 bg-gray-200 rounded animate-pulse mt-3" />
+              <div class="skeleton h-4 w-20 rounded" />
+              <div class="skeleton mt-3 h-9 w-12 rounded" />
             </div>
-            <div class="w-12 h-12 bg-gray-100 rounded-full animate-pulse" />
+            <div class="skeleton size-12 rounded-full" />
           </div>
         </div>
-      </div>
+      </SkeletonStatus>
 
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <!-- Total Reviews -->
@@ -162,7 +162,8 @@ const { $api } = useNuxtApp()
 // State
 const reviews = ref<UserReview[]>([])
 const stats = ref<ReviewStats>({ totalReviews: 0, averageScore: 0, scoredCount: 0 })
-const isLoading = ref(false)
+// True from the start, so the empty state doesn't show before the first load.
+const isLoading = ref(true)
 const statsLoading = ref(true)
 const loadError = ref('')
 const currentPage = ref(1)
@@ -290,17 +291,17 @@ const handlePageChange = (page: number) => {
   currentPage.value = page
 }
 
-// Watch sort change -> reset page and reload
+// Watch sort change -> reset page and reload (moving back to page 1 already reloads)
 watch(sortBy, () => {
-  currentPage.value = 1
-  loadReviews()
+  if (currentPage.value !== 1) currentPage.value = 1
+  else loadReviews()
 })
 
 watch(currentPage, () => {
   loadReviews()
 })
 
-onMounted(() => {
-  loadReviews()
-})
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) loadReviews()
+else onMounted(loadReviews)
 </script>

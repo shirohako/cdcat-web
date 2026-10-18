@@ -15,7 +15,7 @@ const { t } = useI18n()
 const { formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
-const { data, pending, error } = useAPI<EventSeriesSummary[]>('/v1/event-series', { lazy: true })
+const { data, status, error, revealClass } = usePageAPI<EventSeriesSummary[]>('/v1/event-series')
 const seriesList = computed(() => Array.isArray(data.value) ? data.value : [])
 
 const latestDate = (series: EventSeriesSummary) => series.latest_start_date
@@ -41,15 +41,7 @@ useHead({
           />
         </template>
 
-        <CollectionLoadingSkeleton v-if="pending" />
-
-        <div v-else-if="error" class="flex items-center justify-center min-h-60">
-          <div class="alert alert-error max-w-md">
-            <span>{{ localizeError(error) }}</span>
-          </div>
-        </div>
-
-        <div v-else class="collection-content-enter">
+        <div v-if="data" :class="revealClass">
           <div v-if="seriesList.length === 0" class="flex min-h-72 items-center justify-center text-sm text-slate-400">
             {{ t('collection_pages.events.no_series') }}
           </div>
@@ -64,6 +56,7 @@ useHead({
               <div class="relative aspect-video overflow-hidden bg-gray-50">
                 <img
                   v-if="series.banner_url"
+                  v-img-fade
                   :src="series.banner_url"
                   :alt="series.name"
                   loading="lazy"
@@ -88,6 +81,14 @@ useHead({
             </NuxtLink>
           </div>
         </div>
+
+        <div v-else-if="status === 'error'" class="flex items-center justify-center min-h-60">
+          <div class="alert alert-error max-w-md">
+            <span>{{ localizeError(error) }}</span>
+          </div>
+        </div>
+
+        <CollectionLoadingSkeleton v-else variant="wide" />
       </CollectionPageCard>
     </div>
   </div>

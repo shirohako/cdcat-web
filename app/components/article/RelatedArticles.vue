@@ -8,13 +8,14 @@ const { t } = useI18n()
 const { typeName } = useArticleTypes()
 const { $api } = useNuxtApp()
 const { formatDate } = useLocaleFormatting()
-const { data: articles } = await useAsyncData(`related-articles-${props.type}-${props.id}`,
-  () => $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { link: `${props.type}:${props.id}`, per_page: 5 } }).then(response => response.articles),
-  { default: () => [] as ArticleCard[] })
+const { data, revealClass } = await usePageData(`related-articles-${props.type}-${props.id}`,
+  ({ signal, background }) => $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { link: `${props.type}:${props.id}`, per_page: 5 }, signal, progress: !background })
+    .then(response => response.articles))
+const articles = computed(() => data.value ?? [])
 </script>
 
 <template>
-  <section v-if="articles.length" class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
+  <section v-if="articles.length" class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm" :class="revealClass">
     <div class="flex items-center gap-2.5 border-b border-gray-100 px-5 py-3">
       <div class="grid size-8 shrink-0 place-items-center rounded-lg bg-amber-50"><FileText :size="15" class="text-amber-500" /></div>
       <h2 class="text-base font-bold text-gray-900">{{ t('article_ui.related.title') }}</h2>

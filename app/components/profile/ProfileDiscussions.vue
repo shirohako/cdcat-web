@@ -13,9 +13,8 @@ const page = ref(1)
 watch(tab, () => { page.value = 1 })
 
 type Page = { topics?: DiscussionTopicCard[], posts?: DiscussionPostSummary[], pagination: Pagination }
-const { data, pending } = await useAsyncData<Page>(() => `profile-discussions-${props.username}-${tab.value}-${page.value}`,
-  () => $api<Page>(`/v1/profiles/${props.username}/discussions/${tab.value}`, { query: { page: page.value, per_page: 10 } }),
-  { watch: [tab, page, () => props.username] })
+const { data, loading, refetching } = await usePageData<Page>(() => `profile-discussions-${props.username}-${tab.value}-${page.value}`,
+  ({ signal, background }) => $api<Page>(`/v1/profiles/${props.username}/discussions/${tab.value}`, { query: { page: page.value, per_page: 10 }, signal, progress: !background }))
 const topics = computed(() => data.value?.topics ?? [])
 const posts = computed(() => data.value?.posts ?? [])
 </script>
@@ -34,7 +33,13 @@ const posts = computed(() => data.value?.posts ?? [])
         </button>
       </nav>
     </header>
-    <div :class="pending ? 'opacity-60' : ''">
+    <SkeletonStatus v-if="loading" class="divide-y divide-gray-50">
+      <div v-for="row in 3" :key="row" class="space-y-1.5 py-2.5">
+        <div class="skeleton h-3.5 rounded-full" :class="['w-3/5', 'w-2/3', 'w-1/2'][row - 1]" />
+        <div class="skeleton h-2.5 w-1/4 rounded-full" />
+      </div>
+    </SkeletonStatus>
+    <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
       <div v-if="tab === 'topics'" class="divide-y divide-gray-50">
         <NuxtLink v-for="topic in topics" :key="topic.id" :to="`/discussions/${topic.id}`" class="group flex items-center gap-3 py-2.5">
           <div class="min-w-0 flex-1">
@@ -52,7 +57,7 @@ const posts = computed(() => data.value?.posts ?? [])
         </NuxtLink>
         <p v-if="!posts.length" class="py-6 text-center text-sm text-gray-400">{{ t('discussions.profile.no_posts') }}</p>
       </div>
-      <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-3" :total-pages="data.pagination.last_page" :disabled="pending" />
+      <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-3" :total-pages="data.pagination.last_page" :disabled="refetching" />
     </div>
   </section>
 </template>

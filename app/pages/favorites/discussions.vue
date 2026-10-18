@@ -10,8 +10,10 @@ const { localizeError } = useLocalizedApiError()
 const { ago } = useRelativeTime()
 const page = ref(1)
 type Bookmark = { id: number, created_at: string, post: DiscussionPostSummary, topic: DiscussionPostSummary['topic'] }
-const { data, pending, refresh } = await useAsyncData('favorite-discussions',
-  () => $api<{ bookmarks: Bookmark[], pagination: Pagination }>('/v1/me/discussions/bookmarks', { query: { page: page.value } }), { watch: [page] })
+// The reader's own bookmarks: always fetched fresh (no revisit cache).
+const { data, status, refresh, loading, refetching } = await usePageData(() => `favorite-discussions-${page.value}`,
+  ({ signal }) => $api<{ bookmarks: Bookmark[], pagination: Pagination }>('/v1/me/discussions/bookmarks', { query: { page: page.value }, signal }),
+  { cache: false })
 const error = ref('')
 
 async function remove(bookmark: Bookmark) {
@@ -28,7 +30,15 @@ async function remove(bookmark: Bookmark) {
 <template>
   <div class="p-4 sm:p-6">
     <p v-if="error" role="alert" class="mb-3 text-sm text-rose-600">{{ error }}</p>
-    <div v-if="data?.bookmarks.length" class="divide-y divide-gray-100" :class="pending ? 'opacity-60' : ''">
+    <CommonLoadError v-if="status === 'error'" class="mb-3" @retry="refresh()" />
+    <SkeletonStatus v-if="loading" page class="divide-y divide-gray-100">
+      <div v-for="row in 5" :key="row" class="space-y-2 py-3">
+        <div class="skeleton h-3.5 rounded-full" :class="['w-2/5', 'w-1/2', 'w-1/3', 'w-3/5', 'w-2/5'][row - 1]" />
+        <div class="skeleton h-3 w-4/5 rounded-full" />
+        <div class="skeleton h-2.5 w-1/4 rounded-full" />
+      </div>
+    </SkeletonStatus>
+    <div v-else-if="data?.bookmarks.length" class="divide-y divide-gray-100 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
       <div v-for="bookmark in data.bookmarks" :key="bookmark.id" class="flex items-start gap-3 py-3">
         <NuxtLink :to="`/discussions/${bookmark.topic?.id}?post=${bookmark.post.id}`" class="min-w-0 flex-1">
           <p class="text-sm font-semibold text-gray-800 hover:text-sky-700">{{ bookmark.topic?.title }}</p>
@@ -44,10 +54,10 @@ async function remove(bookmark: Bookmark) {
         </button>
       </div>
     </div>
-    <div v-else-if="!pending" class="flex min-h-60 flex-col items-center justify-center text-center">
+    <div v-else-if="status !== 'error'" class="flex min-h-60 flex-col items-center justify-center text-center">
       <div class="mb-3 grid size-14 place-items-center rounded-2xl bg-gray-50"><MessageCircle :size="26" class="text-gray-300" /></div>
       <p class="text-sm text-gray-400">{{ t('discussions.bookmarks.empty') }}</p>
     </div>
-    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-4" :total-pages="data.pagination.last_page" :disabled="pending" />
+    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-4" :total-pages="data.pagination.last_page" :disabled="refetching" />
   </div>
 </template>

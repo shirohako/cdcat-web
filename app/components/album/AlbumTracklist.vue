@@ -41,7 +41,7 @@
           v-for="track in disc.tracks"
           :id="`track-${track.id}`"
           :key="track.id"
-          class="group flex items-center gap-2 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-indigo-50/50 sm:gap-3 sm:px-5"
+          class="group flex scroll-mt-20 items-center gap-2 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-indigo-50/50 sm:gap-3 sm:px-5"
         >
           <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-gray-400 group-hover:text-indigo-500">{{ track.number }}</span>
 

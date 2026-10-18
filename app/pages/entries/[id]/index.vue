@@ -6,7 +6,7 @@ const route = useRoute()
 const { languageName } = useLocaleFormatting()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
 
-const { data: entry, pending, error } = await useAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
+const { data: entry, status, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
 
 useHead({ title: computed(() => entry.value ? displayName(entry.value) : '') })
 
@@ -28,26 +28,17 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
 
 <template>
   <div class="min-h-screen bg-base-100">
-    <div v-if="pending" class="flex min-h-screen items-center justify-center">
-      <span class="loading loading-spinner loading-lg" />
-    </div>
-
-    <div v-else-if="error || !entry" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
-      <Film :size="56" class="text-gray-300" />
-      <p>{{ $t('catalog.not_found') }}</p>
-    </div>
-
-    <template v-else>
+    <div v-if="entry" :class="revealClass">
       <!-- Hero -->
       <div class="relative h-96 w-full overflow-hidden bg-slate-900">
-        <img v-if="entry.banner_url || entry.image_url" :src="entry.banner_url || entry.image_url!" alt="" class="absolute inset-0 h-full w-full object-cover" :class="{ 'scale-110 opacity-40 blur-2xl': !entry.banner_url }" >
+        <img v-if="entry.banner_url || entry.image_url" v-img-fade :src="entry.banner_url || entry.image_url!" alt="" class="absolute inset-0 h-full w-full object-cover" :class="{ 'scale-110 opacity-40 blur-2xl': !entry.banner_url }" >
         <div class="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
 
         <div class="container relative z-10 mx-auto h-full max-w-6xl px-4 md:px-8 2xl:max-w-7xl">
           <div class="flex h-full items-end gap-6 pb-8">
             <div class="hidden w-40 shrink-0 sm:block md:w-48">
               <div class="aspect-2/3 overflow-hidden rounded-xl border-4 border-white/10 shadow-2xl">
-                <img v-if="entry.image_url" :src="entry.image_url" :alt="name" class="h-full w-full object-cover" >
+                <img v-if="entry.image_url" v-img-fade :src="entry.image_url" :alt="name" class="h-full w-full object-cover" >
                 <div v-else class="flex h-full w-full items-center justify-center bg-gray-700">
                   <Film :size="56" class="text-gray-500" />
                 </div>
@@ -232,6 +223,13 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
           </aside>
         </div>
       </div>
-    </template>
+    </div>
+
+    <div v-else-if="status === 'error'" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
+      <Film :size="56" class="text-gray-300" />
+      <p>{{ $t('catalog.not_found') }}</p>
+    </div>
+
+    <SkeletonCatalogDetail v-else hero="poster" />
   </div>
 </template>

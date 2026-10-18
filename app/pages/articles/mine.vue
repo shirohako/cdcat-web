@@ -17,10 +17,13 @@ const page = computed({
   get: () => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1),
   set: value => { router.push({ query: { ...route.query, page: value > 1 ? value : undefined } }) },
 })
-const { data, pending, error, refresh } = await useAsyncData('my-articles',
-  () => $api<{ articles: MyArticle[], counts: Partial<Record<ArticleStatus, number>>, pagination: Pagination }>('/v1/me/articles',
-    { query: { status: status.value ?? undefined, page: page.value } }),
-  { watch: [status, page] })
+// The reader's own drafts and articles: always fetched fresh (no revisit cache).
+const { data, status: loadStatus, error, refresh, loading, refetching, revealKey, revealClass } = await usePageData(
+  () => `my-articles-${status.value ?? 'all'}-${page.value}`,
+  ({ signal }) => $api<{ articles: MyArticle[], counts: Partial<Record<ArticleStatus, number>>, pagination: Pagination }>('/v1/me/articles',
+    { query: { status: status.value ?? undefined, page: page.value }, signal }),
+  { cache: false },
+)
 
 const total = computed(() => Object.values(data.value?.counts ?? {}).reduce((sum, count) => sum + (count ?? 0), 0))
 const tabs = computed(() => [{ value: null, count: total.value }, ...ARTICLE_STATUSES.map(value => ({ value, count: data.value?.counts[value] ?? 0 }))])
@@ -60,19 +63,26 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
         :class="status === tab.value ? 'border-violet-500 font-semibold text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-800'"
         @click="selectTab(tab.value)">
         {{ tab.value ? t(`article_ui.statuses.${tab.value}`) : t('article_ui.mine.all') }}
-        <span class="rounded-full bg-slate-100 px-1.5 text-[11px] tabular-nums text-slate-500">{{ tab.count }}</span>
+        <span v-if="data" class="rounded-full bg-slate-100 px-1.5 text-[11px] tabular-nums text-slate-500">{{ tab.count }}</span>
       </button>
     </nav>
 
-    <div v-if="pending" class="py-16 text-center text-sm text-slate-400">{{ t('common.loading') }}</div>
-    <div v-else-if="error" class="py-16 text-center text-sm text-rose-600">
+    <CommonLoadError v-if="loadStatus === 'error' && data" class="mt-4" @retry="refresh()" />
+    <SkeletonRows v-if="loading" page class="mt-4" :count="6" />
+    <div v-else-if="loadStatus === 'error' && !data" class="py-16 text-center text-sm text-rose-600">
       {{ localizeError(error) }} <button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
     </div>
     <div v-else-if="!data?.articles.length" class="py-16 text-center">
       <FileText :size="28" class="mx-auto text-slate-300" />
       <p class="mt-3 text-sm text-slate-500">{{ t('article_ui.mine.empty') }}</p>
     </div>
-    <ul v-else class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+    <ul
+      v-else
+      :key="revealKey"
+      class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white transition-opacity"
+      :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
+      :inert="refetching"
+    >
       <li v-for="article in data.articles" :key="article.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
@@ -100,7 +110,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
         </div>
       </li>
     </ul>
-    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-6" :total-pages="data.pagination.last_page" :disabled="pending" />
+    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-6" :total-pages="data.pagination.last_page" :disabled="refetching" />
 
     <CommonConfirmDialog
       v-model="deleteOpen" variant="delete" :title="t('article_ui.mine.delete_title')"

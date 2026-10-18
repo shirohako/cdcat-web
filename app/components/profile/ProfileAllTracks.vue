@@ -18,13 +18,11 @@
       </div>
 
       <!-- Loading -->
-      <div v-if="pending" class="flex min-h-[30vh] items-center justify-center">
-        <div class="h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-      </div>
+      <SkeletonRows v-if="loading" :count="6" thumb="square" cards />
 
       <!-- Error -->
-      <div v-else-if="error" class="flex min-h-[20vh] items-center justify-center">
-        <p class="text-sm text-gray-400">{{ error.message }}</p>
+      <div v-else-if="status === 'error' && !response" class="flex min-h-[20vh] items-center justify-center">
+        <p class="text-sm text-gray-400">{{ error?.message }}</p>
       </div>
 
       <!-- Empty -->
@@ -37,7 +35,7 @@
 
       <!-- Tracks list -->
       <template v-else>
-        <div class="space-y-2">
+        <div class="space-y-2 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
           <component
             :is="track.album ? NuxtLink : 'div'"
             v-for="track in tracks"
@@ -90,7 +88,7 @@
           v-model:page="currentPage"
           class="mt-4"
           :total-pages="pagination.last_page"
-          :disabled="pending"
+          :disabled="refetching"
         />
       </template>
     </div>
@@ -114,12 +112,9 @@ const { locale } = useI18n()
 
 const currentPage = ref(1)
 
-const { data: response, pending, error } = await useAPI<ProfileFavoriteTracksResponse>(
+const { data: response, status, error, loading, refetching } = await usePageAPI<ProfileFavoriteTracksResponse>(
   () => `/v1/profiles/${props.username}/favorites/tracks`,
-  {
-    query: { page: currentPage },
-    watch: [currentPage],
-  }
+  { query: () => ({ page: currentPage.value }) },
 )
 
 const tracks = computed(() => response.value?.tracks || [])

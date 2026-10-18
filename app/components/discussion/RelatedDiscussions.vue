@@ -10,9 +10,8 @@ const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
 const { ago } = useRelativeTime()
 const link = computed(() => `${props.type}:${props.id}`)
-const { data } = await useAsyncData(`related-discussions-${link.value}`,
-  () => $api<DiscussionTopicList>('/v1/discussions/topics', { query: { link: link.value, per_page: 5 } }),
-  { default: () => null })
+const { data, loading } = await usePageData(`related-discussions-${link.value}`,
+  ({ signal, background }) => $api<DiscussionTopicList>('/v1/discussions/topics', { query: { link: link.value, per_page: 5 }, signal, progress: !background }))
 const topics = computed(() => data.value?.topics ?? [])
 const total = computed(() => data.value?.pagination.total ?? 0)
 const start = computed(() => isAuthenticated.value ? { path: '/discussions/new', query: { link: link.value } } : { path: '/auth/login', query: { redirect: `/discussions/new?link=${link.value}` } })
@@ -36,6 +35,12 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
       </NuxtLink>
       <NuxtLink v-if="total > topics.length" :to="{ path: '/discussions', query: {} }" class="block px-4 py-2 text-center text-xs text-gray-400 hover:text-sky-700">{{ t('discussions.related.more', { count: total }) }}</NuxtLink>
     </div>
+    <SkeletonStatus v-else-if="loading" class="space-y-3 px-4 py-3">
+      <div v-for="row in 2" :key="row" class="space-y-1.5">
+        <div class="skeleton h-3.5 rounded-full" :class="row === 1 ? 'w-3/4' : 'w-1/2'" />
+        <div class="skeleton h-2.5 w-1/3 rounded-full" />
+      </div>
+    </SkeletonStatus>
     <p v-else class="px-5 py-4 text-sm text-gray-400">{{ t('discussions.related.empty') }}</p>
   </section>
 </template>

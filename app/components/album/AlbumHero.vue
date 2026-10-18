@@ -2,6 +2,7 @@
   <div class="relative w-full overflow-hidden bg-white">
     <img
       v-if="background"
+      v-img-fade
       :src="background"
       alt=""
       class="absolute inset-0 h-full w-full scale-105 object-cover opacity-30 blur-[3px]"
@@ -13,6 +14,7 @@
           <button type="button" class="cursor-zoom-in" :disabled="!album.cover" @click="$emit('open-cover')">
             <img
               v-if="coverUrl"
+              v-img-fade
               :src="coverUrl"
               :alt="album.title"
               class="h-44 w-44 rounded-md object-cover shadow-2xl sm:h-56 sm:w-56 md:h-60 md:w-60 lg:h-72 lg:w-72 xl:h-80 xl:w-80 2xl:h-96 2xl:w-96"
@@ -164,7 +166,7 @@ import { getStreamingProvider } from '~/utils/streamingProviders'
 import { Building2, Calendar, Clock, Disc3, Edit, Hash, Headphones, Heart, History, Music, Tag, UserRound } from '@lucide/vue'
 
 const props = defineProps<{ album: Album }>()
-defineEmits<{ 'open-cover': [] }>()
+const emit = defineEmits<{ 'open-cover': [], favorited: [value: boolean] }>()
 
 const { t, te } = useI18n()
 const { isAuthenticated } = useAuth()
@@ -184,6 +186,8 @@ const providerName = (name: string) => name.split('_').map(word => word.charAt(0
 
 const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.album.is_favorited)
+// The page may swap in a fresher copy of the album after this has rendered (revisit cache).
+watch(() => props.album.is_favorited, (value) => { isFavorited.value = value })
 const isToggling = ref(false)
 
 const toggleLike = async () => {
@@ -195,6 +199,7 @@ const toggleLike = async () => {
   isToggling.value = true
   try {
     isFavorited.value = (await setFavoriteAlbum(props.album.id, !isFavorited.value)).favorited
+    emit('favorited', isFavorited.value)
   } catch {
     // 401 已由 api 插件处理
   } finally {

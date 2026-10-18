@@ -1,9 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 md:p-8">
-    <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
-    </div>
+    <!-- Loading State: until there is something to show -->
+    <SkeletonRows v-if="isLoading && !reviews.length" page :count="4" thumb="square" cards />
 
     <!-- Empty State -->
     <div v-else-if="reviews.length === 0" class="flex flex-col items-center justify-center py-16">
@@ -16,8 +14,8 @@
       </NuxtLink>
     </div>
 
-    <!-- Reviews List -->
-    <div v-else>
+    <!-- Reviews List: dimmed while another page loads -->
+    <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': isLoading }" :inert="isLoading">
       <div class="mb-4 space-y-4 sm:mb-5">
         <div
           v-for="review in reviews"

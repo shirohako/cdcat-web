@@ -1,15 +1,7 @@
 <template>
   <div class="relative min-h-[calc(100vh-4rem)]">
-    <!-- Loading state -->
-    <div v-if="pending" class="flex min-h-[60vh] items-center justify-center">
-      <div class="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-    </div>
-
-    <!-- Error state - User not found -->
-    <ProfileNotFound v-else-if="error" :username="username" />
-
     <!-- Profile content -->
-    <template v-else-if="profile">
+    <template v-if="profile">
       <!-- Decorative background -->
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
         <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-sky-200/50 to-blue-200/25 blur-3xl" />
@@ -19,7 +11,7 @@
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
       </div>
 
-      <div class="relative">
+      <div class="relative" :class="revealClass">
         <ProfileHero :profile="profile" />
 
         <!-- Two-column content -->
@@ -49,6 +41,11 @@
         </div>
       </div>
     </template>
+
+    <!-- Error state - User not found -->
+    <ProfileNotFound v-else-if="status === 'error'" :username="username" />
+
+    <SkeletonProfile v-else />
   </div>
 </template>
 
@@ -66,9 +63,7 @@ const onSelectTrackingStatus = (status: TrackingStatus) => {
   activeView.value = 'tracking'
 }
 
-const { data: profile, pending, error } = await useAPI<PublicProfile>(
-  `/v1/profiles/${username}`
-)
+const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`/v1/profiles/${username}`)
 
 // --------------- SEO ---------------
 
@@ -96,17 +91,18 @@ definePageMeta({
   }
 }
 
+/* `backwards`, not `both`: hidden during the delay, and no transform left behind afterwards. */
 .animate-fade-in-up {
-  animation: fade-in-up 0.6s ease both;
+  animation: fade-in-up 0.6s ease backwards;
 }
 
 .animate-fade-in-up-delayed {
-  animation: fade-in-up 0.6s ease both;
+  animation: fade-in-up 0.6s ease backwards;
   animation-delay: 0.15s;
 }
 
 .animate-fade-in-up-slow {
-  animation: fade-in-up 0.7s ease both;
+  animation: fade-in-up 0.7s ease backwards;
   animation-delay: 0.3s;
 }
 </style>

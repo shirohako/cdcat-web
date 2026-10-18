@@ -35,10 +35,10 @@ const params = computed(() => ({
   status: status.value ?? undefined,
   page: page.value,
 }))
-const { data, pending, error, refresh } = await useAsyncData(
-  () => `discussion-list-${props.category ?? ''}-${props.tag ?? ''}`,
-  () => $api<DiscussionTopicList>('/v1/discussions/topics', { query: params.value }),
-  { watch: [params] },
+// Every parameter is part of the key, so a list shown again from the revisit cache matches the address.
+const { data, status: loadStatus, refresh, loading, refetching, revealKey, revealClass } = await usePageData(
+  () => `discussion-list-${JSON.stringify(params.value)}`,
+  ({ signal, background }) => $api<DiscussionTopicList>('/v1/discussions/topics', { query: params.value, signal, progress: !background }),
 )
 </script>
 
@@ -64,28 +64,31 @@ const { data, pending, error, refresh } = await useAsyncData(
         <option value="solved">{{ t('discussions.list.status_solved') }}</option>
       </select>
     </div>
-    <div v-if="pending && !data" role="status" aria-live="polite" :aria-label="t('common.loading')" class="animate-pulse divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200/80 bg-white">
-      <div v-for="row in 8" :key="row" class="flex items-center gap-3 px-4 py-4">
-        <div class="size-9 shrink-0 rounded-full bg-slate-100" />
-        <div class="flex-1 space-y-2">
-          <div class="h-3.5 w-3/5 rounded-full bg-slate-200/80" />
-          <div class="h-2.5 w-2/5 rounded-full bg-slate-100" />
-        </div>
-        <div class="hidden h-8 w-24 rounded-lg bg-slate-100 sm:block" />
-      </div>
-    </div>
-    <div v-else-if="error" class="flex min-h-60 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500">
-      {{ t('common.load_failed') }}<button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
-    </div>
-    <template v-else-if="data">
+    <template v-if="data">
+      <CommonLoadError v-if="loadStatus === 'error'" class="mb-3" @retry="refresh()" />
       <DiscussionTopicList
-        :topics="data.topics" :pinned="data.pinned" :show-category="showCategory" :class="pending ? 'opacity-60' : ''"
+        :key="revealKey"
+        :topics="data.topics" :pinned="data.pinned" :show-category="showCategory"
+        class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching"
         :empty="tab === 'unread' ? t('discussions.list.empty_unread') : tab === 'watching' ? t('discussions.list.empty_watching') : ''"
       />
       <CommonPagination
         v-if="data.pagination.last_page > 1" class="mt-5" :page="data.pagination.current_page" :total-pages="data.pagination.last_page"
-        :disabled="pending" @update:page="value => update({ page: value > 1 ? String(value) : null })"
+        :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })"
       />
     </template>
+    <div v-else-if="loadStatus === 'error'" class="flex min-h-60 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500">
+      {{ t('common.load_failed') }}<button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
+    </div>
+    <SkeletonStatus v-else-if="loading" page class="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200/80 bg-white">
+      <div v-for="row in 8" :key="row" class="flex items-center gap-3 px-4 py-4">
+        <div class="skeleton size-9 shrink-0 rounded-full" />
+        <div class="flex-1 space-y-2">
+          <div class="skeleton h-3.5 w-3/5 rounded-full" />
+          <div class="skeleton h-2.5 w-2/5 rounded-full" />
+        </div>
+        <div class="skeleton hidden h-8 w-24 rounded-lg sm:block" />
+      </div>
+    </SkeletonStatus>
   </div>
 </template>

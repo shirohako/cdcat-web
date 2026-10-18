@@ -1,9 +1,7 @@
 <template>
   <div class="p-4 sm:p-6 md:p-8">
-    <!-- Loading State -->
-    <div v-if="isLoading" class="flex items-center justify-center py-12">
-      <Icon name="lucide:loader" class="w-8 h-8 animate-spin text-blue-600" />
-    </div>
+    <!-- Loading State: only until the first page is in -->
+    <SkeletonRows v-if="isLoading && !loaded" page :count="5" thumb="round" cards />
 
     <!-- Empty State -->
     <div v-else-if="artists.length === 0" class="flex flex-col items-center justify-center py-16">
@@ -16,8 +14,8 @@
       </NuxtLink>
     </div>
 
-    <!-- Artists List -->
-    <div v-else>
+    <!-- Artists List: dimmed while another page loads -->
+    <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': isLoading }" :inert="isLoading">
       <div class="mb-4 space-y-3 sm:mb-5 sm:space-y-4">
         <div
           v-for="artist in artists"
@@ -106,7 +104,9 @@ const artists = ref<FavoriteArtist[]>([])
 const page = ref(1)
 const perPage = 15
 const totalItems = ref(0)
-const isLoading = ref(false)
+// True from the start, so the empty state doesn't show before the first load.
+const isLoading = ref(true)
+const loaded = ref(false)
 
 const totalPages = computed(() => Math.ceil(totalItems.value / perPage))
 
@@ -120,6 +120,7 @@ const loadData = async () => {
     console.error('Failed to load artists:', error)
   } finally {
     isLoading.value = false
+    loaded.value = true
   }
 }
 
@@ -144,7 +145,7 @@ watch(() => page.value, async () => {
   await loadData()
 })
 
-onMounted(() => {
-  loadData()
-})
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) loadData()
+else onMounted(loadData)
 </script>

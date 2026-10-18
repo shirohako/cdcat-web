@@ -5,12 +5,13 @@ import { Hash, Lock, PenSquare, Search } from '@lucide/vue'
 const props = defineProps<{ activeSlug?: string | null, newTopicQuery?: Record<string, string> }>()
 const { t } = useI18n()
 const { isAuthenticated } = useAuth()
-const { categories, categoryName } = useDiscussionCategories()
+const { categories, categoryName, pending: categoriesPending } = useDiscussionCategories()
 const { $api } = useNuxtApp()
 const { tagName } = useTags()
-const { data: tags } = await useAsyncData('discussion-tags',
+// Loaded once per visit to the site. Lazy, so the page around it never waits for it in the browser.
+const { data: tags, pending: tagsPending } = await useAsyncData('discussion-tags',
   () => $api<{ tags: import('~/types/discussion').DiscussionTagWithCount[] }>('/v1/discussions/tags').then(response => response.tags.filter(tag => tag.topics_count > 0).sort((a, b) => b.topics_count - a.topics_count).slice(0, 12)),
-  { default: () => [], getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key] })
+  { lazy: true, default: () => [], getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key] })
 const isActive = (slug: string) => props.activeSlug === slug
 </script>
 
@@ -33,6 +34,12 @@ const isActive = (slug: string) => props.activeSlug === slug
       <NuxtLink to="/discussions" class="flex items-center gap-2 px-4 py-2 text-sm transition hover:bg-slate-50" :class="!activeSlug ? 'bg-sky-50/70 font-semibold text-sky-700' : 'text-slate-700'">
         <span class="size-2 rounded-full bg-slate-300" aria-hidden="true" />{{ t('discussions.all_topics') }}
       </NuxtLink>
+      <SkeletonStatus v-if="categoriesPending && !categories.length">
+        <div v-for="row in 4" :key="row" class="flex items-center gap-2 px-4 py-2.5">
+          <div class="skeleton size-2 shrink-0 rounded-full" />
+          <div class="skeleton h-3 rounded-full" :class="['w-24', 'w-32', 'w-20', 'w-28'][row - 1]" />
+        </div>
+      </SkeletonStatus>
       <template v-for="category in categories" :key="category.id">
         <NuxtLink
           :to="`/discussions/c/${category.slug}`" class="flex items-center gap-2 px-4 py-2 text-sm transition hover:bg-slate-50"
@@ -54,7 +61,13 @@ const isActive = (slug: string) => props.activeSlug === slug
       </template>
     </nav>
 
-    <section v-if="tags.length" class="rounded-xl border border-slate-200/80 bg-white p-4">
+    <SkeletonStatus v-if="tagsPending && !tags.length" class="rounded-xl border border-slate-200/80 bg-white p-4">
+      <div class="skeleton mb-3 h-3 w-20 rounded-full" />
+      <div class="flex flex-wrap gap-1.5">
+        <div v-for="chip in 6" :key="chip" class="skeleton h-6 rounded-md" :class="['w-14', 'w-20', 'w-12', 'w-16', 'w-24', 'w-14'][chip - 1]" />
+      </div>
+    </SkeletonStatus>
+    <section v-else-if="tags.length" class="rounded-xl border border-slate-200/80 bg-white p-4">
       <h2 class="mb-2.5 text-xs font-semibold uppercase tracking-wide text-slate-400">{{ t('discussions.popular_tags') }}</h2>
       <div class="flex flex-wrap gap-1.5">
         <NuxtLink

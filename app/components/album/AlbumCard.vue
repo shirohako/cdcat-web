@@ -4,6 +4,7 @@
       <div class="relative flex aspect-square items-center justify-center overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
         <img
           v-if="album.image_url"
+          v-img-fade
           :src="album.image_url"
           :alt="album.title"
           loading="lazy"

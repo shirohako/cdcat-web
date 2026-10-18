@@ -23,8 +23,7 @@ const typeFilters = computed(() => [
 const formats = computed(() => selectedType.value === 'all' ? [] : ENTRY_FORMATS[selectedType.value])
 
 const { includePending, setIncludePending } = usePendingToggle()
-const { data, pending, error } = useAPI<{ entries: EntrySummary[], pagination: Pagination }>('/v1/entries', {
-  lazy: true,
+const { data, status, refresh, loading, refetching, revealKey, revealClass } = usePageAPI<{ entries: EntrySummary[], pagination: Pagination }>('/v1/entries', {
   query: computed(() => ({
     page: currentPage.value,
     per_page: 20,
@@ -101,18 +100,20 @@ const goToPage = (page: number) => {
           </div>
         </template>
 
-        <CollectionLoadingSkeleton v-if="pending" variant="list" />
+        <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
 
-        <div v-else-if="error" class="flex min-h-72 items-center justify-center text-sm text-red-600">
+        <CollectionLoadingSkeleton v-if="loading" variant="list" />
+
+        <div v-else-if="status === 'error' && !data" class="flex min-h-72 items-center justify-center text-sm text-red-600">
           {{ $t('common.load_failed') }}
         </div>
 
-        <div v-else class="collection-content-enter">
+        <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <div class="space-y-3">
             <NuxtLink v-for="entry in entries" :key="entry.id" :to="`/entries/${entry.id}`" class="group block">
               <article class="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg">
                 <div class="relative h-32 w-22 shrink-0 overflow-hidden rounded-lg bg-linear-to-br from-gray-50 to-gray-100">
-                  <img v-if="entry.image_url" :src="entry.image_url" :alt="displayName(entry)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
+                  <img v-if="entry.image_url" v-img-fade :src="entry.image_url" :alt="displayName(entry)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
                   <div v-else class="flex h-full items-center justify-center text-gray-300">
                     <Film :size="36" />
                   </div>
@@ -156,7 +157,7 @@ const goToPage = (page: number) => {
             class="mt-6"
             :page="pagination.current_page"
             :total-pages="pagination.last_page"
-            :disabled="pending"
+            :disabled="refetching"
             @update:page="goToPage"
           />
         </div>

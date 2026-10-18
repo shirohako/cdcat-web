@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-50/60">
     <div class="container mx-auto max-w-5xl px-3 py-6 md:px-6">
-      <div v-if="loading" class="flex min-h-96 items-center justify-center"><span class="loading loading-spinner loading-lg" /></div>
+      <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
 
       <div v-else-if="loadError" class="mx-auto max-w-lg space-y-3 py-16 text-center">
         <p class="alert alert-error justify-center">{{ loadError }}</p>

@@ -6,8 +6,8 @@
         <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.preferences.description') }}</p>
       </div>
 
-      <div v-if="isLoading" class="p-6 flex items-center justify-center py-12">
-        <span class="loading loading-spinner loading-md text-gray-400"></span>
+      <div v-if="isLoading" class="p-6">
+        <SkeletonForm :fields="3" class="max-w-sm" />
       </div>
 
       <template v-else>
@@ -225,7 +225,7 @@ const saveSettings = async () => {
   }
 }
 
-onMounted(() => {
-  loadSettings()
-})
+// On client-side navigation start at once; after a server render, wait until hydration is done.
+if (import.meta.client && !useNuxtApp().isHydrating) loadSettings()
+else onMounted(loadSettings)
 </script>

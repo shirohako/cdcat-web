@@ -6,6 +6,7 @@
       <div class="relative h-38 sm:h-44 md:h-52">
         <img
           v-if="displayBanner && !bannerLoadFailed"
+          v-img-fade
           :src="displayBanner"
           :alt="`${profile.username} banner`"
           class="h-full w-full object-cover"
@@ -28,6 +29,7 @@
         >
           <img
             v-if="displayAvatar"
+            v-img-fade
             :src="profile.avatar_url"
             :alt="profile.username"
             class="h-full w-full object-cover"

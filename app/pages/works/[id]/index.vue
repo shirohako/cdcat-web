@@ -1,10 +1,7 @@
 <template>
   <div class="min-h-screen bg-base-100">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
-      <div v-if="pending" class="flex justify-center py-20"><span class="loading loading-spinner loading-lg" /></div>
-      <div v-else-if="error || !work" class="alert alert-error mx-auto max-w-md"><span>{{ $t('works.not_found') }}</span></div>
-
-      <template v-else>
+      <div v-if="work" :class="revealClass">
         <CatalogPendingBanner inline :pending="work.is_pending" :revision="work.pending_revision" />
         <header class="mb-6 flex flex-wrap items-start gap-4">
           <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-500"><Music :size="26" /></div>
@@ -91,7 +88,9 @@
             <AlbumLinks v-if="work.links.length" :links="work.links" />
           </aside>
         </div>
-      </template>
+      </div>
+      <div v-else-if="status === 'error'" class="alert alert-error mx-auto max-w-md"><span>{{ $t('works.not_found') }}</span></div>
+      <SkeletonCatalogDetail v-else hero="tile" />
     </div>
   </div>
 </template>
@@ -104,7 +103,7 @@ const route = useRoute()
 const { localName, formatDate, formatDuration, enumLabel } = useCatalogDisplay()
 const { roleName } = useCatalogSchema()
 
-const { data: work, pending, error } = await useAPI<Work>(`/v1/works/${route.params.id}`)
+const { data: work, status, revealClass } = await usePageAPI<Work>(`/v1/works/${route.params.id}`)
 
 const shownTitle = computed(() => work.value ? localName(work.value.title, work.value.titles) : '')
 /** Credits on the work itself, then those found on its recordings. */

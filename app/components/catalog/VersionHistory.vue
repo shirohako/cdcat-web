@@ -3,8 +3,13 @@
     <aside class="lg:col-span-1">
       <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
         <h2 class="border-b border-gray-100 px-4 py-3 text-sm font-bold text-gray-900">{{ $t('versions.list') }}</h2>
-        <div v-if="pending" class="flex justify-center py-8"><span class="loading loading-spinner" /></div>
-        <ul v-else class="max-h-[70vh] divide-y divide-gray-50 overflow-y-auto">
+        <SkeletonStatus v-if="loading" class="divide-y divide-gray-50">
+          <div v-for="row in 6" :key="row" class="space-y-1.5 px-4 py-2.5">
+            <div class="skeleton h-3.5 w-1/3 rounded-full" />
+            <div class="skeleton h-2.5 w-3/4 rounded-full" />
+          </div>
+        </SkeletonStatus>
+        <ul v-else class="max-h-[70vh] divide-y divide-gray-50 overflow-y-auto transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
           <li v-for="version in versions" :key="version.version">
             <button
               type="button"
@@ -25,7 +30,7 @@
           </li>
         </ul>
         <div v-if="lastPage > 1" class="border-t border-gray-100 px-4 py-2">
-          <CommonPagination :page="page" :total-pages="lastPage" :disabled="pending" @update:page="page = $event" />
+          <CommonPagination :page="page" :total-pages="lastPage" :disabled="refetching" @update:page="page = $event" />
         </div>
       </div>
     </aside>
@@ -45,9 +50,16 @@
           </template>
         </div>
         <div class="px-5 py-4">
-          <div v-if="diffPending" class="flex justify-center py-8"><span class="loading loading-spinner" /></div>
+          <SkeletonStatus v-if="diffPending && !diff" class="space-y-2.5 py-2">
+            <div v-for="line in 5" :key="line" class="skeleton h-3 rounded-full" :class="['w-2/3', 'w-full', 'w-1/2', 'w-5/6', 'w-3/5'][line - 1]" />
+          </SkeletonStatus>
           <p v-else-if="diffError" class="py-6 text-center text-sm text-gray-400">{{ localizeError(diffError) }}</p>
-          <CatalogDiffView v-else-if="diff" :type="type" :changes="diff.changes" :references="diff.references" :documents="[snapshot]" />
+          <CatalogDiffView
+            v-else-if="diff"
+            class="transition-opacity"
+            :class="{ 'opacity-60': diffPending }"
+            :type="type" :changes="diff.changes" :references="diff.references" :documents="[snapshot]"
+          />
         </div>
       </div>
     </section>
@@ -70,10 +82,13 @@ const resource = CATALOG_RESOURCES[props.type]
 const canRestore = computed(() => hasPermission('revisions.rollback'))
 
 const page = ref(1)
-const { data, pending } = useAsyncData(
+const { data, loading, refetching } = usePageData(
   () => `versions:${props.type}:${props.id}:${page.value}`,
-  () => $api<{ versions: ContentVersion[], pagination: { last_page: number } }>(`/v1/${resource}/${props.id}/versions`, { params: { page: page.value } }),
-  { watch: [page] },
+  ({ signal, background }) => $api<{ versions: ContentVersion[], pagination: { last_page: number } }>(`/v1/${resource}/${props.id}/versions`, {
+    params: { page: page.value },
+    signal,
+    progress: !background,
+  }),
 )
 const versions = computed(() => data.value?.versions ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)

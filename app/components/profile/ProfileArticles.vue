@@ -6,13 +6,12 @@ import type { ArticleCard, Pagination } from '~/types/article'
 const props = defineProps<{ username: string }>()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
-const { data } = await useAsyncData(`profile-articles-${props.username}`,
-  () => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', { query: { user: props.username, per_page: 4 } }),
-  { watch: [() => props.username] })
+const { data, revealClass } = await usePageData(() => `profile-articles-${props.username}`,
+  ({ signal, background }) => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', { query: { user: props.username, per_page: 4 }, signal, progress: !background }))
 </script>
 
 <template>
-  <section v-if="data?.articles.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+  <section v-if="data?.articles.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm" :class="revealClass">
     <header class="mb-4 flex items-center gap-2">
       <Newspaper :size="16" class="text-violet-500" />
       <h2 class="text-base font-bold text-gray-900">{{ t('article_ui.profile.title') }}</h2>

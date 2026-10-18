@@ -2,24 +2,122 @@
 @import "./ui.css";
 @plugin "@tailwindcss/typography";
 
-@keyframes collection-content-reveal {
+/* Page switches (nuxt.config `app.pageTransition`): the old page fades out, then the new one fades in and settles. */
+.page-leave-active {
+  transition: opacity 120ms ease-in;
+  /* A click on the page that is leaving would start another navigation. */
+  pointer-events: none;
+}
+
+.page-enter-active {
+  transition: opacity 220ms ease-out, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.page-leave-to,
+.page-enter-from {
+  opacity: 0;
+}
+
+.page-enter-from {
+  transform: translateY(8px);
+}
+
+/* Layout switches (to and from the writing layout) only fade: a transform would move the layout's fixed navbar and sidebar. */
+.layout-leave-active {
+  transition: opacity 120ms ease-in;
+  pointer-events: none;
+}
+
+.layout-enter-active {
+  transition: opacity 220ms ease-out;
+}
+
+.layout-leave-to,
+.layout-enter-from {
+  opacity: 0;
+}
+
+/* Content that replaces a skeleton fades in and settles. The keyframes only have a `from` frame and the fill is
+   `backwards`, so nothing stays applied afterwards (a lingering transform would trap fixed descendants). */
+@keyframes content-reveal {
   from {
     opacity: 0;
     transform: translateY(8px);
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+}
+
+.content-reveal {
+  animation: content-reveal 280ms ease-out backwards;
+}
+
+/* v-img-fade (plugins/img-fade.ts): hidden until loaded, then fades in to the image's own opacity. */
+.img-fade {
+  opacity: 0;
+}
+
+@keyframes img-fade {
+  from {
+    opacity: 0;
   }
 }
 
-.collection-content-enter {
-  animation: collection-content-reveal 320ms ease-out both;
+.img-fade-in {
+  animation: img-fade 300ms ease-out;
+}
+
+/* A placeholder block for content that is still loading; a light band sweeps across it. In the components
+   layer so utilities such as `bg-slate-200` can still change its colour. */
+@layer components {
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--color-slate-100);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* On dark heroes: a faint block and band. */
+  .skeleton-dark {
+    background-color: rgb(255 255 255 / 0.1);
+  }
+
+  .skeleton-dark::after {
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .collection-content-enter {
+  .page-enter-active,
+  .page-leave-active,
+  .layout-enter-active,
+  .layout-leave-active {
+    transition: none;
+  }
+
+  .page-enter-from {
+    transform: none;
+  }
+
+  .content-reveal,
+  .img-fade-in {
     animation: none;
+  }
+
+  .skeleton::after {
+    display: none;
   }
 }
 

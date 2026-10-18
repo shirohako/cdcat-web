@@ -17,9 +17,12 @@ const page = computed({
   get: () => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1),
   set: value => { router.push({ query: { ...route.query, page: value > 1 ? value : undefined } }) },
 })
-const { data, pending, error, refresh } = await useAsyncData('notifications-page',
-  () => $api<{ notifications: NotificationItem[], unread_count: number, pagination: Pagination }>('/v1/me/notifications', { query: { filter: filter.value, page: page.value } }),
-  { watch: [filter, page] })
+// About the reader themselves, so always fetched fresh (no revisit cache).
+const { data, status, error, refresh, loading, refetching, revealKey, revealClass } = await usePageData(
+  () => `notifications-page-${filter.value}-${page.value}`,
+  ({ signal }) => $api<{ notifications: NotificationItem[], unread_count: number, pagination: Pagination }>('/v1/me/notifications', { query: { filter: filter.value, page: page.value }, signal }),
+  { cache: false },
+)
 watch(data, (value) => { if (value) unread.value = value.unread_count })
 
 async function markRead(ids: number[] | null) {
@@ -53,10 +56,17 @@ useHead({ title: computed(() => t('notifications.title')) })
       </NuxtLink>
     </nav>
 
-    <p v-if="pending" class="py-16 text-center text-sm text-slate-400">{{ t('common.loading') }}</p>
-    <p v-else-if="error" class="py-16 text-center text-sm text-rose-600">{{ localizeError(error) }}</p>
+    <CommonLoadError v-if="status === 'error' && data" class="mt-4" @retry="refresh()" />
+    <SkeletonRows v-if="loading" page class="mt-4" :count="8" thumb="dot" />
+    <p v-else-if="status === 'error' && !data" class="py-16 text-center text-sm text-rose-600">{{ localizeError(error) }}</p>
     <p v-else-if="!data?.notifications.length" class="py-16 text-center text-sm text-slate-400">{{ t('notifications.empty') }}</p>
-    <ul v-else class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
+    <ul
+      v-else
+      :key="revealKey"
+      class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white transition-opacity"
+      :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
+      :inert="refetching"
+    >
       <li v-for="item in data.notifications" :key="item.id">
         <button type="button" class="flex w-full gap-3 px-4 py-3 text-left transition hover:bg-slate-50" @click="openItem(item)">
           <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-violet-500'" />
@@ -68,6 +78,6 @@ useHead({ title: computed(() => t('notifications.title')) })
         </button>
       </li>
     </ul>
-    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-6" :total-pages="data.pagination.last_page" :disabled="pending" />
+    <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" class="mt-6" :total-pages="data.pagination.last_page" :disabled="refetching" />
   </div>
 </template>

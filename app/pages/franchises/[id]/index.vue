@@ -6,7 +6,7 @@ const route = useRoute()
 const { t } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 
-const { data: series, pending, error } = await useAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
+const { data: series, status, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
 
 useHead({ title: computed(() => series.value ? displayName(series.value) : '') })
 
@@ -21,18 +21,9 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <div v-if="pending" class="flex min-h-screen items-center justify-center">
-      <span class="loading loading-spinner loading-lg" />
-    </div>
-
-    <div v-else-if="error || !series" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
-      <Boxes :size="56" class="text-gray-300" />
-      <p>{{ $t('catalog.not_found') }}</p>
-    </div>
-
-    <template v-else>
+    <div v-if="series" :class="revealClass">
       <div class="relative h-80 overflow-hidden bg-linear-to-br from-emerald-600 to-slate-800">
-        <img v-if="series.banner_url || series.image_url" :src="series.banner_url || series.image_url!" alt="" class="h-full w-full object-cover opacity-40" >
+        <img v-if="series.banner_url || series.image_url" v-img-fade :src="series.banner_url || series.image_url!" alt="" class="h-full w-full object-cover opacity-40" >
         <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
         <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
@@ -129,6 +120,13 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
           <FranchiseAlbumsSection :franchise-id="series.id" />
         </section>
       </div>
-    </template>
+    </div>
+
+    <div v-else-if="status === 'error'" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
+      <Boxes :size="56" class="text-gray-300" />
+      <p>{{ $t('catalog.not_found') }}</p>
+    </div>
+
+    <SkeletonCatalogDetail v-else hero="gradient" />
   </div>
 </template>

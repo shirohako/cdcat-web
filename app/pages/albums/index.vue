@@ -101,21 +101,24 @@
           </section>
         </template>
 
+      <!-- A failed refetch keeps the last results below this. -->
+      <CommonLoadError v-if="status === 'error' && albumsResponse" class="mb-4" @retry="refresh()" />
+
       <!-- 加载状态 -->
-      <CollectionLoadingSkeleton v-if="pending" variant="covers" />
+      <CollectionLoadingSkeleton v-if="loading" variant="covers" />
 
       <!-- 错误状态 -->
-      <div v-else-if="error" class="flex items-center justify-center min-h-100">
+      <div v-else-if="status === 'error' && !albumsResponse" class="flex items-center justify-center min-h-100">
         <div class="alert alert-error max-w-md">
           <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span>{{ $t('albums.load_failed', { message: error.message }) }}</span>
+          <span>{{ $t('albums.load_failed', { message: error?.message ?? '' }) }}</span>
         </div>
       </div>
 
       <!-- 专辑列表 -->
-      <div v-else class="collection-content-enter">
+      <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
         <!-- 专辑网格 -->
         <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
           <AlbumCard
@@ -137,7 +140,7 @@
           class="mt-6"
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
-          :disabled="pending"
+          :disabled="refetching"
           @update:page="goToPage"
         />
       </div>
@@ -205,8 +208,7 @@ const currentPage = computed(() => {
 });
 
 // 从 API 获取专辑列表
-const { data: albumsResponse, pending, error } = useAPI<{ albums: AlbumSimple[], pagination: { total: number, per_page: number, current_page: number, last_page: number } }>("/v1/albums", {
-  lazy: true,
+const { data: albumsResponse, status, error, refresh, loading, refetching, revealKey, revealClass } = usePageAPI<{ albums: AlbumSimple[], pagination: { total: number, per_page: number, current_page: number, last_page: number } }>("/v1/albums", {
   query: computed(() => ({
     page: currentPage.value,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
@@ -216,7 +218,6 @@ const { data: albumsResponse, pending, error } = useAPI<{ albums: AlbumSimple[],
     search: searchQuery.value ?? undefined,
     include_pending: includePending.value ? 1 : undefined,
   })),
-  watch: [currentPage, selectedType, eventId, category, format, searchQuery, includePending],
 });
 
 // 处理专辑数据
