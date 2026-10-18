@@ -198,15 +198,20 @@ export function importTracklist(doc: AlbumDocument, parsed: ParsedDisc[], mode: 
 export const sortedProducts = (doc: AlbumDocument) => byOrder(doc.products)
 
 /** A new edition with every main disc; digital when all of them are digital. */
-export function addProduct(doc: AlbumDocument, fields: Partial<AlbumProductRow> = {}): AlbumProductRow {
+/** A new edition with every main disc, not yet on the album. */
+export function blankProduct(doc: AlbumDocument, fields: Partial<AlbumProductRow> = {}): AlbumProductRow {
   const discs = mainDiscs(doc)
-  doc.products.push({
+  return {
     id: newKey('p'), name: null, edition_type: 'regular',
     medium: discs.length && discs.every(disc => disc.format === 'digital') ? 'digital' : 'physical',
     limited_rule: null, limited_name: null, catalog_number: null, barcode: null, release_date: null, release_date_precision: 'day',
     region: null, price: null, currency: null, is_hires: false, is_available: true, sort_order: nextOrder(doc.products),
     disc_ids: discs.map(disc => disc.id), ...fields,
-  })
+  }
+}
+
+export function addProduct(doc: AlbumDocument, fields: Partial<AlbumProductRow> = {}): AlbumProductRow {
+  doc.products.push(blankProduct(doc, fields))
   return doc.products[doc.products.length - 1]!
 }
 
@@ -236,11 +241,14 @@ export const untickedDiscs = (doc: AlbumDocument) => doc.products.length
   ? mainDiscs(doc).filter(disc => !doc.products.some(product => product.disc_ids.some(id => sameId(id, disc.id))))
   : []
 
+/** A new bonus, not yet on the album. */
+export const blankBonus = (doc: AlbumDocument, fields: Partial<AlbumBonusRow> = {}): AlbumBonusRow => ({
+  id: newKey('b'), name: '', type: 'other', description: null, is_digital: false, shop: null, availability: null,
+  note: null, event_id: null, sort_order: nextOrder(doc.bonuses), product_ids: [], ...fields,
+})
+
 export function addBonus(doc: AlbumDocument, fields: Partial<AlbumBonusRow> = {}): AlbumBonusRow {
-  doc.bonuses.push({
-    id: newKey('b'), name: '', type: 'other', description: null, is_digital: false, shop: null, availability: null,
-    note: null, event_id: null, sort_order: nextOrder(doc.bonuses), product_ids: [], ...fields,
-  })
+  doc.bonuses.push(blankBonus(doc, fields))
   return doc.bonuses[doc.bonuses.length - 1]!
 }
 
@@ -333,6 +341,28 @@ export function updateCreditGroup(doc: AlbumDocument, group: CreditGroup, patch:
   for (const row of group.rows) Object.assign(row, patch)
   Object.assign(group, patch)
   dedupeCredits(doc)
+}
+
+/** Track numbers as ranges: "1–3, 5", or "1: 1–3 · 2: 4" on albums with several discs. */
+export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
+  const has = (id: RowId) => trackIds.some(item => sameId(item, id))
+  const discs = sortedDiscs(doc)
+  return discs.map((disc) => {
+    const tracks = tracksOn(doc, disc.id)
+    const ranges: string[] = []
+    let start = -1
+    tracks.forEach((track, index) => {
+      const on = has(track.id)
+      if (on && start < 0) start = index
+      const endsHere = on && (index === tracks.length - 1 || !has(tracks[index + 1]!.id))
+      if (endsHere) {
+        const label = (position: number) => tracks[position]!.number_label || String(tracks[position]!.track_number)
+        ranges.push(start === index ? label(index) : `${label(start)}–${label(index)}`)
+        start = -1
+      }
+    })
+    return ranges.length ? (discs.length > 1 ? `${disc.position}: ${ranges.join(', ')}` : ranges.join(', ')) : ''
+  }).filter(Boolean).join(' · ')
 }
 
 /** Credits `fields` on the whole album (trackIds null) or on each of the tracks. */

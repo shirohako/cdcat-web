@@ -24,10 +24,11 @@ const props = defineProps<{ draft: ReturnType<typeof useRevisionDraft> }>()
 const emit = defineEmits<{ discard: [] }>()
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const { ago } = useRelativeTime()
 
 const discard = async () => {
-  if (!confirm(t('editor.restored_discard_confirm'))) return
+  if (!await confirm({ title: t('editor.restored_discard_confirm'), confirmText: t('editor.restored_discard') })) return
   await props.draft.discard()
   emit('discard')
 }

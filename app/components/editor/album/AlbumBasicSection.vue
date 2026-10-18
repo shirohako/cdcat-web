@@ -78,7 +78,7 @@
     </div>
 
     <div class="border-t border-gray-100 px-5 py-4">
-      <h3 class="mb-2 text-sm font-semibold text-gray-700">{{ $t('editor.album.other_names') }}</h3>
+      <h3 class="mb-1 text-sm font-semibold text-gray-700">{{ $t('editor.album.other_names') }}</h3>
       <EditorTitleRows v-model="album.titles" />
     </div>
 

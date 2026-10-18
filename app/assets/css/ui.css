@@ -95,6 +95,21 @@
     box-shadow: none;
   }
 
+  /* "Add …" buttons in editors: one tinted, dashed look at every size. */
+  .btn-add {
+    --ui-btn-bg: #eff6ff;
+    --ui-btn-border: #93c5fd;
+    --ui-btn-color: #1d4ed8;
+    --ui-btn-hover: #dbeafe;
+    border-style: dashed;
+    box-shadow: none;
+  }
+
+  .btn-add:hover:not(:disabled, .btn-disabled) {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 12px rgb(37 99 235 / 0.12);
+  }
+
   .btn-sm {
     min-height: 2.125rem;
     border-radius: 0.625rem;

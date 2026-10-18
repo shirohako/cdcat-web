@@ -31,7 +31,7 @@
     </div>
 
     <div class="flex items-center gap-2 border-t border-gray-100 px-3 py-1.5">
-      <button type="button" class="btn btn-ghost btn-xs gap-1" @click="add"><Plus :size="12" />{{ $t('editor.album.add_track') }}</button>
+      <EditorAddButton small @click="add">{{ $t('editor.album.add_track') }}</EditorAddButton>
       <span v-if="duration" class="ml-auto font-mono text-[11px] text-gray-400">{{ formatDuration(duration) }}</span>
     </div>
   </div>
@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { WorkSuggestion } from '~/types/work'
-import { ArrowDown, ArrowUp, Disc3, Plus, Trash2 } from '@lucide/vue'
+import { ArrowDown, ArrowUp, Disc3, Trash2 } from '@lucide/vue'
 import { addTrack, findDisc, moveDisc, removeDisc, sortedDiscs, tracksOn } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
@@ -49,6 +49,7 @@ const emit = defineEmits<{ toc: [], dismiss: [trackId: RowId, workId: number] }>
 
 const editor = useAlbumEditor()
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const { schema } = useCatalogSchema()
 const { enumLabel, formatDuration } = useCatalogDisplay()
 
@@ -92,8 +93,8 @@ const next = (trackId: RowId) => {
   else focusTitle(index + 1)
 }
 
-const remove = () => {
-  if (tracks.value.length && !confirm(t('editor.album.remove_disc_confirm', { count: tracks.value.length }))) return
+const remove = async () => {
+  if (tracks.value.length && !await confirm({ title: t('editor.album.remove_disc_confirm', { count: tracks.value.length }) })) return
   removeDisc(album.value, props.discId)
 }
 </script>

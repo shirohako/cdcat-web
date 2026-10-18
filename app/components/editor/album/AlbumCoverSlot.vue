@@ -16,14 +16,11 @@
         <Upload :size="14" class="shrink-0" /><span class="truncate">{{ $t(coverImage ? 'editor.image.replace' : 'editor.image.upload') }}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
       </label>
-      <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('editor.image.from_url')" @click="showUrl = !showUrl"><Link2 :size="14" /></button>
+      <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
     </div>
-    <div v-if="showUrl" class="flex gap-1.5">
-      <input v-model.trim="url" type="url" class="input input-sm min-w-0 flex-1" placeholder="https://" @keydown.enter.prevent="fromUrl">
-      <button type="button" class="btn btn-sm" :disabled="!url || busy" @click="fromUrl">{{ $t('editor.image.import') }}</button>
-    </div>
-    <p v-if="message || error" class="text-xs text-error">{{ message || error }}</p>
+    <p v-if="(message && !showUrl) || error" class="text-xs text-error">{{ message || error }}</p>
     <p class="text-[11px] leading-snug text-gray-400">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }}</p>
+    <EditorImageImportDialog v-model="showUrl" :busy="busy" :error="message" :description="$t('editor.image.cover_rules', { size: limits.coverMinSize })" @import="fromUrl" />
     <EditorImageCropDialog :file="cropFile" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>
 </template>
@@ -46,7 +43,6 @@ const error = computed(() => editor.errorAt('images'))
 const busy = ref(false)
 const message = ref('')
 const showUrl = ref(false)
-const url = ref('')
 const cropFile = ref<File | null>(null)
 
 const problemText = (problem: 'too_small' | 'not_square', fromLink = false) => problem === 'too_small'
@@ -96,19 +92,22 @@ const uploadCropped = async (blob: Blob) => {
   await send(blob, 'cover.jpg')
 }
 
-const fromUrl = async () => {
-  if (!url.value) return
+const openUrl = () => {
+  message.value = ''
+  showUrl.value = true
+}
+
+const fromUrl = async (url: string) => {
   busy.value = true
   message.value = ''
   try {
-    const image = await importUrl(url.value)
+    const image = await importUrl(url)
     const problem = coverProblem(image.width, image.height)
     if (problem) {
       message.value = problemText(problem, true)
       return
     }
     use(image)
-    url.value = ''
     showUrl.value = false
   } catch (failure) {
     message.value = localizeError(failure)

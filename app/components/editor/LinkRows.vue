@@ -1,51 +1,141 @@
 <template>
   <div class="space-y-2">
-    <div v-for="row in shown" :key="row.id" class="flex flex-wrap items-center gap-2">
-      <input v-model.trim="row.url" type="url" class="input input-sm min-w-64 flex-1" placeholder="https://" @change="detect(row)">
-      <select v-model="row.link_provider_id" class="select select-sm w-44">
-        <option :value="null" disabled>{{ $t('catalog.field.link_provider_id') }}</option>
-        <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ providerName(provider.name) }}</option>
-      </select>
-      <button type="button" class="btn btn-ghost btn-sm px-2" :aria-label="$t('common.delete')" @click="remove(row)"><Trash2 :size="14" /></button>
-    </div>
-    <button type="button" class="btn btn-ghost btn-xs gap-1" @click="add"><Plus :size="12" />{{ $t('editor.add_link') }}</button>
+    <ul v-if="shown.length" class="space-y-1.5">
+      <EditorListRow v-for="row in shown" :key="row.id" :invalid="!row.url" @edit="edit(row)" @remove="remove(row)">
+        <span class="max-w-36 shrink-0 truncate rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600">{{ providerOf(row.link_provider_id) }}</span>
+        <span class="min-w-0 truncate text-sm text-gray-700">{{ bare(row.url) || '—' }}</span>
+        <template #actions>
+          <a v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700" :aria-label="$t('editor.dialog.open_link')">
+            <ExternalLink :size="14" />
+          </a>
+        </template>
+      </EditorListRow>
+    </ul>
+    <EditorAddButton :small="compact" @click="edit(null)">{{ $t('editor.add_link') }}</EditorAddButton>
+
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.link_edit' : 'editor.add_link')" :description="$t('editor.dialog.link_hint')" :icon="Link2" tone="gray" @submit="save">
+      <div class="space-y-4">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-gray-700">URL</span>
+          <input
+            v-model.trim="form.url"
+            data-autofocus
+            type="url"
+            inputmode="url"
+            class="input w-full"
+            :class="{ 'input-error': problem }"
+            placeholder="https://"
+            @input="autoDetect"
+          >
+          <span v-if="problem" class="mt-1 block text-xs text-error">{{ problem }}</span>
+        </label>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.link_provider_id') }}</span>
+          <select v-model="form.provider" class="select select-sm w-full" @change="pickedByHand = true">
+            <option :value="null" disabled>—</option>
+            <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ providerName(provider.name) }}</option>
+          </select>
+          <span class="mt-1 block text-[11px] text-gray-400">{{ $t('editor.dialog.link_provider_hint') }}</span>
+        </label>
+      </div>
+      <template #footer>
+        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+      </template>
+    </EditorModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { LinkRow, RowId } from '~/types/document'
-import { Plus, Trash2 } from '@lucide/vue'
+import { ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
 
-/** Link rows; with `owner` the model is a collection such as track_links and only that track's rows are shown. */
-const props = defineProps<{ owner?: { field: string, id: RowId } }>()
+/**
+ * Link rows, added and edited in a dialog. With `owner` the model is a collection such as
+ * track_links and only that track's rows are shown. `compact` when nested in a row, e.g. a track's details.
+ */
+const props = defineProps<{ owner?: { field: string, id: RowId }, compact?: boolean }>()
 const rows = defineModel<LinkRow[]>({ required: true })
+const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const providers = computed(() => schema.value?.link_providers ?? [])
 const providerName = (name: string) => name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+const providerOf = (id: number | null) => {
+  const provider = providers.value.find(item => item.id === id)
+  return provider ? providerName(provider.name) : '—'
+}
+const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')
 
 const mine = (row: LinkRow) => !props.owner || sameId((row as unknown as Record<string, RowId>)[props.owner.field], props.owner.id)
 const shown = computed(() => byOrder(rows.value.filter(mine)))
-
-const add = () => rows.value.push({
-  id: newKey('l'), link_provider_id: null, url: '', sort_order: nextOrder(shown.value),
-  ...(props.owner ? { [props.owner.field]: props.owner.id } : {}),
-} as LinkRow)
 
 const remove = (row: LinkRow) => {
   const index = rows.value.indexOf(row)
   if (index >= 0) rows.value.splice(index, 1)
 }
 
-/** Picks the provider whose URL pattern matches, e.g. https://vgmdb.net/* */
-const detect = (row: LinkRow) => {
-  if (row.link_provider_id || !row.url) return
+/** The provider whose URL pattern matches, e.g. https://vgmdb.net/*, else "other". */
+const detect = (url: string) => {
   const match = providers.value.find((provider) => {
     if (!provider.url_pattern) return false
     const pattern = new RegExp(`^${provider.url_pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}`, 'i')
-    return pattern.test(row.url) || pattern.test(row.url.replace(/^http:/, 'https:'))
+    return pattern.test(url) || pattern.test(url.replace(/^http:/, 'https:'))
   })
-  row.link_provider_id = match?.id ?? providers.value.find(provider => provider.name === 'other')?.id ?? null
+  return match?.id ?? providers.value.find(provider => provider.name === 'other')?.id ?? null
+}
+
+// ---- the dialog ----
+
+const dialog = ref(false)
+const editing = ref<LinkRow | null>(null)
+const form = reactive({ url: '', provider: null as number | null })
+const pickedByHand = ref(false)
+const tried = ref(false)
+
+const edit = (row: LinkRow | null) => {
+  editing.value = row
+  form.url = row?.url ?? ''
+  form.provider = row?.link_provider_id ?? null
+  pickedByHand.value = !!row?.link_provider_id
+  tried.value = false
+  dialog.value = true
+}
+
+/** Follows the URL until a provider is chosen by hand. */
+const autoDetect = () => {
+  if (!pickedByHand.value) form.provider = form.url ? detect(form.url) : null
+}
+
+const valid = (url: string) => {
+  try {
+    return ['http:', 'https:'].includes(new URL(url).protocol)
+  } catch {
+    return false
+  }
+}
+const same = (a: string, b: string) => bare(a).toLowerCase() === bare(b).toLowerCase()
+const problem = computed(() => {
+  if (!tried.value) return null
+  if (!valid(form.url)) return t('editor.dialog.link_invalid')
+  if (shown.value.some(row => row !== editing.value && same(row.url, form.url))) return t('editor.dialog.link_duplicate')
+  return null
+})
+
+const save = () => {
+  tried.value = true
+  if (problem.value) return
+  const provider = form.provider ?? detect(form.url)
+  if (editing.value) {
+    editing.value.url = form.url
+    editing.value.link_provider_id = provider
+  } else {
+    rows.value.push({
+      id: newKey('l'), link_provider_id: provider, url: form.url, sort_order: nextOrder(shown.value),
+      ...(props.owner ? { [props.owner.field]: props.owner.id } : {}),
+    } as LinkRow)
+  }
+  dialog.value = false
 }
 </script>

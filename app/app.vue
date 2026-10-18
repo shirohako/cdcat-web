@@ -3,6 +3,7 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <AppConfirm />
 </template>
 
 <script setup lang="ts">

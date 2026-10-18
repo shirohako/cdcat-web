@@ -1,66 +1,154 @@
 <template>
   <div class="space-y-6">
-    <CatalogSection :title="$t('catalog.collection.artists')" :icon="Users" tone="indigo">
+    <CatalogSection :title="$t('catalog.collection.artists')" :icon="Users" tone="indigo" :description="$t('editor.album.artists_hint')">
       <div class="space-y-3 p-5">
-        <p class="text-xs text-gray-500">{{ $t('editor.album.artists_hint') }}</p>
         <p v-if="preview" class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
           <span class="mr-2 text-[11px] uppercase tracking-wider text-gray-400">{{ $t('editor.preview') }}</span>{{ preview }}
         </p>
         <EditorAlbumRowErrors collection="artists" />
 
-        <ul class="space-y-2">
-          <li v-for="(row, index) in artists" :key="row.id" class="flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 px-3 py-2" :class="{ 'border-rose-200 bg-rose-50/40': rowError('artists', row.id) }">
-            <div class="flex flex-col">
+        <ul v-if="artists.length" class="space-y-1.5">
+          <EditorListRow v-for="(row, index) in artists" :key="row.id" :invalid="rowError('artists', row.id)" @edit="editArtist(row)" @remove="remove(album.artists, row)">
+            <span class="flex shrink-0 flex-col" @click.stop>
               <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.artists, row, -1)"><ChevronUp :size="14" /></button>
               <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === artists.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.artists, row, 1)"><ChevronDown :size="14" /></button>
-            </div>
-            <EditorRefLabel :id="row.artist_id" type="artist" :references="references" :pending="editor.pending.value" class="min-w-32 flex-1 text-sm font-medium" />
-            <input v-model="row.credited_as" class="input input-sm w-40" :placeholder="$t('editor.album.credited_as_placeholder')">
-            <input v-if="index < artists.length - 1" v-model="row.join_phrase" list="editor-join-phrases" class="input input-sm w-24 font-mono" :placeholder="', '" :title="$t('catalog.field.join_phrase')">
-            <button type="button" class="btn btn-ghost btn-sm px-2" :aria-label="$t('common.delete')" @click="remove(album.artists, row)"><Trash2 :size="14" /></button>
-          </li>
+            </span>
+            <span class="min-w-0 truncate text-sm font-medium text-gray-900">{{ nameOf('artist', row.artist_id) || '—' }}</span>
+            <span v-if="isNew(row.artist_id)" class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
+            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-gray-500">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
+            <span v-if="index < artists.length - 1" class="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500" :title="$t('catalog.field.join_phrase')">{{ shownPhrase(row.join_phrase) }}</span>
+          </EditorListRow>
         </ul>
-        <datalist id="editor-join-phrases">
-          <option v-for="phrase in JOIN_PHRASES" :key="phrase" :value="phrase" />
-        </datalist>
-        <EditorEntityPicker kind="artist" allow-create :exclude="artists.map(row => row.artist_id)" :placeholder="$t('editor.album.add_artist')" class="max-w-md" @select="addArtist" @create="createArtist" />
+        <EditorAddButton @click="editArtist(null)">{{ $t('editor.dialog.artist_add') }}</EditorAddButton>
       </div>
     </CatalogSection>
 
-    <CatalogSection :title="$t('catalog.collection.labels')" :icon="Building2" tone="amber">
+    <CatalogSection :title="$t('catalog.collection.labels')" :icon="Building2" tone="amber" :description="$t('editor.album.labels_hint')">
       <div class="space-y-3 p-5">
-        <p class="text-xs text-gray-500">{{ $t('editor.album.labels_hint') }}</p>
         <EditorAlbumRowErrors collection="labels" />
-        <ul class="space-y-2">
-          <li v-for="(row, index) in labels" :key="row.id" class="flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 px-3 py-2" :class="{ 'border-rose-200 bg-rose-50/40': rowError('labels', row.id) }">
-            <div class="flex flex-col">
+        <ul v-if="labels.length" class="space-y-1.5">
+          <EditorListRow v-for="(row, index) in labels" :key="row.id" :invalid="rowError('labels', row.id)" @edit="editLabel(row)" @remove="remove(album.labels, row)">
+            <span class="flex shrink-0 flex-col" @click.stop>
               <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.labels, row, -1)"><ChevronUp :size="14" /></button>
               <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === labels.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.labels, row, 1)"><ChevronDown :size="14" /></button>
-            </div>
-            <EditorRefLabel :id="row.label_id" type="label" :references="references" :pending="editor.pending.value" class="min-w-32 flex-1 text-sm font-medium" />
-            <select v-model="row.role" class="select select-sm w-36">
-              <option v-for="value in enums.label_role ?? []" :key="value" :value="value">{{ enumLabel('label_role', value) }}</option>
-            </select>
-            <input v-model="row.credited_as" class="input input-sm w-40" :placeholder="$t('editor.album.credited_as_placeholder')">
-            <button type="button" class="btn btn-ghost btn-sm px-2" :aria-label="$t('common.delete')" @click="remove(album.labels, row)"><Trash2 :size="14" /></button>
-          </li>
+            </span>
+            <span class="min-w-0 truncate text-sm font-medium text-gray-900">{{ nameOf('label', row.label_id) || '—' }}</span>
+            <span v-if="isNew(row.label_id)" class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
+            <span class="shrink-0 rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700">{{ enumLabel('label_role', row.role) }}</span>
+            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-gray-500">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
+          </EditorListRow>
         </ul>
-        <EditorEntityPicker kind="label" allow-create :placeholder="$t('editor.album.add_label')" class="max-w-md" @select="addLabel" @create="createLabel" />
+        <EditorAddButton @click="editLabel(null)">{{ $t('editor.dialog.label_add') }}</EditorAddButton>
       </div>
     </CatalogSection>
+
+    <EditorModal v-model="dialog" :title="dialogTitle" :description="kind === 'artist' ? $t('editor.album.artists_hint') : $t('editor.album.labels_hint')" :icon="kind === 'artist' ? Users : Building2" :tone="kind === 'artist' ? 'indigo' : 'amber'" @submit="save(false)">
+      <div class="space-y-4">
+        <div ref="picker">
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t(kind === 'artist' ? 'editor.dialog.credit_artist' : 'editor.dialog.label') }}</span>
+          <EditorPickedRef v-if="form.ref !== null" :id="form.ref" :type="kind" :references="editor.references" :pending="editor.pending.value" :icon="kind === 'artist' ? User : Building2" @remove="form.ref = null" />
+          <div v-else-if="form.newName" class="flex h-[2.125rem] items-center gap-2 rounded-[0.58rem] border border-emerald-200 bg-emerald-50 pl-2.5 pr-1 text-sm text-emerald-950">
+            <component :is="kind === 'artist' ? User : Building2" :size="14" class="shrink-0 text-emerald-500" />
+            <span class="min-w-0 flex-1 truncate font-medium">{{ form.newName }}</span>
+            <span class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
+            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-emerald-500 hover:bg-emerald-100" :aria-label="$t('common.delete')" @click="form.newName = ''"><X :size="13" /></button>
+          </div>
+          <EditorEntityPicker v-else :kind="kind" allow-create data-autofocus :exclude="kind === 'artist' ? takenArtists : []" :placeholder="$t(kind === 'artist' ? 'editor.album.add_artist' : 'editor.album.add_label')" @select="pick" @create="form.newName = $event" />
+          <span v-if="tried && form.ref === null && !form.newName" class="mt-1 block text-xs text-error">{{ $t(kind === 'artist' ? 'editor.dialog.artist_required' : 'editor.dialog.label_required') }}</span>
+        </div>
+
+        <div v-if="kind === 'label'">
+          <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.role') }}</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              v-for="value in enums.label_role ?? []"
+              :key="value"
+              type="button"
+              class="rounded-full border px-3 py-1 text-xs transition-colors"
+              :class="form.role === value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              :aria-pressed="form.role === value"
+              @click="form.role = value"
+            >{{ enumLabel('label_role', value) }}</button>
+          </div>
+        </div>
+
+        <div class="grid gap-4" :class="{ 'sm:grid-cols-[minmax(0,1fr)_9rem]': kind === 'artist' }">
+          <label class="block">
+            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.album.credited_as_placeholder') }}</span>
+            <input v-model="form.creditedAs" class="input input-sm w-full" maxlength="200" :placeholder="kind === 'artist' ? $t('editor.artist_examples.credited_placeholder') : ''">
+            <span class="mt-1 block text-[11px] text-gray-400">{{ $t('editor.dialog.shown_as_hint') }}</span>
+          </label>
+          <label v-if="kind === 'artist'" class="block">
+            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.join_phrase') }}</span>
+            <input v-model="form.joinPhrase" class="input input-sm w-full font-mono" placeholder=", ">
+          </label>
+        </div>
+
+        <template v-if="kind === 'artist'">
+          <div class="-mt-2 flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] text-gray-400">{{ $t('editor.dialog.join_phrase_hint') }}</span>
+            <button
+              v-for="phrase in JOIN_PHRASES"
+              :key="phrase"
+              type="button"
+              class="rounded-md border px-2 py-0.5 font-mono text-[11px] transition-colors"
+              :class="form.joinPhrase === phrase ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              :title="JSON.stringify(phrase)"
+              @click="form.joinPhrase = form.joinPhrase === phrase ? '' : phrase"
+            >{{ phrase.trim() || phrase }}</button>
+          </div>
+
+          <div class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
+            <span class="mr-2 text-[11px] uppercase tracking-wider text-gray-400">{{ $t('editor.preview') }}</span>
+            <template v-for="(part, index) in dialogPreview" :key="index">
+              <span :class="part.mine ? 'rounded bg-indigo-100 px-0.5 font-semibold text-indigo-800' : ''">{{ part.name }}</span><span class="whitespace-pre text-gray-400">{{ part.join }}</span>
+            </template>
+          </div>
+
+          <details class="group rounded-xl border border-amber-200 bg-amber-50/60 px-3.5 py-2.5 text-xs text-amber-900" open>
+            <summary class="flex cursor-pointer list-none items-center gap-1.5 font-semibold">
+              <Lightbulb :size="14" class="shrink-0 text-amber-500" />{{ $t('editor.artist_examples.title') }}
+              <ChevronDown :size="13" class="ml-auto shrink-0 transition-transform group-open:rotate-180" />
+            </summary>
+            <ul class="mt-2 space-y-2">
+              <li v-for="example in ARTIST_EXAMPLES" :key="example.key" class="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2.5">
+                <span class="w-fit shrink-0 rounded-md border border-amber-200 bg-white px-2 py-0.5 font-medium text-gray-800 sm:w-40">{{ example.printed }}</span>
+                <span class="leading-5">{{ $t(`editor.artist_examples.${example.key}`) }}</span>
+              </li>
+            </ul>
+          </details>
+        </template>
+      </div>
+      <template #footer>
+        <span v-if="addedCount" class="mr-auto text-xs text-emerald-600">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
+        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
+        <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
+        <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+      </template>
+    </EditorModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
-import type { AggregateRef } from '~/types/document'
-import { Building2, ChevronDown, ChevronUp, Trash2, Users } from '@lucide/vue'
+import type { AggregateRef, AlbumDocument } from '~/types/document'
+import { Building2, ChevronDown, ChevronUp, Lightbulb, User, Users, X } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, moveRow, nextOrder } from '~/utils/documentRows'
 
+type ArtistRow = AlbumDocument['artists'][number]
+type LabelRow = AlbumDocument['labels'][number]
+
 const JOIN_PHRASES = [', ', ' & ', ' × ', ' feat. ', ' and ', ' with ', ' / ', '、']
+/** How a printed artist line is entered. The printed text is the same in every language. */
+const ARTIST_EXAMPLES = [
+  { key: 'featuring', printed: '梶浦由記 feat. Joelle' },
+  { key: 'credited', printed: 'Yuki Kajiura' },
+  { key: 'circle', printed: 'IOSYS' },
+]
 
 const editor = useAlbumEditor()
+const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 
@@ -70,6 +158,7 @@ const enums = computed(() => schema.value?.enums ?? {})
 const artists = computed(() => byOrder(album.value.artists))
 const labels = computed(() => byOrder(album.value.labels))
 const rowError = (collection: string, id: string | number) => editor.errorsIn(`${collection}.${id}`).length > 0
+const isNew = (id: AggregateRef | null) => typeof id === 'string'
 
 const nameOf = (type: string, id: AggregateRef | null) => {
   if (id === null) return ''
@@ -77,6 +166,8 @@ const nameOf = (type: string, id: AggregateRef | null) => {
   const row = references[type]?.[String(id)] as { name?: string } | undefined
   return row?.name ?? `#${id}`
 }
+/** Spaces made visible, so " & " and "&" can be told apart. */
+const shownPhrase = (phrase: string | null) => (phrase || ', ').replace(/ /g, '·')
 
 /** The artist line as the album page prints it: names joined by their join phrases. */
 const preview = computed(() => artists.value.map((row, index) =>
@@ -87,21 +178,91 @@ function remove<T>(rows: T[], row: T) {
   if (index >= 0) rows.splice(index, 1)
 }
 
-const addArtistRef = (artistId: AggregateRef) => {
-  album.value.artists.push({ id: newKey('aa'), artist_id: artistId, credited_as: null, join_phrase: null, sort_order: nextOrder(album.value.artists) })
-}
-const addArtist = (item: PickedEntity) => {
-  editor.remember('artist', item.id, { id: item.id, name: item.label, image_url: item.image_url })
-  addArtistRef(item.id)
-}
-const createArtist = (name: string) => addArtistRef(editor.createItem('artist', { name, type: 'person' }))
+// ---- the dialog, shared by artists and labels ----
 
-const addLabelRef = (labelId: AggregateRef) => {
-  album.value.labels.push({ id: newKey('al'), label_id: labelId, role: 'label', credited_as: null, sort_order: nextOrder(album.value.labels) })
+const dialog = ref(false)
+const kind = ref<'artist' | 'label'>('artist')
+const editing = ref<ArtistRow | LabelRow | null>(null)
+const form = reactive({
+  ref: null as AggregateRef | null,
+  /** A new artist's or label's name; it is created only when the row is added. */
+  newName: '',
+  creditedAs: '',
+  joinPhrase: '',
+  role: 'label',
+})
+const tried = ref(false)
+const addedCount = ref(0)
+const picker = ref<HTMLElement | null>(null)
+
+const dialogTitle = computed(() => t(kind.value === 'artist'
+  ? (editing.value ? 'editor.dialog.artist_edit' : 'editor.dialog.artist_add')
+  : (editing.value ? 'editor.dialog.label_edit' : 'editor.dialog.label_add')))
+/** The artist line with this row as the dialog has it now; its own name is marked. */
+const dialogPreview = computed(() => {
+  const mine = { name: form.creditedAs.trim() || (form.ref !== null ? nameOf('artist', form.ref) : form.newName) || '…', join: form.joinPhrase || null, mine: true }
+  const list = artists.value.map(row => row === editing.value ? mine : { name: row.credited_as || nameOf('artist', row.artist_id), join: row.join_phrase, mine: false })
+  if (!editing.value) list.push(mine)
+  return list.map((item, index) => ({ name: item.name, mine: item.mine, join: index < list.length - 1 ? (item.join || ', ') : '' }))
+})
+const takenArtists = computed(() => album.value.artists.filter(row => row !== editing.value).map(row => row.artist_id))
+
+const reset = () => {
+  form.ref = null
+  form.newName = ''
+  form.creditedAs = ''
+  form.joinPhrase = ''
+  tried.value = false
 }
-const addLabel = (item: PickedEntity) => {
-  editor.remember('label', item.id, { id: item.id, name: item.label, image_url: item.image_url })
-  addLabelRef(item.id)
+
+const editArtist = (row: ArtistRow | null) => {
+  kind.value = 'artist'
+  editing.value = row
+  reset()
+  form.ref = row?.artist_id ?? null
+  form.creditedAs = row?.credited_as ?? ''
+  form.joinPhrase = row?.join_phrase ?? ''
+  addedCount.value = 0
+  dialog.value = true
 }
-const createLabel = (name: string) => addLabelRef(editor.createItem('label', { name }))
+
+const editLabel = (row: LabelRow | null) => {
+  kind.value = 'label'
+  editing.value = row
+  reset()
+  form.ref = row?.label_id ?? null
+  form.creditedAs = row?.credited_as ?? ''
+  form.role = row?.role ?? 'label'
+  addedCount.value = 0
+  dialog.value = true
+}
+
+const pick = (item: PickedEntity) => {
+  editor.remember(kind.value, item.id, { id: item.id, name: item.label, image_url: item.image_url })
+  form.ref = item.id
+}
+
+const save = async (another: boolean) => {
+  tried.value = true
+  if (form.ref === null && !form.newName) return
+  const ref = form.ref ?? editor.createItem(kind.value, kind.value === 'artist' ? { name: form.newName, type: 'person' } : { name: form.newName })
+  const creditedAs = form.creditedAs.trim() || null
+  if (kind.value === 'artist') {
+    const values = { artist_id: ref, credited_as: creditedAs, join_phrase: form.joinPhrase || null }
+    if (editing.value) Object.assign(editing.value, values)
+    else album.value.artists.push({ id: newKey('aa'), ...values, sort_order: nextOrder(album.value.artists) })
+  } else {
+    const values = { label_id: ref, role: form.role, credited_as: creditedAs }
+    if (editing.value) Object.assign(editing.value, values)
+    else album.value.labels.push({ id: newKey('al'), ...values, sort_order: nextOrder(album.value.labels) })
+  }
+  if (!another) {
+    dialog.value = false
+    return
+  }
+  addedCount.value++
+  reset()
+  await nextTick()
+  picker.value?.querySelector('input')?.focus()
+}
 </script>

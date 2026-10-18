@@ -37,6 +37,7 @@ import { DATE_PRECISIONS } from '~/types/entry'
 
 const props = defineProps<{ definition: AttributeDefinition | null, references: CatalogReferences }>()
 const model = defineModel<unknown>()
+const emit = defineEmits<{ picked: [type: string, id: number, row: Record<string, unknown>] }>()
 
 const { localizedContent } = useLocaleFormatting()
 const { enumLabel } = useCatalogDisplay()
@@ -50,5 +51,6 @@ const localReferences = computed(() => ({ ...props.references, ...Object.fromEnt
 const pick = (item: PickedEntity) => {
   picked.value = { ...picked.value, [referenceType.value]: { ...(picked.value[referenceType.value] ?? {}), [item.id]: { name: item.label, image_url: item.image_url } } }
   model.value = { type: referenceType.value, id: item.id }
+  emit('picked', referenceType.value, item.id, { name: item.label, image_url: item.image_url })
 }
 </script>

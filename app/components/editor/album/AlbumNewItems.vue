@@ -66,6 +66,7 @@ import { nextOrder } from '~/utils/documentRows'
 /** Artists, labels and works created in this revision, and other entities it edits (works that get originals). */
 const editor = useAlbumEditor()
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const enums = computed(() => schema.value?.enums ?? {})
@@ -101,8 +102,8 @@ function removeRow<T>(rows: T[], row: T) {
   if (index >= 0) rows.splice(index, 1)
 }
 
-const remove = (ref: string) => {
-  if (editor.referenced(`@${ref}`) && !confirm(t('editor.new_items.remove_confirm'))) return
+const remove = async (ref: string) => {
+  if (editor.referenced(`@${ref}`) && !await confirm({ title: t('editor.new_items.remove_confirm'), confirmText: t('editor.new_items.remove') })) return
   editor.removeItem(ref)
 }
 

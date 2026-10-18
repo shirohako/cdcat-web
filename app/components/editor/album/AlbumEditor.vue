@@ -102,13 +102,7 @@
               </div>
             </CatalogSection>
 
-            <EditorAlbumNewItems />
-
-            <div class="flex items-center justify-between gap-3">
-              <button v-if="previous" type="button" class="btn btn-ghost btn-sm gap-1" @click="go(previous.key)"><ArrowLeft :size="14" />{{ previous.label }}</button>
-              <span v-else />
-              <button v-if="next" type="button" class="btn btn-sm gap-1" :class="{ 'btn-primary': next.key === 'submit' }" @click="go(next.key)">{{ next.label }}<ArrowRight :size="14" /></button>
-            </div>
+            <EditorAlbumNewItems v-if="active === 'submit'" />
           </main>
         </div>
       </template>
@@ -124,7 +118,7 @@ import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AggregateRef, AlbumDocument, WorkDocument } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
-import { ArrowLeft, ArrowRight, Contact, Gift, History, Images, Info, Languages, ListMusic, Network, Package, PencilLine, Send, Users, Circle, CircleCheck } from '@lucide/vue'
+import { Contact, Gift, History, Images, Info, Languages, ListMusic, Network, Package, PencilLine, Send, Users, Circle, CircleCheck } from '@lucide/vue'
 import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
 import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument } from '~/utils/albumDocument'
@@ -344,12 +338,6 @@ const active = ref<AlbumSection>(props.mode === 'translate' ? 'translate' : 'bas
 const translating = computed(() => active.value === 'translate')
 const sections = computed(() => (translating.value ? SECTIONS.filter(section => section.key === 'submit') : SECTIONS)
   .map(section => ({ ...section, label: t(section.key === 'submit' ? 'editor.section_submit' : `editor.album.section.${section.key}`) })))
-const flow = computed(() => translating.value
-  ? [{ key: 'translate' as AlbumSection, label: t('editor.translate.title') }, ...sections.value]
-  : sections.value)
-const position = computed(() => flow.value.findIndex(section => section.key === active.value))
-const previous = computed(() => flow.value[position.value - 1] ?? null)
-const next = computed(() => flow.value[position.value + 1] ?? null)
 
 const go = (section: AlbumSection) => {
   active.value = section

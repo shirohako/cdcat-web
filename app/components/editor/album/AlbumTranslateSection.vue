@@ -1,8 +1,7 @@
 <template>
-  <CatalogSection :title="$t('editor.translate.title')" :icon="Languages" tone="emerald">
+  <CatalogSection :title="$t('editor.translate.title')" :icon="Languages" tone="emerald" :description="$t('editor.translate.hint')">
     <template #actions>{{ $t('editor.translate.progress', { done: done, total: rows.length }) }}</template>
     <div class="space-y-4 p-3 sm:p-5">
-      <p class="text-xs text-gray-500">{{ $t('editor.translate.hint') }}</p>
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('editor.translate.language') }}</span>

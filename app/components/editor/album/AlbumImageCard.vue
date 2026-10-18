@@ -30,7 +30,7 @@
       <input v-model="image.caption" class="input input-sm w-full" maxlength="500" :placeholder="$t('editor.image.caption_placeholder')">
       <details :open="hasAttributes">
         <summary class="cursor-pointer text-[11px] font-medium text-gray-500">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
-        <EditorAttributeRows v-model="album.image_attributes" subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
+        <EditorAttributeRows v-model="album.image_attributes" compact subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
       </details>
       <p v-if="file" class="text-[10px] text-gray-400">{{ file.width }} × {{ file.height }}</p>
       <p v-for="error in errors" :key="error.path" class="text-[11px] text-error">{{ error.message }}</p>

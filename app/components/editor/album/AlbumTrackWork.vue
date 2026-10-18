@@ -1,7 +1,8 @@
 <template>
   <div v-if="track" class="space-y-3">
     <div>
-      <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('editor.work.song') }}</p>
+      <p class="text-xs font-semibold text-gray-600">{{ $t('editor.work.song') }}</p>
+      <p class="mb-1.5 text-[11px] text-gray-400">{{ $t('editor.work.hint') }}</p>
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <span v-if="track.work_id === null" class="text-gray-500">{{ $t('editor.work.auto') }}</span>
         <template v-else>
@@ -9,10 +10,8 @@
           <span v-if="recordings > 1" class="text-xs text-gray-400">{{ $t('editor.work.recordings', { count: recordings }) }}</span>
           <button v-if="recordings > 1" type="button" class="btn btn-ghost btn-xs" @click="separate">{{ $t('editor.work.separate') }}</button>
         </template>
-        <button type="button" class="btn btn-ghost btn-xs" @click="picking = !picking">{{ $t('editor.work.link_other') }}</button>
+        <button type="button" class="btn btn-ghost btn-xs" @click="picking = true">{{ $t('editor.work.link_other') }}</button>
       </div>
-      <EditorEntityPicker v-if="picking" kind="work" class="mt-2 max-w-md" :placeholder="$t('editor.work.search')" :exclude="[track.work_id]" @select="link" />
-      <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.work.hint') }}</p>
     </div>
 
     <div v-if="candidates.length" class="rounded-lg border border-amber-200 bg-amber-50/60 p-2.5">
@@ -30,7 +29,8 @@
     </div>
 
     <div>
-      <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('editor.work.originals') }}</p>
+      <p class="text-xs font-semibold text-gray-600">{{ $t('editor.work.originals') }}</p>
+      <p class="mb-1.5 text-[11px] text-gray-400">{{ $t('editor.work.originals_hint') }}</p>
       <p v-if="loading" class="mb-2 text-xs text-gray-400">{{ $t('common.loading') }}</p>
       <ul v-else-if="originals.length" class="mb-2 space-y-1.5">
         <li v-for="row in originals" :key="row.id" class="flex flex-wrap items-center gap-2 text-sm">
@@ -41,22 +41,61 @@
           <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.delete')" @click="removeOriginal(row.id)"><X :size="12" /></button>
         </li>
       </ul>
-      <div class="flex flex-wrap items-center gap-2">
-        <select v-model="relation" class="select select-sm h-8 w-36 text-xs" :aria-label="$t('catalog.field.relation_type')">
-          <option v-for="value in ORIGIN_RELATIONS" :key="value" :value="value">{{ enumLabel('work_relation', value) }}</option>
-        </select>
-        <EditorEntityPicker
-          kind="work"
-          allow-create
-          class="min-w-56 flex-1"
-          :placeholder="$t('editor.work.search_original')"
-          :exclude="[track.work_id, ...originals.map(row => row.related_work_id)]"
-          @select="pickOriginal"
-          @create="createOriginal"
-        />
-      </div>
-      <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.work.originals_hint') }}</p>
+      <EditorAddButton small @click="openOriginal">{{ $t('editor.dialog.original_add') }}</EditorAddButton>
     </div>
+
+    <EditorModal v-model="picking" :title="$t('editor.work.link_other')" :description="$t('editor.work.hint')" :icon="Music" tone="indigo">
+      <EditorEntityPicker kind="work" data-autofocus :placeholder="$t('editor.work.search')" :exclude="[track.work_id]" @select="link" />
+      <p class="mt-2 text-[11px] text-gray-400">{{ $t('editor.dialog.pick_closes') }}</p>
+    </EditorModal>
+
+    <EditorModal v-model="originalOpen" :title="$t('editor.dialog.original_add')" :description="$t('editor.work.originals_hint')" :icon="GitBranch" tone="indigo" @submit="saveOriginal">
+      <div class="space-y-4">
+        <div>
+          <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.relation_type') }}</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button
+              v-for="value in ORIGIN_RELATIONS"
+              :key="value"
+              type="button"
+              class="rounded-full border px-3 py-1 text-xs transition-colors"
+              :class="relation === value ? 'border-indigo-400 bg-indigo-50 font-medium text-indigo-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              :aria-pressed="relation === value"
+              @click="relation = value"
+            >{{ enumLabel('work_relation', value) }}</button>
+          </div>
+        </div>
+        <div>
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.work.originals') }}</span>
+          <EditorPickedRef v-if="original.ref !== null" :id="original.ref" type="work" :references="references" :pending="editor.pending.value" :icon="Music" @remove="original.ref = null" />
+          <div v-else-if="original.newTitle" class="flex h-[2.125rem] items-center gap-2 rounded-[0.58rem] border border-emerald-200 bg-emerald-50 pl-2.5 pr-1 text-sm text-emerald-950">
+            <Music :size="14" class="shrink-0 text-emerald-500" />
+            <span class="min-w-0 flex-1 truncate font-medium">{{ original.newTitle }}</span>
+            <span class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
+            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-emerald-500 hover:bg-emerald-100" :aria-label="$t('common.delete')" @click="original.newTitle = ''"><X :size="13" /></button>
+          </div>
+          <EditorEntityPicker
+            v-else
+            kind="work"
+            allow-create
+            data-autofocus
+            :placeholder="$t('editor.work.search_original')"
+            :exclude="[track.work_id, ...originals.map(row => row.related_work_id)]"
+            @select="pickOriginal"
+            @create="original.newTitle = $event"
+          />
+          <span v-if="original.tried && original.ref === null && !original.newTitle" class="mt-1 block text-xs text-error">{{ $t('editor.dialog.original_required') }}</span>
+        </div>
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.note') }}</span>
+          <input v-model="original.note" class="input input-sm w-full" maxlength="500">
+        </label>
+      </div>
+      <template #footer>
+        <button type="button" class="btn btn-ghost btn-sm" @click="originalOpen = false">{{ $t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary btn-sm">{{ $t('common.add') }}</button>
+      </template>
+    </EditorModal>
   </div>
 </template>
 
@@ -64,7 +103,7 @@
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { AggregateRef, RowId, WorkDocument } from '~/types/document'
 import type { WorkSuggestion } from '~/types/work'
-import { X } from '@lucide/vue'
+import { GitBranch, Music, X } from '@lucide/vue'
 import { ORIGIN_RELATIONS } from '~/types/work'
 import { findTrack } from '~/utils/albumDocument'
 import { newKey } from '~/utils/documentKeys'
@@ -138,22 +177,39 @@ const ownItem = async () => {
   return editor.workItem(track.value!.work_id)
 }
 
-const addOriginal = async (relatedId: AggregateRef) => {
+const addOriginal = async (relatedId: AggregateRef, note: string | null) => {
   const item = await ownItem()
   if (!item?.document) return
   const relations = (item.document.relations ??= []) as Relation[]
   if (!relations.some(row => sameId(row.related_work_id, relatedId))) {
-    relations.push({ id: newKey('wr'), related_work_id: relatedId, relation_type: relation.value, note: null })
+    relations.push({ id: newKey('wr'), related_work_id: relatedId, relation_type: relation.value, note })
   }
+}
+
+// ---- the original dialog; the relation type stays from the last original added ----
+
+const originalOpen = ref(false)
+/** The original: an id or "@ref", or the title of a work to create once it is added. */
+const original = reactive({ ref: null as AggregateRef | null, newTitle: '', note: '', tried: false })
+
+const openOriginal = () => {
+  Object.assign(original, { ref: null, newTitle: '', note: '', tried: false })
+  originalOpen.value = true
 }
 
 const pickOriginal = (item: PickedEntity) => {
   editor.remember('work', item.id, { id: item.id, title: item.label })
-  void addOriginal(item.id)
+  original.ref = item.id
 }
 
-/** An original that is not in the catalog yet becomes a new work in this revision. */
-const createOriginal = (title: string) => { void addOriginal(editor.createItem('work', { title })) }
+const saveOriginal = () => {
+  original.tried = true
+  if (original.ref === null && !original.newTitle) return
+  // An original that is not in the catalog yet becomes a new work in this revision.
+  const ref = original.ref ?? editor.createItem('work', { title: original.newTitle })
+  void addOriginal(ref, original.note.trim() || null)
+  originalOpen.value = false
+}
 
 const editRelations = async (change: (relations: Relation[]) => void) => {
   const item = await editor.workItem(track.value!.work_id!)

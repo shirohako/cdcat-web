@@ -1,23 +1,19 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.images')" :icon="Images" tone="sky">
+  <CatalogSection :title="$t('editor.album.section.images')" :icon="Images" tone="sky" :description="$t('editor.image.gallery_hint')">
     <div class="space-y-5 p-3 sm:p-5">
       <div class="grid gap-5 sm:grid-cols-[13rem_1fr]">
         <div>
           <p class="mb-1.5 text-sm font-medium text-gray-700">{{ $t('editor.album.cover') }} <span class="text-error">*</span></p>
           <EditorAlbumCoverSlot />
         </div>
-        <div class="space-y-3 text-sm text-gray-600">
-          <p>{{ $t('editor.image.gallery_hint') }}</p>
+        <div class="space-y-3 text-sm text-gray-600 sm:pt-6">
           <div class="flex flex-wrap items-center gap-2">
-            <label class="btn btn-sm cursor-pointer gap-1" :class="{ 'btn-disabled': uploading > 0 }">
+            <label class="btn btn-add btn-sm cursor-pointer gap-1" :class="{ 'btn-disabled': uploading > 0 }">
               <Upload :size="14" />{{ $t('editor.image.upload_many') }}
               <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
             </label>
+            <button type="button" class="btn btn-add btn-sm gap-1" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
             <span v-if="uploading" class="flex items-center gap-1.5 text-xs text-gray-500"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</span>
-          </div>
-          <div class="flex max-w-lg gap-2">
-            <input v-model.trim="url" type="url" class="input input-sm min-w-0 flex-1" placeholder="https://" @keydown.enter.prevent="fromUrl">
-            <button type="button" class="btn btn-sm" :disabled="!url || importing" @click="fromUrl">{{ $t('editor.image.import') }}</button>
           </div>
           <ul v-if="failures.length" class="space-y-0.5 text-xs text-error">
             <li v-for="failure in failures" :key="failure">{{ failure }}</li>
@@ -37,6 +33,16 @@
       </ul>
       <p v-else class="text-sm text-gray-400">{{ $t('editor.image.none') }}</p>
 
+      <EditorImageImportDialog v-model="urlOpen" :busy="importing" :error="urlError" @import="fromUrl">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.kind') }}</span>
+          <select v-model="urlKind" class="select select-sm w-full">
+            <option value="">{{ $t('editor.dialog.image_kind_guess') }}</option>
+            <option v-for="value in kinds" :key="value" :value="value" :disabled="value === 'cover'">{{ enumLabel('image_kind', value) }}</option>
+          </select>
+        </label>
+      </EditorImageImportDialog>
+
       <datalist v-for="(presets, kind) in LABEL_PRESETS" :id="`editor-image-labels-${kind}`" :key="kind">
         <option v-for="preset in presets" :key="preset" :value="preset" />
       </datalist>
@@ -46,7 +52,7 @@
 
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
-import { Images, Upload } from '@lucide/vue'
+import { Images, Link2, Upload } from '@lucide/vue'
 import { addImage, coverOf } from '~/utils/albumDocument'
 import { byOrder, moveRow, sameId } from '~/utils/documentRows'
 
@@ -62,6 +68,9 @@ const editor = useAlbumEditor()
 const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
 const { limits, upload, importUrl } = useImageUpload()
+const { schema } = useCatalogSchema()
+const { enumLabel } = useCatalogDisplay()
+const kinds = computed(() => schema.value?.enums?.image_kind ?? [])
 
 const album = computed(() => editor.album.value)
 /** Every image but the album cover, which has its own slot. */
@@ -70,7 +79,10 @@ const gallery = computed(() => byOrder(album.value.images).filter(image => !same
 const uploading = ref(0)
 const importing = ref(false)
 const failures = ref<string[]>([])
-const url = ref('')
+const urlOpen = ref(false)
+const urlError = ref('')
+/** The kind for an imported image; blank guesses it from the address. */
+const urlKind = ref('')
 
 const guessKind = (name: string) => {
   const lower = name.toLowerCase()
@@ -110,15 +122,20 @@ const pick = async (event: Event) => {
   }
 }
 
-const fromUrl = async () => {
-  if (!url.value) return
+const openUrl = () => {
+  urlError.value = ''
+  urlKind.value = ''
+  urlOpen.value = true
+}
+
+const fromUrl = async (url: string) => {
   importing.value = true
-  failures.value = []
+  urlError.value = ''
   try {
-    place(await importUrl(url.value), guessKind(url.value))
-    url.value = ''
+    place(await importUrl(url), urlKind.value || guessKind(url))
+    urlOpen.value = false
   } catch (error) {
-    failures.value.push(localizeError(error))
+    urlError.value = localizeError(error)
   } finally {
     importing.value = false
   }

@@ -67,11 +67,11 @@
 
       <div>
         <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_attributes') }}</p>
-        <EditorAttributeRows v-model="album.track_attributes" subject="track" :owner="{ field: 'track_id', id: track.id }" :references="editor.references" />
+        <EditorAttributeRows v-model="album.track_attributes" compact subject="track" :owner="{ field: 'track_id', id: track.id }" :references="editor.references" />
       </div>
       <div>
         <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_links') }}</p>
-        <EditorLinkRows v-model="album.track_links" :owner="{ field: 'track_id', id: track.id }" />
+        <EditorLinkRows v-model="album.track_links" compact :owner="{ field: 'track_id', id: track.id }" />
       </div>
     </div>
   </div>
@@ -89,6 +89,7 @@ const emit = defineEmits<{ next: [], dismiss: [workId: number] }>()
 
 const editor = useAlbumEditor()
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const album = computed(() => editor.album.value)
 const track = computed(() => findTrack(album.value, props.trackId))
 const discs = computed(() => sortedDiscs(album.value))
@@ -114,8 +115,8 @@ const moveTo = (discId: string) => {
   if (disc) moveTrackToDisc(album.value, props.trackId, disc.id)
 }
 
-const remove = () => {
-  if (typeof props.trackId === 'number' && !confirm(t('editor.album.remove_track_confirm', { title: track.value?.title ?? '' }))) return
+const remove = async () => {
+  if (typeof props.trackId === 'number' && !await confirm({ title: t('editor.album.remove_track_confirm', { title: track.value?.title ?? '' }) })) return
   removeTrack(album.value, props.trackId)
 }
 </script>

@@ -66,6 +66,7 @@ const props = defineProps<{
 const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [] }>()
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
 const { schema } = useCatalogSchema()
 const { hasPermission } = useAuth()
 const { enumLabel } = useCatalogDisplay()
@@ -126,7 +127,7 @@ const submit = async () => {
 }
 
 const discard = async () => {
-  if (!confirm(t(props.draft.revisionId.value ? 'editor.restored_discard_confirm' : 'editor.discard_confirm'))) return
+  if (!await confirm({ title: t(props.draft.revisionId.value ? 'editor.restored_discard_confirm' : 'editor.discard_confirm'), confirmText: t(props.draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') })) return
   await props.draft.discard()
   emit('discarded')
 }

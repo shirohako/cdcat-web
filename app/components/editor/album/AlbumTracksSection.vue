@@ -1,5 +1,5 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" tone="indigo">
+  <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" tone="indigo" :description="$t('editor.album.tracks_hint')">
     <template #actions>
       <button type="button" class="btn btn-xs gap-1" @click="pasteOpen = true"><ClipboardPaste :size="12" />{{ $t('editor.paste.button') }}</button>
       <button type="button" class="btn btn-xs gap-1" :disabled="suggesting || !album.tracks.length" @click="suggest">
@@ -8,7 +8,6 @@
     </template>
 
     <div class="space-y-4 p-3 sm:p-5">
-      <p class="text-xs text-gray-500">{{ $t('editor.album.tracks_hint') }}</p>
       <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
@@ -35,7 +34,7 @@
       />
 
       <div class="flex flex-wrap items-center gap-2">
-        <button type="button" class="btn btn-sm gap-1" @click="addDisc(album)"><Plus :size="14" />{{ $t('editor.album.add_disc') }}</button>
+        <EditorAddButton @click="addDisc(album)">{{ $t('editor.album.add_disc') }}</EditorAddButton>
         <span class="ml-auto text-xs text-gray-400">{{ $t('editor.album.totals', { discs: discs.length, tracks: album.tracks.length }) }}</span>
       </div>
     </div>
@@ -48,7 +47,7 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { WorkSuggestion } from '~/types/work'
-import { ClipboardPaste, ListMusic, Plus, Sparkles } from '@lucide/vue'
+import { ClipboardPaste, ListMusic, Sparkles } from '@lucide/vue'
 import { addDisc, findTrack, orderedTracks, sortedDiscs } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
