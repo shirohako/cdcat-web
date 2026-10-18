@@ -3,7 +3,7 @@ import type { AdminHandledReport, AdminPagination, AdminReportGroup } from '~/ty
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-type Action = 'unpublish' | 'delete' | 'hide' | 'none'
+type Action = 'delete' | 'hide' | 'lock' | 'none'
 
 const route = useRoute()
 const router = useRouter()
@@ -121,7 +121,8 @@ useHead({ title: computed(() => t('admin_pages.reports.title')) })
                 <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">{{ t('admin_pages.reports.accept_delete_post') }}</button>
               </template>
               <template v-else>
-                <button v-if="group.target.status === 'published'" type="button" class="rounded-lg border border-rose-300 px-2.5 py-1.5 text-rose-700" @click="start(group, 'accept', 'unpublish')">{{ t('admin_pages.reports.accept_unpublish') }}</button>
+                <button v-if="group.target.status === 'published'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="start(group, 'accept', 'hide')">{{ t('admin_pages.reports.accept_hide_article') }}</button>
+                <button v-if="group.target.status !== 'locked'" type="button" class="rounded-lg border border-rose-300 px-2.5 py-1.5 text-rose-700" @click="start(group, 'accept', 'lock')">{{ t('admin_pages.reports.accept_lock') }}</button>
                 <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">{{ t('admin_pages.reports.accept_delete') }}</button>
               </template>
             </div>
@@ -153,7 +154,7 @@ useHead({ title: computed(() => t('admin_pages.reports.title')) })
       <footer v-if="data && data.pagination.last_page > 1" class="mt-4"><CommonPagination v-model:page="page" :total-pages="data.pagination.last_page" :disabled="pending" /></footer>
     </AdminListState>
     <AdminConfirmDialog
-      v-model="resolveOpen" :busy="busy" :reason-required="resolving?.action === 'delete' || resolving?.action === 'hide'"
+      v-model="resolveOpen" :busy="busy" :reason-required="resolving?.action === 'delete' || resolving?.action === 'hide' || resolving?.action === 'lock'"
       :title="resolving ? t(`admin_pages.reports.confirm.${resolving.decision === 'dismiss' ? 'dismiss' : resolving.group.target.type !== 'article' && resolving.action !== 'none' ? `${resolving.group.target.type}_${resolving.action}` : resolving.action}`) : ''"
       :description="resolving?.group.target.type === 'post' ? t('admin_pages.reports.confirm_help_post') : t('admin_pages.reports.confirm_help')" @confirm="resolve"
     >

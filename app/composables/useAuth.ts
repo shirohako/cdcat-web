@@ -91,8 +91,11 @@ export const useAuth = () => {
 
   // 登出
   const logout = async () => {
-    // Revision drafts are kept in this browser until submitted; logging out deletes them all.
-    if (import.meta.client) await localDrafts.clear().catch(() => undefined)
+    // Revision drafts and unsaved article edits are kept in this browser; logging out deletes them all.
+    if (import.meta.client) {
+      await localDrafts.clear().catch(() => undefined)
+      clearLocalArticleDrafts()
+    }
     try {
       await $api('/v1/auth/logout', { method: 'POST', retry: 0 })
 

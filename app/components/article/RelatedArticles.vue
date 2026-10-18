@@ -5,6 +5,7 @@ import type { ArticleCard, ContentLinkType } from '~/types/article'
 /** Published articles linking a piece of content; renders nothing when there are none. */
 const props = defineProps<{ type: ContentLinkType, id: number }>()
 const { t } = useI18n()
+const { typeName } = useArticleTypes()
 const { $api } = useNuxtApp()
 const { formatDate } = useLocaleFormatting()
 const { data: articles } = await useAsyncData(`related-articles-${props.type}-${props.id}`,
@@ -29,7 +30,7 @@ const { data: articles } = await useAsyncData(`related-articles-${props.type}-${
         </div>
         <div class="min-w-0 flex-1">
           <p class="line-clamp-2 text-sm font-medium leading-snug text-gray-800 transition-colors group-hover:text-amber-600">{{ article.title }}</p>
-          <p class="mt-1 text-[11px] text-gray-400">{{ [article.type ? t(`article_ui.types.${article.type}`) : null, article.published_at ? formatDate(article.published_at) : null].filter(Boolean).join(' · ') }}</p>
+          <p class="mt-1 text-[11px] text-gray-400">{{ [article.type ? typeName(article.type) : null, article.published_at ? formatDate(article.published_at) : null].filter(Boolean).join(' · ') }}</p>
         </div>
       </NuxtLink>
     </div>

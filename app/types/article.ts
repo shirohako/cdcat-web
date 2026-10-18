@@ -1,9 +1,17 @@
 /** Articles and the shared community pieces they use. See docs/api/articles.md in the backend. */
 
-export const ARTICLE_TYPES = ['review', 'feature', 'interview', 'news', 'guide', 'translation', 'essay', 'other'] as const
-export type ArticleType = typeof ARTICLE_TYPES[number]
+/** A key of an article type; the list is maintained in the admin panel (GET /article-types). */
+export type ArticleType = string
 
-export const ARTICLE_STATUSES = ['draft', 'pending', 'published', 'rejected', 'unpublished'] as const
+export interface ArticleTypeDefinition {
+  key: ArticleType
+  names: Record<string, string>
+  sort_order: number
+  is_active: boolean
+}
+
+/** draft: saved, not on the site; hidden: taken off by the author or a moderator; locked: frozen by a moderator. */
+export const ARTICLE_STATUSES = ['draft', 'published', 'hidden', 'locked'] as const
 export type ArticleStatus = typeof ARTICLE_STATUSES[number]
 
 export const CONTENT_LINK_TYPES = ['album', 'artist', 'entry', 'franchise', 'event'] as const
@@ -59,55 +67,39 @@ export interface ArticleCard {
 export interface ArticleDetail extends ArticleCard {
   content: string
   links: ContentLinkSummary[]
-  /** Set when the live version changed after the first publication. */
+  /** Set when the article was edited well after its first publication. */
   updated_at: string | null
   /** The discussion topic that serves as the comment section. */
   discussion_topic_id: number | null
   can: { edit: boolean, manage: boolean, report: boolean }
 }
 
-export interface ArticleVersion {
-  /** Null for an unsaved copy of the live version. */
-  id: number | null
-  status: 'draft' | 'pending' | 'rejected' | 'published'
-  revision: number
-  type: ArticleType | null
-  title: string | null
-  summary: string | null
-  cover_url: string | null
-  submit_note: string | null
-  review_note: string | null
-  editor: UserSummary | null
-  published_at: string | null
-  reviewed_at: string | null
-  updated_at: string | null
-  is_live?: boolean
-}
-
-export interface ArticleVersionContent extends ArticleVersion {
-  content: string | null
-  links: ContentLink[]
-  tag_ids: number[]
-}
-
-/** What the writing page loads and every workflow action returns. */
-export interface ArticleDraftPayload {
+/** What the writing page loads (GET /articles/{id}/edit) and every save or action returns. */
+export interface ArticleEditPayload {
   article: {
     id: number
     status: ArticleStatus
     slug: string | null
+    /** Why a moderator hid or locked it. */
     status_reason: string | null
+    /** Bumped on every save; a save based on an older one is refused with ARTICLE_DRAFT_CONFLICT. */
+    revision: number
+    type: ArticleType | null
+    title: string | null
+    summary: string | null
+    cover_url: string | null
+    content: string | null
+    links: ContentLinkSummary[]
+    tags: TagSummary[]
     featured: boolean
-    has_live_version: boolean
     published_at: string | null
-    submitted_at: string | null
+    edited_at: string | null
+    updated_at: string | null
   }
-  draft: Omit<ArticleVersionContent, 'links' | 'tag_ids'> & { links: ContentLinkSummary[], tags: TagSummary[] }
-  review_note: string | null
-  can: { edit: boolean, submit: boolean, publish: boolean, withdraw: boolean, discard: boolean }
+  can: { edit: boolean, save_draft: boolean, publish: boolean, update: boolean, hide: boolean }
 }
 
-/** The editable fields sent to POST /articles and PUT /articles/{id}/draft. */
+/** The editable fields sent to POST /articles, PUT /articles/{id} and POST …/publish. */
 export interface ArticleDraftFields {
   type: ArticleType | null
   title: string
@@ -129,11 +121,9 @@ export interface MyArticle {
   views_count: number
   title: string | null
   type: ArticleType | null
-  has_live_version: boolean
-  has_changes: boolean
   featured: boolean
   published_at: string | null
-  submitted_at: string | null
+  edited_at: string | null
   updated_at: string | null
 }
 

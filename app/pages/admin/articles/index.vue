@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AdminArticleItem, AdminPagination } from '~/types/admin'
-import { ARTICLE_TYPES } from '~/types/article'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
@@ -8,18 +7,18 @@ const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
+const { types, typeName } = useArticleTypes()
 
-// Tabs map onto list filters; the review queue is the default view.
+// Tabs map onto list filters; everything, newest first, is the default view.
 const tabs = [
-  { key: 'pending', query: { status: 'pending' } },
+  { key: 'all', query: { status: 'all' } },
   { key: 'reported', query: { reported: '1' } },
   { key: 'published', query: { status: 'published' } },
-  { key: 'rejected', query: { status: 'rejected' } },
-  { key: 'unpublished', query: { status: 'unpublished' } },
+  { key: 'hidden', query: { status: 'hidden' } },
+  { key: 'locked', query: { status: 'locked' } },
   { key: 'draft', query: { status: 'draft' } },
-  { key: 'all', query: { status: 'all' } },
 ] as const
-const activeTab = computed(() => route.query.reported ? 'reported' : String(route.query.status || 'pending'))
+const activeTab = computed(() => route.query.reported ? 'reported' : String(route.query.status || 'all'))
 const filterKeys = ['search', 'type', 'user_id'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
@@ -42,8 +41,8 @@ const { data, pending, error, refresh } = await useAsyncData('admin-articles',
   () => $api<{ items: AdminArticleItem[], pagination: AdminPagination }>('/v1/admin/articles', { query: query.value }), { watch: [query] })
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 const statusTone: Record<string, string> = {
-  pending: 'border-amber-200 text-amber-700', published: 'border-emerald-200 text-emerald-700',
-  rejected: 'border-rose-200 text-rose-700', unpublished: 'border-rose-200 text-rose-700', draft: 'border-slate-200 text-slate-500',
+  published: 'border-emerald-200 text-emerald-700', hidden: 'border-amber-200 text-amber-700',
+  locked: 'border-rose-200 text-rose-700', draft: 'border-slate-200 text-slate-500',
 }
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
 useHead({ title: computed(() => t('admin_pages.articles.title')) })
@@ -67,7 +66,7 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.articles.search')" :aria-label="t('admin_pages.articles.search')" :class="[field, 'w-56']">
         <select v-model="filters.type" :aria-label="t('admin_pages.articles.type')" :class="field">
           <option value="">{{ t('admin_pages.articles.all_types') }}</option>
-          <option v-for="value in ARTICLE_TYPES" :key="value" :value="value">{{ t(`admin_pages.articles.types.${value}`) }}</option>
+          <option v-for="option in types" :key="option.key" :value="option.key">{{ typeName(option.key, 'zh-Hans') }}{{ option.is_active ? '' : `（${t('admin_pages.article_types.inactive')}）` }}</option>
         </select>
         <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" :class="[field, 'w-28']">
         <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
@@ -81,7 +80,7 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
               <tr>
                 <th class="px-4 py-3">{{ t('admin_pages.articles.article') }}</th><th class="px-4 py-3">{{ t('admin_pages.articles.author') }}</th>
                 <th class="px-4 py-3">{{ t('admin_pages.articles.status') }}</th><th class="px-4 py-3">{{ t('admin_pages.articles.reports') }}</th>
-                <th class="px-4 py-3">{{ activeTab === 'pending' ? t('admin_pages.articles.submitted_at') : t('admin_pages.content.sorts.updated_at') }}</th>
+                <th class="px-4 py-3">{{ t('admin_pages.content.sorts.updated_at') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -89,15 +88,14 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
                 <td class="max-w-md px-4 py-3">
                   <NuxtLink :to="`/admin/articles/${article.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ article.title || t('admin_pages.articles.untitled') }}</NuxtLink>
                   <p class="mt-0.5 text-xs text-slate-500">
-                    <span v-if="article.type">{{ t(`admin_pages.articles.types.${article.type}`) }}</span>
+                    <span v-if="article.type">{{ typeName(article.type, 'zh-Hans') }}</span>
                     <span v-if="article.featured" class="ml-2 text-violet-600">{{ t('admin_pages.articles.featured') }}</span>
-                    <span v-if="article.has_changes" class="ml-2">{{ t('admin_pages.articles.has_changes') }}</span>
                   </p>
                 </td>
                 <td class="px-4 py-3">{{ article.author?.nickname || article.author?.username || '—' }}</td>
                 <td class="px-4 py-3"><span class="rounded-full border px-2 py-0.5 text-xs" :class="statusTone[article.status]">{{ t(`admin_pages.articles.statuses.${article.status}`) }}</span></td>
                 <td class="px-4 py-3 tabular-nums" :class="article.pending_reports ? 'font-semibold text-rose-600' : 'text-slate-400'">{{ article.pending_reports || '—' }}</td>
-                <td class="px-4 py-3 text-xs text-slate-500">{{ time(activeTab === 'pending' ? article.submitted_at : article.updated_at) }}</td>
+                <td class="px-4 py-3 text-xs text-slate-500">{{ time(article.updated_at) }}</td>
               </tr>
             </tbody>
           </table>

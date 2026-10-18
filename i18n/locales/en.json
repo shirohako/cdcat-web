@@ -415,7 +415,6 @@
       "article_not_found": "This article does not exist or is not published.",
       "article_draft_conflict": "This draft was changed elsewhere. Reload it before saving.",
       "article_invalid_state": "The article cannot do this in its current state.",
-      "article_pending_limit": "You already have 3 articles in review. Please wait for the results.",
       "content_blocked": "The content contains words that are not allowed.",
       "already_reported": "You have already reported this. It is waiting to be reviewed.",
       "rate_limit_exceeded": "Too many requests. Please try again later.",
@@ -529,25 +528,13 @@
     "write": "Write",
     "untitled": "Untitled",
     "featured": "Editors' pick",
-    "has_changes": "unpublished changes",
     "views": "{count} views",
     "minutes": "{count} min",
-    "types": {
-      "review": "Review",
-      "feature": "Feature",
-      "interview": "Interview",
-      "news": "News",
-      "guide": "Guide",
-      "translation": "Translation",
-      "essay": "Essay",
-      "other": "Other"
-    },
     "statuses": {
       "draft": "Draft",
-      "pending": "In review",
       "published": "Published",
-      "rejected": "Returned",
-      "unpublished": "Taken down"
+      "hidden": "Hidden",
+      "locked": "Locked"
     },
     "link_types": {
       "album": "Album",
@@ -612,44 +599,41 @@
       "outline": "Outline",
       "outline_empty": "Divide the text with ## headings to see an outline here.",
       "saving": "Saving…",
-      "unsaved": "Unsaved changes",
-      "save_failed": "Save failed",
       "not_saved": "Not saved yet",
       "saved": "Saved",
       "saved_at": "Saved at {time}",
       "actions": {
-        "submit": "Submit for review",
-        "resubmit": "Resubmit",
+        "save_draft": "Save draft",
+        "update": "Update",
         "publish": "Publish",
-        "publish_changes": "Publish changes",
-        "withdraw": "Withdraw"
+        "republish": "Publish again",
+        "hide": "Hide"
       },
-      "discard": "Discard changes",
-      "discard_title": "Discard changes?",
-      "discard_description": "The working copy is deleted and the live version stays. This cannot be undone.",
-      "discarded": "Changes discarded",
-      "withdrawn": "Withdrawn. You can keep editing.",
-      "submitted": "Submitted for review",
       "published": "Published",
-      "notice_pending": "This article is in review and cannot be edited. Withdraw it to make changes.",
-      "notice_rejected": "Returned by a moderator: ",
-      "notice_unpublished": "Taken down: ",
-      "notice_published": "You are editing a published article. Readers see your changes once you publish them.",
-      "backup_found": "Found local text from {time} that never reached the server.",
-      "backup_restore": "Restore",
-      "backup_dismiss": "Discard",
-      "conflict_title": "This draft changed elsewhere",
+      "notice_published": "You are editing a published article. Your changes reach readers when you click “Update”.",
+      "conflict_title": "This article was saved elsewhere",
       "conflict_description": "The server has a newer copy saved at {time}, perhaps from another window. Which one do you want to keep?",
       "conflict_keep_mine": "Keep mine",
       "conflict_use_server": "Use the server copy",
-      "leave_confirm": "Some changes have not been saved. Leave anyway?"
+      "leave_confirm": "Your changes are kept in this browser but not saved to the server yet. Leave anyway?",
+      "unsaved_local": "Unsaved changes, kept in this browser",
+      "draft_saved": "Draft saved",
+      "updated": "Updated",
+      "hidden": "Hidden from the site",
+      "hide_title": "Hide this article?",
+      "hide_description": "Readers will no longer see it. You can publish it again at any time.",
+      "notice_hidden": "This article is hidden and readers cannot see it. ",
+      "notice_hidden_reason": "A moderator hid it: {reason}",
+      "notice_locked": "A moderator locked this article. It is off the site and cannot be edited. ",
+      "local_restored": "Restored the unsaved changes you made at {time} in this browser.",
+      "local_stale": "You have unsaved changes from {time} in this browser, but the article was saved elsewhere since.",
+      "local_restore": "Use my changes",
+      "local_discard": "Discard them",
+      "save_shortcut": "Ctrl+S"
     },
     "submit": {
-      "submit_title": "Submit for review",
-      "submit_description": "The article goes public once approved. Later edits need no review.",
-      "submit_confirm": "Submit",
       "publish_title": "Publish",
-      "publish_description": "The content goes public right away; the old version stays in the history.",
+      "publish_description": "The article goes public right away; no review is needed.",
       "publish_confirm": "Publish",
       "checks": {
         "title": "Title of 2–100 characters",
@@ -659,8 +643,9 @@
         "cover": "Cover set"
       },
       "optional": "Suggested",
-      "note": "Note to the reviewer (optional)",
-      "note_placeholder": "e.g. sources or permission to repost"
+      "republish_title": "Publish again",
+      "republish_description": "The article goes back on the site with what you have now.",
+      "republish_confirm": "Publish"
     },
     "errors": {
       "title": "The title needs 2–100 characters.",
@@ -672,15 +657,12 @@
       "tag_ids": "Some tags cannot be used.",
       "slug": "This link is taken or malformed.",
       "blocked": "The content contains words that are not allowed. Edit it and try again.",
-      "pending_limit": "You already have 3 articles in review. Please wait for the results.",
-      "conflict": "This draft changed elsewhere. Choose which version to keep.",
-      "invalid_state": "The article cannot do this in its current state. Reload and try again.",
-      "revision": "The draft is out of date. Reload and try again.",
-      "note": "The note can be at most 1,000 characters."
+      "conflict": "This article was saved elsewhere. Choose which copy to keep.",
+      "invalid_state": "The article cannot do this in its current state. Reload and try again."
     },
     "mine": {
       "title": "My articles",
-      "description": "Drafts save automatically. The first publication is reviewed; later edits take effect at once.",
+      "description": "Edits are kept in this browser as you type; save the draft or publish to store them. Publishing needs no review.",
       "filter": "Filter by status",
       "all": "All",
       "empty": "No articles here yet.",
@@ -689,12 +671,11 @@
       "view": "View",
       "deleted": "Deleted",
       "delete_title": "Delete article",
-      "delete_description": "“{title}” and all its versions will be deleted for good."
+      "delete_description": "“{title}” will be deleted for good."
     },
     "list": {
       "featured": "Editors' picks",
       "all_types": "All types",
-      "all_tags": "All tags",
       "sort": "Sort",
       "latest": "Latest",
       "popular": "Most read",
@@ -1785,10 +1766,6 @@
       "unread": "Unread"
     },
     "types": {
-      "article_approved": "Your article “{title}” was approved and published",
-      "article_rejected": "Your article “{title}” was returned",
-      "article_unpublished": "Your article “{title}” was taken down",
-      "article_republished": "Your article “{title}” is live again",
       "article_featured": "Your article “{title}” is an editors' pick",
       "article_edited": "A moderator edited your article “{title}”",
       "article_deleted": "Your article “{title}” was deleted",
@@ -1821,7 +1798,10 @@
         "discussions": "You have been silenced in the discussions for now",
         "lyrics": "You cannot add or edit lyrics for now",
         "shouts": "You cannot post shouts for now"
-      }
+      },
+      "article_hidden": "A moderator hid your article “{title}”",
+      "article_locked": "A moderator locked your article “{title}”",
+      "article_unlocked": "Your article “{title}” was unlocked"
     },
     "reason_line": "Reason: {reason}",
     "comment_line": "Comment: {comment}"

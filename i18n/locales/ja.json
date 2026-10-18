@@ -415,7 +415,6 @@
       "article_not_found": "記事が存在しないか、まだ公開されていません。",
       "article_draft_conflict": "この下書きは別の場所で変更されました。読み込み直してください。",
       "article_invalid_state": "記事の現在の状態ではこの操作はできません。",
-      "article_pending_limit": "審査中の記事がすでに 3 件あります。結果をお待ちください。",
       "content_blocked": "使用できない語句が含まれています。",
       "already_reported": "すでに報告済みです。対応をお待ちください。",
       "rate_limit_exceeded": "操作が多すぎます。しばらくしてからお試しください。",
@@ -529,25 +528,13 @@
     "write": "記事を書く",
     "untitled": "無題",
     "featured": "編集部のおすすめ",
-    "has_changes": "未公開の変更あり",
     "views": "{count} 回閲覧",
     "minutes": "{count} 分",
-    "types": {
-      "review": "レビュー",
-      "feature": "特集",
-      "interview": "インタビュー",
-      "news": "ニュース",
-      "guide": "ガイド",
-      "translation": "翻訳",
-      "essay": "エッセイ",
-      "other": "その他"
-    },
     "statuses": {
       "draft": "下書き",
-      "pending": "審査中",
       "published": "公開中",
-      "rejected": "差し戻し",
-      "unpublished": "非公開"
+      "hidden": "非公開",
+      "locked": "ロック中"
     },
     "link_types": {
       "album": "アルバム",
@@ -612,44 +599,41 @@
       "outline": "アウトライン",
       "outline_empty": "## の見出しで段落を区切ると、ここにアウトラインが表示されます。",
       "saving": "保存中…",
-      "unsaved": "未保存の変更があります",
-      "save_failed": "保存に失敗しました",
       "not_saved": "まだ保存されていません",
       "saved": "保存済み",
       "saved_at": "{time} に保存",
       "actions": {
-        "submit": "審査に出す",
-        "resubmit": "再提出",
+        "save_draft": "下書き保存",
+        "update": "更新",
         "publish": "公開",
-        "publish_changes": "変更を公開",
-        "withdraw": "審査を取り下げる"
+        "republish": "再公開",
+        "hide": "非公開にする"
       },
-      "discard": "変更を破棄",
-      "discard_title": "変更を破棄しますか？",
-      "discard_description": "作業中の版を削除し、公開中の版に戻ります。元に戻せません。",
-      "discarded": "変更を破棄しました",
-      "withdrawn": "取り下げました。編集を続けられます。",
-      "submitted": "審査に出しました",
       "published": "公開しました",
-      "notice_pending": "審査中のため編集できません。変更するには審査を取り下げてください。",
-      "notice_rejected": "差し戻されました：",
-      "notice_unpublished": "非公開になりました：",
-      "notice_published": "公開中の記事を編集しています。「変更を公開」を押すまで読者には反映されません。",
-      "backup_found": "サーバーに保存されていない {time} のローカルの内容があります。",
-      "backup_restore": "復元",
-      "backup_dismiss": "破棄",
-      "conflict_title": "下書きが別の場所で変更されました",
+      "notice_published": "公開中の記事を編集しています。「更新」を押すと読者に反映されます。",
+      "conflict_title": "記事が別の場所で保存されました",
       "conflict_description": "サーバーに {time} に保存された新しい版があります（別のウィンドウかもしれません）。どちらを残しますか？",
       "conflict_keep_mine": "自分の内容を残す",
       "conflict_use_server": "サーバーの版を使う",
-      "leave_confirm": "保存されていない変更があります。ページを離れますか？"
+      "leave_confirm": "変更はこのブラウザに保存されていますが、まだサーバーには保存されていません。ページを離れますか？",
+      "unsaved_local": "未保存の変更（このブラウザに保存済み）",
+      "draft_saved": "下書きを保存しました",
+      "updated": "更新しました",
+      "hidden": "非公開にしました",
+      "hide_title": "この記事を非公開にしますか？",
+      "hide_description": "読者からは見えなくなります。いつでも再公開できます。",
+      "notice_hidden": "この記事は非公開で、読者には表示されません。",
+      "notice_hidden_reason": "モデレーターが非公開にしました：{reason}",
+      "notice_locked": "この記事はモデレーターによってロックされています。公開されず、編集もできません。",
+      "local_restored": "このブラウザに残っていた {time} の未保存の変更を復元しました。",
+      "local_stale": "このブラウザに {time} の未保存の変更がありますが、その後記事が別の場所で保存されています。",
+      "local_restore": "自分の変更を使う",
+      "local_discard": "破棄する",
+      "save_shortcut": "Ctrl+S"
     },
     "submit": {
-      "submit_title": "審査に出す",
-      "submit_description": "承認されると公開されます。その後の編集に審査は不要です。",
-      "submit_confirm": "提出",
       "publish_title": "公開",
-      "publish_description": "すぐに公開されます。前の版は履歴に残ります。",
+      "publish_description": "審査なしですぐに公開されます。",
       "publish_confirm": "公開",
       "checks": {
         "title": "タイトル 2〜100 文字",
@@ -659,8 +643,9 @@
         "cover": "カバーを設定"
       },
       "optional": "推奨",
-      "note": "審査担当へのメモ（任意）",
-      "note_placeholder": "出典や転載の許可など"
+      "republish_title": "再公開",
+      "republish_description": "今の内容で記事を再び公開します。",
+      "republish_confirm": "公開"
     },
     "errors": {
       "title": "タイトルは 2〜100 文字にしてください。",
@@ -672,15 +657,12 @@
       "tag_ids": "使用できないタグがあります。",
       "slug": "このリンクは使用済みか、形式が正しくありません。",
       "blocked": "使用できない語句が含まれています。修正してからお試しください。",
-      "pending_limit": "審査中の記事がすでに 3 件あります。結果をお待ちください。",
-      "conflict": "下書きが別の場所で変更されました。残す版を選んでください。",
-      "invalid_state": "記事の現在の状態ではこの操作はできません。再読み込みしてお試しください。",
-      "revision": "下書きの版が古くなっています。再読み込みしてお試しください。",
-      "note": "メモは 1000 文字以内にしてください。"
+      "conflict": "記事が別の場所で保存されました。残す版を選んでください。",
+      "invalid_state": "記事の現在の状態ではこの操作はできません。再読み込みしてお試しください。"
     },
     "mine": {
       "title": "自分の記事",
-      "description": "下書きは自動保存されます。初回の公開は審査があり、その後の編集はすぐに反映されます。",
+      "description": "編集内容は入力中このブラウザに保存されます。下書き保存か公開でサーバーに保存されます。公開に審査はありません。",
       "filter": "状態で絞り込む",
       "all": "すべて",
       "empty": "まだ記事がありません。",
@@ -689,12 +671,11 @@
       "view": "表示",
       "deleted": "削除しました",
       "delete_title": "記事を削除",
-      "delete_description": "「{title}」とすべての版が完全に削除されます。"
+      "delete_description": "「{title}」が完全に削除されます。"
     },
     "list": {
       "featured": "編集部のおすすめ",
       "all_types": "すべての種類",
-      "all_tags": "すべてのタグ",
       "sort": "並び替え",
       "latest": "新着",
       "popular": "人気",
@@ -1785,10 +1766,6 @@
       "unread": "未読"
     },
     "types": {
-      "article_approved": "記事「{title}」が承認され、公開されました",
-      "article_rejected": "記事「{title}」が差し戻されました",
-      "article_unpublished": "記事「{title}」が非公開になりました",
-      "article_republished": "記事「{title}」が再公開されました",
       "article_featured": "記事「{title}」が編集部のおすすめに選ばれました",
       "article_edited": "モデレーターが記事「{title}」を編集しました",
       "article_deleted": "記事「{title}」が削除されました",
@@ -1821,7 +1798,10 @@
         "discussions": "ディスカッションでの投稿が一時的に制限されました",
         "lyrics": "歌詞の追加・編集が一時的に制限されました",
         "shouts": "コメントの投稿が一時的に制限されました"
-      }
+      },
+      "article_hidden": "記事「{title}」がモデレーターにより非公開になりました",
+      "article_locked": "記事「{title}」がモデレーターによりロックされました",
+      "article_unlocked": "記事「{title}」のロックが解除されました"
     },
     "reason_line": "理由：{reason}",
     "comment_line": "コメント：{comment}"

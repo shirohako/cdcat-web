@@ -1,20 +1,21 @@
 <script setup lang="ts">
 import { FileText, FolderOpen, PenLine, Search, Sparkles } from '@lucide/vue'
-import { ARTICLE_TYPES, type ArticleCard, type ArticleType, type Pagination } from '~/types/article'
+import type { ArticleCard, Pagination } from '~/types/article'
 
 const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
-const { tags, tagName } = useTags()
+const { types, typeName } = useArticleTypes()
 
-const type = computed(() => (ARTICLE_TYPES as readonly string[]).includes(String(route.query.type)) ? String(route.query.type) as ArticleType : null)
-const tag = computed(() => route.query.tag ? String(route.query.tag) : null)
+// Deactivated types stay in the filter only while they are the one selected, so old links keep working.
+const type = computed(() => typeof route.query.type === 'string' && /^[a-z][a-z0-9_]{1,19}$/.test(route.query.type) ? route.query.type : null)
+const typeOptions = computed(() => types.value.filter(item => item.is_active || item.key === type.value))
 const sort = computed(() => route.query.sort === 'popular' ? 'popular' : 'latest')
 const search = computed(() => route.query.search ? String(route.query.search) : '')
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
-const filtered = computed(() => type.value || tag.value || search.value)
+const filtered = computed(() => type.value || search.value)
 const searchInput = ref(search.value)
 watch(search, (value) => { searchInput.value = value })
 
@@ -29,8 +30,8 @@ const submitSearch = () => update({ search: searchInput.value.trim().length >= 2
 
 const { data, pending, error, refresh } = await useAsyncData('articles-list',
   () => $api<{ articles: ArticleCard[], pagination: Pagination }>('/v1/articles', {
-    query: { type: type.value ?? undefined, tag: tag.value ?? undefined, sort: sort.value, search: search.value || undefined, page: page.value },
-  }), { watch: [type, tag, sort, search, page] })
+    query: { type: type.value ?? undefined, sort: sort.value, search: search.value || undefined, page: page.value },
+  }), { watch: [type, sort, search, page] })
 
 const { data: featured } = await useAsyncData('articles-featured',
   () => $api<{ articles: ArticleCard[] }>('/v1/articles', { query: { featured: 1, per_page: 3 } }).then(response => response.articles),
@@ -77,16 +78,12 @@ useHead({ title: computed(() => t('content_display.articles')) })
               {{ t('article_ui.list.all_types') }}
             </button>
             <button
-              v-for="value in ARTICLE_TYPES" :key="value" type="button" class="rounded-full px-3 py-1 text-xs font-medium transition"
-              :class="type === value ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'" @click="update({ type: value })">
-              {{ t(`article_ui.types.${value}`) }}
+              v-for="option in typeOptions" :key="option.key" type="button" class="rounded-full px-3 py-1 text-xs font-medium transition"
+              :class="type === option.key ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:ring-slate-300'" @click="update({ type: option.key })">
+              {{ typeName(option.key) }}
             </button>
           </div>
           <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
-            <select :value="tag ?? ''" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600" :aria-label="t('article_ui.fields.tags')" @change="update({ tag: ($event.target as HTMLSelectElement).value || null })">
-              <option value="">{{ t('article_ui.list.all_tags') }}</option>
-              <option v-for="item in tags" :key="item.id" :value="item.slug">#{{ tagName(item) }} ({{ item.articles_count }})</option>
-            </select>
             <select :value="sort" class="rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600" :aria-label="t('article_ui.list.sort')" @change="update({ sort: ($event.target as HTMLSelectElement).value === 'popular' ? 'popular' : null })">
               <option value="latest">{{ t('article_ui.list.latest') }}</option>
               <option value="popular">{{ t('article_ui.list.popular') }}</option>

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { AlertTriangle, ArrowLeft, Check, Columns2, Eye, History, ListTree, Loader2, PenLine, RotateCcw, Settings2, X } from '@lucide/vue'
+import { AlertTriangle, ArrowLeft, Check, Columns2, EyeOff, Eye, History, ListTree, Loader2, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
 import type { MarkdownHeading } from '~/utils/markdown'
 import type { SubmitCheck } from './WriterSubmitDialog.vue'
 import { TAG_NAME_MAX, tagErrorKey } from '~/utils/tags'
 
 /**
  * The full-screen writing page for new and existing articles (docs/articles/README.md).
- * A new article is created on its first autosave; the address then switches to its edit URL
- * without remounting, so the editor keeps its cursor.
+ * Edits are kept in this browser as you type; a draft reaches the server with「保存草稿」, a
+ * published or hidden article with「更新」. A new article is created on its first save; the
+ * address then switches to its edit URL without remounting, so the editor keeps its cursor.
  */
 const props = defineProps<{ articleId: number | null }>()
 const { t, locale } = useI18n()
@@ -18,7 +19,7 @@ const { toast, showToast } = useToast()
 const draft = useArticleDraft(props.articleId, {
   onCreated: (id) => { if (import.meta.client) window.history.replaceState(window.history.state, '', `/articles/${id}/edit`) },
 })
-const { form, payload, saveState, savedAt, conflict, backup, busy } = draft
+const { form, payload, savedAt, dirty, conflict, restoredAt, stale, busy } = draft
 const editor = useTemplateRef<{ insert: (text: string) => void, focus: () => void, scrollToLine: (line: number) => void }>('editor')
 const titleInput = useTemplateRef<HTMLTextAreaElement>('titleInput')
 
@@ -56,20 +57,8 @@ watch(mode, (value) => {
 
 // ── Status and actions ──
 const status = computed(() => payload.value?.article.status ?? 'draft')
+const can = computed(() => payload.value?.can ?? { edit: true, save_draft: true, publish: true, update: false, hide: false })
 const readOnly = computed(() => !draft.canEdit.value)
-const editingLive = computed(() => status.value === 'published' && payload.value?.draft.id !== null)
-const primary = computed<'submit' | 'publish' | 'withdraw' | null>(() => {
-  const can = payload.value?.can
-  if (!can) return hasPermission('articles.publish') ? 'publish' : 'submit'
-  if (can.withdraw) return 'withdraw'
-  if (can.publish) return 'publish'
-  return can.submit ? 'submit' : null
-})
-const primaryLabel = computed(() => {
-  if (primary.value === 'publish') return status.value === 'published' ? 'publish_changes' : 'publish'
-  if (primary.value === 'submit') return status.value === 'rejected' || status.value === 'unpublished' ? 'resubmit' : 'submit'
-  return primary.value ?? ''
-})
 
 const wordCount = ref(0)
 const headings = ref<MarkdownHeading[]>([])
@@ -93,10 +82,9 @@ const checks = computed<SubmitCheck[]>(() => [
 ])
 
 const dialogOpen = ref(false)
-const dialogAction = ref<'submit' | 'publish'>('submit')
 const actionError = ref('')
 const fieldErrors = ref<Record<string, string>>({})
-const discardOpen = ref(false)
+const hideOpen = ref(false)
 
 type ApiError = { name?: string, details?: { details?: Record<string, string[]> } }
 function describe(error: unknown) {
@@ -112,44 +100,46 @@ function describe(error: unknown) {
     return Object.values(fieldErrors.value).join(' ')
   }
   const known: Record<string, string> = {
-    CONTENT_BLOCKED: 'article_ui.errors.blocked', ARTICLE_PENDING_LIMIT: 'article_ui.errors.pending_limit',
-    ARTICLE_DRAFT_CONFLICT: 'article_ui.errors.conflict', ARTICLE_INVALID_STATE: 'article_ui.errors.invalid_state',
+    CONTENT_BLOCKED: 'article_ui.errors.blocked', ARTICLE_DRAFT_CONFLICT: 'article_ui.errors.conflict', ARTICLE_INVALID_STATE: 'article_ui.errors.invalid_state',
   }
   return failure?.name && known[failure.name] ? t(known[failure.name]!) : localizeError(error)
 }
 
-async function runPrimary() {
-  if (primary.value === 'withdraw') {
-    try {
-      await draft.act('withdraw')
-      showToast(t('article_ui.writer.withdrawn'))
-    }
-    catch (error) { showToast(describe(error), 'error') }
-    return
+/** Saves the draft, or updates the article on the site; Ctrl+S does the same. */
+async function save() {
+  if (!can.value.edit || busy.value) return
+  fieldErrors.value = {}
+  try {
+    await draft.save()
+    showToast(t(can.value.update ? 'article_ui.writer.updated' : 'article_ui.writer.draft_saved'))
   }
-  if (!primary.value) return
-  dialogAction.value = primary.value
+  catch (error) { if ((error as ApiError).name !== 'ARTICLE_DRAFT_CONFLICT') showToast(describe(error), 'error') }
+}
+
+function openPublish() {
   actionError.value = ''
   fieldErrors.value = {}
   dialogOpen.value = true
 }
 
-async function confirmDialog(note: string) {
+async function confirmPublish() {
   actionError.value = ''
   try {
-    const next = await draft.act(dialogAction.value, dialogAction.value === 'submit' && note ? { note } : {})
+    await draft.publish()
     dialogOpen.value = false
-    showToast(t(next?.article.status === 'pending' ? 'article_ui.writer.submitted' : 'article_ui.writer.published'))
+    showToast(t('article_ui.writer.published'))
   }
   catch (error) {
-    actionError.value = describe(error)
+    if ((error as ApiError).name === 'ARTICLE_DRAFT_CONFLICT') dialogOpen.value = false
+    else actionError.value = describe(error)
   }
 }
 
-async function discard() {
+async function hide() {
   try {
-    await draft.act('discard')
-    showToast(t('article_ui.writer.discarded'))
+    await draft.hide()
+    hideOpen.value = false
+    showToast(t('article_ui.writer.hidden'))
   }
   catch (error) { showToast(describe(error), 'error') }
 }
@@ -171,21 +161,17 @@ watch(() => form.title, () => nextTick(resizeTitle))
 function onKeydown(event: KeyboardEvent) {
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
     event.preventDefault()
-    void draft.save()
+    void save()
   }
 }
 
-onBeforeRouteLeave(async () => {
-  if (!draft.hasUnsaved()) return true
-  await draft.save()
-  return !draft.hasUnsaved() || window.confirm(t('article_ui.writer.leave_confirm'))
-})
+// Unsaved edits stay in this browser, but they are not on the server yet.
+onBeforeRouteLeave(() => !dirty.value || !can.value.edit || window.confirm(t('article_ui.writer.leave_confirm')))
 
 const time = (value: string | null) => value ? new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : ''
 const saveLabel = computed(() => {
-  if (saveState.value === 'saving') return t('article_ui.writer.saving')
-  if (saveState.value === 'dirty') return t('article_ui.writer.unsaved')
-  if (saveState.value === 'error') return t('article_ui.writer.save_failed')
+  if (busy.value) return t('article_ui.writer.saving')
+  if (dirty.value) return t('article_ui.writer.unsaved_local')
   if (!draft.articleId.value) return t('article_ui.writer.not_saved')
   return savedAt.value ? t('article_ui.writer.saved_at', { time: time(savedAt.value) }) : t('article_ui.writer.saved')
 })
@@ -202,8 +188,8 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       <span class="h-5 w-px shrink-0 bg-slate-200" />
       <!-- Status and save state describe the loaded draft, so they wait for it. -->
       <template v-if="!loading && !loadError">
-        <ArticleStatusBadge :status="status" :has-changes="editingLive" />
-        <span class="hidden truncate text-xs md:inline" :class="saveState === 'error' ? 'text-rose-600' : 'text-slate-400'" aria-live="polite">{{ saveLabel }}</span>
+        <ArticleStatusBadge :status="status" />
+        <span class="hidden truncate text-xs md:inline" :class="dirty ? 'text-amber-600' : 'text-slate-400'" aria-live="polite">{{ saveLabel }}</span>
         <span class="hidden text-xs tabular-nums text-slate-400 lg:inline">· {{ t('article_ui.word_count', { count: wordCount.toLocaleString() }) }}</span>
       </template>
 
@@ -222,15 +208,20 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
         <button type="button" class="btn btn-ghost btn-sm" :class="settingsOpen && 'bg-slate-100'" :title="t('article_ui.settings')" @click="settingsOpen = !settingsOpen">
           <Settings2 :size="15" /><span class="hidden sm:inline">{{ t('article_ui.settings') }}</span>
         </button>
-        <button v-if="payload?.can.discard" type="button" class="btn btn-ghost btn-sm hidden sm:inline-flex" :disabled="busy" @click="discardOpen = true">
-          <RotateCcw :size="14" />{{ t('article_ui.writer.discard') }}
-        </button>
-        <button
-          v-if="primary" type="button" class="btn btn-sm" :class="primary === 'withdraw' ? 'btn-outline' : 'btn-primary'"
-          :disabled="busy || loading || !!loadError" @click="runPrimary">
-          <Loader2 v-if="busy" :size="14" class="animate-spin" />
-          {{ t(`article_ui.writer.actions.${primaryLabel}`) }}
-        </button>
+        <template v-if="!loading && !loadError && can.edit">
+          <button v-if="can.hide" type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="hideOpen = true">
+            <EyeOff :size="14" /><span class="hidden sm:inline">{{ t('article_ui.writer.actions.hide') }}</span>
+          </button>
+          <button
+            type="button" class="btn btn-sm" :class="can.publish ? 'btn-outline' : 'btn-primary'" :disabled="busy || (!dirty && !!draft.articleId.value)"
+            :title="t('article_ui.writer.save_shortcut')" @click="save">
+            <Loader2 v-if="busy && !dialogOpen" :size="14" class="animate-spin" /><Save v-else :size="14" />
+            {{ t(`article_ui.writer.actions.${can.update ? 'update' : 'save_draft'}`) }}
+          </button>
+          <button v-if="can.publish" type="button" class="btn btn-primary btn-sm" :disabled="busy" @click="openPublish">
+            {{ t(`article_ui.writer.actions.${status === 'hidden' ? 'republish' : 'publish'}`) }}
+          </button>
+        </template>
       </div>
     </header>
 
@@ -246,22 +237,22 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
     <template v-else>
       <!-- Notices -->
       <div class="shrink-0 space-y-px">
-        <p v-if="status === 'pending'" class="bg-amber-50 px-4 py-2 text-sm text-amber-800">{{ t('article_ui.writer.notice_pending') }}</p>
-        <p v-else-if="status === 'rejected' && payload?.review_note" class="bg-rose-50 px-4 py-2 text-sm text-rose-800">
-          <strong>{{ t('article_ui.writer.notice_rejected') }}</strong>{{ payload.review_note }}
+        <p v-if="status === 'locked'" class="flex flex-wrap items-center gap-1.5 bg-rose-50 px-4 py-2 text-sm text-rose-800">
+          <Lock :size="15" /><strong>{{ t('article_ui.writer.notice_locked') }}</strong>{{ payload?.article.status_reason }}
         </p>
-        <p v-else-if="status === 'unpublished'" class="bg-rose-50 px-4 py-2 text-sm text-rose-800">
-          <strong>{{ t('article_ui.writer.notice_unpublished') }}</strong>{{ payload?.article.status_reason }}
+        <p v-else-if="status === 'hidden'" class="bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          <strong>{{ t('article_ui.writer.notice_hidden') }}</strong>
+          <template v-if="payload?.article.status_reason">{{ t('article_ui.writer.notice_hidden_reason', { reason: payload.article.status_reason }) }}</template>
         </p>
         <p v-else-if="status === 'published'" class="bg-sky-50 px-4 py-2 text-sm text-sky-800">{{ t('article_ui.writer.notice_published') }}</p>
-        <div v-if="backup" class="flex flex-wrap items-center gap-2 bg-violet-50 px-4 py-2 text-sm text-violet-800">
-          <History :size="15" />{{ t('article_ui.writer.backup_found', { time: time(backup.at) }) }}
-          <button type="button" class="font-semibold underline" @click="draft.restoreBackup()">{{ t('article_ui.writer.backup_restore') }}</button>
-          <button type="button" class="text-violet-600 underline" @click="draft.dismissBackup()">{{ t('article_ui.writer.backup_dismiss') }}</button>
+        <div v-if="restoredAt && dirty" class="flex flex-wrap items-center gap-2 bg-violet-50 px-4 py-2 text-sm text-violet-800">
+          <History :size="15" />{{ t('article_ui.writer.local_restored', { time: time(restoredAt) }) }}
+          <button type="button" class="text-violet-600 underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
         </div>
-        <div v-if="saveState === 'error' && !conflict" class="flex flex-wrap items-center gap-2 bg-rose-50 px-4 py-2 text-sm text-rose-800" role="alert">
-          <AlertTriangle :size="15" />{{ describe(draft.lastError.value) }}
-          <button type="button" class="font-semibold underline" @click="draft.save()">{{ t('common.retry') }}</button>
+        <div v-if="stale" class="flex flex-wrap items-center gap-2 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+          <History :size="15" />{{ t('article_ui.writer.local_stale', { time: time(stale.at) }) }}
+          <button type="button" class="font-semibold underline" @click="draft.restoreStale()">{{ t('article_ui.writer.local_restore') }}</button>
+          <button type="button" class="text-amber-700 underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
         </div>
       </div>
 
@@ -299,7 +290,7 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
           <div class="min-h-0 flex-1">
             <MarkdownEditor
               ref="editor" v-model="form.content" :mode="mode" fill :disabled="readOnly" :error="fieldErrors.content"
-              :placeholder="t('article_ui.start_writing')" @save="draft.save()" />
+              :placeholder="t('article_ui.start_writing')" @save="save()" />
           </div>
         </main>
 
@@ -319,16 +310,16 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       </div>
     </template>
 
-    <ArticleWriterSubmitDialog v-model:open="dialogOpen" :action="dialogAction" :checks="checks" :busy="busy" :error="actionError" @confirm="confirmDialog" />
+    <ArticleWriterSubmitDialog v-model:open="dialogOpen" :republish="status === 'hidden'" :checks="checks" :busy="busy" :error="actionError" @confirm="confirmPublish" />
     <CommonConfirmDialog
-      v-model="discardOpen" variant="warning" :title="t('article_ui.writer.discard_title')" :description="t('article_ui.writer.discard_description')"
-      :confirm-text="t('article_ui.writer.discard')" @confirm="discard" />
+      v-model="hideOpen" variant="warning" :title="t('article_ui.writer.hide_title')" :description="t('article_ui.writer.hide_description')"
+      :confirm-text="t('article_ui.writer.actions.hide')" @confirm="hide" />
 
     <!-- Conflict with a newer copy saved elsewhere -->
     <div v-if="conflict" class="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4" role="alertdialog" aria-modal="true">
       <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
         <h2 class="text-lg font-bold text-slate-900">{{ t('article_ui.writer.conflict_title') }}</h2>
-        <p class="mt-2 text-sm text-slate-600">{{ t('article_ui.writer.conflict_description', { time: time(conflict.draft.updated_at) }) }}</p>
+        <p class="mt-2 text-sm text-slate-600">{{ t('article_ui.writer.conflict_description', { time: time(conflict.article.updated_at) }) }}</p>
         <div class="mt-5 flex flex-wrap justify-end gap-2">
           <button type="button" class="btn btn-outline btn-sm" @click="draft.useServer()">{{ t('article_ui.writer.conflict_use_server') }}</button>
           <button type="button" class="btn btn-primary btn-sm" @click="draft.keepMine()">{{ t('article_ui.writer.conflict_keep_mine') }}</button>

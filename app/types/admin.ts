@@ -1,5 +1,5 @@
 import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText } from './catalog'
-import type { ArticleDetail, ArticleVersion, ArticleVersionContent, ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
+import type { ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
 
 export interface DeletionImpact {
   checksum?: string
@@ -83,7 +83,6 @@ export interface AdminDashboard {
   conflicted_revisions?: number
   pending_lyric_revisions?: number
   unchecked_lyrics?: number
-  pending_articles?: number
   pending_reports?: number
   recent_actions?: AdminAuditEntry[]
   operations?: {
@@ -157,6 +156,16 @@ export interface AdminRestorePreview {
   problems: Array<{ path: string, message: string }>
   impact: DeletionImpact | null
   references: CatalogReferences
+}
+
+/** GET /admin/article-types */
+export interface AdminArticleType {
+  key: string
+  names: LocalizedText
+  sort_order: number
+  is_active: boolean
+  /** Articles of any status, drafts included, with the type. */
+  usage: { articles: number }
 }
 
 /** GET /admin/credit-roles */
@@ -265,10 +274,15 @@ export interface AdminArticleItem extends MyArticle {
 }
 
 export interface AdminArticle extends AdminArticleItem {
-  live: (Pick<ArticleDetail, 'type' | 'title' | 'cover_url' | 'content' | 'word_count' | 'links' | 'tags'> & { summary: string | null }) | null
-  open_version: (ArticleVersionContent & { links: ContentLinkSummary[], tags: TagSummary[] }) | null
-  last_rejected_version_id: number | null
-  versions: ArticleVersion[]
+  summary: string | null
+  cover_url: string | null
+  content: string | null
+  word_count: number
+  /** The status a locked article goes back to when unlocked. */
+  locked_previous_status: MyArticle['status'] | null
+  status_changed_at: string | null
+  links: ContentLinkSummary[]
+  tags: TagSummary[]
   reports: AdminReportEntry[]
 }
 

@@ -40,6 +40,7 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
   { path: '/admin/reviews', permission: 'reviews.manage', label: 'admin_pages.reviews.title', icon: 'lucide:message-square', group: 'community' },
   { path: '/admin/articles', permission: 'articles.manage', label: 'admin_pages.articles.title', icon: 'lucide:newspaper', group: 'community' },
+  { path: '/admin/article-types', permission: 'articles.manage', label: 'admin_pages.article_types.title', icon: 'lucide:shapes', group: 'community' },
   { path: '/admin/reports', permission: ['articles.manage', 'discussions.moderate', 'shouts.manage'], label: 'admin_pages.reports.title', icon: 'lucide:flag', group: 'community' },
   { path: '/admin/discussions/categories', permission: 'discussions.manage', label: 'admin_pages.discussions.categories.title', icon: 'lucide:folder-tree', group: 'community' },
   { path: '/admin/discussions/posts', permission: 'discussions.moderate', label: 'admin_pages.discussions.posts.title', icon: 'lucide:messages-square', group: 'community' },

@@ -15,8 +15,8 @@
         <div class="flex items-start gap-6">
           <div class="min-w-0 flex-1 space-y-4">
             <div class="flex flex-wrap items-center gap-2 rounded-2xl bg-white px-5 py-3 text-xs text-gray-500 shadow-sm">
-              <span v-if="article.type" class="rounded-md bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">{{ t(`article_ui.types.${article.type}`) }}</span>
-              <NuxtLink v-for="tag in article.tags" :key="tag.id" :to="{ path: '/articles', query: { tag: tag.slug } }" class="rounded-md bg-slate-50 px-2 py-0.5 hover:text-violet-700">#{{ tagName(tag) }}</NuxtLink>
+              <span v-if="article.type" class="rounded-md bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">{{ typeName(article.type) }}</span>
+              <span v-for="tag in article.tags" :key="tag.id" class="rounded-md bg-slate-50 px-2 py-0.5">#{{ tagName(tag) }}</span>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>
               <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('article_ui.views', { count: article.views_count }) }}</span>
               <span class="ml-auto flex items-center gap-1">
@@ -61,6 +61,7 @@ const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { formatDate } = useLocaleFormatting()
 const { tagName } = useTags()
+const { typeName } = useArticleTypes()
 const config = useRuntimeConfig()
 const articleId = String(route.params.id)
 

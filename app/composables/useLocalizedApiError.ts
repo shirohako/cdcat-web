@@ -37,7 +37,6 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   ARTICLE_NOT_FOUND: 'errors.codes.article_not_found',
   ARTICLE_DRAFT_CONFLICT: 'errors.codes.article_draft_conflict',
   ARTICLE_INVALID_STATE: 'errors.codes.article_invalid_state',
-  ARTICLE_PENDING_LIMIT: 'errors.codes.article_pending_limit',
   CONTENT_BLOCKED: 'errors.codes.content_blocked',
   ALREADY_REPORTED: 'errors.codes.already_reported',
   RATE_LIMIT_EXCEEDED: 'errors.codes.rate_limit_exceeded',

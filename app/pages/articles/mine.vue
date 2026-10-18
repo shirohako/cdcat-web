@@ -7,6 +7,7 @@ definePageMeta({ middleware: 'auth' })
 const route = useRoute()
 const router = useRouter()
 const { t, locale } = useI18n()
+const { typeName } = useArticleTypes()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { toast, showToast } = useToast()
@@ -75,14 +76,14 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
       <li v-for="article in data.articles" :key="article.id" class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
-            <ArticleStatusBadge :status="article.status" :has-changes="article.has_changes" />
-            <span v-if="article.type" class="text-xs text-slate-400">{{ t(`article_ui.types.${article.type}`) }}</span>
+            <ArticleStatusBadge :status="article.status" />
+            <span v-if="article.type" class="text-xs text-slate-400">{{ typeName(article.type) }}</span>
             <span v-if="article.featured" class="rounded bg-violet-50 px-1.5 text-[11px] text-violet-600">{{ t('article_ui.featured') }}</span>
           </div>
           <NuxtLink :to="`/articles/${article.id}/edit`" class="mt-1 block truncate font-medium text-slate-900 hover:text-violet-700">
             {{ article.title || t('article_ui.untitled') }}
           </NuxtLink>
-          <p v-if="article.status_reason && (article.status === 'rejected' || article.status === 'unpublished')" class="mt-1 text-xs text-rose-600">
+          <p v-if="article.status_reason && (article.status === 'hidden' || article.status === 'locked')" class="mt-1 text-xs text-rose-600">
             {{ t('article_ui.mine.reason') }}{{ article.status_reason }}
           </p>
           <p class="mt-1 text-xs text-slate-400">

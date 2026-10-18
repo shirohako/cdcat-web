@@ -1,7 +1,5 @@
-import type { ArticleDraftFields, ArticleDraftPayload, ContentLinkSummary, TagSummary } from '~/types/article'
-import { isNewTag, tagPayload } from '~/utils/tags'
-
-type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
+import type { ArticleDraftFields, ArticleEditPayload, ContentLinkSummary, TagSummary } from '~/types/article'
+import { tagPayload } from '~/utils/tags'
 
 /** The editable state of the writing page; links and tags keep their display data. */
 export interface ArticleDraftForm {
@@ -15,21 +13,27 @@ export interface ArticleDraftForm {
   tags: TagSummary[]
 }
 
-const SAVE_DELAY = 2000
-const SAVE_MAX_WAIT = 15000
-const BACKUP_PREFIX = 'cdcat:article-draft:'
+/** What this browser keeps of unsaved edits: the form, and the server revision it started from. */
+interface LocalCopy {
+  form: ArticleDraftForm
+  revision: number
+  at: string
+}
+
+const LOCAL_DELAY = 1000
+const LOCAL_PREFIX = 'cdcat:article-draft:'
 
 const emptyForm = (): ArticleDraftForm => ({ type: null, title: '', summary: '', cover_url: '', content: '', slug: '', links: [], tags: [] })
 
-const formFrom = (payload: ArticleDraftPayload): ArticleDraftForm => ({
-  type: payload.draft.type,
-  title: payload.draft.title ?? '',
-  summary: payload.draft.summary ?? '',
-  cover_url: payload.draft.cover_url ?? '',
-  content: payload.draft.content ?? '',
+const formFrom = (payload: ArticleEditPayload): ArticleDraftForm => ({
+  type: payload.article.type,
+  title: payload.article.title ?? '',
+  summary: payload.article.summary ?? '',
+  cover_url: payload.article.cover_url ?? '',
+  content: payload.article.content ?? '',
   slug: payload.article.slug ?? '',
-  links: payload.draft.links,
-  tags: payload.draft.tags,
+  links: payload.article.links,
+  tags: payload.article.tags,
 })
 
 /** What the API stores for each field; used to send only what changed. */
@@ -44,200 +48,163 @@ const serialize = (form: ArticleDraftForm): Record<keyof ArticleDraftFields, unk
   ...tagPayload(form.tags),
 })
 
-type ApiError = { name?: string, status?: number, details?: { details?: Record<string, unknown> } }
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
+const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
+
+/** Deletes every article draft kept in this browser; logging out calls it. */
+export function clearLocalArticleDrafts() {
+  try {
+    Object.keys(localStorage).filter(key => key.startsWith(LOCAL_PREFIX)).forEach(key => localStorage.removeItem(key))
+  }
+  catch { /* storage unavailable */ }
+}
+
+type ApiError = { name?: string }
 
 /**
- * The writing page's draft (docs/articles/README.md): loads the working copy, autosaves it two
- * seconds after typing stops (and at least every 15 seconds), keeps a local backup until the
- * server has it, and runs the submit / withdraw / publish / discard actions. A revision mismatch
- * stops autosave and exposes the server's copy in `conflict` until the author picks one.
+ * The writing page's article (docs/articles/README.md#保存与草稿). Edits are saved in this browser
+ * a second after typing stops and never sent on their own: the server only hears of them when the
+ * author saves the draft, updates a published article or publishes. Reopening the article brings
+ * the unsaved edits back; if the article was saved elsewhere since, the author chooses. A save
+ * based on an older revision is refused and exposes the server's copy in `conflict`.
  */
 export function useArticleDraft(initialId: number | null, options: { onCreated?: (id: number) => void } = {}) {
   const { $api } = useNuxtApp()
+  const { user } = useAuth()
   const articleId = ref<number | null>(initialId)
-  const payload = shallowRef<ArticleDraftPayload | null>(null)
+  const payload = shallowRef<ArticleEditPayload | null>(null)
   const form = reactive<ArticleDraftForm>(emptyForm())
   const revision = ref(0)
-  const saveState = ref<SaveState>('idle')
   const savedAt = ref<string | null>(null)
+  const dirty = ref(false)
   const lastError = ref<unknown>(null)
-  const conflict = shallowRef<ArticleDraftPayload | null>(null)
-  const backup = shallowRef<{ form: ArticleDraftForm, at: string } | null>(null)
+  const conflict = shallowRef<ArticleEditPayload | null>(null)
+  /** When the unsaved edits brought back on opening were made. */
+  const restoredAt = ref<string | null>(null)
+  /** Unsaved edits made before the article was saved elsewhere; the author keeps or drops them. */
+  const stale = shallowRef<LocalCopy | null>(null)
   const busy = ref(false)
 
   let saved = serialize(form)
   let timer: ReturnType<typeof setTimeout> | undefined
-  let firstChangeAt = 0
-  let inflight: Promise<void> | null = null
   let applying = false
 
   const canEdit = computed(() => !payload.value || payload.value.can.edit)
   const changedFields = () => {
     const current = serialize(form)
-    const changes = Object.fromEntries(Object.entries(current).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(saved[key as keyof ArticleDraftFields])))
+    const changes = Object.fromEntries(Object.entries(current).filter(([key, value]) => !same(value, saved[key as keyof ArticleDraftFields])))
     // Either tag field replaces the whole list, so they always go together.
     if ('tag_ids' in changes || 'new_tags' in changes) Object.assign(changes, { tag_ids: current.tag_ids, new_tags: current.new_tags })
     return changes
   }
+  const hasUnsaved = () => Object.keys(changedFields()).length > 0
 
-  /**
-   * New tags are created by the save; show them as the library's tags from then on, unless the tags
-   * were changed again while the request ran.
-   */
-  const adoptTags = (tags: TagSummary[] | undefined, sent: Record<string, unknown>) => {
-    if (!tags || !form.tags.some(isNewTag)) return
-    if (JSON.stringify(tagPayload(form.tags)) !== JSON.stringify({ tag_ids: sent.tag_ids, new_tags: sent.new_tags })) return
-    applying = true
-    form.tags = tags
-    nextTick(() => { applying = false })
+  const localKey = (id = articleId.value) => `${LOCAL_PREFIX}${user.value?.id ?? 'guest'}:${id ?? 'new'}`
+  const readLocal = (): LocalCopy | null => {
+    try { return JSON.parse(localStorage.getItem(localKey()) ?? 'null') as LocalCopy | null }
+    catch { return null }
   }
-  const backupKey = () => `${BACKUP_PREFIX}${articleId.value ?? 'new'}`
-
-  const writeBackup = () => {
-    try { localStorage.setItem(backupKey(), JSON.stringify({ form: toRaw(form), at: new Date().toISOString() })) }
-    catch { /* private mode or storage full: the server copy still saves */ }
+  const writeLocal = () => {
+    clearTimeout(timer)
+    try { localStorage.setItem(localKey(), JSON.stringify({ form: copy(form), revision: revision.value, at: new Date().toISOString() })) }
+    catch { /* private mode or storage full: the edits stay in the page */ }
   }
-  const clearBackup = () => {
-    try { localStorage.removeItem(backupKey()) }
+  const clearLocal = (key = localKey()) => {
+    clearTimeout(timer)
+    try { localStorage.removeItem(key) }
     catch { /* nothing to clear */ }
   }
 
-  const apply = (next: ArticleDraftPayload) => {
+  /** Takes the server's copy as the saved state. */
+  const apply = (next: ArticleEditPayload) => {
     applying = true
     payload.value = next
-    revision.value = next.draft.revision
+    revision.value = next.article.revision
     Object.assign(form, formFrom(next))
     saved = serialize(form)
+    savedAt.value = next.article.updated_at
+    dirty.value = false
     nextTick(() => { applying = false })
   }
 
-  async function load() {
-    if (!articleId.value) return
-    apply(await $api<ArticleDraftPayload>(`/v1/articles/${articleId.value}/draft`))
-    savedAt.value = payload.value?.draft.updated_at ?? null
-    saveState.value = 'idle'
-    // A backup left by a session that closed before saving is offered back, never applied silently.
-    try {
-      const stored = JSON.parse(localStorage.getItem(backupKey()) ?? 'null') as { form: ArticleDraftForm, at: string } | null
-      if (stored && JSON.stringify(serialize(stored.form)) !== JSON.stringify(saved)) backup.value = stored
-      else clearBackup()
-    }
-    catch { backup.value = null }
-  }
-
-  async function save(): Promise<void> {
-    clearTimeout(timer)
-    if (inflight) {
-      await inflight
-      return Object.keys(changedFields()).length ? save() : undefined
-    }
-    const changes = changedFields()
-    if (!Object.keys(changes).length || !canEdit.value || conflict.value) return
-    saveState.value = 'saving'
-    const sent = serialize(form)
-    inflight = (async () => {
-      try {
-        if (!articleId.value) {
-          const created = await $api<ArticleDraftPayload>('/v1/articles', { method: 'POST', body: sent, progress: false })
-          clearBackup()
-          articleId.value = created.article.id
-          payload.value = created
-          adoptTags(created.draft.tags, sent)
-          revision.value = created.draft.revision
-          savedAt.value = created.draft.updated_at ?? null
-          options.onCreated?.(created.article.id)
-        }
-        else {
-          const result = await $api<{ revision: number, updated_at: string, tags: TagSummary[] }>(`/v1/articles/${articleId.value}/draft`, {
-            method: 'PUT', body: { ...changes, revision: revision.value }, progress: false,
-          })
-          adoptTags(result.tags, sent)
-          revision.value = result.revision
-          savedAt.value = result.updated_at
-        }
-        saved = form.tags.some(isNewTag) ? sent : { ...sent, ...tagPayload(form.tags) }
-        firstChangeAt = 0
-        lastError.value = null
-        const pendingAfter = Object.keys(changedFields()).length > 0
-        saveState.value = pendingAfter ? 'dirty' : 'saved'
-        // Edits typed while this request ran go out in the next one.
-        if (pendingAfter) schedule()
-        else clearBackup()
-      }
-      catch (error) {
-        lastError.value = error
-        if ((error as ApiError).name === 'ARTICLE_DRAFT_CONFLICT' && articleId.value) {
-          conflict.value = await $api<ArticleDraftPayload>(`/v1/articles/${articleId.value}/draft`)
-        }
-        saveState.value = 'error'
-      }
-      finally {
-        inflight = null
-      }
-    })()
-    await inflight
-  }
-
-  function schedule() {
-    clearTimeout(timer)
-    if (!firstChangeAt) firstChangeAt = Date.now()
-    const wait = Math.max(0, Math.min(SAVE_DELAY, firstChangeAt + SAVE_MAX_WAIT - Date.now()))
-    timer = setTimeout(() => { void save() }, wait)
+  /** Takes the server's copy, keeping edits made since `sent` (what the request carried) on top. */
+  const adopt = (next: ArticleEditPayload, sent: Record<string, unknown>) => {
+    const mine = same(serialize(form), sent) ? null : copy(form)
+    apply(next)
+    if (mine) Object.assign(form, mine)
+    else clearLocal()
   }
 
   watch(form, () => {
     if (applying || !canEdit.value) return
-    saveState.value = 'dirty'
-    writeBackup()
-    schedule()
+    dirty.value = hasUnsaved()
+    clearTimeout(timer)
+    if (dirty.value) timer = setTimeout(writeLocal, LOCAL_DELAY)
+    else clearLocal()
   }, { deep: true })
 
-  /** Keeps the author's text over the server's by saving it on top of the newer revision. */
-  async function keepMine() {
-    if (!conflict.value) return
-    revision.value = conflict.value.draft.revision
-    saved = serialize(formFrom(conflict.value))
-    conflict.value = null
-    await save()
+  async function load() {
+    if (articleId.value) apply(await $api<ArticleEditPayload>(`/v1/articles/${articleId.value}/edit`))
+    const local = readLocal()
+    if (!local || !canEdit.value) return
+    if (same(serialize(local.form), saved)) {
+      clearLocal()
+    }
+    else if (!articleId.value || local.revision === revision.value) {
+      Object.assign(form, local.form)
+      restoredAt.value = local.at
+    }
+    else {
+      stale.value = local
+    }
   }
 
-  /** Drops local edits in favour of the server's copy. */
-  function useServer() {
-    if (!conflict.value) return
-    apply(conflict.value)
-    conflict.value = null
-    clearBackup()
-    saveState.value = 'saved'
+  /** Sends the form to the server: a plain save, or a save that also publishes. */
+  async function persist(action: 'save' | 'publish'): Promise<ArticleEditPayload | null> {
+    if (!canEdit.value || conflict.value) return null
+    busy.value = true
+    lastError.value = null
+    const sent = serialize(form)
+    try {
+      if (!articleId.value) {
+        const newKey = localKey(null)
+        const created = await $api<ArticleEditPayload>('/v1/articles', { method: 'POST', body: sent })
+        articleId.value = created.article.id
+        options.onCreated?.(created.article.id)
+        clearLocal(newKey)
+        adopt(created, sent)
+        if (action === 'save') return created
+      }
+      else if (action === 'save' && !hasUnsaved()) {
+        return payload.value
+      }
+      const body = { ...changedFields(), revision: revision.value }
+      const next = await $api<ArticleEditPayload>(action === 'publish' ? `/v1/articles/${articleId.value}/publish` : `/v1/articles/${articleId.value}`, {
+        method: action === 'publish' ? 'POST' : 'PUT', body,
+      })
+      adopt(next, sent)
+      return next
+    }
+    catch (error) {
+      lastError.value = error
+      if ((error as ApiError).name === 'ARTICLE_DRAFT_CONFLICT' && articleId.value) {
+        conflict.value = await $api<ArticleEditPayload>(`/v1/articles/${articleId.value}/edit`)
+      }
+      throw error
+    }
+    finally {
+      busy.value = false
+    }
   }
 
-  function restoreBackup() {
-    if (!backup.value) return
-    Object.assign(form, backup.value.form)
-    backup.value = null
-  }
-
-  function dismissBackup() {
-    backup.value = null
-    clearBackup()
-  }
-
-  /** Runs a workflow action after the latest edits are saved; the response replaces the draft. */
-  async function act(action: 'submit' | 'withdraw' | 'publish' | 'discard', body: Record<string, unknown> = {}) {
+  /** Takes a published article off the site; unsaved edits stay in the page. */
+  async function hide() {
+    if (!articleId.value) return null
     busy.value = true
     try {
-      if (action === 'submit' || action === 'publish') {
-        await save()
-        if (saveState.value === 'error') throw lastError.value
-      }
-      if (!articleId.value) return
-      const url = action === 'discard' ? `/v1/articles/${articleId.value}/draft` : `/v1/articles/${articleId.value}/${action}`
-      const next = await $api<ArticleDraftPayload>(url, {
-        method: action === 'discard' ? 'DELETE' : 'POST',
-        body: action === 'withdraw' || action === 'discard' ? undefined : { ...body, revision: revision.value },
-      })
-      apply(next)
-      clearBackup()
-      saveState.value = 'saved'
+      const before = saved
+      const next = await $api<ArticleEditPayload>(`/v1/articles/${articleId.value}/hide`, { method: 'POST' })
+      adopt(next, before)
       return next
     }
     finally {
@@ -245,28 +212,63 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
     }
   }
 
-  const hasUnsaved = () => saveState.value === 'dirty' || saveState.value === 'saving' || (saveState.value === 'error' && Object.keys(changedFields()).length > 0)
+  /** Keeps the author's text over the server's: the next save overwrites the newer copy. */
+  function keepMine() {
+    if (!conflict.value) return
+    const mine = copy(form)
+    apply(conflict.value)
+    conflict.value = null
+    Object.assign(form, mine)
+  }
+
+  /** Drops local edits in favour of the server's copy. */
+  function useServer() {
+    if (!conflict.value) return
+    apply(conflict.value)
+    conflict.value = null
+    clearLocal()
+  }
+
+  /** Puts back edits made before the article was saved elsewhere, to save over that copy. */
+  function restoreStale() {
+    if (!stale.value) return
+    Object.assign(form, stale.value.form)
+    stale.value = null
+  }
+
+  /** Forgets the unsaved edits kept in this browser and shows the saved article. */
+  function discardLocal() {
+    stale.value = null
+    restoredAt.value = null
+    clearLocal()
+    applying = true
+    Object.assign(form, payload.value ? formFrom(payload.value) : emptyForm())
+    dirty.value = false
+    nextTick(() => { applying = false })
+  }
 
   if (import.meta.client) {
+    // Leaving the page keeps the latest keystrokes too.
+    const flush = () => { if (dirty.value && canEdit.value) writeLocal() }
     const beforeUnload = (event: BeforeUnloadEvent) => {
-      if (!hasUnsaved()) return
-      void save()
+      if (!dirty.value) return
+      flush()
       event.preventDefault()
     }
-    const hidden = () => { if (document.visibilityState === 'hidden' && hasUnsaved()) void save() }
+    const hidden = () => { if (document.visibilityState === 'hidden') flush() }
     onMounted(() => {
       window.addEventListener('beforeunload', beforeUnload)
       document.addEventListener('visibilitychange', hidden)
     })
     onBeforeUnmount(() => {
-      clearTimeout(timer)
+      flush()
       window.removeEventListener('beforeunload', beforeUnload)
       document.removeEventListener('visibilitychange', hidden)
     })
   }
 
   return {
-    articleId, payload, form, revision, saveState, savedAt, lastError, conflict, backup, busy, canEdit,
-    load, save, act, keepMine, useServer, restoreBackup, dismissBackup, hasUnsaved,
+    articleId, payload, form, revision, savedAt, dirty, lastError, conflict, restoredAt, stale, busy, canEdit,
+    load, save: () => persist('save'), publish: () => persist('publish'), hide, keepMine, useServer, restoreStale, discardLocal, hasUnsaved,
   }
 }

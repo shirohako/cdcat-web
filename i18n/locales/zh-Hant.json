@@ -415,7 +415,6 @@
       "article_not_found": "文章不存在或尚未發布。",
       "article_draft_conflict": "這篇草稿已在別處修改，請重新載入。",
       "article_invalid_state": "文章目前的狀態不允許這個操作。",
-      "article_pending_limit": "你已有 3 篇文章在審核中，請等待審核結果。",
       "content_blocked": "內容包含不允許的詞語。",
       "already_reported": "你已經檢舉過，正在等待處理。",
       "rate_limit_exceeded": "操作太頻繁，請稍後再試。",
@@ -529,25 +528,13 @@
     "write": "寫文章",
     "untitled": "無標題",
     "featured": "編輯推薦",
-    "has_changes": "有未發布的修改",
     "views": "{count} 次瀏覽",
     "minutes": "{count} 分鐘",
-    "types": {
-      "review": "評測",
-      "feature": "專題",
-      "interview": "訪談",
-      "news": "資訊",
-      "guide": "指南",
-      "translation": "譯文",
-      "essay": "隨筆",
-      "other": "其他"
-    },
     "statuses": {
       "draft": "草稿",
-      "pending": "審核中",
       "published": "已發布",
-      "rejected": "被退回",
-      "unpublished": "已下架"
+      "hidden": "已隱藏",
+      "locked": "已鎖定"
     },
     "link_types": {
       "album": "專輯",
@@ -612,44 +599,41 @@
       "outline": "大綱",
       "outline_empty": "用 ## 標題劃分段落後，這裡會顯示大綱。",
       "saving": "儲存中…",
-      "unsaved": "有未儲存的修改",
-      "save_failed": "儲存失敗",
       "not_saved": "尚未儲存",
       "saved": "已儲存",
       "saved_at": "已儲存 {time}",
       "actions": {
-        "submit": "提交審核",
-        "resubmit": "重新提交",
+        "save_draft": "儲存草稿",
+        "update": "更新",
         "publish": "發布",
-        "publish_changes": "發布修改",
-        "withdraw": "撤回審核"
+        "republish": "重新公開",
+        "hide": "隱藏"
       },
-      "discard": "放棄修改",
-      "discard_title": "放棄修改？",
-      "discard_description": "工作稿會被刪除，回到線上的版本。這一步無法復原。",
-      "discarded": "已放棄修改",
-      "withdrawn": "已撤回，可以繼續編輯",
-      "submitted": "已提交審核",
       "published": "已發布",
-      "notice_pending": "文章正在審核中，暫時不能修改。需要修改時，請先撤回審核。",
-      "notice_rejected": "文章被退回：",
-      "notice_unpublished": "文章已被下架：",
-      "notice_published": "你正在編輯已發布的文章，點擊「發布修改」後才會取代線上內容。",
-      "backup_found": "發現一份 {time} 未儲存到伺服器的本機內容。",
-      "backup_restore": "還原",
-      "backup_dismiss": "捨棄",
-      "conflict_title": "草稿在別處被修改過",
+      "notice_published": "你正在編輯已發布的文章，點擊「更新」後修改才會公開。",
+      "conflict_title": "文章在別處儲存過",
       "conflict_description": "伺服器上有一份 {time} 儲存的較新版本，可能來自另一個視窗。要保留哪一份？",
       "conflict_keep_mine": "保留我的內容",
       "conflict_use_server": "使用伺服器上的版本",
-      "leave_confirm": "還有內容沒有儲存成功，確定離開嗎？"
+      "leave_confirm": "修改已存在這個瀏覽器裡，但還沒有儲存到伺服器。確定離開嗎？",
+      "unsaved_local": "有未儲存的修改（已存在本機）",
+      "draft_saved": "草稿已儲存",
+      "updated": "已更新",
+      "hidden": "已隱藏",
+      "hide_title": "隱藏這篇文章？",
+      "hide_description": "讀者將看不到這篇文章，你可以隨時重新公開。",
+      "notice_hidden": "文章已隱藏，讀者看不到。",
+      "notice_hidden_reason": "由版主隱藏：{reason}",
+      "notice_locked": "文章已被版主鎖定，不會公開，也不能編輯。",
+      "local_restored": "已恢復你在這個瀏覽器裡 {time} 未儲存的修改。",
+      "local_stale": "這個瀏覽器裡有一份 {time} 未儲存的修改，但文章之後在別處儲存過。",
+      "local_restore": "使用我的修改",
+      "local_discard": "捨棄",
+      "save_shortcut": "Ctrl+S"
     },
     "submit": {
-      "submit_title": "提交審核",
-      "submit_description": "審核通過後文章才會公開。之後再修改無需審核。",
-      "submit_confirm": "提交",
       "publish_title": "發布",
-      "publish_description": "內容會立即公開，舊版本會保留在版本紀錄裡。",
+      "publish_description": "文章會立即公開，不需要審核。",
       "publish_confirm": "發布",
       "checks": {
         "title": "標題 2–100 字",
@@ -659,8 +643,9 @@
         "cover": "設定封面"
       },
       "optional": "建議",
-      "note": "給審核人的留言（選填）",
-      "note_placeholder": "例如資料來源、轉載授權等"
+      "republish_title": "重新公開",
+      "republish_description": "文章會以目前的內容重新公開。",
+      "republish_confirm": "公開"
     },
     "errors": {
       "title": "標題需要 2–100 字。",
@@ -672,15 +657,12 @@
       "tag_ids": "有標籤無法使用。",
       "slug": "這個連結已被使用或格式不正確。",
       "blocked": "內容包含不允許的詞語，請修改後再試。",
-      "pending_limit": "你已有 3 篇文章在審核中，請等待審核結果。",
-      "conflict": "草稿在別處被修改過，請選擇要保留的版本。",
-      "invalid_state": "文章目前的狀態不允許這個操作，請重新整理後再試。",
-      "revision": "草稿版本已過期，請重新整理後再試。",
-      "note": "留言最多 1000 字。"
+      "conflict": "文章在別處儲存過，請選擇要保留哪一份。",
+      "invalid_state": "文章目前的狀態不允許這個操作，請重新整理後再試。"
     },
     "mine": {
       "title": "我的文章",
-      "description": "草稿會自動儲存。第一次發布需要審核，之後的修改立即生效。",
+      "description": "編輯時內容會自動存在這個瀏覽器裡，點「儲存草稿」或「發布」才會儲存到伺服器。發布不需要審核。",
       "filter": "依狀態篩選",
       "all": "全部",
       "empty": "這裡還沒有文章。",
@@ -689,12 +671,11 @@
       "view": "查看",
       "deleted": "已刪除",
       "delete_title": "刪除文章",
-      "delete_description": "「{title}」和它的所有版本都會被永久刪除。"
+      "delete_description": "「{title}」會被永久刪除。"
     },
     "list": {
       "featured": "編輯推薦",
       "all_types": "全部類型",
-      "all_tags": "全部標籤",
       "sort": "排序",
       "latest": "最新",
       "popular": "最熱",
@@ -1785,10 +1766,6 @@
       "unread": "未讀"
     },
     "types": {
-      "article_approved": "你的文章「{title}」已通過審核並發布",
-      "article_rejected": "你的文章「{title}」被退回",
-      "article_unpublished": "你的文章「{title}」被下架",
-      "article_republished": "你的文章「{title}」已恢復上線",
       "article_featured": "你的文章「{title}」被設為編輯推薦",
       "article_edited": "版主編輯了你的文章「{title}」",
       "article_deleted": "你的文章「{title}」被刪除",
@@ -1821,7 +1798,10 @@
         "discussions": "你在討論區被暫時禁言",
         "lyrics": "你暫時不能新增或修改歌詞",
         "shouts": "你暫時不能發布留言"
-      }
+      },
+      "article_hidden": "你的文章「{title}」被版主隱藏",
+      "article_locked": "你的文章「{title}」被版主鎖定",
+      "article_unlocked": "你的文章「{title}」已解除鎖定"
     },
     "reason_line": "原因：{reason}",
     "comment_line": "意見：{comment}"

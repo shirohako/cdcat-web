@@ -8,17 +8,16 @@ export interface SubmitCheck {
   required: boolean
 }
 
-/** Confirms a submission (with an optional note to reviewers) or a direct publication. */
-const props = defineProps<{ open: boolean, action: 'submit' | 'publish', checks: SubmitCheck[], busy: boolean, error: string }>()
-const emit = defineEmits<{ 'update:open': [value: boolean], confirm: [note: string] }>()
+/** Confirms publishing, or publishing a hidden article again, after a checklist; there is no review. */
+const props = defineProps<{ open: boolean, republish?: boolean, checks: SubmitCheck[], busy: boolean, error: string }>()
+const emit = defineEmits<{ 'update:open': [value: boolean], confirm: [] }>()
 const { t } = useI18n()
 const dialog = useTemplateRef('dialog')
-const note = ref('')
+const action = computed(() => props.republish ? 'republish' : 'publish')
 const blocked = computed(() => props.checks.some(check => check.required && !check.ok))
 watch(() => props.open, async (value) => {
   await nextTick()
   if (value) {
-    note.value = ''
     if (!dialog.value?.open) dialog.value?.showModal()
   }
   else {
@@ -26,7 +25,7 @@ watch(() => props.open, async (value) => {
   }
 }, { immediate: true })
 const close = () => { if (!props.busy) emit('update:open', false) }
-const confirm = () => { if (!props.busy && !blocked.value) emit('confirm', note.value.trim()) }
+const confirm = () => { if (!props.busy && !blocked.value) emit('confirm') }
 </script>
 
 <template>
@@ -45,12 +44,6 @@ const confirm = () => { if (!props.busy && !blocked.value) emit('confirm', note.
           <span v-if="!check.required" class="ml-auto text-[11px] text-slate-400">{{ t('article_ui.submit.optional') }}</span>
         </li>
       </ul>
-      <label v-if="action === 'submit'" class="block space-y-1.5">
-        <span class="text-xs font-semibold text-slate-500">{{ t('article_ui.submit.note') }}</span>
-        <textarea
-          v-model="note" rows="3" maxlength="1000" class="w-full resize-none rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-violet-400"
-          :placeholder="t('article_ui.submit.note_placeholder')" />
-      </label>
       <p v-if="error" role="alert" class="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">{{ error }}</p>
       <footer class="flex justify-end gap-2">
         <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="close">{{ t('common.cancel') }}</button>

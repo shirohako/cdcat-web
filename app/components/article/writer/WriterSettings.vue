@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ARTICLE_TYPES, type ArticleType, type ContentLinkSummary, type TagSummary } from '~/types/article'
+import type { ArticleType, ContentLinkSummary, TagSummary } from '~/types/article'
 
 /** The article's metadata: type, tags, summary, cover, links and custom link path. */
 const props = withDefaults(defineProps<{ disabled?: boolean, allowStaffTags?: boolean, errors?: Record<string, string> }>(),
@@ -11,6 +11,9 @@ const slug = defineModel<string>('slug', { required: true })
 const links = defineModel<ContentLinkSummary[]>('links', { required: true })
 const tags = defineModel<TagSummary[]>('tags', { required: true })
 const { t } = useI18n()
+const { types, typeName } = useArticleTypes()
+// A type deactivated since it was picked stays visible while selected; it can only go live on an article that already had it.
+const typeOptions = computed(() => types.value.filter(item => item.is_active || item.key === type.value))
 const coverBroken = ref(false)
 watch(coverUrl, () => { coverBroken.value = false })
 const coverIsHttps = computed(() => !coverUrl.value.trim() || /^https:\/\/\S+$/i.test(coverUrl.value.trim()))
@@ -25,11 +28,11 @@ const errorText = (key: string) => props.errors[key]
       <span :class="label">{{ t('article_ui.fields.type') }} <span class="text-rose-500">*</span></span>
       <div class="grid grid-cols-2 gap-1.5">
         <button
-          v-for="value in ARTICLE_TYPES" :key="value" type="button" :disabled="disabled"
+          v-for="option in typeOptions" :key="option.key" type="button" :disabled="disabled"
           class="rounded-lg border px-2.5 py-1.5 text-left text-sm transition disabled:opacity-60"
-          :class="type === value ? 'border-violet-400 bg-violet-50 font-semibold text-violet-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'"
-          :aria-pressed="type === value" @click="type = value">
-          {{ t(`article_ui.types.${value}`) }}
+          :class="type === option.key ? 'border-violet-400 bg-violet-50 font-semibold text-violet-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'"
+          :aria-pressed="type === option.key" @click="type = option.key">
+          {{ typeName(option.key) }}
         </button>
       </div>
       <p v-if="errorText('type')" class="text-xs text-rose-600">{{ errorText('type') }}</p>

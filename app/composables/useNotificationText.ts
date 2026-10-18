@@ -59,8 +59,8 @@ export const useNotificationText = () => {
     if (type === 'revision') return `/revisions/${id}`
     if (type !== 'article' || notification.type === 'article.deleted') return null
     if (notification.type === 'report.resolved') return notification.data.resolution === 'delete' ? null : `/articles/${id}`
-    // The author fixes rejected or edited work in the writer; everything else opens the article.
-    return ['article.rejected', 'article.unpublished', 'article.edited'].includes(notification.type) ? `/articles/${id}/edit` : `/articles/${id}`
+    // An article a moderator edited, hid or locked opens in the writer, where the author sees why; the rest open the article.
+    return ['article.hidden', 'article.locked', 'article.unlocked', 'article.edited'].includes(notification.type) ? `/articles/${id}/edit` : `/articles/${id}`
   }
 
   return { text, detail, link }

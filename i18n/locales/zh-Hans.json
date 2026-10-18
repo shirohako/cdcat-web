@@ -415,7 +415,6 @@
       "article_not_found": "文章不存在或尚未发布。",
       "article_draft_conflict": "这篇草稿已在别处修改，请重新加载。",
       "article_invalid_state": "文章当前的状态不允许这个操作。",
-      "article_pending_limit": "你已有 3 篇文章在审核中，请等待审核结果。",
       "content_blocked": "内容包含不允许的词语。",
       "already_reported": "你已经举报过，正在等待处理。",
       "rate_limit_exceeded": "操作太频繁，请稍后再试。",
@@ -664,15 +663,15 @@
       "pending_help": "按提交时间排列，可批量处理",
       "all_logs": "全部日志",
       "view_system": "运行状态",
-      "pending_articles": "待审文章",
-      "pending_reports": "{count} 篇文章有待处理举报",
       "labels": "厂牌",
       "works": "乐曲",
       "shouts": "留言",
       "conflicted": "{count} 条有冲突",
       "unchecked_lyrics": "待巡查歌词",
       "go_patrol": "去巡查",
-      "pending_lyric_revisions": "另有 {count} 条歌词修改待审"
+      "pending_lyric_revisions": "另有 {count} 条歌词修改待审",
+      "reports_card": "待处理举报",
+      "go_handle": "去处理"
     },
     "roles": {
       "title": "角色与权限",
@@ -786,10 +785,6 @@
       "system_delete_failed_job": "删除失败任务",
       "system_cache_clear": "清除缓存",
       "system_test_mail": "发送测试邮件",
-      "articles_approve": "通过文章",
-      "articles_reject": "退回文章",
-      "articles_unpublish": "下架文章",
-      "articles_republish": "恢复文章",
       "articles_feature": "设为编辑推荐",
       "articles_unfeature": "取消编辑推荐",
       "articles_slug": "修改文章链接",
@@ -807,6 +802,9 @@
       "credit_roles_create": "新建角色",
       "credit_roles_update": "修改角色",
       "credit_roles_delete": "删除角色",
+      "article_types_create": "新建文章类型",
+      "article_types_update": "修改文章类型",
+      "article_types_delete": "删除文章类型",
       "attribute_definitions_create": "新建属性定义",
       "attribute_definitions_update": "修改属性定义",
       "attribute_definitions_delete": "删除属性定义",
@@ -817,7 +815,10 @@
       "discussions_silence": "讨论区禁言",
       "lyrics_silence": "限制改歌词",
       "shouts_silence": "限制发留言",
-      "link_providers_delete": "删除链接提供方"
+      "link_providers_delete": "删除链接提供方",
+      "articles_hide": "隐藏文章",
+      "articles_lock": "锁定文章",
+      "articles_unlock": "解锁文章"
     },
     "apply": "应用",
     "reset": "重置",
@@ -1056,105 +1057,51 @@
     },
     "articles": {
       "title": "文章管理",
-      "description": "审核新文章，管理已发布的文章：下架、恢复、编辑推荐、编辑和删除都会写入操作日志并通知作者。",
+      "description": "管理所有文章：隐藏、锁定、编辑推荐、编辑和删除都会写入操作日志并通知作者。发布不需要审核。",
       "search": "搜索标题",
       "article": "文章",
       "article_title": "标题",
       "author": "作者",
       "status": "状态",
-      "albums": "关联专辑",
       "published_at": "发布时间",
       "cover": "封面 URL",
-      "album_ids": "关联专辑 ID（逗号分隔）",
       "content": "正文（Markdown）",
-      "draft_or_unpublished": "草稿 / 下架",
       "delete_title": "删除文章",
-      "delete_help": "永久删除文章及其全部版本、关联、标签和举报，并刷新相关专辑的文章数。删除前的内容写入操作日志。",
+      "delete_help": "永久删除文章及其关联、标签和举报，并刷新相关专辑的文章数。删除前的内容写入操作日志。",
       "type": "类型",
       "all_types": "全部类型",
       "untitled": "无标题",
       "featured": "编辑推荐",
-      "has_changes": "有未发布的修改",
       "reports": "举报",
-      "submitted_at": "提交时间",
       "status_reason": "原因：",
       "summary": "摘要",
       "tags": "标签",
       "links": "关联内容",
       "slug": "自定义链接",
-      "submit_note": "作者留言",
-      "versions": "版本记录",
-      "live": "线上",
-      "compare_previous": "和上一版对比",
-      "comparison": "版本对比：{before} → {after}",
-      "diff_folded": "…… 省略 {count} 行未改动的内容 ……",
       "nothing_to_show": "没有可显示的内容。",
-      "show_submission": "待审内容",
-      "show_draft": "工作稿",
-      "show_live": "线上版本",
       "views": {
         "rendered": "渲染",
-        "source": "原文",
-        "diff": "与上次退回对比"
+        "source": "原文"
       },
-      "approve": "通过",
-      "approve_title": "通过并发布",
-      "approve_help": "文章会立即公开，作者会收到通知。",
-      "approved": "已通过并发布",
-      "reject": "退回",
-      "reject_title": "退回文章",
-      "reject_help": "原因会通知作者，作者修改后可以重新提交。",
-      "rejected_done": "已退回",
-      "reject_presets": {
-        "too_short": "内容过短，请补充后再提交。",
-        "off_topic": "与本站音乐主题无关。",
-        "formatting": "排版需要整理，请调整段落和标题。",
-        "infringement": "涉及侵权，请提供转载授权或改为原创内容。"
-      },
-      "unpublish": "下架",
-      "unpublish_title": "下架文章",
-      "unpublish_help": "文章不再公开，并取消编辑推荐。作者修改后需要重新审核。",
-      "unpublished_done": "已下架",
-      "republish": "恢复上线",
-      "republished_done": "已恢复上线",
       "feature": "设为推荐",
       "unfeature": "取消推荐",
-      "edit_live": "编辑线上版本",
       "edited_done": "已保存，修改立即生效",
       "deleted_done": "已删除",
       "pending_reports": "{count} 条待处理举报",
       "handle_reports": "去处理举报",
       "tabs": {
-        "pending": "待审核",
+        "all": "全部",
         "reported": "有举报",
         "published": "已发布",
-        "rejected": "被退回",
-        "unpublished": "已下架",
-        "draft": "草稿",
-        "all": "全部"
+        "hidden": "已隐藏",
+        "locked": "已锁定",
+        "draft": "草稿"
       },
       "statuses": {
         "draft": "草稿",
-        "pending": "审核中",
         "published": "已发布",
-        "rejected": "被退回",
-        "unpublished": "已下架"
-      },
-      "version_statuses": {
-        "draft": "工作稿",
-        "pending": "待审",
-        "rejected": "被退回",
-        "published": "已发布"
-      },
-      "types": {
-        "review": "评测",
-        "feature": "专题",
-        "interview": "访谈",
-        "news": "资讯",
-        "guide": "指南",
-        "translation": "译文",
-        "essay": "随笔",
-        "other": "其他"
+        "hidden": "已隐藏",
+        "locked": "已锁定"
       },
       "link_types": {
         "album": "专辑",
@@ -1162,7 +1109,42 @@
         "entry": "条目",
         "franchise": "系列",
         "event": "活动"
-      }
+      },
+      "edited_at": "最后修改",
+      "edit_help": "修改立即生效，作者会收到通知；作者还没保存的本地修改需要和这次修改合并。",
+      "hide": "隐藏",
+      "hide_title": "隐藏文章",
+      "hide_help": "文章不再公开，并取消编辑推荐。原因会通知作者，作者之后可以自己重新公开。",
+      "hide_done": "已隐藏",
+      "lock": "锁定",
+      "lock_title": "锁定文章",
+      "lock_help": "文章不再公开，作者不能编辑、公开或隐藏，只能删除。原因会通知作者。",
+      "lock_done": "已锁定",
+      "unlock": "解锁",
+      "unlock_title": "解除锁定",
+      "unlock_help": "文章恢复到锁定前的状态（已发布或已隐藏），作者会收到通知。",
+      "unlock_done": "已解锁",
+      "unlocks_to": "解锁后恢复为{status}",
+      "diff_folded": "…… 省略 {count} 行未改动的内容 ……"
+    },
+    "article_types": {
+      "title": "文章类型",
+      "description": "写文章时可选的类型。key 创建后不能改；被文章用过的类型不能删除，可以停用：停用后不能再选，已有的文章保留原类型。",
+      "create": "新建类型",
+      "edit": "编辑类型 {key}",
+      "key": "Key",
+      "key_help": "小写字母开头，可用小写字母、数字和下划线，最多 20 个字符，创建后不能修改。",
+      "names": "名称",
+      "name_in": "名称（{language}）",
+      "sort_order": "排序",
+      "active": "启用",
+      "inactive": "已停用",
+      "usage": "使用情况",
+      "usage_value": "{articles} 篇文章",
+      "in_use": "已被文章使用，只能停用",
+      "deleted": "已删除类型 {key}",
+      "delete_title": "删除类型 {key}",
+      "delete_help": "只有没有任何文章（包括草稿）使用的类型才能删除。"
     },
     "lyrics": {
       "title": "歌词巡查",
@@ -1349,7 +1331,7 @@
     },
     "word_filters": {
       "title": "关键词过滤",
-      "description": "提交审核和发布修改时检查标题、摘要和正文。屏蔽：拒绝保存；标记：照常保存，同时生成一条举报。关键词按全角转半角、忽略大小写匹配。",
+      "description": "发布和更新文章时检查标题、摘要和正文（草稿不检查）。屏蔽：拒绝发布；标记：照常发布，同时生成一条举报。关键词按全角转半角、忽略大小写匹配。",
       "word": "关键词",
       "action": "动作",
       "actions": {
@@ -1373,7 +1355,6 @@
       "count": "{count} 条举报",
       "dismiss": "驳回",
       "accept_only": "认可（不处置）",
-      "accept_unpublish": "认可并下架",
       "accept_delete": "认可并删除",
       "system": "关键词过滤",
       "reasons": {
@@ -1391,20 +1372,21 @@
         "dismissed": "已驳回"
       },
       "resolutions": {
-        "unpublish": "下架",
         "delete": "删除",
         "none": "不处置",
-        "hide": "折叠"
+        "hide": "隐藏",
+        "lock": "锁定"
       },
       "confirm": {
         "dismiss": "驳回这些举报",
         "none": "认可举报，不处置",
-        "unpublish": "认可举报并下架文章",
         "delete": "认可举报并删除文章",
         "post_hide": "认可举报并折叠帖子",
         "post_delete": "认可举报并删除帖子",
         "shout_hide": "成立并隐藏留言",
-        "shout_delete": "成立并删除留言"
+        "shout_delete": "成立并删除留言",
+        "hide": "认可举报并隐藏文章",
+        "lock": "认可举报并锁定文章"
       },
       "confirm_help": "同一篇文章的所有待处理举报都会结案。",
       "resolved": "已处理",
@@ -1420,7 +1402,9 @@
       "silence": "同时禁言作者",
       "silence_none": "不禁言",
       "accept_hide_shout": "成立并隐藏",
-      "accept_delete_shout": "成立并删除"
+      "accept_delete_shout": "成立并删除",
+      "accept_hide_article": "隐藏文章",
+      "accept_lock": "锁定文章"
     },
     "discussions": {
       "categories": {
@@ -1661,25 +1645,13 @@
     "write": "写文章",
     "untitled": "无标题",
     "featured": "编辑推荐",
-    "has_changes": "有未发布的修改",
     "views": "{count} 次浏览",
     "minutes": "{count} 分钟",
-    "types": {
-      "review": "评测",
-      "feature": "专题",
-      "interview": "访谈",
-      "news": "资讯",
-      "guide": "指南",
-      "translation": "译文",
-      "essay": "随笔",
-      "other": "其他"
-    },
     "statuses": {
       "draft": "草稿",
-      "pending": "审核中",
       "published": "已发布",
-      "rejected": "被退回",
-      "unpublished": "已下架"
+      "hidden": "已隐藏",
+      "locked": "已锁定"
     },
     "link_types": {
       "album": "专辑",
@@ -1744,44 +1716,41 @@
       "outline": "大纲",
       "outline_empty": "用 ## 标题划分段落后，这里会显示大纲。",
       "saving": "保存中…",
-      "unsaved": "有未保存的修改",
-      "save_failed": "保存失败",
       "not_saved": "尚未保存",
       "saved": "已保存",
       "saved_at": "已保存 {time}",
       "actions": {
-        "submit": "提交审核",
-        "resubmit": "重新提交",
+        "save_draft": "保存草稿",
+        "update": "更新",
         "publish": "发布",
-        "publish_changes": "发布修改",
-        "withdraw": "撤回审核"
+        "republish": "重新公开",
+        "hide": "隐藏"
       },
-      "discard": "放弃修改",
-      "discard_title": "放弃修改？",
-      "discard_description": "工作稿会被删除，回到线上的版本。这一步无法撤销。",
-      "discarded": "已放弃修改",
-      "withdrawn": "已撤回，可以继续编辑",
-      "submitted": "已提交审核",
       "published": "已发布",
-      "notice_pending": "文章正在审核中，暂时不能修改。需要修改时，请先撤回审核。",
-      "notice_rejected": "文章被退回：",
-      "notice_unpublished": "文章已被下架：",
-      "notice_published": "你正在编辑已发布的文章，点击「发布修改」后才会替换线上内容。",
-      "backup_found": "发现一份 {time} 未保存到服务器的本地内容。",
-      "backup_restore": "恢复",
-      "backup_dismiss": "丢弃",
-      "conflict_title": "草稿在别处被修改过",
-      "conflict_description": "服务器上有一份 {time} 保存的更新版本，可能来自另一个窗口。要保留哪一份？",
+      "notice_published": "你正在编辑已发布的文章，点击「更新」后修改才会公开。",
+      "conflict_title": "文章在别处保存过",
+      "conflict_description": "服务器上有一份 {time} 保存的较新版本，可能来自另一个窗口。要保留哪一份？",
       "conflict_keep_mine": "保留我的内容",
       "conflict_use_server": "使用服务器上的版本",
-      "leave_confirm": "还有内容没保存成功，确定离开吗？"
+      "leave_confirm": "修改已存在这个浏览器里，但还没有保存到服务器。确定离开吗？",
+      "unsaved_local": "有未保存的修改（已存在本地）",
+      "draft_saved": "草稿已保存",
+      "updated": "已更新",
+      "hidden": "已隐藏",
+      "hide_title": "隐藏这篇文章？",
+      "hide_description": "读者将看不到这篇文章，你可以随时重新公开。",
+      "notice_hidden": "文章已隐藏，读者看不到。",
+      "notice_hidden_reason": "由版主隐藏：{reason}",
+      "notice_locked": "文章已被版主锁定，不会公开，也不能编辑。",
+      "local_restored": "已恢复你在这个浏览器里 {time} 未保存的修改。",
+      "local_stale": "这个浏览器里有一份 {time} 未保存的修改，但文章之后在别处保存过。",
+      "local_restore": "使用我的修改",
+      "local_discard": "丢弃",
+      "save_shortcut": "Ctrl+S"
     },
     "submit": {
-      "submit_title": "提交审核",
-      "submit_description": "审核通过后文章才会公开。之后再修改无需审核。",
-      "submit_confirm": "提交",
       "publish_title": "发布",
-      "publish_description": "内容会立即公开，旧版本会保留在版本记录里。",
+      "publish_description": "文章会立即公开，不需要审核。",
       "publish_confirm": "发布",
       "checks": {
         "title": "标题 2–100 字",
@@ -1791,8 +1760,9 @@
         "cover": "设置封面"
       },
       "optional": "建议",
-      "note": "给审核人的留言（可选）",
-      "note_placeholder": "比如资料来源、转载授权等"
+      "republish_title": "重新公开",
+      "republish_description": "文章会以当前的内容重新公开。",
+      "republish_confirm": "公开"
     },
     "errors": {
       "title": "标题需要 2–100 字。",
@@ -1804,15 +1774,12 @@
       "tag_ids": "有标签不可用。",
       "slug": "这个链接已被占用或格式不对。",
       "blocked": "内容包含不允许的词语，请修改后再试。",
-      "pending_limit": "你已有 3 篇文章在审核中，请等待审核结果。",
-      "conflict": "草稿在别处被修改过，请选择要保留的版本。",
-      "invalid_state": "文章当前的状态不允许这个操作，请刷新后重试。",
-      "revision": "草稿版本已过期，请刷新后重试。",
-      "note": "留言最多 1000 字。"
+      "conflict": "文章在别处保存过，请选择要保留哪一份。",
+      "invalid_state": "文章当前的状态不允许这个操作，请刷新后重试。"
     },
     "mine": {
       "title": "我的文章",
-      "description": "草稿会自动保存。第一次发布需要审核，之后的修改立即生效。",
+      "description": "编辑时内容会自动存在这个浏览器里，点「保存草稿」或「发布」才会保存到服务器。发布不需要审核。",
       "filter": "按状态筛选",
       "all": "全部",
       "empty": "这里还没有文章。",
@@ -1821,12 +1788,11 @@
       "view": "查看",
       "deleted": "已删除",
       "delete_title": "删除文章",
-      "delete_description": "「{title}」和它的所有版本都会被永久删除。"
+      "delete_description": "「{title}」会被永久删除。"
     },
     "list": {
       "featured": "编辑推荐",
       "all_types": "全部类型",
-      "all_tags": "全部标签",
       "sort": "排序",
       "latest": "最新",
       "popular": "最热",
@@ -2917,10 +2883,6 @@
       "unread": "未读"
     },
     "types": {
-      "article_approved": "你的文章「{title}」已通过审核并发布",
-      "article_rejected": "你的文章「{title}」被退回",
-      "article_unpublished": "你的文章「{title}」被下架",
-      "article_republished": "你的文章「{title}」已恢复上线",
       "article_featured": "你的文章「{title}」被设为编辑推荐",
       "article_edited": "版主编辑了你的文章「{title}」",
       "article_deleted": "你的文章「{title}」被删除",
@@ -2953,7 +2915,10 @@
         "discussions": "你在讨论区被暂时禁言",
         "lyrics": "你暂时不能新增或修改歌词",
         "shouts": "你暂时不能发布留言"
-      }
+      },
+      "article_hidden": "你的文章「{title}」被版主隐藏",
+      "article_locked": "你的文章「{title}」被版主锁定",
+      "article_unlocked": "你的文章「{title}」已解除锁定"
     },
     "reason_line": "原因：{reason}",
     "comment_line": "意见：{comment}"

@@ -6,6 +6,7 @@ import type { ArticleCard } from '~/types/article'
 const props = defineProps<{ article: ArticleCard }>()
 const { t, locale } = useI18n()
 const { tagName } = useTags()
+const { typeName } = useArticleTypes()
 const href = computed(() => props.article.slug ? `/articles/${props.article.id}/${props.article.slug}` : `/articles/${props.article.id}`)
 const minutes = computed(() => Math.max(1, Math.ceil(props.article.word_count / 300)))
 const date = computed(() => props.article.published_at ? new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }).format(new Date(props.article.published_at)) : '')
@@ -19,7 +20,7 @@ const date = computed(() => props.article.published_at ? new Intl.DateTimeFormat
         class="size-full object-cover transition-transform duration-500 group-hover:scale-105">
       <div v-else class="grid size-full place-items-center"><ImageIcon :size="28" class="text-gray-200" /></div>
       <span v-if="article.type" class="absolute left-2.5 top-2.5 rounded-md bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm backdrop-blur">
-        {{ t(`article_ui.types.${article.type}`) }}
+        {{ typeName(article.type) }}
       </span>
       <span v-if="article.featured" class="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-md bg-violet-600/90 px-2 py-0.5 text-[11px] font-semibold text-white shadow-sm">
         <Sparkles :size="11" />{{ t('article_ui.featured') }}
