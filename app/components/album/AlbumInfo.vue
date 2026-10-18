@@ -31,7 +31,7 @@
         <ul class="space-y-1.5">
           <li v-for="entry in album.entries" :key="entry.id" class="flex items-baseline gap-2">
             <NuxtLink :to="`/entries/${entry.id}`" class="min-w-0 truncate text-gray-800 hover:text-sky-700 hover:underline">{{ entry.name }}</NuxtLink>
-            <span class="shrink-0 text-[11px] text-gray-400">{{ albumRelationLabel(entry.relation_type) }}<template v-if="entry.episode"> · {{ $t('catalog.episode_n', { n: entry.episode }) }}</template></span>
+            <span class="shrink-0 text-[11px] text-gray-400">{{ albumRelationLabel(entry.relation_type) }}</span>
           </li>
         </ul>
       </div>

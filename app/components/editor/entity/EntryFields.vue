@@ -62,8 +62,6 @@
           :references="editor.references"
           :relations="{ group: 'entry_album_relation', values: enums.entry_album_relation ?? [], default: 'ost' }"
           :extras="[
-            { name: 'character_name', label: $t('catalog.form.character_name') },
-            { name: 'episode', type: 'number', label: $t('catalog.form.episode') },
             { name: 'note', label: $t('catalog.field.note'), wide: true },
           ]"
           :placeholder="$t('catalog.form.search_album')"

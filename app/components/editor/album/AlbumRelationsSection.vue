@@ -12,7 +12,7 @@
                   <span class="truncate text-sm font-medium text-gray-900">{{ entryName(row.entry_id) }}</span>
                   <span class="shrink-0 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] text-rose-700">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
                 </span>
-                <span v-if="details(row)" class="block truncate text-[11px] text-gray-500">{{ details(row) }}</span>
+                <span v-if="row.note" class="block truncate text-[11px] text-gray-500">{{ row.note }}</span>
               </span>
             </EditorListRow>
             <p v-for="error in errorsOf('entries', row.id)" :key="error.path" class="px-1 text-[11px] text-error">{{ error.message }}</p>
@@ -58,16 +58,6 @@
             >{{ enumLabel('entry_album_relation', value) }}<span v-if="labelEn('entry_album_relation', value)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', value) }}</span></button>
           </div>
         </div>
-        <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_7rem]">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.character_name') }}</span>
-            <input v-model="form.character_name" class="input input-sm w-full" maxlength="200">
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.episode') }}</span>
-            <input v-model.number="form.episode" type="number" min="0" class="input input-sm w-full">
-          </label>
-        </div>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.note') }}</span>
           <input v-model="form.note" class="input input-sm w-full" maxlength="500">
@@ -90,7 +80,6 @@ import { newKey } from '~/utils/documentKeys'
 type EntryRow = AlbumDocument['entries'][number]
 
 const editor = useAlbumEditor()
-const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const { labelEn } = useEnglishLabels()
@@ -108,17 +97,12 @@ const entryOf = (id: AggregateRef | null) => typeof id === 'number'
   ? editor.references.entry?.[String(id)] as { name?: string, image_url?: string | null } | undefined
   : undefined
 const entryName = (id: AggregateRef | null) => entryOf(id)?.name ?? (id === null ? '—' : `#${id}`)
-const details = (row: EntryRow) => [
-  row.character_name,
-  row.episode !== null ? t('editor.dialog.episode_n', { n: row.episode }) : null,
-  row.note,
-].filter(Boolean).join(' · ')
 
 // ---- the dialog ----
 
 const dialog = ref(false)
 const editing = ref<EntryRow | null>(null)
-const form = reactive({ entry_id: null as AggregateRef | null, relation_type: 'other', character_name: '', episode: '' as number | '', note: '' })
+const form = reactive({ entry_id: null as AggregateRef | null, relation_type: 'other', note: '' })
 const tried = ref(false)
 const taken = computed(() => album.value.entries.filter(row => row !== editing.value).map(row => row.entry_id))
 
@@ -126,8 +110,6 @@ const edit = (row: EntryRow | null) => {
   editing.value = row
   form.entry_id = row?.entry_id ?? null
   form.relation_type = row?.relation_type ?? 'other'
-  form.character_name = row?.character_name ?? ''
-  form.episode = row?.episode ?? ''
   form.note = row?.note ?? ''
   tried.value = false
   dialog.value = true
@@ -144,8 +126,6 @@ const save = () => {
   const values = {
     entry_id: form.entry_id,
     relation_type: form.relation_type,
-    character_name: form.character_name.trim() || null,
-    episode: form.episode === '' ? null : Number(form.episode),
     note: form.note.trim() || null,
   }
   if (editing.value) Object.assign(editing.value, values)

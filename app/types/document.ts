@@ -52,7 +52,7 @@ export interface AlbumDocument {
   track_attributes: Array<AttributeRow & { track_id: RowId }>
   image_attributes: Array<AttributeRow & { album_image_id: RowId }>
   links: LinkRow[]
-  entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, character_name: string | null, episode: number | null, note: string | null }>
+  entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 
 export interface ArtistDocument {
@@ -114,7 +114,7 @@ export interface EntryDocument {
   banner_url: string | null
   titles: TitleRow[]
   links: LinkRow[]
-  albums: Array<{ id: RowId, album_id: AggregateRef | null, relation_type: string, character_name: string | null, episode: number | null, note: string | null }>
+  albums: Array<{ id: RowId, album_id: AggregateRef | null, relation_type: string, note: string | null }>
   relations: Array<{ id: RowId, related_entry_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 

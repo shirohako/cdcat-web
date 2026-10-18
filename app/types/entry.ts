@@ -79,8 +79,6 @@ export interface EntryAlbum {
   release_date: string | null
   catalog_number: string | null
   relation_type: EntryAlbumRelation
-  character_name: string | null
-  episode: number | null
   note: string | null
 }
 

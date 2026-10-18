@@ -126,7 +126,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                         <div class="p-3">
                           <h4 class="line-clamp-2 text-sm font-semibold transition-colors group-hover:text-primary">{{ album.title }}</h4>
                           <p class="mt-1 truncate text-xs text-gray-500">
-                            {{ [album.character_name, album.episode ? $t('catalog.episode_n', { n: album.episode }) : null, album.release_date].filter(Boolean).join(' · ') }}
+                            {{ album.release_date }}
                           </p>
                           <p v-if="album.note" class="mt-0.5 truncate text-xs text-gray-400">{{ album.note }}</p>
                         </div>

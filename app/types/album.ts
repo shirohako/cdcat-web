@@ -179,8 +179,6 @@ export interface AlbumEntry {
   image_url: string | null
   release_date: string | null
   relation_type: EntryAlbumRelation
-  character_name: string | null
-  episode: number | null
   note: string | null
   franchises: Array<{ id: number, name: string, slug: string | null, parent_id: number | null }>
 }

@@ -451,11 +451,16 @@ const blank = (value: unknown): boolean => value === null || value === undefined
 
 /**
  * A copy without rows left empty in the editor: blank names, links without a URL, details without a
- * value. Drafts saved before track links were removed still carry an empty `track_links`, which goes too.
+ * value. Drafts saved before fields were dropped still carry them, so they go too: `track_links`, and
+ * the entries' `character_name` and `episode`.
  */
 export function pruneAlbumDocument(doc: AlbumDocument): AlbumDocument {
   const copy = JSON.parse(JSON.stringify(doc)) as AlbumDocument & { track_links?: unknown }
   delete copy.track_links
+  for (const row of copy.entries as Array<Record<string, unknown>>) {
+    delete row.character_name
+    delete row.episode
+  }
   copy.titles = copy.titles.filter(row => !blank(row.title))
   copy.disc_titles = copy.disc_titles.filter(row => !blank(row.title))
   copy.track_titles = copy.track_titles.filter(row => !blank(row.title))
