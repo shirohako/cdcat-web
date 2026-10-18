@@ -575,7 +575,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       <div
         ref="editorHost"
         class="min-w-0 bg-white"
-        :class="[editorVisibility, fill ? 'h-full min-h-0 overflow-hidden' : '', mode === 'edit' && !compact ? 'mx-auto w-full max-w-3xl' : '']"
+        :class="[editorVisibility, fill ? 'h-full min-h-0 overflow-hidden' : '']"
       />
       <div
         class="overflow-y-auto bg-slate-50/50"
