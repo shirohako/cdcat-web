@@ -53,8 +53,6 @@
           <CatalogSection v-if="track.work" :title="$t('lyrics_ui.lyrics_and_translations')" :icon="FileText" tone="sky">
             <div class="px-5 py-4"><LyricsPanel :work-id="track.work.id" /></div>
           </CatalogSection>
-
-          <AlbumLinks v-if="track.links?.length" :links="track.links" />
         </div>
       </template>
     </div>

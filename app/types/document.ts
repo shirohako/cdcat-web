@@ -52,7 +52,6 @@ export interface AlbumDocument {
   track_attributes: Array<AttributeRow & { track_id: RowId }>
   image_attributes: Array<AttributeRow & { album_image_id: RowId }>
   links: LinkRow[]
-  track_links: Array<LinkRow & { track_id: RowId }>
   entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, character_name: string | null, episode: number | null, note: string | null }>
 }
 

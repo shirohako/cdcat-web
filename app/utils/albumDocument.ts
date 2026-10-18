@@ -44,7 +44,6 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   track_attributes: [],
   image_attributes: [],
   links: [],
-  track_links: [],
   entries: [],
 })
 
@@ -122,7 +121,6 @@ function removeTrackRows(doc: AlbumDocument, ids: Set<string>) {
   doc.tracks = doc.tracks.filter(track => !ids.has(String(track.id)))
   doc.track_titles = doc.track_titles.filter(row => !ids.has(String(row.track_id)))
   doc.track_attributes = doc.track_attributes.filter(row => !ids.has(String(row.track_id)))
-  doc.track_links = doc.track_links.filter(row => !ids.has(String(row.track_id)))
   doc.credits = doc.credits.filter(row => row.track_id === null || !ids.has(String(row.track_id)))
 }
 
@@ -451,14 +449,17 @@ export const missingSuggested = (doc: AlbumDocument): SuggestedItem[] => [
 const blank = (value: unknown): boolean => value === null || value === undefined || (typeof value === 'string' && !value.trim())
   || (typeof value === 'object' && !Array.isArray(value) && 'date' in (value as object) && blank((value as { date: unknown }).date))
 
-/** A copy without rows left empty in the editor: blank names, links without a URL, details without a value. */
+/**
+ * A copy without rows left empty in the editor: blank names, links without a URL, details without a
+ * value. Drafts saved before track links were removed still carry an empty `track_links`, which goes too.
+ */
 export function pruneAlbumDocument(doc: AlbumDocument): AlbumDocument {
-  const copy = JSON.parse(JSON.stringify(doc)) as AlbumDocument
+  const copy = JSON.parse(JSON.stringify(doc)) as AlbumDocument & { track_links?: unknown }
+  delete copy.track_links
   copy.titles = copy.titles.filter(row => !blank(row.title))
   copy.disc_titles = copy.disc_titles.filter(row => !blank(row.title))
   copy.track_titles = copy.track_titles.filter(row => !blank(row.title))
   copy.links = copy.links.filter(row => !blank(row.url))
-  copy.track_links = copy.track_links.filter(row => !blank(row.url))
   copy.attributes = copy.attributes.filter(row => !blank(row.value))
   copy.track_attributes = copy.track_attributes.filter(row => !blank(row.value))
   copy.image_attributes = copy.image_attributes.filter(row => !blank(row.value))

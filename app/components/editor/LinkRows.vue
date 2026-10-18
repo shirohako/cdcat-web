@@ -11,7 +11,7 @@
         </template>
       </EditorListRow>
     </ul>
-    <EditorAddButton :small="compact" @click="edit(null)">{{ $t('editor.add_link') }}</EditorAddButton>
+    <EditorAddButton @click="edit(null)">{{ $t('editor.add_link') }}</EditorAddButton>
 
     <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.link_edit' : 'editor.add_link')" :description="$t('editor.dialog.link_hint')" :icon="Link2" tone="gray" @submit="save">
       <div class="space-y-4">
@@ -47,16 +47,12 @@
 </template>
 
 <script setup lang="ts">
-import type { LinkRow, RowId } from '~/types/document'
+import type { LinkRow } from '~/types/document'
 import { ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
-import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
+import { byOrder, nextOrder } from '~/utils/documentRows'
 
-/**
- * Link rows, added and edited in a dialog. With `owner` the model is a collection such as
- * track_links and only that track's rows are shown. `compact` when nested in a row, e.g. a track's details.
- */
-const props = defineProps<{ owner?: { field: string, id: RowId }, compact?: boolean }>()
+/** External links of an album, artist, label, work, entry or series, added and edited in a dialog. */
 const rows = defineModel<LinkRow[]>({ required: true })
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
@@ -68,8 +64,7 @@ const providerOf = (id: number | null) => {
 }
 const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')
 
-const mine = (row: LinkRow) => !props.owner || sameId((row as unknown as Record<string, RowId>)[props.owner.field], props.owner.id)
-const shown = computed(() => byOrder(rows.value.filter(mine)))
+const shown = computed(() => byOrder(rows.value))
 
 const remove = (row: LinkRow) => {
   const index = rows.value.indexOf(row)
@@ -131,10 +126,7 @@ const save = () => {
     editing.value.url = form.url
     editing.value.link_provider_id = provider
   } else {
-    rows.value.push({
-      id: newKey('l'), link_provider_id: provider, url: form.url, sort_order: nextOrder(shown.value),
-      ...(props.owner ? { [props.owner.field]: props.owner.id } : {}),
-    } as LinkRow)
+    rows.value.push({ id: newKey('l'), link_provider_id: provider, url: form.url, sort_order: nextOrder(shown.value) })
   }
   dialog.value = false
 }

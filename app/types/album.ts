@@ -96,7 +96,6 @@ export interface AlbumTrack {
   work: WorkSimple | null
   credits: CatalogCredit[]
   attributes: CatalogAttribute[]
-  links: CatalogLink[]
 }
 
 export interface AlbumDisc {
@@ -271,7 +270,6 @@ export interface TrackDetail {
   album?: AlbumSimple
   credits?: Array<Omit<CatalogCredit, 'category'>>
   attributes?: CatalogAttribute[]
-  links?: CatalogLink[]
   created_at: string
   updated_at: string
 }

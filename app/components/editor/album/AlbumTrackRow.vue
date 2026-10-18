@@ -69,10 +69,6 @@
         <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_attributes') }}</p>
         <EditorAttributeRows v-model="album.track_attributes" compact subject="track" :owner="{ field: 'track_id', id: track.id }" :references="editor.references" />
       </div>
-      <div>
-        <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_links') }}</p>
-        <EditorLinkRows v-model="album.track_links" compact :owner="{ field: 'track_id', id: track.id }" />
-      </div>
     </div>
   </div>
 </template>
