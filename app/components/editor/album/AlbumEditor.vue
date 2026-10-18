@@ -313,7 +313,7 @@ const SECTION_FIELDS: Partial<Record<AlbumSection, string[]>> = {
   editions: ['products'],
   bonuses: ['bonuses'],
   images: ['images', 'image_attributes'],
-  relations: ['entries', 'relations', 'links', 'attributes'],
+  relations: ['entries', 'links', 'attributes'],
 }
 const sectionOf = (path: string): AlbumSection => {
   const [, ref, field] = path.split('.')

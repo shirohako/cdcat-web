@@ -54,7 +54,6 @@ export interface AlbumDocument {
   links: LinkRow[]
   track_links: Array<LinkRow & { track_id: RowId }>
   entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, character_name: string | null, episode: number | null, note: string | null }>
-  relations: Array<{ id: RowId, related_album_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 
 export interface ArtistDocument {

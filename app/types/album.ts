@@ -23,9 +23,6 @@ export const IMAGE_KINDS = [
 ] as const
 export type ImageKind = typeof IMAGE_KINDS[number]
 
-export const ALBUM_RELATIONS = ['reissue', 'reissue_of', 'remaster', 'remaster_of', 'other_format', 'related'] as const
-export type AlbumRelation = typeof ALBUM_RELATIONS[number]
-
 export const LABEL_ROLES = ['label', 'publisher', 'distributor', 'manufacturer', 'other'] as const
 export type LabelRole = typeof LABEL_ROLES[number]
 
@@ -189,12 +186,6 @@ export interface AlbumEntry {
   franchises: Array<{ id: number, name: string, slug: string | null, parent_id: number | null }>
 }
 
-export interface AlbumRelationItem {
-  album: AlbumSimple
-  relation_type: AlbumRelation
-  note: string | null
-}
-
 export interface AlbumArticle {
   id: number
   title: string
@@ -236,7 +227,6 @@ export interface Album extends PendingFields {
   streaming: CatalogLink[]
   entries: AlbumEntry[]
   franchises: Array<{ id: number, name: string, slug: string | null, image_url: string | null }>
-  relations: AlbumRelationItem[]
   tracking_stats: TrackingStats
   favorites_count: number
   reviews_count: number

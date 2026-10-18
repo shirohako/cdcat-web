@@ -46,7 +46,6 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   links: [],
   track_links: [],
   entries: [],
-  relations: [],
 })
 
 // ---- discs and tracks -------------------------------------------------------------------------

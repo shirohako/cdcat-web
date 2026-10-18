@@ -44,28 +44,11 @@
       </div>
     </div>
   </CatalogSection>
-
-  <CatalogSection v-if="album.relations.length" :title="$t('album.section.related_albums')" :icon="Disc3" tone="purple">
-    <ul class="divide-y divide-gray-50">
-      <li v-for="relation in album.relations" :key="`${relation.album.id}-${relation.relation_type}`">
-        <NuxtLink :to="`/albums/${relation.album.id}`" class="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50">
-          <img v-if="relation.album.image_url" :src="relation.album.image_url" :alt="relation.album.title" class="h-10 w-10 shrink-0 rounded object-cover">
-          <div class="min-w-0">
-            <p class="truncate text-sm font-medium text-gray-800">{{ relation.album.title }}</p>
-            <p class="text-[11px] text-gray-400">
-              {{ enumLabel('related_album', relation.relation_type) }}
-              <template v-if="relation.album.disc_formats.some(format => format !== 'cd')"> · {{ relation.album.disc_formats.map(format => enumLabel('disc_format', format)).join(' / ') }}</template>
-            </p>
-          </div>
-        </NuxtLink>
-      </li>
-    </ul>
-  </CatalogSection>
 </template>
 
 <script setup lang="ts">
 import type { Album } from '~/types/album'
-import { Disc3, Info } from '@lucide/vue'
+import { Info } from '@lucide/vue'
 
 const props = defineProps<{ album: Album }>()
 

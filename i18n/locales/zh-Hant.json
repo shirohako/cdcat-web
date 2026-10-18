@@ -43,8 +43,7 @@
       "contributors": "貢獻者",
       "stats": "統計",
       "gallery": "圖片",
-      "information": "資訊",
-      "related_albums": "相關專輯"
+      "information": "資訊"
     },
     "stats": {
       "viewed": "瀏覽",
@@ -1553,14 +1552,6 @@
       "manufacturer": "製造",
       "other": "其他"
     },
-    "related_album": {
-      "reissue": "再版為",
-      "reissue_of": "再版自",
-      "remaster": "重製為",
-      "remaster_of": "重製自",
-      "other_format": "其他載體版本",
-      "related": "相關"
-    },
     "work_relation": {
       "arranged_from": "改編自",
       "arrangement": "改編",
@@ -1713,7 +1704,6 @@
       "relation_type": "關係",
       "character_name": "角色",
       "episode": "集",
-      "related_album_id": "專輯",
       "related_work_id": "樂曲",
       "related_entry_id": "條目",
       "related_artist_id": "藝術家",
@@ -2441,8 +2431,6 @@
     },
     "relations": {
       "entries_hint": "這張專輯所屬的遊戲、動畫等作品。",
-      "related_albums": "相關專輯",
-      "related_albums_hint": "再版、重製版和其他載體版本，例如 CD 對應的黑膠。對方專輯會顯示反向的關係。",
       "links_hint": "商店、串流、官方頁面、VGMdb、MusicBrainz……",
       "attributes_hint": "含義事先約定好的補充資訊，例如封面上的角色。知道才填。"
     },

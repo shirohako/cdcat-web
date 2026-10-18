@@ -4,7 +4,6 @@ import type { DatePrecision } from '~/types/entry'
 /** Enums whose labels live outside catalog.<enum>, e.g. album_type under albums.type. */
 const ENUM_GROUPS: Record<string, string> = {
   album_type: 'albums.type',
-  album_relation: 'catalog.related_album',
   entry_album_relation: 'catalog.album_relation',
   entry_relation: 'catalog.relation',
   date_precision: 'catalog.precision',

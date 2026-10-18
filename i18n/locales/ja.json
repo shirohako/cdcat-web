@@ -43,8 +43,7 @@
       "contributors": "貢献者",
       "stats": "統計",
       "gallery": "画像",
-      "information": "情報",
-      "related_albums": "関連アルバム"
+      "information": "情報"
     },
     "stats": {
       "viewed": "閲覧",
@@ -1553,14 +1552,6 @@
       "manufacturer": "製造元",
       "other": "その他"
     },
-    "related_album": {
-      "reissue": "再発",
-      "reissue_of": "再発元",
-      "remaster": "リマスター",
-      "remaster_of": "リマスター元",
-      "other_format": "別形態",
-      "related": "関連"
-    },
     "work_relation": {
       "arranged_from": "原曲",
       "arrangement": "アレンジ",
@@ -1713,7 +1704,6 @@
       "relation_type": "関係",
       "character_name": "キャラクター",
       "episode": "話",
-      "related_album_id": "アルバム",
       "related_work_id": "楽曲",
       "related_entry_id": "作品",
       "related_artist_id": "アーティスト",
@@ -2441,8 +2431,6 @@
     },
     "relations": {
       "entries_hint": "このアルバムが属するゲームやアニメなどの作品。",
-      "related_albums": "関連アルバム",
-      "related_albums_hint": "再発、リマスター、別フォーマット（CD に対するアナログ盤など）。相手のアルバムには逆向きの関係が表示されます。",
       "links_hint": "ショップ、配信サービス、公式ページ、VGMdb、MusicBrainz など",
       "attributes_hint": "意味があらかじめ決められた補足情報（ジャケットのキャラクターなど）。わかるものだけ入力してください。"
     },

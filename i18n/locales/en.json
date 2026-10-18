@@ -43,8 +43,7 @@
       "contributors": "Contributors",
       "stats": "Stats",
       "gallery": "Images",
-      "information": "Information",
-      "related_albums": "Related albums"
+      "information": "Information"
     },
     "stats": {
       "viewed": "Viewed",
@@ -1553,14 +1552,6 @@
       "manufacturer": "Manufacturer",
       "other": "Other"
     },
-    "related_album": {
-      "reissue": "Reissued as",
-      "reissue_of": "Reissue of",
-      "remaster": "Remastered as",
-      "remaster_of": "Remaster of",
-      "other_format": "Other format",
-      "related": "Related"
-    },
     "work_relation": {
       "arranged_from": "Arrangement of",
       "arrangement": "Arranged as",
@@ -1713,7 +1704,6 @@
       "relation_type": "Relation",
       "character_name": "Character",
       "episode": "Episode",
-      "related_album_id": "Album",
       "related_work_id": "Song",
       "related_entry_id": "Entry",
       "related_artist_id": "Artist",
@@ -2441,8 +2431,6 @@
     },
     "relations": {
       "entries_hint": "The games, anime and other works this album belongs to.",
-      "related_albums": "Related albums",
-      "related_albums_hint": "Reissues, remasters and other formats, such as the vinyl of a CD. The other album shows the reverse relation.",
       "links_hint": "Shops, streaming services, official pages, VGMdb, MusicBrainz…",
       "attributes_hint": "Extra facts with an agreed meaning, such as a character on the cover. Only fill in what you know."
     },

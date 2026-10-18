@@ -43,8 +43,7 @@
       "contributors": "贡献者",
       "stats": "统计",
       "gallery": "图片",
-      "information": "信息",
-      "related_albums": "相关专辑"
+      "information": "信息"
     },
     "stats": {
       "viewed": "浏览",
@@ -967,7 +966,6 @@
       "merge_absorb_titles": "新增的其他名称",
       "merge_absorb_links": "新增的链接",
       "merge_absorb_entries": "新增的关联条目",
-      "merge_absorb_relations": "新增的相关专辑",
       "merge_absorb_track_titles": "新增的曲目名称",
       "merge_moves": "转到保留方的数据",
       "merge_dropped": "（其中 {count} 条重复，删除）",
@@ -2685,14 +2683,6 @@
       "manufacturer": "制造",
       "other": "其他"
     },
-    "related_album": {
-      "reissue": "再版为",
-      "reissue_of": "再版自",
-      "remaster": "重制为",
-      "remaster_of": "重制自",
-      "other_format": "其他载体版本",
-      "related": "相关"
-    },
     "work_relation": {
       "arranged_from": "改编自",
       "arrangement": "改编",
@@ -2845,7 +2835,6 @@
       "relation_type": "关系",
       "character_name": "角色",
       "episode": "集",
-      "related_album_id": "专辑",
       "related_work_id": "乐曲",
       "related_entry_id": "条目",
       "related_artist_id": "艺术家",
@@ -3573,8 +3562,6 @@
     },
     "relations": {
       "entries_hint": "这张专辑所属的游戏、动画等作品。",
-      "related_albums": "相关专辑",
-      "related_albums_hint": "再版、重制版和其他载体版本，比如 CD 对应的黑胶。对方专辑会显示反向的关系。",
       "links_hint": "商店、流媒体、官方页面、VGMdb、MusicBrainz……",
       "attributes_hint": "含义事先约定好的补充信息，比如封面上的角色。知道才填。"
     },

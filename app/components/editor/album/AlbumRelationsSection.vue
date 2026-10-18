@@ -20,29 +20,6 @@
       </div>
     </CatalogSection>
 
-    <CatalogSection :title="$t('editor.relations.related_albums')" :icon="Disc3" tone="indigo">
-      <div class="space-y-3 p-3 sm:p-5">
-        <p class="text-xs text-gray-500">{{ $t('editor.relations.related_albums_hint') }}</p>
-        <ul class="space-y-2">
-          <li v-for="row in album.relations" :key="row.id" class="grid gap-2 rounded-lg border border-gray-100 px-3 py-2 sm:grid-cols-[11rem_minmax(0,1fr)_auto] sm:items-center" :class="{ 'border-rose-200 bg-rose-50/40': errorsOf('relations', row.id).length }">
-            <select v-model="row.relation_type" class="select select-sm w-full">
-              <option v-for="value in enums.album_relation ?? []" :key="value" :value="value">{{ enumLabel('album_relation', value) }}</option>
-            </select>
-            <EditorRefLabel :id="row.related_album_id" type="album" :references="editor.references" class="min-w-0 text-sm font-medium" />
-            <button type="button" class="btn btn-ghost btn-sm justify-self-end px-2" :aria-label="$t('common.delete')" @click="remove(album.relations, row)"><Trash2 :size="14" /></button>
-            <input v-model="row.note" class="input input-sm w-full sm:col-span-2" :placeholder="$t('catalog.form.note')">
-            <p v-for="error in errorsOf('relations', row.id)" :key="error.path" class="text-[11px] text-error sm:col-span-3">{{ error.message }}</p>
-          </li>
-        </ul>
-        <div class="flex flex-wrap items-center gap-2">
-          <select v-model="relation" class="select select-sm w-44">
-            <option v-for="value in enums.album_relation ?? []" :key="value" :value="value">{{ enumLabel('album_relation', value) }}</option>
-          </select>
-          <EditorEntityPicker kind="album" class="min-w-64 flex-1" :placeholder="$t('catalog.form.search_album')" :exclude="[editor.albumId, ...album.relations.map(row => row.related_album_id)]" @select="addAlbum" />
-        </div>
-      </div>
-    </CatalogSection>
-
     <CatalogSection :title="$t('catalog.collection.links')" :icon="Link2" tone="gray">
       <div class="space-y-3 p-3 sm:p-5">
         <p class="text-xs text-gray-500">{{ $t('editor.relations.links_hint') }}</p>
@@ -63,7 +40,7 @@
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
-import { Clapperboard, Disc3, Link2, ListChecks, Trash2 } from '@lucide/vue'
+import { Clapperboard, Link2, ListChecks, Trash2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 
 const editor = useAlbumEditor()
@@ -72,7 +49,6 @@ const { enumLabel } = useCatalogDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
-const relation = ref('other_format')
 const errorsOf = (collection: string, id: string | number) => editor.errorsIn(`${collection}.${id}`)
 
 function remove<T>(rows: T[], row: T) {
@@ -83,10 +59,5 @@ function remove<T>(rows: T[], row: T) {
 const addEntry = (item: PickedEntity) => {
   editor.remember('entry', item.id, { id: item.id, name: item.label, image_url: item.image_url, type: item.type })
   album.value.entries.push({ id: newKey('ae'), entry_id: item.id, relation_type: 'other', character_name: null, episode: null, note: null })
-}
-
-const addAlbum = (item: PickedEntity) => {
-  editor.remember('album', item.id, { id: item.id, title: item.label, image_url: item.image_url })
-  album.value.relations.push({ id: newKey('ar'), related_album_id: item.id, relation_type: relation.value, note: null })
 }
 </script>
