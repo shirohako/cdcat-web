@@ -1299,8 +1299,12 @@
     },
     "groups": {
       "overview": "概览",
-      "content": "内容",
-      "community": "社区",
+      "content": "资料库",
+      "catalog_settings": "资料设置",
+      "articles": "文章",
+      "discussions": "讨论区",
+      "moderation": "审核与处理",
+      "community_settings": "社区设置",
       "users": "用户",
       "system": "系统"
     },
