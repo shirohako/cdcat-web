@@ -6,6 +6,7 @@ import type { AttributeDefinition, CatalogSchema, CreditRoleDefinition } from '~
  */
 export const useCatalogSchema = () => {
   const { $api } = useNuxtApp()
+  const { locale } = useI18n()
   const { localizedContent } = useLocaleFormatting()
   const { data: schema, pending } = useAsyncData('catalog:schema', () => $api<CatalogSchema>('/v1/catalog/schema'), {
     getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
@@ -24,7 +25,12 @@ export const useCatalogSchema = () => {
   }
 
   const attributeName = (key: string) => localizedContent(attributes.value.get(key)?.names, key.replaceAll('_', ' '))
+  /** The attribute's English name, for showing next to the UI language's one; empty in the English UI or when they read the same. */
+  const attributeNameEn = (key: string) => {
+    const english = attributes.value.get(key)?.names?.en
+    return locale.value === 'en' || !english || english === attributeName(key) ? '' : english
+  }
   const attributeDefinition = (key: string) => attributes.value.get(key) ?? null
 
-  return { schema, pending, roleName, roleCategory, roleOrder, attributeName, attributeDefinition }
+  return { schema, pending, roleName, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
 }

@@ -2,7 +2,7 @@
   <div class="space-y-2">
     <ul v-if="shown.length" class="space-y-1.5">
       <EditorListRow v-for="row in shown" :key="row.id" :invalid="empty(row.value)" @edit="edit(row)" @remove="remove(row)">
-        <span class="shrink-0 text-xs text-gray-500">{{ attributeName(row.key) }}</span>
+        <span class="shrink-0 text-xs text-gray-500">{{ attributeName(row.key) }}<span v-if="attributeNameEn(row.key)" class="ml-1 opacity-60">{{ attributeNameEn(row.key) }}</span></span>
         <span class="min-w-0 truncate text-sm font-medium text-gray-800">{{ valueText(row) || '—' }}</span>
       </EditorListRow>
     </ul>
@@ -14,7 +14,7 @@
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.attribute_key') }}</span>
           <select v-model="form.key" data-autofocus class="select select-sm w-full" @change="form.value = null">
             <option v-for="definition in definitions" :key="definition.key" :value="definition.key" :disabled="!definition.is_multiple && taken(definition.key, editing)">
-              {{ attributeName(definition.key) }}
+              {{ fieldLabel(definition.key) }}
             </option>
           </select>
           <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-gray-400">{{ hint(form.key) }}</span>
@@ -48,7 +48,7 @@ import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
 const props = defineProps<{ subject: string, references: CatalogReferences, owner?: { field: string, id: RowId }, compact?: boolean }>()
 const rows = defineModel<AttributeRow[]>({ required: true })
 
-const { schema, attributeName, attributeDefinition } = useCatalogSchema()
+const { schema, attributeName, attributeNameEn, attributeDefinition } = useCatalogSchema()
 const { attributeText } = useCatalogDisplay()
 const { localizedContent } = useLocaleFormatting()
 
@@ -58,6 +58,8 @@ const shown = computed(() => byOrder(rows.value.filter(mine)))
 const taken = (key: string, except: AttributeRow | null) => shown.value.some(row => row !== except && row.key === key)
 const available = computed(() => definitions.value.filter(definition => definition.is_multiple || !taken(definition.key, null)))
 const hint = (key: string) => localizedContent(attributeDefinition(key)?.description ?? null, '')
+/** An option can only hold text, so the English name follows after a dot. */
+const fieldLabel = (key: string) => [attributeName(key), attributeNameEn(key)].filter(Boolean).join(' · ')
 
 /** Entities picked as values here, so their names show before the draft is saved and reloaded. */
 const picked = ref<CatalogReferences>({})
