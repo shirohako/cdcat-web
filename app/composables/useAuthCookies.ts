@@ -3,10 +3,15 @@ import type { Ref } from 'vue'
 import type { User } from '~/types/auth'
 
 /**
- * Sessions last a year from the last visit: every successful /v1/me re-sets the cookies
- * (`refresh`), so only a year without visiting signs someone out. API tokens don't expire.
+ * Sessions last a year from the last visit: every page the server renders runs /v1/me and re-sets
+ * the cookies (`refresh`), so only a year without visiting signs someone out. API tokens don't expire.
+ *
+ * Only the server refreshes. In the browser, Nuxt shares cookie changes between tabs; with `refresh`
+ * every tab rewrote the cookie it was just told about (auth_user is an object, so each copy counts as
+ * a change), and two open tabs bounced the write back and forth until the browser hung. Without it a
+ * tab writes only a value that differs, so the echo stops after one round.
  */
-const AUTH_COOKIE = { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', refresh: true } as const
+const AUTH_COOKIE = { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax', refresh: import.meta.server } as const
 
 interface AuthCookies {
   token: Ref<string | null | undefined>

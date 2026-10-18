@@ -118,7 +118,7 @@ export const useAuth = () => {
       const response = await $api<User>('/v1/me')
       user.value = response
       userCookie.value = response
-      // Re-setting the same token extends the cookie, keeping active sessions signed in.
+      // On the server this extends the cookie even when the token is the same (see useAuthCookies).
       tokenCookie.value = token.value
 
       return { success: true, data: response }
