@@ -13,18 +13,9 @@
             <option v-for="value in enums.artist_type ?? []" :key="value" :value="value">{{ enumLabel('artist_type', value) }}</option>
           </select>
         </label>
-        <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.region') }}</span>
-          <CommonRegionSelect :model-value="doc.region ?? ''" class="select-sm" @update:model-value="doc.region = $event || null" />
+        <label class="flex items-center gap-2 self-end pb-2 text-sm text-gray-700">
+          <input v-model="doc.is_active" type="checkbox" class="checkbox checkbox-sm">{{ $t('catalog.field.is_active') }}
         </label>
-        <div>
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t(isPerson ? 'editor.entity.born' : 'editor.entity.active_from') }}</span>
-          <EditorDateInput v-model:date="doc.begin_date" v-model:precision="doc.begin_date_precision" />
-        </div>
-        <div>
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t(isPerson ? 'editor.entity.died' : 'editor.entity.active_until') }}</span>
-          <EditorDateInput v-model:date="doc.end_date" v-model:precision="doc.end_date_precision" />
-        </div>
         <div class="sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.image_url') }}</span>
           <EditorImageUrlInput v-model="doc.image_url" />
@@ -51,8 +42,6 @@
           :references="editor.references"
           :relations="{ group: 'artist_relation', values: enums.artist_relation ?? [], default: 'member_of' }"
           :extras="[
-            { name: 'begin_date', type: 'date', precision: 'begin_date_precision', label: $t('catalog.field.begin_date') },
-            { name: 'end_date', type: 'date', precision: 'end_date_precision', label: $t('catalog.field.end_date') },
             { name: 'note', label: $t('catalog.field.note'), wide: true },
           ]"
           :exclude="[editor.id]"
@@ -75,5 +64,4 @@ const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const doc = computed(() => editor.doc.value as unknown as ArtistDocument)
 const enums = computed(() => schema.value?.enums ?? {})
-const isPerson = computed(() => ['person', 'character'].includes(doc.value.type))
 </script>

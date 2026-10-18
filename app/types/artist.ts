@@ -1,7 +1,6 @@
 // Artists. Backend: docs/api/artists.md.
 
 import type { CatalogAttribute, CatalogLink, CatalogTitle, PendingFields } from './catalog'
-import type { DatePrecision } from './entry'
 
 export const ARTIST_TYPES = ['person', 'group', 'company', 'virtual', 'circle', 'character'] as const
 export type ArtistType = typeof ARTIST_TYPES[number]
@@ -15,14 +14,9 @@ export interface ArtistDetail extends PendingFields {
   name: string
   slug: string | null
   type: ArtistType | null
-  region: string | null
+  is_active: boolean
   bio: string | null
   image_url: string | null
-  begin_date: string | null
-  begin_date_precision: DatePrecision | null
-  end_date: string | null
-  end_date_precision: DatePrecision | null
-  is_active: boolean
   followers_count: number
   albums_count: number
   shouts_count: number
@@ -33,8 +27,6 @@ export interface ArtistDetail extends PendingFields {
   relations?: Array<{
     artist: { id: number, name: string, image_url: string | null, type: ArtistType | null }
     relation_type: ArtistRelation
-    begin_date: string | null
-    end_date: string | null
     note: string | null
   }>
   version: number

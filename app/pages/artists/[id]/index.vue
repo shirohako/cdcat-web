@@ -31,11 +31,6 @@
               <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
                 <span class="inline-flex items-center gap-2"><Disc3 :size="16" class="text-slate-400" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
                 <span class="inline-flex items-center gap-2"><Users :size="16" class="text-slate-400" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
-                <span v-if="artist.region" class="inline-flex items-center gap-2"><MapPin :size="16" class="text-slate-400" />{{ regionName(artist.region) }}</span>
-                <span v-if="artist.begin_date || artist.end_date" class="inline-flex items-center gap-2">
-                  <CalendarDays :size="16" class="text-slate-400" />
-                  {{ formatDate(artist.begin_date, artist.begin_date_precision) || '?' }} – {{ artist.end_date ? formatDate(artist.end_date, artist.end_date_precision) : '' }}
-                </span>
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
@@ -109,7 +104,6 @@
                   <p class="truncate text-sm font-medium text-gray-800">{{ relation.artist.name }}</p>
                   <p class="text-[11px] text-gray-400">
                     {{ enumLabel('artist_relation', relation.relation_type) }}
-                    <template v-if="relation.begin_date || relation.end_date"> · {{ relation.begin_date ?? '?' }} – {{ relation.end_date ?? '' }}</template>
                   </p>
                 </div>
               </NuxtLink>
@@ -136,7 +130,7 @@
 <script setup lang="ts">
 import type { AlbumSimple } from '~/types/album'
 import type { ArtistDetail } from '~/types/artist'
-import { CalendarDays, Disc3, Edit, History, Info, Library, MapPin, Network, UserCheck, UserPlus, Users } from '@lucide/vue'
+import { Disc3, Edit, History, Info, Library, Network, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
 
 const route = useRoute()
@@ -144,8 +138,7 @@ const { $api } = useNuxtApp()
 const { t } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavorite } = useFavorites()
-const { regionName } = useLocaleFormatting()
-const { localName, formatDate, enumLabel } = useCatalogDisplay()
+const { localName, enumLabel } = useCatalogDisplay()
 const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)

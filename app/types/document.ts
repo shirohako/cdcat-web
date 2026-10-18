@@ -59,17 +59,13 @@ export interface ArtistDocument {
   name: string
   slug: string | null
   type: string
-  region: string | null
-  begin_date: string | null
-  begin_date_precision: DatePrecision
-  end_date: string | null
-  end_date_precision: DatePrecision
+  is_active: boolean
   bio: string | null
   image_url: string | null
   titles: TitleRow[]
   links: LinkRow[]
   attributes: AttributeRow[]
-  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, begin_date: string | null, end_date: string | null, note: string | null }>
+  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 
 export interface LabelDocument {

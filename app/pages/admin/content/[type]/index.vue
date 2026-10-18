@@ -29,7 +29,7 @@ const sorts: Record<AdminContentType, string[]> = {
 }
 const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'multimedia_franchise', 'game_adjacent', 'event']
 const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other']
-const filterKeys = ['search', 'type', 'category', 'format', 'region', 'is_active', 'has_lyrics', 'album_id', 'work_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
+const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'work_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -54,7 +54,7 @@ const detail = (item: AdminContentItem) => [
   ...(type.value === 'label' ? [((item.catalog_prefixes as string[] | undefined) ?? []).join(', '), t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
   ...(type.value === 'work' ? [t('admin_pages.content.tracks_count', { count: item.tracks_count }), t('admin_pages.content.lyrics_count', { count: item.lyrics_count })] : []),
   ...(type.value === 'lyric' ? [item.kind, item.language, item.excerpt] : []),
-  ...(type.value === 'artist' ? [item.type && t(`admin_pages.content.artist_types.${item.type}`), item.region, item.is_active === false ? t('admin_pages.content.inactive') : null] : []),
+  ...(type.value === 'artist' ? [item.type && t(`admin_pages.content.artist_types.${item.type}`), item.is_active === false ? t('admin_pages.content.inactive') : null] : []),
   ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
   ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
   ...(type.value === 'track' ? [(item.album as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, (item.work as { title?: string } | null)?.title] : []),
@@ -132,7 +132,6 @@ useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
             <option value="">{{ t('admin_pages.content.all_types') }}</option>
             <option v-for="value in ['person', 'group', 'company', 'virtual', 'circle', 'character']" :key="value" :value="value">{{ t(`admin_pages.content.artist_types.${value}`) }}</option>
           </select>
-          <input v-model="filters.region" maxlength="100" :placeholder="t('admin_pages.content.region')" :aria-label="t('admin_pages.content.region')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
           <select v-model="filters.is_active" :aria-label="t('admin_pages.content.active')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
             <option value="">{{ t('admin_pages.all_statuses') }}</option><option value="1">{{ t('admin_pages.content.active') }}</option><option value="0">{{ t('admin_pages.content.inactive') }}</option>
           </select>

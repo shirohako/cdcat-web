@@ -68,10 +68,6 @@
                 {{ artist.name }}
               </h3>
 
-              <p v-if="artist.region" class="mt-0.5 truncate text-xs text-slate-500">
-                {{ artist.region }}
-              </p>
-
               <div class="mt-1.5 flex items-center gap-3.5 text-xs text-slate-500">
                 <div class="flex items-center gap-1.5">
                   <Disc3 :size="13" class="text-slate-400" />

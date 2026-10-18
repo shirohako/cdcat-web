@@ -37,7 +37,7 @@ const subtitle = computed(() => {
     case 'track':
       return join(meta.album_title, meta.disc_number && meta.track_number ? t('search.disc_track', { disc: meta.disc_number, track: meta.track_number }) : null, meta.duration ? formatDuration(meta.duration as number) : null)
     case 'artist':
-      return join(enumLabel('artist_type', meta.artist_type as string | null), meta.region)
+      return join(enumLabel('artist_type', meta.artist_type as string | null))
     case 'label':
       return join(meta.country)
     case 'entry':
