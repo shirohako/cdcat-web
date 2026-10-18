@@ -1452,8 +1452,8 @@
         "user": "用户名",
         "category": "版块 slug",
         "topic_id": "主题 ID",
-        "edits": "编辑 {count} 次",
-        "reason": "原因：{reason}"
+        "reason": "原因：{reason}",
+        "edited": "{time} 编辑过"
       },
       "restrictions": {
         "title": "用户限制",
@@ -3021,7 +3021,6 @@
       "unbookmark": "取消收藏",
       "bookmarked": "已收藏",
       "unbookmarked": "已取消收藏",
-      "history": "编辑历史",
       "view_all_replies": "查看全部 {count} 条回复",
       "deleted": "已删除",
       "deleted_by_author": "该楼已被作者删除",
@@ -3102,22 +3101,6 @@
         "illegal": "违法",
         "other": "其他"
       }
-    },
-    "history": {
-      "title": "编辑历史",
-      "edit_number": "第 {n} 次编辑",
-      "reason": "原因：{reason}",
-      "hidden": "已隐藏",
-      "hide": "隐藏这个版本",
-      "show": "显示这个版本",
-      "hidden_text": "这个版本已被版主隐藏。",
-      "hidden_done": "已隐藏这个版本",
-      "shown_done": "已显示这个版本",
-      "empty": "没有编辑记录。",
-      "changed_title": "标题：{before} → {after}",
-      "changed_category": "版块：{before} → {after}",
-      "changed_tags": "标签：{before} → {after}",
-      "changed_links": "修改了关联内容"
     },
     "moderation": {
       "title": "管理",

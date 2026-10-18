@@ -7,7 +7,7 @@ import { TAG_NAME_MAX, tagErrorKey, tagPayload } from '~/utils/tags'
 /**
  * Changes a topic's title, category, tags and links. Authors save through the
  * topic endpoint; moderators editing someone else's topic give a reason and use
- * the moderation endpoint. Changes are recorded in floor #1's history.
+ * the moderation endpoint. Changes mark floor #1 edited; no earlier values are kept.
  */
 const props = defineProps<{ topic: DiscussionTopicDetail | null, asModerator?: boolean }>()
 const emit = defineEmits<{ close: [], saved: [] }>()

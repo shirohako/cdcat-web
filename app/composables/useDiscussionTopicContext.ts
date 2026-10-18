@@ -13,7 +13,6 @@ export interface DiscussionTopicContext {
   mergeReferences: (references: DiscussionReferences | null | undefined) => void
   quote: (post: DiscussionPost, selection?: string) => void
   report: (post: DiscussionPost) => void
-  history: (post: DiscussionPost) => void
   moderate: (post: DiscussionPost) => void
   accept: (post: DiscussionPost | null) => Promise<void>
   /** Called after a post changed on the server, with its new state. */

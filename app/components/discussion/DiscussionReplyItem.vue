@@ -48,7 +48,7 @@ async function remove() {
           </template>
           <span class="text-slate-400">·</span>
           <NuxtLink :to="`/discussions/${reply.topic_id}?post=${reply.id}`" class="text-slate-400 hover:text-slate-600" :title="exact(reply.created_at)">{{ ago(reply.created_at) }}</NuxtLink>
-          <button v-if="reply.edit_count > 0" type="button" class="text-slate-400 hover:text-slate-600" @click="context.history(reply)">{{ t('discussions.post.edited') }}</button>
+          <span v-if="reply.edited_at" class="text-slate-400" :title="exact(reply.edited_at)">{{ t('discussions.post.edited') }}</span>
           <span class="ml-auto"><DiscussionPostMenu :post="reply" @edit="editing = true" @delete="confirmDelete = true" /></span>
         </div>
         <DiscussionPostEditor v-if="editing" class="mt-2" :post="reply" :topic-id="reply.topic_id" @saved="saved" @cancel="editing = false" />

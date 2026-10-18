@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Bookmark, BookmarkCheck, CheckCircle2, Flag, History, Link2, MoreHorizontal, Pencil, Shield, Trash2 } from '@lucide/vue'
+import { Bookmark, BookmarkCheck, CheckCircle2, Flag, Link2, MoreHorizontal, Pencil, Shield, Trash2 } from '@lucide/vue'
 import type { DiscussionPost } from '~/types/discussion'
 
-/** The "…" menu of a post: copy link, bookmark, history, report, and the author's and moderators' actions. */
+/** The "…" menu of a post: copy link, bookmark, report, and the author's and moderators' actions. */
 const props = defineProps<{ post: DiscussionPost, canAccept?: boolean, accepted?: boolean }>()
 const emit = defineEmits<{ edit: [], delete: [] }>()
 const { t } = useI18n()
@@ -58,7 +58,6 @@ const item = 'flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-sl
       <button v-if="isAuthenticated" type="button" role="menuitem" :class="item" @click="toggleBookmark">
         <component :is="post.bookmarked ? BookmarkCheck : Bookmark" :size="14" />{{ post.bookmarked ? t('discussions.post.unbookmark') : t('discussions.post.bookmark') }}
       </button>
-      <button v-if="post.edit_count > 0" type="button" role="menuitem" :class="item" @click="run(() => context.history(post))"><History :size="14" />{{ t('discussions.post.history') }}</button>
       <button v-if="canAccept && post.status === 'visible'" type="button" role="menuitem" :class="item" @click="run(() => context.accept(accepted ? null : post))">
         <CheckCircle2 :size="14" />{{ accepted ? t('discussions.answer.unaccept') : t('discussions.answer.accept') }}
       </button>

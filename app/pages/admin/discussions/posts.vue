@@ -93,7 +93,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.posts.title')) })
               <p class="mt-1.5 line-clamp-3 whitespace-pre-line text-slate-700">{{ post.excerpt || post.raw }}</p>
               <p class="mt-1.5 text-xs text-slate-400">
                 <NuxtLink v-if="post.user" :to="{ query: { user: post.user.username } }" class="hover:text-slate-700">{{ post.user.nickname || post.user.username }}</NuxtLink>
-                · {{ time(post.created_at) }}<template v-if="post.edit_count"> · {{ t('admin_pages.discussions.posts.edits', { count: post.edit_count }) }}</template>
+                · {{ time(post.created_at) }}<template v-if="post.edited_at"> · {{ t('admin_pages.discussions.posts.edited', { time: time(post.edited_at) }) }}</template>
                 <template v-if="post.status_reason"> · {{ t('admin_pages.discussions.posts.reason', { reason: post.status_reason }) }}</template>
                 <template v-if="canSeeIp && post.ip_address"> · <NuxtLink :to="{ query: { ip: post.ip_address } }" class="font-mono hover:text-slate-700">{{ post.ip_address }}</NuxtLink></template>
               </p>

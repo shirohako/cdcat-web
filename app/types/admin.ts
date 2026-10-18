@@ -438,7 +438,7 @@ export interface AdminDiscussionPost {
   user: UserSummary | null
   excerpt: string
   raw: string
-  edit_count: number
+  edited_at: string | null
   topic: { id: number, title: string, status: string, category: { id: number, name: string, slug: string, color: string | null } | null } | null
   ip_address?: string | null
   created_at: string

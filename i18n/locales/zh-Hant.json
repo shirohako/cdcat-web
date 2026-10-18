@@ -1904,7 +1904,6 @@
       "unbookmark": "取消收藏",
       "bookmarked": "已收藏",
       "unbookmarked": "已取消收藏",
-      "history": "編輯紀錄",
       "view_all_replies": "查看全部 {count} 則回覆",
       "deleted": "已刪除",
       "deleted_by_author": "該樓已被作者刪除",
@@ -1985,22 +1984,6 @@
         "illegal": "違法",
         "other": "其他"
       }
-    },
-    "history": {
-      "title": "編輯紀錄",
-      "edit_number": "第 {n} 次編輯",
-      "reason": "原因：{reason}",
-      "hidden": "已隱藏",
-      "hide": "隱藏這個版本",
-      "show": "顯示這個版本",
-      "hidden_text": "這個版本已被版主隱藏。",
-      "hidden_done": "已隱藏這個版本",
-      "shown_done": "已顯示這個版本",
-      "empty": "沒有編輯紀錄。",
-      "changed_title": "標題：{before} → {after}",
-      "changed_category": "版塊：{before} → {after}",
-      "changed_tags": "標籤：{before} → {after}",
-      "changed_links": "修改了關聯內容"
     },
     "moderation": {
       "title": "管理",

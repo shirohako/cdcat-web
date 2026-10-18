@@ -1904,7 +1904,6 @@
       "unbookmark": "Remove bookmark",
       "bookmarked": "Bookmarked",
       "unbookmarked": "Bookmark removed",
-      "history": "Edit history",
       "view_all_replies": "View all {count} replies",
       "deleted": "Deleted",
       "deleted_by_author": "Deleted by the author",
@@ -1985,22 +1984,6 @@
         "illegal": "Illegal",
         "other": "Other"
       }
-    },
-    "history": {
-      "title": "Edit history",
-      "edit_number": "Edit {n}",
-      "reason": "Reason: {reason}",
-      "hidden": "Hidden",
-      "hide": "Hide this version",
-      "show": "Show this version",
-      "hidden_text": "A moderator hid this version.",
-      "hidden_done": "Version hidden",
-      "shown_done": "Version shown",
-      "empty": "No edits recorded.",
-      "changed_title": "Title: {before} → {after}",
-      "changed_category": "Category: {before} → {after}",
-      "changed_tags": "Tags: {before} → {after}",
-      "changed_links": "Changed the linked content"
     },
     "moderation": {
       "title": "Moderate",

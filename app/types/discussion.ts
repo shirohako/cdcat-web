@@ -126,7 +126,6 @@ export interface DiscussionPost {
   removed_by: 'author' | 'moderator' | 'system' | null
   created_at: string | null
   edited_at: string | null
-  edit_count: number
   reactions: DiscussionReactionCount[]
   replies_count: number
   replies?: DiscussionPost[]
@@ -163,17 +162,6 @@ export interface DiscussionPostSummary {
   created_at: string | null
   excerpt: string | null
   topic: { id: number, title: string, status: string, category: DiscussionCategorySummary | null } | null
-}
-
-export interface DiscussionRevision {
-  id: number
-  version: number
-  editor: UserSummary | null
-  raw: string | null
-  topic_changes: Record<string, [unknown, unknown]> | null
-  reason: string | null
-  is_hidden: boolean
-  created_at: string | null
 }
 
 export interface DiscussionSuggestion {

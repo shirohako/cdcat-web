@@ -1904,7 +1904,6 @@
       "unbookmark": "ブックマークを解除",
       "bookmarked": "ブックマークしました",
       "unbookmarked": "ブックマークを解除しました",
-      "history": "編集履歴",
       "view_all_replies": "返信 {count} 件をすべて表示",
       "deleted": "削除しました",
       "deleted_by_author": "投稿者により削除されました",
@@ -1985,22 +1984,6 @@
         "illegal": "違法",
         "other": "その他"
       }
-    },
-    "history": {
-      "title": "編集履歴",
-      "edit_number": "{n} 回目の編集",
-      "reason": "理由：{reason}",
-      "hidden": "非表示",
-      "hide": "この版を非表示",
-      "show": "この版を表示",
-      "hidden_text": "この版はモデレーターにより非表示です。",
-      "hidden_done": "この版を非表示にしました",
-      "shown_done": "この版を表示しました",
-      "empty": "編集履歴はありません。",
-      "changed_title": "タイトル：{before} → {after}",
-      "changed_category": "カテゴリー：{before} → {after}",
-      "changed_tags": "タグ：{before} → {after}",
-      "changed_links": "関連コンテンツを変更"
     },
     "moderation": {
       "title": "管理",

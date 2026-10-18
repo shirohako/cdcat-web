@@ -122,7 +122,7 @@ function quote() {
           <span class="ml-auto flex items-center gap-2 text-xs text-slate-400">
             <NuxtLink :to="`/discussions/${post.topic_id}?post=${post.id}`" class="font-semibold tabular-nums text-slate-500 hover:text-sky-700">#{{ post.floor }}</NuxtLink>
             <time :datetime="post.created_at ?? undefined" :title="exact(post.created_at)">{{ ago(post.created_at) }}</time>
-            <button v-if="post.edit_count > 0" type="button" class="hover:text-slate-600" :title="exact(post.edited_at)" @click="context.history(post)">{{ t('discussions.post.edited') }}</button>
+            <span v-if="post.edited_at" :title="exact(post.edited_at)">{{ t('discussions.post.edited') }}</span>
             <DiscussionPostMenu :post="post" :can-accept="canAccept" :accepted="accepted" @edit="editing = true" @delete="confirmDelete = true" />
           </span>
         </header>

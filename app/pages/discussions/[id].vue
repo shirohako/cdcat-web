@@ -47,7 +47,6 @@ watch(data, (value) => {
 const composer = ref<{ insert: (text: string) => void, focus: () => void } | null>(null)
 const composerSection = useTemplateRef<HTMLElement>('composerSection')
 const reportPostId = ref<number | null>(null)
-const historyPostId = ref<number | null>(null)
 const moderating = ref<DiscussionPost | null>(null)
 const editingTopic = ref<DiscussionTopicDetail | null>(null)
 const moderatingTopic = ref<DiscussionTopicDetail | null>(null)
@@ -64,7 +63,6 @@ provideDiscussionTopic({
     composerSection.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   },
   report: (post) => { reportPostId.value = post.id },
-  history: (post) => { historyPostId.value = post.id },
   moderate: (post) => { moderating.value = post },
   accept: async (post) => {
     try {
@@ -374,7 +372,6 @@ useHead(() => ({
     </div>
 
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />
-    <DiscussionRevisionsDialog :post-id="historyPostId" :moderator="moderator" @close="historyPostId = null" />
     <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" />
     <DiscussionTopicEditDialog :topic="editingTopic" :as-moderator="moderator && editingTopic?.author?.id !== topic?.author?.id" @close="editingTopic = null" @saved="editingTopic = null; refresh()" />
     <DiscussionTopicModDialog :topic="moderatingTopic" @close="moderatingTopic = null" @saved="moderatingTopic = null; refresh()" />

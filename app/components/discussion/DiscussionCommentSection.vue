@@ -33,7 +33,6 @@ const first = computed(() => floors.value.find(floor => floor.floor === 1) ?? nu
 const comments = computed(() => floors.value.filter(floor => floor.floor !== 1))
 const composer = ref<{ insert: (text: string) => void } | null>(null)
 const reportPostId = ref<number | null>(null)
-const historyPostId = ref<number | null>(null)
 const moderating = ref<DiscussionPost | null>(null)
 
 function replacePost(post: DiscussionPost) {
@@ -51,7 +50,6 @@ provideDiscussionTopic({
   mergeReferences: (incoming) => { references.value = mergeDiscussionReferences(references.value, incoming) },
   quote: (post, selection) => { if (post.raw) composer.value?.insert(markdownQuote(post.id, selection || post.raw)) },
   report: (post) => { reportPostId.value = post.id },
-  history: (post) => { historyPostId.value = post.id },
   moderate: (post) => { moderating.value = post },
   accept: async () => {},
   updated: replacePost,
@@ -95,7 +93,6 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
       </div>
     </template>
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />
-    <DiscussionRevisionsDialog :post-id="historyPostId" :moderator="topic?.viewer.can.moderate" @close="historyPostId = null" />
     <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" />
   </section>
 </template>
