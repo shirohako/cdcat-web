@@ -17,6 +17,8 @@ export interface DiscussionTopicContext {
   accept: (post: DiscussionPost | null) => Promise<void>
   /** Called after a post changed on the server, with its new state. */
   updated: (post: DiscussionPost) => void
+  /** Called after a post was deleted for good; deleting #1 deletes the whole topic. */
+  removed: (post: DiscussionPost, topicDeleted: boolean) => void
 }
 
 const KEY: InjectionKey<DiscussionTopicContext> = Symbol('discussion-topic')

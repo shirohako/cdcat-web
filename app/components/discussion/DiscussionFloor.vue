@@ -88,8 +88,8 @@ function saved(post: DiscussionPost, references: DiscussionReferences) {
 async function remove() {
   try {
     await $api(`/v1/discussions/posts/${props.post.id}`, { method: 'DELETE' })
-    emit('update', { ...props.post, status: 'deleted', removed_by: 'author', raw: null, can: { ...props.post.can, edit: false, delete: false, react: false, report: false } })
-    notice.success(t('discussions.post.deleted'))
+    notice.success(t(isFirst.value ? 'discussions.topic.deleted' : 'discussions.post.deleted'))
+    context.removed(props.post, isFirst.value)
   }
   catch (failure) {
     notice.error(localizeError(failure))

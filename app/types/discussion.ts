@@ -82,7 +82,7 @@ export interface DiscussionTopicCard {
   featured: boolean
   locked: boolean
   solved: boolean
-  status: 'visible' | 'hidden' | 'deleted'
+  status: 'visible' | 'hidden'
   article_id: number | null
   excerpt?: string | null
   viewer?: DiscussionTopicViewerState
@@ -123,9 +123,9 @@ export interface DiscussionPost {
   reply_to: { post_id: number, user: UserSummary | null } | null
   /** Withheld from hidden posts (except for their author and moderators) and deleted ones. */
   raw: string | null
-  status: 'visible' | 'hidden' | 'deleted'
+  status: 'visible' | 'hidden'
   status_reason: string | null
-  removed_by: 'author' | 'moderator' | 'system' | null
+  removed_by: 'moderator' | 'system' | null
   created_at: string | null
   edited_at: string | null
   reactions: DiscussionReactionCount[]
@@ -158,7 +158,7 @@ export interface DiscussionPostSummary {
   floor: number | null
   parent_id: number | null
   parent_floor: number | null
-  status: 'visible' | 'hidden' | 'deleted'
+  status: 'visible' | 'hidden'
   user: UserSummary | null
   reactions_count: number
   created_at: string | null

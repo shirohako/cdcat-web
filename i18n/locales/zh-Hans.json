@@ -427,7 +427,6 @@
       "discussion_duplicate_post": "刚刚已经发过同样的内容了。",
       "discussion_new_user_limit": "新用户的帖子最多 2 个链接、不能插图片、最多提及 3 人。",
       "discussion_own_reaction": "不能给自己的帖子点表情。",
-      "discussion_topic_has_replies": "已经有其他人回复，不能删除主题。如需删除请举报给版主。",
       "user_block_not_allowed": "不能屏蔽这个用户。",
       "revision_not_editable": "这条修订在当前状态下不能修改。",
       "revision_conflict": "有人改了同样的内容。请先处理冲突，再重新提交。",
@@ -1492,14 +1491,12 @@
       },
       "post_statuses": {
         "visible": "正常",
-        "hidden": "已折叠",
-        "deleted": "已删除"
+        "hidden": "已折叠"
       },
       "actions": {
         "hide": "折叠",
         "unhide": "取消折叠",
         "delete": "删除",
-        "restore": "恢复",
         "purge": "清理广告号"
       },
       "confirm": {
@@ -3010,9 +3007,8 @@
       "invalid": "标题要 4–120 个字。",
       "delete": "删除主题",
       "delete_title": "删除这个主题？",
-      "delete_help": "删除后其他人将看不到这个主题。只有在没有其他人回复时才能删除。",
+      "delete_help": "主题和里面的全部回复（包括其他人的）都会被彻底删除，无法恢复。",
       "deleted": "主题已删除",
-      "deleted_notice": "这个主题已被删除（{reason}），只有版主能看到。",
       "hidden_notice": "这个主题已被折叠，不会出现在列表里。"
     },
     "post": {
@@ -3031,8 +3027,6 @@
       "unbookmarked": "已取消收藏",
       "view_all_replies": "查看全部 {count} 条回复",
       "deleted": "已删除",
-      "deleted_by_author": "该楼已被作者删除",
-      "deleted_by_moderator": "该楼已被版主删除",
       "hidden": "该楼已被折叠",
       "hidden_reason": "该楼已被折叠：{reason}",
       "auto_hidden": "收到多次举报，等待版主处理",
@@ -3040,9 +3034,9 @@
       "expand": "展开",
       "collapse": "收起",
       "delete_title": "删除这条帖子？",
-      "delete_floor_help": "楼层会留下「已被作者删除」的占位，楼层号不变，下面的回复照常显示。",
-      "delete_first_help": "一楼会留下占位，主题和回复保留。要删除整个主题，请在没有他人回复时使用「删除主题」。",
-      "delete_reply_help": "删除后这条回复将不再显示。"
+      "delete_floor_help": "这层楼和下面的回复都会被彻底删除，楼层号空出来不再使用。",
+      "delete_first_help": "会删除整个主题，包括其他人的全部回复，无法恢复。",
+      "delete_reply_help": "这条回复会被彻底删除。"
     },
     "answer": {
       "badge": "最佳答案",
@@ -3119,15 +3113,13 @@
         "hide": "折叠",
         "unhide": "取消折叠",
         "delete": "删除",
-        "restore": "恢复",
         "edit": "编辑",
         "silence": "禁言作者"
       },
       "help": {
         "hide": "对外显示「该楼已被折叠」和原因，只有作者和版主能展开。折叠一楼时主题也会从列表里消失。",
         "unhide": "恢复正常显示。",
-        "delete": "对外显示占位（楼中楼直接不显示）。原文保留，可以恢复。",
-        "restore": "恢复为正常显示。",
+        "delete": "彻底删除这条帖子（楼层连同下面的回复；删除一楼会删除整个主题）。原文只保留在操作日志里。",
         "edit": "修改会记入编辑历史，作者会收到通知和原因。",
         "silence": "禁言期间可以看帖、点表情、收藏和举报，不能发帖、回复和编辑。"
       },
@@ -3148,8 +3140,7 @@
       "pin_until": "截止时间（可选）",
       "featured": "设为精华",
       "locked": "锁定（不能再回复）",
-      "delete_topic": "删除主题",
-      "restore_topic": "恢复主题"
+      "delete_topic": "删除主题"
     },
     "new": {
       "title": "发起主题",

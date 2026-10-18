@@ -427,7 +427,6 @@
       "discussion_duplicate_post": "剛剛已經發過同樣的內容了。",
       "discussion_new_user_limit": "新使用者的貼文最多 2 個連結、不能插圖片、最多提及 3 人。",
       "discussion_own_reaction": "不能給自己的貼文點表情。",
-      "discussion_topic_has_replies": "已經有其他人回覆，不能刪除主題。如需刪除請檢舉給版主。",
       "user_block_not_allowed": "不能封鎖這個使用者。",
       "revision_not_editable": "這筆修訂在目前狀態下不能修改。",
       "revision_conflict": "有人改了同樣的內容。請先處理衝突，再重新提交。",
@@ -1887,9 +1886,8 @@
       "invalid": "標題要 4–120 個字。",
       "delete": "刪除主題",
       "delete_title": "刪除這個主題？",
-      "delete_help": "刪除後其他人將看不到這個主題。只有在沒有其他人回覆時才能刪除。",
+      "delete_help": "主題和裡面的全部回覆（包括其他人的）都會被徹底刪除，無法恢復。",
       "deleted": "主題已刪除",
-      "deleted_notice": "這個主題已被刪除（{reason}），只有版主能看到。",
       "hidden_notice": "這個主題已被摺疊，不會出現在列表裡。"
     },
     "post": {
@@ -1908,8 +1906,6 @@
       "unbookmarked": "已取消收藏",
       "view_all_replies": "查看全部 {count} 則回覆",
       "deleted": "已刪除",
-      "deleted_by_author": "該樓已被作者刪除",
-      "deleted_by_moderator": "該樓已被版主刪除",
       "hidden": "該樓已被摺疊",
       "hidden_reason": "該樓已被摺疊：{reason}",
       "auto_hidden": "收到多次檢舉，等待版主處理",
@@ -1917,9 +1913,9 @@
       "expand": "展開",
       "collapse": "收起",
       "delete_title": "刪除這則貼文？",
-      "delete_floor_help": "樓層會留下「已被作者刪除」的佔位，樓層號不變，下面的回覆照常顯示。",
-      "delete_first_help": "一樓會留下佔位，主題和回覆保留。要刪除整個主題，請在沒有他人回覆時使用「刪除主題」。",
-      "delete_reply_help": "刪除後這則回覆將不再顯示。"
+      "delete_floor_help": "這層樓和下面的回覆都會被徹底刪除，樓層號空出來不再使用。",
+      "delete_first_help": "會刪除整個主題，包括其他人的全部回覆，無法恢復。",
+      "delete_reply_help": "這則回覆會被徹底刪除。"
     },
     "answer": {
       "badge": "最佳解答",
@@ -1996,15 +1992,13 @@
         "hide": "摺疊",
         "unhide": "取消摺疊",
         "delete": "刪除",
-        "restore": "恢復",
         "edit": "編輯",
         "silence": "禁言作者"
       },
       "help": {
         "hide": "對外顯示「該樓已被摺疊」和原因，只有作者和版主能展開。摺疊一樓時主題也會從列表裡消失。",
         "unhide": "恢復正常顯示。",
-        "delete": "對外顯示佔位（樓中樓直接不顯示）。原文保留，可以恢復。",
-        "restore": "恢復為正常顯示。",
+        "delete": "徹底刪除這則貼文（樓層連同下面的回覆；刪除一樓會刪除整個主題）。原文只保留在操作紀錄裡。",
         "edit": "修改會記入編輯紀錄，作者會收到通知和原因。",
         "silence": "禁言期間可以看帖、點表情、收藏和檢舉，不能發帖、回覆和編輯。"
       },
@@ -2025,8 +2019,7 @@
       "pin_until": "截止時間（選填）",
       "featured": "設為精華",
       "locked": "鎖定（不能再回覆）",
-      "delete_topic": "刪除主題",
-      "restore_topic": "恢復主題"
+      "delete_topic": "刪除主題"
     },
     "new": {
       "title": "發起主題",

@@ -10,7 +10,6 @@ const env: MarkdownEnv = {
     posts: {
       12: { id: 12, topic_id: 3, topic_title: 'T', floor: 5, parent_floor: null, user: { username: 'bob', nickname: 'Bob "B"' }, status: 'visible' },
       13: { id: 13, topic_id: 3, topic_title: 'T', floor: null, parent_floor: 5, user: { username: 'bob', nickname: null }, status: 'visible' },
-      14: { id: 14, topic_id: 3, topic_title: 'T', floor: 6, parent_floor: null, user: null, status: 'deleted' },
     },
     albums: {
       7: { type: 'album', id: 7, title: '<script>x</script> Album', image_url: 'https://img.example/a.jpg', date: '2024-12-30' },
@@ -78,8 +77,7 @@ describe('Quotes', () => {
     expect(renderMarkdown('::: quote post:13\nx\n:::', env)).toContain('reply under #5')
   })
 
-  it('says when the original is deleted or unavailable', () => {
-    expect(renderMarkdown('::: quote post:14\nx\n:::', env)).toContain('markdown-quote-missing')
+  it('says when the original is gone (deleted posts are not returned)', () => {
     expect(renderMarkdown('::: quote post:99\nx\n:::', env)).toContain('markdown-quote-missing')
     expect(renderMarkdown(':::: quote post:12\n::: tip\ninner\n:::\n::::', env)).toContain('markdown-container-callout')
   })

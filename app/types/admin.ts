@@ -436,7 +436,7 @@ export interface AdminDiscussionPost {
   floor: number | null
   parent_id: number | null
   parent_floor: number | null
-  status: 'visible' | 'hidden' | 'deleted'
+  status: 'visible' | 'hidden'
   status_reason: string | null
   user: UserSummary | null
   excerpt: string

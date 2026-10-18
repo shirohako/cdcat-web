@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { EyeOff, Trash2, UserX } from '@lucide/vue'
+import { EyeOff, UserX } from '@lucide/vue'
 import type { DiscussionPost } from '~/types/discussion'
 
 /**
- * A post's text, or the placeholder that stands in for it: folded by a moderator
- * (expandable by its author and moderators), deleted, or from someone the reader
- * blocked (expandable by the reader).
+ * A post's text, or the placeholder that stands in for it: folded by a moderator or
+ * by reports (expandable by its author and moderators), or from someone the reader
+ * blocked (expandable by the reader). Deleted posts are gone, so they never get here.
  */
 const props = defineProps<{ post: DiscussionPost }>()
 const { t } = useI18n()
@@ -14,9 +14,6 @@ const expanded = ref(false)
 const env = computed(() => ({ references: references.value }))
 
 const notice = computed(() => {
-  if (props.post.status === 'deleted') {
-    return { icon: Trash2, text: props.post.removed_by === 'author' ? t('discussions.post.deleted_by_author') : t('discussions.post.deleted_by_moderator') }
-  }
   if (props.post.status === 'hidden') {
     const reason = props.post.status_reason === 'auto:reports' ? t('discussions.post.auto_hidden') : props.post.status_reason
     return { icon: EyeOff, text: reason ? t('discussions.post.hidden_reason', { reason }) : t('discussions.post.hidden') }

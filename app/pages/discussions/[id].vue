@@ -84,9 +84,26 @@ provideDiscussionTopic({
     }
   },
   updated: post => replacePost(post),
+  removed: (post, topicDeleted) => removePost(post, topicDeleted),
 })
 
 /** Puts a changed floor or sub-reply back into the page. */
+/** The topic no longer exists: back to its category. */
+function leaveDeletedTopic() {
+  void router.push(topic.value.category ? `/discussions/c/${topic.value.category.slug}` : '/discussions')
+}
+
+/** Takes a deleted post off the page; a deleted #1 means the topic is gone. */
+function removePost(post: DiscussionPost, topicDeleted: boolean) {
+  if (topicDeleted) {
+    leaveDeletedTopic()
+    return
+  }
+  floors.value = post.parent_id === null
+    ? floors.value.filter(floor => floor.id !== post.id)
+    : floors.value.map(floor => floor.id === post.parent_id ? { ...floor, replies: (floor.replies ?? []).filter(reply => reply.id !== post.id), replies_count: Math.max(0, floor.replies_count - 1) } : floor)
+}
+
 function replacePost(post: DiscussionPost) {
   if (post.parent_id === null) {
     floors.value = floors.value.map(floor => floor.id === post.id ? { ...floor, ...post, replies: post.replies ?? floor.replies } : floor)
@@ -220,7 +237,7 @@ async function deleteTopic() {
   try {
     await $api(`/v1/discussions/topics/${topicId.value}`, { method: 'DELETE' })
     notice.success(t('discussions.topic.deleted'))
-    await router.push('/discussions')
+    leaveDeletedTopic()
   }
   catch (failure) {
     notice.error(localizeError(failure))
@@ -291,7 +308,7 @@ useHead(() => ({
 
         <header class="rounded-2xl border border-slate-200/80 bg-white p-5">
           <div v-if="topic.status !== 'visible'" class="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            {{ topic.status === 'deleted' ? t('discussions.topic.deleted_notice', { reason: topic.status_reason ?? '' }) : t('discussions.topic.hidden_notice') }}
+            {{ t('discussions.topic.hidden_notice') }}
           </div>
           <div class="flex flex-wrap items-start gap-3">
             <h1 class="min-w-0 flex-1 text-xl font-bold leading-snug text-slate-950 sm:text-2xl">
@@ -380,9 +397,9 @@ useHead(() => ({
     </div>
 
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />
-    <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" />
+    <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" @removed="removePost" />
     <DiscussionTopicEditDialog :topic="editingTopic" :as-moderator="moderator && editingTopic?.author?.id !== topic?.author?.id" @close="editingTopic = null" @saved="editingTopic = null; refresh()" />
-    <DiscussionTopicModDialog :topic="moderatingTopic" @close="moderatingTopic = null" @saved="moderatingTopic = null; refresh()" />
+    <DiscussionTopicModDialog :topic="moderatingTopic" @close="moderatingTopic = null" @saved="moderatingTopic = null; refresh()" @deleted="moderatingTopic = null; leaveDeletedTopic()" />
     <CommonConfirmDialog v-model="confirmDeleteTopic" :title="t('discussions.topic.delete_title')" :description="t('discussions.topic.delete_help')" @confirm="deleteTopic" />
     <DiscussionNotice />
   </div>

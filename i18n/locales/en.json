@@ -427,7 +427,6 @@
       "discussion_duplicate_post": "You posted the same text a moment ago.",
       "discussion_new_user_limit": "New members can include up to 2 links, no images and up to 3 mentions per post.",
       "discussion_own_reaction": "You cannot react to your own post.",
-      "discussion_topic_has_replies": "Others have replied, so the topic cannot be deleted. Report it to a moderator instead.",
       "user_block_not_allowed": "This user cannot be blocked.",
       "revision_not_editable": "This revision cannot be changed in its current state.",
       "revision_conflict": "Someone changed the same content. Resolve the conflicts, then submit again.",
@@ -1887,9 +1886,8 @@
       "invalid": "Titles are 4–120 characters.",
       "delete": "Delete topic",
       "delete_title": "Delete this topic?",
-      "delete_help": "Nobody else will see the topic. You can only delete it while nobody else has replied.",
+      "delete_help": "The topic and every reply in it, including other people's, are deleted for good. It cannot be undone.",
       "deleted": "Topic deleted",
-      "deleted_notice": "This topic was deleted ({reason}); only moderators can see it.",
       "hidden_notice": "This topic is folded and does not appear in lists."
     },
     "post": {
@@ -1908,8 +1906,6 @@
       "unbookmarked": "Bookmark removed",
       "view_all_replies": "View all {count} replies",
       "deleted": "Deleted",
-      "deleted_by_author": "Deleted by the author",
-      "deleted_by_moderator": "Deleted by a moderator",
       "hidden": "Folded by a moderator",
       "hidden_reason": "Folded by a moderator: {reason}",
       "auto_hidden": "Reported several times; waiting for a moderator",
@@ -1917,9 +1913,9 @@
       "expand": "Show",
       "collapse": "Hide",
       "delete_title": "Delete this post?",
-      "delete_floor_help": "The floor keeps a \"deleted by the author\" placeholder and its number; replies under it stay.",
-      "delete_first_help": "Floor #1 keeps a placeholder and the topic stays. To delete the whole topic, use \"Delete topic\" while nobody else has replied.",
-      "delete_reply_help": "The reply will no longer be shown."
+      "delete_floor_help": "The floor and the replies under it are deleted for good. Its number stays unused.",
+      "delete_first_help": "This deletes the whole topic, with every reply in it, including other people's. It cannot be undone.",
+      "delete_reply_help": "The reply is deleted for good."
     },
     "answer": {
       "badge": "Accepted answer",
@@ -1996,15 +1992,13 @@
         "hide": "Fold",
         "unhide": "Unfold",
         "delete": "Delete",
-        "restore": "Restore",
         "edit": "Edit",
         "silence": "Silence author"
       },
       "help": {
         "hide": "Shows \"folded\" with the reason; only the author and moderators can expand it. Folding #1 also takes the topic out of lists.",
         "unhide": "Shows the post normally again.",
-        "delete": "Leaves a placeholder (sub-replies disappear). The text is kept and can be restored.",
-        "restore": "Shows the post normally again.",
+        "delete": "Deletes the post for good (with the replies under a floor; #1 takes the whole topic). The text stays only in the audit log.",
         "edit": "The edit is recorded in the history; the author is told why.",
         "silence": "Silenced members can still read, react, bookmark and report, but cannot post, reply or edit."
       },
@@ -2025,8 +2019,7 @@
       "pin_until": "Until (optional)",
       "featured": "Feature",
       "locked": "Lock (no more replies)",
-      "delete_topic": "Delete topic",
-      "restore_topic": "Restore topic"
+      "delete_topic": "Delete topic"
     },
     "new": {
       "title": "New topic",

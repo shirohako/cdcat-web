@@ -2,14 +2,14 @@
 import { Loader2 } from '@lucide/vue'
 import type { DiscussionPost } from '~/types/discussion'
 
-type Action = 'hide' | 'unhide' | 'delete' | 'restore' | 'edit' | 'silence'
+type Action = 'hide' | 'unhide' | 'delete' | 'edit' | 'silence'
 
 /**
- * A moderator's actions on one post: fold or unfold it, delete or restore it, edit
- * it with a reason, or silence its author. Reasons reach the author with a notice.
+ * A moderator's actions on one post: fold or unfold it, delete it for good (#1 takes the
+ * topic along), edit it with a reason, or silence its author. Reasons reach the author.
  */
 const props = defineProps<{ post: DiscussionPost | null }>()
-const emit = defineEmits<{ close: [], updated: [post: DiscussionPost] }>()
+const emit = defineEmits<{ close: [], updated: [post: DiscussionPost], removed: [post: DiscussionPost, topicDeleted: boolean] }>()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
@@ -27,8 +27,7 @@ const actions = computed<Action[]>(() => {
   const list: Action[] = []
   if (props.post.status === 'visible') list.push('hide')
   if (props.post.status === 'hidden') list.push('unhide')
-  if (props.post.status !== 'deleted') list.push('delete', 'edit')
-  if (props.post.status !== 'visible') list.push('restore')
+  list.push('delete', 'edit')
   list.push('silence')
   return list
 })
@@ -59,13 +58,18 @@ async function submit() {
       emit('close')
       return
     }
+    if (action.value === 'delete') {
+      const result = await $api<{ topic_deleted: boolean }>(`/v1/admin/discussions/posts/${post.id}`, { method: 'DELETE', body })
+      notice.success(t('discussions.moderation.done'))
+      emit('removed', post, result.topic_deleted)
+      emit('close')
+      return
+    }
     const request = {
       hide: () => $api<Partial<DiscussionPost>>(`/v1/admin/discussions/posts/${post.id}`, { method: 'PATCH', body: { status: 'hidden', ...body } }),
       unhide: () => $api<Partial<DiscussionPost>>(`/v1/admin/discussions/posts/${post.id}`, { method: 'PATCH', body: { status: 'visible', ...body } }),
       edit: () => $api<Partial<DiscussionPost>>(`/v1/admin/discussions/posts/${post.id}`, { method: 'PATCH', body: { raw: raw.value, ...body } }),
-      delete: () => $api<Partial<DiscussionPost>>(`/v1/admin/discussions/posts/${post.id}`, { method: 'DELETE', body }),
-      restore: () => $api<Partial<DiscussionPost>>(`/v1/admin/discussions/posts/${post.id}/restore`, { method: 'POST', body }),
-    }[action.value]
+    }[action.value as 'hide' | 'unhide' | 'edit']
     const state = await request()
     const status = state.status ?? post.status
     emit('updated', {

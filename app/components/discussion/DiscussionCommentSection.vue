@@ -56,6 +56,14 @@ onMounted(() => {
 const reportPostId = ref<number | null>(null)
 const moderating = ref<DiscussionPost | null>(null)
 
+/** Takes a deleted comment off the list. */
+function removePost(post: DiscussionPost) {
+  floors.value = post.parent_id === null
+    ? floors.value.filter(floor => floor.id !== post.id)
+    : floors.value.map(floor => floor.id === post.parent_id ? { ...floor, replies: (floor.replies ?? []).filter(reply => reply.id !== post.id), replies_count: Math.max(0, floor.replies_count - 1) } : floor)
+  if (post.parent_id === null) topic.value = { ...topic.value, replies_count: Math.max(0, topic.value.replies_count - 1) }
+}
+
 function replacePost(post: DiscussionPost) {
   if (post.parent_id === null) {
     floors.value = floors.value.map(floor => floor.id === post.id ? { ...floor, ...post, replies: post.replies ?? floor.replies } : floor)
@@ -74,6 +82,7 @@ provideDiscussionTopic({
   moderate: (post) => { moderating.value = post },
   accept: async () => {},
   updated: replacePost,
+  removed: removePost,
 })
 
 async function posted(post: DiscussionPost, incoming: DiscussionReferences, lastFloor: number) {
@@ -121,6 +130,6 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
       </div>
     </template>
     <DiscussionReportDialog :post-id="reportPostId" @close="reportPostId = null" />
-    <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" />
+    <DiscussionModerationDialog :post="moderating" @close="moderating = null" @updated="replacePost" @removed="removePost" />
   </section>
 </template>

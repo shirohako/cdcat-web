@@ -3,7 +3,7 @@ import type { AdminDiscussionPost, AdminPagination } from '~/types/admin'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-type Action = 'hide' | 'unhide' | 'delete' | 'restore' | 'purge'
+type Action = 'hide' | 'unhide' | 'delete' | 'purge'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,7 +44,6 @@ async function act(reason: string) {
     if (current.action === 'hide') await $api(`/v1/admin/discussions/posts/${id}`, { method: 'PATCH', body: { status: 'hidden', ...body } })
     if (current.action === 'unhide') await $api(`/v1/admin/discussions/posts/${id}`, { method: 'PATCH', body: { status: 'visible', ...body } })
     if (current.action === 'delete') await $api(`/v1/admin/discussions/posts/${id}`, { method: 'DELETE', body })
-    if (current.action === 'restore') await $api(`/v1/admin/discussions/posts/${id}/restore`, { method: 'POST', body })
     if (current.action === 'purge' && current.post.user) await $api(`/v1/admin/discussions/users/${current.post.user.id}/purge`, { method: 'POST', body })
     notice.value = t('admin_pages.saved')
     acting.value = null
@@ -53,7 +52,7 @@ async function act(reason: string) {
   catch (failure) { message.value = localizeError(failure, 'admin_pages.action_failed') }
   finally { busy.value = false }
 }
-const tone: Record<string, string> = { visible: 'bg-emerald-50 text-emerald-700', hidden: 'bg-amber-50 text-amber-700', deleted: 'bg-rose-50 text-rose-700' }
+const tone: Record<string, string> = { visible: 'bg-emerald-50 text-emerald-700', hidden: 'bg-amber-50 text-amber-700' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 const field = 'rounded-lg border border-slate-300 px-3 py-1.5 text-sm'
 useHead({ title: computed(() => t('admin_pages.discussions.posts.title')) })
@@ -73,7 +72,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.posts.title')) })
       <input v-if="canSeeIp" v-model="filters.ip" maxlength="45" :class="[field, 'w-36 font-mono']" placeholder="IP">
       <select v-model="filters.status" :class="field">
         <option value="">{{ t('admin_pages.all_statuses') }}</option>
-        <option v-for="value in ['visible', 'hidden', 'deleted']" :key="value" :value="value">{{ t(`admin_pages.discussions.post_statuses.${value}`) }}</option>
+        <option v-for="value in ['visible', 'hidden']" :key="value" :value="value">{{ t(`admin_pages.discussions.post_statuses.${value}`) }}</option>
       </select>
       <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white">{{ t('admin_pages.apply') }}</button>
     </form>
@@ -101,8 +100,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.posts.title')) })
             <div class="flex shrink-0 flex-wrap gap-1.5 text-xs">
               <button v-if="post.status === 'visible'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="acting = { post, action: 'hide' }">{{ t('admin_pages.discussions.actions.hide') }}</button>
               <button v-if="post.status === 'hidden'" type="button" class="rounded-lg border px-2.5 py-1.5" @click="acting = { post, action: 'unhide' }">{{ t('admin_pages.discussions.actions.unhide') }}</button>
-              <button v-if="post.status !== 'deleted'" type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="acting = { post, action: 'delete' }">{{ t('admin_pages.discussions.actions.delete') }}</button>
-              <button v-if="post.status !== 'visible'" type="button" class="rounded-lg border px-2.5 py-1.5" @click="acting = { post, action: 'restore' }">{{ t('admin_pages.discussions.actions.restore') }}</button>
+              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="acting = { post, action: 'delete' }">{{ t('admin_pages.discussions.actions.delete') }}</button>
               <button v-if="post.user" type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="acting = { post, action: 'purge' }">{{ t('admin_pages.discussions.actions.purge') }}</button>
             </div>
           </div>

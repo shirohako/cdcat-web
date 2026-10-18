@@ -38,7 +38,7 @@ export interface MarkdownReferencePost {
   floor: number | null
   parent_floor: number | null
   user: { username: string, nickname: string | null } | null
-  status: 'visible' | 'hidden' | 'deleted'
+  status: 'visible' | 'hidden'
 }
 
 /** A database object named by `[[type:id]]`. Fields beyond `title` depend on the type. */
@@ -650,9 +650,6 @@ md.use(container, 'quote', {
     let header: string
     if (!post) {
       header = `<span class="markdown-quote-missing">${escapeHtml(mdT('markdown.quote.unavailable'))}</span>`
-    }
-    else if (post.status === 'deleted') {
-      header = `<span class="markdown-quote-missing">${escapeHtml(mdT('markdown.quote.deleted'))}</span>`
     }
     else {
       const author = escapeHtml(post.user?.nickname || post.user?.username || mdT('markdown.quote.someone'))

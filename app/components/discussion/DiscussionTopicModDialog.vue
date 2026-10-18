@@ -2,9 +2,9 @@
 import { Loader2 } from '@lucide/vue'
 import type { DiscussionTopicDetail } from '~/types/discussion'
 
-/** Pin, feature, lock, delete or restore a topic. Editing its fields is the edit dialog. */
+/** Pin, feature, lock or delete (for good) a topic. Editing its fields is the edit dialog. */
 const props = defineProps<{ topic: DiscussionTopicDetail | null }>()
-const emit = defineEmits<{ close: [], saved: [] }>()
+const emit = defineEmits<{ close: [], saved: [], deleted: [] }>()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
@@ -28,13 +28,14 @@ watch(() => props.topic, (topic) => {
   error.value = ''
 }, { immediate: true })
 
-async function run(request: () => Promise<unknown>) {
+async function run(request: () => Promise<unknown>, done: 'saved' | 'deleted' = 'saved') {
   busy.value = true
   error.value = ''
   try {
     await request()
     notice.success(t('discussions.moderation.done'))
-    emit('saved')
+    if (done === 'deleted') emit('deleted')
+    else emit('saved')
   }
   catch (failure) {
     error.value = localizeError(failure)
@@ -57,9 +58,8 @@ const remove = () => {
     error.value = t('discussions.moderation.reason_required')
     return
   }
-  return run(() => $api(`/v1/admin/discussions/topics/${props.topic!.id}`, { method: 'DELETE', body: { reason: reason.value.trim() } }))
+  return run(() => $api(`/v1/admin/discussions/topics/${props.topic!.id}`, { method: 'DELETE', body: { reason: reason.value.trim() } }), 'deleted')
 }
-const restore = () => run(() => $api(`/v1/admin/discussions/topics/${props.topic!.id}/restore`, { method: 'POST', body: { reason: reason.value.trim() || undefined } }))
 </script>
 
 <template>
@@ -86,8 +86,7 @@ const restore = () => run(() => $api(`/v1/admin/discussions/topics/${props.topic
       <p v-if="error" role="alert" class="text-rose-600">{{ error }}</p>
     </form>
     <template #footer>
-      <button v-if="topic?.status === 'deleted'" type="button" class="btn btn-sm mr-auto" :disabled="busy" @click="restore">{{ t('discussions.moderation.restore_topic') }}</button>
-      <button v-else type="button" class="btn btn-error btn-sm mr-auto" :disabled="busy" @click="remove">{{ t('discussions.moderation.delete_topic') }}</button>
+      <button type="button" class="btn btn-error btn-sm mr-auto" :disabled="busy" @click="remove">{{ t('discussions.moderation.delete_topic') }}</button>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>
       <button type="submit" form="discussion-topic-mod" class="btn btn-primary btn-sm" :disabled="busy"><Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.save') }}</button>
     </template>
