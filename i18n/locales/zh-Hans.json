@@ -1323,7 +1323,7 @@
     "no_menu_match": "没有匹配的菜单",
     "tags": {
       "title": "标签库",
-      "description": "文章和讨论区共用的标签。用户只能从这里选；可以合并写法不同的重复标签。",
+      "description": "文章和讨论区共用的标签。用户写作时可以新建；用户新建、没有内容使用的标签每天自动清理，在这里编辑过的标签会一直保留。可以合并写法不同的重复标签。",
       "search": "搜索标签",
       "name": "名称",
       "articles": "文章数",
@@ -1343,7 +1343,9 @@
       "delete_title": "删除「{name}」",
       "delete_help": "会从所有文章和草稿上移除这个标签。",
       "deleted": "已删除",
-      "topics": "讨论"
+      "topics": "讨论",
+      "member_created": "{name} 新建",
+      "member_created_help": "用户写作时新建的标签；没有内容使用时会被自动清理，编辑后转为标签库的标签。"
     },
     "word_filters": {
       "title": "关键词过滤",
@@ -1712,11 +1714,23 @@
       "remove": "移除 {title}"
     },
     "tags": {
-      "filter": "筛选标签…",
+      "filter": "搜索或新建标签…",
       "full": "最多 {max} 个标签",
       "no_match": "没有匹配的标签。",
       "empty": "标签库还是空的。",
-      "remove": "移除 {name}"
+      "remove": "移除 {name}",
+      "new": "新",
+      "create": "新建「{name}」",
+      "create_hint": "没有合适的标签时，输入名称按回车就能新建（最多 {max} 字），保存时生效。",
+      "picked": "这个标签已经选上了。",
+      "errors": {
+        "too_long": "标签名最多 {max} 字。",
+        "blocked": "这个标签名不能使用，请换一个。",
+        "staff": "这个标签只有管理者能使用。",
+        "daily": "今天新建的标签已达上限，请先选用已有的标签。",
+        "full": "标签太多了，最多 5 个。",
+        "other": "有标签不可用，请检查后再试。"
+      }
     },
     "writer": {
       "new_title": "写文章",

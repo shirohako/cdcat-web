@@ -1,4 +1,5 @@
 import type { ArticleDraftFields, ArticleDraftPayload, ContentLinkSummary, TagSummary } from '~/types/article'
+import { isNewTag, tagPayload } from '~/utils/tags'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
 
@@ -40,7 +41,7 @@ const serialize = (form: ArticleDraftForm): Record<keyof ArticleDraftFields, unk
   content: form.content,
   slug: form.slug.trim(),
   links: form.links.map(link => ({ type: link.type, id: link.id })),
-  tag_ids: form.tags.map(tag => tag.id),
+  ...tagPayload(form.tags),
 })
 
 type ApiError = { name?: string, status?: number, details?: { details?: Record<string, unknown> } }
@@ -73,7 +74,22 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
   const canEdit = computed(() => !payload.value || payload.value.can.edit)
   const changedFields = () => {
     const current = serialize(form)
-    return Object.fromEntries(Object.entries(current).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(saved[key as keyof ArticleDraftFields])))
+    const changes = Object.fromEntries(Object.entries(current).filter(([key, value]) => JSON.stringify(value) !== JSON.stringify(saved[key as keyof ArticleDraftFields])))
+    // Either tag field replaces the whole list, so they always go together.
+    if ('tag_ids' in changes || 'new_tags' in changes) Object.assign(changes, { tag_ids: current.tag_ids, new_tags: current.new_tags })
+    return changes
+  }
+
+  /**
+   * New tags are created by the save; show them as the library's tags from then on, unless the tags
+   * were changed again while the request ran.
+   */
+  const adoptTags = (tags: TagSummary[] | undefined, sent: Record<string, unknown>) => {
+    if (!tags || !form.tags.some(isNewTag)) return
+    if (JSON.stringify(tagPayload(form.tags)) !== JSON.stringify({ tag_ids: sent.tag_ids, new_tags: sent.new_tags })) return
+    applying = true
+    form.tags = tags
+    nextTick(() => { applying = false })
   }
   const backupKey = () => `${BACKUP_PREFIX}${articleId.value ?? 'new'}`
 
@@ -126,18 +142,20 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
           clearBackup()
           articleId.value = created.article.id
           payload.value = created
+          adoptTags(created.draft.tags, sent)
           revision.value = created.draft.revision
           savedAt.value = created.draft.updated_at ?? null
           options.onCreated?.(created.article.id)
         }
         else {
-          const result = await $api<{ revision: number, updated_at: string }>(`/v1/articles/${articleId.value}/draft`, {
+          const result = await $api<{ revision: number, updated_at: string, tags: TagSummary[] }>(`/v1/articles/${articleId.value}/draft`, {
             method: 'PUT', body: { ...changes, revision: revision.value }, progress: false,
           })
+          adoptTags(result.tags, sent)
           revision.value = result.revision
           savedAt.value = result.updated_at
         }
-        saved = sent
+        saved = form.tags.some(isNewTag) ? sent : { ...sent, ...tagPayload(form.tags) }
         firstChangeAt = 0
         lastError.value = null
         const pendingAfter = Object.keys(changedFields()).length > 0

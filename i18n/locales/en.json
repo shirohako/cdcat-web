@@ -582,11 +582,23 @@
       "remove": "Remove {title}"
     },
     "tags": {
-      "filter": "Filter tags…",
+      "filter": "Search or create a tag…",
       "full": "Up to {max} tags",
       "no_match": "No matching tags.",
       "empty": "The tag library is empty.",
-      "remove": "Remove {name}"
+      "remove": "Remove {name}",
+      "new": "new",
+      "create": "Create “{name}”",
+      "create_hint": "No fitting tag? Type a name and press Enter to create it (up to {max} characters); it is added when you save.",
+      "picked": "This tag is already picked.",
+      "errors": {
+        "too_long": "Tag names can have at most {max} characters.",
+        "blocked": "This tag name can’t be used. Try another.",
+        "staff": "Only moderators can use this tag.",
+        "daily": "You’ve created as many tags as you can today. Pick existing tags for now.",
+        "full": "Too many tags; at most 5.",
+        "other": "Some tags can’t be used. Check them and try again."
+      }
     },
     "writer": {
       "new_title": "New article",

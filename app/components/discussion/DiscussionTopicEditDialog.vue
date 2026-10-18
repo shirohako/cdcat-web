@@ -2,6 +2,7 @@
 import { Loader2 } from '@lucide/vue'
 import type { ContentLinkSummary, TagSummary } from '~/types/article'
 import type { DiscussionTopicDetail } from '~/types/discussion'
+import { TAG_NAME_MAX, tagErrorKey, tagPayload } from '~/utils/tags'
 
 /**
  * Changes a topic's title, category, tags and links. Authors save through the
@@ -42,7 +43,7 @@ async function save() {
   busy.value = true
   error.value = ''
   const body: Record<string, unknown> = {
-    tag_ids: tags.value.map(tag => tag.id),
+    ...tagPayload(tags.value),
     links: links.value.map(link => ({ type: link.type, id: link.id })),
   }
   if (!articleTopic.value) {
@@ -56,7 +57,9 @@ async function save() {
     emit('saved')
   }
   catch (failure) {
-    error.value = (failure as { name?: string }).name === 'VALIDATION_FAILED' ? t('discussions.topic.invalid') : localizeError(failure)
+    const tagError = tagErrorKey((failure as { details?: { details?: Record<string, string[]> } }).details?.details)
+    error.value = (failure as { name?: string }).name !== 'VALIDATION_FAILED' ? localizeError(failure)
+      : tagError ? t(tagError, { max: TAG_NAME_MAX }) : t('discussions.topic.invalid')
   }
   finally {
     busy.value = false

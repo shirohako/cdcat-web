@@ -82,7 +82,7 @@ useHead({ title: computed(() => t('admin_pages.tags.title')) })
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-2">{{ t('admin_pages.tags.name') }}</th><th class="px-4 py-2">Slug</th><th class="px-4 py-2">{{ t('admin_pages.tags.articles') }}</th><th class="px-4 py-2">{{ t('admin_pages.tags.topics') }}</th><th class="px-4 py-2" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="tag in data?.items" :key="tag.id">
-                <td class="px-4 py-2">{{ tag.name }}<span v-if="tag.is_staff_only" class="ml-1.5 rounded bg-amber-50 px-1 text-[11px] text-amber-700">{{ t('admin_pages.tags.staff_only') }}</span></td>
+                <td class="px-4 py-2">{{ tag.name }}<span v-if="tag.is_staff_only" class="ml-1.5 rounded bg-amber-50 px-1 text-[11px] text-amber-700">{{ t('admin_pages.tags.staff_only') }}</span><span v-if="tag.creator" class="ml-1.5 rounded bg-sky-50 px-1 text-[11px] text-sky-700" :title="t('admin_pages.tags.member_created_help')">{{ t('admin_pages.tags.member_created', { name: tag.creator.username }) }}</span></td>
                 <td class="px-4 py-2 font-mono text-xs text-slate-500">{{ tag.slug }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.articles_count }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.discussion_topics_count }}</td>

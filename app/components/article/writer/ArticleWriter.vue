@@ -2,6 +2,7 @@
 import { AlertTriangle, ArrowLeft, Check, Columns2, Eye, History, ListTree, Loader2, PenLine, RotateCcw, Settings2, X } from '@lucide/vue'
 import type { MarkdownHeading } from '~/utils/markdown'
 import type { SubmitCheck } from './WriterSubmitDialog.vue'
+import { TAG_NAME_MAX, tagErrorKey } from '~/utils/tags'
 
 /**
  * The full-screen writing page for new and existing articles (docs/articles/README.md).
@@ -102,6 +103,12 @@ function describe(error: unknown) {
   const failure = error as ApiError
   if (failure?.name === 'VALIDATION_FAILED' && failure.details?.details) {
     fieldErrors.value = Object.fromEntries(Object.keys(failure.details.details).map(field => [field.split('.')[0]!, t(`article_ui.errors.${field.split('.')[0]}`)]))
+    // Both tag fields show under the tag picker, saying what was wrong.
+    const tagError = tagErrorKey(failure.details.details)
+    if (tagError) {
+      delete fieldErrors.value.new_tags
+      fieldErrors.value.tag_ids = t(tagError, { max: TAG_NAME_MAX })
+    }
     return Object.values(fieldErrors.value).join(' ')
   }
   const known: Record<string, string> = {

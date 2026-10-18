@@ -308,6 +308,8 @@ export interface AdminHandledReport extends Omit<AdminReportEntry, 'updated_at'>
 
 export interface AdminTag extends TagSummary {
   description: string | null
+  /** The member who created the tag while writing; null for the library's own tags. */
+  creator: { id: number, username: string, nickname: string | null } | null
   articles_count: number
   discussion_topics_count: number
   created_at: string

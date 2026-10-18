@@ -117,6 +117,8 @@ export interface ArticleDraftFields {
   slug: string
   links: ContentLink[]
   tag_ids: number[]
+  /** Names of tags the library lacks, created when saved (utils/tags tagPayload). */
+  new_tags: string[]
 }
 
 export interface MyArticle {

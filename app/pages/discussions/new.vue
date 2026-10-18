@@ -2,6 +2,7 @@
 import { Loader2, Send } from '@lucide/vue'
 import type { ContentLinkSummary, ContentLinkType, TagSummary } from '~/types/article'
 import type { DiscussionCategoryDetail, DiscussionReferences } from '~/types/discussion'
+import { TAG_NAME_MAX, tagErrorKey, tagPayload } from '~/utils/tags'
 
 /**
  * Starts a topic. `?category=` preselects the category and `?link=album:123` links
@@ -69,7 +70,7 @@ async function submit() {
       method: 'POST',
       body: {
         category_id: draft.value.category_id, title: draft.value.title.trim(), raw: draft.value.raw,
-        tag_ids: draft.value.tags.map(tag => tag.id), links: draft.value.links.map(link => ({ type: link.type, id: link.id })),
+        ...tagPayload(draft.value.tags), links: draft.value.links.map(link => ({ type: link.type, id: link.id })),
       },
     })
     clear()
@@ -80,6 +81,8 @@ async function submit() {
     const details = (failure as { details?: { details?: Record<string, string[]> } }).details?.details
     if ((failure as { name?: string }).name === 'VALIDATION_FAILED' && details) {
       for (const field of Object.keys(details)) fieldErrors.value[field] = t(`discussions.new.invalid.${field}`, t('discussions.new.invalid.other'))
+      const tagError = tagErrorKey(details)
+      if (tagError) fieldErrors.value.tags = t(tagError, { max: TAG_NAME_MAX })
     }
     else {
       error.value = localizeError(failure)
@@ -122,6 +125,7 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
           <div class="text-sm font-medium text-slate-700">
             {{ t('discussions.fields.tags') }} <span class="text-xs font-normal text-slate-400">{{ t('discussions.new.optional') }}</span>
             <CommonTagPicker v-model="draft.tags" class="mt-1" :max="5" :allow-staff="canModerate" />
+            <span v-if="fieldErrors.tags" class="mt-1 block text-xs font-normal text-rose-600">{{ fieldErrors.tags }}</span>
           </div>
           <div class="text-sm font-medium text-slate-700">
             {{ t('discussions.fields.links') }} <span class="text-xs font-normal text-slate-400">{{ t('discussions.new.links_hint') }}</span>

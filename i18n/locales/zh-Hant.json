@@ -582,11 +582,23 @@
       "remove": "移除 {title}"
     },
     "tags": {
-      "filter": "篩選標籤…",
+      "filter": "搜尋或新建標籤…",
       "full": "最多 {max} 個標籤",
       "no_match": "沒有符合的標籤。",
       "empty": "標籤庫還是空的。",
-      "remove": "移除 {name}"
+      "remove": "移除 {name}",
+      "new": "新",
+      "create": "新建「{name}」",
+      "create_hint": "沒有合適的標籤時，輸入名稱按 Enter 就能新建（最多 {max} 字），儲存時生效。",
+      "picked": "這個標籤已經選上了。",
+      "errors": {
+        "too_long": "標籤名最多 {max} 字。",
+        "blocked": "這個標籤名不能使用，請換一個。",
+        "staff": "這個標籤只有管理者能使用。",
+        "daily": "今天新建的標籤已達上限，請先選用已有的標籤。",
+        "full": "標籤太多了，最多 5 個。",
+        "other": "有標籤不可用，請檢查後再試。"
+      }
     },
     "writer": {
       "new_title": "寫文章",
