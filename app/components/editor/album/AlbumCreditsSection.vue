@@ -59,6 +59,7 @@
           </div>
           <EditorEntityPicker v-else kind="artist" allow-create data-autofocus :placeholder="$t('editor.credits.pick_artist')" @select="pick" @create="form.newArtist = $event" />
         </div>
+        <EditorArtistTypePicker v-if="form.ref === null && form.newArtist" v-model="form.newType" :invalid="problem === 'type'" />
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
@@ -71,7 +72,7 @@
             <input v-model="form.detail" class="input input-sm w-full" maxlength="100">
           </label>
         </div>
-        <p v-if="problem" class="text-xs text-error">{{ $t(problem === 'person' ? 'editor.dialog.credit_person_required' : 'editor.dialog.credit_tracks_required') }}</p>
+        <p v-if="problem && problem !== 'type'" class="text-xs text-error">{{ $t(problem === 'person' ? 'editor.dialog.credit_person_required' : 'editor.dialog.credit_tracks_required') }}</p>
       </div>
       <template #footer>
         <span v-if="addedCount" class="mr-auto text-xs text-emerald-600">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
@@ -140,6 +141,8 @@ const form = reactive({
   ref: null as AggregateRef | null,
   /** A new artist's name; the artist is created only when the credit is saved. */
   newArtist: '',
+  /** The type of the new artist, chosen in the dialog. */
+  newType: null as string | null,
   creditedAs: '',
   detail: '',
 })
@@ -150,6 +153,7 @@ const person = ref<HTMLElement | null>(null)
 const problem = computed(() => {
   if (!tried.value) return null
   if (form.ref === null && !form.newArtist && !form.creditedAs.trim()) return 'person'
+  if (form.ref === null && form.newArtist && !form.newType) return 'type'
   if (form.scope === 'tracks' && !form.tracks.length) return 'tracks'
   return null
 })
@@ -157,6 +161,7 @@ const problem = computed(() => {
 const clearPerson = () => {
   form.ref = null
   form.newArtist = ''
+  form.newType = null
   form.creditedAs = ''
   form.detail = ''
   tried.value = false
@@ -218,7 +223,7 @@ const save = async (another: boolean) => {
   tried.value = true
   if (problem.value) return
   const fields = {
-    artist_id: form.ref ?? (form.newArtist ? editor.createItem('artist', { name: form.newArtist, type: 'person' }) : null),
+    artist_id: form.ref ?? (form.newArtist ? editor.createItem('artist', { name: form.newArtist, type: form.newType }) : null),
     credited_as: form.creditedAs.trim() || null,
     role: form.role,
     detail: form.detail.trim() || null,

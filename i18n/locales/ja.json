@@ -2477,7 +2477,8 @@
       "work_relations_hint": "この楽曲から見た原曲、アレンジ、カバー、リミックス、メドレー。",
       "work_entries": "出典",
       "work_entries_hint": "この曲が使われたゲームやアニメなどの作品（ゲームの BGM など）。",
-      "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。"
+      "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。",
+      "artist_type_placeholder": "アーティストの種類を選択"
     },
     "pending_notice": "新しい項目は投稿するとすぐに公開され、「承認待ち」と表示されます。既存の内容への変更は承認後に反映されます。",
     "local_hint": "下書きは送信するまでこのブラウザだけに保存され、ログアウトすると削除されます",
@@ -2538,7 +2539,9 @@
       "image_kind_guess": "URL から推測",
       "original_add": "原曲を追加",
       "original_required": "原曲を選ぶか、タイトルを入力して新規作成してください。",
-      "pick_closes": "選ぶとすぐに関連付けられます。"
+      "pick_closes": "選ぶとすぐに関連付けられます。",
+      "new_artist_type": "新しいアーティストの種類",
+      "new_artist_type_required": "新しいアーティストの種類を選んでください。"
     },
     "artist_examples": {
       "title": "例：ジャケットの表記 → 入力のしかた",

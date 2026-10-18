@@ -17,7 +17,8 @@
             :placeholder="$t('catalog.field.title')"
           >
           <input v-else v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
-          <select v-if="item.resource_type === 'artist'" v-model="docOf(item).type" class="select select-sm w-36">
+          <select v-if="item.resource_type === 'artist'" v-model="docOf(item).type" class="select select-sm w-36" :class="{ 'select-error': !docOf(item).type }" :aria-label="$t('catalog.field.type')">
+            <option :value="null" disabled>{{ $t('editor.entity.artist_type_placeholder') }}</option>
             <option v-for="value in enums.artist_type ?? []" :key="value" :value="value">{{ enumLabel('artist_type', value) }}</option>
           </select>
           <span class="text-[11px] text-gray-500">{{ usage(item.ref) }}</span>
@@ -39,7 +40,7 @@
             <button type="button" class="btn btn-ghost btn-xs px-1" :aria-label="$t('common.delete')" @click="removeRow(docOf(item).entries ?? [], entry)"><X :size="12" /></button>
           </div>
           <div class="grid gap-2 sm:grid-cols-2">
-            <EditorEntityPicker kind="artist" allow-create :placeholder="$t('editor.new_items.add_composer')" @select="addComposer(item, $event.id, $event)" @create="addComposer(item, editor.createItem('artist', { name: $event, type: 'person' }))" />
+            <EditorEntityPicker kind="artist" allow-create :placeholder="$t('editor.new_items.add_composer')" @select="addComposer(item, $event.id, $event)" @create="addComposer(item, editor.createItem('artist', { name: $event, type: null }))" />
             <EditorEntityPicker kind="entry" :placeholder="$t('editor.new_items.add_source')" @select="addSource(item, $event)" />
           </div>
         </div>
@@ -79,7 +80,7 @@ const edited = computed(() => others.value.filter(item => item.action === 'updat
 interface NewItemDocument {
   name?: string
   title?: string
-  type?: string
+  type?: string | null
   credits?: WorkDocument['credits']
   entries?: WorkDocument['entries']
 }

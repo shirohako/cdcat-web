@@ -56,6 +56,7 @@
           <EditorEntityPicker v-else :kind="kind" allow-create data-autofocus :exclude="kind === 'artist' ? takenArtists : []" :placeholder="$t(kind === 'artist' ? 'editor.album.add_artist' : 'editor.album.add_label')" @select="pick" @create="form.newName = $event" />
           <span v-if="tried && form.ref === null && !form.newName" class="mt-1 block text-xs text-error">{{ $t(kind === 'artist' ? 'editor.dialog.artist_required' : 'editor.dialog.label_required') }}</span>
         </div>
+        <EditorArtistTypePicker v-if="kind === 'artist' && form.ref === null && form.newName" v-model="form.newType" :invalid="tried && !form.newType" />
 
         <div v-if="kind === 'label'">
           <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.role') }}</span>
@@ -187,6 +188,8 @@ const form = reactive({
   ref: null as AggregateRef | null,
   /** A new artist's or label's name; it is created only when the row is added. */
   newName: '',
+  /** The type of a new artist, chosen in the dialog. */
+  newType: null as string | null,
   creditedAs: '',
   joinPhrase: '',
   role: 'label',
@@ -210,6 +213,7 @@ const takenArtists = computed(() => album.value.artists.filter(row => row !== ed
 const reset = () => {
   form.ref = null
   form.newName = ''
+  form.newType = null
   form.creditedAs = ''
   form.joinPhrase = ''
   tried.value = false
@@ -245,7 +249,8 @@ const pick = (item: PickedEntity) => {
 const save = async (another: boolean) => {
   tried.value = true
   if (form.ref === null && !form.newName) return
-  const ref = form.ref ?? editor.createItem(kind.value, kind.value === 'artist' ? { name: form.newName, type: 'person' } : { name: form.newName })
+  if (kind.value === 'artist' && form.ref === null && !form.newType) return
+  const ref = form.ref ?? editor.createItem(kind.value, kind.value === 'artist' ? { name: form.newName, type: form.newType } : { name: form.newName })
   const creditedAs = form.creditedAs.trim() || null
   if (kind.value === 'artist') {
     const values = { artist_id: ref, credited_as: creditedAs, join_phrase: form.joinPhrase || null }

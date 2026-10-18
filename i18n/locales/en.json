@@ -2477,7 +2477,8 @@
       "work_relations_hint": "Original songs, arrangements, covers, remixes and medleys, seen from this song.",
       "work_entries": "Source",
       "work_entries_hint": "The game, anime or other work the song comes from, e.g. a game's BGM.",
-      "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at})."
+      "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",
+      "artist_type_placeholder": "Choose the artist type"
     },
     "pending_notice": "New content goes live as soon as you submit it, marked “Pending”; changes to existing content wait for approval.",
     "local_hint": "Drafts stay in this browser until you submit them; logging out deletes them",
@@ -2538,7 +2539,9 @@
       "image_kind_guess": "Guess from the address",
       "original_add": "Add original",
       "original_required": "Choose the original, or type a title to create it.",
-      "pick_closes": "Choosing one links it right away."
+      "pick_closes": "Choosing one links it right away.",
+      "new_artist_type": "Type of the new artist",
+      "new_artist_type_required": "Choose the new artist’s type."
     },
     "artist_examples": {
       "title": "Examples: printed on the cover → what to enter",

@@ -8,10 +8,12 @@
           <span v-if="editor.errorAt('name')" class="mt-1 block text-xs text-error">{{ editor.errorAt('name') }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }}</span>
-          <select v-model="doc.type" class="select select-sm w-full">
+          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }} <span class="text-error">*</span></span>
+          <select v-model="doc.type" class="select select-sm w-full" :class="{ 'select-error': editor.errorAt('type') }">
+            <option :value="null" disabled>{{ $t('editor.entity.artist_type_placeholder') }}</option>
             <option v-for="value in enums.artist_type ?? []" :key="value" :value="value">{{ enumLabel('artist_type', value) }}</option>
           </select>
+          <span v-if="editor.errorAt('type')" class="mt-1 block text-xs text-error">{{ editor.errorAt('type') }}</span>
         </label>
         <label class="flex items-center gap-2 self-end pb-2 text-sm text-gray-700">
           <input v-model="doc.is_active" type="checkbox" class="checkbox checkbox-sm">{{ $t('catalog.field.is_active') }}

@@ -58,7 +58,8 @@ export interface AlbumDocument {
 export interface ArtistDocument {
   name: string
   slug: string | null
-  type: string
+  /** Required; new artists start without one so it is chosen, not assumed. */
+  type: string | null
   is_active: boolean
   bio: string | null
   image_url: string | null

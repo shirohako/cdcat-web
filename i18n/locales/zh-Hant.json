@@ -2477,7 +2477,8 @@
       "work_relations_hint": "從這首樂曲的角度填寫原曲、改編、翻唱、混音和組曲。",
       "work_entries": "出處",
       "work_entries_hint": "這首歌出自的遊戲、動畫等作品，例如某個遊戲的 BGM。",
-      "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。"
+      "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。",
+      "artist_type_placeholder": "請選擇藝術家類型"
     },
     "pending_notice": "新建的內容提交後立即上線，標記為「審核中」；對已有內容的修改要等審核通過。",
     "local_hint": "草稿只儲存在這個瀏覽器，送出後才會傳送；登出會刪除",
@@ -2538,7 +2539,9 @@
       "image_kind_guess": "按網址猜測",
       "original_add": "新增原曲",
       "original_required": "請選擇原曲，或者輸入名稱新建。",
-      "pick_closes": "選中後立即關聯。"
+      "pick_closes": "選中後立即關聯。",
+      "new_artist_type": "新藝術家的類型",
+      "new_artist_type_required": "請選擇新藝術家的類型。"
     },
     "artist_examples": {
       "title": "範例：封面上印的 → 怎麼填",

@@ -3602,7 +3602,8 @@
       "work_relations_hint": "从这首乐曲的角度填写原曲、改编、翻唱、混音和组曲。",
       "work_entries": "出处",
       "work_entries_hint": "这首歌出自的游戏、动画等作品，比如某个游戏的 BGM。",
-      "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。"
+      "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。",
+      "artist_type_placeholder": "请选择艺术家类型"
     },
     "pending_notice": "新建的内容提交后立即上线，标记为「审核中」；对已有内容的修改要等审核通过。",
     "local_hint": "草稿只保存在这个浏览器，提交后才会发送；退出登录会删除",
@@ -3663,7 +3664,9 @@
       "image_kind_guess": "按网址猜测",
       "original_add": "添加原曲",
       "original_required": "请选择原曲，或者输入名称新建。",
-      "pick_closes": "选中后立即关联。"
+      "pick_closes": "选中后立即关联。",
+      "new_artist_type": "新艺术家的类型",
+      "new_artist_type_required": "请选择新艺术家的类型。"
     },
     "artist_examples": {
       "title": "示例：封面上印的 → 怎么填",

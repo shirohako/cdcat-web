@@ -31,7 +31,7 @@ export const emptyDocument = (type: EntityType): Record<string, unknown> => {
   const dates = { begin_date: null, begin_date_precision: 'day', end_date: null, end_date_precision: 'day' }
   switch (type) {
     case 'artist':
-      return { name: '', slug: null, type: 'person', is_active: true, bio: null, image_url: null, titles: [], links: [], attributes: [], relations: [] }
+      return { name: '', slug: null, type: null, is_active: true, bio: null, image_url: null, titles: [], links: [], attributes: [], relations: [] }
     case 'label':
       return { name: '', slug: null, parent_id: null, country: null, description: null, image_url: null, ...dates, catalog_prefixes: [], titles: [], links: [], attributes: [] }
     case 'work':
