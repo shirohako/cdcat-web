@@ -9,6 +9,32 @@
         <NuxtLink to="/contribute/album" class="btn btn-primary btn-sm gap-1"><Plus :size="14" />{{ $t('revision_page.new_album') }}</NuxtLink>
       </header>
 
+      <!-- Drafts kept in this browser; the list below holds submitted revisions only. -->
+      <section v-if="localList.length" class="mb-8">
+        <h2 class="flex items-center gap-2 text-sm font-semibold text-gray-800">
+          <HardDrive :size="15" class="text-sky-600" />{{ $t('revision_page.local_title') }}<span class="text-xs font-normal text-gray-400">{{ localList.length }}</span>
+        </h2>
+        <p class="mb-3 mt-0.5 text-xs text-gray-500">{{ $t('revision_page.local_hint') }}</p>
+        <ul class="space-y-2">
+          <li v-for="item in localList" :key="item.key" class="flex flex-wrap items-center gap-3 rounded-xl border border-dashed border-sky-300 bg-sky-50/60 px-4 py-3">
+            <div class="min-w-0 flex-1">
+              <NuxtLink v-if="draftEditorPath(item)" :to="draftEditorPath(item)!" class="font-semibold text-gray-900 hover:underline">{{ item.label || $t('revision_page.local_untitled') }}</NuxtLink>
+              <span v-else class="font-semibold text-gray-900">{{ item.label || $t('revision_page.local_untitled') }}</span>
+              <p class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
+                <span class="rounded bg-white px-1.5 py-0.5 ring-1 ring-gray-200">
+                  {{ $t(`revision_page.action.${item.action}`) }} · {{ enumLabel('catalog_type', item.type) }}<template v-if="item.entityId"> #{{ item.entityId }}</template>
+                </span>
+                <span v-if="item.items.length > 1" class="rounded bg-white px-1.5 py-0.5 ring-1 ring-gray-200">{{ $t('revision_page.local_items', { count: item.items.length }) }}</span>
+                <span v-if="item.revisionId" class="rounded bg-orange-50 px-1.5 py-0.5 text-orange-700">{{ $t('revision_page.local_revision', { id: item.revisionId }) }}</span>
+                <span class="text-gray-400">{{ $t('revision_page.local_saved', { at: ago(item.updatedAt) }) }}</span>
+              </p>
+            </div>
+            <NuxtLink v-if="draftEditorPath(item)" :to="draftEditorPath(item)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
+            <button type="button" class="btn btn-ghost btn-sm text-error" @click="discardLocal(item)">{{ $t('revision_page.delete_draft') }}</button>
+          </li>
+        </ul>
+      </section>
+
       <nav class="mb-5 flex gap-1 overflow-x-auto pb-1">
         <button
           v-for="value in FILTERS"
@@ -50,7 +76,6 @@
             <NuxtLink v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
             <NuxtLink :to="`/revisions/${revision.id}`" class="btn btn-ghost btn-sm">{{ $t('common.details') }}</NuxtLink>
             <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</button>
-            <button v-if="revision.status === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy === revision.id" @click="remove(revision)">{{ $t('revision_page.delete_draft') }}</button>
           </div>
         </li>
       </ul>
@@ -63,12 +88,14 @@
 
 <script setup lang="ts">
 import type { Revision, RevisionStatus } from '~/types/revision'
-import { GitPullRequest, Plus } from '@lucide/vue'
-import { editorPath, isOpenRevision } from '~/utils/revisionLinks'
+import type { LocalDraft } from '~/utils/localDrafts'
+import { GitPullRequest, HardDrive, Plus } from '@lucide/vue'
+import { localDrafts } from '~/utils/localDrafts'
+import { draftEditorPath, editorPath, isOpenRevision } from '~/utils/revisionLinks'
 
 definePageMeta({ middleware: 'auth' })
 
-const FILTERS = ['all', 'draft', 'pending', 'changes_requested', 'approved', 'rejected', 'withdrawn'] as const
+const FILTERS = ['all', 'pending', 'changes_requested', 'approved', 'rejected', 'withdrawn'] as const
 
 const route = useRoute()
 const router = useRouter()
@@ -77,6 +104,19 @@ const { $api } = useNuxtApp()
 const { ago } = useRelativeTime()
 const { enumLabel } = useCatalogDisplay()
 const { localizeError } = useLocalizedApiError()
+const { user } = useAuth()
+
+/** Drafts kept in this browser (utils/localDrafts), newest first. */
+const localList = ref<LocalDraft[]>([])
+const loadLocal = async () => {
+  if (user.value) localList.value = await localDrafts.list(user.value.id).catch(() => [])
+}
+onMounted(loadLocal)
+const discardLocal = async (draft: LocalDraft) => {
+  if (!confirm(t('revision_page.delete_confirm'))) return
+  await localDrafts.remove(draft.userId, draft.scope).catch(() => undefined)
+  await loadLocal()
+}
 
 const status = computed(() => (FILTERS as readonly string[]).includes(String(route.query.status)) ? String(route.query.status) as typeof FILTERS[number] : 'all')
 const page = ref(Number(route.query.page) || 1)
@@ -115,7 +155,6 @@ const act = async (revision: Revision, question: string, request: () => Promise<
   }
 }
 const withdraw = (revision: Revision) => act(revision, t('revision_page.withdraw_confirm'), () => $api(`/v1/revisions/${revision.id}/withdraw`, { method: 'POST' }))
-const remove = (revision: Revision) => act(revision, t('revision_page.delete_confirm'), () => $api(`/v1/revisions/${revision.id}`, { method: 'DELETE' }))
 
 const statusTitle = computed(() => status.value === 'all' ? '' : ` · ${t(`revision_page.status.${status.value as RevisionStatus}`)}`)
 useSeoMeta({ title: () => `${t('collection_pages.revisions.title')}${statusTitle.value}`, robots: 'noindex' })

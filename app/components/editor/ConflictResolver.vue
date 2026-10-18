@@ -31,10 +31,14 @@
 import type { CatalogType } from '~/types/catalog'
 import type { RevisionConflict } from '~/types/revision'
 
-const props = defineProps<{ revisionId: number, conflicts: RevisionConflict[], type: CatalogType }>()
+const props = defineProps<{
+  conflicts: RevisionConflict[]
+  type: CatalogType
+  /** Merges one item with the chosen side of each of its conflicts: a stored revision or a draft in this browser. */
+  rebase: (ref: string, resolutions: Record<string, 'mine' | 'current'>) => Promise<unknown>
+}>()
 const emit = defineEmits<{ resolved: [] }>()
 
-const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { fieldLabel, collectionLabel } = useDocumentSchema(() => props.type)
 
@@ -51,13 +55,13 @@ const resolve = async () => {
   busy.value = true
   message.value = ''
   try {
-    const byRef = new Map<string, Record<string, string>>()
+    const byRef = new Map<string, Record<string, 'mine' | 'current'>>()
     for (const conflict of props.conflicts) {
       const ref = conflict.ref ?? 'main'
       byRef.set(ref, { ...(byRef.get(ref) ?? {}), [conflict.id]: choices[conflict.id]! })
     }
     for (const [ref, resolutions] of byRef) {
-      await $api(`/v1/revisions/${props.revisionId}/items/${ref}/rebase`, { method: 'POST', body: { resolutions } })
+      await props.rebase(ref, resolutions)
     }
     emit('resolved')
   } catch (error) {

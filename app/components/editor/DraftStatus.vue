@@ -1,34 +1,36 @@
 <template>
   <div class="space-y-2">
-    <div v-if="draft.backup.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm text-sky-800">
-      <span>{{ $t('editor.backup_found', { at: exact(draft.backup.value.at) }) }}</span>
-      <div class="flex gap-2">
-        <button type="button" class="btn btn-xs" @click="draft.restoreBackup()">{{ $t('editor.restore_backup') }}</button>
-        <button type="button" class="btn btn-ghost btn-xs" @click="draft.dismissBackup()">{{ $t('editor.dismiss_backup') }}</button>
-      </div>
+    <div v-if="draft.restoredAt.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm text-sky-800">
+      <History :size="16" class="shrink-0" />
+      <span class="min-w-0 flex-1">{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}</span>
+      <button type="button" class="btn btn-ghost btn-xs" @click="discard">{{ $t('editor.restored_discard') }}</button>
     </div>
-    <div v-if="draft.conflict.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-800">
-      <span>{{ $t('editor.draft_conflict') }}</span>
-      <div class="flex gap-2">
-        <button type="button" class="btn btn-xs" @click="draft.keepMine()">{{ $t('editor.keep_mine') }}</button>
-        <button type="button" class="btn btn-ghost btn-xs" @click="draft.useServer()">{{ $t('editor.use_server') }}</button>
-      </div>
-    </div>
-    <p class="flex items-center gap-1.5 text-xs text-gray-400">
+    <p class="flex flex-wrap items-center gap-1.5 text-xs text-gray-400">
       <span class="inline-block h-2 w-2 rounded-full" :class="dotClass" />
       {{ label }}
       <NuxtLink v-if="draft.revisionId.value" :to="`/revisions/${draft.revisionId.value}`" class="hover:underline">#{{ draft.revisionId.value }}</NuxtLink>
+      <span class="text-gray-300">·</span>
+      <span>{{ $t('editor.local_hint') }}</span>
     </p>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { useRevisionDraft } from '~/composables/useRevisionDraft'
+import { History } from '@lucide/vue'
 
 const props = defineProps<{ draft: ReturnType<typeof useRevisionDraft> }>()
+/** The editor starts over without the restored edits. */
+const emit = defineEmits<{ discard: [] }>()
 
 const { t } = useI18n()
-const { exact, ago } = useRelativeTime()
+const { ago } = useRelativeTime()
+
+const discard = async () => {
+  if (!confirm(t('editor.restored_discard_confirm'))) return
+  await props.draft.discard()
+  emit('discard')
+}
 
 const label = computed(() => ({
   idle: t('editor.state_idle'),

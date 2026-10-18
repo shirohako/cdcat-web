@@ -91,7 +91,7 @@ useHead({ title: computed(() => t('admin_pages.revisions.title')) })
         <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.revisions.search')" :aria-label="t('admin_pages.revisions.search')" class="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <select v-model="filters.status" :aria-label="t('admin_pages.revisions.status')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.status_all') }}</option>
-          <option v-for="status in REVISION_STATUSES.filter(item => item !== 'draft')" :key="status" :value="status">{{ t(`admin_pages.revisions.status_${status}`) }}</option>
+          <option v-for="status in REVISION_STATUSES" :key="status" :value="status">{{ t(`admin_pages.revisions.status_${status}`) }}</option>
         </select>
         <select v-model="filters.kind" :aria-label="t('admin_pages.revisions.kind')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.revisions.all_kinds') }}</option>

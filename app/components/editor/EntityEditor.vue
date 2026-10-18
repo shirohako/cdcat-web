@@ -19,23 +19,23 @@
           </p>
         </header>
 
-        <div v-if="openDrafts.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
           <History :size="16" class="shrink-0" />
-          <span class="min-w-0 flex-1">{{ $t('editor.entity.open_draft', { id: openDrafts[0]!.id, at: ago(openDrafts[0]!.updated_at) }) }}</span>
-          <NuxtLink :to="{ query: { ...$route.query, revision: openDrafts[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm" @click="openDrafts = []">{{ $t('editor.ignore') }}</button>
+          <span class="min-w-0 flex-1">{{ $t('editor.entity.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
+          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
+          <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p class="font-semibold">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
-        <div class="mb-4"><EditorDraftStatus :draft="draft" /></div>
+        <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
 
         <div class="space-y-6">
           <slot />
           <CatalogSection :title="$t('editor.section_submit')" :icon="Send" tone="blue">
             <div class="p-5">
-              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" @submitted="submitted" @errors="setErrors" />
+              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" @submitted="submitted" @errors="setErrors" @discarded="restart" />
             </div>
           </CatalogSection>
         </div>
@@ -54,16 +54,20 @@ import type { Revision } from '~/types/revision'
 import { History, Send } from '@lucide/vue'
 import { emptyDocument, entityEditorKey } from '~/composables/useEntityEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
+import { newDraftScope } from '~/utils/localDrafts'
 
 /**
  * Editor for one artist, label, work, entry or series (docs/catalog/editing.md): the fields come
  * from the default slot, which reads the document with useEntityEditor(). Like the album editor it
- * saves a server draft while editing and submits one revision.
+ * keeps the draft in this browser while editing and submits one revision.
  */
 const props = defineProps<{
   type: EntityType
   id?: number | null
+  /** A revision sent back for changes to continue. */
   revisionId?: number | null
+  /** A new item's draft kept in this browser to continue (?draft=). */
+  draftScope?: string | null
   /** Starting document of a new entity, e.g. imported from Bangumi */
   initial?: Record<string, unknown> | null
 }>()
@@ -72,6 +76,7 @@ const MAIN = 'main'
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const router = useRouter()
+const route = useRoute()
 const { schema } = useCatalogSchema()
 const { toast, showToast } = useToast()
 const { ago } = useRelativeTime()
@@ -92,7 +97,7 @@ const prepare = (item: DraftItem): DraftItem => {
   if (Array.isArray(document.attributes)) document.attributes = document.attributes.filter(row => !blank(row.value))
   return { ...item, document: document as Record<string, unknown> }
 }
-const draft = useRevisionDraft(`${props.type}:${id ?? 'new'}`, { prepare })
+const draft = useRevisionDraft({ prepare, afterRebase: item => loadOriginals([item]) })
 const references = draft.references as CatalogReferences
 
 const loading = ref(true)
@@ -100,7 +105,8 @@ const loadError = ref('')
 const loaded = ref(false)
 const ready = computed(() => loaded.value && !!schema.value)
 const reviewComment = ref<string | null>(null)
-const openDrafts = ref<Revision[]>([])
+/** This entity's revisions sent back for changes, offered before starting another. */
+const openRevisions = ref<Revision[]>([])
 const originals = reactive<Record<string, Record<string, unknown> | null>>({})
 const mainRef = ref(MAIN)
 
@@ -130,10 +136,21 @@ provide(entityEditorKey, context)
 
 const clone = (value: unknown) => JSON.parse(JSON.stringify(value)) as Record<string, unknown>
 
+/** Documents of the versions update items were edited from, for the change preview; null for new items. */
+const loadOriginals = async (list: DraftItem[]) => {
+  await Promise.all(list.map(async (item) => {
+    originals[item.ref] = null
+    if (item.action !== 'update' || !item.resource_id || item.base_version === undefined) return
+    const version = await $api<{ snapshot: Record<string, unknown> | null, references?: CatalogReferences }>(`/v1/${CATALOG_RESOURCES[item.resource_type]}/${item.resource_id}/versions/${item.base_version}`)
+    originals[item.ref] = version.snapshot
+    mergeReferences(version.references)
+  }))
+}
+
 const open = async () => {
   if (props.revisionId) {
     const revision = await draft.loadRevision(props.revisionId)
-    if (!['draft', 'changes_requested'].includes(revision.status)) throw new Error(t('editor.not_editable'))
+    if (revision.status !== 'changes_requested') throw new Error(t('editor.not_editable'))
     const main = revision.items?.find(item => item.resource_type === props.type && (id ? item.resource_id === id : item.action === 'create'))
     if (!main) throw new Error(t('editor.entity.revision_mismatch'))
     // Content that went live at submission is edited directly now, not through this revision.
@@ -143,31 +160,46 @@ const open = async () => {
     }
     mainRef.value = main.ref
     reviewComment.value = revision.review_comment
-    originals[main.ref] = null
-    if (main.action === 'update' && main.resource_id && main.base_version !== null) {
-      const version = await $api<{ snapshot: Record<string, unknown> | null, references?: CatalogReferences }>(`/v1/${resource}/${main.resource_id}/versions/${main.base_version}`)
-      originals[main.ref] = version.snapshot
-      mergeReferences(version.references)
-    }
+    await loadOriginals(draft.items.value)
+    return
+  }
+  if (props.draftScope) {
+    const record = await draft.resume(props.draftScope)
+    if (!record) throw new Error(t('editor.draft_missing'))
+    mainRef.value = record.mainRef
+    await loadOriginals(draft.items.value)
     return
   }
   if (id) {
     const data = await $api<{ document: Record<string, unknown>, version: number, references: CatalogReferences }>(`/v1/${resource}/${id}/document`)
     mergeReferences(data.references)
-    originals[MAIN] = clone(data.document)
-    draft.start([{ ref: MAIN, resource_type: props.type, action: 'update', resource_id: id, base_version: data.version, document: clone(data.document) }])
-    void findOpenDrafts()
+    const restored = await draft.start([{ ref: MAIN, resource_type: props.type, action: 'update', resource_id: id, base_version: data.version, document: clone(data.document) }], `${props.type}:${id}`)
+    if (restored) await loadOriginals(draft.items.value)
+    else originals[MAIN] = clone(data.document)
+    void findOpenRevisions()
     return
   }
   originals[MAIN] = null
-  draft.start([{ ref: MAIN, resource_type: props.type, action: 'create', document: { ...emptyDocument(props.type), ...clone(props.initial ?? {}) } }])
+  await draft.start([{ ref: MAIN, resource_type: props.type, action: 'create', document: { ...emptyDocument(props.type), ...clone(props.initial ?? {}) } }], newDraftScope(props.type))
 }
 
-const findOpenDrafts = async () => {
+/** Starts over after the draft was thrown away: a new item from scratch, an entity or revision as stored. */
+const restart = () => {
+  if (!id && !props.revisionId) return navigateTo('/revisions')
+  loading.value = true
+  return open().finally(() => { loading.value = false })
+}
+
+// Once a new item's draft is saved, the address names it, so reloading the page continues it.
+watch(draft.persisted, (persisted) => {
+  if (!persisted || id || props.revisionId || props.draftScope || !draft.scope.value) return
+  window.history.replaceState(window.history.state, '', router.resolve({ query: { ...route.query, draft: draft.scope.value } }).href)
+})
+
+const findOpenRevisions = async () => {
   try {
-    const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: props.type, resource_id: id, per_page: 10 } })
-    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status)
-      && !revision.items?.some(item => item.resource_type === props.type && item.resource_id === id && item.applied_at))
+    const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: props.type, resource_id: id, status: 'changes_requested', per_page: 10 } })
+    openRevisions.value = page.revisions.filter(revision => !revision.items?.some(item => item.resource_type === props.type && item.resource_id === id && item.applied_at))
   } catch { /* the banner is optional */ }
 }
 

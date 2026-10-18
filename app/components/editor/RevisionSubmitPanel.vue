@@ -29,11 +29,11 @@
     <p v-if="message" class="text-sm text-error">{{ message }}</p>
 
     <EditorConflictResolver
-      v-if="conflicts.length && draft.revisionId.value"
-      :revision-id="draft.revisionId.value"
+      v-if="conflicts.length"
+      :rebase="draft.rebase"
       :conflicts="conflicts"
       :type="mainType"
-      @resolved="afterRebase"
+      @resolved="conflicts = []"
     />
 
     <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
@@ -42,7 +42,7 @@
         {{ $t(canAutoApprove ? 'editor.submit_publish' : 'editor.submit_review') }}
       </button>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</button>
-      <button v-if="draft.revisionId.value && draft.status.value === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" @click="discard">{{ $t('editor.discard') }}</button>
+      <button v-if="draft.persisted.value" type="button" class="btn btn-ghost btn-sm text-error" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</button>
       <span class="text-xs text-gray-400">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
   </div>
@@ -63,7 +63,7 @@ const props = defineProps<{
   /** Names of items for the preview, by ref. */
   labels?: Record<string, string>
 }>()
-const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]] }>()
+const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [] }>()
 
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
@@ -110,12 +110,7 @@ const submit = async () => {
   conflicts.value = []
   message.value = ''
   try {
-    const revision = await props.draft.submit()
-    if (!revision) {
-      message.value = t('editor.nothing_to_submit')
-      return
-    }
-    emit('submitted', revision)
+    emit('submitted', await props.draft.submit())
   } catch (error) {
     const name = errorName(error)
     if (name === 'REVISION_CONFLICT') conflicts.value = revisionConflicts(error)
@@ -130,15 +125,9 @@ const submit = async () => {
   }
 }
 
-/** After a rebase the server holds the merged documents; continue from them. */
-const afterRebase = async () => {
-  conflicts.value = []
-  if (props.draft.revisionId.value) await props.draft.loadRevision(props.draft.revisionId.value)
-}
-
 const discard = async () => {
-  if (!confirm(t('editor.discard_confirm'))) return
+  if (!confirm(t(props.draft.revisionId.value ? 'editor.restored_discard_confirm' : 'editor.discard_confirm'))) return
   await props.draft.discard()
-  navigateTo('/revisions')
+  emit('discarded')
 }
 </script>

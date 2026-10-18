@@ -22,7 +22,8 @@
     "register": "注册",
     "logout": "退出登录",
     "articles": "我的文章",
-    "notifications": "通知"
+    "notifications": "通知",
+    "logout_drafts_confirm": "这个浏览器里有 {count} 份未提交的草稿，退出登录后会被删除。确定退出吗？"
   },
   "admin": {
     "console": "管理后台"
@@ -538,7 +539,6 @@
       "rollback_confirm": "确认回滚",
       "rollback_dialog": "回滚会生成一条新修订并立即生效，请填写原因。",
       "rollback_missing": "目标版本引用的内容已被删除：{refs}",
-      "status_draft": "草稿",
       "status_changes_requested": "退回修改",
       "status_withdrawn": "已撤回",
       "kind": "类别",
@@ -3338,17 +3338,11 @@
     "names_hint": "译名、罗马字、别名和简称。搜索会匹配所有名称。",
     "add_link": "添加链接",
     "add_attribute": "添加信息",
-    "backup_found": "这个浏览器里有 {at} 未保存的修改。",
-    "restore_backup": "恢复",
-    "dismiss_backup": "丢弃",
-    "draft_conflict": "这份草稿在其他标签页或设备上被修改过。",
-    "keep_mine": "保留本页的版本",
-    "use_server": "载入另一个版本",
     "state_idle": "还没有修改",
     "state_dirty": "有未保存的修改",
-    "state_saving": "正在保存草稿…",
-    "state_saved": "草稿已保存（{at}）",
-    "state_error": "草稿保存失败",
+    "state_saving": "正在保存到本机…",
+    "state_saved": "已保存到本机（{at}）",
+    "state_error": "无法保存到本机",
     "conflicts_title": "有人改了同样的内容",
     "conflicts_hint": "你开始编辑后，另一条修订已经通过。请为每一项选择要保留的值。",
     "conflict_kind": {
@@ -3375,7 +3369,6 @@
     "discard": "删除草稿",
     "publish_notice": "改动会立即生效，并保留在历史里。",
     "review_notice": "改动经管理员审核后才会显示。",
-    "nothing_to_submit": "还没有任何改动。",
     "discard_confirm": "删除这份草稿？删除后无法恢复。",
     "advanced": "更多选项",
     "recommended": "建议补充",
@@ -3402,7 +3395,6 @@
     "mode_edit": "编辑",
     "mode_translate": "翻译曲目表",
     "my_revisions": "我的修订",
-    "open_draft": "你有一条这张专辑的未完成修订（#{id}，{at}保存）。",
     "continue_draft": "继续编辑",
     "ignore": "忽略",
     "changes_requested": "管理员要求修改",
@@ -3618,7 +3610,6 @@
       "edit_title": "编辑{type}",
       "untitled": "未命名",
       "view": "查看页面",
-      "open_draft": "你有一条它的未完成修订（#{id}，{at}保存）。",
       "revision_mismatch": "这条修订不是编辑它的。",
       "section": {
         "basic": "基本信息"
@@ -3641,9 +3632,16 @@
       "work_relations": "相关乐曲",
       "work_relations_hint": "从这首乐曲的角度填写原曲、改编、翻唱、混音和组曲。",
       "work_entries": "出处",
-      "work_entries_hint": "这首歌出自的游戏、动画等作品，比如某个游戏的 BGM。"
+      "work_entries_hint": "这首歌出自的游戏、动画等作品，比如某个游戏的 BGM。",
+      "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。"
     },
-    "pending_notice": "新建的内容提交后立即上线，标记为「审核中」；对已有内容的修改要等审核通过。"
+    "pending_notice": "新建的内容提交后立即上线，标记为「审核中」；对已有内容的修改要等审核通过。",
+    "local_hint": "草稿只保存在这个浏览器，提交后才会发送；退出登录会删除",
+    "restored": "已恢复这个浏览器 {at} 保存的修改。",
+    "restored_discard": "放弃这些修改",
+    "restored_discard_confirm": "放弃这个浏览器里保存的修改？放弃后无法恢复。",
+    "draft_missing": "这个浏览器里没有这份草稿，可能已经提交或删除了。",
+    "open_revision": "这张专辑有一条你的修订被退回修改（#{id}，{at}）。"
   },
   "revision_page": {
     "action": {
@@ -3669,7 +3667,6 @@
     "withdraw_confirm": "撤回这条修订？撤回后仍保留在列表里。",
     "delete_draft": "删除草稿",
     "delete_confirm": "删除这份草稿？删除后无法恢复。",
-    "submit": "提交",
     "back": "我的修订",
     "review_comment": "管理员意见",
     "errors": "通过前需要修正的问题",
@@ -3685,7 +3682,6 @@
     "restores": "恢复到第 {version} 版",
     "requires_manage": "需要内容管理员批准",
     "status": {
-      "draft": "草稿",
       "pending": "待审核",
       "changes_requested": "需要修改",
       "approved": "已通过",
@@ -3719,7 +3715,14 @@
       "release": "保留并视为已通过",
       "move": "保留，改挂到提交 #{id}",
       "because": "原因：{names} 还在使用它"
-    }
+    },
+    "local_title": "本机草稿",
+    "local_hint": "只保存在这个浏览器里，提交后才会出现在下面的修订列表；退出登录会删除。",
+    "local_untitled": "未命名",
+    "local_items": "共 {count} 项",
+    "local_revision": "修订 #{id} 的修改",
+    "local_saved": "{at}保存",
+    "local_edits": "这条修订有保存在本机的修改（{at}）还没有提交，请继续编辑，在编辑器里重新提交。"
   },
   "pending": {
     "badge": "审核中",

@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-// Edits an entry; ?revision=<id> continues a draft.
+// Edits an entry; ?revision=<id> continues a revision sent back for changes.
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()

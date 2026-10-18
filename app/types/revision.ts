@@ -1,8 +1,8 @@
-// Catalog revisions: drafts, review, conflicts. Backend: docs/api/revisions.md, docs/catalog/editing.md.
+// Catalog revisions: review and conflicts; drafts are kept in the browser (utils/localDrafts). Backend: docs/api/revisions.md, docs/catalog/editing.md.
 
 import type { CatalogReferences, CatalogType, ChangeOp, UserSummary } from './catalog'
 
-export const REVISION_STATUSES = ['draft', 'pending', 'changes_requested', 'approved', 'rejected', 'withdrawn'] as const
+export const REVISION_STATUSES = ['pending', 'changes_requested', 'approved', 'rejected', 'withdrawn'] as const
 export type RevisionStatus = typeof REVISION_STATUSES[number]
 export type RevisionKind = 'catalog' | 'lyric'
 export type RevisionOrigin = 'manual' | 'import' | 'client' | 'system'

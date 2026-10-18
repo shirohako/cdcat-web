@@ -10,7 +10,6 @@ import type { RevisionStatus } from '~/types/revision'
 defineProps<{ status: RevisionStatus }>()
 
 const TONES: Record<RevisionStatus, { badge: string, dot: string }> = {
-  draft: { badge: 'border-gray-200 bg-gray-50 text-gray-600', dot: 'bg-gray-400' },
   pending: { badge: 'border-amber-200 bg-amber-50 text-amber-700', dot: 'bg-amber-500' },
   changes_requested: { badge: 'border-orange-200 bg-orange-50 text-orange-700', dot: 'bg-orange-500' },
   approved: { badge: 'border-emerald-200 bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' },

@@ -25,12 +25,13 @@
 
         <div v-if="mine" class="mb-5 flex flex-wrap gap-2">
           <NuxtLink v-if="isOpenRevision(revision.status) && editor" :to="editor" class="btn btn-primary btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
-          <button v-if="revision.status === 'draft' || revision.status === 'changes_requested'" type="button" class="btn btn-sm" :disabled="busy" @click="submit">
-            {{ $t(revision.status === 'draft' ? 'revision_page.submit' : 'revision_page.resubmit') }}
-          </button>
+          <!-- With edits kept in this browser, resubmitting here would send the revision without them. -->
+          <button v-if="revision.status === 'changes_requested' && !localEditsAt" type="button" class="btn btn-sm" :disabled="busy" @click="submit">{{ $t('revision_page.resubmit') }}</button>
           <button v-if="revision.status === 'pending' || revision.status === 'changes_requested'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
-          <button v-if="revision.status === 'draft'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="remove">{{ $t('revision_page.delete_draft') }}</button>
         </div>
+        <p v-if="mine && localEditsAt && isOpenRevision(revision.status)" class="mb-5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+          {{ $t('revision_page.local_edits', { at: ago(localEditsAt) }) }}
+        </p>
         <p v-if="message" class="mb-4 text-sm text-error">{{ message }}</p>
 
         <!-- New content this revision put live; it waits for this review (docs/catalog/editing.md#待审内容). -->
@@ -50,11 +51,11 @@
           <p class="mt-1 whitespace-pre-line">{{ revision.review_comment }}</p>
         </div>
 
-        <div v-if="mine && conflictsByItem.length" class="mb-5 space-y-3">
+        <div v-if="mine && conflictsByItem.length && !localEditsAt" class="mb-5 space-y-3">
           <EditorConflictResolver
             v-for="group in conflictsByItem"
             :key="group.ref"
-            :revision-id="revision.id"
+            :rebase="rebaseItem"
             :conflicts="group.conflicts"
             :type="group.type"
             @resolved="refresh()"
@@ -110,10 +111,10 @@ import type { CatalogType } from '~/types/catalog'
 import type { RemovalPlan, Revision } from '~/types/revision'
 import { ArrowLeft } from '@lucide/vue'
 import { errorName, revisionFieldErrors } from '~/utils/revisionErrors'
+import { localDrafts } from '~/utils/localDrafts'
 import { editorPath, entityPath, isOpenRevision } from '~/utils/revisionLinks'
 
 const route = useRoute()
-const router = useRouter()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { user } = useAuth()
@@ -143,13 +144,13 @@ const problems = computed(() => [
 
 const busy = ref(false)
 const message = ref('')
-const run = async (request: () => Promise<unknown>, after?: () => unknown) => {
+const run = async (request: () => Promise<unknown>) => {
   busy.value = true
   message.value = ''
   submitErrors.value = []
   try {
     await request()
-    await (after ? after() : refresh())
+    await refresh()
   } catch (failure) {
     if (errorName(failure) === 'VALIDATION_FAILED') submitErrors.value = revisionFieldErrors(failure)
     else message.value = localizeError(failure)
@@ -163,6 +164,15 @@ const liveContent = computed(() => Object.entries(revision.value?.pending_conten
   .flatMap(([type, rows]) => (rows ?? []).map(row => ({ type: type as CatalogType, ...row }))))
 
 const submit = () => run(() => $api(`/v1/revisions/${route.params.id}/submit`, { method: 'POST' }))
+const rebaseItem = (ref: string, resolutions: Record<string, 'mine' | 'current'>) =>
+  $api(`/v1/revisions/${route.params.id}/items/${ref}/rebase`, { method: 'POST', body: { resolutions } })
+
+/** When the submitter's edits of this revision are kept in this browser, they are resubmitted from the editor. */
+const localEditsAt = ref<string | null>(null)
+onMounted(async () => {
+  if (!user.value) return
+  localEditsAt.value = (await localDrafts.get(user.value.id, `revision:${route.params.id}`).catch(() => undefined))?.updatedAt ?? null
+})
 
 // Withdrawing a revision whose content is live removes that content: confirm its plan first.
 const withdrawOpen = ref(false)
@@ -181,7 +191,6 @@ const withdraw = async () => {
   }
 }
 const confirmWithdraw = () => run(() => $api(`/v1/revisions/${route.params.id}/withdraw`, { method: 'POST', body: { impact_checksum: removal.value?.checksum } }))
-const remove = () => confirm(t('revision_page.delete_confirm')) && run(() => $api(`/v1/revisions/${route.params.id}`, { method: 'DELETE' }), () => router.push('/revisions'))
 
 useSeoMeta({ title: () => heading.value, robots: 'noindex' })
 </script>

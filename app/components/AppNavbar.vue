@@ -188,6 +188,7 @@
 
 <script setup lang="ts">
 import { userMenuItems } from '~/config/menu'
+import { localDrafts } from '~/utils/localDrafts'
 
 defineProps<{
   isCollapsed: boolean
@@ -199,7 +200,7 @@ const emit = defineEmits<{
   toggleMobileMenu: []
 }>()
 
-const { locale, locales, setLocale } = useI18n()
+const { t, locale, locales, setLocale } = useI18n()
 const { user, isAuthenticated, logout, hasPermission } = useAuth()
 
 const showUserMenu = ref(false)
@@ -243,6 +244,9 @@ const closeAllDropdowns = () => {
 }
 
 const handleLogout = async () => {
+  // Logging out deletes the revision drafts kept in this browser.
+  const drafts = user.value ? (await localDrafts.list(user.value.id).catch(() => [])).length : 0
+  if (drafts && !confirm(t('user.logout_drafts_confirm', { count: drafts }))) return
   await logout()
   showUserMenu.value = false
 }

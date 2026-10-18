@@ -1,4 +1,5 @@
 import type { LoginRequest, RegisterRequest, AuthResponse, User } from '~/types/auth'
+import { localDrafts } from '~/utils/localDrafts'
 
 /**
  * 认证状态管理 composable
@@ -90,6 +91,8 @@ export const useAuth = () => {
 
   // 登出
   const logout = async () => {
+    // Revision drafts are kept in this browser until submitted; logging out deletes them all.
+    if (import.meta.client) await localDrafts.clear().catch(() => undefined)
     try {
       await $api('/v1/auth/logout', { method: 'POST', retry: 0 })
 

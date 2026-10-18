@@ -1,8 +1,10 @@
 import type { SchemaCollection, SchemaField } from '~/composables/useDocumentSchema'
 import type { CatalogReferences } from '~/types/catalog'
 import type { Revision, RevisionItemInput, RevisionStatus } from '~/types/revision'
-import { errorName } from '~/utils/revisionErrors'
+import type { LocalDraft } from '~/utils/localDrafts'
+import { draftKey, dropLegacyBackups, localDrafts } from '~/utils/localDrafts'
 import { fillRequiredText } from '~/utils/requiredText'
+import { mainItem } from '~/utils/revisionLinks'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
 
@@ -17,20 +19,32 @@ interface Snapshot {
   sources: string[]
 }
 
-const SAVE_DELAY = 3000
-const SAVE_MAX_WAIT = 20000
-const BACKUP_PREFIX = 'cdcat:revision-draft:'
+/**
+ * Saved this long after editing pauses. A save copies the whole draft once (about 1 ms for a
+ * 100-track album, under 10 ms at the 999-track limit); leaving or hiding the page saves at once.
+ */
+const SAVE_DELAY = 1000
 
 /**
- * A catalog revision being edited (docs/catalog/editing.md#修订): the items and their documents,
- * the edit summary and sources. After the first change it is saved as a server draft three seconds
- * after editing stops (POST /revisions with submit=false, then PUT with lock_version), with a
- * local backup until the server has it. A lock_version mismatch stops autosave and exposes the
- * server's copy in `conflict` until the editor keeps theirs or takes the server's.
+ * A catalog revision being edited (docs/catalog/editing.md#草稿): the items and their documents,
+ * the edit summary and sources. The draft is kept in this browser (utils/localDrafts), saved there
+ * shortly after each change; the server first sees it when it is submitted. A revision sent back for
+ * changes is loaded from the server, and its edits are kept here too until it is resubmitted.
+ *
+ * `prepare` drops what the editor keeps only while editing, such as blank rows; `afterRebase` lets
+ * the editor reload what it shows for an item whose base version moved.
  */
-export function useRevisionDraft(backupId: string, options: { prepare?: (item: DraftItem) => DraftItem } = {}) {
+export function useRevisionDraft(options: {
+  prepare?: (item: DraftItem) => DraftItem
+  afterRebase?: (item: DraftItem) => Promise<void> | void
+} = {}) {
   const { $api } = useNuxtApp()
+  const { user } = useAuth()
   const { schema, pending: schemaPending } = useCatalogSchema()
+
+  /** Which draft this is, see utils/localDrafts. */
+  const scope = ref<string | null>(null)
+  /** Set when continuing a revision sent back for changes. */
   const revisionId = ref<number | null>(null)
   const lockVersion = ref(0)
   const status = ref<RevisionStatus | null>(null)
@@ -40,72 +54,30 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
   const references = reactive<CatalogReferences>({})
   const saveState = ref<SaveState>('idle')
   const savedAt = ref<string | null>(null)
+  /** Whether this browser holds the draft (it is written on the first change). */
+  const persisted = ref(false)
+  /** Set when the editor opened with edits this browser had kept: when they were last saved. */
+  const restoredAt = ref<string | null>(null)
   const lastError = ref<unknown>(null)
-  const conflict = shallowRef<Revision | null>(null)
-  const backup = shallowRef<(Snapshot & { at: string }) | null>(null)
   const busy = ref(false)
-  const autosave = ref(true)
 
-  let saved = ''
-  /** Refs of the items the server has, so removed items can be dropped from the draft. */
+  let createdAt: string | null = null
+  /** Refs of the items the server has, so items removed here are dropped on resubmission. */
   let serverRefs = new Set<string>()
   let timer: ReturnType<typeof setTimeout> | undefined
-  let firstChangeAt = 0
-  let inflight: Promise<void> | null = null
   let applying = false
+  /** The draft as opened: a draft not stored yet is only written once it differs from this. */
+  let baseline = ''
 
-  const snapshot = (): Snapshot => ({ items: toRaw(items.value).map(item => ({ ...item })), summary: summary.value, sources: [...sources.value] })
-  const serialized = () => JSON.stringify(snapshot())
-  const backupKey = () => `${BACKUP_PREFIX}${backupId}`
-
-  const writeBackup = () => {
-    try { localStorage.setItem(backupKey(), JSON.stringify({ ...snapshot(), at: new Date().toISOString() })) }
-    catch { /* private mode or storage full: the server copy still saves */ }
-  }
-  const clearBackup = () => {
-    try { localStorage.removeItem(backupKey()) }
-    catch { /* nothing to clear */ }
-  }
+  // The raw objects behind the reactive ones: copying them skips the proxies, which is several times faster.
+  const serialized = () => JSON.stringify({ items: toRaw(items.value), summary: summary.value, sources: toRaw(sources.value) })
 
   const apply = (next: Snapshot) => {
     applying = true
     items.value = next.items
     summary.value = next.summary
     sources.value = next.sources
-    saved = serialized()
     nextTick(() => { applying = false })
-  }
-
-  /** Starts editing these items; an unsaved local copy from an earlier visit is offered back. */
-  function start(initial: DraftItem[], meta: { summary?: string, sources?: string[] } = {}) {
-    apply({ items: initial, summary: meta.summary ?? '', sources: meta.sources ?? [] })
-    saveState.value = 'idle'
-    try {
-      const stored = JSON.parse(localStorage.getItem(backupKey()) ?? 'null') as (Snapshot & { at: string }) | null
-      if (stored && JSON.stringify({ items: stored.items, summary: stored.summary, sources: stored.sources }) !== saved) backup.value = stored
-      else clearBackup()
-    }
-    catch { backup.value = null }
-  }
-
-  /**
-   * Continues a saved draft, or a revision sent back for changes. Items that went live at
-   * submission (applied_at) are not part of the draft any more: that content is edited directly.
-   */
-  async function loadRevision(id: number) {
-    const [revision] = await Promise.all([$api<Revision>(`/v1/revisions/${id}`), schemaLoaded()])
-    adopt(revision)
-    start((revision.items ?? []).filter(item => !item.applied_at).map(item => ({
-      ref: item.ref,
-      resource_type: item.resource_type,
-      action: item.action,
-      ...(item.resource_id ? { resource_id: item.resource_id } : {}),
-      ...(item.base_version !== null ? { base_version: item.base_version } : {}),
-      ...(item.document ? { document: editable(item.resource_type, item.document) } : {}),
-      ...(item.impact_checksum ? { impact_checksum: item.impact_checksum } : {}),
-      ...(item.acknowledged_duplicate_ids?.length ? { acknowledged_duplicate_ids: item.acknowledged_duplicate_ids } : {}),
-    })), { summary: revision.summary ?? '', sources: revision.sources })
-    return revision
   }
 
   /** Resolves once GET /catalog/schema has answered, whether or not it succeeded. */
@@ -118,23 +90,84 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
     })
   })
 
-  /** A saved document as the editors bind it: required text fields the draft left empty come back as ''. */
+  /** A saved document as the editors bind it: required text fields the server stored empty come back as ''. */
   const editable = (type: string, document: Record<string, unknown>) => {
     const aggregate = schema.value?.aggregates?.[type] as { fields: SchemaField[], collections: SchemaCollection[] } | undefined
     return aggregate ? fillRequiredText(document, aggregate) : document
   }
 
-  const adopt = (revision: Revision) => {
-    revisionId.value = revision.id
-    // Applied items are never sent back, so they are not "removed" by leaving the draft either.
-    serverRefs = new Set((revision.items ?? []).filter(item => !item.applied_at).map(item => item.ref))
-    lockVersion.value = revision.lock_version
-    status.value = revision.status
-    savedAt.value = revision.updated_at
-    Object.assign(references, revision.references ?? {})
+  const read = async () => {
+    const id = user.value?.id
+    if (!id || !scope.value) return undefined
+    try { return await localDrafts.get(id, scope.value) }
+    catch { return undefined }
   }
 
-  /** The items as they are sent: `prepare` drops what the editor keeps only while editing, such as blank rows. */
+  const adopt = (record: LocalDraft) => {
+    Object.assign(references, record.references)
+    apply({ items: record.items, summary: record.summary, sources: record.sources })
+    createdAt = record.createdAt
+    persisted.value = true
+    savedAt.value = record.updatedAt
+    restoredAt.value = record.updatedAt
+    saveState.value = 'saved'
+  }
+
+  /**
+   * Starts editing these items as draft `draftScope`. When this browser kept edits for that scope
+   * (an entity edited before, a revision sent back), they replace `initial`; returns whether they did.
+   */
+  async function start(initial: DraftItem[], draftScope: string, meta: { summary?: string, sources?: string[] } = {}) {
+    dropLegacyBackups()
+    clearTimeout(timer)
+    scope.value = draftScope
+    createdAt = null
+    persisted.value = false
+    restoredAt.value = null
+    savedAt.value = null
+    apply({ items: initial, summary: meta.summary ?? '', sources: meta.sources ?? [] })
+    baseline = serialized()
+    saveState.value = 'idle'
+    const record = await read()
+    if (record) adopt(record)
+    return !!record
+  }
+
+  /** Continues a draft kept in this browser, e.g. of a new album; null when there is none. */
+  async function resume(draftScope: string) {
+    dropLegacyBackups()
+    scope.value = draftScope
+    const record = await read()
+    if (record) adopt(record)
+    return record ?? null
+  }
+
+  /**
+   * Continues a revision sent back for changes. Items that went live at submission (applied_at) are
+   * not part of it any more: that content is edited directly. Edits kept in this browser win.
+   */
+  async function loadRevision(id: number) {
+    const [revision] = await Promise.all([$api<Revision>(`/v1/revisions/${id}`), schemaLoaded()])
+    revisionId.value = revision.id
+    lockVersion.value = revision.lock_version
+    status.value = revision.status
+    const open = (revision.items ?? []).filter(item => !item.applied_at)
+    serverRefs = new Set(open.map(item => item.ref))
+    Object.assign(references, revision.references ?? {})
+    await start(open.map(item => ({
+      ref: item.ref,
+      resource_type: item.resource_type,
+      action: item.action,
+      ...(item.resource_id ? { resource_id: item.resource_id } : {}),
+      ...(item.base_version !== null ? { base_version: item.base_version } : {}),
+      ...(item.document ? { document: editable(item.resource_type, item.document) } : {}),
+      ...(item.impact_checksum ? { impact_checksum: item.impact_checksum } : {}),
+      ...(item.acknowledged_duplicate_ids?.length ? { acknowledged_duplicate_ids: item.acknowledged_duplicate_ids } : {}),
+    })), `revision:${id}`, { summary: revision.summary ?? '', sources: revision.sources })
+    return revision
+  }
+
+  /** The items as they are sent. */
   const prepared = computed(() => items.value.map(item => options.prepare ? options.prepare(item) : item))
 
   const payload = () => ({
@@ -143,111 +176,96 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
     items: prepared.value,
   })
 
+  /** Writes the draft to this browser. Nothing is written before the first change. */
   async function save(): Promise<void> {
     clearTimeout(timer)
-    if (inflight) {
-      await inflight
-      return serialized() !== saved ? save() : undefined
+    const id = user.value?.id
+    if (!id || !scope.value || (!persisted.value && saveState.value !== 'dirty' && saveState.value !== 'error')) return
+    if (!persisted.value && serialized() === baseline) {
+      saveState.value = 'idle'
+      return
     }
-    if (serialized() === saved || conflict.value) return
-    // A submitted revision is no longer a draft; changes wait for the next submit.
-    if (status.value && !['draft', 'changes_requested'].includes(status.value)) return
+    const main = mainItem(items.value)
+    const now = new Date().toISOString()
+    createdAt ??= now
     saveState.value = 'saving'
-    const sent = serialized()
-    inflight = (async () => {
-      try {
-        const current = new Set(items.value.map(item => item.ref))
-        const removedRefs = [...serverRefs].filter(ref => !current.has(ref))
-        const revision = revisionId.value
-          ? await $api<Revision>(`/v1/revisions/${revisionId.value}`, { method: 'PUT', body: { ...payload(), removed_refs: removedRefs, lock_version: lockVersion.value }, progress: false })
-          : await $api<Revision>('/v1/revisions', { method: 'POST', body: { ...payload(), submit: false }, progress: false })
-        adopt(revision)
-        saved = sent
-        firstChangeAt = 0
-        lastError.value = null
-        const pendingAfter = serialized() !== saved
-        saveState.value = pendingAfter ? 'dirty' : 'saved'
-        if (pendingAfter) schedule()
-        else clearBackup()
-      }
-      catch (error) {
-        lastError.value = error
-        if (errorName(error) === 'REVISION_DRAFT_CONFLICT' && revisionId.value) {
-          conflict.value = await $api<Revision>(`/v1/revisions/${revisionId.value}`)
-        }
-        saveState.value = 'error'
-      }
-      finally {
-        inflight = null
-      }
-    })()
-    await inflight
+    try {
+      await localDrafts.put({
+        key: draftKey(id, scope.value),
+        userId: id,
+        scope: scope.value,
+        mainRef: main?.ref ?? 'main',
+        type: main?.resource_type ?? 'album',
+        action: main?.action ?? 'create',
+        entityId: main?.resource_id ?? null,
+        revisionId: revisionId.value,
+        label: String(main?.document?.title ?? main?.document?.name ?? ''),
+        items: toRaw(items.value),
+        summary: summary.value,
+        sources: toRaw(sources.value),
+        references: toRaw(references),
+        createdAt,
+        updatedAt: now,
+      })
+      persisted.value = true
+      savedAt.value = now
+      lastError.value = null
+      // Edits made while writing leave it dirty, with another save scheduled.
+      if (saveState.value === 'saving') saveState.value = 'saved'
+    }
+    catch (error) {
+      lastError.value = error
+      saveState.value = 'error'
+    }
   }
 
-  function schedule() {
+  const schedule = () => {
     clearTimeout(timer)
-    if (!autosave.value) return
-    if (!firstChangeAt) firstChangeAt = Date.now()
-    const wait = Math.max(0, Math.min(SAVE_DELAY, firstChangeAt + SAVE_MAX_WAIT - Date.now()))
-    timer = setTimeout(() => { void save() }, wait)
+    timer = setTimeout(() => { void save() }, SAVE_DELAY)
   }
 
   watch([items, summary, sources], () => {
     if (applying) return
     saveState.value = 'dirty'
-    writeBackup()
     schedule()
   }, { deep: true })
 
-  /** Saves this page's copy over the newer server copy. */
-  async function keepMine() {
-    if (!conflict.value) return
-    lockVersion.value = conflict.value.lock_version
-    conflict.value = null
-    saved = ''
-    await save()
-  }
-
-  /** Drops local edits in favour of the server's copy. */
-  async function useServer() {
-    if (!conflict.value) return
-    const id = conflict.value.id
-    conflict.value = null
-    await loadRevision(id)
-    clearBackup()
-    saveState.value = 'saved'
-  }
-
-  function restoreBackup() {
-    if (!backup.value) return
-    const { items: storedItems, summary: storedSummary, sources: storedSources } = backup.value
-    items.value = storedItems
-    summary.value = storedSummary
-    sources.value = storedSources
-    backup.value = null
-  }
-
-  function dismissBackup() {
-    backup.value = null
-    clearBackup()
+  /** Deletes this browser's copy. */
+  async function forget() {
+    clearTimeout(timer)
+    const id = user.value?.id
+    if (id && scope.value) await localDrafts.remove(id, scope.value).catch(() => undefined)
+    persisted.value = false
+    restoredAt.value = null
+    savedAt.value = null
+    saveState.value = 'idle'
   }
 
   /**
-   * Saves the latest edits as a draft, then submits it; returns the revision (approved at once for
-   * trusted editors). Going through a draft means a conflict always leaves a revision to rebase.
-   * Returns null when nothing was changed.
+   * Submits the draft and forgets it here; returns the revision (approved at once for trusted
+   * editors). A revision sent back gets the edits first (PUT), then is submitted again. On failure
+   * the draft stays in this browser.
    */
-  async function submit(): Promise<Revision | null> {
+  async function submit(): Promise<Revision> {
     busy.value = true
     try {
       clearTimeout(timer)
-      await save()
-      if (saveState.value === 'error') throw lastError.value
-      if (!revisionId.value) return null
-      const revision = await $api<Revision>(`/v1/revisions/${revisionId.value}/submit`, { method: 'POST' })
-      adopt(revision)
-      clearBackup()
-      saveState.value = 'saved'
+      let revision: Revision
+      if (revisionId.value) {
+        const current = new Set(items.value.map(item => item.ref))
+        const saved = await $api<Revision>(`/v1/revisions/${revisionId.value}`, {
+          method: 'PUT',
+          body: { ...payload(), removed_refs: [...serverRefs].filter(ref => !current.has(ref)), lock_version: lockVersion.value },
+        })
+        lockVersion.value = saved.lock_version
+        serverRefs = new Set((saved.items ?? []).filter(item => !item.applied_at).map(item => item.ref))
+        revision = await $api<Revision>(`/v1/revisions/${revisionId.value}/submit`, { method: 'POST' })
+      }
+      else {
+        revision = await $api<Revision>('/v1/revisions', { method: 'POST', body: payload() })
+      }
+      status.value = revision.status
+      await forget()
       return revision
     }
     finally {
@@ -255,33 +273,50 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
     }
   }
 
-  /** Deletes the server draft (never submitted) and the local copy. */
-  async function discard() {
-    clearTimeout(timer)
-    if (revisionId.value && status.value === 'draft') await $api(`/v1/revisions/${revisionId.value}`, { method: 'DELETE' })
-    clearBackup()
-    revisionId.value = null
-    status.value = null
-    saveState.value = 'idle'
+  /** Throws the draft away: this browser's copy only; a revision sent back stays as it is on the server. */
+  const discard = () => forget()
+
+  /**
+   * Merges update item `ref` onto the current version of its entity (POST /revisions/rebase), keeping
+   * the given side of each conflict; the item is then based on that version.
+   */
+  async function rebase(ref: string, resolutions: Record<string, 'mine' | 'current'>) {
+    const result = await $api<{ document: Record<string, unknown>, base_version: number }>('/v1/revisions/rebase', {
+      method: 'POST', body: { ...payload(), ref, resolutions },
+    })
+    const item = items.value.find(entry => entry.ref === ref)
+    if (!item) return
+    item.document = editable(item.resource_type, result.document)
+    item.base_version = result.base_version
+    await options.afterRebase?.(item)
   }
 
-  const hasUnsaved = () => saveState.value === 'dirty' || saveState.value === 'saving' || (saveState.value === 'error' && serialized() !== saved)
+  const hasUnsaved = () => saveState.value === 'dirty' || saveState.value === 'saving' || saveState.value === 'error'
 
   if (import.meta.client) {
+    // Leaving or hiding the page writes pending edits at once.
+    const flush = () => { if (hasUnsaved()) void save() }
     const beforeUnload = (event: BeforeUnloadEvent) => {
       if (!hasUnsaved()) return
-      writeBackup()
+      void save()
       event.preventDefault()
     }
-    onMounted(() => window.addEventListener('beforeunload', beforeUnload))
+    const onVisibility = () => { if (document.visibilityState === 'hidden') flush() }
+    onMounted(() => {
+      window.addEventListener('beforeunload', beforeUnload)
+      window.addEventListener('pagehide', flush)
+      document.addEventListener('visibilitychange', onVisibility)
+    })
     onBeforeUnmount(() => {
       clearTimeout(timer)
       window.removeEventListener('beforeunload', beforeUnload)
+      window.removeEventListener('pagehide', flush)
+      document.removeEventListener('visibilitychange', onVisibility)
     })
   }
 
   return {
-    revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, lastError, conflict, backup, busy, autosave,
-    start, loadRevision, save, submit, discard, keepMine, useServer, restoreBackup, dismissBackup, hasUnsaved,
+    scope, revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, persisted, restoredAt, lastError, busy,
+    start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved,
   }
 }

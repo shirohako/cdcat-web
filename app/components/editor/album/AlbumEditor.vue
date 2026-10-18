@@ -29,17 +29,17 @@
           </div>
         </header>
 
-        <div v-if="openDrafts.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
           <History :size="16" class="shrink-0" />
-          <span class="min-w-0 flex-1">{{ $t('editor.open_draft', { id: openDrafts[0]!.id, at: ago(openDrafts[0]!.updated_at) }) }}</span>
-          <NuxtLink :to="{ query: { ...$route.query, revision: openDrafts[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm" @click="openDrafts = []">{{ $t('editor.ignore') }}</button>
+          <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
+          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
+          <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p class="font-semibold">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
-        <div class="mb-4"><EditorDraftStatus :draft="draft" /></div>
+        <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
 
         <div class="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
           <aside class="space-y-4 lg:sticky lg:top-20 lg:self-start">
@@ -98,7 +98,7 @@
                     </li>
                   </ul>
                 </div>
-                <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="itemLabels" @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" />
+                <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="itemLabels" @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" />
               </div>
             </CatalogSection>
 
@@ -129,17 +129,20 @@ import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
 import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument } from '~/utils/albumDocument'
 import { newRef } from '~/utils/documentKeys'
+import { newDraftScope } from '~/utils/localDrafts'
 
 /**
  * The album editor (docs/catalog/editing.md): the album document and any artists, labels and works
- * created on the way are items of one revision, saved as a server draft while editing and
+ * created on the way are items of one revision, kept as a draft in this browser while editing and
  * submitted together. Sections mount one at a time; `mode=translate` opens the tracklist translator.
+ * `revisionId` continues a revision sent back for changes, `draftScope` a new album's draft (?draft=).
  */
-const props = defineProps<{ albumId?: number | null, revisionId?: number | null, mode?: 'edit' | 'translate', locale?: string }>()
+const props = defineProps<{ albumId?: number | null, revisionId?: number | null, draftScope?: string | null, mode?: 'edit' | 'translate', locale?: string }>()
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const router = useRouter()
+const route = useRoute()
 const { schema } = useCatalogSchema()
 const { toast, showToast } = useToast()
 const { ago } = useRelativeTime()
@@ -152,7 +155,7 @@ const mainRef = ref(ALBUM_REF)
 const prepare = (item: DraftItem): DraftItem => item.resource_type === 'album' && item.document
   ? { ...item, document: pruneAlbumDocument(item.document as unknown as AlbumDocument) as unknown as Record<string, unknown> }
   : item
-const draft = useRevisionDraft(albumId ? `album:${albumId}` : 'album:new', { prepare })
+const draft = useRevisionDraft({ prepare, afterRebase: item => loadOriginals([item]) })
 const items = draft.items
 const references = draft.references as CatalogReferences
 
@@ -161,7 +164,7 @@ const loadError = ref('')
 const loaded = ref(false)
 const ready = computed(() => loaded.value && !!schema.value)
 const reviewComment = ref<string | null>(null)
-const openDrafts = ref<Revision[]>([])
+const openRevisions = ref<Revision[]>([])
 /** Documents as loaded, by item ref, for the change preview; null for new items. */
 const originals = reactive<Record<string, Record<string, unknown> | null>>({})
 const duplicatePanel = ref<{ show: (candidates: DuplicateCandidate[]) => Promise<void> } | null>(null)
@@ -377,24 +380,37 @@ provide(albumEditorKey, context)
 
 // ---- loading ----
 
-const startNew = () => {
-  mainRef.value = ALBUM_REF
-  originals[ALBUM_REF] = null
-  draft.start([{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: emptyAlbumDocument() as unknown as Record<string, unknown> }])
+/** Documents of the versions update items were edited from, for the change preview; null for new items. */
+const loadOriginals = async (list: DraftItem[]) => {
+  await Promise.all(list.map(async (item) => {
+    originals[item.ref] = null
+    if (item.action !== 'update' || !item.resource_id || item.base_version === undefined) return
+    const version = await $api<{ snapshot: Record<string, unknown> | null, references?: CatalogReferences }>(`/v1/${CATALOG_RESOURCES[item.resource_type]}/${item.resource_id}/versions/${item.base_version}`)
+    originals[item.ref] = version.snapshot
+    mergeReferences(version.references)
+  }))
 }
 
+const startNew = async () => {
+  mainRef.value = ALBUM_REF
+  originals[ALBUM_REF] = null
+  await draft.start([{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: emptyAlbumDocument() as unknown as Record<string, unknown> }], newDraftScope('album'))
+}
+
+/** Edits kept in this browser for this album come back by themselves. */
 const openAlbum = async (id: number) => {
   const data = await $api<{ document: AlbumDocument, version: number, references: CatalogReferences }>(`/v1/albums/${id}/document`)
   mergeReferences(data.references)
   mainRef.value = ALBUM_REF
-  originals[ALBUM_REF] = clone(data.document) as unknown as Record<string, unknown>
-  draft.start([{ ref: ALBUM_REF, resource_type: 'album', action: 'update', resource_id: id, base_version: data.version, document: clone(data.document) as unknown as Record<string, unknown> }])
+  const restored = await draft.start([{ ref: ALBUM_REF, resource_type: 'album', action: 'update', resource_id: id, base_version: data.version, document: clone(data.document) as unknown as Record<string, unknown> }], `album:${id}`)
+  if (restored) await loadOriginals(items.value)
+  else originals[ALBUM_REF] = clone(data.document) as unknown as Record<string, unknown>
 }
 
-/** Continues a draft or a revision sent back; the preview compares against each item's base version. */
+/** Continues a revision sent back; the preview compares against each item's base version. */
 const openRevision = async (id: number) => {
   const revision = await draft.loadRevision(id)
-  if (!['draft', 'changes_requested'].includes(revision.status)) throw new Error(t('editor.not_editable'))
+  if (revision.status !== 'changes_requested') throw new Error(t('editor.not_editable'))
   const main = revision.items?.find(item => item.resource_type === 'album' && (albumId ? item.resource_id === albumId : item.action === 'create'))
   if (!main) throw new Error(t('editor.album.revision_mismatch'))
   // The album went live at submission: it is edited directly now, not through this revision.
@@ -404,36 +420,55 @@ const openRevision = async (id: number) => {
   }
   mainRef.value = main.ref
   reviewComment.value = revision.review_comment
-  await Promise.all((revision.items ?? []).map(async (item) => {
-    originals[item.ref] = null
-    if (item.action !== 'update' || !item.resource_id || item.base_version === null) return
-    const version = await $api<{ snapshot: Record<string, unknown> | null, references?: CatalogReferences }>(`/v1/${CATALOG_RESOURCES[item.resource_type]}/${item.resource_id}/versions/${item.base_version}`)
-    originals[item.ref] = version.snapshot
-    mergeReferences(version.references)
-  }))
+  await loadOriginals(items.value)
 }
 
-/** Unfinished revisions of this album by the same user, offered before starting another. */
-const findOpenDrafts = async (id: number) => {
+/** Continues a new album's draft kept in this browser. */
+const openDraft = async (scope: string) => {
+  const record = await draft.resume(scope)
+  if (!record) throw new Error(t('editor.draft_missing'))
+  mainRef.value = record.mainRef
+  await loadOriginals(items.value)
+}
+
+/** This album's revisions sent back for changes, offered before starting another. */
+const findOpenRevisions = async (id: number) => {
   try {
-    const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: 'album', resource_id: id, per_page: 10 } })
-    openDrafts.value = page.revisions.filter(revision => ['draft', 'changes_requested'].includes(revision.status)
-      && !revision.items?.some(item => item.resource_type === 'album' && item.resource_id === id && item.applied_at))
+    const page = await $api<{ revisions: Revision[] }>('/v1/me/revisions', { query: { resource_type: 'album', resource_id: id, status: 'changes_requested', per_page: 10 } })
+    openRevisions.value = page.revisions.filter(revision => !revision.items?.some(item => item.resource_type === 'album' && item.resource_id === id && item.applied_at))
   } catch { /* the banner is optional */ }
+}
+
+const open = async () => {
+  if (props.revisionId) await openRevision(props.revisionId)
+  else if (props.draftScope) await openDraft(props.draftScope)
+  else if (albumId) await openAlbum(albumId)
+  else await startNew()
 }
 
 onMounted(async () => {
   try {
-    if (props.revisionId) await openRevision(props.revisionId)
-    else if (albumId) await openAlbum(albumId)
-    else startNew()
+    await open()
     loaded.value = true
-    if (albumId && !props.revisionId) void findOpenDrafts(albumId)
+    if (albumId && !props.revisionId) void findOpenRevisions(albumId)
   } catch (error) {
     loadError.value = error instanceof Error && !(error as { details?: unknown }).details ? error.message : localizeError(error)
   } finally {
     loading.value = false
   }
+})
+
+/** Starts over after the draft was thrown away: the album or revision as stored; a new album's list of drafts. */
+const restart = () => {
+  if (!albumId && !props.revisionId) return navigateTo('/revisions')
+  loading.value = true
+  return open().finally(() => { loading.value = false })
+}
+
+// Once a new album's draft is saved, the address names it, so reloading the page continues it.
+watch(draft.persisted, (persisted) => {
+  if (!persisted || albumId || props.revisionId || props.draftScope || !draft.scope.value) return
+  window.history.replaceState(window.history.state, '', router.resolve({ query: { ...route.query, draft: draft.scope.value } }).href)
 })
 
 onBeforeRouteLeave(async () => {

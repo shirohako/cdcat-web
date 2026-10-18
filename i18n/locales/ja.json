@@ -22,7 +22,8 @@
     "register": "新規登録",
     "logout": "ログアウト",
     "articles": "自分の記事",
-    "notifications": "通知"
+    "notifications": "通知",
+    "logout_drafts_confirm": "このブラウザに未送信の下書きが {count} 件あります。ログアウトすると削除されます。ログアウトしますか？"
   },
   "admin": {
     "console": "管理画面"
@@ -2205,17 +2206,11 @@
     "names_hint": "翻訳名、ローマ字、別名、略称。検索はすべての名前に一致します。",
     "add_link": "リンクを追加",
     "add_attribute": "情報を追加",
-    "backup_found": "このブラウザに {at} の未保存の変更があります。",
-    "restore_backup": "復元",
-    "dismiss_backup": "破棄",
-    "draft_conflict": "この下書きは別のタブや端末で変更されています。",
-    "keep_mine": "このページの内容を残す",
-    "use_server": "もう一方を読み込む",
     "state_idle": "変更はまだありません",
     "state_dirty": "未保存の変更があります",
-    "state_saving": "下書きを保存中…",
-    "state_saved": "下書きを保存しました（{at}）",
-    "state_error": "下書きを保存できませんでした",
+    "state_saving": "このブラウザに保存中…",
+    "state_saved": "このブラウザに保存しました（{at}）",
+    "state_error": "このブラウザに保存できませんでした",
     "conflicts_title": "同じ箇所が変更されています",
     "conflicts_hint": "編集を始めてから、別の修正が承認されました。項目ごとに残す値を選んでください。",
     "conflict_kind": {
@@ -2242,7 +2237,6 @@
     "discard": "下書きを削除",
     "publish_notice": "変更はすぐに反映され、履歴に残ります。",
     "review_notice": "変更はモデレーターの審査後に反映されます。",
-    "nothing_to_submit": "まだ何も変更されていません。",
     "discard_confirm": "この下書きを削除しますか？元に戻せません。",
     "advanced": "その他の設定",
     "recommended": "入力推奨",
@@ -2269,7 +2263,6 @@
     "mode_edit": "編集",
     "mode_translate": "トラックリストを翻訳",
     "my_revisions": "自分の修正",
-    "open_draft": "このアルバムの未完了の修正があります（#{id}、{at}に保存）。",
     "continue_draft": "続きを編集",
     "ignore": "無視",
     "changes_requested": "モデレーターから修正の依頼があります",
@@ -2485,7 +2478,6 @@
       "edit_title": "{type}を編集",
       "untitled": "無題",
       "view": "ページを表示",
-      "open_draft": "未完了の修正があります（#{id}、{at}に保存）。",
       "revision_mismatch": "この修正はこの項目のものではありません。",
       "section": {
         "basic": "基本情報"
@@ -2508,9 +2500,16 @@
       "work_relations": "関連楽曲",
       "work_relations_hint": "この楽曲から見た原曲、アレンジ、カバー、リミックス、メドレー。",
       "work_entries": "出典",
-      "work_entries_hint": "この曲が使われたゲームやアニメなどの作品（ゲームの BGM など）。"
+      "work_entries_hint": "この曲が使われたゲームやアニメなどの作品（ゲームの BGM など）。",
+      "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。"
     },
-    "pending_notice": "新しい項目は投稿するとすぐに公開され、「承認待ち」と表示されます。既存の内容への変更は承認後に反映されます。"
+    "pending_notice": "新しい項目は投稿するとすぐに公開され、「承認待ち」と表示されます。既存の内容への変更は承認後に反映されます。",
+    "local_hint": "下書きは送信するまでこのブラウザだけに保存され、ログアウトすると削除されます",
+    "restored": "このブラウザに{at}保存した変更を復元しました。",
+    "restored_discard": "この変更を破棄",
+    "restored_discard_confirm": "このブラウザに保存した変更を破棄しますか？元に戻せません。",
+    "draft_missing": "この下書きはこのブラウザにありません。送信済みか、削除された可能性があります。",
+    "open_revision": "このアルバムのあなたの修正が差し戻されています（#{id}、{at}）。"
   },
   "revision_page": {
     "action": {
@@ -2536,7 +2535,6 @@
     "withdraw_confirm": "この修正を取り下げますか？一覧には残ります。",
     "delete_draft": "下書きを削除",
     "delete_confirm": "この下書きを削除しますか？元に戻せません。",
-    "submit": "提出",
     "back": "自分の修正",
     "review_comment": "モデレーターのコメント",
     "errors": "承認前に直す必要がある問題",
@@ -2552,7 +2550,6 @@
     "restores": "バージョン {version} に戻す",
     "requires_manage": "コンテンツ管理者の承認が必要です",
     "status": {
-      "draft": "下書き",
       "pending": "審査待ち",
       "changes_requested": "修正依頼",
       "approved": "承認済み",
@@ -2586,7 +2583,14 @@
       "release": "残して承認済みにする",
       "move": "残して投稿 #{id} に移す",
       "because": "理由：{names} がまだ使っています"
-    }
+    },
+    "local_title": "このブラウザの下書き",
+    "local_hint": "このブラウザだけに保存されています。送信すると下の修正一覧に表示されます。ログアウトすると削除されます。",
+    "local_untitled": "無題",
+    "local_items": "{count} 項目",
+    "local_revision": "修正 #{id} の変更",
+    "local_saved": "{at}に保存",
+    "local_edits": "この修正には、このブラウザに保存された未送信の変更があります（{at}）。編集を続けて、エディタから再送信してください。"
   },
   "pending": {
     "badge": "承認待ち",

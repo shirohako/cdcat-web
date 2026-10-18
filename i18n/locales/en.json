@@ -22,7 +22,8 @@
     "register": "Sign Up",
     "logout": "Sign Out",
     "articles": "My articles",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "logout_drafts_confirm": "There are {count} unsubmitted drafts in this browser, and logging out deletes them. Log out anyway?"
   },
   "admin": {
     "console": "Admin Console"
@@ -2205,17 +2206,11 @@
     "names_hint": "Translations, romanizations, aliases and abbreviations. Search matches every name.",
     "add_link": "Add link",
     "add_attribute": "Add detail",
-    "backup_found": "Unsaved changes from {at} were found in this browser.",
-    "restore_backup": "Restore",
-    "dismiss_backup": "Discard",
-    "draft_conflict": "This draft was changed in another tab or on another device.",
-    "keep_mine": "Keep this page's version",
-    "use_server": "Load the other version",
     "state_idle": "No changes yet",
     "state_dirty": "Unsaved changes",
-    "state_saving": "Saving draft…",
-    "state_saved": "Draft saved {at}",
-    "state_error": "Could not save the draft",
+    "state_saving": "Saving in this browser…",
+    "state_saved": "Saved in this browser ({at})",
+    "state_error": "Couldn't save in this browser",
     "conflicts_title": "Someone changed the same things",
     "conflicts_hint": "Another revision was approved since you started editing. Choose which value to keep for each item.",
     "conflict_kind": {
@@ -2242,7 +2237,6 @@
     "discard": "Discard draft",
     "publish_notice": "Your changes go live right away and stay in the history.",
     "review_notice": "A moderator reviews your changes before they appear.",
-    "nothing_to_submit": "Nothing has changed yet.",
     "discard_confirm": "Delete this draft? This cannot be undone.",
     "advanced": "More options",
     "recommended": "Recommended",
@@ -2269,7 +2263,6 @@
     "mode_edit": "Edit",
     "mode_translate": "Translate tracklist",
     "my_revisions": "My revisions",
-    "open_draft": "You have an unfinished revision of this album (#{id}, saved {at}).",
     "continue_draft": "Continue it",
     "ignore": "Ignore",
     "changes_requested": "A moderator asked for changes",
@@ -2485,7 +2478,6 @@
       "edit_title": "Edit {type}",
       "untitled": "Untitled",
       "view": "View page",
-      "open_draft": "You have an unfinished revision of this (#{id}, saved {at}).",
       "revision_mismatch": "This revision does not edit this item.",
       "section": {
         "basic": "Basics"
@@ -2508,9 +2500,16 @@
       "work_relations": "Related songs",
       "work_relations_hint": "Original songs, arrangements, covers, remixes and medleys, seen from this song.",
       "work_entries": "Source",
-      "work_entries_hint": "The game, anime or other work the song comes from, e.g. a game's BGM."
+      "work_entries_hint": "The game, anime or other work the song comes from, e.g. a game's BGM.",
+      "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at})."
     },
-    "pending_notice": "New content goes live as soon as you submit it, marked “Pending”; changes to existing content wait for approval."
+    "pending_notice": "New content goes live as soon as you submit it, marked “Pending”; changes to existing content wait for approval.",
+    "local_hint": "Drafts stay in this browser until you submit them; logging out deletes them",
+    "restored": "Restored the changes saved in this browser {at}.",
+    "restored_discard": "Discard these changes",
+    "restored_discard_confirm": "Discard the changes saved in this browser? This can't be undone.",
+    "draft_missing": "This draft isn't in this browser; it may have been submitted or deleted.",
+    "open_revision": "One of your revisions of this album was sent back for changes (#{id}, {at})."
   },
   "revision_page": {
     "action": {
@@ -2536,7 +2535,6 @@
     "withdraw_confirm": "Withdraw this revision? It stays in your list.",
     "delete_draft": "Delete draft",
     "delete_confirm": "Delete this draft? This cannot be undone.",
-    "submit": "Submit",
     "back": "My revisions",
     "review_comment": "Moderator's comment",
     "errors": "Problems to fix before it can be approved",
@@ -2552,7 +2550,6 @@
     "restores": "restores version {version}",
     "requires_manage": "Needs a content manager to approve",
     "status": {
-      "draft": "Draft",
       "pending": "Pending review",
       "changes_requested": "Changes requested",
       "approved": "Approved",
@@ -2586,7 +2583,14 @@
       "release": "kept and treated as approved",
       "move": "kept and moved to submission #{id}",
       "because": "Still used by {names}"
-    }
+    },
+    "local_title": "Drafts in this browser",
+    "local_hint": "Kept only in this browser; they join the revisions below once submitted. Logging out deletes them.",
+    "local_untitled": "Untitled",
+    "local_items": "{count} items",
+    "local_revision": "Changes to revision #{id}",
+    "local_saved": "saved {at}",
+    "local_edits": "Changes to this revision are kept in this browser ({at}) and haven't been submitted. Continue editing and resubmit from the editor."
   },
   "pending": {
     "badge": "Pending",

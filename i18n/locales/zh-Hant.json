@@ -22,7 +22,8 @@
     "register": "註冊",
     "logout": "登出",
     "articles": "我的文章",
-    "notifications": "通知"
+    "notifications": "通知",
+    "logout_drafts_confirm": "這個瀏覽器裡有 {count} 份未送出的草稿，登出後會被刪除。確定登出嗎？"
   },
   "admin": {
     "console": "管理後台"
@@ -2205,17 +2206,11 @@
     "names_hint": "譯名、羅馬字、別名和簡稱。搜尋會比對所有名稱。",
     "add_link": "新增連結",
     "add_attribute": "新增資訊",
-    "backup_found": "這個瀏覽器裡有 {at} 未儲存的修改。",
-    "restore_backup": "恢復",
-    "dismiss_backup": "捨棄",
-    "draft_conflict": "這份草稿在其他分頁或裝置上被修改過。",
-    "keep_mine": "保留本頁的版本",
-    "use_server": "載入另一個版本",
     "state_idle": "還沒有修改",
     "state_dirty": "有未儲存的修改",
-    "state_saving": "正在儲存草稿…",
-    "state_saved": "草稿已儲存（{at}）",
-    "state_error": "草稿儲存失敗",
+    "state_saving": "正在儲存到本機…",
+    "state_saved": "已儲存到本機（{at}）",
+    "state_error": "無法儲存到本機",
     "conflicts_title": "有人改了同樣的內容",
     "conflicts_hint": "你開始編輯後，另一筆修訂已經通過。請為每一項選擇要保留的值。",
     "conflict_kind": {
@@ -2242,7 +2237,6 @@
     "discard": "刪除草稿",
     "publish_notice": "改動會立即生效，並保留在歷史裡。",
     "review_notice": "改動經管理員審核後才會顯示。",
-    "nothing_to_submit": "還沒有任何改動。",
     "discard_confirm": "刪除這份草稿？刪除後無法復原。",
     "advanced": "更多選項",
     "recommended": "建議補充",
@@ -2269,7 +2263,6 @@
     "mode_edit": "編輯",
     "mode_translate": "翻譯曲目表",
     "my_revisions": "我的修訂",
-    "open_draft": "你有一筆這張專輯的未完成修訂（#{id}，{at}儲存）。",
     "continue_draft": "繼續編輯",
     "ignore": "忽略",
     "changes_requested": "管理員要求修改",
@@ -2485,7 +2478,6 @@
       "edit_title": "編輯{type}",
       "untitled": "未命名",
       "view": "檢視頁面",
-      "open_draft": "你有一筆它的未完成修訂（#{id}，{at}儲存）。",
       "revision_mismatch": "這筆修訂不是編輯它的。",
       "section": {
         "basic": "基本資訊"
@@ -2508,9 +2500,16 @@
       "work_relations": "相關樂曲",
       "work_relations_hint": "從這首樂曲的角度填寫原曲、改編、翻唱、混音和組曲。",
       "work_entries": "出處",
-      "work_entries_hint": "這首歌出自的遊戲、動畫等作品，例如某個遊戲的 BGM。"
+      "work_entries_hint": "這首歌出自的遊戲、動畫等作品，例如某個遊戲的 BGM。",
+      "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。"
     },
-    "pending_notice": "新建的內容提交後立即上線，標記為「審核中」；對已有內容的修改要等審核通過。"
+    "pending_notice": "新建的內容提交後立即上線，標記為「審核中」；對已有內容的修改要等審核通過。",
+    "local_hint": "草稿只儲存在這個瀏覽器，送出後才會傳送；登出會刪除",
+    "restored": "已還原這個瀏覽器 {at} 儲存的修改。",
+    "restored_discard": "放棄這些修改",
+    "restored_discard_confirm": "放棄這個瀏覽器裡儲存的修改？放棄後無法復原。",
+    "draft_missing": "這個瀏覽器裡沒有這份草稿，可能已經送出或刪除了。",
+    "open_revision": "這張專輯有一條你的修訂被退回修改（#{id}，{at}）。"
   },
   "revision_page": {
     "action": {
@@ -2536,7 +2535,6 @@
     "withdraw_confirm": "撤回這筆修訂？撤回後仍保留在列表裡。",
     "delete_draft": "刪除草稿",
     "delete_confirm": "刪除這份草稿？刪除後無法復原。",
-    "submit": "提交",
     "back": "我的修訂",
     "review_comment": "管理員意見",
     "errors": "通過前需要修正的問題",
@@ -2552,7 +2550,6 @@
     "restores": "恢復到第 {version} 版",
     "requires_manage": "需要內容管理員批准",
     "status": {
-      "draft": "草稿",
       "pending": "待審核",
       "changes_requested": "需要修改",
       "approved": "已通過",
@@ -2586,7 +2583,14 @@
       "release": "保留並視為已通過",
       "move": "保留，改掛到提交 #{id}",
       "because": "原因：{names} 還在使用它"
-    }
+    },
+    "local_title": "本機草稿",
+    "local_hint": "只儲存在這個瀏覽器裡，送出後才會出現在下面的修訂列表；登出會刪除。",
+    "local_untitled": "未命名",
+    "local_items": "共 {count} 項",
+    "local_revision": "修訂 #{id} 的修改",
+    "local_saved": "{at}儲存",
+    "local_edits": "這條修訂有儲存在本機的修改（{at}）還沒有送出，請繼續編輯，在編輯器裡重新送出。"
   },
   "pending": {
     "badge": "審核中",

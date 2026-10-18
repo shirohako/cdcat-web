@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-// Edits an album: ?revision=<id> continues a draft, ?mode=translate&locale=en opens the tracklist translator.
+// Edits an album: ?revision=<id> continues a revision sent back for changes, ?mode=translate&locale=en opens the tracklist translator.
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
