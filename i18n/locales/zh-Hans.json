@@ -3536,7 +3536,8 @@
       "scope": "属于",
       "scope_album": "整张专辑",
       "already_added": "这张图片已经在图库里了。",
-      "upload_file": "上传"
+      "upload_file": "上传",
+      "remove": "移除"
     },
     "crop": {
       "title": "裁切成正方形",

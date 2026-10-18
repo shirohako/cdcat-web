@@ -2411,7 +2411,8 @@
       "scope": "屬於",
       "scope_album": "整張專輯",
       "already_added": "這張圖片已經在圖庫裡了。",
-      "upload_file": "上傳"
+      "upload_file": "上傳",
+      "remove": "移除"
     },
     "crop": {
       "title": "裁切成正方形",

@@ -2411,7 +2411,8 @@
       "scope": "対象",
       "scope_album": "アルバム全体",
       "already_added": "この画像はすでにギャラリーにあります。",
-      "upload_file": "アップロード"
+      "upload_file": "アップロード",
+      "remove": "削除"
     },
     "crop": {
       "title": "正方形に切り抜く",

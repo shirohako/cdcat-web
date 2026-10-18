@@ -1,34 +1,42 @@
 <template>
   <div class="flex items-start gap-3">
-    <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-50" :class="{ 'w-28': wide }">
+    <div class="relative flex h-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 text-gray-300" :class="wide ? 'w-36' : 'w-20'">
       <img v-if="model" :src="model" alt="" class="h-full w-full object-cover">
+      <ImagePlus v-else :size="22" />
+      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-white/70"><span class="loading loading-spinner loading-sm" /></div>
     </div>
     <div class="min-w-0 flex-1 space-y-1.5">
-      <div class="flex gap-1.5">
-        <input v-model.trim="model" type="url" class="input input-sm min-w-0 flex-1" placeholder="https://">
+      <div class="flex flex-wrap gap-1.5">
         <label class="btn btn-sm cursor-pointer gap-1" :class="{ 'btn-disabled': busy }">
-          <span v-if="busy" class="loading loading-spinner loading-xs" /><Upload v-else :size="14" />
-          <span class="hidden sm:inline">{{ $t('editor.image.upload_file') }}</span>
-          <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
+          <Upload :size="14" />{{ $t(model ? 'editor.image.replace' : 'editor.image.upload_file') }}
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="busy" @change="pick">
         </label>
+        <button type="button" class="btn btn-ghost btn-sm gap-1" :disabled="busy" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
+        <button v-if="model" type="button" class="btn btn-ghost btn-sm gap-1 text-gray-500 hover:text-error" :disabled="busy" @click="model = null"><Trash2 :size="14" />{{ $t('editor.image.remove') }}</button>
       </div>
       <p v-if="message" class="text-xs text-error">{{ message }}</p>
     </div>
+    <EditorImageImportDialog v-model="urlOpen" :busy="busy" :error="urlError" @import="fromUrl" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { Upload } from '@lucide/vue'
+import { ImagePlus, Link2, Trash2, Upload } from '@lucide/vue'
 
-/** An image URL column (artists, labels, entries, series): paste a link or upload a file to this site. */
+/**
+ * An image URL column (artists, labels, entries, series). The image always comes through this
+ * site: uploaded, or imported from a link by the server; there is no field to type a URL into.
+ */
 defineProps<{ wide?: boolean }>()
 const model = defineModel<string | null>({ required: true })
 
 const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
-const { limits, upload } = useImageUpload()
+const { limits, upload, importUrl } = useImageUpload()
 const busy = ref(false)
 const message = ref('')
+const urlOpen = ref(false)
+const urlError = ref('')
 
 const pick = async (event: Event) => {
   const input = event.target as HTMLInputElement
@@ -45,6 +53,25 @@ const pick = async (event: Event) => {
     model.value = (await upload(file, file.name)).medium_url
   } catch (error) {
     message.value = localizeError(error)
+  } finally {
+    busy.value = false
+  }
+}
+
+const openUrl = () => {
+  urlError.value = ''
+  urlOpen.value = true
+}
+
+const fromUrl = async (url: string) => {
+  busy.value = true
+  urlError.value = ''
+  try {
+    model.value = (await importUrl(url)).medium_url
+    message.value = ''
+    urlOpen.value = false
+  } catch (error) {
+    urlError.value = localizeError(error)
   } finally {
     busy.value = false
   }
