@@ -1440,6 +1440,8 @@
         "archive_help": "归档：不能再发主题和回复",
         "system": "系统版块",
         "topics": "{count} 个主题",
+        "show_in_list": "显示在版块列表和侧栏里（关掉后仍可通过链接打开）",
+        "not_in_list": "不在版块列表",
         "template": "发帖模板",
         "template_placeholder": "发主题时预填到编辑器里，例如：\n曲目信息：\n试听链接：\n出处：",
         "delete_title": "删除版块「{name}」？",
@@ -3199,7 +3201,6 @@
     },
     "comments": {
       "title": "评论",
-      "open_topic": "在讨论区打开",
       "reactions": "回应这篇文章",
       "empty": "还没有评论，来说两句吧。",
       "login": "登录后发表评论"
@@ -3208,6 +3209,7 @@
   "labels": {
     "title": "厂牌",
     "subtitle": "唱片公司与厂牌",
+      "write": "写评论…",
     "label": "厂牌",
     "parent": "上级厂牌",
     "children": "子厂牌",

@@ -44,6 +44,8 @@ export interface DiscussionCategory extends DiscussionCategorySummary {
   visibility: 'public' | 'staff'
   is_archived: boolean
   show_in_latest: boolean
+  /** False: left out of the category list and sidebar, still reachable by link. */
+  show_in_list: boolean
   sort_order: number
   stats: DiscussionCategoryStats
   notification_level: NotificationLevel | null

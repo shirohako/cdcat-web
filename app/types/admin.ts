@@ -424,6 +424,7 @@ export interface AdminDiscussionCategory {
   show_in_latest: boolean
   topics_count: number
   is_system: boolean
+  show_in_list: boolean
   created_at: string
   updated_at: string
 }

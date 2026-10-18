@@ -2082,11 +2082,11 @@
     },
     "comments": {
       "title": "Comments",
-      "open_topic": "Open in discussions",
       "reactions": "React to this article",
       "empty": "No comments yet. Be the first.",
       "login": "Sign in to comment"
     }
+      "write": "Write a comment…",
   },
   "labels": {
     "title": "Labels",

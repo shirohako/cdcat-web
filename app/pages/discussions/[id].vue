@@ -32,6 +32,14 @@ const query = computed(() => ({
 const { data, error, refresh, pending } = await useAsyncData(() => `discussion-topic-${topicId.value}`,
   () => $api<DiscussionTopicPage>(`/v1/discussions/topics/${topicId.value}`, { query: query.value }), { watch: [query] })
 
+// An article's comment topic lives on the article page; go there while the article is on the site.
+const articlePath = (value: DiscussionTopicPage | null | undefined) => {
+  const article = value?.topic.article
+  return article?.status === 'published' ? `/articles/${article.id}${article.slug ? `/${article.slug}` : ''}#comments` : null
+}
+if (articlePath(data.value)) await navigateTo(articlePath(data.value)!, { replace: true, redirectCode: 302 })
+watch(data, (value) => { if (articlePath(value)) void navigateTo(articlePath(value)!, { replace: true }) })
+
 const topic = ref<DiscussionTopicDetail>(data.value?.topic as DiscussionTopicDetail)
 const floors = ref<DiscussionPost[]>(data.value?.floors ?? [])
 const references = ref<DiscussionReferences>(data.value?.references ?? {})

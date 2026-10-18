@@ -22,7 +22,7 @@ const dirtyOrder = ref(false)
 const empty = () => ({
   id: 0, parent_id: null as number | null, name: '', slug: '', description: '', name_en: '', name_ja: '', name_zh_hant: '',
   color: 'slate', icon: '', kind: 'discussion' as 'discussion' | 'question', topic_permission: 'everyone' as 'everyone' | 'moderators',
-  visibility: 'public' as 'public' | 'staff', is_archived: false, topic_template: '', show_in_latest: true,
+  visibility: 'public' as 'public' | 'staff', is_archived: false, topic_template: '', show_in_latest: true, show_in_list: true,
 })
 const form = reactive(empty())
 const editing = computed(() => form.id > 0)
@@ -36,6 +36,7 @@ function edit(category: AdminDiscussionCategory) {
     name_en: category.translations?.en?.name ?? '', name_ja: category.translations?.ja?.name ?? '', name_zh_hant: category.translations?.['zh-Hant']?.name ?? '',
     color: category.color ?? 'slate', icon: category.icon ?? '', kind: category.kind, topic_permission: category.topic_permission,
     visibility: category.visibility, is_archived: category.is_archived, topic_template: category.topic_template ?? '', show_in_latest: category.show_in_latest,
+    show_in_list: category.show_in_list,
   })
 }
 const reset = () => Object.assign(form, empty())
@@ -60,6 +61,7 @@ const save = () => run(async () => {
     parent_id: form.parent_id, name: form.name.trim(), slug: form.slug.trim(), description: form.description.trim() || null, translations,
     color: form.color || null, icon: form.icon.trim() || null, kind: form.kind, topic_permission: form.topic_permission, visibility: form.visibility,
     is_archived: form.is_archived, topic_template: form.topic_template.trim() || null, show_in_latest: form.show_in_latest,
+    show_in_list: form.show_in_list,
   }
   await $api(editing.value ? `/v1/admin/discussions/categories/${form.id}` : '/v1/admin/discussions/categories', { method: editing.value ? 'PUT' : 'POST', body })
   reset()
@@ -129,6 +131,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) }
                   <span v-if="category.kind === 'question'" class="rounded bg-emerald-50 px-1 text-emerald-700">{{ t('admin_pages.discussions.categories.kinds.question') }}</span>
                   <span v-if="category.topic_permission === 'moderators'" class="rounded bg-indigo-50 px-1 text-indigo-700">{{ t('admin_pages.discussions.categories.moderators_only') }}</span>
                   <span v-if="!category.show_in_latest" class="rounded bg-slate-100 px-1">{{ t('admin_pages.discussions.categories.not_in_latest') }}</span>
+                  <span v-if="!category.show_in_list" class="rounded bg-slate-100 px-1">{{ t('admin_pages.discussions.categories.not_in_list') }}</span>
                   <span v-if="category.is_archived" class="rounded bg-amber-50 px-1 text-amber-700">{{ t('admin_pages.discussions.categories.archived') }}</span>
                   <span v-if="category.is_system" class="rounded bg-sky-50 px-1 text-sky-700">{{ t('admin_pages.discussions.categories.system') }}</span>
                   <span>{{ t('admin_pages.discussions.categories.topics', { count: category.topics_count }) }}</span>
@@ -174,6 +177,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) }
         </div>
         <label class="flex items-center gap-2"><input v-model="form.topic_permission" type="checkbox" true-value="moderators" false-value="everyone">{{ t('admin_pages.discussions.categories.moderators_only_help') }}</label>
         <label class="flex items-center gap-2"><input v-model="form.show_in_latest" type="checkbox">{{ t('admin_pages.discussions.categories.show_in_latest') }}</label>
+        <label class="flex items-center gap-2"><input v-model="form.show_in_list" type="checkbox">{{ t('admin_pages.discussions.categories.show_in_list') }}</label>
         <label class="flex items-center gap-2"><input v-model="form.is_archived" type="checkbox">{{ t('admin_pages.discussions.categories.archive_help') }}</label>
         <label class="block">{{ t('admin_pages.discussions.categories.template') }}<textarea v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'font-mono text-xs']" :placeholder="t('admin_pages.discussions.categories.template_placeholder')" /></label>
         <div class="flex justify-end gap-2">

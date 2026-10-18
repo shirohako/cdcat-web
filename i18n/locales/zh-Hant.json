@@ -2082,11 +2082,11 @@
     },
     "comments": {
       "title": "留言",
-      "open_topic": "在討論區開啟",
       "reactions": "回應這篇文章",
       "empty": "還沒有留言，來說兩句吧。",
       "login": "登入後發表留言"
     }
+      "write": "寫評論…",
   },
   "labels": {
     "title": "廠牌",
