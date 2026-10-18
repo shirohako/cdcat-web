@@ -95,9 +95,11 @@ const prepare = (item: DraftItem): DraftItem => {
   if (Array.isArray(document.titles)) document.titles = document.titles.filter(row => !blank(row.title))
   if (Array.isArray(document.links)) document.links = document.links.filter(row => !blank(row.url))
   if (Array.isArray(document.attributes)) document.attributes = document.attributes.filter(row => !blank(row.value))
-  // Drafts saved before album links of entries lost them still carry these fields.
-  if (item.resource_type === 'entry' && Array.isArray(document.albums)) {
-    for (const row of document.albums as Array<Record<string, unknown>>) {
+  // Drafts saved before these fields were dropped still carry them: the episode count, and the
+  // character name and episode of album links.
+  if (item.resource_type === 'entry') {
+    delete document.episodes
+    for (const row of (Array.isArray(document.albums) ? document.albums : []) as Array<Record<string, unknown>>) {
       delete row.character_name
       delete row.episode
     }

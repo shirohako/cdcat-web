@@ -24,10 +24,6 @@
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.release_date') }}</span>
           <EditorDateInput v-model:date="doc.release_date" v-model:precision="doc.release_date_precision" />
         </div>
-        <label v-if="doc.type === 'anime' || doc.type === 'tv'" class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.episodes') }}</span>
-          <input v-model.number="doc.episodes" type="number" min="0" class="input input-sm w-32">
-        </label>
         <label v-if="doc.type === 'game'" class="block sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.platforms') }}</span>
           <input :value="doc.platforms.join(', ')" class="input input-sm w-full" :placeholder="$t('catalog.form.platforms_hint')" @change="doc.platforms = splitList(($event.target as HTMLInputElement).value)">

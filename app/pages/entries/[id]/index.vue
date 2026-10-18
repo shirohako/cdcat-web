@@ -79,10 +79,6 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                   <Calendar :size="18" />
                   {{ formatReleaseDate(entry.release_date, entry.release_date_precision) }}
                 </span>
-                <span v-if="entry.episodes" class="flex items-center gap-2">
-                  <Film :size="18" />
-                  {{ $t('catalog.episodes_count', { count: entry.episodes }) }}
-                </span>
                 <span class="flex items-center gap-2">
                   <Music2 :size="18" />
                   {{ $t('catalog.albums_count', { count: entry.albums_count ?? entry.albums.length }) }}
@@ -190,10 +186,6 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                 <div v-if="entry.release_date">
                   <dt class="text-gray-500">{{ $t('catalog.release_date') }}</dt>
                   <dd class="font-medium">{{ formatReleaseDate(entry.release_date, entry.release_date_precision) }}</dd>
-                </div>
-                <div v-if="entry.episodes">
-                  <dt class="text-gray-500">{{ $t('catalog.episodes') }}</dt>
-                  <dd class="font-medium">{{ entry.episodes }}</dd>
                 </div>
                 <div v-if="entry.platforms?.length">
                   <dt class="text-gray-500">{{ $t('catalog.platforms') }}</dt>

@@ -38,7 +38,7 @@ export const emptyDocument = (type: EntityType): Record<string, unknown> => {
       return { title: '', description: null, titles: [], credits: [], relations: [], entries: [], links: [], attributes: [] }
     case 'entry':
       return {
-        name: '', slug: null, type: 'anime', format: null, platforms: [], release_date: null, release_date_precision: 'day', episodes: null,
+        name: '', slug: null, type: 'anime', format: null, platforms: [], release_date: null, release_date_precision: 'day',
         description: null, image_url: null, banner_url: null, titles: [], links: [], albums: [], relations: [],
       }
     case 'franchise':

@@ -104,7 +104,6 @@ export interface EntryDocument {
   platforms: string[]
   release_date: string | null
   release_date_precision: DatePrecision
-  episodes: number | null
   description: string | null
   image_url: string | null
   banner_url: string | null
