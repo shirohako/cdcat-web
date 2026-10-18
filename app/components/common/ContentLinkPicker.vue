@@ -55,7 +55,7 @@ async function search() {
   searchError.value = false
   try {
     const meta = TYPE_META[type.value]
-    const response = await $api<Record<string, SearchRow[]>>(meta.endpoint, { query: { search: term, per_page: 8 } })
+    const response = await $api<Record<string, SearchRow[]>>(meta.endpoint, { query: { search: term, per_page: 8 }, progress: false })
     if (token === searchToken) results.value = (response[meta.list] ?? []).map(row => toSummary(type.value, row))
   }
   catch {

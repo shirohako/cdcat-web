@@ -306,7 +306,7 @@ watch(albumQuery, (query) => {
   isSearching.value = true
   searchTimer = setTimeout(async () => {
     try {
-      const res = await $api<any>('/v1/albums', { params: { search: query.trim(), per_page: 5 } })
+      const res = await $api<any>('/v1/albums', { params: { search: query.trim(), per_page: 5 }, progress: false })
       const list = res.albums ?? []
       albumResults.value = (Array.isArray(list) ? list : []).map((w: any) => ({
         id: w.id,

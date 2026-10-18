@@ -392,6 +392,7 @@
     "search_language": "输入关键词搜索语言",
     "no_more_matches": "没有更多匹配项",
     "retry": "重试",
+    "clear": "清除",
     "type_to_confirm": "输入 {phrase} 以确认"
   },
   "errors": {
@@ -443,7 +444,9 @@
       "user_silenced": "你暂时被限制发布这类内容。",
       "content_pending": "内容还在审核中，通过审核后才能这样做。",
       "revision_item_applied": "这一项已经上线，请直接编辑内容本身。",
-      "duplicate_suspected": "可能和已有的专辑重复，请先确认。"
+      "duplicate_suspected": "可能和已有的专辑重复，请先确认。",
+      "invalid_credentials": "邮箱或密码不正确。",
+      "user_inactive": "该账号已被停用。"
     }
   },
   "admin_pages": {
@@ -2572,6 +2575,7 @@
       "search_min": "至少输入 2 个字符",
       "no_results": "没有找到结果",
       "searching": "搜索中…",
+      "search_failed": "搜索失败，请重试。",
       "links_hint": "官网、Bangumi、VNDB、Steam 等外部页面。",
       "add_link": "添加链接",
       "provider": "平台",
@@ -3379,6 +3383,7 @@
     "required_missing": "还缺这些",
     "required_item": {
       "title": "标题",
+      "type": "专辑类型",
       "release_date": "发行日期",
       "cover": "正方形封面",
       "tracks": "至少一首曲目"
@@ -3411,6 +3416,7 @@
       "view": "查看专辑",
       "cover": "封面",
       "title_placeholder": "按实物上印的标题填写",
+      "type_placeholder": "请选择类型",
       "release_event": "首发活动",
       "release_event_placeholder": "搜索活动，如 Comic Market",
       "release_event_hint": "在 Comic Market、M3 等活动首发的作品填写。",

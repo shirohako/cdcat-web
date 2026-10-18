@@ -1,49 +1,100 @@
 <template>
   <div class="relative">
-    <label class="input input-sm flex w-full items-center gap-2">
-      <Search class="h-3.5 w-3.5 shrink-0 text-gray-400" />
-      <input
-        v-model="query"
-        type="search"
-        class="grow"
-        :placeholder="placeholder ?? $t('editor.search_placeholder')"
-        @focus="open = true"
-        @blur="close"
-        @keydown.enter.prevent="results[0] ? choose(results[0]) : createNew()"
+    <Search class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+    <input
+      ref="input"
+      v-model="query"
+      type="text"
+      role="combobox"
+      autocomplete="off"
+      spellcheck="false"
+      enterkeyhint="search"
+      aria-autocomplete="list"
+      class="input input-sm w-full pl-8 pr-8"
+      :placeholder="placeholderText"
+      :aria-label="placeholderText"
+      :aria-expanded="expanded"
+      :aria-controls="expanded ? listId : undefined"
+      :aria-activedescendant="expanded && active >= 0 ? optionId(active) : undefined"
+      @focus="open = true"
+      @click="open = true"
+      @input="open = true"
+      @blur="open = false"
+      @keydown="onKeydown"
+    >
+    <span class="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center">
+      <Loader2 v-if="searching" class="m-1 h-3.5 w-3.5 animate-spin text-gray-400" aria-hidden="true" />
+      <button
+        v-else-if="query"
+        type="button"
+        tabindex="-1"
+        class="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        :aria-label="$t('common.clear')"
+        @mousedown.prevent
+        @click="clear"
+      ><X :size="13" /></button>
+    </span>
+
+    <!-- Rendered on <body> so sections and dialogs with overflow-hidden don't clip it. -->
+    <Teleport to="body">
+      <div
+        v-if="expanded"
+        :id="listId"
+        ref="panel"
+        role="listbox"
+        class="fixed z-[60] overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+        :style="panelStyle"
+        @mousedown.prevent
       >
-    </label>
-    <div v-if="open && query.trim()" class="absolute z-30 mt-1 max-h-80 w-full min-w-64 overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
-      <p v-if="query.trim().length < 2" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.search_min') }}</p>
-      <p v-else-if="searching" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.searching') }}</p>
-      <template v-else>
-        <button
-          v-for="item in results"
-          :key="item.id"
-          type="button"
-          class="flex w-full items-center gap-2.5 px-3 py-1.5 text-left hover:bg-gray-50"
-          @mousedown.prevent="choose(item)"
-        >
-          <img v-if="item.image_url" :src="item.image_url" alt="" class="h-8 w-8 shrink-0 rounded object-cover">
-          <span v-else class="h-8 w-8 shrink-0 rounded bg-gray-100" />
-          <span class="min-w-0">
-            <span class="flex min-w-0 items-center gap-1.5"><span class="truncate text-sm text-gray-900">{{ item.label }}</span><CatalogPendingBadge v-if="item.is_pending" /></span>
-            <span v-if="item.subtitle" class="block truncate text-[11px] text-gray-500">{{ item.subtitle }}</span>
-          </span>
-          <span class="ml-auto shrink-0 text-[11px] text-gray-400">#{{ item.id }}</span>
-        </button>
-        <p v-if="!results.length" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.no_results') }}</p>
-        <button v-if="allowCreate" type="button" class="flex w-full items-center gap-2 border-t border-gray-100 px-3 py-2 text-left text-sm text-primary hover:bg-gray-50" @mousedown.prevent="createNew">
-          <Plus :size="14" />{{ $t('editor.create_new', { name: query.trim() }) }}
-        </button>
-      </template>
-    </div>
+        <p v-if="term.length < 2" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.search_min') }}</p>
+        <p v-else-if="failed" class="px-3 py-2 text-xs text-error">{{ $t('catalog.form.search_failed') }}</p>
+        <p v-else-if="stale && !results.length" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.searching') }}</p>
+        <p v-else-if="!results.length" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.no_results') }}</p>
+
+        <template v-for="(option, index) in options" :key="option.kind === 'item' ? option.item.id : 'create'">
+          <div
+            v-if="option.kind === 'item'"
+            :id="optionId(index)"
+            role="option"
+            :aria-selected="index === active"
+            class="flex cursor-pointer items-center gap-2.5 px-3 py-1.5 transition-opacity"
+            :class="[index === active ? 'bg-blue-50' : '', stale ? 'opacity-60' : '']"
+            @mousemove="active = index"
+            @click="choose(option)"
+          >
+            <img v-if="option.item.image_url" :src="option.item.image_url" alt="" class="h-8 w-8 shrink-0 rounded object-cover">
+            <span v-else class="h-8 w-8 shrink-0 rounded bg-gray-100" />
+            <span class="min-w-0 flex-1">
+              <span class="flex min-w-0 items-center gap-1.5">
+                <span class="truncate text-sm text-gray-900">{{ option.item.label }}</span>
+                <CatalogPendingBadge v-if="option.item.is_pending" />
+              </span>
+              <span v-if="option.item.subtitle" class="block truncate text-[11px] text-gray-500">{{ option.item.subtitle }}</span>
+            </span>
+            <span class="shrink-0 text-[11px] text-gray-400">#{{ option.item.id }}</span>
+          </div>
+          <div
+            v-else
+            :id="optionId(index)"
+            role="option"
+            :aria-selected="index === active"
+            class="flex cursor-pointer items-center gap-2 border-t border-gray-100 px-3 py-2 text-sm text-primary"
+            :class="{ 'bg-blue-50': index === active }"
+            @mousemove="active = index"
+            @click="choose(option)"
+          >
+            <Plus :size="14" class="shrink-0" /><span class="truncate">{{ $t('editor.create_new', { name: option.name }) }}</span>
+          </div>
+        </template>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { EventOption } from '~/composables/useEventSearch'
 import type { DatePrecision } from '~/types/entry'
-import { Plus, Search } from '@lucide/vue'
+import { Loader2, Plus, Search, X } from '@lucide/vue'
 
 export type PickerKind = 'artist' | 'label' | 'work' | 'entry' | 'album' | 'franchise' | 'event'
 
@@ -69,14 +120,35 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [item: PickedEntity], create: [name: string] }>()
 
 const { $api } = useNuxtApp()
+const { t } = useI18n()
 const { enumLabel, formatDate } = useCatalogDisplay()
 
+const input = useTemplateRef<HTMLInputElement>('input')
+const panel = useTemplateRef<HTMLElement>('panel')
+const listId = useId()
+const optionId = (index: number) => `${listId}-${index}`
+const placeholderText = computed(() => props.placeholder ?? t('editor.search_placeholder'))
+
 const query = ref('')
-const results = ref<PickedEntity[]>([])
-const searching = ref(false)
 const open = ref(false)
-let timer: ReturnType<typeof setTimeout> | undefined
-let requestId = 0
+const results = ref<PickedEntity[]>([])
+/** The term the shown results belong to; while it differs from the typed one they are stale. */
+const resultsFor = ref<string | null>(null)
+const searching = ref(false)
+const failed = ref(false)
+const active = ref(-1)
+
+const term = computed(() => query.value.trim())
+const stale = computed(() => resultsFor.value !== term.value)
+const expanded = computed(() => open.value && term.value.length > 0)
+
+type Option = { kind: 'item', item: PickedEntity } | { kind: 'create', name: string }
+const options = computed<Option[]>(() => {
+  const list: Option[] = term.value.length < 2 ? [] : results.value.map(item => ({ kind: 'item', item }))
+  // Offering "create" before the search has answered invites duplicates.
+  if (props.allowCreate && term.value && (term.value.length < 2 || !stale.value)) list.push({ kind: 'create', name: term.value })
+  return list
+})
 
 /** The fields the pickers read from the search endpoints' rows. */
 interface Row {
@@ -103,48 +175,177 @@ const endpoints: Record<PickerKind, { url: string, key: string, map: (row: Row) 
   event: { url: '/v1/events', key: 'events', map: row => ({ id: row.id, label: row.name ?? '', subtitle: describeEvent(row as unknown as EventOption), image_url: null }) },
 }
 
-const search = async (term: string) => {
+// ---- searching ----
+
+let timer: ReturnType<typeof setTimeout> | undefined
+let requestId = 0
+
+const search = async (value: string) => {
   const current = ++requestId
   searching.value = true
   try {
     const endpoint = endpoints[props.kind]
-    const query = { search: term, per_page: 10, ...(props.excludePending || props.kind === 'event' ? {} : { include_pending: 1 }) }
-    const data = await $api<Record<string, Row[]>>(endpoint.url, { query })
-    if (current === requestId) {
-      results.value = (data[endpoint.key] ?? []).map(row => ({ ...endpoint.map(row), is_pending: row.is_pending ?? false }))
-        .filter(item => !props.exclude?.includes(item.id))
-    }
+    const params = { search: value, per_page: 10, ...(props.excludePending || props.kind === 'event' ? {} : { include_pending: 1 }) }
+    const data = await $api<Record<string, Row[]>>(endpoint.url, { query: params, progress: false })
+    if (current !== requestId) return
+    results.value = (data[endpoint.key] ?? [])
+      .map(row => ({ ...endpoint.map(row), is_pending: row.is_pending ?? false }))
+      .filter(item => !props.exclude?.includes(item.id))
+    failed.value = false
   } catch {
-    if (current === requestId) results.value = []
+    if (current !== requestId) return
+    results.value = []
+    failed.value = true
   } finally {
-    if (current === requestId) searching.value = false
+    if (current === requestId) {
+      resultsFor.value = value
+      searching.value = false
+    }
   }
 }
 
-watch(query, (value) => {
+watch(term, (value) => {
   clearTimeout(timer)
-  const term = value.trim()
-  if (term.length < 2) {
+  active.value = -1
+  failed.value = false
+  if (value.length < 2) {
+    requestId++
     results.value = []
+    resultsFor.value = null
+    searching.value = false
     return
   }
-  timer = setTimeout(() => search(term), 250)
+  timer = setTimeout(() => search(value), 250)
 })
 
-const choose = (item: PickedEntity) => {
-  emit('select', item)
+// Fresh results highlight the first option, so Enter picks the best match as before.
+watch(options, (list) => {
+  if (!stale.value || term.value.length < 2) active.value = list.length ? 0 : -1
+  else if (active.value >= list.length) active.value = -1
+})
+
+// ---- choosing ----
+
+const reset = () => {
+  clearTimeout(timer)
+  requestId++
   query.value = ''
   results.value = []
+  resultsFor.value = null
+  searching.value = false
+}
+
+const choose = (option: Option) => {
+  if (option.kind === 'item') emit('select', option.item)
+  else emit('create', option.name)
+  reset()
+  // Focus stays here so the next one can be typed straight away; typing reopens the list.
   open.value = false
 }
 
-const createNew = () => {
-  if (!props.allowCreate || query.value.trim().length < 1) return
-  emit('create', query.value.trim())
-  query.value = ''
-  open.value = false
+const clear = () => {
+  reset()
+  input.value?.focus()
 }
 
-const close = () => setTimeout(() => { open.value = false }, 150)
-onBeforeUnmount(() => clearTimeout(timer))
+const move = (step: number) => {
+  open.value = true
+  const count = options.value.length
+  if (!count) return
+  active.value = active.value < 0 ? (step > 0 ? 0 : count - 1) : (active.value + step + count) % count
+}
+
+const onKeydown = (event: KeyboardEvent) => {
+  if (event.isComposing) return
+  switch (event.key) {
+    case 'ArrowDown':
+      event.preventDefault()
+      move(1)
+      break
+    case 'ArrowUp':
+      event.preventDefault()
+      move(-1)
+      break
+    case 'Enter': {
+      // Never submit the surrounding form from here.
+      event.preventDefault()
+      const option = expanded.value ? options.value[active.value] : undefined
+      if (option) choose(option)
+      break
+    }
+    case 'Escape':
+      // Close the list first; dialogs listening for Escape only see the second press.
+      if (expanded.value) {
+        event.stopPropagation()
+        open.value = false
+      }
+      else if (query.value) {
+        event.stopPropagation()
+        reset()
+      }
+      break
+    case 'Tab':
+      open.value = false
+      break
+  }
+}
+
+watch(active, async (index) => {
+  if (index < 0) return
+  await nextTick()
+  document.getElementById(optionId(index))?.scrollIntoView({ block: 'nearest' })
+})
+
+// ---- placing the list ----
+
+const panelStyle = ref<Record<string, string>>({})
+const GAP = 4
+const MARGIN = 8
+
+/** Below the input, or above it when there's clearly more room there; never off-screen. */
+const place = () => {
+  const box = input.value?.getBoundingClientRect()
+  if (!box) return
+  const width = Math.min(Math.max(box.width, 256), window.innerWidth - MARGIN * 2)
+  const left = Math.max(MARGIN, Math.min(box.left, window.innerWidth - width - MARGIN))
+  const below = window.innerHeight - box.bottom - GAP - MARGIN
+  const above = box.top - GAP - MARGIN
+  const up = below < 240 && above > below
+  panelStyle.value = {
+    left: `${left}px`,
+    width: `${width}px`,
+    maxHeight: `${Math.max(120, Math.min(320, up ? above : below))}px`,
+    ...(up ? { bottom: `${window.innerHeight - box.top + GAP}px` } : { top: `${box.bottom + GAP}px` }),
+  }
+}
+
+let frame = 0
+const schedulePlace = () => {
+  cancelAnimationFrame(frame)
+  frame = requestAnimationFrame(place)
+}
+const onScroll = (event: Event) => {
+  // Scrolling the list itself doesn't move the input.
+  if (panel.value && event.target instanceof Node && panel.value.contains(event.target)) return
+  schedulePlace()
+}
+
+watch(expanded, (value) => {
+  if (value) {
+    place()
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true })
+    window.addEventListener('resize', schedulePlace, { passive: true })
+  }
+  else {
+    window.removeEventListener('scroll', onScroll, { capture: true })
+    window.removeEventListener('resize', schedulePlace)
+  }
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(timer)
+  cancelAnimationFrame(frame)
+  window.removeEventListener('scroll', onScroll, { capture: true })
+  window.removeEventListener('resize', schedulePlace)
+})
 </script>

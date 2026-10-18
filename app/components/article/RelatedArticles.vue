@@ -29,7 +29,7 @@ const { data: articles } = await useAsyncData(`related-articles-${props.type}-${
         </div>
         <div class="min-w-0 flex-1">
           <p class="line-clamp-2 text-sm font-medium leading-snug text-gray-800 transition-colors group-hover:text-amber-600">{{ article.title }}</p>
-          <p class="mt-1 text-[11px] text-gray-400">{{ t(`article_ui.types.${article.type}`) }}<template v-if="article.published_at"> · {{ formatDate(article.published_at) }}</template></p>
+          <p class="mt-1 text-[11px] text-gray-400">{{ [article.type ? t(`article_ui.types.${article.type}`) : null, article.published_at ? formatDate(article.published_at) : null].filter(Boolean).join(' · ') }}</p>
         </div>
       </NuxtLink>
     </div>

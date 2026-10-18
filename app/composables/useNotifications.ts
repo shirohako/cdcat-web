@@ -18,7 +18,7 @@ export const useNotifications = () => {
       return
     }
     try {
-      unread.value = (await $api<{ unread_count: number }>('/v1/me/notifications/unread-count')).unread_count
+      unread.value = (await $api<{ unread_count: number }>('/v1/me/notifications/unread-count', { progress: false })).unread_count
     }
     catch {
       // Keep the last known count; the next poll tries again.

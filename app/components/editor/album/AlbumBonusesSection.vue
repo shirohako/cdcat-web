@@ -31,10 +31,7 @@
           </label>
           <div>
             <span class="mb-1 block text-[11px] text-gray-500">{{ $t('catalog.field.event_id') }}</span>
-            <div v-if="bonus.event_id" class="flex items-center gap-1.5 text-sm">
-              <EditorRefLabel :id="bonus.event_id" type="events" :references="editor.references" />
-              <button type="button" class="btn btn-ghost btn-xs px-1" :aria-label="$t('common.delete')" @click="bonus.event_id = null"><X :size="12" /></button>
-            </div>
+            <EditorPickedRef v-if="bonus.event_id" :id="bonus.event_id" type="events" :references="editor.references" :icon="CalendarDays" @remove="bonus.event_id = null" />
             <EditorEntityPicker v-else kind="event" @select="pickEvent(bonus, $event)" />
           </div>
         </div>
@@ -90,7 +87,7 @@
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { AlbumBonusRow, AlbumProductRow } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
-import { ArrowDown, ArrowUp, Disc3, Gift, Plus, Trash2, X } from '@lucide/vue'
+import { ArrowDown, ArrowUp, CalendarDays, Disc3, Gift, Plus, Trash2, X } from '@lucide/vue'
 import { addBonus, addDisc, mainDiscs, removeBonus, setDiscBonus, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
 import { byOrder, moveRow, sameId } from '~/utils/documentRows'
 

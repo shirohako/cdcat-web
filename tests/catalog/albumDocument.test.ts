@@ -150,8 +150,9 @@ describe('names and checks', () => {
 
   it('lists the missing required fields', () => {
     const doc = emptyAlbumDocument()
-    expect(missingRequired(doc)).toEqual(['title', 'release_date', 'cover', 'tracks'])
+    expect(missingRequired(doc)).toEqual(['title', 'type', 'release_date', 'cover', 'tracks'])
     doc.title = 'X'
+    doc.type = 'album'
     doc.release_date = '2024-01-01'
     setCover(doc, 1)
     addTrack(doc, doc.discs[0]!.id, { title: 'A' })

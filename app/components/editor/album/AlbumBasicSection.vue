@@ -20,19 +20,18 @@
             <span v-if="errorAt('release_date')" class="mt-1 block text-xs text-error">{{ errorAt('release_date') }}</span>
           </div>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }}</span>
-            <select v-model="album.type" class="select select-sm w-full">
+            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }} <span class="text-error">*</span></span>
+            <select v-model="album.type" class="select select-sm w-full" :class="{ 'select-error': errorAt('type') }">
+              <option :value="null" disabled>{{ $t('editor.album.type_placeholder') }}</option>
               <option v-for="value in enums.album_type ?? []" :key="value" :value="value">{{ enumLabel('album_type', value) }}</option>
             </select>
+            <span v-if="errorAt('type')" class="mt-1 block text-xs text-error">{{ errorAt('type') }}</span>
           </label>
         </div>
 
         <div>
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.album.release_event') }}</span>
-          <div v-if="album.release_event_id" class="flex items-center gap-2 text-sm">
-            <EditorRefLabel :id="album.release_event_id" type="events" :references="references" />
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.delete')" @click="album.release_event_id = null"><X :size="12" /></button>
-          </div>
+          <EditorPickedRef v-if="album.release_event_id" :id="album.release_event_id" type="events" :references="references" :icon="CalendarDays" class="max-w-sm" @remove="album.release_event_id = null" />
           <EditorEntityPicker v-else kind="event" class="max-w-sm" :placeholder="$t('editor.album.release_event_placeholder')" @select="pickEvent" />
           <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.album.release_event_hint') }}</p>
         </div>
@@ -62,11 +61,11 @@
               class="rounded-full border px-2.5 py-1 text-xs transition-colors"
               :class="album.categories.includes(value) ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
               @click="toggleCategory(value)"
-            >{{ enumLabel('album_category', value) }}</button>
+            >{{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </div>
           <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-gray-500">
             {{ $t('editor.album.categories_suggested') }}
-            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-blue-300 px-2 py-0.5 text-blue-700 hover:bg-blue-50" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}</button>
+            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-blue-300 px-2 py-0.5 text-blue-700 hover:bg-blue-50" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </p>
           <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.album.categories_hint') }}</p>
         </div>
@@ -105,12 +104,14 @@
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
-import { Info, X } from '@lucide/vue'
+import { CalendarDays, Info } from '@lucide/vue'
 import { firstProduct } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
-const { enumLabel } = useCatalogDisplay()
+const { enumLabel, enumLabelEn } = useCatalogDisplay()
+const { locale } = useI18n()
+const { $i18n } = useNuxtApp()
 
 const album = computed(() => editor.album.value)
 const references = editor.references
@@ -122,6 +123,15 @@ const ENTRY_CATEGORIES: Record<string, string> = { game: 'game', anime: 'animati
 const suggestedCategories = computed(() => [...new Set(album.value.entries
   .map(row => typeof row.entry_id === 'number' ? ENTRY_CATEGORIES[String((references.entry?.[String(row.entry_id)] as { type?: string } | undefined)?.type)] : undefined)
   .filter((value): value is string => !!value && !album.value.categories.includes(value)))])
+
+// Outside the English UI each category also shows its English name. Only the UI language's
+// messages are loaded up front, so the English ones are fetched here.
+const categoryEn = (value: string) => locale.value === 'en' ? '' : enumLabelEn('album_category', value)
+const loadEnglish = () => {
+  if (locale.value !== 'en') $i18n.loadLocaleMessages('en')
+}
+onMounted(loadEnglish)
+watch(locale, loadEnglish)
 
 const toggleCategory = (value: string) => {
   const categories = album.value.categories

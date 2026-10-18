@@ -41,7 +41,7 @@ export const useEventSearch = (limit = 10) => {
     searching.value = true
     timer = setTimeout(async () => {
       try {
-        const page = await $api<{ events: EventOption[] }>('/v1/events', { query: { search: term, per_page: limit } })
+        const page = await $api<{ events: EventOption[] }>('/v1/events', { query: { search: term, per_page: limit }, progress: false })
         if (search.value.trim() === term) results.value = page.events
       } catch {
         results.value = []

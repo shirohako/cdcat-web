@@ -150,7 +150,8 @@ useHead({ title: computed(() => heading.value) })
           <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             <li v-for="entry in liveContent" :key="`${entry.type}:${entry.id}`">
               <span class="text-xs text-amber-700">{{ t(`admin_pages.types.${entry.type}`) }}</span>
-              <NuxtLink :to="entityPath(entry.type, entry.id) ?? '#'" target="_blank" class="ml-1 underline">{{ entry.label }}</NuxtLink>
+              <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" target="_blank" class="ml-1 underline">{{ entry.label }}</NuxtLink>
+              <span v-else class="ml-1">{{ entry.label }}</span>
             </li>
           </ul>
         </div>

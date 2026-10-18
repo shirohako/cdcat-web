@@ -9,18 +9,11 @@ export const useAuth = () => {
   const { localizeError } = useLocalizedApiError()
 
   // 使用 cookie 存储 token 和用户信息
-  const tokenCookie = useCookie<string | null>('auth_token', {
-    maxAge: 60 * 60 * 24 * 7, // 7 天
-    sameSite: 'lax'
-  })
-  const userCookie = useCookie<User | null>('auth_user', {
-    maxAge: 60 * 60 * 24 * 7, // 7 天
-    sameSite: 'lax'
-  })
+  const { token: tokenCookie, user: userCookie } = useAuthCookies()
 
   // 使用 useState 来保证状态在服务端和客户端之间共享
-  const user = useState<User | null>('auth:user', () => userCookie.value)
-  const token = useState<string | null>('auth:token', () => tokenCookie.value)
+  const user = useState<User | null>('auth:user', () => userCookie.value ?? null)
+  const token = useState<string | null>('auth:token', () => tokenCookie.value ?? null)
 
   // 计算属性：是否已登录
   const isAuthenticated = computed(() => !!user.value && !!token.value)
@@ -122,6 +115,8 @@ export const useAuth = () => {
       const response = await $api<User>('/v1/me')
       user.value = response
       userCookie.value = response
+      // Re-setting the same token extends the cookie, keeping active sessions signed in.
+      tokenCookie.value = token.value
 
       return { success: true, data: response }
     } catch (error) {

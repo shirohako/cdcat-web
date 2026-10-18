@@ -392,6 +392,7 @@
     "search_language": "キーワードで言語を検索",
     "no_more_matches": "ほかに一致する項目はありません",
     "retry": "再試行",
+    "clear": "クリア",
     "type_to_confirm": "確認のため {phrase} と入力してください"
   },
   "errors": {
@@ -443,7 +444,9 @@
       "user_silenced": "現在この投稿は制限されています。",
       "content_pending": "このコンテンツは承認待ちです。承認後に利用できます。",
       "revision_item_applied": "この項目は既に反映されています。コンテンツ自体を編集してください。",
-      "duplicate_suspected": "既存のアルバムと重複している可能性があります。確認してください。"
+      "duplicate_suspected": "既存のアルバムと重複している可能性があります。確認してください。",
+      "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。",
+      "user_inactive": "このアカウントは利用停止されています。"
     }
   },
   "admin_pages": {
@@ -1439,6 +1442,7 @@
       "search_min": "2 文字以上入力してください",
       "no_results": "見つかりませんでした",
       "searching": "検索中…",
+      "search_failed": "検索に失敗しました。もう一度お試しください。",
       "links_hint": "公式サイト、Bangumi、VNDB、Steam などの外部ページ。",
       "add_link": "リンクを追加",
       "provider": "サイト",
@@ -2246,6 +2250,7 @@
     "required_missing": "まだ足りないもの",
     "required_item": {
       "title": "タイトル",
+      "type": "アルバムの種類",
       "release_date": "発売日",
       "cover": "正方形のジャケット",
       "tracks": "1 曲以上のトラック"
@@ -2278,6 +2283,7 @@
       "view": "アルバムを表示",
       "cover": "ジャケット",
       "title_placeholder": "商品に印刷されたとおりのタイトル",
+      "type_placeholder": "種類を選択",
       "release_event": "頒布イベント",
       "release_event_placeholder": "イベントを検索（例：コミックマーケット）",
       "release_event_hint": "コミックマーケットや M3 などで初頒布された作品に入力します。",

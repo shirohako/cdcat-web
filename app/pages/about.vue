@@ -70,11 +70,13 @@
             <h3 class="mt-2 text-lg font-semibold text-slate-900">{{ guide.title }}</h3>
             <p class="mt-2 text-sm leading-6 text-slate-700">{{ guide.desc }}</p>
             <NuxtLink
+              v-if="guide.link"
               :to="guide.link"
               class="mt-4 inline-flex items-center text-sm font-medium text-slate-900 transition-colors duration-150 group-hover:text-sky-700"
             >
               {{ t('common.view') }}
             </NuxtLink>
+            <span v-else class="mt-4 inline-flex items-center text-sm text-slate-400">{{ t('common.coming_soon') }}</span>
           </article>
         </div>
       </section>
@@ -89,11 +91,13 @@
           </h2>
           <p class="mt-2 text-sm text-slate-600">{{ t('about_page.docs_desc') }}</p>
           <div class="mt-5 space-y-3">
-            <NuxtLink
+            <component
+              :is="doc.link ? NuxtLink : 'div'"
               v-for="doc in docs"
               :key="doc.name"
-              :to="doc.link"
-              class="flex items-center justify-between rounded-xl border border-indigo-100/90 bg-white/85 px-4 py-3 transition-all duration-150 hover:border-indigo-200 hover:bg-indigo-50/55"
+              :to="doc.link ?? undefined"
+              class="flex items-center justify-between rounded-xl border border-indigo-100/90 bg-white/85 px-4 py-3 transition-all duration-150"
+              :class="{ 'hover:border-indigo-200 hover:bg-indigo-50/55': doc.link }"
             >
               <div class="flex items-start gap-2.5">
                 <div class="rounded-md p-1.5" :class="doc.iconBg">
@@ -104,8 +108,9 @@
                   <p class="text-xs text-slate-500">{{ doc.desc }}</p>
                 </div>
               </div>
-              <span class="text-xs font-medium text-indigo-600">{{ t('common.view') }}</span>
-            </NuxtLink>
+              <span v-if="doc.link" class="text-xs font-medium text-indigo-600">{{ t('common.view') }}</span>
+              <span v-else class="text-xs text-slate-400">{{ t('common.coming_soon') }}</span>
+            </component>
           </div>
         </article>
 
@@ -134,7 +139,7 @@
                     <p class="text-xs text-slate-500">{{ group.code }}</p>
                   </div>
                 </div>
-                <NuxtLink :to="group.link" class="text-xs font-medium text-rose-700 hover:text-rose-800">
+                <NuxtLink v-if="group.link" :to="group.link" class="text-xs font-medium text-rose-700 hover:text-rose-800">
                   {{ t('common.view') }}
                 </NuxtLink>
               </div>
@@ -148,6 +153,8 @@
 </template>
 
 <script setup lang="ts">
+import { NuxtLink } from '#components'
+
 const { t } = useI18n()
 
 const highlights = computed(() => [
@@ -214,7 +221,7 @@ const usageGuides = computed(() => [
     tag: t('about_page.guide_basics_tag'),
     title: t('about_page.guide_basics_title'),
     desc: t('about_page.guide_basics_desc'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:plus-circle',
     tone: 'border-slate-200/80',
     iconBg: 'bg-cyan-100',
@@ -224,7 +231,7 @@ const usageGuides = computed(() => [
     tag: t('about_page.guide_research_tag'),
     title: t('about_page.guide_research_title'),
     desc: t('about_page.guide_research_desc'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:scan-search',
     tone: 'border-slate-200/80',
     iconBg: 'bg-blue-100',
@@ -234,7 +241,7 @@ const usageGuides = computed(() => [
     tag: t('about_page.guide_submit_tag'),
     title: t('about_page.guide_submit_title'),
     desc: t('about_page.guide_submit_desc'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:badge-check',
     tone: 'border-slate-200/80',
     iconBg: 'bg-teal-100',
@@ -243,15 +250,15 @@ const usageGuides = computed(() => [
 ])
 
 const docs = computed(() => [
-  { name: t('about_page.api_docs'), desc: t('about_page.api_docs_desc'), link: '#', icon: 'lucide:braces', iconBg: 'bg-indigo-100', iconTone: 'text-indigo-700' },
-  { name: t('about_page.frontend_repo'), desc: t('about_page.frontend_repo_desc'), link: '#', icon: 'lucide:github', iconBg: 'bg-blue-100', iconTone: 'text-blue-700' }
+  { name: t('about_page.api_docs'), desc: t('about_page.api_docs_desc'), link: null as string | null, icon: 'lucide:braces', iconBg: 'bg-indigo-100', iconTone: 'text-indigo-700' },
+  { name: t('about_page.frontend_repo'), desc: t('about_page.frontend_repo_desc'), link: null as string | null, icon: 'lucide:github', iconBg: 'bg-blue-100', iconTone: 'text-blue-700' }
 ])
 
 const communities = computed(() => [
   {
     name: t('about_page.qq_group'),
     code: t('about_page.qq_code'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:message-circle',
     tone: 'border-slate-200/80',
     iconBg: 'bg-rose-100',
@@ -260,7 +267,7 @@ const communities = computed(() => [
   {
     name: t('about_page.telegram_group'),
     code: t('common.coming_soon'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:send',
     tone: 'border-slate-200/80',
     iconBg: 'bg-orange-100',
@@ -269,7 +276,7 @@ const communities = computed(() => [
   {
     name: t('about_page.discord_group'),
     code: t('common.coming_soon'),
-    link: '#',
+    link: null as string | null,
     icon: 'lucide:messages-square',
     tone: 'border-slate-200/80',
     iconBg: 'bg-pink-100',

@@ -392,6 +392,7 @@
     "search_language": "Type to search languages",
     "no_more_matches": "No more matches",
     "retry": "Retry",
+    "clear": "Clear",
     "type_to_confirm": "Type {phrase} to confirm"
   },
   "errors": {
@@ -443,7 +444,9 @@
       "user_silenced": "You are restricted from posting this for now.",
       "content_pending": "This content is awaiting approval; you can do this once it is approved.",
       "revision_item_applied": "This item is already live; edit the content itself instead.",
-      "duplicate_suspected": "This may duplicate an existing album; please confirm first."
+      "duplicate_suspected": "This may duplicate an existing album; please confirm first.",
+      "invalid_credentials": "The email or password is incorrect.",
+      "user_inactive": "This account has been disabled."
     }
   },
   "admin_pages": {
@@ -1439,6 +1442,7 @@
       "search_min": "Type at least 2 characters",
       "no_results": "No results",
       "searching": "Searching…",
+      "search_failed": "Search failed. Please try again.",
       "links_hint": "Official site, Bangumi, VNDB, Steam and other pages.",
       "add_link": "Add link",
       "provider": "Site",
@@ -2246,6 +2250,7 @@
     "required_missing": "Still needed",
     "required_item": {
       "title": "Title",
+      "type": "Album type",
       "release_date": "Release date",
       "cover": "Square cover",
       "tracks": "At least one track"
@@ -2278,6 +2283,7 @@
       "view": "View album",
       "cover": "Cover",
       "title_placeholder": "The title as printed on the release",
+      "type_placeholder": "Choose a type",
       "release_event": "Release event",
       "release_event_placeholder": "Search events, e.g. Comic Market",
       "release_event_hint": "For releases first sold at an event such as Comic Market or M3.",

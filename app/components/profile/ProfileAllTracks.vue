@@ -38,10 +38,11 @@
       <!-- Tracks list -->
       <template v-else>
         <div class="space-y-2">
-          <NuxtLink
+          <component
+            :is="track.album ? NuxtLink : 'div'"
             v-for="track in tracks"
             :key="track.id"
-            :to="track.album ? `/albums/${track.album.id}` : '#'"
+            :to="track.album ? `/albums/${track.album.id}` : undefined"
             class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white/85 px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
           >
             <!-- Album cover -->
@@ -82,7 +83,7 @@
             </div>
 
             <ChevronRight :size="14" class="ml-1 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all shrink-0" />
-          </NuxtLink>
+          </component>
         </div>
 
         <CommonPagination
@@ -98,6 +99,7 @@
 
 <script setup lang="ts">
 import { ArrowLeft, ChevronRight, Heart, Music } from '@lucide/vue'
+import { NuxtLink } from '#components'
 import type { ProfileFavoriteTrack, ProfileFavoriteTracksResponse, PaginationInfo } from '~/types/profile'
 
 const props = defineProps<{

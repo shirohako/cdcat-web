@@ -20,7 +20,7 @@ export type TitleCollection = 'titles' | 'disc_titles' | 'track_titles'
 export const emptyAlbumDocument = (): AlbumDocument => ({
   title: '',
   slug: null,
-  type: 'album',
+  type: null,
   categories: [],
   release_date: null,
   release_date_precision: 'day',
@@ -396,11 +396,12 @@ export function setTitleIn(doc: AlbumDocument, collection: TitleCollection, owne
 
 // ---- checks -----------------------------------------------------------------------------------
 
-export type RequiredItem = 'title' | 'release_date' | 'cover' | 'tracks'
+export type RequiredItem = 'title' | 'type' | 'release_date' | 'cover' | 'tracks'
 
 /** What an album needs before it can be submitted (docs/catalog/README.md#必填项). */
 export const missingRequired = (doc: AlbumDocument): RequiredItem[] => [
   ...(!doc.title.trim() ? ['title' as const] : []),
+  ...(!doc.type ? ['type' as const] : []),
   ...(!doc.release_date ? ['release_date' as const] : []),
   ...(!coverOf(doc) ? ['cover' as const] : []),
   ...(!doc.tracks.some(track => track.title.trim()) ? ['tracks' as const] : []),

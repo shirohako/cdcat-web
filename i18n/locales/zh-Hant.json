@@ -392,6 +392,7 @@
     "search_language": "輸入關鍵字搜尋語言",
     "no_more_matches": "沒有更多符合項目",
     "retry": "重試",
+    "clear": "清除",
     "type_to_confirm": "輸入 {phrase} 以確認"
   },
   "errors": {
@@ -443,7 +444,9 @@
       "user_silenced": "你暫時被限制發布這類內容。",
       "content_pending": "內容還在審核中，通過審核後才能這樣做。",
       "revision_item_applied": "這一項已經上線，請直接編輯內容本身。",
-      "duplicate_suspected": "可能和已有的專輯重複，請先確認。"
+      "duplicate_suspected": "可能和已有的專輯重複，請先確認。",
+      "invalid_credentials": "電子郵件或密碼不正確。",
+      "user_inactive": "此帳號已被停用。"
     }
   },
   "admin_pages": {
@@ -1439,6 +1442,7 @@
       "search_min": "至少輸入 2 個字元",
       "no_results": "沒有找到結果",
       "searching": "搜尋中…",
+      "search_failed": "搜尋失敗，請重試。",
       "links_hint": "官網、Bangumi、VNDB、Steam 等外部頁面。",
       "add_link": "新增連結",
       "provider": "平台",
@@ -2246,6 +2250,7 @@
     "required_missing": "還缺這些",
     "required_item": {
       "title": "標題",
+      "type": "專輯類型",
       "release_date": "發行日期",
       "cover": "正方形封面",
       "tracks": "至少一首曲目"
@@ -2278,6 +2283,7 @@
       "view": "檢視專輯",
       "cover": "封面",
       "title_placeholder": "依實物上印的標題填寫",
+      "type_placeholder": "請選擇類型",
       "release_event": "首發活動",
       "release_event_placeholder": "搜尋活動，如 Comic Market",
       "release_event_hint": "在 Comic Market、M3 等活動首發的作品填寫。",

@@ -354,8 +354,8 @@ const go = (section: AlbumSection) => {
 }
 
 const missing = computed(() => missingRequired(album.value))
-const REQUIRED_SECTIONS = { title: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const
-const requiredChecks = computed(() => (['title', 'release_date', 'cover', 'tracks'] as const).map(key => ({
+const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const
+const requiredChecks = computed(() => (['title', 'type', 'release_date', 'cover', 'tracks'] as const).map(key => ({
   key, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
 })))
 const missingIn = (section: AlbumSection) => requiredChecks.value.some(check => !check.done && check.section === section)

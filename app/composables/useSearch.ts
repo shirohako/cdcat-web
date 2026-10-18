@@ -39,7 +39,7 @@ export const useQuickSearch = (limit = 3) => {
     loading.value = true
     failed.value = false
     try {
-      const data = await $api<SearchGroupsResponse>('/v1/search', { query: { q: text, limit }, signal: current.signal })
+      const data = await $api<SearchGroupsResponse>('/v1/search', { query: { q: text, limit }, signal: current.signal, progress: false })
       if (controller === current) groups.value = data.groups.filter(group => group.items.length)
     } catch {
       if (controller === current && !current.signal.aborted) {

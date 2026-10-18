@@ -52,6 +52,8 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   DISCUSSION_OWN_REACTION: 'errors.codes.discussion_own_reaction',
   DISCUSSION_TOPIC_HAS_REPLIES: 'errors.codes.discussion_topic_has_replies',
   USER_BLOCK_NOT_ALLOWED: 'errors.codes.user_block_not_allowed',
+  INVALID_CREDENTIALS: 'errors.codes.invalid_credentials',
+  USER_INACTIVE: 'errors.codes.user_inactive',
 }
 
 export const useLocalizedApiError = (translate?: (key: string, params?: Record<string, unknown>) => string) => {

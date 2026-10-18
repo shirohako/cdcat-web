@@ -9,10 +9,7 @@
         </label>
         <div class="sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.parent') }}</span>
-          <div v-if="doc.parent_id !== null" class="flex items-center gap-2 text-sm">
-            <EditorRefLabel :id="doc.parent_id" type="franchise" :references="editor.references" />
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.delete')" @click="doc.parent_id = null"><X :size="12" /></button>
-          </div>
+          <EditorPickedRef v-if="doc.parent_id !== null" :id="doc.parent_id" type="franchise" :references="editor.references" :icon="Library" class="max-w-md" @remove="doc.parent_id = null" />
           <EditorEntityPicker v-else kind="franchise" class="max-w-md" :exclude="[editor.id]" :placeholder="$t('catalog.form.search_series')" @select="pickParent" />
           <p class="mt-1 text-[11px] text-gray-400">{{ $t('catalog.form.parent_hint') }}</p>
           <p v-if="editor.errorAt('parent_id')" class="mt-1 text-xs text-error">{{ editor.errorAt('parent_id') }}</p>
@@ -80,7 +77,7 @@
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { FranchiseDocument } from '~/types/document'
-import { Clapperboard, Disc3, Languages, Library, X } from '@lucide/vue'
+import { Clapperboard, Disc3, Languages, Library } from '@lucide/vue'
 
 const editor = useEntityEditor()
 const doc = computed(() => editor.doc.value as unknown as FranchiseDocument)

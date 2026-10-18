@@ -1,6 +1,8 @@
+import type { SchemaCollection, SchemaField } from '~/composables/useDocumentSchema'
 import type { CatalogReferences } from '~/types/catalog'
 import type { Revision, RevisionItemInput, RevisionStatus } from '~/types/revision'
 import { errorName } from '~/utils/revisionErrors'
+import { fillRequiredText } from '~/utils/requiredText'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
 
@@ -28,6 +30,7 @@ const BACKUP_PREFIX = 'cdcat:revision-draft:'
  */
 export function useRevisionDraft(backupId: string, options: { prepare?: (item: DraftItem) => DraftItem } = {}) {
   const { $api } = useNuxtApp()
+  const { schema, pending: schemaPending } = useCatalogSchema()
   const revisionId = ref<number | null>(null)
   const lockVersion = ref(0)
   const status = ref<RevisionStatus | null>(null)
@@ -90,7 +93,7 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
    * submission (applied_at) are not part of the draft any more: that content is edited directly.
    */
   async function loadRevision(id: number) {
-    const revision = await $api<Revision>(`/v1/revisions/${id}`)
+    const [revision] = await Promise.all([$api<Revision>(`/v1/revisions/${id}`), schemaLoaded()])
     adopt(revision)
     start((revision.items ?? []).filter(item => !item.applied_at).map(item => ({
       ref: item.ref,
@@ -98,11 +101,27 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
       action: item.action,
       ...(item.resource_id ? { resource_id: item.resource_id } : {}),
       ...(item.base_version !== null ? { base_version: item.base_version } : {}),
-      ...(item.document ? { document: item.document } : {}),
+      ...(item.document ? { document: editable(item.resource_type, item.document) } : {}),
       ...(item.impact_checksum ? { impact_checksum: item.impact_checksum } : {}),
       ...(item.acknowledged_duplicate_ids?.length ? { acknowledged_duplicate_ids: item.acknowledged_duplicate_ids } : {}),
     })), { summary: revision.summary ?? '', sources: revision.sources })
     return revision
+  }
+
+  /** Resolves once GET /catalog/schema has answered, whether or not it succeeded. */
+  const schemaLoaded = () => new Promise<void>((resolve) => {
+    if (!schemaPending.value) return resolve()
+    const stop = watch(schemaPending, (value) => {
+      if (value) return
+      stop()
+      resolve()
+    })
+  })
+
+  /** A saved document as the editors bind it: required text fields the draft left empty come back as ''. */
+  const editable = (type: string, document: Record<string, unknown>) => {
+    const aggregate = schema.value?.aggregates?.[type] as { fields: SchemaField[], collections: SchemaCollection[] } | undefined
+    return aggregate ? fillRequiredText(document, aggregate) : document
   }
 
   const adopt = (revision: Revision) => {
@@ -140,8 +159,8 @@ export function useRevisionDraft(backupId: string, options: { prepare?: (item: D
         const current = new Set(items.value.map(item => item.ref))
         const removedRefs = [...serverRefs].filter(ref => !current.has(ref))
         const revision = revisionId.value
-          ? await $api<Revision>(`/v1/revisions/${revisionId.value}`, { method: 'PUT', body: { ...payload(), removed_refs: removedRefs, lock_version: lockVersion.value } })
-          : await $api<Revision>('/v1/revisions', { method: 'POST', body: { ...payload(), submit: false } })
+          ? await $api<Revision>(`/v1/revisions/${revisionId.value}`, { method: 'PUT', body: { ...payload(), removed_refs: removedRefs, lock_version: lockVersion.value }, progress: false })
+          : await $api<Revision>('/v1/revisions', { method: 'POST', body: { ...payload(), submit: false }, progress: false })
         adopt(revision)
         saved = sent
         firstChangeAt = 0

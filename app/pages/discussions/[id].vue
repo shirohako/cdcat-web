@@ -134,7 +134,7 @@ function sendRead(keepalive = false) {
     }).catch(() => {})
     return
   }
-  $api(`/v1/discussions/topics/${topicId.value}/read`, { method: 'PUT', body: { post_id: seenMax } }).catch(() => { reportedMax = 0 })
+  $api(`/v1/discussions/topics/${topicId.value}/read`, { method: 'PUT', body: { post_id: seenMax }, progress: false }).catch(() => { reportedMax = 0 })
 }
 
 function observe() {
@@ -152,7 +152,7 @@ function observe() {
 async function poll() {
   if (document.visibilityState !== 'visible' || !topic.value) return
   try {
-    const activity = await $api<{ new_floors: number, new_replies: Record<string, number> }>(`/v1/discussions/topics/${topicId.value}/activity`, { query: { after_post_id: loadedMax() } })
+    const activity = await $api<{ new_floors: number, new_replies: Record<string, number> }>(`/v1/discussions/topics/${topicId.value}/activity`, { query: { after_post_id: loadedMax() }, progress: false })
     newActivity.value = activity.new_floors || Object.keys(activity.new_replies).length ? activity : null
   }
   catch { /* try again on the next tick */ }

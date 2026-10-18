@@ -15,7 +15,7 @@ export interface AttributeRow { id: RowId, key: string, value: unknown, sort_ord
 export interface AlbumDocument {
   title: string
   slug: string | null
-  type: string
+  type: string | null
   categories: string[]
   release_date: string | null
   release_date_precision: DatePrecision

@@ -9,10 +9,7 @@
         </label>
         <div class="sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.entity.parent_label') }}</span>
-          <div v-if="doc.parent_id !== null" class="flex items-center gap-2 text-sm">
-            <EditorRefLabel :id="doc.parent_id" type="label" :references="editor.references" />
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.delete')" @click="doc.parent_id = null"><X :size="12" /></button>
-          </div>
+          <EditorPickedRef v-if="doc.parent_id !== null" :id="doc.parent_id" type="label" :references="editor.references" :icon="Building2" class="max-w-md" @remove="doc.parent_id = null" />
           <EditorEntityPicker v-else kind="label" class="max-w-md" :exclude="[editor.id]" @select="pickParent" />
           <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.entity.parent_label_hint') }}</p>
           <p v-if="editor.errorAt('parent_id')" class="mt-1 text-xs text-error">{{ editor.errorAt('parent_id') }}</p>
@@ -57,7 +54,7 @@
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { LabelDocument } from '~/types/document'
-import { Building2, Languages, X } from '@lucide/vue'
+import { Building2, Languages } from '@lucide/vue'
 
 const editor = useEntityEditor()
 const doc = computed(() => editor.doc.value as unknown as LabelDocument)

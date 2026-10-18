@@ -122,7 +122,7 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
     inflight = (async () => {
       try {
         if (!articleId.value) {
-          const created = await $api<ArticleDraftPayload>('/v1/articles', { method: 'POST', body: sent })
+          const created = await $api<ArticleDraftPayload>('/v1/articles', { method: 'POST', body: sent, progress: false })
           clearBackup()
           articleId.value = created.article.id
           payload.value = created
@@ -132,7 +132,7 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
         }
         else {
           const result = await $api<{ revision: number, updated_at: string }>(`/v1/articles/${articleId.value}/draft`, {
-            method: 'PUT', body: { ...changes, revision: revision.value },
+            method: 'PUT', body: { ...changes, revision: revision.value }, progress: false,
           })
           revision.value = result.revision
           savedAt.value = result.updated_at

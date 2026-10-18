@@ -79,6 +79,13 @@ export const useCatalogDisplay = () => {
     return te(key) ? t(key) : value.replaceAll('_', ' ')
   }
 
+  /** The English label, for showing next to the UI-language one; empty until the English messages are loaded. */
+  const enumLabelEn = (group: string, value: string | null | undefined) => {
+    if (!value) return ''
+    const key = `${ENUM_GROUPS[group] ?? `catalog.${group}`}.${value}`
+    return te(key, 'en') ? t(key, {}, { locale: 'en' }) : ''
+  }
+
   /** An attribute value as text: choices by their name, dates at their precision, references by the item's name. */
   const attributeText = (attribute: CatalogAttribute) => {
     const definition = attributeDefinition(attribute.key)
@@ -103,5 +110,5 @@ export const useCatalogDisplay = () => {
     return resource ? `/${resource}/${value.id}` : null
   }
 
-  return { localName, originalName, titleIn, localeName, formatDate, formatDuration, enumLabel, attributeText, attributeLink }
+  return { localName, originalName, titleIn, localeName, formatDate, formatDuration, enumLabel, enumLabelEn, attributeText, attributeLink }
 }

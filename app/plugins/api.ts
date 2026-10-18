@@ -12,15 +12,23 @@ export default defineNuxtPlugin((nuxtApp) => {
   const config = useRuntimeConfig()
   const stateToken = useState<string | null>('auth:token')
   const stateUser = useState<User | null>('auth:user')
-  const authTokenCookie = useCookie<string | null>('auth_token')
-  const authUserCookie = useCookie('auth_user')
+  const { token: authTokenCookie, user: authUserCookie } = useAuthCookies()
   const translateError = (key: string) => nuxtApp.$i18n.t(key)
+  const progressBar = import.meta.client ? useProgressBar() : null
+  /** Ends the request's share of the progress bar; kept on the ofetch context of each attempt. */
+  const PROGRESS_DONE = Symbol('progress-done')
+  type TrackedContext = { [PROGRESS_DONE]?: () => void }
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl as string,
 
     // 请求拦截器
-    onRequest({ options }) {
+    onRequest(context) {
+      const { options } = context
+      // Background requests (autosave, polling, search-as-you-type) pass `progress: false`.
+      if (progressBar && (options as ApiFetchOptions).progress !== false) {
+        (context as TrackedContext)[PROGRESS_DONE] = progressBar.track()
+      }
       // 从 useState 读取 token（与 useAuth composable 共享同一个 ref，写入即时生效）
       // 回退到 cookie（SSR 首次请求时 useState 可能未初始化）
       const token = stateToken.value || authTokenCookie.value
@@ -32,8 +40,15 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
     },
 
+    // Network failures, timeouts and aborts never reach onResponse.
+    onRequestError(context) {
+      (context as TrackedContext)[PROGRESS_DONE]?.()
+    },
+
     // 响应拦截器 - 处理成功响应
-    onResponse({ response }) {
+    onResponse(context) {
+      (context as TrackedContext)[PROGRESS_DONE]?.()
+      const { response } = context
       // Let HTTP errors reach onResponseError, which also clears invalid sessions.
       if (!response.ok) return
       const result = response._data as ApiResponse | ApiErrorResponse
@@ -133,4 +148,9 @@ export default defineNuxtPlugin((nuxtApp) => {
  * The result type still comes from the explicit type argument or the assignment target.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- same default as ofetch's $Fetch
-type ApiFetch = <T = any>(request: string, options?: Parameters<typeof $fetch>[1]) => Promise<T>
+type ApiFetch = <T = any>(request: string, options?: ApiFetchOptions) => Promise<T>
+
+type ApiFetchOptions = NonNullable<Parameters<typeof $fetch>[1]> & {
+  /** false keeps this request off the page-top progress bar (AppProgressBar). */
+  progress?: boolean
+}

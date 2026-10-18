@@ -44,7 +44,7 @@ let poll: ReturnType<typeof setTimeout> | null = null
 const pollMail = async (attempt = 0) => {
   if (!mailAuditId.value || !hasPermission('audit.view')) return
   try {
-    mailLog.value = await $api<AdminAuditLog>(`/v1/admin/audit-logs/${mailAuditId.value}`)
+    mailLog.value = await $api<AdminAuditLog>(`/v1/admin/audit-logs/${mailAuditId.value}`, { progress: false })
   } catch { /* Keep the submitted state; the audit log remains the source of truth. */ }
   if (mailLog.value?.result === 'submitted' && attempt < 20) poll = setTimeout(() => pollMail(attempt + 1), 3000)
 }

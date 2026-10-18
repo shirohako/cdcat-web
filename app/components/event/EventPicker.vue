@@ -90,6 +90,7 @@ watch(() => props.releaseDate, async (date) => {
   try {
     const page = await $api<{ events: EventOption[] }>('/v1/events', {
       query: { start_from: from.toISOString().slice(0, 10), start_to: date, per_page: 10 },
+      progress: false,
     })
     if (props.releaseDate === date) suggestions.value = page.events.filter(event => eventCoversDate(event, date))
   } catch {

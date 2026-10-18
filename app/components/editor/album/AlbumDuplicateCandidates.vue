@@ -85,6 +85,7 @@ const check = async () => {
     const data = await $api<{ candidates: DuplicateCandidate[] }>('/v1/albums/duplicate-candidates', {
       method: 'POST',
       body: { document: pruneAlbumDocument(album.value), exclude_id: albumId ?? undefined },
+      progress: false,
     })
     if (current === requestId) candidates.value = data.candidates
   } catch {
