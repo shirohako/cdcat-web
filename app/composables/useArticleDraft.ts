@@ -7,6 +7,7 @@ export interface ArticleDraftForm {
   title: string
   summary: string
   cover_url: string
+  banner_url: string
   content: string
   slug: string
   links: ContentLinkSummary[]
@@ -23,13 +24,14 @@ interface LocalCopy {
 const LOCAL_DELAY = 1000
 const LOCAL_PREFIX = 'cdcat:article-draft:'
 
-const emptyForm = (): ArticleDraftForm => ({ type: null, title: '', summary: '', cover_url: '', content: '', slug: '', links: [], tags: [] })
+const emptyForm = (): ArticleDraftForm => ({ type: null, title: '', summary: '', cover_url: '', banner_url: '', content: '', slug: '', links: [], tags: [] })
 
 const formFrom = (payload: ArticleEditPayload): ArticleDraftForm => ({
   type: payload.article.type,
   title: payload.article.title ?? '',
   summary: payload.article.summary ?? '',
   cover_url: payload.article.cover_url ?? '',
+  banner_url: payload.article.banner_url ?? '',
   content: payload.article.content ?? '',
   slug: payload.article.slug ?? '',
   links: payload.article.links,
@@ -42,6 +44,7 @@ const serialize = (form: ArticleDraftForm): Record<keyof ArticleDraftFields, unk
   title: form.title,
   summary: form.summary,
   cover_url: form.cover_url.trim(),
+  banner_url: form.banner_url.trim(),
   content: form.content,
   slug: form.slug.trim(),
   links: form.links.map(link => ({ type: link.type, id: link.id })),

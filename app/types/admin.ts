@@ -276,6 +276,7 @@ export interface AdminArticleItem extends MyArticle {
 export interface AdminArticle extends AdminArticleItem {
   summary: string | null
   cover_url: string | null
+  banner_url: string | null
   content: string | null
   word_count: number
   /** The status a locked article goes back to when unlocked. */
@@ -344,6 +345,7 @@ export interface AdminSiteSettings {
   settings: {
     registration_open: boolean
     announcement: { content: string, level: 'info' | 'warning', enabled: boolean, ends_at: string | null, version: number }
+    article_content_min: number
   }
   updated: Record<string, { updated_at: string | null, updated_by: { id: number, username: string, nickname: string | null } | null }>
   public: { registration_open: boolean, announcement: unknown }
@@ -422,9 +424,9 @@ export interface AdminDiscussionCategory {
   is_archived: boolean
   topic_template: string | null
   show_in_latest: boolean
+  show_in_list: boolean
   topics_count: number
   is_system: boolean
-  show_in_list: boolean
   created_at: string
   updated_at: string
 }

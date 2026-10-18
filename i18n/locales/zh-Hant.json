@@ -554,6 +554,9 @@
       "cover_https": "請填寫 https 開頭的圖片網址。",
       "cover_preview": "封面預覽",
       "cover_broken": "圖片無法載入，請檢查網址。",
+      "banner": "頁面橫幅",
+      "banner_hint": "文章頁頂部的大圖，建議 3:1（如 1920×640）。不填時使用封面。",
+      "banner_preview": "橫幅預覽",
       "links": "關聯內容",
       "links_hint": "文章會出現在這些專輯、藝術家、條目、系列頁面的「相關文章」裡。",
       "advanced": "進階設定",
@@ -610,7 +613,6 @@
         "hide": "隱藏"
       },
       "published": "已發布",
-      "notice_published": "你正在編輯已發布的文章，點擊「更新」後修改才會公開。",
       "conflict_title": "文章在別處儲存過",
       "conflict_description": "伺服器上有一份 {time} 儲存的較新版本，可能來自另一個視窗。要保留哪一份？",
       "conflict_keep_mine": "保留我的內容",
@@ -638,7 +640,7 @@
       "checks": {
         "title": "標題 2–100 字",
         "type": "選擇文章類型",
-        "content": "內文至少 300 字",
+        "content": "內文至少 {count} 字",
         "summary": "填寫摘要",
         "cover": "設定封面"
       },
@@ -2084,9 +2086,9 @@
       "title": "留言",
       "reactions": "回應這篇文章",
       "empty": "還沒有留言，來說兩句吧。",
+      "write": "寫評論…",
       "login": "登入後發表留言"
     }
-      "write": "寫評論…",
   },
   "labels": {
     "title": "廠牌",

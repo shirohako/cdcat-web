@@ -1065,6 +1065,7 @@
       "status": "状态",
       "published_at": "发布时间",
       "cover": "封面 URL",
+      "banner": "页面横幅 URL",
       "content": "正文（Markdown）",
       "delete_title": "删除文章",
       "delete_help": "永久删除文章及其关联、标签和举报，并刷新相关专辑的文章数。删除前的内容写入操作日志。",
@@ -1202,7 +1203,10 @@
       "preview": "预览",
       "live": "公告正在前台显示。",
       "not_live": "前台当前没有显示公告。",
-      "updated": "{name} 于 {time} 修改"
+      "updated": "{name} 于 {time} 修改",
+      "articles": "文章",
+      "article_content_min": "发布所需的最少字数",
+      "article_content_min_help": "按正文纯文本计算（不含空白和 Markdown 标记）。发布、以及更新已发布或已隐藏的文章时检查，草稿不受限制。0 表示不限制。"
     },
     "audit": {
       "title": "操作日志",
@@ -1436,12 +1440,12 @@
         "moderators_only_help": "只有版主能发主题（其他人可以回复）",
         "show_in_latest": "出现在讨论区首页的「最新」里",
         "not_in_latest": "不进「最新」",
+        "show_in_list": "显示在版块列表和侧栏里（关掉后仍可通过链接打开）",
+        "not_in_list": "不在版块列表",
         "archived": "已归档",
         "archive_help": "归档：不能再发主题和回复",
         "system": "系统版块",
         "topics": "{count} 个主题",
-        "show_in_list": "显示在版块列表和侧栏里（关掉后仍可通过链接打开）",
-        "not_in_list": "不在版块列表",
         "template": "发帖模板",
         "template_placeholder": "发主题时预填到编辑器里，例如：\n曲目信息：\n试听链接：\n出处：",
         "delete_title": "删除版块「{name}」？",
@@ -1673,6 +1677,9 @@
       "cover_https": "请填写 https 开头的图片地址。",
       "cover_preview": "封面预览",
       "cover_broken": "图片无法加载，请检查地址。",
+      "banner": "页面横幅",
+      "banner_hint": "文章页顶部的大图，建议 3:1（如 1920×640）。不填时使用封面。",
+      "banner_preview": "横幅预览",
       "links": "关联内容",
       "links_hint": "文章会出现在这些专辑、艺术家、条目、系列页面的「相关文章」里。",
       "advanced": "高级设置",
@@ -1729,7 +1736,6 @@
         "hide": "隐藏"
       },
       "published": "已发布",
-      "notice_published": "你正在编辑已发布的文章，点击「更新」后修改才会公开。",
       "conflict_title": "文章在别处保存过",
       "conflict_description": "服务器上有一份 {time} 保存的较新版本，可能来自另一个窗口。要保留哪一份？",
       "conflict_keep_mine": "保留我的内容",
@@ -1757,7 +1763,7 @@
       "checks": {
         "title": "标题 2–100 字",
         "type": "选择文章类型",
-        "content": "正文至少 300 字",
+        "content": "正文至少 {count} 字",
         "summary": "填写摘要",
         "cover": "设置封面"
       },
@@ -3203,13 +3209,13 @@
       "title": "评论",
       "reactions": "回应这篇文章",
       "empty": "还没有评论，来说两句吧。",
+      "write": "写评论…",
       "login": "登录后发表评论"
     }
   },
   "labels": {
     "title": "厂牌",
     "subtitle": "唱片公司与厂牌",
-      "write": "写评论…",
     "label": "厂牌",
     "parent": "上级厂牌",
     "children": "子厂牌",

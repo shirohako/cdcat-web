@@ -65,6 +65,8 @@ export interface ArticleCard {
 }
 
 export interface ArticleDetail extends ArticleCard {
+  /** The wide page header; the cover stands in when it is null. */
+  banner_url: string | null
   content: string
   links: ContentLinkSummary[]
   /** Set when the article was edited well after its first publication. */
@@ -88,6 +90,7 @@ export interface ArticleEditPayload {
     title: string | null
     summary: string | null
     cover_url: string | null
+    banner_url: string | null
     content: string | null
     links: ContentLinkSummary[]
     tags: TagSummary[]
@@ -105,6 +108,7 @@ export interface ArticleDraftFields {
   title: string
   summary: string
   cover_url: string
+  banner_url: string
   content: string
   slug: string
   links: ContentLink[]

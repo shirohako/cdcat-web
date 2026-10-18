@@ -51,15 +51,15 @@ watch(data, (value) => { slug.value = value?.slug ?? '' }, { immediate: true })
 const saveSlug = () => run(() => $api(`/v1/admin/articles/${id.value}`, { method: 'PATCH', body: { slug: slug.value.trim() || null } }), t('admin_pages.saved'))
 
 const editing = ref(false)
-const edit = reactive({ type: null as ArticleType | null, title: '', summary: '', cover_url: '', content: '', reason: '' })
+const edit = reactive({ type: null as ArticleType | null, title: '', summary: '', cover_url: '', banner_url: '', content: '', reason: '' })
 function startEdit() {
   const article = data.value
   if (!article) return
-  Object.assign(edit, { type: article.type, title: article.title ?? '', summary: article.summary ?? '', cover_url: article.cover_url ?? '', content: article.content ?? '', reason: '' })
+  Object.assign(edit, { type: article.type, title: article.title ?? '', summary: article.summary ?? '', cover_url: article.cover_url ?? '', banner_url: article.banner_url ?? '', content: article.content ?? '', reason: '' })
   editing.value = true
 }
 const saveEdit = () => run(() => $api(`/v1/admin/articles/${id.value}`, { method: 'PATCH', body: {
-  type: edit.type, title: edit.title, summary: edit.summary || null, cover_url: edit.cover_url.trim() || null, content: edit.content, reason: edit.reason.trim(),
+  type: edit.type, title: edit.title, summary: edit.summary || null, cover_url: edit.cover_url.trim() || null, banner_url: edit.banner_url.trim() || null, content: edit.content, reason: edit.reason.trim(),
 } }), t('admin_pages.articles.edited_done'), async () => { editing.value = false; await refresh() })
 
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'
@@ -118,6 +118,7 @@ useHead({ title: computed(() => data.value?.title ?? t('admin_pages.articles.tit
           <label class="block sm:col-span-2">{{ t('admin_pages.articles.article_title') }}<input v-model="edit.title" :required="data.status !== 'draft'" maxlength="100" :class="input"></label>
           <label class="block">{{ t('admin_pages.articles.type') }}<select v-model="edit.type" :required="data.status !== 'draft'" :class="input"><option v-for="option in types.filter(item => item.is_active || item.key === edit.type)" :key="option.key" :value="option.key">{{ typeName(option.key, 'zh-Hans') }}</option></select></label>
           <label class="block">{{ t('admin_pages.articles.cover') }}<input v-model="edit.cover_url" type="url" maxlength="500" :class="input"></label>
+          <label class="block">{{ t('admin_pages.articles.banner') }}<input v-model="edit.banner_url" type="url" maxlength="500" :class="input"></label>
           <label class="block sm:col-span-2">{{ t('admin_pages.articles.summary') }}<input v-model="edit.summary" maxlength="200" :class="input"></label>
           <div class="sm:col-span-2"><MarkdownEditor v-model="edit.content" :guide-url="null" /></div>
           <label class="block sm:col-span-2">{{ t('admin_pages.reason') }}<input v-model="edit.reason" required maxlength="2000" :class="input"></label>
@@ -141,6 +142,7 @@ useHead({ title: computed(() => data.value?.title ?? t('admin_pages.articles.tit
               <dt>{{ t('admin_pages.articles.tags') }}</dt><dd class="text-slate-700">{{ data.tags.map(tag => tag.name).join('、') || '—' }}</dd>
               <dt>{{ t('admin_pages.articles.links') }}</dt><dd class="text-slate-700">{{ data.links.map(link => `${t(`admin_pages.articles.link_types.${link.type}`)}：${link.title}`).join('；') || '—' }}</dd>
               <dt>{{ t('admin_pages.articles.cover') }}</dt><dd class="truncate text-slate-700">{{ data.cover_url || '—' }}</dd>
+              <dt>{{ t('admin_pages.articles.banner') }}</dt><dd class="truncate text-slate-700">{{ data.banner_url || '—' }}</dd>
             </dl>
             <p v-if="!data.content" class="text-sm text-slate-500">{{ t('admin_pages.articles.nothing_to_show') }}</p>
             <RichContent v-else-if="contentView === 'rendered'" :content="data.content" format="markdown" />

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { AlertTriangle, ArrowLeft, Check, Columns2, EyeOff, Eye, History, ListTree, Loader2, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
+import type { ArticleEditPayload } from '~/types/article'
 import type { MarkdownHeading } from '~/utils/markdown'
 import type { SubmitCheck } from './WriterSubmitDialog.vue'
 import { TAG_NAME_MAX, tagErrorKey } from '~/utils/tags'
@@ -15,6 +16,7 @@ const { t, locale } = useI18n()
 const { hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { toast, showToast } = useToast()
+const { site } = useSite()
 
 const draft = useArticleDraft(props.articleId, {
   onCreated: (id) => { if (import.meta.client) window.history.replaceState(window.history.state, '', `/articles/${id}/edit`) },
@@ -76,7 +78,7 @@ onBeforeUnmount(() => clearTimeout(textTimer))
 const checks = computed<SubmitCheck[]>(() => [
   { key: 'title', ok: form.title.trim().length >= 2 && form.title.trim().length <= 100, required: true },
   { key: 'type', ok: form.type !== null, required: true },
-  { key: 'content', ok: wordCount.value >= 300, required: true },
+  { key: 'content', ok: wordCount.value >= site.value.article_content_min, required: true, params: { count: site.value.article_content_min } },
   { key: 'summary', ok: form.summary.trim() !== '', required: false },
   { key: 'cover', ok: form.cover_url.trim() !== '', required: false },
 ])
@@ -105,12 +107,24 @@ function describe(error: unknown) {
   return failure?.name && known[failure.name] ? t(known[failure.name]!) : localizeError(error)
 }
 
-/** Saves the draft, or updates the article on the site; Ctrl+S does the same. */
-async function save() {
+/** Shows the author the article as readers see it, once it is on the site. */
+async function openArticle(payload: ArticleEditPayload | null | undefined) {
+  if (payload?.article.status !== 'published') return false
+  const { id, slug } = payload.article
+  await navigateTo(`/articles/${id}${slug ? `/${slug}` : ''}`)
+  return true
+}
+
+/**
+ * Saves the draft, or updates the article on the site. The「更新」button then opens the published
+ * article; Ctrl+S saves in place, so writing can go on.
+ */
+async function save(options: { openAfter?: boolean } = {}) {
   if (!can.value.edit || busy.value) return
   fieldErrors.value = {}
   try {
-    await draft.save()
+    const next = await draft.save()
+    if (options.openAfter && can.value.update && await openArticle(next)) return
     showToast(t(can.value.update ? 'article_ui.writer.updated' : 'article_ui.writer.draft_saved'))
   }
   catch (error) { if ((error as ApiError).name !== 'ARTICLE_DRAFT_CONFLICT') showToast(describe(error), 'error') }
@@ -125,8 +139,9 @@ function openPublish() {
 async function confirmPublish() {
   actionError.value = ''
   try {
-    await draft.publish()
+    const next = await draft.publish()
     dialogOpen.value = false
+    if (await openArticle(next)) return
     showToast(t('article_ui.writer.published'))
   }
   catch (error) {
@@ -214,7 +229,7 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
           </button>
           <button
             type="button" class="btn btn-sm" :class="can.publish ? 'btn-outline' : 'btn-primary'" :disabled="busy || (!dirty && !!draft.articleId.value)"
-            :title="t('article_ui.writer.save_shortcut')" @click="save">
+            :title="t('article_ui.writer.save_shortcut')" @click="save({ openAfter: true })">
             <Loader2 v-if="busy && !dialogOpen" :size="14" class="animate-spin" /><Save v-else :size="14" />
             {{ t(`article_ui.writer.actions.${can.update ? 'update' : 'save_draft'}`) }}
           </button>
@@ -244,7 +259,6 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
           <strong>{{ t('article_ui.writer.notice_hidden') }}</strong>
           <template v-if="payload?.article.status_reason">{{ t('article_ui.writer.notice_hidden_reason', { reason: payload.article.status_reason }) }}</template>
         </p>
-        <p v-else-if="status === 'published'" class="bg-sky-50 px-4 py-2 text-sm text-sky-800">{{ t('article_ui.writer.notice_published') }}</p>
         <div v-if="restoredAt && dirty" class="flex flex-wrap items-center gap-2 bg-violet-50 px-4 py-2 text-sm text-violet-800">
           <History :size="15" />{{ t('article_ui.writer.local_restored', { time: time(restoredAt) }) }}
           <button type="button" class="text-violet-600 underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
@@ -304,7 +318,7 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
             <button type="button" class="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-slate-100" :aria-label="t('common.close')" @click="settingsOpen = false"><X :size="15" /></button>
           </div>
           <ArticleWriterSettings
-            v-model:type="form.type" v-model:summary="form.summary" v-model:cover-url="form.cover_url" v-model:slug="form.slug"
+            v-model:type="form.type" v-model:summary="form.summary" v-model:cover-url="form.cover_url" v-model:banner-url="form.banner_url" v-model:slug="form.slug"
             v-model:links="form.links" v-model:tags="form.tags" :disabled="readOnly" :allow-staff-tags="hasPermission('articles.manage')" :errors="fieldErrors" />
         </aside>
       </div>

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { ArticleType, ContentLinkSummary, TagSummary } from '~/types/article'
 
-/** The article's metadata: type, tags, summary, cover, links and custom link path. */
+/** The article's metadata: type, tags, summary, cover, page banner, links and custom link path. */
 const props = withDefaults(defineProps<{ disabled?: boolean, allowStaffTags?: boolean, errors?: Record<string, string> }>(),
   { disabled: false, allowStaffTags: false, errors: () => ({}) })
 const type = defineModel<ArticleType | null>('type', { required: true })
 const summary = defineModel<string>('summary', { required: true })
 const coverUrl = defineModel<string>('coverUrl', { required: true })
+const bannerUrl = defineModel<string>('bannerUrl', { required: true })
 const slug = defineModel<string>('slug', { required: true })
 const links = defineModel<ContentLinkSummary[]>('links', { required: true })
 const tags = defineModel<TagSummary[]>('tags', { required: true })
@@ -16,7 +17,11 @@ const { types, typeName } = useArticleTypes()
 const typeOptions = computed(() => types.value.filter(item => item.is_active || item.key === type.value))
 const coverBroken = ref(false)
 watch(coverUrl, () => { coverBroken.value = false })
-const coverIsHttps = computed(() => !coverUrl.value.trim() || /^https:\/\/\S+$/i.test(coverUrl.value.trim()))
+const isHttps = (url: string) => !url.trim() || /^https:\/\/\S+$/i.test(url.trim())
+const coverIsHttps = computed(() => isHttps(coverUrl.value))
+const bannerBroken = ref(false)
+watch(bannerUrl, () => { bannerBroken.value = false })
+const bannerIsHttps = computed(() => isHttps(bannerUrl.value))
 const label = 'block text-xs font-semibold uppercase tracking-wide text-slate-500'
 const field = 'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-violet-400 disabled:bg-slate-50'
 const errorText = (key: string) => props.errors[key]
@@ -60,6 +65,17 @@ const errorText = (key: string) => props.errors[key]
       <p v-if="!coverIsHttps || errorText('cover_url')" class="text-xs text-rose-600">{{ errorText('cover_url') || t('article_ui.fields.cover_https') }}</p>
       <div v-else-if="coverUrl.trim()" class="aspect-video overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
         <img v-if="!coverBroken" :src="coverUrl.trim()" :alt="t('article_ui.fields.cover_preview')" class="size-full object-cover" referrerpolicy="no-referrer" @error="coverBroken = true">
+        <p v-else class="grid size-full place-items-center text-xs text-slate-400">{{ t('article_ui.fields.cover_broken') }}</p>
+      </div>
+    </section>
+
+    <section class="space-y-2">
+      <label :class="label" for="writer-banner">{{ t('article_ui.fields.banner') }}</label>
+      <input id="writer-banner" v-model="bannerUrl" type="url" inputmode="url" maxlength="500" :disabled="disabled" :class="field" placeholder="https://…">
+      <p class="text-[11px] text-slate-400">{{ t('article_ui.fields.banner_hint') }}</p>
+      <p v-if="!bannerIsHttps || errorText('banner_url')" class="text-xs text-rose-600">{{ errorText('banner_url') || t('article_ui.fields.cover_https') }}</p>
+      <div v-else-if="bannerUrl.trim()" class="aspect-[3/1] overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
+        <img v-if="!bannerBroken" :src="bannerUrl.trim()" :alt="t('article_ui.fields.banner_preview')" class="size-full object-cover" referrerpolicy="no-referrer" @error="bannerBroken = true">
         <p v-else class="grid size-full place-items-center text-xs text-slate-400">{{ t('article_ui.fields.cover_broken') }}</p>
       </div>
     </section>

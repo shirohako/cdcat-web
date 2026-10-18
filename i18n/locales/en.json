@@ -554,6 +554,9 @@
       "cover_https": "Enter an image address starting with https.",
       "cover_preview": "Cover preview",
       "cover_broken": "The image cannot be loaded. Check the address.",
+      "banner": "Page banner",
+      "banner_hint": "The wide image across the top of the article page, about 3:1 (e.g. 1920×640). The cover is used when empty.",
+      "banner_preview": "Banner preview",
       "links": "Linked content",
       "links_hint": "The article appears under “Related articles” on these album, artist, entry and series pages.",
       "advanced": "Advanced",
@@ -610,7 +613,6 @@
         "hide": "Hide"
       },
       "published": "Published",
-      "notice_published": "You are editing a published article. Your changes reach readers when you click “Update”.",
       "conflict_title": "This article was saved elsewhere",
       "conflict_description": "The server has a newer copy saved at {time}, perhaps from another window. Which one do you want to keep?",
       "conflict_keep_mine": "Keep mine",
@@ -638,7 +640,7 @@
       "checks": {
         "title": "Title of 2–100 characters",
         "type": "Article type chosen",
-        "content": "At least 300 characters of text",
+        "content": "At least {count} characters of text",
         "summary": "Summary written",
         "cover": "Cover set"
       },
@@ -2084,9 +2086,9 @@
       "title": "Comments",
       "reactions": "React to this article",
       "empty": "No comments yet. Be the first.",
+      "write": "Write a comment…",
       "login": "Sign in to comment"
     }
-      "write": "Write a comment…",
   },
   "labels": {
     "title": "Labels",

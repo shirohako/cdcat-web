@@ -6,6 +6,7 @@ export interface SubmitCheck {
   ok: boolean
   /** Required checks block the action; the others are suggestions. */
   required: boolean
+  params?: Record<string, unknown>
 }
 
 /** Confirms publishing, or publishing a hidden article again, after a checklist; there is no review. */
@@ -40,7 +41,7 @@ const confirm = () => { if (!props.busy && !blocked.value) emit('confirm') }
           <CheckCircle2 v-if="check.ok" :size="16" class="shrink-0 text-emerald-500" />
           <XCircle v-else-if="check.required" :size="16" class="shrink-0 text-rose-500" />
           <Circle v-else :size="16" class="shrink-0 text-slate-300" />
-          <span :class="check.ok ? 'text-slate-700' : check.required ? 'text-rose-700' : 'text-slate-500'">{{ t(`article_ui.submit.checks.${check.key}`) }}</span>
+          <span :class="check.ok ? 'text-slate-700' : check.required ? 'text-rose-700' : 'text-slate-500'">{{ t(`article_ui.submit.checks.${check.key}`, check.params ?? {}) }}</span>
           <span v-if="!check.required" class="ml-auto text-[11px] text-slate-400">{{ t('article_ui.submit.optional') }}</span>
         </li>
       </ul>

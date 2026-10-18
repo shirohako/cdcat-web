@@ -14,11 +14,11 @@ const toLocalInput = (iso: string | null) => {
   const date = new Date(iso)
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
 }
-const form = reactive({ registration_open: true, content: '', level: 'info' as 'info' | 'warning', enabled: false, ends_at: '', reason: '' })
+const form = reactive({ registration_open: true, content: '', level: 'info' as 'info' | 'warning', enabled: false, ends_at: '', article_content_min: 100, reason: '' })
 watch(data, (value) => {
   if (!value) return
-  const { registration_open, announcement } = value.settings
-  Object.assign(form, { registration_open, content: announcement.content, level: announcement.level, enabled: announcement.enabled, ends_at: toLocalInput(announcement.ends_at), reason: '' })
+  const { registration_open, announcement, article_content_min } = value.settings
+  Object.assign(form, { registration_open, content: announcement.content, level: announcement.level, enabled: announcement.enabled, ends_at: toLocalInput(announcement.ends_at), article_content_min, reason: '' })
 }, { immediate: true })
 const busy = ref(false)
 const message = ref('')
@@ -31,6 +31,7 @@ const save = async () => {
     data.value = await $api<AdminSiteSettings>('/v1/admin/settings', { method: 'PUT', body: {
       registration_open: form.registration_open,
       announcement: { content: form.content, level: form.level, enabled: form.enabled, ends_at: form.ends_at ? new Date(form.ends_at).toISOString() : null },
+      article_content_min: form.article_content_min,
       reason: form.reason || null,
     } })
     notice.value = t('admin_pages.saved')
@@ -79,6 +80,14 @@ useHead({ title: computed(() => t('admin_pages.settings.title')) })
             <p class="whitespace-pre-line">{{ form.content }}</p>
           </div>
           <p class="mt-2 text-xs text-slate-500">{{ data.public.announcement ? t('admin_pages.settings.live') : t('admin_pages.settings.not_live') }}</p>
+        </section>
+        <section class="rounded-xl border border-slate-200 bg-white p-5">
+          <h2 class="font-semibold">{{ t('admin_pages.settings.articles') }}</h2>
+          <label class="mt-3 block max-w-xs">{{ t('admin_pages.settings.article_content_min') }}
+            <input v-model.number="form.article_content_min" type="number" min="0" max="100000" required :class="input">
+          </label>
+          <p class="mt-2 text-xs text-slate-500">{{ t('admin_pages.settings.article_content_min_help') }}</p>
+          <p v-if="updated('article_content_min')" class="mt-1 text-xs text-slate-400">{{ updated('article_content_min') }}</p>
         </section>
         <label class="block">{{ t('admin_pages.optional_reason') }}<input v-model="form.reason" maxlength="2000" :class="input"></label>
         <div class="flex items-center justify-end gap-3">
