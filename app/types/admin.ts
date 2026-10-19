@@ -244,8 +244,11 @@ export interface AdminEvent {
   slug: string
   start_date: string
   end_date: string | null
+  start_time: string | null
+  end_time: string | null
   venue: string | null
   location: string | null
+  website_url: string | null
   main_visual_url: string | null
   main_visual_width: number | null
   main_visual_height: number | null

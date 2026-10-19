@@ -586,14 +586,14 @@ const REF_ICONS: Record<MarkdownRefType, string> = {
 const refIcon = (type: MarkdownRefType, className: string) =>
   `<svg class="${className}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${REF_ICONS[type]}</svg>`
 
-/** Where a database token links. Events have no page of their own; they open their series. */
+/** Where a database token links. */
 export function markdownRefHref(type: MarkdownRefType, item: MarkdownReferenceObject): string {
   switch (type) {
     case 'album': return `/albums/${item.id}`
     case 'artist': return `/artists/${item.id}`
     case 'entry': return `/entries/${item.id}`
     case 'franchise': return `/franchises/${item.id}`
-    case 'event': return item.event_series_id ? `/event-series/${item.event_series_id}` : '/events'
+    case 'event': return `/events/${item.id}`
     case 'track': return item.album_id ? `/albums/${item.album_id}` : '/albums'
     case 'topic': return `/discussions/${item.id}`
     case 'article': return `/articles/${item.id}${item.slug ? `/${encodeURIComponent(item.slug)}` : ''}`

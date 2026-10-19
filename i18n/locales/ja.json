@@ -2684,5 +2684,87 @@
       "link": "外部リンクが同じ：{value}",
       "title": "タイトルが近い：{value}"
     }
+  },
+  "event_page": {
+    "seo_description": "{name}の会場マップと参加サークル {count} 件。会場：{venue}。",
+    "not_found": "イベントが見つかりません",
+    "hero": {
+      "date": "日程",
+      "venue": "会場",
+      "open_map": "会場マップを見る",
+      "days_left": "あと {count} 日",
+      "today": "開催中",
+      "ended": "終了",
+      "edition_site": "公式サイト",
+      "series_site": "{name} 公式サイト"
+    },
+    "stats": {
+      "circles": "参加サークル",
+      "spaces": "スペース",
+      "halls": "ホール・フロア",
+      "albums": "頒布作品"
+    },
+    "map": {
+      "aria": "会場配置図",
+      "title": "会場マップ",
+      "hint": "ホールを選んで拡大、スペースにカーソルでサークル表示、クリックで詳細",
+      "overview": "全体",
+      "zoom_in": "拡大",
+      "zoom_out": "縮小",
+      "reset": "リセット",
+      "wheel_hint": "{key} を押しながらスクロールで拡大縮小（またはマップを一度クリック）",
+      "empty_space": "空きスペース",
+      "color_genre": "ジャンル別に色分け",
+      "color_plain": "単色"
+    },
+    "families": {
+      "music": "音楽一般",
+      "anime_game": "アニメ/ゲーム系",
+      "other": "音響・映像・その他"
+    },
+    "filters": {
+      "search": "サークル名・読み・スペース番号・キーワード・{'@'}X で検索",
+      "all_genres": "すべてのジャンル",
+      "all_halls": "すべてのホール",
+      "clear": "絞り込みを解除",
+      "matching": "{count} / {total} サークル"
+    },
+    "checklist": {
+      "title": "チェック",
+      "short": "チェック済",
+      "add": "チェックする",
+      "remove": "チェックを外す"
+    },
+    "circle": {
+      "artist_page": "アーティストページ",
+      "details": "詳細",
+      "catalog_only": "カタログ参加",
+      "locate": "マップで表示",
+      "links": "リンク",
+      "preview": "試聴・PV",
+      "artist": "アーティスト",
+      "albums": "今回の頒布作品",
+      "adult": "成人向け内容を含みます",
+      "watch_on": "{site} で見る"
+    },
+    "circles": {
+      "empty": "条件に合うサークルはありません",
+      "none": "参加サークルはまだ登録されていません",
+      "index": "ブロック索引",
+      "block_count": "{block} ブロック · {count} サークル",
+      "count": "{count} サークル",
+      "continued": "（前ページから続く）",
+      "range": "{total} 件中 {from}–{to} 件",
+      "following": "マップに連動：{hall}の {count} サークルのみ表示",
+      "show_all_halls": "すべてのホールを表示",
+      "follow_map": "リストをマップのホールに連動させる"
+    },
+    "tabs": {
+      "circles": "参加サークル",
+      "albums": "頒布作品"
+    },
+    "albums": {
+      "empty": "このイベントで頒布されたアルバムはまだありません"
+    }
   }
 }

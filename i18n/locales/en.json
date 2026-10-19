@@ -2684,5 +2684,87 @@
       "link": "Same external link: {value}",
       "title": "Similar title: {value}"
     }
+  },
+  "event_page": {
+    "seo_description": "Venue map and {count} participating circles of {name} at {venue}.",
+    "not_found": "Event not found",
+    "hero": {
+      "date": "Date",
+      "venue": "Venue",
+      "open_map": "Open the venue map",
+      "days_left": "{count} day to go | {count} days to go",
+      "today": "Happening now",
+      "ended": "Ended",
+      "edition_site": "Official site",
+      "series_site": "{name} site"
+    },
+    "stats": {
+      "circles": "circles",
+      "spaces": "spaces",
+      "halls": "halls & floors",
+      "albums": "albums released"
+    },
+    "map": {
+      "aria": "Venue floor plan",
+      "title": "Venue map",
+      "hint": "Pick a hall to zoom in, hover a space to see its circle, click for details",
+      "overview": "Overview",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Zoom out",
+      "reset": "Reset view",
+      "wheel_hint": "Hold {key} and scroll to zoom, or click the map first",
+      "empty_space": "empty space",
+      "color_genre": "Colour by genre",
+      "color_plain": "Single colour"
+    },
+    "families": {
+      "music": "General music",
+      "anime_game": "Anime & games",
+      "other": "Audio, video & other"
+    },
+    "filters": {
+      "search": "Search circles, readings, spaces, keywords, {'@'}handles",
+      "all_genres": "All genres",
+      "all_halls": "All halls",
+      "clear": "Clear filters",
+      "matching": "{count} of {total} circles"
+    },
+    "checklist": {
+      "title": "Want to visit",
+      "short": "Want to visit",
+      "add": "Add to my list",
+      "remove": "Remove from my list"
+    },
+    "circle": {
+      "artist_page": "Artist page",
+      "details": "Details",
+      "catalog_only": "Catalog only",
+      "locate": "Show on map",
+      "links": "Links",
+      "preview": "Previews",
+      "artist": "Artist on CDCat",
+      "albums": "Released here",
+      "adult": "Includes adult content",
+      "watch_on": "Watch on {site}"
+    },
+    "circles": {
+      "empty": "No circles match these filters",
+      "none": "No circles have been imported yet",
+      "index": "Block index",
+      "block_count": "Block {block} · {count} circles",
+      "count": "{count} circle | {count} circles",
+      "continued": "(continued)",
+      "range": "{from}–{to} of {total}",
+      "following": "Following the map: only the {count} circles in {hall}",
+      "show_all_halls": "Show all halls",
+      "follow_map": "Make the list follow the hall on the map"
+    },
+    "tabs": {
+      "circles": "Circles",
+      "albums": "Albums"
+    },
+    "albums": {
+      "empty": "No albums list this event as their release event yet"
+    }
   }
 }

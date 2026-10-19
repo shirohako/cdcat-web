@@ -29,13 +29,14 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Event form =====
-const emptyEvent = () => ({ id: 0, event_series_id: '', name: '', slug: '', start_date: '', end_date: '', venue: '', location: '', main_visual_url: '', main_visual_width: null as number | null, main_visual_height: null as number | null })
+const emptyEvent = () => ({ id: 0, event_series_id: '', name: '', slug: '', start_date: '', end_date: '', start_time: '', end_time: '', venue: '', location: '', website_url: '', main_visual_url: '', main_visual_width: null as number | null, main_visual_height: null as number | null })
 const eventForm = reactive(emptyEvent())
 const eventOpen = ref(false)
 const editEvent = (event?: AdminEvent) => {
   Object.assign(eventForm, emptyEvent(), event ? {
     ...event, event_series_id: event.event_series_id ? String(event.event_series_id) : '', end_date: event.end_date ?? '', venue: event.venue ?? '',
     location: event.location ?? '', main_visual_url: event.main_visual_url ?? '',
+    start_time: event.start_time ?? '', end_time: event.end_time ?? '', website_url: event.website_url ?? '',
     main_visual_width: event.main_visual_width ?? null, main_visual_height: event.main_visual_height ?? null,
   } : {})
   message.value = ''
@@ -48,6 +49,7 @@ const saveEvent = async () => {
     const body = {
       event_series_id: eventForm.event_series_id ? Number(eventForm.event_series_id) : null, name: eventForm.name, slug: eventForm.slug, start_date: eventForm.start_date,
       end_date: eventForm.end_date || null, venue: eventForm.venue || null, location: eventForm.location || null, main_visual_url: eventForm.main_visual_url || null,
+      start_time: eventForm.start_time || null, end_time: eventForm.end_time || null, website_url: eventForm.website_url || null,
       main_visual_width: eventForm.main_visual_url ? eventForm.main_visual_width : null, main_visual_height: eventForm.main_visual_url ? eventForm.main_visual_height : null,
     }
     await $api(eventForm.id ? `/v1/admin/events/${eventForm.id}` : '/v1/admin/events', { method: eventForm.id ? 'PUT' : 'POST', body })
@@ -132,8 +134,11 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
         <label class="block">Slug<input v-model="eventForm.slug" required maxlength="255" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.start_date') }}<input v-model="eventForm.start_date" required type="date" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.end_date') }}<input v-model="eventForm.end_date" type="date" :min="eventForm.start_date" :class="input"></label>
+        <label class="block">{{ t('admin_pages.events.start_time') }}<input v-model="eventForm.start_time" type="time" :class="input"></label>
+        <label class="block">{{ t('admin_pages.events.end_time') }}<input v-model="eventForm.end_time" type="time" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.venue') }}<input v-model="eventForm.venue" maxlength="255" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.location') }}<input v-model="eventForm.location" maxlength="255" :class="input"></label>
+        <label class="block sm:col-span-2">{{ t('admin_pages.events.website') }}<input v-model="eventForm.website_url" type="url" maxlength="2048" placeholder="https://" :class="input"></label>
         <label class="block sm:col-span-2">{{ t('admin_pages.events.visual') }}<input v-model="eventForm.main_visual_url" type="url" maxlength="2048" placeholder="https://" :class="input" @input="clearVisualSize"><span class="mt-1 block text-xs text-slate-500">{{ visualSizeText }}</span><span v-if="visualMismatch" class="mt-1 block text-xs text-amber-700">{{ t('admin_pages.events.visual_mismatch', { orientation: t(`admin_pages.event_series.orientations.${seriesOrientation}`) }) }}</span></label>
         <img v-if="eventForm.main_visual_url" :src="eventForm.main_visual_url" alt="" class="max-h-56 w-auto max-w-full justify-self-start rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2" @load="readVisualSize" @error="clearVisualSize">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
@@ -163,7 +168,7 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
                 <td class="px-4 py-3">{{ event.series?.name ?? '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ event.start_date }}<template v-if="event.end_date && event.end_date !== event.start_date"> ~ {{ event.end_date }}</template></td>
                 <td class="px-4 py-3 tabular-nums">{{ event.released_albums_count }}</td>
-                <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><button type="button" class="underline" @click="editEvent(event)">{{ t('common.edit') }}</button><button type="button" class="text-red-700" @click="startDelete(event)">{{ t('common.delete') }}</button></div></td>
+                <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><NuxtLink :to="`/admin/events/${event.id}`" class="underline">{{ t('admin_pages.event_venue.manage') }}</NuxtLink><button type="button" class="underline" @click="editEvent(event)">{{ t('common.edit') }}</button><button type="button" class="text-red-700" @click="startDelete(event)">{{ t('common.delete') }}</button></div></td>
               </tr>
             </tbody>
           </table>

@@ -1022,7 +1022,10 @@
         "square": "方图"
       },
       "released_albums": "发行专辑",
-      "delete_help": "永久删除并写入操作日志。"
+      "delete_help": "永久删除并写入操作日志。",
+      "start_time": "开场时间",
+      "end_time": "结束时间",
+      "website": "本届官网"
     },
     "event_series": {
       "title": "活动系列",
@@ -1717,6 +1720,79 @@
       "delete": "删除图片",
       "delete_help": "永久删除这张图片和它的缩略图。如果历史版本或已结束的修订用过它，之后恢复到这些版本会被拒绝。",
       "delete_blocked": "这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。"
+    },
+    "event_venue": {
+      "title": "会场与社团",
+      "manage": "会场与社团",
+      "counts": "{circles} 个社团 · {albums} 张专辑",
+      "view_page": "查看活动页",
+      "tabs": {
+        "import": "导入",
+        "circles": "社团",
+        "venue": "会场"
+      },
+      "import_title": "一键导入",
+      "import_help": "从主办方抓取时间、主视觉、平面图和社团列表，先生成预览，确认后再应用。再次导入会更新现有社团，后台手动设置的艺术家关联会保留。",
+      "source": "来源",
+      "sources": {
+        "m3": "M3（数字目录 + 平面图 PDF）"
+      },
+      "exhibition": "目录场次（如 2026f）",
+      "map_pdf": "平面图 PDF",
+      "map_pdf_help": "留空则只导入社团，不更新会场图。",
+      "profile": "解析配置",
+      "fetch": "抓取并预览",
+      "apply": "应用导入",
+      "confirm_create": "应用后会新建 {count} 个社团艺术家（系统来源的已批准修订）。继续吗？",
+      "run": "导入 #{id}",
+      "working": "正在处理，页面会自动刷新…",
+      "applied": "导入已应用。",
+      "history": "更早的导入",
+      "statuses": {
+        "queued": "排队中",
+        "running": "抓取中",
+        "ready": "待确认",
+        "applying": "应用中",
+        "applied": "已应用",
+        "failed": "失败"
+      },
+      "summary": {
+        "circles": "社团",
+        "circles_detail": "新增 {new} · 更新 {updated} · 移除 {removed} · 仅目录参加 {catalog_only} · 有 cut {with_cut}",
+        "map": "会场摊位",
+        "no_map": "本次没有平面图",
+        "artists": "将新建艺术家",
+        "artists_detail": "按 X 匹配 {handle} · 按链接 {url} · 按名称 {name} · 沿用 {kept} · 手动 {manual} · 同名多个 {ambiguous}",
+        "without_space": "{count} 个社团在平面图上找不到摊位：",
+        "empty_spaces": "{count} 个摊位没有社团：",
+        "all_placed": "所有现场社团都对上了摊位。",
+        "event": "活动信息变更"
+      },
+      "search": "搜索",
+      "link_filter": "艺术家关联",
+      "links": {
+        "all": "全部",
+        "none": "未关联",
+        "auto": "自动匹配",
+        "created": "导入新建",
+        "manual": "手动"
+      },
+      "columns": {
+        "circle": "社团",
+        "space": "摊位",
+        "artist": "艺术家"
+      },
+      "relink": "更改",
+      "artist_search": "搜索艺术家名",
+      "unlink": "取消关联（之后导入也不再自动匹配）",
+      "halls": "展馆与楼层",
+      "building": "建筑",
+      "floor": "楼层",
+      "hall_name": "显示名称",
+      "order": "顺序",
+      "no_map": "还没有导入会场图。",
+      "preview_help": "预览中变淡的是没有社团的摊位。",
+      "read_info": "读取一般参加说明页的开场时间"
     }
   },
   "article_ui": {
@@ -3897,6 +3973,88 @@
       "barcode": "条码相同：{value}",
       "link": "外部链接相同：{value}",
       "title": "标题相近：{value}"
+    }
+  },
+  "event_page": {
+    "seo_description": "{name}的会场图与 {count} 个参展社团，地点：{venue}。",
+    "not_found": "没有找到这个活动",
+    "hero": {
+      "date": "日期",
+      "venue": "会场",
+      "open_map": "查看会场图",
+      "days_left": "还有 {count} 天",
+      "today": "进行中",
+      "ended": "已结束",
+      "edition_site": "本届官网",
+      "series_site": "{name} 官网"
+    },
+    "stats": {
+      "circles": "参展社团",
+      "spaces": "摊位",
+      "halls": "展馆楼层",
+      "albums": "本场作品"
+    },
+    "map": {
+      "aria": "会场平面图",
+      "title": "会场图",
+      "hint": "点选展馆放大，悬停摊位查看社团，点击查看详情",
+      "overview": "总览",
+      "zoom_in": "放大",
+      "zoom_out": "缩小",
+      "reset": "复位",
+      "wheel_hint": "按住 {key} 滚动缩放，或先点一下地图",
+      "empty_space": "空摊位",
+      "color_genre": "按类别着色",
+      "color_plain": "单色"
+    },
+    "families": {
+      "music": "音乐一般",
+      "anime_game": "动画/游戏",
+      "other": "音响·影像·其他"
+    },
+    "filters": {
+      "search": "搜索社团名、假名、摊位号、关键词、{'@'}推特",
+      "all_genres": "全部类别",
+      "all_halls": "全部展馆",
+      "clear": "清除筛选",
+      "matching": "{count} / {total} 个社团"
+    },
+    "checklist": {
+      "title": "想去",
+      "short": "想去",
+      "add": "加入想去",
+      "remove": "移出想去"
+    },
+    "circle": {
+      "artist_page": "艺术家页",
+      "details": "详情",
+      "catalog_only": "仅目录参加",
+      "locate": "在地图上定位",
+      "links": "链接",
+      "preview": "试听 / 宣传视频",
+      "artist": "本站艺术家",
+      "albums": "本场作品",
+      "adult": "含成人向内容",
+      "watch_on": "在 {site} 观看"
+    },
+    "circles": {
+      "empty": "没有符合筛选的社团",
+      "none": "还没有导入参展社团",
+      "index": "区块索引",
+      "block_count": "{block} 区 · {count} 个社团",
+      "count": "{count} 个社团",
+      "continued": "（接上页）",
+      "range": "第 {from}–{to} 个，共 {total} 个",
+      "following": "跟随地图：只显示{hall}的 {count} 个社团",
+      "show_all_halls": "显示全部展馆",
+      "follow_map": "让列表跟随地图当前的展馆"
+    },
+    "tabs": {
+      "circles": "参展社团",
+      "albums": "本场作品"
+    },
+    "albums": {
+      "empty": "还没有以本场为发行活动的专辑"
     }
   }
 }

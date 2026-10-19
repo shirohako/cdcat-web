@@ -2684,5 +2684,87 @@
       "link": "外部連結相同：{value}",
       "title": "標題相近：{value}"
     }
+  },
+  "event_page": {
+    "seo_description": "{name}的會場圖與 {count} 個參展社團，地點：{venue}。",
+    "not_found": "找不到這個活動",
+    "hero": {
+      "date": "日期",
+      "venue": "會場",
+      "open_map": "查看會場圖",
+      "days_left": "還有 {count} 天",
+      "today": "進行中",
+      "ended": "已結束",
+      "edition_site": "本屆官網",
+      "series_site": "{name} 官網"
+    },
+    "stats": {
+      "circles": "參展社團",
+      "spaces": "攤位",
+      "halls": "展館樓層",
+      "albums": "本場作品"
+    },
+    "map": {
+      "aria": "會場平面圖",
+      "title": "會場圖",
+      "hint": "點選展館放大，懸停攤位查看社團，點擊查看詳情",
+      "overview": "總覽",
+      "zoom_in": "放大",
+      "zoom_out": "縮小",
+      "reset": "復位",
+      "wheel_hint": "按住 {key} 捲動縮放，或先點一下地圖",
+      "empty_space": "空攤位",
+      "color_genre": "按類別著色",
+      "color_plain": "單色"
+    },
+    "families": {
+      "music": "音樂一般",
+      "anime_game": "動畫/遊戲",
+      "other": "音響·影像·其他"
+    },
+    "filters": {
+      "search": "搜尋社團名、假名、攤位號、關鍵字、{'@'}推特",
+      "all_genres": "全部類別",
+      "all_halls": "全部展館",
+      "clear": "清除篩選",
+      "matching": "{count} / {total} 個社團"
+    },
+    "checklist": {
+      "title": "想去",
+      "short": "想去",
+      "add": "加入想去",
+      "remove": "移出想去"
+    },
+    "circle": {
+      "artist_page": "藝術家頁",
+      "details": "詳情",
+      "catalog_only": "僅目錄參加",
+      "locate": "在地圖上定位",
+      "links": "連結",
+      "preview": "試聽 / 宣傳影片",
+      "artist": "本站藝術家",
+      "albums": "本場作品",
+      "adult": "含成人向內容",
+      "watch_on": "在 {site} 觀看"
+    },
+    "circles": {
+      "empty": "沒有符合篩選的社團",
+      "none": "尚未匯入參展社團",
+      "index": "區塊索引",
+      "block_count": "{block} 區 · {count} 個社團",
+      "count": "{count} 個社團",
+      "continued": "（接上頁）",
+      "range": "第 {from}–{to} 個，共 {total} 個",
+      "following": "跟隨地圖：只顯示{hall}的 {count} 個社團",
+      "show_all_halls": "顯示全部展館",
+      "follow_map": "讓列表跟隨地圖目前的展館"
+    },
+    "tabs": {
+      "circles": "參展社團",
+      "albums": "本場作品"
+    },
+    "albums": {
+      "empty": "還沒有以本場為發行活動的專輯"
+    }
   }
 }

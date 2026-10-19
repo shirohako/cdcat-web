@@ -55,9 +55,9 @@ describe('Database tokens', () => {
     expect(renderMarkdown('- [[album:8]]\n- [[album:7]]', env)).not.toContain('markdown-ref-card')
   })
 
-  it('drops non-https card images and links events to their series', () => {
+  it('drops non-https card images and links events to their page', () => {
     expect(renderMarkdown('[[album:8]]', env)).not.toContain('insecure.example')
-    expect(renderMarkdown('[[event:2]]', env)).toContain('href="/event-series/9"')
+    expect(renderMarkdown('[[event:2]]', env)).toContain('href="/events/2"')
     expect(renderMarkdown('[[article:4]]', env)).toContain('href="/articles/4/liner-notes"')
   })
 

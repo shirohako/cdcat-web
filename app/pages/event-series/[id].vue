@@ -163,16 +163,18 @@ useHead({
             :key="event.id"
             class="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white"
           >
-            <div class="bg-gray-50" :style="{ aspectRatio: visualRatio }">
+            <NuxtLink :to="`/events/${event.id}`" class="block bg-gray-50" :style="{ aspectRatio: visualRatio }">
               <img v-if="event.main_visual_url" v-img-fade :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
               <div v-else class="flex h-full w-full items-center justify-center">
                 <CalendarDays class="h-10 w-10 text-gray-300" />
               </div>
-            </div>
+            </NuxtLink>
             <div class="flex flex-1 flex-col justify-between p-5">
               <div>
                 <span class="mb-3 inline-block rounded-md bg-gray-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gray-500">{{ event.slug }}</span>
-                <h2 class="mb-4 text-lg font-bold leading-snug text-gray-900">{{ event.name || event.slug }}</h2>
+                <h2 class="mb-4 text-lg font-bold leading-snug text-gray-900">
+                  <NuxtLink :to="`/events/${event.id}`" class="hover:text-blue-600">{{ event.name || event.slug }}</NuxtLink>
+                </h2>
               </div>
               <div class="space-y-2 text-sm text-gray-600">
                 <div class="flex items-center gap-2">

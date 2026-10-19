@@ -8,13 +8,12 @@ defineProps<{ links: ContentLinkSummary[] }>()
 const { t } = useI18n()
 const icons: Record<ContentLinkType, Component> = { album: Disc3, artist: Mic2, entry: Film, franchise: Library, event: Calendar }
 
-// Events have no page of their own yet; they open their series.
 const href = (link: ContentLinkSummary) => ({
   album: `/albums/${link.id}`,
   artist: `/artists/${link.id}`,
   entry: `/entries/${link.id}`,
   franchise: `/franchises/${link.id}`,
-  event: link.event_series_id ? `/event-series/${link.event_series_id}` : '/events',
+  event: `/events/${link.id}`,
 })[link.type]
 </script>
 
