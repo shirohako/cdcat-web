@@ -27,7 +27,7 @@ const value = computed(() => shown.value ? progress.value : 0)
   height: 3px;
   pointer-events: none;
   opacity: 0;
-  background: repeating-linear-gradient(to right, #ef4444 0%, #f97316 17%, #eab308 33%, #22c55e 50%, #06b6d4 67%, #3b82f6 83%, #a855f7 100%);
+  background: repeating-linear-gradient(to right, #eab308 0%, #22c55e 25%, #06b6d4 50%, #3b82f6 75%, #a855f7 100%);
   transform-origin: left;
   transition: transform 0.1s, opacity 0.4s;
 }
