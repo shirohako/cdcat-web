@@ -42,6 +42,7 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/images', permission: 'content.manage', label: 'admin_pages.images.title', icon: 'lucide:images', group: 'content' },
   { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'content' },
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
+  { path: '/admin/event-imports', permission: 'events.manage', label: 'admin_pages.event_imports.title', icon: 'lucide:download-cloud', group: 'content' },
   { path: '/admin/credit-roles', permission: 'content.manage', label: 'admin_pages.credit_roles.title', icon: 'lucide:contact', group: 'catalog_settings' },
   { path: '/admin/attribute-definitions', permission: 'content.manage', label: 'admin_pages.attribute_definitions.title', icon: 'lucide:list-checks', group: 'catalog_settings' },
   { path: '/admin/link-providers', permission: 'content.manage', label: 'admin_pages.link_providers.title', icon: 'lucide:link', group: 'catalog_settings' },

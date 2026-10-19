@@ -2757,7 +2757,8 @@
       "range": "第 {from}–{to} 個，共 {total} 個",
       "following": "跟隨地圖：只顯示{hall}的 {count} 個社團",
       "show_all_halls": "顯示全部展館",
-      "follow_map": "讓列表跟隨地圖目前的展館"
+      "follow_map": "讓列表跟隨地圖目前的展館",
+      "off_map": "平面圖外"
     },
     "tabs": {
       "circles": "參展社團",

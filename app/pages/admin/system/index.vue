@@ -114,7 +114,7 @@ useHead({ title: computed(() => t('admin_pages.system.title')) })
               <thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-5 py-2">{{ t('admin_pages.system.task') }}</th><th class="px-5 py-2">{{ t('admin_pages.system.expression') }}</th><th class="px-5 py-2">{{ t('admin_pages.system.next_run') }}</th><th class="px-5 py-2">{{ t('admin_pages.system.last_run') }}</th></tr></thead>
               <tbody class="divide-y divide-slate-100">
                 <tr v-for="task in data.schedule" :key="task.name">
-                  <td class="px-5 py-2.5 font-mono text-xs">{{ task.name.replace('App\\Jobs\\', '') }}</td>
+                  <td class="px-5 py-2.5 font-mono text-xs">{{ (task.name ?? '—').replace('App\\Jobs\\', '') }}</td>
                   <td class="px-5 py-2.5 font-mono text-xs">{{ task.expression }}</td>
                   <td class="px-5 py-2.5 text-xs">{{ time(task.next_run_at) }}</td>
                   <td class="px-5 py-2.5 text-xs">

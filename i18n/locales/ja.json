@@ -2757,7 +2757,8 @@
       "range": "{total} 件中 {from}–{to} 件",
       "following": "マップに連動：{hall}の {count} サークルのみ表示",
       "show_all_halls": "すべてのホールを表示",
-      "follow_map": "リストをマップのホールに連動させる"
+      "follow_map": "リストをマップのホールに連動させる",
+      "off_map": "配置図外"
     },
     "tabs": {
       "circles": "参加サークル",

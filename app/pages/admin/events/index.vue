@@ -121,7 +121,10 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
         <h1 class="text-3xl font-bold">{{ t('admin_pages.events.title') }}</h1>
         <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.events.description') }}</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="editEvent()">{{ t('admin_pages.events.create') }}</button>
+      <div class="flex gap-2">
+        <NuxtLink to="/admin/event-imports" class="rounded-lg border border-slate-300 px-4 py-2 text-sm">{{ t('admin_pages.event_imports.title') }}</NuxtLink>
+        <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="editEvent()">{{ t('admin_pages.events.create') }}</button>
+      </div>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !eventOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>

@@ -2757,7 +2757,8 @@
       "range": "{from}–{to} of {total}",
       "following": "Following the map: only the {count} circles in {hall}",
       "show_all_halls": "Show all halls",
-      "follow_map": "Make the list follow the hall on the map"
+      "follow_map": "Make the list follow the hall on the map",
+      "off_map": "Not on the map"
     },
     "tabs": {
       "circles": "Circles",

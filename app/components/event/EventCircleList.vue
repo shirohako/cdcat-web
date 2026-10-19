@@ -9,7 +9,7 @@
       <!-- Block index, by hall: jumps to the page and heading of a block -->
       <nav class="sticky top-16 z-20 -mx-1 mb-4 space-y-1.5 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-[0_8px_24px_-20px_rgba(15,23,42,0.4)] backdrop-blur" :aria-label="t('event_page.circles.index')">
         <div v-for="group in index" :key="group.hall" class="flex items-start gap-2">
-          <span class="w-24 shrink-0 truncate pt-1 text-[11px] font-semibold text-slate-500 sm:w-28" :title="group.hall">{{ group.hall || t('event_page.circle.catalog_only') }}</span>
+          <span class="w-24 shrink-0 truncate pt-1 text-[11px] font-semibold text-slate-500 sm:w-28" :title="group.hall">{{ group.hall || t('event_page.circles.off_map') }}</span>
           <div class="flex flex-wrap gap-1">
             <button
               v-for="block in group.blocks"
@@ -102,6 +102,7 @@ const { t } = useI18n()
 interface Block { key: string, area: string | null, label: string, hall: string, circles: EventCircle[] }
 
 // Blocks in the order they first appear; circles without a space (catalog-only) form the last one.
+// A block's hall comes from its circles' desks on the map, so an area the map does not have has none.
 const blocks = computed(() => {
   const byKey = new Map<string, Block>()
   for (const circle of props.circles) {
@@ -113,8 +114,9 @@ const blocks = computed(() => {
     }
     block.circles.push(circle)
   }
+  // Blocks on the map first, then areas the map does not have (coloured areas, 藍), then circles without a space.
   const list = [...byKey.values()]
-  return [...list.filter(b => b.area), ...list.filter(b => !b.area)]
+  return [...list.filter(b => b.area && b.hall), ...list.filter(b => b.area && !b.hall), ...list.filter(b => !b.area)]
 })
 const ordered = computed(() => blocks.value.flatMap(b => b.circles))
 const index = computed(() => {

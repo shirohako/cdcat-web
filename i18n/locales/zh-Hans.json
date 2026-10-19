@@ -1792,7 +1792,40 @@
       "order": "顺序",
       "no_map": "还没有导入会场图。",
       "preview_help": "预览中变淡的是没有社团的摊位。",
-      "read_info": "读取一般参加说明页的开场时间"
+      "read_info": "读取一般参加说明页的开场时间",
+      "batch_link": "批量导入多届"
+    },
+    "event_imports": {
+      "title": "批量导入",
+      "description": "一次导入主办方公开的多届活动：先逐届抓取并预览，再把没有问题的一起应用，或者挑着应用。以后新公开的届次也会出现在这里。",
+      "editions": "主办方公开的届次",
+      "edition": "届次",
+      "event": "本站活动",
+      "current": "现有数据",
+      "last_import": "最近一次导入",
+      "no_event": "本站还没有这一届，请先在活动管理里新建",
+      "circles": "{count} 个社团",
+      "has_map": "有会场图",
+      "no_map_yet": "无会场图",
+      "select_missing": "只选未导入的",
+      "select_all": "全选",
+      "select_none": "清空",
+      "fetch": "抓取并预览（{count} 届）",
+      "fetch_help": "每届单独排队，预览完成前不会改动任何数据。",
+      "batch": "本批预览",
+      "status": "状态",
+      "check": "检查",
+      "apply_clean": "应用全部无问题的（{count}）",
+      "apply_picked": "应用所选（{count}）",
+      "apply_help": "按从新到旧依次应用。较早的届次会沿用较新届次新建的艺术家，实际新建数会比预览里的少；同一个社团只会建一次。",
+      "confirm": "将依次应用 {count} 届，预览里共计新建 {artists} 个社团艺术家（实际会更少）。继续吗？",
+      "circle_changes": "新增 {new} · 更新 {updated} · 移除 {removed}",
+      "off_map": "平面图外：{list}",
+      "matched": "已匹配 {count}",
+      "clean": "无问题",
+      "no_map": "没有会场图（平面图无法解析或未提供），应用后只有社团列表",
+      "unplaced": "{count} 个社团找不到摊位：{list}",
+      "empty": "{count} 个摊位没有社团：{list}"
     }
   },
   "article_ui": {
@@ -4047,7 +4080,8 @@
       "range": "第 {from}–{to} 个，共 {total} 个",
       "following": "跟随地图：只显示{hall}的 {count} 个社团",
       "show_all_halls": "显示全部展馆",
-      "follow_map": "让列表跟随地图当前的展馆"
+      "follow_map": "让列表跟随地图当前的展馆",
+      "off_map": "平面图外"
     },
     "tabs": {
       "circles": "参展社团",

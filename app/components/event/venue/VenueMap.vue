@@ -46,7 +46,9 @@
             v-for="(shape, i) in map.background"
             :key="i"
             :d="shape.d"
-            :fill="tone(shape.s)"
+            :fill="shape.w ? 'none' : tone(shape.s)"
+            :stroke="shape.w ? tone(shape.s) : undefined"
+            :stroke-width="shape.w"
             :fill-rule="shape.e ? 'evenodd' : undefined"
           />
           <text

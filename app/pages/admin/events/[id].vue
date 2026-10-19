@@ -239,7 +239,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · ${t('admin
     <template v-if="tab === 'import'">
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">{{ t('admin_pages.event_venue.import_title') }}</h2>
-        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.event_venue.import_help') }}</p>
+        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.event_venue.import_help') }} <NuxtLink to="/admin/event-imports" class="underline">{{ t('admin_pages.event_venue.batch_link') }}</NuxtLink></p>
         <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="startImport">
           <label class="block">{{ t('admin_pages.event_venue.source') }}
             <select v-model="sourceKey" :class="input"><option v-for="source in sources" :key="source.key" :value="source.key">{{ t(`admin_pages.event_venue.sources.${source.key}`) }}</option></select>

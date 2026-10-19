@@ -46,8 +46,8 @@ export interface VenueLabel {
 export interface VenueMapData {
   width: number
   height: number
-  /** Shapes in paint order; s is their lightness 0 (wall) … 1 (floor), e marks the even-odd rule. */
-  background: { d: string, s: number, e?: 1 }[]
+  /** Shapes in paint order; s is their lightness 0 (wall) … 1 (floor), e marks the even-odd rule, w a stroked line's width. */
+  background: { d: string, s: number, e?: 1, w?: number }[]
   labels: VenueLabel[]
   halls: VenueHall[]
   spaces: VenueSpaceRow[]
