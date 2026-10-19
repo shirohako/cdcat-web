@@ -16,7 +16,10 @@ const { formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
 const { data, status, error, revealClass } = usePageAPI<EventSeriesSummary[]>('/v1/event-series')
-const seriesList = computed(() => Array.isArray(data.value) ? data.value : [])
+const seriesList = computed(() => (Array.isArray(data.value) ? data.value : []).map(series => ({
+  ...series,
+  banner_url: eventSeriesBanner(series),
+})))
 
 const latestDate = (series: EventSeriesSummary) => series.latest_start_date
   ? formatDate(series.latest_start_date, { year: 'numeric', month: '2-digit', day: '2-digit' })

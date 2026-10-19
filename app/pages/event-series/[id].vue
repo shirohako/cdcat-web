@@ -76,6 +76,7 @@ const goToPage = (value: number) => {
 }
 
 const description = computed(() => series.value ? localizedContent(series.value.description, t('collection_pages.events.no_description')) : '')
+const bannerUrl = computed(() => series.value ? eventSeriesBanner(series.value) : null)
 
 // The series decides the visual format (Comic Market and M3 portrait catalogs, TGS landscape),
 // so every card in a series shares one ratio and a missing visual keeps its slot.
@@ -108,7 +109,7 @@ useHead({
       <div v-if="series" class="space-y-6" :class="revealClass">
         <section class="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:flex-row md:p-8">
           <div class="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-gray-50 md:w-80 lg:w-96">
-            <img v-if="series.banner_url" v-img-fade :src="series.banner_url" :alt="series.name" class="h-full w-full object-contain">
+            <img v-if="bannerUrl" v-img-fade :src="bannerUrl" :alt="series.name" class="h-full w-full object-contain">
             <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-br from-amber-50 to-gray-100">
               <CalendarDays class="h-12 w-12 text-amber-300" />
             </div>
