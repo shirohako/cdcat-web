@@ -69,7 +69,7 @@ const ago = (value: string) => {
     <button
       type="button" class="relative grid size-9 place-items-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100"
       :aria-label="unread ? t('notifications.bell_unread', { count: unread }) : t('notifications.title')" :aria-expanded="open" @click.stop="toggle">
-      <Bell :size="18" />
+      <Bell :size="20" />
       <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[10px] font-bold leading-4 text-white">
         {{ unread > 99 ? '99+' : unread }}
       </span>

@@ -1,34 +1,14 @@
 <template>
   <aside
     :class="[
-      'fixed left-0 top-0 h-screen bg-white border-r border-gray-200 z-40',
+      'fixed left-0 top-16 bottom-0 bg-white border-r border-gray-200 z-40',
       'transition-all duration-300 ease-in-out',
       'flex flex-col',
       isCollapsed ? 'w-16' : 'w-52',
       isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
     ]"
   >
-    <!-- Logo Section -->
-    <div class="h-16 flex items-center justify-center border-b border-gray-200 shrink-0">
-      <transition name="fade" mode="out-in">
-        <h1
-          v-if="!isCollapsed"
-          key="full-logo"
-          class="text-2xl font-bold text-gray-900 tracking-tight"
-        >
-          CDCAT
-        </h1>
-        <div
-          v-else
-          key="collapsed-logo"
-          class="w-10 h-10 bg-gray-900 rounded-lg flex items-center justify-center"
-        >
-          <span class="text-white text-base font-bold">C</span>
-        </div>
-      </transition>
-    </div>
-
-    <!-- Navigation -->
+    <!-- Navigation (the logo lives in the navbar, which runs across the top) -->
     <nav class="flex-1 min-h-0 overflow-y-auto py-6">
       <ul :class="['space-y-2', isCollapsed ? 'px-2' : 'px-3']">
         <li v-for="item in menuItems" :key="item.name">
@@ -71,7 +51,7 @@
     </nav>
 
     <!-- Footer -->
-    <div class="mt-auto shrink-0 border-t border-gray-200 p-4">
+    <div class="mt-auto shrink-0 p-4">
       <transition name="fade" mode="out-in">
         <div v-if="!isCollapsed" class="text-xs text-gray-400 text-center">
           © 2026 CDCAT
@@ -87,7 +67,7 @@
   <transition name="fade">
     <div
       v-if="isMobileOpen"
-      class="fixed inset-0 bg-black/50 z-30 lg:hidden"
+      class="fixed inset-x-0 top-16 bottom-0 bg-black/50 z-30 lg:hidden"
       @click="closeMobile"
     />
   </transition>

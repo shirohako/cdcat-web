@@ -1,18 +1,12 @@
 <template>
-  <header
-    :class="[
-      'fixed top-0 h-16 bg-white border-b border-gray-200 z-30',
-      'transition-all duration-300 ease-in-out',
-      'left-0 right-0',
-      isCollapsed ? 'lg:left-16' : 'lg:left-52'
-    ]"
-  >
+  <!-- Spans the full width above the sidebar; z-50 keeps its dropdowns over the sidebar. -->
+  <header class="fixed inset-x-0 top-0 z-50 h-16 bg-white border-b border-gray-200">
     <div class="h-full px-4 flex items-center justify-between">
-      <!-- Left Section: Menu Toggle & Search -->
+      <!-- Left Section: Menu Toggle & Logo -->
       <div class="flex items-center gap-4">
         <!-- Mobile Menu Toggle -->
         <button
-          class="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          class="grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100 lg:hidden"
           aria-label="Toggle mobile menu"
           @click="toggleMobileMenu"
         >
@@ -21,29 +15,53 @@
 
         <!-- Desktop Sidebar Toggle -->
         <button
-          class="hidden lg:block p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
+          class="group hidden size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100 lg:grid"
           aria-label="Toggle sidebar"
           @click="toggleSidebar"
         >
           <Icon
-            :name="isCollapsed ? 'lucide:panel-left-open' : 'lucide:panel-left-close'"
+            name="lucide:menu"
             class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
           />
         </button>
 
-        <!-- Search Bar -->
-        <SearchQuickResults class="hidden md:block" />
-        <NuxtLink to="/search" class="rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 md:hidden" :aria-label="$t('search.title')">
-          <Icon name="lucide:search" class="h-5 w-5 text-gray-700" />
-        </NuxtLink>
+        <!-- Logo -->
+        <NuxtLink to="/" class="flex h-9 items-center text-2xl font-bold leading-none tracking-tight text-gray-900">CDCAT</NuxtLink>
       </div>
 
-      <!-- Right Section: Language Switcher & User -->
+      <!-- Right Section: Search, Language Switcher & User -->
       <div class="flex items-center gap-2">
+        <!-- Search: an icon that opens a search box ("/" opens it too) -->
+        <div class="sm:relative">
+          <button
+            class="group grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100"
+            :class="{ 'bg-gray-100': showSearch }"
+            :aria-label="$t('search.title')"
+            :title="$t('search.shortcut')"
+            :aria-expanded="showSearch"
+            @click="toggleSearch"
+          >
+            <Icon
+              name="lucide:search"
+              class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
+            />
+          </button>
+
+          <transition name="dropdown">
+            <div
+              v-if="showSearch"
+              class="fixed inset-x-4 top-[4.5rem] rounded-lg border border-gray-200 bg-white p-3 shadow-lg
+                     sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[28rem]"
+            >
+              <SearchQuickResults autofocus @dismiss="showSearch = false" />
+            </div>
+          </transition>
+        </div>
+
         <!-- Language Switcher -->
         <div class="relative">
           <button
-            class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200 group"
+            class="group grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100"
             aria-label="Switch language"
             @click="toggleLanguageMenu"
           >
@@ -87,8 +105,8 @@
         <!-- User Menu or Login/Register Buttons -->
         <div v-if="isAuthenticated" class="relative">
           <button
-            class="flex items-center gap-2 p-1.5 hover:bg-gray-100 rounded-lg
-                   transition-colors duration-200 group"
+            class="group flex h-9 items-center gap-1.5 rounded-lg pl-0.5 pr-1.5
+                   transition-colors duration-200 hover:bg-gray-100"
             aria-label="User menu"
             @click="toggleUserMenu"
           >
@@ -163,13 +181,13 @@
         <div v-else class="flex items-center gap-2">
           <NuxtLink
             to="/auth/login"
-            class="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+            class="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100"
           >
             {{ $t('user.login') }}
           </NuxtLink>
           <NuxtLink
             to="/auth/register"
-            class="px-4 py-2 text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+            class="inline-flex h-9 items-center rounded-lg bg-gray-900 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-gray-800"
           >
             {{ $t('user.register') }}
           </NuxtLink>
@@ -179,7 +197,7 @@
 
     <!-- Click outside to close dropdowns -->
     <div
-      v-if="showLanguageMenu || showUserMenu"
+      v-if="showLanguageMenu || showUserMenu || showSearch"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
     />
@@ -205,6 +223,7 @@ const { user, isAuthenticated, logout, hasPermission } = useAuth()
 
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
+const showSearch = ref(false)
 
 const currentLocale = computed(() => locale.value)
 const availableLocales = computed(() => locales.value)
@@ -228,20 +247,45 @@ const toggleMobileMenu = () => {
   emit('toggleMobileMenu')
 }
 
+const toggleSearch = () => {
+  const next = !showSearch.value
+  closeAllDropdowns()
+  showSearch.value = next
+}
+
 const toggleLanguageMenu = () => {
-  showUserMenu.value = false
-  showLanguageMenu.value = !showLanguageMenu.value
+  const next = !showLanguageMenu.value
+  closeAllDropdowns()
+  showLanguageMenu.value = next
 }
 
 const toggleUserMenu = () => {
-  showLanguageMenu.value = false
-  showUserMenu.value = !showUserMenu.value
+  const next = !showUserMenu.value
+  closeAllDropdowns()
+  showUserMenu.value = next
 }
 
 const closeAllDropdowns = () => {
   showUserMenu.value = false
   showLanguageMenu.value = false
+  showSearch.value = false
 }
+
+// Opening a search result (or any other page) closes the menus.
+const route = useRoute()
+watch(() => route.fullPath, closeAllDropdowns)
+
+// "/" anywhere outside a text field opens the search box.
+const onKey = (event: KeyboardEvent) => {
+  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
+  const target = event.target as HTMLElement | null
+  if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return
+  event.preventDefault()
+  closeAllDropdowns()
+  showSearch.value = true
+}
+onMounted(() => window.addEventListener('keydown', onKey))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
 const handleLogout = async () => {
   // Logging out deletes the revision drafts kept in this browser.

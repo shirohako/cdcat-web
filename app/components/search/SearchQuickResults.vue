@@ -1,32 +1,32 @@
 <template>
-  <div ref="root" class="relative">
-    <input
-      ref="input"
-      v-model="query"
-      type="search"
-      role="combobox"
-      :aria-expanded="open"
-      :aria-controls="listId"
-      :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
-      aria-autocomplete="list"
-      :placeholder="$t('search.placeholder')"
-      :title="$t('search.shortcut')"
-      maxlength="100"
-      class="w-64 rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-8 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gray-900 lg:w-80"
-      @focus="focused = true"
-      @keydown.down.prevent="move(1)"
-      @keydown.up.prevent="move(-1)"
-      @keydown.enter.prevent="submit"
-      @keydown.esc.prevent="close(true)"
-    >
-    <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-    <kbd v-if="!query" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-gray-200 bg-white px-1.5 text-[10px] text-gray-400">/</kbd>
+  <div ref="root">
+    <div class="relative">
+      <input
+        ref="input"
+        v-model="query"
+        type="search"
+        role="combobox"
+        :aria-expanded="open"
+        :aria-controls="listId"
+        :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
+        aria-autocomplete="list"
+        :placeholder="$t('search.placeholder')"
+        maxlength="100"
+        class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-3 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gray-900"
+        @focus="focused = true"
+        @keydown.down.prevent="move(1)"
+        @keydown.up.prevent="move(-1)"
+        @keydown.enter.prevent="submit"
+        @keydown.esc.prevent="dismiss"
+      >
+      <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+    </div>
 
     <div
       v-if="open"
       :id="listId"
       role="listbox"
-      class="absolute left-0 top-full z-40 mt-2 max-h-[70vh] w-[26rem] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+      class="-mx-3 -mb-3 mt-3 max-h-[60vh] overflow-y-auto border-t border-gray-100 py-1"
     >
       <p v-if="!searchable(query.trim())" class="px-4 py-3 text-sm text-gray-500">{{ $t('search.too_short') }}</p>
       <p v-else-if="loading && !groups.length" class="px-4 py-3 text-sm text-gray-500">{{ $t('search.searching') }}</p>
@@ -60,10 +60,14 @@
 </template>
 
 <script setup lang="ts">
-// The navbar search: a few results per type while typing (docs/api/search.md). ↑↓ pick a result,
-// Enter opens it or the full results, Esc closes, "/" anywhere focuses the box.
+// The navbar search box (inside the navbar's search popup): a few results per type while typing
+// (docs/api/search.md), listed below the input. ↑↓ pick a result, Enter opens it or the full results,
+// Esc dismisses the popup.
 import type { SearchResult } from '~/types/search'
 import { Search } from '@lucide/vue'
+
+const props = defineProps<{ autofocus?: boolean }>()
+const emit = defineEmits<{ dismiss: [] }>()
 
 const { query, groups, loading, failed } = useQuickSearch(3)
 const router = useRouter()
@@ -103,22 +107,19 @@ const submit = () => {
 // Leaving the search page or opening a result clears the box; the results page has its own input.
 watch(() => route.fullPath, () => close())
 
+const dismiss = () => {
+  close(true)
+  emit('dismiss')
+}
+
 const onPointer = (event: PointerEvent) => {
   if (root.value && !root.value.contains(event.target as Node)) close()
 }
-const onKey = (event: KeyboardEvent) => {
-  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
-  const target = event.target as HTMLElement | null
-  if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return
-  event.preventDefault()
-  input.value?.focus()
-}
 onMounted(() => {
   document.addEventListener('pointerdown', onPointer)
-  window.addEventListener('keydown', onKey)
+  if (props.autofocus) input.value?.focus()
 })
 onBeforeUnmount(() => {
   document.removeEventListener('pointerdown', onPointer)
-  window.removeEventListener('keydown', onKey)
 })
 </script>
