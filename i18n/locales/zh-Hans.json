@@ -449,7 +449,14 @@
       "revision_item_applied": "这一项已经上线，请直接编辑内容本身。",
       "duplicate_suspected": "可能和已有的专辑重复，请先确认。",
       "invalid_credentials": "邮箱或密码不正确。",
-      "user_inactive": "该账号已被停用。"
+      "user_inactive": "该账号已被停用。",
+      "mail_link_invalid": "链接无效，请登录后在账号设置里修改邮件设置。",
+      "mail_category_required": "这类邮件会发给所有用户，不能关闭。",
+      "mail_category_in_use": "这个类型已经用于群发，不能删除，可以改为停用。",
+      "mail_campaign_not_editable": "这封群发当前的状态不允许这样操作。",
+      "mail_audience_changed": "收件人数已经变化，请确认新的人数后重新提交。",
+      "mail_audience_empty": "没有人会收到这封邮件。",
+      "mail_not_configured": "这台服务器还没有配置群发邮件。"
     }
   },
   "admin_pages": {
@@ -823,7 +830,25 @@
       "link_providers_delete": "删除链接提供方",
       "articles_hide": "隐藏文章",
       "articles_lock": "锁定文章",
-      "articles_unlock": "解锁文章"
+      "articles_unlock": "解锁文章",
+      "mail_categories_create": "创建邮件类型",
+      "mail_categories_update": "修改邮件类型",
+      "mail_categories_delete": "删除邮件类型",
+      "mail_templates_create": "创建邮件模板",
+      "mail_templates_update": "修改邮件模板",
+      "mail_templates_delete": "删除邮件模板",
+      "mail_templates_reset": "恢复默认邮件文案",
+      "mail_campaigns_create": "创建群发",
+      "mail_campaigns_update": "修改群发",
+      "mail_campaigns_delete": "删除群发",
+      "mail_campaigns_duplicate": "复制群发",
+      "mail_campaigns_send": "开始群发",
+      "mail_campaigns_schedule": "定时群发",
+      "mail_campaigns_cancel": "取消群发",
+      "mail_campaigns_resume": "继续群发",
+      "mail_suppressions_create": "加入退信名单",
+      "mail_suppressions_delete": "移出退信名单",
+      "mail_test_send": "发测试邮件"
     },
     "apply": "应用",
     "reset": "重置",
@@ -1252,7 +1277,11 @@
         "system": "系统",
         "discussion_category": "讨论版块",
         "discussion_topic": "讨论主题",
-        "discussion_post": "帖子"
+        "discussion_post": "帖子",
+        "mail_category": "邮件类型",
+        "mail_template": "邮件模板",
+        "mail_campaign": "群发",
+        "mail_suppression": "退信名单"
       }
     },
     "system": {
@@ -1318,7 +1347,8 @@
       "moderation": "审核与处理",
       "community_settings": "社区设置",
       "users": "用户",
-      "system": "系统"
+      "system": "系统",
+      "mail": "邮件"
     },
     "search_menu": "搜索菜单",
     "no_menu_match": "没有匹配的菜单",
@@ -1826,6 +1856,287 @@
       "no_map": "没有会场图（平面图无法解析或未提供），应用后只有社团列表",
       "unplaced": "{count} 个社团找不到摊位：{list}",
       "empty": "{count} 个摊位没有社团：{list}"
+    },
+    "mail": {
+      "locales": {
+        "en": "English",
+        "ja": "日本語",
+        "zh-Hans": "简体中文",
+        "zh-Hant": "繁體中文"
+      },
+      "errors": {
+        "category_required": "这类邮件是必收的，不能关闭。",
+        "category_in_use": "这个类型已经用于群发，不能删除，可以改为停用。",
+        "campaign_not_editable": "这封群发在当前状态下不能这样操作，请刷新后再试。",
+        "audience_changed": "收件人数有变化（期间有人注册或退订），请核对新的人数，再输入一次确认。",
+        "audience_empty": "按当前的类型和筛选条件，没有人会收到这封邮件。",
+        "not_configured": "服务器还没有配置群发：需要群发 mailer（MAIL_BULK_MAILER）和 APP_KEY。",
+        "already_exists": "已经存在，不用重复添加。",
+        "conflict": "当前状态下不能这样操作。",
+        "rate_limited": "操作太频繁，请稍后再试。测试邮件每人每小时最多 10 封。",
+        "invalid": "有内容没通过检查，请按提示修改后再试。"
+      },
+      "campaign_status": {
+        "draft": "草稿",
+        "scheduled": "已定时",
+        "sending": "发送中",
+        "sent": "已发完",
+        "cancelled": "已取消"
+      },
+      "campaigns": {
+        "title": "群发",
+        "description": "按邮件类型给订阅的用户发邮件。除重要通知外，每封邮件都带退订链接；收件人收到的是自己邮件语言的版本。",
+        "create": "新建群发",
+        "create_draft": "创建草稿",
+        "campaign_title": "名称",
+        "title_help": "只在后台显示，收件人看不到。",
+        "category": "类型",
+        "category_help": "决定谁能收到：订阅了这个类型的用户。必收类型发给所有正常账号。",
+        "search": "搜索名称",
+        "status": "状态",
+        "progress": "进度",
+        "progress_value": "已发 {sent} / {total}，失败 {failed}，跳过 {skipped}",
+        "when": "时间",
+        "scheduled_for": "定时于 {time} 发送",
+        "updated": "更新于 {time}",
+        "created_by": "创建人",
+        "not_configured": "服务器还没有配置群发（缺少 MAIL_BULK_MAILER 或 APP_KEY），现在只能编辑和预览，不能发送。",
+        "last_error": "发信服务出错",
+        "resume": "继续发送",
+        "resumed_done": "已重新开始发送。",
+        "view_logs": "发送记录",
+        "duplicate": "复制为新草稿",
+        "delete_title": "删除草稿「{title}」？",
+        "delete_help": "草稿删除后无法恢复。",
+        "unschedule": "取消定时",
+        "unschedule_help": "取消后回到草稿，可以继续编辑，之后再重新发送或定时。",
+        "unscheduled_done": "已取消定时，回到草稿。",
+        "problems": "发送前还需要解决这些问题：",
+        "from_template": "从模板开始",
+        "load_template": "载入模板",
+        "load_template_help": "模板的内容会替换当前所有语言的标题和正文，未保存的修改会丢失。",
+        "template_loaded": "已载入模板「{name}」，记得保存。",
+        "based_on": "基于模板「{name}」",
+        "contents": "内容",
+        "audience": "收件人",
+        "send": "发送…",
+        "reschedule": "重新定时或立即发送…",
+        "unsaved": "有未保存的修改",
+        "send_title": "确认发送",
+        "send_now": "立即发送",
+        "send_later": "定时发送",
+        "send_help": "开始发送时收件人名单就固定了，之后注册的用户不会收到；每封发出前还会再检查一次订阅状态。",
+        "send_confirm": "确认发送",
+        "schedule_confirm": "确认定时",
+        "sending_done": "已开始发送。",
+        "scheduled_done": "已定时，到时间后会自动开始发送。",
+        "results": "发送情况",
+        "stop": "停止发送",
+        "stop_help": "停止后，还没发出的邮件都不会再发，已经发出的不受影响。这一步不能撤销。",
+        "cancelled_done": "已停止发送。",
+        "delivery_help": "已送达、退信和投诉来自发信服务的回调或退信邮箱；没有接入时一直是 0。",
+        "started_at": "开始时间",
+        "finished_at": "完成时间",
+        "counters": {
+          "recipients": "收件人",
+          "sent": "已发送",
+          "failed": "失败",
+          "skipped": "跳过",
+          "pending": "等待中",
+          "delivered": "已送达",
+          "bounced": "退信",
+          "complained": "投诉",
+          "unsubscribed": "因此退订"
+        }
+      },
+      "audience": {
+        "help": "默认发给订阅了这个类型的所有用户；下面的条件可以缩小范围，多个条件需要同时满足。",
+        "roles": "角色",
+        "locales": "邮件语言",
+        "active_within_days": "最近几天内登录过",
+        "any": "不限",
+        "joined_from": "注册日期从",
+        "joined_to": "注册日期至",
+        "pick_category": "先选择类型，才能统计收件人。",
+        "total": "预计 {count} 人收到",
+        "counting": "统计中…",
+        "excluded": "已排除：禁用账号 {inactive} 人，未订阅 {unsubscribed} 人，退信名单 {suppressed} 人",
+        "summary_all": "所有订阅者",
+        "summary_roles": "角色：{roles}",
+        "summary_locales": "语言：{locales}",
+        "summary_active": "最近 {days} 天登录过",
+        "summary_joined": "注册于 {from} 至 {to}"
+      },
+      "editor": {
+        "languages": "语言版本",
+        "has_errors": "这个语言有问题",
+        "written": "已填写",
+        "english_help": "英文版必填。收件人的语言没有对应版本时，会收到英文版。",
+        "fallback_help": "可以不写：不写时，这个语言的收件人会收到英文版。",
+        "subject": "标题",
+        "body": "正文",
+        "variables_help": "点击插入变量，会插到标题或正文里光标所在的位置：",
+        "required_variable": "每种语言的正文都必须包含",
+        "secret_variable": "不能放进标题",
+        "required_list": "必须出现在正文里：{names}",
+        "secret_list": "不能放进标题：{names}",
+        "markdown_help": "正文是普通 Markdown，支持标题、粗体、列表、表格和链接；站内的扩展语法（容器、剧透、站内条目标记）不能用。链接要以 http、https、mailto 或 / 开头，图片只能用 https 地址。",
+        "remove_locale": "删除{language}版本",
+        "preview": "预览",
+        "rendering": "渲染中…",
+        "show_text": "看纯文本版",
+        "show_html": "看 HTML 版",
+        "no_preview": "选择类型后显示预览。",
+        "sample_help": "预览里的变量用的是示例值：你自己的昵称、验证码 ABC123 等。"
+      },
+      "test": {
+        "title": "发测试邮件",
+        "help": "把当前内容（不用先保存）发到你自己的邮箱 {email}，每种语言一封，标题前会加「[测试]」。",
+        "nothing": "先写好至少一种语言的标题和正文。",
+        "send": "发给我",
+        "sending": "发送中…",
+        "sent": "已发送",
+        "failed": "失败：{error}"
+      },
+      "templates": {
+        "title": "邮件模板",
+        "description": "系统邮件（验证码、找回密码、欢迎等）的文案在这里修改；群发模板是可以反复使用的群发内容。",
+        "create": "新建群发模板",
+        "kind": {
+          "system": "系统模板",
+          "campaign": "群发模板"
+        },
+        "kind_help": {
+          "system": "由系统事件发出。不能删除，只能修改各语言的内容，可以恢复默认文案。",
+          "campaign": "新建群发时可以载入，内容会复制到群发里，之后再改模板不影响已有的群发。"
+        },
+        "none": "暂无模板",
+        "default_category": "默认类型",
+        "default_category_help": "群发载入这个模板时，会顺带选上这个类型。",
+        "updated": "{time} 由 {user} 修改",
+        "name": "名称",
+        "system_help": "必需的变量必须出现在每种语言的正文里，保存后马上生效。模板出错时系统会改用默认文案发出。",
+        "reset": "恢复默认文案",
+        "all_languages": "全部语言",
+        "reset_button": "恢复",
+        "reset_title": "把{language}恢复成默认文案？",
+        "reset_help": "会用代码里的默认文案覆盖当前内容，覆盖后不能撤销。",
+        "reset_done": "已把{language}恢复成默认文案。",
+        "delete_title": "删除模板「{name}」？",
+        "delete_help": "已经用这个模板建好的群发不受影响。"
+      },
+      "categories": {
+        "title": "邮件类型",
+        "description": "群发邮件都属于一个类型，用户在设置里按类型订阅或退订。必收类型发给所有正常账号，不能退订。",
+        "create": "新建类型",
+        "edit": "编辑类型 {key}",
+        "key": "键",
+        "key_help": "以小写字母开头，只能用小写字母、数字和下划线，创建后不能修改。",
+        "name_in": "名称（{language}）",
+        "description_in": "说明（{language}）",
+        "is_required": "必收",
+        "is_required_help": "必收类型不能退订，邮件里也没有退订链接。只能在创建时设定，之后不能修改，免得把已经退订的人变成必收。",
+        "is_default_subscribed": "默认订阅",
+        "is_default_subscribed_help": "没表过态的用户是否收这个类型；点过「退订全部」的用户不会因此收到。",
+        "is_active": "启用",
+        "sort_order": "排序",
+        "names": "名称",
+        "rules": "规则",
+        "required": "必收",
+        "default_on": "默认订阅",
+        "default_off": "默认不订阅",
+        "usage": "使用情况",
+        "usage_value": "群发 {campaigns} 次 · {unsubscribed} 人退订",
+        "in_use": "群发用过的类型不能删除，可以停用",
+        "inactive": "已停用",
+        "deleted": "已删除类型 {key}",
+        "delete_title": "删除类型 {key}？",
+        "delete_help": "用户对这个类型的订阅记录会一起删除。"
+      },
+      "suppressions": {
+        "title": "退信名单",
+        "description": "名单里的地址不会再收到任何群发，系统邮件照常发送。硬退信、投诉和反复的软退信会自动加入，也可以手动添加。",
+        "add": "手动添加",
+        "email": "邮箱",
+        "note": "备注",
+        "added": "已把 {email} 加入退信名单。",
+        "search": "搜索邮箱",
+        "reason": "原因",
+        "all_reasons": "全部原因",
+        "remove": "移出",
+        "remove_title": "把 {email} 移出退信名单？",
+        "remove_help": "移出后，这个地址会重新收到群发。",
+        "removed": "已把 {email} 移出退信名单。"
+      },
+      "suppression_reasons": {
+        "hard_bounce": "硬退信",
+        "soft_bounce": "反复软退信",
+        "complaint": "投诉",
+        "manual": "手动添加"
+      },
+      "logs": {
+        "title": "发送记录",
+        "description": "每一封发出的邮件都有一条记录，系统邮件和群发都在这里。记录里不保存正文。",
+        "search": "搜索邮箱或用户名",
+        "status": "状态",
+        "delivery": "投递",
+        "all_deliveries": "全部投递状态",
+        "drop_filter": "去掉这个筛选",
+        "linked": {
+          "campaign_id": "群发 #{id}",
+          "template_id": "模板 #{id}",
+          "user_id": "用户 #{id}"
+        },
+        "time": "时间",
+        "recipient": "收件人",
+        "mail": "邮件",
+        "locale": "语言",
+        "error": "错误",
+        "subject": "标题",
+        "mailer": "Mailer",
+        "sent_at": "交给发信服务的时间",
+        "message_id": "Message-ID",
+        "delivery_updated_at": "投递状态更新时间",
+        "delivery_detail": "对方服务器的回应",
+        "retention": "发送记录保留 180 天。「已发送」只表示发信服务已经接收，之后的情况看投递状态。"
+      },
+      "log_status": {
+        "pending": "等待发送",
+        "sent": "已发送",
+        "failed": "失败",
+        "skipped": "跳过",
+        "cancelled": "已取消"
+      },
+      "skip_reasons": {
+        "unsubscribed": "已退订",
+        "inactive": "账号禁用",
+        "suppressed": "在退信名单"
+      },
+      "delivery_status": {
+        "delivered": "已送达",
+        "delayed": "延迟",
+        "bounced": "退信",
+        "complained": "投诉",
+        "none": "暂无回执"
+      },
+      "bounce_types": {
+        "hard": "硬退信",
+        "soft": "软退信"
+      },
+      "user": {
+        "title": "邮件",
+        "all_logs": "全部发送记录",
+        "locale": "邮件语言",
+        "opted_out": "退订全部",
+        "never": "没有",
+        "suppression": "退信名单",
+        "not_suppressed": "不在名单里",
+        "subscriptions": "订阅",
+        "required": "必收",
+        "subscribed": "已订阅",
+        "unsubscribed": "未订阅",
+        "recent": "最近 20 封"
+      }
     }
   },
   "article_ui": {
@@ -2550,7 +2861,9 @@
       "reactions": "表情回应通知",
       "reactions_help": "有人对你的帖子点表情时通知你。同一条帖子的回应会合并成一条。",
       "saved": "已保存",
-      "levels_hint": "主题和版块的通知级别（关注、普通、静音）在讨论区对应页面上设置。"
+      "levels_hint": "主题和版块的通知级别（关注、普通、静音）在讨论区对应页面上设置。",
+      "mail_title": "邮件",
+      "mail_description": "选择接收哪些邮件，以及用哪种语言接收。"
     },
     "privacy": {
       "title": "隐私设置",
@@ -4090,5 +4403,26 @@
     "albums": {
       "empty": "还没有以本场为发行活动的专辑"
     }
+  },
+  "mail_settings": {
+    "language": "邮件语言",
+    "language_help": "我们发给你的邮件都会使用这种语言。",
+    "required": "必收",
+    "required_help": "这类邮件会发给所有用户，不能关闭。",
+    "receive": "接收「{name}」"
+  },
+  "mail_preferences": {
+    "title": "邮件设置",
+    "subtitle": "管理发到 {email} 的邮件，不需要登录。",
+    "unsubscribe": "不再接收「{name}」",
+    "unsubscribed": "已退订「{name}」，以后不会再收到这类邮件。",
+    "required_notice": "「{name}」是发给所有用户的重要通知，不能退订。",
+    "unsubscribe_all": "退订全部可关闭的邮件",
+    "unsubscribed_all": "已退订全部可关闭的邮件，重要通知仍会照常发送。",
+    "settings_title": "全部邮件设置",
+    "saved": "已保存",
+    "invalid_title": "链接无效",
+    "invalid_message": "这个链接无效，或者已被改动。请登录后在账号设置里修改邮件设置。",
+    "go_to_account": "前往账号设置"
   }
 }

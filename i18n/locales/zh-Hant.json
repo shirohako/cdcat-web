@@ -449,7 +449,14 @@
       "revision_item_applied": "這一項已經上線，請直接編輯內容本身。",
       "duplicate_suspected": "可能和已有的專輯重複，請先確認。",
       "invalid_credentials": "電子郵件或密碼不正確。",
-      "user_inactive": "此帳號已被停用。"
+      "user_inactive": "此帳號已被停用。",
+      "mail_link_invalid": "連結無效，請登入後在帳號設定裡修改郵件設定。",
+      "mail_category_required": "這類郵件會寄給所有使用者，無法關閉。",
+      "mail_category_in_use": "這個類型已經用於群發，不能刪除，可以改為停用。",
+      "mail_campaign_not_editable": "這封群發目前的狀態不允許這樣操作。",
+      "mail_audience_changed": "收件人數已經變動，請確認新的人數後重新送出。",
+      "mail_audience_empty": "沒有人會收到這封郵件。",
+      "mail_not_configured": "這台伺服器還沒有設定群發郵件。"
     }
   },
   "admin_pages": {
@@ -1227,7 +1234,9 @@
       "reactions": "表情回應通知",
       "reactions_help": "有人對你的貼文點表情時通知你。同一則貼文的回應會合併成一則。",
       "saved": "已儲存",
-      "levels_hint": "主題和版塊的通知等級（關注、一般、靜音）在討論區對應頁面上設定。"
+      "levels_hint": "主題和版塊的通知等級（關注、一般、靜音）在討論區對應頁面上設定。",
+      "mail_title": "郵件",
+      "mail_description": "選擇接收哪些郵件，以及用哪種語言接收。"
     },
     "privacy": {
       "title": "隱私設定",
@@ -2767,5 +2776,26 @@
     "albums": {
       "empty": "還沒有以本場為發行活動的專輯"
     }
+  },
+  "mail_settings": {
+    "language": "郵件語言",
+    "language_help": "我們寄給你的郵件都會使用這種語言。",
+    "required": "必收",
+    "required_help": "這類郵件會寄給所有使用者，無法關閉。",
+    "receive": "接收「{name}」"
+  },
+  "mail_preferences": {
+    "title": "郵件設定",
+    "subtitle": "管理寄到 {email} 的郵件，不需要登入。",
+    "unsubscribe": "不再接收「{name}」",
+    "unsubscribed": "已取消訂閱「{name}」，以後不會再收到這類郵件。",
+    "required_notice": "「{name}」是寄給所有使用者的重要通知，無法取消訂閱。",
+    "unsubscribe_all": "取消訂閱全部可關閉的郵件",
+    "unsubscribed_all": "已取消訂閱全部可關閉的郵件，重要通知仍會照常寄送。",
+    "settings_title": "全部郵件設定",
+    "saved": "已儲存",
+    "invalid_title": "連結無效",
+    "invalid_message": "這個連結無效，或已被更動。請登入後在帳號設定裡修改郵件設定。",
+    "go_to_account": "前往帳號設定"
   }
 }

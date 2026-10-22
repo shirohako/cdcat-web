@@ -449,7 +449,14 @@
       "revision_item_applied": "この項目は既に反映されています。コンテンツ自体を編集してください。",
       "duplicate_suspected": "既存のアルバムと重複している可能性があります。確認してください。",
       "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。",
-      "user_inactive": "このアカウントは利用停止されています。"
+      "user_inactive": "このアカウントは利用停止されています。",
+      "mail_link_invalid": "このリンクは無効です。ログインして、アカウント設定からメール設定を変更してください。",
+      "mail_category_required": "このメールはすべてのユーザーに届くため、停止できません。",
+      "mail_category_in_use": "この種類はすでに一斉送信で使われているため削除できません。代わりに無効にしてください。",
+      "mail_campaign_not_editable": "この一斉送信は、現在の状態ではこの操作ができません。",
+      "mail_audience_changed": "受信者数が変わりました。新しい人数を確認してから、もう一度確定してください。",
+      "mail_audience_empty": "このメールを受け取る人がいません。",
+      "mail_not_configured": "このサーバーでは一斉送信が設定されていません。"
     }
   },
   "admin_pages": {
@@ -1227,7 +1234,9 @@
       "reactions": "リアクションの通知",
       "reactions_help": "自分の投稿にリアクションがあったら通知します。同じ投稿へのリアクションはまとめて表示されます。",
       "saved": "保存しました",
-      "levels_hint": "トピックやカテゴリーの通知レベル（ウォッチ・通常・ミュート）は各ページで設定できます。"
+      "levels_hint": "トピックやカテゴリーの通知レベル（ウォッチ・通常・ミュート）は各ページで設定できます。",
+      "mail_title": "メール",
+      "mail_description": "受け取るメールの種類と、メールの言語を選びます。"
     },
     "privacy": {
       "title": "プライバシー設定",
@@ -2767,5 +2776,26 @@
     "albums": {
       "empty": "このイベントで頒布されたアルバムはまだありません"
     }
+  },
+  "mail_settings": {
+    "language": "メールの言語",
+    "language_help": "お送りするメールはすべてこの言語で届きます。",
+    "required": "停止不可",
+    "required_help": "すべてのユーザーにお送りするため、受信を停止できません。",
+    "receive": "「{name}」を受け取る"
+  },
+  "mail_preferences": {
+    "title": "メール設定",
+    "subtitle": "{email} 宛てのメールを管理します。ログインは不要です。",
+    "unsubscribe": "「{name}」の配信を停止",
+    "unsubscribed": "「{name}」の配信を停止しました。今後このメールは届きません。",
+    "required_notice": "「{name}」はすべてのユーザーにお送りする重要なお知らせのため、配信を停止できません。",
+    "unsubscribe_all": "停止できるメールをすべて停止",
+    "unsubscribed_all": "停止できるメールをすべて停止しました。重要なお知らせは引き続き届きます。",
+    "settings_title": "すべてのメール設定",
+    "saved": "保存しました",
+    "invalid_title": "リンクが無効です",
+    "invalid_message": "リンクが無効か、変更されています。ログインして、アカウント設定からメール設定を変更してください。",
+    "go_to_account": "アカウント設定へ"
   }
 }

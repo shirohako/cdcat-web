@@ -9,6 +9,7 @@ export const adminGroups = [
   { key: 'moderation', label: 'admin_pages.groups.moderation' },
   { key: 'community_settings', label: 'admin_pages.groups.community_settings' },
   { key: 'users', label: 'admin_pages.groups.users' },
+  { key: 'mail', label: 'admin_pages.groups.mail' },
   { key: 'system', label: 'admin_pages.groups.system' },
 ] as const
 
@@ -59,6 +60,11 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/word-filters', permission: 'filters.manage', label: 'admin_pages.word_filters.title', icon: 'lucide:shield-ban', group: 'community_settings' },
   { path: '/admin/users', permission: 'users.manage', label: 'admin_pages.users.title', icon: 'lucide:users', group: 'users' },
   { path: '/admin/roles', permission: 'roles.manage', label: 'admin_pages.roles.title', icon: 'lucide:shield-check', group: 'users' },
+  { path: '/admin/mail/campaigns', permission: 'mail.manage', label: 'admin_pages.mail.campaigns.title', icon: 'lucide:send', group: 'mail' },
+  { path: '/admin/mail/templates', permission: 'mail.manage', label: 'admin_pages.mail.templates.title', icon: 'lucide:layout-template', group: 'mail' },
+  { path: '/admin/mail/categories', permission: 'mail.manage', label: 'admin_pages.mail.categories.title', icon: 'lucide:inbox', group: 'mail' },
+  { path: '/admin/mail/suppressions', permission: 'mail.manage', label: 'admin_pages.mail.suppressions.title', icon: 'lucide:mail-x', group: 'mail' },
+  { path: '/admin/mail/logs', permission: 'mail.logs', label: 'admin_pages.mail.logs.title', icon: 'lucide:mail-search', group: 'mail' },
   { path: '/admin/settings', permission: 'system.settings', label: 'admin_pages.settings.title', icon: 'lucide:settings', group: 'system' },
   { path: '/admin/audit', permission: 'audit.view', label: 'admin_pages.audit.title', icon: 'lucide:scroll-text', group: 'system' },
   { path: '/admin/system', permission: 'system.logs', label: 'admin_pages.system.title', icon: 'lucide:activity', group: 'system' },

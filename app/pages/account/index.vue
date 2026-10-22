@@ -195,7 +195,9 @@ const tabs = computed(() => [
   { key: 'danger', label: t('account_pages.tabs.danger'), icon: AlertTriangle }
 ])
 
-const activeTab = ref('profile')
+// `?tab=notifications` opens a tab directly (the mail settings page links there).
+const route = useRoute()
+const activeTab = ref(tabs.value.some(tab => tab.key === route.query.tab) ? String(route.query.tab) : 'profile')
 
 // Scroll fade hints
 const tabsScrollRef = ref(null)

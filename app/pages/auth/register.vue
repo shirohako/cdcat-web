@@ -254,7 +254,7 @@ const router = useRouter()
 const { $api } = useNuxtApp()
 const { register } = useAuth()
 const { site } = useSite()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { localizeError, localizeFieldErrors } = useLocalizedApiError()
 
 const formData = ref({
@@ -307,7 +307,8 @@ const sendVerificationCode = async () => {
   try {
     await $api('/v1/auth/send-verification-code', {
       method: 'POST',
-      body: { email: formData.value.email }
+      // The code mail goes out in the interface language.
+      body: { email: formData.value.email, locale: locale.value }
     })
     countdown.value = 60
     countdownTimer = setInterval(() => {
@@ -385,7 +386,9 @@ const handleRegister = async () => {
       email: formData.value.email,
       password: formData.value.password,
       verification_code: formData.value.verificationCode,
-      birthday: formData.value.birthday
+      birthday: formData.value.birthday,
+      // Becomes the mail language; it can be changed later in the account settings.
+      locale: locale.value
     })
 
     if (result.success) {

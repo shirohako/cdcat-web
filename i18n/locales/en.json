@@ -449,7 +449,14 @@
       "revision_item_applied": "This item is already live; edit the content itself instead.",
       "duplicate_suspected": "This may duplicate an existing album; please confirm first.",
       "invalid_credentials": "The email or password is incorrect.",
-      "user_inactive": "This account has been disabled."
+      "user_inactive": "This account has been disabled.",
+      "mail_link_invalid": "This link is invalid. Sign in to change your email settings in your account.",
+      "mail_category_required": "These emails go to everyone and can't be turned off.",
+      "mail_category_in_use": "Group mail has already used this category. Deactivate it instead of deleting it.",
+      "mail_campaign_not_editable": "This group mail can't do that in its current state.",
+      "mail_audience_changed": "The number of recipients has changed. Check the new count and confirm again.",
+      "mail_audience_empty": "Nobody would receive this email.",
+      "mail_not_configured": "Group mail isn't set up on this server."
     }
   },
   "admin_pages": {
@@ -1227,7 +1234,9 @@
       "reactions": "Reactions",
       "reactions_help": "Notify me when someone reacts to my posts. Reactions to one post are grouped together.",
       "saved": "Saved",
-      "levels_hint": "Watching, normal and muted levels for topics and categories are set on those pages."
+      "levels_hint": "Watching, normal and muted levels for topics and categories are set on those pages.",
+      "mail_title": "Email",
+      "mail_description": "Choose which emails you get from us and the language they come in."
     },
     "privacy": {
       "title": "Privacy",
@@ -2767,5 +2776,26 @@
     "albums": {
       "empty": "No albums list this event as their release event yet"
     }
+  },
+  "mail_settings": {
+    "language": "Email language",
+    "language_help": "Every email we send you is written in this language.",
+    "required": "Always sent",
+    "required_help": "Sent to every user; this can't be turned off.",
+    "receive": "Receive “{name}”"
+  },
+  "mail_preferences": {
+    "title": "Email settings",
+    "subtitle": "Manage the emails sent to {email}. No sign-in needed.",
+    "unsubscribe": "Unsubscribe from “{name}”",
+    "unsubscribed": "You've unsubscribed from “{name}” and won't get these emails anymore.",
+    "required_notice": "“{name}” are important notices sent to every user, so you can't unsubscribe from them.",
+    "unsubscribe_all": "Unsubscribe from all optional emails",
+    "unsubscribed_all": "You've unsubscribed from all optional emails. Important notices will still reach you.",
+    "settings_title": "All email settings",
+    "saved": "Saved",
+    "invalid_title": "This link doesn't work",
+    "invalid_message": "The link is invalid or has been changed. Sign in to change your email settings in your account.",
+    "go_to_account": "Go to account settings"
   }
 }

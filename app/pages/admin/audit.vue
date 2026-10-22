@@ -10,7 +10,7 @@ const { t, te } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
 // Morph aliases of audited models (App\Support\MorphMap), plus `system` for operations without a model.
-const targetTypes = ['album', 'artist', 'entry', 'franchise', 'revision', 'user', 'role', 'article', 'album_review', 'lyric', 'event', 'event_series', 'link_provider', 'site_setting', 'tag', 'word_filter', 'discussion_category', 'discussion_topic', 'discussion_post', 'system']
+const targetTypes = ['album', 'artist', 'entry', 'franchise', 'revision', 'user', 'role', 'article', 'album_review', 'lyric', 'event', 'event_series', 'link_provider', 'site_setting', 'tag', 'word_filter', 'discussion_category', 'discussion_topic', 'discussion_post', 'mail_category', 'mail_template', 'mail_campaign', 'mail_suppression', 'system']
 const filterKeys = ['actor', 'action', 'target_type', 'target_id', 'result', 'from', 'to'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })

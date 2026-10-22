@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdminPagination, AdminRole, AdminUserActivity, AdminUserDetail } from '~/types/admin'
+import type { AdminPagination, AdminRole, AdminUserActivity, AdminUserDetail, AdminUserMail } from '~/types/admin'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const route = useRoute()
@@ -81,6 +81,11 @@ const confirmAction = async (reason: string) => {
   finally { busy.value = false }
 }
 const time = (value: string | null | undefined) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—'
+// Mail language, subscriptions and recent mail, for people who can read the send log.
+const canSeeMail = computed(() => hasPermission('mail.logs'))
+const { data: mail, pending: mailPending, error: mailLoadError, refresh: refreshMail } = await useAsyncData(() => `admin-user-mail-${id.value}`,
+  () => canSeeMail.value ? $api<AdminUserMail>(`/v1/admin/users/${id.value}/mail`) : Promise.resolve(null), { watch: [id] })
+const mailName = (names: Record<string, string | undefined>, key: string) => names['zh-Hans'] || names.en || key
 useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
 </script>
 
@@ -114,6 +119,39 @@ useHead({ title: computed(() => t('admin_pages.user_detail.title')) })
           <AdminListState :pending="activityPending" :error="activityError" :empty="!activity?.items.length" @retry="refreshActivity()">
             <ul class="divide-y divide-slate-100"><li v-for="item in activity?.items" :key="item.id" class="flex flex-wrap items-center justify-between gap-3 py-4 text-sm"><div><NuxtLink v-if="activityLink(item)" :to="activityLink(item)!" class="font-medium underline">{{ item.title || `#${item.id}` }}</NuxtLink><span v-else class="font-medium">{{ item.title || `#${item.id}` }}</span><span class="ml-3 text-xs text-slate-500">{{ item.status === 'draft' ? t('admin_pages.user_detail.draft') : item.status === 'published' ? t('admin_pages.user_detail.published') : item.status }} {{ item.language }}</span></div><time class="text-xs text-slate-500">{{ time(item.created_at) }}</time></li></ul>
             <CommonPagination v-model:page="page" :total-pages="activity?.pagination.last_page || 1" :disabled="activityPending" />
+          </AdminListState>
+        </section>
+        <section v-if="canSeeMail" class="mt-6 rounded-xl border border-slate-200 bg-white p-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-lg font-semibold">{{ t('admin_pages.mail.user.title') }}</h2>
+            <NuxtLink :to="`/admin/mail/logs?user_id=${user.id}`" class="text-sm underline">{{ t('admin_pages.mail.user.all_logs') }}</NuxtLink>
+          </div>
+          <AdminListState :pending="mailPending" :error="mailLoadError" @retry="refreshMail()">
+            <template v-if="mail">
+              <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
+                <div><dt class="text-slate-500">{{ t('admin_pages.mail.user.locale') }}</dt><dd class="mt-1">{{ t(`admin_pages.mail.locales.${mail.mail_locale}`) }}</dd></div>
+                <div><dt class="text-slate-500">{{ t('admin_pages.mail.user.opted_out') }}</dt><dd class="mt-1">{{ mail.mail_opted_out_at ? time(mail.mail_opted_out_at) : t('admin_pages.mail.user.never') }}</dd></div>
+                <div>
+                  <dt class="text-slate-500">{{ t('admin_pages.mail.user.suppression') }}</dt>
+                  <dd class="mt-1" :class="mail.suppression ? 'text-red-700' : ''">{{ mail.suppression ? `${t(`admin_pages.mail.suppression_reasons.${mail.suppression.reason}`)} · ${time(mail.suppression.created_at)}` : t('admin_pages.mail.user.not_suppressed') }}</dd>
+                </div>
+              </dl>
+              <h3 class="mt-5 text-sm font-medium">{{ t('admin_pages.mail.user.subscriptions') }}</h3>
+              <ul class="mt-2 flex flex-wrap gap-2 text-xs">
+                <li v-for="subscription in mail.mail_subscriptions" :key="subscription.key" class="rounded-full px-3 py-1" :class="subscription.is_subscribed ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-500'">
+                  {{ mailName(subscription.names, subscription.key) }} · {{ subscription.is_required ? t('admin_pages.mail.user.required') : subscription.is_subscribed ? t('admin_pages.mail.user.subscribed') : t('admin_pages.mail.user.unsubscribed') }}
+                </li>
+              </ul>
+              <h3 class="mt-5 text-sm font-medium">{{ t('admin_pages.mail.user.recent') }}</h3>
+              <p v-if="!mail.mail_logs.length" class="mt-2 text-sm text-slate-500">{{ t('common.no_records') }}</p>
+              <ul v-else class="mt-2 divide-y divide-slate-100 text-sm">
+                <li v-for="log in mail.mail_logs" :key="log.id" class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2">
+                  <span class="font-medium">{{ log.campaign?.title || log.template?.name || log.subject || '—' }}</span>
+                  <span class="text-xs text-slate-500">{{ t(`admin_pages.mail.log_status.${log.status}`) }}<template v-if="log.delivery_status"> · {{ t(`admin_pages.mail.delivery_status.${log.delivery_status}`) }}</template></span>
+                  <time class="ml-auto text-xs text-slate-500">{{ time(log.created_at) }}</time>
+                </li>
+              </ul>
+            </template>
           </AdminListState>
         </section>
         <section class="mt-6 rounded-xl border border-slate-200 bg-white p-5">

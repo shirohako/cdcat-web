@@ -50,6 +50,13 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   DISCUSSION_NEW_USER_LIMIT: 'errors.codes.discussion_new_user_limit',
   DISCUSSION_OWN_REACTION: 'errors.codes.discussion_own_reaction',
   USER_BLOCK_NOT_ALLOWED: 'errors.codes.user_block_not_allowed',
+  MAIL_LINK_INVALID: 'errors.codes.mail_link_invalid',
+  MAIL_CATEGORY_REQUIRED: 'errors.codes.mail_category_required',
+  MAIL_CATEGORY_IN_USE: 'errors.codes.mail_category_in_use',
+  MAIL_CAMPAIGN_NOT_EDITABLE: 'errors.codes.mail_campaign_not_editable',
+  MAIL_AUDIENCE_CHANGED: 'errors.codes.mail_audience_changed',
+  MAIL_AUDIENCE_EMPTY: 'errors.codes.mail_audience_empty',
+  MAIL_NOT_CONFIGURED: 'errors.codes.mail_not_configured',
   INVALID_CREDENTIALS: 'errors.codes.invalid_credentials',
   USER_INACTIVE: 'errors.codes.user_inactive',
 }

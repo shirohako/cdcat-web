@@ -510,3 +510,163 @@ export interface AdminImageDetail extends AdminImage {
     revisions: { id: number, status: string, title: string | null, submitter: AdminUserName | null, submitted_at: string | null }[]
   }
 }
+
+// ── Mail (docs/mail/README.md) ──
+
+export type AdminMailLocale = 'en' | 'ja' | 'zh-Hans' | 'zh-Hant'
+
+/** Subject and Markdown body per language; English is required before anything is sent. */
+export type AdminMailContents = Partial<Record<AdminMailLocale, { subject: string, body: string }>>
+
+/** Validation messages keyed like `contents.en.body`. */
+export type AdminMailProblems = Record<string, string[]>
+
+/** What a preview or test mail renders as: a system template, or group mail of a category. */
+export type AdminMailTarget = { template_key: string } | { mail_category_id: number }
+
+type AdminMailCategoryRef = { id: number, key: string, names: Partial<Record<AdminMailLocale, string>> }
+
+export interface AdminMailCategory extends AdminMailCategoryRef {
+  descriptions: Partial<Record<AdminMailLocale, string>>
+  is_required: boolean
+  is_default_subscribed: boolean
+  is_active: boolean
+  sort_order: number
+  created_at: string | null
+  updated_at: string | null
+  usage: { campaigns: number, unsubscribed: number }
+}
+
+export interface AdminMailTemplateSummary {
+  id: number
+  /** Set on system templates (App\Enums\SystemMail); null on group mail templates. */
+  key: string | null
+  name: string
+  kind: 'system' | 'campaign'
+  mail_category: AdminMailCategoryRef | null
+  locales: AdminMailLocale[]
+  updated_by: { id: number, username: string } | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface AdminMailTemplate extends AdminMailTemplateSummary {
+  contents: AdminMailContents
+  variables: string[]
+  /** Variables every language's body must contain. */
+  required: string[]
+  /** Variables that may not appear in the subject. */
+  secret: string[]
+}
+
+export type AdminMailCampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'cancelled'
+
+export interface AdminMailAudience {
+  roles?: string[]
+  locales?: AdminMailLocale[]
+  active_within_days?: number
+  joined_from?: string
+  joined_to?: string
+}
+
+export interface AdminMailAudienceStats {
+  total: number
+  by_locale: Partial<Record<AdminMailLocale, number>>
+  excluded: { inactive: number, unsubscribed: number, suppressed: number }
+}
+
+export interface AdminMailCampaignSummary {
+  id: number
+  title: string
+  status: AdminMailCampaignStatus
+  mail_category: AdminMailCategoryRef | null
+  scheduled_at: string | null
+  started_at: string | null
+  finished_at: string | null
+  recipients_count: number
+  sent_count: number
+  failed_count: number
+  skipped_count: number
+  delivered_count: number
+  bounced_count: number
+  complained_count: number
+  last_error: string | null
+  created_by: { id: number, username: string } | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface AdminMailCampaign extends Omit<AdminMailCampaignSummary, 'mail_category'> {
+  mail_category: (AdminMailCategoryRef & { is_required: boolean, is_active: boolean }) | null
+  mail_template: { id: number, name: string } | null
+  contents: AdminMailContents
+  audience: AdminMailAudience
+  sent_by: { id: number, username: string } | null
+  pending_count: number
+  unsubscribed_count: number
+  variables: string[]
+  /** What would stop it from going out; drafts may be saved with these. */
+  problems: AdminMailProblems
+  /** Whether the server has a group mailer and APP_KEY. */
+  configured: boolean
+}
+
+export interface AdminMailPreview {
+  subject: string
+  html: string
+  text: string
+  /** Template checks for the previewed version; empty when it is fine. */
+  problems: Partial<Record<'subject' | 'body', string[]>>
+}
+
+export interface AdminMailTestResult {
+  locale: AdminMailLocale
+  status: 'sent' | 'failed'
+  mail_log_id: number
+  error?: string
+}
+
+export type AdminMailLogStatus = 'pending' | 'sent' | 'failed' | 'skipped' | 'cancelled'
+export type AdminMailDeliveryStatus = 'delayed' | 'delivered' | 'bounced' | 'complained'
+
+export interface AdminMailLog {
+  id: number
+  email: string
+  locale: string
+  subject: string | null
+  mailer: string | null
+  user: { id: number, username: string, nickname: string | null } | null
+  template: { id: number, key: string | null, name: string } | null
+  campaign: { id: number, title: string } | null
+  status: AdminMailLogStatus
+  skip_reason: 'unsubscribed' | 'inactive' | 'suppressed' | null
+  error: string | null
+  message_id: string | null
+  delivery_status: AdminMailDeliveryStatus | null
+  bounce_type: 'hard' | 'soft' | null
+  delivery_detail: string | null
+  delivery_updated_at: string | null
+  created_at: string | null
+  sent_at: string | null
+}
+
+export type AdminMailSuppressionReason = 'hard_bounce' | 'soft_bounce' | 'complaint' | 'manual'
+
+export interface AdminMailSuppression {
+  id: number
+  email: string
+  reason: AdminMailSuppressionReason
+  note: string | null
+  created_by: { id: number, username: string } | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+/** GET /v1/admin/users/{id}/mail */
+export interface AdminUserMail {
+  mail_locale: AdminMailLocale
+  mail_opted_out_at: string | null
+  mail_subscriptions: { key: string, names: Partial<Record<AdminMailLocale, string>>, descriptions: Partial<Record<AdminMailLocale, string>>, is_required: boolean, is_subscribed: boolean }[]
+  suppression: { reason: AdminMailSuppressionReason, created_at: string | null } | null
+  mail_logs: AdminMailLog[]
+}

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { Bell } from '@lucide/vue'
+import type { MailSubscription } from '~/types/mail'
 
-/** Notification switches. Discussions add the first one: whether reactions to your posts notify you. */
+/**
+ * Notification switches. Discussions add the first one: whether reactions to your posts notify you.
+ * Below them, mail: the language mail is sent in and which kinds of group mail to receive.
+ */
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
@@ -11,10 +15,21 @@ const saving = ref(false)
 const message = ref('')
 const failed = ref(false)
 
+const mailLocale = ref('en')
+const subscriptions = ref<MailSubscription[]>([])
+const mailSaving = ref(false)
+const mailMessage = ref('')
+const mailFailed = ref(false)
+
 async function load() {
   try {
-    const settings = await $api<{ notification_preferences?: { reactions?: boolean } }>('/v1/me/settings')
+    const [settings, mail] = await Promise.all([
+      $api<{ notification_preferences?: { reactions?: boolean }, mail_locale?: string }>('/v1/me/settings'),
+      $api<{ mail_subscriptions: MailSubscription[] }>('/v1/me/mail-subscriptions'),
+    ])
     reactions.value = settings.notification_preferences?.reactions ?? true
+    mailLocale.value = settings.mail_locale ?? 'en'
+    subscriptions.value = mail.mail_subscriptions
   }
   catch (failure) {
     message.value = localizeError(failure)
@@ -46,6 +61,33 @@ async function toggle() {
     saving.value = false
   }
 }
+
+async function saveMail(change: () => Promise<void>) {
+  mailSaving.value = true
+  mailMessage.value = ''
+  mailFailed.value = false
+  try {
+    await change()
+    mailMessage.value = t('account_pages.notifications.saved')
+  }
+  catch (failure) {
+    mailMessage.value = localizeError(failure)
+    mailFailed.value = true
+  }
+  finally {
+    mailSaving.value = false
+  }
+}
+
+const changeMailLocale = (code: string) => saveMail(async () => {
+  const settings = await $api<{ mail_locale: string }>('/v1/me/settings', { method: 'PUT', body: { mail_locale: code } })
+  mailLocale.value = settings.mail_locale
+})
+
+const toggleMail = (key: string, subscribed: boolean) => saveMail(async () => {
+  const item = await $api<MailSubscription>(`/v1/me/mail-subscriptions/${key}`, { method: subscribed ? 'PUT' : 'DELETE' })
+  subscriptions.value = subscriptions.value.map(current => current.key === key ? item : current)
+})
 </script>
 
 <template>
@@ -79,6 +121,27 @@ async function toggle() {
         </div>
         <p v-if="message" class="mt-4 text-sm" :class="failed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ message }}</p>
         <p class="mt-6 text-xs text-gray-400">{{ t('account_pages.notifications.levels_hint') }}</p>
+      </div>
+    </section>
+
+    <section class="overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5">
+      <div class="border-b border-gray-100 p-6 pb-5">
+        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.notifications.mail_title') }}</h2>
+        <p class="mt-1 text-sm text-gray-500">{{ t('account_pages.notifications.mail_description') }}</p>
+      </div>
+      <div class="p-6">
+        <SkeletonStatus v-if="loading" class="space-y-4">
+          <div class="skeleton h-10 w-full max-w-sm rounded-lg" />
+          <div v-for="row in 3" :key="row" class="flex items-start gap-4">
+            <div class="flex-1 space-y-2">
+              <div class="skeleton h-3.5 w-1/3 rounded-full" />
+              <div class="skeleton h-3 w-2/3 rounded-full" />
+            </div>
+            <div class="skeleton h-6 w-11 shrink-0 rounded-full" />
+          </div>
+        </SkeletonStatus>
+        <MailSettings v-else-if="subscriptions.length" :mail-locale="mailLocale" :subscriptions="subscriptions" :busy="mailSaving" @locale="changeMailLocale" @toggle="toggleMail" />
+        <p v-if="mailMessage" class="mt-4 text-sm" :class="mailFailed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ mailMessage }}</p>
       </div>
     </section>
   </div>
