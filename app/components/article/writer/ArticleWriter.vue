@@ -80,6 +80,8 @@ const checks = computed<SubmitCheck[]>(() => [
   { key: 'content', ok: wordCount.value >= site.value.article_content_min, required: true, params: { count: site.value.article_content_min } },
   { key: 'summary', ok: form.summary.trim() !== '', required: false },
   { key: 'cover', ok: form.cover_url.trim() !== '', required: false },
+  // A repost names its original; an original always has a license.
+  ...(form.is_repost ? [{ key: 'source', ok: /^https?:\/\/\S+$/i.test(form.source_url.trim()), required: true }] : []),
 ])
 
 const dialogOpen = ref(false)
@@ -324,7 +326,8 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
           </div>
           <ArticleWriterSettings
             v-model:type="form.type" v-model:summary="form.summary" v-model:cover-url="form.cover_url" v-model:banner-url="form.banner_url" v-model:slug="form.slug"
-            v-model:links="form.links" v-model:tags="form.tags" :disabled="readOnly" :allow-staff-tags="hasPermission('articles.manage')" :errors="fieldErrors" />
+            v-model:links="form.links" v-model:tags="form.tags" v-model:license="form.license" v-model:is-repost="form.is_repost"
+            v-model:source-url="form.source_url" v-model:source-author="form.source_author" :disabled="readOnly" :allow-staff-tags="hasPermission('articles.manage')" :errors="fieldErrors" />
         </aside>
       </div>
     </template>

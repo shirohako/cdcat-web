@@ -9,6 +9,15 @@
             <div class="flex flex-wrap items-center gap-2 rounded-2xl bg-white px-5 py-3 text-xs text-gray-500 shadow-sm">
               <span v-if="article.type" class="rounded-md bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">{{ typeName(article.type) }}</span>
               <span v-for="tag in article.tags" :key="tag.id" class="rounded-md bg-slate-50 px-2 py-0.5">#{{ tagName(tag) }}</span>
+              <a v-if="article.is_repost" href="#article-license" class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-amber-700 hover:bg-amber-100">
+                <Repeat2 :size="12" />{{ t('article_ui.declaration.reposted') }}
+              </a>
+              <a
+                v-else-if="license" :href="licenseUrl ?? '#article-license'" :target="licenseUrl ? '_blank' : undefined" :rel="licenseUrl ? 'license noopener' : undefined"
+                class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 hover:bg-slate-100" :title="t(`article_ui.licenses.${license.key}.summary`)">
+                <Copyright v-if="!license.url" :size="12" /><span v-else class="font-mono text-[10px] font-bold">cc</span>
+                {{ license.url ? license.short : t(`article_ui.licenses.${license.key}.name`) }}<ExternalLink v-if="licenseUrl" :size="10" />
+              </a>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>
               <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('article_ui.views', { count: article.views_count }) }}</span>
               <button
@@ -23,6 +32,7 @@
               </span>
             </div>
             <ArticleContent ref="contentRef" :content="article.content" :published-at="article.published_at ?? ''" />
+            <ArticleLicenseNotice :article="article" />
             <ArticleLinkCards :links="article.links" />
             <DiscussionCommentSection v-if="article.discussion_topic_id" :topic-id="article.discussion_topic_id" />
             <section v-if="moreByAuthor.length" class="rounded-2xl bg-white p-5 shadow-sm">
@@ -57,11 +67,12 @@
 </template>
 
 <script setup lang="ts">
-import { Eye, Flag, Heart, History, Shield } from '@lucide/vue'
+import { Copyright, ExternalLink, Eye, Flag, Heart, History, Repeat2, Shield } from '@lucide/vue'
 import type { ArticleCard, ArticleDetail } from '~/types/article'
+import { articleLicense, licenseDeedUrl } from '~/utils/articleLicenses'
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { toast, showToast } = useToast()
@@ -72,6 +83,8 @@ const config = useRuntimeConfig()
 const articleId = String(route.params.id)
 
 const { data: article, status, error, revealClass, mutate } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
+const license = computed(() => article.value && !article.value.is_repost ? articleLicense(article.value.license) : null)
+const licenseUrl = computed(() => license.value ? licenseDeedUrl(license.value, locale.value) : null)
 
 // Liking: guests go to log in first; authors cannot like their own article.
 const { isAuthenticated } = useAuth()

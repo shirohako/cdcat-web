@@ -650,7 +650,8 @@
         "type": "記事の種類を選択",
         "content": "本文 {count} 文字以上",
         "summary": "概要を記入",
-        "cover": "カバーを設定"
+        "cover": "カバーを設定",
+        "source": "転載元のURLを入力"
       },
       "optional": "推奨",
       "republish_title": "再公開",
@@ -668,7 +669,10 @@
       "slug": "このリンクは使用済みか、形式が正しくありません。",
       "blocked": "使用できない語句が含まれています。修正してからお試しください。",
       "conflict": "記事が別の場所で保存されました。残す版を選んでください。",
-      "invalid_state": "記事の現在の状態ではこの操作はできません。再読み込みしてお試しください。"
+      "invalid_state": "記事の現在の状態ではこの操作はできません。再読み込みしてお試しください。",
+      "license": "ライセンスを選んでください。",
+      "source_url": "転載には有効な元記事のURL（http または https）が必要です。",
+      "source_author": "原著者は100文字以内で入力してください。"
     },
     "mine": {
       "title": "自分の記事",
@@ -733,6 +737,64 @@
       "all_drafts": "下書き {count} 件をすべて見る",
       "new": "新しい記事を書く",
       "new_drops_local": "新しく書くと、このブラウザにある未保存の記事は破棄されます。"
+    },
+    "declaration": {
+      "title": "著作権表示",
+      "original": "オリジナル",
+      "repost": "転載",
+      "license_hint": "公開後も変更できます。変更前のライセンスで転載されたものには影響しません。",
+      "source_url": "元記事のURL",
+      "source_author": "原著者",
+      "source_author_placeholder": "任意",
+      "repost_hint": "転載記事はライセンスを選ばず、末尾に出典を表示します。",
+      "reposted": "転載",
+      "reposted_from": "{author} の記事を転載",
+      "reposted_unknown": "この記事は転載です",
+      "view_original": "元記事を見る",
+      "license_of": "この記事のライセンス",
+      "view_license": "ライセンスを見る"
+    },
+    "licenses": {
+      "all_rights_reserved": {
+        "name": "All Rights Reserved",
+        "summary": "著者の許可なく転載・商用利用・改変はできません。"
+      },
+      "cc_by_nc_sa": {
+        "name": "表示-非営利-継承",
+        "summary": "クレジット表示で転載可、商用不可。改変したものは同じライセンスで公開してください。"
+      },
+      "cc_by_nc": {
+        "name": "表示-非営利",
+        "summary": "クレジット表示で転載・改変可、商用不可。"
+      },
+      "cc_by_nc_nd": {
+        "name": "表示-非営利-改変禁止",
+        "summary": "クレジット表示で転載可、商用不可、改変不可。"
+      },
+      "cc_by_sa": {
+        "name": "表示-継承",
+        "summary": "クレジット表示で転載・商用可。改変したものは同じライセンスで公開してください。"
+      },
+      "cc_by": {
+        "name": "表示",
+        "summary": "クレジット表示で転載・商用・改変すべて可。"
+      },
+      "cc_by_nd": {
+        "name": "表示-改変禁止",
+        "summary": "クレジット表示で転載・商用可、改変不可。"
+      },
+      "cc0": {
+        "name": "パブリックドメイン",
+        "summary": "すべての権利を放棄。クレジット表示なしで自由に利用できます。"
+      },
+      "permissions": {
+        "reprint": "転載",
+        "commercial": "商用",
+        "derivatives": "改変",
+        "yes": "可",
+        "no": "不可",
+        "share_alike": "継承"
+      }
     }
   },
   "collection_pages": {

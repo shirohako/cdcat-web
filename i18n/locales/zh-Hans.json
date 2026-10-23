@@ -2614,7 +2614,8 @@
         "type": "选择文章类型",
         "content": "正文至少 {count} 字",
         "summary": "填写摘要",
-        "cover": "设置封面"
+        "cover": "设置封面",
+        "source": "填写转载的原文链接"
       },
       "optional": "建议",
       "republish_title": "重新公开",
@@ -2632,7 +2633,10 @@
       "slug": "这个链接已被占用或格式不对。",
       "blocked": "内容包含不允许的词语，请修改后再试。",
       "conflict": "文章在别处保存过，请选择要保留哪一份。",
-      "invalid_state": "文章当前的状态不允许这个操作，请刷新后重试。"
+      "invalid_state": "文章当前的状态不允许这个操作，请刷新后重试。",
+      "license": "请选择一个协议。",
+      "source_url": "转载需要填写有效的原文链接（http 或 https）。",
+      "source_author": "原作者最多 100 字。"
     },
     "mine": {
       "title": "我的文章",
@@ -2697,6 +2701,64 @@
       "all_drafts": "查看全部 {count} 篇草稿",
       "new": "新建文章",
       "new_drops_local": "新建会丢弃这个浏览器里未保存的那篇。"
+    },
+    "declaration": {
+      "title": "创作声明",
+      "original": "原创",
+      "repost": "转载",
+      "license_hint": "发布后仍可修改；已经按原协议转载出去的内容不受影响。",
+      "source_url": "原文链接",
+      "source_author": "原作者",
+      "source_author_placeholder": "可选",
+      "repost_hint": "转载的文章不选协议，文末会显示原文出处。",
+      "reposted": "转载",
+      "reposted_from": "本文转载自 {author}",
+      "reposted_unknown": "本文为转载",
+      "view_original": "查看原文",
+      "license_of": "本文协议",
+      "view_license": "查看协议"
+    },
+    "licenses": {
+      "all_rights_reserved": {
+        "name": "保留所有权利",
+        "summary": "未经作者许可，禁止转载、商用和改编。"
+      },
+      "cc_by_nc_sa": {
+        "name": "署名-非商业性使用-相同方式共享",
+        "summary": "转载需署名，不得商用；改编后须以相同协议发布。"
+      },
+      "cc_by_nc": {
+        "name": "署名-非商业性使用",
+        "summary": "转载和改编需署名，不得商用。"
+      },
+      "cc_by_nc_nd": {
+        "name": "署名-非商业性使用-禁止演绎",
+        "summary": "转载需署名，不得商用，不得改编。"
+      },
+      "cc_by_sa": {
+        "name": "署名-相同方式共享",
+        "summary": "转载需署名，可以商用；改编后须以相同协议发布。"
+      },
+      "cc_by": {
+        "name": "署名",
+        "summary": "转载、商用和改编都可以，需署名。"
+      },
+      "cc_by_nd": {
+        "name": "署名-禁止演绎",
+        "summary": "转载需署名，可以商用，不得改编。"
+      },
+      "cc0": {
+        "name": "公共领域",
+        "summary": "放弃所有权利，任何人都可以自由使用，无需署名。"
+      },
+      "permissions": {
+        "reprint": "转载",
+        "commercial": "商用",
+        "derivatives": "改编",
+        "yes": "可",
+        "no": "不可",
+        "share_alike": "同协议"
+      }
     }
   },
   "collection_pages": {

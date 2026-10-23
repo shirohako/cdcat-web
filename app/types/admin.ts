@@ -1,5 +1,5 @@
 import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText } from './catalog'
-import type { ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
+import type { ArticleLicense, ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
 import type { ReviewRating } from './reviews'
 
 export interface DeletionImpact {
@@ -281,6 +281,10 @@ export interface AdminArticle extends AdminArticleItem {
   cover_url: string | null
   banner_url: string | null
   content: string | null
+  license: ArticleLicense
+  is_repost: boolean
+  source_url: string | null
+  source_author: string | null
   word_count: number
   /** The status a locked article goes back to when unlocked. */
   locked_previous_status: MyArticle['status'] | null

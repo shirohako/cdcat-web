@@ -650,7 +650,8 @@
         "type": "選擇文章類型",
         "content": "內文至少 {count} 字",
         "summary": "填寫摘要",
-        "cover": "設定封面"
+        "cover": "設定封面",
+        "source": "填寫轉載的原文連結"
       },
       "optional": "建議",
       "republish_title": "重新公開",
@@ -668,7 +669,10 @@
       "slug": "這個連結已被使用或格式不正確。",
       "blocked": "內容包含不允許的詞語，請修改後再試。",
       "conflict": "文章在別處儲存過，請選擇要保留哪一份。",
-      "invalid_state": "文章目前的狀態不允許這個操作，請重新整理後再試。"
+      "invalid_state": "文章目前的狀態不允許這個操作，請重新整理後再試。",
+      "license": "請選擇一個協議。",
+      "source_url": "轉載需要填寫有效的原文連結（http 或 https）。",
+      "source_author": "原作者最多 100 字。"
     },
     "mine": {
       "title": "我的文章",
@@ -733,6 +737,64 @@
       "all_drafts": "查看全部 {count} 篇草稿",
       "new": "新建文章",
       "new_drops_local": "新建會捨棄這個瀏覽器裡未儲存的那篇。"
+    },
+    "declaration": {
+      "title": "創作聲明",
+      "original": "原創",
+      "repost": "轉載",
+      "license_hint": "發佈後仍可修改；已經按原協議轉載出去的內容不受影響。",
+      "source_url": "原文連結",
+      "source_author": "原作者",
+      "source_author_placeholder": "可選",
+      "repost_hint": "轉載的文章不選協議，文末會顯示原文出處。",
+      "reposted": "轉載",
+      "reposted_from": "本文轉載自 {author}",
+      "reposted_unknown": "本文為轉載",
+      "view_original": "查看原文",
+      "license_of": "本文協議",
+      "view_license": "查看協議"
+    },
+    "licenses": {
+      "all_rights_reserved": {
+        "name": "保留所有權利",
+        "summary": "未經作者許可，禁止轉載、商用和改編。"
+      },
+      "cc_by_nc_sa": {
+        "name": "姓名標示-非商業性-相同方式分享",
+        "summary": "轉載需署名，不得商用；改編後須以相同協議發佈。"
+      },
+      "cc_by_nc": {
+        "name": "姓名標示-非商業性",
+        "summary": "轉載和改編需署名，不得商用。"
+      },
+      "cc_by_nc_nd": {
+        "name": "姓名標示-非商業性-禁止改作",
+        "summary": "轉載需署名，不得商用，不得改編。"
+      },
+      "cc_by_sa": {
+        "name": "姓名標示-相同方式分享",
+        "summary": "轉載需署名，可以商用；改編後須以相同協議發佈。"
+      },
+      "cc_by": {
+        "name": "姓名標示",
+        "summary": "轉載、商用和改編都可以，需署名。"
+      },
+      "cc_by_nd": {
+        "name": "姓名標示-禁止改作",
+        "summary": "轉載需署名，可以商用，不得改編。"
+      },
+      "cc0": {
+        "name": "公眾領域",
+        "summary": "放棄所有權利，任何人都可以自由使用，無需署名。"
+      },
+      "permissions": {
+        "reprint": "轉載",
+        "commercial": "商用",
+        "derivatives": "改編",
+        "yes": "可",
+        "no": "不可",
+        "share_alike": "同協議"
+      }
     }
   },
   "collection_pages": {

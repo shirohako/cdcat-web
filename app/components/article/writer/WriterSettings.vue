@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { ArticleType, ContentLinkSummary, TagSummary } from '~/types/article'
+import type { ArticleLicense, ArticleType, ContentLinkSummary, TagSummary } from '~/types/article'
+import { ARTICLE_LICENSES } from '~/utils/articleLicenses'
 
-/** The article's metadata: type, tags, summary, cover, page banner, links and custom link path. */
+/** The article's metadata: type, tags, summary, cover, page banner, links, rights and custom link path. */
 const props = withDefaults(defineProps<{ disabled?: boolean, allowStaffTags?: boolean, errors?: Record<string, string> }>(),
   { disabled: false, allowStaffTags: false, errors: () => ({}) })
 const type = defineModel<ArticleType | null>('type', { required: true })
@@ -11,6 +12,10 @@ const bannerUrl = defineModel<string>('bannerUrl', { required: true })
 const slug = defineModel<string>('slug', { required: true })
 const links = defineModel<ContentLinkSummary[]>('links', { required: true })
 const tags = defineModel<TagSummary[]>('tags', { required: true })
+const license = defineModel<ArticleLicense>('license', { required: true })
+const isRepost = defineModel<boolean>('isRepost', { required: true })
+const sourceUrl = defineModel<string>('sourceUrl', { required: true })
+const sourceAuthor = defineModel<string>('sourceAuthor', { required: true })
 const { t } = useI18n()
 const { types, typeName } = useArticleTypes()
 // A type deactivated since it was picked stays visible while selected; it can only go live on an article that already had it.
@@ -22,6 +27,8 @@ const coverIsHttps = computed(() => isHttps(coverUrl.value))
 const bannerBroken = ref(false)
 watch(bannerUrl, () => { bannerBroken.value = false })
 const bannerIsHttps = computed(() => isHttps(bannerUrl.value))
+const sourceIsWeb = computed(() => !sourceUrl.value.trim() || /^https?:\/\/\S+$/i.test(sourceUrl.value.trim()))
+
 const label = 'block text-xs font-semibold uppercase tracking-wide text-slate-500'
 const field = 'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-violet-400 disabled:bg-slate-50'
 const errorText = (key: string) => props.errors[key]
@@ -85,6 +92,47 @@ const errorText = (key: string) => props.errors[key]
       <p class="text-[11px] text-slate-400">{{ t('article_ui.fields.links_hint') }}</p>
       <CommonContentLinkPicker v-model="links" :disabled="disabled" />
       <p v-if="errorText('links')" class="text-xs text-rose-600">{{ errorText('links') }}</p>
+    </section>
+
+    <section class="space-y-2">
+      <span :class="label">{{ t('article_ui.declaration.title') }}</span>
+      <div class="grid grid-cols-2 gap-1.5" role="radiogroup" :aria-label="t('article_ui.declaration.title')">
+        <button
+          v-for="repost in [false, true]" :key="String(repost)" type="button" role="radio" :disabled="disabled" :aria-checked="isRepost === repost"
+          class="rounded-lg border px-2.5 py-1.5 text-sm transition disabled:opacity-60"
+          :class="isRepost === repost ? 'border-violet-400 bg-violet-50 font-semibold text-violet-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'"
+          @click="isRepost = repost">
+          {{ t(repost ? 'article_ui.declaration.repost' : 'article_ui.declaration.original') }}
+        </button>
+      </div>
+
+      <template v-if="!isRepost">
+        <div class="space-y-1.5" role="radiogroup" :aria-label="t('article_ui.declaration.license_of')">
+          <label
+            v-for="item in ARTICLE_LICENSES" :key="item.key"
+            class="flex cursor-pointer items-start gap-2.5 rounded-lg border px-2.5 py-2 transition has-[:disabled]:cursor-default has-[:disabled]:opacity-60"
+            :class="license === item.key ? 'border-violet-400 bg-violet-50' : 'border-slate-200 bg-white hover:border-slate-300'">
+            <input v-model="license" type="radio" name="writer-license" :value="item.key" :disabled="disabled" class="radio radio-xs mt-0.5 shrink-0">
+            <span class="min-w-0">
+              <span class="block text-sm font-medium leading-5 text-slate-800">{{ t(`article_ui.licenses.${item.key}.name`) }}</span>
+              <span v-if="item.url" class="block font-mono text-[10px] text-slate-400">{{ item.short }}</span>
+              <ArticleLicensePermissions :info="item" class="mt-1" />
+            </span>
+          </label>
+        </div>
+        <p class="text-[11px] text-slate-400">{{ t('article_ui.declaration.license_hint') }}</p>
+        <p v-if="errorText('license')" class="text-xs text-rose-600">{{ errorText('license') }}</p>
+      </template>
+
+      <div v-else class="space-y-2">
+        <label :class="label" for="writer-source-url">{{ t('article_ui.declaration.source_url') }} <span class="text-rose-500">*</span></label>
+        <input id="writer-source-url" v-model="sourceUrl" type="url" inputmode="url" maxlength="2048" :disabled="disabled" :class="field" placeholder="https://…">
+        <p v-if="!sourceIsWeb || errorText('source_url')" class="text-xs text-rose-600">{{ errorText('source_url') || t('article_ui.errors.source_url') }}</p>
+        <label :class="label" for="writer-source-author">{{ t('article_ui.declaration.source_author') }}</label>
+        <input id="writer-source-author" v-model="sourceAuthor" maxlength="100" :disabled="disabled" :class="field" :placeholder="t('article_ui.declaration.source_author_placeholder')">
+        <p v-if="errorText('source_author')" class="text-xs text-rose-600">{{ errorText('source_author') }}</p>
+        <p class="text-[11px] text-slate-400">{{ t('article_ui.declaration.repost_hint') }}</p>
+      </div>
     </section>
 
     <details class="group rounded-lg border border-slate-200 bg-white">

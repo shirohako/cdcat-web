@@ -1,4 +1,5 @@
 import type { ArticleDraftFields, ArticleEditPayload, ContentLinkSummary, TagSummary } from '~/types/article'
+import { DEFAULT_ARTICLE_LICENSE } from '~/utils/articleLicenses'
 import { tagPayload } from '~/utils/tags'
 
 /** The editable state of the writing page; links and tags keep their display data. */
@@ -9,6 +10,10 @@ export interface ArticleDraftForm {
   cover_url: string
   banner_url: string
   content: string
+  license: ArticleDraftFields['license']
+  is_repost: boolean
+  source_url: string
+  source_author: string
   slug: string
   links: ContentLinkSummary[]
   tags: TagSummary[]
@@ -24,7 +29,10 @@ interface LocalCopy {
 const LOCAL_DELAY = 1000
 const LOCAL_PREFIX = 'cdcat:article-draft:'
 
-const emptyForm = (): ArticleDraftForm => ({ type: null, title: '', summary: '', cover_url: '', banner_url: '', content: '', slug: '', links: [], tags: [] })
+const emptyForm = (): ArticleDraftForm => ({
+  type: null, title: '', summary: '', cover_url: '', banner_url: '', content: '',
+  license: DEFAULT_ARTICLE_LICENSE, is_repost: false, source_url: '', source_author: '', slug: '', links: [], tags: [],
+})
 
 const formFrom = (payload: ArticleEditPayload): ArticleDraftForm => ({
   type: payload.article.type,
@@ -33,6 +41,10 @@ const formFrom = (payload: ArticleEditPayload): ArticleDraftForm => ({
   cover_url: payload.article.cover_url ?? '',
   banner_url: payload.article.banner_url ?? '',
   content: payload.article.content ?? '',
+  license: payload.article.license ?? DEFAULT_ARTICLE_LICENSE,
+  is_repost: payload.article.is_repost ?? false,
+  source_url: payload.article.source_url ?? '',
+  source_author: payload.article.source_author ?? '',
   slug: payload.article.slug ?? '',
   links: payload.article.links,
   tags: payload.article.tags,
@@ -46,6 +58,10 @@ const serialize = (form: ArticleDraftForm): Record<keyof ArticleDraftFields, unk
   cover_url: form.cover_url.trim(),
   banner_url: form.banner_url.trim(),
   content: form.content,
+  license: form.license,
+  is_repost: form.is_repost,
+  source_url: form.source_url.trim(),
+  source_author: form.source_author.trim(),
   slug: form.slug.trim(),
   links: form.links.map(link => ({ type: link.type, id: link.id })),
   ...tagPayload(form.tags),
@@ -119,7 +135,11 @@ export function useArticleDraft(initialId: number | null, options: { onCreated?:
 
   const localKey = (id = articleId.value) => `${LOCAL_PREFIX}${user.value?.id ?? 'guest'}:${id ?? 'new'}`
   const readLocal = (): LocalCopy | null => {
-    try { return JSON.parse(localStorage.getItem(localKey()) ?? 'null') as LocalCopy | null }
+    try {
+      const local = JSON.parse(localStorage.getItem(localKey()) ?? 'null') as LocalCopy | null
+      // Copies kept before a field existed get its default.
+      return local?.form ? { ...local, form: { ...emptyForm(), ...local.form } } : null
+    }
     catch { return null }
   }
   const writeLocal = () => {

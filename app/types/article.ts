@@ -49,6 +49,9 @@ export interface ContentLinkSummary extends ContentLink {
   event_series_id?: number | null
 }
 
+/** What readers may do with an original article (docs/articles/README.md#协议与转载); utils/articleLicenses describes each. */
+export type ArticleLicense = 'all_rights_reserved' | 'cc_by' | 'cc_by_sa' | 'cc_by_nc' | 'cc_by_nc_sa' | 'cc_by_nd' | 'cc_by_nc_nd' | 'cc0'
+
 export interface ArticleCard {
   id: number
   slug: string | null
@@ -69,6 +72,11 @@ export interface ArticleDetail extends ArticleCard {
   /** The wide page header; the cover stands in when it is null. */
   banner_url: string | null
   content: string
+  /** The license of an original; null for a repost. */
+  license: ArticleLicense | null
+  is_repost: boolean
+  /** Where a repost comes from; null for an original. */
+  source: { url: string, author: string | null } | null
   links: ContentLinkSummary[]
   /** Set when the article was edited well after its first publication. */
   updated_at: string | null
@@ -95,6 +103,10 @@ export interface ArticleEditPayload {
     cover_url: string | null
     banner_url: string | null
     content: string | null
+    license: ArticleLicense
+    is_repost: boolean
+    source_url: string | null
+    source_author: string | null
     links: ContentLinkSummary[]
     tags: TagSummary[]
     featured: boolean
@@ -113,6 +125,10 @@ export interface ArticleDraftFields {
   cover_url: string
   banner_url: string
   content: string
+  license: ArticleLicense
+  is_repost: boolean
+  source_url: string
+  source_author: string
   slug: string
   links: ContentLink[]
   tag_ids: number[]

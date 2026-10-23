@@ -650,7 +650,8 @@
         "type": "Article type chosen",
         "content": "At least {count} characters of text",
         "summary": "Summary written",
-        "cover": "Cover set"
+        "cover": "Cover set",
+        "source": "Link to the original of the repost"
       },
       "optional": "Suggested",
       "republish_title": "Publish again",
@@ -668,7 +669,10 @@
       "slug": "This link is taken or malformed.",
       "blocked": "The content contains words that are not allowed. Edit it and try again.",
       "conflict": "This article was saved elsewhere. Choose which copy to keep.",
-      "invalid_state": "The article cannot do this in its current state. Reload and try again."
+      "invalid_state": "The article cannot do this in its current state. Reload and try again.",
+      "license": "Choose a license.",
+      "source_url": "A repost needs a valid link to the original (http or https).",
+      "source_author": "The original author can be at most 100 characters."
     },
     "mine": {
       "title": "My articles",
@@ -733,6 +737,64 @@
       "all_drafts": "See all {count} drafts",
       "new": "New article",
       "new_drops_local": "Starting a new one discards the unsaved article in this browser."
+    },
+    "declaration": {
+      "title": "Rights",
+      "original": "Original",
+      "repost": "Repost",
+      "license_hint": "You can change it after publishing; copies already shared under the old license keep it.",
+      "source_url": "Link to the original",
+      "source_author": "Original author",
+      "source_author_placeholder": "Optional",
+      "repost_hint": "A repost has no license; the end of the article names where it comes from.",
+      "reposted": "Repost",
+      "reposted_from": "Reposted from {author}",
+      "reposted_unknown": "This article is a repost",
+      "view_original": "Read the original",
+      "license_of": "License",
+      "view_license": "View license"
+    },
+    "licenses": {
+      "all_rights_reserved": {
+        "name": "All rights reserved",
+        "summary": "No reposting, commercial use or adaptation without the author’s permission."
+      },
+      "cc_by_nc_sa": {
+        "name": "Attribution-NonCommercial-ShareAlike",
+        "summary": "Repost with credit, no commercial use; adaptations must use the same license."
+      },
+      "cc_by_nc": {
+        "name": "Attribution-NonCommercial",
+        "summary": "Repost and adapt with credit, no commercial use."
+      },
+      "cc_by_nc_nd": {
+        "name": "Attribution-NonCommercial-NoDerivatives",
+        "summary": "Repost with credit, no commercial use, no adaptations."
+      },
+      "cc_by_sa": {
+        "name": "Attribution-ShareAlike",
+        "summary": "Repost and use commercially with credit; adaptations must use the same license."
+      },
+      "cc_by": {
+        "name": "Attribution",
+        "summary": "Repost, use commercially and adapt, with credit."
+      },
+      "cc_by_nd": {
+        "name": "Attribution-NoDerivatives",
+        "summary": "Repost and use commercially with credit, no adaptations."
+      },
+      "cc0": {
+        "name": "Public domain",
+        "summary": "No rights reserved: anyone may use it freely, without credit."
+      },
+      "permissions": {
+        "reprint": "Repost",
+        "commercial": "Commercial",
+        "derivatives": "Adapt",
+        "yes": "yes",
+        "no": "no",
+        "share_alike": "same license"
+      }
     }
   },
   "collection_pages": {

@@ -146,6 +146,12 @@ useHead({ title: computed(() => data.value?.title ?? t('admin_pages.articles.tit
               <dt>{{ t('admin_pages.articles.links') }}</dt><dd class="text-slate-700">{{ data.links.map(link => `${t(`admin_pages.articles.link_types.${link.type}`)}：${link.title}`).join('；') || '—' }}</dd>
               <dt>{{ t('admin_pages.articles.cover') }}</dt><dd class="truncate text-slate-700">{{ data.cover_url || '—' }}</dd>
               <dt>{{ t('admin_pages.articles.banner') }}</dt><dd class="truncate text-slate-700">{{ data.banner_url || '—' }}</dd>
+              <dt>{{ t('article_ui.declaration.title') }}</dt>
+              <dd v-if="data.is_repost" class="min-w-0 text-slate-700">
+                {{ t('article_ui.declaration.repost') }}<template v-if="data.source_author"> · {{ data.source_author }}</template> ·
+                <a v-if="data.source_url" :href="data.source_url" target="_blank" rel="noopener nofollow" class="break-all underline">{{ data.source_url }}</a><span v-else>—</span>
+              </dd>
+              <dd v-else class="text-slate-700">{{ t('article_ui.declaration.original') }} · {{ t(`article_ui.licenses.${data.license}.name`) }}</dd>
             </dl>
             <p v-if="!data.content" class="text-sm text-slate-500">{{ t('admin_pages.articles.nothing_to_show') }}</p>
             <RichContent v-else-if="contentView === 'rendered'" :content="data.content" format="markdown" />
