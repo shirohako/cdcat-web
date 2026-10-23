@@ -1,6 +1,6 @@
 <template>
   <section class="animate-fade-in-up-slow">
-    <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
+    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div class="divide-y divide-gray-100">
         <!-- Tracks -->
         <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">

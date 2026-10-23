@@ -1,5 +1,5 @@
 <template>
-  <section class="animate-fade-in-up-slow rounded-2xl border border-black/5 bg-white/75 p-5 shadow-sm backdrop-blur-xl">
+  <section class="animate-fade-in-up-slow rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
     <header class="mb-5 flex items-center justify-between gap-3">
       <h2 class="text-base font-semibold leading-6 text-gray-900">{{ $t('tracking.widget.title') }}</h2>
       <p class="shrink-0 text-xs text-gray-500">{{ totalCount }} {{ $t('profile.total') }}</p>

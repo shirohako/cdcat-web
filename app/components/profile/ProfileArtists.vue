@@ -1,6 +1,6 @@
 <template>
   <section class="animate-fade-in-up-slow">
-    <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
+    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div class="mb-5 flex items-center justify-between">
         <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
           <Mic2 :size="18" class="text-gray-400" />
@@ -29,7 +29,7 @@
           v-for="artist in artists.slice(0, 6)"
           :key="artist.id"
           :to="`/artists/${artist.id}`"
-          class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white/85 px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
+          class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
         >
           <div class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5 transition-transform duration-300 group-hover:scale-110">
             <img v-if="artist.image_url" :src="artist.image_url" :alt="artist.name" class="w-full h-full object-cover">

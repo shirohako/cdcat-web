@@ -35,7 +35,6 @@
             <!-- Right column -->
             <div class="space-y-6">
               <ProfileStats :stats="profile.tracking" @select-status="onSelectTrackingStatus" />
-              <ProfileTaste />
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <section class="animate-fade-in-up-slow">
-    <div class="bg-white/70 backdrop-blur-xl rounded-2xl ring-1 ring-black/5 p-5 shadow-sm">
+    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
       <div class="mb-5 flex items-center justify-between">
         <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
           <Disc3 :size="18" class="text-gray-400" />
@@ -29,7 +29,7 @@
           v-for="album in albums"
           :key="album.id"
           :to="`/albums/${album.id}`"
-          class="group overflow-hidden rounded-xl bg-white/90 ring-1 ring-black/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+          class="group overflow-hidden rounded-xl bg-white ring-1 ring-black/5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
         >
           <div class="relative aspect-square overflow-hidden bg-gray-100">
             <img

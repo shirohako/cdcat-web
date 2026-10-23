@@ -17,7 +17,7 @@
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
-          <div v-for="card in 2" :key="card" class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+          <div v-for="card in 2" :key="card" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <div class="skeleton h-4 w-28 rounded-full" />
             <div class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5">
               <div v-for="cover in 5" :key="cover" class="skeleton aspect-square rounded-lg" :class="cover > 3 ? 'hidden sm:block' : ''" />
@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="space-y-6">
-          <div v-for="card in 2" :key="card" class="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+          <div v-for="card in 2" :key="card" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
             <div class="skeleton h-4 w-20 rounded-full" />
             <div class="mt-4 space-y-2.5">
               <div class="skeleton h-3 w-full rounded-full" />
