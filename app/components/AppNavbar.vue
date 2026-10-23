@@ -26,7 +26,11 @@
         </button>
 
         <!-- Logo -->
-        <NuxtLink to="/" class="flex h-9 items-center text-2xl font-bold leading-none tracking-tight text-gray-900">CDCAT</NuxtLink>
+        <NuxtLink to="/" class="flex h-9 items-center gap-2 text-2xl font-bold leading-none tracking-tight text-gray-900">
+          <!-- The name follows, so the picture needs no alt text of its own. -->
+          <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg">
+          CDCAT
+        </NuxtLink>
       </div>
 
       <!-- Right Section: Search, Language Switcher & User -->

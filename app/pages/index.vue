@@ -9,6 +9,17 @@
       <section class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
         <div class="space-y-6">
           <div class="space-y-4 animate-rise">
+            <div class="flex items-center gap-4">
+              <!-- The name follows, so the picture needs no alt text of its own. -->
+              <img
+                src="/icon.png"
+                alt=""
+                width="80"
+                height="80"
+                class="size-16 md:size-20 rounded-2xl shadow-[0_18px_40px_-20px_rgba(15,23,42,0.55)] ring-4 ring-white"
+              >
+              <p class="text-3xl md:text-4xl font-black tracking-tight text-slate-900">CDCAT</p>
+            </div>
             <h1
               class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900"
             >
@@ -75,13 +86,7 @@
 
         <div class="relative">
           <div class="border border-white/80 bg-[linear-gradient(140deg,rgba(255,255,255,0.9),rgba(241,245,249,0.9))] shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] rounded-4xl p-5 backdrop-blur-sm animate-[fade-in_0.6s_ease_backwards]">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                  {{ t('home.beta') }}
-                </p>
-                <p class="text-3xl font-black text-slate-900 mt-1">CDCAT</p>
-              </div>
+            <div class="flex items-center">
               <div
                 class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-semibold"
               >
