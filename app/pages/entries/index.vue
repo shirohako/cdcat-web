@@ -68,7 +68,7 @@ const goToPage = (page: number) => {
             <template #action>
               <button
                 class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-                @click="navigateTo('/contribute/entry')"
+                @click="navigateTo('/contribute?type=entry')"
               >
                 <Plus class="h-3.5 w-3.5" />
                 <span class="hidden sm:inline">{{ $t('common.new') }}</span>

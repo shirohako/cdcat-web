@@ -1888,6 +1888,9 @@
       "blocked": "你已封鎖該使用者",
       "expand": "展開",
       "collapse": "收起",
+      "reveal_title": "查看被摺疊的內容？",
+      "reveal_description": "{reason}。內容可能令人不適，確定要查看嗎？",
+      "reveal_confirm": "查看",
       "delete_title": "刪除這則貼文？",
       "delete_floor_help": "這層樓和下面的回覆都會被徹底刪除，樓層號空出來不再使用。",
       "delete_first_help": "會刪除整個主題，包括其他人的全部回覆，無法恢復。",
@@ -2814,5 +2817,42 @@
     "invalid_title": "連結無效",
     "invalid_message": "這個連結無效，或已被更動。請登入後在帳號設定裡修改郵件設定。",
     "go_to_account": "前往帳號設定"
+  },
+  "contribute_page": {
+    "seo_title": "參與貢獻",
+    "title": "你想補充什麼？",
+    "summary": "提交後馬上上線，由貢獻者審核。",
+    "more": "了解更多",
+    "less": "收起",
+    "details": {
+      "search": "先搜尋一下，確認還沒有人錄過；新建專輯時也會提示可能重複的專輯。",
+      "live": "新建的內容提交後馬上上線，標記為「審核中」；修改已有內容要等審核通過才生效。",
+      "review": "貢獻者或版主審核，結果會通知你：通過、退回修改或駁回。",
+      "history": "每次修改都記入版本歷史，改錯了也能復原。只接受人工整理的資料，不接受機器人採集。"
+    },
+    "kinds": {
+      "album": {
+        "title": "專輯",
+        "desc": "曲目、發行資訊、製作人員、商品和特典"
+      },
+      "artist": {
+        "title": "藝術家",
+        "desc": "個人、社團、樂團、虛擬歌手、角色"
+      },
+      "entry": {
+        "title": "條目",
+        "desc": "遊戲、動畫、電影等作品，可從 Bangumi 匯入"
+      },
+      "franchise": {
+        "title": "系列",
+        "desc": "把多個條目歸在一起"
+      },
+      "label": {
+        "title": "廠牌",
+        "desc": "發行或經銷專輯的公司、品牌"
+      }
+    },
+    "my_revisions": "查看我的修訂",
+    "guest_note": "瀏覽不需要登入；選擇後會先請你登入。"
   }
 }

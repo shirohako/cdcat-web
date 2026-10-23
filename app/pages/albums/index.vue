@@ -30,7 +30,7 @@
                 <button
                   type="button"
                   class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-700"
-                  @click="navigateTo('/contribute/album')"
+                  @click="navigateTo('/contribute?type=album')"
                 >
                   <Plus class="h-4 w-4" />
                   <span class="hidden sm:inline">{{ $t('albums.new') }}</span>

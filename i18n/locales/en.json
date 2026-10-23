@@ -1888,6 +1888,9 @@
       "blocked": "You blocked this user",
       "expand": "Show",
       "collapse": "Hide",
+      "reveal_title": "Show the folded post?",
+      "reveal_description": "{reason}. It may be upsetting. Show it anyway?",
+      "reveal_confirm": "Show",
       "delete_title": "Delete this post?",
       "delete_floor_help": "The floor and the replies under it are deleted for good. Its number stays unused.",
       "delete_first_help": "This deletes the whole topic, with every reply in it, including other people's. It cannot be undone.",
@@ -2814,5 +2817,42 @@
     "invalid_title": "This link doesn't work",
     "invalid_message": "The link is invalid or has been changed. Sign in to change your email settings in your account.",
     "go_to_account": "Go to account settings"
+  },
+  "contribute_page": {
+    "seo_title": "Contribute",
+    "title": "What would you like to add?",
+    "summary": "It goes live as soon as you submit, and contributors review it.",
+    "more": "Learn more",
+    "less": "Hide",
+    "details": {
+      "search": "Search first to make sure it isn't there yet; adding an album also shows possible duplicates.",
+      "live": "New content goes live when you submit it, marked “pending review”; edits to existing content wait for approval.",
+      "review": "A contributor or moderator reviews it and you're told the outcome: approved, changes requested or rejected.",
+      "history": "Every change goes into the version history, so mistakes can be undone. Only data put together by people — no bots."
+    },
+    "kinds": {
+      "album": {
+        "title": "Album",
+        "desc": "Tracklist, release details, credits, products and bonuses"
+      },
+      "artist": {
+        "title": "Artist",
+        "desc": "People, circles, bands, virtual singers, characters"
+      },
+      "entry": {
+        "title": "Entry",
+        "desc": "Games, anime, films and more — import from Bangumi"
+      },
+      "franchise": {
+        "title": "Franchise",
+        "desc": "Groups several entries together"
+      },
+      "label": {
+        "title": "Label",
+        "desc": "Companies and brands that release albums"
+      }
+    },
+    "my_revisions": "See my revisions",
+    "guest_note": "Browsing needs no account; you'll be asked to log in after choosing."
   }
 }

@@ -1516,9 +1516,72 @@
         "delete_title": "删除版块「{name}」？",
         "delete_help": "版块里没有主题和子版块时才能删除。"
       },
+      "topics": {
+        "title": "主题",
+        "description": "按主题管理：置顶、加精、锁定、移动版块、折叠（折叠 1 楼）和删除。单条帖子和回复在「全部帖子」里处理；文章评论主题跟随文章，不能移动、折叠或删除。",
+        "search": "搜索标题",
+        "all_categories": "全部版块",
+        "any_flag": "全部主题",
+        "flags": {
+          "pinned": "置顶中",
+          "featured": "精华",
+          "locked": "已锁定",
+          "article": "文章评论"
+        },
+        "sorts": {
+          "created": "按发布时间",
+          "last_posted": "按最后回复",
+          "posts": "按回复数",
+          "views": "按浏览量"
+        },
+        "pinned": {
+          "category": "版块置顶",
+          "global": "全站置顶"
+        },
+        "stats": "{replies} 回复 · {views} 浏览",
+        "last_posted": "最后回复 {time}",
+        "view_posts": "查看帖子",
+        "actions": {
+          "pin": "置顶",
+          "feature": "加精",
+          "unfeature": "取消精华",
+          "lock": "锁定",
+          "unlock": "解锁",
+          "move": "移动"
+        },
+        "pin_scope": "置顶范围",
+        "pin_scopes": {
+          "none": "不置顶",
+          "category": "版块置顶",
+          "global": "全站置顶"
+        },
+        "move_to": "移动到",
+        "confirm": {
+          "pin": "设置置顶：{title}",
+          "feature": "设为精华：{title}",
+          "unfeature": "取消精华：{title}",
+          "lock": "锁定主题：{title}",
+          "unlock": "解锁主题：{title}",
+          "move": "移动主题：{title}",
+          "hide": "折叠主题：{title}",
+          "unhide": "取消折叠：{title}",
+          "delete": "删除主题：{title}"
+        },
+        "confirm_help": {
+          "pin": "版块置顶只在所在版块顶部显示，全站置顶在讨论首页也显示。",
+          "feature": "主题会出现在精华列表。",
+          "unfeature": "主题不再出现在精华列表。",
+          "lock": "锁定后只有版主能回复。",
+          "unlock": "所有人恢复可以回复。",
+          "move": "主题和全部回复一起移到新版块。",
+          "hide": "折叠 1 楼，主题从列表和搜索里消失，链接仍能打开。作者会收到通知和原因。",
+          "unhide": "1 楼恢复显示，主题回到列表。",
+          "delete": "主题和全部回复永久删除，原文写入操作日志，作者会收到通知。"
+        }
+      },
       "posts": {
-        "title": "帖子检索",
-        "description": "全站帖子，包括已折叠和已删除的。有用户管理权限时还能按 IP 查找。",
+        "title": "全部帖子",
+        "description": "全站帖子：主题的 1 楼、回复和楼中楼，包括已折叠的。有用户管理权限时还能按 IP 查找。",
         "search": "搜索正文",
         "user": "用户名",
         "category": "版块 slug",
@@ -1577,7 +1640,7 @@
       "confirm_help": {
         "hide": "对外显示「已被折叠」和原因。",
         "unhide": "帖子恢复正常显示。",
-        "delete": "原文保留，可以恢复。",
+        "delete": "永久删除，原文写入操作日志。",
         "restore": "帖子恢复正常显示。",
         "purge": "永久禁言，并删除该用户的全部主题和帖子。要禁用整个账号，请到用户管理操作。"
       },
@@ -3794,6 +3857,9 @@
       "blocked": "你已屏蔽该用户",
       "expand": "展开",
       "collapse": "收起",
+      "reveal_title": "查看被折叠的内容？",
+      "reveal_description": "{reason}。内容可能令人不适，确定要查看吗？",
+      "reveal_confirm": "查看",
       "delete_title": "删除这条帖子？",
       "delete_floor_help": "这层楼和下面的回复都会被彻底删除，楼层号空出来不再使用。",
       "delete_first_help": "会删除整个主题，包括其他人的全部回复，无法恢复。",
@@ -4720,5 +4786,42 @@
     "invalid_title": "链接无效",
     "invalid_message": "这个链接无效，或者已被改动。请登录后在账号设置里修改邮件设置。",
     "go_to_account": "前往账号设置"
+  },
+  "contribute_page": {
+    "seo_title": "参与贡献",
+    "title": "你想补充什么？",
+    "summary": "提交后马上上线，由贡献者审核。",
+    "more": "了解更多",
+    "less": "收起",
+    "details": {
+      "search": "先搜一下，确认还没人录过；新建专辑时也会提示可能重复的专辑。",
+      "live": "新建的内容提交后马上上线，标记为「审核中」；修改已有内容要等审核通过才生效。",
+      "review": "贡献者或版主审核，结果会通知你：通过、退回修改或驳回。",
+      "history": "每次修改都记入版本历史，改错了也能恢复。只接受人工整理的资料，不接受机器人采集。"
+    },
+    "kinds": {
+      "album": {
+        "title": "专辑",
+        "desc": "曲目、发行信息、制作人员、商品和特典"
+      },
+      "artist": {
+        "title": "艺术家",
+        "desc": "个人、社团、乐队、虚拟歌手、角色"
+      },
+      "entry": {
+        "title": "条目",
+        "desc": "游戏、动画、电影等作品，可从 Bangumi 导入"
+      },
+      "franchise": {
+        "title": "系列",
+        "desc": "把多个条目归在一起"
+      },
+      "label": {
+        "title": "厂牌",
+        "desc": "发行或经销专辑的公司、品牌"
+      }
+    },
+    "my_revisions": "查看我的修订",
+    "guest_note": "浏览不需要登录；选择后会先请你登录。"
   }
 }

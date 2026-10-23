@@ -456,6 +456,28 @@ export interface AdminDiscussionPost {
   updated_at: string
 }
 
+export interface AdminDiscussionTopic {
+  id: number
+  title: string
+  status: 'visible' | 'hidden'
+  status_reason: string | null
+  category_id: number
+  category: { id: number, name: string, slug: string, color: string | null } | null
+  user: UserSummary | null
+  pinned_scope: 'category' | 'global' | null
+  pinned_until: string | null
+  featured: boolean
+  locked: boolean
+  /** Set on an article's comment topic, which follows its article. */
+  article_id: number | null
+  first_post_id: number | null
+  replies_count: number
+  views_count: number
+  last_posted_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface AdminDiscussionRestriction {
   id: number
   user: UserSummary | null
