@@ -74,7 +74,6 @@ export interface ArtistDocument {
 export interface LabelDocument {
   name: string
   slug: string | null
-  parent_id: AggregateRef | null
   country: string | null
   description: string | null
   image_url: string | null

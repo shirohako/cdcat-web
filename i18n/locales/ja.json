@@ -2109,8 +2109,6 @@
     "title": "レーベル",
     "subtitle": "レコード会社とレーベル",
     "label": "レーベル",
-    "parent": "親レーベル",
-    "children": "サブレーベル",
     "catalog_prefixes": "品番の接頭辞",
     "no_results": "レーベルが見つかりません",
     "not_found": "このレーベルは存在しません。"
@@ -2497,8 +2495,6 @@
       "founded": "設立",
       "dissolved": "終了",
       "artist_relations_hint": "メンバー、声優、別名義、ユニット。このアーティストから見た関係を選ぶと、相手には逆の関係が表示されます。",
-      "parent_label": "親レーベル",
-      "parent_label_hint": "サブレーベルやブランドの所属先。レコード会社のアナログ盤レーベルなど。",
       "prefixes_hint": "品番の接頭辞をカンマ区切りで。アルバム追加時にレーベルの推測に使います。",
       "name_only_credit": "表記名だけ",
       "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。",

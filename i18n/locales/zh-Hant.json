@@ -2109,8 +2109,6 @@
     "title": "廠牌",
     "subtitle": "唱片公司與廠牌",
     "label": "廠牌",
-    "parent": "上級廠牌",
-    "children": "子廠牌",
     "catalog_prefixes": "品番前綴",
     "no_results": "沒有找到廠牌",
     "not_found": "廠牌不存在。"
@@ -2497,8 +2495,6 @@
       "founded": "成立",
       "dissolved": "結束",
       "artist_relations_hint": "成員、聲優、馬甲和小分隊。從這個藝術家的角度選擇關係，對方會自動顯示反向關係。",
-      "parent_label": "上級廠牌",
-      "parent_label_hint": "子廠牌或子品牌填寫所屬的廠牌，例如唱片公司的黑膠品牌。",
       "prefixes_hint": "品番前綴，用逗號分隔。新增專輯時用來猜測廠牌。",
       "name_only_credit": "只填署名",
       "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。",

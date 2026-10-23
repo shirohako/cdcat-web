@@ -16,7 +16,6 @@
               <span>{{ $t('artists.detail.albums', { count: label.albums_count }) }}</span>
               <span v-if="label.country">{{ regionName(label.country) }}</span>
               <span v-if="label.begin_date">{{ formatDate(label.begin_date, label.begin_date_precision) }} – {{ label.end_date ? formatDate(label.end_date, label.end_date_precision) : '' }}</span>
-              <span v-if="label.parent">{{ $t('labels.parent') }}: <NuxtLink :to="`/labels/${label.parent.id}`" class="link">{{ label.parent.name }}</NuxtLink></span>
             </p>
           </div>
           <div class="flex gap-2">
@@ -47,10 +46,6 @@
                 <div v-if="label.catalog_prefixes.length">
                   <h3 class="mb-1 text-xs font-semibold text-gray-400">{{ $t('labels.catalog_prefixes') }}</h3>
                   <p class="flex flex-wrap gap-1.5 font-mono text-xs"><span v-for="prefix in label.catalog_prefixes" :key="prefix" class="rounded bg-gray-100 px-1.5 py-0.5">{{ prefix }}</span></p>
-                </div>
-                <div v-if="label.children?.length">
-                  <h3 class="mb-1 text-xs font-semibold text-gray-400">{{ $t('labels.children') }}</h3>
-                  <p class="flex flex-wrap gap-x-3"><NuxtLink v-for="child in label.children" :key="child.id" :to="`/labels/${child.id}`" class="hover:underline">{{ child.name }}</NuxtLink></p>
                 </div>
                 <CatalogTitleList v-if="label.titles?.length" :titles="label.titles" />
                 <CatalogAttributeList v-if="label.attributes?.length" :attributes="label.attributes" />

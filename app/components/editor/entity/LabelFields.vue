@@ -7,13 +7,6 @@
           <input v-model="doc.name" class="input w-full" :class="{ 'input-error': editor.errorAt('name') }" maxlength="500">
           <span v-if="editor.errorAt('name')" class="mt-1 block text-xs text-error">{{ editor.errorAt('name') }}</span>
         </label>
-        <div class="sm:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.entity.parent_label') }}</span>
-          <EditorPickedRef v-if="doc.parent_id !== null" :id="doc.parent_id" type="label" :references="editor.references" :icon="Building2" class="max-w-md" @remove="doc.parent_id = null" />
-          <EditorEntityPicker v-else kind="label" class="max-w-md" :exclude="[editor.id]" @select="pickParent" />
-          <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.entity.parent_label_hint') }}</p>
-          <p v-if="editor.errorAt('parent_id')" class="mt-1 text-xs text-error">{{ editor.errorAt('parent_id') }}</p>
-        </div>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.country') }}</span>
           <CommonRegionSelect :model-value="doc.country ?? ''" class="select-sm" @update:model-value="doc.country = $event || null" />
@@ -52,17 +45,11 @@
 </template>
 
 <script setup lang="ts">
-import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { LabelDocument } from '~/types/document'
 import { Building2, Languages } from '@lucide/vue'
 
 const editor = useEntityEditor()
 const doc = computed(() => editor.doc.value as unknown as LabelDocument)
-
-const pickParent = (item: PickedEntity) => {
-  editor.remember('label', item.id, { id: item.id, name: item.label, image_url: item.image_url })
-  doc.value.parent_id = item.id
-}
 
 const setPrefixes = (text: string) => {
   doc.value.catalog_prefixes = [...new Set(text.split(/[,，\s]+/).map(prefix => prefix.trim().toUpperCase()).filter(Boolean))]

@@ -2109,8 +2109,6 @@
     "title": "Labels",
     "subtitle": "Record labels and imprints",
     "label": "Label",
-    "parent": "Parent label",
-    "children": "Sub-labels",
     "catalog_prefixes": "Catalog number prefixes",
     "no_results": "No labels found",
     "not_found": "This label does not exist."
@@ -2497,8 +2495,6 @@
       "founded": "Founded",
       "dissolved": "Closed",
       "artist_relations_hint": "Members, voice actors, aliases and sub-units. Pick the relation as seen from this artist; the other artist shows the reverse.",
-      "parent_label": "Parent label",
-      "parent_label_hint": "For imprints and sub-labels, e.g. a vinyl imprint of a record company.",
       "prefixes_hint": "Catalog number prefixes, comma-separated. Used to guess the label when an album is added.",
       "name_only_credit": "Name only",
       "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",

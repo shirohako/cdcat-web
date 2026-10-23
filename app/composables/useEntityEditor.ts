@@ -33,7 +33,7 @@ export const emptyDocument = (type: EntityType): Record<string, unknown> => {
     case 'artist':
       return { name: '', slug: null, type: null, is_active: true, bio: null, image_url: null, titles: [], links: [], attributes: [], relations: [] }
     case 'label':
-      return { name: '', slug: null, parent_id: null, country: null, description: null, image_url: null, ...dates, catalog_prefixes: [], titles: [], links: [], attributes: [] }
+      return { name: '', slug: null, country: null, description: null, image_url: null, ...dates, catalog_prefixes: [], titles: [], links: [], attributes: [] }
     case 'entry':
       return {
         name: '', slug: null, type: 'anime', format: null, platforms: [], release_date: null, release_date_precision: 'day',

@@ -16,8 +16,6 @@ export interface Label extends PendingFields {
   end_date: string | null
   end_date_precision: DatePrecision | null
   catalog_prefixes: string[]
-  parent?: { id: number, name: string, slug: string | null } | null
-  children?: Array<{ id: number, name: string, slug: string | null }>
   titles?: CatalogTitle[]
   links?: CatalogLink[]
   attributes?: CatalogAttribute[]
