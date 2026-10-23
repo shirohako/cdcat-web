@@ -17,7 +17,7 @@ export const albumSchema = {
 
 export async function createMockAPI(port) {
   const permissions = {
-    founder: ['admin.access', 'users.manage', 'users.assign-roles', 'revisions.view', 'revisions.review', 'content.manage', 'roles.manage', 'audit.view', 'system.logs'],
+    staff: ['admin.access', 'users.manage', 'users.assign-roles', 'revisions.view', 'revisions.review', 'content.manage', 'roles.manage', 'audit.view', 'system.logs'],
     moderator: ['admin.access', 'users.manage', 'revisions.view', 'revisions.review'],
     contributor: ['admin.access', 'revisions.view', 'revisions.review'],
     member: ['content.submit'],
@@ -49,11 +49,11 @@ export async function createMockAPI(port) {
       if (state.meFailure) return fail(state.meFailure.status, state.meFailure.name)
       return send({
         id: 1, username: 'admin', nickname: '管理员', email: 'admin@example.test',
-        roles: token, role_level: token === 'founder' ? 100 : 20,
+        roles: token, role_level: token === 'staff' ? 100 : 20,
         permissions: state.revoked ? [] : permissions[token] || [], joined_at: '2026-01-01T00:00:00Z',
       })
     }
-    if (url.pathname === '/v1/auth/login') return send({ token: 'founder' })
+    if (url.pathname === '/v1/auth/login') return send({ token: 'staff' })
     if (url.pathname === '/v1/auth/logout') return send({})
     if (url.pathname === '/v1/albums/1/schema') return send(albumSchema)
     if (url.pathname === '/v1/artists/2/schema') return send({ id: 2, name: '原艺术家', type: 'person', bio: '简介', links: [], snapshot_version: 1, baseline_checksum: baseline })
@@ -96,8 +96,8 @@ export async function createMockAPI(port) {
       if (permissions[token]?.includes('system.logs')) data.operations = { failed_jobs: 2, scheduler: { status: 'unknown', last_seen_at: null }, worker: { status: 'unknown', last_seen_at: null } }
       return send(data)
     }
-    state.roleRecords ??= Object.entries(permissions).map(([name, list], index) => ({ id: index + 1, name, permissions: [...list], level: { founder: 100, moderator: 50, contributor: 20, member: 0 }[name] }))
-    if (url.pathname === '/v1/admin/permissions/catalog') return send([...new Set(Object.values(permissions).flat())].map(name => ({ name, group: name.startsWith('users') || name.startsWith('roles') ? '用户' : '后台', description: name === 'roles.manage' ? '管理角色及权限' : name, assignable: token === 'founder' || permissions[token]?.includes(name) })))
+    state.roleRecords ??= Object.entries(permissions).map(([name, list], index) => ({ id: index + 1, name, permissions: [...list], level: { staff: 100, moderator: 50, contributor: 20, member: 0 }[name] }))
+    if (url.pathname === '/v1/admin/permissions/catalog') return send([...new Set(Object.values(permissions).flat())].map(name => ({ name, group: name.startsWith('users') || name.startsWith('roles') ? '用户' : '后台', description: name === 'roles.manage' ? '管理角色及权限' : name, assignable: token === 'staff' || permissions[token]?.includes(name) })))
     if (url.pathname === '/v1/admin/roles' && req.method === 'POST') {
       const role = { id: 10 + state.roleRecords.length, ...payload }
       state.roleRecords.push(role)
@@ -114,7 +114,7 @@ export async function createMockAPI(port) {
       }
       return send({})
     }
-    if (url.pathname === '/v1/admin/roles') return send(state.roleRecords.map(role => ({ ...role, users_count: role.name === state.role || role.name === 'founder' ? 1 : 0, can_manage: role.name !== 'founder' && token === 'founder', can_delete: !['founder', 'member'].includes(role.name) && token === 'founder' })))
+    if (url.pathname === '/v1/admin/roles') return send(state.roleRecords.map(role => ({ ...role, users_count: role.name === state.role || role.name === 'staff' ? 1 : 0, can_manage: role.name !== 'staff' && token === 'staff', can_delete: !['staff', 'member'].includes(role.name) && token === 'staff' })))
     if (url.pathname === '/v1/admin/users/2' && req.method === 'GET') return send({
       id: 2, username: 'member', nickname: '测试用户', email: 'member@example.test', birthday: '2000-01-01', avatar_url: null, banner_url: null, bio: '用户简介',
       status: state.userStatus, roles: state.role, role_names: [state.role], role_level: 0, can_manage: !state.userProtected, permissions: ['content.submit'], contributions_count: 3, reviews_count: 2,

@@ -62,6 +62,21 @@ export function clearLocalArticleDrafts() {
   catch { /* storage unavailable */ }
 }
 
+/** The unsaved new article kept in this browser for the user, if any: its title and when it was written. */
+export function localNewArticleDraft(userId: number | undefined): { title: string, at: string } | null {
+  try {
+    const local = JSON.parse(localStorage.getItem(`${LOCAL_PREFIX}${userId ?? 'guest'}:new`) ?? 'null') as LocalCopy | null
+    return local ? { title: local.form.title, at: local.at } : null
+  }
+  catch { return null }
+}
+
+/** Drops the unsaved new article kept in this browser, so the writer starts blank. */
+export function clearLocalNewArticleDraft(userId: number | undefined) {
+  try { localStorage.removeItem(`${LOCAL_PREFIX}${userId ?? 'guest'}:new`) }
+  catch { /* storage unavailable */ }
+}
+
 type ApiError = { name?: string }
 
 /**

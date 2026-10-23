@@ -530,6 +530,10 @@
     "untitled": "無標題",
     "featured": "編輯推薦",
     "views": "{count} 次瀏覽",
+    "likes": "{count} 人喜歡",
+    "like": "喜歡",
+    "unlike": "取消喜歡",
+    "like_own": "不能喜歡自己的文章",
     "minutes": "{count} 分鐘",
     "statuses": {
       "draft": "草稿",
@@ -674,7 +678,8 @@
       "view": "查看",
       "deleted": "已刪除",
       "delete_title": "刪除文章",
-      "delete_description": "「{title}」會被永久刪除。"
+      "delete_description": "「{title}」會被永久刪除。",
+      "local_new": "這個瀏覽器裡有一篇未儲存的新文章「{title}」· {time}"
     },
     "list": {
       "featured": "編輯推薦",
@@ -716,6 +721,15 @@
     "profile": {
       "title": "文章",
       "all": "查看全部"
+    },
+    "chooser": {
+      "title": "繼續寫草稿，還是新建一篇？",
+      "description": "你還有沒發布的草稿。",
+      "local": "僅存在這個瀏覽器裡，還沒儲存到伺服器 · {time}",
+      "continue": "繼續編輯",
+      "all_drafts": "查看全部 {count} 篇草稿",
+      "new": "新建文章",
+      "new_drops_local": "新建會捨棄這個瀏覽器裡未儲存的那篇。"
     }
   },
   "collection_pages": {
@@ -1726,6 +1740,8 @@
     },
     "types": {
       "article_featured": "你的文章「{title}」被設為編輯推薦",
+      "article_liked": "{actor} 喜歡了你的文章「{title}」",
+      "article_liked_many": "{actor} 等 {count} 人喜歡了你的文章「{title}」",
       "article_edited": "版主編輯了你的文章「{title}」",
       "article_deleted": "你的文章「{title}」被刪除",
       "report_accepted": "你對「{title}」的檢舉已處理",
@@ -1760,6 +1776,7 @@
         "reviews": "你暫時不能發布或修改評價"
       },
       "article_hidden": "你的文章「{title}」被版主隱藏",
+      "article_unhidden": "你的文章「{title}」已被版主重新公開",
       "article_locked": "你的文章「{title}」被版主鎖定",
       "article_unlocked": "你的文章「{title}」已解除鎖定"
     },
@@ -1805,7 +1822,7 @@
       "topics": "{count} 個主題",
       "question": "問答版塊：可以採納最佳解答",
       "moderators_only": "只有版主能發主題",
-      "staff": "僅版主可見",
+      "moderators_visible": "僅版主可見",
       "archived": "已封存"
     },
     "tag": {
@@ -2036,7 +2053,6 @@
     },
     "comments": {
       "title": "留言",
-      "reactions": "回應這篇文章",
       "empty": "還沒有留言，來說兩句吧。",
       "write": "寫評論…",
       "login": "登入後發表留言"

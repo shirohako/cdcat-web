@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ExternalLink, FileText, PenLine, Plus, Trash2 } from '@lucide/vue'
+import { ExternalLink, FileText, HardDrive, PenLine, Plus, Trash2 } from '@lucide/vue'
 import { ARTICLE_STATUSES, type ArticleStatus, type MyArticle, type Pagination } from '~/types/article'
 
 definePageMeta({ middleware: 'auth' })
@@ -11,6 +11,11 @@ const { typeName } = useArticleTypes()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { toast, showToast } = useToast()
+const { user } = useAuth()
+
+// A new article never saved to the server lives only in this browser; the writer picks it up from 写文章.
+const localNew = ref<{ title: string, at: string } | null>(null)
+onMounted(() => { localNew.value = localNewArticleDraft(user.value?.id) })
 
 const status = computed(() => (ARTICLE_STATUSES as readonly string[]).includes(String(route.query.status)) ? String(route.query.status) as ArticleStatus : null)
 const page = computed({
@@ -56,6 +61,12 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
       <NuxtLink to="/articles/new" class="btn btn-primary btn-sm"><Plus :size="15" />{{ t('article_ui.write') }}</NuxtLink>
     </header>
 
+    <NuxtLink v-if="localNew" to="/articles/new" class="mt-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 transition hover:bg-amber-100">
+      <HardDrive :size="16" class="shrink-0" />
+      <span class="min-w-0 flex-1 truncate">{{ t('article_ui.mine.local_new', { title: localNew.title || t('article_ui.untitled'), time: date(localNew.at) }) }}</span>
+      <span class="shrink-0 font-medium">{{ t('article_ui.chooser.continue') }}</span>
+    </NuxtLink>
+
     <nav class="mt-6 flex gap-1 overflow-x-auto border-b border-slate-200" :aria-label="t('article_ui.mine.filter')">
       <button
         v-for="tab in tabs" :key="tab.value ?? 'all'" type="button"
@@ -98,7 +109,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
           </p>
           <p class="mt-1 text-xs text-slate-400">
             {{ t('article_ui.mine.updated', { time: date(article.updated_at) }) }}
-            <template v-if="article.status === 'published'"> · {{ t('article_ui.views', { count: article.views_count }) }}</template>
+            <template v-if="article.status === 'published'"> · {{ t('article_ui.views', { count: article.views_count }) }} · {{ t('article_ui.likes', { count: article.likes_count }) }}</template>
           </p>
         </div>
         <div class="flex items-center gap-1">

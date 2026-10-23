@@ -57,6 +57,7 @@ export interface ArticleCard {
   cover_url: string | null
   word_count: number
   views_count: number
+  likes_count: number
   summary: string
   featured: boolean
   author: UserSummary | null
@@ -73,7 +74,9 @@ export interface ArticleDetail extends ArticleCard {
   updated_at: string | null
   /** The discussion topic that serves as the comment section. */
   discussion_topic_id: number | null
-  can: { edit: boolean, manage: boolean, report: boolean }
+  /** Whether the viewer likes it. */
+  liked: boolean
+  can: { edit: boolean, manage: boolean, report: boolean, like: boolean }
 }
 
 /** What the writing page loads (GET /articles/{id}/edit) and every save or action returns. */
@@ -123,6 +126,7 @@ export interface MyArticle {
   slug: string | null
   status_reason: string | null
   views_count: number
+  likes_count: number
   title: string | null
   type: ArticleType | null
   featured: boolean

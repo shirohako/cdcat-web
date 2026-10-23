@@ -11,6 +11,12 @@
               <span v-for="tag in article.tags" :key="tag.id" class="rounded-md bg-slate-50 px-2 py-0.5">#{{ tagName(tag) }}</span>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>
               <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('article_ui.views', { count: article.views_count }) }}</span>
+              <button
+                type="button" class="btn btn-xs gap-1 rounded-full" :class="article.liked ? 'btn-error text-white' : 'btn-ghost'"
+                :disabled="liking || (isAuthenticated && !article.can.like)" :aria-pressed="article.liked"
+                :title="isAuthenticated && !article.can.like ? t('article_ui.like_own') : t(article.liked ? 'article_ui.unlike' : 'article_ui.like')" @click="toggleLike">
+                <Heart :size="12" :fill="article.liked ? 'currentColor' : 'none'" />{{ article.likes_count }}
+              </button>
               <span class="ml-auto flex items-center gap-1">
                 <NuxtLink v-if="article.can.manage" :to="`/admin/articles/${article.id}`" class="btn btn-ghost btn-xs"><Shield :size="12" />{{ t('article_ui.reader.manage') }}</NuxtLink>
                 <button v-if="article.can.report" type="button" class="btn btn-ghost btn-xs" @click="reportOpen = true"><Flag :size="12" />{{ t('article_ui.report.title') }}</button>
@@ -39,6 +45,7 @@
         {{ t('article_ui.report.done') }}
       </p>
       <DiscussionNotice />
+      <CommonToast :toast="toast" />
     </div>
 
     <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-gray-500">
@@ -50,20 +57,40 @@
 </template>
 
 <script setup lang="ts">
-import { Eye, Flag, History, Shield } from '@lucide/vue'
+import { Eye, Flag, Heart, History, Shield } from '@lucide/vue'
 import type { ArticleCard, ArticleDetail } from '~/types/article'
 
 const route = useRoute()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
+const { toast, showToast } = useToast()
 const { formatDate } = useLocaleFormatting()
 const { tagName } = useTags()
 const { typeName } = useArticleTypes()
 const config = useRuntimeConfig()
 const articleId = String(route.params.id)
 
-const { data: article, status, error, revealClass } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
+const { data: article, status, error, revealClass, mutate } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
+
+// Liking: guests go to log in first; authors cannot like their own article.
+const { isAuthenticated } = useAuth()
+const liking = ref(false)
+async function toggleLike() {
+  const current = article.value
+  if (!current || liking.value) return
+  if (!isAuthenticated.value) {
+    await navigateTo({ path: '/auth/login', query: { redirect: route.fullPath } })
+    return
+  }
+  liking.value = true
+  try {
+    const result = await $api<{ liked: boolean, likes_count: number }>(`/v1/articles/${current.id}/like`, { method: current.liked ? 'DELETE' : 'PUT' })
+    mutate(value => ({ ...value, liked: result.liked, likes_count: result.likes_count }))
+  }
+  catch (failure) { showToast(localizeError(failure), 'error') }
+  finally { liking.value = false }
+}
 
 // Contents and anchors come from the same renderer that draws the article, so they always match.
 const tocItems = computed(() => markdownHeadings(article.value?.content ?? ''))

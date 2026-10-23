@@ -428,7 +428,7 @@ export interface AdminDiscussionCategory {
   sort_order: number
   kind: 'discussion' | 'question'
   topic_permission: 'everyone' | 'moderators'
-  visibility: 'public' | 'staff'
+  visibility: 'public' | 'moderators'
   is_archived: boolean
   topic_template: string | null
   show_in_latest: boolean

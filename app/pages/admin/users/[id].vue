@@ -52,7 +52,7 @@ const activityLink = (item: AdminUserActivity) => {
 }
 const selectType = (type: ActivityType) => router.push({ query: { ...route.query, type, page: undefined } })
 const { data: roles, pending: rolesPending, error: rolesError, refresh: refreshRoles } = await useAsyncData('admin-user-role-options', () => hasPermission('users.assign-roles') ? $api<AdminRole[]>('/v1/admin/roles') : Promise.resolve([]))
-const availableRoles = computed(() => (roles.value ?? []).filter(role => role.name !== 'founder' && (actor.value?.roles === 'founder' || (role.level < (actor.value?.role_level ?? 0) && role.permissions.every(hasPermission)))))
+const availableRoles = computed(() => (roles.value ?? []).filter(role => role.name !== 'staff' && (actor.value?.roles === 'staff' || (role.level < (actor.value?.role_level ?? 0) && role.permissions.every(hasPermission)))))
 const dialog = ref(false)
 const action = ref<'enable' | 'disable' | 'revoke' | 'send_reset' | 'clear_limit' | 'role'>('disable')
 const selectedRole = ref('')

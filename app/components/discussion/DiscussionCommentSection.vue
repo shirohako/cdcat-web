@@ -32,7 +32,7 @@ watch(data, (value) => {
   floors.value = value.floors
   references.value = value.references
 }, { immediate: true })
-const first = computed(() => floors.value.find(floor => floor.floor === 1) ?? null)
+// Floor #1 only introduces the article; readers like the article itself instead of reacting to it.
 const comments = computed(() => floors.value.filter(floor => floor.floor !== 1))
 const composer = ref<{ insert: (text: string) => void } | null>(null)
 const composerOpen = ref(false)
@@ -106,10 +106,6 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
     </header>
     <template v-if="topic">
       <CommonLoadError v-if="status === 'error'" @retry="refresh()" />
-      <div v-if="first" class="flex items-center gap-3 border-b border-gray-100 pb-4">
-        <span class="text-xs text-gray-400">{{ t('discussions.comments.reactions') }}</span>
-        <DiscussionReactions :post-id="first.id" :reactions="first.reactions" :can-react="first.can.react" @update:reactions="value => replacePost({ ...first!, reactions: value })" />
-      </div>
       <div class="space-y-3" :class="pending ? 'opacity-60' : ''">
         <DiscussionFloor v-for="floor in comments" :key="floor.id" :post="floor" @update="replacePost" />
         <p v-if="!comments.length" class="py-6 text-center text-sm text-gray-400">{{ t('discussions.comments.empty') }}</p>

@@ -353,7 +353,7 @@ const users = computed(() => data.value?.users ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
 
 const availableRoles = computed(() => (rolesData.value ?? []).filter(role =>
-  role.name !== 'founder' && (currentUser.value?.roles === 'founder' || (
+  role.name !== 'staff' && (currentUser.value?.roles === 'staff' || (
     role.level < (currentUser.value?.role_level ?? 0) && role.permissions.every(hasPermission)
   )),
 ))
@@ -409,7 +409,7 @@ const showToast = (message: string, type: 'success' | 'error' = 'success') => {
 
 // ===== 样式 =====
 const ROLE_BADGE: Record<string, string> = {
-  founder:     'bg-violet-50 border-violet-200 text-violet-700',
+  staff:     'bg-violet-50 border-violet-200 text-violet-700',
   moderator:   'bg-blue-50 border-blue-200 text-blue-700',
   contributor: 'bg-emerald-50 border-emerald-200 text-emerald-700',
   member:      'bg-slate-50 border-slate-200 text-slate-600',

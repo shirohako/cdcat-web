@@ -31,8 +31,8 @@ async function run(action: () => Promise<unknown>, done: string, after?: () => v
 
 const contentView = ref<'rendered' | 'source'>('rendered')
 
-// ── Moderation: hide and lock take the article off the site, with a reason the author sees ──
-type Action = 'hide' | 'lock' | 'unlock'
+// ── Moderation: hide and lock take the article off the site, with a reason the author sees; unhide puts back what a moderator hid ──
+type Action = 'hide' | 'unhide' | 'lock' | 'unlock'
 const pendingAction = ref<Action | null>(null)
 const actionOpen = computed({ get: () => pendingAction.value !== null, set: (open) => { if (!open) pendingAction.value = null } })
 const moderate = (reason: string) => {
@@ -85,6 +85,8 @@ useHead({ title: computed(() => data.value?.title ?? t('admin_pages.articles.tit
               {{ t('admin_pages.articles.author') }}：<NuxtLink v-if="data.author" :to="`/admin/users/${data.author.id}`" class="underline">{{ data.author.nickname || data.author.username }}</NuxtLink>
               · {{ t('admin_pages.articles.published_at') }} {{ time(data.published_at) }}
               <template v-if="data.edited_at"> · {{ t('admin_pages.articles.edited_at') }} {{ time(data.edited_at) }}</template>
+              · {{ t('admin_pages.articles.views_count') }} {{ data.views_count.toLocaleString() }}
+              · {{ t('admin_pages.articles.likes_count') }} {{ data.likes_count.toLocaleString() }}
             </p>
             <p v-if="data.status_reason" class="mt-1 text-sm text-rose-700">{{ t('admin_pages.articles.status_reason') }}{{ data.status_reason }}</p>
           </div>
@@ -94,6 +96,7 @@ useHead({ title: computed(() => data.value?.title ?? t('admin_pages.articles.tit
               <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="toggleFeatured">{{ data.featured ? t('admin_pages.articles.unfeature') : t('admin_pages.articles.feature') }}</button>
               <button type="button" :disabled="busy" class="rounded-lg border border-amber-300 px-3 py-2 text-amber-800 disabled:opacity-50" @click="pendingAction = 'hide'">{{ t('admin_pages.articles.hide') }}</button>
             </template>
+            <button v-if="data.status === 'hidden' && data.status_changed_at" type="button" :disabled="busy" class="rounded-lg border border-emerald-300 px-3 py-2 text-emerald-700 disabled:opacity-50" @click="pendingAction = 'unhide'">{{ t('admin_pages.articles.unhide') }}</button>
             <button v-if="data.status === 'locked'" type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="pendingAction = 'unlock'">{{ t('admin_pages.articles.unlock') }}</button>
             <button v-else type="button" :disabled="busy" class="rounded-lg border border-rose-300 px-3 py-2 text-rose-700 disabled:opacity-50" @click="pendingAction = 'lock'">{{ t('admin_pages.articles.lock') }}</button>
             <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="startEdit">{{ t('common.edit') }}</button>

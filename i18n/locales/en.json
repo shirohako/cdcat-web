@@ -530,6 +530,10 @@
     "untitled": "Untitled",
     "featured": "Editors' pick",
     "views": "{count} views",
+    "likes": "{count} likes",
+    "like": "Like",
+    "unlike": "Unlike",
+    "like_own": "You cannot like your own article",
     "minutes": "{count} min",
     "statuses": {
       "draft": "Draft",
@@ -674,7 +678,8 @@
       "view": "View",
       "deleted": "Deleted",
       "delete_title": "Delete article",
-      "delete_description": "“{title}” will be deleted for good."
+      "delete_description": "“{title}” will be deleted for good.",
+      "local_new": "This browser has an unsaved new article “{title}” · {time}"
     },
     "list": {
       "featured": "Editors' picks",
@@ -716,6 +721,15 @@
     "profile": {
       "title": "Articles",
       "all": "View all"
+    },
+    "chooser": {
+      "title": "Continue a draft or start a new one?",
+      "description": "You have unpublished drafts.",
+      "local": "Only in this browser, not saved to the server yet · {time}",
+      "continue": "Continue",
+      "all_drafts": "See all {count} drafts",
+      "new": "New article",
+      "new_drops_local": "Starting a new one discards the unsaved article in this browser."
     }
   },
   "collection_pages": {
@@ -1726,6 +1740,8 @@
     },
     "types": {
       "article_featured": "Your article “{title}” is an editors' pick",
+      "article_liked": "{actor} liked your article “{title}”",
+      "article_liked_many": "{actor} and {count} others liked your article “{title}”",
       "article_edited": "A moderator edited your article “{title}”",
       "article_deleted": "Your article “{title}” was deleted",
       "report_accepted": "Your report on “{title}” was acted on",
@@ -1760,6 +1776,7 @@
         "reviews": "You cannot post or edit reviews for now"
       },
       "article_hidden": "A moderator hid your article “{title}”",
+      "article_unhidden": "A moderator made your article “{title}” public again",
       "article_locked": "A moderator locked your article “{title}”",
       "article_unlocked": "Your article “{title}” was unlocked"
     },
@@ -1805,7 +1822,7 @@
       "topics": "{count} topics",
       "question": "Q&A: the best answer can be accepted",
       "moderators_only": "Only moderators start topics",
-      "staff": "Moderators only",
+      "moderators_visible": "Moderators only",
       "archived": "Archived"
     },
     "tag": {
@@ -2036,7 +2053,6 @@
     },
     "comments": {
       "title": "Comments",
-      "reactions": "React to this article",
       "empty": "No comments yet. Be the first.",
       "write": "Write a comment…",
       "login": "Sign in to comment"

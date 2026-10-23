@@ -25,6 +25,10 @@ export const useNotificationText = () => {
     if (notification.type === 'report.resolved') {
       return t(notification.data.decision === 'accept' ? 'notifications.types.report_accepted' : 'notifications.types.report_dismissed', { title })
     }
+    if (notification.type === 'article.liked') {
+      const actor = notification.actor?.nickname || notification.actor?.username || t('common.anonymous')
+      return t(notification.actor_count > 1 ? 'notifications.types.article_liked_many' : 'notifications.types.article_liked', { title, actor, count: notification.actor_count })
+    }
     if (notification.type.startsWith('discussion.')) {
       const actor = notification.actor?.nickname || notification.actor?.username || t('common.anonymous')
       const params = { title, actor, count: notification.actor_count, floor: notification.data.floor ?? notification.data.parent_floor ?? '' }

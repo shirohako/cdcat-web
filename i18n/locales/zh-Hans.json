@@ -686,7 +686,7 @@
       "permissions": "权限矩阵",
       "name_help": "使用小写字母、数字、下划线或连字符，以字母开头。",
       "limits": "只能管理比自己等级低的角色，且只能授予自己拥有的权限。",
-      "reserved": "founder 受保护；member 不能改名或删除。",
+      "reserved": "staff（管理员）受保护；member 不能改名或删除。",
       "delete": "删除角色",
       "delete_title": "删除角色并替换用户角色",
       "replacement": "替代角色",
@@ -722,7 +722,7 @@
       "reset_done": "密码重置邮件已提交发送。",
       "cleared": "指定的验证码限制已清除。",
       "revoked": "全部登录会话已作废。",
-      "protected": "该账号仅可查看，不能操作自己、founder 或等级不低于自己的用户。",
+      "protected": "该账号仅可查看，不能操作自己、管理员（staff）或等级不低于自己的用户。",
       "sessions": "登录会话",
       "sessions_help": "仅展示最近 100 条会话的创建与最后使用时间，不展示凭据或设备信息。",
       "created_at": "创建时间",
@@ -755,7 +755,7 @@
       "users_revoke_tokens": "作废用户登录会话",
       "users_send_reset": "发送密码重置验证码",
       "users_clear_verification_limit": "清除验证码限制",
-      "users_bootstrap_founder": "建立初始管理员",
+      "users_bootstrap_staff": "建立初始管理员",
       "users_reconcile_roles": "收敛用户角色",
       "roles_create": "创建角色",
       "roles_update": "修改角色",
@@ -821,6 +821,7 @@
       "shouts_silence": "限制发留言",
       "link_providers_delete": "删除链接提供方",
       "articles_hide": "隐藏文章",
+      "articles_unhide": "重新公开文章",
       "articles_lock": "锁定文章",
       "articles_unlock": "解锁文章",
       "mail_categories_create": "创建邮件类型",
@@ -1153,6 +1154,10 @@
       "hide_title": "隐藏文章",
       "hide_help": "文章不再公开，并取消编辑推荐。原因会通知作者，作者之后可以自己重新公开。",
       "hide_done": "已隐藏",
+      "unhide": "重新公开",
+      "unhide_title": "重新公开文章",
+      "unhide_help": "把版主隐藏的文章恢复为已发布。原因会通知作者。作者自己隐藏的文章不能由版主公开。",
+      "unhide_done": "已重新公开",
       "lock": "锁定",
       "lock_title": "锁定文章",
       "lock_help": "文章不再公开，作者不能编辑、公开或隐藏，只能删除。原因会通知作者。",
@@ -1162,7 +1167,15 @@
       "unlock_help": "文章恢复到锁定前的状态（已发布或已隐藏），作者会收到通知。",
       "unlock_done": "已解锁",
       "unlocks_to": "解锁后恢复为{status}",
-      "diff_folded": "…… 省略 {count} 行未改动的内容 ……"
+      "diff_folded": "…… 省略 {count} 行未改动的内容 ……",
+      "views_count": "浏览",
+      "likes_count": "喜欢",
+      "sorts": {
+        "updated_at": "按更新时间",
+        "published_at": "按发布时间",
+        "views_count": "按浏览量",
+        "likes_count": "按喜欢量"
+      }
     },
     "article_types": {
       "title": "文章类型",
@@ -1486,7 +1499,7 @@
         "visibility": "可见范围",
         "visibilities": {
           "public": "公开",
-          "staff": "仅版主"
+          "moderators": "仅版主"
         },
         "moderators_only": "仅版主发主题",
         "moderators_only_help": "只有版主能发主题（其他人可以回复）",
@@ -2423,6 +2436,10 @@
     "untitled": "无标题",
     "featured": "编辑推荐",
     "views": "{count} 次浏览",
+    "likes": "{count} 人喜欢",
+    "like": "喜欢",
+    "unlike": "取消喜欢",
+    "like_own": "不能喜欢自己的文章",
     "minutes": "{count} 分钟",
     "statuses": {
       "draft": "草稿",
@@ -2567,7 +2584,8 @@
       "view": "查看",
       "deleted": "已删除",
       "delete_title": "删除文章",
-      "delete_description": "「{title}」会被永久删除。"
+      "delete_description": "「{title}」会被永久删除。",
+      "local_new": "这个浏览器里有一篇未保存的新文章「{title}」· {time}"
     },
     "list": {
       "featured": "编辑推荐",
@@ -2609,6 +2627,15 @@
     "profile": {
       "title": "文章",
       "all": "查看全部"
+    },
+    "chooser": {
+      "title": "继续写草稿，还是新建一篇？",
+      "description": "你还有没发布的草稿。",
+      "local": "仅存在这个浏览器里，还没保存到服务器 · {time}",
+      "continue": "继续编辑",
+      "all_drafts": "查看全部 {count} 篇草稿",
+      "new": "新建文章",
+      "new_drops_local": "新建会丢弃这个浏览器里未保存的那篇。"
     }
   },
   "collection_pages": {
@@ -3619,6 +3646,8 @@
     },
     "types": {
       "article_featured": "你的文章「{title}」被设为编辑推荐",
+      "article_liked": "{actor} 喜欢了你的文章「{title}」",
+      "article_liked_many": "{actor} 等 {count} 人喜欢了你的文章「{title}」",
       "article_edited": "版主编辑了你的文章「{title}」",
       "article_deleted": "你的文章「{title}」被删除",
       "report_accepted": "你对「{title}」的举报已处理",
@@ -3653,6 +3682,7 @@
         "reviews": "你暂时不能发布或修改评价"
       },
       "article_hidden": "你的文章「{title}」被版主隐藏",
+      "article_unhidden": "你的文章「{title}」已被版主重新公开",
       "article_locked": "你的文章「{title}」被版主锁定",
       "article_unlocked": "你的文章「{title}」已解除锁定"
     },
@@ -3698,7 +3728,7 @@
       "topics": "{count} 个主题",
       "question": "问答版块：可以采纳最佳答案",
       "moderators_only": "只有版主能发主题",
-      "staff": "仅版主可见",
+      "moderators_visible": "仅版主可见",
       "archived": "已归档"
     },
     "tag": {
@@ -3929,7 +3959,6 @@
     },
     "comments": {
       "title": "评论",
-      "reactions": "回应这篇文章",
       "empty": "还没有评论，来说两句吧。",
       "write": "写评论…",
       "login": "登录后发表评论"

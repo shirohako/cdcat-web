@@ -530,6 +530,10 @@
     "untitled": "無題",
     "featured": "編集部のおすすめ",
     "views": "{count} 回閲覧",
+    "likes": "いいね {count}",
+    "like": "いいね",
+    "unlike": "いいねを取り消す",
+    "like_own": "自分の記事にはいいねできません",
     "minutes": "{count} 分",
     "statuses": {
       "draft": "下書き",
@@ -674,7 +678,8 @@
       "view": "表示",
       "deleted": "削除しました",
       "delete_title": "記事を削除",
-      "delete_description": "「{title}」が完全に削除されます。"
+      "delete_description": "「{title}」が完全に削除されます。",
+      "local_new": "このブラウザに未保存の新しい記事「{title}」があります · {time}"
     },
     "list": {
       "featured": "編集部のおすすめ",
@@ -716,6 +721,15 @@
     "profile": {
       "title": "記事",
       "all": "すべて見る"
+    },
+    "chooser": {
+      "title": "下書きの続きを書くか、新しく書くか",
+      "description": "未公開の下書きがあります。",
+      "local": "このブラウザにだけ保存されていて、まだサーバーに保存されていません · {time}",
+      "continue": "続きを書く",
+      "all_drafts": "下書き {count} 件をすべて見る",
+      "new": "新しい記事を書く",
+      "new_drops_local": "新しく書くと、このブラウザにある未保存の記事は破棄されます。"
     }
   },
   "collection_pages": {
@@ -1726,6 +1740,8 @@
     },
     "types": {
       "article_featured": "記事「{title}」が編集部のおすすめに選ばれました",
+      "article_liked": "{actor} さんがあなたの記事「{title}」にいいねしました",
+      "article_liked_many": "{actor} さんほか {count} 人があなたの記事「{title}」にいいねしました",
       "article_edited": "モデレーターが記事「{title}」を編集しました",
       "article_deleted": "記事「{title}」が削除されました",
       "report_accepted": "「{title}」への報告が対応されました",
@@ -1760,6 +1776,7 @@
         "reviews": "レビューの投稿・編集が一時的に制限されました"
       },
       "article_hidden": "記事「{title}」がモデレーターにより非公開になりました",
+      "article_unhidden": "あなたの記事「{title}」がモデレーターにより再公開されました",
       "article_locked": "記事「{title}」がモデレーターによりロックされました",
       "article_unlocked": "記事「{title}」のロックが解除されました"
     },
@@ -1805,7 +1822,7 @@
       "topics": "{count} 件のトピック",
       "question": "Q&A：ベストアンサーを選べます",
       "moderators_only": "トピック作成はモデレーターのみ",
-      "staff": "モデレーター限定",
+      "moderators_visible": "モデレーター限定",
       "archived": "アーカイブ済み"
     },
     "tag": {
@@ -2036,7 +2053,6 @@
     },
     "comments": {
       "title": "コメント",
-      "reactions": "この記事にリアクション",
       "empty": "まだコメントはありません。",
       "write": "コメントを書く…",
       "login": "ログインしてコメントする"

@@ -18,7 +18,7 @@ const newTopic = computed(() => category.value ? { category: String(category.val
 useSeoMeta({
   title: () => category.value ? `${categoryName(category.value)} - ${t('discussions.title')}` : t('discussions.title'),
   description: () => categoryDescription(category.value) || t('discussions.description'),
-  robots: () => category.value?.visibility === 'staff' ? 'noindex' : undefined,
+  robots: () => category.value?.visibility === 'moderators' ? 'noindex' : undefined,
 })
 </script>
 
@@ -40,7 +40,7 @@ useSeoMeta({
                 </nav>
                 <h1 class="flex items-center gap-2 text-2xl font-bold text-slate-950">
                   {{ categoryName(category) }}
-                  <Lock v-if="category.visibility === 'staff'" :size="16" class="text-slate-400" :aria-label="t('discussions.category.staff')" />
+                  <Lock v-if="category.visibility === 'moderators'" :size="16" class="text-slate-400" :aria-label="t('discussions.category.moderators_visible')" />
                   <Archive v-if="category.is_archived" :size="16" class="text-slate-400" :aria-label="t('discussions.category.archived')" />
                 </h1>
                 <p v-if="categoryDescription(category)" class="mt-1.5 text-sm leading-6 text-slate-500">{{ categoryDescription(category) }}</p>

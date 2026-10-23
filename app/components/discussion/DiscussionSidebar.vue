@@ -47,7 +47,7 @@ const isActive = (slug: string) => props.activeSlug === slug
         >
           <span class="size-2 shrink-0 rounded-full" :class="categoryTone(category.color).dot" aria-hidden="true" />
           <span class="min-w-0 flex-1 truncate">{{ categoryName(category) }}</span>
-          <Lock v-if="category.visibility === 'staff'" :size="11" class="text-slate-400" />
+          <Lock v-if="category.visibility === 'moderators'" :size="11" class="text-slate-400" />
           <span class="text-[11px] tabular-nums text-slate-400">{{ category.stats.topics_count }}</span>
         </NuxtLink>
         <NuxtLink

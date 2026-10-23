@@ -126,15 +126,19 @@ useHead({ title: computed(() => t('admin_pages.article_types.title')) })
                 <th class="px-3 py-3">{{ t('admin_pages.article_types.names') }}</th>
                 <th class="px-3 py-3">{{ t('admin_pages.article_types.sort_order') }}</th>
                 <th class="px-3 py-3">{{ t('admin_pages.article_types.usage') }}</th>
+                <th class="px-3 py-3">{{ t('admin_pages.article_types.active') }}</th>
                 <th class="px-3 py-3" />
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              <tr v-for="type in types" :key="type.key" :class="{ 'opacity-50': !type.is_active }">
-                <td class="px-4 py-3 font-mono text-xs">{{ type.key }}<span v-if="!type.is_active" class="ml-1 font-sans text-slate-500">（{{ t('admin_pages.article_types.inactive') }}）</span></td>
+              <tr v-for="type in types" :key="type.key" :class="{ 'text-slate-400': !type.is_active }">
+                <td class="px-4 py-3 font-mono text-xs">{{ type.key }}</td>
                 <td class="px-3 py-3">{{ type.names['zh-Hans'] || type.names.en }} <span class="text-xs text-slate-500">{{ type.names.en }}</span></td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ type.sort_order }}</td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ t('admin_pages.article_types.usage_value', type.usage) }}</td>
+                <td class="px-3 py-3 text-xs">
+                  <span class="rounded px-1.5 py-0.5" :class="type.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">{{ t(type.is_active ? 'admin_pages.article_types.active' : 'admin_pages.article_types.inactive') }}</span>
+                </td>
                 <td class="px-3 py-3 text-right text-xs">
                   <button type="button" class="underline" @click="open(type)">{{ t('common.edit') }}</button>
                   <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="used(type) > 0" :title="used(type) ? t('admin_pages.article_types.in_use') : undefined" @click="deleting = type">{{ t('common.delete') }}</button>

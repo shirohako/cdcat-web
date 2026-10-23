@@ -22,7 +22,7 @@ const dirtyOrder = ref(false)
 const empty = () => ({
   id: 0, parent_id: null as number | null, name: '', slug: '', description: '', name_en: '', name_ja: '', name_zh_hant: '',
   color: 'slate', icon: '', kind: 'discussion' as 'discussion' | 'question', topic_permission: 'everyone' as 'everyone' | 'moderators',
-  visibility: 'public' as 'public' | 'staff', is_archived: false, topic_template: '', show_in_latest: true, show_in_list: true,
+  visibility: 'public' as 'public' | 'moderators', is_archived: false, topic_template: '', show_in_latest: true, show_in_list: true,
 })
 const form = reactive(empty())
 const editing = computed(() => form.id > 0)
@@ -125,7 +125,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) }
                 <p class="font-medium">
                   {{ category.name }}
                   <span class="ml-1 font-mono text-xs text-slate-400">{{ category.slug }}</span>
-                  <Lock v-if="category.visibility === 'staff'" :size="12" class="ml-1 inline text-slate-400" />
+                  <Lock v-if="category.visibility === 'moderators'" :size="12" class="ml-1 inline text-slate-400" />
                 </p>
                 <p class="mt-0.5 flex flex-wrap gap-1.5 text-[11px] text-slate-500">
                   <span v-if="category.kind === 'question'" class="rounded bg-emerald-50 px-1 text-emerald-700">{{ t('admin_pages.discussions.categories.kinds.question') }}</span>
@@ -172,7 +172,7 @@ useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) }
             <select v-model="form.kind" :class="field"><option value="discussion">{{ t('admin_pages.discussions.categories.kinds.discussion') }}</option><option value="question">{{ t('admin_pages.discussions.categories.kinds.question') }}</option></select>
           </label>
           <label class="block">{{ t('admin_pages.discussions.categories.visibility') }}
-            <select v-model="form.visibility" :class="field"><option value="public">{{ t('admin_pages.discussions.categories.visibilities.public') }}</option><option value="staff">{{ t('admin_pages.discussions.categories.visibilities.staff') }}</option></select>
+            <select v-model="form.visibility" :class="field"><option value="public">{{ t('admin_pages.discussions.categories.visibilities.public') }}</option><option value="moderators">{{ t('admin_pages.discussions.categories.visibilities.moderators') }}</option></select>
           </label>
         </div>
         <label class="flex items-center gap-2"><input v-model="form.topic_permission" type="checkbox" true-value="moderators" false-value="everyone">{{ t('admin_pages.discussions.categories.moderators_only_help') }}</label>

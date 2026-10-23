@@ -19,7 +19,8 @@ const tabs = [
   { key: 'draft', query: { status: 'draft' } },
 ] as const
 const activeTab = computed(() => route.query.reported ? 'reported' : String(route.query.status || 'all'))
-const filterKeys = ['search', 'type', 'user_id'] as const
+const filterKeys = ['search', 'type', 'user_id', 'sort_by'] as const
+const SORTS = ['updated_at', 'published_at', 'views_count', 'likes_count'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const tabQuery = computed(() => tabs.find(tab => tab.key === activeTab.value)?.query ?? tabs[0].query)
@@ -69,6 +70,9 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
           <option v-for="option in types" :key="option.key" :value="option.key">{{ typeName(option.key, 'zh-Hans') }}{{ option.is_active ? '' : `（${t('admin_pages.article_types.inactive')}）` }}</option>
         </select>
         <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" :class="[field, 'w-28']">
+        <select v-model="filters.sort_by" :aria-label="t('admin_pages.sort_by')" :class="field">
+          <option v-for="sort in SORTS" :key="sort" :value="sort === 'updated_at' ? '' : sort">{{ t(`admin_pages.articles.sorts.${sort}`) }}</option>
+        </select>
         <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
       </form>
     </AdminFilterBar>
@@ -79,7 +83,9 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
               <tr>
                 <th class="px-4 py-3">{{ t('admin_pages.articles.article') }}</th><th class="px-4 py-3">{{ t('admin_pages.articles.author') }}</th>
-                <th class="px-4 py-3">{{ t('admin_pages.articles.status') }}</th><th class="px-4 py-3">{{ t('admin_pages.articles.reports') }}</th>
+                <th class="px-4 py-3">{{ t('admin_pages.articles.status') }}</th>
+                <th class="px-4 py-3 text-right">{{ t('admin_pages.articles.views_count') }}</th><th class="px-4 py-3 text-right">{{ t('admin_pages.articles.likes_count') }}</th>
+                <th class="px-4 py-3">{{ t('admin_pages.articles.reports') }}</th>
                 <th class="px-4 py-3">{{ t('admin_pages.content.sorts.updated_at') }}</th>
               </tr>
             </thead>
@@ -94,6 +100,8 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
                 </td>
                 <td class="px-4 py-3">{{ article.author?.nickname || article.author?.username || '—' }}</td>
                 <td class="px-4 py-3"><span class="rounded-full border px-2 py-0.5 text-xs" :class="statusTone[article.status]">{{ t(`admin_pages.articles.statuses.${article.status}`) }}</span></td>
+                <td class="px-4 py-3 text-right tabular-nums text-slate-600">{{ article.views_count.toLocaleString() }}</td>
+                <td class="px-4 py-3 text-right tabular-nums text-slate-600">{{ article.likes_count.toLocaleString() }}</td>
                 <td class="px-4 py-3 tabular-nums" :class="article.pending_reports ? 'font-semibold text-rose-600' : 'text-slate-400'">{{ article.pending_reports || '—' }}</td>
                 <td class="px-4 py-3 text-xs text-slate-500">{{ time(article.updated_at) }}</td>
               </tr>

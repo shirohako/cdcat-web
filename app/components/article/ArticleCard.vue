@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Calendar, Clock, ImageIcon, Sparkles, UserRound } from '@lucide/vue'
+import { Calendar, Clock, Heart, ImageIcon, Sparkles, UserRound } from '@lucide/vue'
 import type { ArticleCard } from '~/types/article'
 
 /** A published article in a grid: cover, type, title, spoiler-free summary and reading time. */
@@ -38,7 +38,8 @@ const date = computed(() => props.article.published_at ? new Intl.DateTimeFormat
           <UserRound v-else :size="11" class="text-violet-400" />
         </div>
         <span class="truncate font-medium text-gray-500">{{ article.author?.nickname || article.author?.username }}</span>
-        <span class="ml-auto inline-flex shrink-0 items-center gap-1"><Clock :size="11" />{{ t('article_ui.minutes', { count: minutes }) }}</span>
+        <span class="ml-auto inline-flex shrink-0 items-center gap-1" :title="t('article_ui.likes', { count: article.likes_count })"><Heart :size="11" />{{ article.likes_count }}</span>
+        <span class="inline-flex shrink-0 items-center gap-1"><Clock :size="11" />{{ t('article_ui.minutes', { count: minutes }) }}</span>
         <span class="inline-flex shrink-0 items-center gap-1"><Calendar :size="11" />{{ date }}</span>
       </div>
     </div>

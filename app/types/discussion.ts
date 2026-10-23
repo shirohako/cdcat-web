@@ -41,7 +41,7 @@ export interface DiscussionCategoryStats {
 export interface DiscussionCategory extends DiscussionCategorySummary {
   description: string | null
   topic_permission: 'everyone' | 'moderators'
-  visibility: 'public' | 'staff'
+  visibility: 'public' | 'moderators'
   is_archived: boolean
   show_in_latest: boolean
   /** False: left out of the category list and sidebar, still reachable by link. */

@@ -97,7 +97,7 @@ test('contributors see the review module and can open and close mobile navigatio
 })
 
 test('role assignment refreshes the row and closes the dialog', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users')
   await page.getByRole('button', { name: '编辑角色' }).click()
   await page.locator('.fixed').getByText('contributor', { exact: true }).click()
@@ -109,7 +109,7 @@ test('role assignment refreshes the row and closes the dialog', async () => {
 })
 
 test('URL filters survive browser history and show empty and error states', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users')
   await page.getByRole('searchbox').fill('empty')
   await page.getByRole('button', { name: '筛选条件', exact: true }).click()
@@ -125,7 +125,7 @@ test('URL filters survive browser history and show empty and error states', asyn
 })
 
 test('pending totals refresh after a batch rejection and the reason is mandatory', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/revisions')
   assert.match(await page.getByRole('link', { name: /待审/ }).textContent(), /1/)
   await page.getByRole('checkbox', { name: '选择修订 7' }).check()
@@ -144,7 +144,7 @@ test('pending totals refresh after a batch rejection and the reason is mandatory
 })
 
 test('permission revocation is checked on the next admin navigation', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/revisions')
   api.state.revoked = true
   await page.locator('aside a[href="/admin/users"]').click()
@@ -154,24 +154,24 @@ test('permission revocation is checked on the next admin navigation', async () =
 
 test('inactive sessions are cleared; server failures retain the token and block admin access', async () => {
   api.state.meFailure = { status: 403, name: 'USER_INACTIVE' }
-  const inactive = await session('founder')
+  const inactive = await session('staff')
   await visit(inactive.page, '/admin/users')
   await inactive.page.waitForURL('**/auth/login?**')
   assert.ok(!(await inactive.context.cookies()).some(cookie => cookie.name === 'auth_token' && cookie.value))
   api.state.meFailure = { status: 503, name: 'INTERNAL_ERROR' }
-  const unavailable = await session('founder')
+  const unavailable = await session('staff')
   const response = await unavailable.page.goto(`${baseURL}/admin/users`)
   assert.equal(response.status(), 503)
-  assert.ok((await unavailable.context.cookies()).some(cookie => cookie.name === 'auth_token' && cookie.value === 'founder'))
+  assert.ok((await unavailable.context.cookies()).some(cookie => cookie.name === 'auth_token' && cookie.value === 'staff'))
 })
 
 test('logout revokes the current token before clearing the browser session', async () => {
-  const { page, context } = await session('founder')
+  const { page, context } = await session('staff')
   await visit(page, '/')
   await page.getByRole('button', { name: 'User menu' }).click()
   await page.getByRole('button', { name: 'Sign Out', exact: true }).click()
   await page.getByRole('button', { name: 'User menu' }).waitFor({ state: 'hidden' })
-  assert.ok(api.state.requests.some(request => request.path === '/v1/auth/logout' && request.method === 'POST' && request.token === 'founder'))
+  assert.ok(api.state.requests.some(request => request.path === '/v1/auth/logout' && request.method === 'POST' && request.token === 'staff'))
   assert.ok(!(await context.cookies()).some(cookie => cookie.name === 'auth_token' && cookie.value))
   assert.deepEqual(errors, [])
 })
@@ -185,7 +185,7 @@ test('login reports a profile fetch failure instead of navigating as a successfu
   await page.locator('form button[type="submit"]').click()
   await page.locator('.bg-red-50 p').waitFor()
   assert.equal(new URL(page.url()).pathname, '/auth/login')
-  assert.ok(api.state.requests.some(request => request.path === '/v1/me' && request.token === 'founder'))
+  assert.ok(api.state.requests.some(request => request.path === '/v1/me' && request.token === 'staff'))
   assert.deepEqual(errors, [])
 })
 
@@ -311,7 +311,7 @@ test('removing the last track previews impact and requires a reason before submi
 
 test('legacy pending revisions cannot be approved and offer reopening the current editor', async () => {
   api.state.legacy = true
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/revisions/7')
   await page.getByRole('alert').waitFor()
   assert.equal(await page.getByRole('button', { name: '通过', exact: true }).isDisabled(), true)
@@ -333,7 +333,7 @@ test('a stale album submission displays the actionable API error and retains the
 
 test('destructive review previews the exact tracks and requires confirmation before approval', async () => {
   api.state.destructive = true
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/revisions/7')
   await page.getByRole('button', { name: '通过', exact: true }).click()
   const dialog = page.getByRole('dialog')
@@ -358,14 +358,14 @@ test('contributors cannot approve a track removal from revision details', async 
 })
 
 test('dashboard renders trends and keeps audit and operations sections permission-bound', async () => {
-  const founder = await session('founder')
-  await visit(founder.page, '/admin')
-  await founder.page.getByRole('heading', { name: '工作台', exact: true }).waitFor()
-  await founder.page.getByRole('heading', { name: '最近管理操作' }).waitFor()
-  await founder.page.getByRole('heading', { name: '运维摘要' }).waitFor()
-  await founder.page.getByRole('button', { name: '近 30 天', exact: true }).click()
-  assert.equal(await founder.page.getByRole('button', { name: '近 30 天', exact: true }).getAttribute('aria-pressed'), 'true')
-  assert.equal(await founder.page.getByRole('img', { name: '用户新增趋势' }).count(), 1)
+  const staff = await session('staff')
+  await visit(staff.page, '/admin')
+  await staff.page.getByRole('heading', { name: '工作台', exact: true }).waitFor()
+  await staff.page.getByRole('heading', { name: '最近管理操作' }).waitFor()
+  await staff.page.getByRole('heading', { name: '运维摘要' }).waitFor()
+  await staff.page.getByRole('button', { name: '近 30 天', exact: true }).click()
+  assert.equal(await staff.page.getByRole('button', { name: '近 30 天', exact: true }).getAttribute('aria-pressed'), 'true')
+  assert.equal(await staff.page.getByRole('img', { name: '用户新增趋势' }).count(), 1)
   const contributor = await session('contributor')
   await visit(contributor.page, '/admin')
   assert.equal(await contributor.page.getByRole('heading', { name: '最近管理操作' }).count(), 0)
@@ -375,7 +375,7 @@ test('dashboard renders trends and keeps audit and operations sections permissio
 })
 
 test('user state and sort filters survive history and user details are reachable', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users')
   await page.getByRole('combobox', { name: '状态', exact: true }).selectOption('disabled')
   await page.getByRole('combobox', { name: '排序字段' }).selectOption('reviews_count')
@@ -398,7 +398,7 @@ test('user state and sort filters survive history and user details are reachable
 })
 
 test('user details edit profile, require status reasons, and revoke only after confirmation', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users/2')
   await page.getByRole('textbox', { name: '昵称', exact: true }).fill('已核对用户')
   await page.getByRole('button', { name: '保存资料' }).click()
@@ -430,7 +430,7 @@ test('user details edit profile, require status reasons, and revoke only after c
 })
 
 test('user content tabs and recovery actions use the selected account and explicit reasons', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users/2')
   await page.getByRole('button', { name: '文章', exact: true }).click()
   await page.getByText('articles 测试记录', { exact: true }).waitFor()
@@ -455,7 +455,7 @@ test('user content tabs and recovery actions use the selected account and explic
 })
 
 test('roles can be created with grouped permissions while reserved roles stay read-only', async () => {
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/roles')
   await page.getByRole('link', { name: '新建角色', exact: true }).click()
   await page.waitForURL('**/admin/roles/new')
@@ -476,9 +476,9 @@ test('roles can be created with grouped permissions while reserved roles stay re
   const updated = api.state.requests.find(request => request.path.startsWith('/v1/admin/roles/') && request.method === 'PUT')
   assert.equal(updated.payload.level, 31)
   assert.ok(updated.payload.permissions.includes('content.submit'))
-  const founderRow = page.locator('tr').filter({ has: page.getByRole('cell', { name: 'founder', exact: true }) })
-  assert.equal(await founderRow.getByRole('button', { name: '删除角色', exact: true }).count(), 0)
-  await founderRow.getByRole('link', { name: '查看角色', exact: true }).click()
+  const staffRow = page.locator('tr').filter({ has: page.getByRole('cell', { name: 'staff', exact: true }) })
+  assert.equal(await staffRow.getByRole('button', { name: '删除角色', exact: true }).count(), 0)
+  await staffRow.getByRole('link', { name: '查看角色', exact: true }).click()
   assert.equal(await page.getByRole('textbox', { name: /角色名称/ }).isDisabled(), true)
   assert.equal(await page.getByRole('button', { name: '保存', exact: true }).count(), 0)
   assert.deepEqual(errors, [])
@@ -486,7 +486,7 @@ test('roles can be created with grouped permissions while reserved roles stay re
 
 test('deleting an assigned role requires both replacement and a reason', async () => {
   api.state.role = 'contributor'
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/roles')
   const row = page.locator('tr').filter({ has: page.getByRole('cell', { name: 'contributor', exact: true }) })
   await row.getByRole('button', { name: '删除角色', exact: true }).click()
@@ -516,7 +516,7 @@ test('users.manage alone cannot enter role editing routes', async () => {
 
 test('protected users remain visible while profile and security operations are disabled', async () => {
   api.state.userProtected = true
-  const { page } = await session('founder')
+  const { page } = await session('staff')
   await visit(page, '/admin/users/2')
   assert.equal(await page.getByRole('textbox', { name: '昵称', exact: true }).isDisabled(), true)
   assert.equal(await page.getByRole('button', { name: '保存资料' }).count(), 0)

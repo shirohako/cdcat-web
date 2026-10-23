@@ -43,11 +43,10 @@ onMounted(async () => {
   catch { /* storage unavailable */ }
   settingsOpen.value = window.matchMedia('(min-width: 1280px)').matches
   window.addEventListener('keydown', onKeydown)
-  if (props.articleId !== null) {
-    try { await draft.load() }
-    catch (error) { loadError.value = error }
-    finally { loading.value = false }
-  }
+  // A new article only brings back the unsaved copy kept in this browser.
+  try { await draft.load() }
+  catch (error) { loadError.value = error }
+  finally { loading.value = false }
   await nextTick()
   resizeTitle()
 })
