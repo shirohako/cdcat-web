@@ -1,6 +1,6 @@
 # Comic Market cover — version 3
 
-Generated with the built-in image_gen tool on 2026-10-19, using `public/images/events/comic-market-v2.webp` as the edit target. Final asset: `public/images/events/comic-market-v3.webp`, 1280 × 720 WebP. The user requested richer color and slightly smaller foreground goods. M3 remains on version 2. Earlier assets are retained for comparison.
+Generated with the built-in image_gen tool on 2026-10-19, using `public/images/events/comic-market-v2.webp` as the edit target. Final asset: `public/images/events/comic-market-v3.webp`, 1280 × 720 WebP. The user requested richer color and slightly smaller foreground goods. M3 remains on version 2. The earlier versions were deleted on 2026-10-23 once nothing used them.
 
 Official visual sources and earlier prompts: [event-series-artwork.md](event-series-artwork.md).
 
