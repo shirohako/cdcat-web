@@ -151,13 +151,17 @@
       "follow": "フォロー",
       "following": "フォロー中",
       "share": "共有",
-      "releases": "すべてのアルバム",
+      "releases": "参加作品",
       "no_bio": "アーティスト紹介はまだありません。",
       "no_releases": "アルバムはまだありません",
       "no_releases_desc": "このアーティストに関連付けられたアルバムはまだありません。",
       "as_artist": "アーティストとして",
       "inactive": "活動終了",
-      "relations": "関連アーティスト"
+      "relations": "関連アーティスト",
+      "view_albums": "アルバム",
+      "view_tracks": "楽曲",
+      "no_tracks": "参加楽曲はまだありません",
+      "credited_as": "{name} 名義"
     }
   },
   "tracking": {

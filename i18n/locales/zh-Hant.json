@@ -151,13 +151,17 @@
       "follow": "關注",
       "following": "已關注",
       "share": "分享",
-      "releases": "全部專輯",
+      "releases": "參與作品",
       "no_bio": "暫無藝術家簡介。",
       "no_releases": "暫無專輯",
       "no_releases_desc": "該藝術家尚未有關聯的專輯。",
       "as_artist": "作為藝術家",
       "inactive": "已停止活動",
-      "relations": "相關藝術家"
+      "relations": "相關藝術家",
+      "view_albums": "專輯",
+      "view_tracks": "曲目",
+      "no_tracks": "暫無參與曲目",
+      "credited_as": "署名為 {name}"
     }
   },
   "tracking": {

@@ -151,13 +151,17 @@
       "follow": "Follow",
       "following": "Following",
       "share": "Share",
-      "releases": "All releases",
+      "releases": "Discography",
       "no_bio": "No artist biography yet.",
       "no_releases": "No releases yet",
       "no_releases_desc": "This artist has no linked music releases yet.",
       "as_artist": "As artist",
       "inactive": "Inactive",
-      "relations": "Related artists"
+      "relations": "Related artists",
+      "view_albums": "Albums",
+      "view_tracks": "Tracks",
+      "no_tracks": "No credited tracks yet",
+      "credited_as": "as {name}"
     }
   },
   "tracking": {

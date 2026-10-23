@@ -2,7 +2,7 @@
 
 import type { UserSummary } from './catalog'
 
-export const SHOUT_MAX_LENGTH = 300
+export const SHOUT_MAX_LENGTH = 1000
 
 export interface Shout {
   id: number

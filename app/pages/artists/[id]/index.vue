@@ -27,6 +27,33 @@
                 <span class="inline-flex items-center gap-2"><Disc3 :size="16" class="text-slate-400" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
                 <span class="inline-flex items-center gap-2"><Users :size="16" class="text-slate-400" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
               </div>
+              <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
+              <div v-if="artist.titles?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
+                <div v-if="artist.titles?.length" class="flex gap-3">
+                  <span class="w-24 shrink-0 text-xs leading-5 text-gray-400">{{ $t('catalog.other_names') }}</span>
+                  <ul class="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
+                    <li v-for="(title, index) in artist.titles" :key="index" class="text-slate-700">
+                      {{ title.title }}
+                      <span class="text-[11px] text-gray-400">{{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}</span>
+                    </li>
+                  </ul>
+                </div>
+                <div v-if="artist.relations?.length" class="flex gap-3">
+                  <span class="w-24 shrink-0 text-xs leading-6 text-gray-400">{{ $t('artists.detail.relations') }}</span>
+                  <ul class="flex min-w-0 flex-wrap gap-1.5">
+                    <li v-for="relation in artist.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
+                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="inline-flex h-6 items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 pl-0.5 pr-2.5 text-xs text-slate-700 hover:border-slate-300 hover:bg-slate-100">
+                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-slate-200">
+                          <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
+                        </span>
+                        {{ relation.artist.name }}
+                        <span class="text-[11px] text-gray-400">{{ enumLabel('artist_relation', relation.relation_type) }}</span>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </div>
+                <CatalogAttributeList v-if="artist.attributes?.length" :attributes="artist.attributes" />
+              </div>
             </div>
             <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
               <button
@@ -60,90 +87,75 @@
       </div>
     </section>
 
-    <main v-if="artist" class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 lg:grid-cols-3 2xl:max-w-7xl" :class="revealClass">
-      <div class="space-y-6 lg:col-span-2">
-        <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
-          <header class="flex flex-wrap items-center gap-2 border-b border-slate-100 px-4 py-3 sm:px-6">
-            <Library :size="17" class="text-slate-500" />
-            <h2 class="mr-2 text-base font-semibold text-slate-900">{{ $t('artists.detail.releases') }}</h2>
+    <main v-if="artist" class="mx-auto w-full max-w-6xl space-y-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl" :class="revealClass">
+      <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
+        <header class="flex flex-wrap items-center gap-2 border-b border-slate-100 px-4 py-3 sm:px-6">
+          <Library :size="17" class="text-slate-500" />
+          <h2 class="mr-2 text-base font-semibold text-slate-900">{{ $t('artists.detail.releases') }}</h2>
+          <button
+            v-for="tab in roleTabs"
+            :key="tab.role ?? 'all'"
+            type="button"
+            class="rounded-full px-2.5 py-1 text-xs transition-colors"
+            :class="role === tab.role ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            @click="selectRole(tab.role)"
+          >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
+          <div class="ml-auto inline-flex rounded-md bg-slate-100 p-0.5 text-xs">
             <button
-              v-for="tab in roleTabs"
-              :key="tab.role ?? 'all'"
+              v-for="option in views"
+              :key="option"
               type="button"
-              class="rounded-full px-2.5 py-1 text-xs transition-colors"
-              :class="role === tab.role ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-              @click="selectRole(tab.role)"
-            >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
-          </header>
-          <div class="min-h-60 p-4 sm:p-6">
-            <CollectionLoadingSkeleton v-if="albumsLoading" grid-class="grid-cols-2 gap-5 sm:grid-cols-3 md:gap-6 lg:grid-cols-4" :count="8" />
-            <div
-              v-else-if="albums.length"
-              :key="albumsRevealKey"
-              class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 md:gap-6 lg:grid-cols-4"
-              :class="[albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
-              :inert="albumsRefetching"
-            >
-              <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
-            </div>
-            <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
-              <Disc3 :size="26" class="text-slate-300" />
-              <p class="mt-3 text-sm font-medium text-slate-600">{{ $t('artists.detail.no_releases') }}</p>
-            </div>
-            <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsRefetching" @update:page="albumPage = $event" />
+              class="rounded px-2.5 py-1 transition-colors"
+              :class="view === option ? 'bg-white font-semibold text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+              @click="selectView(option)"
+            >{{ option === 'albums' ? $t('artists.detail.view_albums') : $t('artists.detail.view_tracks') }}</button>
           </div>
-        </section>
-
-        <!-- Artists awaiting review can only be viewed: following, shouts and links open after approval. -->
-        <template v-if="!artist.is_pending">
-          <ShoutBox :id="artist.id" resource="artists" />
-          <ArticleRelatedArticles :id="artist.id" type="artist" />
-          <DiscussionRelatedDiscussions :id="artist.id" type="artist" />
-        </template>
-      </div>
-
-      <aside class="space-y-6">
-        <CatalogSection v-if="artist.relations?.length" :title="$t('artists.detail.relations')" :icon="Network" tone="purple">
-          <ul class="divide-y divide-gray-50">
-            <li v-for="relation in artist.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
-              <NuxtLink :to="`/artists/${relation.artist.id}`" class="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50">
-                <div class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-gray-100">
-                  <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
-                </div>
-                <div class="min-w-0">
-                  <p class="truncate text-sm font-medium text-gray-800">{{ relation.artist.name }}</p>
-                  <p class="text-[11px] text-gray-400">
-                    {{ enumLabel('artist_relation', relation.relation_type) }}
-                  </p>
-                </div>
-              </NuxtLink>
-            </li>
-          </ul>
-        </CatalogSection>
-
-        <CatalogSection v-if="artist.titles?.length || artist.attributes?.length" :title="$t('album.section.information')" :icon="Info" tone="sky">
-          <div class="space-y-4 px-5 py-4 text-sm">
-            <div v-if="artist.titles?.length">
-              <h3 class="mb-1.5 text-xs font-semibold text-gray-400">{{ $t('catalog.other_names') }}</h3>
-              <CatalogTitleList :titles="artist.titles" />
-            </div>
-            <CatalogAttributeList v-if="artist.attributes?.length" :attributes="artist.attributes" />
+        </header>
+        <div class="min-h-60 p-4 sm:p-6">
+          <CollectionLoadingSkeleton v-if="albumsLoading" :grid-class="albumGridClass" :count="12" />
+          <ArtistCreditedTracks
+            v-else-if="view === 'tracks' && trackGroups.length"
+            :key="albumsRevealKey"
+            :groups="trackGroups"
+            :artist-name="artist.name"
+            class="transition-opacity"
+            :class="[albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
+            :inert="albumsRefetching"
+          />
+          <div
+            v-else-if="view === 'albums' && albums.length"
+            :key="albumsRevealKey"
+            class="grid transition-opacity"
+            :class="[albumGridClass, albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
+            :inert="albumsRefetching"
+          >
+            <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
           </div>
-        </CatalogSection>
+          <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
+            <Disc3 :size="26" class="text-slate-300" />
+            <p class="mt-3 text-sm font-medium text-slate-600">{{ view === 'tracks' ? $t('artists.detail.no_tracks') : $t('artists.detail.no_releases') }}</p>
+          </div>
+          <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsRefetching" @update:page="albumPage = $event" />
+        </div>
+      </section>
 
-        <AlbumLinks :links="artist.links ?? []" />
-      </aside>
+      <!-- Artists awaiting review can only be viewed: following, shouts and links open after approval. -->
+      <template v-if="!artist.is_pending">
+        <ShoutBox :id="artist.id" resource="artists" />
+        <ArticleRelatedArticles :id="artist.id" type="artist" />
+        <DiscussionRelatedDiscussions :id="artist.id" type="artist" />
+      </template>
     </main>
     <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
-      <SkeletonCatalogDetail hero="none" :sections="2" />
+      <SkeletonCatalogDetail hero="none" :sections="2" :aside="false" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { AlbumSimple } from '~/types/album'
-import type { ArtistDetail } from '~/types/artist'
-import { Disc3, Edit, History, Info, Library, Network, UserCheck, UserPlus, Users } from '@lucide/vue'
+import type { ArtistCreditedAlbum, ArtistDetail } from '~/types/artist'
+import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
 
 const route = useRoute()
@@ -152,7 +164,7 @@ const { $api } = useNuxtApp()
 const { t } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavorite } = useFavorites()
-const { localName, enumLabel } = useCatalogDisplay()
+const { localName, localeName, enumLabel } = useCatalogDisplay()
 const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)
@@ -160,6 +172,8 @@ const { data: artist, status, mutate, revealClass } = await usePageAPI<ArtistDet
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
+// One full-width column: up to six albums a row; a page of 30 ends on a full row at 2, 3, 5 and 6 columns.
+const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6'
 
 const pageCssVariables = {
   '--artist-banner-mobile-height': `${artistPageConfig.banner.mobileHeight}px`,
@@ -168,7 +182,12 @@ const pageCssVariables = {
   '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
 }
 
-// Discography: every album, as album artist, or by credited role. Role and page live in the URL (?role=, ?page=).
+// Discography: every album, as album artist, or by credited role; or the credited tracks grouped by album.
+// View, role and page live in the URL (?view=tracks, ?role=, ?page=).
+type Releases = { pagination: { last_page: number }, roles: Record<string, number> }
+  & ({ view: 'albums', albums: AlbumSimple[] } | { view: 'tracks', albums: ArtistCreditedAlbum[], all: number })
+const views = ['albums', 'tracks'] as const
+const view = computed(() => route.query.view === 'tracks' ? 'tracks' : 'albums')
 const role = computed(() => route.query.role ? String(route.query.role) : null)
 const albumPage = useQueryPage()
 const {
@@ -178,21 +197,29 @@ const {
   revealKey: albumsRevealKey,
   revealClass: albumsRevealClass,
 } = usePageData(
-  () => `artist:${artistId}:albums:${role.value ?? 'all'}:${albumPage.value}`,
-  ({ signal, background }) => $api<{ albums: AlbumSimple[], pagination: { last_page: number }, roles: Record<string, number> }>(`/v1/artists/${artistId}/albums`, {
-    params: { page: albumPage.value, ...(role.value ? { role: role.value } : {}) },
-    signal,
-    progress: !background,
-  }),
+  () => `artist:${artistId}:${view.value}:${role.value ?? 'all'}:${albumPage.value}`,
+  async ({ signal, background }) => {
+    const current = view.value
+    const result = await $api<Omit<Releases, 'view'>>(`/v1/artists/${artistId}/${current}`, {
+      params: { page: albumPage.value, ...(current === 'albums' ? { per_page: 30 } : {}), ...(role.value ? { role: role.value } : {}) },
+      signal,
+      progress: !background,
+    })
+    return { ...result, view: current } as Releases
+  },
 )
-const albums = computed(() => albumData.value?.albums ?? [])
+const albums = computed(() => albumData.value?.view === 'albums' ? albumData.value.albums : [])
+const trackGroups = computed(() => albumData.value?.view === 'tracks' ? albumData.value.albums : [])
 const albumLastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
-// The tabs keep the last known counts while another role's list loads.
-const lastRoles = shallowRef<Record<string, number>>({})
-watch(() => albumData.value?.roles, (roles) => { if (roles) lastRoles.value = roles })
-const roleCounts = computed(() => albumData.value?.roles ?? lastRoles.value)
+// The tabs keep the last known counts of the same view while another role's list loads.
+const lastCounts = shallowRef<{ view: string, roles: Record<string, number>, all: number }>({ view: '', roles: {}, all: 0 })
+watch(albumData, (data) => {
+  if (data) lastCounts.value = { view: data.view, roles: data.roles, all: data.view === 'tracks' ? data.all : 0 }
+})
+const counts = computed(() => lastCounts.value.view === view.value ? lastCounts.value : { roles: {}, all: 0 })
+const roleCounts = computed(() => counts.value.roles)
 const roleTabs = computed(() => [
-  { role: null, label: t('common.all'), count: artist.value?.albums_count ?? 0 },
+  { role: null, label: t('common.all'), count: view.value === 'tracks' ? counts.value.all : (artist.value?.albums_count ?? 0) },
   ...Object.entries(roleCounts.value)
     .filter(([, count]) => count > 0)
     .sort(([a], [b]) => (a === 'artist' ? -1 : b === 'artist' ? 1 : roleOrder(a) - roleOrder(b)))
@@ -200,6 +227,12 @@ const roleTabs = computed(() => [
 ])
 const selectRole = (value: string | null) => {
   router.push({ query: { ...route.query, role: value ?? undefined, page: undefined } })
+}
+// Album artists have no track credits, so that tab does not carry over to the track view.
+const selectView = (value: 'albums' | 'tracks') => {
+  if (value === view.value) return
+  const keepRole = value === 'albums' || role.value !== 'artist'
+  router.push({ query: { ...route.query, view: value === 'tracks' ? 'tracks' : undefined, role: keepRole ? role.value ?? undefined : undefined, page: undefined } })
 }
 
 const isFavorited = computed(() => artist.value?.is_favorited ?? false)

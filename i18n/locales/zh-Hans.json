@@ -151,13 +151,17 @@
       "follow": "关注",
       "following": "已关注",
       "share": "分享",
-      "releases": "全部专辑",
+      "releases": "参与作品",
       "no_bio": "暂无艺术家简介。",
       "no_releases": "暂无专辑",
       "no_releases_desc": "该艺术家还没有关联的专辑。",
       "as_artist": "作为艺术家",
       "inactive": "已停止活动",
-      "relations": "相关艺术家"
+      "relations": "相关艺术家",
+      "view_albums": "专辑",
+      "view_tracks": "曲目",
+      "no_tracks": "暂无参与曲目",
+      "credited_as": "署名为 {name}"
     }
   },
   "tracking": {
@@ -1911,7 +1915,7 @@
       "batch_link": "批量导入多届"
     },
     "event_imports": {
-      "title": "批量导入",
+      "title": "活动导入",
       "description": "一次导入主办方公开的多届活动：先逐届抓取并预览，再把没有问题的一起应用，或者挑着应用。以后新公开的届次也会出现在这里。",
       "editions": "主办方公开的届次",
       "edition": "届次",

@@ -9,7 +9,7 @@
             v-model="draft"
             rows="2"
             :maxlength="SHOUT_MAX_LENGTH"
-            class="textarea w-full text-sm"
+            class="textarea field-sizing-content max-h-60 min-h-16 w-full text-sm"
             :placeholder="$t('shouts.placeholder')"
           />
           <div class="mt-1 flex items-center gap-2">

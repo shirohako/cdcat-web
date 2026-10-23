@@ -1,5 +1,6 @@
 // Artists. Backend: docs/api/artists.md.
 
+import type { AlbumSimple } from './album'
 import type { CatalogAttribute, CatalogLink, CatalogTitle, PendingFields } from './catalog'
 
 export const ARTIST_TYPES = ['person', 'group', 'company', 'virtual', 'circle', 'character'] as const
@@ -32,4 +33,20 @@ export interface ArtistDetail extends PendingFields {
   version: number
   created_at: string
   updated_at: string
+}
+
+/** A track the artist is credited on, with every role they had on it. */
+export interface ArtistCreditedTrack {
+  id: number
+  title: string
+  disc_position: number
+  track_number: number
+  number_label: string | null
+  roles: Array<{ role: string, credited_as: string | null, detail: string | null }>
+}
+
+/** GET /artists/{id}/tracks: credited tracks grouped by album. */
+export interface ArtistCreditedAlbum {
+  album: AlbumSimple
+  tracks: ArtistCreditedTrack[]
 }
