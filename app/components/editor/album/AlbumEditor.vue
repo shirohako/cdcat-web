@@ -13,7 +13,7 @@
           <div class="min-w-0 flex-1">
             <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
             <h1 class="truncate text-2xl font-bold text-gray-900">{{ album.title || $t('editor.album.untitled') }}</h1>
-            <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+            <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="hover:underline">{{ $t('editor.album.view') }}</NuxtLink>
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="hover:underline">{{ $t('versions.title') }}</NuxtLink>
               <NuxtLink to="/revisions" class="hover:underline">{{ $t('editor.my_revisions') }}</NuxtLink>
@@ -114,7 +114,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '~/composables/useAlbumEditor'
-import type { DraftItem } from '~/composables/useRevisionDraft'
+import type { DraftItem, RevisionPayload } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AggregateRef, AlbumDocument, WorkDocument } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
@@ -130,8 +130,19 @@ import { newDraftScope } from '~/utils/localDrafts'
  * created on the way are items of one revision, kept as a draft in this browser while editing and
  * submitted together. Sections mount one at a time; `mode=translate` opens the tracklist translator.
  * `revisionId` continues a revision sent back for changes, `draftScope` a new album's draft (?draft=).
+ * `embedded` (the harvest review page) sends the draft to `submitTo` and emits `submitted` and
+ * `discarded` instead of leaving the page.
  */
-const props = defineProps<{ albumId?: number | null, revisionId?: number | null, draftScope?: string | null, mode?: 'edit' | 'translate', locale?: string }>()
+const props = defineProps<{
+  albumId?: number | null
+  revisionId?: number | null
+  draftScope?: string | null
+  mode?: 'edit' | 'translate'
+  locale?: string
+  embedded?: boolean
+  submitTo?: (payload: RevisionPayload) => Promise<Revision>
+}>()
+const emit = defineEmits<{ submitted: [revision: Revision], discarded: [] }>()
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -149,7 +160,7 @@ const mainRef = ref(ALBUM_REF)
 const prepare = (item: DraftItem): DraftItem => item.resource_type === 'album' && item.document
   ? { ...item, document: pruneAlbumDocument(item.document as unknown as AlbumDocument) as unknown as Record<string, unknown> }
   : item
-const draft = useRevisionDraft({ prepare, afterRebase: item => loadOriginals([item]) })
+const draft = useRevisionDraft({ prepare, afterRebase: item => loadOriginals([item]), submitTo: props.submitTo })
 const items = draft.items
 const references = draft.references as CatalogReferences
 
@@ -365,6 +376,7 @@ const context: AlbumEditorContext = {
   remember, errors, errorAt, errorsIn, go, notify: showToast,
 }
 provide(albumEditorKey, context)
+defineExpose({ album, draft, references, remember, go })
 
 // ---- loading ----
 
@@ -448,6 +460,7 @@ onMounted(async () => {
 
 /** Starts over after the draft was thrown away: the album or revision as stored; a new album's list of drafts. */
 const restart = () => {
+  if (props.embedded) return emit('discarded')
   if (!albumId && !props.revisionId) return navigateTo('/revisions')
   loading.value = true
   return open().finally(() => { loading.value = false })
@@ -465,6 +478,7 @@ onBeforeRouteLeave(async () => {
 
 const submitted = (revision: Revision) => {
   errors.value = []
+  if (props.embedded) return emit('submitted', revision)
   const main = revision.items?.find(item => item.ref === mainRef.value)
   if (revision.status === 'approved') {
     showToast(t('editor.published'))

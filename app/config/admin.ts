@@ -3,6 +3,7 @@ import type { AdminContentType } from '~/types/admin'
 export const adminGroups = [
   { key: 'overview', label: 'admin_pages.groups.overview' },
   { key: 'content', label: 'admin_pages.groups.content' },
+  { key: 'harvest', label: 'admin_pages.groups.harvest' },
   { key: 'catalog_settings', label: 'admin_pages.groups.catalog_settings' },
   { key: 'articles', label: 'admin_pages.groups.articles' },
   { key: 'discussions', label: 'admin_pages.groups.discussions' },
@@ -44,6 +45,7 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'content' },
   { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
   { path: '/admin/event-imports', permission: 'events.manage', label: 'admin_pages.event_imports.title', icon: 'lucide:download-cloud', group: 'content' },
+  { path: '/admin/harvest', permission: 'harvest.manage', label: 'admin_pages.harvest.title', icon: 'lucide:radar', group: 'harvest' },
   { path: '/admin/credit-roles', permission: 'content.manage', label: 'admin_pages.credit_roles.title', icon: 'lucide:contact', group: 'catalog_settings' },
   { path: '/admin/attribute-definitions', permission: 'content.manage', label: 'admin_pages.attribute_definitions.title', icon: 'lucide:list-checks', group: 'catalog_settings' },
   { path: '/admin/link-providers', permission: 'content.manage', label: 'admin_pages.link_providers.title', icon: 'lucide:link', group: 'catalog_settings' },
