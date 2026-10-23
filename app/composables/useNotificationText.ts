@@ -56,6 +56,8 @@ export const useNotificationText = () => {
     }
     if (type === 'discussion_topic') return notification.data.action === 'deleted' ? null : `/discussions/${id}`
     if (type === 'user') return null
+    if (type === 'album_review') return notification.data.album_id ? `/albums/${notification.data.album_id}` : null
+    if (type === 'shout') return notification.data.artist_id ? `/artists/${notification.data.artist_id}` : null
     if (type === 'revision') return `/revisions/${id}`
     if (type !== 'article' || notification.type === 'article.deleted') return null
     if (notification.type === 'report.resolved') return notification.data.resolution === 'delete' ? null : `/articles/${id}`

@@ -32,27 +32,24 @@
           </div>
         </div>
 
-        <!-- Average Score -->
+        <!-- Ratings on this page, per level -->
         <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.average') }}</p>
-              <p
-                class="text-3xl font-bold mt-2"
-                :class="stats.averageScore > 0 ? getScoreColorClass(stats.averageScore) : 'text-gray-900'"
-              >
-                {{ stats.averageScore > 0 ? stats.averageScore.toFixed(1) : '--' }}
-              </p>
-            </div>
-            <Icon name="lucide:star" class="w-12 h-12 text-yellow-100" />
+          <p class="text-sm text-gray-500">{{ t('reviews.page_ratings') }}</p>
+          <div v-if="stats.scoredCount" class="mt-3 flex flex-wrap gap-1.5">
+            <template v-for="value in REVIEW_RATINGS" :key="value">
+              <span v-if="stats.byRating[value]" class="rounded-full px-2 py-0.5 text-xs font-medium ring-1" :class="reviewRatingTone(value)">
+                {{ t(reviewRatingKey(value)) }} {{ stats.byRating[value] }}
+              </span>
+            </template>
           </div>
+          <p v-else class="text-3xl font-bold text-gray-900 mt-2">--</p>
         </div>
 
         <!-- Scored Reviews -->
         <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.scored') }}</p>
+              <p class="text-sm text-gray-500">{{ t('reviews.page_rated') }}</p>
               <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.scoredCount }}</p>
             </div>
             <Icon name="lucide:hash" class="w-12 h-12 text-green-100" />
@@ -73,8 +70,8 @@
           >
             <option value="date_desc">{{ t('collection_pages.reviews.sort_newest') }}</option>
             <option value="date_asc">{{ t('collection_pages.reviews.sort_oldest') }}</option>
-            <option value="score_desc">{{ t('collection_pages.reviews.sort_highest') }}</option>
-            <option value="score_asc">{{ t('collection_pages.reviews.sort_lowest') }}</option>
+            <option value="score_desc">{{ t('reviews.sort.liked_most') }}</option>
+            <option value="score_asc">{{ t('reviews.sort.liked_least') }}</option>
           </select>
         </div>
 
@@ -131,10 +128,10 @@
         </div>
       </Teleport>
 
-      <!-- Write/Edit Review Modal -->
-      <ReviewsReviewFormModal
-        v-if="showWriteModal"
-        :key="editingReview?.id ?? 'new'"
+      <!-- Edit Review Modal -->
+      <ReviewEditorModal
+        v-if="editingReview"
+        :key="editingReview.album_id"
         :review="editingReview"
         @close="closeModal"
         @saved="handleSaved"
@@ -144,9 +141,10 @@
 </template>
 
 <script setup lang="ts">
-import type { UserReview, ReviewStats, ReviewSortBy } from '~/types/reviews'
+import type { AlbumReview, ReviewDraft, ReviewPage, ReviewRating } from '~/types/reviews'
 import ReviewsList from '~/components/review/ReviewsList.vue'
-import ReviewsReviewFormModal from '~/components/review/ReviewFormModal.vue'
+
+type SortBy = 'date_desc' | 'date_asc' | 'score_desc' | 'score_asc'
 
 definePageMeta({
   middleware: 'auth'
@@ -160,8 +158,7 @@ useHead({ title: computed(() => t('collection_pages.reviews.seo_title')) })
 const { $api } = useNuxtApp()
 
 // State
-const reviews = ref<UserReview[]>([])
-const stats = ref<ReviewStats>({ totalReviews: 0, averageScore: 0, scoredCount: 0 })
+const reviews = ref<AlbumReview[]>([])
 // True from the start, so the empty state doesn't show before the first load.
 const isLoading = ref(true)
 const statsLoading = ref(true)
@@ -169,45 +166,20 @@ const loadError = ref('')
 const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
-const sortBy = ref<ReviewSortBy>('date_desc')
-const showWriteModal = ref(false)
-const editingReview = ref<UserReview | null>(null)
+const sortBy = ref<SortBy>('date_desc')
+const editingReview = ref<ReviewDraft | null>(null)
 const deleteConfirm = reactive({ show: false, reviewId: 0, loading: false })
 
-// API 响应 → UserReview 映射
-function mapReview(raw: any): UserReview {
-  return {
-    id: raw.id,
-    albumId: raw.album_id,
-    albumTitle: raw.album?.title ?? '',
-    albumImageUrl: raw.album?.image_url ?? '',
-    artists: [],
-    content: raw.content ?? '',
-    score: raw.rating ?? null,
-    reactions: {
-      helpful: raw.useful_count ?? 0,
-      unhelpful: raw.dislike_count ?? 0,
-      funny: raw.fun_count ?? 0,
-    },
-    createdAt: raw.created_at,
-    updatedAt: raw.updated_at,
+// Totals come from the server; ratings per level only cover the loaded page.
+const stats = computed(() => {
+  const byRating: Partial<Record<ReviewRating, number>> = {}
+  for (const review of reviews.value) {
+    if (review.rating) byRating[review.rating] = (byRating[review.rating] ?? 0) + 1
   }
-}
+  return { totalReviews: total.value, scoredCount: reviews.value.filter(r => r.rating).length, byRating }
+})
 
-// 从评价列表计算统计
-function computeStats(list: UserReview[], totalCount: number): ReviewStats {
-  const scored = list.filter(r => r.score !== null)
-  return {
-    totalReviews: totalCount,
-    averageScore: scored.length > 0
-      ? scored.reduce((sum, r) => sum + r.score!, 0) / scored.length
-      : 0,
-    scoredCount: scored.length,
-  }
-}
-
-// 排序参数映射
-const sortQueryMap: Record<ReviewSortBy, string> = {
+const sortQueryMap: Record<SortBy, string> = {
   date_desc: '-created_at',
   date_asc: 'created_at',
   score_desc: '-rating',
@@ -219,20 +191,16 @@ const loadReviews = async () => {
   isLoading.value = true
   loadError.value = ''
   try {
-    // $api plugin unwraps { success, data } → res = { reviews: [...], pagination: {...} }
-    const res = await $api<any>('/v1/me/reviews', {
+    const res = await $api<Omit<ReviewPage, 'mine'>>('/v1/me/reviews', {
       params: {
         page: currentPage.value,
         per_page: pageSize.value,
         sort: sortQueryMap[sortBy.value],
       },
     })
-    const reviewList: any[] = res?.reviews ?? []
-    const pagination = res?.pagination ?? {}
-    reviews.value = reviewList.map(mapReview)
-    total.value = pagination.total ?? reviewList.length
-    stats.value = computeStats(reviews.value, total.value)
-  } catch (error: any) {
+    reviews.value = res.reviews
+    total.value = res.pagination.total
+  } catch (error) {
     console.error('Failed to load reviews:', error)
     loadError.value = localizeError(error, 'collection_pages.reviews.load_failed')
   } finally {
@@ -241,17 +209,12 @@ const loadReviews = async () => {
   }
 }
 
-// Score color helper (Metacritic style)
-const getScoreColorClass = (score: number): string => {
-  if (score >= 7) return 'text-green-500'
-  if (score >= 5) return 'text-yellow-500'
-  return 'text-red-500'
-}
-
 // Event handlers
-const handleEdit = (review: UserReview) => {
-  editingReview.value = review
-  showWriteModal.value = true
+const handleEdit = (review: AlbumReview) => {
+  editingReview.value = {
+    album_id: review.album_id, content: review.content, rating: review.rating, language: review.language,
+    album: { id: review.album_id, title: review.album?.title ?? '', image_url: review.album?.image_url ?? null },
+  }
 }
 
 const handleDelete = (reviewId: number) => {
@@ -283,7 +246,6 @@ const handleSaved = () => {
 }
 
 const closeModal = () => {
-  showWriteModal.value = false
   editingReview.value = null
 }
 

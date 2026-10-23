@@ -1,5 +1,6 @@
 import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText } from './catalog'
 import type { ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
+import type { ReviewRating } from './reviews'
 
 export interface DeletionImpact {
   checksum?: string
@@ -201,13 +202,11 @@ export interface AdminAttributeDefinition {
 /** GET /admin/shouts */
 export interface AdminShout {
   id: number
-  album_id: number | null
-  artist_id: number | null
+  artist_id: number
   user_id: number
   content: string
   is_hidden: boolean
   hidden_at: string | null
-  album: { id: number, title: string } | null
   artist: { id: number, name: string } | null
   user: AdminUserRef | null
   created_at: string | null
@@ -259,12 +258,14 @@ export interface AdminReview {
   id: number
   album_id: number
   user_id: number
-  rating: number | null
+  rating: ReviewRating | null
   content: string
   language: string | null
   useful_count: number
   dislike_count: number
   fun_count: number
+  is_hidden: boolean
+  hidden_at: string | null
   album: { id: number, title: string } | null
   user: AdminUserRef | null
   created_at: string
@@ -303,7 +304,8 @@ export interface AdminReportGroup {
   target:
     | { type: 'article', id: number, title: string | null, status: string | null, author: UserSummary | null }
     | { type: 'post', id: number, title: string | null, status: string | null, author: UserSummary | null, topic_id: number | null, floor: number | null, parent_floor: number | null, excerpt: string | null }
-    | { type: 'shout', id: number, title: string | null, status: 'hidden' | 'visible' | null, author: UserSummary | null, album_id: number | null, artist_id: number | null, excerpt: string | null }
+    | { type: 'shout', id: number, title: string | null, status: 'hidden' | 'visible' | null, author: UserSummary | null, artist_id: number | null, excerpt: string | null }
+    | { type: 'review', id: number, title: string | null, status: 'hidden' | 'visible' | null, author: UserSummary | null, album_id: number | null, rating: ReviewRating | null, excerpt: string | null }
   reports_count: number
   reasons: Record<string, number>
   reports: AdminReportEntry[]
@@ -314,7 +316,9 @@ export interface AdminHandledReport extends Omit<AdminReportEntry, 'updated_at'>
   post_id: number | null
   post: { id: number, floor: number | null, topic: { id: number, title: string } | null } | null
   shout_id?: number | null
-  shout?: { id: number, album_id: number | null, artist_id: number | null, content: string } | null
+  shout?: { id: number, artist_id: number, content: string } | null
+  review_id?: number | null
+  review?: { id: number, album_id: number, content: string } | null
   status: 'accepted' | 'dismissed'
   resolution: string | null
   resolution_note: string | null

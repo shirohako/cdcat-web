@@ -35,9 +35,7 @@
       "bonuses": "Bonuses",
       "credits": "Credits",
       "tracklist": "Tracklist",
-      "reviews": "Reviews",
       "artists": "Artists",
-      "rankings": "Rankings",
       "links": "Links",
       "articles": "Related Articles",
       "contributors": "Contributors",
@@ -65,9 +63,7 @@
       "other_recordings_hint": "The same song appears on other releases",
       "translate": "Translate"
     },
-    "actions": {
-      "write_review": "Write Review"
-    },
+    "actions": {},
     "empty": {
       "products_title": "No products",
       "products_desc": "No products are linked to this album yet",
@@ -85,13 +81,9 @@
       "articles_desc": "No articles are linked to this album yet",
       "contributors_title": "No contributors",
       "contributors_desc": "Be the first to contribute data",
-      "reviews_title": "No reviews yet",
-      "reviews_desc": "Be the first to write a review",
       "lyrics_title": "No lyrics",
       "lyrics_desc": "Click “Submit lyrics or translation” in the top right to contribute",
-      "content": "No content",
-      "ratings": "No ratings yet",
-      "rankings": "No ranking data"
+      "content": "No content"
     },
     "gallery": {
       "count": "{count} images",
@@ -226,9 +218,7 @@
     "recent_reviews": "Recent Reviews",
     "favorites": "Favorites",
     "top_artists": "Top Artists",
-    "music_taste": "Music Taste",
     "total": "total",
-    "genres": "genres",
     "not_found": "User not found",
     "not_found_desc": "The user {'@'}{username} doesn't exist or has been deactivated",
     "favorite_tracks": "Favorite Songs",
@@ -741,13 +731,9 @@
       "title": "My Reviews",
       "description": "Share your thoughts and ratings for releases you’ve heard.",
       "total": "Reviews",
-      "average": "Average rating",
-      "scored": "Rated reviews",
       "count": "{count} reviews",
       "sort_newest": "Newest first",
       "sort_oldest": "Oldest first",
-      "sort_highest": "Highest rated",
-      "sort_lowest": "Lowest rated",
       "delete_title": "Delete review",
       "delete_confirm": "Delete this review? This action cannot be undone.",
       "load_failed": "Unable to load your reviews. Please refresh and try again.",
@@ -973,23 +959,6 @@
     "format_lrc": "LRC (timed)",
     "format_srt": "SRT subtitles"
   },
-  "review_ui": {
-    "count": "{count} reviews",
-    "load_more": "Show more · {count} remaining",
-    "helpful": "Helpful",
-    "unhelpful": "Not helpful",
-    "funny": "Funny",
-    "score": "Rating",
-    "language": "Review language",
-    "content": "Review",
-    "placeholder": "Share your thoughts on this release… Markdown is supported.",
-    "markdown": "Markdown supported",
-    "submit": "Submit review",
-    "just_now": "Just now",
-    "minutes_ago": "{count} min ago",
-    "hours_ago": "{count} hr ago",
-    "days_ago": "{count} days ago"
-  },
   "content_display": {
     "articles": "Articles",
     "new_article": "New article",
@@ -1091,29 +1060,7 @@
     "album": "Release",
     "favorited_at": "Date saved",
     "actions": "Actions",
-    "no_album": "No release",
-    "empty_reviews": "No reviews yet",
-    "empty_reviews_hint": "Write your first review and share your thoughts on a release.",
-    "discover_albums": "Discover releases",
-    "collapse": "Show less",
-    "expand": "Show more",
-    "edited": "Edited",
-    "helpful": "Helpful",
-    "unhelpful": "Not helpful",
-    "funny": "Funny",
-    "write_review": "Write a review",
-    "edit_review": "Edit review",
-    "select_album": "Select a release",
-    "search_album": "Search by release or artist…",
-    "no_search_results": "No matching releases found",
-    "score": "Rating (0–10)",
-    "optional": "Optional",
-    "clear": "Clear",
-    "review_content": "Review",
-    "review_placeholder": "Share your thoughts on this release…",
-    "update_review": "Update review",
-    "submit_review": "Submit review",
-    "submit_failed": "Could not submit the review. Please try again later."
+    "no_album": "No release"
   },
   "account_pages": {
     "title": "Account Settings",
@@ -1809,7 +1756,8 @@
       "user_restricted": {
         "discussions": "You have been silenced in the discussions for now",
         "lyrics": "You cannot add or edit lyrics for now",
-        "shouts": "You cannot post shouts for now"
+        "shouts": "You cannot post shouts for now",
+        "reviews": "You cannot post or edit reviews for now"
       },
       "article_hidden": "A moderator hid your article “{title}”",
       "article_locked": "A moderator locked your article “{title}”",
@@ -2154,6 +2102,59 @@
       "illegal": "Illegal",
       "other": "Other"
     }
+  },
+  "reviews": {
+    "title": "Reviews",
+    "count": "{count}",
+    "sort": {
+      "latest": "Latest",
+      "useful": "Most useful",
+      "liked_most": "Most liked first",
+      "liked_least": "Least liked first"
+    },
+    "mine": "Your review",
+    "hidden": "Hidden",
+    "hidden_hint": "Hidden by a moderator; only you can see it",
+    "write": "Write a review",
+    "edit": "Edit review",
+    "update": "Save changes",
+    "submit": "Post review",
+    "submit_failed": "Could not post the review. Please try again later.",
+    "login": "Log in to write a review",
+    "empty": "No reviews yet. Be the first to write one.",
+    "more": "More",
+    "delete_confirm": "Delete your review? Its rating goes with it.",
+    "report": "Report",
+    "reported": "Reported",
+    "expand": "Show more",
+    "collapse": "Show less",
+    "edited": "edited",
+    "reactions": {
+      "useful": "Useful",
+      "dislike": "Disagree",
+      "fun": "Funny"
+    },
+    "rating": "Rating",
+    "rating_hint": "A rating is optional, and needs a written review",
+    "ratings": {
+      "love": "Love it",
+      "like": "Like it",
+      "okay": "It's okay",
+      "meh": "Not really",
+      "dislike": "Don't like it"
+    },
+    "language": "Language",
+    "content": "Review",
+    "placeholder": "How did it sound to you?",
+    "rating_title": "Rating",
+    "no_ratings": "No ratings yet",
+    "rating_count": "{count} ratings",
+    "rating_few": "{count} ratings; the average shows from {min}",
+    "page_ratings": "Ratings on this page",
+    "page_rated": "Rated on this page",
+    "mine_empty": "You haven't written any reviews yet",
+    "mine_empty_hint": "Write one on an album page, with a rating if you like",
+    "discover_albums": "Find albums"
   },
   "versions": {
     "title": "History",

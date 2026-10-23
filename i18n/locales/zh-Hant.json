@@ -35,9 +35,7 @@
       "bonuses": "特典",
       "credits": "製作人員",
       "tracklist": "曲目表",
-      "reviews": "評價",
       "artists": "藝術家",
-      "rankings": "評分排行",
       "links": "相關連結",
       "articles": "相關文章",
       "contributors": "貢獻者",
@@ -65,9 +63,7 @@
       "other_recordings_hint": "這首歌也收錄在其他專輯中",
       "translate": "翻譯"
     },
-    "actions": {
-      "write_review": "寫評價"
-    },
+    "actions": {},
     "empty": {
       "products_title": "暫無商品資訊",
       "products_desc": "該專輯尚未關聯任何商品",
@@ -85,13 +81,9 @@
       "articles_desc": "該專輯尚未關聯任何文章",
       "contributors_title": "暫無貢獻者",
       "contributors_desc": "成為第一個貢獻資料的人",
-      "reviews_title": "暫無評論",
-      "reviews_desc": "還沒有人評論，來寫第一條吧",
       "lyrics_title": "暫無歌詞",
       "lyrics_desc": "點擊右上角「提交歌詞或翻譯」來貢獻內容",
-      "content": "暫無內容",
-      "ratings": "暫無評分",
-      "rankings": "暫無排名資料"
+      "content": "暫無內容"
     },
     "gallery": {
       "count": "{count} 張",
@@ -226,9 +218,7 @@
     "recent_reviews": "近期評價",
     "favorites": "收藏專輯",
     "top_artists": "最愛藝術家",
-    "music_taste": "音樂品味",
     "total": "總計",
-    "genres": "種類型",
     "not_found": "用戶不存在",
     "not_found_desc": "用戶 {'@'}{username} 不存在或已被註銷",
     "favorite_tracks": "收藏曲目",
@@ -741,13 +731,9 @@
       "title": "我的評論",
       "description": "分享聽完專輯後的心得與評分。",
       "total": "評論總數",
-      "average": "平均評分",
-      "scored": "已評分",
       "count": "共 {count} 則評論",
       "sort_newest": "最新優先",
       "sort_oldest": "最早優先",
-      "sort_highest": "最高分優先",
-      "sort_lowest": "最低分優先",
       "delete_title": "刪除評論",
       "delete_confirm": "確定要刪除這則評論嗎？此操作無法復原。",
       "load_failed": "無法載入評論，請重新整理後再試。",
@@ -973,23 +959,6 @@
     "format_lrc": "LRC（帶時間軸）",
     "format_srt": "SRT 字幕"
   },
-  "review_ui": {
-    "count": "共 {count} 則",
-    "load_more": "查看更多 · 還有 {count} 則",
-    "helpful": "有幫助",
-    "unhelpful": "沒幫助",
-    "funny": "有趣",
-    "score": "評分",
-    "language": "評論語言",
-    "content": "評論內容",
-    "placeholder": "分享你對這張專輯的想法…支援 Markdown。",
-    "markdown": "支援 Markdown",
-    "submit": "送出評論",
-    "just_now": "剛剛",
-    "minutes_ago": "{count} 分鐘前",
-    "hours_ago": "{count} 小時前",
-    "days_ago": "{count} 天前"
-  },
   "content_display": {
     "articles": "文章",
     "new_article": "新增文章",
@@ -1091,29 +1060,7 @@
     "album": "所屬專輯",
     "favorited_at": "收藏時間",
     "actions": "操作",
-    "no_album": "無專輯",
-    "empty_reviews": "還沒有任何評論",
-    "empty_reviews_hint": "寫下第一則評論，分享你對專輯的想法。",
-    "discover_albums": "探索專輯",
-    "collapse": "收合",
-    "expand": "展開",
-    "edited": "已編輯",
-    "helpful": "有幫助",
-    "unhelpful": "沒幫助",
-    "funny": "有趣",
-    "write_review": "撰寫評論",
-    "edit_review": "編輯評論",
-    "select_album": "選擇專輯",
-    "search_album": "搜尋專輯名稱或藝人…",
-    "no_search_results": "找不到符合的專輯",
-    "score": "評分（0–10）",
-    "optional": "選填",
-    "clear": "清除",
-    "review_content": "評論內容",
-    "review_placeholder": "分享你對這張專輯的想法…",
-    "update_review": "更新評論",
-    "submit_review": "送出評論",
-    "submit_failed": "無法送出評論，請稍後再試。"
+    "no_album": "無專輯"
   },
   "account_pages": {
     "title": "帳號設定",
@@ -1809,7 +1756,8 @@
       "user_restricted": {
         "discussions": "你在討論區被暫時禁言",
         "lyrics": "你暫時不能新增或修改歌詞",
-        "shouts": "你暫時不能發布留言"
+        "shouts": "你暫時不能發布留言",
+        "reviews": "你暫時不能發布或修改評價"
       },
       "article_hidden": "你的文章「{title}」被版主隱藏",
       "article_locked": "你的文章「{title}」被版主鎖定",
@@ -2154,6 +2102,59 @@
       "illegal": "違法",
       "other": "其他"
     }
+  },
+  "reviews": {
+    "title": "評價",
+    "count": "{count} 則",
+    "sort": {
+      "latest": "最新",
+      "useful": "最有用",
+      "liked_most": "最喜歡的在前",
+      "liked_least": "最不喜歡的在前"
+    },
+    "mine": "我的評價",
+    "hidden": "已隱藏",
+    "hidden_hint": "已被管理員隱藏，只有你自己能看到",
+    "write": "寫評價",
+    "edit": "修改評價",
+    "update": "儲存修改",
+    "submit": "發布評價",
+    "submit_failed": "發布失敗，請稍後再試",
+    "login": "登入後寫評價",
+    "empty": "還沒有評價，來寫第一則吧",
+    "more": "更多",
+    "delete_confirm": "刪除你的評價？評分也會一起刪除。",
+    "report": "檢舉",
+    "reported": "已檢舉",
+    "expand": "展開",
+    "collapse": "收起",
+    "edited": "已編輯",
+    "reactions": {
+      "useful": "有用",
+      "dislike": "不贊同",
+      "fun": "有趣"
+    },
+    "rating": "評分",
+    "rating_hint": "評分可選，寫下評價才能評分",
+    "ratings": {
+      "love": "非常喜歡",
+      "like": "喜歡",
+      "okay": "還行",
+      "meh": "不太喜歡",
+      "dislike": "不喜歡"
+    },
+    "language": "語言",
+    "content": "評價內容",
+    "placeholder": "說說你聽後的感受…",
+    "rating_title": "評分",
+    "no_ratings": "還沒有人評分",
+    "rating_count": "{count} 人評分",
+    "rating_few": "{count} 人評分，滿 {min} 人顯示平均分",
+    "page_ratings": "本頁評分",
+    "page_rated": "本頁已評分",
+    "mine_empty": "還沒有寫過評價",
+    "mine_empty_hint": "在專輯頁寫下你的感受，也可以順便評分",
+    "discover_albums": "去找專輯"
   },
   "versions": {
     "title": "版本歷史",

@@ -228,12 +228,13 @@ export interface Album extends PendingFields {
   favorites_count: number
   reviews_count: number
   views_count: number
-  shouts_count: number
-  rating: number
+  /** Average of the visible review ratings (1–5, two decimals); null when nobody rated. */
+  rating: number | null
   rating_count: number
+  /** How many picked each rating: [count of 1, …, count of 5]; null when nobody rated. */
+  rating_distribution: number[] | null
   ranking: number | null
   articles?: AlbumArticle[]
-  reviews?: unknown[]
   contributors: Array<Omit<UserSummary, 'id'>>
   is_favorited: boolean
   user_tracking: { status: TrackingStatus, created_at: string, updated_at: string } | null

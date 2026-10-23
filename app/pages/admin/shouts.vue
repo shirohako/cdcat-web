@@ -9,7 +9,7 @@ const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
-const filterKeys = ['search', 'is_hidden', 'album_id', 'artist_id', 'user_id'] as const
+const filterKeys = ['search', 'is_hidden', 'artist_id', 'user_id'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -68,7 +68,6 @@ useHead({ title: computed(() => t('admin_pages.shouts.title')) })
           <option value="0">{{ t('admin_pages.shouts.statuses.visible') }}</option>
           <option value="1">{{ t('admin_pages.shouts.statuses.hidden') }}</option>
         </select>
-        <input v-model="filters.album_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.album_id')" :aria-label="t('admin_pages.content.album_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <input v-model="filters.artist_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.shouts.artist_id')" :aria-label="t('admin_pages.shouts.artist_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
@@ -88,8 +87,7 @@ useHead({ title: computed(() => t('admin_pages.shouts.title')) })
               <p class="mt-1 text-xs text-slate-500">
                 <NuxtLink v-if="shout.user" :to="`/admin/users/${shout.user.id}`" class="underline">{{ shout.user.nickname || shout.user.username }}</NuxtLink>
                 ·
-                <NuxtLink v-if="shout.album" :to="`/albums/${shout.album.id}`" target="_blank" class="underline">{{ t('admin_pages.types.album') }} {{ shout.album.title }}</NuxtLink>
-                <NuxtLink v-else-if="shout.artist" :to="`/artists/${shout.artist.id}`" target="_blank" class="underline">{{ t('admin_pages.types.artist') }} {{ shout.artist.name }}</NuxtLink>
+                <NuxtLink v-if="shout.artist" :to="`/artists/${shout.artist.id}`" target="_blank" class="underline">{{ t('admin_pages.types.artist') }} {{ shout.artist.name }}</NuxtLink>
                 · {{ time(shout.updated_at) }}
                 <span v-if="shout.is_hidden" class="ml-1 rounded bg-amber-100 px-1.5 text-amber-800">{{ t('admin_pages.shouts.statuses.hidden') }}</span>
               </p>

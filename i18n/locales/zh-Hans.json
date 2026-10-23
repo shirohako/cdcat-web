@@ -35,9 +35,7 @@
       "bonuses": "特典",
       "credits": "制作人员",
       "tracklist": "曲目表",
-      "reviews": "评价",
       "artists": "艺术家",
-      "rankings": "评分排行",
       "links": "相关链接",
       "articles": "相关文章",
       "contributors": "贡献者",
@@ -65,9 +63,7 @@
       "other_recordings_hint": "这首歌也收录在其他专辑中",
       "translate": "翻译"
     },
-    "actions": {
-      "write_review": "写评价"
-    },
+    "actions": {},
     "empty": {
       "products_title": "暂无商品信息",
       "products_desc": "该专辑尚未关联任何商品",
@@ -85,13 +81,9 @@
       "articles_desc": "该专辑尚未关联任何文章",
       "contributors_title": "暂无贡献者",
       "contributors_desc": "成为第一个贡献数据的人",
-      "reviews_title": "暂无评论",
-      "reviews_desc": "还没有人评论，来写第一条吧",
       "lyrics_title": "暂无歌词",
       "lyrics_desc": "点击右上角「提交歌词或翻译」来贡献内容",
-      "content": "暂无内容",
-      "ratings": "暂无评分",
-      "rankings": "暂无排名数据"
+      "content": "暂无内容"
     },
     "gallery": {
       "count": "{count} 张",
@@ -226,9 +218,7 @@
     "recent_reviews": "近期评价",
     "favorites": "收藏专辑",
     "top_artists": "最爱艺术家",
-    "music_taste": "音乐品味",
     "total": "总计",
-    "genres": "种类型",
     "not_found": "用户不存在",
     "not_found_desc": "用户 {'@'}{username} 不存在或已被注销",
     "favorite_tracks": "收藏曲目",
@@ -655,7 +645,7 @@
       "entries": "条目",
       "franchises": "系列",
       "tracks": "曲目",
-      "reviews": "评论",
+      "reviews": "评价",
       "articles": "文章",
       "lyrics": "歌词",
       "events": "活动",
@@ -739,10 +729,10 @@
       "last_used_at": "最后使用时间",
       "no_sessions": "暂无登录会话",
       "contributions": "已批准修订数",
-      "reviews": "评论数",
+      "reviews": "评价数",
       "activity": "用户内容",
       "activity_revisions": "修订",
-      "activity_reviews": "评论",
+      "activity_reviews": "评价",
       "activity_articles": "文章",
       "activity_lyrics": "歌词",
       "empty": "暂无记录",
@@ -786,7 +776,9 @@
       "event_series_create": "新建活动系列",
       "event_series_update": "修改活动系列",
       "event_series_delete": "删除活动系列",
-      "reviews_delete": "删除评论",
+      "reviews_delete": "删除评价",
+      "reviews_hide": "隐藏评价",
+      "reviews_unhide": "取消隐藏评价",
       "articles_update": "编辑文章",
       "articles_delete": "删除文章",
       "lyrics_create": "新增歌词",
@@ -1074,19 +1066,30 @@
     "user_id": "用户 ID",
     "optional_reason": "原因（可选，写入操作日志）",
     "reviews": {
-      "title": "评论管理",
-      "description": "全站检索评论，删除时填写原因，并同步更新专辑评分和作者的评论数。",
-      "search": "搜索评论内容",
+      "title": "评价管理",
+      "description": "全站检索专辑评价。可以隐藏或删除违规评价，隐藏和删除都会同步更新专辑评分和作者的评价数；举报在「举报处理」里处理。",
+      "search": "搜索评价内容",
       "rating": "评分",
       "any_rating": "全部评分",
       "has_rating": "是否评分",
       "rated": "有评分",
       "unrated": "无评分",
       "useful": "有用数",
-      "score": "{score} 分",
       "reactions": "有用 {useful} · 不赞同 {dislike} · 有趣 {fun}",
-      "delete_title": "删除评论",
-      "delete_help": "永久删除评论及其反应，完整内容写入操作日志。"
+      "visibility": "显示状态",
+      "statuses": {
+        "visible": "显示中",
+        "hidden": "已隐藏"
+      },
+      "hide": "隐藏评价",
+      "unhide": "取消隐藏",
+      "delete": "删除评价",
+      "hide_help": "隐藏后只有作者自己能看到，评分不再计入专辑。",
+      "unhide_help": "评价会重新显示，评分重新计入专辑。",
+      "delete_help": "永久删除评价及其反应和举报，完整内容写入操作日志。",
+      "done_hide": "已隐藏",
+      "done_unhide": "已取消隐藏",
+      "done_delete": "已删除"
     },
     "articles": {
       "title": "文章管理",
@@ -1266,7 +1269,7 @@
         "user": "用户",
         "role": "角色",
         "article": "文章",
-        "album_review": "评论",
+        "album_review": "评价",
         "lyric": "歌词",
         "event": "活动",
         "event_series": "活动系列",
@@ -1436,7 +1439,9 @@
         "shout_hide": "成立并隐藏留言",
         "shout_delete": "成立并删除留言",
         "hide": "认可举报并隐藏文章",
-        "lock": "认可举报并锁定文章"
+        "lock": "认可举报并锁定文章",
+        "review_hide": "成立并隐藏评价",
+        "review_delete": "成立并删除评价"
       },
       "confirm_help": "同一篇文章的所有待处理举报都会结案。",
       "resolved": "已处理",
@@ -1446,7 +1451,8 @@
         "all": "全部",
         "article": "文章",
         "post": "帖子",
-        "shout": "留言"
+        "shout": "留言",
+        "review": "评价"
       },
       "confirm_help_post": "同一条帖子的所有待处理举报都会结案。被自动折叠的帖子在驳回后会恢复。",
       "silence": "同时禁言作者",
@@ -1509,7 +1515,7 @@
       },
       "restrictions": {
         "title": "用户限制",
-        "description": "按范围限制用户：讨论区禁言、禁止改歌词、禁止发留言。到期自动解除，也可以提前撤销。",
+        "description": "按范围限制用户：讨论区禁言、禁止改歌词、禁止发留言、禁止写评价。到期自动解除，也可以提前撤销。",
         "tabs": {
           "active": "生效中",
           "all": "全部"
@@ -1530,11 +1536,13 @@
         "scopes": {
           "discussions": "讨论区",
           "lyrics": "歌词",
-          "shouts": "留言"
+          "shouts": "留言",
+          "reviews": "评价"
         },
         "help_discussions": "禁言期间可以看帖、点表情、收藏和举报，不能发帖、回复和编辑。",
         "help_lyrics": "限制期间不能新增或修改歌词。",
-        "help_shouts": "限制期间不能发布或修改留言，已有留言也不再显示。"
+        "help_shouts": "限制期间不能发布或修改留言，已有留言也不再显示。",
+        "help_reviews": "限制期间不能发布或修改专辑评价，已有评价照常显示。"
       },
       "post_statuses": {
         "visible": "正常",
@@ -1648,7 +1656,7 @@
     },
     "shouts": {
       "title": "留言",
-      "description": "专辑页和艺术家页上的留言。可以隐藏或删除违规留言，举报在「举报处理」里处理。",
+      "description": "艺术家页上的留言。可以隐藏或删除违规留言，举报在「举报处理」里处理。",
       "search": "搜索留言内容",
       "visibility": "显示状态",
       "statuses": {
@@ -1728,7 +1736,7 @@
         "event_series": "活动系列",
         "user": "用户",
         "article": "文章",
-        "album_review": "评论",
+        "album_review": "评价",
         "discussion_post": "讨论帖"
       },
       "fields": {
@@ -2616,13 +2624,9 @@
       "title": "我的评价",
       "description": "分享你对听过专辑的感想和评分。",
       "total": "评价总数",
-      "average": "平均评分",
-      "scored": "已评分",
       "count": "共 {count} 条评价",
       "sort_newest": "最新优先",
       "sort_oldest": "最早优先",
-      "sort_highest": "最高分",
-      "sort_lowest": "最低分",
       "delete_title": "删除评价",
       "delete_confirm": "确定要删除这条评价吗？此操作无法撤销。",
       "load_failed": "评价加载失败，请刷新后重试。",
@@ -2848,23 +2852,6 @@
     "format_lrc": "LRC（带时间轴）",
     "format_srt": "SRT 字幕"
   },
-  "review_ui": {
-    "count": "共 {count} 条",
-    "load_more": "查看更多 · 还有 {count} 条",
-    "helpful": "有帮助",
-    "unhelpful": "没帮助",
-    "funny": "欢乐",
-    "score": "评分",
-    "language": "评价语言",
-    "content": "评价内容",
-    "placeholder": "分享你对这张专辑的想法…支持 Markdown 格式。",
-    "markdown": "支持 Markdown",
-    "submit": "提交评价",
-    "just_now": "刚刚",
-    "minutes_ago": "{count} 分钟前",
-    "hours_ago": "{count} 小时前",
-    "days_ago": "{count} 天前"
-  },
   "content_display": {
     "articles": "文章",
     "new_article": "新建文章",
@@ -2966,29 +2953,7 @@
     "album": "所属专辑",
     "favorited_at": "收藏时间",
     "actions": "操作",
-    "no_album": "无专辑",
-    "empty_reviews": "还没有任何评价",
-    "empty_reviews_hint": "写下第一条评价，分享你对专辑的看法。",
-    "discover_albums": "发现专辑",
-    "collapse": "收起",
-    "expand": "展开",
-    "edited": "已编辑",
-    "helpful": "有用",
-    "unhelpful": "无用",
-    "funny": "欢乐",
-    "write_review": "写评价",
-    "edit_review": "编辑评价",
-    "select_album": "选择专辑",
-    "search_album": "搜索专辑名称或艺术家…",
-    "no_search_results": "未找到匹配的专辑",
-    "score": "评分（0–10）",
-    "optional": "可选",
-    "clear": "清除",
-    "review_content": "评价内容",
-    "review_placeholder": "分享你对这张专辑的想法…",
-    "update_review": "更新评价",
-    "submit_review": "提交评价",
-    "submit_failed": "提交失败，请稍后重试。"
+    "no_album": "无专辑"
   },
   "account_pages": {
     "title": "账户设置",
@@ -3684,7 +3649,8 @@
       "user_restricted": {
         "discussions": "你在讨论区被暂时禁言",
         "lyrics": "你暂时不能新增或修改歌词",
-        "shouts": "你暂时不能发布留言"
+        "shouts": "你暂时不能发布留言",
+        "reviews": "你暂时不能发布或修改评价"
       },
       "article_hidden": "你的文章「{title}」被版主隐藏",
       "article_locked": "你的文章「{title}」被版主锁定",
@@ -4029,6 +3995,59 @@
       "illegal": "违法",
       "other": "其他"
     }
+  },
+  "reviews": {
+    "title": "评价",
+    "count": "{count} 条",
+    "sort": {
+      "latest": "最新",
+      "useful": "最有用",
+      "liked_most": "最喜欢的在前",
+      "liked_least": "最不喜欢的在前"
+    },
+    "mine": "我的评价",
+    "hidden": "已隐藏",
+    "hidden_hint": "已被管理员隐藏，只有你自己能看到",
+    "write": "写评价",
+    "edit": "修改评价",
+    "update": "保存修改",
+    "submit": "发布评价",
+    "submit_failed": "发布失败，请稍后再试",
+    "login": "登录后写评价",
+    "empty": "还没有评价，来写第一条吧",
+    "more": "更多",
+    "delete_confirm": "删除你的评价？评分也会一起删除。",
+    "report": "举报",
+    "reported": "已举报",
+    "expand": "展开",
+    "collapse": "收起",
+    "edited": "已编辑",
+    "reactions": {
+      "useful": "有用",
+      "dislike": "不赞同",
+      "fun": "有趣"
+    },
+    "rating": "评分",
+    "rating_hint": "评分可选，写下评价才能评分",
+    "ratings": {
+      "love": "非常喜欢",
+      "like": "喜欢",
+      "okay": "还行",
+      "meh": "不太喜欢",
+      "dislike": "不喜欢"
+    },
+    "language": "语言",
+    "content": "评价内容",
+    "placeholder": "说说你听后的感受…",
+    "rating_title": "评分",
+    "no_ratings": "还没有人评分",
+    "rating_count": "{count} 人评分",
+    "rating_few": "{count} 人评分，满 {min} 人显示平均分",
+    "page_ratings": "本页评分",
+    "page_rated": "本页已评分",
+    "mine_empty": "还没有写过评价",
+    "mine_empty_hint": "在专辑页写下你的感受，也可以顺便评分",
+    "discover_albums": "去找专辑"
   },
   "versions": {
     "title": "版本历史",

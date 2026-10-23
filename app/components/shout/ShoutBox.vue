@@ -43,7 +43,6 @@
         <div class="min-w-0 flex-1">
           <p class="flex flex-wrap items-center gap-x-2 text-xs">
             <NuxtLink :to="`/profile/${shout.user?.username}`" class="font-semibold text-gray-700 hover:underline">{{ shout.user?.nickname || shout.user?.username }}</NuxtLink>
-            <span v-if="shout.tracking_status" class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">{{ $t(`album.stats.${shout.tracking_status}`) }}</span>
             <time class="text-gray-400" :datetime="shout.updated_at" :title="exact(shout.updated_at)">{{ ago(shout.updated_at) }}</time>
             <button
               v-if="isAuthenticated && shout.user?.username !== user?.username"
@@ -95,7 +94,7 @@ import type { Shout, ShoutPage } from '~/types/shout'
 import { SHOUT_MAX_LENGTH } from '~/types/shout'
 import { Flag, MessageSquareQuote } from '@lucide/vue'
 
-const props = defineProps<{ resource: 'albums' | 'artists', id: number }>()
+const props = defineProps<{ resource: 'artists', id: number }>()
 
 const REPORT_REASONS = ['spam', 'abuse', 'spoiler', 'off_topic', 'infringement', 'illegal', 'other'] as const
 

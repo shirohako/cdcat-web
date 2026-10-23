@@ -1,75 +1,57 @@
-/**
- * 评价管理 - 数据模型和接口定义
- * 用户可以对专辑发表评价（文字感想）并可选打分（0-10分）
- */
+// 评价 on album pages: Markdown text with an optional 1–5 rating, one per user per album.
+// Backend: docs/api/reviews.md.
 
-// 排序选项
-export type ReviewSortBy = 'date_desc' | 'date_asc' | 'score_desc' | 'score_asc'
+import type { AlbumSimple } from './album'
+import type { UserSummary } from './catalog'
+import type { TrackingStatus } from './tracking'
 
-// 艺术家信息
-export interface ReviewArtist {
+export const REVIEW_MAX_LENGTH = 5000
+
+/** 1 不喜欢 … 5 非常喜欢: how much the listener liked it, not a quality score. */
+export type ReviewRating = 1 | 2 | 3 | 4 | 5
+
+export type ReactionType = 'useful' | 'dislike' | 'fun'
+
+export type ReviewSort = 'latest' | 'useful'
+
+export interface AlbumReview {
   id: number
-  name: string
-  image_url?: string
+  user_id: number
+  album_id: number
+  content: string
+  language: string | null
+  rating: ReviewRating | null
+  useful_count: number
+  dislike_count: number
+  fun_count: number
+  /** Hidden by a moderator; only the writer still sees it. */
+  is_hidden: boolean
+  user?: UserSummary | null
+  /** The writer's listening status of the album, in album lists. */
+  tracking_status: TrackingStatus | null
+  /** The viewer's reactions to this review. */
+  my_reactions: ReactionType[]
+  /** In the viewer's own list (/me/reviews). */
+  album?: AlbumSimple
+  created_at: string
+  updated_at: string
 }
 
-// 评价互动计数（类似 Steam）
-export interface ReviewReactions {
-  helpful: number             // 有用
-  unhelpful: number           // 无用
-  funny: number               // 欢乐
-}
-
-// 用户评价
-export interface UserReview {
-  id: number
-  albumId: number
-  albumTitle: string
-  albumImageUrl: string
-  artists: ReviewArtist[]
-  content: string             // 评价内容
-  score: number | null        // 0-10 分，null 表示未评分
-  reactions: ReviewReactions  // 互动计数
-  createdAt: string           // 创建时间
-  updatedAt: string           // 更新时间
-}
-
-// 评价统计
-export interface ReviewStats {
-  totalReviews: number
-  averageScore: number        // 仅计算有评分的平均值，无评分时为 0
-  scoredCount: number         // 有评分的评价数
-}
-
-// 分页响应
-export interface GetReviewsResponse {
-  data: UserReview[]
+export interface ReviewPagination {
   total: number
-  page: number
-  pageSize: number
+  per_page: number
+  current_page: number
+  last_page: number
 }
 
-// 可搜索的专辑（写评价模态框用）
-export interface SearchableAlbum {
-  id: number
-  title: string
-  imageUrl: string
-  artists: ReviewArtist[]
-  releaseDate: string
-  catalogNumber: string
+export interface ReviewPage {
+  reviews: AlbumReview[]
+  pagination: ReviewPagination
+  /** The viewer's own review of the album, hidden or not. */
+  mine: AlbumReview | null
 }
 
-// 创建评价请求
-export interface CreateReviewRequest {
-  albumId: number
-  content: string
-  score: number | null
-  language?: string
-}
-
-// 更新评价请求
-export interface UpdateReviewRequest {
-  reviewId: number
-  content: string
-  score: number | null
+/** What the editor needs to edit an existing review. */
+export type ReviewDraft = Pick<AlbumReview, 'album_id' | 'content' | 'rating' | 'language'> & {
+  album?: { id: number, title: string, image_url: string | null }
 }

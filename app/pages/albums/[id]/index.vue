@@ -19,13 +19,8 @@
 
             <AlbumCredits :credits="album.credits" />
 
-            <!-- Albums awaiting review can only be viewed: reviews, shouts and tracking open after approval. -->
-            <template v-if="!album.is_pending">
-              <AlbumReviews :initial-reviews="album.reviews ?? []" :reviews-count="album.reviews_count" :album-id="String(album.id)" />
-              <AlbumReviewModal v-model="showReviewModal" :album-id="String(album.id)" @saved="refresh" />
-
-              <ShoutBox :id="album.id" resource="albums" />
-            </template>
+            <!-- Albums awaiting review can only be viewed: reviews and tracking open after approval. -->
+            <AlbumReviews v-if="!album.is_pending" ref="reviews" :album-id="album.id" @changed="refresh" />
           </div>
 
           <div class="space-y-6 lg:col-span-1">
@@ -35,7 +30,7 @@
             </div>
             <AlbumTracking v-else :album-id="String(album.id)" :initial-tracking="album.user_tracking" @tracked="setTracking" />
             <AlbumStats :views-count="album.views_count" :favorites-count="album.favorites_count" :tracking-stats="album.tracking_stats" />
-            <AlbumRankings v-if="!album.is_pending" :user-score="album.rating" :rating-count="album.reviews_count" @write-review="writeReview" />
+            <AlbumRankings v-if="!album.is_pending" :rating="album.rating" :rating-count="album.rating_count" :distribution="album.rating_distribution" @write-review="reviews?.openEditor()" />
             <AlbumInfo :album="album" />
             <AlbumLinks :links="album.links" />
             <AlbumArticles :articles="album.articles ?? []" />
@@ -62,8 +57,6 @@ import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
 
 const route = useRoute()
-const router = useRouter()
-const { isAuthenticated } = useAuth()
 const { localName } = useCatalogDisplay()
 
 const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${route.params.id}`)
@@ -84,15 +77,7 @@ const setTracking = (tracking: TrackingStatus | null) => mutate((current) => {
 })
 
 const gallery = ref<{ openCover: () => void } | null>(null)
-const showReviewModal = ref(false)
-
-const writeReview = () => {
-  if (!isAuthenticated.value) {
-    navigateTo({ path: '/auth/login', query: { redirect: router.currentRoute.value.fullPath } })
-    return
-  }
-  showReviewModal.value = true
-}
+const reviews = ref<{ openEditor: () => void } | null>(null)
 
 const seoTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : 'Album')
 const seoDescription = computed(() => album.value?.description?.slice(0, 160) || (album.value ? `${album.value.title} on CDCAT.` : 'Music album details on CDCAT.'))

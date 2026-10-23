@@ -35,9 +35,7 @@
       "bonuses": "特典",
       "credits": "クレジット",
       "tracklist": "トラックリスト",
-      "reviews": "レビュー",
       "artists": "アーティスト",
-      "rankings": "ランキング",
       "links": "リンク",
       "articles": "関連記事",
       "contributors": "貢献者",
@@ -65,9 +63,7 @@
       "other_recordings_hint": "同じ曲が他の作品にも収録されています",
       "translate": "翻訳"
     },
-    "actions": {
-      "write_review": "レビューを書く"
-    },
+    "actions": {},
     "empty": {
       "products_title": "商品情報がありません",
       "products_desc": "このアルバムには商品がまだ紐づいていません",
@@ -85,13 +81,9 @@
       "articles_desc": "このアルバムには記事がまだ紐づいていません",
       "contributors_title": "貢献者はいません",
       "contributors_desc": "最初の貢献者になりましょう",
-      "reviews_title": "レビューはまだありません",
-      "reviews_desc": "最初のレビューを書いてみましょう",
       "lyrics_title": "歌詞がありません",
       "lyrics_desc": "右上の「歌詞・翻訳を投稿」から貢献できます",
-      "content": "内容がありません",
-      "ratings": "評価はまだありません",
-      "rankings": "ランキングデータがありません"
+      "content": "内容がありません"
     },
     "gallery": {
       "count": "{count} 枚",
@@ -226,9 +218,7 @@
     "recent_reviews": "最近のレビュー",
     "favorites": "お気に入りアルバム",
     "top_artists": "お気に入りアーティスト",
-    "music_taste": "音楽の好み",
     "total": "合計",
-    "genres": "ジャンル",
     "not_found": "ユーザーが見つかりません",
     "not_found_desc": "ユーザー {'@'}{username} は存在しないか、退会済みです",
     "favorite_tracks": "お気に入り曲",
@@ -741,13 +731,9 @@
       "title": "自分のレビュー",
       "description": "聴いたアルバムの感想と評価を共有しましょう。",
       "total": "レビュー数",
-      "average": "平均評価",
-      "scored": "評価済み",
       "count": "全{count}件",
       "sort_newest": "新しい順",
       "sort_oldest": "古い順",
-      "sort_highest": "評価が高い順",
-      "sort_lowest": "評価が低い順",
       "delete_title": "レビューを削除",
       "delete_confirm": "このレビューを削除しますか？この操作は取り消せません。",
       "load_failed": "レビューを読み込めませんでした。ページを再読み込みしてもう一度お試しください。",
@@ -973,23 +959,6 @@
     "format_lrc": "LRC（タイムタグ付き）",
     "format_srt": "SRT 字幕"
   },
-  "review_ui": {
-    "count": "全{count}件",
-    "load_more": "もっと見る · 残り{count}件",
-    "helpful": "参考になった",
-    "unhelpful": "参考にならなかった",
-    "funny": "面白い",
-    "score": "評価",
-    "language": "レビューの言語",
-    "content": "レビュー本文",
-    "placeholder": "このアルバムへの感想を共有しましょう…Markdownを利用できます。",
-    "markdown": "Markdown対応",
-    "submit": "レビューを投稿",
-    "just_now": "たった今",
-    "minutes_ago": "{count}分前",
-    "hours_ago": "{count}時間前",
-    "days_ago": "{count}日前"
-  },
   "content_display": {
     "articles": "記事",
     "new_article": "記事を作成",
@@ -1091,29 +1060,7 @@
     "album": "収録アルバム",
     "favorited_at": "追加日",
     "actions": "操作",
-    "no_album": "アルバム情報なし",
-    "empty_reviews": "レビューはまだありません",
-    "empty_reviews_hint": "最初のレビューを書いて、アルバムへの感想を共有しましょう。",
-    "discover_albums": "アルバムを探す",
-    "collapse": "閉じる",
-    "expand": "もっと見る",
-    "edited": "編集済み",
-    "helpful": "参考になった",
-    "unhelpful": "参考にならなかった",
-    "funny": "面白い",
-    "write_review": "レビューを書く",
-    "edit_review": "レビューを編集",
-    "select_album": "アルバムを選択",
-    "search_album": "アルバム名またはアーティスト名で検索…",
-    "no_search_results": "一致するアルバムが見つかりません",
-    "score": "評価（0〜10）",
-    "optional": "任意",
-    "clear": "クリア",
-    "review_content": "レビュー本文",
-    "review_placeholder": "このアルバムへの感想を共有しましょう…",
-    "update_review": "レビューを更新",
-    "submit_review": "レビューを投稿",
-    "submit_failed": "レビューを投稿できませんでした。しばらくしてからもう一度お試しください。"
+    "no_album": "アルバム情報なし"
   },
   "account_pages": {
     "title": "アカウント設定",
@@ -1809,7 +1756,8 @@
       "user_restricted": {
         "discussions": "ディスカッションでの投稿が一時的に制限されました",
         "lyrics": "歌詞の追加・編集が一時的に制限されました",
-        "shouts": "コメントの投稿が一時的に制限されました"
+        "shouts": "コメントの投稿が一時的に制限されました",
+        "reviews": "レビューの投稿・編集が一時的に制限されました"
       },
       "article_hidden": "記事「{title}」がモデレーターにより非公開になりました",
       "article_locked": "記事「{title}」がモデレーターによりロックされました",
@@ -2154,6 +2102,59 @@
       "illegal": "違法",
       "other": "その他"
     }
+  },
+  "reviews": {
+    "title": "レビュー",
+    "count": "{count} 件",
+    "sort": {
+      "latest": "新着",
+      "useful": "参考になった順",
+      "liked_most": "好きな順",
+      "liked_least": "好きではない順"
+    },
+    "mine": "あなたのレビュー",
+    "hidden": "非表示",
+    "hidden_hint": "管理者により非表示になりました。あなたにだけ表示されています",
+    "write": "レビューを書く",
+    "edit": "レビューを編集",
+    "update": "変更を保存",
+    "submit": "投稿する",
+    "submit_failed": "投稿できませんでした。しばらくしてからお試しください",
+    "login": "ログインしてレビューを書く",
+    "empty": "まだレビューはありません。最初のレビューを書いてみましょう",
+    "more": "もっと見る",
+    "delete_confirm": "レビューを削除しますか？評価も一緒に削除されます。",
+    "report": "通報",
+    "reported": "通報しました",
+    "expand": "続きを読む",
+    "collapse": "閉じる",
+    "edited": "編集済み",
+    "reactions": {
+      "useful": "参考になった",
+      "dislike": "同意しない",
+      "fun": "おもしろい"
+    },
+    "rating": "評価",
+    "rating_hint": "評価は任意です。評価するにはレビュー本文が必要です",
+    "ratings": {
+      "love": "とても好き",
+      "like": "好き",
+      "okay": "まあまあ",
+      "meh": "あまり好きではない",
+      "dislike": "好きではない"
+    },
+    "language": "言語",
+    "content": "レビュー本文",
+    "placeholder": "聴いた感想を書いてみましょう…",
+    "rating_title": "評価",
+    "no_ratings": "まだ評価はありません",
+    "rating_count": "{count} 人が評価",
+    "rating_few": "{count} 人が評価（{min} 人以上で平均を表示）",
+    "page_ratings": "このページの評価",
+    "page_rated": "このページの評価済み",
+    "mine_empty": "まだレビューを書いていません",
+    "mine_empty_hint": "アルバムページで感想を書き、評価もつけられます",
+    "discover_albums": "アルバムを探す"
   },
   "versions": {
     "title": "編集履歴",

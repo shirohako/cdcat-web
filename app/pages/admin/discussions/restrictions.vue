@@ -9,8 +9,8 @@ const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const { localizeError } = useLocalizedApiError(t)
 const { hasPermission } = useAuth()
-/** Each scope is managed with its own permission: discussions, lyrics, shouts. */
-const SCOPES = { discussions: 'discussions.moderate', lyrics: 'lyrics.manage', shouts: 'shouts.manage' } as const
+/** Each scope is managed with its own permission: discussions, lyrics, shouts, reviews. */
+const SCOPES = { discussions: 'discussions.moderate', lyrics: 'lyrics.manage', shouts: 'shouts.manage', reviews: 'reviews.manage' } as const
 type Scope = keyof typeof SCOPES
 const scopes = computed(() => (Object.keys(SCOPES) as Scope[]).filter(key => hasPermission(SCOPES[key])))
 const scope = computed<Scope>(() => scopes.value.includes(route.query.scope as Scope) ? route.query.scope as Scope : scopes.value[0] ?? 'discussions')

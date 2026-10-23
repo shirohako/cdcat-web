@@ -12,7 +12,7 @@ const { t } = useAdminI18n()
 const { hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError(t)
 const status = computed(() => route.query.status === 'handled' ? 'handled' : 'pending')
-const type = computed(() => ['article', 'post', 'shout'].includes(String(route.query.type)) ? String(route.query.type) : undefined)
+const type = computed(() => ['article', 'post', 'shout', 'review'].includes(String(route.query.type)) ? String(route.query.type) : undefined)
 const articleId = computed(() => route.query.article_id ? Number(route.query.article_id) : undefined)
 const postId = computed(() => route.query.post_id ? Number(route.query.post_id) : undefined)
 const page = computed({
@@ -29,6 +29,7 @@ const kinds = computed(() => [
   ...(hasPermission('articles.manage') ? ['article'] : []),
   ...(hasPermission('discussions.moderate') ? ['post'] : []),
   ...(hasPermission('shouts.manage') ? ['shout'] : []),
+  ...(hasPermission('reviews.manage') ? ['review'] : []),
 ])
 const bothKinds = computed(() => kinds.value.length > 1)
 
@@ -52,7 +53,7 @@ async function resolve(note: string) {
     await $api('/v1/admin/reports/resolve', {
       method: 'POST',
       body: {
-        [target.type === 'post' ? 'post_id' : target.type === 'shout' ? 'shout_id' : 'article_id']: target.id, decision: current.decision,
+        [`${target.type}_id`]: target.id, decision: current.decision,
         action: current.decision === 'accept' ? current.action : undefined, note: note || undefined,
         silence_days: target.type === 'post' && current.decision === 'accept' && silenceDays.value !== '' ? Number(silenceDays.value) : undefined,
       },
@@ -66,12 +67,12 @@ async function resolve(note: string) {
 }
 const targetLink = (group: AdminReportGroup) => group.target.type === 'post'
   ? `/discussions/${group.target.topic_id}?post=${group.target.id}`
-  : group.target.type === 'shout'
-    ? (group.target.album_id ? `/albums/${group.target.album_id}` : `/artists/${group.target.artist_id}`)
-    : `/admin/articles/${group.target.id}`
+  : group.target.type === 'shout' ? `/artists/${group.target.artist_id}`
+    : group.target.type === 'review' ? `/albums/${group.target.album_id}`
+      : `/admin/articles/${group.target.id}`
 const statusLabel = (group: AdminReportGroup) => !group.target.status ? ''
   : group.target.type === 'post' ? t(`admin_pages.discussions.post_statuses.${group.target.status}`)
-    : group.target.type === 'shout' ? t(`admin_pages.shouts.statuses.${group.target.status}`)
+    : group.target.type === 'shout' || group.target.type === 'review' ? t(`admin_pages.shouts.statuses.${group.target.status}`)
       : t(`admin_pages.articles.statuses.${group.target.status}`)
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 useHead({ title: computed(() => t('admin_pages.reports.title')) })
@@ -103,7 +104,7 @@ useHead({ title: computed(() => t('admin_pages.reports.title')) })
             <div class="min-w-0 flex-1">
               <p class="text-[11px] font-medium text-slate-400">{{ t(`admin_pages.reports.types.${group.target.type}`) }}<template v-if="group.target.type === 'post'"> · {{ group.target.floor ? `#${group.target.floor}` : t('admin_pages.discussions.reply_under', { floor: group.target.parent_floor }) }}</template></p>
               <NuxtLink :to="targetLink(group)" class="font-semibold underline decoration-slate-200 underline-offset-4">{{ group.target.title || t('admin_pages.articles.untitled') }}</NuxtLink>
-              <p v-if="(group.target.type === 'post' || group.target.type === 'shout') && group.target.excerpt" class="mt-1 line-clamp-2 text-xs text-slate-600">{{ group.target.excerpt }}</p>
+              <p v-if="group.target.type !== 'article' && group.target.excerpt" class="mt-1 line-clamp-2 text-xs text-slate-600">{{ group.target.excerpt }}</p>
               <p class="mt-0.5 text-xs text-slate-500">
                 {{ statusLabel(group) }} · {{ group.target.author?.nickname || group.target.author?.username }}
                 · {{ t('admin_pages.reports.count', { count: group.reports_count }) }}
@@ -112,7 +113,7 @@ useHead({ title: computed(() => t('admin_pages.reports.title')) })
             <div class="flex flex-wrap gap-1.5 text-xs">
               <button type="button" class="rounded-lg border px-2.5 py-1.5" @click="start(group, 'dismiss')">{{ t('admin_pages.reports.dismiss') }}</button>
               <button type="button" class="rounded-lg border px-2.5 py-1.5" @click="start(group, 'accept', 'none')">{{ t('admin_pages.reports.accept_only') }}</button>
-              <template v-if="group.target.type === 'shout'">
+              <template v-if="group.target.type === 'shout' || group.target.type === 'review'">
                 <button v-if="group.target.status !== 'hidden'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="start(group, 'accept', 'hide')">{{ t('admin_pages.reports.accept_hide_shout') }}</button>
                 <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">{{ t('admin_pages.reports.accept_delete_shout') }}</button>
               </template>
@@ -142,7 +143,8 @@ useHead({ title: computed(() => t('admin_pages.reports.title')) })
             <td class="px-4 py-2">
               <NuxtLink v-if="report.article" :to="`/admin/articles/${report.article.id}`" class="underline">{{ report.article.title || t('admin_pages.articles.untitled') }}</NuxtLink>
               <NuxtLink v-else-if="report.post?.topic" :to="`/discussions/${report.post.topic.id}?post=${report.post.id}`" class="underline">{{ report.post.topic.title }}<span v-if="report.post.floor" class="text-slate-400"> #{{ report.post.floor }}</span></NuxtLink>
-              <NuxtLink v-else-if="report.shout" :to="report.shout.album_id ? `/albums/${report.shout.album_id}` : `/artists/${report.shout.artist_id}`" class="line-clamp-1 underline">{{ t('admin_pages.shouts.title') }}：{{ report.shout.content }}</NuxtLink>
+              <NuxtLink v-else-if="report.shout" :to="`/artists/${report.shout.artist_id}`" class="line-clamp-1 underline">{{ t('admin_pages.shouts.title') }}：{{ report.shout.content }}</NuxtLink>
+              <NuxtLink v-else-if="report.review" :to="`/albums/${report.review.album_id}`" class="line-clamp-1 underline">{{ t('admin_pages.reviews.title') }}：{{ report.review.content }}</NuxtLink>
               <span v-else class="text-slate-400">—</span>
             </td>
             <td class="px-4 py-2 text-xs">{{ t(`admin_pages.reports.reasons.${report.reason}`) }}</td>
