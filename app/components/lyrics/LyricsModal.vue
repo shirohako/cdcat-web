@@ -1,29 +1,26 @@
 <template>
-  <Teleport to="body">
-    <div v-if="modelValue && workId" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="close" />
-      <div class="relative flex max-h-[88vh] w-full max-w-3xl flex-col rounded-2xl bg-white shadow-2xl">
-        <div class="flex shrink-0 items-center gap-2.5 border-b border-gray-100 px-6 py-4">
-          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-50"><FileText :size="15" class="text-sky-500" /></div>
-          <div class="min-w-0">
-            <h2 class="text-base font-bold text-gray-900">{{ $t('lyrics_ui.lyrics_and_translations') }}</h2>
-            <p v-if="title" class="mt-0.5 truncate text-xs text-gray-400">{{ title }}</p>
-          </div>
-          <NuxtLink :to="`/works/${workId}`" class="hover:underline ml-auto text-xs text-gray-500" @click="close">{{ $t('works.open') }}</NuxtLink>
-          <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full hover:bg-gray-100" @click="close"><X :size="18" class="text-gray-400" /></button>
-        </div>
-        <div class="overflow-y-auto px-6 py-4">
-          <LyricsPanel :key="workId" :work-id="workId" />
-        </div>
-      </div>
-    </div>
-  </Teleport>
+  <EditorModal
+    v-model="open"
+    as="div"
+    wide
+    :title="title || $t('lyrics_ui.lyrics_and_translations')"
+    :description="title ? $t('lyrics_ui.lyrics_and_translations') : undefined"
+    :icon="FileText"
+    tone="sky"
+  >
+    <template #actions>
+      <NuxtLink v-if="trackId" :to="`/tracks/${trackId}`" class="btn btn-ghost btn-xs mt-0.5 shrink-0 gap-1 font-normal text-gray-500" @click="open = false">
+        {{ $t('lyrics_ui.open_track') }}<ArrowUpRight :size="12" />
+      </NuxtLink>
+    </template>
+    <LyricsPanel v-if="trackId" :key="trackId" :track-id="trackId" />
+  </EditorModal>
 </template>
 
 <script setup lang="ts">
-import { FileText, X } from '@lucide/vue'
+import { ArrowUpRight, FileText } from '@lucide/vue'
 
-defineProps<{ modelValue: boolean, workId: number | null, title?: string }>()
-const emit = defineEmits<{ 'update:modelValue': [boolean] }>()
-const close = () => emit('update:modelValue', false)
+/** The lyrics of one track over the album page; the panel is the same as on the track page. */
+defineProps<{ trackId: number | null, title?: string }>()
+const open = defineModel<boolean>({ required: true })
 </script>

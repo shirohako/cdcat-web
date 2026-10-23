@@ -4,8 +4,8 @@ import type { AdminAttributeDefinition } from '~/types/admin'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const VALUE_TYPES = ['text', 'integer', 'decimal', 'date', 'url', 'boolean', 'choice', 'reference'] as const
-const SUBJECTS = ['album', 'track', 'album_image', 'work', 'artist', 'label'] as const
-const REFERENCE_TYPES = ['album', 'artist', 'label', 'work', 'entry', 'franchise'] as const
+const SUBJECTS = ['album', 'track', 'album_image', 'artist', 'label'] as const
+const REFERENCE_TYPES = ['album', 'artist', 'label', 'entry', 'franchise'] as const
 const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
 
 const { $api } = useNuxtApp()

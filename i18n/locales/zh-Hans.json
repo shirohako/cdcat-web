@@ -59,9 +59,8 @@
       "translation_with_count": "翻译 {count}",
       "language": "曲目表语言",
       "original": "原文",
-      "other_recordings": "另有 {count} 个录音",
-      "other_recordings_hint": "这首歌也收录在其他专辑中",
-      "translate": "翻译"
+      "translate": "翻译",
+      "original_songs": "原曲："
     },
     "actions": {},
     "empty": {
@@ -612,7 +611,6 @@
       "franchise": "系列",
       "track": "曲目",
       "label": "厂牌",
-      "work": "乐曲",
       "lyric": "歌词"
     },
     "impact": "删除影响",
@@ -669,7 +667,6 @@
       "all_logs": "全部日志",
       "view_system": "运行状态",
       "labels": "厂牌",
-      "works": "乐曲",
       "shouts": "留言",
       "conflicted": "{count} 条有冲突",
       "unchecked_lyrics": "待巡查歌词",
@@ -806,7 +803,6 @@
       "reports_resolve": "处理举报",
       "revisions_request_changes": "退回修订",
       "labels_merge": "合并厂牌",
-      "works_merge": "合并乐曲",
       "credit_roles_create": "新建角色",
       "credit_roles_update": "修改角色",
       "credit_roles_delete": "删除角色",
@@ -862,7 +858,6 @@
         "franchise": "系列",
         "track": "曲目",
         "label": "厂牌",
-        "work": "乐曲",
         "lyric": "歌词"
       },
       "create": "新建{type}",
@@ -936,8 +931,7 @@
         "franchise": "检索和维护系列，包括分组以及系列下的条目和专辑。",
         "track": "跨专辑检索曲目。曲目随专辑一起编辑，点击曲名进入所属专辑的编辑器。",
         "label": "检索和维护厂牌，包括子厂牌和品番前缀。",
-        "work": "检索和维护乐曲（同一首歌在不同专辑里的录音共用一个乐曲），可以合并重复的乐曲。",
-        "lyric": "跨乐曲检索歌词。歌词在乐曲页编辑，日常巡查见「歌词巡查」。"
+        "lyric": "跨曲目检索歌词。歌词在曲目页编辑，日常巡查见「歌词巡查」。"
       },
       "categories": {
         "game": "游戏",
@@ -955,14 +949,12 @@
       "has_lyrics": "是否有歌词",
       "with_lyrics": "有原文歌词",
       "without_lyrics": "没有歌词",
-      "work_id": "乐曲 ID",
       "lyric_kind": "歌词类别",
       "lyric_kinds": {
         "original": "原文",
         "translation": "翻译",
         "transliteration": "注音"
       },
-      "tracks_count": "{count} 首曲目",
       "tab_revisions": "相关修订",
       "current_version": "当前第 {version} 版",
       "open_editor": "在编辑器中修改",
@@ -1001,7 +993,8 @@
       "merge_track_source": "这张专辑的曲目",
       "merge_track_target": "对应到保留方的曲目",
       "merge_track_target_for": "“{title}”对应的曲目",
-      "merge_track_none": "不对应（收藏会删除）"
+      "merge_track_none": "不对应（收藏会删除）",
+      "track_id": "曲目 ID"
     },
     "link_providers": {
       "title": "链接提供方",
@@ -1360,7 +1353,11 @@
     },
     "groups": {
       "overview": "概览",
-      "content": "资料库",
+      "music": "专辑与曲目",
+      "artists": "艺术家与厂牌",
+      "entries": "条目与系列",
+      "events": "活动",
+      "catalog_tools": "采集与图片",
       "catalog_settings": "资料设置",
       "articles": "文章",
       "discussions": "讨论区",
@@ -1368,8 +1365,7 @@
       "community_settings": "社区设置",
       "users": "用户",
       "system": "系统",
-      "mail": "邮件",
-      "harvest": "采集"
+      "mail": "邮件"
     },
     "search_menu": "搜索菜单",
     "no_menu_match": "没有匹配的菜单",
@@ -1680,12 +1676,11 @@
       "levels": "可用层级",
       "is_album_role": "专辑",
       "is_track_role": "曲目",
-      "is_work_role": "乐曲",
-      "levels_help": "乐曲层级的角色（作曲、作词等）也用于同曲候选的打分。",
+      "levels_help": "专辑层级的角色记在整张专辑上，曲目层级的角色记在单个曲目上。",
       "sort_order": "排序",
       "active": "启用",
       "inactive": "已停用",
-      "usage": "使用（专辑 / 曲目 / 乐曲）",
+      "usage": "使用（专辑 / 曲目）",
       "in_use": "已有署名使用这个角色，只能停用。",
       "delete_title": "删除角色 {key}",
       "delete_help": "只有从未被使用的角色可以删除。",
@@ -1720,7 +1715,6 @@
         "album": "专辑",
         "track": "曲目",
         "album_image": "专辑图片",
-        "work": "乐曲",
         "artist": "艺术家",
         "label": "厂牌"
       },
@@ -2937,14 +2931,15 @@
     "translation_of": "对应的原文",
     "summary": "修改说明",
     "summary_placeholder": "可选，例如修正了第 3 行",
-    "empty_hint": "歌词挂在乐曲上，这首歌的所有录音都会显示。",
+    "empty_hint": "歌词挂在曲目上，单曲版、专辑版等各有各的歌词。",
     "moderation_hint": "新歌词和对自己歌词的修改会立即生效，之后由管理员巡查；修改别人的歌词需要审核。",
     "delete_confirm": "确定删除这份歌词？",
     "published": "已发布",
     "pending_review": "已提交，等待审核",
     "format_plain": "纯文本",
     "format_lrc": "LRC（带时间轴）",
-    "format_srt": "SRT 字幕"
+    "format_srt": "SRT 字幕",
+    "open_track": "曲目页面"
   },
   "content_display": {
     "articles": "文章",
@@ -3442,7 +3437,6 @@
       "album": "专辑",
       "artist": "艺术家",
       "label": "厂牌",
-      "work": "乐曲",
       "lyric": "歌词",
       "entry": "条目",
       "franchise": "系列"
@@ -3489,28 +3483,6 @@
       "publisher": "发行",
       "distributor": "经销",
       "manufacturer": "制造",
-      "other": "其他"
-    },
-    "work_relation": {
-      "arranged_from": "改编自",
-      "arrangement": "改编",
-      "covered_from": "翻唱自",
-      "cover": "翻唱",
-      "remixed_from": "混音自",
-      "remix": "混音",
-      "medley": "被收录于组曲",
-      "medley_source": "组曲收录",
-      "version": "其他版本",
-      "related": "相关"
-    },
-    "entry_work_relation": {
-      "bgm": "BGM",
-      "opening": "片头曲",
-      "ending": "片尾曲",
-      "insert_song": "插曲",
-      "theme_song": "主题曲",
-      "character_song": "角色歌",
-      "image_song": "印象曲",
       "other": "其他"
     },
     "artist_relation": {
@@ -3596,7 +3568,6 @@
       "source": "来源",
       "translator": "译者",
       "is_ai_generated": "AI 生成",
-      "work_id": "乐曲",
       "translation_of_id": "原文",
       "platforms": "平台",
       "sort_order": "顺序",
@@ -3643,7 +3614,6 @@
       "relation_type": "关系",
       "character_name": "角色",
       "episode": "集",
-      "related_work_id": "乐曲",
       "related_entry_id": "条目",
       "related_artist_id": "艺术家",
       "locale": "语言",
@@ -3652,7 +3622,9 @@
       "leadout_offset": "导出区",
       "offsets": "偏移",
       "album_id": "专辑",
-      "album_image_id": "图片"
+      "album_image_id": "图片",
+      "original_track_id": "原曲曲目",
+      "original_title": "原曲名称"
     },
     "collection": {
       "titles": "其他名称",
@@ -3673,7 +3645,8 @@
       "links": "链接",
       "entries": "关联条目",
       "relations": "关联",
-      "albums": "专辑"
+      "albums": "专辑",
+      "track_originals": "原曲"
     },
     "credit_role_category": {
       "composition": "作曲",
@@ -4044,32 +4017,15 @@
     "no_results": "没有找到厂牌",
     "not_found": "厂牌不存在。"
   },
-  "works": {
-    "title": "乐曲",
-    "subtitle": "同一首歌在各张专辑中的录音、歌词和改编关系",
-    "label": "乐曲",
-    "recordings": "{count} 个录音",
-    "recordings_title": "收录",
-    "lyrics_count": "{count} 份歌词",
-    "no_recordings": "还没有收录在任何专辑中",
-    "credits": "作者",
-    "relations": "相关乐曲",
-    "entries": "出处",
-    "open": "乐曲页面",
-    "no_results": "没有找到乐曲",
-    "not_found": "乐曲不存在。",
-    "duplicates": {
-      "title": "可能重复的乐曲",
-      "hint": "去掉 Instrumental、TV size 等版本说明后标题相同的乐曲。如果是同一首歌，可以在专辑编辑器里把曲目改挂到同一个乐曲（点击专辑名），或请内容管理员合并；如果不是，标记为不同的歌，它们就不会再出现在这里。",
-      "empty": "现在没有需要检查的乐曲。",
-      "not_same": "不是同一首",
-      "merge": "合并…",
-      "relink_hint": "在编辑器里打开这张专辑，把曲目改挂到另一个乐曲"
-    }
-  },
   "tracks": {
     "not_found": "曲目不存在。",
-    "work": "乐曲：{title}"
+    "originals_section": "原曲",
+    "originals": "这首曲目的原曲",
+    "derived_tracks": "以它为原曲的曲目（{count}）",
+    "album_tracklist": "专辑曲目",
+    "previous": "上一首",
+    "next": "下一首",
+    "edit_hint": "曲目随所属专辑一起编辑"
   },
   "shouts": {
     "title": "留言",
@@ -4283,7 +4239,7 @@
       "add_artist": "添加艺术家…",
       "add_label": "添加厂牌…",
       "credited_as_placeholder": "署名为",
-      "tracks_hint": "曲目号按碟分别计数。在标题里按回车跳到下一首；展开曲目可以设置乐曲、原曲、信息和链接。",
+      "tracks_hint": "曲目号按碟分别计数。在标题里按回车跳到下一首；展开曲目可以设置原曲、信息和链接。",
       "empty_tracklist": "还没有曲目",
       "empty_tracklist_hint": "可以从歌词本、商店页面或 VGMdb 粘贴曲目表，也可以一首一首添加。",
       "disc_n": "Disc {n}",
@@ -4297,7 +4253,7 @@
       "remove_track_confirm": "删除「{title}」？这首曲目的收藏也会被删除。",
       "no_tracks": "这张碟还没有曲目。",
       "track_title": "曲目标题",
-      "track_details": "乐曲、信息与链接",
+      "track_details": "原曲、信息与链接",
       "duplicate_number": "这张碟上有其他曲目用了这个编号",
       "move_to_disc": "移到",
       "totals": "{discs} 张碟 · {tracks} 首曲目",
@@ -4324,30 +4280,6 @@
       "count_mismatch": "但这张碟有 {count} 首曲目",
       "unreadable": "这段文字里没有 TOC 表格。",
       "add": "添加 TOC"
-    },
-    "work": {
-      "song": "乐曲",
-      "auto": "会为这首曲目新建一个乐曲",
-      "recordings": "{count} 个录音",
-      "separate": "设为独立的乐曲",
-      "link_other": "和已有乐曲是同一首…",
-      "search": "搜索乐曲",
-      "hint": "同一首歌的曲目共用歌词和翻译，比如单曲和专辑版本、伴奏版。",
-      "suggestions": "可能是同一首歌",
-      "on_albums": "{count} 首曲目 · {albums}",
-      "same_song": "是同一首",
-      "not_same": "不是同一首",
-      "originals": "原曲",
-      "originals_hint": "改编、翻唱、混音和组曲填写所依据的乐曲。库里还没有时，输入名称就能新建。",
-      "search_original": "搜索原曲，或输入名称新建",
-      "find_same": "查找同一首歌",
-      "found": "有 {count} 首曲目可能是库里已有的乐曲。",
-      "accept_all": "全部关联",
-      "linked": "已关联 {count} 首曲目",
-      "none_found": "没有找到相同的乐曲。",
-      "same_song_badge": "同一首？",
-      "new_badge": "新乐曲",
-      "new_badge_hint": "这条修订会新建这个乐曲"
     },
     "credits": {
       "hint": "每人每个角色一行。可以署名在整张专辑上，也可以选择曲目。",
@@ -4447,14 +4379,11 @@
       "hint": "修订发布时一起建立",
       "remove": "移除",
       "remove_confirm": "专辑里还在用它。仍然移除吗？",
-      "used_tracks": "{count} 首曲目的乐曲",
       "used_credits": "署名 {count} 处",
-      "used_elsewhere": "作为原曲使用",
+      "used_elsewhere": "在其他地方使用",
       "unused": "还没有用到",
-      "add_composer": "添加作曲…",
-      "add_source": "添加出处（游戏、动画……）",
       "edited": "修改{type}",
-      "edited_hint": "从曲目表添加了原曲"
+      "edited_hint": "这条修订同时修改它"
     },
     "entity": {
       "new_title": "新建{type}",
@@ -4473,13 +4402,7 @@
       "parent_label": "上级厂牌",
       "parent_label_hint": "子厂牌或子品牌填写所属的厂牌，比如唱片公司的黑胶品牌。",
       "prefixes_hint": "品番前缀，用逗号分隔。添加专辑时用来猜测厂牌。",
-      "work_hint": "乐曲是同一首歌的各个曲目共用的部分，比如单曲版、专辑版、伴奏版。歌词挂在乐曲上。",
-      "work_credits_hint": "乐曲本身的署名，即谁写了这首歌。主要用于还不在任何专辑里的乐曲，比如游戏原曲。",
       "name_only_credit": "只填署名",
-      "work_relations": "相关乐曲",
-      "work_relations_hint": "从这首乐曲的角度填写原曲、改编、翻唱、混音和组曲。",
-      "work_entries": "出处",
-      "work_entries_hint": "这首歌出自的游戏、动画等作品，比如某个游戏的 BGM。",
       "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。",
       "artist_type_placeholder": "请选择艺术家类型"
     },
@@ -4540,9 +4463,6 @@
       "image_preview": "填写网址后在这里预览",
       "image_no_preview": "无法预览，但仍可以尝试导入",
       "image_kind_guess": "按网址猜测",
-      "original_add": "添加原曲",
-      "original_required": "请选择原曲，或者输入名称新建。",
-      "pick_closes": "选中后立即关联。",
       "new_artist_type": "新艺术家的类型",
       "new_artist_type_required": "请选择新艺术家的类型。"
     },
@@ -4552,6 +4472,15 @@
       "featuring": "添加两位艺术家：先加梶浦由記，连接词选「feat.」；再加 Joelle。",
       "credited": "库里叫「梶浦由記」时，选择梶浦由記，「署名为」填 Yuki Kajiura。",
       "circle": "封面只印社团名时只填社团；作曲、演唱等写在「制作人员」里。"
+    },
+    "originals": {
+      "title": "原曲",
+      "hint": "改编、翻唱、混音和组曲所依据的曲子。优先选库里的曲目；搜不到时，直接把输入的文字存为原曲。",
+      "search": "搜索曲目，或直接输入原曲名",
+      "use_text": "使用文字「{name}」",
+      "text_only": "仅文字",
+      "text_only_hint": "这首原曲还不在库里，只记了名称",
+      "badge": "原曲 {count}"
     }
   },
   "revision_page": {
@@ -4667,7 +4596,6 @@
       "track": "曲目",
       "artist": "艺术家",
       "label": "厂牌",
-      "work": "乐曲",
       "entry": "条目",
       "franchise": "系列"
     }

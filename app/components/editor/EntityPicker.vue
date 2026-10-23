@@ -83,7 +83,7 @@
             @mousemove="active = index"
             @click="choose(option)"
           >
-            <Plus :size="14" class="shrink-0" /><span class="truncate">{{ $t('editor.create_new', { name: option.name }) }}</span>
+            <Plus :size="14" class="shrink-0" /><span class="truncate">{{ $t(createLabel ?? 'editor.create_new', { name: option.name }) }}</span>
           </div>
         </template>
       </div>
@@ -96,7 +96,7 @@ import type { EventOption } from '~/composables/useEventSearch'
 import type { DatePrecision } from '~/types/entry'
 import { Loader2, Plus, Search, X } from '@lucide/vue'
 
-export type PickerKind = 'artist' | 'label' | 'work' | 'entry' | 'album' | 'franchise' | 'event'
+export type PickerKind = 'artist' | 'label' | 'track' | 'entry' | 'album' | 'franchise' | 'event'
 
 export interface PickedEntity {
   id: number
@@ -105,6 +105,8 @@ export interface PickedEntity {
   image_url: string | null
   /** The artist's or entry's type, e.g. game */
   type?: string | null
+  /** A track's album */
+  album_title?: string | null
   /** Awaiting review: still worth picking, so nobody enters it twice. */
   is_pending?: boolean
 }
@@ -114,6 +116,8 @@ const props = defineProps<{
   placeholder?: string
   exclude?: Array<number | string | null>
   allowCreate?: boolean
+  /** The i18n key of the "create" option, given `name`; "Create {name}" by default. */
+  createLabel?: string
   /** Leave out content awaiting review (e.g. merge targets); editors include it by default. */
   excludePending?: boolean
 }>()
@@ -158,17 +162,25 @@ interface Row {
   type?: string | null
   image_url?: string | null
   catalog_prefixes?: string[]
-  tracks_count?: number
+  /** Site search results (tracks): album title and position */
+  meta?: { album_title?: string, disc_number?: number | null, track_number?: number }
   catalog_number?: string | null
   release_date?: string | null
   release_date_precision?: DatePrecision | null
   parent?: { name: string } | null
   is_pending?: boolean
 }
-const endpoints: Record<PickerKind, { url: string, key: string, map: (row: Row) => PickedEntity }> = {
+/** "Album title · 2-05": where a track is. */
+const describeTrack = (row: Row) => {
+  const number = row.meta?.track_number === undefined ? '' : [row.meta.disc_number, String(row.meta.track_number).padStart(2, '0')].filter(part => part !== null && part !== undefined).join('-')
+  return [row.meta?.album_title, number].filter(Boolean).join(' · ')
+}
+
+/** Most kinds search their own list endpoint with `search`; tracks go through the site search, which takes `q`. */
+const endpoints: Record<PickerKind, { url: string, key: string, param?: string, query?: Record<string, string>, map: (row: Row) => PickedEntity }> = {
   artist: { url: '/v1/artists', key: 'artists', map: row => ({ id: row.id, label: row.name ?? '', subtitle: row.type ? enumLabel('artist_type', row.type) : '', image_url: row.image_url ?? null, type: row.type }) },
   label: { url: '/v1/labels', key: 'labels', map: row => ({ id: row.id, label: row.name ?? '', subtitle: (row.catalog_prefixes ?? []).join(', '), image_url: row.image_url ?? null }) },
-  work: { url: '/v1/works', key: 'works', map: row => ({ id: row.id, label: row.title ?? '', subtitle: row.tracks_count ? `${row.tracks_count} ♪` : '', image_url: null }) },
+  track: { url: '/v1/search', key: 'results', param: 'q', query: { type: 'track' }, map: row => ({ id: row.id, label: row.title ?? '', subtitle: describeTrack(row), image_url: row.image_url ?? null, album_title: row.meta?.album_title ?? null }) },
   entry: { url: '/v1/entries', key: 'entries', map: row => ({ id: row.id, label: row.name ?? '', subtitle: [row.type ? enumLabel('entry_type', row.type) : null, formatDate(row.release_date, row.release_date_precision)].filter(Boolean).join(' · '), image_url: row.image_url ?? null, type: row.type }) },
   album: { url: '/v1/albums', key: 'albums', map: row => ({ id: row.id, label: row.title ?? '', subtitle: [row.catalog_number, formatDate(row.release_date, row.release_date_precision)].filter(Boolean).join(' · '), image_url: row.image_url ?? null }) },
   franchise: { url: '/v1/franchises', key: 'franchises', map: row => ({ id: row.id, label: row.name ?? '', subtitle: row.parent ? `↳ ${row.parent.name}` : '', image_url: row.image_url ?? null }) },
@@ -185,7 +197,7 @@ const search = async (value: string) => {
   searching.value = true
   try {
     const endpoint = endpoints[props.kind]
-    const params = { search: value, per_page: 10, ...(props.excludePending || props.kind === 'event' ? {} : { include_pending: 1 }) }
+    const params = { [endpoint.param ?? 'search']: value, ...endpoint.query, per_page: 10, ...(props.excludePending || props.kind === 'event' ? {} : { include_pending: 1 }) }
     const data = await $api<Record<string, Row[]>>(endpoint.url, { query: params, progress: false })
     if (current !== requestId) return
     results.value = (data[endpoint.key] ?? [])

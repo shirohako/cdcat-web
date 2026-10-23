@@ -21,7 +21,6 @@ const sorts: Record<AdminContentType, string[]> = {
   album: ['id', 'title', 'release_date', 'created_at', 'updated_at', 'reviews_count', 'views_count', 'rating', 'track_count'],
   artist: ['id', 'name', 'albums_count', 'followers_count', 'created_at', 'updated_at'],
   label: ['id', 'name', 'albums_count', 'created_at', 'updated_at'],
-  work: ['id', 'title', 'tracks_count', 'lyrics_count', 'created_at', 'updated_at'],
   entry: ['id', 'name', 'release_date', 'created_at', 'updated_at'],
   franchise: ['id', 'name', 'entries_count', 'albums_count', 'created_at', 'updated_at'],
   track: ['id', 'title', 'created_at'],
@@ -29,7 +28,7 @@ const sorts: Record<AdminContentType, string[]> = {
 }
 const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'multimedia_franchise', 'game_adjacent', 'event']
 const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other']
-const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'work_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
+const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'track_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })
 const page = computed({
@@ -43,21 +42,20 @@ const { data, pending, error, refresh } = await useAsyncData(() => `admin-conten
   () => $api<{ items: AdminContentItem[], pagination: AdminPagination }>(`/v1/admin/content/${segment.value}`, { query: query.value }), { watch: [query, type] })
 const items = computed(() => data.value?.items ?? [])
 const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page: 15, current_page: 1, last_page: 1 })
-const label = (item: AdminContentItem) => String(item.title ?? item.name ?? (type.value === 'lyric' ? (item.work as { title?: string } | null)?.title : null) ?? `#${item.id}`)
+const label = (item: AdminContentItem) => String(item.title ?? item.name ?? (type.value === 'lyric' ? (item.track as { title?: string } | null)?.title : null) ?? `#${item.id}`)
 const editable = computed(() => type.value !== 'track')
 const creatable = computed(() => !!adminEditorPath(type.value))
-const recountable = computed(() => ['album', 'artist', 'label', 'work'].includes(type.value))
+const recountable = computed(() => ['album', 'artist', 'label'].includes(type.value))
 const frontLink = (item: AdminContentItem) => type.value === 'track' ? `/tracks/${item.id}`
-  : type.value === 'lyric' ? `/works/${(item.work as { id: number } | null)?.id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
+  : type.value === 'lyric' ? `/tracks/${item.track_id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
 const detail = (item: AdminContentItem) => [
   ...(type.value === 'album' ? [item.catalog_number, item.type, item.release_date, item.track_count ? `${item.track_count} 曲` : null] : []),
   ...(type.value === 'label' ? [((item.catalog_prefixes as string[] | undefined) ?? []).join(', '), t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
-  ...(type.value === 'work' ? [t('admin_pages.content.tracks_count', { count: item.tracks_count }), t('admin_pages.content.lyrics_count', { count: item.lyrics_count })] : []),
-  ...(type.value === 'lyric' ? [item.kind, item.language, item.excerpt] : []),
+  ...(type.value === 'lyric' ? [(item.track as { album?: { title: string } } | null)?.album?.title, item.kind, item.language, item.excerpt] : []),
   ...(type.value === 'artist' ? [item.type && t(`admin_pages.content.artist_types.${item.type}`), item.is_active === false ? t('admin_pages.content.inactive') : null] : []),
   ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
   ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, t('admin_pages.content.entries_count', { count: item.entries_count }), t('admin_pages.content.albums_count', { count: item.albums_count })] : []),
-  ...(type.value === 'track' ? [(item.album as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, (item.work as { title?: string } | null)?.title] : []),
+  ...(type.value === 'track' ? [(item.album as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, item.lyrics_count ? t('admin_pages.content.lyrics_count', { count: item.lyrics_count }) : null] : []),
 ].filter(Boolean).join(' · ')
 
 // ===== Recount =====
@@ -112,11 +110,11 @@ useHead({ title: computed(() => t(`admin_pages.content.tabs.${type.value}`)) })
             <option v-for="value in DISC_FORMATS" :key="value" :value="value">{{ value.toUpperCase() }}</option>
           </select>
         </template>
-        <select v-if="type === 'work'" v-model="filters.has_lyrics" :aria-label="t('admin_pages.content.has_lyrics')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <select v-if="type === 'track'" v-model="filters.has_lyrics" :aria-label="t('admin_pages.content.has_lyrics')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
           <option value="">{{ t('admin_pages.content.has_lyrics') }}</option><option value="1">{{ t('admin_pages.content.with_lyrics') }}</option><option value="0">{{ t('admin_pages.content.without_lyrics') }}</option>
         </select>
         <template v-if="type === 'lyric'">
-          <input v-model="filters.work_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.work_id')" :aria-label="t('admin_pages.content.work_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <input v-model="filters.track_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.track_id')" :aria-label="t('admin_pages.content.track_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
           <input v-model="filters.language" maxlength="20" :placeholder="t('admin_pages.lyrics.language')" :aria-label="t('admin_pages.lyrics.language')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
           <select v-model="filters.kind" :aria-label="t('admin_pages.content.lyric_kind')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
             <option value="">{{ t('admin_pages.content.lyric_kind') }}</option>

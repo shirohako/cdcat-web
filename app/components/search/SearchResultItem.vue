@@ -18,13 +18,13 @@
 <script setup lang="ts">
 import type { DatePrecision } from '~/types/entry'
 import type { SearchResult } from '~/types/search'
-import { Disc3, Library, Mic2, Music, Network, Tag, Tv } from '@lucide/vue'
+import { Disc3, Mic2, Music, Network, Tag, Tv } from '@lucide/vue'
 
 const props = defineProps<{ result: SearchResult, compact?: boolean }>()
 const { t } = useI18n()
 const { formatDate, formatDuration, enumLabel } = useCatalogDisplay()
 
-const ICONS = { album: Disc3, track: Music, artist: Mic2, label: Tag, work: Library, entry: Tv, franchise: Network }
+const ICONS = { album: Disc3, track: Music, artist: Mic2, label: Tag, entry: Tv, franchise: Network }
 const icon = computed(() => ICONS[props.result.type])
 const round = computed(() => props.result.type === 'artist')
 

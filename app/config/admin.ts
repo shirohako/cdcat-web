@@ -2,8 +2,11 @@ import type { AdminContentType } from '~/types/admin'
 /** Sidebar groups in display order: by what the pages are for, not by which permission they need. */
 export const adminGroups = [
   { key: 'overview', label: 'admin_pages.groups.overview' },
-  { key: 'content', label: 'admin_pages.groups.content' },
-  { key: 'harvest', label: 'admin_pages.groups.harvest' },
+  { key: 'music', label: 'admin_pages.groups.music' },
+  { key: 'artists', label: 'admin_pages.groups.artists' },
+  { key: 'entries', label: 'admin_pages.groups.entries' },
+  { key: 'events', label: 'admin_pages.groups.events' },
+  { key: 'catalog_tools', label: 'admin_pages.groups.catalog_tools' },
   { key: 'catalog_settings', label: 'admin_pages.groups.catalog_settings' },
   { key: 'articles', label: 'admin_pages.groups.articles' },
   { key: 'discussions', label: 'admin_pages.groups.discussions' },
@@ -33,19 +36,18 @@ export const allowedBy = (permission: string | string[], has: (name: string) => 
 export const adminMenu: AdminMenuItem[] = [
   { path: '/admin', permission: 'admin.access', label: 'admin_pages.dashboard.title', icon: 'lucide:layout-dashboard', group: 'overview' },
   { path: '/admin/revisions', permission: 'revisions.view', label: 'admin_pages.revisions.title', icon: 'lucide:git-pull-request', group: 'overview' },
-  { path: '/admin/content/albums', permission: 'content.manage', label: 'admin_pages.content.tabs.album', icon: 'lucide:disc-3', group: 'content' },
-  { path: '/admin/content/artists', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'content' },
-  { path: '/admin/content/labels', permission: 'content.manage', label: 'admin_pages.content.tabs.label', icon: 'lucide:building-2', group: 'content' },
-  { path: '/admin/content/works', permission: 'content.manage', label: 'admin_pages.content.tabs.work', icon: 'lucide:music-4', group: 'content' },
-  { path: '/admin/content/entries', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'content' },
-  { path: '/admin/content/franchises', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'content' },
-  { path: '/admin/content/tracks', permission: 'content.manage', label: 'admin_pages.content.tabs.track', icon: 'lucide:music', group: 'content' },
-  { path: '/admin/content/lyrics', permission: 'content.manage', label: 'admin_pages.content.tabs.lyric', icon: 'lucide:file-text', group: 'content' },
-  { path: '/admin/images', permission: 'content.manage', label: 'admin_pages.images.title', icon: 'lucide:images', group: 'content' },
-  { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'content' },
-  { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'content' },
-  { path: '/admin/event-imports', permission: 'events.manage', label: 'admin_pages.event_imports.title', icon: 'lucide:download-cloud', group: 'content' },
-  { path: '/admin/harvest', permission: 'harvest.manage', label: 'admin_pages.harvest.title', icon: 'lucide:radar', group: 'harvest' },
+  { path: '/admin/content/albums', permission: 'content.manage', label: 'admin_pages.content.tabs.album', icon: 'lucide:disc-3', group: 'music' },
+  { path: '/admin/content/tracks', permission: 'content.manage', label: 'admin_pages.content.tabs.track', icon: 'lucide:music', group: 'music' },
+  { path: '/admin/content/lyrics', permission: 'content.manage', label: 'admin_pages.content.tabs.lyric', icon: 'lucide:file-text', group: 'music' },
+  { path: '/admin/content/artists', permission: 'content.manage', label: 'admin_pages.content.tabs.artist', icon: 'lucide:mic-vocal', group: 'artists' },
+  { path: '/admin/content/labels', permission: 'content.manage', label: 'admin_pages.content.tabs.label', icon: 'lucide:building-2', group: 'artists' },
+  { path: '/admin/content/entries', permission: 'content.manage', label: 'admin_pages.content.tabs.entry', icon: 'lucide:clapperboard', group: 'entries' },
+  { path: '/admin/content/franchises', permission: 'content.manage', label: 'admin_pages.content.tabs.franchise', icon: 'lucide:layers', group: 'entries' },
+  { path: '/admin/events', permission: 'events.manage', label: 'admin_pages.events.title', icon: 'lucide:calendar-days', group: 'events' },
+  { path: '/admin/event-series', permission: 'events.manage', label: 'admin_pages.event_series.title', icon: 'lucide:calendar-range', group: 'events' },
+  { path: '/admin/event-imports', permission: 'events.manage', label: 'admin_pages.event_imports.title', icon: 'lucide:download-cloud', group: 'events' },
+  { path: '/admin/harvest', permission: 'harvest.manage', label: 'admin_pages.harvest.title', icon: 'lucide:radar', group: 'catalog_tools' },
+  { path: '/admin/images', permission: 'content.manage', label: 'admin_pages.images.title', icon: 'lucide:images', group: 'catalog_tools' },
   { path: '/admin/credit-roles', permission: 'content.manage', label: 'admin_pages.credit_roles.title', icon: 'lucide:contact', group: 'catalog_settings' },
   { path: '/admin/attribute-definitions', permission: 'content.manage', label: 'admin_pages.attribute_definitions.title', icon: 'lucide:list-checks', group: 'catalog_settings' },
   { path: '/admin/link-providers', permission: 'content.manage', label: 'admin_pages.link_providers.title', icon: 'lucide:link', group: 'catalog_settings' },
@@ -78,7 +80,7 @@ export const findAdminMenuItem = (path: string, items: AdminMenuItem[] = adminMe
   items.find(item => item.path === path)
   ?? items.filter(item => item.path !== '/admin' && path.startsWith(`${item.path}/`)).sort((a, b) => b.path.length - a.path.length)[0]
 
-export const adminContentTypes = ['album', 'artist', 'label', 'work', 'entry', 'franchise', 'track', 'lyric'] as const
+export const adminContentTypes = ['album', 'artist', 'label', 'entry', 'franchise', 'track', 'lyric'] as const
 
 /**
  * Per content type (the singular morph alias, as in `resource_type`): the plural URL segment the
@@ -88,7 +90,6 @@ export const adminContentRoutes: Record<AdminContentType, { api: string, front: 
   album: { api: 'albums', front: 'albums' },
   artist: { api: 'artists', front: 'artists' },
   label: { api: 'labels', front: 'labels' },
-  work: { api: 'works', front: 'works' },
   entry: { api: 'entries', front: 'entries' },
   franchise: { api: 'franchises', front: 'franchises' },
   track: { api: 'tracks', front: 'tracks' },
@@ -96,9 +97,9 @@ export const adminContentRoutes: Record<AdminContentType, { api: string, front: 
 }
 
 /** Types whose duplicates can be merged into another entity. */
-export const mergeableContentTypes: AdminContentType[] = ['album', 'artist', 'label', 'work']
+export const mergeableContentTypes: AdminContentType[] = ['album', 'artist', 'label']
 
-/** The editor of an entity; tracks are edited with their album and lyrics on their song's page. */
+/** The editor of an entity; tracks are edited with their album and lyrics on their track's page. */
 export const adminEditorPath = (type: AdminContentType, id?: number | string | null) => {
   if (type === 'track' || type === 'lyric') return null
   if (!id) return type === 'entry' ? '/contribute/entry' : `/contribute/${type}`

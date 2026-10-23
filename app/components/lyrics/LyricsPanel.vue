@@ -1,17 +1,19 @@
 <template>
   <div>
-    <SkeletonStatus v-if="loading" class="space-y-3 py-2">
-      <div class="flex gap-2">
-        <div class="skeleton h-6 w-16 rounded-md" />
-        <div class="skeleton h-6 w-20 rounded-md" />
+    <SkeletonStatus v-if="loading">
+      <div class="flex gap-1.5">
+        <div class="skeleton h-6 w-20 rounded-full" />
+        <div class="skeleton h-6 w-24 rounded-full" />
       </div>
-      <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
+      <div class="mt-3 space-y-3 rounded-xl bg-gray-50 px-4 py-5 sm:px-6">
+        <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
+      </div>
     </SkeletonStatus>
     <p v-else-if="status === 'error' && !data" class="py-6 text-center text-sm text-error">{{ localizeError(error) }}</p>
 
     <template v-else-if="editing">
       <LyricsForm
-        :work-id="workId"
+        :track-id="trackId"
         :lyric="editing === 'new' ? null : current"
         :originals="originals"
         @saved="onSaved"
@@ -19,58 +21,86 @@
       />
     </template>
 
+    <div v-else-if="!lyrics.length" class="flex flex-col items-center py-10 text-center">
+      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50"><FileText :size="18" class="text-sky-400" /></div>
+      <p class="mt-3 text-sm font-semibold text-gray-600">{{ $t('album.empty.lyrics_title') }}</p>
+      <p class="mt-1 max-w-sm text-xs leading-5 text-gray-400">{{ $t('lyrics_ui.empty_hint') }}</p>
+      <button v-if="canSubmit" type="button" class="btn btn-sm btn-primary mt-4 gap-1" @click="startNew">
+        <Plus :size="14" />{{ $t('lyrics_ui.submit_lyrics_or_translation') }}
+      </button>
+    </div>
+
     <template v-else>
-      <div class="mb-3 flex flex-wrap items-center gap-2">
-        <div v-if="lyrics.length" role="tablist" class="tabs-box tabs tabs-xs">
+      <div class="flex items-center gap-2">
+        <div role="tablist" class="-my-1 flex min-w-0 flex-1 gap-1.5 overflow-x-auto py-1">
           <button
             v-for="lyric in lyrics"
             :key="lyric.id"
             type="button"
             role="tab"
-            class="tab"
-            :class="{ 'tab-active': lyric.id === selectedId }"
+            :aria-selected="lyric.id === selectedId"
+            class="shrink-0 rounded-full px-3 py-1 text-xs font-medium ring-1 transition-colors"
+            :class="lyric.id === selectedId ? 'bg-sky-600 text-white ring-sky-600' : 'bg-white text-gray-600 ring-gray-200 hover:bg-gray-50'"
             @click="selectedId = lyric.id"
           >
-            {{ localeName(lyric.language) }}
-            <span class="ml-1 text-[10px] opacity-60">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
+            {{ localeName(lyric.language) }}<span class="ml-1 opacity-70">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
           </button>
         </div>
-        <label v-if="selected && companions.length" class="flex items-center gap-1.5 text-xs text-gray-500">
-          {{ $t('lyrics_ui.compare_with') }}
-          <select v-model="compareId" class="select select-sm h-8 text-xs">
-            <option :value="null">—</option>
-            <option v-for="lyric in companions" :key="lyric.id" :value="lyric.id">{{ localeName(lyric.language) }} · {{ enumLabel('lyric_kind', lyric.kind) }}</option>
-          </select>
-        </label>
-        <button v-if="canSubmit" type="button" class="btn btn-xs btn-primary ml-auto gap-1" @click="startNew">
-          <Plus :size="12" />{{ $t('lyrics_ui.submit_lyrics_or_translation') }}
+        <button v-if="canSubmit" type="button" class="btn btn-ghost btn-xs shrink-0 gap-1 text-sky-700" @click="startNew">
+          <Plus :size="12" /><span class="hidden sm:inline">{{ $t('lyrics_ui.submit_lyrics_or_translation') }}</span>
         </button>
       </div>
 
-      <div v-if="!lyrics.length" class="py-10 text-center">
-        <p class="text-sm font-semibold text-gray-600">{{ $t('album.empty.lyrics_title') }}</p>
-        <p class="mt-1 text-xs text-gray-400">{{ $t('lyrics_ui.empty_hint') }}</p>
+      <div v-if="companions.length" class="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
+        <Columns2 :size="13" class="text-gray-400" />
+        <span class="mr-0.5">{{ $t('lyrics_ui.compare_with') }}</span>
+        <button
+          v-for="lyric in companions"
+          :key="lyric.id"
+          type="button"
+          :aria-pressed="lyric.id === compareId"
+          class="rounded-full px-2.5 py-0.5 transition-colors"
+          :class="lyric.id === compareId ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+          @click="compareId = lyric.id === compareId ? null : lyric.id"
+        >
+          {{ localeName(lyric.language) }}<span class="ml-1 opacity-60">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
+        </button>
       </div>
 
-      <div v-else-if="current">
-        <div class="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-400">
+      <div v-if="current" class="mt-3">
+        <div class="rounded-xl bg-gray-50 px-4 py-4 sm:px-6 sm:py-5">
+          <div v-if="comparison" class="mb-3 hidden grid-cols-2 gap-x-8 border-b border-gray-200/70 pb-2 text-[11px] font-medium text-gray-400 sm:grid">
+            <span>{{ lyricLabel(current) }}</span>
+            <span>{{ lyricLabel(comparison) }}</span>
+          </div>
+          <template v-for="(row, index) in rows" :key="index">
+            <!-- A blank line in both texts separates stanzas. -->
+            <div v-if="!row[0] && !row[1]" class="h-4" />
+            <div v-else class="grid gap-x-8" :class="{ 'mb-1.5 sm:mb-0 sm:grid-cols-2': comparison }">
+              <p class="whitespace-pre-wrap break-words text-[15px] leading-7 text-gray-900">{{ row[0] }}</p>
+              <p v-if="comparison" class="whitespace-pre-wrap break-words text-[13px] leading-6 text-gray-500 sm:text-[15px] sm:leading-7">{{ row[1] }}</p>
+            </div>
+          </template>
+        </div>
+
+        <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-400">
           <span v-if="current.creator">{{ $t('lyrics_ui.added_by', { name: current.creator.nickname || current.creator.username }) }}</span>
           <span v-if="current.translator">{{ $t('lyrics_ui.translator', { name: current.translator }) }}</span>
-          <span v-if="current.is_ai_generated" class="badge badge-ghost badge-xs">{{ $t('lyrics_ui.ai_generated') }}</span>
-          <span v-if="current.source" class="truncate">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</span>
-          <NuxtLink :to="`/lyrics/${current.id}/versions`" class="hover:text-gray-600 hover:underline">{{ $t('versions.short', { version: current.version }) }}</NuxtLink>
-          <template v-if="canSubmit">
-            <button type="button" class="hover:underline" @click="editing = 'edit'">{{ $t('common.edit') }}</button>
-            <button type="button" class="hover:underline text-error" @click="remove">{{ $t('common.delete') }}</button>
-          </template>
-        </div>
-        <div class="grid gap-x-6 text-sm leading-7 text-gray-800" :class="comparison ? 'grid-cols-2' : 'grid-cols-1'">
-          <template v-for="(line, index) in rows" :key="index">
-            <p class="min-h-7 whitespace-pre-wrap">{{ line[0] }}</p>
-            <p v-if="comparison" class="min-h-7 whitespace-pre-wrap text-gray-500">{{ line[1] }}</p>
-          </template>
+          <span v-if="current.is_ai_generated" class="rounded bg-amber-50 px-1.5 py-px font-medium text-amber-600">{{ $t('lyrics_ui.ai_generated') }}</span>
+          <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate hover:text-gray-600 hover:underline">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
+          <span v-else-if="current.source" class="max-w-[16rem] truncate">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</span>
+          <span class="ml-auto flex items-center gap-1">
+            <NuxtLink :to="`/lyrics/${current.id}/versions`" class="rounded px-1.5 py-0.5 hover:bg-gray-100 hover:text-gray-600">{{ $t('versions.short', { version: current.version }) }}</NuxtLink>
+            <template v-if="canSubmit">
+              <button type="button" class="flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 hover:text-gray-600" :title="$t('common.edit')" :aria-label="$t('common.edit')" @click="editing = 'edit'"><Pencil :size="12" /></button>
+              <button type="button" class="flex h-6 w-6 items-center justify-center rounded hover:bg-red-50 hover:text-error" :title="$t('common.delete')" :aria-label="$t('common.delete')" @click="remove"><Trash2 :size="12" /></button>
+            </template>
+          </span>
         </div>
       </div>
+      <SkeletonStatus v-else class="mt-3 space-y-3 rounded-xl bg-gray-50 px-4 py-5 sm:px-6">
+        <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
+      </SkeletonStatus>
     </template>
     <CommonToast :toast="toast" />
   </div>
@@ -79,10 +109,10 @@
 <script setup lang="ts">
 import type { Lyric, LyricSummary } from '~/types/lyric'
 import type { Revision } from '~/types/revision'
-import { Plus } from '@lucide/vue'
+import { Columns2, FileText, Pencil, Plus, Trash2 } from '@lucide/vue'
 import { lyricLines } from '~/utils/lyricText'
 
-const props = defineProps<{ workId: number }>()
+const props = defineProps<{ trackId: number }>()
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()
@@ -91,8 +121,8 @@ const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
 const { toast, showToast } = useToast()
 
-const { data, status, error, loading, refresh } = usePageData(`work:${props.workId}:lyrics`,
-  ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/works/${props.workId}/lyrics`, { signal, progress: !background }))
+const { data, status, error, loading, refresh } = usePageData(`track:${props.trackId}:lyrics`,
+  ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/tracks/${props.trackId}/lyrics`, { signal, progress: !background }))
 const kindOrder = { original: 0, transliteration: 1, translation: 2 } as const
 const lyrics = computed(() => [...(data.value?.lyrics ?? [])].sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.language.localeCompare(b.language)))
 const originals = computed(() => lyrics.value.filter(lyric => lyric.kind === 'original'))
@@ -122,6 +152,8 @@ const load = async (id: number | null) => {
 watch([selectedId, compareId], ([a, b]) => Promise.all([load(a), load(b)]), { immediate: true })
 
 const current = computed(() => selectedId.value ? texts[selectedId.value] ?? null : null)
+const lyricLabel = (lyric: LyricSummary) => `${localeName(lyric.language)} · ${enumLabel('lyric_kind', lyric.kind)}`
+const isUrl = (text: string) => /^https?:\/\//i.test(text)
 const comparison = computed(() => compareId.value ? texts[compareId.value] ?? null : null)
 /** Lines of the shown lyric, paired by position with the comparison. */
 const rows = computed(() => {

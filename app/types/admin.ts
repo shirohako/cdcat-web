@@ -69,7 +69,7 @@ export interface AdminUserActivity {
   title: string | null
   status?: string
   album_id?: number | null
-  work_id?: number | null
+  track_id?: number | null
   kind?: string
   items?: Array<{ resource_type: string, resource_id: number | null, action: string }>
   language?: string
@@ -106,7 +106,7 @@ export interface AdminBatchResult {
   failed: number
 }
 
-export type AdminContentType = 'album' | 'artist' | 'label' | 'work' | 'entry' | 'franchise' | 'track' | 'lyric'
+export type AdminContentType = 'album' | 'artist' | 'label' | 'entry' | 'franchise' | 'track' | 'lyric'
 
 export interface AdminContentItem {
   id: number
@@ -177,10 +177,9 @@ export interface AdminCreditRole {
   aliases: string[] | null
   is_album_role: boolean
   is_track_role: boolean
-  is_work_role: boolean
   sort_order: number
   is_active: boolean
-  usage: { album: number, track: number, work: number }
+  usage: { album: number, track: number }
 }
 
 /** GET /admin/attribute-definitions */

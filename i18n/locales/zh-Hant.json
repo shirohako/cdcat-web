@@ -59,9 +59,8 @@
       "translation_with_count": "翻譯 {count}",
       "language": "曲目表語言",
       "original": "原文",
-      "other_recordings": "另有 {count} 個錄音",
-      "other_recordings_hint": "這首歌也收錄在其他專輯中",
-      "translate": "翻譯"
+      "translate": "翻譯",
+      "original_songs": "原曲："
     },
     "actions": {},
     "empty": {
@@ -968,14 +967,15 @@
     "translation_of": "對應的原文",
     "summary": "修改說明",
     "summary_placeholder": "可選，例如修正了第 3 行",
-    "empty_hint": "歌詞掛在樂曲上，這首歌的所有錄音都會顯示。",
+    "empty_hint": "歌詞掛在曲目上，單曲版、專輯版等各有各的歌詞。",
     "moderation_hint": "新歌詞和對自己歌詞的修改會立即生效，之後由管理員巡查；修改別人的歌詞需要審核。",
     "delete_confirm": "確定刪除這份歌詞？",
     "published": "已發布",
     "pending_review": "已提交，等待審核",
     "format_plain": "純文字",
     "format_lrc": "LRC（帶時間軸）",
-    "format_srt": "SRT 字幕"
+    "format_srt": "SRT 字幕",
+    "open_track": "曲目頁面"
   },
   "content_display": {
     "articles": "文章",
@@ -1473,7 +1473,6 @@
       "album": "專輯",
       "artist": "藝術家",
       "label": "廠牌",
-      "work": "樂曲",
       "lyric": "歌詞",
       "entry": "條目",
       "franchise": "系列"
@@ -1520,28 +1519,6 @@
       "publisher": "發行",
       "distributor": "經銷",
       "manufacturer": "製造",
-      "other": "其他"
-    },
-    "work_relation": {
-      "arranged_from": "改編自",
-      "arrangement": "改編",
-      "covered_from": "翻唱自",
-      "cover": "翻唱",
-      "remixed_from": "混音自",
-      "remix": "混音",
-      "medley": "被收錄於組曲",
-      "medley_source": "組曲收錄",
-      "version": "其他版本",
-      "related": "相關"
-    },
-    "entry_work_relation": {
-      "bgm": "BGM",
-      "opening": "片頭曲",
-      "ending": "片尾曲",
-      "insert_song": "插曲",
-      "theme_song": "主題曲",
-      "character_song": "角色歌",
-      "image_song": "印象曲",
       "other": "其他"
     },
     "artist_relation": {
@@ -1627,7 +1604,6 @@
       "source": "來源",
       "translator": "譯者",
       "is_ai_generated": "AI 生成",
-      "work_id": "樂曲",
       "translation_of_id": "原文",
       "platforms": "平台",
       "sort_order": "順序",
@@ -1674,7 +1650,6 @@
       "relation_type": "關係",
       "character_name": "角色",
       "episode": "集",
-      "related_work_id": "樂曲",
       "related_entry_id": "條目",
       "related_artist_id": "藝術家",
       "locale": "語言",
@@ -1683,7 +1658,9 @@
       "leadout_offset": "導出區",
       "offsets": "偏移",
       "album_id": "專輯",
-      "album_image_id": "圖片"
+      "album_image_id": "圖片",
+      "original_track_id": "原曲曲目",
+      "original_title": "原曲名稱"
     },
     "collection": {
       "titles": "其他名稱",
@@ -1704,7 +1681,8 @@
       "links": "連結",
       "entries": "關聯條目",
       "relations": "關聯",
-      "albums": "專輯"
+      "albums": "專輯",
+      "track_originals": "原曲"
     },
     "credit_role_category": {
       "composition": "作曲",
@@ -2075,32 +2053,15 @@
     "no_results": "沒有找到廠牌",
     "not_found": "廠牌不存在。"
   },
-  "works": {
-    "title": "樂曲",
-    "subtitle": "同一首歌在各張專輯中的錄音、歌詞和改編關係",
-    "label": "樂曲",
-    "recordings": "{count} 個錄音",
-    "recordings_title": "收錄",
-    "lyrics_count": "{count} 份歌詞",
-    "no_recordings": "還沒有收錄在任何專輯中",
-    "credits": "作者",
-    "relations": "相關樂曲",
-    "entries": "出處",
-    "open": "樂曲頁面",
-    "no_results": "沒有找到樂曲",
-    "not_found": "樂曲不存在。",
-    "duplicates": {
-      "title": "可能重複的樂曲",
-      "hint": "去掉 Instrumental、TV size 等版本說明後標題相同的樂曲。如果是同一首歌，可以在專輯編輯器裡把曲目改掛到同一個樂曲（點擊專輯名），或請內容管理員合併；如果不是，標記為不同的歌，它們就不會再出現在這裡。",
-      "empty": "現在沒有需要檢查的樂曲。",
-      "not_same": "不是同一首",
-      "merge": "合併…",
-      "relink_hint": "在編輯器裡打開這張專輯，把曲目改掛到另一個樂曲"
-    }
-  },
   "tracks": {
     "not_found": "曲目不存在。",
-    "work": "樂曲：{title}"
+    "originals_section": "原曲",
+    "originals": "這首曲目的原曲",
+    "derived_tracks": "以它為原曲的曲目（{count}）",
+    "album_tracklist": "專輯曲目",
+    "previous": "上一首",
+    "next": "下一首",
+    "edit_hint": "曲目隨所屬專輯一起編輯"
   },
   "shouts": {
     "title": "留言",
@@ -2314,7 +2275,7 @@
       "add_artist": "新增藝術家…",
       "add_label": "新增廠牌…",
       "credited_as_placeholder": "署名為",
-      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定樂曲、原曲、資訊和連結。",
+      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定原曲、資訊和連結。",
       "empty_tracklist": "還沒有曲目",
       "empty_tracklist_hint": "可以從歌詞本、商店頁面或 VGMdb 貼上曲目表，也可以一首一首新增。",
       "disc_n": "Disc {n}",
@@ -2328,7 +2289,7 @@
       "remove_track_confirm": "刪除「{title}」？這首曲目的收藏也會被刪除。",
       "no_tracks": "這張碟還沒有曲目。",
       "track_title": "曲目標題",
-      "track_details": "樂曲、資訊與連結",
+      "track_details": "原曲、資訊與連結",
       "duplicate_number": "這張碟上有其他曲目用了這個編號",
       "move_to_disc": "移到",
       "totals": "{discs} 張碟 · {tracks} 首曲目",
@@ -2355,30 +2316,6 @@
       "count_mismatch": "但這張碟有 {count} 首曲目",
       "unreadable": "這段文字裡沒有 TOC 表格。",
       "add": "新增 TOC"
-    },
-    "work": {
-      "song": "樂曲",
-      "auto": "會為這首曲目新建一個樂曲",
-      "recordings": "{count} 個錄音",
-      "separate": "設為獨立的樂曲",
-      "link_other": "和已有樂曲是同一首…",
-      "search": "搜尋樂曲",
-      "hint": "同一首歌的曲目共用歌詞和翻譯，例如單曲和專輯版本、伴奏版。",
-      "suggestions": "可能是同一首歌",
-      "on_albums": "{count} 首曲目 · {albums}",
-      "same_song": "是同一首",
-      "not_same": "不是同一首",
-      "originals": "原曲",
-      "originals_hint": "改編、翻唱、混音和組曲填寫所依據的樂曲。庫裡還沒有時，輸入名稱就能新建。",
-      "search_original": "搜尋原曲，或輸入名稱新建",
-      "find_same": "尋找同一首歌",
-      "found": "有 {count} 首曲目可能是庫裡已有的樂曲。",
-      "accept_all": "全部關聯",
-      "linked": "已關聯 {count} 首曲目",
-      "none_found": "沒有找到相同的樂曲。",
-      "same_song_badge": "同一首？",
-      "new_badge": "新樂曲",
-      "new_badge_hint": "這筆修訂會新建這個樂曲"
     },
     "credits": {
       "hint": "每人每個角色一行。可以署名在整張專輯上，也可以選擇曲目。",
@@ -2478,14 +2415,11 @@
       "hint": "修訂發布時一起建立",
       "remove": "移除",
       "remove_confirm": "專輯裡還在用它。仍然移除嗎？",
-      "used_tracks": "{count} 首曲目的樂曲",
       "used_credits": "署名 {count} 處",
-      "used_elsewhere": "作為原曲使用",
+      "used_elsewhere": "在其他地方使用",
       "unused": "還沒有用到",
-      "add_composer": "新增作曲…",
-      "add_source": "新增出處（遊戲、動畫……）",
       "edited": "修改{type}",
-      "edited_hint": "從曲目表新增了原曲"
+      "edited_hint": "這筆修訂同時修改它"
     },
     "entity": {
       "new_title": "新建{type}",
@@ -2504,13 +2438,7 @@
       "parent_label": "上級廠牌",
       "parent_label_hint": "子廠牌或子品牌填寫所屬的廠牌，例如唱片公司的黑膠品牌。",
       "prefixes_hint": "品番前綴，用逗號分隔。新增專輯時用來猜測廠牌。",
-      "work_hint": "樂曲是同一首歌的各個曲目共用的部分，例如單曲版、專輯版、伴奏版。歌詞掛在樂曲上。",
-      "work_credits_hint": "樂曲本身的署名，即誰寫了這首歌。主要用於還不在任何專輯裡的樂曲，例如遊戲原曲。",
       "name_only_credit": "只填署名",
-      "work_relations": "相關樂曲",
-      "work_relations_hint": "從這首樂曲的角度填寫原曲、改編、翻唱、混音和組曲。",
-      "work_entries": "出處",
-      "work_entries_hint": "這首歌出自的遊戲、動畫等作品，例如某個遊戲的 BGM。",
       "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。",
       "artist_type_placeholder": "請選擇藝術家類型"
     },
@@ -2571,9 +2499,6 @@
       "image_preview": "填寫網址後在這裡預覽",
       "image_no_preview": "無法預覽，但仍可以嘗試匯入",
       "image_kind_guess": "按網址猜測",
-      "original_add": "新增原曲",
-      "original_required": "請選擇原曲，或者輸入名稱新建。",
-      "pick_closes": "選中後立即關聯。",
       "new_artist_type": "新藝術家的類型",
       "new_artist_type_required": "請選擇新藝術家的類型。"
     },
@@ -2583,6 +2508,15 @@
       "featuring": "新增兩位藝術家：先加梶浦由記，連接詞選「feat.」；再加 Joelle。",
       "credited": "資料庫裡叫「梶浦由記」時，選擇梶浦由記，「署名為」填 Yuki Kajiura。",
       "circle": "封面只印社團名時只填社團；作曲、演唱等寫在「製作人員」裡。"
+    },
+    "originals": {
+      "title": "原曲",
+      "hint": "改編、翻唱、混音和組曲所依據的曲子。優先選資料庫裡的曲目；搜不到時，直接把輸入的文字存為原曲。",
+      "search": "搜尋曲目，或直接輸入原曲名",
+      "use_text": "使用文字「{name}」",
+      "text_only": "僅文字",
+      "text_only_hint": "這首原曲還不在資料庫裡，只記了名稱",
+      "badge": "原曲 {count}"
     }
   },
   "revision_page": {
@@ -2698,7 +2632,6 @@
       "track": "曲目",
       "artist": "藝術家",
       "label": "廠牌",
-      "work": "樂曲",
       "entry": "條目",
       "franchise": "系列"
     }

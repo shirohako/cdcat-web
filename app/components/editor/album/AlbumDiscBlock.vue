@@ -23,9 +23,7 @@
         :key="track.id"
         :track-id="track.id"
         :duplicate-number="duplicates.has(track.track_number)"
-        :suggestions="suggestions[String(track.id)]"
         @next="next(track.id)"
-        @dismiss="emit('dismiss', track.id, $event)"
       />
       <p v-if="!tracks.length" class="px-4 py-3 text-xs text-gray-400">{{ $t('editor.album.no_tracks') }}</p>
     </div>
@@ -39,13 +37,12 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
-import type { WorkSuggestion } from '~/types/work'
 import { ArrowDown, ArrowUp, Disc3, Trash2 } from '@lucide/vue'
 import { addTrack, findDisc, moveDisc, removeDisc, sortedDiscs, tracksOn } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
-const props = defineProps<{ discId: RowId, suggestions: Record<string, WorkSuggestion[]> }>()
-const emit = defineEmits<{ toc: [], dismiss: [trackId: RowId, workId: number] }>()
+const props = defineProps<{ discId: RowId }>()
+const emit = defineEmits<{ toc: [] }>()
 
 const editor = useAlbumEditor()
 const { t } = useI18n()

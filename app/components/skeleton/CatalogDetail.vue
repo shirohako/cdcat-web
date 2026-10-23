@@ -1,10 +1,11 @@
 <template>
   <SkeletonStatus page>
-    <!-- Full-width heroes (albums, entries, franchises) come with their own body container. -->
-    <div v-if="hero === 'album'" class="bg-white">
+    <!-- Full-width heroes (albums, tracks, entries, franchises) come with their own body container. -->
+    <div v-if="hero === 'album' || hero === 'track'" class="bg-white">
       <div class="container mx-auto max-w-6xl px-4 pb-7 pt-5 md:px-12 md:py-10 lg:px-20 xl:px-8 2xl:max-w-7xl">
         <div class="mx-auto flex max-w-5xl flex-col items-center gap-6 md:flex-row md:items-stretch md:gap-10">
-          <div class="skeleton size-44 shrink-0 rounded-md sm:size-56 md:size-60 lg:size-72 xl:size-80 2xl:size-96" />
+          <div v-if="hero === 'track'" class="skeleton size-36 shrink-0 rounded-md sm:size-44 md:size-48 lg:size-56" />
+          <div v-else class="skeleton size-44 shrink-0 rounded-md sm:size-56 md:size-60 lg:size-72 xl:size-80 2xl:size-96" />
           <div class="flex w-full flex-1 flex-col items-center gap-3 rounded-lg bg-slate-50 p-3 sm:p-4 md:items-start md:p-6">
             <div class="skeleton h-7 w-3/5 rounded-md" />
             <div class="skeleton h-4 w-2/5 rounded-full" />
@@ -50,21 +51,6 @@
       </div>
     </div>
 
-    <template v-else-if="hero === 'track'">
-      <div class="mb-6 flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-3">
-        <div class="skeleton size-14 shrink-0 rounded-lg" />
-        <div class="flex-1 space-y-2">
-          <div class="skeleton h-4 w-2/5 rounded-full" />
-          <div class="skeleton h-3 w-1/4 rounded-full" />
-        </div>
-      </div>
-      <div class="mb-6 space-y-2.5">
-        <div class="skeleton h-8 w-1/2 rounded-md" />
-        <div class="skeleton h-4 w-1/3 rounded-full" />
-        <div class="skeleton h-4 w-1/4 rounded-full" />
-      </div>
-    </template>
-
     <div v-else-if="hero === 'series'" class="flex flex-col gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:flex-row md:p-8">
       <div class="skeleton aspect-video w-full shrink-0 rounded-xl md:w-80 lg:w-96" />
       <div class="flex-1 space-y-3">
@@ -109,9 +95,9 @@
 <script setup lang="ts">
 /**
  * The placeholder for a catalog detail page while its data loads. `hero` mirrors the page's header:
- * `album`, `poster` (entries) and `gradient` (franchises) span the full width and bring the body's
- * container; `tile` (works, labels), `track` and `series` go inside the page's container; `none` is
- * for a page that renders its own header (artists).
+ * `album`, `track` (the album's banner with a smaller cover), `poster` (entries) and `gradient`
+ * (franchises) span the full width and bring the body's container; `tile` (labels) and `series` go
+ * inside the page's container; `none` is for a page that renders its own header (artists).
  */
 const props = withDefaults(defineProps<{
   hero: 'album' | 'poster' | 'gradient' | 'tile' | 'track' | 'series' | 'none'
@@ -126,5 +112,5 @@ const props = withDefaults(defineProps<{
 
 const LINE_WIDTHS = ['w-3/5', 'w-2/5', 'w-1/2', 'w-2/3', 'w-1/3']
 
-const fullWidth = computed(() => props.hero === 'album' || props.hero === 'poster' || props.hero === 'gradient')
+const fullWidth = computed(() => ['album', 'track', 'poster', 'gradient'].includes(props.hero))
 </script>

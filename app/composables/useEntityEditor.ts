@@ -2,13 +2,13 @@ import type { ComputedRef, InjectionKey } from 'vue'
 import type { CatalogReferences } from '~/types/catalog'
 import type { FieldError } from './useAlbumEditor'
 
-export type EntityType = 'artist' | 'label' | 'work' | 'entry' | 'franchise'
+export type EntityType = 'artist' | 'label' | 'entry' | 'franchise'
 
 /** What the single-entity editor (components/editor/EntityEditor.vue) shares with its fields. */
 export interface EntityEditorContext {
   type: EntityType
   id: number | null
-  // Documents of five types share the editor; each fields component knows its own shape.
+  // Documents of four types share the editor; each fields component knows its own shape.
   doc: ComputedRef<Record<string, unknown>>
   references: CatalogReferences
   remember: (type: string, id: number, row: object) => void
@@ -34,8 +34,6 @@ export const emptyDocument = (type: EntityType): Record<string, unknown> => {
       return { name: '', slug: null, type: null, is_active: true, bio: null, image_url: null, titles: [], links: [], attributes: [], relations: [] }
     case 'label':
       return { name: '', slug: null, parent_id: null, country: null, description: null, image_url: null, ...dates, catalog_prefixes: [], titles: [], links: [], attributes: [] }
-    case 'work':
-      return { title: '', description: null, titles: [], credits: [], relations: [], entries: [], links: [], attributes: [] }
     case 'entry':
       return {
         name: '', slug: null, type: 'anime', format: null, platforms: [], release_date: null, release_date_precision: 'day',

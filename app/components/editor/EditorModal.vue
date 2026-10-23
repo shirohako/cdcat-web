@@ -16,7 +16,8 @@
           leave-active-class="transition duration-150 ease-in"
           leave-to-class="translate-y-6 opacity-0 sm:translate-y-2 sm:scale-[0.97]"
         >
-          <form
+          <component
+            :is="as"
             v-if="open"
             ref="panel"
             class="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl ring-1 ring-gray-900/5 sm:max-h-[88vh] sm:rounded-2xl"
@@ -24,7 +25,7 @@
             role="dialog"
             aria-modal="true"
             :aria-labelledby="titleId"
-            novalidate
+            :novalidate="as === 'form' || undefined"
             @submit.prevent="emit('submit')"
           >
             <div class="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-gray-200 sm:hidden" aria-hidden="true" />
@@ -36,6 +37,7 @@
                 <h2 :id="titleId" class="truncate text-base font-semibold leading-6 text-gray-900">{{ title }}</h2>
                 <p v-if="description" class="mt-0.5 text-xs leading-5 text-gray-500">{{ description }}</p>
               </div>
+              <slot name="actions" />
               <button type="button" class="-mr-1.5 -mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600" :aria-label="$t('common.close')" @click="close">
                 <X :size="18" />
               </button>
@@ -44,7 +46,7 @@
             <footer v-if="$slots.footer" class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-gray-100 bg-gray-50/70 px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
               <slot name="footer" />
             </footer>
-          </form>
+          </component>
         </Transition>
       </div>
     </Transition>
@@ -60,19 +62,21 @@ const stack: symbol[] = []
 </script>
 
 <script setup lang="ts">
-type Tone = 'blue' | 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple' | 'gray'
+type Tone = 'blue' | 'sky' | 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple' | 'gray'
 
 /**
  * A dialog: centred on wide screens, a sheet from the bottom on phones. The body is a form, so a
- * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to
- * the field marked `data-autofocus`, else the first field, and goes back where it was on close.
+ * `type="submit"` button in the footer (or Enter in a text field) emits `submit`; `as="div"` is for
+ * dialogs that hold forms of their own. Focus moves to the field marked `data-autofocus`, else the
+ * first field, and goes back where it was on close. The `actions` slot sits left of the close button.
  */
-withDefaults(defineProps<{ title: string, description?: string, icon?: Component, tone?: Tone, wide?: boolean }>(), { description: undefined, icon: undefined, tone: 'blue' })
+withDefaults(defineProps<{ title: string, description?: string, icon?: Component, tone?: Tone, wide?: boolean, as?: 'form' | 'div' }>(), { description: undefined, icon: undefined, tone: 'blue', as: 'form' })
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
 
 const TONES: Record<Tone, string> = {
   blue: 'bg-blue-50 text-blue-600',
+  sky: 'bg-sky-50 text-sky-600',
   indigo: 'bg-indigo-50 text-indigo-600',
   emerald: 'bg-emerald-50 text-emerald-600',
   amber: 'bg-amber-50 text-amber-600',
@@ -82,7 +86,7 @@ const TONES: Record<Tone, string> = {
 }
 
 const titleId = useId()
-const panel = ref<HTMLFormElement | null>(null)
+const panel = ref<HTMLElement | null>(null)
 const token = Symbol('dialog')
 let returnTo: HTMLElement | null = null
 

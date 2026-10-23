@@ -5,7 +5,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const CATEGORIES = ['composition', 'lyrics', 'arrangement', 'vocals', 'performance', 'production', 'engineering', 'artwork', 'other'] as const
 const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
-const LEVELS = ['is_album_role', 'is_track_role', 'is_work_role'] as const
+const LEVELS = ['is_album_role', 'is_track_role'] as const
 
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
@@ -18,7 +18,7 @@ const shown = computed(() => roles.value.filter(role => !category.value || role.
 
 const empty = () => ({
   key: '', category: 'composition', names: { 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '' } as Record<string, string>, aliases: '',
-  is_album_role: true, is_track_role: true, is_work_role: false, sort_order: 0, is_active: true, reason: '',
+  is_album_role: true, is_track_role: true, sort_order: 0, is_active: true, reason: '',
 })
 const form = reactive(empty())
 const editing = ref<string | null>(null)
@@ -34,7 +34,7 @@ const open = (role?: AdminCreditRole) => {
   if (role) {
     Object.assign(form, {
       key: role.key, category: role.category, names: { ...form.names, ...role.names }, aliases: (role.aliases ?? []).join(', '),
-      is_album_role: role.is_album_role, is_track_role: role.is_track_role, is_work_role: role.is_work_role, sort_order: role.sort_order, is_active: role.is_active,
+      is_album_role: role.is_album_role, is_track_role: role.is_track_role, sort_order: role.sort_order, is_active: role.is_active,
     })
   } else {
     form.sort_order = Math.max(0, ...roles.value.map(item => item.sort_order)) + 10
@@ -50,7 +50,7 @@ const save = async () => {
       category: form.category,
       names: Object.fromEntries(Object.entries(form.names).filter(([, value]) => value.trim()).map(([key, value]) => [key, value.trim()])),
       aliases: form.aliases.split(/[,，]/).map(alias => alias.trim()).filter(Boolean),
-      is_album_role: form.is_album_role, is_track_role: form.is_track_role, is_work_role: form.is_work_role,
+      is_album_role: form.is_album_role, is_track_role: form.is_track_role,
       sort_order: form.sort_order, is_active: form.is_active, reason: form.reason.trim() || null,
     }
     await $api(editing.value ? `/v1/admin/credit-roles/${editing.value}` : '/v1/admin/credit-roles', {
@@ -85,7 +85,7 @@ const remove = async (reason: string) => {
   }
 }
 
-const used = (role: AdminCreditRole) => role.usage.album + role.usage.track + role.usage.work
+const used = (role: AdminCreditRole) => role.usage.album + role.usage.track
 useHead({ title: computed(() => t('admin_pages.credit_roles.title')) })
 </script>
 
@@ -169,7 +169,7 @@ useHead({ title: computed(() => t('admin_pages.credit_roles.title')) })
                 <td class="px-3 py-3">{{ role.names['zh-Hans'] || role.names.en }} <span class="text-xs text-slate-500">{{ role.names.en }}</span></td>
                 <td class="px-3 py-3 text-xs">{{ t(`admin_pages.credit_roles.categories.${role.category}`) }}</td>
                 <td class="px-3 py-3 text-xs">{{ LEVELS.filter(level => role[level]).map(level => t(`admin_pages.credit_roles.${level}`)).join(' · ') }}</td>
-                <td class="px-3 py-3 text-xs tabular-nums">{{ role.usage.album }} / {{ role.usage.track }} / {{ role.usage.work }}</td>
+                <td class="px-3 py-3 text-xs tabular-nums">{{ role.usage.album }} / {{ role.usage.track }}</td>
                 <td class="px-3 py-3 text-right text-xs">
                   <button type="button" class="underline" @click="open(role)">{{ t('common.edit') }}</button>
                   <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="used(role) > 0" :title="used(role) ? t('admin_pages.credit_roles.in_use') : undefined" @click="deleting = role">{{ t('common.delete') }}</button>

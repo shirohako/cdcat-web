@@ -47,7 +47,7 @@ const { data: activity, pending: activityPending, error: activityError, refresh:
 const activityLink = (item: AdminUserActivity) => {
   if (activityType.value === 'revisions') return hasPermission('revisions.view') ? `/admin/revisions/${item.id}` : null
   if (activityType.value === 'articles') return item.status === 'published' ? `/articles/${item.id}` : null
-  if (activityType.value === 'lyrics') return item.work_id ? `/works/${item.work_id}` : null
+  if (activityType.value === 'lyrics') return item.track_id ? `/tracks/${item.track_id}` : null
   return item.album_id ? `/albums/${item.album_id}` : null
 }
 const selectType = (type: ActivityType) => router.push({ query: { ...route.query, type, page: undefined } })

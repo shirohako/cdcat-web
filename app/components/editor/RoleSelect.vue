@@ -10,14 +10,14 @@
 <script setup lang="ts">
 import type { CreditRoleDefinition } from '~/types/catalog'
 
-/** A credit role from the dictionary, limited to roles allowed at this level (album, track or work). */
-const props = defineProps<{ level: 'album' | 'track' | 'work' }>()
+/** A credit role from the dictionary, limited to roles allowed at this level (album or track). */
+const props = defineProps<{ level: 'album' | 'track' }>()
 const model = defineModel<string>({ required: true })
 
 const { schema, roleName } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 
-const allowed = (role: CreditRoleDefinition) => props.level === 'album' ? role.is_album_role : props.level === 'track' ? role.is_track_role : role.is_work_role
+const allowed = (role: CreditRoleDefinition) => props.level === 'album' ? role.is_album_role : role.is_track_role
 const roles = computed(() => (schema.value?.credit_roles ?? []).filter(allowed))
 const invalid = computed(() => !!model.value && !roles.value.some(role => role.key === model.value))
 const groups = computed(() => {

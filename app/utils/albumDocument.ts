@@ -14,6 +14,7 @@ export type AlbumProductRow = AlbumDocument['products'][number]
 export type AlbumBonusRow = AlbumDocument['bonuses'][number]
 export type AlbumImageRow = AlbumDocument['images'][number]
 export type AlbumCreditRow = AlbumDocument['credits'][number]
+export type AlbumOriginalRow = AlbumDocument['track_originals'][number]
 export type TitleCollection = 'titles' | 'disc_titles' | 'track_titles'
 
 /** A new album: one CD and nothing else. The server adds a default edition when there is none. */
@@ -37,6 +38,7 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   disc_titles: [],
   tracks: [],
   track_titles: [],
+  track_originals: [],
   disc_tocs: [],
   credits: [],
   images: [],
@@ -46,6 +48,12 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   links: [],
   entries: [],
 })
+
+/** Brings a document kept in a draft up to date: tracks lose `work_id`, and `track_originals` exists. */
+export function upgradeAlbumDocument(doc: AlbumDocument) {
+  for (const track of doc.tracks as Array<AlbumDocument['tracks'][number] & { work_id?: unknown }>) delete track.work_id
+  doc.track_originals ??= []
+}
 
 // ---- discs and tracks -------------------------------------------------------------------------
 
@@ -110,17 +118,18 @@ export function addTrack(doc: AlbumDocument, discId: RowId, fields: Partial<Albu
   const last = tracksOn(doc, discId).at(-1)
   doc.tracks.push({
     id: newKey('t'), disc_id: discId, track_number: (last?.track_number ?? 0) + 1, number_label: null, title: '',
-    duration: null, is_instrumental: false, isrc: null, work_id: null, ...fields,
+    duration: null, is_instrumental: false, isrc: null, ...fields,
   })
   return doc.tracks[doc.tracks.length - 1]!
 }
 
-/** Removes tracks and what hangs on them: names, credits, details and links. */
+/** Removes tracks and what hangs on them: names, credits, details and 原曲, including other tracks' 原曲 pointing at them. */
 function removeTrackRows(doc: AlbumDocument, ids: Set<string>) {
   if (!ids.size) return
   doc.tracks = doc.tracks.filter(track => !ids.has(String(track.id)))
   doc.track_titles = doc.track_titles.filter(row => !ids.has(String(row.track_id)))
   doc.track_attributes = doc.track_attributes.filter(row => !ids.has(String(row.track_id)))
+  doc.track_originals = doc.track_originals.filter(row => !ids.has(String(row.track_id)) && !ids.has(String(row.original_track_id)))
   doc.credits = doc.credits.filter(row => row.track_id === null || !ids.has(String(row.track_id)))
 }
 
@@ -451,12 +460,14 @@ const blank = (value: unknown): boolean => value === null || value === undefined
 
 /**
  * A copy without rows left empty in the editor: blank names, links without a URL, details without a
- * value. Drafts saved before fields were dropped still carry them, so they go too: `track_links`, and
- * the entries' `character_name` and `episode`.
+ * value. Drafts saved before fields were dropped still carry them, so they go too: `track_links`, the
+ * tracks' `work_id`, and the entries' `character_name` and `episode`.
  */
 export function pruneAlbumDocument(doc: AlbumDocument): AlbumDocument {
   const copy = JSON.parse(JSON.stringify(doc)) as AlbumDocument & { track_links?: unknown }
   delete copy.track_links
+  for (const track of copy.tracks as Array<Record<string, unknown>>) delete track.work_id
+  copy.track_originals = (copy.track_originals ?? []).filter(row => row.original_track_id !== null || !blank(row.original_title))
   for (const row of copy.entries as Array<Record<string, unknown>>) {
     delete row.character_name
     delete row.episode

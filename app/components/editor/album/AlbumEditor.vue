@@ -116,17 +116,17 @@ import type { Component } from 'vue'
 import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '~/composables/useAlbumEditor'
 import type { DraftItem, RevisionPayload } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
-import type { AggregateRef, AlbumDocument, WorkDocument } from '~/types/document'
+import type { AlbumDocument } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
 import { Contact, Gift, History, Images, Info, Languages, ListMusic, Network, Package, PencilLine, Send, Users, Circle, CircleCheck } from '@lucide/vue'
 import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
-import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument } from '~/utils/albumDocument'
+import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument, upgradeAlbumDocument } from '~/utils/albumDocument'
 import { newRef } from '~/utils/documentKeys'
 import { newDraftScope } from '~/utils/localDrafts'
 
 /**
- * The album editor (docs/catalog/editing.md): the album document and any artists, labels and works
+ * The album editor (docs/catalog/editing.md): the album document and any artists and labels
  * created on the way are items of one revision, kept as a draft in this browser while editing and
  * submitted together. Sections mount one at a time; `mode=translate` opens the tracklist translator.
  * `revisionId` continues a revision sent back for changes, `draftScope` a new album's draft (?draft=).
@@ -194,7 +194,7 @@ const pending = computed(() => Object.fromEntries(items.value
   .map(item => [item.ref, String(item.document?.name ?? item.document?.title ?? item.ref) || '…'])))
 
 const createItem = (type: NewItemType, document: Record<string, unknown>) => {
-  const ref = newRef(type === 'artist' ? 'ar' : type === 'label' ? 'lb' : 'wk')
+  const ref = newRef(type === 'artist' ? 'ar' : 'lb')
   items.value.push({ ref, resource_type: type, action: 'create', document })
   return `@${ref}`
 }
@@ -233,69 +233,6 @@ const removeItem = (ref: string) => {
   }
 }
 
-// ---- works: shown with their originals, edited as update items on demand ----
-
-const workCache = reactive<Record<string, { document: WorkDocument, version: number }>>({})
-const workLoads = new Map<number, Promise<void>>()
-
-const loadWork = (id: number): Promise<void> => {
-  if (workCache[id]) return Promise.resolve()
-  const running = workLoads.get(id)
-  if (running) return running
-  const promise = $api<{ document: WorkDocument, version: number, references?: CatalogReferences }>(`/v1/works/${id}/document`)
-    .then((data) => {
-      workCache[id] = { document: data.document, version: data.version }
-      mergeReferences(data.references)
-    })
-    .catch(() => { /* the panel shows no originals */ })
-    .finally(() => workLoads.delete(id))
-  workLoads.set(id, promise)
-  return promise
-}
-
-const workItemOf = (workId: AggregateRef) => typeof workId === 'string'
-  ? itemOf(workId.replace(/^@/, ''))
-  : items.value.find(item => item.resource_type === 'work' && item.action === 'update' && item.resource_id === workId)
-
-const workDocument = (workId: AggregateRef | null) => {
-  if (workId === null) return null
-  const item = workItemOf(workId)
-  if (item?.document) return item.document as unknown as WorkDocument
-  return typeof workId === 'number' ? workCache[workId]?.document ?? null : null
-}
-
-const workItem = async (workId: AggregateRef) => {
-  const existing = workItemOf(workId)
-  if (existing || typeof workId === 'string') return existing ?? null
-  await loadWork(workId)
-  const loadedWork = workCache[workId]
-  if (!loadedWork) return null
-  const ref = `w${workId}`
-  originals[ref] = clone(loadedWork.document) as unknown as Record<string, unknown>
-  items.value.push({ ref, resource_type: 'work', action: 'update', resource_id: workId, base_version: loadedWork.version, document: clone(loadedWork.document) as unknown as Record<string, unknown> })
-  return items.value[items.value.length - 1]!
-}
-
-const tidyItem = (ref: string) => {
-  const item = itemOf(ref)
-  if (item?.action === 'update' && ref !== mainRef.value && JSON.stringify(item.document) === JSON.stringify(originals[ref])) {
-    items.value = items.value.filter(entry => entry.ref !== ref)
-  }
-}
-
-/** A new work made for a track follows the track's title until it is renamed. */
-const titles = new Map<string, string>()
-watch(() => album.value.tracks.map(track => [String(track.id), track.title, track.work_id] as const), (rows) => {
-  for (const [id, title, workId] of rows) {
-    const before = titles.get(id)
-    if (before !== undefined && before !== title && typeof workId === 'string') {
-      const item = itemOf(workId.replace(/^@/, ''))
-      if (item?.action === 'create' && item.document?.title === before) item.document.title = title
-    }
-    titles.set(id, title)
-  }
-})
-
 // ---- errors and sections ----
 
 const errors = ref<FieldError[]>([])
@@ -313,7 +250,7 @@ const setErrors = (list: FieldError[]) => {
 const SECTION_FIELDS: Partial<Record<AlbumSection, string[]>> = {
   basic: ['title', 'slug', 'type', 'categories', 'release_date', 'release_date_precision', 'release_event_id', 'description', 'is_adult', 'banner_url', 'titles'],
   people: ['artists', 'labels'],
-  tracks: ['discs', 'tracks', 'disc_titles', 'track_titles', 'disc_tocs', 'track_attributes'],
+  tracks: ['discs', 'tracks', 'disc_titles', 'track_titles', 'track_originals', 'disc_tocs', 'track_attributes'],
   credits: ['credits'],
   editions: ['products'],
   bonuses: ['bonuses'],
@@ -372,7 +309,7 @@ const itemLabels = computed(() => Object.fromEntries(items.value.map((item) => {
 })))
 
 const context: AlbumEditorContext = {
-  albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced, workDocument, loadWork, workItem, tidyItem,
+  albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,
   remember, errors, errorAt, errorsIn, go, notify: showToast,
 }
 provide(albumEditorKey, context)
@@ -439,11 +376,20 @@ const findOpenRevisions = async (id: number) => {
   } catch { /* the banner is optional */ }
 }
 
+/** Drafts kept from before 乐曲 were removed: their work items go and album documents get the newer collections. */
+const upgradeItems = () => {
+  items.value = items.value.filter(item => (item.resource_type as string) !== 'work')
+  for (const item of items.value) {
+    if (item.resource_type === 'album' && item.document) upgradeAlbumDocument(item.document as unknown as AlbumDocument)
+  }
+}
+
 const open = async () => {
   if (props.revisionId) await openRevision(props.revisionId)
   else if (props.draftScope) await openDraft(props.draftScope)
   else if (albumId) await openAlbum(albumId)
   else await startNew()
+  upgradeItems()
 }
 
 onMounted(async () => {

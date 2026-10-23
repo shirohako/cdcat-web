@@ -101,11 +101,11 @@ export const useCatalogDisplay = () => {
     return String(value ?? '')
   }
 
-  /** Where a referenced attribute value links to, e.g. /works/12. */
+  /** Where a referenced attribute value links to, e.g. /entries/12. */
   const attributeLink = (attribute: CatalogAttribute) => {
     const value = attribute.value as { type?: string, id?: number } | null
     if (!value || typeof value !== 'object' || !value.type || !value.id) return null
-    const resource = { album: 'albums', artist: 'artists', label: 'labels', work: 'works', entry: 'entries', franchise: 'franchises' }[value.type]
+    const resource = { album: 'albums', artist: 'artists', label: 'labels', entry: 'entries', franchise: 'franchises' }[value.type]
     return resource ? `/${resource}/${value.id}` : null
   }
 

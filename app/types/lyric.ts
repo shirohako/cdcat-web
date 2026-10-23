@@ -1,7 +1,7 @@
-// Lyrics belong to works and are post-moderated. Backend: docs/api/lyrics.md.
+// Lyrics belong to tracks and are post-moderated. Backend: docs/api/lyrics.md.
 
+import type { AlbumSimple } from './album'
 import type { UserSummary } from './catalog'
-import type { WorkSimple } from './work'
 
 export const LYRIC_KINDS = ['original', 'translation', 'transliteration'] as const
 export type LyricKind = typeof LYRIC_KINDS[number]
@@ -12,7 +12,7 @@ export type LyricFormat = typeof LYRIC_FORMATS[number]
 /** A lyric without its text, as lists return it. */
 export interface LyricSummary {
   id: number
-  work_id: number
+  track_id: number
   kind: LyricKind
   language: string
   translation_of_id: number | null
@@ -27,11 +27,11 @@ export interface LyricSummary {
 export interface Lyric extends LyricSummary {
   content: string
   source: string | null
-  work?: WorkSimple
+  track?: { id: number, title: string, disc_number: number | null, track_number: number, album: AlbumSimple }
   created_at: string
 }
 
-/** Fields sent to POST /works/{id}/lyrics and PUT /lyrics/{id}. */
+/** Fields sent to POST /tracks/{id}/lyrics and PUT /lyrics/{id}. */
 export interface LyricInput {
   kind: LyricKind
   language: string

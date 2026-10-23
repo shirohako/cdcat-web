@@ -1,15 +1,15 @@
-// Shared shapes of the catalog API (albums, artists, labels, works, lyrics, entries, franchises).
+// Shared shapes of the catalog API (albums, artists, labels, lyrics, entries, franchises).
 // Backend docs: docs/api/catalog.md, versions.md, revisions.md; data model docs/catalog/README.md.
 
 import type { DatePrecision } from './entry'
 
 /** Aggregate types edited through revisions, as the API names them. */
-export const CATALOG_TYPES = ['album', 'artist', 'label', 'work', 'lyric', 'entry', 'franchise'] as const
+export const CATALOG_TYPES = ['album', 'artist', 'label', 'lyric', 'entry', 'franchise'] as const
 export type CatalogType = typeof CATALOG_TYPES[number]
 
 /** URL segment of each type: /v1/albums/{id}/versions … */
 export const CATALOG_RESOURCES: Record<CatalogType, string> = {
-  album: 'albums', artist: 'artists', label: 'labels', work: 'works', lyric: 'lyrics', entry: 'entries', franchise: 'franchises',
+  album: 'albums', artist: 'artists', label: 'labels', lyric: 'lyrics', entry: 'entries', franchise: 'franchises',
 }
 
 /**
@@ -77,7 +77,6 @@ export interface CreditRoleDefinition {
   names: LocalizedText
   is_album_role: boolean
   is_track_role: boolean
-  is_work_role: boolean
 }
 
 export interface AttributeDefinition {
@@ -102,7 +101,7 @@ export interface CatalogSchema {
   limits: { cover_min_size: number, cover_square_tolerance: number, image_max_bytes: number }
 }
 
-/** A credit on an album, a track or a work. `artist` is null when only a printed name is known. */
+/** A credit on an album or a track. `artist` is null when only a printed name is known. */
 export interface CatalogCredit {
   id: number
   role: string

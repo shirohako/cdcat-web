@@ -52,7 +52,7 @@ import { ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder } from '~/utils/documentRows'
 
-/** External links of an album, artist, label, work, entry or series, added and edited in a dialog. */
+/** External links of an album, artist, label, entry or series, added and edited in a dialog. */
 const rows = defineModel<LinkRow[]>({ required: true })
 const { t } = useI18n()
 const { schema } = useCatalogSchema()

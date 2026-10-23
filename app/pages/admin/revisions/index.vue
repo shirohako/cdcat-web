@@ -5,7 +5,7 @@ import { REVISION_STATUSES } from '~/types/revision'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const TYPES = ['album', 'artist', 'label', 'work', 'lyric', 'entry', 'franchise'] as const
+const TYPES = ['album', 'artist', 'label', 'lyric', 'entry', 'franchise'] as const
 const FLAGS = ['has_conflicts', 'requires_content_manage', 'unchecked', 'applied'] as const
 
 const route = useRoute()

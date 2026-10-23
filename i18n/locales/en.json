@@ -59,9 +59,8 @@
       "translation_with_count": "Translations {count}",
       "language": "Tracklist language",
       "original": "Original titles",
-      "other_recordings": "+{count} recordings",
-      "other_recordings_hint": "The same song appears on other releases",
-      "translate": "Translate"
+      "translate": "Translate",
+      "original_songs": "Original: "
     },
     "actions": {},
     "empty": {
@@ -968,14 +967,15 @@
     "translation_of": "Translation of",
     "summary": "What changed",
     "summary_placeholder": "Optional, e.g. fixed line 3",
-    "empty_hint": "Lyrics belong to the song, so every recording shows them.",
+    "empty_hint": "Lyrics belong to each track, so a single version and an album version have their own.",
     "moderation_hint": "New lyrics and edits to your own go live at once and are checked later; edits to other people's lyrics wait for review.",
     "delete_confirm": "Delete these lyrics?",
     "published": "Published",
     "pending_review": "Submitted for review",
     "format_plain": "Plain text",
     "format_lrc": "LRC (timed)",
-    "format_srt": "SRT subtitles"
+    "format_srt": "SRT subtitles",
+    "open_track": "Track page"
   },
   "content_display": {
     "articles": "Articles",
@@ -1473,7 +1473,6 @@
       "album": "Album",
       "artist": "Artist",
       "label": "Label",
-      "work": "Song",
       "lyric": "Lyrics",
       "entry": "Entry",
       "franchise": "Series"
@@ -1520,28 +1519,6 @@
       "publisher": "Publisher",
       "distributor": "Distributor",
       "manufacturer": "Manufacturer",
-      "other": "Other"
-    },
-    "work_relation": {
-      "arranged_from": "Arrangement of",
-      "arrangement": "Arranged as",
-      "covered_from": "Cover of",
-      "cover": "Covered as",
-      "remixed_from": "Remix of",
-      "remix": "Remixed as",
-      "medley": "Part of medley",
-      "medley_source": "Medley of",
-      "version": "Other version",
-      "related": "Related"
-    },
-    "entry_work_relation": {
-      "bgm": "BGM",
-      "opening": "Opening",
-      "ending": "Ending",
-      "insert_song": "Insert song",
-      "theme_song": "Theme song",
-      "character_song": "Character song",
-      "image_song": "Image song",
       "other": "Other"
     },
     "artist_relation": {
@@ -1627,7 +1604,6 @@
       "source": "Source",
       "translator": "Translator",
       "is_ai_generated": "AI generated",
-      "work_id": "Song",
       "translation_of_id": "Translation of",
       "platforms": "Platforms",
       "sort_order": "Order",
@@ -1674,7 +1650,6 @@
       "relation_type": "Relation",
       "character_name": "Character",
       "episode": "Episode",
-      "related_work_id": "Song",
       "related_entry_id": "Entry",
       "related_artist_id": "Artist",
       "locale": "Language",
@@ -1683,7 +1658,9 @@
       "leadout_offset": "Lead-out",
       "offsets": "Offsets",
       "album_id": "Album",
-      "album_image_id": "Image"
+      "album_image_id": "Image",
+      "original_track_id": "Original track",
+      "original_title": "Original title"
     },
     "collection": {
       "titles": "Other names",
@@ -1704,7 +1681,8 @@
       "links": "Links",
       "entries": "Entries",
       "relations": "Relations",
-      "albums": "Albums"
+      "albums": "Albums",
+      "track_originals": "Originals"
     },
     "credit_role_category": {
       "composition": "Composition",
@@ -2075,32 +2053,15 @@
     "no_results": "No labels found",
     "not_found": "This label does not exist."
   },
-  "works": {
-    "title": "Songs",
-    "subtitle": "A song links its recordings on every release, with lyrics and arrangements.",
-    "label": "Song",
-    "recordings": "{count} recordings",
-    "recordings_title": "Recordings",
-    "lyrics_count": "{count} lyrics",
-    "no_recordings": "Not on any album yet",
-    "credits": "Writers",
-    "relations": "Related songs",
-    "entries": "Used in",
-    "open": "Song page",
-    "no_results": "No songs found",
-    "not_found": "This song does not exist.",
-    "duplicates": {
-      "title": "Possibly the same song",
-      "hint": "Songs whose titles match once version notes such as “Instrumental” or “TV size” are ignored. If they are the same song, link the tracks to one song in the album editor (click an album), or ask a content manager to merge them. If not, mark them as different and they stop showing up here.",
-      "empty": "Nothing to check right now.",
-      "not_same": "Different songs",
-      "merge": "Merge…",
-      "relink_hint": "Open this album in the editor to link the track to the other song"
-    }
-  },
   "tracks": {
     "not_found": "This track does not exist.",
-    "work": "Song: {title}"
+    "originals_section": "Originals",
+    "originals": "Based on",
+    "derived_tracks": "Tracks based on it ({count})",
+    "album_tracklist": "Album tracklist",
+    "previous": "Previous",
+    "next": "Next",
+    "edit_hint": "Tracks are edited with their album"
   },
   "shouts": {
     "title": "Shouts",
@@ -2314,7 +2275,7 @@
       "add_artist": "Add an artist…",
       "add_label": "Add a label…",
       "credited_as_placeholder": "Credited as",
-      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its song, original song, details and links.",
+      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.",
       "empty_tracklist": "No tracks yet",
       "empty_tracklist_hint": "Paste a tracklist from the booklet, a shop page or VGMdb, or add tracks one by one.",
       "disc_n": "Disc {n}",
@@ -2328,7 +2289,7 @@
       "remove_track_confirm": "Remove “{title}”? Favorites of this track are removed too.",
       "no_tracks": "No tracks on this disc.",
       "track_title": "Track title",
-      "track_details": "Song, details and links",
+      "track_details": "Originals, details and links",
       "duplicate_number": "Another track on this disc has this number",
       "move_to_disc": "Move to",
       "totals": "{discs} discs · {tracks} tracks",
@@ -2355,30 +2316,6 @@
       "count_mismatch": "but the disc has {count} tracks",
       "unreadable": "No TOC table found in this text.",
       "add": "Add TOC"
-    },
-    "work": {
-      "song": "Song",
-      "auto": "A new song is created for this track",
-      "recordings": "{count} recording | {count} recordings",
-      "separate": "Make it a song of its own",
-      "link_other": "Same song as an existing one…",
-      "search": "Search songs",
-      "hint": "Tracks of one song share lyrics and translations, e.g. a single and its album version, or an instrumental.",
-      "suggestions": "Possibly the same song",
-      "on_albums": "{count} tracks · {albums}",
-      "same_song": "Same song",
-      "not_same": "Not the same",
-      "originals": "Original song",
-      "originals_hint": "For arrangements, covers, remixes and medleys: the song this track is based on. If it is not in the catalog yet, type its name to add it.",
-      "search_original": "Search the original song, or type a new one",
-      "find_same": "Find same songs",
-      "found": "{count} track may record a song already in the catalog. | {count} tracks may record songs already in the catalog.",
-      "accept_all": "Link all",
-      "linked": "Linked {count} track | Linked {count} tracks",
-      "none_found": "No matching songs found.",
-      "same_song_badge": "Same song?",
-      "new_badge": "New song",
-      "new_badge_hint": "A new song is added with this revision"
     },
     "credits": {
       "hint": "One row per person and role. Credit the whole album, or pick the tracks.",
@@ -2478,14 +2415,11 @@
       "hint": "created when the revision is published",
       "remove": "Remove",
       "remove_confirm": "The album still uses this. Remove it anyway?",
-      "used_tracks": "song of {count} track | song of {count} tracks",
       "used_credits": "credited {count}×",
-      "used_elsewhere": "used as an original song",
+      "used_elsewhere": "used elsewhere",
       "unused": "not used yet",
-      "add_composer": "Add composer…",
-      "add_source": "Add source (game, anime…)",
       "edited": "Edits {type}",
-      "edited_hint": "original songs added from the tracklist"
+      "edited_hint": "also edited in this revision"
     },
     "entity": {
       "new_title": "New {type}",
@@ -2504,13 +2438,7 @@
       "parent_label": "Parent label",
       "parent_label_hint": "For imprints and sub-labels, e.g. a vinyl imprint of a record company.",
       "prefixes_hint": "Catalog number prefixes, comma-separated. Used to guess the label when an album is added.",
-      "work_hint": "A song is what tracks of the same piece share, e.g. its single, album and instrumental versions. Lyrics belong to the song.",
-      "work_credits_hint": "Credits of the song itself: who wrote it. Mostly for songs that are not on any album yet, such as game music.",
       "name_only_credit": "Name only",
-      "work_relations": "Related songs",
-      "work_relations_hint": "Original songs, arrangements, covers, remixes and medleys, seen from this song.",
-      "work_entries": "Source",
-      "work_entries_hint": "The game, anime or other work the song comes from, e.g. a game's BGM.",
       "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",
       "artist_type_placeholder": "Choose the artist type"
     },
@@ -2571,9 +2499,6 @@
       "image_preview": "The preview appears here",
       "image_no_preview": "No preview, but you can still try importing",
       "image_kind_guess": "Guess from the address",
-      "original_add": "Add original",
-      "original_required": "Choose the original, or type a title to create it.",
-      "pick_closes": "Choosing one links it right away.",
       "new_artist_type": "Type of the new artist",
       "new_artist_type_required": "Choose the new artist’s type."
     },
@@ -2583,6 +2508,15 @@
       "featuring": "Add two artists: Yuki Kajiura with the join phrase “feat.”, then Joelle.",
       "credited": "When the catalog lists her as 梶浦由記, choose that artist and enter Yuki Kajiura under “Credited as”.",
       "circle": "When only the circle is printed, enter just the circle; composers and singers go under Credits."
+    },
+    "originals": {
+      "title": "Originals",
+      "hint": "The pieces this track arranges, covers, remixes or uses in a medley. Pick a track from the catalog; if it isn’t there, the text you type is saved as the original.",
+      "search": "Search tracks, or type the original’s name",
+      "use_text": "Use the text “{name}”",
+      "text_only": "Text only",
+      "text_only_hint": "This original isn’t in the catalog yet; only its name is recorded",
+      "badge": "Originals {count}"
     }
   },
   "revision_page": {
@@ -2698,7 +2632,6 @@
       "track": "Tracks",
       "artist": "Artists",
       "label": "Labels",
-      "work": "Works",
       "entry": "Entries",
       "franchise": "Series"
     }

@@ -57,7 +57,7 @@ import { CATALOG_RESOURCES } from '~/types/catalog'
 import { newDraftScope } from '~/utils/localDrafts'
 
 /**
- * Editor for one artist, label, work, entry or series (docs/catalog/editing.md): the fields come
+ * Editor for one artist, label, entry or series (docs/catalog/editing.md): the fields come
  * from the default slot, which reads the document with useEntityEditor(). Like the album editor it
  * keeps the draft in this browser while editing and submits one revision.
  */

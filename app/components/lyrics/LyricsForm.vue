@@ -69,7 +69,7 @@ import type { Lyric, LyricInput, LyricSummary } from '~/types/lyric'
 import type { Revision } from '~/types/revision'
 import { LYRIC_FORMATS, LYRIC_KINDS } from '~/types/lyric'
 
-const props = defineProps<{ workId: number, lyric: Lyric | null, originals: LyricSummary[] }>()
+const props = defineProps<{ trackId: number, lyric: Lyric | null, originals: LyricSummary[] }>()
 const emit = defineEmits<{ saved: [{ revision: Revision, lyric: Lyric | null }], cancel: [] }>()
 
 const LANGUAGES = ['ja', 'ja-Latn', 'zh-Hans', 'zh-Hant', 'en', 'ko']
@@ -107,7 +107,7 @@ const submit = async () => {
   try {
     const result = props.lyric
       ? await $api<{ revision: Revision, lyric: Lyric | null }>(`/v1/lyrics/${props.lyric.id}`, { method: 'PUT', body })
-      : await $api<{ revision: Revision, lyric: Lyric | null }>(`/v1/works/${props.workId}/lyrics`, { method: 'POST', body })
+      : await $api<{ revision: Revision, lyric: Lyric | null }>(`/v1/tracks/${props.trackId}/lyrics`, { method: 'POST', body })
     emit('saved', result)
   } catch (err) {
     errorMessage.value = localizeError(err)

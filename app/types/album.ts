@@ -4,7 +4,6 @@ import type { ApiResponse } from './api'
 import type { CatalogAttribute, CatalogCredit, CatalogImage, CatalogLink, CatalogTitle, CatalogTitleKind, PendingFields, UserSummary } from './catalog'
 import type { DatePrecision, EntryAlbumRelation, EntryType } from './entry'
 import type { TrackingStatus } from './tracking'
-import type { WorkSimple } from './work'
 
 export const ALBUM_TYPES = ['album', 'ep', 'single', 'compilation', 'drama', 'radio'] as const
 export type AlbumType = typeof ALBUM_TYPES[number]
@@ -80,6 +79,12 @@ export interface AlbumLabelRef {
   credited_as: string | null
 }
 
+/** A 原曲 of a track: another track in the catalog, or only its name when it is not in the catalog. */
+export interface TrackOriginal {
+  title: string
+  track: { id: number, album: { id: number, title: string } } | null
+}
+
 export interface AlbumTrack {
   id: number
   disc_number: number
@@ -93,7 +98,11 @@ export interface AlbumTrack {
   isrc: string | null
   favorites_count: number
   is_favorited: boolean
-  work: WorkSimple | null
+  /** Has original lyrics. */
+  has_lyrics: boolean
+  lyrics_count: number
+  translations_count: number
+  originals: TrackOriginal[]
   credits: CatalogCredit[]
   attributes: CatalogAttribute[]
 }
@@ -258,14 +267,28 @@ export interface TrackDetail {
   duration: number | null
   is_instrumental: boolean
   isrc: string | null
-  work_id: number
   has_lyrics: boolean
+  lyrics_count: number
   translations_count: number
+  /** On GET /tracks/{id}. */
+  originals?: TrackOriginal[]
+  /** Tracks that use this one as their 原曲, on GET /tracks/{id}. */
+  derived_tracks?: Array<{ id: number, title: string, album: AlbumSimple }>
+  /** Every track of the album in disc and track order, on GET /tracks/{id}. */
+  album_tracks?: Array<{
+    id: number
+    disc_number: number
+    track_number: number
+    number_label: string | null
+    title: string
+    titles: CatalogTitle[]
+    duration: number | null
+    has_lyrics: boolean
+  }>
   favorites_count: number
   is_favorited: boolean
   /** Its album awaits review. */
   is_pending?: boolean
-  work?: WorkSimple | null
   album?: AlbumSimple
   credits?: Array<Omit<CatalogCredit, 'category'>>
   attributes?: CatalogAttribute[]

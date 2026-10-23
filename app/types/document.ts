@@ -39,8 +39,10 @@ export interface AlbumDocument {
   disc_titles: Array<TitleRow & { disc_id: RowId }>
   tracks: Array<{
     id: RowId, disc_id: RowId, track_number: number, number_label: string | null, title: string, duration: number | null,
-    is_instrumental: boolean, isrc: string | null, work_id: AggregateRef | null
+    is_instrumental: boolean, isrc: string | null
   }>
+  /** 原曲 of a track: a saved track elsewhere in the catalog, or only a name. Exactly one of the two is set. */
+  track_originals: Array<{ id: RowId, track_id: RowId, original_track_id: number | null, original_title: string | null, sort_order?: number }>
   track_titles: Array<TitleRow & { track_id: RowId }>
   disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], source: string }>
   credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, role: string, detail: string | null, sort_order?: number }>
@@ -82,17 +84,6 @@ export interface LabelDocument {
   end_date_precision: DatePrecision
   catalog_prefixes: string[]
   titles: TitleRow[]
-  links: LinkRow[]
-  attributes: AttributeRow[]
-}
-
-export interface WorkDocument {
-  title: string
-  description: string | null
-  titles: TitleRow[]
-  credits: Array<{ id: RowId, artist_id: AggregateRef | null, credited_as: string | null, role: string, detail: string | null, sort_order?: number }>
-  relations: Array<{ id: RowId, related_work_id: AggregateRef | null, relation_type: string, note: string | null }>
-  entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, episode: number | null, note: string | null, sort_order?: number }>
   links: LinkRow[]
   attributes: AttributeRow[]
 }

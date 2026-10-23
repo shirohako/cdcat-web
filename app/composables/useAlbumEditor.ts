@@ -1,10 +1,10 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import type { CatalogReferences } from '~/types/catalog'
-import type { AggregateRef, AlbumDocument, WorkDocument } from '~/types/document'
-import type { DraftItem, useRevisionDraft } from './useRevisionDraft'
+import type { AlbumDocument } from '~/types/document'
+import type { useRevisionDraft } from './useRevisionDraft'
 
 export interface FieldError { path: string, message: string }
-export type NewItemType = 'artist' | 'label' | 'work'
+export type NewItemType = 'artist' | 'label'
 export type AlbumSection = 'basic' | 'people' | 'tracks' | 'credits' | 'editions' | 'bonuses' | 'images' | 'relations' | 'translate' | 'submit'
 
 /** What the album editor shares with its sections (components/editor/album). */
@@ -23,14 +23,6 @@ export interface AlbumEditorContext {
   removeItem: (ref: string) => void
   /** Whether any item of the revision still points at "@ref". */
   referenced: (ref: string) => boolean
-  /** A work's document as this revision has it: its item's, or the loaded current one (see loadWork); null until loaded. */
-  workDocument: (workId: AggregateRef | null) => WorkDocument | null
-  /** Loads an existing work's document for display, without adding it to the revision. */
-  loadWork: (workId: number) => Promise<void>
-  /** The item that edits a work: the create item of "@ref", or an update item added on first use. */
-  workItem: (workId: AggregateRef) => Promise<DraftItem | null>
-  /** Drops an update item whose document is back to what was loaded. */
-  tidyItem: (ref: string) => void
   /** Remembers the name of an entity picked in the editor, for labels and the change preview. */
   remember: (type: string, id: number, row: object) => void
   errors: Ref<FieldError[]>

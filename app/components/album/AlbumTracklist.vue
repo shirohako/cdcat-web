@@ -65,14 +65,16 @@
               <span v-if="track.is_instrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
                 <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-600"><Music2 :size="11" :stroke-width="2.5" /></span>
               </span>
-              <NuxtLink
-                v-if="track.work && track.work.tracks_count > 1"
-                :to="`/works/${track.work.id}`"
-                class="tooltip tooltip-bottom shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500 hover:bg-indigo-100 hover:text-indigo-600"
-                :data-tip="$t('album.tracklist.other_recordings_hint')"
-              >{{ $t('album.tracklist.other_recordings', { count: track.work.tracks_count - 1 }) }}</NuxtLink>
             </div>
             <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-gray-400">{{ track.subtitle }}</p>
+            <p v-if="track.originals.length" class="mt-0.5 truncate text-xs text-gray-500">
+              <span class="text-gray-400">{{ $t('album.tracklist.original_songs') }}</span>
+              <template v-for="(original, index) in track.originals" :key="index">
+                <NuxtLink v-if="original.track" :to="`/tracks/${original.track.id}`" class="hover:text-indigo-600 hover:underline">{{ original.title }}</NuxtLink>
+                <span v-else>{{ original.title }}</span>
+                <span v-if="index < track.originals.length - 1" class="text-gray-300"> / </span>
+              </template>
+            </p>
 
             <div v-if="showCredits && (track.creditGroups.length || track.attributes.length)" class="mt-2 space-y-1 border-t border-gray-100 pt-2 text-xs">
               <div v-for="group in track.creditGroups" :key="group.role" class="flex items-baseline gap-2">
@@ -95,15 +97,15 @@
           <div class="flex shrink-0 flex-col items-center justify-center gap-1 sm:items-end">
             <span class="text-xs tabular-nums text-gray-400">{{ formatDuration(track.duration) || '--' }}</span>
             <button
-              v-if="track.work && !track.is_instrumental"
+              v-if="!track.is_instrumental"
               type="button"
               class="inline-flex cursor-pointer items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors"
-              :class="track.work.lyrics_count ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+              :class="track.lyrics_count ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
               @click="openLyrics(track)"
             >
               <FileText :size="10" />
               <span class="hidden sm:inline">{{ $t('album.tracklist.lyric') }}</span>
-              <span v-if="track.work.translations_count" class="text-teal-500">+{{ track.work.translations_count }}</span>
+              <span v-if="track.translations_count" class="text-teal-500">+{{ track.translations_count }}</span>
             </button>
           </div>
         </div>
@@ -119,7 +121,7 @@
     </div>
   </CatalogSection>
 
-  <LyricsModal v-model="showLyrics" :work-id="lyricsTarget.workId" :title="lyricsTarget.title" />
+  <LyricsModal v-model="showLyrics" :track-id="lyricsTarget.trackId" :title="lyricsTarget.title" />
 </template>
 
 <script setup lang="ts">
@@ -219,9 +221,9 @@ const toggleFavorite = async (trackId: number) => {
 }
 
 const showLyrics = ref(false)
-const lyricsTarget = ref<{ workId: number | null, title: string }>({ workId: null, title: '' })
-const openLyrics = (track: { work: AlbumTrack['work'], shownTitle: string }) => {
-  lyricsTarget.value = { workId: track.work?.id ?? null, title: track.shownTitle }
+const lyricsTarget = ref<{ trackId: number | null, title: string }>({ trackId: null, title: '' })
+const openLyrics = (track: { id: number, shownTitle: string }) => {
+  lyricsTarget.value = { trackId: track.id, title: track.shownTitle }
   showLyrics.value = true
 }
 </script>

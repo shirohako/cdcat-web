@@ -69,7 +69,8 @@ export const useDocumentSchema = (type: MaybeRefOrGetter<CatalogType>) => {
 
   const referenceLabel = (target: string, id: unknown, references: CatalogReferences) => {
     if (typeof id === 'string') return id.startsWith('@') ? t('catalog.new_item', { ref: id.slice(1) }) : id
-    const row = references[target]?.[String(id)] as Record<string, unknown> | undefined
+    // Tracks are referenced by table (原曲 point at them) but listed under the morph alias.
+    const row = references[target === 'tracks' ? 'track' : target]?.[String(id)] as Record<string, unknown> | undefined
     const name = row?.title ?? row?.name
     return name ? String(name) : `#${String(id)}`
   }

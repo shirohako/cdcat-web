@@ -11,7 +11,7 @@ export const mainItem = <T extends ItemLike>(items: T[] = []): T | null => items
 
 const EDITORS: Partial<Record<CatalogType, string>> = {
   album: '/contribute/album', artist: '/contribute/artist', label: '/contribute/label',
-  work: '/contribute/work', entry: '/contribute/entry', franchise: '/contribute/franchise',
+  entry: '/contribute/entry', franchise: '/contribute/franchise',
 }
 
 /** Whether the submitter can still change the revision: it was sent back for changes. */
@@ -21,7 +21,7 @@ export const isOpenRevision = (status: RevisionStatus) => status === 'changes_re
 const newItemPath = (type: CatalogType, base: string) => type === 'entry' ? `${base}/create` : base
 
 /**
- * Where to continue a revision sent back; null for lyrics, which are edited on their song's page.
+ * Where to continue a revision sent back; null for lyrics, which are edited on their track's page.
  * Once its main item went live at submission (applied_at), the entity itself is edited instead.
  */
 export const editorPath = (revision: { id: number, items?: Array<ItemLike & { applied_at?: string | null }> }) => {

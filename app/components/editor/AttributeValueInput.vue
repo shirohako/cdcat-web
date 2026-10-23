@@ -44,7 +44,7 @@ const { enumLabel } = useCatalogDisplay()
 
 const dated = computed(() => (model.value && typeof model.value === 'object' ? model.value : { date: '', precision: 'day' }) as { date: string, precision: string })
 const reference = computed(() => model.value && typeof model.value === 'object' && 'type' in model.value ? model.value as { type: string, id: number } : null)
-const referenceType = ref(props.definition?.reference_types?.[0] ?? 'work')
+const referenceType = ref(props.definition?.reference_types?.[0] ?? 'entry')
 const picked = ref<Record<string, Record<string, Record<string, unknown>>>>({})
 const localReferences = computed(() => ({ ...props.references, ...Object.fromEntries(Object.entries(picked.value).map(([type, rows]) => [type, { ...(props.references[type] ?? {}), ...rows }])) }))
 

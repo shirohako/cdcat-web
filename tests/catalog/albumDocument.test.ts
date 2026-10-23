@@ -3,7 +3,7 @@ import {
   addBonus, addCredit, addDisc, addProduct, addTrack, coverOf, creditGroups, emptyAlbumDocument, importTracklist,
   missingRequired, moveDisc, moveTrack, moveTrackToDisc, orderedTracks, pruneAlbumDocument, removeBonus, removeDisc,
   removeProduct, removeTrack, setCover, setCreditScope, setCreditTracks, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
-  tracksOn, untickedDiscs, updateCreditGroup,
+  tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument,
 } from '../../app/utils/albumDocument'
 import { parseTracklist } from '../../app/utils/tracklistParser'
 
@@ -41,6 +41,18 @@ describe('discs and tracks', () => {
     removeTrack(doc, track.id)
     expect(doc.track_titles).toEqual([])
     expect(doc.credits.map(credit => credit.role)).toEqual(['producer'])
+  })
+
+  it('drops the 原曲 of a removed track and those pointing at it', () => {
+    const { doc, disc } = album()
+    const [a, b, c] = tracksOn(doc, disc.id).map((track, index) => Object.assign(track, { id: 10 + index }))
+    doc.track_originals.push(
+      { id: 'o1', track_id: a!.id, original_track_id: 500, original_title: null },
+      { id: 'o2', track_id: b!.id, original_track_id: a!.id, original_title: null },
+      { id: 'o3', track_id: c!.id, original_track_id: null, original_title: '亡き王女の為のセプテット' },
+    )
+    removeTrack(doc, a!.id)
+    expect(doc.track_originals.map(row => row.id)).toEqual(['o3'])
   })
 
   it('moves tracks within and across discs', () => {
@@ -146,6 +158,18 @@ describe('names and checks', () => {
     expect(doc.titles).toHaveLength(1)
     expect(pruneAlbumDocument(doc).titles).toEqual([])
     expect(pruneAlbumDocument(doc).track_titles).toHaveLength(1)
+  })
+
+  it('upgrades drafts kept from before 原曲 moved to tracks', () => {
+    const { doc, disc } = album()
+    const draft = doc as typeof doc & { track_originals?: unknown }
+    delete draft.track_originals
+    Object.assign(tracksOn(doc, disc.id)[0]!, { work_id: 3 })
+    upgradeAlbumDocument(doc)
+    expect(doc.track_originals).toEqual([])
+    expect('work_id' in tracksOn(doc, disc.id)[0]!).toBe(false)
+    doc.track_originals.push({ id: 'o1', track_id: tracksOn(doc, disc.id)[0]!.id, original_track_id: null, original_title: ' ' })
+    expect(pruneAlbumDocument(doc).track_originals).toEqual([])
   })
 
   it('lists the missing required fields', () => {

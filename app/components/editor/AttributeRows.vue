@@ -41,7 +41,7 @@ import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
 
 /**
- * Attribute rows of one subject type (album, track, album_image, work, artist, label), added and
+ * Attribute rows of one subject type (album, track, album_image, artist, label), added and
  * edited in a dialog. With `owner` the model is a whole collection such as track_attributes and
  * only that track's rows are shown. `compact` when nested in a row, e.g. a track's details.
  */

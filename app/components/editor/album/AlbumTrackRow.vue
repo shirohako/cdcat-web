@@ -63,7 +63,7 @@
         </div>
       </div>
 
-      <EditorAlbumTrackWork :track-id="track.id" :suggestions="suggestions" @dismiss="emit('dismiss', $event)" />
+      <EditorAlbumTrackOriginals :track-id="track.id" />
 
       <div>
         <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_attributes') }}</p>
@@ -75,13 +75,12 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
-import type { WorkSuggestion } from '~/types/work'
 import { ArrowDown, ArrowUp, ChevronDown, Music2, X } from '@lucide/vue'
 import { findTrack, moveTrack, moveTrackToDisc, removeTrack, sortedDiscs } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
-const props = defineProps<{ trackId: RowId, duplicateNumber?: boolean, suggestions?: WorkSuggestion[] }>()
-const emit = defineEmits<{ next: [], dismiss: [workId: number] }>()
+const props = defineProps<{ trackId: RowId, duplicateNumber?: boolean }>()
+const emit = defineEmits<{ next: [] }>()
 
 const editor = useAlbumEditor()
 const { t } = useI18n()
@@ -93,17 +92,17 @@ const open = ref(false)
 
 const errorAt = (field: string) => editor.errorAt('tracks', props.trackId, field)
 const errors = computed(() => editor.errorsIn(`tracks.${props.trackId}`))
+const originals = computed(() => album.value.track_originals.filter(row => sameId(row.track_id, props.trackId)))
 
-/** A hint next to the title: same-song candidates, a new song, or other recordings of the song. */
+/** A hint next to the title: how many 原曲 the track has, or that one of them needs fixing. */
 const badge = computed(() => {
-  const workId = track.value?.work_id ?? null
-  const candidates = (props.suggestions ?? []).filter(candidate => !sameId(candidate.work_id, workId))
-  if (candidates.length) return { text: t('editor.work.same_song_badge'), title: candidates.map(candidate => candidate.title).join('\n'), tone: 'bg-amber-100 text-amber-700' }
-  if (typeof workId === 'string') return { text: t('editor.work.new_badge'), title: t('editor.work.new_badge_hint'), tone: 'bg-emerald-100 text-emerald-700' }
-  const count = typeof workId === 'number'
-    ? Number((editor.references.work?.[String(workId)] as { tracks_count?: number } | undefined)?.tracks_count ?? 0)
-    : 0
-  return count > 1 ? { text: `♪ ${count}`, title: t('editor.work.recordings', { count }), tone: 'bg-indigo-50 text-indigo-600' } : null
+  if (!originals.value.length) return null
+  const broken = originals.value.some(row => editor.errorsIn(`track_originals.${row.id}`).length)
+  return {
+    text: t('editor.originals.badge', { count: originals.value.length }),
+    title: originals.value.map(row => row.original_title ?? String((editor.references.track?.[String(row.original_track_id)] as { title?: string } | undefined)?.title ?? `#${row.original_track_id}`)).join('\n'),
+    tone: broken ? 'bg-rose-100 text-rose-700' : 'bg-indigo-50 text-indigo-600',
+  }
 })
 
 const moveTo = (discId: string) => {

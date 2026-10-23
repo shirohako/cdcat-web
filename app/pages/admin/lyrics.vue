@@ -6,7 +6,10 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 /** A lyric revision of the patrol queue, with the lyric as it is now (null when it was deleted). */
 type LyricRevision = Revision & {
-  lyric: { id: number, work_id: number, kind: string, language: string, translator: string | null, is_ai_generated: boolean, created_by: number | null, work: { id: number, title: string } | null } | null
+  lyric: {
+    id: number, track_id: number, kind: string, language: string, translator: string | null, is_ai_generated: boolean, created_by: number | null
+    track: { id: number, title: string, album: { id: number, title: string } | null } | null
+  } | null
 }
 
 const route = useRoute()
@@ -18,13 +21,13 @@ const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, 
 const QUEUES = ['unchecked', 'pending', 'all'] as const
 const queue = computed(() => (QUEUES as readonly string[]).includes(String(route.query.queue)) ? String(route.query.queue) : 'unchecked')
 const flagged = computed(() => route.query.flagged === '1')
-const workId = ref(String(route.query.work_id ?? ''))
+const trackId = ref(String(route.query.track_id ?? ''))
 const page = computed({
   get: () => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1),
   set: value => { router.push({ query: { ...route.query, page: value > 1 ? value : undefined } }) },
 })
 const setQuery = (patch: Record<string, string | undefined>) => router.push({ query: { ...route.query, page: undefined, ...patch } })
-const query = computed(() => ({ queue: queue.value, flagged: flagged.value ? 1 : undefined, work_id: route.query.work_id || undefined, page: page.value }))
+const query = computed(() => ({ queue: queue.value, flagged: flagged.value ? 1 : undefined, track_id: route.query.track_id || undefined, page: page.value }))
 
 const { data, pending, error, refresh } = await useAsyncData('admin-lyric-patrol',
   () => $api<{ revisions: LyricRevision[], pagination: AdminPagination }>('/v1/admin/lyrics', { query: query.value }), { watch: [query] })
@@ -101,8 +104,8 @@ useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
         <label class="flex items-center gap-1.5 rounded-lg border bg-white px-3 py-2">
           <input type="checkbox" :checked="flagged" @change="setQuery({ flagged: ($event.target as HTMLInputElement).checked ? '1' : undefined })">{{ t('admin_pages.lyrics.flagged') }}
         </label>
-        <form class="flex gap-2" @submit.prevent="setQuery({ work_id: workId.trim() || undefined })">
-          <input v-model="workId" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.work_id')" :aria-label="t('admin_pages.content.work_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <form class="flex gap-2" @submit.prevent="setQuery({ track_id: trackId.trim() || undefined })">
+          <input v-model="trackId" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.content.track_id')" :aria-label="t('admin_pages.content.track_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
           <button type="submit" class="rounded-lg border bg-white px-3 py-2">{{ t('admin_pages.apply') }}</button>
         </form>
         <button v-if="queue === 'unchecked'" type="button" :disabled="busy || !selected.length" class="ml-auto rounded-lg border border-emerald-300 bg-white px-3 py-2 text-emerald-700 disabled:opacity-40" @click="checkSelected">{{ t('admin_pages.lyrics.check_selected', { count: selected.length }) }}</button>
@@ -120,8 +123,9 @@ useHead({ title: computed(() => t('admin_pages.lyrics.title')) })
             <input v-if="checkable(revision)" v-model="selected" type="checkbox" :value="revision.id" class="mt-1" :aria-label="t('admin_pages.revisions.select', { id: revision.id })">
             <div class="min-w-0 flex-1">
               <p class="font-medium">
-                <NuxtLink v-if="revision.lyric?.work" :to="`/works/${revision.lyric.work.id}`" target="_blank" class="underline decoration-slate-200 underline-offset-4">{{ revision.lyric.work.title }}</NuxtLink>
-                <span v-else class="text-slate-400">{{ t('admin_pages.lyrics.deleted') }}</span>
+                <NuxtLink v-if="revision.lyric?.track" :to="`/tracks/${revision.lyric.track.id}`" target="_blank" class="underline decoration-slate-200 underline-offset-4">{{ revision.lyric.track.title }}</NuxtLink>
+                <span v-if="revision.lyric?.track?.album" class="ml-1.5 text-xs text-slate-500">{{ revision.lyric.track.album.title }}</span>
+                <span v-if="!revision.lyric?.track" class="text-slate-400">{{ t('admin_pages.lyrics.deleted') }}</span>
                 <span class="ml-2 text-xs text-slate-500">{{ t(`admin_pages.content.lyric_kinds.${revision.lyric?.kind ?? 'original'}`) }} · {{ revision.lyric?.language ?? '—' }}<template v-if="revision.lyric?.is_ai_generated"> · AI</template></span>
               </p>
               <p class="mt-1 text-xs text-slate-500">
