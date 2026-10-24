@@ -3,9 +3,10 @@ interface HarvestErrorLike {
 }
 
 /**
- * Error text for the harvest admin pages. Harvest errors and conflicts carry a message written for
- * the admin (which site is paused, that the crawler is not running), and validation errors name
- * the field, so those are shown as sent; anything else gets the generic text.
+ * Error text for the harvest admin pages and the event imports (whose bundles the harvester makes).
+ * Harvest errors and conflicts carry a message written for the admin (which site is paused, that
+ * the crawler is not running, why a bundle was refused), and validation errors name the field, so
+ * those are shown as sent; anything else gets the generic text.
  */
 export const useHarvestError = () => {
   const { t } = useAdminI18n()

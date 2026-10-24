@@ -14,7 +14,8 @@ interface ImportSummary {
 interface EventImportRun {
   id: number
   source: string
-  params: Record<string, unknown>
+  // What the bundle says about itself (docs/events/README.md#导入包).
+  params: { file?: { name: string, bytes: number }, edition?: { key: string, name: string }, created_at?: string }
   status: 'queued' | 'running' | 'ready' | 'applying' | 'applied' | 'failed'
   summary: ImportSummary | null
   error: string | null
@@ -57,14 +58,8 @@ const notice = ref('')
 const input = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
 
 // ===== Import =====
-const { data: sources } = await useAsyncData(`admin-event-sources-${eventId}`,
-  () => $api<{ key: string, defaults: Record<string, unknown> }[]>(`/v1/admin/events/${eventId}/import-sources`))
-const sourceKey = ref('m3')
-const params = reactive({ exhibition: '', map_pdf_url: '', map_profile: 'm3-trc', read_info_page: true })
-watch(() => sources.value?.find(s => s.key === sourceKey.value)?.defaults, (defaults) => {
-  if (defaults) Object.assign(params, defaults)
-}, { immediate: true })
-
+const bundleError = useHarvestError()
+const bundleInput = useTemplateRef<HTMLInputElement>('bundleInput')
 const { data: imports, refresh: refreshImports } = await useAsyncData(`admin-event-imports-${eventId}`,
   () => $api<{ imports: EventImportRun[] }>(`/v1/admin/events/${eventId}/imports`))
 const latest = computed(() => imports.value?.imports[0] ?? null)
@@ -89,18 +84,32 @@ watch(() => latest.value?.status, (status, before) => {
 })
 onBeforeUnmount(stopPolling)
 
-const startImport = async () => {
+// A bundle the harvester made for this event: checked, kept and previewed by the site.
+const uploadBundle = async () => {
+  const file = bundleInput.value?.files?.[0]
+  if (!file || busy.value) return
   busy.value = true
   message.value = ''
   notice.value = ''
   try {
-    await $api(`/v1/admin/events/${eventId}/imports`, { method: 'POST', body: { source: sourceKey.value, params: { ...params, map_pdf_url: params.map_pdf_url || null } } })
+    const form = new FormData()
+    form.append('bundle', file)
+    await $api(`/v1/admin/events/${eventId}/imports`, { method: 'POST', body: form })
     await refreshImports()
   } catch (e) {
-    message.value = localizeError(e)
+    message.value = (e as { statusCode?: number }).statusCode === 413 ? t('admin_pages.event_venue.too_large') : bundleError(e)
   } finally {
     busy.value = false
+    if (bundleInput.value) bundleInput.value.value = ''
   }
+}
+const bundleLine = (run: EventImportRun) => {
+  const { file, edition, created_at: createdAt } = run.params
+  if (!file) return ''
+  return t('admin_pages.event_venue.bundle', {
+    edition: edition?.name ?? '—', file: file.name, size: `${(file.bytes / 1024 / 1024).toFixed(1)} MB`,
+    created: createdAt ? new Date(createdAt).toLocaleString() : '—',
+  })
 }
 const applyImport = async (run: EventImportRun) => {
   const create = run.summary?.artists.create ?? 0
@@ -239,19 +248,12 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · ${t('admin
     <template v-if="tab === 'import'">
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">{{ t('admin_pages.event_venue.import_title') }}</h2>
-        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.event_venue.import_help') }} <NuxtLink to="/admin/event-imports" class="underline">{{ t('admin_pages.event_venue.batch_link') }}</NuxtLink></p>
-        <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="startImport">
-          <label class="block">{{ t('admin_pages.event_venue.source') }}
-            <select v-model="sourceKey" :class="input"><option v-for="source in sources" :key="source.key" :value="source.key">{{ t(`admin_pages.event_venue.sources.${source.key}`) }}</option></select>
-          </label>
-          <label class="block">{{ t('admin_pages.event_venue.exhibition') }}<input v-model="params.exhibition" required pattern="\d{4}[sf]" placeholder="2026f" :class="input"></label>
-          <label class="block sm:col-span-2">{{ t('admin_pages.event_venue.map_pdf') }}<input v-model="params.map_pdf_url" type="url" placeholder="https://www.m3net.jp/m3_58/M3tuushin58map_web.pdf" :class="input"><span class="mt-1 block text-xs text-slate-500">{{ t('admin_pages.event_venue.map_pdf_help') }}</span></label>
-          <label class="block">{{ t('admin_pages.event_venue.profile') }}<input v-model="params.map_profile" pattern="[a-z0-9-]+" :class="input"></label>
-          <label class="flex items-center gap-2 self-end pb-2"><input v-model="params.read_info_page" type="checkbox">{{ t('admin_pages.event_venue.read_info') }}</label>
-          <div class="sm:col-span-2">
-            <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50" :disabled="busy || Boolean(working)">{{ t('admin_pages.event_venue.fetch') }}</button>
-          </div>
-        </form>
+        <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.event_venue.import_help') }}</p>
+        <label class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" :class="busy || working ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'">
+          <Icon name="lucide:upload" class="size-4" />
+          {{ busy ? t('admin_pages.event_venue.uploading') : t('admin_pages.event_venue.upload') }}
+          <input ref="bundleInput" type="file" accept=".zip,application/zip" class="sr-only" :disabled="busy || Boolean(working)" @change="uploadBundle">
+        </label>
       </section>
 
       <section v-if="latest" class="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
@@ -263,6 +265,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · ${t('admin
           </div>
           <button v-if="latest.status === 'ready'" type="button" class="rounded-lg bg-emerald-700 px-4 py-2 text-sm text-white disabled:opacity-50" :disabled="busy" @click="applyImport(latest)">{{ t('admin_pages.event_venue.apply') }}</button>
         </div>
+        <p v-if="bundleLine(latest)" class="text-xs text-slate-500">{{ bundleLine(latest) }}</p>
         <p v-if="working" class="text-sm text-slate-500">{{ t('admin_pages.event_venue.working') }}</p>
         <p v-if="latest.error" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ latest.error }}</p>
 
@@ -318,6 +321,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · ${t('admin
             <span class="font-mono text-xs text-slate-500">#{{ run.id }}</span>
             <span class="rounded-full px-2 py-0.5 text-xs" :class="statusClass(run.status)">{{ t(`admin_pages.event_venue.statuses.${run.status}`) }}</span>
             <span class="text-slate-600">{{ new Date(run.created_at).toLocaleString() }}</span>
+            <span v-if="run.params.edition" class="text-slate-500">{{ run.params.edition.name }}</span>
             <span v-if="run.summary" class="text-slate-500">{{ run.summary.circles.total }} / {{ run.summary.map?.spaces ?? 0 }}</span>
           </li>
         </ul>

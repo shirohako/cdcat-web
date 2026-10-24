@@ -122,7 +122,6 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
         <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.events.description') }}</p>
       </div>
       <div class="flex gap-2">
-        <NuxtLink to="/admin/event-imports" class="rounded-lg border border-slate-300 px-4 py-2 text-sm">{{ t('admin_pages.event_imports.title') }}</NuxtLink>
         <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="editEvent()">{{ t('admin_pages.events.create') }}</button>
       </div>
     </header>
