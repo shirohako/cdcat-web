@@ -90,7 +90,7 @@ const pick = async (event: Event) => {
 
 const uploadCropped = async (blob: Blob) => {
   cropFile.value = null
-  await send(blob, 'cover.jpg')
+  await send(blob, blob.type === 'image/webp' ? 'cover.webp' : 'cover.jpg')
 }
 
 const openUrl = () => {

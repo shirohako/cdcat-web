@@ -13,13 +13,20 @@ export const squareCrop = (width: number, height: number, offset = 0) => {
 /** The output size of a square crop: no larger than `max`, no upscaling. */
 export const outputSize = (size: number, max = 3000) => Math.min(size, max)
 
-/** Crops a loaded image to a square in the browser; resolves to a JPEG blob. */
-export const cropToSquare = (image: HTMLImageElement, offset = 0, max = 3000, quality = 0.92): Promise<Blob> => {
+/**
+ * Crops a loaded image to a square in the browser. Resolves to a WebP blob at the server's own quality, which the
+ * server stores as uploaded, so the cover is compressed once; browsers that can't write WebP get a JPEG.
+ */
+export const cropToSquare = async (image: HTMLImageElement, offset = 0, max = 3000, quality = 0.95): Promise<Blob> => {
   const { x, y, size } = squareCrop(image.naturalWidth, image.naturalHeight, offset)
   const output = outputSize(size, max)
   const canvas = document.createElement('canvas')
   canvas.width = output
   canvas.height = output
   canvas.getContext('2d')!.drawImage(image, x, y, size, size, 0, 0, output, output)
-  return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('crop failed')), 'image/jpeg', quality))
+  const encode = (type: string) => new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('crop failed')), type, quality))
+  const webp = await encode('image/webp')
+  // A browser without a WebP encoder (Safari) returns a PNG instead.
+  return webp.type === 'image/webp' ? webp : encode('image/jpeg')
 }
