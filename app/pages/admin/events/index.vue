@@ -40,6 +40,7 @@ const editEvent = (event?: AdminEvent) => {
     main_visual_width: event.main_visual_width ?? null, main_visual_height: event.main_visual_height ?? null,
   } : {})
   message.value = ''
+  visualError.value = ''
   eventOpen.value = true
 }
 const saveEvent = async () => {
@@ -72,6 +73,37 @@ const readVisualSize = (e: Event) => {
 const clearVisualSize = () => {
   eventForm.main_visual_width = null
   eventForm.main_visual_height = null
+}
+// An uploaded visual is stored on this site (POST /v1/images); its size comes with it.
+const { limits: imageLimits, upload: uploadImage } = useImageUpload()
+const visualUploading = ref(false)
+const visualError = ref('')
+const uploadVisual = async (e: Event) => {
+  const picker = e.target as HTMLInputElement
+  const file = picker.files?.[0]
+  picker.value = ''
+  visualError.value = ''
+  if (!file) return
+  if (file.size > imageLimits.value.maxBytes) {
+    visualError.value = t('admin_pages.events.visual_too_large', { mb: Math.floor(imageLimits.value.maxBytes / 1024 / 1024) })
+    return
+  }
+  visualUploading.value = true
+  try {
+    const image = await uploadImage(file, file.name)
+    eventForm.main_visual_url = image.url
+    eventForm.main_visual_width = image.width
+    eventForm.main_visual_height = image.height
+  } catch (err) {
+    visualError.value = localizeError(err)
+  } finally {
+    visualUploading.value = false
+  }
+}
+const removeVisual = () => {
+  eventForm.main_visual_url = ''
+  visualError.value = ''
+  clearVisualSize()
 }
 // Layout follows the series orientation, so flag a visual that would be letterboxed in its series.
 const seriesOrientation = computed(() => series.value?.find(item => String(item.id) === eventForm.event_series_id)?.visual_orientation)
@@ -133,7 +165,7 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="saveEvent">
         <label class="block">{{ t('admin_pages.events.series') }}<select v-model="eventForm.event_series_id" :class="input"><option value="">{{ t('admin_pages.events.no_series') }}</option><option v-for="item in series" :key="item.id" :value="String(item.id)">{{ item.name }}</option></select></label>
         <label class="block">{{ t('admin_pages.events.name') }}<input v-model="eventForm.name" required maxlength="255" :class="input"></label>
-        <label class="block">Slug<input v-model="eventForm.slug" required maxlength="255" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" :class="input"></label>
+        <label class="block">{{ t('admin_pages.events.slug') }}<input v-model="eventForm.slug" required maxlength="255" pattern="[A-Za-z0-9]+(-[A-Za-z0-9]+)*" placeholder="M3-58" :class="input"><span class="mt-1 block text-xs text-slate-500">{{ t('admin_pages.events.slug_help') }}</span></label>
         <label class="block">{{ t('admin_pages.events.start_date') }}<input v-model="eventForm.start_date" required type="date" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.end_date') }}<input v-model="eventForm.end_date" type="date" :min="eventForm.start_date" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.start_time') }}<input v-model="eventForm.start_time" type="time" :class="input"></label>
@@ -141,12 +173,25 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
         <label class="block">{{ t('admin_pages.events.venue') }}<input v-model="eventForm.venue" maxlength="255" :class="input"></label>
         <label class="block">{{ t('admin_pages.events.location') }}<input v-model="eventForm.location" maxlength="255" :class="input"></label>
         <label class="block sm:col-span-2">{{ t('admin_pages.events.website') }}<input v-model="eventForm.website_url" type="url" maxlength="2048" placeholder="https://" :class="input"></label>
-        <label class="block sm:col-span-2">{{ t('admin_pages.events.visual') }}<input v-model="eventForm.main_visual_url" type="url" maxlength="2048" placeholder="https://" :class="input" @input="clearVisualSize"><span class="mt-1 block text-xs text-slate-500">{{ visualSizeText }}</span><span v-if="visualMismatch" class="mt-1 block text-xs text-amber-700">{{ t('admin_pages.events.visual_mismatch', { orientation: t(`admin_pages.event_series.orientations.${seriesOrientation}`) }) }}</span></label>
+        <div class="sm:col-span-2">
+          <label for="event-visual-url">{{ t('admin_pages.events.visual') }}</label>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <input id="event-visual-url" v-model="eventForm.main_visual_url" type="url" maxlength="2048" placeholder="https://" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2" :disabled="visualUploading" @input="clearVisualSize">
+            <label class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2" :class="visualUploading || busy ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-slate-50'">
+              <Icon name="lucide:upload" class="size-4" />{{ visualUploading ? t('admin_pages.events.visual_uploading') : t('admin_pages.events.visual_upload') }}
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="sr-only" :disabled="visualUploading || busy" @change="uploadVisual">
+            </label>
+            <button v-if="eventForm.main_visual_url" type="button" class="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-slate-600 hover:text-red-700" :disabled="visualUploading" @click="removeVisual">{{ t('admin_pages.events.visual_remove') }}</button>
+          </div>
+          <span class="mt-1 block text-xs text-slate-500">{{ visualSizeText }}</span>
+          <span v-if="visualError" role="alert" class="mt-1 block text-xs text-red-700">{{ visualError }}</span>
+          <span v-if="visualMismatch" class="mt-1 block text-xs text-amber-700">{{ t('admin_pages.events.visual_mismatch', { orientation: t(`admin_pages.event_series.orientations.${seriesOrientation}`) }) }}</span>
+        </div>
         <img v-if="eventForm.main_visual_url" :src="eventForm.main_visual_url" alt="" class="max-h-56 w-auto max-w-full justify-self-start rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2" @load="readVisualSize" @error="clearVisualSize">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
           <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="eventOpen = false">{{ t('common.cancel') }}</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ busy ? t('common.saving') : t('common.save') }}</button>
+          <button type="submit" :disabled="busy || visualUploading" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ busy ? t('common.saving') : t('common.save') }}</button>
         </div>
       </form>
     </section>
@@ -162,11 +207,12 @@ useHead({ title: computed(() => t('admin_pages.events.title')) })
     <section class="rounded-xl border border-slate-200 bg-white">
       <AdminListState :pending="pending" :error="error" :empty="!events?.events.length" @retry="refresh()">
         <div class="overflow-x-auto">
-          <table class="w-full min-w-175 text-left text-sm">
-            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">{{ t('admin_pages.events.name') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.series') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.start_date') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.released_albums') }}</th><th class="px-4 py-3" /></tr></thead>
+          <table class="w-full min-w-200 text-left text-sm">
+            <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">{{ t('admin_pages.events.name') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.slug') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.series') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.start_date') }}</th><th class="px-4 py-3">{{ t('admin_pages.events.released_albums') }}</th><th class="px-4 py-3" /></tr></thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="event in events?.events" :key="event.id">
-                <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="event.main_visual_url" :src="event.main_visual_url" alt="" loading="lazy" :style="{ aspectRatio: imageAspectRatio(event.main_visual_width, event.main_visual_height) }" class="h-12 w-auto max-w-20 shrink-0 rounded bg-slate-50 object-contain"><div>{{ event.name }}<p class="text-xs font-normal text-slate-500">{{ event.slug }}<template v-if="event.venue"> · {{ event.venue }}</template></p></div></div></td>
+                <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="event.main_visual_url" :src="event.main_visual_url" alt="" loading="lazy" :style="{ aspectRatio: imageAspectRatio(event.main_visual_width, event.main_visual_height) }" class="h-12 w-auto max-w-20 shrink-0 rounded bg-slate-50 object-contain"><div>{{ event.name }}<p v-if="event.venue" class="text-xs font-normal text-slate-500">{{ event.venue }}</p></div></div></td>
+                <td class="whitespace-nowrap px-4 py-3 font-mono text-xs">{{ event.slug }}</td>
                 <td class="px-4 py-3">{{ event.series?.name ?? '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ event.start_date }}<template v-if="event.end_date && event.end_date !== event.start_date"> ~ {{ event.end_date }}</template></td>
                 <td class="px-4 py-3 tabular-nums">{{ event.released_albums_count }}</td>
