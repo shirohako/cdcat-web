@@ -147,7 +147,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 function forwardedHeaders(event: ReturnType<typeof useRequestEvent>): Record<string, string> {
   if (!event) return {}
   const { headers, socket } = event.node.req
-  const chain = [headers['x-forwarded-for'], socket.remoteAddress].flat().filter(Boolean).join(', ')
+  // A dual-stack socket reports IPv4 peers as ::ffff:a.b.c.d, which TRUSTED_PROXIES' 127.0.0.1 would not match.
+  const peer = socket.remoteAddress?.replace(/^::ffff:(?=\d+\.\d+\.\d+\.\d+$)/i, '')
+  const chain = [headers['x-forwarded-for'], peer].flat().filter(Boolean).join(', ')
   const forwarded: Record<string, string> = {}
   if (chain) forwarded['X-Forwarded-For'] = chain
   if (headers['user-agent']) forwarded['User-Agent'] = headers['user-agent']
