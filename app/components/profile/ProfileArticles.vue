@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Newspaper } from '@lucide/vue'
-import type { ArticleCard, Pagination } from '~/types/article'
+import type { ArticleCard } from '~/types/article'
+import type { Pagination } from '~/types/api'
 
 /** A user's published articles on their profile; hidden when they have none. */
 const props = defineProps<{ username: string }>()

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { AdminLinkProvider, DeletionImpact } from '~/types/admin'
+import type { AdminLinkProvider } from '~/types/admin'
+import type { DeletionImpact } from '~/types/revision'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 

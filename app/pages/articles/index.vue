@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FileText, FolderOpen, PenLine, Search, Sparkles } from '@lucide/vue'
-import type { ArticleCard, Pagination } from '~/types/article'
+import type { ArticleCard } from '~/types/article'
+import type { Pagination } from '~/types/api'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 const route = useRoute()

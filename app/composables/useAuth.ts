@@ -1,4 +1,5 @@
-import type { LoginRequest, RegisterRequest, AuthResponse, User } from '~/types/auth'
+import type { LoginRequest, RegisterRequest, AuthResponse } from '~/types/auth'
+import type { User } from '~/types/user'
 import { localDrafts } from '~/utils/localDrafts'
 
 /**

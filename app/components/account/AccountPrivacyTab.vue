@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { UserX } from '@lucide/vue'
-import type { UserSummary } from '~/types/article'
+import type { UserSummary } from '~/types/catalog'
 
 /**
  * The block list. Blocked people's posts fold, their topics leave your lists and

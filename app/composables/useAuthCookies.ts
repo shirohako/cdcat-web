@@ -1,6 +1,6 @@
 import type { NuxtApp } from '#app'
 import type { Ref } from 'vue'
-import type { User } from '~/types/auth'
+import type { User } from '~/types/user'
 
 /**
  * Sessions last a year from the last visit: every page the server renders runs /v1/me and re-sets

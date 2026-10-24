@@ -1,5 +1,5 @@
 import type { ApiResponse, ApiErrorResponse } from '~/types/api'
-import type { User } from '~/types/auth'
+import type { User } from '~/types/user'
 
 /**
  * 自定义 API 插件

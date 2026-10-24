@@ -1,12 +1,7 @@
-import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText } from './catalog'
-import type { ArticleLicense, ContentLinkSummary, MyArticle, TagSummary, UserSummary } from './article'
+import type { CatalogReferences, ChangeOp, ChangeSummary, LocalizedText, UserSummary } from './catalog'
+import type { ArticleLicense, ContentLinkSummary, MyArticle, TagSummary } from './article'
 import type { ReviewRating } from './reviews'
-
-export interface DeletionImpact {
-  checksum?: string
-  counts: { label: string, count: number }[]
-  blockers: string[]
-}
+import type { DeletionImpact } from './revision'
 
 export interface AdminAuditEntry {
   id: number

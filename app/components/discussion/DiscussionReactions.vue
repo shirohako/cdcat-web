@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SmilePlus } from '@lucide/vue'
 import { DISCUSSION_REACTIONS, DISCUSSION_REACTION_EMOJI, type DiscussionReactionCount, type DiscussionReactionKey } from '~/types/discussion'
-import type { UserSummary } from '~/types/article'
+import type { UserSummary } from '~/types/catalog'
 
 /**
  * Reaction chips under a post. Each person may leave several different reactions;

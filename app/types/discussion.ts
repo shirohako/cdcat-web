@@ -1,6 +1,8 @@
 /** Discussions. See docs/api/discussions.md in the backend. */
 import type { MarkdownReferences } from '~/utils/markdown'
-import type { ContentLinkSummary, Pagination, TagSummary, UserSummary } from '~/types/article'
+import type { ContentLinkSummary, TagSummary } from '~/types/article'
+import type { UserSummary } from '~/types/catalog'
+import type { Pagination } from '~/types/api'
 
 export const DISCUSSION_REACTIONS = [
   'thumbs_up', 'heart', 'joy', 'open_mouth', 'cry', 'tada', 'fire', 'eyes',

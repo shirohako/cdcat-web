@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Disc3 } from '@lucide/vue'
-import { ENTRY_ALBUM_RELATIONS, type FranchiseAlbum, type Pagination } from '~/types/entry'
+import { ENTRY_ALBUM_RELATIONS, type FranchiseAlbum } from '~/types/entry'
+import type { Pagination } from '~/types/api'
 
 // Every album in the series and its sub-series (through entries, plus series-wide releases), paginated.
 const props = defineProps<{ franchiseId: number | string }>()

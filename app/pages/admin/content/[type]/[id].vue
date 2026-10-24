@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { AdminMergePreview, AdminPagination, AdminRestorePreview, DeletionImpact } from '~/types/admin'
+import type { AdminMergePreview, AdminPagination, AdminRestorePreview } from '~/types/admin'
 import type { CatalogType, ContentVersion } from '~/types/catalog'
-import type { Revision } from '~/types/revision'
+import type { DeletionImpact, Revision } from '~/types/revision'
 import { adminContentRoutes, adminContentTypeOf, adminEditorPath, isRevisionable, mergeableContentTypes } from '~/config/admin'
 
 definePageMeta({

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Calendar, Film, Music2, Plus, Search } from '@lucide/vue'
-import { ENTRY_FORMATS, ENTRY_TYPES, ENTRY_TYPE_ICONS, type EntrySummary, type EntryType, type Pagination } from '~/types/entry'
+import { ENTRY_FORMATS, ENTRY_TYPES, ENTRY_TYPE_ICONS, type EntrySummary, type EntryType } from '~/types/entry'
+import type { Pagination } from '~/types/api'
 
 const route = useRoute()
 const router = useRouter()

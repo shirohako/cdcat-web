@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserSummary } from '~/types/article'
+import type { UserSummary } from '~/types/catalog'
 
 /** A user's avatar, or their initial on a colour picked from the username. */
 const props = withDefaults(defineProps<{ user: Pick<UserSummary, 'username' | 'nickname' | 'avatar_url'> | null, size?: 'xs' | 'sm' | 'md' | 'lg' }>(), { size: 'md' })

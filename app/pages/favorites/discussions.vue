@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BookmarkX, MessageCircle } from '@lucide/vue'
-import type { Pagination } from '~/types/article'
+import type { Pagination } from '~/types/api'
 import type { DiscussionPostSummary } from '~/types/discussion'
 
 /** Posts the user bookmarked in discussions. */

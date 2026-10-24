@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MessageCircle, MessageSquare } from '@lucide/vue'
-import type { Pagination } from '~/types/article'
+import type { Pagination } from '~/types/api'
 import type { DiscussionPostSummary, DiscussionTopicCard } from '~/types/discussion'
 
 /** A user's discussion topics and replies on their profile, in two tabs. */

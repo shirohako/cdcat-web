@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Bell, CheckCheck } from '@lucide/vue'
-import type { NotificationItem, Pagination } from '~/types/article'
+import type { NotificationItem } from '~/types/article'
+import type { Pagination } from '~/types/api'
 
 definePageMeta({ middleware: 'auth' })
 

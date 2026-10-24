@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '~/composables/useAlbumEditor'
-import type { DraftItem, RevisionPayload } from '~/composables/useRevisionDraft'
+import type { DraftItem, RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
@@ -139,7 +139,7 @@ const props = defineProps<{
   mode?: 'edit' | 'translate'
   locale?: string
   embedded?: boolean
-  submitTo?: (payload: RevisionPayload) => Promise<Revision>
+  submitTo?: (payload: RevisionDraftPayload) => Promise<Revision>
 }>()
 const emit = defineEmits<{ submitted: [revision: Revision], discarded: [] }>()
 

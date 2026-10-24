@@ -28,3 +28,11 @@ export interface ApiErrorResponse {
     [key: string]: any
   }
 }
+
+// 列表接口的分页信息（data.pagination）
+export interface Pagination {
+  total: number
+  per_page: number
+  current_page: number
+  last_page: number
+}

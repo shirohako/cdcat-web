@@ -52,8 +52,8 @@ export interface AlbumSimple {
   is_pending?: boolean
 }
 
-/** 用户收听状态统计（各状态的人数） */
-export interface TrackingStats {
+/** 这张专辑各收听状态的人数（tracking_stats；没有 total，和个人的 TrackingStats 不同） */
+export interface AlbumTrackingStats {
   plan_to_listen: number
   completed: number
   wishlist: number
@@ -233,7 +233,7 @@ export interface Album extends PendingFields {
   streaming: CatalogLink[]
   entries: AlbumEntry[]
   franchises: Array<{ id: number, name: string, slug: string | null, image_url: string | null }>
-  tracking_stats: TrackingStats
+  tracking_stats: AlbumTrackingStats
   favorites_count: number
   reviews_count: number
   views_count: number

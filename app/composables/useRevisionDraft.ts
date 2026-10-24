@@ -34,7 +34,7 @@ const SAVE_DELAY = 1000
  * `prepare` drops what the editor keeps only while editing, such as blank rows; `afterRebase` lets
  * the editor reload what it shows for an item whose base version moved.
  */
-export interface RevisionPayload {
+export interface RevisionDraftPayload {
   summary: string | null
   sources: string[]
   items: DraftItem[]
@@ -44,7 +44,7 @@ export function useRevisionDraft(options: {
   prepare?: (item: DraftItem) => DraftItem
   afterRebase?: (item: DraftItem) => Promise<void> | void
   /** Sends a new draft somewhere else than POST /revisions (e.g. approving a harvest candidate); answers the revision. */
-  submitTo?: (payload: RevisionPayload) => Promise<Revision>
+  submitTo?: (payload: RevisionDraftPayload) => Promise<Revision>
 } = {}) {
   const { $api } = useNuxtApp()
   const { user } = useAuth()
@@ -178,7 +178,7 @@ export function useRevisionDraft(options: {
   /** The items as they are sent. */
   const prepared = computed(() => items.value.map(item => options.prepare ? options.prepare(item) : item))
 
-  const payload = (): RevisionPayload => ({
+  const payload = (): RevisionDraftPayload => ({
     summary: summary.value || null,
     sources: sources.value.map(source => source.trim()).filter(Boolean),
     items: prepared.value,

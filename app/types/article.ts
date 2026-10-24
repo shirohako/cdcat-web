@@ -1,5 +1,7 @@
 /** Articles and the shared community pieces they use. See docs/api/articles.md in the backend. */
 
+import type { UserSummary } from './catalog'
+
 /** A key of an article type; the list is maintained in the admin panel (GET /article-types). */
 export type ArticleType = string
 
@@ -19,13 +21,6 @@ export type ContentLinkType = typeof CONTENT_LINK_TYPES[number]
 
 export const ARTICLE_REPORT_REASONS = ['spam', 'abuse', 'spoiler', 'infringement', 'illegal', 'other'] as const
 export type ArticleReportReason = typeof ARTICLE_REPORT_REASONS[number]
-
-export interface UserSummary {
-  id: number
-  username: string
-  nickname: string | null
-  avatar_url: string | null
-}
 
 export interface TagSummary {
   id: number
@@ -149,13 +144,6 @@ export interface MyArticle {
   published_at: string | null
   edited_at: string | null
   updated_at: string | null
-}
-
-export interface Pagination {
-  total: number
-  per_page: number
-  current_page: number
-  last_page: number
 }
 
 export interface NotificationItem {

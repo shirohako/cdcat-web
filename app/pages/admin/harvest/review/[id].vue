@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RevisionPayload } from '~/composables/useRevisionDraft'
+import type { RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
 import type { HarvestCandidateDetail } from '~/types/harvest'
@@ -68,7 +68,7 @@ const go = (target: number | null) => target && navigateTo(`/admin/harvest/revie
 const next = () => go(detail.value?.neighbors.next ?? null)
 const previous = () => go(detail.value?.neighbors.previous ?? null)
 
-const approve = (payload: RevisionPayload) => $api<Revision>(`/v1/admin/harvest/candidates/${id.value}/approve`, {
+const approve = (payload: RevisionDraftPayload) => $api<Revision>(`/v1/admin/harvest/candidates/${id.value}/approve`, {
   method: 'POST', body: { ...payload, lock_version: detail.value?.candidate.lock_version },
 })
 const approved = async () => {

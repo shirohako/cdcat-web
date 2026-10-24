@@ -1,7 +1,5 @@
 import type { User } from './user'
 
-export type { User }
-
 export interface LoginRequest {
   email: string
   password: string

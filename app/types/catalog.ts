@@ -111,8 +111,9 @@ export interface CatalogCredit {
   detail: string | null
 }
 
+/** A user as other content shows them (author, submitter, reviewer …): the API's id, username, nickname and avatar_url. */
 export interface UserSummary {
-  id?: number
+  id: number
   username: string
   nickname: string
   avatar_url: string | null

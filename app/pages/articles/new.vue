@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowLeft, FileText, HardDrive, Plus } from '@lucide/vue'
-import type { MyArticle, Pagination } from '~/types/article'
+import type { MyArticle } from '~/types/article'
+import type { Pagination } from '~/types/api'
 
 definePageMeta({ layout: 'writer', middleware: 'auth' })
 

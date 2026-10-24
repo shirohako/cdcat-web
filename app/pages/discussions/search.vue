@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Search } from '@lucide/vue'
-import type { Pagination } from '~/types/article'
+import type { Pagination } from '~/types/api'
 import type { DiscussionPostSummary, DiscussionTopicCard } from '~/types/discussion'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Boxes, Disc3, Film, Layers, Plus, Search } from '@lucide/vue'
-import type { FranchiseSummary, Pagination } from '~/types/entry'
+import type { FranchiseSummary } from '~/types/entry'
+import type { Pagination } from '~/types/api'
 
 const route = useRoute()
 const router = useRouter()

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ExternalLink, FileText, HardDrive, PenLine, Plus, Trash2 } from '@lucide/vue'
-import { ARTICLE_STATUSES, type ArticleStatus, type MyArticle, type Pagination } from '~/types/article'
+import { ARTICLE_STATUSES, type ArticleStatus, type MyArticle } from '~/types/article'
+import type { Pagination } from '~/types/api'
 
 definePageMeta({ middleware: 'auth' })
 

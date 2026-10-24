@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DeletionImpact } from '~/types/admin'
+import type { DeletionImpact } from '~/types/revision'
 defineProps<{ impact: DeletionImpact }>()
 const { t } = useAdminI18n()
 </script>

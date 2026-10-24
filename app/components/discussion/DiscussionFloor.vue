@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CheckCircle2, Loader2, MessageSquareReply, Quote } from '@lucide/vue'
-import type { Pagination } from '~/types/article'
+import type { Pagination } from '~/types/api'
 import type { DiscussionPost, DiscussionReferences } from '~/types/discussion'
 
 /**
