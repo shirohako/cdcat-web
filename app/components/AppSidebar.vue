@@ -1,5 +1,6 @@
 <template>
   <aside
+    ref="aside"
     :class="[
       'fixed left-0 top-16 bottom-0 bg-card border-r border-line z-40',
       'transition-all duration-300 ease-in-out',
@@ -9,7 +10,8 @@
     ]"
   >
     <!-- Navigation (the logo lives in the navbar, which runs across the top) -->
-    <nav class="flex-1 min-h-0 overflow-y-auto py-6">
+    <!-- Scrolls only vertically: nothing may widen it while the sidebar collapses. -->
+    <nav class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto py-6">
       <ul :class="['relative space-y-2', isCollapsed ? 'px-2' : 'px-3']" @mouseleave="leave">
         <!-- One highlight for the whole list: it glides to the item under the pointer. -->
         <div
@@ -23,7 +25,7 @@
           <NuxtLink
             :to="item.path"
             :class="[
-              'group relative flex h-11 items-center rounded-lg',
+              'relative flex h-11 items-center rounded-lg',
               isCollapsed ? 'justify-center px-3' : 'gap-3.5 px-3.5',
               'transition-colors duration-200 ease-out',
               isActive(item.path) ? 'bg-primary text-on-primary' : hovered === item.name ? 'text-primary' : 'text-body'
@@ -31,33 +33,33 @@
           >
             <Icon :name="item.icon" class="size-5 shrink-0" />
             <transition name="fade">
-              <span v-if="!isCollapsed" class="font-semibold text-[15px]">
+              <span v-if="!isCollapsed" class="whitespace-nowrap font-semibold text-[15px]">
                 {{ $t(item.i18nKey) }}
               </span>
             </transition>
-
-            <!-- Tooltip for collapsed state -->
-            <div
-              v-if="isCollapsed"
-              class="absolute left-full ml-3 px-3 py-1.5 bg-popover text-title text-sm font-medium rounded-lg ring-1 ring-line
-                     opacity-0 group-hover:opacity-100 transition-opacity duration-150
-                     pointer-events-none whitespace-nowrap shadow-overlay"
-            >
-              {{ $t(item.i18nKey) }}
-            </div>
           </NuxtLink>
         </li>
       </ul>
     </nav>
 
-    <!-- Footer -->
+    <!-- Collapsed, the hovered item's name shows beside the sidebar. It lives outside the scrolling nav,
+         which would otherwise clip it or grow a horizontal scrollbar. -->
+    <div
+      v-if="isCollapsed"
+      class="pointer-events-none absolute left-full ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-popover px-3 py-1.5
+             text-sm font-medium text-title shadow-overlay ring-1 ring-line transition-opacity duration-150"
+      :class="hovered ? 'opacity-100' : 'opacity-0'"
+      :style="{ top: `${tooltipTop}px` }"
+      aria-hidden="true"
+    >
+      {{ tooltipLabel }}
+    </div>
+
+    <!-- Footer: only while expanded; the collapsed bar shows nothing here. -->
     <div class="mt-auto shrink-0 p-4">
-      <transition name="fade" mode="out-in">
-        <div v-if="!isCollapsed" class="text-xs text-faint text-center">
+      <transition name="fade">
+        <div v-if="!isCollapsed" class="whitespace-nowrap text-xs text-faint text-center">
           © 2026 CDCAT
-        </div>
-        <div v-else class="flex justify-center">
-          <div class="w-1.5 h-1.5 bg-faint rounded-full"/>
         </div>
       </transition>
     </div>
@@ -104,8 +106,16 @@ const hovered = ref<string | null>(null)
 const highlight = reactive({ top: 0, height: 0, visible: false, glide: false })
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
+const aside = useTemplateRef<HTMLElement>('aside')
+const tooltipTop = ref(0)
+const tooltipLabel = ref('')
+const { t } = useI18n()
+
 const enter = (event: MouseEvent, name: string) => {
   const item = event.currentTarget as HTMLElement
+  const box = item.getBoundingClientRect()
+  tooltipTop.value = box.top - (aside.value?.getBoundingClientRect().top ?? 0) + box.height / 2
+  tooltipLabel.value = t(menuItems.find(entry => entry.name === name)?.i18nKey ?? '')
   highlight.glide = highlight.visible
   highlight.top = item.offsetTop
   highlight.height = item.offsetHeight

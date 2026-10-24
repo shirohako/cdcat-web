@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertTriangle, ArrowLeft, Check, Columns2, EyeOff, Eye, History, ListTree, Loader2, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
+import { AlertTriangle, ArrowLeft, Columns2, EyeOff, Eye, History, ListTree, Loader2, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
 import type { ArticleEditPayload } from '~/types/article'
 import type { MarkdownHeading } from '~/utils/markdown'
 import type { SubmitCheck } from './WriterSubmitDialog.vue'
@@ -15,7 +15,7 @@ const props = defineProps<{ articleId: number | null }>()
 const { t, locale } = useI18n()
 const { hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 const { site } = useSite()
 
 const draft = useArticleDraft(props.articleId, {
@@ -349,9 +349,5 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       </div>
     </div>
 
-    <div
-      v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-popover px-4 py-3 text-sm text-body shadow-overlay ring-1 ring-line" role="status">
-      <Check v-if="toast.type !== 'error'" :size="16" class="shrink-0 text-success" /><AlertTriangle v-else :size="16" class="shrink-0 text-danger" />{{ toast.message }}
-    </div>
   </div>
 </template>

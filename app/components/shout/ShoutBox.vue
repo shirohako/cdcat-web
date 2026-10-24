@@ -84,7 +84,6 @@
     </div>
     <div class="modal-backdrop bg-black/50" @click="reporting = null" />
   </dialog>
-  <CommonToast :toast="toast" />
 </template>
 
 <script setup lang="ts">
@@ -103,7 +102,7 @@ const route = useRoute()
 const { isAuthenticated, user } = useAuth()
 const { ago, exact } = useRelativeTime()
 const { localizeError } = useLocalizedApiError()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 
 const shouts = ref<Shout[]>([])
 const mine = ref<Shout | null>(null)

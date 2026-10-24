@@ -8,7 +8,36 @@ import type { MarkdownEnv } from '~/utils/markdown'
  */
 useHead({ title: 'UI', meta: [{ name: 'robots', content: 'noindex' }] })
 
-const { toast, showToast } = useToast()
+const { showToast, add: addToast, update: updateToast } = useToast()
+
+const toastDemos = {
+  colors: () => {
+    addToast({ title: '已保存', color: 'success' })
+    addToast({ title: '提交了修订 #128', description: '审核通过后会出现在专辑页。', color: 'info' })
+    addToast({ title: '图片太大', description: '超过 10 MB 的图片没有上传。', color: 'warning' })
+    addToast({ title: '请求失败', description: '请稍后再试。', color: 'error' })
+  },
+  actions: () => addToast({
+    title: '已删除 3 条曲目',
+    description: '可以在 10 秒内撤销。',
+    color: 'neutral',
+    icon: 'lucide:trash-2',
+    duration: 10000,
+    actions: [{ label: '撤销', icon: 'lucide:undo-2', onClick: () => showToast('已撤销', 'info') }],
+  }),
+  horizontal: () => addToast({
+    title: '有新版本',
+    orientation: 'horizontal',
+    icon: 'lucide:sparkles',
+    actions: [{ label: '刷新', onClick: () => showToast('刷新中…', 'info') }],
+  }),
+  sticky: () => addToast({ title: '这条不会自动关闭', description: 'duration: 0，只能手动关掉。', duration: 0, icon: 'lucide:pin' }),
+  progress: () => {
+    const toast = addToast({ title: '正在上传…', icon: 'lucide:loader-circle', duration: 0, close: false })
+    setTimeout(() => updateToast(toast.id, { title: '上传完成', icon: undefined, color: 'success', duration: 4000, close: true }), 2000)
+  },
+  duplicate: () => addToast({ id: 'demo-duplicate', title: '同一个 id 只会跳一下', color: 'primary' }),
+}
 const { confirm } = useConfirm()
 
 const surfaces = [
@@ -362,6 +391,19 @@ const markdownEnv: MarkdownEnv = {
       </div>
     </section>
 
+    <!-- Toasts -->
+    <section class="card space-y-4 p-5">
+      <UiSectionTitle title="Toast" description="useToast()：右下角弹出，悬停暂停倒计时，向右滑动可关闭，重复的 id 会跳动而不是叠加。" />
+      <div class="flex flex-wrap gap-2">
+        <UiButton size="sm" @click="toastDemos.colors">四种状态</UiButton>
+        <UiButton size="sm" @click="toastDemos.actions">带操作</UiButton>
+        <UiButton size="sm" @click="toastDemos.horizontal">横向操作</UiButton>
+        <UiButton size="sm" @click="toastDemos.sticky">不自动关闭</UiButton>
+        <UiButton size="sm" @click="toastDemos.progress">更新同一条</UiButton>
+        <UiButton size="sm" @click="toastDemos.duplicate">重复 id</UiButton>
+      </div>
+    </section>
+
     <!-- Menus -->
     <section class="card space-y-4 p-5">
       <UiSectionTitle title="菜单" />
@@ -418,6 +460,5 @@ const markdownEnv: MarkdownEnv = {
     </UiDialog>
 
     <CommonConfirmDialog v-model="confirmDialog" title="删除这张专辑？" description="删除后需要管理员才能恢复。" confirm-phrase="#12" @confirm="showToast('已删除')" />
-    <CommonToast :toast="toast" />
   </div>
 </template>

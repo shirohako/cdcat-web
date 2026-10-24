@@ -121,6 +121,106 @@
   }
 }
 
+/* Toasts (components/ui/Toaster.vue), after Nuxt UI's toaster theme. Each toast is positioned from the bottom of
+   the viewport by --transform; collapsed, the ones behind the front toast shrink to its height, scale down by
+   --scale-factor and peek out by --gap. UiToast sets data-state, data-swipe and the swipe offsets; the keyframes are
+   global so the names match. */
+@layer components {
+  .ui-toaster {
+    --scale-factor: 0.05;
+    --translate-factor: -1px;
+    --gap: -16px;
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 100;
+    display: flex;
+    width: calc(100% - 2rem);
+    flex-direction: column;
+    outline: none;
+  }
+
+  @media (min-width: 640px) {
+    .ui-toaster { width: 24rem; }
+  }
+
+  .ui-toaster[data-expanded="true"] { height: var(--height); }
+
+  .ui-toast {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: var(--index);
+    pointer-events: auto;
+    transform: var(--transform);
+    transition: transform 200ms ease-out, translate 200ms ease-out, height 200ms ease-out;
+  }
+
+  .ui-toast[data-front="false"] > * { transition: opacity 100ms; }
+  .ui-toast[data-collapsed="true"][data-front="false"] { height: var(--front-height); }
+  .ui-toast[data-collapsed="true"][data-front="false"] > * { opacity: 0; }
+
+  .ui-toast[data-state="open"] { animation: toast-slide-in-from-bottom 200ms ease-out; }
+  .ui-toast[data-state="open"][data-pulsing="odd"] { animation: toast-pulse-a 200ms ease-out; }
+  .ui-toast[data-state="open"][data-pulsing="even"] { animation: toast-pulse-b 200ms ease-out; }
+  .ui-toast[data-state="closed"] { animation: toast-closed 200ms ease-out; }
+  .ui-toast[data-state="closed"][data-collapsed="true"][data-front="false"] { animation: toast-collapsed-closed 200ms ease-out; }
+
+  .ui-toast[data-swipe="move"] { translate: var(--toast-swipe-move-x) 0; transition: none; }
+  .ui-toast[data-swipe="cancel"] { translate: 0 0; }
+  .ui-toast[data-swipe="end"] {
+    translate: var(--toast-swipe-end-x) 0;
+    animation: toast-slide-right 200ms ease-out;
+  }
+}
+
+@keyframes toast-slide-in-from-bottom {
+  from { transform: translateY(100%); }
+  to { transform: var(--transform); }
+}
+
+@keyframes toast-pulse-a {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.04; }
+}
+
+@keyframes toast-pulse-b {
+  0%, 100% { scale: 1; }
+  50% { scale: 1.04; }
+}
+
+@keyframes toast-collapsed-closed {
+  from { transform: var(--transform); }
+  to { transform: translateY(calc((var(--before) - var(--height)) * var(--gap))) scale(var(--scale)); }
+}
+
+@keyframes toast-closed {
+  from { transform: var(--transform); }
+  to { transform: translateY(calc((var(--offset) - var(--height)) * var(--translate-factor))); }
+}
+
+@keyframes toast-slide-right {
+  from { transform: translateX(0) translateY(var(--translate)); }
+  to { transform: translateX(100%) translateY(var(--translate)); }
+}
+
+@keyframes toast-fade-in {
+  from { opacity: 0; }
+}
+
+@keyframes toast-fade-out {
+  to { opacity: 0; }
+}
+
+/* Reduced motion: toasts fade in and out in place, without sliding, pulsing or easing. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-toast { transition: none; }
+  .ui-toast[data-state="open"],
+  .ui-toast[data-state="open"][data-pulsing] { animation: toast-fade-in 200ms ease-out; }
+  .ui-toast[data-state="closed"],
+  .ui-toast[data-state="closed"][data-collapsed="true"][data-front="false"] { animation: toast-fade-out 200ms ease-out; }
+}
+
 /* Scrollbars everywhere (page, sidebar, menus, editor, code blocks): a thin rounded thumb floating on a
    clear track, a little see-through, in the text colour of the current theme; it firms up on hover and takes
    the theme colour while dragged. Chromium and Safari get the full look through ::-webkit-scrollbar.

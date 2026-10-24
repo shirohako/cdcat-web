@@ -133,24 +133,6 @@
         </section>
       </div>
 
-      <!-- Toast -->
-      <Transition
-        enter-active-class="transition duration-300 ease-out"
-        enter-from-class="translate-y-2 opacity-0"
-        enter-to-class="translate-y-0 opacity-100"
-        leave-active-class="transition duration-200 ease-in"
-        leave-from-class="translate-y-0 opacity-100"
-        leave-to-class="translate-y-2 opacity-0"
-      >
-        <div v-if="toast.show" class="fixed bottom-6 right-6 z-50">
-          <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-popover ring-1 ring-line shadow-overlay text-sm font-medium text-body">
-            <Check v-if="toast.type === 'success'" :size="16" class="shrink-0 text-success" />
-            <AlertTriangle v-else-if="toast.type === 'error'" :size="16" class="shrink-0 text-danger" />
-            <InfoIcon v-else :size="16" class="shrink-0 text-info" />
-            {{ toast.message }}
-          </div>
-        </div>
-      </Transition>
     </div>
   </div>
 </template>
@@ -158,7 +140,6 @@
 <script setup>
 import {
   User as UserIcon, Mail, Lock, Bell, AlertTriangle, Settings, EyeOff,
-  Check, Info as InfoIcon
 } from '@lucide/vue'
 
 definePageMeta({
@@ -166,7 +147,7 @@ definePageMeta({
 })
 
 const { user } = useAuth()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 const { t } = useI18n()
 
 const userDisplayName = computed(() => {

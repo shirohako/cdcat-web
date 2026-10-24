@@ -101,7 +101,6 @@
         <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
       </SkeletonStatus>
     </template>
-    <CommonToast :toast="toast" />
   </div>
 </template>
 
@@ -118,7 +117,7 @@ const { t } = useI18n()
 const { isAuthenticated, hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 
 const { data, status, error, loading, refresh } = usePageData(`track:${props.trackId}:lyrics`,
   ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/tracks/${props.trackId}/lyrics`, { signal, progress: !background }))

@@ -55,7 +55,6 @@
         <Icon name="lucide:circle-check" class="size-4 shrink-0 text-success" />{{ t('article_ui.report.done') }}
       </p>
       <DiscussionNotice />
-      <CommonToast :toast="toast" />
     </div>
 
     <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-meta">
@@ -75,7 +74,7 @@ const route = useRoute()
 const { t, locale } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 const { formatDate } = useLocaleFormatting()
 const { tagName } = useTags()
 const { typeName } = useArticleTypes()

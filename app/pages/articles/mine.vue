@@ -10,7 +10,7 @@ const { t, locale } = useI18n()
 const { typeName } = useArticleTypes()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 const { user } = useAuth()
 
 // A new article never saved to the server lives only in this browser; the writer picks it up from 写文章.
@@ -123,9 +123,5 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
     <CommonConfirmDialog
       v-model="deleteOpen" variant="delete" :title="t('article_ui.mine.delete_title')"
       :description="t('article_ui.mine.delete_description', { title: deleting?.title || t('article_ui.untitled') })" @confirm="remove" />
-    <div
-      v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-popover px-4 py-3 text-sm text-body shadow-overlay ring-1 ring-line" role="status">
-      <Icon :name="toast.type === 'error' ? 'lucide:circle-alert' : 'lucide:circle-check'" class="size-4 shrink-0" :class="toast.type === 'error' ? 'text-danger' : 'text-success'" />{{ toast.message }}
-    </div>
   </div>
 </template>

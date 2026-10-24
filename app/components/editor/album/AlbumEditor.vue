@@ -107,7 +107,6 @@
         </div>
       </template>
     </div>
-    <CommonToast :toast="toast" />
   </div>
 </template>
 
@@ -149,7 +148,7 @@ const { $api } = useNuxtApp()
 const router = useRouter()
 const route = useRoute()
 const { schema } = useCatalogSchema()
-const { toast, showToast } = useToast()
+const { showToast } = useToast()
 const { ago } = useRelativeTime()
 const { localizeError } = useLocalizedApiError()
 
