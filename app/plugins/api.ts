@@ -18,6 +18,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   /** Ends the request's share of the progress bar; kept on the ofetch context of each attempt. */
   const PROGRESS_DONE = Symbol('progress-done')
   type TrackedContext = { [PROGRESS_DONE]?: () => void }
+  // SSR requests reach the API from this server; pass the visitor on so rate limits and view counts see them.
+  // The API believes X-Forwarded-For only from its TRUSTED_PROXIES.
+  const visitorHeaders = import.meta.server ? forwardedHeaders(useRequestEvent()) : {}
 
   const api = $fetch.create({
     baseURL: config.public.apiBaseUrl as string,
@@ -32,12 +35,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       // 从 useState 读取 token（与 useAuth composable 共享同一个 ref，写入即时生效）
       // 回退到 cookie（SSR 首次请求时 useState 可能未初始化）
       const token = stateToken.value || authTokenCookie.value
-
-      if (token) {
-        const headers = new Headers(options.headers)
-        headers.set('Authorization', `Bearer ${token}`)
-        options.headers = headers
-      }
+      const headers = new Headers(options.headers)
+      for (const [name, value] of Object.entries(visitorHeaders)) headers.set(name, value)
+      if (token) headers.set('Authorization', `Bearer ${token}`)
+      options.headers = headers
     },
 
     // Network failures, timeouts and aborts never reach onResponse.
@@ -141,6 +142,17 @@ export default defineNuxtPlugin((nuxtApp) => {
     },
   }
 })
+
+/** Appends the visitor's address to X-Forwarded-For, as any proxy does, and keeps their User-Agent. */
+function forwardedHeaders(event: ReturnType<typeof useRequestEvent>): Record<string, string> {
+  if (!event) return {}
+  const { headers, socket } = event.node.req
+  const chain = [headers['x-forwarded-for'], socket.remoteAddress].flat().filter(Boolean).join(', ')
+  const forwarded: Record<string, string> = {}
+  if (chain) forwarded['X-Forwarded-For'] = chain
+  if (headers['user-agent']) forwarded['User-Agent'] = headers['user-agent']
+  return forwarded
+}
 
 /**
  * The API is external to Nitro, so skip Nitro's typed-route inference: matching every URL
