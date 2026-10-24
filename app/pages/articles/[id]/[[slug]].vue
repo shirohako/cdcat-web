@@ -69,6 +69,7 @@
 import { Copyright, ExternalLink, Eye, Flag, Heart, History, Repeat2, Shield } from '@lucide/vue'
 import type { ArticleCard, ArticleDetail } from '~/types/article'
 import { articleLicense, licenseDeedUrl } from '~/utils/articleLicenses'
+import { compactLd } from '~/utils/structuredData'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -78,7 +79,6 @@ const { showToast } = useToast()
 const { formatDate } = useLocaleFormatting()
 const { tagName } = useTags()
 const { typeName } = useArticleTypes()
-const config = useRuntimeConfig()
 const articleId = String(route.params.id)
 
 const { data: article, status, error, revealClass, mutate } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
@@ -121,34 +121,37 @@ const { data: moreData } = usePageData(() => `articles-more-${articleId}-${autho
 })
 const moreByAuthor = computed(() => moreData.value ?? [])
 
-const canonical = computed(() => article.value && config.public.baseUrl
-  ? `${String(config.public.baseUrl).replace(/\/$/, '')}/articles/${article.value.id}${article.value.slug ? `/${article.value.slug}` : ''}` : undefined)
-
-useSeoMeta({
+const articlePath = computed(() => article.value ? `/articles/${article.value.id}${article.value.slug ? `/${article.value.slug}` : ''}` : null)
+const absolute = useSiteUrl()
+usePageSeo({
   title: () => article.value?.title,
   description: () => article.value?.summary,
-  ogTitle: () => article.value ? `${article.value.title} | CDCAT` : undefined,
-  ogDescription: () => article.value?.summary,
-  ogImage: () => article.value?.cover_url ?? undefined,
-  ogType: 'article',
+  image: () => article.value?.cover_url,
+  wideImage: true,
+  type: 'article',
+  path: articlePath,
+  query: [],
+  error,
+  breadcrumbs: () => article.value && articlePath.value
+    ? [{ name: t('content_display.articles'), path: '/articles' }, { name: article.value.title, path: articlePath.value }]
+    : null,
+  jsonLd: () => article.value && compactLd({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': article.value.title,
+    'description': article.value.summary,
+    'url': articlePath.value ? absolute(articlePath.value) : undefined,
+    'image': article.value.cover_url ? [article.value.cover_url] : undefined,
+    'datePublished': article.value.published_at,
+    'dateModified': article.value.updated_at ?? article.value.published_at,
+    'wordCount': article.value.word_count,
+    'author': article.value.author
+      ? { '@type': 'Person', 'name': article.value.author.nickname || article.value.author.username, 'url': absolute(`/profile/${article.value.author.username}`) }
+      : undefined,
+  }),
+})
+useSeoMeta({
   articlePublishedTime: () => article.value?.published_at ?? undefined,
   articleModifiedTime: () => article.value?.updated_at ?? undefined,
 })
-useHead(() => ({
-  link: canonical.value ? [{ rel: 'canonical', href: canonical.value }] : [],
-  script: article.value ? [{
-    type: 'application/ld+json',
-    innerHTML: JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'Article',
-      'headline': article.value.title,
-      'description': article.value.summary,
-      'image': article.value.cover_url ? [article.value.cover_url] : undefined,
-      'datePublished': article.value.published_at,
-      'dateModified': article.value.updated_at ?? article.value.published_at,
-      'wordCount': article.value.word_count,
-      'author': article.value.author ? { '@type': 'Person', 'name': article.value.author.nickname || article.value.author.username } : undefined,
-    }),
-  }] : [],
-}))
 </script>

@@ -404,6 +404,7 @@ const handleRegister = async () => {
 useHead({
   title: computed(() => t('user.register')),
   meta: [
+    { name: 'robots', content: 'noindex' },
     {
       name: 'description',
       content: computed(() => t('auth.register.meta_description'))

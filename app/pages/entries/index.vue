@@ -7,7 +7,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, formatReleaseDate } = useEntryDisplay()
 
-useHead({ title: computed(() => t('menu.entry')) })
+usePageSeo({ title: () => t('menu.entry'), description: () => t('seo.pages.entries') })
 
 const selectedType = computed(() => (ENTRY_TYPES as readonly string[]).includes(route.query.type as string) ? route.query.type as EntryType : 'all')
 const selectedFormat = computed(() => (route.query.format as string) || '')

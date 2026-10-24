@@ -47,38 +47,4 @@ const route = useRoute()
 watch(() => route.path, () => {
   isMobileMenuOpen.value = false
 })
-
-const { locale, locales } = useI18n()
-const config = useRuntimeConfig()
-
-// SEO: 设置 HTML lang 属性和 hreflang 链接（lang 跟随语言切换）
-useHead({
-  htmlAttrs: {
-    lang: () => locale.value
-  },
-  link: computed(() => {
-    const links: { rel: 'alternate', hreflang: string, href: string }[] = []
-    const baseUrl = config.public.baseUrl
-    const currentPath = route.path
-
-    // 为每个语言添加 hreflang 链接（包含 lang 参数）
-    locales.value.forEach((loc) => {
-      const langCode = loc.code
-      links.push({
-        rel: 'alternate',
-        hreflang: loc.language || loc.code,
-        href: `${baseUrl}${currentPath}?lang=${langCode}`
-      })
-    })
-
-    // 添加 x-default（默认语言）
-    links.push({
-      rel: 'alternate',
-      hreflang: 'x-default',
-      href: `${baseUrl}${currentPath}`
-    })
-
-    return links
-  })
-})
 </script>

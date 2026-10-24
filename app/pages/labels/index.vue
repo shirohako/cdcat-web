@@ -57,5 +57,5 @@ const { data, status, refresh, loading, refetching, revealKey, revealClass } = a
 const labels = computed(() => data.value?.labels ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
 const applySearch = () => router.push({ query: { ...route.query, search: search.value.trim() || undefined, page: undefined } })
-useHead({ title: computed(() => t('labels.title')) })
+usePageSeo({ title: () => t('labels.title'), description: () => t('seo.pages.labels') })
 </script>

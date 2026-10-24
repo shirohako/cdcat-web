@@ -37,5 +37,5 @@ const snapshot = computed(() => latest.value?.snapshot as Record<string, unknown
 const name = computed(() => String(snapshot.value?.title ?? snapshot.value?.name ?? (props.type === 'lyric' && snapshot.value?.language ? snapshot.value.language : '')))
 const backLink = computed(() => props.type === 'lyric' && snapshot.value?.track_id ? `/tracks/${snapshot.value.track_id}` : `/${resource}/${id}`)
 
-useHead({ title: computed(() => `${t('versions.title')} · ${name.value || `#${id}`}`) })
+useSeoMeta({ title: () => `${t('versions.title')} · ${name.value || `#${id}`}`, robots: 'noindex' })
 </script>

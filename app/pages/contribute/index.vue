@@ -23,7 +23,7 @@ const targetOf = (kind: Kind) => isAuthenticated.value ? `/contribute/${kind}` :
 const moreOpen = ref(false)
 const details = ['search', 'live', 'review', 'history'] as const
 
-useSeoMeta({ title: () => t('contribute_page.seo_title'), description: () => t('contribute_page.summary') })
+usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('contribute_page.summary') })
 </script>
 
 <template>

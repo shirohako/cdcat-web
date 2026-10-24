@@ -230,6 +230,7 @@ const handleLogin = async () => {
 useHead({
   title: computed(() => t('user.login')),
   meta: [
+    { name: 'robots', content: 'noindex' },
     {
       name: 'description',
       content: computed(() => t('auth.login.meta_description'))

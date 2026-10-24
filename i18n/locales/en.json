@@ -2721,7 +2721,6 @@
     }
   },
   "event_page": {
-    "seo_description": "Venue map and {count} participating circles of {name} at {venue}.",
     "not_found": "Event not found",
     "hero": {
       "date": "Date",
@@ -2860,5 +2859,56 @@
     },
     "my_revisions": "See my revisions",
     "guest_note": "Browsing needs no account; you'll be asked to log in after choosing."
+  },
+  "seo": {
+    "with_original": "{name} ({original})",
+    "separator": ", ",
+    "list_separator": ", ",
+    "sentence": "{text}.",
+    "albums_count": "{count} album | {count} albums",
+    "album": {
+      "by": "{type} by {artists}",
+      "released": "released {date}",
+      "event": "debuted at {event}",
+      "catalog": "catalog no. {number}",
+      "tracks": "{count} track | {count} tracks"
+    },
+    "track": {
+      "from": "Track on {album}",
+      "artists": "by {artists}",
+      "duration": "{time} long",
+      "original": "original: {titles}",
+      "lyrics": "with lyrics",
+      "instrumental": "instrumental"
+    },
+    "label": {
+      "lead": "Record label",
+      "founded": "founded {date}"
+    },
+    "entry": {
+      "albums": "{count} related album | {count} related albums"
+    },
+    "franchise": {
+      "lead": "Franchise",
+      "entries": "{count} entry | {count} entries"
+    },
+    "event": {
+      "date": "held {date}",
+      "venue": "at {venue}",
+      "circles": "{count} participating circle | {count} participating circles",
+      "albums": "{count} new release | {count} new releases",
+      "map": "with a venue map"
+    },
+    "pages": {
+      "albums": "Browse albums, singles, EPs and compilations on CDCAT.",
+      "vinyls": "Browse vinyl records on CDCAT.",
+      "artists": "Browse artists, doujin circles and virtual singers on CDCAT, with their discographies.",
+      "labels": "Browse record labels and publishers on CDCAT.",
+      "entries": "Browse anime, games, films and other works on CDCAT, with their music.",
+      "franchises": "Browse franchises on CDCAT and the albums that go with them.",
+      "articles": "Music reviews, features and research written by CDCAT users.",
+      "about": "About CDCAT, a community-edited database of doujin and Japanese music.",
+      "discussion_tag": "Topics tagged #{tag} in the CDCAT forum."
+    }
   }
 }

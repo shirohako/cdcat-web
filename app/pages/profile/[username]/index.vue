@@ -66,11 +66,10 @@ const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`
 
 // --------------- SEO ---------------
 
-useHead({
-  title: computed(() => {
-    if (!profile.value) return ''
-    return profile.value.nickname || profile.value.username
-  })
+useSeoMeta({
+  title: () => profile.value ? profile.value.nickname || profile.value.username : '',
+  // Profiles stay out of search results; their links are still followed.
+  robots: 'noindex, follow',
 })
 
 definePageMeta({

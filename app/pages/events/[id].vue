@@ -4,12 +4,15 @@ import type { EventCircle, EventDetail, VenueMapData } from '~/types/event'
 import type { GenreFamily } from '~/utils/eventVenue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Disc3, Layers, MapPin, Palette, Search, Star, Users, X } from '@lucide/vue'
+import { eventLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
 const router = useRouter()
 const eventId = Number(route.params.id)
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { localizeError } = useLocalizedApiError()
+const { formatDate, localizedContent } = useLocaleFormatting()
 
 const { data: event, status, error, revealClass } = await usePageAPI<EventDetail>(`/v1/events/${eventId}`)
 
@@ -148,15 +151,50 @@ const stats = computed(() => {
   return out.filter(s => s.value || s.key === 'circles')
 })
 
-const description = computed(() => event.value
-  ? t('event_page.seo_description', { name: event.value.name, venue: event.value.venue ?? '', count: event.value.circles_count ?? 0 })
-  : '')
-useSeoMeta({
-  title: () => event.value?.name ?? t('collection_pages.events.title'),
-  description: () => description.value,
-  ogTitle: () => event.value?.name,
-  ogDescription: () => description.value,
-  ogImage: () => event.value?.main_visual_url ?? undefined,
+const { sentence, count } = useSeoText()
+const absolute = useSiteUrl()
+/** "25 Oct 2026", or "25 Oct 2026 – 26 Oct 2026" over several days. */
+const eventDates = computed(() => {
+  const value = event.value
+  const start = value?.start_date ? formatDate(value.start_date) : ''
+  const end = value?.end_date ? formatDate(value.end_date) : ''
+  return start && end && start !== end ? `${start} – ${end}` : start || end
+})
+usePageSeo({
+  title: () => event.value?.name,
+  description: () => {
+    const value = event.value
+    if (!value) return undefined
+    const place = [value.venue, value.location].filter(Boolean).join(' ')
+    const lead = sentence([
+      eventDates.value && t('seo.event.date', { date: eventDates.value }),
+      place && t('seo.event.venue', { venue: place }),
+      count('seo.event.circles', value.circles_count),
+      count('seo.event.albums', value.released_albums_count),
+      value.has_map && t('seo.event.map'),
+    ])
+    return composeDescription(lead, plainText(localizedContent(value.description)), descriptionLength(locale.value))
+  },
+  image: () => event.value?.main_visual_url,
+  error,
+  breadcrumbs: () => event.value
+    ? [
+        { name: t('collection_pages.events.title'), path: '/events' },
+        ...(event.value.series ? [{ name: event.value.series.name, path: `/event-series/${event.value.series.id}` }] : []),
+        { name: event.value.name, path: `/events/${event.value.id}` },
+      ]
+    : null,
+  jsonLd: () => event.value && eventLd({
+    name: event.value.name,
+    url: absolute(`/events/${event.value.id}`),
+    startDate: event.value.start_date,
+    endDate: event.value.end_date,
+    venue: event.value.venue,
+    address: event.value.location,
+    image: event.value.main_visual_url,
+    description: plainText(localizedContent(event.value.description)),
+    series: event.value.series ? { name: event.value.series.name, url: absolute(`/event-series/${event.value.series.id}`) } : null,
+  }),
 })
 </script>
 

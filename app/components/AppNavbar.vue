@@ -213,6 +213,7 @@
 <script setup lang="ts">
 import { userMenuItems } from '~/config/menu'
 import { localDrafts } from '~/utils/localDrafts'
+import { queryLanguage, withoutLanguageQuery, type SiteLocale } from '~/utils/languageQuery'
 
 defineProps<{
   isCollapsed: boolean
@@ -242,9 +243,13 @@ const userInitial = computed(() => {
   return user.value.username.charAt(0).toUpperCase()
 })
 
+const router = useRouter()
 const switchLanguage = async (localeCode: string) => {
-  await setLocale(localeCode as 'zh-Hans' | 'zh-Hant' | 'en' | 'ja')
+  await setLocale(localeCode as SiteLocale)
   showLanguageMenu.value = false
+  // A `?l=` / `?lang=` left in the address would switch back on the next reload.
+  const { query } = router.currentRoute.value
+  if (queryLanguage(query)) await router.replace({ query: withoutLanguageQuery(query) })
 }
 
 const toggleSidebar = () => {

@@ -190,13 +190,9 @@ const searchQuery = computed(() => {
 const searchInput = ref(String(route.query.q || ''))
 watch(() => route.query.q, value => { searchInput.value = String(value || '') })
 
-useSeoMeta({
-  title: 'Albums',
-  description: 'Explore all music albums, singles, EPs and compilations on CDCAT.',
-  ogTitle: 'Albums | CDCAT',
-  ogDescription: 'Explore all music albums, singles, EPs and compilations on CDCAT.',
-  ogType: 'website',
-  twitterCard: 'summary',
+usePageSeo({
+  title: () => t('albums.title'),
+  description: () => t('seo.pages.albums'),
 })
 
 // 获取当前页码

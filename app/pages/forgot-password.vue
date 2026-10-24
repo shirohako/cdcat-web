@@ -413,6 +413,7 @@ onUnmounted(() => {
 useHead({
   title: computed(() => t('auth.forgot_password.title')),
   meta: [
+    { name: 'robots', content: 'noindex' },
     {
       name: 'description',
       content: computed(() => t('auth.forgot_password.subtitle'))

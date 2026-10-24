@@ -1,14 +1,45 @@
 <script setup lang="ts">
 import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
 import type { FranchiseDetail } from '~/types/entry'
+import { namedLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 
-const { data: series, status, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
+const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
 
-useHead({ title: computed(() => series.value ? displayName(series.value) : '') })
+const { withOriginal, sentence, count } = useSeoText()
+const absolute = useSiteUrl()
+const seriesName = computed(() => displayName(series.value))
+usePageSeo({
+  title: () => series.value ? withOriginal(seriesName.value, series.value.name) : undefined,
+  description: () => series.value
+    ? composeDescription(
+        sentence([
+          t('seo.franchise.lead'),
+          count('seo.franchise.entries', series.value.entries_count ?? series.value.entries.length),
+          count('seo.entry.albums', series.value.albums_count ?? series.value.albums.length),
+        ]),
+        plainText(series.value.description),
+        descriptionLength(locale.value),
+      )
+    : undefined,
+  image: () => series.value?.banner_url || series.value?.image_url,
+  wideImage: true,
+  noindex: () => series.value?.is_pending,
+  error,
+  breadcrumbs: () => series.value ? [{ name: t('menu.series'), path: '/franchises' }, { name: seriesName.value, path: `/franchises/${series.value.id}` }] : null,
+  jsonLd: () => series.value && namedLd('CreativeWorkSeries', {
+    name: seriesName.value,
+    alternateNames: [series.value.name, ...(series.value.titles ?? []).map(title => title.title)],
+    url: absolute(`/franchises/${series.value.id}`),
+    image: series.value.image_url || series.value.banner_url,
+    description: plainText(series.value.description),
+    sameAs: series.value.links.map(link => link.url),
+  }),
+})
 
 const tabs = computed(() => [
   { id: 'entries', label: t('catalog.series_entries') },

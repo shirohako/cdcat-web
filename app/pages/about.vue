@@ -243,7 +243,8 @@ const communities = computed(() => [
   }
 ])
 
-useHead({
-  title: computed(() => t('menu.about'))
+usePageSeo({
+  title: () => t('menu.about'),
+  description: () => t('seo.pages.about'),
 })
 </script>

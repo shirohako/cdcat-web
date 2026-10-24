@@ -16,7 +16,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
-      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || ''
+      apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
+      // Search engines may index the site only where NUXT_PUBLIC_INDEXABLE=true (production); see docs/seo in the API repo.
+      indexable: false,
     }
   },
 

@@ -55,9 +55,14 @@
 <script setup lang="ts">
 import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
+import { ldDate, musicAlbumLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
-const { localName } = useCatalogDisplay()
+const { t, locale } = useI18n()
+const { localName, formatDate, enumLabel } = useCatalogDisplay()
+const { withOriginal, sentence, count } = useSeoText()
+const absolute = useSiteUrl()
 
 const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${route.params.id}`)
 
@@ -79,15 +84,53 @@ const setTracking = (tracking: TrackingStatus | null) => mutate((current) => {
 const gallery = ref<{ openCover: () => void } | null>(null)
 const reviews = ref<{ openEditor: () => void } | null>(null)
 
-const seoTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : 'Album')
-const seoDescription = computed(() => album.value?.description?.slice(0, 160) || (album.value ? `${album.value.title} on CDCAT.` : 'Music album details on CDCAT.'))
-useSeoMeta({
-  title: seoTitle,
-  description: seoDescription,
-  ogTitle: computed(() => `${seoTitle.value} | CDCAT`),
-  ogDescription: seoDescription,
-  ogType: 'music.album',
-  ogImage: computed(() => album.value?.cover?.medium_url || album.value?.image_url || undefined),
-  twitterCard: 'summary_large_image',
+const shownTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : '')
+/** The artists as printed: "A feat. B". */
+const artistLine = computed(() => (album.value?.artists ?? [])
+  .map((artist, index, all) => `${artist.credited_as || artist.name}${index < all.length - 1 ? artist.join_phrase || ', ' : ''}`).join(''))
+
+usePageSeo({
+  title: () => album.value ? [withOriginal(shownTitle.value, album.value.title), artistLine.value].filter(Boolean).join(' - ') : undefined,
+  description: () => {
+    const value = album.value
+    if (!value) return undefined
+    const type = enumLabel('album_type', value.type)
+    const lead = sentence([
+      artistLine.value ? t('seo.album.by', { artists: artistLine.value, type }) : type,
+      value.release_date && t('seo.album.released', { date: formatDate(value.release_date, value.release_date_precision) }),
+      value.release_event && t('seo.album.event', { event: value.release_event.name }),
+      value.catalog_number && t('seo.album.catalog', { number: value.catalog_number }),
+      count('seo.album.tracks', value.track_count),
+    ])
+    return composeDescription(lead, plainText(value.description), descriptionLength(locale.value))
+  },
+  image: () => album.value?.cover?.medium_url || album.value?.image_url,
+  type: 'music.album',
+  noindex: () => album.value?.is_pending,
+  adult: () => album.value?.is_adult,
+  error,
+  breadcrumbs: () => album.value ? [{ name: t('menu.album'), path: '/albums' }, { name: shownTitle.value, path: `/albums/${album.value.id}` }] : null,
+  jsonLd: () => {
+    const value = album.value
+    if (!value) return null
+    return musicAlbumLd({
+      name: shownTitle.value,
+      alternateNames: [value.title, ...value.titles.map(title => title.title)],
+      url: absolute(`/albums/${value.id}`),
+      image: value.cover?.url || value.image_url,
+      description: plainText(value.description),
+      datePublished: ldDate(value.release_date, value.release_date_precision),
+      genre: value.categories.map(category => enumLabel('album_category', category)),
+      artists: value.artists.map(artist => ({ name: artist.credited_as || artist.name, url: absolute(`/artists/${artist.id}`), type: artist.type })),
+      labels: value.labels.filter(label => label.role === 'label' || label.role === 'publisher')
+        .map(label => ({ name: label.credited_as || label.name, url: absolute(`/labels/${label.id}`) })),
+      catalogNumber: value.catalog_number,
+      // The album's own discs; bonus discs come with some editions only.
+      tracks: value.discs.filter(disc => !disc.bonus_id).flatMap(disc => disc.tracks)
+        .map(track => ({ name: localName(track.title, track.titles), url: absolute(`/tracks/${track.id}`), duration: track.duration })),
+      rating: value.rating !== null ? { value: value.rating, count: value.rating_count } : null,
+      isAdult: value.is_adult,
+    })
+  },
 })
 </script>

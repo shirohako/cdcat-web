@@ -424,19 +424,16 @@ const flow = computed(() => [
   },
 ]);
 
+const absolute = useSiteUrl();
+usePageSeo({
+  title: () => t('home.seo_title'),
+  description: () => t('home.seo_description'),
+  jsonLd: () => websiteLd({ name: SITE_NAME, url: absolute('/'), logo: absolute('/icon.png'), description: t('home.seo_description') }),
+});
 useHead({
-  title: computed(() => t('home.seo_title')),
+  // The home title already names the site.
   titleTemplate: '%s',
-  meta: [
-    {
-      name: "description",
-      content: computed(() => t('home.seo_description')),
-    },
-    {
-      name: "keywords",
-      content: computed(() => t('home.seo_keywords')),
-    },
-  ],
+  meta: [{ name: 'keywords', content: computed(() => t('home.seo_keywords')) }],
 });
 </script>
 

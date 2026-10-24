@@ -65,14 +65,17 @@
 import type { AlbumSimple } from '~/types/album'
 import type { Label } from '~/types/label'
 import { Building2, Edit, History, Info } from '@lucide/vue'
+import { namedLd, ldDate } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
 const { $api } = useNuxtApp()
+const { t, locale } = useI18n()
 const { regionName } = useLocaleFormatting()
 const { localName, formatDate } = useCatalogDisplay()
 
 const labelId = Number(route.params.id)
-const { data: label, status, revealClass } = await usePageAPI<Label>(`/v1/labels/${labelId}`)
+const { data: label, status, error, revealClass } = await usePageAPI<Label>(`/v1/labels/${labelId}`)
 const shownName = computed(() => label.value ? localName(label.value.name, label.value.titles) : '')
 
 const page = useQueryPage()
@@ -89,5 +92,35 @@ const {
 const albums = computed(() => albumData.value?.albums ?? [])
 const lastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
 
-useHead({ title: computed(() => shownName.value || 'Label') })
+const { withOriginal, sentence, count } = useSeoText()
+const absolute = useSiteUrl()
+usePageSeo({
+  title: () => label.value ? withOriginal(shownName.value, label.value.name) : undefined,
+  description: () => label.value
+    ? composeDescription(
+        sentence([
+          t('seo.label.lead'),
+          label.value.country && regionName(label.value.country),
+          label.value.begin_date && t('seo.label.founded', { date: formatDate(label.value.begin_date, label.value.begin_date_precision) }),
+          count('seo.albums_count', label.value.albums_count),
+        ]),
+        plainText(label.value.description),
+        descriptionLength(locale.value),
+      )
+    : undefined,
+  image: () => label.value?.image_url,
+  noindex: () => label.value?.is_pending,
+  error,
+  breadcrumbs: () => label.value ? [{ name: t('labels.title'), path: '/labels' }, { name: shownName.value, path: `/labels/${label.value.id}` }] : null,
+  jsonLd: () => label.value && namedLd('Organization', {
+    name: shownName.value,
+    alternateNames: [label.value.name, ...(label.value.titles ?? []).map(title => title.title)],
+    url: absolute(`/labels/${label.value.id}`),
+    logo: label.value.image_url,
+    description: plainText(label.value.description),
+    foundingDate: ldDate(label.value.begin_date, label.value.begin_date_precision),
+    dissolutionDate: ldDate(label.value.end_date, label.value.end_date_precision),
+    sameAs: (label.value.links ?? []).map(link => link.url),
+  }),
+})
 </script>

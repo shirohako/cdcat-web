@@ -7,7 +7,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 
-useHead({ title: computed(() => t('content_display.series')) })
+usePageSeo({ title: () => t('content_display.series'), description: () => t('seo.pages.franchises') })
 
 const currentPage = computed(() => Math.max(1, Number.parseInt(route.query.page as string || '1') || 1))
 const search = computed(() => (route.query.search as string) || '')

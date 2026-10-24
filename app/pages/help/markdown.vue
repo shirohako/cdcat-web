@@ -9,7 +9,7 @@
 <script setup lang="ts">
 /** The site's own Markdown guide; the editor's help banner links here. */
 const { t } = useI18n()
-useSeoMeta({
+usePageSeo({
   title: () => t('markdown.help.title'),
   description: () => t('markdown.help.lead'),
 })

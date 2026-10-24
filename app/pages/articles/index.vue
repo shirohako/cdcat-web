@@ -53,7 +53,7 @@ const { data: featuredData, loading: featuredLoading } = usePageData(
 )
 const featured = computed(() => featuredData.value ?? [])
 
-useHead({ title: computed(() => t('content_display.articles')) })
+usePageSeo({ title: () => t('content_display.articles'), description: () => t('seo.pages.articles') })
 </script>
 
 <template>

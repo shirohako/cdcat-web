@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ArrowDownWideNarrow, CheckCircle2, ChevronRight, Eye, Lock, MessageSquare, Pencil, Pin, RefreshCw, Shield, Star, UserRound } from '@lucide/vue'
 import { markdownQuote } from '~/utils/markdownEditor'
+import { plainText } from '~/utils/seoText'
+import { compactLd } from '~/utils/structuredData'
 import type { DiscussionPost, DiscussionReferences, DiscussionTopicDetail, DiscussionTopicPage } from '~/types/discussion'
 
 /**
@@ -12,6 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const config = useRuntimeConfig()
+const absolute = useSiteUrl()
 const { $api } = useNuxtApp()
 const { isAuthenticated, token } = useAuth()
 const { localizeError } = useLocalizedApiError()
@@ -259,42 +262,39 @@ const confirmDeleteTopic = ref(false)
 // ===== SEO =====
 
 const firstFloor = computed(() => floors.value.find(floor => floor.floor === 1))
-const description = computed(() => {
-  const text = firstFloor.value?.status === 'visible' ? (firstFloor.value.raw ?? '') : ''
-  // Spoilers never reach the description.
-  return text.replace(/\|\|.+?\|\|/g, '▇▇▇').replace(/:::+\s*spoiler[\s\S]*?:::+/g, '▇▇▇').replace(/:::+[^\n]*\n?/g, '').replace(/[#*_>`~=[\]{}()!|-]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 160)
-})
-const canonical = computed(() => config.public.baseUrl
-  ? `${String(config.public.baseUrl).replace(/\/$/, '')}/discussions/${topicId.value}${(pagination.value?.current_page ?? 1) > 1 ? `?page=${pagination.value!.current_page}` : ''}` : undefined)
-useSeoMeta({
+// Spoilers never reach the description.
+const description = computed(() => plainText(firstFloor.value?.status === 'visible' ? firstFloor.value.raw : '', { spoiler: '▇▇▇' }))
+const { canonical } = usePageSeo({
   title: () => topic.value ? `${topic.value.title} - ${categoryName(topic.value.category)}` : t('discussions.title'),
-  description: () => description.value || undefined,
-  ogTitle: () => topic.value?.title,
-  ogDescription: () => description.value || undefined,
-  robots: () => topic.value?.noindex ? 'noindex' : undefined,
+  description,
+  noindex: () => topic.value?.noindex,
+  // `?post=` and `?floor=` open the page that holds the post: that page is the address.
+  query: () => ({ page: (pagination.value?.current_page ?? 1) > 1 ? pagination.value?.current_page : undefined }),
+  error,
+  breadcrumbs: () => topic.value
+    ? [
+        { name: t('discussions.title'), path: '/discussions' },
+        ...(topic.value.category ? [{ name: categoryName(topic.value.category), path: `/discussions/c/${topic.value.category.slug}` }] : []),
+        { name: topic.value.title, path: `/discussions/${topic.value.id}` },
+      ]
+    : null,
+  jsonLd: () => topic.value && compactLd({
+    '@context': 'https://schema.org',
+    '@type': 'DiscussionForumPosting',
+    'headline': topic.value.title,
+    'text': description.value,
+    'url': canonical.value,
+    'datePublished': topic.value.created_at,
+    'author': topic.value.author ? { '@type': 'Person', 'name': topic.value.author.nickname || topic.value.author.username, 'url': absolute(`/profile/${topic.value.author.username}`) } : undefined,
+    'interactionStatistic': [{ '@type': 'InteractionCounter', 'interactionType': 'https://schema.org/CommentAction', 'userInteractionCount': topic.value.replies_count }],
+    'comment': floors.value.filter(floor => floor.floor !== 1 && floor.status === 'visible').map(floor => ({
+      '@type': 'Comment',
+      'author': { '@type': 'Person', 'name': floor.user.nickname || floor.user.username },
+      'datePublished': floor.created_at,
+      'text': plainText(floor.raw, { spoiler: '▇▇▇' }).slice(0, 500),
+    })),
+  }),
 })
-useHead(() => ({
-  link: canonical.value ? [{ rel: 'canonical', href: canonical.value }] : [],
-  script: topic.value && !topic.value.noindex ? [{
-    type: 'application/ld+json',
-    innerHTML: JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'DiscussionForumPosting',
-      'headline': topic.value.title,
-      'text': description.value,
-      'url': canonical.value,
-      'datePublished': topic.value.created_at,
-      'author': topic.value.author ? { '@type': 'Person', 'name': topic.value.author.nickname || topic.value.author.username, 'url': `/profile/${topic.value.author.username}` } : undefined,
-      'interactionStatistic': [{ '@type': 'InteractionCounter', 'interactionType': 'https://schema.org/CommentAction', 'userInteractionCount': topic.value.replies_count }],
-      'comment': floors.value.filter(floor => floor.floor !== 1 && floor.status === 'visible').map(floor => ({
-        '@type': 'Comment',
-        'author': { '@type': 'Person', 'name': floor.user.nickname || floor.user.username },
-        'datePublished': floor.created_at,
-        'text': (floor.raw ?? '').replace(/\|\|.+?\|\|/g, '▇▇▇').slice(0, 500),
-      })),
-    }),
-  }] : [],
-}))
 </script>
 
 <template>

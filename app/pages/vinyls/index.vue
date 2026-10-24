@@ -35,5 +35,5 @@ const { data, status, refresh, loading, refetching, revealKey, revealClass } = a
 })
 const albums = computed(() => data.value?.albums ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
-useHead({ title: computed(() => t('menu.vinyl')) })
+usePageSeo({ title: () => t('menu.vinyl'), description: () => t('seo.pages.vinyls') })
 </script>

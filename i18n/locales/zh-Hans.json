@@ -4690,7 +4690,6 @@
     }
   },
   "event_page": {
-    "seo_description": "{name}的会场图与 {count} 个参展社团，地点：{venue}。",
     "not_found": "没有找到这个活动",
     "hero": {
       "date": "日期",
@@ -4829,5 +4828,56 @@
     },
     "my_revisions": "查看我的修订",
     "guest_note": "浏览不需要登录；选择后会先请你登录。"
+  },
+  "seo": {
+    "with_original": "{name}（{original}）",
+    "separator": "，",
+    "list_separator": "、",
+    "sentence": "{text}。",
+    "albums_count": "收录 {count} 张专辑",
+    "album": {
+      "by": "{artists} 的{type}",
+      "released": "{date}发行",
+      "event": "首发于 {event}",
+      "catalog": "编号 {number}",
+      "tracks": "收录 {count} 首曲目"
+    },
+    "track": {
+      "from": "收录于《{album}》的曲目",
+      "artists": "艺术家：{artists}",
+      "duration": "时长 {time}",
+      "original": "原曲：{titles}",
+      "lyrics": "附歌词",
+      "instrumental": "纯音乐"
+    },
+    "label": {
+      "lead": "唱片厂牌",
+      "founded": "成立于 {date}"
+    },
+    "entry": {
+      "albums": "关联 {count} 张专辑"
+    },
+    "franchise": {
+      "lead": "作品系列",
+      "entries": "包含 {count} 个条目"
+    },
+    "event": {
+      "date": "{date}举办",
+      "venue": "地点：{venue}",
+      "circles": "{count} 个参展社团",
+      "albums": "{count} 张新专辑",
+      "map": "附会场图"
+    },
+    "pages": {
+      "albums": "浏览 CDCAT 收录的专辑、单曲、EP 与合辑。",
+      "vinyls": "浏览 CDCAT 收录的黑胶唱片。",
+      "artists": "浏览 CDCAT 收录的艺术家、同人社团与虚拟歌手及其作品。",
+      "labels": "浏览 CDCAT 收录的唱片厂牌与发行商。",
+      "entries": "浏览 CDCAT 收录的动画、游戏、影视等作品及其音乐。",
+      "franchises": "浏览 CDCAT 收录的作品系列及相关专辑。",
+      "articles": "CDCAT 用户撰写的音乐评论、专题与资料整理。",
+      "about": "了解 CDCAT：面向同人与日系音乐、由社区共同编辑的音乐数据库。",
+      "discussion_tag": "CDCAT 讨论区中标记为 #{tag} 的话题。"
+    }
   }
 }

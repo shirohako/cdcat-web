@@ -122,13 +122,9 @@ const artistTypes = computed(() => [
 // From the URL, so back and forward switch the type too.
 const selectedType = computed(() => route.query.type || 'all');
 
-useSeoMeta({
-  title: 'Artists',
-  description: 'Browse all artists and their discographies on CDCAT.',
-  ogTitle: 'Artists | CDCAT',
-  ogDescription: 'Browse all artists and their discographies on CDCAT.',
-  ogType: 'website',
-  twitterCard: 'summary',
+usePageSeo({
+  title: () => t('artists.title'),
+  description: () => t('seo.pages.artists'),
 })
 
 // 获取当前页码

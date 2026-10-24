@@ -25,9 +25,9 @@ const latestDate = (series: EventSeriesSummary) => series.latest_start_date
   ? formatDate(series.latest_start_date, { year: 'numeric', month: '2-digit', day: '2-digit' })
   : ''
 
-useHead({
-  title: computed(() => t('collection_pages.events.title')),
-  meta: [{ name: 'description', content: computed(() => t('collection_pages.events.seo_description')) }],
+usePageSeo({
+  title: () => t('collection_pages.events.title'),
+  description: () => t('collection_pages.events.seo_description'),
 })
 </script>
 

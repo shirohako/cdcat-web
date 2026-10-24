@@ -15,10 +15,14 @@ const level = ref<NotificationLevel | null>(null)
 watch(category, (value) => { level.value = value?.notification_level ?? null }, { immediate: true })
 const newTopic = computed(() => category.value ? { category: String(category.value.id) } : undefined)
 
-useSeoMeta({
+usePageSeo({
   title: () => category.value ? `${categoryName(category.value)} - ${t('discussions.title')}` : t('discussions.title'),
   description: () => categoryDescription(category.value) || t('discussions.description'),
-  robots: () => category.value?.visibility === 'moderators' ? 'noindex' : undefined,
+  noindex: () => category.value?.visibility === 'moderators',
+  error,
+  breadcrumbs: () => category.value
+    ? [{ name: t('discussions.title'), path: '/discussions' }, { name: categoryName(category.value), path: `/discussions/c/${category.value.slug}` }]
+    : null,
 })
 </script>
 

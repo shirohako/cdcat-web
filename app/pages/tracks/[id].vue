@@ -40,11 +40,15 @@
 <script setup lang="ts">
 import type { TrackDetail } from '~/types/album'
 import { FileText, Info } from '@lucide/vue'
+import { musicRecordingLd } from '~/utils/structuredData'
 
 const route = useRoute()
-const { localName } = useCatalogDisplay()
+const { t } = useI18n()
+const { localName, formatDuration } = useCatalogDisplay()
+const { withOriginal, sentence, list } = useSeoText()
+const absolute = useSiteUrl()
 
-const { data: track, status, mutate, revealClass } = await usePageAPI<TrackDetail>(`/v1/tracks/${route.params.id}`)
+const { data: track, status, error, mutate, revealClass } = await usePageAPI<TrackDetail>(`/v1/tracks/${route.params.id}`)
 
 // Tracks of a merged album answer with the track they were mapped to: a 301 on the server (and with
 // cached data), a replace once the data arrives after client-side navigation.
@@ -68,5 +72,42 @@ const multiDisc = computed(() => new Set((track.value?.album_tracks ?? []).map(i
 
 const shownTitle = computed(() => track.value ? localName(track.value.title, track.value.titles) : '')
 
-useHead({ title: computed(() => shownTitle.value || 'Track') })
+/** Everyone credited on the track, once each. */
+const creditedArtists = computed(() => {
+  const seen = new Map<number, string>()
+  for (const credit of track.value?.credits ?? []) if (credit.artist && !seen.has(credit.artist.id)) seen.set(credit.artist.id, credit.credited_as || credit.artist.name)
+  return [...seen].map(([id, name]) => ({ id, name }))
+})
+
+usePageSeo({
+  title: () => track.value ? [withOriginal(shownTitle.value, track.value.title), track.value.album?.title].filter(Boolean).join(' - ') : undefined,
+  description: () => {
+    const value = track.value
+    if (!value) return undefined
+    return sentence([
+      value.album && t('seo.track.from', { album: value.album.title }),
+      creditedArtists.value.length && t('seo.track.artists', { artists: list(creditedArtists.value.slice(0, 4).map(artist => artist.name)) }),
+      value.duration && t('seo.track.duration', { time: formatDuration(value.duration) }),
+      value.originals?.length && t('seo.track.original', { titles: list(value.originals.map(original => original.title)) }),
+      value.has_lyrics ? t('seo.track.lyrics') : value.is_instrumental && t('seo.track.instrumental'),
+    ])
+  },
+  image: () => track.value?.album?.image_url,
+  type: 'music.song',
+  noindex: () => track.value?.is_pending,
+  adult: () => track.value?.album?.is_adult,
+  error,
+  breadcrumbs: () => track.value?.album
+    ? [{ name: t('menu.album'), path: '/albums' }, { name: track.value.album.title, path: `/albums/${track.value.album.id}` }, { name: shownTitle.value, path: `/tracks/${track.value.id}` }]
+    : null,
+  jsonLd: () => track.value && musicRecordingLd({
+    name: shownTitle.value,
+    alternateNames: [track.value.title, ...(track.value.titles ?? []).map(title => title.title)],
+    url: absolute(`/tracks/${track.value.id}`),
+    duration: track.value.duration,
+    isrc: track.value.isrc,
+    album: track.value.album ? { name: track.value.album.title, url: absolute(`/albums/${track.value.album.id}`) } : null,
+    artists: creditedArtists.value.map(artist => ({ name: artist.name, url: absolute(`/artists/${artist.id}`) })),
+  }),
+})
 </script>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ArrowLeft, Calendar, CalendarDays, Disc3, ExternalLink, MapPin } from '@lucide/vue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
+import { namedLd } from '~/utils/structuredData'
+import { plainText } from '~/utils/seoText'
 
 interface SeriesEvent {
   id: number
@@ -94,9 +96,24 @@ const formatEventDate = (event: SeriesEvent) => {
   return start || end
 }
 
-useHead({
-  title: computed(() => series.value?.name ?? t('collection_pages.events.title')),
-  meta: [{ name: 'description', content: computed(() => description.value || t('collection_pages.events.seo_description')) }],
+const absolute = useSiteUrl()
+usePageSeo({
+  title: () => series.value?.name,
+  description: () => plainText(series.value ? localizedContent(series.value.description) : '') || t('collection_pages.events.seo_description'),
+  image: () => bannerUrl.value,
+  wideImage: true,
+  error,
+  breadcrumbs: () => series.value
+    ? [{ name: t('collection_pages.events.title'), path: '/events' }, { name: series.value.name, path: `/event-series/${series.value.id}` }]
+    : null,
+  jsonLd: () => series.value && namedLd('EventSeries', {
+    name: series.value.name,
+    alternateNames: [],
+    url: absolute(`/event-series/${series.value.id}`),
+    image: bannerUrl.value,
+    description: plainText(localizedContent(series.value.description)),
+    sameAs: series.value.website ? [series.value.website] : [],
+  }),
 })
 </script>
 

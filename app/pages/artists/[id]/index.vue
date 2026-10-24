@@ -155,18 +155,20 @@ import type { AlbumSimple } from '~/types/album'
 import type { ArtistCreditedAlbum, ArtistDetail } from '~/types/artist'
 import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
+import { artistLdType, namedLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavorite } = useFavorites()
 const { localName, localeName, enumLabel } = useCatalogDisplay()
 const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)
-const { data: artist, status, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`)
+const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`)
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
@@ -250,15 +252,30 @@ const toggleFollow = async () => {
   }
 }
 
-const seoTitle = computed(() => shownName.value || 'Artist')
-const seoDescription = computed(() => artist.value?.bio?.slice(0, 160) || `${seoTitle.value} on CDCAT.`)
-useSeoMeta({
-  title: seoTitle,
-  description: seoDescription,
-  ogTitle: computed(() => `${seoTitle.value} | CDCAT`),
-  ogDescription: seoDescription,
-  ogType: 'profile',
-  ogImage: computed(() => artist.value?.image_url || artistPageConfig.defaultBannerUrl),
+const { withOriginal, sentence, count } = useSeoText()
+const absolute = useSiteUrl()
+usePageSeo({
+  title: () => artist.value ? withOriginal(shownName.value, artist.value.name) : undefined,
+  description: () => artist.value
+    ? composeDescription(
+        sentence([enumLabel('artist_type', artist.value.type), count('seo.albums_count', artist.value.albums_count)]),
+        plainText(artist.value.bio),
+        descriptionLength(locale.value),
+      )
+    : undefined,
+  image: () => artist.value?.image_url,
+  type: 'profile',
+  noindex: () => artist.value?.is_pending,
+  error,
+  breadcrumbs: () => artist.value ? [{ name: t('menu.artist'), path: '/artists' }, { name: shownName.value, path: `/artists/${artist.value.id}` }] : null,
+  jsonLd: () => artist.value && namedLd(artistLdType(artist.value.type), {
+    name: shownName.value,
+    alternateNames: [artist.value.name, ...(artist.value.titles ?? []).map(title => title.title)],
+    url: absolute(`/artists/${artist.value.id}`),
+    image: artist.value.image_url,
+    description: plainText(artist.value.bio),
+    sameAs: (artist.value.links ?? []).map(link => link.url),
+  }),
 })
 </script>
 

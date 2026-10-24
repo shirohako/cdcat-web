@@ -12,7 +12,12 @@ const { data: tag, loading } = await usePageData(() => `discussion-tag-${slug.va
   ({ signal, background }) => $api<{ tags: DiscussionTagWithCount[] }>('/v1/discussions/tags', { signal, progress: !background })
     .then(response => response.tags.find(item => item.slug === slug.value) ?? null))
 const name = computed(() => tag.value ? tagName(tag.value) : slug.value)
-useSeoMeta({ title: () => `#${name.value} - ${t('discussions.title')}` })
+usePageSeo({
+  title: () => `#${name.value} - ${t('discussions.title')}`,
+  description: () => t('seo.pages.discussion_tag', { tag: name.value }),
+  // An unknown tag lists nothing.
+  error: computed(() => !loading.value && !tag.value ? { statusCode: 404 } : null),
+})
 </script>
 
 <template>

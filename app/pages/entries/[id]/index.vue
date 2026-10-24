@@ -1,17 +1,48 @@
 <script setup lang="ts">
 import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } from '@lucide/vue'
 import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
+import { entryLdType, ldDate, namedLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
+const { t, locale } = useI18n()
 const { languageName } = useLocaleFormatting()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
 
-const { data: entry, status, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
-
-useHead({ title: computed(() => entry.value ? displayName(entry.value) : '') })
+const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
 
 const name = computed(() => displayName(entry.value))
 const subtitle = computed(() => originalName(entry.value))
+
+const { withOriginal, sentence, count } = useSeoText()
+const absolute = useSiteUrl()
+usePageSeo({
+  title: () => entry.value ? withOriginal(name.value, entry.value.name) : undefined,
+  description: () => entry.value
+    ? composeDescription(
+        sentence([
+          typeWithFormat(entry.value.type, entry.value.format),
+          formatReleaseDate(entry.value.release_date, entry.value.release_date_precision),
+          count('seo.entry.albums', entry.value.albums.length),
+        ]),
+        plainText(entry.value.description),
+        descriptionLength(locale.value),
+      )
+    : undefined,
+  image: () => entry.value?.image_url,
+  noindex: () => entry.value?.is_pending,
+  error,
+  breadcrumbs: () => entry.value ? [{ name: t('menu.entry'), path: '/entries' }, { name: name.value, path: `/entries/${entry.value.id}` }] : null,
+  jsonLd: () => entry.value && namedLd(entryLdType(entry.value.type), {
+    name: name.value,
+    alternateNames: [entry.value.name, ...(entry.value.titles ?? []).map(title => title.title)],
+    url: absolute(`/entries/${entry.value.id}`),
+    image: entry.value.image_url,
+    description: plainText(entry.value.description),
+    datePublished: ldDate(entry.value.release_date, entry.value.release_date_precision),
+    sameAs: entry.value.links.map(link => link.url),
+  }),
+})
 // Every name except the one in the heading.
 const otherTitles = computed(() => (entry.value?.titles || []).filter(title => title.title !== name.value))
 

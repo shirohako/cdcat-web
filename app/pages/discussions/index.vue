@@ -6,7 +6,7 @@ const { t } = useI18n()
 const router = useRouter()
 const query = ref('')
 const search = () => { if (query.value.trim().length >= 2) router.push({ path: '/discussions/search', query: { q: query.value.trim() } }) }
-useSeoMeta({ title: () => t('discussions.title'), description: () => t('discussions.description') })
+usePageSeo({ title: () => t('discussions.title'), description: () => t('discussions.description') })
 </script>
 
 <template>
