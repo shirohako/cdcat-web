@@ -10,10 +10,7 @@
     >
       <template v-if="circle">
         <div class="flex gap-3">
-          <div class="size-20 shrink-0 overflow-hidden rounded-xl bg-sunken ring-1 ring-line">
-            <img v-if="circle.image_url" :src="circle.image_url" :alt="circle.name" class="h-full w-full object-cover">
-            <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users :size="28" /></div>
-          </div>
+          <UiCover :src="circle.image_url" :alt="circle.name" :icon="Users" rounded="xl" eager class="size-20 ring-1 ring-line" />
           <div class="min-w-0 flex-1">
             <p class="text-[11px] font-semibold tracking-wide text-meta">{{ spaceLabel }}</p>
             <p class="mt-0.5 line-clamp-2 text-[15px] font-bold leading-snug text-title">{{ circle.name }}</p>

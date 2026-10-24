@@ -41,11 +41,11 @@
               :class="{ 'ring-2 ring-primary': circle.id === selectedId }"
               @click="$emit('select', circle.id)"
             >
-              <div class="relative size-20 shrink-0 overflow-hidden rounded-xl bg-sunken">
-                <img v-if="circle.image_url" :src="circle.image_url" :alt="circle.name" loading="lazy" class="h-full w-full object-cover">
-                <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users :size="26" /></div>
-                <span class="absolute inset-x-0 bottom-0 h-1" :style="{ background: familyColor(circle) }" />
-              </div>
+              <UiCover :src="circle.image_url" :alt="circle.name" :icon="Users" rounded="xl" class="size-20">
+                <template #overlay>
+                  <span class="absolute inset-x-0 bottom-0 h-1" :style="{ background: familyColor(circle) }" />
+                </template>
+              </UiCover>
               <div class="min-w-0 flex-1 py-0.5">
                 <span class="rounded-md bg-title px-1.5 py-0.5 font-mono text-[11px] font-semibold text-page">{{ circle.space_code ?? t('event_page.circle.catalog_only') }}</span>
                 <p class="mt-1 line-clamp-1 text-sm font-bold text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ circle.name }}</p>

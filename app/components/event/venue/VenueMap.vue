@@ -366,10 +366,12 @@ const initialFocus = () => {
 const hovered = shallowRef<VenuePiece | null>(null)
 const hoverAnchor = shallowRef<Element | null>(null)
 let hideTimer: ReturnType<typeof setTimeout> | null = null
+let warmTimer: ReturnType<typeof setTimeout> | null = null
 
 const hide = () => {
   hovered.value = null
   hoverAnchor.value = null
+  if (warmTimer) clearTimeout(warmTimer)
 }
 const cancelHide = () => {
   if (hideTimer) clearTimeout(hideTimer)
@@ -393,8 +395,41 @@ const onPointerMove = (event: PointerEvent) => {
   if (hovered.value?.key !== piece.key) {
     hovered.value = piece
     hoverAnchor.value = event.target as Element
+    if (warmTimer) clearTimeout(warmTimer)
+    warmTimer = setTimeout(() => warmAround(piece), 150)
   }
 }
+
+/**
+ * Once the pointer rests on a booth, the cuts of the booths around it (about three desks each way) load quietly, so the
+ * card shows them at once when the pointer moves on along the row or across the aisle. A sweep over the map loads none.
+ */
+const warmed = new Set<string>()
+const warmAround = (piece: VenuePiece) => {
+  const space = spaceById.value.get(piece.spaceId)
+  if (!space) return
+  // The card loads this one itself.
+  if (piece.circle?.image_url) warmed.add(piece.circle.image_url)
+  const x = piece.x + piece.w / 2
+  const y = piece.y + piece.h / 2
+  const reach = (Math.max(space.w, space.h) * 3) ** 2
+  const near: { distance: number, url: string }[] = []
+  for (const other of pieces.value.values()) {
+    const url = other.circle?.image_url
+    if (!url || warmed.has(url)) continue
+    const distance = (other.x + other.w / 2 - x) ** 2 + (other.y + other.h / 2 - y) ** 2
+    if (distance <= reach) near.push({ distance, url })
+  }
+  for (const { url } of near.sort((a, b) => a.distance - b.distance).slice(0, 12)) {
+    warmed.add(url)
+    const image = new Image()
+    image.fetchPriority = 'low'
+    image.src = url
+  }
+}
+onBeforeUnmount(() => {
+  if (warmTimer) clearTimeout(warmTimer)
+})
 
 const openPiece = (piece: VenuePiece) => {
   if (piece.circle) emit('select', piece.circle.id)

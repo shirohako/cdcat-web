@@ -301,6 +301,9 @@ const markdownEnv: MarkdownEnv = {
             <UiBadge variant="overlay" class="absolute bottom-1.5 right-1.5">CD</UiBadge>
           </template>
         </UiCover>
+        <div class="rounded-2xl bg-hero p-3">
+          <UiCover src="/icon.png" alt="封面" class="size-18" rounded="xl" dark />
+        </div>
         <div class="flex gap-2">
           <UiIconTile v-for="tone in tones" :key="tone" icon="lucide:disc-3" :tone="tone" />
         </div>

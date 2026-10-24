@@ -13,7 +13,7 @@
         >
           <!-- Always dark, over a blur of the circle's picture -->
           <div class="relative shrink-0 bg-hero px-5 pb-5 pt-4 text-on-media">
-            <img v-if="circle.image_url" :src="circle.image_url" alt="" class="absolute inset-0 h-full w-full scale-125 object-cover opacity-30 blur-xl">
+            <img v-if="circle.image_url" v-img-fade :src="circle.image_url" alt="" class="absolute inset-0 h-full w-full scale-125 object-cover opacity-30 blur-xl">
             <div class="relative flex items-start justify-between gap-3">
               <span class="rounded-md bg-on-media/10 px-2 py-1 text-xs font-semibold ring-1 ring-on-media/15">{{ spaceLabel || t('event_page.circle.catalog_only') }}</span>
               <button type="button" class="-mr-1 rounded-full p-1.5 text-on-media/70 transition-colors duration-150 ease-out hover:bg-on-media/10 hover:text-on-media" :aria-label="t('common.close')" @click="$emit('close')">
@@ -21,10 +21,7 @@
               </button>
             </div>
             <div class="relative mt-3 flex gap-4">
-              <div class="size-28 shrink-0 overflow-hidden rounded-2xl bg-on-media/10 ring-1 ring-on-media/20">
-                <img v-if="circle.image_url" :src="circle.image_url" :alt="circle.name" class="h-full w-full object-cover">
-                <div v-else class="flex h-full w-full items-center justify-center text-on-media/30"><Users :size="36" /></div>
-              </div>
+              <UiCover :src="circle.image_url" :alt="circle.name" :icon="Users" rounded="2xl" eager dark class="size-28 ring-1 ring-on-media/20" />
               <div class="min-w-0 flex-1 self-end">
                 <h2 class="text-xl font-bold leading-snug">{{ circle.name }}</h2>
                 <p v-if="circle.name_kana && circle.name_kana !== circle.name" class="mt-0.5 text-xs text-on-media/60">{{ circle.name_kana }}</p>
@@ -124,7 +121,7 @@
             <section v-if="circle.artist">
               <h3 class="drawer-heading">{{ t('event_page.circle.artist') }}</h3>
               <NuxtLink :to="`/artists/${circle.artist.id}`" class="flex items-center gap-3 rounded-xl bg-sunken p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
-                <img v-if="circle.artist.image_url" :src="circle.artist.image_url" alt="" class="size-10 rounded-full object-cover">
+                <img v-if="circle.artist.image_url" v-img-fade :src="circle.artist.image_url" alt="" class="size-10 rounded-full object-cover">
                 <span v-else class="flex size-10 items-center justify-center rounded-full bg-btn text-faint"><UserRound :size="18" /></span>
                 <span class="min-w-0 flex-1 truncate text-sm font-semibold text-title">{{ circle.artist.name }}</span>
                 <ChevronRight :size="16" class="text-meta" />
@@ -139,7 +136,7 @@
               <div v-else class="grid grid-cols-2 gap-3">
                 <NuxtLink v-for="album in albums" :key="album.id" :to="`/albums/${album.id}`" class="group">
                   <div class="aspect-square overflow-hidden rounded-xl bg-sunken">
-                    <img v-if="album.image_url" :src="album.image_url" :alt="album.title" loading="lazy" class="h-full w-full object-cover transition-transform group-hover:scale-105">
+                    <img v-if="album.image_url" v-img-fade :src="album.image_url" :alt="album.title" loading="lazy" class="h-full w-full object-cover transition-transform group-hover:scale-105">
                   </div>
                   <p class="mt-1.5 line-clamp-2 text-xs font-medium text-body transition-colors duration-150 ease-out group-hover:text-primary">{{ album.title }}</p>
                 </NuxtLink>
