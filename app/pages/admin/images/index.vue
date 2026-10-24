@@ -108,6 +108,7 @@ useHead({ title: computed(() => t('admin_pages.images.title')) })
                 <span v-else class="rounded bg-emerald-100 px-1.5 text-emerald-800">{{ t('admin_pages.images.statuses.in_use') }}</span>
               </div>
               <p class="mt-1 text-slate-500">{{ image.width }} × {{ image.height }} · {{ formatBytes(image.size) }}</p>
+              <p v-if="image.conversion" :class="image.conversion === 'failed' ? 'text-red-700' : 'text-slate-500'">{{ t(`admin_pages.images.conversion.${image.conversion}`) }}</p>
               <p v-if="image.cleanup_at" class="text-amber-700">{{ t('admin_pages.images.cleanup_at', { date: date(image.cleanup_at) }) }}</p>
               <p v-else-if="image.album_images_count" class="text-slate-500">{{ t('admin_pages.images.album_images', { count: image.album_images_count }) }}</p>
               <p class="truncate text-slate-400">{{ image.uploader ? (image.uploader.nickname || image.uploader.username) : '—' }} · {{ date(image.created_at) }}</p>

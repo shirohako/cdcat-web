@@ -137,6 +137,13 @@ useHead({ title: computed(() => t('admin_pages.images.detail_title', { id: id.va
                 <p v-if="image.unused_since" class="mt-1 text-xs text-slate-500">{{ t('admin_pages.images.unused_since', { time: time(image.unused_since) }) }}</p>
                 <p v-if="image.cleanup_at" class="text-xs text-amber-700">{{ t('admin_pages.images.cleanup_at', { date: time(image.cleanup_at) }) }}</p>
               </dd>
+              <template v-if="image.conversion">
+                <dt class="text-slate-500">{{ t('admin_pages.images.meta.conversion') }}</dt>
+                <dd>
+                  <span :class="image.conversion === 'failed' ? 'rounded bg-red-100 px-1.5 text-red-800' : 'rounded bg-slate-100 px-1.5 text-slate-700'">{{ t(`admin_pages.images.conversion.${image.conversion}`) }}</span>
+                  <p v-if="image.conversion_error" class="mt-1 break-words text-xs text-red-700">{{ image.conversion_error }}</p>
+                </dd>
+              </template>
               <dt class="text-slate-500">{{ t('admin_pages.images.meta.dimensions') }}</dt><dd>{{ image.width }} × {{ image.height }}</dd>
               <dt class="text-slate-500">{{ t('admin_pages.images.meta.size') }}</dt><dd>{{ formatBytes(image.size) }}</dd>
               <dt class="text-slate-500">{{ t('admin_pages.images.meta.mime') }}</dt><dd>{{ image.mime }}</dd>

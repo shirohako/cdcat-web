@@ -1792,7 +1792,8 @@
         "uploader": "上传人",
         "uploaded_at": "上传时间",
         "status": "状态",
-        "files": "文件"
+        "files": "文件",
+        "conversion": "转换"
       },
       "unused_since": "{time} 起未使用",
       "usage": "用在哪里",
@@ -1833,7 +1834,11 @@
       "edit_album": "编辑专辑",
       "delete": "删除图片",
       "delete_help": "永久删除这张图片和它的缩略图。如果历史版本或已结束的修订用过它，之后恢复到这些版本会被拒绝。",
-      "delete_blocked": "这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。"
+      "delete_blocked": "这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。",
+      "conversion": {
+        "pending": "等待转换",
+        "failed": "转换失败"
+      }
     },
     "event_venue": {
       "title": "会场与社团",

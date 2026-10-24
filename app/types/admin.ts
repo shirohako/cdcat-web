@@ -511,6 +511,9 @@ export interface AdminImage {
   uploader: AdminUserName | null
   album_images_count: number
   unused_since: string | null
+  /** Waiting for WebP conversion, or given up on; null once converted. */
+  conversion: 'pending' | 'failed' | null
+  conversion_error: string | null
   cleanup_at: string | null
   created_at: string | null
 }
