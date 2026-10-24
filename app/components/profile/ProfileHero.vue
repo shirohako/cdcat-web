@@ -3,10 +3,10 @@
     <header class="card relative overflow-hidden">
       <div class="relative h-38 sm:h-44 md:h-52">
         <img
-          v-if="displayBanner && !bannerLoadFailed"
+          v-if="displayBanner"
           v-img-fade
           :src="displayBanner"
-          :alt="`${profile.username} banner`"
+          :alt="displayBanner === ownBanner ? `${profile.username} banner` : ''"
           class="h-full w-full object-cover"
           @error="onBannerError"
         >
@@ -94,6 +94,7 @@
 
 <script setup>
 import { Calendar, MoreVertical, User } from "@lucide/vue";
+import { artistPageConfig } from "~/config/artistPage";
 
 const props = defineProps({
   profile: {
@@ -105,6 +106,7 @@ const props = defineProps({
 const { locale } = useI18n();
 
 const bannerLoadFailed = ref(false);
+const defaultBannerFailed = ref(false);
 const avatarLoadFailed = ref(false);
 const bioTextRef = ref(null);
 const bioExpanded = ref(false);
@@ -157,16 +159,23 @@ const memberSince = computed(() => {
   });
 });
 
-const displayBanner = computed(() => {
+const ownBanner = computed(() => {
   return (props.profile.banner_url || "").trim();
 });
 
-watch(displayBanner, () => {
+// The user's banner, else (or when it fails to load) the same default as artist pages; the gradient only if that fails too.
+const displayBanner = computed(() => {
+  if (ownBanner.value && !bannerLoadFailed.value) return ownBanner.value;
+  return defaultBannerFailed.value ? "" : artistPageConfig.defaultBannerUrl;
+});
+
+watch(ownBanner, () => {
   bannerLoadFailed.value = false;
 });
 
 const onBannerError = () => {
-  bannerLoadFailed.value = true;
+  if (displayBanner.value === ownBanner.value) bannerLoadFailed.value = true;
+  else defaultBannerFailed.value = true;
 };
 
 watch(
