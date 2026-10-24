@@ -385,13 +385,14 @@
     "confirm_delete": "Delete",
     "coming_soon_desc": "Even the longest night gives way to dawn.",
     "loading_animation": "Loading animation",
-    "select_language_code": "Select or enter a language code…",
-    "use_custom_code": "Use custom code",
-    "search_language": "Type to search languages",
-    "no_more_matches": "No more matches",
+    "search_language": "Search languages",
     "retry": "Retry",
     "clear": "Clear",
-    "type_to_confirm": "Type {phrase} to confirm"
+    "type_to_confirm": "Type {phrase} to confirm",
+    "select_language": "Select a language",
+    "languages_common": "Common",
+    "languages_all": "All languages",
+    "no_matches": "No matches"
   },
   "errors": {
     "request_failed": "The request failed. Please try again.",
@@ -2526,7 +2527,7 @@
       "link_duplicate": "This link is already in the list.",
       "name_edit": "Edit name",
       "name_required": "Enter the name.",
-      "locale_other": "Other code",
+      "locale_other": "Other language…",
       "attribute_edit": "Edit detail",
       "attribute_key": "Field",
       "attribute_value": "Value",

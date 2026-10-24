@@ -5,7 +5,7 @@
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-body">{{ $t('editor.translate.language') }}</span>
-          <UiSelect v-model="locale" :options="localeOptions" size="sm" class="w-48" />
+          <UiLanguageSelect v-model="locale" :suggested="usedLocales" readings size="sm" class="w-48" />
         </label>
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.kind') }}</span>
@@ -42,6 +42,7 @@ import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Languages } from '@lucide/vue'
 import { setTitleIn, sortedDiscs, titleIn, tracksOn } from '~/utils/albumDocument'
+import { isReading, languageTag } from '~/utils/contentLanguages'
 
 /**
  * 翻译曲目表: names of the album, its discs and tracks in one language, submitted together as
@@ -49,19 +50,21 @@ import { setTitleIn, sortedDiscs, titleIn, tracksOn } from '~/utils/albumDocumen
  */
 const props = defineProps<{ initialLocale?: string }>()
 
-const LOCALES = ['zh-Hans', 'zh-Hant', 'en', 'ja', 'ja-Latn', 'ja-Hrkt', 'ko']
 const KINDS = ['translation', 'official', 'transliteration'] as const
 
 const editor = useAlbumEditor()
 const { t, locale: uiLocale } = useI18n()
-const { enumLabel, localeName } = useCatalogDisplay()
+const { enumLabel } = useCatalogDisplay()
 
 const album = computed(() => editor.album.value)
-const locale = ref(props.initialLocale && LOCALES.includes(props.initialLocale) ? props.initialLocale : LOCALES.includes(uiLocale.value) && uiLocale.value !== 'ja' ? uiLocale.value : 'en')
+const locale = ref((props.initialLocale && languageTag(props.initialLocale)) || (uiLocale.value !== 'ja' ? uiLocale.value : 'en'))
 const kind = ref<typeof KINDS[number]>('translation')
-const localeOptions = computed<UiSelectOption<string>[]>(() => LOCALES.map(code => ({ value: code, label: localeName(code) })))
 const kindOptions = computed<UiSelectOption<typeof KINDS[number]>[]>(() => KINDS.map(value => ({ value, label: enumLabel('title_kind', value) })))
-watch(locale, (code) => { if (code.endsWith('-Latn') || code.endsWith('-Hrkt')) kind.value = 'transliteration' })
+watch(locale, (code) => { if (isReading(code)) kind.value = 'transliteration' })
+
+/** Languages the album, its discs or tracks already have names in, listed with the common ones. */
+const usedLocales = computed(() => [...new Set((['titles', 'disc_titles', 'track_titles'] as const)
+  .flatMap(collection => album.value[collection].map(row => row.locale).filter((code): code is string => Boolean(code))))])
 
 interface Row {
   key: string

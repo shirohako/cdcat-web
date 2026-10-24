@@ -53,7 +53,17 @@
               :title="code"
               @click="form.locale = form.locale === code ? '' : code"
             >{{ localeName(code) }}</button>
-            <input v-model.trim="form.locale" class="input input-sm w-28 font-mono text-xs" :placeholder="$t('editor.dialog.locale_other')" :aria-label="$t('catalog.field.locale')">
+            <span class="flex items-center gap-0.5">
+              <UiLanguageSelect
+                v-model="otherLocale"
+                :readings="form.group !== 'official'"
+                :placeholder="$t('editor.dialog.locale_other')"
+                :aria-label="$t('catalog.field.locale')"
+                size="sm"
+                class="w-40"
+              />
+              <UiIconButton v-if="otherLocale" icon="lucide:x" :label="$t('common.clear')" size="xs" @click="form.locale = ''" />
+            </span>
           </div>
           <span v-if="localeProblem" class="mt-1 block text-xs text-danger">{{ localeProblem }}</span>
           <span v-else-if="kind === 'transliteration'" class="mt-1 block text-[11px] text-meta">{{ $t('editor.names.reading_note') }}</span>
@@ -86,6 +96,7 @@ import type { Component } from 'vue'
 import type { CatalogTitleKind } from '~/types/catalog'
 import type { TitleRow } from '~/types/document'
 import { BadgeCheck, ChevronDown, Languages, Lightbulb, Tags, Type } from '@lucide/vue'
+import { COMMON_LANGUAGES, isReading, READINGS } from '~/utils/contentLanguages'
 import { newKey } from '~/utils/documentKeys'
 import { nextOrder } from '~/utils/documentRows'
 
@@ -107,12 +118,8 @@ const GROUPS: Record<Group, { icon: Component, active: string, text: string, chi
   alias: { icon: Tags, active: 'border-meta bg-sunken ring-1 ring-line', text: 'text-title', chip: 'bg-btn text-btn-content' },
 }
 const TIPS = ['shown', 'count', 'search', 'unsure'] as const
-const LANGUAGES = ['ja', 'zh-Hans', 'zh-Hant', 'en', 'ko']
-const READINGS = ['ja-Latn', 'ja-Hrkt']
-
 const groupOf = (kind: CatalogTitleKind): Group =>
   kind === 'official' ? 'official' : kind === 'translation' || kind === 'transliteration' ? 'translation' : 'alias'
-const isReading = (code: string) => /-(Latn|Hrkt)$/.test(code)
 
 const remove = (row: TitleRow) => {
   const index = rows.value.indexOf(row)
@@ -127,7 +134,12 @@ const form = reactive({ title: '', group: 'translation' as Group, locale: '', ab
 const tried = ref(false)
 
 /** An official name is never a reading, so readings are offered for translations and other names only. */
-const languages = computed(() => form.group === 'official' ? LANGUAGES : [...LANGUAGES, ...READINGS])
+const languages = computed(() => form.group === 'official' ? COMMON_LANGUAGES : [...COMMON_LANGUAGES, ...READINGS])
+/** The chips have the usual languages and the select next to them the rest; it shows a language only when no chip has it. */
+const otherLocale = computed({
+  get: () => languages.value.includes(form.locale) ? '' : form.locale,
+  set: (code: string) => { form.locale = code },
+})
 
 const kind = computed<CatalogTitleKind>(() => {
   if (form.group === 'official') return 'official'

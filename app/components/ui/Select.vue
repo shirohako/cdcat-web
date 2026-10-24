@@ -11,6 +11,10 @@ export interface UiSelectOption<V extends UiSelectValue = UiSelectValue> {
   icon?: string | Component
   /** Options with the same group are listed under its name, like <optgroup>. */
   group?: string
+  /** Dim text at the end of the row, e.g. a code. */
+  hint?: string
+  /** More text the search matches besides the label and hint, e.g. other names. */
+  keywords?: string
 }
 </script>
 
@@ -21,6 +25,9 @@ export interface UiSelectOption<V extends UiSelectValue = UiSelectValue> {
  * to a matching label. The list is teleported to <body> (or into the open modal <dialog> it sits in) and placed
  * with floating-ui, so cards with overflow hidden don't clip it and it flips above the field near the bottom of
  * the screen.
+ *
+ * With `searchable`, a field above the list filters it by label, hint and keywords, and keys other than ↑↓, Enter,
+ * Esc and Tab go to that field.
  *
  * Attributes (class, id, aria-label …) go to the button. The `trigger` slot replaces the button (e.g. the filter
  * chips); it gets `open`, `selected`, `label`, `toggle` and `attrs`, which must be bound to its focusable element.
@@ -35,7 +42,9 @@ const props = withDefaults(defineProps<{
   disabled?: boolean
   /** Submitted with a surrounding form, as a native select's name would be. */
   name?: string
-}>(), { placeholder: '', size: 'md', name: undefined })
+  searchable?: boolean
+  searchPlaceholder?: string
+}>(), { placeholder: '', size: 'md', name: undefined, searchPlaceholder: '' })
 
 const model = defineModel<T>()
 const emit = defineEmits<{ change: [value: T] }>()
@@ -47,27 +56,37 @@ const active = ref(-1)
 const trigger = ref<HTMLElement | null>(null)
 const panel = ref<HTMLElement | null>(null)
 const list = ref<HTMLElement | null>(null)
+const search = ref<HTMLInputElement | null>(null)
+const query = ref('')
 let stopAutoUpdate: (() => void) | null = null
 // Inside a modal <dialog> (top layer, the rest of the page inert) the list has to live in that dialog.
 const layer = ref<HTMLElement | 'body'>('body')
 
 const SIZES = { xs: 'select-xs', sm: 'select-sm', md: '' }
 
-const selectedIndex = computed(() => props.options.findIndex(option => option.value === model.value))
-const selected = computed(() => props.options[selectedIndex.value] ?? null)
+const selected = computed(() => props.options.find(option => option.value === model.value) ?? null)
 const label = computed(() => selected.value?.label ?? props.placeholder)
 
+/** What the list shows: every option, or those matching the search. */
+const shown = computed(() => {
+  const text = query.value.trim().toLowerCase()
+  return text
+    ? props.options.filter(option => [option.label, option.hint, option.keywords].some(words => words?.toLowerCase().includes(text)))
+    : props.options
+})
+const selectedIndex = computed(() => shown.value.findIndex(option => option.value === model.value))
+
 /** Group headings go before the first option of each group. */
-const rows = computed(() => props.options.map((option, index) => ({
+const rows = computed(() => shown.value.map((option, index) => ({
   option,
   index,
-  heading: option.group && option.group !== props.options[index - 1]?.group ? option.group : null,
+  heading: option.group && option.group !== shown.value[index - 1]?.group ? option.group : null,
 })))
 
-const enabled = (index: number) => Boolean(props.options[index]) && !props.options[index]!.disabled
+const enabled = (index: number) => Boolean(shown.value[index]) && !shown.value[index]!.disabled
 
 const step = (from: number, by: 1 | -1) => {
-  for (let index = from + by; index >= 0 && index < props.options.length; index += by) {
+  for (let index = from + by; index >= 0 && index < shown.value.length; index += by) {
     if (enabled(index)) return index
   }
   return from
@@ -92,7 +111,7 @@ const place = () => {
         padding: 8,
         apply({ rects, availableHeight }) {
           Object.assign(floating.style, {
-            minWidth: `${rects.reference.width}px`,
+            minWidth: `${Math.max(rects.reference.width, props.searchable ? 256 : 0)}px`,
             maxHeight: `${Math.max(120, Math.min(availableHeight, 320))}px`,
           })
         },
@@ -106,11 +125,13 @@ const place = () => {
 const show = async () => {
   if (props.disabled || open.value) return
   layer.value = trigger.value?.closest<HTMLElement>('dialog[open]') ?? 'body'
+  query.value = ''
   open.value = true
   active.value = selectedIndex.value >= 0 ? selectedIndex.value : step(-1, 1)
   await nextTick()
   if (trigger.value && panel.value) stopAutoUpdate = autoUpdate(trigger.value, panel.value, place)
-  list.value?.focus({ preventScroll: true })
+  const focused = search.value ?? list.value
+  focused?.focus({ preventScroll: true })
   scrollToActive()
 }
 
@@ -126,7 +147,7 @@ const toggle = () => (open.value ? hide() : show())
 
 const choose = (index: number) => {
   if (!enabled(index)) return
-  const value = props.options[index]!.value
+  const value = shown.value[index]!.value
   const changed = value !== model.value
   model.value = value
   hide()
@@ -140,11 +161,11 @@ const typeahead = (key: string) => {
   clearTimeout(typedTimer)
   typed += key.toLowerCase()
   typedTimer = setTimeout(() => { typed = '' }, 500)
-  const count = props.options.length
+  const count = shown.value.length
   const start = typed.length === 1 ? active.value + 1 : active.value
   for (let offsetIndex = 0; offsetIndex < count; offsetIndex++) {
     const index = (Math.max(start, 0) + offsetIndex) % count
-    if (enabled(index) && props.options[index]!.label.toLowerCase().startsWith(typed)) {
+    if (enabled(index) && shown.value[index]!.label.toLowerCase().startsWith(typed)) {
       active.value = index
       scrollToActive()
       return
@@ -159,22 +180,29 @@ const onTriggerKeydown = (event: KeyboardEvent) => {
   }
 }
 
-const onListKeydown = (event: KeyboardEvent) => {
+const onPanelKeydown = (event: KeyboardEvent) => {
   // Keys stay here: a dialog around the select must not close on the same Escape.
   event.stopPropagation()
+  // In the search field, Home, End, Space and letters edit the text.
+  const typing = event.target === search.value
   switch (event.key) {
     case 'ArrowDown': event.preventDefault(); active.value = step(active.value, 1); scrollToActive(); break
     case 'ArrowUp': event.preventDefault(); active.value = step(active.value, -1); scrollToActive(); break
-    case 'Home': event.preventDefault(); active.value = step(-1, 1); scrollToActive(); break
-    case 'End': event.preventDefault(); active.value = step(props.options.length, -1); scrollToActive(); break
-    case 'Enter':
-    case ' ': event.preventDefault(); choose(active.value); break
+    case 'Home': if (!typing) { event.preventDefault(); active.value = step(-1, 1); scrollToActive() } break
+    case 'End': if (!typing) { event.preventDefault(); active.value = step(shown.value.length, -1); scrollToActive() } break
+    case 'Enter': event.preventDefault(); choose(active.value); break
+    case ' ': if (!typing) { event.preventDefault(); choose(active.value) } break
     case 'Escape': event.preventDefault(); hide(); break
     case 'Tab': hide(false); break
     default:
-      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) typeahead(event.key)
+      if (!typing && event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) typeahead(event.key)
   }
 }
+
+watch(query, () => {
+  active.value = selectedIndex.value >= 0 ? selectedIndex.value : step(-1, 1)
+  scrollToActive()
+})
 
 const onPointerDown = (event: PointerEvent) => {
   const target = event.target as Node
@@ -244,7 +272,24 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
         v-if="open"
         ref="panel"
         class="fixed left-0 top-0 z-[80] flex flex-col overflow-hidden rounded-[10px] bg-popover p-1.5 shadow-overlay ring-1 ring-line"
+        @keydown="onPanelKeydown"
       >
+        <input
+          v-if="searchable"
+          ref="search"
+          v-model="query"
+          type="text"
+          role="combobox"
+          aria-expanded="true"
+          aria-autocomplete="list"
+          :aria-controls="listId"
+          :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
+          :aria-label="searchPlaceholder || undefined"
+          :placeholder="searchPlaceholder"
+          class="input input-sm mb-1.5 w-full shrink-0"
+          autocomplete="off"
+          spellcheck="false"
+        >
         <!-- The padding sits outside the scrolling list, so its scrollbar stays clear of the rounded corners. -->
         <ul
           :id="listId"
@@ -253,8 +298,8 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
           tabindex="-1"
           :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
           class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain outline-none [&::-webkit-scrollbar]:w-2"
-          @keydown="onListKeydown"
         >
+          <li v-if="!rows.length" role="presentation" class="px-3.5 py-2.5 text-sm text-faint">{{ $t('common.no_matches') }}</li>
           <template v-for="row in rows" :key="row.index">
             <li v-if="row.heading" role="presentation" class="px-3.5 pb-1 pt-3 text-[11px] font-semibold tracking-wide text-faint">
               {{ row.heading }}
@@ -277,6 +322,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
             >
               <UiIcon v-if="row.option.icon" :icon="row.option.icon" class="size-4 shrink-0" />
               <span class="min-w-0 flex-1 truncate">{{ row.option.label }}</span>
+              <span v-if="row.option.hint" class="shrink-0 font-mono text-[11px] text-faint">{{ row.option.hint }}</span>
               <Icon v-if="row.index === selectedIndex" name="lucide:check" class="size-4 shrink-0" />
             </li>
           </template>

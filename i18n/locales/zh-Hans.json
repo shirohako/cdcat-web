@@ -385,13 +385,14 @@
     "confirm_delete": "确认删除",
     "coming_soon_desc": "穿越漫漫长夜，终会迎来黎明。",
     "loading_animation": "加载动画",
-    "select_language_code": "请选择或输入语言代码…",
-    "use_custom_code": "使用自定义代码",
-    "search_language": "输入关键词搜索语言",
-    "no_more_matches": "没有更多匹配项",
+    "search_language": "搜索语言",
     "retry": "重试",
     "clear": "清除",
-    "type_to_confirm": "输入 {phrase} 以确认"
+    "type_to_confirm": "输入 {phrase} 以确认",
+    "select_language": "选择语言",
+    "languages_common": "常用",
+    "languages_all": "所有语言",
+    "no_matches": "没有匹配项"
   },
   "errors": {
     "request_failed": "请求失败，请重试。",
@@ -4490,7 +4491,7 @@
       "link_duplicate": "这个链接已经添加过了。",
       "name_edit": "编辑名称",
       "name_required": "请填写名称。",
-      "locale_other": "其他代码",
+      "locale_other": "其他语言…",
       "attribute_edit": "编辑信息",
       "attribute_key": "项目",
       "attribute_value": "内容",

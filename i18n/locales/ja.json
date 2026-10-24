@@ -385,13 +385,14 @@
     "confirm_delete": "削除する",
     "coming_soon_desc": "長い夜の先には、きっと夜明けが待っています。",
     "loading_animation": "読み込みアニメーション",
-    "select_language_code": "言語コードを選択または入力…",
-    "use_custom_code": "カスタムコードを使用",
-    "search_language": "キーワードで言語を検索",
-    "no_more_matches": "ほかに一致する項目はありません",
+    "search_language": "言語を検索",
     "retry": "再試行",
     "clear": "クリア",
-    "type_to_confirm": "確認のため {phrase} と入力してください"
+    "type_to_confirm": "確認のため {phrase} と入力してください",
+    "select_language": "言語を選択",
+    "languages_common": "よく使う言語",
+    "languages_all": "すべての言語",
+    "no_matches": "一致する項目はありません"
   },
   "errors": {
     "request_failed": "リクエストに失敗しました。もう一度お試しください。",
@@ -2526,7 +2527,7 @@
       "link_duplicate": "このリンクはすでに追加されています。",
       "name_edit": "名前を編集",
       "name_required": "名前を入力してください。",
-      "locale_other": "その他のコード",
+      "locale_other": "その他の言語…",
       "attribute_edit": "情報を編集",
       "attribute_key": "項目",
       "attribute_value": "内容",

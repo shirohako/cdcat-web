@@ -58,6 +58,7 @@ const page = ref(4)
 const name = ref('')
 const email = ref('bad@')
 const format = ref<string | number | null>('cd')
+const language = ref('ja')
 const bio = ref('')
 const agree = ref(true)
 const kinds = ref<(string | number)[]>(['cd'])
@@ -362,6 +363,11 @@ const markdownEnv: MarkdownEnv = {
         <UiField label="格式">
           <template #default="{ id }">
             <UiSelect :id="id" v-model="format" :options="[{ value: 'cd', label: 'CD' }, { value: 'vinyl', label: '黑胶' }, { value: 'digital', label: '数字' }]" />
+          </template>
+        </UiField>
+        <UiField label="语言（可搜索）">
+          <template #default="{ id }">
+            <UiLanguageSelect :id="id" v-model="language" readings />
           </template>
         </UiField>
         <UiField label="小号输入框">

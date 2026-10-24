@@ -385,13 +385,14 @@
     "confirm_delete": "確認刪除",
     "coming_soon_desc": "穿越漫漫長夜，終會迎來黎明。",
     "loading_animation": "載入動畫",
-    "select_language_code": "請選擇或輸入語言代碼…",
-    "use_custom_code": "使用自訂代碼",
-    "search_language": "輸入關鍵字搜尋語言",
-    "no_more_matches": "沒有更多符合項目",
+    "search_language": "搜尋語言",
     "retry": "重試",
     "clear": "清除",
-    "type_to_confirm": "輸入 {phrase} 以確認"
+    "type_to_confirm": "輸入 {phrase} 以確認",
+    "select_language": "選擇語言",
+    "languages_common": "常用",
+    "languages_all": "所有語言",
+    "no_matches": "沒有符合項目"
   },
   "errors": {
     "request_failed": "要求失敗，請再試一次。",
@@ -2526,7 +2527,7 @@
       "link_duplicate": "這個連結已經新增過了。",
       "name_edit": "編輯名稱",
       "name_required": "請填寫名稱。",
-      "locale_other": "其他代碼",
+      "locale_other": "其他語言…",
       "attribute_edit": "編輯資訊",
       "attribute_key": "項目",
       "attribute_value": "內容",

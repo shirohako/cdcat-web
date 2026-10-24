@@ -7,10 +7,7 @@
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.language') }}</span>
-        <input v-model.trim="form.language" list="lyric-languages" class="input input-sm" placeholder="ja, zh-Hans, ja-Latn …" required>
-        <datalist id="lyric-languages">
-          <option v-for="code in LANGUAGES" :key="code" :value="code">{{ localeName(code) }}</option>
-        </datalist>
+        <UiLanguageSelect v-model="form.language" :suggested="originals.map(original => original.language)" readings size="sm" :invalid="tried && !form.language" />
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.format') }}</span>
@@ -66,8 +63,6 @@ import { LYRIC_FORMATS, LYRIC_KINDS } from '~/types/lyric'
 const props = defineProps<{ trackId: number, lyric: Lyric | null, originals: LyricSummary[] }>()
 const emit = defineEmits<{ saved: [{ revision: Revision, lyric: Lyric | null }], cancel: [] }>()
 
-const LANGUAGES = ['ja', 'ja-Latn', 'zh-Hans', 'zh-Hant', 'en', 'ko']
-
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
@@ -95,8 +90,11 @@ const originalOptions = computed<UiSelectOption<number | null>[]>(() => [
 
 const saving = ref(false)
 const errorMessage = ref('')
+const tried = ref(false)
 
 const submit = async () => {
+  tried.value = true
+  if (!form.language) return
   saving.value = true
   errorMessage.value = ''
   const body = {
