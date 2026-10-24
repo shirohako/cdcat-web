@@ -1,7 +1,7 @@
 <template>
   <NuxtLink :to="`/albums/${album.id}`" class="group">
-    <div class="transform overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-      <div class="relative flex aspect-square items-center justify-center overflow-hidden bg-linear-to-br from-gray-50 to-gray-100">
+    <div class="overflow-hidden rounded-xl bg-sunken transition-colors duration-150 ease-out group-hover:bg-card-hover group-active:bg-card-active">
+      <div class="relative flex aspect-square items-center justify-center overflow-hidden">
         <img
           v-if="album.image_url"
           v-img-fade
@@ -11,37 +11,37 @@
           class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           style="image-rendering: -webkit-optimize-contrast;"
         >
-        <div v-else class="text-gray-300"><Disc3 :size="64" /></div>
+        <div v-else class="text-faint"><Disc3 :size="64" /></div>
         <div class="absolute inset-0 bg-linear-to-t from-black/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <CatalogPendingBadge v-if="album.is_pending" overlay class="absolute left-2 top-2" />
         <div class="absolute right-2 top-2 flex gap-1">
-          <span v-for="format in badges" :key="format" class="rounded-md bg-gray-900/80 px-2 py-1 text-[11px] font-bold text-white backdrop-blur-sm">{{ enumLabel('disc_format', format) }}</span>
-          <span class="rounded-md bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">{{ typeLabel }}</span>
+          <span v-for="format in badges" :key="format" class="rounded-md bg-scrim px-2 py-1 text-[11px] font-bold text-on-media backdrop-blur-sm">{{ enumLabel('disc_format', format) }}</span>
+          <span class="rounded-md bg-scrim px-2 py-1 text-[11px] font-medium text-on-media backdrop-blur-sm">{{ typeLabel }}</span>
         </div>
-        <div class="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+        <div class="absolute bottom-2 left-2 flex items-center gap-1 rounded-md bg-scrim px-2 py-0.5 text-[10px] font-medium text-on-media backdrop-blur-sm">
           <Disc3 :size="11" />{{ album.disc_count || 0 }}
         </div>
-        <div class="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-black/60 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+        <div class="absolute bottom-2 right-2 flex items-center gap-1 rounded-md bg-scrim px-2 py-0.5 text-[10px] font-medium text-on-media backdrop-blur-sm">
           <Music :size="11" />{{ album.track_count || 0 }}
         </div>
       </div>
 
-      <div class="flex flex-col gap-2 bg-white p-4">
-        <h3 class="flex h-5 min-w-0 items-center text-sm font-bold transition-colors group-hover:text-blue-600">
+      <div class="flex flex-col gap-2 p-4">
+        <h3 class="flex h-5 min-w-0 items-center text-sm font-bold text-title transition-colors group-hover:text-primary">
           <span class="truncate">{{ album.title }}</span>
         </h3>
-        <div class="flex h-4 min-w-0 items-center gap-1.5 text-xs text-gray-500">
-          <Hash :size="14" class="shrink-0" :class="album.catalog_number ? 'text-gray-400' : 'text-gray-300'" />
-          <span class="truncate" :class="{ 'text-gray-300': !album.catalog_number }">{{ album.catalog_number || '—' }}</span>
+        <div class="flex h-4 min-w-0 items-center gap-1.5 text-xs text-meta">
+          <Hash :size="14" class="shrink-0" :class="album.catalog_number ? 'text-meta' : 'text-faint'" />
+          <span class="truncate" :class="{ 'text-faint': !album.catalog_number }">{{ album.catalog_number || '—' }}</span>
         </div>
-        <div class="flex h-4 min-w-0 items-center gap-1.5 text-xs text-gray-600">
-          <Calendar :size="14" class="shrink-0" :class="album.release_date ? 'text-gray-400' : 'text-gray-300'" />
-          <span :class="{ 'text-gray-300': !album.release_date }">{{ album.release_date ? formatDate(album.release_date, album.release_date_precision) : '—' }}</span>
+        <div class="flex h-4 min-w-0 items-center gap-1.5 text-xs text-body">
+          <Calendar :size="14" class="shrink-0" :class="album.release_date ? 'text-meta' : 'text-faint'" />
+          <span :class="{ 'text-faint': !album.release_date }">{{ album.release_date ? formatDate(album.release_date, album.release_date_precision) : '—' }}</span>
         </div>
-        <div class="grid h-6 grid-cols-2 items-end border-t border-gray-100 text-xs text-gray-600">
-          <div class="flex items-center gap-1.5"><Eye :size="14" class="shrink-0 text-gray-400" /><span>{{ album.views_count || 0 }}</span></div>
+        <div class="grid h-6 grid-cols-2 items-end border-t border-line text-xs text-body">
+          <div class="flex items-center gap-1.5"><Eye :size="14" class="shrink-0 text-meta" /><span>{{ album.views_count || 0 }}</span></div>
           <div class="flex items-center gap-1.5 justify-self-end">
-            <Heart :size="14" :fill="album.is_favorited ? 'currentColor' : 'none'" :class="album.is_favorited ? 'text-red-500' : 'text-gray-400 group-hover:text-red-400'" class="shrink-0 transition-colors" />
+            <Heart :size="14" :fill="album.is_favorited ? 'currentColor' : 'none'" :class="album.is_favorited ? 'text-red-500 dark:text-red-400' : 'text-meta group-hover:text-red-400'" class="shrink-0 transition-colors" />
             <span>{{ album.favorites_count || 0 }}</span>
           </div>
         </div>

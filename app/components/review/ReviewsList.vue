@@ -5,9 +5,9 @@
 
     <!-- Empty State -->
     <div v-else-if="reviews.length === 0" class="flex flex-col items-center justify-center py-16">
-      <Icon name="lucide:message-square-text" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">{{ $t('reviews.mine_empty') }}</p>
-      <p class="text-sm text-gray-400 mb-6">{{ $t('reviews.mine_empty_hint') }}</p>
+      <Icon name="lucide:message-square-text" class="w-16 h-16 text-faint mb-4" />
+      <p class="text-lg text-meta mb-2">{{ $t('reviews.mine_empty') }}</p>
+      <p class="text-sm text-meta mb-6">{{ $t('reviews.mine_empty_hint') }}</p>
       <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
         <Icon name="lucide:search" class="w-4 h-4" />
         {{ $t('reviews.discover_albums') }}
@@ -20,8 +20,7 @@
         <div
           v-for="review in reviews"
           :key="review.id"
-          class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4
-                 hover:shadow-md hover:ring-black/10 transition-all duration-200"
+          class="rounded-xl bg-sunken p-4"
         >
           <div class="flex gap-3 sm:gap-4">
             <!-- Album Cover -->
@@ -30,7 +29,7 @@
               class="shrink-0"
               :aria-label="review.album?.title"
             >
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-card ring-1 ring-line">
                 <img
                   v-if="review.album?.image_url"
                   :src="review.album.image_url"
@@ -38,7 +37,7 @@
                   class="w-full h-full object-cover"
                   loading="lazy"
                 >
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
+                <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
               </div>
@@ -50,15 +49,15 @@
               <div class="flex items-center gap-2 flex-wrap">
                 <NuxtLink
                   :to="`/albums/${review.album_id}`"
-                  class="font-semibold text-sm sm:text-base text-gray-900
-                         hover:text-blue-700 transition-colors line-clamp-1"
+                  class="font-semibold text-sm sm:text-base text-title
+                         hover:text-primary transition-colors line-clamp-1"
                 >
                   {{ review.album?.title }}
                 </NuxtLink>
                 <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 shrink-0" :class="reviewRatingTone(review.rating)">
                   {{ $t(reviewRatingKey(review.rating)) }}
                 </span>
-                <span v-if="review.is_hidden" class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600 shrink-0" :title="$t('reviews.hidden_hint')">
+                <span v-if="review.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-[10px] font-medium text-btn-content shrink-0" :title="$t('reviews.hidden_hint')">
                   {{ $t('reviews.hidden') }}
                 </span>
               </div>
@@ -67,12 +66,12 @@
               <div class="mt-1.5">
                 <div class="relative" :class="{ 'max-h-24 overflow-hidden': isLongContent(review.content) && !expandedIds.has(review.id) }">
                   <RichContent :content="review.content" format="markdown" class="text-sm" />
-                  <div v-if="isLongContent(review.content) && !expandedIds.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-white" />
+                  <div v-if="isLongContent(review.content) && !expandedIds.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-sunken" />
                 </div>
                 <button
                   v-if="isLongContent(review.content)"
                   type="button"
-                  class="text-xs text-blue-600 hover:text-blue-700 mt-1 font-medium"
+                  class="link mt-1 text-xs font-medium"
                   @click="toggleExpand(review.id)"
                 >
                   {{ $t(expandedIds.has(review.id) ? 'reviews.collapse' : 'reviews.expand') }}
@@ -80,20 +79,20 @@
               </div>
 
               <!-- Row 5: Reactions + Date + Actions -->
-              <div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+              <div class="flex items-center justify-between mt-3 pt-2 border-t border-line">
                 <div class="flex items-center gap-3">
-                  <span class="text-xs text-gray-400">
+                  <span class="text-xs text-meta">
                     {{ formatDate(review.created_at) }}
                     <span
                       v-if="review.updated_at !== review.created_at"
-                      class="text-gray-300 ml-1"
+                      class="text-faint ml-1"
                     >({{ $t('reviews.edited') }})</span>
                   </span>
                   <!-- Reaction counts -->
                   <div class="flex items-center gap-2.5 text-xs">
                     <span
                       v-if="review.useful_count > 0"
-                      class="inline-flex items-center gap-1 text-blue-500"
+                      class="inline-flex items-center gap-1 text-blue-500 dark:text-blue-400"
                       :title="$t('reviews.reactions.useful')"
                     >
                       <Icon name="lucide:thumbs-up" class="w-3 h-3" />
@@ -101,7 +100,7 @@
                     </span>
                     <span
                       v-if="review.dislike_count > 0"
-                      class="inline-flex items-center gap-1 text-red-400"
+                      class="inline-flex items-center gap-1 text-red-400 dark:text-red-300"
                       :title="$t('reviews.reactions.dislike')"
                     >
                       <Icon name="lucide:thumbs-down" class="w-3 h-3" />
@@ -109,7 +108,7 @@
                     </span>
                     <span
                       v-if="review.fun_count > 0"
-                      class="inline-flex items-center gap-1 text-amber-500"
+                      class="inline-flex items-center gap-1 text-amber-500 dark:text-amber-400"
                       :title="$t('reviews.reactions.fun')"
                     >
                       <Icon name="lucide:laugh" class="w-3 h-3" />
@@ -120,21 +119,21 @@
                 <div class="flex items-center gap-1">
                   <button
                     type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full
-                           transition-colors hover:bg-gray-100"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-meta
+                           transition-colors hover:bg-ghost-hover hover:text-primary"
                     :title="$t('common.edit')"
                     @click="emit('edit', review)"
                   >
-                    <Icon name="lucide:pencil" class="w-4 h-4 text-gray-400 hover:text-blue-500 transition-colors" />
+                    <Icon name="lucide:pencil" class="w-4 h-4" />
                   </button>
                   <button
                     type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full
-                           transition-colors hover:bg-red-50"
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-meta
+                           transition-colors hover:bg-danger/10 hover:text-danger"
                     :title="$t('common.delete')"
                     @click="emit('delete', review.id)"
                   >
-                    <Icon name="lucide:trash-2" class="w-4 h-4 text-gray-400 hover:text-red-500 transition-colors" />
+                    <Icon name="lucide:trash-2" class="w-4 h-4" />
                   </button>
                 </div>
               </div>

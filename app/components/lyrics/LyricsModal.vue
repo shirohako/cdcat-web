@@ -9,7 +9,7 @@
     tone="sky"
   >
     <template #actions>
-      <NuxtLink v-if="trackId" :to="`/tracks/${trackId}`" class="btn btn-ghost btn-xs mt-0.5 shrink-0 gap-1 font-normal text-gray-500" @click="open = false">
+      <NuxtLink v-if="trackId" :to="`/tracks/${trackId}`" class="btn btn-ghost btn-xs mt-0.5 shrink-0 gap-1 font-normal text-meta hover:text-primary" @click="open = false">
         {{ $t('lyrics_ui.open_track') }}<ArrowUpRight :size="12" />
       </NuxtLink>
     </template>

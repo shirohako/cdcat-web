@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'fixed left-0 top-16 bottom-0 bg-white border-r border-gray-200 z-40',
+      'fixed left-0 top-16 bottom-0 bg-card border-r border-line z-40',
       'transition-all duration-300 ease-in-out',
       'flex flex-col',
       isCollapsed ? 'w-16' : 'w-52',
@@ -12,26 +12,19 @@
     <nav class="flex-1 min-h-0 overflow-y-auto py-6">
       <ul :class="['space-y-2', isCollapsed ? 'px-2' : 'px-3']">
         <li v-for="item in menuItems" :key="item.name">
+          <!-- vivia's navigation links: a quiet background and the theme colour on hover, the current one filled -->
           <NuxtLink
             :to="item.path"
             :class="[
-              'flex items-center',
-              isCollapsed ? 'justify-center px-3 py-3' : 'gap-4 px-4 py-3',
-              'rounded-xl',
-              'transition-all duration-200',
-              'hover:bg-gray-100 group relative',
-              isActive(item.path) ? 'bg-gray-900 text-white hover:bg-gray-800' : 'text-gray-700'
+              'group relative flex h-11 items-center rounded-lg',
+              isCollapsed ? 'justify-center px-3' : 'gap-3.5 px-3.5',
+              'transition-colors duration-150 ease-out',
+              isActive(item.path) ? 'bg-primary text-on-primary' : 'text-body hover:bg-ghost-hover hover:text-primary'
             ]"
           >
-            <Icon
-              :name="item.icon"
-              :class="[
-                'w-6 h-6 transition-transform duration-200 shrink-0',
-                'group-hover:scale-110'
-              ]"
-            />
+            <Icon :name="item.icon" class="size-5 shrink-0" />
             <transition name="fade">
-              <span v-if="!isCollapsed" class="font-medium text-[15px]">
+              <span v-if="!isCollapsed" class="font-semibold text-[15px]">
                 {{ $t(item.i18nKey) }}
               </span>
             </transition>
@@ -39,9 +32,9 @@
             <!-- Tooltip for collapsed state -->
             <div
               v-if="isCollapsed"
-              class="absolute left-full ml-3 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-lg
-                     opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                     pointer-events-none whitespace-nowrap shadow-lg"
+              class="absolute left-full ml-3 px-3 py-1.5 bg-popover text-title text-sm font-medium rounded-lg ring-1 ring-line
+                     opacity-0 group-hover:opacity-100 transition-opacity duration-150
+                     pointer-events-none whitespace-nowrap shadow-overlay"
             >
               {{ $t(item.i18nKey) }}
             </div>
@@ -53,11 +46,11 @@
     <!-- Footer -->
     <div class="mt-auto shrink-0 p-4">
       <transition name="fade" mode="out-in">
-        <div v-if="!isCollapsed" class="text-xs text-gray-400 text-center">
+        <div v-if="!isCollapsed" class="text-xs text-faint text-center">
           © 2026 CDCAT
         </div>
         <div v-else class="flex justify-center">
-          <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"/>
+          <div class="w-1.5 h-1.5 bg-faint rounded-full"/>
         </div>
       </transition>
     </div>

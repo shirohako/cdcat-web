@@ -1,12 +1,12 @@
 <template>
   <dl v-if="groups.length" class="space-y-2 text-sm">
     <div v-for="group in groups" :key="group.key" class="flex gap-3">
-      <dt class="w-24 shrink-0 text-xs leading-5 text-gray-400">
+      <dt class="w-24 shrink-0 text-xs leading-5 text-meta">
         <span class="tooltip tooltip-right" :data-tip="hint(group.key)">{{ attributeName(group.key) }}</span>
       </dt>
-      <dd class="flex min-w-0 flex-wrap gap-x-2 gap-y-1 text-gray-700">
+      <dd class="flex min-w-0 flex-wrap gap-x-2 gap-y-1 text-body">
         <template v-for="attribute in group.values" :key="attribute.id">
-          <NuxtLink v-if="attributeLink(attribute)" :to="attributeLink(attribute)!" class="hover:text-indigo-600 hover:underline">
+          <NuxtLink v-if="attributeLink(attribute)" :to="attributeLink(attribute)!" class="transition-colors hover:text-primary">
             {{ attributeText(attribute) }}
           </NuxtLink>
           <span v-else>{{ attributeText(attribute) }}</span>

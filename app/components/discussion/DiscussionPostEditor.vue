@@ -40,7 +40,7 @@ async function save() {
       />
     </ClientOnly>
     <div class="flex items-center justify-end gap-2">
-      <p v-if="error" role="alert" class="mr-auto text-sm text-rose-600">{{ error }}</p>
+      <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</button>
       <button type="button" class="btn btn-primary btn-sm" :disabled="busy || !raw.trim()" @click="save">
         <Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.save') }}

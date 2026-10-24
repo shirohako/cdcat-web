@@ -1,19 +1,17 @@
 <template>
   <section>
-    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div class="card p-5">
       <!-- Header -->
       <div class="mb-5 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('back')">
+          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-meta hover:bg-ghost-hover hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('back')">
             <ArrowLeft :size="16" />
           </button>
-          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
-            <Disc3 :size="18" class="text-gray-400" />
+          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-title">
+            <Disc3 :size="18" class="text-meta" />
             {{ $t('profile.favorites') }}
           </h2>
-          <span v-if="pagination.total" class="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-600 ring-1 ring-sky-200/60">
-            {{ pagination.total }}
-          </span>
+          <UiCount v-if="pagination.total" :value="pagination.total" size="sm" />
         </div>
       </div>
 
@@ -22,16 +20,11 @@
 
       <!-- Error -->
       <div v-else-if="status === 'error' && !response" class="flex min-h-[20vh] items-center justify-center">
-        <p class="text-sm text-gray-400">{{ error?.message }}</p>
+        <p class="text-sm text-meta">{{ error?.message }}</p>
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!albums.length" class="flex flex-col items-center justify-center py-10 text-center">
-        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50">
-          <Disc3 :size="26" class="text-amber-400" />
-        </div>
-        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_albums') }}</p>
-      </div>
+      <UiEmpty v-else-if="!albums.length" :title="$t('profile.no_favorite_albums')" :icon="Disc3" />
 
       <!-- Albums list -->
       <template v-else>
@@ -40,9 +33,9 @@
             v-for="album in albums"
             :key="album.id"
             :to="`/albums/${album.id}`"
-            class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
+            class="group flex items-center gap-3 rounded-xl bg-sunken px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           >
-            <div class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-black/5">
+            <div class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-sunken ring-1 ring-line">
               <img
                 v-if="hasCover(album)"
                 :src="album.image_url!"
@@ -51,18 +44,18 @@
                 loading="lazy"
                 @error="onCoverError(album.id)"
               >
-              <div v-else class="grid h-full w-full place-items-center bg-linear-to-br from-slate-50 to-slate-100">
-                <Disc3 :size="20" class="text-slate-400" />
+              <div v-else class="grid h-full w-full place-items-center bg-sunken">
+                <Disc3 :size="20" class="text-faint" />
               </div>
             </div>
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-gray-900 group-hover:text-blue-700 transition-colors">{{ album.title }}</p>
-              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-gray-400">
+              <p class="truncate text-sm font-medium text-title group-hover:text-primary transition-colors">{{ album.title }}</p>
+              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-meta">
                 <Heart :size="11" />
                 <span>{{ formatDate(album.favorited_at) }}</span>
               </p>
             </div>
-            <ChevronRight :size="14" class="ml-auto text-gray-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+            <ChevronRight :size="14" class="ml-auto text-faint group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
           </NuxtLink>
         </div>
 

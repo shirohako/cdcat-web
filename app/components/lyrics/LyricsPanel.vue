@@ -5,11 +5,11 @@
         <div class="skeleton h-6 w-20 rounded-full" />
         <div class="skeleton h-6 w-24 rounded-full" />
       </div>
-      <div class="mt-3 space-y-3 rounded-xl bg-gray-50 px-4 py-5 sm:px-6">
+      <div class="mt-3 space-y-3 rounded-xl bg-sunken px-4 py-5 sm:px-6">
         <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
       </div>
     </SkeletonStatus>
-    <p v-else-if="status === 'error' && !data" class="py-6 text-center text-sm text-error">{{ localizeError(error) }}</p>
+    <p v-else-if="status === 'error' && !data" class="py-6 text-center text-sm text-danger">{{ localizeError(error) }}</p>
 
     <template v-else-if="editing">
       <LyricsForm
@@ -21,14 +21,13 @@
       />
     </template>
 
-    <div v-else-if="!lyrics.length" class="flex flex-col items-center py-10 text-center">
-      <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50"><FileText :size="18" class="text-sky-400" /></div>
-      <p class="mt-3 text-sm font-semibold text-gray-600">{{ $t('album.empty.lyrics_title') }}</p>
-      <p class="mt-1 max-w-sm text-xs leading-5 text-gray-400">{{ $t('lyrics_ui.empty_hint') }}</p>
-      <button v-if="canSubmit" type="button" class="btn btn-sm btn-primary mt-4 gap-1" @click="startNew">
-        <Plus :size="14" />{{ $t('lyrics_ui.submit_lyrics_or_translation') }}
-      </button>
-    </div>
+    <UiEmpty v-else-if="!lyrics.length" :title="$t('album.empty.lyrics_title')" :description="$t('lyrics_ui.empty_hint')" :icon="FileText">
+      <template v-if="canSubmit" #actions>
+        <button type="button" class="btn btn-sm btn-primary gap-1" @click="startNew">
+          <Plus :size="14" />{{ $t('lyrics_ui.submit_lyrics_or_translation') }}
+        </button>
+      </template>
+    </UiEmpty>
 
     <template v-else>
       <div class="flex items-center gap-2">
@@ -39,28 +38,28 @@
             type="button"
             role="tab"
             :aria-selected="lyric.id === selectedId"
-            class="shrink-0 rounded-full px-3 py-1 text-xs font-medium ring-1 transition-colors"
-            :class="lyric.id === selectedId ? 'bg-sky-600 text-white ring-sky-600' : 'bg-white text-gray-600 ring-gray-200 hover:bg-gray-50'"
+            class="chip chip-sm shrink-0"
+            :class="{ 'chip-selected': lyric.id === selectedId }"
             @click="selectedId = lyric.id"
           >
             {{ localeName(lyric.language) }}<span class="ml-1 opacity-70">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
           </button>
         </div>
-        <button v-if="canSubmit" type="button" class="btn btn-ghost btn-xs shrink-0 gap-1 text-sky-700" @click="startNew">
+        <button v-if="canSubmit" type="button" class="btn btn-ghost btn-xs shrink-0 gap-1 text-primary" @click="startNew">
           <Plus :size="12" /><span class="hidden sm:inline">{{ $t('lyrics_ui.submit_lyrics_or_translation') }}</span>
         </button>
       </div>
 
-      <div v-if="companions.length" class="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-gray-500">
-        <Columns2 :size="13" class="text-gray-400" />
+      <div v-if="companions.length" class="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-meta">
+        <Columns2 :size="13" class="text-meta" />
         <span class="mr-0.5">{{ $t('lyrics_ui.compare_with') }}</span>
         <button
           v-for="lyric in companions"
           :key="lyric.id"
           type="button"
           :aria-pressed="lyric.id === compareId"
-          class="rounded-full px-2.5 py-0.5 transition-colors"
-          :class="lyric.id === compareId ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+          class="chip chip-sm"
+          :class="{ 'chip-selected': lyric.id === compareId }"
           @click="compareId = lyric.id === compareId ? null : lyric.id"
         >
           {{ localeName(lyric.language) }}<span class="ml-1 opacity-60">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
@@ -68,8 +67,8 @@
       </div>
 
       <div v-if="current" class="mt-3">
-        <div class="rounded-xl bg-gray-50 px-4 py-4 sm:px-6 sm:py-5">
-          <div v-if="comparison" class="mb-3 hidden grid-cols-2 gap-x-8 border-b border-gray-200/70 pb-2 text-[11px] font-medium text-gray-400 sm:grid">
+        <div class="rounded-xl bg-sunken px-4 py-4 sm:px-6 sm:py-5">
+          <div v-if="comparison" class="mb-3 hidden grid-cols-2 gap-x-8 border-b border-line pb-2 text-[11px] font-medium text-meta sm:grid">
             <span>{{ lyricLabel(current) }}</span>
             <span>{{ lyricLabel(comparison) }}</span>
           </div>
@@ -77,28 +76,28 @@
             <!-- A blank line in both texts separates stanzas. -->
             <div v-if="!row[0] && !row[1]" class="h-4" />
             <div v-else class="grid gap-x-8" :class="{ 'mb-1.5 sm:mb-0 sm:grid-cols-2': comparison }">
-              <p class="whitespace-pre-wrap break-words text-[15px] leading-7 text-gray-900">{{ row[0] }}</p>
-              <p v-if="comparison" class="whitespace-pre-wrap break-words text-[13px] leading-6 text-gray-500 sm:text-[15px] sm:leading-7">{{ row[1] }}</p>
+              <p class="whitespace-pre-wrap break-words text-[15px] leading-7 text-title">{{ row[0] }}</p>
+              <p v-if="comparison" class="whitespace-pre-wrap break-words text-[13px] leading-6 text-meta sm:text-[15px] sm:leading-7">{{ row[1] }}</p>
             </div>
           </template>
         </div>
 
-        <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-400">
+        <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-meta">
           <span v-if="current.creator">{{ $t('lyrics_ui.added_by', { name: current.creator.nickname || current.creator.username }) }}</span>
           <span v-if="current.translator">{{ $t('lyrics_ui.translator', { name: current.translator }) }}</span>
-          <span v-if="current.is_ai_generated" class="rounded bg-amber-50 px-1.5 py-px font-medium text-amber-600">{{ $t('lyrics_ui.ai_generated') }}</span>
-          <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate hover:text-gray-600 hover:underline">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
+          <span v-if="current.is_ai_generated" class="rounded bg-warning/10 px-1.5 py-px font-medium text-warning">{{ $t('lyrics_ui.ai_generated') }}</span>
+          <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate transition-colors hover:text-primary">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
           <span v-else-if="current.source" class="max-w-[16rem] truncate">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</span>
           <span class="ml-auto flex items-center gap-1">
-            <NuxtLink :to="`/lyrics/${current.id}/versions`" class="rounded px-1.5 py-0.5 hover:bg-gray-100 hover:text-gray-600">{{ $t('versions.short', { version: current.version }) }}</NuxtLink>
+            <NuxtLink :to="`/lyrics/${current.id}/versions`" class="rounded px-1.5 py-0.5 transition-colors hover:bg-ghost-hover hover:text-primary">{{ $t('versions.short', { version: current.version }) }}</NuxtLink>
             <template v-if="canSubmit">
-              <button type="button" class="flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 hover:text-gray-600" :title="$t('common.edit')" :aria-label="$t('common.edit')" @click="editing = 'edit'"><Pencil :size="12" /></button>
-              <button type="button" class="flex h-6 w-6 items-center justify-center rounded hover:bg-red-50 hover:text-error" :title="$t('common.delete')" :aria-label="$t('common.delete')" @click="remove"><Trash2 :size="12" /></button>
+              <button type="button" class="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-ghost-hover hover:text-primary" :title="$t('common.edit')" :aria-label="$t('common.edit')" @click="editing = 'edit'"><Pencil :size="12" /></button>
+              <button type="button" class="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-danger/10 hover:text-danger" :title="$t('common.delete')" :aria-label="$t('common.delete')" @click="remove"><Trash2 :size="12" /></button>
             </template>
           </span>
         </div>
       </div>
-      <SkeletonStatus v-else class="mt-3 space-y-3 rounded-xl bg-gray-50 px-4 py-5 sm:px-6">
+      <SkeletonStatus v-else class="mt-3 space-y-3 rounded-xl bg-sunken px-4 py-5 sm:px-6">
         <div v-for="line in 6" :key="line" class="skeleton h-3 rounded-full" :class="['w-4/5', 'w-full', 'w-2/3'][line % 3]" />
       </SkeletonStatus>
     </template>

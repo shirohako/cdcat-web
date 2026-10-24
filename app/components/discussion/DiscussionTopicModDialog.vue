@@ -66,24 +66,24 @@ const remove = () => {
   <DiscussionDialog v-model:open="open" :title="t('discussions.moderation.topic_title')" width="max-w-lg" :busy="busy">
     <form id="discussion-topic-mod" class="space-y-4 text-sm" @submit.prevent="save">
       <fieldset>
-        <legend class="font-medium text-slate-700">{{ t('discussions.moderation.pin') }}</legend>
+        <legend class="font-medium text-body">{{ t('discussions.moderation.pin') }}</legend>
         <div class="mt-1.5 flex flex-wrap gap-3">
           <label v-for="value in ['none', 'category', 'global'] as const" :key="value" class="flex items-center gap-1.5">
-            <input v-model="pinned" type="radio" :value="value" class="accent-sky-600">{{ t(`discussions.moderation.pin_scopes.${value}`) }}
+            <input v-model="pinned" type="radio" :value="value" class="radio radio-sm">{{ t(`discussions.moderation.pin_scopes.${value}`) }}
           </label>
         </div>
-        <label v-if="pinned !== 'none'" class="mt-2 block text-slate-600">
+        <label v-if="pinned !== 'none'" class="mt-2 block text-body">
           {{ t('discussions.moderation.pin_until') }}
-          <input v-model="pinnedUntil" type="datetime-local" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+          <input v-model="pinnedUntil" type="datetime-local" class="input mt-1 w-full">
         </label>
       </fieldset>
-      <label class="flex items-center gap-2"><input v-model="featured" type="checkbox" class="accent-sky-600">{{ t('discussions.moderation.featured') }}</label>
-      <label class="flex items-center gap-2"><input v-model="locked" type="checkbox" class="accent-sky-600">{{ t('discussions.moderation.locked') }}</label>
+      <label class="flex items-center gap-2"><input v-model="featured" type="checkbox" class="checkbox checkbox-sm">{{ t('discussions.moderation.featured') }}</label>
+      <label class="flex items-center gap-2"><input v-model="locked" type="checkbox" class="checkbox checkbox-sm">{{ t('discussions.moderation.locked') }}</label>
       <label class="block">
         {{ t('discussions.moderation.reason_optional') }}
-        <textarea v-model="reason" rows="2" maxlength="2000" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-sky-400" />
+        <textarea v-model="reason" rows="2" maxlength="2000" class="textarea textarea-sm mt-1 w-full" />
       </label>
-      <p v-if="error" role="alert" class="text-rose-600">{{ error }}</p>
+      <p v-if="error" role="alert" class="text-danger">{{ error }}</p>
     </form>
     <template #footer>
       <button type="button" class="btn btn-error btn-sm mr-auto" :disabled="busy" @click="remove">{{ t('discussions.moderation.delete_topic') }}</button>

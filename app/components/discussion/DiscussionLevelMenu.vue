@@ -34,22 +34,22 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 <template>
   <div ref="root" class="relative">
     <button
-      type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
-      :class="current === 'watching' ? 'border-sky-200 text-sky-700' : ''" :aria-expanded="open" @click.stop="open = !open"
+      type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors duration-150 ease-out hover:bg-ghost-hover"
+      :class="current === 'watching' ? 'border-primary/40 text-primary' : 'border-line text-body hover:text-primary'" :aria-expanded="open" @click.stop="open = !open"
     >
       <component :is="icons[current]" :size="14" />{{ t(`discussions.levels.${current}`) }}<ChevronDown :size="12" />
     </button>
-    <div v-if="open" class="absolute right-0 top-full z-30 mt-1 w-64 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg" role="menu">
+    <div v-if="open" class="absolute right-0 top-full z-30 mt-1 w-64 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line" role="menu">
       <button
         v-for="option in NOTIFICATION_LEVELS" :key="option" type="button" role="menuitemradio" :aria-checked="option === current"
-        class="flex w-full items-start gap-2.5 px-3 py-2 text-left transition hover:bg-slate-50" @click="choose(option)"
+        class="flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="choose(option)"
       >
-        <component :is="icons[option]" :size="15" class="mt-0.5 shrink-0 text-slate-500" />
+        <component :is="icons[option]" :size="15" class="mt-0.5 shrink-0 text-meta" />
         <span class="min-w-0 flex-1">
-          <span class="block text-sm font-medium text-slate-800">{{ t(`discussions.levels.${option}`) }}</span>
-          <span class="block text-xs text-slate-500">{{ t(`discussions.levels.${kind}_help.${option}`) }}</span>
+          <span class="block text-sm font-medium text-title">{{ t(`discussions.levels.${option}`) }}</span>
+          <span class="block text-xs text-meta">{{ t(`discussions.levels.${kind}_help.${option}`) }}</span>
         </span>
-        <Check v-if="option === current" :size="14" class="mt-0.5 text-sky-600" />
+        <Check v-if="option === current" :size="14" class="mt-0.5 text-primary" />
       </button>
     </div>
   </div>

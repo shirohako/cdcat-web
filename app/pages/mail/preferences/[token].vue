@@ -78,22 +78,20 @@ useSeoMeta({ title: () => t('mail_preferences.title'), robots: 'noindex' })
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-sky-50 via-slate-50 to-emerald-50 px-4 py-10 sm:py-16">
+  <div class="min-h-screen bg-linear-to-br from-primary/10 via-transparent to-primary/5 px-4 py-10 sm:py-16">
     <div class="mx-auto w-full max-w-xl">
-      <div class="rounded-3xl border border-white/80 bg-white/95 p-6 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] sm:p-10">
+      <div class="card p-6 sm:p-10">
         <div class="mb-8 text-center">
-          <div class="mb-4 inline-flex size-12 items-center justify-center rounded-xl bg-linear-to-br from-sky-500 to-emerald-500 text-white shadow-lg">
-            <Settings :size="24" />
-          </div>
-          <h1 class="text-2xl font-black text-slate-900">{{ t('mail_preferences.title') }}</h1>
-          <p v-if="preferences" class="mt-2 text-sm text-slate-600">{{ t('mail_preferences.subtitle', { email: preferences.email }) }}</p>
+          <UiIconTile :icon="Settings" size="lg" class="mb-4" />
+          <h1 class="text-2xl font-black text-title">{{ t('mail_preferences.title') }}</h1>
+          <p v-if="preferences" class="mt-2 text-sm text-body">{{ t('mail_preferences.subtitle', { email: preferences.email }) }}</p>
         </div>
 
         <div v-if="invalid" class="text-center" role="alert">
-          <div class="mb-4 inline-flex size-14 items-center justify-center rounded-full bg-rose-50"><Link2Off :size="26" class="text-rose-500" /></div>
-          <h2 class="text-lg font-bold text-slate-900">{{ t('mail_preferences.invalid_title') }}</h2>
-          <p class="mx-auto mt-2 max-w-sm text-sm text-slate-600">{{ t('mail_preferences.invalid_message') }}</p>
-          <NuxtLink to="/account?tab=notifications" class="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-slate-800">
+          <div class="mb-4 inline-flex size-14 items-center justify-center rounded-full bg-danger/10"><Link2Off :size="26" class="text-danger" /></div>
+          <h2 class="text-lg font-bold text-title">{{ t('mail_preferences.invalid_title') }}</h2>
+          <p class="mx-auto mt-2 max-w-sm text-sm text-body">{{ t('mail_preferences.invalid_message') }}</p>
+          <NuxtLink to="/account?tab=notifications" class="btn btn-primary mt-6 rounded-xl px-5">
             {{ t('mail_preferences.go_to_account') }}
           </NuxtLink>
         </div>
@@ -113,36 +111,36 @@ useSeoMeta({ title: () => t('mail_preferences.title'), robots: 'noindex' })
         <CommonLoadError v-else-if="loadError" :message="loadError" @retry="load" />
 
         <template v-else-if="preferences">
-          <p v-if="done" class="mb-6 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800" role="status">
+          <p v-if="done" class="mb-6 flex items-start gap-2 rounded-xl border border-success/25 bg-success/10 p-4 text-sm text-success" role="status">
             <CheckCircle :size="18" class="mt-0.5 shrink-0" />
             <span>{{ done === 'category' ? t('mail_preferences.unsubscribed', { name: categoryName }) : t('mail_preferences.unsubscribed_all') }}</span>
           </p>
 
-          <p v-if="category?.is_required" class="mb-6 flex items-start gap-2 rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+          <p v-if="category?.is_required" class="mb-6 flex items-start gap-2 rounded-xl border border-info/25 bg-info/10 p-4 text-sm text-info">
             <Info :size="18" class="mt-0.5 shrink-0" />
             <span>{{ t('mail_preferences.required_notice', { name: categoryName }) }}</span>
           </p>
           <button
             v-else-if="category && categorySubscribed" type="button" :disabled="busy"
-            class="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-50"
+            class="btn btn-primary mb-3 flex w-full gap-2 rounded-xl px-5 py-3"
             @click="unsubscribeCategory"
           >
             <MailX :size="18" />{{ t('mail_preferences.unsubscribe', { name: categoryName }) }}
           </button>
           <button
             v-if="anyOptional" type="button" :disabled="busy"
-            class="mb-8 w-full rounded-xl border border-slate-200 px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+            class="btn btn-outline mb-8 w-full rounded-xl px-5 py-3"
             @click="update({ unsubscribe_all: true }, 'all')"
           >
             {{ t('mail_preferences.unsubscribe_all') }}
           </button>
 
-          <h2 class="mb-4 border-t border-slate-100 pt-6 text-sm font-semibold text-slate-900">{{ t('mail_preferences.settings_title') }}</h2>
+          <h2 class="mb-4 border-t border-line pt-6 text-sm font-semibold text-title">{{ t('mail_preferences.settings_title') }}</h2>
           <MailSettings
             :mail-locale="preferences.mail_locale" :subscriptions="preferences.mail_subscriptions" :busy="busy"
             @locale="code => update({ mail_locale: code })" @toggle="(key, subscribed) => update({ subscriptions: { [key]: subscribed } })"
           />
-          <p v-if="message" class="mt-4 text-sm" :class="failed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ message }}</p>
+          <p v-if="message" class="mt-4 text-sm" :class="failed ? 'text-danger' : 'text-success'" role="status">{{ message }}</p>
         </template>
       </div>
     </div>

@@ -9,12 +9,12 @@
       <textarea :value="sources.join('\n')" rows="2" class="textarea font-mono text-xs" :placeholder="$t('editor.sources_placeholder')" @input="setSources(($event.target as HTMLTextAreaElement).value)" />
     </label>
 
-    <details class="rounded-lg border border-gray-200" @toggle="previewOpen = ($event.target as HTMLDetailsElement).open">
-      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-gray-700">{{ $t('editor.preview_changes', { count: totalChanges }) }}</summary>
-      <div v-if="previewOpen" class="space-y-4 border-t border-gray-100 px-4 py-3">
+    <details class="rounded-lg border border-line" @toggle="previewOpen = ($event.target as HTMLDetailsElement).open">
+      <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-body transition-colors hover:text-primary">{{ $t('editor.preview_changes', { count: totalChanges }) }}</summary>
+      <div v-if="previewOpen" class="space-y-4 border-t border-line px-4 py-3">
         <div v-for="preview in previews" :key="preview.ref">
-          <p class="mb-1 text-xs font-semibold text-gray-500">{{ enumLabel('catalog_type', preview.type) }} · {{ preview.label }}</p>
-          <p v-if="preview.action === 'delete'" class="text-sm text-error">{{ $t('editor.will_delete') }}</p>
+          <p class="mb-1 text-xs font-semibold text-meta">{{ enumLabel('catalog_type', preview.type) }} · {{ preview.label }}</p>
+          <p v-if="preview.action === 'delete'" class="text-sm text-danger">{{ $t('editor.will_delete') }}</p>
           <CatalogDiffView v-else :type="preview.type" :changes="preview.changes" :references="references" :documents="[preview.document, preview.original]" />
         </div>
       </div>
@@ -26,7 +26,7 @@
         <li v-for="error in errors" :key="error.path"><span class="font-mono text-xs opacity-70">{{ shortPath(error.path) }}</span> {{ error.message }}</li>
       </ul>
     </div>
-    <p v-if="message" class="text-sm text-error">{{ message }}</p>
+    <p v-if="message" class="text-sm text-danger">{{ message }}</p>
 
     <EditorConflictResolver
       v-if="conflicts.length"
@@ -36,14 +36,14 @@
       @resolved="conflicts = []"
     />
 
-    <div class="flex flex-wrap items-center gap-2 border-t border-gray-100 pt-4">
+    <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
       <button type="button" class="btn btn-primary" :disabled="draft.busy.value || !totalChanges" @click="submit">
         <span v-if="draft.busy.value" class="loading loading-spinner loading-xs" />
         {{ $t(canAutoApprove ? 'editor.submit_publish' : 'editor.submit_review') }}
       </button>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</button>
-      <button v-if="draft.persisted.value" type="button" class="btn btn-ghost btn-sm text-error" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</button>
-      <span class="text-xs text-gray-400">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
+      <button v-if="draft.persisted.value" type="button" class="btn btn-ghost btn-sm text-danger" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</button>
+      <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
   </div>
 </template>

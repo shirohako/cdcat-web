@@ -38,12 +38,12 @@ exports[`all-syntax fixture > renders unchanged 1`] = `
 <p>Paragraph with <strong>bold</strong>, <em>italic</em>, <s>strike</s>, <mark>mark</mark>, <code>code</code>, <span class="markdown-inline-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="Click to reveal inline spoiler"><span class="markdown-inline-spoiler-content">spoiler <strong>nested</strong></span></span>, <a href="https://example.com" target="_blank" rel="nofollow ugc noopener noreferrer">link</a>, an autolink <a href="https://example.org" target="_blank" rel="nofollow ugc noopener noreferrer">https://example.org</a> and <a href="mailto:foo@example.com" target="_blank" rel="nofollow ugc noopener noreferrer">foo@example.com</a>.<br>
 A soft line break<br>
 continues here.</p>
-<p><span class="markdown-text-color text-rose-600">Red <strong>text</strong></span> <span class="markdown-text-size text-lg">Large</span> <span class="markdown-text-underline markdown-underline-blue">Underlined</span> <span class="markdown-text-color text-violet-600 markdown-text-size text-xl markdown-text-underline markdown-underline-green">Combo</span><br>
-<span class="markdown-text-size text-lg">Outer <span class="markdown-text-color text-rose-600">inner</span></span> [unknown]{color=nope} [handler]{onclick=alert(1)} <span class="markdown-text-color text-rose-600">Outer <span class="markdown-inline-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="Click to reveal inline spoiler"><span class="markdown-inline-spoiler-content">hidden <strong>bold</strong></span></span></span></p>
+<p><span class="markdown-text-color markdown-color-red">Red <strong>text</strong></span> <span class="markdown-text-size text-lg">Large</span> <span class="markdown-text-underline markdown-underline-blue">Underlined</span> <span class="markdown-text-color markdown-color-purple markdown-text-size text-xl markdown-text-underline markdown-underline-green">Combo</span><br>
+<span class="markdown-text-size text-lg">Outer <span class="markdown-text-color markdown-color-red">inner</span></span> [unknown]{color=nope} [handler]{onclick=alert(1)} <span class="markdown-text-color markdown-color-red">Outer <span class="markdown-inline-spoiler" role="button" tabindex="0" aria-expanded="false" aria-label="Click to reveal inline spoiler"><span class="markdown-inline-spoiler-content">hidden <strong>bold</strong></span></span></span></p>
 <p><img src="/logo.png" alt="Logo" class="markdown-sized-image" width="320" height="180" loading="lazy" referrerpolicy="no-referrer"> <img src="https://example.com/a.png" alt="Too wide" loading="lazy" referrerpolicy="no-referrer">{width=99999} <img src="https://example.com/b.png" alt="Plain" loading="lazy" referrerpolicy="no-referrer"></p>
 <ul class="contains-task-list">
 <li class="task-list-item enabled"><input class="task-list-item-checkbox" checked=""type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Done</label></li>
-<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Pending <strong>bold</strong> and <span class="markdown-text-color text-rose-600 markdown-text-size text-lg">Styled <strong>nested</strong></span></label></li>
+<li class="task-list-item enabled"><input class="task-list-item-checkbox"type="checkbox" id="task-item-N"><label class="task-list-item-label" for="task-item-N"> Pending <strong>bold</strong> and <span class="markdown-text-color markdown-color-red markdown-text-size text-lg">Styled <strong>nested</strong></span></label></li>
 <li>plain item
 <ul>
 <li>nested item</li>
@@ -74,16 +74,16 @@ continues</p>
 </table>
 <pre><code class="language-js">const x = '&lt;b&gt;not bold&lt;/b&gt;'
 </code></pre>
-<div class="markdown-container markdown-container-callout border-sky-200 bg-sky-50/80 text-sky-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-sky-500 text-white" aria-hidden="true">i</span><strong>Information</strong></div><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout markdown-callout-info" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">i</span><strong>Information</strong></div><div class="markdown-container-body">
 <p>Info body</p>
 </div></div>
-<div class="markdown-container markdown-container-callout border-emerald-200 bg-emerald-50/80 text-emerald-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-emerald-500 text-white" aria-hidden="true">✓</span><strong>Custom tip</strong></div><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout markdown-callout-tip" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">✓</span><strong>Custom tip</strong></div><div class="markdown-container-body">
 <p>Tip body</p>
 </div></div>
-<div class="markdown-container markdown-container-callout border-amber-200 bg-amber-50/80 text-amber-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-amber-500 text-white" aria-hidden="true">!</span><strong>Warning</strong></div><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout markdown-callout-warning" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">!</span><strong>Warning</strong></div><div class="markdown-container-body">
 <p>Warning body</p>
 </div></div>
-<div class="markdown-container markdown-container-callout border-rose-200 bg-rose-50/80 text-rose-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-rose-500 text-white" aria-hidden="true">!</span><strong>&lt;img src=x onerror=alert(1)&gt;</strong></div><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout markdown-callout-danger" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">!</span><strong>&lt;img src=x onerror=alert(1)&gt;</strong></div><div class="markdown-container-body">
 <p>Danger body</p>
 </div></div>
 <details class="markdown-container markdown-container-details"><summary><span>Click to open</span></summary><div class="markdown-container-body">
@@ -105,7 +105,7 @@ continues</p>
 </ol>
 </div>
 <details class="markdown-container markdown-container-details"><summary><span>Outer</span></summary><div class="markdown-container-body">
-<div class="markdown-container markdown-container-callout border-amber-200 bg-amber-50/80 text-amber-950" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon bg-amber-500 text-white" aria-hidden="true">!</span><strong>Inner</strong></div><div class="markdown-container-body">
+<div class="markdown-container markdown-container-callout markdown-callout-warning" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">!</span><strong>Inner</strong></div><div class="markdown-container-body">
 <p>Nested body</p>
 </div></div>
 </div></details>

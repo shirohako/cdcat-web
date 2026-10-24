@@ -1,16 +1,16 @@
 <template>
   <EditorModal :model-value="!!file" :title="$t('editor.crop.title')" wide @update:model-value="value => !value && emit('cancel')">
     <div v-if="image" class="space-y-4">
-      <p class="text-sm text-gray-600">{{ $t('editor.crop.hint') }}</p>
-      <div class="relative mx-auto w-fit max-w-full select-none overflow-hidden rounded-lg bg-gray-900">
+      <p class="text-sm text-body">{{ $t('editor.crop.hint') }}</p>
+      <div class="relative mx-auto w-fit max-w-full select-none overflow-hidden rounded-lg bg-hero">
         <img :src="image.src" alt="" class="block max-h-[55vh] max-w-full">
-        <div class="pointer-events-none absolute border-2 border-white shadow-[0_0_0_9999px_rgba(0,0,0,0.55)]" :style="box" />
+        <div class="pointer-events-none absolute border-2 border-white shadow-[0_0_0_9999px_var(--scrim)]" :style="box" />
       </div>
       <label class="block">
-        <span class="mb-1 block text-xs text-gray-500">{{ $t('editor.crop.position') }}</span>
-        <input v-model.number="offset" type="range" min="-1" max="1" step="0.01" class="w-full">
+        <span class="mb-1 block text-xs text-meta">{{ $t('editor.crop.position') }}</span>
+        <input v-model.number="offset" type="range" min="-1" max="1" step="0.01" class="w-full accent-primary">
       </label>
-      <p class="text-xs text-gray-500">{{ $t('editor.crop.result', { size: output }) }}</p>
+      <p class="text-xs text-meta">{{ $t('editor.crop.result', { size: output }) }}</p>
     </div>
     <div v-else class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
     <template #footer>

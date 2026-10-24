@@ -2,15 +2,15 @@
   <div class="space-y-2">
     <div
       class="relative aspect-square w-full overflow-hidden rounded-xl border-2"
-      :class="coverImage ? 'border-transparent bg-gray-100' : error ? 'border-dashed border-rose-300 bg-rose-50/60' : 'border-dashed border-gray-300 bg-gray-50'"
+      :class="coverImage ? 'border-transparent bg-sunken' : error ? 'border-dashed border-danger/40 bg-danger/10' : 'border-dashed border-line bg-sunken'"
     >
       <img v-if="coverImage" :src="coverImage.medium_url" alt="" class="h-full w-full object-cover">
-      <div v-else class="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-gray-400">
+      <div v-else class="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-meta">
         <ImagePlus :size="28" />
         <!-- The cover row points at an upload that images:prune or an admin removed. -->
-        <span class="text-xs" :class="{ 'text-rose-500': cover?.image_id }">{{ $t(cover?.image_id ? 'editor.image.missing' : 'editor.image.cover_needed') }}</span>
+        <span class="text-xs" :class="{ 'text-danger': cover?.image_id }">{{ $t(cover?.image_id ? 'editor.image.missing' : 'editor.image.cover_needed') }}</span>
       </div>
-      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-white/70"><span class="loading loading-spinner" /></div>
+      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-card/70 text-meta"><span class="loading loading-spinner" /></div>
     </div>
     <div class="flex gap-1.5">
       <label class="btn btn-sm min-w-0 flex-1 cursor-pointer" :class="{ 'btn-disabled': busy }">
@@ -19,8 +19,8 @@
       </label>
       <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
     </div>
-    <p v-if="(message && !showUrl) || error" class="text-xs text-error">{{ message || error }}</p>
-    <p class="text-[11px] leading-snug text-gray-400">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }}</p>
+    <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
+    <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }}</p>
     <EditorImageImportDialog v-model="showUrl" :busy="busy" :error="message" :description="$t('editor.image.cover_rules', { size: limits.coverMinSize })" @import="fromUrl" />
     <EditorImageCropDialog :file="cropFile" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>

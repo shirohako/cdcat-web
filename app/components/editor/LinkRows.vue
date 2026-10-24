@@ -2,10 +2,10 @@
   <div class="space-y-2">
     <ul v-if="shown.length" class="space-y-1.5">
       <EditorListRow v-for="row in shown" :key="row.id" :invalid="!row.url" @edit="edit(row)" @remove="remove(row)">
-        <span class="max-w-36 shrink-0 truncate rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] font-medium text-gray-600">{{ providerOf(row.link_provider_id) }}</span>
-        <span class="min-w-0 truncate text-sm text-gray-700">{{ bare(row.url) || '—' }}</span>
+        <span class="max-w-36 shrink-0 truncate rounded-md bg-btn px-1.5 py-0.5 text-[11px] font-medium text-btn-content">{{ providerOf(row.link_provider_id) }}</span>
+        <span class="min-w-0 truncate text-sm text-body">{{ bare(row.url) || '—' }}</span>
         <template #actions>
-          <a v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700" :aria-label="$t('editor.dialog.open_link')">
+          <a v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-meta transition-colors hover:bg-ghost-hover hover:text-primary" :aria-label="$t('editor.dialog.open_link')">
             <ExternalLink :size="14" />
           </a>
         </template>
@@ -13,10 +13,10 @@
     </ul>
     <EditorAddButton @click="edit(null)">{{ $t('editor.add_link') }}</EditorAddButton>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.link_edit' : 'editor.add_link')" :description="$t('editor.dialog.link_hint')" :icon="Link2" tone="gray" @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.link_edit' : 'editor.add_link')" :description="$t('editor.dialog.link_hint')" :icon="Link2" @submit="save">
       <div class="space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">URL</span>
+          <span class="mb-1 block text-sm font-medium text-body">URL</span>
           <input
             v-model.trim="form.url"
             data-autofocus
@@ -27,15 +27,15 @@
             placeholder="https://"
             @input="autoDetect"
           >
-          <span v-if="problem" class="mt-1 block text-xs text-error">{{ problem }}</span>
+          <span v-if="problem" class="mt-1 block text-xs text-danger">{{ problem }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.link_provider_id') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.link_provider_id') }}</span>
           <select v-model="form.provider" class="select select-sm w-full" @change="pickedByHand = true">
             <option :value="null" disabled>—</option>
             <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ providerName(provider.name) }}</option>
           </select>
-          <span class="mt-1 block text-[11px] text-gray-400">{{ $t('editor.dialog.link_provider_hint') }}</span>
+          <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_provider_hint') }}</span>
         </label>
       </div>
       <template #footer>

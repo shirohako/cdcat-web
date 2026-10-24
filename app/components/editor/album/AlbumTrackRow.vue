@@ -1,5 +1,5 @@
 <template>
-  <div v-if="track" class="border-b border-gray-100 last:border-b-0" :class="{ 'bg-rose-50/50': errors.length }">
+  <div v-if="track" class="border-b border-line last:border-b-0" :class="{ 'bg-danger/10': errors.length }">
     <div class="flex items-center gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3">
       <input
         v-model.number="track.track_number"
@@ -24,7 +24,7 @@
       <button
         type="button"
         class="btn btn-ghost btn-sm shrink-0 px-1.5"
-        :class="track.is_instrumental ? 'text-violet-600' : 'text-gray-300'"
+        :class="{ 'text-faint hover:text-primary': !track.is_instrumental }"
         :title="$t('catalog.field.is_instrumental')"
         :aria-pressed="track.is_instrumental"
         @click="track.is_instrumental = !track.is_instrumental"
@@ -33,26 +33,26 @@
       <button type="button" class="btn btn-ghost btn-sm shrink-0 px-1.5" :aria-expanded="open" :title="$t('editor.album.track_details')" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </button>
-      <button type="button" class="btn btn-ghost btn-sm shrink-0 px-1.5 text-gray-400 hover:text-error" :aria-label="$t('common.delete')" @click="remove"><X :size="14" /></button>
+      <button type="button" class="btn btn-ghost btn-sm shrink-0 px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="remove"><X :size="14" /></button>
     </div>
-    <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-[11px] text-error">{{ error.message }}</p>
+    <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-[11px] text-danger">{{ error.message }}</p>
 
-    <div v-if="open" class="space-y-4 border-t border-dashed border-gray-200 bg-gray-50/60 px-4 py-3">
+    <div v-if="open" class="space-y-4 border-t border-dashed border-line bg-sunken px-4 py-3">
       <div class="flex flex-wrap items-end gap-3">
         <label class="block sm:hidden">
-          <span class="mb-1 block text-[11px] text-gray-500">{{ $t('catalog.field.duration') }}</span>
+          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.duration') }}</span>
           <EditorDurationInput v-model="track.duration" />
         </label>
         <label class="block">
-          <span class="mb-1 block text-[11px] text-gray-500">{{ $t('catalog.field.number_label') }}</span>
+          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.number_label') }}</span>
           <input v-model="track.number_label" class="input input-sm w-20 font-mono" placeholder="A1" maxlength="10">
         </label>
         <label class="block">
-          <span class="mb-1 block text-[11px] text-gray-500">ISRC</span>
+          <span class="mb-1 block text-[11px] text-meta">ISRC</span>
           <input v-model="track.isrc" class="input input-sm w-36 font-mono uppercase" placeholder="JPXX01234567" maxlength="12">
         </label>
         <label v-if="discs.length > 1" class="block">
-          <span class="mb-1 block text-[11px] text-gray-500">{{ $t('editor.album.move_to_disc') }}</span>
+          <span class="mb-1 block text-[11px] text-meta">{{ $t('editor.album.move_to_disc') }}</span>
           <select :value="String(track.disc_id)" class="select select-sm w-32" @change="moveTo(($event.target as HTMLSelectElement).value)">
             <option v-for="disc in discs" :key="disc.id" :value="String(disc.id)">{{ $t('editor.album.disc_n', { n: disc.position }) }}</option>
           </select>
@@ -66,7 +66,7 @@
       <EditorAlbumTrackOriginals :track-id="track.id" />
 
       <div>
-        <p class="mb-1 text-xs font-semibold text-gray-600">{{ $t('catalog.collection.track_attributes') }}</p>
+        <p class="mb-1 text-xs font-semibold text-body">{{ $t('catalog.collection.track_attributes') }}</p>
         <EditorAttributeRows v-model="album.track_attributes" compact subject="track" :owner="{ field: 'track_id', id: track.id }" :references="editor.references" />
       </div>
     </div>
@@ -101,7 +101,7 @@ const badge = computed(() => {
   return {
     text: t('editor.originals.badge', { count: originals.value.length }),
     title: originals.value.map(row => row.original_title ?? String((editor.references.track?.[String(row.original_track_id)] as { title?: string } | undefined)?.title ?? `#${row.original_track_id}`)).join('\n'),
-    tone: broken ? 'bg-rose-100 text-rose-700' : 'bg-indigo-50 text-indigo-600',
+    tone: broken ? 'bg-danger/15 text-danger' : 'bg-primary/10 text-primary',
   }
 })
 

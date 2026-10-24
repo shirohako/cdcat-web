@@ -55,42 +55,39 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
   <div class="container mx-auto max-w-5xl px-4 py-8 md:px-6">
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-bold text-slate-900">{{ t('article_ui.mine.title') }}</h1>
-        <p class="mt-1 text-sm text-slate-500">{{ t('article_ui.mine.description') }}</p>
+        <h1 class="text-2xl font-bold text-title">{{ t('article_ui.mine.title') }}</h1>
+        <p class="mt-1 text-sm text-meta">{{ t('article_ui.mine.description') }}</p>
       </div>
       <NuxtLink to="/articles/new" class="btn btn-primary btn-sm"><Plus :size="15" />{{ t('article_ui.write') }}</NuxtLink>
     </header>
 
-    <NuxtLink v-if="localNew" to="/articles/new" class="mt-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 transition hover:bg-amber-100">
+    <NuxtLink v-if="localNew" to="/articles/new" class="mt-6 flex items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-warning transition-colors duration-150 ease-out hover:bg-warning/15">
       <HardDrive :size="16" class="shrink-0" />
       <span class="min-w-0 flex-1 truncate">{{ t('article_ui.mine.local_new', { title: localNew.title || t('article_ui.untitled'), time: date(localNew.at) }) }}</span>
       <span class="shrink-0 font-medium">{{ t('article_ui.chooser.continue') }}</span>
     </NuxtLink>
 
-    <nav class="mt-6 flex gap-1 overflow-x-auto border-b border-slate-200" :aria-label="t('article_ui.mine.filter')">
+    <nav class="mt-6 flex gap-1 overflow-x-auto border-b border-line" :aria-label="t('article_ui.mine.filter')">
       <button
         v-for="tab in tabs" :key="tab.value ?? 'all'" type="button"
-        class="-mb-px inline-flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition"
-        :class="status === tab.value ? 'border-violet-500 font-semibold text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-800'"
+        class="-mb-px inline-flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2 text-sm transition-colors duration-150 ease-out"
+        :class="status === tab.value ? 'border-primary font-semibold text-primary' : 'border-transparent text-meta hover:text-title'"
         @click="selectTab(tab.value)">
         {{ tab.value ? t(`article_ui.statuses.${tab.value}`) : t('article_ui.mine.all') }}
-        <span v-if="data" class="rounded-full bg-slate-100 px-1.5 text-[11px] tabular-nums text-slate-500">{{ tab.count }}</span>
+        <span v-if="data" class="rounded-full bg-btn px-1.5 text-[11px] tabular-nums text-btn-content">{{ tab.count }}</span>
       </button>
     </nav>
 
     <CommonLoadError v-if="loadStatus === 'error' && data" class="mt-4" @retry="refresh()" />
     <SkeletonRows v-if="loading" page class="mt-4" :count="6" />
-    <div v-else-if="loadStatus === 'error' && !data" class="py-16 text-center text-sm text-rose-600">
+    <div v-else-if="loadStatus === 'error' && !data" class="py-16 text-center text-sm text-danger">
       {{ localizeError(error) }} <button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
     </div>
-    <div v-else-if="!data?.articles.length" class="py-16 text-center">
-      <FileText :size="28" class="mx-auto text-slate-300" />
-      <p class="mt-3 text-sm text-slate-500">{{ t('article_ui.mine.empty') }}</p>
-    </div>
+    <UiEmpty v-else-if="!data?.articles.length" :title="t('article_ui.mine.empty')" :icon="FileText" class="mt-4" />
     <ul
       v-else
       :key="revealKey"
-      class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white transition-opacity"
+      class="card mt-4 divide-y divide-line transition-opacity"
       :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
       :inert="refetching"
     >
@@ -98,16 +95,16 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-center gap-2">
             <ArticleStatusBadge :status="article.status" />
-            <span v-if="article.type" class="text-xs text-slate-400">{{ typeName(article.type) }}</span>
-            <span v-if="article.featured" class="rounded bg-violet-50 px-1.5 text-[11px] text-violet-600">{{ t('article_ui.featured') }}</span>
+            <span v-if="article.type" class="text-xs text-meta">{{ typeName(article.type) }}</span>
+            <span v-if="article.featured" class="rounded bg-primary/15 px-1.5 text-[11px] text-primary">{{ t('article_ui.featured') }}</span>
           </div>
-          <NuxtLink :to="`/articles/${article.id}/edit`" class="mt-1 block truncate font-medium text-slate-900 hover:text-violet-700">
+          <NuxtLink :to="`/articles/${article.id}/edit`" class="mt-1 block truncate font-medium text-title transition-colors duration-150 ease-out hover:text-primary">
             {{ article.title || t('article_ui.untitled') }}
           </NuxtLink>
-          <p v-if="article.status_reason && (article.status === 'hidden' || article.status === 'locked')" class="mt-1 text-xs text-rose-600">
+          <p v-if="article.status_reason && (article.status === 'hidden' || article.status === 'locked')" class="mt-1 text-xs text-danger">
             {{ t('article_ui.mine.reason') }}{{ article.status_reason }}
           </p>
-          <p class="mt-1 text-xs text-slate-400">
+          <p class="mt-1 text-xs text-meta">
             {{ t('article_ui.mine.updated', { time: date(article.updated_at) }) }}
             <template v-if="article.status === 'published'"> · {{ t('article_ui.views', { count: article.views_count }) }} · {{ t('article_ui.likes', { count: article.likes_count }) }}</template>
           </p>
@@ -117,7 +114,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
             <ExternalLink :size="14" />
           </NuxtLink>
           <NuxtLink :to="`/articles/${article.id}/edit`" class="btn btn-ghost btn-sm"><PenLine :size="14" />{{ t('common.edit') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm text-rose-600" :title="t('common.delete')" @click="deleting = article"><Trash2 :size="14" /></button>
+          <button type="button" class="btn btn-ghost btn-sm text-danger" :title="t('common.delete')" @click="deleting = article"><Trash2 :size="14" /></button>
         </div>
       </li>
     </ul>
@@ -127,9 +124,8 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
       v-model="deleteOpen" variant="delete" :title="t('article_ui.mine.delete_title')"
       :description="t('article_ui.mine.delete_description', { title: deleting?.title || t('article_ui.untitled') })" @confirm="remove" />
     <div
-      v-if="toast.show" class="fixed bottom-6 right-6 z-50 rounded-xl border px-4 py-3 text-sm shadow-lg"
-      :class="toast.type === 'error' ? 'border-rose-200 bg-rose-50 text-rose-700' : 'border-emerald-200 bg-emerald-50 text-emerald-700'" role="status">
-      {{ toast.message }}
+      v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-popover px-4 py-3 text-sm text-body shadow-overlay ring-1 ring-line" role="status">
+      <Icon :name="toast.type === 'error' ? 'lucide:circle-alert' : 'lucide:circle-check'" class="size-4 shrink-0" :class="toast.type === 'error' ? 'text-danger' : 'text-success'" />{{ toast.message }}
     </div>
   </div>
 </template>

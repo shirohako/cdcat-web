@@ -1,46 +1,45 @@
 <template>
-  <div class="min-h-screen relative overflow-hidden bg-linear-to-br from-emerald-50 via-slate-50 to-sky-50 flex items-center justify-center p-4">
+  <div class="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
     <!-- Decorative Background -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(rgba(148,163,184,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.08)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"></div>
-      <div class="absolute rounded-full bg-[radial-gradient(circle,rgba(16,185,129,0.15),transparent_70%)] blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-[radial-gradient(circle,rgba(56,189,248,0.15),transparent_70%)] [animation-delay:2s]"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-[radial-gradient(circle,rgba(244,165,96,0.15),transparent_70%)] [animation-delay:4s]"></div>
+      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"></div>
+      <div class="absolute rounded-full bg-radial from-primary/15 to-transparent to-70% blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"></div>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-radial from-primary/10 to-transparent to-70% [animation-delay:2s]"></div>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-radial from-primary/15 to-transparent to-70% [animation-delay:4s]"></div>
     </div>
 
     <!-- Register Card -->
     <div class="relative z-10 w-full max-w-md">
-      <div class="bg-[linear-gradient(140deg,rgba(255,255,255,0.95),rgba(248,250,252,0.95))] border border-white/80 rounded-4xl p-10 shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] backdrop-blur-md">
+      <div class="card p-10">
         <!-- Header -->
         <div class="text-center mb-8 animate-[fade-in_0.6s_ease_both]">
           <div class="inline-flex items-center gap-2 mb-4">
-            <div class="h-12 w-12 rounded-xl bg-linear-to-br from-emerald-500 to-sky-500 flex items-center justify-center text-white shadow-lg">
+            <div class="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-on-primary">
               <Music :size="24" />
             </div>
           </div>
-          <h1 class="text-3xl font-black text-slate-900 mb-2">{{ $t('auth.register.title') }}</h1>
-          <p class="text-slate-600">{{ $t('auth.register.subtitle') }}</p>
+          <h1 class="text-3xl font-black text-title mb-2">{{ $t('auth.register.title') }}</h1>
+          <p class="text-body">{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <!-- Error Message -->
-        <div v-if="errorMessage || errorDetails.length" class="animate-[fade-in_0.6s_ease_both] bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-          <p v-if="errorMessage" class="text-sm text-red-600 font-bold">{{ errorMessage }}</p>
-          <ul v-if="errorDetails.length" class="text-sm text-red-600 list-disc list-inside">
+        <UiAlert v-if="errorMessage || errorDetails.length" tone="danger" :title="errorMessage" class="animate-[fade-in_0.6s_ease_both] mb-4">
+          <ul v-if="errorDetails.length" class="list-disc list-inside">
             <li v-for="detail in errorDetails" :key="detail">{{ detail }}</li>
           </ul>
-        </div>
+        </UiAlert>
 
         <!-- Registration paused by the site settings -->
-        <div v-if="site?.registration_open === false" role="alert" class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
-          <p class="font-bold text-amber-900">{{ $t('auth.register.closed_title') }}</p>
-          <p class="mt-1 text-sm text-amber-800">{{ $t('auth.register.closed_message') }}</p>
+        <div v-if="site?.registration_open === false" role="alert" class="rounded-lg border border-warning/25 bg-warning/10 p-4 text-center">
+          <p class="font-bold text-warning">{{ $t('auth.register.closed_title') }}</p>
+          <p class="mt-1 text-sm text-body">{{ $t('auth.register.closed_message') }}</p>
         </div>
 
         <!-- Register Form -->
         <form v-else @submit.prevent="handleRegister" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
           <!-- Nickname Input -->
           <div class="flex flex-col gap-2">
-            <label for="nickname" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="nickname" class="flex items-center gap-2 text-sm font-semibold text-body">
               <User :size="16" />
               <span>{{ $t('auth.register.nickname') }}</span>
             </label>
@@ -50,14 +49,14 @@
               type="text"
               :placeholder="$t('auth.register.nickname_placeholder')"
               maxlength="32"
-              class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+              class="input w-full h-11"
               required
             />
           </div>
 
           <!-- Email Input -->
           <div class="flex flex-col gap-2">
-            <label for="email" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="email" class="flex items-center gap-2 text-sm font-semibold text-body">
               <Mail :size="16" />
               <span>{{ $t('auth.register.email') }}</span>
             </label>
@@ -66,14 +65,14 @@
               v-model="formData.email"
               type="email"
               :placeholder="$t('auth.register.email_placeholder')"
-              class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+              class="input w-full h-11"
               required
             />
           </div>
 
           <!-- Verification Code Input -->
           <div class="flex flex-col gap-2">
-            <label for="verificationCode" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="verificationCode" class="flex items-center gap-2 text-sm font-semibold text-body">
               <ShieldCheck :size="16" />
               <span>{{ $t('auth.register.verification_code') }}</span>
             </label>
@@ -84,15 +83,14 @@
                 type="text"
                 :placeholder="$t('auth.register.verification_code_placeholder')"
                 maxlength="6"
-                class="flex-1 py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+                class="input h-11 flex-1"
                 required
               />
               <button
                 type="button"
                 @click="sendVerificationCode"
                 :disabled="!formData.email || countdown > 0 || isSendingCode"
-                class="shrink-0 px-4 py-3 text-sm font-semibold rounded-xl border transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                :class="countdown > 0 ? 'bg-slate-100 text-slate-400 border-slate-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100'"
+                class="btn h-11 shrink-0"
               >
                 {{ countdown > 0 ? `${countdown}s` : $t('auth.register.send_code') }}
               </button>
@@ -101,7 +99,7 @@
 
           <!-- Password Input -->
           <div class="flex flex-col gap-2">
-            <label for="password" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="password" class="flex items-center gap-2 text-sm font-semibold text-body">
               <Lock :size="16" />
               <span>{{ $t('auth.register.password') }}</span>
             </label>
@@ -111,14 +109,14 @@
                 v-model="formData.password"
                 :type="showPassword ? 'text' : 'password'"
                 :placeholder="$t('auth.register.password_placeholder')"
-                class="w-full py-3 px-4 pr-12 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+                class="input w-full h-11 pr-12"
                 required
                 minlength="8"
               />
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-meta hover:text-primary transition-colors"
               >
                 <Eye v-if="!showPassword" :size="20" />
                 <EyeOff v-if="showPassword" :size="20" />
@@ -129,11 +127,11 @@
               <div
                 v-for="i in 4"
                 :key="i"
-                class="h-1 flex-1 rounded-full transition-all duration-300"
-                :class="passwordStrength >= i ? 'bg-emerald-500' : 'bg-slate-200'"
+                class="h-1 flex-1 rounded-full transition-colors duration-300"
+                :class="passwordStrength >= i ? 'bg-success' : 'bg-line'"
               ></div>
             </div>
-            <p class="text-xs text-slate-500 mt-1">
+            <p class="text-xs text-meta mt-1">
               {{ $t('auth.register.password_strength') }}:
               <span :class="passwordStrengthColor">{{ passwordStrengthText }}</span>
             </p>
@@ -141,7 +139,7 @@
 
           <!-- Confirm Password Input -->
           <div class="flex flex-col gap-2">
-            <label for="confirmPassword" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="confirmPassword" class="flex items-center gap-2 text-sm font-semibold text-body">
               <Lock :size="16" />
               <span>{{ $t('auth.register.confirm_password') }}</span>
             </label>
@@ -151,13 +149,13 @@
                 v-model="formData.confirmPassword"
                 :type="showConfirmPassword ? 'text' : 'password'"
                 :placeholder="$t('auth.register.confirm_password_placeholder')"
-                class="w-full py-3 px-4 pr-12 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+                class="input w-full h-11 pr-12"
                 required
               />
               <button
                 type="button"
                 @click="showConfirmPassword = !showConfirmPassword"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-meta hover:text-primary transition-colors"
               >
                 <Eye v-if="!showConfirmPassword" :size="20" />
                 <EyeOff v-if="showConfirmPassword" :size="20" />
@@ -165,7 +163,7 @@
             </div>
             <p
               v-if="formData.confirmPassword && formData.password !== formData.confirmPassword"
-              class="text-xs text-red-500 mt-1"
+              class="text-xs text-danger mt-1"
             >
               {{ $t('auth.register.password_mismatch') }}
             </p>
@@ -173,7 +171,7 @@
 
           <!-- Birthday Input -->
           <div class="flex flex-col gap-2">
-            <label for="birthday" class="flex items-center gap-2 text-sm font-semibold text-slate-600">
+            <label for="birthday" class="flex items-center gap-2 text-sm font-semibold text-body">
               <Cake :size="16" />
               <span>{{ $t('auth.register.birthday') }}</span>
             </label>
@@ -181,10 +179,10 @@
               id="birthday"
               v-model="formData.birthday"
               type="date"
-              class="w-full py-3 px-4 border border-slate-200 rounded-xl text-sm bg-white/90 text-slate-900 transition-all duration-300 outline-none focus:border-emerald-500 focus:shadow-[0_0_0_3px_rgba(16,185,129,0.1)] focus:bg-white placeholder:text-slate-400"
+              class="input w-full h-11"
               required
             />
-            <p class="text-xs text-slate-500 mt-1">{{ $t('auth.register.birthday_hint') }}</p>
+            <p class="text-xs text-meta mt-1">{{ $t('auth.register.birthday_hint') }}</p>
           </div>
 
           <!-- Terms & Conditions -->
@@ -193,16 +191,16 @@
               id="terms"
               v-model="formData.acceptTerms"
               type="checkbox"
-              class="w-4 h-4 mt-0.5 rounded border-slate-300 text-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-0 transition-all cursor-pointer"
+              class="checkbox checkbox-sm mt-0.5 cursor-pointer"
               required
             />
-            <label for="terms" class="text-sm text-slate-600 cursor-pointer">
+            <label for="terms" class="text-sm text-body cursor-pointer">
               {{ $t('auth.register.agree_prefix') }}
-              <NuxtLink to="/terms" class="text-emerald-600 hover:text-emerald-700 font-semibold">
+              <NuxtLink to="/terms" class="link font-semibold">
                 {{ $t('auth.register.terms_of_service') }}
               </NuxtLink>
               {{ $t('auth.register.and') }}
-              <NuxtLink to="/privacy" class="text-emerald-600 hover:text-emerald-700 font-semibold">
+              <NuxtLink to="/privacy" class="link font-semibold">
                 {{ $t('auth.register.privacy_policy') }}
               </NuxtLink>
             </label>
@@ -211,22 +209,22 @@
           <!-- Submit Button -->
           <button
             type="submit"
-            class="flex items-center justify-center gap-2 w-full py-3 px-6 bg-linear-to-r from-emerald-500 to-sky-500 text-white font-semibold rounded-xl cursor-pointer transition-all duration-300 shadow-[0_10px_30px_-20px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-22px_rgba(16,185,129,0.6)] disabled:opacity-50 disabled:cursor-not-allowed"
+            class="btn btn-primary flex w-full h-11"
             :disabled="!isFormValid || isLoading"
           >
-            <div v-if="isLoading" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div v-if="isLoading" class="loading loading-spinner"></div>
             <UserPlus v-else :size="20" />
             <span>{{ isLoading ? $t('auth.register.creating_account') : $t('auth.register.create_account') }}</span>
-            <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-150 ease-out group-hover:translate-x-1" />
           </button>
         </form>
 
         <!-- Login Link -->
         <div class="mt-6 text-center text-sm animate-[fade-in_0.9s_ease_0.1s_both]">
-          <span class="text-slate-600">{{ $t('auth.register.have_account') }}</span>
+          <span class="text-body">{{ $t('auth.register.have_account') }}</span>
           <NuxtLink
             to="/auth/login"
-            class="ml-1 text-emerald-600 hover:text-emerald-700 font-semibold transition-colors"
+            class="link ml-1 font-semibold"
           >
             {{ $t('auth.register.login_now') }}
           </NuxtLink>
@@ -237,7 +235,7 @@
       <div class="mt-6 text-center">
         <NuxtLink
           to="/"
-          class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 transition-colors"
+          class="inline-flex items-center gap-2 text-sm text-body hover:text-primary transition-colors"
         >
           <ArrowLeft :size="16" />
           <span>{{ $t('common.back_home') }}</span>
@@ -354,10 +352,10 @@ const passwordStrengthText = computed(() => {
 
 const passwordStrengthColor = computed(() => {
   const strength = passwordStrength.value
-  if (strength <= 1) return 'text-red-500'
-  if (strength === 2) return 'text-amber-500'
-  if (strength === 3) return 'text-emerald-500'
-  return 'text-emerald-600 font-semibold'
+  if (strength <= 1) return 'text-danger'
+  if (strength === 2) return 'text-warning'
+  if (strength === 3) return 'text-success'
+  return 'text-success font-semibold'
 })
 
 const isFormValid = computed(() => {

@@ -81,15 +81,16 @@ export interface MarkdownEnv {
   references?: Partial<MarkdownReferences> | null
 }
 
+/** Text colours are classes in assets/css/markdown.css, so each can have a light and a dark tone. */
 export const MARKDOWN_TEXT_COLORS = {
-  slate: 'text-slate-600',
-  red: 'text-rose-600',
-  orange: 'text-orange-600',
-  yellow: 'text-amber-600',
-  green: 'text-emerald-600',
-  blue: 'text-sky-600',
-  purple: 'text-violet-600',
-  pink: 'text-pink-600',
+  slate: 'markdown-color-slate',
+  red: 'markdown-color-red',
+  orange: 'markdown-color-orange',
+  yellow: 'markdown-color-yellow',
+  green: 'markdown-color-green',
+  blue: 'markdown-color-blue',
+  purple: 'markdown-color-purple',
+  pink: 'markdown-color-pink',
 } as const
 
 export const MARKDOWN_TEXT_SIZES = {
@@ -168,11 +169,12 @@ export const markdownContainers: readonly MarkdownContainerDefinition[] = [
   },
 ] as const
 
+// Each kind's colours live in assets/css/markdown.css (.markdown-callout-*), one set per theme.
 const CALLOUTS = {
-  info: { icon: 'i', classes: 'border-sky-200 bg-sky-50/80 text-sky-950', iconClasses: 'bg-sky-500 text-white' },
-  tip: { icon: '✓', classes: 'border-emerald-200 bg-emerald-50/80 text-emerald-950', iconClasses: 'bg-emerald-500 text-white' },
-  warning: { icon: '!', classes: 'border-amber-200 bg-amber-50/80 text-amber-950', iconClasses: 'bg-amber-500 text-white' },
-  danger: { icon: '!', classes: 'border-rose-200 bg-rose-50/80 text-rose-950', iconClasses: 'bg-rose-500 text-white' },
+  info: { icon: 'i', classes: 'markdown-callout-info' },
+  tip: { icon: '✓', classes: 'markdown-callout-tip' },
+  warning: { icon: '!', classes: 'markdown-callout-warning' },
+  danger: { icon: '!', classes: 'markdown-callout-danger' },
 } as const
 
 function titleFrom(info: string, name: MarkdownContainerName) {
@@ -492,7 +494,7 @@ for (const definition of markdownContainers) {
       }
 
       const callout = CALLOUTS[name]
-      return `<div class="markdown-container markdown-container-callout ${callout.classes}" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon ${callout.iconClasses}" aria-hidden="true">${callout.icon}</span><strong>${title}</strong></div><div class="markdown-container-body">\n`
+      return `<div class="markdown-container markdown-container-callout ${callout.classes}" role="note"><div class="markdown-container-heading"><span class="markdown-container-icon" aria-hidden="true">${callout.icon}</span><strong>${title}</strong></div><div class="markdown-container-body">\n`
     },
   })
 }

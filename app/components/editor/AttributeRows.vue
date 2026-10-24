@@ -2,27 +2,27 @@
   <div class="space-y-2">
     <ul v-if="shown.length" class="space-y-1.5">
       <EditorListRow v-for="row in shown" :key="row.id" :invalid="empty(row.value)" @edit="edit(row)" @remove="remove(row)">
-        <span class="shrink-0 text-xs text-gray-500">{{ attributeName(row.key) }}<span v-if="attributeNameEn(row.key)" class="ml-1 opacity-60">{{ attributeNameEn(row.key) }}</span></span>
-        <span class="min-w-0 truncate text-sm font-medium text-gray-800">{{ valueText(row) || '—' }}</span>
+        <span class="shrink-0 text-xs text-meta">{{ attributeName(row.key) }}<span v-if="attributeNameEn(row.key)" class="ml-1 opacity-60">{{ attributeNameEn(row.key) }}</span></span>
+        <span class="min-w-0 truncate text-sm font-medium text-title">{{ valueText(row) || '—' }}</span>
       </EditorListRow>
     </ul>
     <EditorAddButton v-if="definitions.length" :small="compact" :disabled="!available.length" @click="edit(null)">{{ $t('editor.add_attribute') }}</EditorAddButton>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.attribute_edit' : 'editor.add_attribute')" :icon="ListChecks" tone="amber" @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.attribute_edit' : 'editor.add_attribute')" :icon="ListChecks" @submit="save">
       <div class="space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.attribute_key') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_key') }}</span>
           <select v-model="form.key" data-autofocus class="select select-sm w-full" @change="form.value = null">
             <option v-for="definition in definitions" :key="definition.key" :value="definition.key" :disabled="!definition.is_multiple && taken(definition.key, editing)">
               {{ fieldLabel(definition.key) }}
             </option>
           </select>
-          <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-gray-400">{{ hint(form.key) }}</span>
+          <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-meta">{{ hint(form.key) }}</span>
         </label>
         <div>
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.attribute_value') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_value') }}</span>
           <EditorAttributeValueInput :key="form.key" v-model="form.value" :definition="attributeDefinition(form.key)" :references="known" @picked="remember" />
-          <span v-if="tried && empty(form.value)" class="mt-1 block text-xs text-error">{{ $t('editor.dialog.attribute_required') }}</span>
+          <span v-if="tried && empty(form.value)" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.attribute_required') }}</span>
         </div>
       </div>
       <template #footer>

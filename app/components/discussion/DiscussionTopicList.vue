@@ -9,13 +9,10 @@ const { t } = useI18n()
 
 <template>
   <div>
-    <div v-if="pinned.length || topics.length" class="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200/80 bg-white">
-      <DiscussionTopicRow v-for="topic in pinned" :key="`pinned-${topic.id}`" :topic="topic" :show-category="showCategory" class="bg-rose-50/30" />
+    <div v-if="pinned.length || topics.length" class="card divide-y divide-line overflow-hidden">
+      <DiscussionTopicRow v-for="topic in pinned" :key="`pinned-${topic.id}`" :topic="topic" :show-category="showCategory" class="bg-rose-50/30 dark:bg-rose-400/5" />
       <DiscussionTopicRow v-for="topic in topics" :key="topic.id" :topic="topic" :show-category="showCategory" />
     </div>
-    <div v-else class="flex min-h-64 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-white text-center">
-      <div class="mb-3 grid size-14 place-items-center rounded-2xl bg-slate-50"><MessagesSquare :size="26" class="text-slate-300" /></div>
-      <p class="text-sm text-slate-400">{{ empty || t('discussions.list.empty') }}</p>
-    </div>
+    <UiEmpty v-else :title="empty || t('discussions.list.empty')" :icon="MessagesSquare" class="card min-h-64" />
   </div>
 </template>

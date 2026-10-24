@@ -1,34 +1,252 @@
 /**
- * Community Markdown containers. Kept outside Tailwind's prose selectors so
- * the same markup looks identical in live preview, published content and the
- * syntax guide.
+ * Rendered Markdown (`.markdown-body`, set by RichContent) and the community containers inside it, styled after the
+ * hexo theme vivia's articles. The same markup looks identical in live preview, published content and the syntax
+ * guide.
  *
- * This file is plain CSS plus Tailwind v4 theme variables (`--color-slate-200`
- * and friends), so it needs the host's Tailwind theme but no build step of its
- * own. Restating the layer order is idempotent and keeps `@layer components`
- * correctly ordered even when this stylesheet is evaluated before the host's
+ * This file is plain CSS on the theme tokens from theme.css (`var(--title)`, `var(--line)` …) and is not compiled by
+ * Tailwind, so it must not use Tailwind's palette variables. Restating the layer order is idempotent and keeps
+ * `@layer components` correctly ordered even when this stylesheet is evaluated before the host's
  * `@import "tailwindcss"`.
  */
 @layer theme, base, components, utilities;
 
+/* Author-picked text colours, a tone for each theme. */
+@layer base {
+  :root,
+  [data-theme="dark"] {
+    --md-slate: oklch(0.72 0.03 255);
+    --md-red: oklch(0.72 0.17 18);
+    --md-orange: oklch(0.77 0.15 50);
+    --md-yellow: oklch(0.83 0.14 85);
+    --md-green: oklch(0.78 0.14 160);
+    --md-blue: oklch(0.76 0.12 235);
+    --md-purple: oklch(0.74 0.15 295);
+    --md-pink: oklch(0.76 0.15 350);
+  }
+
+  [data-theme="light"] {
+    --md-slate: oklch(0.45 0.04 257);
+    --md-red: oklch(0.59 0.24 18);
+    --md-orange: oklch(0.65 0.21 41);
+    --md-yellow: oklch(0.67 0.18 58);
+    --md-green: oklch(0.6 0.145 163);
+    --md-blue: oklch(0.59 0.16 242);
+    --md-purple: oklch(0.54 0.25 293);
+    --md-pink: oklch(0.59 0.24 0);
+  }
+}
+
 @layer components {
+  .markdown-body {
+    color: var(--body);
+    line-height: 1.75;
+    overflow-wrap: break-word;
+  }
+
+  .markdown-body-sm { font-size: 0.875rem; }
+  .markdown-body-base { font-size: 1rem; line-height: 1.8; }
+
+  .markdown-body > :first-child { margin-top: 0; }
+  .markdown-body > :last-child { margin-bottom: 0; }
+
+  .markdown-body :where(p, ul, ol, table, blockquote, pre) {
+    margin-block: 1em;
+  }
+
+  .markdown-body :where(h1, h2, h3, h4, h5, h6) {
+    margin: 1.6em 0 0.6em;
+    color: var(--title);
+    font-weight: 700;
+    line-height: 1.35;
+    scroll-margin-top: 5rem;
+  }
+
+  .markdown-body :where(h1) { font-size: 1.75em; }
+  .markdown-body :where(h2) { font-size: 1.5em; }
+  .markdown-body :where(h3) { font-size: 1.25em; }
+  .markdown-body :where(h4) { font-size: 1.1em; }
+  .markdown-body :where(h5, h6) { font-size: 1em; }
+  .markdown-body :where(h6) { color: var(--meta); }
+
+  .markdown-body :where(strong) { color: var(--title); font-weight: 700; }
+  .markdown-body :where(s, del) { color: var(--meta); }
+
+  /* vivia's links: the theme colour, and a rounded pill behind them on hover. */
+  .markdown-body :where(a:not(.markdown-mention, .markdown-ref-card, .markdown-quote-source)) {
+    margin: -0.1em -0.2em;
+    border-radius: 0.375rem;
+    padding: 0.1em 0.2em;
+    color: var(--primary);
+    text-decoration: none;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background-color 150ms ease-out;
+  }
+
+  .markdown-body :where(a:not(.markdown-mention, .markdown-ref-card, .markdown-quote-source)):hover {
+    background: var(--link-hover);
+  }
+
+  .markdown-body :where(a:not(.markdown-mention, .markdown-ref-card, .markdown-quote-source)):active {
+    background: var(--link-active);
+  }
+
+  .markdown-body :where(ul, ol) { padding-left: 1.5em; }
+  .markdown-body :where(ul) { list-style: disc; }
+  .markdown-body :where(ol) { list-style: decimal; }
+  .markdown-body :where(li) { margin-block: 0.25em; }
+  .markdown-body :where(li)::marker { color: var(--meta); }
+  .markdown-body :where(li > ul, li > ol) { margin-block: 0.25em; }
+
+  /* A flat block in a quieter colour, as in vivia (no bar down the side). */
+  .markdown-body :where(blockquote) {
+    border-radius: 0.5rem;
+    padding: 0.6em 1.2em;
+    background: var(--sunken);
+  }
+
+  .markdown-body :where(blockquote) > :first-child { margin-top: 0; }
+  .markdown-body :where(blockquote) > :last-child { margin-bottom: 0; }
+
+  .markdown-body :where(hr) {
+    margin-block: 2em;
+    border: 0;
+    border-top: 1px dashed var(--line);
+  }
+
+  .markdown-body :where(img) {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 1em auto;
+    border-radius: 0.5rem;
+  }
+
+  .markdown-body :where(code) {
+    border-radius: 0.25rem;
+    padding: 0.15em 0.4em;
+    background: var(--code);
+    color: var(--title);
+    font-size: 0.875em;
+  }
+
+  /* Code blocks stay dark in both themes, as in vivia. */
+  .markdown-body :where(pre) {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    padding: 1em 1.25em;
+    background: var(--codeblock);
+    color: oklch(0.86 0 0);
+    font-size: 0.875em;
+    line-height: 1.6;
+  }
+
+  .markdown-body :where(pre code) {
+    padding: 0;
+    background: none;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .markdown-body :where(pre) ::selection {
+    background: oklch(0.4 0.08 var(--hue));
+  }
+
+  .markdown-body :where(table) {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
+  .markdown-body :where(th, td) {
+    padding: 0.55em 1.25em 0.55em 0;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .markdown-body :where(th:last-child, td:last-child) { padding-right: 0; }
+
+  .markdown-body :where(th) {
+    border-bottom: 2px solid var(--line);
+    color: var(--title);
+    font-weight: 700;
+  }
+
+  .markdown-body :where(td) {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .markdown-body :where(kbd) {
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 0.25rem;
+    padding: 0 0.35em;
+    background: var(--sunken);
+    font-size: 0.85em;
+  }
+
+  .markdown-body :where(mark) {
+    border-radius: 0.2rem;
+    background: color-mix(in oklab, var(--warning) 30%, transparent);
+    color: inherit;
+    padding: 0.08em 0.18em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .markdown-color-slate { color: var(--md-slate); }
+  .markdown-color-red { color: var(--md-red); }
+  .markdown-color-orange { color: var(--md-orange); }
+  .markdown-color-yellow { color: var(--md-yellow); }
+  .markdown-color-green { color: var(--md-green); }
+  .markdown-color-blue { color: var(--md-blue); }
+  .markdown-color-purple { color: var(--md-purple); }
+  .markdown-color-pink { color: var(--md-pink); }
+
+  .markdown-text-underline {
+    padding-inline: 0.04em;
+    background-image: linear-gradient(
+      to bottom,
+      transparent 52%,
+      var(--markdown-underline-color) 52%,
+      var(--markdown-underline-color) 94%,
+      transparent 94%
+    );
+    background-repeat: no-repeat;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .markdown-underline-slate { --markdown-underline-color: color-mix(in oklab, var(--md-slate) 30%, transparent); }
+  .markdown-underline-red { --markdown-underline-color: color-mix(in oklab, var(--md-red) 30%, transparent); }
+  .markdown-underline-orange { --markdown-underline-color: color-mix(in oklab, var(--md-orange) 30%, transparent); }
+  .markdown-underline-yellow { --markdown-underline-color: color-mix(in oklab, var(--md-yellow) 32%, transparent); }
+  .markdown-underline-green { --markdown-underline-color: color-mix(in oklab, var(--md-green) 30%, transparent); }
+  .markdown-underline-blue { --markdown-underline-color: color-mix(in oklab, var(--md-blue) 30%, transparent); }
+  .markdown-underline-purple { --markdown-underline-color: color-mix(in oklab, var(--md-purple) 30%, transparent); }
+  .markdown-underline-pink { --markdown-underline-color: color-mix(in oklab, var(--md-pink) 30%, transparent); }
+
+  @media (forced-colors: active) {
+    .markdown-text-underline {
+      text-decoration: underline 3px;
+      text-underline-offset: 0.12em;
+    }
+  }
+
+  /* Containers (::: info, ::: details …). */
   .markdown-container {
-    margin-block: 1rem;
+    margin-block: 1em;
     border-radius: 0.75rem;
   }
 
-  .markdown-container-body > :first-child {
-    margin-top: 0 !important;
-  }
-
-  .markdown-container-body > :last-child {
-    margin-bottom: 0 !important;
-  }
+  .markdown-container-body > :first-child { margin-top: 0; }
+  .markdown-container-body > :last-child { margin-bottom: 0; }
 
   .markdown-container-details {
     overflow: hidden;
-    border: 1px solid var(--color-slate-200);
-    background: color-mix(in srgb, var(--color-slate-50) 75%, transparent);
+    border: 1px solid var(--line);
+    background: var(--sunken);
   }
 
   .markdown-container-details > summary {
@@ -37,11 +255,14 @@
     list-style: none;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.7rem 0.9rem;
+    padding: 0.7em 0.9em;
+    color: var(--title);
     font-weight: 650;
-    color: var(--color-slate-700);
     user-select: none;
+    transition: color 150ms ease-out;
   }
+
+  .markdown-container-details > summary:hover { color: var(--primary); }
 
   .markdown-container-details > summary::-webkit-details-marker {
     display: none;
@@ -64,14 +285,15 @@
 
   .markdown-container-details > .markdown-container-body {
     box-sizing: border-box;
-    border-top: 1px solid var(--color-slate-200);
-    padding: 0.85rem 0.95rem;
-    background: white;
+    border-top: 1px solid var(--line);
+    padding: 0.85em 0.95em;
   }
 
-  .markdown-container-spoiler > summary {
-    background: var(--color-slate-900);
-    color: white;
+  /* A spoiler stays a dark bar in both themes until it is opened. */
+  .markdown-container-spoiler > summary,
+  .markdown-container-spoiler > summary:hover {
+    background: var(--hero);
+    color: var(--on-media);
   }
 
   .markdown-container-spoiler > summary::before {
@@ -115,9 +337,9 @@
     cursor: pointer;
     border-radius: 0.3rem;
     background:
-      repeating-linear-gradient(135deg, rgb(51 65 85 / 94%) 0 3px, rgb(71 85 105 / 94%) 3px 6px);
+      repeating-linear-gradient(135deg, oklch(0.32 0.03 var(--hue)) 0 3px, oklch(0.38 0.035 var(--hue)) 3px 6px);
     padding-inline: 0.32em;
-    color: white;
+    color: var(--on-media);
     font-size: inherit;
     line-height: inherit;
     box-decoration-break: clone;
@@ -140,13 +362,13 @@
   }
 
   .markdown-inline-spoiler:focus-visible {
-    outline: 2px solid var(--color-sky-500);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 
   .markdown-inline-spoiler.is-revealed {
     cursor: text;
-    background: var(--color-slate-100);
+    background: var(--code);
     color: inherit;
   }
 
@@ -154,11 +376,6 @@
     filter: none;
     opacity: 1;
     user-select: text;
-  }
-
-  .prose img {
-    display: block;
-    max-width: 100%;
   }
 
   .markdown-image-example img {
@@ -170,84 +387,28 @@
     width: 4rem;
   }
 
+  /* Callouts: a tint of the kind's colour (::: info, tip, warning, danger). */
+  .markdown-callout-info { --callout: var(--info); }
+  .markdown-callout-tip { --callout: var(--success); }
+  .markdown-callout-warning { --callout: var(--warning); }
+  .markdown-callout-danger { --callout: var(--danger); }
+
   .markdown-container-callout {
-    border-width: 1px;
-    padding: 0.72rem 0.95rem;
+    border: 1px solid color-mix(in oklab, var(--callout, var(--info)) 28%, transparent);
+    padding: 0.72em 0.95em;
+    background: color-mix(in oklab, var(--callout, var(--info)) 10%, transparent);
   }
 
   .markdown-container-callout .markdown-container-body > p {
-    margin-block: 0.3rem !important;
+    margin-block: 0.3em;
   }
 
   .markdown-container-callout .markdown-container-body > p:first-child {
-    margin-top: 0 !important;
+    margin-top: 0;
   }
 
   .markdown-container-callout .markdown-container-body > p:last-child {
-    margin-bottom: 0 !important;
-  }
-
-  .markdown-container-checklist {
-    overflow: hidden;
-    border: 1px solid var(--color-slate-200);
-    background: white;
-    transition: border-color 180ms ease, box-shadow 180ms ease;
-  }
-
-  .markdown-container-checklist.is-complete {
-    border-color: var(--color-emerald-200);
-    box-shadow: 0 0 0 3px rgb(16 185 129 / 6%);
-  }
-
-  .markdown-checklist-heading {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    border-bottom: 1px solid var(--color-slate-200);
-    background: var(--color-slate-50);
-    padding: 0.65rem 0.8rem;
-    color: var(--color-slate-800);
-  }
-
-  .markdown-checklist-icon {
-    width: 1rem;
-    height: 1rem;
-    flex: none;
-    color: var(--color-slate-600);
-    transition: color 180ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .markdown-container-checklist.is-complete .markdown-checklist-icon {
-    color: var(--color-emerald-600);
-    transform: scale(1.1);
-  }
-
-  .markdown-checklist-progress {
-    margin-left: auto;
-    border-radius: 999px;
-    background: var(--color-slate-200);
-    padding: 0.15rem 0.5rem;
-    color: var(--color-slate-600);
-    font-size: 0.68rem;
-    font-weight: 750;
-    line-height: 1.35;
-    transition: background-color 180ms ease, color 180ms ease;
-  }
-
-  .markdown-container-checklist.is-complete .markdown-checklist-progress {
-    background: var(--color-emerald-100);
-    color: var(--color-emerald-700);
-  }
-
-  .markdown-checklist-body {
-    padding: 0.35rem;
-  }
-
-  .prose .markdown-container-checklist ul.contains-task-list {
-    margin: 0;
-    border: 0;
-    background: transparent;
-    padding: 0 !important;
+    margin-bottom: 0;
   }
 
   .markdown-container-heading {
@@ -257,39 +418,108 @@
     margin-bottom: 0.32rem;
   }
 
+  .markdown-container-heading strong {
+    color: var(--callout, var(--title));
+  }
+
   .markdown-container-icon {
     display: inline-grid;
     width: 1.25rem;
     height: 1.25rem;
+    flex: none;
     place-items: center;
     border-radius: 999px;
+    background: var(--callout, var(--primary));
+    color: var(--on-primary);
     font-size: 0.7rem;
     font-weight: 800;
   }
 
+  .markdown-container-checklist {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .markdown-container-checklist.is-complete {
+    border-color: color-mix(in oklab, var(--success) 40%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--success) 10%, transparent);
+  }
+
+  .markdown-checklist-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    border-bottom: 1px solid var(--line);
+    background: var(--sunken);
+    padding: 0.65em 0.8em;
+    color: var(--title);
+  }
+
+  .markdown-checklist-icon {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+    color: var(--meta);
+    transition: color 180ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .markdown-container-checklist.is-complete .markdown-checklist-icon {
+    color: var(--success);
+    transform: scale(1.1);
+  }
+
+  .markdown-checklist-progress {
+    margin-left: auto;
+    border-radius: 999px;
+    background: var(--btn);
+    padding: 0.15rem 0.5rem;
+    color: var(--btn-content);
+    font-size: 0.68rem;
+    font-weight: 750;
+    line-height: 1.35;
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  .markdown-container-checklist.is-complete .markdown-checklist-progress {
+    background: color-mix(in oklab, var(--success) 18%, transparent);
+    color: var(--success);
+  }
+
+  .markdown-checklist-body {
+    padding: 0.35rem;
+  }
+
+  .markdown-body .markdown-container-checklist ul.contains-task-list {
+    margin: 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
   .markdown-container-steps {
-    border: 1px solid var(--color-slate-200);
-    background: color-mix(in srgb, var(--color-slate-50) 65%, white);
-    padding: 0.5rem 0.65rem;
+    border: 1px solid var(--line);
+    background: var(--sunken);
+    padding: 0.5em 0.65em;
   }
 
   .markdown-container-steps > ol {
     counter-reset: markdown-step;
-    margin: 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .markdown-container-steps > ol > li {
     counter-increment: markdown-step;
     position: relative;
     min-height: 1.15rem;
-    margin: 0 !important;
-    padding: 0 0 0.4rem 1.55rem !important;
+    margin: 0;
+    padding: 0 0 0.4rem 1.55rem;
   }
 
   .markdown-container-steps > ol > li:last-child {
-    padding-bottom: 0 !important;
+    padding-bottom: 0;
   }
 
   .markdown-container-steps > ol > li::marker {
@@ -300,60 +530,53 @@
     content: counter(markdown-step);
     position: absolute;
     left: 0;
-    /* Center the 1rem badge against prose's roughly 1.5rem first line. */
+    /* Center the 1rem badge against the roughly 1.5rem first line. */
     top: 0.25rem;
     display: grid;
     width: 1rem;
     height: 1rem;
     place-items: center;
     border-radius: 999px;
-    background: var(--color-slate-800);
-    color: white;
-    box-shadow: 0 0 0 1px white;
+    background: var(--primary);
+    color: var(--on-primary);
+    box-shadow: 0 0 0 2px var(--sunken);
     font-size: 0.55rem;
     font-weight: 700;
     line-height: 1;
     z-index: 1;
   }
 
-  /* Loose Markdown lists wrap each item in a paragraph. Neutralize prose's
-     paragraph margins so those wrappers do not create large empty gaps. */
+  /* Loose Markdown lists wrap each item in a paragraph; their margins would leave large gaps. */
   .markdown-container-steps > ol > li > p {
-    margin: 0 !important;
+    margin: 0;
   }
 
-  .prose ul.contains-task-list {
+  .markdown-body ul.contains-task-list {
     display: grid;
     gap: 0.2rem;
-    margin-block: 0.75rem;
-    border: 1px solid var(--color-slate-200);
-    border-radius: 0.8rem;
-    background: color-mix(in srgb, var(--color-slate-50) 60%, white);
-    padding: 0.4rem !important;
+    margin-block: 0.75em;
+    border: 1px solid var(--line);
+    border-radius: 0.75rem;
+    background: var(--sunken);
+    padding: 0.4rem;
     list-style: none;
   }
 
-  .prose .task-list-item {
+  .markdown-body .task-list-item {
     display: flex;
     align-items: center;
     gap: 0.65rem;
     margin: 0;
     border: 1px solid transparent;
-    border-radius: 0.65rem;
-    background: color-mix(in srgb, var(--color-slate-50) 72%, white);
+    border-radius: 0.6rem;
     padding: 0.55rem 0.7rem;
     list-style: none;
-    transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+    transition: border-color 150ms ease-out, background-color 150ms ease-out;
   }
 
-  .prose .task-list-item:hover {
-    border-color: var(--color-slate-300);
-    background: white;
-  }
-
-  .prose .task-list-item:has(.task-list-item-checkbox:checked) {
-    border-color: transparent;
-    background: color-mix(in srgb, var(--color-slate-100) 70%, transparent);
+  .markdown-body .task-list-item:hover {
+    border-color: var(--line);
+    background: color-mix(in oklab, var(--title) 5%, transparent);
   }
 
   .task-list-item-checkbox {
@@ -362,9 +585,9 @@
     flex: none;
     cursor: pointer;
     appearance: none;
-    border: 2px solid var(--color-slate-300);
+    border: 2px solid var(--faint);
     border-radius: 999px;
-    background-color: white;
+    background-color: var(--field);
     background-position: center;
     background-repeat: no-repeat;
     background-size: 0.7rem;
@@ -372,7 +595,7 @@
   }
 
   .task-list-item-checkbox:hover {
-    border-color: var(--color-slate-500);
+    border-color: var(--primary);
   }
 
   .task-list-item-checkbox:active {
@@ -380,15 +603,20 @@
   }
 
   .task-list-item-checkbox:focus-visible {
-    outline: 2px solid var(--color-sky-500);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 
+  /* The tick takes the colour of text on the theme colour: dark in the dark theme, white in the light one. */
   .task-list-item-checkbox:checked {
-    border-color: var(--color-slate-900);
-    background-color: var(--color-slate-900);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m3 8.3 3.1 3L13 4.8' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    border-color: var(--primary);
+    background-color: var(--primary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m3 8.3 3.1 3L13 4.8' stroke='%231f2430' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     animation: markdown-task-check 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-theme="light"] .task-list-item-checkbox:checked {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='m3 8.3 3.1 3L13 4.8' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 
   .task-list-item-label {
@@ -400,19 +628,19 @@
   }
 
   .task-list-item-checkbox:checked + .task-list-item-label {
-    color: var(--color-slate-500);
+    color: var(--meta);
     text-decoration: line-through;
-    text-decoration-color: var(--color-slate-300);
+    text-decoration-color: var(--faint);
   }
 
   @keyframes markdown-task-check {
     0% {
       transform: scale(0.72);
-      box-shadow: 0 0 0 0 rgb(15 23 42 / 35%);
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 45%, transparent);
     }
     55% {
       transform: scale(1.12);
-      box-shadow: 0 0 0 0.35rem rgb(15 23 42 / 8%);
+      box-shadow: 0 0 0 0.35rem color-mix(in oklab, var(--primary) 12%, transparent);
     }
     100% {
       transform: scale(1);
@@ -426,71 +654,27 @@
     }
   }
 
-  .prose mark {
-    border-radius: 0.2rem;
-    background: var(--color-yellow-200);
-    color: var(--color-yellow-950);
-    padding: 0.08em 0.18em;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-  }
-
-  .markdown-text-underline {
-    padding-inline: 0.04em;
-    background-image: linear-gradient(
-      to bottom,
-      transparent 52%,
-      var(--markdown-underline-color) 52%,
-      var(--markdown-underline-color) 94%,
-      transparent 94%
-    );
-    background-repeat: no-repeat;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-  }
-
-  .markdown-underline-slate { --markdown-underline-color: rgb(100 116 139 / 26%); }
-  .markdown-underline-red { --markdown-underline-color: rgb(244 63 94 / 26%); }
-  .markdown-underline-orange { --markdown-underline-color: rgb(249 115 22 / 26%); }
-  .markdown-underline-yellow { --markdown-underline-color: rgb(245 158 11 / 28%); }
-  .markdown-underline-green { --markdown-underline-color: rgb(16 185 129 / 26%); }
-  .markdown-underline-blue { --markdown-underline-color: rgb(14 165 233 / 26%); }
-  .markdown-underline-purple { --markdown-underline-color: rgb(139 92 246 / 26%); }
-  .markdown-underline-pink { --markdown-underline-color: rgb(236 72 153 / 26%); }
-
-  @media (forced-colors: active) {
-    .markdown-text-underline {
-      text-decoration: underline 3px;
-      text-underline-offset: 0.12em;
-    }
-  }
-
   /* Discussion syntax: mentions, database tokens and quotes of other posts. */
-  .prose .markdown-mention {
+  .markdown-body .markdown-mention {
     border-radius: 0.3rem;
-    padding: 0 0.15rem;
-    background: color-mix(in srgb, var(--color-sky-100) 70%, transparent);
-    color: var(--color-sky-700);
+    padding: 0 0.2em;
+    background: color-mix(in oklab, var(--primary) 14%, transparent);
+    color: var(--primary);
     font-weight: 600;
     text-decoration: none;
+    transition: background-color 150ms ease-out;
   }
 
-  .prose .markdown-mention:hover {
-    background: var(--color-sky-100);
-    text-decoration: underline;
+  .markdown-body .markdown-mention:hover {
+    background: color-mix(in oklab, var(--primary) 24%, transparent);
   }
 
-  .prose .markdown-ref {
+  .markdown-body .markdown-ref {
     display: inline-flex;
     max-width: 100%;
     align-items: baseline;
     gap: 0.25rem;
     font-weight: 600;
-    text-decoration: none;
-  }
-
-  .prose .markdown-ref:hover {
-    text-decoration: underline;
   }
 
   .markdown-ref-icon {
@@ -501,29 +685,28 @@
     opacity: 0.75;
   }
 
-  .prose .markdown-ref-missing {
-    color: var(--color-slate-400);
+  .markdown-body .markdown-ref-missing {
+    color: var(--faint);
     font-weight: 500;
   }
 
-  .prose .markdown-ref-card {
+  .markdown-body .markdown-ref-card {
     display: flex;
     max-width: 30rem;
     align-items: center;
     gap: 0.75rem;
-    margin-block: 0.75rem;
-    border: 1px solid var(--color-slate-200);
+    margin-block: 0.75em;
     border-radius: 0.75rem;
     padding: 0.6rem;
-    background: var(--color-white);
+    background: var(--sunken);
+    box-shadow: inset 0 0 0 1px var(--line);
     color: inherit;
     text-decoration: none;
-    transition: border-color 150ms ease, box-shadow 150ms ease;
+    transition: box-shadow 150ms ease-out;
   }
 
-  .prose .markdown-ref-card:hover {
-    border-color: var(--color-sky-300);
-    box-shadow: 0 4px 14px rgb(15 23 42 / 0.06);
+  .markdown-body .markdown-ref-card:hover {
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary) 55%, transparent);
   }
 
   .markdown-ref-card-media {
@@ -534,11 +717,11 @@
     place-items: center;
     overflow: hidden;
     border-radius: 0.5rem;
-    background: var(--color-slate-100);
-    color: var(--color-slate-400);
+    background: var(--btn);
+    color: var(--btn-content);
   }
 
-  .prose .markdown-ref-card-media img {
+  .markdown-body .markdown-ref-card-media img {
     width: 100%;
     height: 100%;
     margin: 0;
@@ -562,68 +745,68 @@
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.06em;
-    color: var(--color-slate-400);
+    color: var(--meta);
     text-transform: uppercase;
   }
 
   .markdown-ref-card-title {
     overflow: hidden;
     font-weight: 650;
-    color: var(--color-slate-900);
+    color: var(--title);
     text-overflow: ellipsis;
     white-space: nowrap;
+    transition: color 150ms ease-out;
+  }
+
+  .markdown-ref-card:hover .markdown-ref-card-title {
+    color: var(--primary);
   }
 
   .markdown-ref-card-meta {
     font-size: 0.75rem;
-    color: var(--color-slate-500);
+    color: var(--meta);
   }
 
-  .prose .markdown-quote {
-    margin-block: 0.85rem;
-    border-left: 3px solid var(--color-slate-300);
+  /* A quoted post keeps a bar down its side, so it doesn't read as the author's own blockquote. */
+  .markdown-body .markdown-quote {
+    margin-block: 0.85em;
+    border-left: 3px solid var(--line);
     border-radius: 0 0.6rem 0.6rem 0;
-    padding: 0.55rem 0.85rem;
-    background: color-mix(in srgb, var(--color-slate-50) 85%, transparent);
-    color: var(--color-slate-600);
+    padding: 0.55em 0.85em;
+    color: var(--body);
     font-style: normal;
     quotes: none;
-  }
-
-  .prose .markdown-quote p:first-of-type::before,
-  .prose .markdown-quote p:last-of-type::after {
-    content: none;
   }
 
   .markdown-quote-header {
     margin-bottom: 0.3rem;
     font-size: 0.78rem;
-    color: var(--color-slate-500);
+    color: var(--meta);
   }
 
-  .prose .markdown-quote-source {
+  .markdown-body .markdown-quote-source {
     color: inherit;
     text-decoration: none;
   }
 
-  .prose .markdown-quote-source:hover strong {
-    color: var(--color-sky-700);
+  .markdown-body .markdown-quote-source:hover strong {
+    color: var(--primary);
   }
 
   .markdown-quote-floor {
-    color: var(--color-slate-400);
+    color: var(--faint);
   }
 
   .markdown-quote-missing {
     font-style: italic;
-    color: var(--color-slate-400);
+    color: var(--faint);
   }
 
   .markdown-quote-body > :first-child {
-    margin-top: 0 !important;
+    margin-top: 0;
   }
 
   .markdown-quote-body > :last-child {
-    margin-bottom: 0 !important;
+    margin-bottom: 0;
   }
 }

@@ -58,9 +58,9 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
   <div ref="root" class="relative flex flex-wrap items-center gap-1.5">
     <button
       v-for="item in reactions" :key="item.reaction" type="button"
-      class="inline-flex items-center gap-1 rounded-full border text-xs tabular-nums transition"
+      class="inline-flex items-center gap-1 rounded-full border text-xs tabular-nums transition-colors duration-150 ease-out"
       :class="[
-        item.reacted ? 'border-sky-300 bg-sky-50 text-sky-700' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300',
+        item.reacted ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover',
         compact ? 'h-6 px-1.5' : 'h-7 px-2',
         canReact ? '' : 'cursor-default',
       ]"
@@ -73,17 +73,17 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
     </button>
     <button
       v-if="canReact" type="button"
-      class="grid place-items-center rounded-full border border-dashed border-slate-300 text-slate-400 transition hover:border-slate-400 hover:text-slate-600"
+      class="grid place-items-center rounded-full border border-dashed border-faint text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
       :class="compact ? 'size-6' : 'size-7'" :aria-label="t('discussions.reactions.add')" :aria-expanded="pickerOpen" @click.stop="pickerOpen = !pickerOpen"
     >
       <SmilePlus :size="compact ? 12 : 14" />
     </button>
     <!-- w-max: an absolute box is otherwise only as wide as the chips row, which squeezes the grid. -->
-    <div v-if="pickerOpen" class="absolute bottom-full left-0 z-20 mb-1.5 grid w-max grid-cols-8 gap-0.5 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg" role="menu">
+    <div v-if="pickerOpen" class="absolute bottom-full left-0 z-20 mb-1.5 grid w-max grid-cols-8 gap-0.5 rounded-xl bg-popover p-1.5 shadow-overlay ring-1 ring-line" role="menu">
       <button
         v-for="reaction in DISCUSSION_REACTIONS" :key="reaction" type="button" role="menuitem"
-        class="grid size-8 place-items-center rounded-lg text-lg transition hover:scale-110 hover:bg-slate-100"
-        :class="reactions.find(item => item.reaction === reaction)?.reacted ? 'bg-sky-50' : ''"
+        class="grid size-8 place-items-center rounded-lg text-lg transition-colors duration-150 ease-out hover:bg-ghost-hover"
+        :class="reactions.find(item => item.reaction === reaction)?.reacted ? 'bg-primary/15' : ''"
         :aria-label="t(`discussions.reactions.names.${reaction}`)" :title="t(`discussions.reactions.names.${reaction}`)" @click="toggle(reaction)"
       >
         {{ DISCUSSION_REACTION_EMOJI[reaction] }}

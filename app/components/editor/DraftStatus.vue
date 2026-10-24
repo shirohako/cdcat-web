@@ -1,15 +1,15 @@
 <template>
   <div class="space-y-2">
-    <div v-if="draft.restoredAt.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm text-sky-800">
-      <History :size="16" class="shrink-0" />
+    <div v-if="draft.restoredAt.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-info/25 bg-info/10 px-4 py-2.5 text-sm text-body">
+      <History :size="16" class="shrink-0 text-info" />
       <span class="min-w-0 flex-1">{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}</span>
       <button type="button" class="btn btn-ghost btn-xs" @click="discard">{{ $t('editor.restored_discard') }}</button>
     </div>
-    <p class="flex flex-wrap items-center gap-1.5 text-xs text-gray-400">
+    <p class="flex flex-wrap items-center gap-1.5 text-xs text-meta">
       <span class="inline-block h-2 w-2 rounded-full" :class="dotClass" />
       {{ label }}
-      <NuxtLink v-if="draft.revisionId.value" :to="`/revisions/${draft.revisionId.value}`" class="hover:underline">#{{ draft.revisionId.value }}</NuxtLink>
-      <span class="text-gray-300">·</span>
+      <NuxtLink v-if="draft.revisionId.value" :to="`/revisions/${draft.revisionId.value}`" class="link link-muted">#{{ draft.revisionId.value }}</NuxtLink>
+      <span class="text-faint">·</span>
       <span>{{ $t('editor.local_hint') }}</span>
     </p>
   </div>
@@ -42,6 +42,6 @@ const label = computed(() => ({
 }[props.draft.saveState.value]))
 
 const dotClass = computed(() => ({
-  idle: 'bg-gray-300', dirty: 'bg-amber-400', saving: 'bg-sky-400 animate-pulse', saved: 'bg-emerald-500', error: 'bg-rose-500',
+  idle: 'bg-faint', dirty: 'bg-warning', saving: 'bg-info animate-pulse', saved: 'bg-success', error: 'bg-danger',
 }[props.draft.saveState.value]))
 </script>

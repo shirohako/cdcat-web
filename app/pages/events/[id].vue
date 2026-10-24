@@ -152,67 +152,69 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50">
+  <div class="min-h-screen">
     <template v-if="event">
       <div :class="revealClass">
         <EventHero :event="event" :stats="stats" :has-map="event.has_map ?? false" @jump-map="mapSection?.scrollIntoView({ behavior: 'smooth' })" />
 
         <div class="container mx-auto max-w-6xl space-y-8 px-4 py-8 md:px-8 2xl:max-w-7xl">
           <!-- Venue map with the filters it shares with the list -->
-          <section v-if="event.has_map" ref="mapSection" class="scroll-mt-20 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_12px_32px_-24px_rgba(15,23,42,0.35)]">
-            <header class="flex flex-col gap-3 border-b border-slate-100 p-4 md:p-5">
+          <section v-if="event.has_map" ref="mapSection" class="card scroll-mt-20 overflow-hidden">
+            <header class="flex flex-col gap-3 border-b border-line p-4 md:p-5">
               <div class="flex flex-wrap items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5">
-                  <span class="flex size-9 items-center justify-center rounded-xl bg-slate-900 text-white"><MapPin :size="18" /></span>
+                  <UiIconTile :icon="MapPin" />
                   <div>
-                    <h2 class="text-base font-bold text-slate-900">{{ t('event_page.map.title') }}</h2>
-                    <p class="text-xs text-slate-500">{{ t('event_page.map.hint') }}</p>
+                    <h2 class="text-base font-bold text-title">{{ t('event_page.map.title') }}</h2>
+                    <p class="text-xs text-meta">{{ t('event_page.map.hint') }}</p>
                   </div>
                 </div>
                 <label class="relative w-full sm:w-80">
-                  <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
                   <input
                     v-model="query"
                     type="search"
-                    class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm outline-none transition-colors focus:border-slate-400 focus:bg-white"
+                    class="input w-full pl-9"
                     :placeholder="t('event_page.filters.search')"
                   >
                 </label>
               </div>
 
+              <!-- Genre colours (utils/eventVenue.ts) are the map's, the same in both themes. -->
               <div class="flex flex-wrap items-center gap-2">
                 <button
                   v-for="item in GENRE_FAMILIES"
                   :key="item.key"
                   type="button"
-                  class="filter-chip"
-                  :class="family === item.key ? 'is-active' : ''"
+                  class="chip"
+                  :class="{ 'chip-selected': family === item.key }"
                   :aria-pressed="family === item.key"
                   @click="family = family === item.key ? null : item.key"
                 >
                   <span class="size-2.5 rounded-full" :style="{ background: item.color }" />
                   {{ t(`event_page.families.${item.key}`) }}
-                  <span class="text-slate-400">{{ familyCounts[item.key] ?? 0 }}</span>
+                  <span class="tabular-nums opacity-60">{{ familyCounts[item.key] ?? 0 }}</span>
                 </button>
-                <select v-model="genre" class="filter-chip appearance-none pr-3" :class="genre ? 'is-active' : ''">
+                <select v-model="genre" class="select select-sm" :class="{ 'border-primary bg-primary/10': genre }">
                   <option :value="null">{{ t('event_page.filters.all_genres') }}</option>
                   <option v-for="option in genreOptions" :key="option.code" :value="option.code">{{ option.label }} ({{ option.count }})</option>
                 </select>
-                <select v-if="map && map.halls.length > 1" v-model="hall" class="filter-chip appearance-none pr-3" :class="hall ? 'is-active' : ''">
+                <select v-if="map && map.halls.length > 1" v-model="hall" class="select select-sm" :class="{ 'border-primary bg-primary/10': hall }">
                   <option :value="null">{{ t('event_page.filters.all_halls') }}</option>
                   <option v-for="item in map.halls" :key="item.id" :value="item.id">{{ item.name }}</option>
                 </select>
-                <button type="button" class="filter-chip" :class="onlyChecked ? 'is-active' : ''" :aria-pressed="onlyChecked" @click="onlyChecked = !onlyChecked">
-                  <Star :size="14" :class="onlyChecked ? 'text-amber-500' : 'text-slate-400'" :fill="onlyChecked ? 'currentColor' : 'none'" />
+                <button type="button" class="chip" :class="{ 'chip-selected': onlyChecked }" :aria-pressed="onlyChecked" @click="onlyChecked = !onlyChecked">
+                  <!-- The checklist's gold star -->
+                  <Star :size="14" :class="onlyChecked ? 'text-amber-500 dark:text-amber-400' : 'opacity-60'" :fill="onlyChecked ? 'currentColor' : 'none'" />
                   {{ t('event_page.checklist.title') }}
-                  <span class="text-slate-400">{{ checklist.ids.value.size }}</span>
+                  <span class="tabular-nums opacity-60">{{ checklist.ids.value.size }}</span>
                 </button>
-                <button v-if="filtering" type="button" class="inline-flex items-center gap-1 px-2 text-xs font-medium text-slate-500 hover:text-slate-900" @click="clearFilters">
+                <button v-if="filtering" type="button" class="inline-flex items-center gap-1 px-2 text-xs font-medium text-meta transition-colors duration-150 ease-out hover:text-primary" @click="clearFilters">
                   <X :size="13" />{{ t('event_page.filters.clear') }}
                 </button>
-                <span class="ml-auto flex items-center gap-3 text-xs text-slate-500">
+                <span class="ml-auto flex items-center gap-3 text-xs text-meta">
                   <span v-if="filtering">{{ t('event_page.filters.matching', { count: filtered.length, total: circles.length }) }}</span>
-                  <button type="button" class="inline-flex items-center gap-1.5 hover:text-slate-900" :aria-pressed="colorByGenre" @click="colorByGenre = !colorByGenre">
+                  <button type="button" class="inline-flex items-center gap-1.5 transition-colors duration-150 ease-out hover:text-primary" :aria-pressed="colorByGenre" @click="colorByGenre = !colorByGenre">
                     <Palette :size="14" />{{ colorByGenre ? t('event_page.map.color_genre') : t('event_page.map.color_plain') }}
                   </button>
                 </span>
@@ -233,10 +235,10 @@ useSeoMeta({
                 @select="select"
                 @hall="onHall"
               />
-              <div v-else-if="mapStatus === 'error' || circlesStatus === 'error'" class="flex h-full items-center justify-center bg-slate-50">
+              <div v-else-if="mapStatus === 'error' || circlesStatus === 'error'" class="flex h-full items-center justify-center bg-sunken">
                 <CommonLoadError :message="localizeError(circlesError)" @retry="refreshCircles()" />
               </div>
-              <div v-else class="relative h-full overflow-hidden bg-slate-100">
+              <div v-else class="relative h-full overflow-hidden bg-sunken">
                 <div class="skeleton absolute inset-x-[6%] top-[12%] h-[36%] rounded-lg" style="width: 41%" />
                 <div class="skeleton absolute right-[6%] top-[12%] h-[36%] w-[41%] rounded-lg" />
                 <div class="skeleton absolute inset-x-[6%] bottom-[8%] h-[38%] rounded-lg" />
@@ -246,7 +248,7 @@ useSeoMeta({
 
           <!-- Circles and albums -->
           <section>
-            <div class="mb-4 flex items-center gap-1 border-b border-slate-200">
+            <div class="mb-4 flex items-center gap-1 border-b border-line">
               <button type="button" class="tab-button" :class="{ 'is-active': tab === 'circles' }" @click="tab = 'circles'">
                 <Users :size="16" />{{ t('event_page.tabs.circles') }}
                 <span class="tab-count">{{ filtering || followedHall ? `${listCircles.length}/${circles.length}` : (event.circles_count ?? circles.length) }}</span>
@@ -260,15 +262,15 @@ useSeoMeta({
             <template v-if="tab === 'circles'">
               <div v-if="!event.has_map && circles.length" class="mb-4 flex flex-wrap gap-2">
                 <label class="relative w-full sm:w-80">
-                  <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="query" type="search" class="w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm" :placeholder="t('event_page.filters.search')">
+                  <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+                  <input v-model="query" type="search" class="input w-full pl-9" :placeholder="t('event_page.filters.search')">
                 </label>
               </div>
               <div v-if="circlesStatus === 'error' && !circleData" class="flex min-h-40 items-center justify-center">
                 <CommonLoadError :message="localizeError(circlesError)" @retry="refreshCircles()" />
               </div>
               <div v-else-if="!circleData" class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <div v-for="n in 9" :key="n" class="flex gap-3 rounded-2xl border border-slate-200 bg-white p-3">
+                <div v-for="n in 9" :key="n" class="card flex gap-3 p-3">
                   <div class="skeleton size-20 shrink-0 rounded-xl" />
                   <div class="flex-1 space-y-2 py-1">
                     <div class="skeleton h-4 w-16 rounded" />
@@ -277,20 +279,19 @@ useSeoMeta({
                   </div>
                 </div>
               </div>
-              <div v-else-if="!circles.length" class="flex min-h-40 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-white text-sm text-slate-500">
-                <Layers :size="28" class="text-slate-300" />
-                {{ t('event_page.circles.none') }}
+              <div v-else-if="!circles.length" class="card flex min-h-40 items-center justify-center">
+                <UiEmpty :title="t('event_page.circles.none')" :icon="Layers" />
               </div>
               <template v-else>
-                <div v-if="followedHall" class="mb-3 flex flex-wrap items-center gap-2 rounded-xl bg-blue-50 px-3 py-2 text-sm text-blue-900">
-                  <MapPin :size="15" class="shrink-0 text-blue-500" />
+                <div v-if="followedHall" class="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-info/25 bg-info/10 px-3 py-2 text-sm text-body">
+                  <MapPin :size="15" class="shrink-0 text-info" />
                   <span>{{ t('event_page.circles.following', { hall: followedHall.name, count: listCircles.length }) }}</span>
-                  <button type="button" class="ml-auto font-medium underline underline-offset-2 hover:text-blue-700" @click="followMap = false">{{ t('event_page.circles.show_all_halls') }}</button>
+                  <button type="button" class="link ml-auto font-medium" @click="followMap = false">{{ t('event_page.circles.show_all_halls') }}</button>
                 </div>
                 <button
                   v-else-if="!followMap && mapHall && !hall"
                   type="button"
-                  class="mb-3 text-xs text-slate-500 underline underline-offset-2 hover:text-slate-900"
+                  class="link mb-3 text-xs"
                   @click="followMap = true"
                 >
                   {{ t('event_page.circles.follow_map') }}
@@ -316,20 +317,19 @@ useSeoMeta({
                     <button
                       v-if="albumCircle.get(album.id)"
                       type="button"
-                      class="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-xs text-slate-600 hover:bg-white hover:text-slate-900"
+                      class="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-xs text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                       @click="select(albumCircle.get(album.id)!.id)"
                     >
-                      <MapPin :size="13" class="shrink-0 text-blue-500" />
-                      <span class="font-mono font-semibold text-slate-900">{{ albumCircle.get(album.id)!.space_code ?? t('event_page.circle.catalog_only') }}</span>
+                      <MapPin :size="13" class="shrink-0 text-primary" />
+                      <span class="font-mono font-semibold text-title">{{ albumCircle.get(album.id)!.space_code ?? t('event_page.circle.catalog_only') }}</span>
                       <span class="truncate">{{ albumCircle.get(album.id)!.name }}</span>
                     </button>
                   </div>
                 </div>
                 <CommonPagination :page="albumPage" :total-pages="albumData.pagination.last_page" :disabled="albumsRefetching" @update:page="albumPage = $event" />
               </div>
-              <div v-else class="flex min-h-40 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-200 bg-white text-sm text-slate-500">
-                <Disc3 :size="28" class="text-slate-300" />
-                {{ t('event_page.albums.empty') }}
+              <div v-else class="card flex min-h-40 items-center justify-center">
+                <UiEmpty :title="t('event_page.albums.empty')" :icon="Disc3" />
               </div>
             </template>
           </section>
@@ -359,27 +359,6 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  border-radius: 9999px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  padding: 0.3rem 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #334155;
-  transition: border-color 0.15s, background-color 0.15s;
-}
-.filter-chip:hover {
-  border-color: #cbd5e1;
-}
-.filter-chip.is-active {
-  border-color: #0f172a;
-  background: #f8fafc;
-  box-shadow: inset 0 0 0 1px #0f172a;
-}
 .tab-button {
   margin-bottom: -1px;
   display: inline-flex;
@@ -389,21 +368,21 @@ useSeoMeta({
   padding: 0.75rem 1rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #64748b;
-  transition: color 0.15s, border-color 0.15s;
+  color: var(--meta);
+  transition: color 150ms ease-out, border-color 150ms ease-out;
 }
 .tab-button:hover {
-  color: #0f172a;
+  color: var(--title);
 }
 .tab-button.is-active {
-  border-color: #0f172a;
-  color: #0f172a;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 .tab-count {
   border-radius: 9999px;
-  background: #f1f5f9;
+  background: var(--btn);
   padding: 0.05rem 0.5rem;
   font-size: 0.75rem;
-  color: #475569;
+  color: var(--btn-content);
 }
 </style>

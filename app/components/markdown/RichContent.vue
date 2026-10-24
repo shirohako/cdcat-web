@@ -1,9 +1,11 @@
 <script setup lang="ts">
 /**
- * Renders rich user content as styled prose. `format` selects the source:
- * `'html'` is output as-is, `'markdown'` is parsed via the shared markdown-it
- * instance in `utils/markdown`. `env` carries the summaries mentions, quotes and
- * `[[type:id]]` tokens render with (a discussion API's `references`).
+ * Renders rich user content as styled prose (`.markdown-body` in
+ * assets/css/markdown.css). `format` selects the source: `'html'` is output
+ * as-is, `'markdown'` is parsed via the shared markdown-it instance in
+ * `utils/markdown`. `env` carries the summaries mentions, quotes and
+ * `[[type:id]]` tokens render with (a discussion API's `references`). `size`
+ * is `sm` for comments and other compact places, `base` for articles.
  *
  * Content is community-authored — sanitize upstream if the source is untrusted.
  *
@@ -15,11 +17,12 @@ import { computed } from 'vue'
 import { renderMarkdown, type MarkdownEnv } from '~/utils/markdown'
 import { useMarkdownT } from '~/utils/markdownI18n'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   content: string
   format: 'html' | 'markdown'
   env?: MarkdownEnv | null
-}>()
+  size?: 'sm' | 'base'
+}>(), { env: undefined, size: 'sm' })
 const { t } = useMarkdownT()
 
 const html = computed(() =>
@@ -110,7 +113,8 @@ function handleSpoilerKeydown(event: KeyboardEvent) {
   <!-- The renderer escapes all source HTML; its output is the only markup here. -->
   <!-- eslint-disable vue/no-v-html -->
   <div
-    class="prose prose-sm max-w-none prose-slate prose-a:text-sky-600 prose-img:rounded-lg prose-pre:bg-slate-900"
+    class="markdown-body"
+    :class="size === 'base' ? 'markdown-body-base' : 'markdown-body-sm'"
     @click="handleContentClick"
     @keydown="handleSpoilerKeydown"
     v-html="html"

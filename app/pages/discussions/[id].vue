@@ -298,81 +298,81 @@ useHead(() => ({
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)] bg-slate-50/60">
+  <div class="relative min-h-[calc(100vh-4rem)]">
     <div class="container mx-auto max-w-5xl px-4 py-6 md:px-6">
-      <div v-if="status === 'error' && !topic" class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
-        <p class="text-sm text-slate-500">{{ localizeError(error) }}</p>
-        <NuxtLink to="/discussions" class="mt-3 inline-block text-sm text-sky-700 hover:underline">{{ t('discussions.back') }}</NuxtLink>
+      <div v-if="status === 'error' && !topic" class="card p-10 text-center">
+        <p class="text-sm text-meta">{{ localizeError(error) }}</p>
+        <NuxtLink to="/discussions" class="link mt-3 inline-block text-sm">{{ t('discussions.back') }}</NuxtLink>
       </div>
       <template v-else-if="topic && !redirecting">
         <!-- A page of floors that failed to load: the previous floors stay below. -->
         <CommonLoadError v-if="status === 'error'" class="mb-3" @retry="refresh()" />
-        <nav class="mb-3 flex flex-wrap items-center gap-1 text-xs text-slate-400" :aria-label="t('discussions.breadcrumb')">
-          <NuxtLink to="/discussions" class="hover:text-slate-600">{{ t('discussions.title') }}</NuxtLink>
+        <nav class="mb-3 flex flex-wrap items-center gap-1 text-xs text-meta" :aria-label="t('discussions.breadcrumb')">
+          <NuxtLink to="/discussions" class="transition-colors duration-150 ease-out hover:text-primary">{{ t('discussions.title') }}</NuxtLink>
           <template v-if="topic.category?.parent">
             <ChevronRight :size="12" />
-            <NuxtLink :to="`/discussions/c/${topic.category.parent.slug}`" class="hover:text-slate-600">{{ categoryName(topic.category.parent) }}</NuxtLink>
+            <NuxtLink :to="`/discussions/c/${topic.category.parent.slug}`" class="transition-colors duration-150 ease-out hover:text-primary">{{ categoryName(topic.category.parent) }}</NuxtLink>
           </template>
           <template v-if="topic.category">
             <ChevronRight :size="12" />
-            <NuxtLink :to="`/discussions/c/${topic.category.slug}`" class="hover:text-slate-600">{{ categoryName(topic.category) }}</NuxtLink>
+            <NuxtLink :to="`/discussions/c/${topic.category.slug}`" class="transition-colors duration-150 ease-out hover:text-primary">{{ categoryName(topic.category) }}</NuxtLink>
           </template>
         </nav>
 
-        <header class="rounded-2xl border border-slate-200/80 bg-white p-5">
-          <div v-if="topic.status !== 'visible'" class="mb-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <header class="card p-5">
+          <div v-if="topic.status !== 'visible'" class="mb-3 rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
             {{ t('discussions.topic.hidden_notice') }}
           </div>
           <div class="flex flex-wrap items-start gap-3">
-            <h1 class="min-w-0 flex-1 text-xl font-bold leading-snug text-slate-950 sm:text-2xl">
-              <Pin v-if="topic.pinned" :size="18" class="mr-1 inline text-rose-500" :aria-label="t('discussions.status.pinned')" />
+            <h1 class="min-w-0 flex-1 text-xl font-bold leading-snug text-title sm:text-2xl">
+              <Pin v-if="topic.pinned" :size="18" class="mr-1 inline text-rose-500 dark:text-rose-400" :aria-label="t('discussions.status.pinned')" />
               <Star v-if="topic.featured" :size="18" class="mr-1 inline fill-amber-400 text-amber-400" :aria-label="t('discussions.status.featured')" />
-              <Lock v-if="topic.locked" :size="18" class="mr-1 inline text-slate-400" :aria-label="t('discussions.status.locked')" />
+              <Lock v-if="topic.locked" :size="18" class="mr-1 inline text-meta" :aria-label="t('discussions.status.locked')" />
               {{ topic.title }}
             </h1>
             <div class="flex items-center gap-1.5">
               <DiscussionLevelMenu v-if="isAuthenticated" :level="topic.viewer.notification_level" kind="topic" :target-id="topic.id" @update:level="value => topic.viewer.notification_level = value" />
-              <button v-if="topic.viewer.can.edit" type="button" class="grid size-8 place-items-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50" :aria-label="t('discussions.topic.edit_title')" @click="editingTopic = topic">
+              <button v-if="topic.viewer.can.edit" type="button" class="btn btn-outline btn-sm btn-square" :aria-label="t('discussions.topic.edit_title')" @click="editingTopic = topic">
                 <Pencil :size="14" />
               </button>
-              <button v-if="moderator" type="button" class="grid size-8 place-items-center rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50" :aria-label="t('discussions.moderation.topic_title')" @click="moderatingTopic = topic">
+              <button v-if="moderator" type="button" class="grid size-8 place-items-center rounded-lg border border-indigo-200 text-indigo-600 transition-colors duration-150 ease-out hover:bg-indigo-50 dark:border-indigo-400/25 dark:text-indigo-400 dark:hover:bg-indigo-400/15" :aria-label="t('discussions.moderation.topic_title')" @click="moderatingTopic = topic">
                 <Shield :size="14" />
               </button>
             </div>
           </div>
-          <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-500">
+          <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-meta">
             <DiscussionCategoryBadge :category="topic.category" size="sm" />
-            <NuxtLink v-for="tag in topic.tags" :key="tag.id" :to="`/discussions/tags/${tag.slug}`" class="text-slate-400 hover:text-sky-700">#{{ tagName(tag) }}</NuxtLink>
+            <NuxtLink v-for="tag in topic.tags" :key="tag.id" :to="`/discussions/tags/${tag.slug}`" class="transition-colors duration-150 ease-out hover:text-primary">#{{ tagName(tag) }}</NuxtLink>
             <span class="inline-flex items-center gap-1"><UserRound :size="12" />{{ topic.author?.nickname || topic.author?.username }}</span>
             <time :datetime="topic.created_at ?? undefined" :title="exact(topic.created_at)">{{ ago(topic.created_at) }}</time>
             <span class="inline-flex items-center gap-1"><MessageSquare :size="12" />{{ t('discussions.topic.replies', { count: topic.replies_count }) }}</span>
             <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('discussions.topic.views', { count: topic.views_count }) }}</span>
-            <NuxtLink v-if="topic.article" :to="`/articles/${topic.article.id}${topic.article.slug ? `/${topic.article.slug}` : ''}`" class="text-sky-700 hover:underline">{{ t('discussions.topic.article', { title: topic.article.title }) }}</NuxtLink>
+            <NuxtLink v-if="topic.article" :to="`/articles/${topic.article.id}${topic.article.slug ? `/${topic.article.slug}` : ''}`" class="link">{{ t('discussions.topic.article', { title: topic.article.title }) }}</NuxtLink>
           </div>
           <NuxtLink
             v-if="topic.accepted_post" :to="`/discussions/${topic.id}?post=${topic.accepted_post.id}`"
-            class="mt-4 flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-2.5 text-sm transition hover:bg-emerald-50"
+            class="mt-4 flex items-start gap-2 rounded-xl border border-success/25 bg-success/10 px-3 py-2.5 text-sm transition-colors duration-150 ease-out hover:bg-success/15"
           >
-            <CheckCircle2 :size="16" class="mt-0.5 shrink-0 text-emerald-600" />
+            <CheckCircle2 :size="16" class="mt-0.5 shrink-0 text-success" />
             <span class="min-w-0">
-              <span class="font-semibold text-emerald-800">{{ t('discussions.answer.summary', { floor: topic.accepted_post.floor, name: topic.accepted_post.user?.nickname || topic.accepted_post.user?.username }) }}</span>
-              <span class="mt-0.5 block line-clamp-2 text-emerald-900/80">{{ topic.accepted_post.excerpt }}</span>
+              <span class="font-semibold text-success">{{ t('discussions.answer.summary', { floor: topic.accepted_post.floor, name: topic.accepted_post.user?.nickname || topic.accepted_post.user?.username }) }}</span>
+              <span class="mt-0.5 block line-clamp-2 text-body">{{ topic.accepted_post.excerpt }}</span>
             </span>
           </NuxtLink>
         </header>
 
-        <ArticleLinkCards v-if="topic.links.length" :links="topic.links" class="mt-4 border border-slate-200/80" />
+        <ArticleLinkCards v-if="topic.links.length" :links="topic.links" class="mt-4" />
 
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition" :class="authorOnly ? 'border-sky-300 bg-sky-50 text-sky-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'" @click="go({ author: authorOnly ? null : 'op', page: null })">
+          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors duration-150 ease-out" :class="authorOnly ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover hover:text-primary'" @click="go({ author: authorOnly ? null : 'op', page: null })">
             <UserRound :size="13" />{{ t('discussions.topic.only_op') }}
           </button>
-          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition" :class="descending ? 'border-sky-300 bg-sky-50 text-sky-700' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'" @click="go({ order: descending ? null : 'desc', page: null })">
+          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors duration-150 ease-out" :class="descending ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover hover:text-primary'" @click="go({ order: descending ? null : 'desc', page: null })">
             <ArrowDownWideNarrow :size="13" />{{ t('discussions.topic.newest_first') }}
           </button>
-          <form class="flex items-center gap-1 text-xs text-slate-500" @submit.prevent="jumpToFloor">
+          <form class="flex items-center gap-1 text-xs text-meta" @submit.prevent="jumpToFloor">
             <label :for="`jump-${topic.id}`">{{ t('discussions.topic.jump') }}</label>
-            <input :id="`jump-${topic.id}`" v-model="jump" inputmode="numeric" pattern="[0-9]*" class="h-8 w-16 rounded-lg border border-slate-200 bg-white px-2 text-center text-xs outline-none focus:border-sky-400" placeholder="#">
+            <input :id="`jump-${topic.id}`" v-model="jump" inputmode="numeric" pattern="[0-9]*" class="input input-sm w-16 px-2 text-center text-xs" placeholder="#">
           </form>
           <CommonPagination v-if="pagination && pagination.last_page > 1" class="ml-auto" :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" @update:page="value => go({ page: value > 1 ? value : null })" />
         </div>
@@ -385,7 +385,7 @@ useHead(() => ({
           />
         </div>
 
-        <button v-if="newActivity" type="button" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-sky-200 bg-sky-50 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-100" @click="showNew">
+        <button v-if="newActivity" type="button" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 py-2.5 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/15" @click="showNew">
           <RefreshCw :size="14" />{{ t('discussions.topic.new_replies', { count: newCount }) }}
         </button>
 
@@ -393,17 +393,17 @@ useHead(() => ({
           <CommonPagination :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" @update:page="value => go({ page: value > 1 ? value : null })" />
         </div>
 
-        <section ref="composerSection" class="mt-6 scroll-mt-24 rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5">
+        <section ref="composerSection" class="card mt-6 scroll-mt-24 p-4 sm:p-5">
           <template v-if="topic.viewer.can.reply">
-            <h2 class="mb-3 text-sm font-semibold text-slate-800">{{ t('discussions.composer.title') }}</h2>
+            <h2 class="mb-3 text-sm font-semibold text-title">{{ t('discussions.composer.title') }}</h2>
             <DiscussionComposer ref="composer" :topic-id="topic.id" @posted="posted" />
           </template>
-          <p v-else-if="!isAuthenticated" class="text-center text-sm text-slate-500">
-            <NuxtLink :to="{ path: '/auth/login', query: { redirect: route.fullPath } }" class="font-medium text-sky-700 hover:underline">{{ t('discussions.composer.login') }}</NuxtLink>
+          <p v-else-if="!isAuthenticated" class="text-center text-sm text-meta">
+            <NuxtLink :to="{ path: '/auth/login', query: { redirect: route.fullPath } }" class="link font-medium">{{ t('discussions.composer.login') }}</NuxtLink>
           </p>
-          <p v-else class="flex items-center justify-center gap-1.5 text-sm text-slate-500"><Lock :size="14" />{{ topic.locked ? t('discussions.composer.locked') : t('discussions.composer.closed') }}</p>
+          <p v-else class="flex items-center justify-center gap-1.5 text-sm text-meta"><Lock :size="14" />{{ topic.locked ? t('discussions.composer.locked') : t('discussions.composer.closed') }}</p>
           <p v-if="topic.viewer.can.delete && topic.replies_count === 0" class="mt-3 text-right text-xs">
-            <button type="button" class="text-rose-600 hover:underline" @click="confirmDeleteTopic = true">{{ t('discussions.topic.delete') }}</button>
+            <button type="button" class="text-danger hover:underline" @click="confirmDeleteTopic = true">{{ t('discussions.topic.delete') }}</button>
           </p>
         </section>
       </template>

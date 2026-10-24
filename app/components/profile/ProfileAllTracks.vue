@@ -1,19 +1,17 @@
 <template>
   <section>
-    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div class="card p-5">
       <!-- Header -->
       <div class="mb-5 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('back')">
+          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-meta hover:bg-ghost-hover hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('back')">
             <ArrowLeft :size="16" />
           </button>
-          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
-            <Music :size="18" class="text-gray-400" />
+          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-title">
+            <Music :size="18" class="text-meta" />
             {{ $t('profile.favorite_tracks') }}
           </h2>
-          <span v-if="pagination.total" class="inline-flex items-center rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-600 ring-1 ring-rose-200/60">
-            {{ pagination.total }}
-          </span>
+          <UiCount v-if="pagination.total" :value="pagination.total" size="sm" />
         </div>
       </div>
 
@@ -22,16 +20,11 @@
 
       <!-- Error -->
       <div v-else-if="status === 'error' && !response" class="flex min-h-[20vh] items-center justify-center">
-        <p class="text-sm text-gray-400">{{ error?.message }}</p>
+        <p class="text-sm text-meta">{{ error?.message }}</p>
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!tracks.length" class="flex flex-col items-center justify-center py-10 text-center">
-        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50">
-          <Music :size="26" class="text-rose-400" />
-        </div>
-        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_tracks') }}</p>
-      </div>
+      <UiEmpty v-else-if="!tracks.length" :title="$t('profile.no_favorite_tracks')" :icon="Music" />
 
       <!-- Tracks list -->
       <template v-else>
@@ -41,10 +34,10 @@
             v-for="track in tracks"
             :key="track.id"
             :to="track.album ? `/albums/${track.album.id}` : undefined"
-            class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
+            class="group flex items-center gap-3 rounded-xl bg-sunken px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           >
             <!-- Album cover -->
-            <div class="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-gray-100 ring-1 ring-black/5">
+            <div class="h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-sunken ring-1 ring-line">
               <img
                 v-if="hasCover(track)"
                 :src="track.album!.image_url!"
@@ -53,17 +46,17 @@
                 loading="lazy"
                 @error="onCoverError(track.id)"
               >
-              <div v-else class="grid h-full w-full place-items-center bg-linear-to-br from-rose-50 to-pink-100">
-                <Music :size="16" class="text-rose-400" />
+              <div v-else class="grid h-full w-full place-items-center bg-sunken">
+                <Music :size="16" class="text-faint" />
               </div>
             </div>
 
             <!-- Track info -->
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-gray-900 group-hover:text-blue-700 transition-colors">
+              <p class="truncate text-sm font-medium text-title group-hover:text-primary transition-colors">
                 {{ track.title }}
               </p>
-              <div class="mt-0.5 flex items-center gap-2 text-[11px] text-gray-400">
+              <div class="mt-0.5 flex items-center gap-2 text-[11px] text-meta">
                 <span v-if="track.album" class="truncate">{{ track.album.title }}</span>
                 <span v-if="track.track_number" class="shrink-0">
                   <template v-if="track.disc_number">Disc {{ track.disc_number }} · </template>#{{ track.track_number }}
@@ -73,14 +66,14 @@
 
             <!-- Duration & date -->
             <div class="shrink-0 text-right">
-              <p v-if="track.duration" class="tabular-nums text-xs font-medium text-gray-500">{{ formatDuration(track.duration) }}</p>
-              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-gray-400">
+              <p v-if="track.duration" class="tabular-nums text-xs font-medium text-meta">{{ formatDuration(track.duration) }}</p>
+              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-meta">
                 <Heart :size="11" />
                 <span>{{ formatDate(track.favorited_at) }}</span>
               </p>
             </div>
 
-            <ChevronRight :size="14" class="ml-1 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+            <ChevronRight :size="14" class="ml-1 text-faint group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
           </component>
         </div>
 

@@ -48,15 +48,15 @@ const { data, status: loadStatus, refresh, loading, refetching, revealKey, revea
       <nav class="flex flex-wrap gap-1" :aria-label="t('discussions.list.tabs')">
         <button
           v-for="value in tabs" :key="value" type="button"
-          class="rounded-lg px-3 py-1.5 text-sm font-medium transition"
-          :class="tab === value ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-white hover:text-slate-900 hover:shadow-sm'"
+          class="chip"
+          :class="{ 'chip-selected': tab === value }"
           :aria-pressed="tab === value" @click="update({ tab: value === 'latest' ? null : value })"
         >
           {{ t(`discussions.list.tab.${value}`) }}
         </button>
       </nav>
       <select
-        v-if="question" :value="status ?? ''" class="ml-auto rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-slate-600"
+        v-if="question" :value="status ?? ''" class="select select-sm ml-auto"
         :aria-label="t('discussions.list.status')" @change="update({ status: ($event.target as HTMLSelectElement).value || null })"
       >
         <option value="">{{ t('discussions.list.status_all') }}</option>
@@ -77,10 +77,10 @@ const { data, status: loadStatus, refresh, loading, refetching, revealKey, revea
         :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })"
       />
     </template>
-    <div v-else-if="loadStatus === 'error'" class="flex min-h-60 flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white text-sm text-slate-500">
-      {{ t('common.load_failed') }}<button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
+    <div v-else-if="loadStatus === 'error'" class="card flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-meta">
+      {{ t('common.load_failed') }}<button type="button" class="link" @click="refresh()">{{ t('common.retry') }}</button>
     </div>
-    <SkeletonStatus v-else-if="loading" page class="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200/80 bg-white">
+    <SkeletonStatus v-else-if="loading" page class="card divide-y divide-line overflow-hidden">
       <div v-for="row in 8" :key="row" class="flex items-center gap-3 px-4 py-4">
         <div class="skeleton size-9 shrink-0 rounded-full" />
         <div class="flex-1 space-y-2">

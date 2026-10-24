@@ -45,7 +45,7 @@
         <input v-model.trim="form.source" class="input input-sm">
       </label>
     </div>
-    <label class="flex items-center gap-2 text-xs text-gray-600">
+    <label class="flex items-center gap-2 text-xs text-body">
       <input v-model="form.is_ai_generated" type="checkbox" class="checkbox checkbox-xs">{{ $t('lyrics_ui.ai_generated') }}
     </label>
     <label v-if="lyric" class="form-control">
@@ -53,8 +53,8 @@
       <input v-model.trim="form.summary" class="input input-sm" :placeholder="$t('lyrics_ui.summary_placeholder')">
     </label>
 
-    <p v-if="errorMessage" class="text-sm text-error">{{ errorMessage }}</p>
-    <p class="text-[11px] text-gray-400">{{ $t('lyrics_ui.moderation_hint') }}</p>
+    <p v-if="errorMessage" class="text-sm text-danger">{{ errorMessage }}</p>
+    <p class="text-[11px] text-meta">{{ $t('lyrics_ui.moderation_hint') }}</p>
     <div class="flex justify-end gap-2">
       <button type="button" class="btn btn-sm btn-ghost" @click="$emit('cancel')">{{ $t('common.cancel') }}</button>
       <button type="submit" class="btn btn-sm btn-primary" :disabled="saving">

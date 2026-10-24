@@ -1,7 +1,7 @@
 <template>
   <div
     ref="root"
-    class="venue-map relative select-none overflow-hidden bg-slate-100"
+    class="venue-map relative select-none overflow-hidden bg-sunken"
     :class="{ 'is-detailed': detailed, 'is-filtered': highlighted !== null }"
     @pointerleave="engaged = false"
   >
@@ -15,10 +15,10 @@
     >
       <defs>
         <pattern id="venue-dots" width="14" height="14" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="1" fill="#cbd5e1" />
+          <circle cx="1" cy="1" r="1" class="venue-dot" />
         </pattern>
         <filter id="venue-hall-shadow" x="-5%" y="-5%" width="110%" height="110%">
-          <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.12" />
+          <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-opacity="0.12" class="venue-shadow" />
         </filter>
       </defs>
       <rect width="100%" height="100%" fill="url(#venue-dots)" />
@@ -46,8 +46,8 @@
             v-for="(shape, i) in map.background"
             :key="i"
             :d="shape.d"
-            :fill="shape.w ? 'none' : tone(shape.s)"
-            :stroke="shape.w ? tone(shape.s) : undefined"
+            :fill="shape.w ? 'none' : undefined"
+            :style="shape.w ? { stroke: tone(shape.s) } : { fill: tone(shape.s) }"
             :stroke-width="shape.w"
             :fill-rule="shape.e ? 'evenodd' : undefined"
           />
@@ -82,7 +82,7 @@
               :width="Math.max(piece.w - 0.7, 0.5)"
               :height="Math.max(piece.h - 0.7, 0.5)"
               rx="0.9"
-              :fill="pieceFill(piece)"
+              :style="{ fill: pieceFill(piece) }"
               :class="pieceClass(piece)"
             />
           </g>
@@ -127,11 +127,11 @@
 
     <!-- Breadcrumb and halls -->
     <div class="pointer-events-none absolute inset-x-0 top-0 flex flex-wrap items-center gap-2 p-3">
-      <nav class="pointer-events-auto flex items-center gap-1 rounded-full bg-white/95 p-1 text-sm shadow-sm ring-1 ring-slate-200 backdrop-blur">
+      <nav class="pointer-events-auto flex items-center gap-1 rounded-full bg-card/80 p-1 text-sm ring-1 ring-line backdrop-blur">
         <button
           type="button"
-          class="rounded-full px-3 py-1 font-medium transition-colors"
-          :class="currentHallId ? 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' : 'bg-slate-900 text-white'"
+          class="rounded-full px-3 py-1 font-medium transition-colors duration-150 ease-out"
+          :class="currentHallId ? 'text-meta hover:bg-ghost-hover hover:text-primary' : 'bg-primary text-on-primary'"
           @click="showOverview()"
         >
           {{ t('event_page.map.overview') }}
@@ -140,8 +140,8 @@
           v-for="hall in map.halls"
           :key="hall.id"
           type="button"
-          class="rounded-full px-3 py-1 font-medium whitespace-nowrap transition-colors"
-          :class="hall.id === currentHallId ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+          class="rounded-full px-3 py-1 font-medium whitespace-nowrap transition-colors duration-150 ease-out"
+          :class="hall.id === currentHallId ? 'bg-primary text-on-primary' : 'text-body hover:bg-ghost-hover hover:text-primary'"
           @click="focusHall(hall.id)"
         >
           {{ hall.name }}
@@ -150,15 +150,15 @@
     </div>
 
     <!-- Zoom -->
-    <div class="absolute bottom-3 right-3 flex flex-col overflow-hidden rounded-xl bg-white/95 shadow-sm ring-1 ring-slate-200 backdrop-blur">
+    <div class="absolute bottom-3 right-3 flex flex-col overflow-hidden rounded-xl bg-card/80 ring-1 ring-line backdrop-blur">
       <button type="button" class="venue-zoom-button" :aria-label="t('event_page.map.zoom_in')" @click="zoomBy(1.6)"><Plus :size="16" /></button>
-      <button type="button" class="venue-zoom-button border-y border-slate-200" :aria-label="t('event_page.map.zoom_out')" @click="zoomBy(1 / 1.6)"><Minus :size="16" /></button>
+      <button type="button" class="venue-zoom-button border-y border-line" :aria-label="t('event_page.map.zoom_out')" @click="zoomBy(1 / 1.6)"><Minus :size="16" /></button>
       <button type="button" class="venue-zoom-button" :aria-label="t('event_page.map.reset')" @click="currentHallId ? focusHall(currentHallId) : showOverview()"><Maximize2 :size="15" /></button>
     </div>
 
     <Transition name="fade">
-      <div v-if="wheelHint" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-900/25">
-        <span class="rounded-full bg-slate-900/85 px-4 py-2 text-sm text-white shadow-lg">{{ t('event_page.map.wheel_hint', { key: isMac ? '⌘' : 'Ctrl' }) }}</span>
+      <div v-if="wheelHint" class="pointer-events-none absolute inset-0 flex items-center justify-center bg-hero/25">
+        <span class="rounded-full bg-hero/85 px-4 py-2 text-sm text-on-media shadow-overlay">{{ t('event_page.map.wheel_hint', { key: isMac ? '⌘' : 'Ctrl' }) }}</span>
       </div>
     </Transition>
 
@@ -222,14 +222,16 @@ const pieceOfCircle = computed(() => {
 })
 const selectedPiece = computed(() => props.selectedCircleId ? pieceOfCircle.value.get(props.selectedCircleId) ?? null : null)
 
-// Colours: walls dark, light grey areas, booths by genre family.
-const tone = (s: number) => (s < 0.35 ? '#334155' : s > 0.97 ? '#ffffff' : s > 0.75 ? '#e2e8f0' : '#94a3b8')
+// Colours: the --map-* properties in the style block, which follow the theme (walls in the ink colour, grey areas as
+// shades of it); booths by genre family, the same in both themes. Used as inline styles, since SVG attributes don't
+// take var().
+const tone = (s: number) => (s < 0.35 ? 'var(--map-wall)' : s > 0.97 ? 'var(--map-floor)' : s > 0.75 ? 'var(--map-shade)' : 'var(--map-mid)')
 const families = Object.fromEntries(GENRE_FAMILIES.map(f => [f.key, f]))
 const pieceFill = (piece: VenuePiece) => {
-  if (!piece.circle) return '#f1f5f9'
-  if (!props.colorByGenre) return '#64748b'
+  if (!piece.circle) return 'var(--map-empty)'
+  if (!props.colorByGenre) return 'var(--map-plain)'
   const family = genreFamily(piece.circle.genre, props.map.genres)
-  return family ? families[family]!.color : '#64748b'
+  return family ? families[family]!.color : 'var(--map-plain)'
 }
 const pieceClass = (piece: VenuePiece) => ({
   'venue-piece': true,
@@ -410,58 +412,81 @@ defineExpose({ focusCircle, focusHall, showOverview })
 </script>
 
 <style scoped>
+/*
+ * Map colours, from the theme tokens: the map follows the light and dark themes (the admin console shows it light).
+ * The tokens for ink and lines are white or black at a fixed strength, so walls and grey areas keep their contrast
+ * on the floor in either theme. Booths take their genre family's colour (utils/eventVenue.ts) in both.
+ */
+.venue-map {
+  --map-floor: var(--card);
+  --map-wall: var(--body);
+  --map-shade: var(--line);
+  --map-mid: var(--faint);
+  --map-empty: var(--sunken);
+  --map-plain: var(--meta);
+  /* The checklist's gold star */
+  --map-checked: var(--warning);
+}
+.venue-dot {
+  fill: var(--line);
+}
+.venue-shadow {
+  flood-color: var(--hero);
+}
 .venue-hall {
-  fill: #fff;
-  stroke: #e2e8f0;
+  fill: var(--map-floor);
+  stroke: var(--line);
   stroke-width: 0.6;
   cursor: zoom-in;
   transition: stroke 0.2s;
 }
 .venue-hall:hover:not(.is-current) {
-  stroke: #2563eb;
+  stroke: var(--primary);
   stroke-width: 1.4;
 }
 .venue-hall.is-current {
   cursor: grab;
 }
 .venue-label {
-  fill: #64748b;
+  fill: var(--meta);
   font-weight: 500;
 }
 .venue-area-label {
-  fill: #0f172a;
+  fill: var(--title);
   font-weight: 800;
 }
 .venue-hall-name {
-  fill: #0f172a;
+  fill: var(--title);
   font-weight: 700;
   paint-order: stroke;
-  stroke: #f1f5f9;
+  /* A halo in the colour around the halls */
+  stroke: var(--sunken);
   stroke-width: 3px;
 }
 .venue-piece {
-  stroke: #fff;
+  /* The seams between booths in the floor's colour */
+  stroke: var(--map-floor);
   stroke-width: 0.35;
   cursor: pointer;
   transition: opacity 0.2s;
 }
 .venue-piece.is-empty {
   cursor: default;
-  stroke: #e2e8f0;
+  stroke: var(--line);
 }
 .venue-piece.is-dimmed {
   opacity: 0.16;
 }
 .venue-piece.is-checked {
-  stroke: #f59e0b;
+  stroke: var(--map-checked);
   stroke-width: 1.1;
   opacity: 1;
 }
 .venue-numbers text {
   /* One number spans the whole desk, across the seam between halves (a/b) and thirds (x/y/z):
-     white with a thin dark outline reads on the colours and on the white seam alike. */
-  fill: #fff;
-  stroke: rgb(15 23 42 / 0.55);
+     white with a thin dark outline reads on the genre colours and on the seam alike, in both themes. */
+  fill: var(--on-media);
+  stroke: color-mix(in oklab, var(--hero) 55%, transparent);
   stroke-width: 0.45px;
   stroke-linejoin: round;
   paint-order: stroke;
@@ -469,36 +494,36 @@ defineExpose({ focusCircle, focusHall, showOverview })
   opacity: 0;
   transition: opacity 0.2s;
 }
-/* A desk with an empty part is mostly light grey: dark ink instead. */
+/* A desk with an empty part is mostly the empty booth's colour: the theme's ink instead, on a halo of the floor. */
 .venue-numbers text.on-light {
-  fill: #475569;
-  stroke: rgb(255 255 255 / 0.9);
+  fill: var(--body);
+  stroke: color-mix(in oklab, var(--map-floor) 90%, transparent);
 }
 .is-detailed .venue-numbers text {
   opacity: 1;
 }
-/* Filtering fades most booths, so the numbers turn dark over them. */
+/* Filtering fades most booths towards the floor, so the numbers take the theme's ink over them. */
 .is-filtered .venue-numbers text {
-  fill: #334155;
-  stroke: rgb(255 255 255 / 0.85);
+  fill: var(--body);
+  stroke: color-mix(in oklab, var(--map-floor) 85%, transparent);
   opacity: 0;
 }
 .is-filtered.is-detailed .venue-numbers text {
   opacity: 0.8;
 }
 .venue-hover {
-  fill: rgb(255 255 255 / 0.25);
-  stroke: #0f172a;
+  fill: color-mix(in oklab, var(--on-media) 25%, transparent);
+  stroke: var(--title);
   stroke-width: 0.9;
 }
 .venue-selected {
   fill: none;
-  stroke: #0f172a;
+  stroke: var(--title);
   stroke-width: 1.2;
 }
 .venue-selected-pulse {
   fill: none;
-  stroke: #2563eb;
+  stroke: var(--primary);
   stroke-width: 1.5;
   animation: venue-pulse 1.4s ease-out infinite;
   transform-box: fill-box;
@@ -514,11 +539,12 @@ defineExpose({ focusCircle, focusHall, showOverview })
   width: 2.25rem;
   align-items: center;
   justify-content: center;
-  color: #334155;
-  transition: background-color 0.15s;
+  color: var(--body);
+  transition: background-color 150ms ease-out, color 150ms ease-out;
 }
 .venue-zoom-button:hover {
-  background: #f1f5f9;
+  background: var(--ghost-hover);
+  color: var(--primary);
 }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

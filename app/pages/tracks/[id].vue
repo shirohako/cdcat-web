@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div v-if="track && !mergedInto" :class="revealClass">
       <TrackHero :track="track" :previous="previous" :next="next" :multi-disc="multiDisc" @favorited="value => mutate(current => ({ ...current, is_favorited: value }))" />
       <CatalogPendingBanner :pending="track.is_pending" />
@@ -7,7 +7,7 @@
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div class="space-y-8 lg:col-span-2">
-            <CatalogSection :title="$t('lyrics_ui.lyrics_and_translations')" :icon="FileText" tone="sky">
+            <CatalogSection :title="$t('lyrics_ui.lyrics_and_translations')" :icon="FileText">
               <div class="px-5 py-4"><LyricsPanel :key="track.id" :track-id="track.id" /></div>
             </CatalogSection>
 
@@ -17,7 +17,7 @@
           <div class="space-y-6 lg:col-span-1">
             <TrackAlbumTracklist :tracks="track.album_tracks ?? []" :current-id="track.id" />
             <AlbumCredits :credits="track.credits ?? []" />
-            <CatalogSection v-if="track.titles?.length || track.attributes?.length" :title="$t('album.section.information')" :icon="Info" tone="gray">
+            <CatalogSection v-if="track.titles?.length || track.attributes?.length" :title="$t('album.section.information')" :icon="Info">
               <div class="space-y-4 px-5 py-4 text-sm">
                 <CatalogTitleList v-if="track.titles?.length" :titles="track.titles" />
                 <CatalogAttributeList v-if="track.attributes?.length" :attributes="track.attributes" />

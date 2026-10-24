@@ -67,36 +67,36 @@ const ago = (value: string) => {
 <template>
   <div ref="root" class="relative">
     <button
-      type="button" class="relative grid size-9 place-items-center rounded-lg text-gray-600 transition-colors hover:bg-gray-100"
+      type="button" class="btn btn-ghost btn-square relative" :class="{ 'bg-ghost-hover text-primary': open }"
       :aria-label="unread ? t('notifications.bell_unread', { count: unread }) : t('notifications.title')" :aria-expanded="open" @click.stop="toggle">
       <Bell :size="20" />
-      <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-rose-500 px-1 text-center text-[10px] font-bold leading-4 text-white">
+      <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-danger px-1 text-center text-[10px] font-bold leading-4 text-on-primary">
         {{ unread > 99 ? '99+' : unread }}
       </span>
     </button>
     <transition name="dropdown">
-      <div v-if="open" class="absolute right-0 mt-2 w-80 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg">
-        <div class="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
-          <span class="text-sm font-semibold text-gray-900">{{ t('notifications.title') }}</span>
-          <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-violet-600" @click="markRead(null)">
+      <div v-if="open" class="absolute right-0 mt-2 w-80 overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line">
+        <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
+          <span class="text-sm font-semibold text-title">{{ t('notifications.title') }}</span>
+          <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors hover:text-primary" @click="markRead(null)">
             <CheckCheck :size="13" />{{ t('notifications.mark_all') }}
           </button>
         </div>
-        <p v-if="loading" class="px-4 py-6 text-center text-xs text-gray-400">{{ t('common.loading') }}</p>
-        <p v-else-if="!items.length" class="px-4 py-6 text-center text-xs text-gray-400">{{ t('notifications.empty') }}</p>
-        <ul v-else class="max-h-96 divide-y divide-gray-50 overflow-y-auto">
+        <p v-if="loading" class="px-4 py-6 text-center text-xs text-faint">{{ t('common.loading') }}</p>
+        <p v-else-if="!items.length" class="px-4 py-6 text-center text-xs text-faint">{{ t('notifications.empty') }}</p>
+        <ul v-else class="max-h-96 divide-y divide-line overflow-y-auto">
           <li v-for="item in items" :key="item.id">
-            <button type="button" class="flex w-full gap-2.5 px-4 py-3 text-left transition-colors hover:bg-gray-50" @click="openItem(item)">
-              <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-violet-500'" />
+            <button type="button" class="flex w-full gap-2.5 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="openItem(item)">
+              <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-primary'" />
               <span class="min-w-0 flex-1">
-                <span class="block text-sm leading-snug" :class="item.read ? 'text-gray-500' : 'text-gray-900'">{{ text(item) }}</span>
-                <span v-if="detail(item)" class="mt-0.5 block truncate text-xs text-gray-400">{{ detail(item) }}</span>
-                <span class="mt-0.5 block text-[11px] text-gray-400">{{ ago(item.updated_at) }}</span>
+                <span class="block text-sm leading-snug" :class="item.read ? 'text-meta' : 'text-title'">{{ text(item) }}</span>
+                <span v-if="detail(item)" class="mt-0.5 block truncate text-xs text-meta">{{ detail(item) }}</span>
+                <span class="mt-0.5 block text-[11px] text-faint">{{ ago(item.updated_at) }}</span>
               </span>
             </button>
           </li>
         </ul>
-        <NuxtLink to="/notifications" class="block border-t border-gray-100 px-4 py-2.5 text-center text-xs font-medium text-violet-600 hover:bg-violet-50">
+        <NuxtLink to="/notifications" class="block border-t border-line px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover">
           {{ t('notifications.view_all') }}
         </NuxtLink>
       </div>

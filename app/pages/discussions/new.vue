@@ -97,24 +97,24 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-4rem)] bg-slate-50/60">
+  <div class="min-h-[calc(100vh-4rem)]">
     <div class="container mx-auto max-w-4xl px-4 py-8 md:px-6">
-      <nav class="mb-3 text-xs text-slate-400"><NuxtLink to="/discussions" class="hover:text-slate-600">{{ t('discussions.title') }}</NuxtLink> / {{ t('discussions.new.title') }}</nav>
-      <form class="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-5 sm:p-6" @submit.prevent="submit">
-        <h1 class="text-xl font-bold text-slate-950">{{ t('discussions.new.title') }}</h1>
-        <label class="block text-sm font-medium text-slate-700">
+      <nav class="mb-3 text-xs text-meta"><NuxtLink to="/discussions" class="transition-colors duration-150 ease-out hover:text-primary">{{ t('discussions.title') }}</NuxtLink> / {{ t('discussions.new.title') }}</nav>
+      <form class="card space-y-5 p-5 sm:p-6" @submit.prevent="submit">
+        <h1 class="text-xl font-bold text-title">{{ t('discussions.new.title') }}</h1>
+        <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.category') }}
-          <select v-model="draft.category_id" class="mt-1 w-full rounded-lg border px-3 py-2 text-sm" :class="fieldErrors.category_id ? 'border-rose-300' : 'border-slate-200'">
+          <select v-model="draft.category_id" class="select mt-1 w-full" :class="{ 'select-error': fieldErrors.category_id }">
             <option :value="null" disabled>{{ t('discussions.new.choose_category') }}</option>
             <option v-for="category in choices" :key="category.id" :value="category.id">{{ category.parent_id ? '\u3000' : '' }}{{ categoryName(category) }}</option>
           </select>
-          <span v-if="fieldErrors.category_id" class="mt-1 block text-xs text-rose-600">{{ fieldErrors.category_id }}</span>
-          <span v-else-if="selected?.kind === 'question'" class="mt-1 block text-xs text-emerald-700">{{ t('discussions.new.question_hint') }}</span>
+          <span v-if="fieldErrors.category_id" class="mt-1 block text-xs text-danger">{{ fieldErrors.category_id }}</span>
+          <span v-else-if="selected?.kind === 'question'" class="mt-1 block text-xs text-success">{{ t('discussions.new.question_hint') }}</span>
         </label>
-        <label class="block text-sm font-medium text-slate-700">
+        <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.title') }}
-          <input v-model="draft.title" maxlength="120" class="mt-1 w-full rounded-lg border px-3 py-2 text-base outline-none focus:border-sky-400" :class="fieldErrors.title ? 'border-rose-300' : 'border-slate-200'" :placeholder="t('discussions.new.title_placeholder')">
-          <span v-if="fieldErrors.title" class="mt-1 block text-xs text-rose-600">{{ fieldErrors.title }}</span>
+          <input v-model="draft.title" maxlength="120" class="input mt-1 w-full text-base" :class="{ 'input-error': fieldErrors.title }" :placeholder="t('discussions.new.title_placeholder')">
+          <span v-if="fieldErrors.title" class="mt-1 block text-xs text-danger">{{ fieldErrors.title }}</span>
         </label>
         <div>
           <ClientOnly>
@@ -122,19 +122,19 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
           </ClientOnly>
         </div>
         <div class="grid gap-5 md:grid-cols-2">
-          <div class="text-sm font-medium text-slate-700">
-            {{ t('discussions.fields.tags') }} <span class="text-xs font-normal text-slate-400">{{ t('discussions.new.optional') }}</span>
+          <div class="text-sm font-medium text-body">
+            {{ t('discussions.fields.tags') }} <span class="text-xs font-normal text-meta">{{ t('discussions.new.optional') }}</span>
             <CommonTagPicker v-model="draft.tags" class="mt-1" :max="5" :allow-staff="canModerate" />
-            <span v-if="fieldErrors.tags" class="mt-1 block text-xs font-normal text-rose-600">{{ fieldErrors.tags }}</span>
+            <span v-if="fieldErrors.tags" class="mt-1 block text-xs font-normal text-danger">{{ fieldErrors.tags }}</span>
           </div>
-          <div class="text-sm font-medium text-slate-700">
-            {{ t('discussions.fields.links') }} <span class="text-xs font-normal text-slate-400">{{ t('discussions.new.links_hint') }}</span>
+          <div class="text-sm font-medium text-body">
+            {{ t('discussions.fields.links') }} <span class="text-xs font-normal text-meta">{{ t('discussions.new.links_hint') }}</span>
             <CommonContentLinkPicker v-model="draft.links" class="mt-1" :max="10" />
           </div>
         </div>
-        <div class="flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-4">
-          <p v-if="error" role="alert" class="mr-auto text-sm text-rose-600">{{ error }}</p>
-          <span v-else class="mr-auto text-xs text-slate-400">{{ t('discussions.new.draft_hint') }}</span>
+        <div class="flex flex-wrap items-center justify-end gap-3 border-t border-line pt-4">
+          <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
+          <span v-else class="mr-auto text-xs text-meta">{{ t('discussions.new.draft_hint') }}</span>
           <NuxtLink to="/discussions" class="btn btn-ghost">{{ t('common.cancel') }}</NuxtLink>
           <button type="submit" class="btn btn-primary" :disabled="busy"><Loader2 v-if="busy" :size="15" class="animate-spin" /><Send v-else :size="15" />{{ t('discussions.new.submit') }}</button>
         </div>

@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-6">
     <!-- Change Password -->
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.security.title') }}</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.security.description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="p-6 pb-5 border-b border-line">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.security.title') }}</h2>
+        <p class="text-sm text-meta mt-1">{{ t('account_pages.security.description') }}</p>
       </div>
 
       <!-- Collapsed: trigger button -->
@@ -19,16 +19,16 @@
         <div v-if="!editing" class="p-6">
           <button
             type="button"
-            class="group flex items-center gap-3 w-full p-4 rounded-xl bg-gray-50 hover:bg-gray-100/80 transition-colors text-left cursor-pointer"
+            class="group flex items-center gap-3 w-full p-4 rounded-xl bg-sunken hover:bg-card-hover active:bg-card-active transition-colors duration-150 ease-out text-left cursor-pointer"
             @click="editing = true"
           >
-            <div class="w-10 h-10 rounded-full bg-white ring-1 ring-black/5 shadow-sm flex items-center justify-center shrink-0 group-hover:shadow transition-shadow">
-              <KeyRound :size="18" class="text-gray-400 group-hover:text-blue-500 transition-colors" />
+            <div class="w-10 h-10 rounded-full bg-card ring-1 ring-line flex items-center justify-center shrink-0">
+              <KeyRound :size="18" class="text-meta group-hover:text-primary transition-colors" />
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">{{ t('account_pages.security.open') }}</p>
+              <p class="text-sm font-medium text-body group-hover:text-title transition-colors">{{ t('account_pages.security.open') }}</p>
             </div>
-            <ChevronRight :size="16" class="text-gray-300 group-hover:text-gray-500 transition-colors shrink-0" />
+            <ChevronRight :size="16" class="text-faint group-hover:text-meta transition-colors shrink-0" />
           </button>
         </div>
 
@@ -37,25 +37,25 @@
           <div class="p-6">
             <div class="grid gap-5 max-w-sm">
             <div class="grid gap-1.5">
-              <label for="current-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.current') }}</label>
+              <label for="current-password" class="text-sm font-medium text-body">{{ t('account_pages.security.current') }}</label>
               <input
                 id="current-password"
                 v-model="passwordForm.currentPassword"
                 type="password"
-                class="input input-bordered w-full bg-white"
+                class="input w-full"
                 :placeholder="t('account_pages.security.current_placeholder')"
                 @keyup.enter="submitPassword"
               />
-              <p class="text-xs text-gray-400">{{ t('account_pages.security.current_hint') }}</p>
+              <p class="text-xs text-meta">{{ t('account_pages.security.current_hint') }}</p>
             </div>
 
             <div class="grid gap-1.5">
-              <label for="new-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.new') }}</label>
+              <label for="new-password" class="text-sm font-medium text-body">{{ t('account_pages.security.new') }}</label>
               <input
                 id="new-password"
                 v-model="passwordForm.newPassword"
                 type="password"
-                class="input input-bordered w-full bg-white"
+                class="input w-full"
                 :placeholder="t('account_pages.security.new_placeholder')"
                 @keyup.enter="submitPassword"
               />
@@ -65,7 +65,7 @@
                     v-for="i in 4"
                     :key="i"
                     class="h-1 flex-1 rounded-full transition-all duration-300"
-                    :class="i <= strength.level ? strength.barColor : 'bg-gray-200'"
+                    :class="i <= strength.level ? strength.barColor : 'bg-line'"
                   />
                 </div>
                 <p class="text-xs font-medium" :class="strength.textColor">{{ strength.label }}</p>
@@ -73,22 +73,22 @@
             </div>
 
             <div class="grid gap-1.5">
-              <label for="confirm-password" class="text-sm font-medium text-gray-700">{{ t('account_pages.security.confirm') }}</label>
+              <label for="confirm-password" class="text-sm font-medium text-body">{{ t('account_pages.security.confirm') }}</label>
               <input
                 id="confirm-password"
                 v-model="passwordForm.confirmPassword"
                 type="password"
-                class="input input-bordered w-full bg-white"
+                class="input w-full"
                 :placeholder="t('account_pages.security.confirm_placeholder')"
                 @keyup.enter="submitPassword"
               />
               <p
                 v-if="passwordForm.confirmPassword && passwordForm.confirmPassword !== passwordForm.newPassword"
-                class="text-xs text-red-500"
+                class="text-xs text-danger"
               >
                 {{ t('account_pages.security.mismatch') }}
               </p>
-              <p v-else class="text-xs text-gray-400">
+              <p v-else class="text-xs text-meta">
                 {{ t('account_pages.security.confirm_hint') }}
               </p>
             </div>
@@ -97,12 +97,12 @@
 
         <!-- Error message -->
         <div v-if="errorMessage" class="px-6 pb-0">
-          <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-            <p class="text-sm text-red-600">{{ errorMessage }}</p>
+          <div class="bg-danger/10 border border-danger/25 rounded-lg p-3">
+            <p class="text-sm text-danger">{{ errorMessage }}</p>
           </div>
         </div>
 
-        <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex justify-end gap-2">
+        <div class="px-6 py-4 bg-sunken border-t border-line flex justify-end gap-2">
           <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
             {{ t('common.cancel') }}
           </button>
@@ -168,11 +168,12 @@ const strength = computed(() => {
   if (/[^A-Za-z0-9]/.test(p)) score++
 
   const map = {
-    0: { label: t('auth.register.strength_weak'), barColor: 'bg-red-400', textColor: 'text-red-500' },
-    1: { label: t('auth.register.strength_fair'), barColor: 'bg-orange-400', textColor: 'text-orange-500' },
-    2: { label: t('auth.register.strength_medium'), barColor: 'bg-yellow-400', textColor: 'text-yellow-600' },
-    3: { label: t('auth.register.strength_strong'), barColor: 'bg-blue-400', textColor: 'text-blue-500' },
-    4: { label: t('auth.register.strength_very_strong'), barColor: 'bg-emerald-400', textColor: 'text-emerald-500' }
+    // The same status colours as the register page.
+    0: { label: t('auth.register.strength_weak'), barColor: 'bg-danger', textColor: 'text-danger' },
+    1: { label: t('auth.register.strength_fair'), barColor: 'bg-danger', textColor: 'text-danger' },
+    2: { label: t('auth.register.strength_medium'), barColor: 'bg-warning', textColor: 'text-warning' },
+    3: { label: t('auth.register.strength_strong'), barColor: 'bg-success', textColor: 'text-success' },
+    4: { label: t('auth.register.strength_very_strong'), barColor: 'bg-success', textColor: 'text-success font-semibold' }
   }
 
   return { level: score, ...map[score] }

@@ -4,15 +4,19 @@
     <SkeletonRows v-if="isLoading && !albums.length" page :count="5" thumb="square" cards />
 
     <!-- Empty State -->
-    <div v-else-if="albums.length === 0" class="flex flex-col items-center justify-center py-16">
-      <Icon name="lucide:disc-3" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">{{ $t('tracking.empty_state') }}</p>
-      <p class="text-sm text-gray-400 mb-6">{{ $t('tracking.empty_hint') }}</p>
-      <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-        <Icon name="lucide:search" class="w-4 h-4" />
-        {{ $t('common.discover') }}
-      </NuxtLink>
-    </div>
+    <UiEmpty
+      v-else-if="albums.length === 0"
+      :title="$t('tracking.empty_state')"
+      :description="$t('tracking.empty_hint')"
+      icon="lucide:disc-3"
+    >
+      <template #actions>
+        <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
+          <Icon name="lucide:search" class="w-4 h-4" />
+          {{ $t('common.discover') }}
+        </NuxtLink>
+      </template>
+    </UiEmpty>
 
     <!-- Albums List -->
     <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': isLoading }" :inert="isLoading">
@@ -20,8 +24,7 @@
         <div
           v-for="album in albums"
           :key="album.id"
-          class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4
-                 hover:shadow-md hover:ring-black/10 transition-all duration-200"
+          class="rounded-xl bg-sunken p-4"
         >
           <div class="flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4">
             <!-- Cover -->
@@ -30,7 +33,7 @@
               class="shrink-0"
               :aria-label="album.albumTitle"
             >
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-sunken ring-1 ring-line">
                 <img
                   v-if="album.image_url"
                   :src="album.image_url"
@@ -38,7 +41,7 @@
                   class="w-full h-full object-cover"
                   loading="lazy"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
+                <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
               </div>
@@ -48,19 +51,19 @@
             <div class="min-w-0 flex-1 text-center sm:text-left">
               <NuxtLink
                 :to="`/albums/${album.albumId}`"
-                class="block font-semibold text-sm sm:text-base text-gray-900 hover:text-blue-700 transition-colors line-clamp-2"
+                class="block font-semibold text-sm sm:text-base text-title hover:text-primary transition-colors duration-150 ease-out line-clamp-2"
               >
                 {{ album.albumTitle }}
               </NuxtLink>
 
-              <p class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">
+              <p class="text-xs sm:text-sm text-body mt-1 line-clamp-1">
                 {{ album.artists.map(a => a.name).join(', ') }}
               </p>
 
-              <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-400">
+              <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-meta">
                 <span v-if="album.release_date">{{ formatDate(album.release_date) }}</span>
                 <span>{{ album.catalog_number }}</span>
-                <span v-if="album.type !== 'album'" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 uppercase">{{ album.type }}</span>
+                <span v-if="album.type !== 'album'" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-btn text-btn-content uppercase">{{ album.type }}</span>
               </div>
             </div>
 
@@ -70,7 +73,7 @@
               <div class="dropdown dropdown-end">
                 <button
                   tabindex="0"
-                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
+                  class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-150 ease-out"
                   :class="statusBadgeClass(album.status)"
                 >
                   <Icon :name="statusIcon(album.status)" class="w-3.5 h-3.5" />
@@ -79,7 +82,7 @@
                 </button>
                 <ul
                   tabindex="0"
-                  class="dropdown-content z-1 menu p-1.5 shadow-lg bg-base-100 rounded-xl w-44 ring-1 ring-black/5"
+                  class="dropdown-content z-1 menu w-44 rounded-xl bg-popover p-1.5 shadow-overlay ring-1 ring-line"
                 >
                   <li v-for="s in otherStatuses(album.status)" :key="s">
                     <a
@@ -96,10 +99,10 @@
               <!-- View -->
               <NuxtLink
                 :to="`/albums/${album.albumId}`"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary flex-none"
                 :aria-label="album.albumTitle"
               >
-                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5" />
               </NuxtLink>
 
               <!-- Remove -->
@@ -107,18 +110,18 @@
                 type="button"
                 :disabled="removingId === album.id"
                 @click="handleRemove(album.id)"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-red-50 flex-none disabled:opacity-40 disabled:cursor-not-allowed"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger flex-none disabled:opacity-40 disabled:cursor-not-allowed"
                 :title="$t('tracking.remove')"
               >
                 <Icon
                   v-if="removingId !== album.id"
                   name="lucide:trash-2"
-                  class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 hover:text-red-500 transition-colors"
+                  class="w-4 h-4 sm:w-5 sm:h-5"
                 />
                 <Icon
                   v-else
                   name="lucide:loader"
-                  class="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-gray-400"
+                  class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"
                 />
               </button>
             </div>
@@ -186,24 +189,25 @@ const statusIcon = (status: TrackingStatus): string => {
   return icons[status]
 }
 
+// Each status keeps its own colour (they must stay apart), with a partner for the dark theme; "dropped" is neutral.
 const statusBadgeClass = (status: TrackingStatus): string => {
   const classes: Record<TrackingStatus, string> = {
-    plan_to_listen: 'bg-purple-50 text-purple-700 hover:bg-purple-100',
-    wishlist: 'bg-blue-50 text-blue-700 hover:bg-blue-100',
-    completed: 'bg-teal-50 text-teal-700 hover:bg-teal-100',
-    owned: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100',
-    dropped: 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+    plan_to_listen: 'bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-400/15 dark:text-purple-300 dark:hover:bg-purple-400/25',
+    wishlist: 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-400/15 dark:text-blue-300 dark:hover:bg-blue-400/25',
+    completed: 'bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-400/15 dark:text-teal-300 dark:hover:bg-teal-400/25',
+    owned: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-400/15 dark:text-emerald-300 dark:hover:bg-emerald-400/25',
+    dropped: 'bg-btn text-btn-content hover:bg-btn-hover'
   }
   return classes[status]
 }
 
 const statusTextColor = (status: TrackingStatus): string => {
   const colors: Record<TrackingStatus, string> = {
-    plan_to_listen: 'text-purple-500',
-    wishlist: 'text-blue-500',
-    completed: 'text-teal-500',
-    owned: 'text-emerald-500',
-    dropped: 'text-gray-400'
+    plan_to_listen: 'text-purple-500 dark:text-purple-400',
+    wishlist: 'text-blue-500 dark:text-blue-400',
+    completed: 'text-teal-500 dark:text-teal-400',
+    owned: 'text-emerald-500 dark:text-emerald-400',
+    dropped: 'text-meta'
   }
   return colors[status]
 }

@@ -1,29 +1,29 @@
 <template>
-  <CatalogSection :title="$t('editor.translate.title')" :icon="Languages" tone="emerald" :description="$t('editor.translate.hint')">
+  <CatalogSection :title="$t('editor.translate.title')" :icon="Languages" :description="$t('editor.translate.hint')">
     <template #actions>{{ $t('editor.translate.progress', { done: done, total: rows.length }) }}</template>
     <div class="space-y-4 p-3 sm:p-5">
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
-          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('editor.translate.language') }}</span>
+          <span class="mb-1 block text-xs font-medium text-body">{{ $t('editor.translate.language') }}</span>
           <select v-model="locale" class="select select-sm w-48">
             <option v-for="code in LOCALES" :key="code" :value="code">{{ localeName(code) }}</option>
           </select>
         </label>
         <label class="block">
-          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('catalog.field.kind') }}</span>
+          <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.kind') }}</span>
           <select v-model="kind" class="select select-sm w-40">
             <option v-for="value in KINDS" :key="value" :value="value">{{ enumLabel('title_kind', value) }}</option>
           </select>
         </label>
-        <p class="pb-2 text-[11px] text-gray-400">{{ $t(`editor.translate.kind_hint.${kind}`) }}</p>
+        <p class="pb-2 text-[11px] text-meta">{{ $t(`editor.translate.kind_hint.${kind}`) }}</p>
       </div>
 
-      <div class="overflow-hidden rounded-xl border border-gray-200">
+      <div class="overflow-hidden rounded-xl border border-line">
         <div v-for="row in rows" :key="row.key">
-          <div v-if="row.heading" class="border-b border-gray-100 bg-gray-50 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-500">{{ row.heading }}</div>
-          <div class="grid items-center gap-2 border-b border-gray-100 px-3 py-1.5 last:border-b-0 sm:grid-cols-2" :class="{ 'bg-amber-50/40': !nameOf(row) }">
-            <p class="flex min-w-0 items-baseline gap-2 text-sm text-gray-700">
-              <span v-if="row.number" class="w-8 shrink-0 text-right font-mono text-xs text-gray-400">{{ row.number }}</span>
+          <div v-if="row.heading" class="border-b border-line bg-sunken px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-meta">{{ row.heading }}</div>
+          <div class="grid items-center gap-2 border-b border-line px-3 py-1.5 last:border-b-0 sm:grid-cols-2" :class="{ 'bg-warning/5': !nameOf(row) }">
+            <p class="flex min-w-0 items-baseline gap-2 text-sm text-body">
+              <span v-if="row.number" class="w-8 shrink-0 text-right font-mono text-xs text-meta">{{ row.number }}</span>
               <span class="truncate" :title="row.original">{{ row.original }}</span>
             </p>
             <input

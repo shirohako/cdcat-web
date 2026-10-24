@@ -33,31 +33,31 @@ function changeLocale(event: Event) {
 <template>
   <div class="space-y-6">
     <div class="grid max-w-sm gap-1.5">
-      <label for="mail-locale" class="text-sm font-medium text-gray-700">{{ t('mail_settings.language') }}</label>
-      <select id="mail-locale" :value="mailLocale" :disabled="busy" class="select select-bordered w-full bg-white" @change="changeLocale">
+      <label for="mail-locale" class="text-sm font-medium text-body">{{ t('mail_settings.language') }}</label>
+      <select id="mail-locale" :value="mailLocale" :disabled="busy" class="select w-full" @change="changeLocale">
         <option v-for="language in languages" :key="language.code" :value="language.code">{{ language.name }}</option>
       </select>
-      <p class="text-xs text-gray-400">{{ t('mail_settings.language_help') }}</p>
+      <p class="text-xs text-meta">{{ t('mail_settings.language_help') }}</p>
     </div>
 
-    <ul class="divide-y divide-gray-100">
+    <ul class="divide-y divide-line">
       <li v-for="item in subscriptions" :key="item.key" class="flex items-start gap-4 py-3.5 first:pt-0 last:pb-0">
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-semibold text-gray-900">
+          <p class="text-sm font-semibold text-title">
             {{ localized(item.names) || item.key }}
-            <span v-if="item.is_required" class="ml-1.5 inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 align-middle text-[11px] font-medium text-gray-500">
+            <span v-if="item.is_required" class="ml-1.5 inline-flex items-center gap-1 rounded bg-btn px-1.5 py-0.5 align-middle text-[11px] font-medium text-btn-content">
               <Lock :size="10" />{{ t('mail_settings.required') }}
             </span>
           </p>
-          <p v-if="localized(item.descriptions)" class="mt-0.5 text-xs text-gray-500">{{ localized(item.descriptions) }}</p>
+          <p v-if="localized(item.descriptions)" class="mt-0.5 text-xs text-meta">{{ localized(item.descriptions) }}</p>
         </div>
         <button
           type="button" role="switch" :aria-checked="item.is_subscribed" :aria-label="t('mail_settings.receive', { name: localized(item.names) || item.key })"
           :disabled="busy || item.is_required" :title="item.is_required ? t('mail_settings.required_help') : undefined"
-          class="relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50" :class="item.is_subscribed ? 'bg-blue-600' : 'bg-gray-300'"
+          class="relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50" :class="item.is_subscribed ? 'bg-primary' : 'bg-faint'"
           @click="emit('toggle', item.key, !item.is_subscribed)"
         >
-          <span class="absolute top-0.5 size-5 rounded-full bg-white shadow transition" :class="item.is_subscribed ? 'left-5.5' : 'left-0.5'" />
+          <span class="absolute top-0.5 size-5 rounded-full transition" :class="item.is_subscribed ? 'left-5.5 bg-on-primary' : 'left-0.5 bg-on-media'" />
         </button>
       </li>
     </ul>

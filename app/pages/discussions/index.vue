@@ -10,16 +10,16 @@ useSeoMeta({ title: () => t('discussions.title'), description: () => t('discussi
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)] bg-slate-50/60">
+  <div class="relative min-h-[calc(100vh-4rem)]">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 class="text-2xl font-bold tracking-tight text-slate-950 sm:text-[28px]">{{ t('discussions.title') }}</h1>
-          <p class="mt-1 text-sm text-slate-500">{{ t('discussions.description') }}</p>
+          <h1 class="text-2xl font-bold tracking-tight text-title sm:text-[28px]">{{ t('discussions.title') }}</h1>
+          <p class="mt-1 text-sm text-meta">{{ t('discussions.description') }}</p>
         </div>
-        <form class="hidden items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 focus-within:border-sky-400 lg:flex" role="search" @submit.prevent="search">
-          <Search :size="15" class="text-slate-400" />
-          <input v-model="query" type="search" maxlength="100" class="w-64 bg-transparent text-sm outline-none placeholder:text-slate-400" :placeholder="t('discussions.search.placeholder')">
+        <form class="hidden items-center gap-2 rounded-xl border border-line bg-field px-3 py-2 transition-colors duration-150 ease-out focus-within:border-primary lg:flex" role="search" @submit.prevent="search">
+          <Search :size="15" class="text-meta" />
+          <input v-model="query" type="search" maxlength="100" class="w-64 bg-transparent text-sm text-title outline-none placeholder:text-faint" :placeholder="t('discussions.search.placeholder')">
         </form>
       </header>
       <div class="flex flex-col gap-6 lg:flex-row lg:items-start">

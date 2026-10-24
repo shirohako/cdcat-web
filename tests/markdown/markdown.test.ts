@@ -80,7 +80,7 @@ describe('Markdown renderer', () => {
   it('renders highlighting, allow-listed colors and text sizes', () => {
     const html = renderMarkdown('==Marked== [Red **text**]{color=red} [Large]{size=large} [Underlined]{underline=blue}')
     expect(html).toContain('<mark>Marked</mark>')
-    expect(html).toContain('markdown-text-color text-rose-600')
+    expect(html).toContain('markdown-text-color markdown-color-red')
     expect(html).toContain('Red <strong>text</strong>')
     expect(html).toContain('markdown-text-size text-lg')
     expect(html).toContain('markdown-text-underline markdown-underline-blue')
@@ -88,14 +88,14 @@ describe('Markdown renderer', () => {
 
   it('combines allow-listed Pandoc span attributes', () => {
     const html = renderMarkdown('[Important]{color=purple size=xlarge underline=green}')
-    expect(html).toContain('markdown-text-color text-violet-600')
+    expect(html).toContain('markdown-text-color markdown-color-purple')
     expect(html).toContain('markdown-text-size text-xl')
     expect(html).toContain('markdown-text-underline markdown-underline-green')
   })
 
   it('nests Pandoc spans when the styled ranges differ', () => {
     const html = renderMarkdown('[Outer [inner]{color=red}]{size=large}')
-    expect(html).toContain('<span class="markdown-text-size text-lg">Outer <span class="markdown-text-color text-rose-600">inner</span></span>')
+    expect(html).toContain('<span class="markdown-text-size text-lg">Outer <span class="markdown-text-color markdown-color-red">inner</span></span>')
   })
 
   it('cross-nests inline spoilers, styled spans and emphasis without duplication', () => {
@@ -108,8 +108,8 @@ describe('Markdown renderer', () => {
     expect(html).toContain('<strong>bold</strong>')
     expect(html).toContain('<em>text</em>')
     expect(html.match(/class="markdown-inline-spoiler"/g)).toHaveLength(2)
-    expect(html).toContain('markdown-text-color text-rose-600')
-    expect(html).toContain('markdown-text-color text-sky-600')
+    expect(html).toContain('markdown-text-color markdown-color-red')
+    expect(html).toContain('markdown-text-color markdown-color-blue')
   })
 
   it('renders inline spoilers with nested Markdown and leaves unclosed syntax inert', () => {
@@ -157,7 +157,7 @@ describe('Markdown renderer', () => {
     expect(html).toContain('<code>code</code>')
     expect(html).toContain('class="markdown-inline-spoiler"')
     expect(html).toContain('<strong>nested</strong>')
-    expect(html).toContain('markdown-text-color text-rose-600')
+    expect(html).toContain('markdown-text-color markdown-color-red')
     expect(html).toContain('markdown-text-size text-lg')
     expect(html).toContain('class="markdown-sized-image"')
     expect(html).toContain('width="320"')

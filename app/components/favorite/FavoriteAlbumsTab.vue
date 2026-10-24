@@ -4,15 +4,19 @@
     <SkeletonRows v-if="isLoading && !loaded" page :count="5" thumb="square" cards />
 
     <!-- Empty State -->
-    <div v-else-if="albums.length === 0" class="flex flex-col items-center justify-center py-16">
-      <Icon name="lucide:disc-3" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg text-gray-500 mb-2">{{ $t('collection_components.empty_albums') }}</p>
-      <p class="text-sm text-gray-400 mb-6">{{ $t('collection_components.empty_albums_hint') }}</p>
-      <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-        <Icon name="lucide:search" class="w-4 h-4" />
-        {{ $t('collection_components.browse_albums') }}
-      </NuxtLink>
-    </div>
+    <UiEmpty
+      v-else-if="albums.length === 0"
+      :title="$t('collection_components.empty_albums')"
+      :description="$t('collection_components.empty_albums_hint')"
+      icon="lucide:disc-3"
+    >
+      <template #actions>
+        <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
+          <Icon name="lucide:search" class="w-4 h-4" />
+          {{ $t('collection_components.browse_albums') }}
+        </NuxtLink>
+      </template>
+    </UiEmpty>
 
     <!-- Albums List: dimmed while another page loads -->
     <div v-else class="transition-opacity" :class="{ 'pointer-events-none opacity-60': isLoading }" :inert="isLoading">
@@ -20,8 +24,7 @@
         <div
           v-for="album in albums"
           :key="album.id"
-          class="bg-white rounded-xl shadow-sm ring-1 ring-black/5 p-4
-                 hover:shadow-md hover:ring-black/10 transition-all duration-200"
+          class="rounded-xl bg-sunken p-4"
         >
           <div class="flex flex-col items-center sm:flex-row sm:items-center gap-3 sm:gap-4">
             <!-- Cover -->
@@ -30,14 +33,14 @@
               class="shrink-0"
               :aria-label="$t('collection_components.view_album', { name: album.title })"
             >
-              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-gray-100 ring-1 ring-black/5">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden bg-sunken ring-1 ring-line">
                 <img
                   v-if="album.image_url"
                   :src="album.image_url"
                   :alt="album.title"
                   class="w-full h-full object-cover"
                 />
-                <div v-else class="w-full h-full flex items-center justify-center text-gray-300">
+                <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
               </div>
@@ -47,16 +50,16 @@
             <div class="min-w-0 flex-1 text-center sm:text-left">
               <NuxtLink
                 :to="`/albums/${album.id}`"
-                class="block font-semibold text-sm sm:text-base text-gray-900 hover:text-blue-700 transition-colors line-clamp-2"
+                class="block font-semibold text-sm sm:text-base text-title hover:text-primary transition-colors line-clamp-2"
               >
                 {{ album.title }}
               </NuxtLink>
 
-              <p v-if="album.artists?.length" class="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-1">
+              <p v-if="album.artists?.length" class="text-xs sm:text-sm text-body mt-1 line-clamp-1">
                 {{ album.artists.map(a => a.pivot?.display_name || a.name).join(', ') }}
               </p>
 
-              <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-gray-400">
+              <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-meta">
                 <span v-if="album.release_date">{{ $t('collection_components.release_date', { date: formatDate(album.release_date) }) }}</span>
                 <span v-if="album.favorited_at">{{ $t('collection_components.favorited_date', { date: formatDate(album.favorited_at) }) }}</span>
               </div>
@@ -66,23 +69,23 @@
             <div class="shrink-0 flex items-center justify-center sm:justify-end gap-2 sm:gap-1">
               <NuxtLink
                 :to="`/albums/${album.id}`"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-body transition-colors hover:bg-ghost-hover hover:text-primary flex-none"
                 :aria-label="$t('collection_components.view_album', { name: album.title })"
                 :title="$t('collection_components.view')"
               >
-                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5" />
               </NuxtLink>
               <button
                 type="button"
                 :disabled="!!unlikeLoading[album.id]"
                 @click="handleToggle(album.id)"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-gray-100 flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-ghost-hover flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 :title="$t(unliked[album.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
               >
                 <Icon
                   :name="unliked[album.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
                   class="w-4 h-4 sm:w-5 sm:h-5"
-                  :class="unliked[album.id] ? 'text-gray-400' : 'text-red-600'"
+                  :class="unliked[album.id] ? 'text-meta' : 'text-red-600 dark:text-red-400'"
                 />
               </button>
             </div>

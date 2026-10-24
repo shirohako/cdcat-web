@@ -1,9 +1,9 @@
 <template>
   <div class="flex items-start gap-3">
-    <div class="relative flex h-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-200 bg-gray-50 text-gray-300" :class="wide ? 'w-36' : 'w-20'">
+    <div class="relative flex h-20 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-sunken text-faint" :class="wide ? 'w-36' : 'w-20'">
       <img v-if="model" :src="model" alt="" class="h-full w-full object-cover">
       <ImagePlus v-else :size="22" />
-      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-white/70"><span class="loading loading-spinner loading-sm" /></div>
+      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-card/70 text-meta"><span class="loading loading-spinner loading-sm" /></div>
     </div>
     <div class="min-w-0 flex-1 space-y-1.5">
       <div class="flex flex-wrap gap-1.5">
@@ -12,9 +12,9 @@
           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="busy" @change="pick">
         </label>
         <button type="button" class="btn btn-ghost btn-sm gap-1" :disabled="busy" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
-        <button v-if="model" type="button" class="btn btn-ghost btn-sm gap-1 text-gray-500 hover:text-error" :disabled="busy" @click="model = null"><Trash2 :size="14" />{{ $t('editor.image.remove') }}</button>
+        <button v-if="model" type="button" class="btn btn-ghost btn-sm gap-1 text-meta hover:text-danger" :disabled="busy" @click="model = null"><Trash2 :size="14" />{{ $t('editor.image.remove') }}</button>
       </div>
-      <p v-if="message" class="text-xs text-error">{{ message }}</p>
+      <p v-if="message" class="text-xs text-danger">{{ message }}</p>
     </div>
     <EditorImageImportDialog v-model="urlOpen" :busy="busy" :error="urlError" @import="fromUrl" />
   </div>

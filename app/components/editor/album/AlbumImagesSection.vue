@@ -1,21 +1,21 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.images')" :icon="Images" tone="sky" :description="$t('editor.image.gallery_hint')">
+  <CatalogSection :title="$t('editor.album.section.images')" :icon="Images" :description="$t('editor.image.gallery_hint')">
     <div class="space-y-5 p-3 sm:p-5">
       <div class="grid gap-5 sm:grid-cols-[13rem_1fr]">
         <div>
-          <p class="mb-1.5 text-sm font-medium text-gray-700">{{ $t('editor.album.cover') }} <span class="text-error">*</span></p>
+          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span></p>
           <EditorAlbumCoverSlot />
         </div>
-        <div class="space-y-3 text-sm text-gray-600 sm:pt-6">
+        <div class="space-y-3 text-sm text-body sm:pt-6">
           <div class="flex flex-wrap items-center gap-2">
             <label class="btn btn-add btn-sm cursor-pointer gap-1" :class="{ 'btn-disabled': uploading > 0 }">
               <Upload :size="14" />{{ $t('editor.image.upload_many') }}
               <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
             </label>
             <button type="button" class="btn btn-add btn-sm gap-1" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
-            <span v-if="uploading" class="flex items-center gap-1.5 text-xs text-gray-500"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</span>
+            <span v-if="uploading" class="flex items-center gap-1.5 text-xs text-meta"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</span>
           </div>
-          <ul v-if="failures.length" class="space-y-0.5 text-xs text-error">
+          <ul v-if="failures.length" class="space-y-0.5 text-xs text-danger">
             <li v-for="failure in failures" :key="failure">{{ failure }}</li>
           </ul>
         </div>
@@ -31,11 +31,11 @@
           @move="moveRow(album.images, image, $event)"
         />
       </ul>
-      <p v-else class="text-sm text-gray-400">{{ $t('editor.image.none') }}</p>
+      <p v-else class="text-sm text-meta">{{ $t('editor.image.none') }}</p>
 
       <EditorImageImportDialog v-model="urlOpen" :busy="importing" :error="urlError" @import="fromUrl">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.kind') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.kind') }}</span>
           <select v-model="urlKind" class="select select-sm w-full">
             <option value="">{{ $t('editor.dialog.image_kind_guess') }}</option>
             <option v-for="value in kinds" :key="value" :value="value" :disabled="value === 'cover'">{{ enumLabel('image_kind', value) }}</option>

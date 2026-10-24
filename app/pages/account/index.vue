@@ -2,40 +2,40 @@
   <div class="relative min-h-[calc(100vh-4rem)]">
     <!-- Decorative background -->
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-      <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-indigo-200/45 to-sky-200/20 blur-3xl" />
-      <div class="absolute -top-24 -right-28 h-80 w-80 rounded-full bg-linear-to-br from-amber-200/45 to-rose-200/15 blur-3xl" />
-      <div class="absolute -bottom-40 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-emerald-200/35 to-cyan-200/15 blur-3xl" />
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
+      <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-primary/15 to-primary/5 blur-3xl" />
+      <div class="absolute -top-24 -right-28 h-80 w-80 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-3xl" />
+      <div class="absolute -bottom-40 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-primary/10 to-primary/5 blur-3xl" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,var(--line)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
     </div>
 
     <div class="relative container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- Header -->
       <div class="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-white/70 backdrop-blur ring-1 ring-black/5 shadow-sm flex items-center justify-center">
-            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-blue-500 to-indigo-500 text-white flex items-center justify-center text-sm font-semibold">
+          <div class="w-12 h-12 rounded-2xl bg-card/70 backdrop-blur flex items-center justify-center">
+            <div class="w-9 h-9 rounded-xl bg-linear-to-br from-primary to-primary-strong text-on-primary flex items-center justify-center text-sm font-semibold">
               {{ userInitial }}
             </div>
           </div>
           <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+            <h1 class="text-2xl md:text-3xl font-bold text-title tracking-tight">
               {{ $t('user.account') }}
             </h1>
-            <p class="mt-1.5 text-sm text-gray-500">
+            <p class="mt-1.5 text-sm text-meta">
               {{ t('account_pages.description') }}
             </p>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 text-xs text-gray-500">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur ring-1 ring-black/5">
-            <UserIcon :size="14" class="text-gray-400" />
-            <span class="font-medium text-gray-700">
+        <div class="flex items-center gap-2 text-xs text-meta">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/70 backdrop-blur">
+            <UserIcon :size="14" class="text-meta" />
+            <span class="font-medium text-body">
               {{ userDisplayName }}
             </span>
           </span>
-          <span v-if="user?.email" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 backdrop-blur ring-1 ring-black/5">
-            <Mail :size="14" class="text-gray-400" />
+          <span v-if="user?.email" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-card/70 backdrop-blur">
+            <Mail :size="14" class="text-meta" />
             <span class="truncate max-w-56">{{ user.email }}</span>
           </span>
         </div>
@@ -46,24 +46,24 @@
         <nav class="relative mb-6" :aria-label="t('account_pages.title')">
           <div
             ref="tabsScrollRef"
-            class="flex items-center gap-1 overflow-x-auto rounded-2xl bg-white/70 backdrop-blur ring-1 ring-black/5 p-1.5 [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            class="flex items-center gap-1 overflow-x-auto rounded-2xl bg-sunken ring-1 ring-line p-1.5 [-webkit-overflow-scrolling:touch] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             @scroll="onTabsScroll"
           >
             <button
               v-for="tab in tabs"
               :key="tab.key"
               type="button"
-              class="shrink-0 flex items-center gap-1.5 rounded-xl font-medium transition-all px-3 py-2 text-xs md:px-4 md:py-2.5 md:text-sm md:gap-2"
+              class="shrink-0 flex items-center gap-1.5 rounded-xl font-medium transition-colors duration-150 ease-out px-3 py-2 text-xs md:px-4 md:py-2.5 md:text-sm md:gap-2"
               :class="activeTab === tab.key
-                ? 'bg-white text-gray-900 shadow-sm ring-1 ring-black/5'
-                : 'text-gray-500 hover:text-gray-900 hover:bg-white/60 active:bg-white/60'"
+                ? 'bg-card text-title ring-1 ring-line'
+                : 'text-meta hover:text-title hover:bg-card/60 active:bg-card/60'"
               @click="activeTab = tab.key"
             >
               <component
                 :is="tab.icon"
                 :size="15"
                 class="shrink-0 transition-colors"
-                :class="activeTab === tab.key ? 'text-blue-500' : 'text-gray-400'"
+                :class="activeTab === tab.key ? 'text-primary' : 'text-meta'"
               />
               <span class="whitespace-nowrap">{{ tab.label }}</span>
             </button>
@@ -72,7 +72,7 @@
           <button
             v-show="canScrollLeft"
             type="button"
-            class="absolute inset-y-0 left-0 w-9 rounded-l-2xl bg-linear-to-r from-white/95 from-40% to-transparent flex items-center justify-start pl-1.5 text-gray-600 hover:text-gray-900 transition-colors"
+            class="absolute inset-y-0 left-0 w-9 rounded-l-2xl bg-linear-to-r from-sunken/95 from-40% to-transparent flex items-center justify-start pl-1.5 text-body hover:text-primary transition-colors"
             :aria-label="t('common.previous')"
             @click="scrollTabs('left')"
           >
@@ -81,7 +81,7 @@
           <button
             v-show="canScrollRight"
             type="button"
-            class="absolute inset-y-0 right-0 w-9 rounded-r-2xl bg-linear-to-l from-white/95 from-40% to-transparent flex items-center justify-end pr-1.5 text-gray-600 hover:text-gray-900 transition-colors"
+            class="absolute inset-y-0 right-0 w-9 rounded-r-2xl bg-linear-to-l from-sunken/95 from-40% to-transparent flex items-center justify-end pr-1.5 text-body hover:text-primary transition-colors"
             :aria-label="t('common.next')"
             @click="scrollTabs('right')"
           >
@@ -143,17 +143,10 @@
         leave-to-class="translate-y-2 opacity-0"
       >
         <div v-if="toast.show" class="fixed bottom-6 right-6 z-50">
-          <div
-            class="flex items-center gap-2 px-4 py-3 rounded-2xl shadow-lg border backdrop-blur text-sm font-medium"
-            :class="{
-              'bg-emerald-50/90 border-emerald-200 text-emerald-700': toast.type === 'success',
-              'bg-red-50/90 border-red-200 text-red-700': toast.type === 'error',
-              'bg-blue-50/90 border-blue-200 text-blue-700': toast.type === 'info'
-            }"
-          >
-            <Check v-if="toast.type === 'success'" :size="16" />
-            <AlertTriangle v-else-if="toast.type === 'error'" :size="16" />
-            <InfoIcon v-else :size="16" />
+          <div class="flex items-center gap-2 px-4 py-3 rounded-xl bg-popover ring-1 ring-line shadow-overlay text-sm font-medium text-body">
+            <Check v-if="toast.type === 'success'" :size="16" class="shrink-0 text-success" />
+            <AlertTriangle v-else-if="toast.type === 'error'" :size="16" class="shrink-0 text-danger" />
+            <InfoIcon v-else :size="16" class="shrink-0 text-info" />
             {{ toast.message }}
           </div>
         </div>

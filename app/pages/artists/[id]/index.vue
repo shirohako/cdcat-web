@@ -1,53 +1,53 @@
 <template>
-  <div class="min-h-screen bg-slate-50" :style="pageCssVariables">
+  <div class="min-h-screen" :style="pageCssVariables">
     <CatalogPendingBanner :pending="artist?.is_pending" :revision="artist?.pending_revision" />
     <section class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
-      <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
-        <div class="artist-banner bg-slate-200">
+      <div class="card overflow-hidden">
+        <div class="artist-banner bg-sunken">
           <img :src="artistPageConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
         </div>
-        <div class="relative h-11 bg-white md:h-13">
-          <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-sm ring-1 ring-slate-200 md:left-6">
+        <div class="relative h-11 md:h-13">
+          <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
             <img v-if="artist?.image_url" v-img-fade :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
-            <div v-else class="flex h-full w-full items-center justify-center text-slate-300"><Users class="h-7 w-7 md:h-9 md:w-9" /></div>
+            <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users class="h-7 w-7 md:h-9 md:w-9" /></div>
           </div>
         </div>
         <div class="p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
           <div v-if="artist" class="flex flex-col gap-4 sm:flex-row sm:items-start" :class="revealClass">
             <div class="min-w-0 flex-1">
-              <h1 class="flex flex-wrap items-center gap-2 text-lg font-bold tracking-tight text-slate-950 md:text-xl">
+              <h1 class="flex flex-wrap items-center gap-2 text-lg font-bold tracking-tight text-title md:text-xl">
                 {{ shownName }}
-                <span v-if="artist.type" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">{{ enumLabel('artist_type', artist.type) }}</span>
-                <span v-if="!artist.is_active" class="rounded bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500">{{ $t('artists.detail.inactive') }}</span>
+                <span v-if="artist.type" class="rounded bg-btn px-2 py-0.5 text-[11px] font-semibold text-btn-content">{{ enumLabel('artist_type', artist.type) }}</span>
+                <span v-if="!artist.is_active" class="rounded bg-sunken px-2 py-0.5 text-[11px] text-meta">{{ $t('artists.detail.inactive') }}</span>
                 <CatalogPendingBadge v-if="artist.is_pending" />
               </h1>
-              <p v-if="originalName" class="mt-0.5 text-sm text-slate-500">{{ originalName }}</p>
-              <p class="mt-1.5 max-w-3xl whitespace-pre-line text-sm leading-6 text-slate-600">{{ artist.bio || $t('artists.detail.no_bio') }}</p>
-              <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-slate-500">
-                <span class="inline-flex items-center gap-2"><Disc3 :size="16" class="text-slate-400" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
-                <span class="inline-flex items-center gap-2"><Users :size="16" class="text-slate-400" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
+              <p v-if="originalName" class="mt-0.5 text-sm text-meta">{{ originalName }}</p>
+              <p class="mt-1.5 max-w-3xl whitespace-pre-line text-sm leading-6 text-body">{{ artist.bio || $t('artists.detail.no_bio') }}</p>
+              <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-meta">
+                <span class="inline-flex items-center gap-2"><Disc3 :size="16" class="text-meta" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
+                <span class="inline-flex items-center gap-2"><Users :size="16" class="text-meta" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
               </div>
               <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
-              <div v-if="artist.titles?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-slate-100 pt-4 text-sm">
+              <div v-if="artist.titles?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
                 <div v-if="artist.titles?.length" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-5 text-gray-400">{{ $t('catalog.other_names') }}</span>
+                  <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('catalog.other_names') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
-                    <li v-for="(title, index) in artist.titles" :key="index" class="text-slate-700">
+                    <li v-for="(title, index) in artist.titles" :key="index" class="text-body">
                       {{ title.title }}
-                      <span class="text-[11px] text-gray-400">{{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}</span>
+                      <span class="text-[11px] text-meta">{{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}</span>
                     </li>
                   </ul>
                 </div>
                 <div v-if="artist.relations?.length" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-6 text-gray-400">{{ $t('artists.detail.relations') }}</span>
+                  <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t('artists.detail.relations') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-1.5">
                     <li v-for="relation in artist.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
-                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="inline-flex h-6 items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 pl-0.5 pr-2.5 text-xs text-slate-700 hover:border-slate-300 hover:bg-slate-100">
-                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-slate-200">
+                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="inline-flex h-6 items-center gap-1.5 rounded-full bg-btn pl-0.5 pr-2.5 text-xs text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover">
+                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken">
                           <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
                         </span>
                         {{ relation.artist.name }}
-                        <span class="text-[11px] text-gray-400">{{ enumLabel('artist_relation', relation.relation_type) }}</span>
+                        <span class="text-[11px] text-meta">{{ enumLabel('artist_relation', relation.relation_type) }}</span>
                       </NuxtLink>
                     </li>
                   </ul>
@@ -57,8 +57,8 @@
             </div>
             <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
               <button
-                class="inline-flex h-9 items-center gap-2 rounded-md border px-4 text-xs font-semibold transition-colors disabled:cursor-wait disabled:opacity-60"
-                :class="isFavorited ? 'border-slate-900 bg-slate-900 text-white hover:bg-slate-700' : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'"
+                class="inline-flex h-9 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ease-out disabled:cursor-wait disabled:opacity-60"
+                :class="isFavorited ? 'bg-primary text-on-primary hover:bg-primary-strong' : 'bg-btn text-btn-content hover:bg-btn-hover'"
                 :disabled="isToggling || (artist.is_pending && !isFavorited)"
                 :title="artist.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFollow"
@@ -66,15 +66,15 @@
                 <UserCheck v-if="isFavorited" :size="15" /><UserPlus v-else :size="15" />
                 {{ isFavorited ? $t('artists.detail.following') : $t('artists.detail.follow') }}
               </button>
-              <NuxtLink :to="`/artists/${artist.id}/versions`" class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800" :title="$t('versions.title')">
+              <NuxtLink :to="`/artists/${artist.id}/versions`" class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-btn text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="$t('versions.title')">
                 <History :size="15" />
               </NuxtLink>
-              <NuxtLink :to="`/contribute/artist/${artist.id}`" class="inline-flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800" :title="$t('common.edit')">
+              <NuxtLink :to="`/contribute/artist/${artist.id}`" class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-btn text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="$t('common.edit')">
                 <Edit :size="15" />
               </NuxtLink>
             </div>
           </div>
-          <div v-else-if="status === 'error'" class="flex min-h-28 items-center justify-center text-sm text-slate-500">{{ $t('common.load_failed') }}</div>
+          <div v-else-if="status === 'error'" class="flex min-h-28 items-center justify-center text-sm text-meta">{{ $t('common.load_failed') }}</div>
           <SkeletonStatus v-else page>
             <div class="skeleton h-7 w-48 rounded" />
             <div class="skeleton mt-3 h-3 w-full max-w-xl rounded" />
@@ -88,28 +88,26 @@
     </section>
 
     <main v-if="artist" class="mx-auto w-full max-w-6xl space-y-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl" :class="revealClass">
-      <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_8px_24px_-20px_rgba(15,23,42,0.24)]">
-        <header class="flex flex-wrap items-center gap-2 border-b border-slate-100 px-4 py-3 sm:px-6">
-          <Library :size="17" class="text-slate-500" />
-          <h2 class="mr-2 text-base font-semibold text-slate-900">{{ $t('artists.detail.releases') }}</h2>
+      <section class="card overflow-hidden">
+        <header class="flex flex-wrap items-center gap-2 border-b border-line px-4 py-3 sm:px-6">
+          <Library :size="17" class="text-primary" />
+          <h2 class="mr-2 text-base font-semibold text-title">{{ $t('artists.detail.releases') }}</h2>
           <button
             v-for="tab in roleTabs"
             :key="tab.role ?? 'all'"
             type="button"
-            class="rounded-full px-2.5 py-1 text-xs transition-colors"
-            :class="role === tab.role ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="chip chip-sm"
+            :class="{ 'chip-selected': role === tab.role }"
             @click="selectRole(tab.role)"
           >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
-          <div class="ml-auto inline-flex rounded-md bg-slate-100 p-0.5 text-xs">
-            <button
-              v-for="option in views"
-              :key="option"
-              type="button"
-              class="rounded px-2.5 py-1 transition-colors"
-              :class="view === option ? 'bg-white font-semibold text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
-              @click="selectView(option)"
-            >{{ option === 'albums' ? $t('artists.detail.view_albums') : $t('artists.detail.view_tracks') }}</button>
-          </div>
+          <UiTabs
+            :model-value="view"
+            variant="segmented"
+            size="sm"
+            class="ml-auto"
+            :items="views.map(option => ({ value: option, label: option === 'albums' ? $t('artists.detail.view_albums') : $t('artists.detail.view_tracks') }))"
+            @update:model-value="option => option && selectView(option)"
+          />
         </header>
         <div class="min-h-60 p-4 sm:p-6">
           <CollectionLoadingSkeleton v-if="albumsLoading" :grid-class="albumGridClass" :count="12" />
@@ -132,8 +130,8 @@
             <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
           </div>
           <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
-            <Disc3 :size="26" class="text-slate-300" />
-            <p class="mt-3 text-sm font-medium text-slate-600">{{ view === 'tracks' ? $t('artists.detail.no_tracks') : $t('artists.detail.no_releases') }}</p>
+            <Disc3 :size="26" class="text-faint" />
+            <p class="mt-3 text-sm font-medium text-body">{{ view === 'tracks' ? $t('artists.detail.no_tracks') : $t('artists.detail.no_releases') }}</p>
           </div>
           <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsRefetching" @update:page="albumPage = $event" />
         </div>

@@ -1,6 +1,6 @@
 @import "tailwindcss";
+@import "./theme.css";
 @import "./ui.css";
-@plugin "@tailwindcss/typography";
 
 /* Page switches (nuxt.config `app.pageTransition`): the old page fades out, then the new one fades in and settles. */
 .page-leave-active {
@@ -66,12 +66,12 @@
 }
 
 /* A placeholder block for content that is still loading; a light band sweeps across it. In the components
-   layer so utilities such as `bg-slate-200` can still change its colour. */
+   layer so utilities such as `bg-sunken` can still change its colour. */
 @layer components {
   .skeleton {
     position: relative;
     overflow: hidden;
-    background-color: var(--color-slate-100);
+    background-color: var(--skeleton);
   }
 
   .skeleton::after {
@@ -79,7 +79,7 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    background: linear-gradient(90deg, transparent, var(--skeleton-band), transparent);
     animation: skeleton-shimmer 1.4s ease-in-out infinite;
   }
 

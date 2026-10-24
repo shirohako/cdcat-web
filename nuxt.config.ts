@@ -1,4 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath } from 'node:url'
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
@@ -29,6 +30,16 @@ export default defineNuxtConfig({
   routeRules: {
     // The writing page moved when articles gained review; keep old links working.
     '/articles/create': { redirect: { to: '/articles/new', statusCode: 301 } },
+  },
+
+  // The component showcase (app/dev/UiShowcase.vue) lives outside app/pages and is routed only under `nuxt dev`,
+  // so production builds have no /dev/ui at all.
+  $development: {
+    hooks: {
+      'pages:extend'(pages) {
+        pages.push({ name: 'dev-ui', path: '/dev/ui', file: fileURLToPath(new URL('./app/dev/UiShowcase.vue', import.meta.url)) })
+      },
+    },
   },
 
   // The Markdown editor keeps its upstream file names (MarkdownEditor,

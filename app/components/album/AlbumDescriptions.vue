@@ -1,15 +1,10 @@
 <template>
-  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="card overflow-hidden">
     <!-- Header -->
-    <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center shrink-0">
-        <FileText :size="16" class="text-sky-500" />
-      </div>
-      <h2 class="text-base font-bold text-gray-900">{{ $t('album.section.description') }}</h2>
-    </div>
+    <UiSectionTitle :title="$t('album.section.description')" :icon="FileText" class="px-6 pb-2 pt-5" />
 
     <!-- Content -->
-    <div class="px-6 py-5 text-gray-700">
+    <div class="px-6 pb-5 pt-2 text-body">
       <RichContent :content="description" format="markdown" />
     </div>
   </section>

@@ -1318,6 +1318,16 @@
   "site": {
     "dismiss_announcement": "Dismiss announcement"
   },
+  "appearance": {
+    "title": "Appearance",
+    "open": "Appearance settings",
+    "dark": "Dark",
+    "light": "Light",
+    "color": "Theme colour",
+    "hue": "Hue {hue}",
+    "reset": "Reset",
+    "preset": "Use hue {hue}"
+  },
   "event_picker": {
     "placeholder": "Search events, e.g. C107 or M3-2025",
     "searching": "Searching…",

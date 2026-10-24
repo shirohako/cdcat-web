@@ -85,59 +85,59 @@ function remove(link: ContentLinkSummary) {
 <template>
   <div class="space-y-3">
     <ul v-if="model.length" class="space-y-1.5">
-      <li v-for="link in model" :key="`${link.type}:${link.id}`" class="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white p-1.5 pr-2">
-        <div class="size-9 shrink-0 overflow-hidden rounded-md bg-slate-100">
+      <li v-for="link in model" :key="`${link.type}:${link.id}`" class="flex items-center gap-2.5 rounded-lg bg-sunken p-1.5 pr-2">
+        <div class="size-9 shrink-0 overflow-hidden rounded-md bg-btn">
           <img v-if="link.image_url" :src="link.image_url" :alt="link.title" class="size-full object-cover" loading="lazy" referrerpolicy="no-referrer">
-          <component :is="TYPE_META[link.type].icon" v-else :size="16" class="m-2.5 text-slate-400" />
+          <component :is="TYPE_META[link.type].icon" v-else :size="16" class="m-2.5 text-faint" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-medium text-slate-800">{{ link.title }}</p>
-          <p class="text-[11px] text-slate-400">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
+          <p class="truncate text-sm font-medium text-title">{{ link.title }}</p>
+          <p class="text-[11px] text-faint">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
         </div>
         <button
-          type="button" class="grid size-7 place-items-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40"
+          type="button" class="grid size-7 place-items-center rounded-md text-faint transition-colors hover:bg-ghost-hover hover:text-danger disabled:opacity-40"
           :disabled="disabled" :aria-label="t('article_ui.links.remove', { title: link.title })" @click="remove(link)">
           <X :size="14" />
         </button>
       </li>
     </ul>
 
-    <div v-if="!disabled" class="rounded-lg border border-slate-200 bg-slate-50/60 p-2">
+    <div v-if="!disabled" class="rounded-lg border border-line bg-sunken p-2">
       <div class="flex flex-wrap gap-1" role="tablist" :aria-label="t('article_ui.links.type')">
         <button
           v-for="linkType in CONTENT_LINK_TYPES" :key="linkType" type="button" role="tab" :aria-selected="type === linkType"
           class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition"
-          :class="type === linkType ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-white hover:text-slate-800'"
+          :class="type === linkType ? 'bg-primary text-on-primary' : 'text-meta hover:bg-ghost-hover hover:text-primary'"
           @click="type = linkType">
           <component :is="TYPE_META[linkType].icon" :size="12" />
           {{ t(`article_ui.link_types.${linkType}`) }}
         </button>
       </div>
-      <label class="mt-2 flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 focus-within:border-violet-400">
-        <Search :size="14" class="shrink-0 text-slate-400" />
+      <label class="mt-2 flex items-center gap-2 rounded-md border border-line bg-field px-2.5 py-1.5 transition-colors focus-within:border-primary">
+        <Search :size="14" class="shrink-0 text-faint" />
         <input
-          v-model="query" type="search" maxlength="100" :disabled="full" class="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-300"
+          v-model="query" type="search" maxlength="100" :disabled="full" class="min-w-0 flex-1 bg-transparent text-sm text-title outline-none placeholder:text-faint"
           :placeholder="full ? t('article_ui.links.full', { max }) : t('article_ui.links.search', { type: t(`article_ui.link_types.${type}`) })">
-        <Loader2 v-if="searching" :size="14" class="shrink-0 animate-spin text-slate-400" />
+        <Loader2 v-if="searching" :size="14" class="shrink-0 animate-spin text-faint" />
       </label>
-      <p v-if="searchError" class="mt-2 text-xs text-rose-600">{{ t('article_ui.links.search_failed') }}</p>
+      <p v-if="searchError" class="mt-2 text-xs text-danger">{{ t('article_ui.links.search_failed') }}</p>
       <ul v-else-if="results.length" class="mt-2 max-h-64 space-y-1 overflow-y-auto">
         <li v-for="result in results" :key="`${result.type}:${result.id}`">
           <button
-            type="button" class="flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition hover:bg-white disabled:cursor-default disabled:opacity-50"
+            type="button" class="flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-card-hover disabled:cursor-default disabled:opacity-50"
             :disabled="isLinked(result) || full" @click="add(result)">
-            <div class="size-8 shrink-0 overflow-hidden rounded bg-slate-100">
+            <div class="size-8 shrink-0 overflow-hidden rounded bg-btn">
               <img v-if="result.image_url" :src="result.image_url" :alt="result.title" class="size-full object-cover" loading="lazy" referrerpolicy="no-referrer">
             </div>
             <span class="min-w-0 flex-1">
-              <span class="block truncate text-sm text-slate-800">{{ result.title }}</span>
-              <span v-if="result.date" class="block text-[11px] text-slate-400">{{ result.date }}</span>
+              <span class="block truncate text-sm text-title">{{ result.title }}</span>
+              <span v-if="result.date" class="block text-[11px] text-faint">{{ result.date }}</span>
             </span>
-            <Plus v-if="!isLinked(result)" :size="14" class="shrink-0 text-slate-400" />
+            <Plus v-if="!isLinked(result)" :size="14" class="shrink-0 text-primary" />
           </button>
         </li>
       </ul>
-      <p v-else-if="query.trim().length >= 2 && !searching" class="mt-2 px-1 text-xs text-slate-400">{{ t('article_ui.links.no_results') }}</p>
+      <p v-else-if="query.trim().length >= 2 && !searching" class="mt-2 px-1 text-xs text-faint">{{ t('article_ui.links.no_results') }}</p>
     </div>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-page">
     <!-- Sidebar -->
     <AppSidebar
       :is-collapsed="isSidebarCollapsed"
@@ -51,10 +51,10 @@ watch(() => route.path, () => {
 const { locale, locales } = useI18n()
 const config = useRuntimeConfig()
 
-// SEO: 设置 HTML lang 属性和 hreflang 链接
+// SEO: 设置 HTML lang 属性和 hreflang 链接（lang 跟随语言切换）
 useHead({
   htmlAttrs: {
-    lang: locale.value
+    lang: () => locale.value
   },
   link: computed(() => {
     const links: { rel: 'alternate', hreflang: string, href: string }[] = []
@@ -79,15 +79,6 @@ useHead({
     })
 
     return links
-  })
-})
-
-// 监听语言变化，更新 HTML lang 属性
-watch(locale, (newLocale) => {
-  useHead({
-    htmlAttrs: {
-      lang: newLocale
-    }
   })
 })
 </script>

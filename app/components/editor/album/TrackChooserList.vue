@@ -1,15 +1,15 @@
 <template>
   <div>
     <div v-for="disc in discs" :key="disc.id">
-      <div class="sticky top-0 flex items-center gap-2 bg-gray-50 px-3 py-1 text-[11px] font-bold text-gray-500">
+      <div class="sticky top-0 flex items-center gap-2 bg-sunken px-3 py-1 text-[11px] font-bold text-meta">
         {{ $t('editor.album.disc_n', { n: disc.position }) }}
-        <button type="button" class="ml-auto font-normal text-primary hover:underline" @click="emit('setDisc', disc.id, true)">{{ $t('common.all') }}</button>
-        <button type="button" class="font-normal text-gray-500 hover:underline" @click="emit('setDisc', disc.id, false)">{{ $t('common.none') }}</button>
+        <button type="button" class="link ml-auto font-normal" @click="emit('setDisc', disc.id, true)">{{ $t('common.all') }}</button>
+        <button type="button" class="link link-muted font-normal" @click="emit('setDisc', disc.id, false)">{{ $t('common.none') }}</button>
       </div>
-      <label v-for="track in tracksOn(album, disc.id)" :key="track.id" class="flex cursor-pointer items-center gap-2 px-3 py-1 text-xs hover:bg-gray-50">
+      <label v-for="track in tracksOn(album, disc.id)" :key="track.id" class="flex cursor-pointer items-center gap-2 px-3 py-1 text-xs transition-colors hover:bg-card-hover active:bg-card-active">
         <input type="checkbox" class="checkbox checkbox-xs" :checked="has(track.id)" :disabled="has(track.id) && modelValue.length === 1" @change="emit('toggle', track.id)">
-        <span class="w-6 shrink-0 text-right font-mono text-gray-400">{{ track.number_label || track.track_number }}</span>
-        <span class="truncate text-gray-700">{{ track.title || '—' }}</span>
+        <span class="w-6 shrink-0 text-right font-mono text-meta">{{ track.number_label || track.track_number }}</span>
+        <span class="truncate text-body">{{ track.title || '—' }}</span>
       </label>
     </div>
   </div>

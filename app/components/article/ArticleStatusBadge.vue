@@ -4,10 +4,10 @@ import type { ArticleStatus } from '~/types/article'
 const props = defineProps<{ status: ArticleStatus }>()
 const { t } = useI18n()
 const tone: Record<ArticleStatus, string> = {
-  draft: 'bg-slate-100 text-slate-600',
-  published: 'bg-emerald-100 text-emerald-700',
-  hidden: 'bg-amber-100 text-amber-700',
-  locked: 'bg-rose-100 text-rose-700',
+  draft: 'bg-btn text-btn-content',
+  published: 'bg-success/15 text-success',
+  hidden: 'bg-warning/15 text-warning',
+  locked: 'bg-danger/15 text-danger',
 }
 </script>
 

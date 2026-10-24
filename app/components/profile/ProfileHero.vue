@@ -1,8 +1,6 @@
 <template>
   <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 pb-2 pt-8 md:px-6">
-    <header
-      class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.35)]"
-    >
+    <header class="card relative overflow-hidden">
       <div class="relative h-38 sm:h-44 md:h-52">
         <img
           v-if="displayBanner && !bannerLoadFailed"
@@ -14,18 +12,18 @@
         >
         <div
           v-else
-          class="h-full w-full bg-linear-to-r from-[#f1dea8] via-[#f0d8bb] to-[#edc7cc]"
+          class="h-full w-full bg-linear-to-br from-primary/35 via-sunken to-card"
         />
         <div
-          class="pointer-events-none absolute inset-0 bg-linear-to-b from-white/0 to-white/30"
+          class="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent to-card/30"
         />
       </div>
 
       <div
-        class="relative border-t border-slate-100 bg-white px-4 pb-4 sm:px-6 sm:pb-6"
+        class="relative border-t border-line px-4 pb-4 sm:px-6 sm:pb-6"
       >
         <div
-          class="absolute -top-22 left-4 h-30 w-30 overflow-hidden rounded-full border-3 border-white bg-gray-100 shadow-md sm:-top-28 sm:left-6 sm:h-38 sm:w-38 sm:border-4"
+          class="absolute -top-22 left-4 h-30 w-30 overflow-hidden rounded-full border-3 border-card bg-sunken sm:-top-28 sm:left-6 sm:h-38 sm:w-38 sm:border-4"
         >
           <img
             v-if="displayAvatar"
@@ -37,31 +35,31 @@
           >
           <span
             v-else
-            class="grid h-full w-full place-items-center text-slate-700"
+            class="grid h-full w-full place-items-center text-body"
           >
-            <User :size="30" class="text-gray-400 sm:h-9 sm:w-9" />
+            <User :size="30" class="text-faint sm:h-9 sm:w-9" />
           </span>
         </div>
 
         <button
           type="button"
-          class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-500"
+          class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
           :aria-label="moreActionsLabel"
         >
           <MoreVertical :size="18" />
         </button>
 
         <h1
-          class="mt-12 truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-slate-900 sm:mt-14 sm:text-[1.28rem] md:text-[1.42rem]"
+          class="mt-12 truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-title sm:mt-14 sm:text-[1.28rem] md:text-[1.42rem]"
         >
           {{ profileDisplayName }}
         </h1>
 
         <p
-          class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-slate-600 sm:text-[1rem]"
+          class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-body sm:text-[1rem]"
         >
           <span>@{{ profile.username }}</span>
-          <span class="text-slate-300" aria-hidden="true">•</span>
+          <span class="text-faint" aria-hidden="true">•</span>
           <span class="inline-flex items-center gap-1.5">
             <Calendar :size="14" />
             {{ $t("profile.joined") }} {{ memberSince }}
@@ -72,7 +70,7 @@
           <p
             ref="bioTextRef"
             :class="[
-              'wrap-break-word text-[0.88rem] leading-[1.55] text-slate-700 transition-all sm:text-[0.96rem] sm:leading-[1.6]',
+              'wrap-break-word text-[0.88rem] leading-[1.55] text-body transition-all sm:text-[0.96rem] sm:leading-[1.6]',
               bioCollapsible && !bioExpanded
                 ? 'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]'
                 : '',
@@ -83,7 +81,7 @@
           <button
             v-if="bioCollapsible"
             type="button"
-            class="mt-1 border-none bg-transparent p-0 text-[0.8rem] font-semibold text-blue-600 hover:text-blue-700 hover:underline sm:text-[0.84rem]"
+            class="link mt-1 border-none text-[0.8rem] font-semibold sm:text-[0.84rem]"
             @click="bioExpanded = !bioExpanded"
           >
             {{ bioExpanded ? bioCollapseLabel : bioExpandLabel }}

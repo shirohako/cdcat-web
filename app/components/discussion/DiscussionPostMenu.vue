@@ -45,15 +45,18 @@ const run = (action: () => void) => {
 const onClickOutside = (event: MouseEvent) => { if (open.value && root.value && !root.value.contains(event.target as Node)) open.value = false }
 onMounted(() => document.addEventListener('click', onClickOutside))
 onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
-const item = 'flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50'
+const item = 'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary'
+const dangerItem = 'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-danger transition-colors duration-150 ease-out hover:bg-danger/10'
+// The moderators' colour, as on their badge.
+const moderatorItem = 'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm text-indigo-700 transition-colors duration-150 ease-out hover:bg-ghost-hover dark:text-indigo-300'
 </script>
 
 <template>
   <div ref="root" class="relative">
-    <button type="button" class="grid size-7 place-items-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700" :aria-label="t('discussions.post.more')" :aria-expanded="open" @click.stop="open = !open">
+    <button type="button" class="grid size-7 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" :aria-label="t('discussions.post.more')" :aria-expanded="open" @click.stop="open = !open">
       <MoreHorizontal :size="16" />
     </button>
-    <div v-if="open" class="absolute right-0 top-full z-30 mt-1 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg" role="menu">
+    <div v-if="open" class="absolute right-0 top-full z-30 mt-1 w-48 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line" role="menu">
       <button type="button" role="menuitem" :class="item" @click="copyLink"><Link2 :size="14" />{{ t('discussions.post.copy_link') }}</button>
       <button v-if="isAuthenticated" type="button" role="menuitem" :class="item" @click="toggleBookmark">
         <component :is="post.bookmarked ? BookmarkCheck : Bookmark" :size="14" />{{ post.bookmarked ? t('discussions.post.unbookmark') : t('discussions.post.bookmark') }}
@@ -62,9 +65,10 @@ const item = 'flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-sl
         <CheckCircle2 :size="14" />{{ accepted ? t('discussions.answer.unaccept') : t('discussions.answer.accept') }}
       </button>
       <button v-if="post.can.edit" type="button" role="menuitem" :class="item" @click="run(() => emit('edit'))"><Pencil :size="14" />{{ t('common.edit') }}</button>
-      <button v-if="post.can.delete" type="button" role="menuitem" :class="[item, 'text-rose-600']" @click="run(() => emit('delete'))"><Trash2 :size="14" />{{ t('common.delete') }}</button>
+      <button v-if="post.can.delete" type="button" role="menuitem" :class="dangerItem" @click="run(() => emit('delete'))"><Trash2 :size="14" />{{ t('common.delete') }}</button>
       <button v-if="post.can.report" type="button" role="menuitem" :class="item" @click="run(() => context.report(post))"><Flag :size="14" />{{ t('discussions.report.title') }}</button>
-      <button v-if="post.can.moderate" type="button" role="menuitem" :class="[item, 'border-t border-slate-100 text-indigo-700']" @click="run(() => context.moderate(post))"><Shield :size="14" />{{ t('discussions.moderation.title') }}</button>
+      <UiMenuDivider v-if="post.can.moderate" />
+      <button v-if="post.can.moderate" type="button" role="menuitem" :class="moderatorItem" @click="run(() => context.moderate(post))"><Shield :size="14" />{{ t('discussions.moderation.title') }}</button>
     </div>
   </div>
 </template>

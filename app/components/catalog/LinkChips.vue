@@ -6,13 +6,13 @@
       :href="link.url"
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex h-7 items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 text-xs text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+      class="inline-flex h-7 items-center gap-1.5 rounded-md bg-btn px-2.5 text-xs font-medium text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover"
       :title="link.url"
     >
       <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" alt="" class="h-3.5 w-3.5 rounded-sm object-contain">
-      <Globe v-else :size="13" class="text-slate-400" />
+      <Globe v-else :size="13" class="opacity-60" />
       {{ label(link) }}
-      <ExternalLink :size="11" class="text-slate-300" />
+      <ExternalLink :size="11" class="opacity-40" />
     </a>
   </div>
 </template>

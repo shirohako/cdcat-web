@@ -1,6 +1,6 @@
 <template>
   <div class="relative">
-    <Search class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+    <Search class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint" aria-hidden="true" />
     <input
       ref="input"
       v-model="query"
@@ -23,12 +23,12 @@
       @keydown="onKeydown"
     >
     <span class="absolute right-1.5 top-1/2 flex -translate-y-1/2 items-center">
-      <Loader2 v-if="searching" class="m-1 h-3.5 w-3.5 animate-spin text-gray-400" aria-hidden="true" />
+      <Loader2 v-if="searching" class="m-1 h-3.5 w-3.5 animate-spin text-faint" aria-hidden="true" />
       <button
         v-else-if="query"
         type="button"
         tabindex="-1"
-        class="flex h-6 w-6 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+        class="flex h-6 w-6 items-center justify-center rounded-md text-faint transition-colors hover:bg-ghost-hover hover:text-primary"
         :aria-label="$t('common.clear')"
         @mousedown.prevent
         @click="clear"
@@ -42,14 +42,14 @@
         :id="listId"
         ref="panel"
         role="listbox"
-        class="fixed z-[60] overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg"
+        class="fixed z-[60] overflow-y-auto rounded-xl bg-popover py-1 shadow-overlay ring-1 ring-line"
         :style="panelStyle"
         @mousedown.prevent
       >
-        <p v-if="term.length < 2" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.search_min') }}</p>
-        <p v-else-if="failed" class="px-3 py-2 text-xs text-error">{{ $t('catalog.form.search_failed') }}</p>
-        <p v-else-if="stale && !results.length" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.searching') }}</p>
-        <p v-else-if="!results.length" class="px-3 py-2 text-xs text-gray-500">{{ $t('catalog.form.no_results') }}</p>
+        <p v-if="term.length < 2" class="px-3 py-2 text-xs text-meta">{{ $t('catalog.form.search_min') }}</p>
+        <p v-else-if="failed" class="px-3 py-2 text-xs text-danger">{{ $t('catalog.form.search_failed') }}</p>
+        <p v-else-if="stale && !results.length" class="px-3 py-2 text-xs text-meta">{{ $t('catalog.form.searching') }}</p>
+        <p v-else-if="!results.length" class="px-3 py-2 text-xs text-meta">{{ $t('catalog.form.no_results') }}</p>
 
         <template v-for="(option, index) in options" :key="option.kind === 'item' ? option.item.id : 'create'">
           <div
@@ -58,28 +58,28 @@
             role="option"
             :aria-selected="index === active"
             class="flex cursor-pointer items-center gap-2.5 px-3 py-1.5 transition-opacity"
-            :class="[index === active ? 'bg-blue-50' : '', stale ? 'opacity-60' : '']"
+            :class="[index === active ? 'bg-ghost-hover' : '', stale ? 'opacity-60' : '']"
             @mousemove="active = index"
             @click="choose(option)"
           >
             <img v-if="option.item.image_url" :src="option.item.image_url" alt="" class="h-8 w-8 shrink-0 rounded object-cover">
-            <span v-else class="h-8 w-8 shrink-0 rounded bg-gray-100" />
+            <span v-else class="h-8 w-8 shrink-0 rounded bg-btn" />
             <span class="min-w-0 flex-1">
               <span class="flex min-w-0 items-center gap-1.5">
-                <span class="truncate text-sm text-gray-900">{{ option.item.label }}</span>
+                <span class="truncate text-sm text-title">{{ option.item.label }}</span>
                 <CatalogPendingBadge v-if="option.item.is_pending" />
               </span>
-              <span v-if="option.item.subtitle" class="block truncate text-[11px] text-gray-500">{{ option.item.subtitle }}</span>
+              <span v-if="option.item.subtitle" class="block truncate text-[11px] text-meta">{{ option.item.subtitle }}</span>
             </span>
-            <span class="shrink-0 text-[11px] text-gray-400">#{{ option.item.id }}</span>
+            <span class="shrink-0 text-[11px] text-faint">#{{ option.item.id }}</span>
           </div>
           <div
             v-else
             :id="optionId(index)"
             role="option"
             :aria-selected="index === active"
-            class="flex cursor-pointer items-center gap-2 border-t border-gray-100 px-3 py-2 text-sm text-primary"
-            :class="{ 'bg-blue-50': index === active }"
+            class="flex cursor-pointer items-center gap-2 border-t border-line px-3 py-2 text-sm text-primary"
+            :class="{ 'bg-ghost-hover': index === active }"
             @mousemove="active = index"
             @click="choose(option)"
           >

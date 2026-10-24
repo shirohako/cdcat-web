@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50/60">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
       <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
 
@@ -11,32 +11,32 @@
       <template v-else-if="ready">
         <header class="mb-5 flex flex-wrap items-end gap-3">
           <div class="min-w-0 flex-1">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
-            <h1 class="truncate text-2xl font-bold text-gray-900">{{ album.title || $t('editor.album.untitled') }}</h1>
-            <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
-              <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="hover:underline">{{ $t('editor.album.view') }}</NuxtLink>
-              <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="hover:underline">{{ $t('versions.title') }}</NuxtLink>
-              <NuxtLink to="/revisions" class="hover:underline">{{ $t('editor.my_revisions') }}</NuxtLink>
+            <p class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
+            <h1 class="truncate text-2xl font-bold text-title">{{ album.title || $t('editor.album.untitled') }}</h1>
+            <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
+              <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="link link-muted">{{ $t('editor.album.view') }}</NuxtLink>
+              <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>
+              <NuxtLink to="/revisions" class="link link-muted">{{ $t('editor.my_revisions') }}</NuxtLink>
             </p>
           </div>
-          <div class="flex rounded-xl border border-gray-200 bg-white p-1 text-sm shadow-sm">
-            <button type="button" class="rounded-lg px-3 py-1.5" :class="!translating ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'" @click="go('basic')">
+          <div class="flex gap-1 rounded-xl bg-sunken p-1 text-sm ring-1 ring-line">
+            <button type="button" class="rounded-lg px-3 py-1.5 font-semibold transition-colors" :class="!translating ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="go('basic')">
               <PencilLine :size="14" class="mr-1 inline" />{{ $t('editor.mode_edit') }}
             </button>
-            <button type="button" class="rounded-lg px-3 py-1.5" :class="translating ? 'bg-gray-900 text-white' : 'text-gray-600 hover:bg-gray-100'" @click="go('translate')">
+            <button type="button" class="rounded-lg px-3 py-1.5 font-semibold transition-colors" :class="translating ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="go('translate')">
               <Languages :size="14" class="mr-1 inline" />{{ $t('editor.mode_translate') }}
             </button>
           </div>
         </header>
 
-        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
-          <History :size="16" class="shrink-0" />
+        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
           <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
           <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
-        <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p class="font-semibold">{{ $t('editor.changes_requested') }}</p>
+        <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
         <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
@@ -49,29 +49,29 @@
                 :key="section.key"
                 type="button"
                 class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-                :class="active === section.key ? 'bg-white font-semibold text-gray-900 shadow-sm ring-1 ring-gray-200' : 'text-gray-600 hover:bg-white/70'"
+                :class="active === section.key ? 'bg-card font-semibold text-primary' : 'text-body hover:bg-card/60 hover:text-primary'"
                 @click="go(section.key)"
               >
-                <component :is="section.icon" :size="15" class="shrink-0 text-gray-400" />
+                <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
                 <span class="flex-1 whitespace-nowrap">{{ section.label }}</span>
-                <span v-if="errorCounts[section.key]" class="rounded-full bg-rose-100 px-1.5 text-[10px] font-bold text-rose-700">{{ errorCounts[section.key] }}</span>
-                <span v-else-if="missingIn(section.key)" class="h-2 w-2 rounded-full bg-amber-400" :title="$t('editor.required_missing')" />
+                <span v-if="errorCounts[section.key]" class="rounded-full bg-danger/15 px-1.5 text-[10px] font-bold text-danger">{{ errorCounts[section.key] }}</span>
+                <span v-else-if="missingIn(section.key)" class="h-2 w-2 rounded-full bg-warning" :title="$t('editor.required_missing')" />
               </button>
             </nav>
 
-            <div class="hidden rounded-xl border border-gray-200 bg-white p-4 text-sm shadow-sm lg:block">
-              <p class="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{{ $t('editor.required') }}</p>
+            <div class="card hidden p-4 text-sm lg:block">
+              <p class="mb-2 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.required') }}</p>
               <ul class="space-y-1.5">
                 <li v-for="check in requiredChecks" :key="check.key">
-                  <button type="button" class="flex items-center gap-2 text-left hover:underline" :class="check.done ? 'text-gray-500' : 'text-gray-900'" @click="go(check.section)">
-                    <CircleCheck v-if="check.done" :size="14" class="text-emerald-500" /><Circle v-else :size="14" class="text-amber-500" />{{ check.label }}
+                  <button type="button" class="flex items-center gap-2 text-left transition-colors hover:text-primary" :class="check.done ? 'text-meta' : 'text-title'" @click="go(check.section)">
+                    <CircleCheck v-if="check.done" :size="14" class="text-success" /><Circle v-else :size="14" class="text-warning" />{{ check.label }}
                   </button>
                 </li>
               </ul>
               <template v-if="suggested.length">
-                <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-gray-400">{{ $t('editor.recommended') }}</p>
-                <ul class="space-y-1.5 text-xs text-gray-500">
-                  <li v-for="item in suggested" :key="item.key"><button type="button" class="hover:underline" @click="go(item.section)">+ {{ item.label }}</button></li>
+                <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.recommended') }}</p>
+                <ul class="space-y-1.5 text-xs text-meta">
+                  <li v-for="item in suggested" :key="item.key"><button type="button" class="link link-muted" @click="go(item.section)">+ {{ item.label }}</button></li>
                 </ul>
               </template>
             </div>
@@ -88,13 +88,13 @@
             <EditorAlbumImagesSection v-else-if="active === 'images'" />
             <EditorAlbumRelationsSection v-else-if="active === 'relations'" />
             <EditorAlbumTranslateSection v-else-if="active === 'translate'" :initial-locale="locale" />
-            <CatalogSection v-else :title="$t('editor.section_submit')" :icon="Send" tone="blue">
+            <CatalogSection v-else :title="$t('editor.section_submit')" :icon="Send">
               <div class="space-y-4 p-5">
-                <div v-if="missing.length" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  <p class="font-semibold">{{ $t('editor.required_missing') }}</p>
+                <div v-if="missing.length" class="rounded-lg border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+                  <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
                   <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
                     <li v-for="check in requiredChecks.filter(item => !item.done)" :key="check.key">
-                      <button type="button" class="hover:underline" @click="go(check.section)">{{ check.label }}</button>
+                      <button type="button" class="link link-muted" @click="go(check.section)">{{ check.label }}</button>
                     </li>
                   </ul>
                 </div>

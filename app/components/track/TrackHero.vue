@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full overflow-hidden bg-white">
+  <div class="relative w-full overflow-hidden bg-card">
     <img
       v-if="cover"
       v-img-fade
@@ -16,35 +16,35 @@
             v-img-fade
             :src="cover"
             :alt="track.album.title"
-            class="h-36 w-36 rounded-md object-cover shadow-2xl sm:h-44 sm:w-44 md:h-48 md:w-48 lg:h-56 lg:w-56"
+            class="h-36 w-36 rounded-md object-cover sm:h-44 sm:w-44 md:h-48 md:w-48 lg:h-56 lg:w-56"
           >
-          <div v-else class="flex h-36 w-36 items-center justify-center rounded-md bg-gray-100 text-gray-300 shadow-2xl sm:h-44 sm:w-44 md:h-48 md:w-48 lg:h-56 lg:w-56">
+          <div v-else class="flex h-36 w-36 items-center justify-center rounded-md bg-sunken text-faint sm:h-44 sm:w-44 md:h-48 md:w-48 lg:h-56 lg:w-56">
             <Music :size="56" />
           </div>
         </NuxtLink>
 
         <div class="flex w-full flex-1 items-stretch">
-          <div class="flex w-full flex-col justify-between rounded-lg p-3 backdrop-blur-[4.45px] sm:p-4 md:p-6" style="opacity: 0.94; background-color: rgba(198, 175, 175, 0.3)">
+          <div class="flex w-full flex-col justify-between rounded-lg bg-card/60 p-3 backdrop-blur sm:p-4 md:p-6">
             <div>
-              <p v-if="track.album" class="mb-2 flex flex-wrap items-center justify-center gap-x-1.5 text-xs text-gray-600 md:justify-start">
-                <Disc3 :size="13" class="shrink-0 text-gray-500" />
-                <NuxtLink :to="`/albums/${track.album.id}`" class="font-medium hover:text-gray-900 hover:underline">{{ albumTitle }}</NuxtLink>
-                <span class="text-gray-400">·</span>
+              <p v-if="track.album" class="mb-2 flex flex-wrap items-center justify-center gap-x-1.5 text-xs text-body md:justify-start">
+                <Disc3 :size="13" class="shrink-0 text-meta" />
+                <NuxtLink :to="`/albums/${track.album.id}`" class="link link-muted font-medium">{{ albumTitle }}</NuxtLink>
+                <span class="text-meta">·</span>
                 <span class="font-mono">{{ position }}</span>
               </p>
 
-              <h1 class="mb-1 wrap-break-word text-center text-lg font-bold leading-snug text-gray-900 md:text-left md:text-xl lg:text-2xl">{{ shownTitle }}</h1>
-              <p v-if="originalTitle" class="mb-2 text-center text-sm text-gray-600 md:text-left">{{ originalTitle }}</p>
+              <h1 class="mb-1 wrap-break-word text-center text-lg font-bold leading-snug text-title md:text-left md:text-xl lg:text-2xl">{{ shownTitle }}</h1>
+              <p v-if="originalTitle" class="mb-2 text-center text-sm text-body md:text-left">{{ originalTitle }}</p>
 
-              <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-gray-700 md:justify-start">
+              <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-body md:justify-start">
                 <span v-if="track.duration" class="flex items-center gap-1.5">
-                  <Clock :size="14" class="shrink-0 text-gray-500" />{{ formatDuration(track.duration) }}
+                  <Clock :size="14" class="shrink-0 text-meta" />{{ formatDuration(track.duration) }}
                 </span>
                 <span v-if="track.has_lyrics" class="flex items-center gap-1.5">
-                  <FileText :size="14" class="shrink-0 text-gray-500" />{{ $t('lyrics_ui.lyrics') }}<span v-if="track.translations_count" class="text-teal-600">+{{ track.translations_count }}</span>
+                  <FileText :size="14" class="shrink-0 text-meta" />{{ $t('lyrics_ui.lyrics') }}<span v-if="track.translations_count" class="text-teal-600 dark:text-teal-400">+{{ track.translations_count }}</span>
                 </span>
-                <span v-if="track.is_instrumental" class="rounded bg-gray-800/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-gray-700">{{ $t('content_display.instrumental') }}</span>
-                <span v-if="track.isrc" class="font-mono text-xs text-gray-600">ISRC {{ track.isrc }}</span>
+                <span v-if="track.is_instrumental" class="rounded bg-btn px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-btn-content">{{ $t('content_display.instrumental') }}</span>
+                <span v-if="track.isrc" class="font-mono text-xs text-body">ISRC {{ track.isrc }}</span>
                 <CatalogPendingBadge v-if="track.is_pending" />
               </div>
             </div>
@@ -53,7 +53,7 @@
               <button
                 type="button"
                 class="btn btn-xs h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
-                :class="isFavorited ? 'border-red-500 bg-red-500 text-white hover:bg-red-600' : 'btn-outline border-red-400 text-red-600 hover:bg-red-50'"
+                :class="isFavorited ? 'border-red-500 bg-red-500 text-white hover:bg-red-600 dark:border-red-400 dark:bg-red-400 dark:text-red-950 dark:hover:bg-red-500' : 'btn-outline border-red-400 text-red-600 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/15'"
                 :disabled="isToggling || (track.is_pending && !isFavorited)"
                 :title="track.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFavorite"
@@ -63,7 +63,7 @@
               </button>
               <NuxtLink
                 :to="isAuthenticated ? editPath : `/auth/login?redirect=${editPath}`"
-                class="btn btn-xs btn-outline h-7 min-h-0 flex-1 gap-1.5 border-gray-400 text-gray-700 hover:bg-gray-50 lg:h-8 lg:flex-none lg:px-5"
+                class="btn btn-xs btn-outline h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
                 :title="$t('tracks.edit_hint')"
               >
                 <Edit :size="13" />
@@ -73,7 +73,7 @@
                 <component
                   :is="previous ? NuxtLink : 'span'"
                   :to="previous ? `/tracks/${previous.id}` : undefined"
-                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 text-gray-700 lg:h-8"
+                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 lg:h-8"
                   :class="{ 'btn-disabled opacity-40': !previous }"
                   :title="previous ? previous.title : undefined"
                   :aria-label="$t('tracks.previous')"
@@ -83,7 +83,7 @@
                 <component
                   :is="next ? NuxtLink : 'span'"
                   :to="next ? `/tracks/${next.id}` : undefined"
-                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 text-gray-700 lg:h-8"
+                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 lg:h-8"
                   :class="{ 'btn-disabled opacity-40': !next }"
                   :title="next ? next.title : undefined"
                   :aria-label="$t('tracks.next')"

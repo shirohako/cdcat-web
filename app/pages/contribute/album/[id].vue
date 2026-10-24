@@ -11,7 +11,7 @@
       />
       <template #fallback>
         <!-- The editor's own loading state, so nothing moves when it takes over. -->
-        <div class="min-h-screen bg-gray-50/60">
+        <div class="min-h-screen">
           <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
             <SkeletonForm :fields="5" class="min-h-96" />
           </div>

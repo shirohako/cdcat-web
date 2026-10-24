@@ -197,31 +197,31 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
 <template>
   <div class="flex h-dvh flex-col">
     <!-- Header -->
-    <header class="z-20 flex shrink-0 items-center gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:gap-3 sm:px-4">
-      <NuxtLink to="/articles/mine" class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
+    <header class="z-20 flex shrink-0 items-center gap-2 border-b border-line bg-card px-3 py-2 sm:gap-3 sm:px-4">
+      <NuxtLink to="/articles/mine" class="inline-flex shrink-0 items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary">
         <ArrowLeft :size="16" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
       </NuxtLink>
-      <span class="h-5 w-px shrink-0 bg-slate-200" />
+      <span class="h-5 w-px shrink-0 bg-line" />
       <!-- Status and save state describe the loaded draft, so they wait for it. -->
       <template v-if="!loading && !loadError">
         <ArticleStatusBadge :status="status" />
-        <span class="hidden truncate text-xs md:inline" :class="dirty ? 'text-amber-600' : 'text-slate-400'" aria-live="polite">{{ saveLabel }}</span>
-        <span class="hidden text-xs tabular-nums text-slate-400 lg:inline">· {{ t('article_ui.word_count', { count: wordCount.toLocaleString() }) }}</span>
+        <span class="hidden truncate text-xs md:inline" :class="dirty ? 'text-warning' : 'text-meta'" aria-live="polite">{{ saveLabel }}</span>
+        <span class="hidden text-xs tabular-nums text-meta lg:inline">· {{ t('article_ui.word_count', { count: wordCount.toLocaleString() }) }}</span>
       </template>
 
       <div class="ml-auto flex items-center gap-1 sm:gap-2">
-        <div class="hidden items-center rounded-lg bg-slate-100 p-0.5 md:flex" role="radiogroup" :aria-label="t('article_ui.writer.mode')">
+        <div class="hidden items-center gap-0.5 rounded-lg bg-sunken p-0.5 ring-1 ring-line md:flex" role="radiogroup" :aria-label="t('article_ui.writer.mode')">
           <button
             v-for="item in modes" :key="item.value" type="button" role="radio" :aria-checked="mode === item.value"
-            class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition"
-            :class="mode === item.value ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'" @click="mode = item.value">
+            class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors duration-150 ease-out"
+            :class="mode === item.value ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="mode = item.value">
             <component :is="item.icon" :size="13" />{{ t(`article_ui.writer.modes.${item.value}`) }}
           </button>
         </div>
-        <button type="button" class="btn btn-ghost btn-sm hidden lg:inline-flex" :class="outlineOpen && 'bg-slate-100'" :title="t('article_ui.writer.outline')" @click="outlineOpen = !outlineOpen">
+        <button type="button" class="btn btn-ghost btn-sm hidden lg:inline-flex" :aria-pressed="outlineOpen" :title="t('article_ui.writer.outline')" @click="outlineOpen = !outlineOpen">
           <ListTree :size="15" />
         </button>
-        <button type="button" class="btn btn-ghost btn-sm" :class="settingsOpen && 'bg-slate-100'" :title="t('article_ui.settings')" @click="settingsOpen = !settingsOpen">
+        <button type="button" class="btn btn-ghost btn-sm" :aria-pressed="settingsOpen" :title="t('article_ui.settings')" @click="settingsOpen = !settingsOpen">
           <Settings2 :size="15" /><span class="hidden sm:inline">{{ t('article_ui.settings') }}</span>
         </button>
         <template v-if="!loading && !loadError && can.edit">
@@ -250,8 +250,8 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
     </SkeletonStatus>
     <div v-else-if="loadError" class="grid flex-1 place-items-center p-6 text-center">
       <div>
-        <AlertTriangle :size="28" class="mx-auto text-amber-500" />
-        <p class="mt-3 text-sm text-slate-600">{{ localizeError(loadError) }}</p>
+        <AlertTriangle :size="28" class="mx-auto text-warning" />
+        <p class="mt-3 text-sm text-body">{{ localizeError(loadError) }}</p>
         <NuxtLink to="/articles/mine" class="btn btn-outline btn-sm mt-4">{{ t('article_ui.mine.title') }}</NuxtLink>
       </div>
     </div>
@@ -259,51 +259,51 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
     <template v-else>
       <!-- Notices -->
       <div class="shrink-0 space-y-px">
-        <p v-if="status === 'locked'" class="flex flex-wrap items-center gap-1.5 bg-rose-50 px-4 py-2 text-sm text-rose-800">
+        <p v-if="status === 'locked'" class="flex flex-wrap items-center gap-1.5 bg-danger/10 px-4 py-2 text-sm text-danger">
           <Lock :size="15" /><strong>{{ t('article_ui.writer.notice_locked') }}</strong>{{ payload?.article.status_reason }}
         </p>
-        <p v-else-if="status === 'hidden'" class="bg-amber-50 px-4 py-2 text-sm text-amber-800">
+        <p v-else-if="status === 'hidden'" class="bg-warning/10 px-4 py-2 text-sm text-warning">
           <strong>{{ t('article_ui.writer.notice_hidden') }}</strong>
           <template v-if="payload?.article.status_reason">{{ t('article_ui.writer.notice_hidden_reason', { reason: payload.article.status_reason }) }}</template>
         </p>
-        <div v-if="restoredAt && dirty" class="flex flex-wrap items-center gap-2 bg-violet-50 px-4 py-2 text-sm text-violet-800">
+        <div v-if="restoredAt && dirty" class="flex flex-wrap items-center gap-2 bg-info/10 px-4 py-2 text-sm text-info">
           <History :size="15" />{{ t('article_ui.writer.local_restored', { time: time(restoredAt) }) }}
-          <button type="button" class="text-violet-600 underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
+          <button type="button" class="underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
         </div>
-        <div v-if="stale" class="flex flex-wrap items-center gap-2 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+        <div v-if="stale" class="flex flex-wrap items-center gap-2 bg-warning/10 px-4 py-2 text-sm text-warning">
           <History :size="15" />{{ t('article_ui.writer.local_stale', { time: time(stale.at) }) }}
           <button type="button" class="font-semibold underline" @click="draft.restoreStale()">{{ t('article_ui.writer.local_restore') }}</button>
-          <button type="button" class="text-amber-700 underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
+          <button type="button" class="underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
         </div>
       </div>
 
       <!-- Body -->
       <div class="flex min-h-0 flex-1">
-        <aside v-if="outlineOpen" class="hidden w-56 shrink-0 overflow-y-auto border-r border-slate-200 bg-white p-3 lg:block">
-          <p class="px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{{ t('article_ui.writer.outline') }}</p>
+        <aside v-if="outlineOpen" class="hidden w-56 shrink-0 overflow-y-auto border-r border-line bg-card p-3 lg:block">
+          <p class="px-2 text-xs font-semibold uppercase tracking-wide text-meta">{{ t('article_ui.writer.outline') }}</p>
           <nav v-if="headings.length" class="mt-2 space-y-0.5">
             <button
               v-for="heading in headings" :key="heading.id" type="button"
-              class="block w-full truncate rounded px-2 py-1 text-left text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              class="block w-full truncate rounded px-2 py-1 text-left text-sm text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
               :style="{ paddingLeft: `${(heading.level - 1) * 0.75 + 0.5}rem` }" @click="goToHeading(heading)">
               {{ heading.text }}
             </button>
           </nav>
-          <p v-else class="mt-2 px-2 text-xs text-slate-400">{{ t('article_ui.writer.outline_empty') }}</p>
+          <p v-else class="mt-2 px-2 text-xs text-meta">{{ t('article_ui.writer.outline_empty') }}</p>
         </aside>
 
         <main class="flex min-w-0 flex-1 flex-col gap-3 p-3 sm:p-4">
           <textarea
             ref="titleInput" v-model="form.title" rows="1" maxlength="100" :readonly="readOnly"
-            class="w-full shrink-0 resize-none overflow-hidden bg-transparent px-1 text-2xl font-bold leading-tight text-slate-900 outline-none placeholder:text-slate-300 sm:text-3xl"
+            class="w-full shrink-0 resize-none overflow-hidden bg-transparent px-1 text-2xl font-bold leading-tight text-title outline-none placeholder:text-faint sm:text-3xl"
             :placeholder="t('article_ui.title_placeholder')" :aria-label="t('article_ui.fields.title')" @input="resizeTitle" @keydown.enter.prevent="editor?.focus()" />
-          <p v-if="fieldErrors.title" class="-mt-2 px-1 text-xs text-rose-600">{{ fieldErrors.title }}</p>
+          <p v-if="fieldErrors.title" class="-mt-2 px-1 text-xs text-danger">{{ fieldErrors.title }}</p>
           <div class="flex md:hidden">
-            <div class="flex rounded-lg bg-slate-100 p-0.5">
+            <div class="flex gap-0.5 rounded-lg bg-sunken p-0.5 ring-1 ring-line">
               <button
                 v-for="item in modes.filter(entry => entry.value !== 'split')" :key="item.value" type="button"
-                class="inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium"
-                :class="mode === item.value || (mode === 'split' && item.value === 'edit') ? 'bg-white shadow-sm' : 'text-slate-500'" @click="mode = item.value">
+                class="inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium transition-colors duration-150 ease-out"
+                :class="mode === item.value || (mode === 'split' && item.value === 'edit') ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="mode = item.value">
                 <component :is="item.icon" :size="13" />{{ t(`article_ui.writer.modes.${item.value}`) }}
               </button>
             </div>
@@ -316,13 +316,13 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
         </main>
 
         <!-- Settings: a side panel on wide screens, a bottom sheet on small ones -->
-        <div v-if="settingsOpen" class="fixed inset-0 z-30 bg-slate-900/30 xl:hidden" @click="settingsOpen = false" />
+        <div v-if="settingsOpen" class="fixed inset-0 z-30 bg-black/50 xl:hidden" @click="settingsOpen = false" />
         <aside
           v-if="settingsOpen"
-          class="fixed inset-x-0 bottom-0 z-40 max-h-[80dvh] overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white p-4 shadow-2xl xl:static xl:z-auto xl:max-h-none xl:w-80 xl:shrink-0 xl:rounded-none xl:border-l xl:border-t-0 xl:shadow-none">
+          class="fixed inset-x-0 bottom-0 z-40 max-h-[80dvh] overflow-y-auto rounded-t-2xl border-t border-line bg-card p-4 max-xl:shadow-overlay xl:static xl:z-auto xl:max-h-none xl:w-80 xl:shrink-0 xl:rounded-none xl:border-l xl:border-t-0">
           <div class="mb-4 flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-slate-700">{{ t('article_ui.settings') }}</h2>
-            <button type="button" class="grid size-7 place-items-center rounded-md text-slate-400 hover:bg-slate-100" :aria-label="t('common.close')" @click="settingsOpen = false"><X :size="15" /></button>
+            <h2 class="text-sm font-semibold text-body">{{ t('article_ui.settings') }}</h2>
+            <button type="button" class="grid size-7 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" :aria-label="t('common.close')" @click="settingsOpen = false"><X :size="15" /></button>
           </div>
           <ArticleWriterSettings
             v-model:type="form.type" v-model:summary="form.summary" v-model:cover-url="form.cover_url" v-model:banner-url="form.banner_url" v-model:slug="form.slug"
@@ -338,10 +338,10 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       :confirm-text="t('article_ui.writer.actions.hide')" @confirm="hide" />
 
     <!-- Conflict with a newer copy saved elsewhere -->
-    <div v-if="conflict" class="fixed inset-0 z-50 grid place-items-center bg-slate-900/40 p-4" role="alertdialog" aria-modal="true">
-      <div class="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
-        <h2 class="text-lg font-bold text-slate-900">{{ t('article_ui.writer.conflict_title') }}</h2>
-        <p class="mt-2 text-sm text-slate-600">{{ t('article_ui.writer.conflict_description', { time: time(conflict.article.updated_at) }) }}</p>
+    <div v-if="conflict" class="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4" role="alertdialog" aria-modal="true">
+      <div class="w-full max-w-md rounded-2xl bg-card p-5 text-body shadow-overlay ring-1 ring-line">
+        <h2 class="text-lg font-bold text-title">{{ t('article_ui.writer.conflict_title') }}</h2>
+        <p class="mt-2 text-sm text-body">{{ t('article_ui.writer.conflict_description', { time: time(conflict.article.updated_at) }) }}</p>
         <div class="mt-5 flex flex-wrap justify-end gap-2">
           <button type="button" class="btn btn-outline btn-sm" @click="draft.useServer()">{{ t('article_ui.writer.conflict_use_server') }}</button>
           <button type="button" class="btn btn-primary btn-sm" @click="draft.keepMine()">{{ t('article_ui.writer.conflict_keep_mine') }}</button>
@@ -350,9 +350,8 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
     </div>
 
     <div
-      v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl border px-4 py-3 text-sm shadow-lg backdrop-blur"
-      :class="toast.type === 'error' ? 'border-rose-200 bg-rose-50/95 text-rose-700' : 'border-emerald-200 bg-emerald-50/95 text-emerald-700'" role="status">
-      <Check v-if="toast.type !== 'error'" :size="16" /><AlertTriangle v-else :size="16" />{{ toast.message }}
+      v-if="toast.show" class="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-popover px-4 py-3 text-sm text-body shadow-overlay ring-1 ring-line" role="status">
+      <Check v-if="toast.type !== 'error'" :size="16" class="shrink-0 text-success" /><AlertTriangle v-else :size="16" class="shrink-0 text-danger" />{{ toast.message }}
     </div>
   </div>
 </template>

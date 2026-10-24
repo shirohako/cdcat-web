@@ -111,7 +111,7 @@ onUnmounted(close)
           <div
             ref="panel"
             role="menu"
-            class="fixed max-h-[calc(100vh-1rem)] min-w-44 overflow-y-auto overscroll-contain rounded-xl border border-slate-200 bg-white py-1 text-sm shadow-lg ring-1 ring-slate-900/5"
+            class="fixed max-h-[calc(100vh-1rem)] min-w-44 overflow-y-auto overscroll-contain rounded-xl bg-popover py-1 text-sm text-body shadow-overlay ring-1 ring-line"
             :class="[align === 'right' ? 'origin-top-right' : 'origin-top-left', panelClass]"
             :style="{ top: `${position.top}px`, left: `${position.left}px` }"
             @click.stop

@@ -92,10 +92,10 @@ const toggleMail = (key: string, subscribed: boolean) => saveMail(async () => {
 
 <template>
   <div class="space-y-6">
-    <section class="overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5">
-      <div class="border-b border-gray-100 p-6 pb-5">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.notifications.title') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ t('account_pages.notifications.description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="border-b border-line p-6 pb-5">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.notifications.title') }}</h2>
+        <p class="mt-1 text-sm text-meta">{{ t('account_pages.notifications.description') }}</p>
       </div>
       <div class="p-6">
         <SkeletonStatus v-if="loading" class="flex items-start gap-4">
@@ -107,27 +107,27 @@ const toggleMail = (key: string, subscribed: boolean) => saveMail(async () => {
           <div class="skeleton h-6 w-11 shrink-0 rounded-full" />
         </SkeletonStatus>
         <div v-else class="flex items-start gap-4">
-          <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-blue-50"><Bell :size="18" class="text-blue-500" /></div>
+          <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/15"><Bell :size="18" class="text-primary" /></div>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-semibold text-gray-900">{{ t('account_pages.notifications.reactions') }}</p>
-            <p class="mt-0.5 text-xs text-gray-500">{{ t('account_pages.notifications.reactions_help') }}</p>
+            <p class="text-sm font-semibold text-title">{{ t('account_pages.notifications.reactions') }}</p>
+            <p class="mt-0.5 text-xs text-meta">{{ t('account_pages.notifications.reactions_help') }}</p>
           </div>
           <button
             type="button" role="switch" :aria-checked="reactions" :disabled="saving"
-            class="relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50" :class="reactions ? 'bg-blue-600' : 'bg-gray-300'" @click="toggle"
+            class="relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50" :class="reactions ? 'bg-primary' : 'bg-faint'" @click="toggle"
           >
-            <span class="absolute top-0.5 size-5 rounded-full bg-white shadow transition" :class="reactions ? 'left-5.5' : 'left-0.5'" />
+            <span class="absolute top-0.5 size-5 rounded-full transition" :class="reactions ? 'left-5.5 bg-on-primary' : 'left-0.5 bg-on-media'" />
           </button>
         </div>
-        <p v-if="message" class="mt-4 text-sm" :class="failed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ message }}</p>
-        <p class="mt-6 text-xs text-gray-400">{{ t('account_pages.notifications.levels_hint') }}</p>
+        <p v-if="message" class="mt-4 text-sm" :class="failed ? 'text-danger' : 'text-success'" role="status">{{ message }}</p>
+        <p class="mt-6 text-xs text-meta">{{ t('account_pages.notifications.levels_hint') }}</p>
       </div>
     </section>
 
-    <section class="overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5">
-      <div class="border-b border-gray-100 p-6 pb-5">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.notifications.mail_title') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ t('account_pages.notifications.mail_description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="border-b border-line p-6 pb-5">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.notifications.mail_title') }}</h2>
+        <p class="mt-1 text-sm text-meta">{{ t('account_pages.notifications.mail_description') }}</p>
       </div>
       <div class="p-6">
         <SkeletonStatus v-if="loading" class="space-y-4">
@@ -141,7 +141,7 @@ const toggleMail = (key: string, subscribed: boolean) => saveMail(async () => {
           </div>
         </SkeletonStatus>
         <MailSettings v-else-if="subscriptions.length" :mail-locale="mailLocale" :subscriptions="subscriptions" :busy="mailSaving" @locale="changeMailLocale" @toggle="toggleMail" />
-        <p v-if="mailMessage" class="mt-4 text-sm" :class="mailFailed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ mailMessage }}</p>
+        <p v-if="mailMessage" class="mt-4 text-sm" :class="mailFailed ? 'text-danger' : 'text-success'" role="status">{{ mailMessage }}</p>
       </div>
     </section>
   </div>

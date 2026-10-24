@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-2">
     <ul v-if="shown.length" class="space-y-2">
-      <li v-for="(row, index) in shown" :key="String(row.id)" class="flex flex-wrap items-center gap-2 rounded-lg border border-gray-100 px-3 py-2" :class="{ 'border-rose-200 bg-rose-50/40': errorsOf(row.id).length }">
+      <li v-for="(row, index) in shown" :key="String(row.id)" class="flex flex-wrap items-center gap-2 rounded-lg px-3 py-2" :class="errorsOf(row.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken'">
         <div v-if="ordered" class="flex flex-col">
-          <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(rows, row, -1)"><ChevronUp :size="14" /></button>
-          <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === shown.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(rows, row, 1)"><ChevronDown :size="14" /></button>
+          <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(rows, row, -1)"><ChevronUp :size="14" /></button>
+          <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === shown.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(rows, row, 1)"><ChevronDown :size="14" /></button>
         </div>
         <select v-if="relations" :value="get(row, 'relation_type')" class="select select-sm w-40" @change="set(row, 'relation_type', ($event.target as HTMLSelectElement).value)">
           <option v-for="value in relations.values" :key="value" :value="value">{{ enumLabel(relations.group, value) }}</option>
@@ -30,7 +30,7 @@
           >
         </template>
         <button type="button" class="btn btn-ghost btn-sm px-2" :aria-label="$t('common.delete')" @click="remove(row)"><Trash2 :size="14" /></button>
-        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-error">{{ error.message }}</p>
+        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
       </li>
     </ul>
     <div class="flex flex-wrap items-center gap-2">

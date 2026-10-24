@@ -1,32 +1,32 @@
 <template>
-  <CatalogSection v-if="bonuses.length" :title="$t('album.section.bonuses')" :icon="Gift" tone="pink">
+  <CatalogSection v-if="bonuses.length" :title="$t('album.section.bonuses')" :icon="Gift">
     <template v-if="bonuses.length > 1" #actions>{{ $t('content_display.bonuses', { count: bonuses.length }) }}</template>
 
-    <ul class="divide-y divide-gray-100">
+    <ul class="divide-y divide-line">
       <li v-for="bonus in sorted" :key="bonus.id" class="flex gap-3 px-5 py-3">
-        <div class="h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-gray-100 bg-pink-50">
+        <div class="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-sunken">
           <img v-if="bonusImage(bonus.id)" :src="bonusImage(bonus.id)!" :alt="bonus.name" class="h-full w-full object-cover">
-          <div v-else class="flex h-full w-full items-center justify-center"><Gift :size="18" class="text-pink-300" /></div>
+          <div v-else class="flex h-full w-full items-center justify-center"><Gift :size="18" class="text-faint" /></div>
         </div>
         <div class="min-w-0 flex-1 space-y-1">
           <div class="flex flex-wrap items-center gap-1.5">
-            <span class="text-sm font-medium leading-snug text-gray-900">{{ bonus.name }}</span>
-            <span class="shrink-0 rounded-full bg-pink-50 px-1.5 py-0.5 text-[10px] font-bold text-pink-600">{{ enumLabel('bonus_type', bonus.type) }}</span>
-            <span v-if="bonus.is_digital" class="shrink-0 rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-500">DL</span>
-            <span v-if="bonus.availability" class="shrink-0 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700">{{ enumLabel('limited_rule', bonus.availability) }}</span>
+            <span class="text-sm font-medium leading-snug text-title">{{ bonus.name }}</span>
+            <span class="shrink-0 rounded-full bg-pink-50 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/15 dark:text-pink-300">{{ enumLabel('bonus_type', bonus.type) }}</span>
+            <span v-if="bonus.is_digital" class="shrink-0 rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] font-bold text-blue-500 dark:bg-blue-400/15 dark:text-blue-300">DL</span>
+            <span v-if="bonus.availability" class="shrink-0 rounded-full bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">{{ enumLabel('limited_rule', bonus.availability) }}</span>
           </div>
-          <p class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-gray-500">
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-meta">
             <span v-if="bonus.shop" class="flex items-center gap-1"><Store :size="11" />{{ bonus.shop }}</span>
-            <NuxtLink v-if="bonus.event" :to="`/albums?event=${bonus.event.id}`" class="flex items-center gap-1 hover:underline"><CalendarDays :size="11" />{{ bonus.event.name }}</NuxtLink>
+            <NuxtLink v-if="bonus.event" :to="`/albums?event=${bonus.event.id}`" class="flex items-center gap-1 transition-colors hover:text-primary"><CalendarDays :size="11" />{{ bonus.event.name }}</NuxtLink>
             <span class="flex items-center gap-1">
               <Package :size="11" />
               {{ bonus.product_ids.length ? editionNames(bonus.product_ids) : $t('album.bonuses.all_editions') }}
             </span>
           </p>
-          <p v-if="bonus.description" class="whitespace-pre-line text-xs leading-relaxed text-gray-600">{{ bonus.description }}</p>
-          <p v-if="bonus.note" class="text-[11px] text-gray-400">{{ bonus.note }}</p>
+          <p v-if="bonus.description" class="whitespace-pre-line text-xs leading-relaxed text-body">{{ bonus.description }}</p>
+          <p v-if="bonus.note" class="text-[11px] text-meta">{{ bonus.note }}</p>
           <p v-if="bonus.disc_ids.length" class="flex flex-wrap gap-2 text-[11px]">
-            <a v-for="discId in bonus.disc_ids" :key="discId" :href="`#disc-${discId}`" class="inline-flex items-center gap-1 text-indigo-500 hover:underline">
+            <a v-for="discId in bonus.disc_ids" :key="discId" :href="`#disc-${discId}`" class="link inline-flex items-center gap-1">
               <Disc3 :size="11" />Disc {{ discNumbers.get(discId) }}
             </a>
           </p>

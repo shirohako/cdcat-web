@@ -1,12 +1,7 @@
 <template>
-  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="card overflow-hidden">
     <!-- Header -->
-    <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-        <ListChecks :size="15" class="text-blue-500" />
-      </div>
-      <h2 class="text-base font-bold text-gray-900">{{ $t('tracking.widget.title') }}</h2>
-    </div>
+    <UiSectionTitle :title="$t('tracking.widget.title')" :icon="ListChecks" class="px-5 pb-2 pt-4" />
 
     <!-- 加载状态 -->
     <div v-if="loading" class="flex justify-center py-5">
@@ -19,7 +14,7 @@
         <button
           v-for="option in statusOptions"
           :key="option.status"
-          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-all duration-200"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-sm font-medium transition-colors duration-150 ease-out"
           :class="currentStatus === option.status ? option.activeClass : option.defaultClass"
           @click="handleStatusClick(option.status)"
         >
@@ -29,10 +24,10 @@
       </div>
 
       <!-- 底部操作栏 -->
-      <div class="flex items-center mt-4 pt-3 border-t border-gray-100" :class="currentStatus ? 'justify-between' : 'justify-end'">
+      <div class="flex items-center mt-4 pt-3 border-t border-line" :class="currentStatus ? 'justify-between' : 'justify-end'">
         <button
           v-if="currentStatus"
-          class="flex items-center gap-1 text-xs text-gray-400 hover:text-red-500 transition-colors"
+          class="flex items-center gap-1 text-xs text-meta hover:text-danger transition-colors"
           @click="handleRemoveTracking"
         >
           <Icon name="lucide:x" class="w-3.5 h-3.5" />
@@ -40,7 +35,7 @@
         </button>
         <NuxtLink
           to="/tracking"
-          class="flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 transition-colors"
+          class="flex items-center gap-1 text-xs text-meta hover:text-primary transition-colors"
         >
           <span>{{ $t('tracking.widget.manage') }}</span>
           <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
@@ -79,46 +74,47 @@ const statusOptions = computed(() => [
     status: 'plan_to_listen' as TrackingStatus,
     label: t('tracking.status.plan_to_listen'),
     icon: 'lucide:headphones',
-    defaultClass: 'border-blue-100 bg-blue-50/50 text-blue-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600',
-    activeClass: 'border-blue-400 bg-blue-100 text-blue-700',
-    iconClass: 'text-blue-300',
-    activeIconClass: 'text-blue-500',
+    defaultClass: 'border-blue-100 bg-blue-50/50 text-blue-500 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 dark:border-blue-400/20 dark:bg-blue-400/10 dark:text-blue-300 dark:hover:border-blue-400/40 dark:hover:bg-blue-400/15 dark:hover:text-blue-200',
+    activeClass: 'border-blue-400 bg-blue-100 text-blue-700 dark:border-blue-400/60 dark:bg-blue-400/20 dark:text-blue-200',
+    iconClass: 'text-blue-300 dark:text-blue-400/70',
+    activeIconClass: 'text-blue-500 dark:text-blue-300',
   },
   {
     status: 'completed' as TrackingStatus,
     label: t('tracking.status.completed'),
     icon: 'lucide:check-circle',
-    defaultClass: 'border-teal-200 bg-teal-50 text-teal-600 hover:border-teal-400 hover:bg-teal-100 hover:text-teal-700',
-    activeClass: 'border-teal-500 bg-teal-100 text-teal-800',
-    iconClass: 'text-teal-400',
-    activeIconClass: 'text-teal-600',
+    defaultClass: 'border-teal-200 bg-teal-50 text-teal-600 hover:border-teal-400 hover:bg-teal-100 hover:text-teal-700 dark:border-teal-400/25 dark:bg-teal-400/15 dark:text-teal-300 dark:hover:border-teal-400/50 dark:hover:bg-teal-400/20 dark:hover:text-teal-200',
+    activeClass: 'border-teal-500 bg-teal-100 text-teal-800 dark:border-teal-400/70 dark:bg-teal-400/25 dark:text-teal-100',
+    iconClass: 'text-teal-400 dark:text-teal-400/70',
+    activeIconClass: 'text-teal-600 dark:text-teal-300',
   },
   {
     status: 'wishlist' as TrackingStatus,
     label: t('tracking.status.wishlist'),
     icon: 'lucide:bookmark',
-    defaultClass: 'border-orange-100 bg-orange-50/50 text-orange-400 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-500',
-    activeClass: 'border-orange-400 bg-orange-100 text-orange-600',
-    iconClass: 'text-orange-300',
-    activeIconClass: 'text-orange-400',
+    defaultClass: 'border-orange-100 bg-orange-50/50 text-orange-400 hover:border-orange-300 hover:bg-orange-50 hover:text-orange-500 dark:border-orange-400/20 dark:bg-orange-400/10 dark:text-orange-300 dark:hover:border-orange-400/40 dark:hover:bg-orange-400/15 dark:hover:text-orange-200',
+    activeClass: 'border-orange-400 bg-orange-100 text-orange-600 dark:border-orange-400/60 dark:bg-orange-400/20 dark:text-orange-200',
+    iconClass: 'text-orange-300 dark:text-orange-400/70',
+    activeIconClass: 'text-orange-400 dark:text-orange-300',
   },
   {
     status: 'owned' as TrackingStatus,
     label: t('tracking.status.owned'),
     icon: 'lucide:package',
-    defaultClass: 'border-purple-100 bg-purple-50/50 text-purple-500 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600',
-    activeClass: 'border-purple-400 bg-purple-100 text-purple-700',
-    iconClass: 'text-purple-300',
-    activeIconClass: 'text-purple-500',
+    defaultClass: 'border-purple-100 bg-purple-50/50 text-purple-500 hover:border-purple-300 hover:bg-purple-50 hover:text-purple-600 dark:border-purple-400/20 dark:bg-purple-400/10 dark:text-purple-300 dark:hover:border-purple-400/40 dark:hover:bg-purple-400/15 dark:hover:text-purple-200',
+    activeClass: 'border-purple-400 bg-purple-100 text-purple-700 dark:border-purple-400/60 dark:bg-purple-400/20 dark:text-purple-200',
+    iconClass: 'text-purple-300 dark:text-purple-400/70',
+    activeIconClass: 'text-purple-500 dark:text-purple-300',
   },
   {
     status: 'dropped' as TrackingStatus,
     label: t('tracking.status.dropped'),
     icon: 'lucide:x-circle',
-    defaultClass: 'border-gray-200 bg-gray-50/50 text-gray-400 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-600',
-    activeClass: 'border-gray-400 bg-gray-100 text-gray-700',
-    iconClass: 'text-gray-300',
-    activeIconClass: 'text-gray-500',
+    // Not a colour of its own: the theme's neutrals.
+    defaultClass: 'border-line bg-sunken text-meta hover:bg-btn hover:text-body',
+    activeClass: 'border-faint bg-btn text-title',
+    iconClass: 'text-faint',
+    activeIconClass: 'text-meta',
   },
 ])
 

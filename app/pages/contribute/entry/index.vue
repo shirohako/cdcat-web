@@ -61,58 +61,58 @@ const createFromScratch = () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <div class="container mx-auto px-4 md:px-8 py-10 max-w-6xl 2xl:max-w-7xl">
       <div class="mb-12 text-center">
         <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
           <Film class="h-8 w-8 text-primary" />
         </div>
-        <h1 class="mb-3 text-3xl font-bold text-gray-900">{{ $t('catalog.contribute.entry_title') }}</h1>
-        <p class="mx-auto max-w-md text-gray-600">{{ $t('catalog.contribute.entry_desc') }}</p>
+        <h1 class="mb-3 text-3xl font-bold text-title">{{ $t('catalog.contribute.entry_title') }}</h1>
+        <p class="mx-auto max-w-md text-body">{{ $t('catalog.contribute.entry_desc') }}</p>
       </div>
 
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <button
           type="button"
-          class="group cursor-pointer rounded-2xl border border-gray-200 bg-white p-8 text-left shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg"
+          class="card group cursor-pointer p-8 text-left transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           @click="openBangumiModal"
         >
           <div class="flex items-start gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-pink-100 transition-colors group-hover:bg-pink-200">
-              <Download class="h-7 w-7 text-pink-600" />
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-pink-100 transition-colors group-hover:bg-pink-200 dark:bg-pink-400/20 dark:group-hover:bg-pink-400/30">
+              <Download class="h-7 w-7 text-pink-600 dark:text-pink-400" />
             </div>
             <div class="flex-1">
-              <h2 class="mb-2 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <h2 class="mb-2 flex items-center gap-2 text-xl font-semibold text-title">
                 {{ $t('catalog.contribute.import_title') }}
-                <ArrowRight class="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-primary" />
+                <ArrowRight class="h-5 w-5 text-meta transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </h2>
-              <p class="text-sm leading-relaxed text-gray-600">{{ $t('catalog.contribute.import_desc') }}</p>
-              <span class="mt-4 inline-block rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-500">{{ $t('catalog.contribute.import_badge') }}</span>
+              <p class="text-sm leading-relaxed text-body">{{ $t('catalog.contribute.import_desc') }}</p>
+              <span class="mt-4 inline-block rounded-full bg-btn px-2 py-1 text-xs text-btn-content">{{ $t('catalog.contribute.import_badge') }}</span>
             </div>
           </div>
         </button>
 
         <button
           type="button"
-          class="group cursor-pointer rounded-2xl border border-gray-200 bg-white p-8 text-left shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg"
+          class="card group cursor-pointer p-8 text-left transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           @click="createFromScratch"
         >
           <div class="flex items-start gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-blue-100 transition-colors group-hover:bg-blue-200">
-              <PenLine class="h-7 w-7 text-blue-600" />
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/15 transition-colors group-hover:bg-primary/25">
+              <PenLine class="h-7 w-7 text-primary" />
             </div>
             <div class="flex-1">
-              <h2 class="mb-2 flex items-center gap-2 text-xl font-semibold text-gray-900">
+              <h2 class="mb-2 flex items-center gap-2 text-xl font-semibold text-title">
                 {{ $t('catalog.contribute.scratch_title') }}
-                <ArrowRight class="h-5 w-5 text-gray-400 transition-all group-hover:translate-x-1 group-hover:text-primary" />
+                <ArrowRight class="h-5 w-5 text-meta transition-all group-hover:translate-x-1 group-hover:text-primary" />
               </h2>
-              <p class="text-sm leading-relaxed text-gray-600">{{ $t('catalog.contribute.scratch_desc') }}</p>
+              <p class="text-sm leading-relaxed text-body">{{ $t('catalog.contribute.scratch_desc') }}</p>
             </div>
           </div>
         </button>
       </div>
 
-      <p class="mt-8 text-center text-sm text-gray-500">{{ $t('catalog.contribute.review_notice') }}</p>
+      <p class="mt-8 text-center text-sm text-meta">{{ $t('catalog.contribute.review_notice') }}</p>
     </div>
 
     <dialog :class="['modal', { 'modal-open': showBangumiModal }]">
@@ -126,11 +126,11 @@ const createFromScratch = () => {
               v-model="bangumiId"
               type="text"
               :placeholder="$t('catalog.contribute.bangumi_placeholder')"
-              class="input input-bordered w-full"
+              class="input w-full"
               :disabled="isLoading"
               @keyup.enter="importFromBangumi"
             >
-            <span class="mt-1 text-xs text-gray-500">{{ $t('catalog.contribute.bangumi_hint') }}</span>
+            <span class="mt-1 text-xs text-meta">{{ $t('catalog.contribute.bangumi_hint') }}</span>
           </label>
 
           <div v-if="existingEntryId" class="alert alert-warning">

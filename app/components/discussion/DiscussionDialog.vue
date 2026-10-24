@@ -14,9 +14,9 @@ const close = () => { if (!props.busy) emit('update:open', false) }
 </script>
 
 <template>
-  <dialog ref="dialog" :aria-labelledby="titleId" class="m-auto w-[calc(100%_-_2rem)] rounded-2xl p-0 shadow-xl backdrop:bg-slate-900/40" :class="width" @cancel.prevent="close" @close="close">
+  <dialog ref="dialog" :aria-labelledby="titleId" class="m-auto w-[calc(100%_-_2rem)] rounded-2xl bg-card p-0 text-body shadow-overlay ring-1 ring-line backdrop:bg-black/50" :class="width" @cancel.prevent="close" @close="close">
     <div v-if="open" class="max-h-[85vh] overflow-y-auto p-5">
-      <h2 :id="titleId" class="text-lg font-bold text-slate-900">{{ title }}</h2>
+      <h2 :id="titleId" class="text-lg font-bold text-title">{{ title }}</h2>
       <div class="mt-4">
         <slot />
       </div>

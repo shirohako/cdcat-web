@@ -1,65 +1,65 @@
 <template>
   <div class="space-y-6">
-    <CatalogSection :title="$t('catalog.collection.entries')" :icon="Clapperboard" tone="rose" :description="$t('editor.relations.entries_hint')">
+    <CatalogSection :title="$t('catalog.collection.entries')" :icon="Clapperboard" :description="$t('editor.relations.entries_hint')">
       <div class="space-y-3 p-3 sm:p-5">
         <ul v-if="album.entries.length" class="space-y-1.5">
           <template v-for="row in album.entries" :key="row.id">
             <EditorListRow :invalid="errorsOf('entries', row.id).length > 0" @edit="edit(row)" @remove="remove(album.entries, row)">
               <img v-if="entryOf(row.entry_id)?.image_url" :src="entryOf(row.entry_id)!.image_url!" alt="" class="h-8 w-8 shrink-0 rounded object-cover">
-              <span v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-rose-50 text-rose-400"><Clapperboard :size="14" /></span>
+              <span v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-btn text-faint"><Clapperboard :size="14" /></span>
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-center gap-1.5">
-                  <span class="truncate text-sm font-medium text-gray-900">{{ entryName(row.entry_id) }}</span>
-                  <span class="shrink-0 rounded-md bg-rose-50 px-1.5 py-0.5 text-[11px] text-rose-700">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
+                  <span class="truncate text-sm font-medium text-title">{{ entryName(row.entry_id) }}</span>
+                  <span class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
                 </span>
-                <span v-if="row.note" class="block truncate text-[11px] text-gray-500">{{ row.note }}</span>
+                <span v-if="row.note" class="block truncate text-[11px] text-meta">{{ row.note }}</span>
               </span>
             </EditorListRow>
-            <p v-for="error in errorsOf('entries', row.id)" :key="error.path" class="px-1 text-[11px] text-error">{{ error.message }}</p>
+            <p v-for="error in errorsOf('entries', row.id)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
           </template>
         </ul>
         <EditorAddButton @click="edit(null)">{{ $t('editor.dialog.entry_add') }}</EditorAddButton>
       </div>
     </CatalogSection>
 
-    <CatalogSection :title="$t('catalog.collection.links')" :icon="Link2" tone="gray" :description="$t('editor.relations.links_hint')">
+    <CatalogSection :title="$t('catalog.collection.links')" :icon="Link2" :description="$t('editor.relations.links_hint')">
       <div class="space-y-3 p-3 sm:p-5">
         <EditorAlbumRowErrors collection="links" />
         <EditorLinkRows v-model="album.links" />
       </div>
     </CatalogSection>
 
-    <CatalogSection :title="$t('catalog.collection.attributes')" :icon="ListChecks" tone="amber" :description="$t('editor.relations.attributes_hint')">
+    <CatalogSection :title="$t('catalog.collection.attributes')" :icon="ListChecks" :description="$t('editor.relations.attributes_hint')">
       <div class="space-y-3 p-3 sm:p-5">
         <EditorAlbumRowErrors collection="attributes" />
         <EditorAttributeRows v-model="album.attributes" subject="album" :references="editor.references" />
       </div>
     </CatalogSection>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.entry_edit' : 'editor.dialog.entry_add')" :description="$t('editor.relations.entries_hint')" :icon="Clapperboard" tone="rose" @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.entry_edit' : 'editor.dialog.entry_add')" :description="$t('editor.relations.entries_hint')" :icon="Clapperboard" @submit="save">
       <div class="space-y-4">
         <div>
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.entry') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.entry') }}</span>
           <EditorPickedRef v-if="form.entry_id !== null" :id="form.entry_id" type="entry" :references="editor.references" :icon="Clapperboard" @remove="form.entry_id = null" />
           <EditorEntityPicker v-else kind="entry" data-autofocus :placeholder="$t('catalog.form.search_entry')" :exclude="taken" @select="pick" />
-          <span v-if="tried && form.entry_id === null" class="mt-1 block text-xs text-error">{{ $t('editor.dialog.entry_required') }}</span>
+          <span v-if="tried && form.entry_id === null" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.entry_required') }}</span>
         </div>
         <div>
-          <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.relation_type') }}</span>
+          <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.relation_type') }}</span>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="value in enums.entry_album_relation ?? []"
               :key="value"
               type="button"
-              class="rounded-full border px-3 py-1 text-xs transition-colors"
-              :class="form.relation_type === value ? 'border-rose-400 bg-rose-50 font-medium text-rose-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              class="chip chip-sm"
+              :class="{ 'chip-selected': form.relation_type === value }"
               :aria-pressed="form.relation_type === value"
               @click="form.relation_type = value"
             >{{ enumLabel('entry_album_relation', value) }}<span v-if="labelEn('entry_album_relation', value)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', value) }}</span></button>
           </div>
         </div>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.form.note') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.form.note') }}</span>
           <input v-model="form.note" class="input input-sm w-full" maxlength="500">
         </label>
       </div>

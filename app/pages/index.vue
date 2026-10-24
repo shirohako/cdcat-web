@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen relative overflow-hidden bg-linear-to-br from-amber-50 via-slate-50 to-sky-50 text-slate-900"
-  >
+  <div class="min-h-screen relative overflow-hidden">
     <div
       class="relative z-10 container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 py-16 md:py-24 space-y-16"
     >
@@ -16,16 +14,16 @@
                 alt=""
                 width="80"
                 height="80"
-                class="size-16 md:size-20 rounded-2xl shadow-[0_18px_40px_-20px_rgba(15,23,42,0.55)] ring-4 ring-white"
+                class="size-16 md:size-20 rounded-2xl ring-4 ring-card"
               >
-              <p class="text-3xl md:text-4xl font-black tracking-tight text-slate-900">CDCAT</p>
+              <p class="text-3xl md:text-4xl font-black tracking-tight text-title">CDCAT</p>
             </div>
             <h1
-              class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-slate-900"
+              class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-title"
             >
               {{ t('home.hero_title') }}
             </h1>
-            <p class="text-lg text-slate-600 max-w-2xl">
+            <p class="text-lg text-body max-w-2xl">
               {{ t('home.hero_description') }}
             </p>
           </div>
@@ -33,18 +31,18 @@
           <div class="flex flex-col sm:flex-row gap-3 animate-rise-delayed">
             <NuxtLink
               to="/albums"
-              class="group inline-flex items-center justify-center gap-2 rounded-full bg-linear-to-r from-sky-500 to-emerald-500 px-6 py-3 text-white font-semibold shadow-lg shadow-sky-200 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl"
+              class="btn btn-primary group min-h-12 px-6 text-base"
             >
               <Music :size="20" />
               {{ t('home.browse_albums') }}
               <ArrowRight
                 :size="18"
-                class="transition-transform duration-300 group-hover:translate-x-1"
+                class="transition-transform duration-150 ease-out group-hover:translate-x-1"
               />
             </NuxtLink>
             <NuxtLink
               to="/artists"
-              class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-3 font-semibold text-slate-800 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg"
+              class="btn min-h-12 px-6 text-base"
             >
               <Users :size="20" />
               {{ t('home.discover_artists') }}
@@ -54,30 +52,30 @@
           <div
             class="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-rise-slower"
           >
-            <div class="border border-slate-200/90 bg-white/80 rounded-[14px] py-3.5 px-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(15,23,42,0.5)]">
+            <div class="card py-3.5 px-4">
               <div
-                class="flex items-center gap-2 text-emerald-600 font-semibold"
+                class="flex items-center gap-2 font-semibold text-title"
               >
-                <Disc3 :size="18" />
+                <Disc3 :size="18" class="text-primary" />
                 <span>{{ t('home.database') }}</span>
               </div>
-              <p class="text-sm text-slate-600 mt-1">{{ t('home.database_desc') }}</p>
+              <p class="text-sm text-body mt-1">{{ t('home.database_desc') }}</p>
             </div>
-            <div class="border border-slate-200/90 bg-white/80 rounded-[14px] py-3.5 px-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(15,23,42,0.5)]">
-              <div class="flex items-center gap-2 text-sky-600 font-semibold">
-                <Search :size="18" />
+            <div class="card py-3.5 px-4">
+              <div class="flex items-center gap-2 font-semibold text-title">
+                <Search :size="18" class="text-primary" />
                 <span>{{ t('home.timeline') }}</span>
               </div>
-              <p class="text-sm text-slate-600 mt-1">
+              <p class="text-sm text-body mt-1">
                 {{ t('home.timeline_desc') }}
               </p>
             </div>
-            <div class="border border-slate-200/90 bg-white/80 rounded-[14px] py-3.5 px-4 shadow-[0_16px_40px_-28px_rgba(15,23,42,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_-30px_rgba(15,23,42,0.5)]">
-              <div class="flex items-center gap-2 text-amber-600 font-semibold">
-                <Radio :size="18" />
+            <div class="card py-3.5 px-4">
+              <div class="flex items-center gap-2 font-semibold text-title">
+                <Radio :size="18" class="text-primary" />
                 <span>{{ t('home.community') }}</span>
               </div>
-              <p class="text-sm text-slate-600 mt-1">
+              <p class="text-sm text-body mt-1">
                 {{ t('home.community_desc') }}
               </p>
             </div>
@@ -85,10 +83,10 @@
         </div>
 
         <div class="relative">
-          <div class="border border-white/80 bg-[linear-gradient(140deg,rgba(255,255,255,0.9),rgba(241,245,249,0.9))] shadow-[0_30px_60px_-40px_rgba(15,23,42,0.45)] rounded-4xl p-5 backdrop-blur-sm animate-[fade-in_0.6s_ease_backwards]">
+          <div class="card p-5 animate-rise-quick">
             <div class="flex items-center">
               <div
-                class="inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-3 py-1 text-xs font-semibold"
+                class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-3 py-1 text-xs font-semibold"
               >
                 <Sparkles :size="14" />
                 <span>{{ t('home.beta') }}</span>
@@ -97,59 +95,59 @@
 
             <div class="mt-6 space-y-4">
               <div
-                class="rounded-2xl bg-white/70 border border-white/60 shadow-sm p-4"
+                class="rounded-xl bg-sunken p-4"
               >
-                <p class="mb-3 text-sm font-semibold text-slate-700">
+                <p class="mb-3 text-sm font-semibold text-body">
                   {{ t('home.search_question') }}
                 </p>
                 <form
                   role="search"
-                  class="rounded-xl border border-slate-200 bg-white px-4 py-3 flex items-center gap-3 shadow-[0_10px_30px_-24px_rgba(15,23,42,0.6)] focus-within:ring-2 focus-within:ring-slate-900"
+                  class="rounded-lg border border-line bg-field px-4 py-3 flex items-center gap-3 transition duration-150 ease-out focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/20"
                   @submit.prevent="submitSearch"
                 >
-                  <Search :size="18" class="shrink-0 text-slate-500" />
+                  <Search :size="18" class="shrink-0 text-meta" />
                   <input
                     v-model="searchText"
                     type="search"
                     maxlength="100"
                     :placeholder="t('home.search_example')"
                     :aria-label="t('search.title')"
-                    class="min-w-0 flex-1 bg-transparent text-sm text-slate-800 placeholder:text-slate-500 focus:outline-none"
+                    class="min-w-0 flex-1 bg-transparent text-sm text-title placeholder:text-faint focus:outline-none"
                   >
                 </form>
               </div>
 
-              <p class="text-sm font-semibold text-slate-700">{{ t('home.discover_more') }}</p>
+              <p class="text-sm font-semibold text-body">{{ t('home.discover_more') }}</p>
               <div class="grid grid-cols-2 gap-3">
-                <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
+                <div class="rounded-xl bg-sunken p-3.5">
                   <div
-                    class="flex items-center gap-2 text-sky-600 font-semibold"
+                    class="flex items-center gap-2 font-semibold text-title"
                   >
-                    <Library :size="16" />
+                    <Library :size="16" class="text-primary" />
                     <span>{{ t('home.find_music') }}</span>
                   </div>
                 </div>
-                <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
+                <div class="rounded-xl bg-sunken p-3.5">
                   <div
-                    class="flex items-center gap-2 text-amber-600 font-semibold"
+                    class="flex items-center gap-2 font-semibold text-title"
                   >
-                    <Mic2 :size="16" />
+                    <Mic2 :size="16" class="text-primary" />
                     <span>{{ t('home.find_artists') }}</span>
                   </div>
                 </div>
-                <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
+                <div class="rounded-xl bg-sunken p-3.5">
                   <div
-                    class="flex items-center gap-2 text-emerald-600 font-semibold"
+                    class="flex items-center gap-2 font-semibold text-title"
                   >
-                    <CalendarDays :size="16" />
+                    <CalendarDays :size="16" class="text-primary" />
                     <span>{{ t('home.gear_reviews') }}</span>
                   </div>
                 </div>
-                <div class="border border-slate-200/90 bg-white/85 rounded-2xl p-3.5 shadow-[0_12px_36px_-26px_rgba(15,23,42,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-26px_rgba(15,23,42,0.6)]">
+                <div class="rounded-xl bg-sunken p-3.5">
                   <div
-                    class="flex items-center gap-2 text-slate-800 font-semibold"
+                    class="flex items-center gap-2 font-semibold text-title"
                   >
-                    <Tag :size="16" />
+                    <Tag :size="16" class="text-primary" />
                     <span>{{ t('home.discussions') }}</span>
                   </div>
                 </div>
@@ -165,8 +163,8 @@
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.for_everyone') }}</h2>
-            <p class="text-slate-600 mt-1">
+            <h2 class="text-3xl font-bold text-title">{{ t('home.for_everyone') }}</h2>
+            <p class="text-body mt-1">
               {{ t('home.for_everyone_desc') }}
             </p>
           </div>
@@ -176,27 +174,24 @@
           <div
             v-for="link in portalLinks"
             :key="link.title"
-            class="group flex items-start gap-4 rounded-2xl bg-white/80 border border-white/70 p-5 shadow-lg shadow-slate-200/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+            class="card group flex items-start gap-4 p-5"
           >
             <div
-              :class="[
-                'h-12 w-12 rounded-xl flex items-center justify-center text-white shrink-0',
-                link.tone,
-              ]"
+              class="h-12 w-12 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 text-primary"
             >
               <component :is="link.icon" :size="22" />
             </div>
             <div class="space-y-2">
               <div class="flex items-center gap-2">
-                <h3 class="text-xl font-semibold text-slate-900">
+                <h3 class="text-xl font-semibold text-title">
                   {{ link.title }}
                 </h3>
                 <ArrowRight
                   :size="16"
-                  class="text-slate-400 transition-transform duration-300 group-hover:translate-x-1"
+                  class="text-meta transition-transform duration-150 ease-out group-hover:translate-x-1"
                 />
               </div>
-              <p class="text-slate-600">{{ link.desc }}</p>
+              <p class="text-body">{{ link.desc }}</p>
             </div>
           </div>
         </div>
@@ -204,24 +199,24 @@
 
       <!-- What We Offer -->
       <section
-        class="rounded-3xl bg-white/80 border border-white/70 shadow-xl shadow-slate-200/60 p-6 md:p-10 space-y-10"
+        class="card p-6 md:p-10 space-y-10"
       >
         <div
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <p class="text-sm uppercase tracking-[0.2em] text-slate-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
               {{ t('home.offer_label') }}
             </p>
-            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.clean_data') }}</h2>
-            <p class="text-slate-600 mt-1">
+            <h2 class="text-3xl font-bold text-title">{{ t('home.clean_data') }}</h2>
+            <p class="text-body mt-1">
               {{ t('home.clean_data_desc') }}
             </p>
           </div>
-          <div class="flex flex-wrap gap-2 text-xs text-slate-600">
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.editable') }}</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.open_api') }}</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]">{{ t('home.free') }}</span>
+          <div class="flex flex-wrap gap-2 text-xs text-body">
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.editable') }}</span>
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.open_api') }}</span>
+            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.free') }}</span>
           </div>
         </div>
 
@@ -229,15 +224,15 @@
           <div
             v-for="stat in stats"
             :key="stat.label"
-            class="rounded-2xl border border-slate-100 bg-slate-50/80 p-4 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+            class="rounded-xl bg-sunken p-4 text-center"
           >
-            <div class="text-3xl font-black text-slate-900">
+            <div class="text-3xl font-black text-title">
               {{ stat.value }}
             </div>
-            <div class="text-sm font-semibold text-slate-600 mt-1">
+            <div class="text-sm font-semibold text-body mt-1">
               {{ stat.label }}
             </div>
-            <p class="text-xs text-slate-500 mt-1">{{ stat.desc }}</p>
+            <p class="text-xs text-meta mt-1">{{ stat.desc }}</p>
           </div>
         </div>
       </section>
@@ -248,11 +243,11 @@
           class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
         >
           <div>
-            <p class="text-sm uppercase tracking-[0.2em] text-slate-500">
+            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
               {{ t('home.topics_label') }}
             </p>
-            <h2 class="text-3xl font-bold text-slate-900">{{ t('home.beyond_music') }}</h2>
-            <p class="text-slate-600 mt-1">
+            <h2 class="text-3xl font-bold text-title">{{ t('home.beyond_music') }}</h2>
+            <p class="text-body mt-1">
               {{ t('home.beyond_music_desc') }}
             </p>
           </div>
@@ -261,34 +256,31 @@
           <div
             v-for="topic in topics"
             :key="topic.title"
-            class="border border-slate-200/90 bg-linear-to-b from-white/96 to-slate-50/95 rounded-[22px] p-4.5 shadow-[0_28px_70px_-46px_rgba(15,23,42,0.5)] transition-all duration-350 hover:-translate-y-2 hover:shadow-[0_32px_80px_-48px_rgba(15,23,42,0.55)] hover:border-blue-500/20"
+            class="card p-4.5"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
                 <div
-                  :class="[
-                    'h-11 w-11 rounded-full flex items-center justify-center text-white',
-                    topic.tone,
-                  ]"
+                  class="h-11 w-11 rounded-full flex items-center justify-center bg-primary/15 text-primary"
                 >
                   <component :is="topic.icon" :size="20" />
                 </div>
                 <div>
-                  <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
+                  <p class="text-xs uppercase tracking-[0.2em] text-meta">
                     {{ topic.tag }}
                   </p>
-                  <h3 class="text-lg font-semibold text-slate-900">
+                  <h3 class="text-lg font-semibold text-title">
                     {{ topic.title }}
                   </h3>
                 </div>
               </div>
             </div>
-            <p class="text-slate-600 mt-3">{{ topic.desc }}</p>
+            <p class="text-body mt-3">{{ topic.desc }}</p>
             <div class="flex flex-wrap gap-2 mt-4">
               <span
                 v-for="pill in topic.pills"
                 :key="pill"
-                class="inline-flex items-center gap-1.5 py-2 px-3 bg-slate-900/4 text-slate-900 rounded-full font-semibold border border-slate-400/30 transition-all duration-200 hover:-translate-y-px hover:shadow-[0_10px_30px_-22px_rgba(15,23,42,0.5)]"
+                class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold"
               >
                 {{ pill }}
               </span>
@@ -299,21 +291,21 @@
 
       <!-- Flow -->
       <section
-        class="rounded-3xl bg-slate-900 text-white p-8 md:p-12 shadow-2xl shadow-slate-400/20 overflow-hidden relative"
+        class="card p-8 md:p-12 overflow-hidden relative"
       >
         <div class="absolute inset-0 pointer-events-none">
-          <div class="absolute inset-0 opacity-30 animate-[shimmer_10s_linear_infinite] hero-grid"></div>
+          <div class="absolute inset-0 opacity-30 hero-grid" />
         </div>
         <div class="relative z-10 space-y-8">
           <div
             class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
           >
             <div>
-              <p class="text-sm uppercase tracking-[0.2em] text-slate-300">
+              <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
                 Flow
               </p>
-              <h2 class="text-3xl font-bold">{{ t('home.collector_title') }}</h2>
-              <p class="text-slate-200/80 mt-2">
+              <h2 class="text-3xl font-bold text-title">{{ t('home.collector_title') }}</h2>
+              <p class="text-body mt-2">
                 {{ t('home.collector_desc') }}
               </p>
             </div>
@@ -323,22 +315,22 @@
             <div
               v-for="(item, index) in flow"
               :key="item.title"
-              class="rounded-2xl bg-white/5 border border-white/10 p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-white/20"
+              class="rounded-xl bg-sunken p-5"
             >
               <div class="flex items-center gap-3">
                 <div
-                  class="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center text-sm font-bold"
+                  class="h-10 w-10 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold"
                 >
                   {{ index + 1 }}
                 </div>
                 <div>
-                  <p class="text-xs uppercase tracking-[0.2em] text-slate-300">
+                  <p class="text-xs uppercase tracking-[0.2em] text-meta">
                     {{ item.tag }}
                   </p>
-                  <h3 class="text-lg font-semibold">{{ item.title }}</h3>
+                  <h3 class="text-lg font-semibold text-title">{{ item.title }}</h3>
                 </div>
               </div>
-              <p class="text-slate-200/80 mt-3 leading-relaxed">
+              <p class="text-body mt-3 leading-relaxed">
                 {{ item.desc }}
               </p>
             </div>
@@ -379,13 +371,11 @@ const portalLinks = computed(() => [
     title: t('home.listener'),
     desc: t('home.listener_desc'),
     icon: Library,
-    tone: "bg-gradient-to-br from-sky-500 to-cyan-500",
   },
   {
     title: t('home.creator'),
     desc: t('home.creator_desc'),
     icon: Mic2,
-    tone: "bg-gradient-to-br from-emerald-500 to-lime-500",
   },
 ]);
 
@@ -403,7 +393,6 @@ const topics = computed(() => [
     desc: t('home.topic_entry_desc'),
     pills: [t('home.anime'), t('home.games'), t('home.tv')],
     icon: Globe2,
-    tone: "bg-gradient-to-br from-sky-500 to-blue-600",
   },
   {
     tag: t('home.topic_series_tag'),
@@ -411,7 +400,6 @@ const topics = computed(() => [
     desc: t('home.topic_series_desc'),
     pills: [t('home.combined_entries'), t('home.shared_theme')],
     icon: ListMusic,
-    tone: "bg-gradient-to-br from-emerald-500 to-teal-600",
   },
 ]);
 
@@ -453,14 +441,23 @@ useHead({
 </script>
 
 <style scoped>
+/* A faint grid behind the Flow card, in the line colour so it shows in both themes. */
 .hero-grid {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
   background-size: 32px 32px;
+  /* One grid step per loop, so the drift never jumps. */
+  animation: shimmer 4s linear infinite;
 }
 
-/* `backwards`, not `both`: hidden during the delay, and no transform left behind afterwards. */
+/* The keyframes are scoped, so animations that use them must be declared here too: Tailwind's
+   `animate-[fade-in…]` would point at the unscoped name and never run.
+   `backwards`, not `both`: hidden during the delay, and no transform left behind afterwards. */
+.animate-rise-quick {
+  animation: fade-in 0.6s ease backwards;
+}
+
 .animate-rise {
   animation: fade-in 0.7s ease backwards;
 }
@@ -494,8 +491,18 @@ useHead({
   }
   100% {
     background-position:
-      80px 80px,
-      80px 80px;
+      32px 32px,
+      32px 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-grid,
+  .animate-rise-quick,
+  .animate-rise,
+  .animate-rise-delayed,
+  .animate-rise-slower {
+    animation: none;
   }
 }
 </style>

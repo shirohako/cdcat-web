@@ -44,36 +44,36 @@ useHead({ title: computed(() => t('notifications.title')) })
 <template>
   <div class="container mx-auto max-w-3xl px-4 py-8 md:px-6">
     <header class="flex flex-wrap items-center justify-between gap-3">
-      <h1 class="inline-flex items-center gap-2 text-2xl font-bold text-slate-900"><Bell :size="22" />{{ t('notifications.title') }}</h1>
+      <h1 class="inline-flex items-center gap-2 text-2xl font-bold text-title"><Bell :size="22" class="text-primary" />{{ t('notifications.title') }}</h1>
       <button v-if="unread" type="button" class="btn btn-outline btn-sm" @click="markRead(null)"><CheckCheck :size="14" />{{ t('notifications.mark_all') }}</button>
     </header>
 
-    <nav class="mt-5 flex gap-1 border-b border-slate-200">
+    <nav class="mt-5 flex gap-1 border-b border-line">
       <NuxtLink
         v-for="value in ['all', 'unread']" :key="value" :to="{ query: value === 'unread' ? { filter: 'unread' } : {} }"
-        class="-mb-px border-b-2 px-3 py-2 text-sm" :class="filter === value ? 'border-violet-500 font-semibold text-violet-700' : 'border-transparent text-slate-500 hover:text-slate-800'">
+        class="-mb-px border-b-2 px-3 py-2 text-sm transition-colors duration-150 ease-out" :class="filter === value ? 'border-primary font-semibold text-primary' : 'border-transparent text-meta hover:text-title'">
         {{ t(`notifications.filters.${value}`) }}<span v-if="value === 'unread' && unread" class="ml-1 tabular-nums">({{ unread }})</span>
       </NuxtLink>
     </nav>
 
     <CommonLoadError v-if="status === 'error' && data" class="mt-4" @retry="refresh()" />
     <SkeletonRows v-if="loading" page class="mt-4" :count="8" thumb="dot" />
-    <p v-else-if="status === 'error' && !data" class="py-16 text-center text-sm text-rose-600">{{ localizeError(error) }}</p>
-    <p v-else-if="!data?.notifications.length" class="py-16 text-center text-sm text-slate-400">{{ t('notifications.empty') }}</p>
+    <p v-else-if="status === 'error' && !data" class="py-16 text-center text-sm text-danger">{{ localizeError(error) }}</p>
+    <UiEmpty v-else-if="!data?.notifications.length" :title="t('notifications.empty')" :icon="Bell" class="mt-4" />
     <ul
       v-else
       :key="revealKey"
-      class="mt-4 divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white transition-opacity"
+      class="card mt-4 divide-y divide-line overflow-hidden transition-opacity"
       :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
       :inert="refetching"
     >
       <li v-for="item in data.notifications" :key="item.id">
-        <button type="button" class="flex w-full gap-3 px-4 py-3 text-left transition hover:bg-slate-50" @click="openItem(item)">
-          <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-violet-500'" />
+        <button type="button" class="flex w-full gap-3 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active" @click="openItem(item)">
+          <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-primary'" />
           <span class="min-w-0 flex-1">
-            <span class="block text-sm" :class="item.read ? 'text-slate-500' : 'font-medium text-slate-900'">{{ text(item) }}</span>
-            <span v-if="detail(item)" class="mt-1 block line-clamp-2 text-xs text-slate-500">{{ detail(item) }}</span>
-            <span class="mt-1 block text-[11px] text-slate-400">{{ date(item.updated_at) }}</span>
+            <span class="block text-sm" :class="item.read ? 'text-meta' : 'font-medium text-title'">{{ text(item) }}</span>
+            <span v-if="detail(item)" class="mt-1 block line-clamp-2 text-xs text-meta">{{ detail(item) }}</span>
+            <span class="mt-1 block text-[11px] text-meta">{{ date(item.updated_at) }}</span>
           </span>
         </button>
       </li>

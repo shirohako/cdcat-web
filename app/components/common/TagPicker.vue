@@ -57,12 +57,12 @@ const onEnter = () => {
       <span
         v-for="tag in model" :key="tag.id"
         class="inline-flex items-center gap-1 rounded-full py-0.5 pl-2.5 pr-1 text-xs font-medium ring-1"
-        :class="isNewTag(tag) ? 'bg-emerald-50 text-emerald-700 ring-emerald-200' : 'bg-violet-50 text-violet-700 ring-violet-200'">
+        :class="isNewTag(tag) ? 'bg-success/10 text-success ring-success/30' : 'bg-primary/10 text-primary ring-primary/30'">
         <Lock v-if="tag.is_staff_only" :size="10" />
         {{ tagName(tag) }}
-        <span v-if="isNewTag(tag)" class="rounded-full bg-emerald-100 px-1 text-[10px] font-bold">{{ t('article_ui.tags.new') }}</span>
+        <span v-if="isNewTag(tag)" class="rounded-full bg-success/15 px-1 text-[10px] font-bold">{{ t('article_ui.tags.new') }}</span>
         <button
-          type="button" class="grid size-4 place-items-center rounded-full hover:bg-black/5 disabled:opacity-40" :disabled="disabled"
+          type="button" class="grid size-4 place-items-center rounded-full transition-colors hover:bg-current/15 disabled:opacity-40" :disabled="disabled"
           :aria-label="t('article_ui.tags.remove', { name: tagName(tag) })" @click="remove(tag)">
           <X :size="10" />
         </button>
@@ -71,28 +71,28 @@ const onEnter = () => {
     <template v-if="!disabled">
       <input
         v-model="filter" type="search" maxlength="60" :disabled="full"
-        class="w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none placeholder:text-slate-300 focus:border-violet-400"
+        class="input input-sm w-full"
         :placeholder="full ? t('article_ui.tags.full', { max }) : t('article_ui.tags.filter')"
         @keydown.enter.prevent="onEnter">
-      <p v-if="pending" class="text-xs text-slate-400">{{ t('common.loading') }}</p>
+      <p v-if="pending" class="text-xs text-faint">{{ t('common.loading') }}</p>
       <div v-else-if="!full" class="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto">
         <button
           v-if="canCreate" type="button"
-          class="inline-flex items-center gap-1 rounded-full border border-dashed border-emerald-400 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
+          class="inline-flex items-center gap-1 rounded-full border border-dashed border-success/50 bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success transition-colors hover:bg-success/15"
           @click="create">
           <Plus :size="10" />{{ t('article_ui.tags.create', { name: typed }) }}
         </button>
         <button
           v-for="tag in available" :key="tag.id" type="button"
-          class="inline-flex items-center gap-1 rounded-full border border-slate-200 px-2.5 py-0.5 text-xs text-slate-600 transition hover:border-violet-300 hover:text-violet-700"
+          class="inline-flex items-center gap-1 rounded-full bg-btn px-2.5 py-0.5 text-xs text-btn-content transition-colors hover:bg-btn-hover"
           @click="add(tag)">
           <Plus :size="10" />{{ tagName(tag) }}
         </button>
-        <p v-if="!available.length && !canCreate" class="text-xs text-slate-400">
+        <p v-if="!available.length && !canCreate" class="text-xs text-faint">
           {{ tooLong ? t('article_ui.tags.errors.too_long', { max: TAG_NAME_MAX }) : alreadyPicked ? t('article_ui.tags.picked') : staffOnly ? t('article_ui.tags.errors.staff') : tags.length || typed ? t('article_ui.tags.no_match') : t('article_ui.tags.empty') }}
         </p>
       </div>
-      <p v-if="!full" class="text-[11px] text-slate-400">{{ t('article_ui.tags.create_hint', { max: TAG_NAME_MAX }) }}</p>
+      <p v-if="!full" class="text-[11px] text-faint">{{ t('article_ui.tags.create_hint', { max: TAG_NAME_MAX }) }}</p>
     </template>
   </div>
 </template>

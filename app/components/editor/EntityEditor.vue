@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50/60">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-5xl px-3 py-6 md:px-6">
       <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
 
@@ -10,30 +10,30 @@
 
       <template v-else-if="ready">
         <header class="mb-5">
-          <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">{{ $t(id ? 'editor.entity.edit_title' : 'editor.entity.new_title', { type: typeLabel }) }}</p>
-          <h1 class="truncate text-2xl font-bold text-gray-900">{{ name || $t('editor.entity.untitled') }}</h1>
-          <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
-            <NuxtLink v-if="id" :to="`/${resource}/${id}`" class="hover:underline">{{ $t('editor.entity.view') }}</NuxtLink>
-            <NuxtLink v-if="id" :to="`/${resource}/${id}/versions`" class="hover:underline">{{ $t('versions.title') }}</NuxtLink>
-            <NuxtLink to="/revisions" class="hover:underline">{{ $t('editor.my_revisions') }}</NuxtLink>
+          <p class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(id ? 'editor.entity.edit_title' : 'editor.entity.new_title', { type: typeLabel }) }}</p>
+          <h1 class="truncate text-2xl font-bold text-title">{{ name || $t('editor.entity.untitled') }}</h1>
+          <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
+            <NuxtLink v-if="id" :to="`/${resource}/${id}`" class="link link-muted">{{ $t('editor.entity.view') }}</NuxtLink>
+            <NuxtLink v-if="id" :to="`/${resource}/${id}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>
+            <NuxtLink to="/revisions" class="link link-muted">{{ $t('editor.my_revisions') }}</NuxtLink>
           </p>
         </header>
 
-        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
-          <History :size="16" class="shrink-0" />
+        <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.entity.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
           <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
           <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
-        <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p class="font-semibold">{{ $t('editor.changes_requested') }}</p>
+        <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
         <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
 
         <div class="space-y-6">
           <slot />
-          <CatalogSection :title="$t('editor.section_submit')" :icon="Send" tone="blue">
+          <CatalogSection :title="$t('editor.section_submit')" :icon="Send">
             <div class="p-5">
               <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" @submitted="submitted" @errors="setErrors" @discarded="restart" />
             </div>

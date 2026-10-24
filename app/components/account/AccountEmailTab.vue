@@ -1,43 +1,43 @@
 <template>
   <div class="space-y-6">
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.email.title') }}</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.email.description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="p-6 pb-5 border-b border-line">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.email.title') }}</h2>
+        <p class="text-sm text-meta mt-1">{{ t('account_pages.email.description') }}</p>
       </div>
 
       <div class="p-6 space-y-6">
         <!-- Current email with action button -->
         <div
           class="flex items-center justify-between gap-4 p-4 rounded-xl border"
-          :class="user?.email ? 'bg-emerald-50/50 border-emerald-100' : 'bg-gray-50 border-gray-100'"
+          :class="user?.email ? 'bg-success/10 border-success/25' : 'bg-sunken border-line'"
         >
           <div class="flex items-center gap-4 min-w-0 flex-1">
             <div
               class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
-              :class="user?.email ? 'bg-emerald-100' : 'bg-white ring-1 ring-black/5'"
+              :class="user?.email ? 'bg-success/15' : 'bg-card ring-1 ring-line'"
             >
-              <Mail :size="18" :class="user?.email ? 'text-emerald-600' : 'text-gray-400'" />
+              <Mail :size="18" :class="user?.email ? 'text-success' : 'text-meta'" />
             </div>
             <div class="min-w-0">
-              <p class="text-sm font-medium text-gray-900 truncate">
+              <p class="text-sm font-medium text-title truncate">
                 {{ user?.email || t('account_pages.email.not_linked') }}
               </p>
               <p
                 v-if="user?.email"
-                class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-0.5"
+                class="text-xs text-success font-medium flex items-center gap-1 mt-0.5"
               >
                 <ShieldCheck :size="12" />
                 {{ t('account_pages.email.verified') }}
               </p>
-              <p v-else class="text-xs text-gray-400 mt-0.5">
+              <p v-else class="text-xs text-meta mt-0.5">
                 {{ t('account_pages.email.link_hint') }}
               </p>
             </div>
           </div>
           <button
             type="button"
-            class="shrink-0 px-3 py-1.5 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors text-xs font-medium whitespace-nowrap"
+            class="shrink-0 px-3 py-1.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-150 ease-out text-xs font-medium whitespace-nowrap"
             @click="editing = true"
           >
             {{ user?.email ? t('account_pages.email.change') : t('account_pages.email.link') }}
@@ -55,35 +55,35 @@
         >
           <div v-if="editing" class="grid gap-5 max-w-sm">
             <!-- Error message -->
-            <div v-if="errorMessage" class="bg-red-50 border border-red-200 rounded-lg p-3">
-              <p class="text-sm text-red-600">{{ errorMessage }}</p>
+            <div v-if="errorMessage" class="bg-danger/10 border border-danger/25 rounded-lg p-3">
+              <p class="text-sm text-danger">{{ errorMessage }}</p>
             </div>
 
             <!-- New email -->
             <div class="grid gap-1.5">
-              <label for="new-email" class="text-sm font-medium text-gray-700">
+              <label for="new-email" class="text-sm font-medium text-body">
                 {{ user?.email ? t('account_pages.email.new_address') : t('account_pages.email.address') }}
               </label>
               <input
                 id="new-email"
                 v-model="form.newEmail"
                 type="email"
-                class="input input-bordered w-full bg-white"
+                class="input w-full"
                 placeholder="your@email.com"
               />
-              <p class="text-xs text-gray-400">{{ t('account_pages.email.invalid') }}</p>
+              <p class="text-xs text-meta">{{ t('account_pages.email.invalid') }}</p>
             </div>
 
             <!-- Verification code -->
             <div class="grid gap-1.5">
-              <label for="email-code" class="text-sm font-medium text-gray-700">{{ t('account_pages.email.verification_code') }}</label>
+              <label for="email-code" class="text-sm font-medium text-body">{{ t('account_pages.email.verification_code') }}</label>
               <div class="flex gap-2">
                 <input
                   id="email-code"
                   v-model="form.verificationCode"
                   type="text"
                   maxlength="6"
-                  class="input input-bordered flex-1 bg-white"
+                  class="input flex-1"
                   :placeholder="t('account_pages.email.code_placeholder')"
                   @keyup.enter="submit"
                 />
@@ -91,14 +91,14 @@
                   type="button"
                   :disabled="!form.newEmail || countdown > 0 || isSendingCode"
                   class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-md border transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  :class="countdown > 0 ? 'bg-gray-100 text-gray-400 border-gray-200' : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100'"
+                  :class="countdown > 0 ? 'bg-sunken text-meta border-line' : 'bg-primary/10 text-primary border-primary/25 hover:bg-primary/20'"
                   @click="sendCode"
                 >
                   <span v-if="isSendingCode" class="loading loading-spinner loading-xs"></span>
                   <span v-else>{{ countdown > 0 ? `${countdown}s` : t('account_pages.email.send_code') }}</span>
                 </button>
               </div>
-              <p class="text-xs text-gray-400">{{ t('account_pages.email.code_hint') }}</p>
+              <p class="text-xs text-meta">{{ t('account_pages.email.code_hint') }}</p>
             </div>
           </div>
         </Transition>
@@ -106,7 +106,7 @@
 
       <div
         v-if="editing"
-        class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex justify-end gap-2"
+        class="px-6 py-4 bg-sunken border-t border-line flex justify-end gap-2"
       >
         <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
           {{ t('common.cancel') }}

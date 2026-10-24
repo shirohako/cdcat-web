@@ -44,8 +44,8 @@ const date = (value: string | null) => value ? new Intl.DateTimeFormat(locale.va
   <ArticleWriter v-if="stage === 'write'" :article-id="null" />
 
   <div v-else class="flex min-h-dvh flex-col">
-    <header class="flex shrink-0 items-center border-b border-slate-200 bg-white px-3 py-2 sm:px-4">
-      <NuxtLink to="/articles/mine" class="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
+    <header class="flex shrink-0 items-center border-b border-line bg-card px-3 py-2 sm:px-4">
+      <NuxtLink to="/articles/mine" class="inline-flex items-center gap-1.5 rounded-md px-1.5 py-1 text-sm text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary">
         <ArrowLeft :size="16" />{{ t('article_ui.mine.title') }}
       </NuxtLink>
     </header>
@@ -56,37 +56,37 @@ const date = (value: string | null) => value ? new Intl.DateTimeFormat(locale.va
     </SkeletonStatus>
 
     <main v-else class="mx-auto w-full max-w-lg px-4 py-12 sm:py-16">
-      <h1 class="text-xl font-bold text-slate-900">{{ t('article_ui.chooser.title') }}</h1>
-      <p class="mt-1 text-sm text-slate-500">{{ t('article_ui.chooser.description') }}</p>
+      <h1 class="text-xl font-bold text-title">{{ t('article_ui.chooser.title') }}</h1>
+      <p class="mt-1 text-sm text-meta">{{ t('article_ui.chooser.description') }}</p>
 
-      <ul class="mt-6 divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+      <ul class="card mt-6 divide-y divide-line overflow-hidden">
         <li v-if="local">
-          <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-slate-50" @click="stage = 'write'">
-            <HardDrive :size="16" class="shrink-0 text-amber-500" />
+          <button type="button" class="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active" @click="stage = 'write'">
+            <HardDrive :size="16" class="shrink-0 text-warning" />
             <div class="min-w-0 flex-1">
-              <p class="truncate font-medium text-slate-900">{{ local.title || t('article_ui.untitled') }}</p>
-              <p class="mt-0.5 text-xs text-amber-600">{{ t('article_ui.chooser.local', { time: date(local.at) }) }}</p>
+              <p class="truncate font-medium text-title">{{ local.title || t('article_ui.untitled') }}</p>
+              <p class="mt-0.5 text-xs text-warning">{{ t('article_ui.chooser.local', { time: date(local.at) }) }}</p>
             </div>
-            <span class="shrink-0 text-xs font-medium text-violet-600">{{ t('article_ui.chooser.continue') }}</span>
+            <span class="shrink-0 text-xs font-medium text-primary">{{ t('article_ui.chooser.continue') }}</span>
           </button>
         </li>
         <li v-for="article in drafts" :key="article.id">
-          <NuxtLink :to="`/articles/${article.id}/edit`" class="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50">
-            <FileText :size="16" class="shrink-0 text-slate-400" />
+          <NuxtLink :to="`/articles/${article.id}/edit`" class="flex items-center gap-3 px-4 py-3 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
+            <FileText :size="16" class="shrink-0 text-meta" />
             <div class="min-w-0 flex-1">
-              <p class="truncate font-medium text-slate-900">{{ article.title || t('article_ui.untitled') }}</p>
-              <p class="mt-0.5 text-xs text-slate-400">{{ t('article_ui.mine.updated', { time: date(article.updated_at) }) }}</p>
+              <p class="truncate font-medium text-title">{{ article.title || t('article_ui.untitled') }}</p>
+              <p class="mt-0.5 text-xs text-meta">{{ t('article_ui.mine.updated', { time: date(article.updated_at) }) }}</p>
             </div>
-            <span class="shrink-0 text-xs font-medium text-violet-600">{{ t('article_ui.chooser.continue') }}</span>
+            <span class="shrink-0 text-xs font-medium text-primary">{{ t('article_ui.chooser.continue') }}</span>
           </NuxtLink>
         </li>
       </ul>
-      <NuxtLink v-if="draftTotal > drafts.length" to="/articles/mine?status=draft" class="mt-2 inline-block text-xs text-slate-500 underline">
+      <NuxtLink v-if="draftTotal > drafts.length" to="/articles/mine?status=draft" class="link mt-2 inline-block text-xs">
         {{ t('article_ui.chooser.all_drafts', { count: draftTotal }) }}
       </NuxtLink>
 
       <button type="button" class="btn btn-primary mt-6 w-full" @click="startNew"><Plus :size="16" />{{ t('article_ui.chooser.new') }}</button>
-      <p v-if="local" class="mt-2 text-center text-xs text-slate-400">{{ t('article_ui.chooser.new_drops_local') }}</p>
+      <p v-if="local" class="mt-2 text-center text-xs text-meta">{{ t('article_ui.chooser.new_drops_local') }}</p>
     </main>
   </div>
 </template>

@@ -10,16 +10,16 @@
     />
     <div
       v-else
-      class="absolute inset-0 bg-linear-to-135deg from-violet-700 via-indigo-600 to-sky-500"
+      class="absolute inset-0 bg-linear-to-br from-primary-strong to-hero"
     />
     <div class="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
 
     <!-- 标题 + 元信息 -->
     <div class="absolute inset-0 flex flex-col items-center justify-center px-4 text-center">
-      <h1 class="text-2xl md:text-4xl font-bold text-white leading-tight drop-shadow-lg max-w-3xl mb-6">
+      <h1 class="text-2xl md:text-4xl font-bold text-on-media leading-tight drop-shadow-lg max-w-3xl mb-6">
         {{ article.title }}
       </h1>
-      <div class="flex flex-wrap items-center justify-center gap-4 text-white/80 text-sm">
+      <div class="flex flex-wrap items-center justify-center gap-4 text-on-media/80 text-sm">
         <div class="flex items-center gap-1.5">
           <UserRound :size="14" />
           <span>{{ article.author.nickname || article.author.username }}</span>
@@ -45,8 +45,8 @@
     <!-- 返回按钮 -->
     <NuxtLink
       to="/articles"
-      class="absolute top-4 left-4 md:left-8 inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white
-             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200 group"
+      class="absolute top-4 left-4 md:left-8 inline-flex items-center gap-1.5 text-sm text-on-media/80 hover:text-on-media
+             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors duration-150 ease-out group"
     >
       <ArrowLeft :size="14" class="group-hover:-translate-x-0.5 transition-transform duration-200" />
       {{ $t('article_ui.back') }}
@@ -56,8 +56,8 @@
     <NuxtLink
       v-if="isAuthor"
       :to="`/articles/${article.id}/edit`"
-      class="absolute top-4 right-4 md:right-8 inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white
-             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-all duration-200"
+      class="absolute top-4 right-4 md:right-8 inline-flex items-center gap-1.5 text-sm text-on-media/80 hover:text-on-media
+             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors duration-150 ease-out"
     >
       <Pencil :size="14" />
       {{ $t('common.edit') }}

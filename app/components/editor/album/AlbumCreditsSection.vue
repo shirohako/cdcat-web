@@ -1,61 +1,66 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.credits')" :icon="Users" tone="purple" :description="$t('editor.credits.hint')">
+  <CatalogSection :title="$t('editor.album.section.credits')" :icon="Users" :description="$t('editor.credits.hint')">
     <div class="space-y-4 p-3 sm:p-5">
-      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
 
       <template v-for="section in sections" :key="section.key">
         <div v-if="section.groups.length">
-          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-gray-400">{{ section.label }}</h3>
+          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-meta">{{ section.label }}</h3>
           <ul class="space-y-1.5">
             <template v-for="group in section.groups" :key="group.key">
               <EditorListRow :invalid="groupErrors(group).length > 0" @edit="edit(group)" @remove="removeCreditGroup(album, group)">
-                <span class="w-24 shrink-0 truncate text-xs text-purple-700 sm:w-32" :class="{ 'text-rose-600': !roleAllowed(group) }">{{ roleName(group.role) }}<span v-if="!roleAllowed(group)"> ⚠</span></span>
+                <span class="w-24 shrink-0 truncate text-xs sm:w-32" :class="roleAllowed(group) ? 'text-primary' : 'text-danger'">{{ roleName(group.role) }}<span v-if="!roleAllowed(group)"> ⚠</span></span>
                 <span class="min-w-0 flex-1">
                   <span class="flex min-w-0 items-center gap-1.5">
-                    <span class="truncate text-sm font-medium text-gray-900">{{ personName(group) }}</span>
-                    <span v-if="typeof group.artist_id === 'string'" class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
-                    <span v-if="group.artist_id === null" class="shrink-0 rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500" :title="$t('editor.credits.link_artist')">{{ $t('editor.dialog.name_only') }}</span>
+                    <span class="truncate text-sm font-medium text-title">{{ personName(group) }}</span>
+                    <span v-if="typeof group.artist_id === 'string'" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+                    <span v-if="group.artist_id === null" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.credits.link_artist')">{{ $t('editor.dialog.name_only') }}</span>
                   </span>
-                  <span v-if="subline(group)" class="block truncate text-[11px] text-gray-500">{{ subline(group) }}</span>
+                  <span v-if="subline(group)" class="block truncate text-[11px] text-meta">{{ subline(group) }}</span>
                 </span>
               </EditorListRow>
-              <p v-for="error in groupErrors(group)" :key="error.path" class="px-1 text-[11px] text-error">{{ error.message }}</p>
+              <p v-for="error in groupErrors(group)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
             </template>
           </ul>
         </div>
       </template>
-      <p v-if="!album.credits.length" class="text-sm text-gray-400">{{ $t('editor.credits.none') }}</p>
+      <p v-if="!album.credits.length" class="text-sm text-meta">{{ $t('editor.credits.none') }}</p>
 
       <EditorAddButton @click="edit(null)">{{ $t('editor.credits.add') }}</EditorAddButton>
     </div>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.credit_edit' : 'editor.credits.add')" :description="$t('editor.credits.hint')" :icon="UserPlus" tone="purple" @submit="save(false)">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.credit_edit' : 'editor.credits.add')" :description="$t('editor.credits.hint')" :icon="UserPlus" @submit="save(false)">
       <div class="space-y-4">
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.credit_role') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.credit_role') }}</span>
             <EditorRoleSelect v-model="form.role" :level="form.scope === 'album' ? 'album' : 'track'" class="w-full" />
           </label>
           <div>
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.credits.scope') }}</span>
-            <div class="grid grid-cols-2 rounded-lg bg-gray-100 p-0.5 text-sm">
-              <button type="button" class="rounded-md px-2 py-1" :class="form.scope === 'album' ? 'bg-white font-medium text-gray-900 shadow-sm' : 'text-gray-600'" @click="form.scope = 'album'">{{ $t('editor.credits.whole_album') }}</button>
-              <button type="button" class="rounded-md px-2 py-1 disabled:opacity-40" :class="form.scope === 'tracks' ? 'bg-white font-medium text-gray-900 shadow-sm' : 'text-gray-600'" :disabled="!album.tracks.length" @click="form.scope = 'tracks'">{{ $t('editor.credits.on_tracks') }}</button>
-            </div>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.credits.scope') }}</span>
+            <UiTabs
+              v-model="form.scope"
+              variant="segmented"
+              :label="$t('editor.credits.scope')"
+              :items="[
+                { value: 'album', label: $t('editor.credits.whole_album') },
+                { value: 'tracks', label: $t('editor.credits.on_tracks'), disabled: !album.tracks.length },
+              ]"
+            />
           </div>
         </div>
         <EditorAlbumTrackChooser v-if="form.scope === 'tracks'" v-model="form.tracks" inline />
 
         <div ref="person">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.credit_artist') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.credit_artist') }}</span>
           <EditorPickedRef v-if="form.ref !== null" :id="form.ref" type="artist" :references="editor.references" :pending="editor.pending.value" :icon="User" @remove="unlink" />
-          <div v-else-if="form.newArtist" class="flex h-[2.125rem] items-center gap-2 rounded-[0.58rem] border border-emerald-200 bg-emerald-50 pl-2.5 pr-1 text-sm text-emerald-950">
-            <User :size="14" class="shrink-0 text-emerald-500" />
+          <div v-else-if="form.newArtist" class="flex h-8 items-center gap-2 rounded-lg border border-success/25 bg-success/10 pl-2.5 pr-1 text-sm text-title">
+            <User :size="14" class="shrink-0 text-success" />
             <span class="min-w-0 flex-1 truncate font-medium">{{ form.newArtist }}</span>
-            <span class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
-            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-emerald-500 hover:bg-emerald-100" :aria-label="$t('common.delete')" @click="form.newArtist = ''"><X :size="13" /></button>
+            <span class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-success/70 transition-colors hover:bg-success/15 hover:text-success" :aria-label="$t('common.delete')" @click="form.newArtist = ''"><X :size="13" /></button>
           </div>
           <EditorEntityPicker v-else kind="artist" allow-create data-autofocus :placeholder="$t('editor.credits.pick_artist')" @select="pick" @create="form.newArtist = $event" />
         </div>
@@ -63,19 +68,19 @@
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.credited_as') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.credited_as') }}</span>
             <input v-model="form.creditedAs" class="input input-sm w-full" :class="{ 'input-error': problem === 'person' }" maxlength="200">
-            <span class="mt-1 block text-[11px] leading-4 text-gray-400">{{ $t('editor.dialog.credited_as_hint') }}</span>
+            <span class="mt-1 block text-[11px] leading-4 text-meta">{{ $t('editor.dialog.credited_as_hint') }}</span>
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.detail') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.detail') }}</span>
             <input v-model="form.detail" class="input input-sm w-full" maxlength="100">
           </label>
         </div>
-        <p v-if="problem && problem !== 'type'" class="text-xs text-error">{{ $t(problem === 'person' ? 'editor.dialog.credit_person_required' : 'editor.dialog.credit_tracks_required') }}</p>
+        <p v-if="problem && problem !== 'type'" class="text-xs text-danger">{{ $t(problem === 'person' ? 'editor.dialog.credit_person_required' : 'editor.dialog.credit_tracks_required') }}</p>
       </div>
       <template #footer>
-        <span v-if="addedCount" class="mr-auto text-xs text-emerald-600">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
+        <span v-if="addedCount" class="mr-auto text-xs text-success">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
         <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
         <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>

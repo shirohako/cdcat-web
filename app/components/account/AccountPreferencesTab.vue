@@ -1,9 +1,9 @@
 <template>
   <div class="space-y-6">
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.preferences.title') }}</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.preferences.description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="p-6 pb-5 border-b border-line">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.preferences.title') }}</h2>
+        <p class="text-sm text-meta mt-1">{{ t('account_pages.preferences.description') }}</p>
       </div>
 
       <div v-if="isLoading" class="p-6">
@@ -14,85 +14,85 @@
         <div class="p-6 space-y-8">
           <!-- Region -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="region" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.region') }}</label>
+            <label for="region" class="text-sm font-medium text-body">{{ t('account_pages.preferences.region') }}</label>
             <select
               id="region"
               v-model="form.region"
-              class="select select-bordered w-full bg-white"
+              class="select w-full"
             >
               <option value="">{{ t('account_pages.preferences.select_region') }}</option>
               <option v-for="code in regionCodes" :key="code" :value="code">{{ regionName(code) }}</option>
             </select>
-            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.region_hint') }}</p>
+            <p class="text-xs text-meta">{{ t('account_pages.preferences.region_hint') }}</p>
           </div>
 
           <!-- Currency -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="currency" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.currency') }}</label>
+            <label for="currency" class="text-sm font-medium text-body">{{ t('account_pages.preferences.currency') }}</label>
             <select
               id="currency"
               v-model="form.currency"
-              class="select select-bordered w-full bg-white"
+              class="select w-full"
             >
               <option value="">{{ t('account_pages.preferences.select_currency') }}</option>
               <option v-for="code in currencyCodes" :key="code" :value="code">{{ currencyName(code) }} ({{ code }})</option>
             </select>
-            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.currency_hint') }}</p>
+            <p class="text-xs text-meta">{{ t('account_pages.preferences.currency_hint') }}</p>
           </div>
 
           <!-- Language -->
           <div class="grid gap-1.5 max-w-sm">
-            <label for="language" class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.language') }}</label>
+            <label for="language" class="text-sm font-medium text-body">{{ t('account_pages.preferences.language') }}</label>
             <select
               id="language"
               v-model="form.locale"
-              class="select select-bordered w-full bg-white"
+              class="select w-full"
             >
               <option value="">{{ t('account_pages.preferences.select_language') }}</option>
               <option v-for="code in languageCodes" :key="code" :value="code">{{ languageName(code) }}</option>
             </select>
-            <p class="text-xs text-gray-400">{{ t('account_pages.preferences.language_hint') }}</p>
+            <p class="text-xs text-meta">{{ t('account_pages.preferences.language_hint') }}</p>
           </div>
 
           <!-- Gender -->
           <div class="grid gap-1.5 max-w-sm">
-            <label class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.gender') }}</label>
+            <label class="text-sm font-medium text-body">{{ t('account_pages.preferences.gender') }}</label>
             <div class="flex gap-3">
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   v-model.number="form.gender"
                   type="radio"
                   :value="1"
-                  class="radio radio-sm radio-primary"
+                  class="radio radio-sm"
                 />
-                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.male') }}</span>
+                <span class="text-sm text-body">{{ t('account_pages.preferences.male') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   v-model.number="form.gender"
                   type="radio"
                   :value="2"
-                  class="radio radio-sm radio-primary"
+                  class="radio radio-sm"
                 />
-                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.female') }}</span>
+                <span class="text-sm text-body">{{ t('account_pages.preferences.female') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   v-model.number="form.gender"
                   type="radio"
                   :value="3"
-                  class="radio radio-sm radio-primary"
+                  class="radio radio-sm"
                 />
-                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.other') }}</span>
+                <span class="text-sm text-body">{{ t('account_pages.preferences.other') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
                 <input
                   v-model.number="form.gender"
                   type="radio"
                   :value="0"
-                  class="radio radio-sm radio-primary"
+                  class="radio radio-sm"
                 />
-                <span class="text-sm text-gray-700">{{ t('account_pages.preferences.undisclosed') }}</span>
+                <span class="text-sm text-body">{{ t('account_pages.preferences.undisclosed') }}</span>
               </label>
             </div>
           </div>
@@ -101,20 +101,20 @@
           <div class="grid gap-1.5 max-w-sm">
             <div class="flex items-start justify-between gap-4">
               <div class="min-w-0">
-                <p class="text-sm font-medium text-gray-700">{{ t('account_pages.preferences.adult_content') }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ t('account_pages.preferences.adult_content_hint') }}</p>
+                <p class="text-sm font-medium text-body">{{ t('account_pages.preferences.adult_content') }}</p>
+                <p class="text-xs text-meta mt-0.5">{{ t('account_pages.preferences.adult_content_hint') }}</p>
               </div>
               <input
                 v-model="form.show_adult_content"
                 type="checkbox"
-                class="toggle toggle-primary"
+                class="toggle"
                 :aria-label="t('account_pages.preferences.adult_content')"
               />
             </div>
           </div>
         </div>
 
-        <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex items-center justify-between">
+        <div class="px-6 py-4 bg-sunken border-t border-line flex items-center justify-between">
           <p v-if="statusMessage" :class="statusClass" class="text-xs font-medium">
             {{ statusMessage }}
           </p>
@@ -215,11 +215,11 @@ const saveSettings = async () => {
 
     original.value = { ...form }
     statusMessage.value = t('account_pages.preferences.saved')
-    statusClass.value = 'text-emerald-600'
+    statusClass.value = 'text-success'
     emit('save', t('account_pages.preferences_saved'))
   } catch (error) {
     statusMessage.value = localizeError(error, 'account_pages.preferences.save_failed')
-    statusClass.value = 'text-red-600'
+    statusClass.value = 'text-danger'
   } finally {
     isSaving.value = false
   }

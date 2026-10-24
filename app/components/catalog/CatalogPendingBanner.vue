@@ -1,18 +1,18 @@
 <template>
-  <div v-if="pending" :class="inline ? 'mb-6 rounded-xl border border-amber-200 bg-amber-50' : 'border-b border-amber-200 bg-amber-50'" role="status">
+  <div v-if="pending" :class="inline ? 'mb-6 rounded-xl border border-warning/25 bg-warning/10' : 'border-b border-warning/25 bg-warning/10'" role="status">
     <div
-      class="flex flex-wrap items-start gap-3 py-3 text-sm text-amber-900"
+      class="flex flex-wrap items-start gap-3 py-3 text-sm text-body"
       :class="inline ? 'px-4' : 'container mx-auto max-w-6xl px-4 md:px-12 lg:px-20 xl:px-8 2xl:max-w-7xl'"
     >
-      <ShieldAlert :size="18" class="mt-0.5 shrink-0 text-amber-600" />
+      <ShieldAlert :size="18" class="mt-0.5 shrink-0 text-warning" />
       <div class="min-w-0 flex-1">
-        <p class="font-medium">{{ $t('pending.notice') }}</p>
-        <p v-if="revision && !canReview" class="mt-0.5 text-amber-800">{{ $t('pending.notice_own') }}</p>
+        <p class="font-semibold text-title">{{ $t('pending.notice') }}</p>
+        <p v-if="revision && !canReview" class="mt-0.5 text-body">{{ $t('pending.notice_own') }}</p>
       </div>
       <NuxtLink
         v-if="revision"
         :to="canReview ? `/admin/revisions/${revision.id}` : `/revisions/${revision.id}`"
-        class="shrink-0 rounded-md border border-amber-300 bg-white px-2.5 py-1 text-xs font-medium text-amber-800 transition-colors hover:bg-amber-100"
+        class="shrink-0 rounded-md border border-warning/40 px-2.5 py-1 text-xs font-semibold text-warning transition-colors hover:bg-warning/15"
       >
         {{ canReview ? $t('pending.review', { id: revision.id }) : $t('pending.view_revision', { id: revision.id }) }}
       </NuxtLink>

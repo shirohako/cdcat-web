@@ -11,12 +11,12 @@ const { data, revealClass } = await usePageData(() => `profile-articles-${props.
 </script>
 
 <template>
-  <section v-if="data?.articles.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm" :class="revealClass">
+  <section v-if="data?.articles.length" class="card p-5" :class="revealClass">
     <header class="mb-4 flex items-center gap-2">
-      <Newspaper :size="16" class="text-violet-500" />
-      <h2 class="text-base font-bold text-gray-900">{{ t('article_ui.profile.title') }}</h2>
-      <span class="text-xs text-gray-400">{{ data.pagination.total }}</span>
-      <NuxtLink v-if="data.pagination.total > data.articles.length" :to="{ path: '/articles', query: { user: username } }" class="ml-auto text-xs text-gray-400 hover:text-violet-600">
+      <Newspaper :size="16" class="text-primary" />
+      <h2 class="text-base font-bold text-title">{{ t('article_ui.profile.title') }}</h2>
+      <span class="text-xs text-meta">{{ data.pagination.total }}</span>
+      <NuxtLink v-if="data.pagination.total > data.articles.length" :to="{ path: '/articles', query: { user: username } }" class="ml-auto text-xs text-meta transition-colors duration-150 ease-out hover:text-primary">
         {{ t('article_ui.profile.all') }}
       </NuxtLink>
     </header>

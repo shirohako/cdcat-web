@@ -1,7 +1,7 @@
 <template>
   <SkeletonStatus page>
     <div v-if="variant === 'artists'" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-xl border border-slate-200/70 bg-white p-2.5">
+      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-xl bg-sunken p-2.5">
         <div class="skeleton size-12 shrink-0 rounded-full" />
         <div class="min-w-0 flex-1 space-y-2">
           <div class="skeleton h-3.5 w-3/5 rounded-full" />
@@ -11,7 +11,7 @@
     </div>
 
     <div v-else-if="variant === 'list'" class="space-y-3">
-      <div v-for="item in total" :key="item" class="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+      <div v-for="item in total" :key="item" class="flex gap-4 rounded-xl bg-sunken p-4">
         <div class="skeleton h-32 w-22 shrink-0 rounded-lg" />
         <div class="flex flex-1 flex-col py-1">
           <div class="skeleton h-5 w-20 rounded-full" />
@@ -27,7 +27,7 @@
     </div>
 
     <div v-else-if="variant === 'labels'" class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      <div v-for="item in total" :key="item" class="flex items-center gap-3 rounded-xl border border-gray-100 bg-white p-4">
+      <div v-for="item in total" :key="item" class="card flex items-center gap-3 p-4">
         <div class="skeleton size-10 shrink-0 rounded-lg" />
         <div class="min-w-0 flex-1 space-y-2">
           <div class="skeleton h-3.5 w-3/5 rounded-full" />
@@ -40,8 +40,8 @@
       <div
         v-for="item in total"
         :key="item"
-        class="flex flex-col overflow-hidden border border-gray-100 bg-white shadow-sm"
-        :class="variant === 'articles' ? 'rounded-2xl' : 'rounded-xl'"
+        class="flex flex-col overflow-hidden"
+        :class="variant === 'events' ? 'card' : variant === 'articles' ? 'rounded-2xl bg-sunken' : 'rounded-xl bg-sunken'"
       >
         <div class="skeleton" :class="mediaClass" />
 
@@ -50,7 +50,7 @@
           <div class="flex h-5 items-center"><div class="skeleton h-3.5 w-4/5 rounded-full" /></div>
           <div class="flex h-4 items-center"><div class="skeleton h-3 w-1/2 rounded-full" /></div>
           <div class="flex h-4 items-center"><div class="skeleton h-3 w-2/5 rounded-full" /></div>
-          <div class="flex h-6 items-end border-t border-gray-100"><div class="skeleton h-3 w-1/4 rounded-full" /></div>
+          <div class="flex h-6 items-end border-t border-line"><div class="skeleton h-3 w-1/4 rounded-full" /></div>
         </div>
 
         <!-- ArticleCard: title, summary and the author footer. -->
@@ -64,7 +64,7 @@
             <div class="skeleton h-2.5 w-full rounded-full" />
             <div class="skeleton h-2.5 w-2/3 rounded-full" />
           </div>
-          <div class="mt-auto flex items-center gap-2 border-t border-gray-50 pt-3">
+          <div class="mt-auto flex items-center gap-2 border-t border-line pt-3">
             <div class="skeleton size-5 shrink-0 rounded-full" />
             <div class="skeleton h-2.5 w-16 rounded-full" />
             <div class="skeleton ml-auto h-2.5 w-12 rounded-full" />
@@ -89,7 +89,7 @@
  * - `list`: the entry cards
  * - `wide`: franchise and event cards
  * - `articles`: ArticleCard
- * - `events`: the event cards of a series, `portrait` (5:7) or landscape
+ * - `events`: the event cards of a series (cards on the page), `portrait` (5:7) or landscape
  * - `labels`: the label cards
  */
 type Variant = 'covers' | 'artists' | 'list' | 'wide' | 'articles' | 'events' | 'labels'

@@ -1,28 +1,28 @@
 <template>
-  <div class="space-y-3 rounded-lg border border-amber-200 bg-amber-50/60 p-4">
+  <div class="space-y-3 rounded-lg border border-warning/25 bg-warning/10 p-4">
     <div>
-      <h3 class="font-semibold text-amber-900">{{ $t('editor.conflicts_title') }}</h3>
-      <p class="text-sm text-amber-800">{{ $t('editor.conflicts_hint') }}</p>
+      <h3 class="font-semibold text-warning">{{ $t('editor.conflicts_title') }}</h3>
+      <p class="text-sm text-body">{{ $t('editor.conflicts_hint') }}</p>
     </div>
     <ul class="space-y-2">
-      <li v-for="conflict in conflicts" :key="conflict.id" class="rounded-md bg-white p-3 text-sm shadow-sm">
-        <p class="mb-2 text-xs text-gray-500">
+      <li v-for="conflict in conflicts" :key="conflict.id" class="rounded-md bg-card p-3 text-sm">
+        <p class="mb-2 text-xs text-meta">
           <span class="badge badge-warning badge-xs mr-1">{{ $t(`editor.conflict_kind.${conflict.kind}`) }}</span>
           {{ describePath(conflict.path) }}
         </p>
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <label class="flex cursor-pointer items-start gap-2 rounded border p-2" :class="choices[conflict.id] === 'mine' ? 'border-primary bg-primary/5' : 'border-gray-200'">
+          <label class="flex cursor-pointer items-start gap-2 rounded border p-2 transition-colors" :class="choices[conflict.id] === 'mine' ? 'border-primary bg-primary/10' : 'border-line hover:bg-card-hover'">
             <input v-model="choices[conflict.id]" type="radio" value="mine" class="radio radio-sm mt-0.5">
-            <span><span class="block text-[11px] text-gray-400">{{ $t('editor.mine') }}</span>{{ show(conflict.mine) }}</span>
+            <span><span class="block text-[11px] text-meta">{{ $t('editor.mine') }}</span>{{ show(conflict.mine) }}</span>
           </label>
-          <label class="flex cursor-pointer items-start gap-2 rounded border p-2" :class="choices[conflict.id] === 'current' ? 'border-primary bg-primary/5' : 'border-gray-200'">
+          <label class="flex cursor-pointer items-start gap-2 rounded border p-2 transition-colors" :class="choices[conflict.id] === 'current' ? 'border-primary bg-primary/10' : 'border-line hover:bg-card-hover'">
             <input v-model="choices[conflict.id]" type="radio" value="current" class="radio radio-sm mt-0.5">
-            <span><span class="block text-[11px] text-gray-400">{{ $t('editor.current') }}</span>{{ show(conflict.current) }}</span>
+            <span><span class="block text-[11px] text-meta">{{ $t('editor.current') }}</span>{{ show(conflict.current) }}</span>
           </label>
         </div>
       </li>
     </ul>
-    <p v-if="message" class="text-sm text-error">{{ message }}</p>
+    <p v-if="message" class="text-sm text-danger">{{ message }}</p>
     <button type="button" class="btn btn-sm btn-warning" :disabled="busy || Object.keys(choices).length < conflicts.length" @click="resolve">{{ $t('editor.resolve') }}</button>
   </div>
 </template>

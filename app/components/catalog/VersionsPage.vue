@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <div class="mb-6 flex flex-wrap items-center gap-3">
         <NuxtLink :to="backLink" class="btn btn-ghost btn-sm gap-1"><ArrowLeft :size="14" />{{ $t('common.go_back') }}</NuxtLink>
         <div class="min-w-0">
-          <p class="text-xs text-gray-400">{{ $t('versions.title') }} · {{ enumLabel('catalog_type', type) }}</p>
-          <h1 class="truncate text-xl font-bold text-gray-900">{{ name || `#${id}` }}</h1>
+          <p class="text-xs text-meta">{{ $t('versions.title') }} · {{ enumLabel('catalog_type', type) }}</p>
+          <h1 class="truncate text-xl font-bold text-title">{{ name || `#${id}` }}</h1>
         </div>
       </div>
       <CatalogVersionHistory :id="id" :type="type" />

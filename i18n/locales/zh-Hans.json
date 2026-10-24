@@ -3282,6 +3282,16 @@
   "site": {
     "dismiss_announcement": "关闭公告"
   },
+  "appearance": {
+    "title": "外观",
+    "open": "外观设置",
+    "dark": "暗色",
+    "light": "亮色",
+    "color": "主题色",
+    "hue": "色相 {hue}",
+    "reset": "恢复默认",
+    "preset": "使用色相 {hue}"
+  },
   "event_picker": {
     "placeholder": "搜索活动，例如 C107 或 M3-2025",
     "searching": "搜索中…",

@@ -1,5 +1,5 @@
 <template>
-  <label class="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs text-gray-600 hover:bg-gray-50">
+  <label class="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-lg px-2 text-xs text-body transition-colors hover:bg-ghost-hover">
     <input type="checkbox" class="checkbox checkbox-xs" :checked="modelValue" @change="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)">
     {{ $t('pending.show_toggle') }}
   </label>

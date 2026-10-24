@@ -1,15 +1,15 @@
 <template>
-  <div class="min-h-screen bg-gray-50/80">
+  <div class="min-h-screen">
     <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
       <!-- Header -->
       <div class="mb-10">
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">{{ t('collection_pages.reviews.title') }}</h1>
-        <p class="mt-1.5 text-sm text-gray-500">{{ t('collection_pages.reviews.description') }}</p>
+        <h1 class="text-2xl md:text-3xl font-bold text-title tracking-tight">{{ t('collection_pages.reviews.title') }}</h1>
+        <p class="mt-1.5 text-sm text-meta">{{ t('collection_pages.reviews.description') }}</p>
       </div>
 
       <!-- Stats Cards -->
       <SkeletonStatus v-if="statsLoading" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div v-for="i in 3" :key="i" class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6">
+        <div v-for="i in 3" :key="i" class="card p-6">
           <div class="flex items-center justify-between">
             <div>
               <div class="skeleton h-4 w-20 rounded" />
@@ -22,19 +22,19 @@
 
       <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <!-- Total Reviews -->
-        <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
+        <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">{{ t('collection_pages.reviews.total') }}</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.totalReviews }}</p>
+              <p class="text-sm text-meta">{{ t('collection_pages.reviews.total') }}</p>
+              <p class="text-3xl font-bold text-title mt-2">{{ stats.totalReviews }}</p>
             </div>
-            <Icon name="lucide:message-square-text" class="w-12 h-12 text-blue-100" />
+            <Icon name="lucide:message-square-text" class="w-12 h-12 text-primary/25" />
           </div>
         </div>
 
         <!-- Ratings on this page, per level -->
-        <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
-          <p class="text-sm text-gray-500">{{ t('reviews.page_ratings') }}</p>
+        <div class="card p-6">
+          <p class="text-sm text-meta">{{ t('reviews.page_ratings') }}</p>
           <div v-if="stats.scoredCount" class="mt-3 flex flex-wrap gap-1.5">
             <template v-for="value in REVIEW_RATINGS" :key="value">
               <span v-if="stats.byRating[value]" class="rounded-full px-2 py-0.5 text-xs font-medium ring-1" :class="reviewRatingTone(value)">
@@ -42,31 +42,31 @@
               </span>
             </template>
           </div>
-          <p v-else class="text-3xl font-bold text-gray-900 mt-2">--</p>
+          <p v-else class="text-3xl font-bold text-title mt-2">--</p>
         </div>
 
         <!-- Scored Reviews -->
-        <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 p-6 transition-all hover:shadow-lg">
+        <div class="card p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-gray-500">{{ t('reviews.page_rated') }}</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.scoredCount }}</p>
+              <p class="text-sm text-meta">{{ t('reviews.page_rated') }}</p>
+              <p class="text-3xl font-bold text-title mt-2">{{ stats.scoredCount }}</p>
             </div>
-            <Icon name="lucide:hash" class="w-12 h-12 text-green-100" />
+            <Icon name="lucide:hash" class="w-12 h-12 text-success/25" />
           </div>
         </div>
       </div>
 
       <!-- Main Content Card -->
-      <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
+      <div class="card overflow-hidden">
         <!-- Sort Bar -->
-        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <p class="text-sm text-gray-500">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-line">
+          <p class="text-sm text-meta">
             {{ t('collection_pages.reviews.count', { count: total }) }}
           </p>
           <select
             v-model="sortBy"
-            class="select select-bordered select-sm text-sm"
+            class="select select-sm text-sm"
           >
             <option value="date_desc">{{ t('collection_pages.reviews.sort_newest') }}</option>
             <option value="date_asc">{{ t('collection_pages.reviews.sort_oldest') }}</option>
@@ -76,7 +76,7 @@
         </div>
 
         <!-- Error State -->
-        <div v-if="loadError" class="px-6 py-4 text-sm text-red-500">
+        <div v-if="loadError" class="px-6 py-4 text-sm text-danger">
           {{ loadError }}
         </div>
 
@@ -97,13 +97,13 @@
       <Teleport to="body">
         <div v-if="deleteConfirm.show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" @click="cancelDelete" />
-          <div class="relative bg-white rounded-2xl shadow-xl ring-1 ring-black/5 w-full max-w-sm p-6">
+          <div class="relative w-full max-w-sm rounded-2xl bg-card p-6 text-body shadow-overlay ring-1 ring-line">
             <div class="flex flex-col items-center text-center">
-              <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                <Icon name="lucide:trash-2" class="w-6 h-6 text-red-500" />
+              <div class="w-12 h-12 rounded-full bg-danger/15 flex items-center justify-center mb-4">
+                <Icon name="lucide:trash-2" class="w-6 h-6 text-danger" />
               </div>
-              <h3 class="text-lg font-bold text-gray-900">{{ t('collection_pages.reviews.delete_title') }}</h3>
-              <p class="text-sm text-gray-500 mt-2">{{ t('collection_pages.reviews.delete_confirm') }}</p>
+              <h3 class="text-lg font-bold text-title">{{ t('collection_pages.reviews.delete_title') }}</h3>
+              <p class="text-sm text-meta mt-2">{{ t('collection_pages.reviews.delete_confirm') }}</p>
             </div>
             <div class="flex gap-3 mt-6">
               <button

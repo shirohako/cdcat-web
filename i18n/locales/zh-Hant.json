@@ -1318,6 +1318,16 @@
   "site": {
     "dismiss_announcement": "關閉公告"
   },
+  "appearance": {
+    "title": "外觀",
+    "open": "外觀設定",
+    "dark": "暗色",
+    "light": "亮色",
+    "color": "主題色",
+    "hue": "色相 {hue}",
+    "reset": "恢復預設",
+    "preset": "使用色相 {hue}"
+  },
   "event_picker": {
     "placeholder": "搜尋活動，例如 C107 或 M3-2025",
     "searching": "搜尋中…",

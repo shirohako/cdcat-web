@@ -94,28 +94,28 @@ async function submit() {
     <form id="discussion-moderation" class="space-y-4" @submit.prevent="submit">
       <div class="flex flex-wrap gap-1.5">
         <button
-          v-for="value in actions" :key="value" type="button" class="rounded-lg px-3 py-1.5 text-sm transition"
-          :class="action === value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'" @click="action = value"
+          v-for="value in actions" :key="value" type="button" class="chip"
+          :class="{ 'chip-selected': action === value }" @click="action = value"
         >
           {{ t(`discussions.moderation.actions.${value}`) }}
         </button>
       </div>
-      <p class="text-sm text-slate-500">{{ t(`discussions.moderation.help.${action}`) }}</p>
+      <p class="text-sm text-meta">{{ t(`discussions.moderation.help.${action}`) }}</p>
       <ClientOnly v-if="action === 'edit'">
         <MarkdownEditor v-model="raw" :variant="post?.floor === null ? 'compact' : 'full'" mode="edit" :guide-url="null" />
       </ClientOnly>
       <label v-if="action === 'silence'" class="block text-sm">
         {{ t('discussions.moderation.duration') }}
-        <select v-model="days" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2">
+        <select v-model="days" class="select mt-1 w-full">
           <option v-for="value in [1, 3, 7, 30]" :key="value" :value="value">{{ t('discussions.moderation.days', { count: value }) }}</option>
           <option :value="null">{{ t('discussions.moderation.forever') }}</option>
         </select>
       </label>
       <label class="block text-sm">
         {{ needsReason ? t('discussions.moderation.reason') : t('discussions.moderation.reason_optional') }}
-        <textarea v-model="reason" rows="2" maxlength="2000" :required="needsReason" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-sky-400" />
+        <textarea v-model="reason" rows="2" maxlength="2000" :required="needsReason" class="textarea textarea-sm mt-1 w-full" />
       </label>
-      <p v-if="error" role="alert" class="text-sm text-rose-600">{{ error }}</p>
+      <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
     </form>
     <template #footer>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>

@@ -1,19 +1,19 @@
 <template>
   <div v-if="track">
-    <p class="text-xs font-semibold text-gray-600">{{ $t('editor.originals.title') }}</p>
-    <p class="mb-1.5 text-[11px] text-gray-400">{{ $t('editor.originals.hint') }}</p>
+    <p class="text-xs font-semibold text-body">{{ $t('editor.originals.title') }}</p>
+    <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.originals.hint') }}</p>
     <ul v-if="rows.length" class="mb-2 space-y-1.5">
       <li v-for="row in rows" :key="row.id" class="flex flex-wrap items-center gap-2 text-sm">
         <template v-if="row.original_track_id !== null">
           <EditorRefLabel :id="row.original_track_id" type="track" :references="editor.references" class="min-w-0" />
-          <span v-if="albumOf(row.original_track_id)" class="min-w-0 truncate text-xs text-gray-400">{{ albumOf(row.original_track_id) }}</span>
+          <span v-if="albumOf(row.original_track_id)" class="min-w-0 truncate text-xs text-meta">{{ albumOf(row.original_track_id) }}</span>
         </template>
         <template v-else>
           <span class="min-w-0 truncate">{{ row.original_title }}</span>
-          <span class="shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
+          <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
         </template>
         <button type="button" class="btn btn-ghost btn-xs ml-auto px-1.5" :aria-label="$t('common.delete')" @click="remove(row.id)"><X :size="12" /></button>
-        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-error">{{ error.message }}</p>
+        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
       </li>
     </ul>
     <EditorEntityPicker

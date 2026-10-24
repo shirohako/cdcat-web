@@ -4,11 +4,11 @@
     <template v-if="profile">
       <!-- Decorative background -->
       <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
-        <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-sky-200/50 to-blue-200/25 blur-3xl" />
-        <div class="absolute -top-24 -right-28 h-80 w-80 rounded-full bg-linear-to-br from-amber-200/40 to-rose-200/15 blur-3xl" />
-        <div class="absolute -bottom-40 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-emerald-200/35 to-cyan-200/15 blur-3xl" />
-        <div class="absolute top-1/2 right-1/4 h-64 w-64 rounded-full bg-linear-to-br from-violet-200/30 to-indigo-200/15 blur-3xl" />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(0,0,0,0.05)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
+        <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-primary/15 to-primary/5 blur-3xl" />
+        <div class="absolute -top-24 -right-28 h-80 w-80 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-3xl" />
+        <div class="absolute -bottom-40 left-1/3 h-96 w-96 rounded-full bg-linear-to-br from-primary/10 to-primary/5 blur-3xl" />
+        <div class="absolute top-1/2 right-1/4 h-64 w-64 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-3xl" />
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,var(--line)_1px,transparent_0)] bg-size-[24px_24px] opacity-35" />
       </div>
 
       <div class="relative" :class="revealClass">

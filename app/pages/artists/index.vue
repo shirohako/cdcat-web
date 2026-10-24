@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
@@ -8,7 +8,6 @@
         :title="$t('artists.title')"
         :description="$t('artists.subtitle')"
         icon="lucide:users-round"
-        tone="violet"
         :filters="artistTypes"
         :filter-label="$t('content_display.type')"
         @update:model-value="selectType"
@@ -18,7 +17,7 @@
         </template>
         <template #action>
           <button
-            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-0 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
             @click="navigateTo('/contribute?type=artist')"
           >
             <Plus class="h-3.5 w-3.5" />
@@ -52,32 +51,32 @@
             v-for="artist in artistsData"
             :key="artist.id"
             :to="`/artists/${artist.id}`"
-            class="group flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-200/70 bg-white p-2.5 transition-colors hover:border-slate-200 hover:bg-slate-50/70"
+            class="group flex min-w-0 items-center gap-2.5 rounded-xl bg-sunken p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           >
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card ring-1 ring-line">
               <img
                 v-if="artist.image_url"
                 :src="artist.image_url"
                 :alt="artist.name"
                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               >
-              <div v-else class="text-slate-300">
+              <div v-else class="text-faint">
                 <Users :size="22" />
               </div>
             </div>
 
             <div class="min-w-0 flex-1">
-              <h3 class="truncate text-sm font-semibold text-slate-900 transition-colors group-hover:text-sky-700">
+              <h3 class="truncate text-sm font-semibold text-title transition-colors group-hover:text-primary">
                 {{ artist.name }}
               </h3>
 
-              <div class="mt-1.5 flex items-center gap-3.5 text-xs text-slate-500">
+              <div class="mt-1.5 flex items-center gap-3.5 text-xs text-meta">
                 <div class="flex items-center gap-1.5">
-                  <Disc3 :size="13" class="text-slate-400" />
+                  <Disc3 :size="13" class="text-meta" />
                   <span class="font-medium">{{ artist.albums_count || 0 }}</span>
                 </div>
                 <div class="flex items-center gap-1.5">
-                  <Heart :size="13" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-rose-500' : 'text-slate-400 group-hover:text-rose-400'" class="transition-colors" />
+                  <Heart :size="13" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-rose-500 dark:text-rose-400' : 'text-meta group-hover:text-rose-400'" class="transition-colors" />
                   <span class="font-medium">{{ artist.followers_count || 0 }}</span>
                 </div>
               </div>
@@ -87,10 +86,10 @@
 
         <!-- 空状态 -->
         <div v-if="artistsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="text-gray-400 mb-4">
+          <div class="text-meta mb-4">
             <Users :size="64" class="mx-auto" />
           </div>
-          <p class="text-gray-500">{{ $t('artists.no_results') }}</p>
+          <p class="text-meta">{{ $t('artists.no_results') }}</p>
         </div>
 
         <CommonPagination

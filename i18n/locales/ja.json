@@ -1318,6 +1318,16 @@
   "site": {
     "dismiss_announcement": "お知らせを閉じる"
   },
+  "appearance": {
+    "title": "外観",
+    "open": "外観の設定",
+    "dark": "ダーク",
+    "light": "ライト",
+    "color": "テーマカラー",
+    "hue": "色相 {hue}",
+    "reset": "デフォルトに戻す",
+    "preset": "色相 {hue} を使う"
+  },
   "event_picker": {
     "placeholder": "イベントを検索（例：C107、M3-2025）",
     "searching": "検索中…",

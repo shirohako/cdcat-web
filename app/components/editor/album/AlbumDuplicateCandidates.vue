@@ -2,38 +2,38 @@
   <section
     v-if="candidates.length"
     ref="root"
-    class="rounded-xl border p-4 shadow-sm"
-    :class="strong.length ? 'border-amber-300 bg-amber-50' : 'border-gray-200 bg-white'"
+    class="rounded-xl border p-4"
+    :class="strong.length ? 'border-warning/25 bg-warning/10' : 'border-transparent bg-card'"
   >
-    <p class="flex items-center gap-2 text-sm font-semibold" :class="strong.length ? 'text-amber-900' : 'text-gray-800'">
+    <p class="flex items-center gap-2 text-sm font-semibold" :class="strong.length ? 'text-warning' : 'text-title'">
       <CopyCheck :size="16" class="shrink-0" />{{ $t('duplicates.title') }}
     </p>
-    <p class="mt-1 text-xs" :class="strong.length ? 'text-amber-800' : 'text-gray-500'">{{ $t(strong.length ? 'duplicates.strong_hint' : 'duplicates.weak_hint') }}</p>
+    <p class="mt-1 text-xs" :class="strong.length ? 'text-body' : 'text-meta'">{{ $t(strong.length ? 'duplicates.strong_hint' : 'duplicates.weak_hint') }}</p>
     <ul class="mt-3 space-y-2">
-      <li v-for="candidate in candidates" :key="candidate.album_id" class="flex items-center gap-3 rounded-lg bg-white p-2 ring-1 ring-gray-100">
+      <li v-for="candidate in candidates" :key="candidate.album_id" class="flex items-center gap-3 rounded-lg p-2" :class="strong.length ? 'bg-card' : 'bg-sunken'">
         <img v-if="candidate.album.image_url" :src="candidate.album.image_url" alt="" class="h-11 w-11 shrink-0 rounded object-cover">
-        <span v-else class="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-gray-100 text-gray-300"><Disc3 :size="18" /></span>
+        <span v-else class="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-btn text-faint"><Disc3 :size="18" /></span>
         <div class="min-w-0 flex-1">
-          <a :href="`/albums/${candidate.album.id}`" target="_blank" rel="noopener" class="flex min-w-0 items-center gap-1.5 text-sm font-medium text-gray-900 hover:underline">
+          <a :href="`/albums/${candidate.album.id}`" target="_blank" rel="noopener" class="flex min-w-0 items-center gap-1.5 text-sm font-medium text-title transition-colors hover:text-primary">
             <span class="truncate">{{ candidate.album.title }}</span>
             <CatalogPendingBadge v-if="candidate.album.is_pending" />
           </a>
-          <p class="truncate text-xs text-gray-500">
+          <p class="truncate text-xs text-meta">
             {{ [candidate.album.catalog_number, formatDate(candidate.album.release_date, candidate.album.release_date_precision as DatePrecision | null)].filter(Boolean).join(' · ') }}
           </p>
-          <p class="truncate text-[11px]" :class="candidate.strength === 'strong' ? 'text-amber-700' : 'text-gray-400'">
+          <p class="truncate text-[11px]" :class="candidate.strength === 'strong' ? 'text-warning' : 'text-meta'">
             {{ candidate.reasons.map(reason => $t(`duplicates.reasons.${reason.kind}`, { value: reason.value })).join('；') }}
           </p>
         </div>
-        <label v-if="candidate.strength === 'strong'" class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-gray-700">
+        <label v-if="candidate.strength === 'strong'" class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-body">
           <input type="checkbox" class="checkbox checkbox-xs" :checked="acknowledged.includes(candidate.album_id)" @change="acknowledge(candidate.album_id, ($event.target as HTMLInputElement).checked)">
           {{ $t('duplicates.not_same') }}
         </label>
       </li>
     </ul>
-    <p v-if="unconfirmed" class="mt-2 text-xs font-medium text-amber-900">{{ $t('duplicates.must_confirm') }}</p>
+    <p v-if="unconfirmed" class="mt-2 text-xs font-medium text-warning">{{ $t('duplicates.must_confirm') }}</p>
   </section>
-  <p v-else-if="checking" class="text-xs text-gray-400">{{ $t('duplicates.checking') }}</p>
+  <p v-else-if="checking" class="text-xs text-meta">{{ $t('duplicates.checking') }}</p>
 </template>
 
 <script setup lang="ts">

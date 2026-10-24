@@ -10,6 +10,8 @@ import { basicSetup, EditorView } from 'codemirror'
 import { Compartment, EditorState, Prec } from '@codemirror/state'
 import { keymap, placeholder as editorPlaceholder } from '@codemirror/view'
 import { markdown } from '@codemirror/lang-markdown'
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import { tags } from '@lezer/highlight'
 import { autocompletion, type Completion, type CompletionContext, type CompletionResult } from '@codemirror/autocomplete'
 import RichContent from './RichContent.vue'
 import MdDropdown from './internal/MdDropdown.vue'
@@ -71,6 +73,7 @@ const emit = defineEmits<{ save: [], submit: [] }>()
 
 const model = defineModel<string>({ required: true })
 const { t } = useMarkdownT()
+const { appliedTheme } = useAppearance()
 const editorHost = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
 const mobilePane = ref<'edit' | 'preview'>('edit')
@@ -82,6 +85,8 @@ let previewTimer: ReturnType<typeof setTimeout> | undefined
 let envTimer: ReturnType<typeof setTimeout> | undefined
 let uploadCount = 0
 const readOnly = new Compartment()
+// Only tells CodeMirror's own defaults which theme is on; every colour below is a theme token already.
+const darkMode = new Compartment()
 
 const compact = computed(() => props.variant === 'compact')
 // `undefined` means "not specified", which falls back to the default guide;
@@ -110,15 +115,33 @@ const containerMenuMeta: Record<MarkdownContainerName, {
   englishLabel: string
   iconClass: string
 }> = {
-  details: { icon: ChevronDown, englishLabel: 'Details', iconClass: 'bg-slate-100 text-slate-600' },
-  info: { icon: Info, englishLabel: 'Info', iconClass: 'bg-sky-100 text-sky-700' },
-  tip: { icon: Lightbulb, englishLabel: 'Tip', iconClass: 'bg-emerald-100 text-emerald-700' },
-  warning: { icon: AlertTriangle, englishLabel: 'Warning', iconClass: 'bg-amber-100 text-amber-700' },
-  danger: { icon: ShieldAlert, englishLabel: 'Danger', iconClass: 'bg-rose-100 text-rose-700' },
-  checklist: { icon: ListChecks, englishLabel: 'Checklist', iconClass: 'bg-indigo-100 text-indigo-700' },
-  steps: { icon: ListOrdered, englishLabel: 'Steps', iconClass: 'bg-violet-100 text-violet-700' },
-  spoiler: { icon: EyeOff, englishLabel: 'Spoiler', iconClass: 'bg-slate-200 text-slate-700' },
+  details: { icon: ChevronDown, englishLabel: 'Details', iconClass: 'bg-btn text-btn-content' },
+  info: { icon: Info, englishLabel: 'Info', iconClass: 'bg-info/15 text-info' },
+  tip: { icon: Lightbulb, englishLabel: 'Tip', iconClass: 'bg-success/15 text-success' },
+  warning: { icon: AlertTriangle, englishLabel: 'Warning', iconClass: 'bg-warning/15 text-warning' },
+  danger: { icon: ShieldAlert, englishLabel: 'Danger', iconClass: 'bg-danger/15 text-danger' },
+  checklist: { icon: ListChecks, englishLabel: 'Checklist', iconClass: 'bg-primary/15 text-primary' },
+  steps: { icon: ListOrdered, englishLabel: 'Steps', iconClass: 'bg-primary/15 text-primary' },
+  spoiler: { icon: EyeOff, englishLabel: 'Spoiler', iconClass: 'bg-btn text-btn-content' },
 }
+
+/** Markdown in the editor, coloured with the theme tokens (code-block languages use the Markdown text colours). */
+const markdownHighlight = HighlightStyle.define([
+  { tag: tags.heading, color: 'var(--title)', fontWeight: '700' },
+  { tag: tags.strong, color: 'var(--title)', fontWeight: '700' },
+  { tag: tags.emphasis, fontStyle: 'italic' },
+  { tag: tags.strikethrough, color: 'var(--meta)', textDecoration: 'line-through' },
+  { tag: [tags.link, tags.url], color: 'var(--primary)' },
+  { tag: tags.monospace, color: 'var(--title)', backgroundColor: 'var(--code)', borderRadius: '3px' },
+  { tag: tags.quote, color: 'var(--meta)' },
+  { tag: [tags.processingInstruction, tags.contentSeparator, tags.meta], color: 'var(--faint)' },
+  { tag: [tags.keyword, tags.atom, tags.bool], color: 'var(--md-purple)' },
+  { tag: [tags.string, tags.special(tags.string)], color: 'var(--md-green)' },
+  { tag: tags.number, color: 'var(--md-orange)' },
+  { tag: [tags.variableName, tags.propertyName], color: 'var(--md-blue)' },
+  { tag: tags.comment, color: 'var(--meta)', fontStyle: 'italic' },
+  { tag: tags.invalid, color: 'var(--danger)' },
+])
 
 /** The preview follows the text after a short pause; references after a longer one, and only when needed. */
 function schedulePreview(value: string) {
@@ -233,6 +256,8 @@ onMounted(() => {
       extensions: [
         basicSetup,
         markdown(),
+        syntaxHighlighting(markdownHighlight),
+        darkMode.of(EditorView.darkTheme.of(appliedTheme.value === 'dark')),
         autocompletion({ override: [containerCompletions, mentionCompletions, refCompletions] }),
         Prec.high(keymap.of([
           { key: 'Mod-s', preventDefault: true, run: () => { emit('save'); return true } },
@@ -268,10 +293,25 @@ onMounted(() => {
           },
         }),
         EditorView.theme({
-          '&': { minHeight: compact.value ? '6rem' : '18rem', height: '100%', fontSize: '14px' },
+          '&': { minHeight: compact.value ? '6rem' : '18rem', height: '100%', fontSize: '14px', color: 'var(--title)', backgroundColor: 'var(--field)' },
           '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', lineHeight: '1.65' },
-          '.cm-content': { padding: compact.value ? '8px 0' : '12px 0' },
-          '.cm-gutters': compact.value ? { display: 'none' } : { backgroundColor: '#f8fafc', borderRight: '1px solid #e2e8f0', color: '#94a3b8' },
+          '.cm-content': { padding: compact.value ? '8px 0' : '12px 0', caretColor: 'var(--primary)' },
+          '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--primary)' },
+          '.cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': { backgroundColor: 'var(--selection)' },
+          '.cm-activeLine': { backgroundColor: 'color-mix(in oklab, var(--title) 4%, transparent)' },
+          '.cm-gutters': compact.value ? { display: 'none' } : { backgroundColor: 'var(--sunken)', borderRight: '1px solid var(--line)', color: 'var(--faint)' },
+          '.cm-activeLineGutter': { backgroundColor: 'transparent', color: 'var(--body)' },
+          '.cm-placeholder': { color: 'var(--faint)' },
+          '&.cm-focused .cm-matchingBracket': { backgroundColor: 'color-mix(in oklab, var(--primary) 25%, transparent)', outline: 'none' },
+          '.cm-searchMatch': { backgroundColor: 'color-mix(in oklab, var(--warning) 30%, transparent)', outline: 'none' },
+          '.cm-tooltip': { backgroundColor: 'var(--popover)', color: 'var(--body)', border: 'none', borderRadius: '0.5rem', boxShadow: '0 0 0 1px var(--line), var(--overlay-shadow)', overflow: 'hidden' },
+          '.cm-tooltip-autocomplete > ul > li': { padding: '4px 10px' },
+          '.cm-tooltip-autocomplete > ul > li[aria-selected]': { backgroundColor: 'color-mix(in oklab, var(--primary) 20%, transparent)', color: 'var(--title)' },
+          '.cm-completionDetail': { color: 'var(--meta)' },
+          '.cm-completionMatchedText': { color: 'var(--primary)', textDecoration: 'none' },
+          '.cm-panels': { backgroundColor: 'var(--sunken)', color: 'var(--body)' },
+          '.cm-textfield': { backgroundColor: 'var(--field)', border: '1px solid var(--line)', color: 'var(--title)' },
+          '.cm-button': { backgroundImage: 'none', backgroundColor: 'var(--btn)', border: 'none', color: 'var(--btn-content)' },
           '&.cm-focused': { outline: 'none' },
         }),
         EditorView.updateListener.of((update) => {
@@ -294,6 +334,10 @@ watch(model, (value) => {
 
 watch(() => props.disabled, (value) => {
   view?.dispatch({ effects: readOnly.reconfigure(EditorState.readOnly.of(value)) })
+})
+
+watch(appliedTheme, (value) => {
+  view?.dispatch({ effects: darkMode.reconfigure(EditorView.darkTheme.of(value === 'dark')) })
 })
 
 // CodeMirror measures its layout when shown again, e.g. after the preview-only mode.
@@ -398,21 +442,21 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
     :href="guideHref"
     target="_blank"
     rel="noopener noreferrer"
-    class="group mb-3 flex items-center gap-2.5 rounded-xl border border-sky-200 bg-gradient-to-r from-sky-50 to-white px-3 py-2 text-left transition hover:border-sky-300 sm:px-3.5"
+    class="group mb-3 flex items-center gap-2.5 rounded-xl border border-primary/25 bg-primary/8 px-3 py-2 text-left transition-colors duration-150 ease-out hover:bg-primary/14 sm:px-3.5"
   >
-    <span class="grid size-7 shrink-0 place-items-center rounded-md bg-sky-100/80 text-sky-700 ring-1 ring-sky-200/80 transition group-hover:scale-105 group-hover:bg-sky-100 group-hover:text-sky-800">
+    <span class="grid size-7 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
       <MdIcon :icon="HelpCircle" class="size-4" />
     </span>
     <span class="min-w-0 flex-1">
-      <span class="block text-sm font-bold text-slate-900">{{ t('markdown.editor.help') }}</span>
-      <span class="block text-xs leading-4 text-slate-500">{{ t('markdown.editor.helpHint') }}</span>
+      <span class="block text-sm font-bold text-title">{{ t('markdown.editor.help') }}</span>
+      <span class="block text-xs leading-4 text-meta">{{ t('markdown.editor.helpHint') }}</span>
     </span>
-    <MdIcon :icon="ExternalLink" class="size-4 shrink-0 text-sky-500 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    <MdIcon :icon="ExternalLink" class="size-4 shrink-0 text-primary transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
   </a>
 
-  <div class="overflow-hidden rounded-xl border bg-white" :class="[error || tooLong ? 'border-rose-300' : 'border-slate-200', fill ? 'flex h-full min-h-0 flex-col' : '']">
+  <div class="overflow-hidden rounded-xl border bg-field" :class="[error || tooLong ? 'border-danger/60' : 'border-line', fill ? 'flex h-full min-h-0 flex-col' : '']">
     <div
-      class="grid shrink-0 grid-cols-1 items-center gap-1.5 border-b border-slate-200 bg-slate-50 px-2 py-1.5 md:gap-2"
+      class="grid shrink-0 grid-cols-1 items-center gap-1.5 border-b border-line bg-card px-2 py-1.5 md:gap-2"
       :class="compact ? 'grid-cols-[minmax(0,1fr)_auto] py-1' : 'md:grid-cols-[minmax(0,1fr)_auto]'"
     >
       <div class="order-1 flex min-w-0 flex-wrap items-center gap-1">
@@ -421,7 +465,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
           :key="item.action"
           type="button"
           :disabled="disabled || (compact && compactPreview)"
-          class="grid place-items-center rounded-md text-slate-500 transition hover:bg-white hover:text-slate-900 hover:shadow-sm disabled:opacity-40"
+          class="grid place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary disabled:opacity-40"
           :class="compact ? 'size-7' : 'size-8'"
           :title="t(item.labelKey)"
           :aria-label="t(item.labelKey)"
@@ -435,7 +479,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             <button
               type="button"
               :disabled="disabled"
-              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-sm disabled:opacity-40"
+              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary disabled:opacity-40"
             >
               <MdIcon :icon="Type" class="size-4" />
               {{ t('markdown.editor.toolbar.size') }}
@@ -446,7 +490,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
                 :key="value"
                 type="button"
                 role="menuitem"
-                class="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-slate-700 transition hover:bg-slate-50"
+                class="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                 @click="applyTextStyle('size', value); close()"
               >
                 <span>{{ t(`markdown.editor.sizes.${value}`) }}</span>
@@ -459,7 +503,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             <button
               type="button"
               :disabled="disabled"
-              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-sm disabled:opacity-40"
+              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary disabled:opacity-40"
             >
               <MdIcon :icon="Palette" class="size-4" />
               {{ t('markdown.editor.toolbar.color') }}
@@ -470,7 +514,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
                 :key="value"
                 type="button"
                 role="menuitem"
-                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-slate-700 transition hover:bg-slate-50"
+                class="flex w-full items-center gap-2.5 px-3 py-2 text-left text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                 @click="applyTextStyle('color', value); close()"
               >
                 <span class="size-3 rounded-full bg-current" :class="className" />
@@ -483,7 +527,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             <button
               type="button"
               :disabled="disabled"
-              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-slate-600 transition hover:bg-white hover:text-slate-900 hover:shadow-sm disabled:opacity-40"
+              class="inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary disabled:opacity-40"
             >
               <MdIcon :icon="Underline" class="size-4" />
               {{ t('markdown.editor.toolbar.underline') }}
@@ -494,7 +538,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
                 :key="value"
                 type="button"
                 role="menuitem"
-                class="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-slate-700 transition hover:bg-slate-50"
+                class="flex w-full items-center justify-between gap-4 px-3 py-2 text-left text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                 @click="applyTextStyle('underline', value); close()"
               >
                 <span>{{ t(`markdown.editor.colors.${value}`) }}</span>
@@ -506,11 +550,11 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       </div>
 
       <div v-if="compact" class="order-2 flex items-center gap-2">
-        <span v-if="maxLength" class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-rose-600' : 'text-slate-400'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
+        <span v-if="maxLength" class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
         <button
           type="button"
-          class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-semibold transition"
-          :class="compactPreview ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-white hover:shadow-sm'"
+          class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-semibold transition-colors duration-150 ease-out"
+          :class="compactPreview ? 'bg-primary text-on-primary' : 'text-body hover:bg-ghost-hover hover:text-primary'"
           :aria-pressed="compactPreview"
           @click="compactPreview = !compactPreview"
         >
@@ -522,13 +566,13 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       <MdDropdown
         v-else
         align="right"
-        class="order-2 flex w-full items-center self-center md:w-auto md:justify-self-end md:border-l md:border-slate-200 md:pl-2"
+        class="order-2 flex w-full items-center self-center md:w-auto md:justify-self-end md:border-l md:border-line md:pl-2"
         panel-class="w-[min(22rem,calc(100vw-1rem))] max-h-[min(22rem,calc(100vh-2rem))] overflow-y-auto p-1.5"
       >
         <button
           type="button"
           :disabled="disabled"
-          class="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-800 px-3 text-xs font-semibold text-white transition hover:border-zinc-700 hover:bg-zinc-700 disabled:opacity-40 md:w-auto"
+          class="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong disabled:opacity-40 md:w-auto"
         >
           <MdIcon :icon="Braces" class="size-4" />
           {{ t('markdown.editor.toolbar.advanced') }}
@@ -539,7 +583,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             :key="definition.name"
             type="button"
             role="menuitem"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition hover:bg-slate-50 focus:bg-slate-50 focus:outline-none"
+            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover focus:bg-ghost-hover focus:outline-none"
             @click="insertContainer(definition.name); close()"
           >
             <span class="grid size-8 shrink-0 place-items-center rounded-lg" :class="containerMenuMeta[definition.name].iconClass">
@@ -547,23 +591,23 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             </span>
             <span class="min-w-0 flex-1">
               <span class="flex min-w-0 items-baseline gap-2">
-                <span class="truncate text-[13px] font-semibold text-slate-800">{{ t(definition.labelKey) }}</span>
-                <span class="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">{{ containerMenuMeta[definition.name].englishLabel }}</span>
+                <span class="truncate text-[13px] font-semibold text-title">{{ t(definition.labelKey) }}</span>
+                <span class="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
               </span>
-              <span class="mt-0.5 block truncate text-[11px] leading-4 text-slate-400">{{ t(definition.descriptionKey) }}</span>
+              <span class="mt-0.5 block truncate text-[11px] leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
             </span>
           </button>
         </template>
       </MdDropdown>
     </div>
 
-    <div v-if="mode === 'split' && !compact" class="flex shrink-0 border-b border-slate-200 bg-white p-1 md:hidden">
+    <div v-if="mode === 'split' && !compact" class="flex shrink-0 border-b border-line bg-card p-1 md:hidden">
       <button
         v-for="pane in (['edit', 'preview'] as const)"
         :key="pane"
         type="button"
-        class="flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition"
-        :class="mobilePane === pane ? 'bg-slate-900 text-white' : 'text-slate-500'"
+        class="flex flex-1 items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-colors duration-150 ease-out"
+        :class="mobilePane === pane ? 'bg-primary text-on-primary' : 'text-meta'"
         @click="mobilePane = pane"
       >
         <MdIcon :icon="pane === 'edit' ? Pencil : Eye" class="size-3.5" />
@@ -571,26 +615,26 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       </button>
     </div>
 
-    <div class="grid" :class="[mode === 'split' && !compact ? 'md:grid-cols-2 md:divide-x md:divide-slate-200' : '', fill ? 'min-h-0 flex-1' : '']">
+    <div class="grid" :class="[mode === 'split' && !compact ? 'md:grid-cols-2 md:divide-x md:divide-line' : '', fill ? 'min-h-0 flex-1' : '']">
       <div
         ref="editorHost"
-        class="min-w-0 bg-white"
+        class="min-w-0 bg-field"
         :class="[editorVisibility, fill ? 'h-full min-h-0 overflow-hidden' : '']"
       />
       <div
-        class="overflow-y-auto bg-slate-50/50"
+        class="overflow-y-auto bg-card"
         :class="[previewVisibility, compact ? 'min-h-24 p-3' : 'min-h-72 p-4', fill ? 'h-full min-h-0' : '', mode === 'preview' && !compact ? 'sm:px-8' : '']"
       >
         <RichContent v-if="preview.trim()" :content="preview" :env="previewEnv" format="markdown" :class="mode === 'preview' && !compact ? 'mx-auto max-w-3xl' : ''" />
-        <div v-else class="grid place-items-center text-sm text-slate-400" :class="compact ? 'min-h-20' : 'min-h-64'">
+        <div v-else class="grid place-items-center text-sm text-faint" :class="compact ? 'min-h-20' : 'min-h-64'">
           {{ t('markdown.editor.previewEmpty') }}
         </div>
       </div>
     </div>
-    <div v-if="maxLength && !compact" class="flex shrink-0 justify-end border-t border-slate-100 bg-white px-3 py-1">
-      <span class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-rose-600' : 'text-slate-400'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
+    <div v-if="maxLength && !compact" class="flex shrink-0 justify-end border-t border-line bg-card px-3 py-1">
+      <span class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
     </div>
   </div>
   <input v-if="upload" ref="fileInput" type="file" accept="image/*" multiple class="hidden" @change="onFilesPicked">
-  <p v-if="error" class="mt-1.5 text-xs font-medium text-rose-600">{{ error }}</p>
+  <p v-if="error" class="mt-1.5 text-xs font-medium text-danger">{{ error }}</p>
 </template>

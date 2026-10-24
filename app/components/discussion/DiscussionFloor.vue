@@ -107,20 +107,20 @@ function quote() {
 <template>
   <article
     :id="`post-${post.id}`" :data-post-id="post.id"
-    class="discussion-post scroll-mt-24 rounded-2xl border bg-white p-4 shadow-sm transition-colors sm:p-5"
-    :class="[focused ? 'border-amber-300 ring-2 ring-amber-100' : accepted ? 'border-emerald-200' : 'border-slate-200/80']"
+    class="discussion-post card scroll-mt-24 p-4 transition-shadow duration-150 ease-out sm:p-5"
+    :class="[focused ? 'ring-2 ring-warning/40' : accepted ? 'ring-1 ring-success/40' : '']"
   >
     <div class="flex gap-3 sm:gap-4">
       <NuxtLink :to="`/profile/${post.user.username}`" class="shrink-0"><DiscussionAvatar :user="post.user" size="lg" /></NuxtLink>
       <div class="min-w-0 flex-1">
         <header class="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <NuxtLink :to="`/profile/${post.user.username}`" class="font-semibold text-slate-900 hover:text-sky-700">{{ post.user.nickname || post.user.username }}</NuxtLink>
-          <span class="text-xs text-slate-400">@{{ post.user.username }}</span>
-          <span v-if="post.user.is_op" class="rounded-md bg-sky-50 px-1.5 py-0.5 text-[11px] font-semibold text-sky-700">{{ t('discussions.post.op') }}</span>
-          <span v-if="post.user.is_moderator" class="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-semibold text-indigo-700">{{ t('discussions.post.moderator') }}</span>
-          <span v-if="accepted" class="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700"><CheckCircle2 :size="12" />{{ t('discussions.answer.badge') }}</span>
-          <span class="ml-auto flex items-center gap-2 text-xs text-slate-400">
-            <NuxtLink :to="`/discussions/${post.topic_id}?post=${post.id}`" class="font-semibold tabular-nums text-slate-500 hover:text-sky-700">#{{ post.floor }}</NuxtLink>
+          <NuxtLink :to="`/profile/${post.user.username}`" class="font-semibold text-title transition-colors duration-150 ease-out hover:text-primary">{{ post.user.nickname || post.user.username }}</NuxtLink>
+          <span class="text-xs text-meta">@{{ post.user.username }}</span>
+          <span v-if="post.user.is_op" class="rounded-md bg-sky-50 px-1.5 py-0.5 text-[11px] font-semibold text-sky-700 dark:bg-sky-400/15 dark:text-sky-300">{{ t('discussions.post.op') }}</span>
+          <span v-if="post.user.is_moderator" class="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-semibold text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">{{ t('discussions.post.moderator') }}</span>
+          <span v-if="accepted" class="inline-flex items-center gap-1 rounded-md bg-success/15 px-1.5 py-0.5 text-[11px] font-semibold text-success"><CheckCircle2 :size="12" />{{ t('discussions.answer.badge') }}</span>
+          <span class="ml-auto flex items-center gap-2 text-xs text-meta">
+            <NuxtLink :to="`/discussions/${post.topic_id}?post=${post.id}`" class="font-semibold tabular-nums transition-colors duration-150 ease-out hover:text-primary">#{{ post.floor }}</NuxtLink>
             <time :datetime="post.created_at ?? undefined" :title="exact(post.created_at)">{{ ago(post.created_at) }}</time>
             <span v-if="post.edited_at" :title="exact(post.edited_at)">{{ t('discussions.post.edited') }}</span>
             <DiscussionPostMenu :post="post" :can-accept="canAccept" :accepted="accepted" @edit="editing = true" @delete="confirmDelete = true" />
@@ -133,19 +133,19 @@ function quote() {
         <div v-if="!editing && post.status === 'visible'" class="mt-3 flex flex-wrap items-center gap-2">
           <DiscussionReactions :post-id="post.id" :reactions="post.reactions" :can-react="post.can.react" @update:reactions="value => emit('update', { ...post, reactions: value, replies: replies })" />
           <span class="ml-auto flex items-center gap-1">
-            <button v-if="topic.viewer.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-slate-500 transition hover:bg-slate-100 hover:text-slate-800" @click="quote">
+            <button v-if="topic.viewer.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" @click="quote">
               <Quote :size="13" />{{ t('discussions.post.quote') }}
             </button>
-            <button v-if="post.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-slate-500 transition hover:bg-slate-100 hover:text-slate-800" @click="openComposer(null)">
+            <button v-if="post.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" @click="openComposer(null)">
               <MessageSquareReply :size="13" />{{ t('discussions.post.reply') }}
             </button>
           </span>
         </div>
 
-        <section v-if="!isFirst && (replies.length || composerOpen)" class="mt-3 rounded-xl bg-slate-50/80 p-1.5">
+        <section v-if="!isFirst && (replies.length || composerOpen)" class="mt-3 rounded-xl bg-sunken p-1.5">
           <DiscussionReplyItem v-for="reply in replies" :key="reply.id" :reply="reply" @reply="target => openComposer(target)" @update="updateReply" @removed="removeReply" />
           <div v-if="!shownAll || (repliesPage && repliesPage.last_page > 1)" class="flex items-center gap-3 px-3 py-1.5 text-xs">
-            <button v-if="!shownAll" type="button" class="font-medium text-sky-700 hover:underline" :disabled="loadingReplies" @click="loadReplies(1)">
+            <button v-if="!shownAll" type="button" class="link font-medium" :disabled="loadingReplies" @click="loadReplies(1)">
               <Loader2 v-if="loadingReplies" :size="12" class="inline animate-spin" />{{ t('discussions.post.view_all_replies', { count: post.replies_count }) }}
             </button>
             <CommonPagination v-else-if="repliesPage" :page="repliesPage.current_page" :total-pages="repliesPage.last_page" :disabled="loadingReplies" @update:page="loadReplies" />

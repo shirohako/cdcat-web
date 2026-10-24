@@ -1,27 +1,25 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-          <section class="border-b border-slate-200/80 bg-white">
+          <section class="border-b border-line">
             <!-- Title, search and the new-album button -->
             <div class="flex flex-col gap-3 px-4 pb-3 pt-4 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:pt-5">
               <div class="flex min-w-0 flex-1 items-center gap-3.5">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600 ring-1 ring-inset ring-sky-100">
-                  <Disc3 class="h-5 w-5" />
-                </div>
+                <UiIconTile :icon="Disc3" />
                 <div class="min-w-0">
-                  <h1 class="text-2xl font-bold tracking-[-0.025em] text-slate-950 sm:text-[28px]">{{ $t('albums.title') }}</h1>
-                  <p class="mt-0.5 truncate text-sm text-slate-500">{{ $t('albums.subtitle') }}</p>
+                  <h1 class="text-2xl font-bold tracking-[-0.025em] text-title sm:text-[28px]">{{ $t('albums.title') }}</h1>
+                  <p class="mt-0.5 truncate text-sm text-meta">{{ $t('albums.subtitle') }}</p>
                 </div>
               </div>
               <div class="flex items-center gap-2">
                 <form class="relative min-w-0 flex-1 sm:w-72 sm:flex-none" role="search" @submit.prevent="applySearch">
-                  <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Search class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-meta" />
                   <input
                     v-model="searchInput"
                     type="search"
-                    class="h-9 w-full rounded-lg border-0 bg-slate-50 pl-9 pr-3 text-sm text-slate-700 ring-1 ring-inset ring-slate-200 transition placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-400"
+                    class="input h-9 w-full pl-9 pr-3"
                     :placeholder="t('albums.search_placeholder')"
                     :aria-label="t('albums.search_placeholder')"
                     @blur="applySearch"
@@ -29,7 +27,7 @@
                 </form>
                 <button
                   type="button"
-                  class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-700"
+                  class="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-sm font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong"
                   @click="navigateTo('/contribute?type=album')"
                 >
                   <Plus class="h-4 w-4" />
@@ -55,8 +53,8 @@
             </div>
 
             <!-- Narrower filters, the pending switch and the result count -->
-            <div class="flex flex-wrap items-center gap-2 border-t border-slate-100 bg-slate-50/70 px-4 py-2.5 sm:px-6">
-              <span class="hidden items-center gap-1.5 text-xs font-medium text-slate-400 sm:inline-flex">
+            <div class="flex flex-wrap items-center gap-2 border-t border-line bg-sunken px-4 py-2.5 sm:px-6">
+              <span class="hidden items-center gap-1.5 text-xs font-medium text-faint sm:inline-flex">
                 <Icon name="lucide:list-filter" class="h-3.5 w-3.5" />
                 {{ t('albums.filters') }}
               </span>
@@ -92,11 +90,11 @@
                 @update:model-value="selectFilter('format', $event)"
               />
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
-              <button v-if="filtered" type="button" class="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800" @click="clearFilters">
+              <button v-if="filtered" type="button" class="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-medium text-meta transition-colors hover:bg-ghost-hover hover:text-primary" @click="clearFilters">
                 <Icon name="lucide:rotate-ccw" class="h-3.5 w-3.5" />
                 {{ t('albums.clear_filters') }}
               </button>
-              <span v-if="albumsResponse" class="ml-auto text-xs tabular-nums text-slate-400">{{ t('albums.found', { count: pagination.total }) }}</span>
+              <span v-if="albumsResponse" class="ml-auto text-xs tabular-nums text-meta">{{ t('albums.found', { count: pagination.total }) }}</span>
             </div>
           </section>
         </template>
@@ -130,10 +128,10 @@
 
         <!-- 空状态 -->
         <div v-if="albumsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="text-gray-400 mb-4">
+          <div class="text-meta mb-4">
             <Disc3 :size="64" class="mx-auto" />
           </div>
-          <p class="text-gray-500">{{ $t('albums.no_results') }}</p>
+          <p class="text-meta">{{ $t('albums.no_results') }}</p>
         </div>
 
         <CommonPagination
@@ -173,8 +171,8 @@ const { enumLabel } = useCatalogDisplay()
 const selectedType = computed(() => String(route.query.type || 'all'));
 
 // The selected chip and the others, shared by every chip of the header.
-const ACTIVE_CHIP = 'bg-sky-600 text-white ring-sky-600'
-const IDLE_CHIP = 'bg-white text-slate-500 ring-slate-200 shadow-xs hover:text-slate-900 hover:ring-slate-300'
+const ACTIVE_CHIP = 'bg-primary text-on-primary ring-primary'
+const IDLE_CHIP = 'bg-btn text-btn-content ring-transparent hover:bg-btn-hover'
 
 // ?event=<id> narrows the list to albums first released at that event.
 const eventId = computed(() => {

@@ -1,16 +1,16 @@
 <template>
-  <CatalogSection :title="$t('catalog.collection.links')" :icon="Link2" tone="gray">
+  <CatalogSection :title="$t('catalog.collection.links')" :icon="Link2">
     <div class="space-y-3 p-5">
-      <p class="text-xs text-gray-500">{{ $t('editor.relations.links_hint') }}</p>
-      <ul v-if="linkErrors.length" class="space-y-0.5 text-xs text-error">
+      <p class="text-xs text-meta">{{ $t('editor.relations.links_hint') }}</p>
+      <ul v-if="linkErrors.length" class="space-y-0.5 text-xs text-danger">
         <li v-for="error in linkErrors" :key="error.path">{{ error.message }}</li>
       </ul>
       <EditorLinkRows v-model="links" />
     </div>
   </CatalogSection>
-  <CatalogSection v-if="subject" :title="$t('catalog.collection.attributes')" :icon="ListChecks" tone="amber">
+  <CatalogSection v-if="subject" :title="$t('catalog.collection.attributes')" :icon="ListChecks">
     <div class="space-y-3 p-5">
-      <p class="text-xs text-gray-500">{{ $t('editor.relations.attributes_hint') }}</p>
+      <p class="text-xs text-meta">{{ $t('editor.relations.attributes_hint') }}</p>
       <EditorAttributeRows v-model="attributes" :subject="subject" :references="editor.references" />
     </div>
   </CatalogSection>

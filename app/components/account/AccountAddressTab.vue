@@ -1,10 +1,10 @@
 <template>
   <div class="space-y-6">
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100 flex items-center justify-between">
+    <section class="card overflow-hidden">
+      <div class="p-6 pb-5 border-b border-line flex items-center justify-between">
         <div>
-          <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.address.title') }}</h2>
-          <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.address.description') }}</p>
+          <h2 class="text-base font-semibold text-title">{{ t('account_pages.address.title') }}</h2>
+          <p class="text-sm text-meta mt-1">{{ t('account_pages.address.description') }}</p>
         </div>
         <button
           type="button"
@@ -17,37 +17,37 @@
       </div>
 
       <!-- Address List -->
-      <div v-if="addresses.length > 0" class="divide-y divide-gray-100">
+      <div v-if="addresses.length > 0" class="divide-y divide-line">
         <div
           v-for="(address, index) in addresses"
           :key="index"
-          class="p-6 flex items-start justify-between gap-4 hover:bg-gray-50/50 transition-colors"
+          class="p-6 flex items-start justify-between gap-4 hover:bg-card-hover transition-colors duration-150 ease-out"
         >
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-2">
-              <h3 class="font-medium text-gray-900">{{ address.name }}</h3>
-              <span v-if="address.isDefault" class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+              <h3 class="font-medium text-title">{{ address.name }}</h3>
+              <span v-if="address.isDefault" class="text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full">
                 {{ t('account_pages.address.default') }}
               </span>
             </div>
-            <p class="text-sm text-gray-600 mb-1">
+            <p class="text-sm text-body mb-1">
               {{ address.province }}{{ address.city }}{{ address.district }}{{ address.address }}
             </p>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-meta">
               {{ address.name }} · {{ address.phone }}
             </p>
           </div>
           <div class="flex gap-2 shrink-0">
             <button
               type="button"
-              class="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+              class="link text-sm"
               @click="editAddress(index)"
             >
               {{ t('common.edit') }}
             </button>
             <button
               type="button"
-              class="text-sm text-red-600 hover:text-red-700 transition-colors"
+              class="text-sm text-danger transition-colors duration-150 ease-out hover:text-danger/80"
               @click="deleteAddress(index)"
             >
               {{ t('common.delete') }}
@@ -57,17 +57,17 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="p-12 text-center">
-        <MapPin :size="32" class="mx-auto text-gray-400 mb-3" />
-        <p class="text-gray-500 mb-4">{{ t('account_pages.address.empty') }}</p>
-        <button
-          type="button"
-          class="text-sm text-blue-600 hover:text-blue-700 transition-colors"
-          @click="showAddForm = true"
-        >
-          {{ t('account_pages.address.add_now') }}
-        </button>
-      </div>
+      <UiEmpty v-else :title="t('account_pages.address.empty')" :icon="MapPin">
+        <template #actions>
+          <button
+            type="button"
+            class="link text-sm"
+            @click="showAddForm = true"
+          >
+            {{ t('account_pages.address.add_now') }}
+          </button>
+        </template>
+      </UiEmpty>
     </section>
 
     <!-- Add/Edit Form Modal -->
@@ -93,81 +93,81 @@
             leave-from-class="scale-100 opacity-100"
             leave-to-class="scale-95 opacity-0"
           >
-            <div v-if="showAddForm" class="bg-white rounded-2xl shadow-2xl w-full max-w-md ring-1 ring-black/5 max-h-[90vh] overflow-y-auto">
+            <div v-if="showAddForm" class="bg-card rounded-2xl shadow-overlay w-full max-w-md ring-1 ring-line max-h-[90vh] overflow-y-auto">
               <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                <h3 class="text-lg font-semibold text-title mb-4">
                   {{ editingIndex !== null ? t('account_pages.address.edit_title') : t('account_pages.address.add_title') }}
                 </h3>
 
                 <div class="space-y-4">
                   <!-- Name -->
                   <div class="grid gap-1.5">
-                    <label for="addr-name" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.recipient') }}</label>
+                    <label for="addr-name" class="text-sm font-medium text-body">{{ t('account_pages.address.recipient') }}</label>
                     <input
                       id="addr-name"
                       v-model="form.name"
                       type="text"
-                      class="input input-bordered w-full bg-white"
+                      class="input w-full"
                       :placeholder="t('account_pages.address.recipient_placeholder')"
                     />
                   </div>
 
                   <!-- Phone -->
                   <div class="grid gap-1.5">
-                    <label for="addr-phone" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.phone') }}</label>
+                    <label for="addr-phone" class="text-sm font-medium text-body">{{ t('account_pages.address.phone') }}</label>
                     <input
                       id="addr-phone"
                       v-model="form.phone"
                       type="tel"
-                      class="input input-bordered w-full bg-white"
+                      class="input w-full"
                       :placeholder="t('account_pages.address.phone_placeholder')"
                     />
                   </div>
 
                   <!-- Province -->
                   <div class="grid gap-1.5">
-                    <label for="addr-province" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.province') }}</label>
+                    <label for="addr-province" class="text-sm font-medium text-body">{{ t('account_pages.address.province') }}</label>
                     <input
                       id="addr-province"
                       v-model="form.province"
                       type="text"
-                      class="input input-bordered w-full bg-white"
+                      class="input w-full"
                       :placeholder="t('account_pages.address.province_placeholder')"
                     />
                   </div>
 
                   <!-- City -->
                   <div class="grid gap-1.5">
-                    <label for="addr-city" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.city') }}</label>
+                    <label for="addr-city" class="text-sm font-medium text-body">{{ t('account_pages.address.city') }}</label>
                     <input
                       id="addr-city"
                       v-model="form.city"
                       type="text"
-                      class="input input-bordered w-full bg-white"
+                      class="input w-full"
                       :placeholder="t('account_pages.address.city_placeholder')"
                     />
                   </div>
 
                   <!-- District -->
                   <div class="grid gap-1.5">
-                    <label for="addr-district" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.district') }}</label>
+                    <label for="addr-district" class="text-sm font-medium text-body">{{ t('account_pages.address.district') }}</label>
                     <input
                       id="addr-district"
                       v-model="form.district"
                       type="text"
-                      class="input input-bordered w-full bg-white"
+                      class="input w-full"
                       :placeholder="t('account_pages.address.district_placeholder')"
                     />
                   </div>
 
                   <!-- Address -->
                   <div class="grid gap-1.5">
-                    <label for="addr-detail" class="text-sm font-medium text-gray-700">{{ t('account_pages.address.details') }}</label>
+                    <label for="addr-detail" class="text-sm font-medium text-body">{{ t('account_pages.address.details') }}</label>
                     <textarea
                       id="addr-detail"
                       v-model="form.address"
                       rows="2"
-                      class="textarea textarea-bordered w-full bg-white resize-none"
+                      class="textarea w-full resize-none"
                       :placeholder="t('account_pages.address.details_placeholder')"
                     />
                   </div>
@@ -177,14 +177,14 @@
                     <input
                       v-model="form.isDefault"
                       type="checkbox"
-                      class="checkbox checkbox-primary checkbox-sm"
+                      class="checkbox checkbox-sm"
                     />
-                    <span class="text-sm text-gray-700">{{ t('account_pages.address.set_default') }}</span>
+                    <span class="text-sm text-body">{{ t('account_pages.address.set_default') }}</span>
                   </label>
                 </div>
               </div>
 
-              <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 rounded-b-2xl flex justify-end gap-2">
+              <div class="px-6 py-4 bg-sunken border-t border-line rounded-b-2xl flex justify-end gap-2">
                 <button
                   type="button"
                   class="btn btn-ghost btn-sm"

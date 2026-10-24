@@ -63,21 +63,21 @@ const attributeExamples = computed(() => [
     label: t('markdown.help.formatting.combined.title'),
     description: t('markdown.help.formatting.combined.description'),
     badge: t('markdown.help.formatting.recommended'),
-    badgeClass: 'bg-emerald-50 text-emerald-700',
+    badgeClass: 'bg-success/15 text-success',
     source: `[${t('markdown.help.formatting.sample')}]{color=red size=large}`,
   },
   {
     label: t('markdown.help.formatting.nested.title'),
     description: t('markdown.help.formatting.nested.description'),
     badge: t('markdown.help.formatting.supported'),
-    badgeClass: 'bg-sky-50 text-sky-700',
+    badgeClass: 'bg-info/15 text-info',
     source: `[${t('markdown.help.formatting.outerSample')} [${t('markdown.help.formatting.innerSample')}]{color=red}]{size=large}`,
   },
   {
     label: t('markdown.help.formatting.avoid.title'),
     description: t('markdown.help.formatting.avoid.description'),
     badge: t('markdown.help.formatting.notRecommended'),
-    badgeClass: 'bg-amber-50 text-amber-700',
+    badgeClass: 'bg-warning/15 text-warning',
     source: `[[${t('markdown.help.formatting.sample')}]{color=red}]{size=large}`,
   },
 ])
@@ -148,85 +148,85 @@ onUnmounted(() => clearTimeout(copiedTimer))
 
 <template>
   <div class="space-y-8">
-    <header class="overflow-hidden rounded-2xl bg-slate-950 px-5 py-9 text-white shadow-xl shadow-slate-900/10 sm:px-8 sm:py-12">
+    <header class="overflow-hidden rounded-2xl bg-hero px-5 py-9 text-on-media sm:px-8 sm:py-12">
       <div class="max-w-2xl">
-        <p v-if="brand" class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">{{ brand }}</p>
+        <p v-if="brand" class="text-xs font-semibold uppercase tracking-[0.2em] text-primary">{{ brand }}</p>
         <h1 class="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">{{ t('markdown.help.title') }}</h1>
-        <p class="mt-3 max-w-xl text-sm leading-7 text-slate-300 sm:text-base">{{ t('markdown.help.lead') }}</p>
+        <p class="mt-3 max-w-xl text-sm leading-7 text-on-media/70 sm:text-base">{{ t('markdown.help.lead') }}</p>
       </div>
     </header>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 class="text-xl font-bold text-slate-900">{{ t('markdown.help.basic.title') }}</h2>
-      <p class="mt-1 text-sm text-slate-500">{{ t('markdown.help.basic.description') }}</p>
-      <div class="mt-4 flex gap-2.5 rounded-lg border border-sky-200 bg-sky-50 px-3.5 py-3 text-sm leading-6 text-sky-900">
-        <MdIcon :icon="List" class="mt-1 size-4 shrink-0 text-sky-600" />
+    <section class="card p-5 sm:p-6">
+      <h2 class="text-xl font-bold text-title">{{ t('markdown.help.basic.title') }}</h2>
+      <p class="mt-1 text-sm text-meta">{{ t('markdown.help.basic.description') }}</p>
+      <div class="mt-4 flex gap-2.5 rounded-lg border border-info/25 bg-info/10 px-3.5 py-3 text-sm leading-6 text-body">
+        <MdIcon :icon="List" class="mt-1 size-4 shrink-0 text-info" />
         <p>{{ t('markdown.help.basic.headingTocHint') }}</p>
       </div>
       <div class="mt-5 grid gap-4 md:grid-cols-2">
-        <article v-for="example in basics" :key="example.label" class="overflow-hidden rounded-lg border border-slate-200">
-          <div class="flex items-center justify-between bg-slate-50 px-3 py-2">
-            <h3 class="text-xs font-semibold text-slate-700">{{ example.label }}</h3>
-            <button type="button" :aria-label="copyLabel(example.source)" class="text-slate-400 hover:text-slate-800" @click="copy(example.source)">
+        <article v-for="example in basics" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
+          <div class="flex items-center justify-between bg-sunken px-3 py-2">
+            <h3 class="text-xs font-semibold text-body">{{ example.label }}</h3>
+            <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
               <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
             </button>
           </div>
-          <pre class="overflow-x-auto border-b border-slate-100 p-3 text-xs leading-6 text-slate-700"><code>{{ example.source }}</code></pre>
-          <div class="bg-slate-50/30 p-3">
-            <span class="mb-2 block text-[10px] font-semibold uppercase tracking-wide text-slate-400">{{ t('markdown.help.result') }}</span>
+          <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
+          <div class="p-3">
+            <span class="mb-2 block text-[10px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
             <RichContent :content="example.source" format="markdown" />
           </div>
         </article>
       </div>
-      <div class="mt-7 border-t border-slate-100 pt-6">
-        <h3 class="font-bold text-slate-900">{{ t('markdown.help.images.title') }}</h3>
-        <p class="mt-1 text-sm leading-6 text-slate-500">{{ t('markdown.help.images.description') }}</p>
+      <div class="mt-7 border-t border-line pt-6">
+        <h3 class="font-bold text-title">{{ t('markdown.help.images.title') }}</h3>
+        <p class="mt-1 text-sm leading-6 text-meta">{{ t('markdown.help.images.description') }}</p>
         <div class="mt-4 grid gap-4 md:grid-cols-2">
-          <article v-for="example in imageSizingExamples" :key="example.label" class="overflow-hidden rounded-lg border border-slate-200">
-            <div class="flex items-center justify-between bg-slate-50 px-3 py-2">
-              <h4 class="text-xs font-semibold text-slate-700">{{ example.label }}</h4>
-              <button type="button" :aria-label="copyLabel(example.source)" class="text-slate-400 hover:text-slate-800" @click="copy(example.source)">
+          <article v-for="example in imageSizingExamples" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
+            <div class="flex items-center justify-between bg-sunken px-3 py-2">
+              <h4 class="text-xs font-semibold text-body">{{ example.label }}</h4>
+              <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
                 <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
               </button>
             </div>
-            <pre class="overflow-x-auto border-b border-slate-100 p-3 text-xs leading-6 text-slate-700"><code>{{ example.source }}</code></pre>
+            <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
             <RichContent class="markdown-image-example p-3" :content="example.source" format="markdown" />
           </article>
         </div>
       </div>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 class="text-xl font-bold text-slate-900">{{ t('markdown.help.formatting.title') }}</h2>
-      <p class="mt-1 text-sm text-slate-500">{{ t('markdown.help.formatting.description') }}</p>
+    <section class="card p-5 sm:p-6">
+      <h2 class="text-xl font-bold text-title">{{ t('markdown.help.formatting.title') }}</h2>
+      <p class="mt-1 text-sm text-meta">{{ t('markdown.help.formatting.description') }}</p>
       <div class="mt-5 grid gap-4 md:grid-cols-2">
-        <article v-for="example in inlineFormatting" :key="example.label" class="overflow-hidden rounded-lg border border-slate-200">
-          <div class="flex items-center justify-between bg-slate-50 px-3 py-2">
-            <h3 class="text-xs font-semibold text-slate-700">{{ example.label }}</h3>
-            <button type="button" :aria-label="copyLabel(example.source)" class="text-slate-400 hover:text-slate-800" @click="copy(example.source)">
+        <article v-for="example in inlineFormatting" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
+          <div class="flex items-center justify-between bg-sunken px-3 py-2">
+            <h3 class="text-xs font-semibold text-body">{{ example.label }}</h3>
+            <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
               <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
             </button>
           </div>
-          <pre class="overflow-x-auto border-b border-slate-100 p-3 text-xs leading-6 text-slate-700"><code>{{ example.source }}</code></pre>
+          <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <RichContent class="p-3" :content="example.source" format="markdown" />
         </article>
       </div>
 
-      <div class="mt-7 border-t border-slate-100 pt-6">
-        <h3 class="font-bold text-slate-900">{{ t('markdown.help.formatting.attributesTitle') }}</h3>
-        <p class="mt-1 text-sm leading-6 text-slate-500">{{ t('markdown.help.formatting.attributesDescription') }}</p>
+      <div class="mt-7 border-t border-line pt-6">
+        <h3 class="font-bold text-title">{{ t('markdown.help.formatting.attributesTitle') }}</h3>
+        <p class="mt-1 text-sm leading-6 text-meta">{{ t('markdown.help.formatting.attributesDescription') }}</p>
         <div class="mt-4 grid gap-4 lg:grid-cols-3">
-          <article v-for="example in attributeExamples" :key="example.label" class="overflow-hidden rounded-lg border border-slate-200">
-            <header class="border-b border-slate-100 bg-slate-50 px-3 py-2.5">
+          <article v-for="example in attributeExamples" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
+            <header class="border-b border-line bg-sunken px-3 py-2.5">
               <div class="flex items-center justify-between gap-2">
-                <h4 class="text-sm font-semibold text-slate-800">{{ example.label }}</h4>
+                <h4 class="text-sm font-semibold text-title">{{ example.label }}</h4>
                 <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" :class="example.badgeClass">{{ example.badge }}</span>
               </div>
-              <p class="mt-1 text-xs leading-5 text-slate-500">{{ example.description }}</p>
+              <p class="mt-1 text-xs leading-5 text-meta">{{ example.description }}</p>
             </header>
-            <div class="relative border-b border-slate-100 p-3 pr-9">
-              <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-700"><code>{{ example.source }}</code></pre>
-              <button type="button" :aria-label="copyLabel(example.source)" class="absolute right-3 top-3 text-slate-400 hover:text-slate-800" @click="copy(example.source)">
+            <div class="relative border-b border-line p-3 pr-9">
+              <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
+              <button type="button" :aria-label="copyLabel(example.source)" class="absolute right-3 top-3 text-faint transition-colors hover:text-primary" @click="copy(example.source)">
                 <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
               </button>
             </div>
@@ -237,55 +237,55 @@ onUnmounted(() => clearTimeout(copiedTimer))
     </section>
 
     <section>
-      <h2 class="text-xl font-bold text-slate-900">{{ t('markdown.help.advanced.title') }}</h2>
-      <p class="mt-1 text-sm text-slate-500">{{ t('markdown.help.advanced.description') }}</p>
+      <h2 class="text-xl font-bold text-title">{{ t('markdown.help.advanced.title') }}</h2>
+      <p class="mt-1 text-sm text-meta">{{ t('markdown.help.advanced.description') }}</p>
       <div class="mt-5 space-y-5">
         <template v-for="definition in markdownContainers" :key="definition.name">
-          <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <header class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 sm:px-5">
+          <article class="card overflow-hidden">
+            <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 sm:px-5">
               <div>
-                <h3 class="font-semibold text-slate-900">{{ t(definition.labelKey) }}</h3>
-                <p class="mt-0.5 text-xs text-slate-400">{{ t(definition.descriptionKey) }}</p>
+                <h3 class="font-semibold text-title">{{ t(definition.labelKey) }}</h3>
+                <p class="mt-0.5 text-xs text-faint">{{ t(definition.descriptionKey) }}</p>
               </div>
-              <code class="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500">::: {{ definition.name }}</code>
+              <code class="rounded bg-code px-2 py-1 text-xs font-semibold text-meta">::: {{ definition.name }}</code>
             </header>
-            <div class="grid md:grid-cols-2 md:divide-x md:divide-slate-200">
-              <div class="min-w-0 bg-slate-950 p-4 text-slate-200">
+            <div class="grid md:grid-cols-2 md:divide-x md:divide-line">
+              <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
-                  <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{{ t('markdown.help.source') }}</span>
-                  <button type="button" :aria-label="copyLabel(containerExample(definition.name))" class="text-slate-500 hover:text-white" @click="copy(containerExample(definition.name))">
+                  <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
+                  <button type="button" :aria-label="copyLabel(containerExample(definition.name))" class="text-on-media/45 transition-colors hover:text-on-media" @click="copy(containerExample(definition.name))">
                     <MdIcon :icon="copiedSource === containerExample(definition.name) ? Check : Clipboard" class="size-4" />
                   </button>
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ containerExample(definition.name) }}</code></pre>
               </div>
-              <div class="min-w-0 bg-slate-50/40 p-4">
-                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-slate-400">{{ t('markdown.help.result') }}</span>
+              <div class="min-w-0 p-4">
+                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
                 <RichContent :content="containerExample(definition.name)" format="markdown" />
               </div>
             </div>
           </article>
 
-          <article v-if="definition.name === 'spoiler'" class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <header class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 px-4 py-3 sm:px-5">
+          <article v-if="definition.name === 'spoiler'" class="card overflow-hidden">
+            <header class="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3 sm:px-5">
               <div>
-                <h3 class="font-semibold text-slate-900">{{ t('markdown.editor.toolbar.inlineSpoiler') }}</h3>
-                <p class="mt-0.5 text-xs text-slate-400">{{ t('markdown.help.spoilers.inline') }}</p>
+                <h3 class="font-semibold text-title">{{ t('markdown.editor.toolbar.inlineSpoiler') }}</h3>
+                <p class="mt-0.5 text-xs text-faint">{{ t('markdown.help.spoilers.inline') }}</p>
               </div>
-              <code class="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500">|| ... ||</code>
+              <code class="rounded bg-code px-2 py-1 text-xs font-semibold text-meta">|| ... ||</code>
             </header>
-            <div class="grid md:grid-cols-2 md:divide-x md:divide-slate-200">
-              <div class="min-w-0 bg-slate-950 p-4 text-slate-200">
+            <div class="grid md:grid-cols-2 md:divide-x md:divide-line">
+              <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
-                  <span class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{{ t('markdown.help.source') }}</span>
-                  <button type="button" :aria-label="copyLabel(inlineSpoilerExample)" class="text-slate-500 hover:text-white" @click="copy(inlineSpoilerExample)">
+                  <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
+                  <button type="button" :aria-label="copyLabel(inlineSpoilerExample)" class="text-on-media/45 transition-colors hover:text-on-media" @click="copy(inlineSpoilerExample)">
                     <MdIcon :icon="copiedSource === inlineSpoilerExample ? Check : Clipboard" class="size-4" />
                   </button>
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ inlineSpoilerExample }}</code></pre>
               </div>
-              <div class="min-w-0 bg-slate-50/40 p-4">
-                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-slate-400">{{ t('markdown.help.result') }}</span>
+              <div class="min-w-0 p-4">
+                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
                 <RichContent :content="inlineSpoilerExample" format="markdown" />
               </div>
             </div>
@@ -295,50 +295,50 @@ onUnmounted(() => clearTimeout(copiedTimer))
     </section>
 
     <section class="grid gap-5 lg:grid-cols-2">
-      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900">{{ t('markdown.help.nesting.title') }}</h2>
-        <p class="mt-1 text-sm leading-6 text-slate-500">{{ t('markdown.help.nesting.description') }}</p>
-        <pre class="mt-4 overflow-x-auto rounded-lg bg-slate-950 p-4 text-xs leading-6 text-slate-200"><code>{{ nestedExample }}</code></pre>
+      <article class="card p-5">
+        <h2 class="text-lg font-bold text-title">{{ t('markdown.help.nesting.title') }}</h2>
+        <p class="mt-1 text-sm leading-6 text-meta">{{ t('markdown.help.nesting.description') }}</p>
+        <pre class="mt-4 overflow-x-auto rounded-lg bg-codeblock p-4 text-xs leading-6 text-on-media/80"><code>{{ nestedExample }}</code></pre>
       </article>
 
-      <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="text-lg font-bold text-slate-900">{{ t('markdown.help.spoilers.title') }}</h2>
-        <p class="mt-1 text-sm leading-6 text-slate-500">{{ t('markdown.help.spoilers.description') }}</p>
-        <ul class="mt-4 space-y-3 text-sm text-slate-600">
-          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-emerald-500" />{{ t('markdown.help.spoilers.whole') }}</li>
-          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-emerald-500" />{{ t('markdown.help.spoilers.block') }}</li>
-          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-emerald-500" />{{ t('markdown.help.spoilers.inline') }}</li>
+      <article class="card p-5">
+        <h2 class="text-lg font-bold text-title">{{ t('markdown.help.spoilers.title') }}</h2>
+        <p class="mt-1 text-sm leading-6 text-meta">{{ t('markdown.help.spoilers.description') }}</p>
+        <ul class="mt-4 space-y-3 text-sm text-body">
+          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-success" />{{ t('markdown.help.spoilers.whole') }}</li>
+          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-success" />{{ t('markdown.help.spoilers.block') }}</li>
+          <li class="flex gap-2"><MdIcon :icon="Check" class="mt-0.5 size-4 shrink-0 text-success" />{{ t('markdown.help.spoilers.inline') }}</li>
         </ul>
       </article>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 class="text-xl font-bold text-slate-900">{{ t('markdown.help.discussion.title') }}</h2>
-      <p class="mt-1 text-sm text-slate-500">{{ t('markdown.help.discussion.description') }}</p>
+    <section class="card p-5 sm:p-6">
+      <h2 class="text-xl font-bold text-title">{{ t('markdown.help.discussion.title') }}</h2>
+      <p class="mt-1 text-sm text-meta">{{ t('markdown.help.discussion.description') }}</p>
       <div class="mt-5 grid gap-4 lg:grid-cols-3">
-        <article v-for="example in discussionExamples" :key="example.label" class="flex flex-col overflow-hidden rounded-lg border border-slate-200">
-          <header class="border-b border-slate-100 bg-slate-50 px-3 py-2.5">
+        <article v-for="example in discussionExamples" :key="example.label" class="flex flex-col overflow-hidden rounded-lg ring-1 ring-line">
+          <header class="border-b border-line bg-sunken px-3 py-2.5">
             <div class="flex items-center justify-between gap-2">
-              <h3 class="text-sm font-semibold text-slate-800">{{ example.label }}</h3>
-              <button type="button" :aria-label="copyLabel(example.source)" class="text-slate-400 hover:text-slate-800" @click="copy(example.source)">
+              <h3 class="text-sm font-semibold text-title">{{ example.label }}</h3>
+              <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
                 <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
               </button>
             </div>
-            <p class="mt-1 text-xs leading-5 text-slate-500">{{ example.hint }}</p>
+            <p class="mt-1 text-xs leading-5 text-meta">{{ example.hint }}</p>
           </header>
-          <pre class="overflow-x-auto whitespace-pre-wrap border-b border-slate-100 p-3 text-xs leading-6 text-slate-700"><code>{{ example.source }}</code></pre>
+          <pre class="overflow-x-auto whitespace-pre-wrap border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <RichContent class="flex-1 p-3" :content="example.source" :env="discussionEnv" format="markdown" />
         </article>
       </div>
-      <p class="mt-4 text-xs leading-5 text-slate-500">{{ t('markdown.help.discussion.refTypes') }}</p>
+      <p class="mt-4 text-xs leading-5 text-meta">{{ t('markdown.help.discussion.refTypes') }}</p>
     </section>
 
-    <aside class="flex gap-3 rounded-xl border border-sky-200 bg-sky-50 p-5 text-sky-950">
-      <MdIcon :icon="ShieldCheck" class="mt-0.5 size-5 shrink-0 text-sky-600" />
+    <aside class="flex gap-3 rounded-xl border border-info/25 bg-info/10 p-5 text-body">
+      <MdIcon :icon="ShieldCheck" class="mt-0.5 size-5 shrink-0 text-info" />
       <div>
-        <h2 class="font-semibold">{{ t('markdown.help.security.title') }}</h2>
-        <p class="mt-1 text-sm leading-6 text-sky-800">{{ t('markdown.help.security.description') }}</p>
-        <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-sky-700 hover:underline">
+        <h2 class="font-semibold text-title">{{ t('markdown.help.security.title') }}</h2>
+        <p class="mt-1 text-sm leading-6 text-body">{{ t('markdown.help.security.description') }}</p>
+        <a href="https://commonmark.org/help/" target="_blank" rel="noopener noreferrer" class="link mt-2 inline-flex items-center gap-1 text-sm font-semibold">
           {{ t('markdown.help.commonMark') }}
           <MdIcon :icon="ExternalLink" class="size-3.5" />
         </a>

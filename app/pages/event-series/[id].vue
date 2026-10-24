@@ -99,34 +99,34 @@ useHead({
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-6xl space-y-6 px-4 py-10 md:px-6 2xl:max-w-7xl">
-      <NuxtLink to="/events" class="inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900">
+      <NuxtLink to="/events" class="inline-flex items-center gap-1.5 text-sm text-meta transition-colors duration-150 ease-out hover:text-primary">
         <ArrowLeft :size="16" />
         {{ t('collection_pages.events.back') }}
       </NuxtLink>
 
       <div v-if="series" class="space-y-6" :class="revealClass">
-        <section class="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:flex-row md:p-8">
-          <div class="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-gray-50 md:w-80 lg:w-96">
+        <section class="card flex flex-col gap-6 p-6 md:flex-row md:p-8">
+          <div class="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-sunken md:w-80 lg:w-96">
             <img v-if="bannerUrl" v-img-fade :src="bannerUrl" :alt="series.name" class="h-full w-full object-contain">
-            <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-br from-amber-50 to-gray-100">
-              <CalendarDays class="h-12 w-12 text-amber-300" />
+            <div v-else class="flex h-full w-full items-center justify-center bg-linear-to-br from-primary/10 to-transparent">
+              <CalendarDays class="h-12 w-12 text-primary/40" />
             </div>
           </div>
           <div class="min-w-0 flex-1 space-y-3">
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900">{{ series.name }}</h1>
-            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
-              <span v-if="series.location" class="inline-flex items-center gap-1.5"><MapPin :size="15" class="text-gray-400" />{{ series.location }}</span>
-              <span class="inline-flex items-center gap-1.5"><CalendarDays :size="15" class="text-gray-400" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</span>
+            <h1 class="text-3xl font-bold tracking-tight text-title">{{ series.name }}</h1>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-body">
+              <span v-if="series.location" class="inline-flex items-center gap-1.5"><MapPin :size="15" class="text-meta" />{{ series.location }}</span>
+              <span class="inline-flex items-center gap-1.5"><CalendarDays :size="15" class="text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</span>
             </div>
-            <p class="max-w-2xl text-sm leading-relaxed text-gray-500">{{ description }}</p>
+            <p class="max-w-2xl text-sm leading-relaxed text-meta">{{ description }}</p>
             <a
               v-if="series.website"
               :href="series.website"
               target="_blank"
               rel="noopener"
-              class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 hover:text-blue-600"
+              class="btn"
             >
               {{ t('collection_pages.events.official_site') }}
               <ExternalLink :size="14" />
@@ -135,16 +135,16 @@ useHead({
         </section>
 
         <div v-if="series.events_count" class="flex flex-wrap items-center justify-between gap-3">
-          <p class="text-sm text-gray-500">{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</p>
-          <label class="flex items-center gap-2 text-sm text-gray-600">
+          <p class="text-sm text-meta">{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</p>
+          <label class="flex items-center gap-2 text-sm text-body">
             {{ t('collection_pages.events.sort_label') }}
-            <select v-model="sort" class="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700">
+            <select v-model="sort" class="select select-sm">
               <option v-for="key in sortKeys" :key="key" :value="key">{{ t(`collection_pages.events.sorts.${key}`) }}</option>
             </select>
           </label>
         </div>
 
-        <div v-if="eventsStatus === 'error'" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+        <div v-if="eventsStatus === 'error'" class="card flex min-h-40 items-center justify-center text-sm text-meta">
           {{ localizeError(eventsError) }}
         </div>
 
@@ -161,39 +161,39 @@ useHead({
           <div
             v-for="event in events"
             :key="event.id"
-            class="flex flex-col overflow-hidden rounded-xl border border-gray-200 bg-white"
+            class="card flex flex-col overflow-hidden"
           >
-            <NuxtLink :to="`/events/${event.id}`" class="block bg-gray-50" :style="{ aspectRatio: visualRatio }">
+            <NuxtLink :to="`/events/${event.id}`" class="block bg-sunken" :style="{ aspectRatio: visualRatio }">
               <img v-if="event.main_visual_url" v-img-fade :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
               <div v-else class="flex h-full w-full items-center justify-center">
-                <CalendarDays class="h-10 w-10 text-gray-300" />
+                <CalendarDays class="h-10 w-10 text-faint" />
               </div>
             </NuxtLink>
             <div class="flex flex-1 flex-col justify-between p-5">
               <div>
-                <span class="mb-3 inline-block rounded-md bg-gray-100 px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-gray-500">{{ event.slug }}</span>
-                <h2 class="mb-4 text-lg font-bold leading-snug text-gray-900">
-                  <NuxtLink :to="`/events/${event.id}`" class="hover:text-blue-600">{{ event.name || event.slug }}</NuxtLink>
+                <span class="mb-3 inline-block rounded-md bg-btn px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-btn-content">{{ event.slug }}</span>
+                <h2 class="mb-4 text-lg font-bold leading-snug text-title">
+                  <NuxtLink :to="`/events/${event.id}`" class="transition-colors duration-150 ease-out hover:text-primary">{{ event.name || event.slug }}</NuxtLink>
                 </h2>
               </div>
-              <div class="space-y-2 text-sm text-gray-600">
+              <div class="space-y-2 text-sm text-body">
                 <div class="flex items-center gap-2">
-                  <Calendar :size="15" class="shrink-0 text-gray-400" />
+                  <Calendar :size="15" class="shrink-0 text-meta" />
                   <span class="truncate font-medium">{{ formatEventDate(event) }}</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <Disc3 :size="15" class="shrink-0 text-gray-400" />
+                  <Disc3 :size="15" class="shrink-0 text-meta" />
                   <NuxtLink
                     v-if="event.released_albums_count"
                     :to="{ path: '/albums', query: { event: event.id } }"
-                    class="text-blue-600 underline decoration-blue-200 underline-offset-4 hover:decoration-blue-500"
+                    class="link"
                   >
                     {{ t('content_display.albums_count', { count: event.released_albums_count }) }}
                   </NuxtLink>
-                  <span v-else class="text-gray-400">{{ t('content_display.albums_count', { count: 0 }) }}</span>
+                  <span v-else class="text-meta">{{ t('content_display.albums_count', { count: 0 }) }}</span>
                 </div>
                 <div v-if="event.venue || event.location" class="flex items-center gap-2">
-                  <MapPin :size="15" class="shrink-0 text-gray-400" />
+                  <MapPin :size="15" class="shrink-0 text-meta" />
                   <span class="truncate" :title="[event.venue, event.location].filter(Boolean).join(' · ')">{{ [event.venue, event.location].filter(Boolean).join(' · ') }}</span>
                 </div>
               </div>
@@ -201,7 +201,7 @@ useHead({
           </div>
         </div>
 
-        <div v-else-if="eventsStatus !== 'error'" class="flex min-h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-white text-sm text-gray-500">
+        <div v-else-if="eventsStatus !== 'error'" class="card flex min-h-40 items-center justify-center text-sm text-meta">
           {{ t('collection_pages.events.empty') }}
         </div>
 

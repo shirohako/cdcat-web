@@ -20,25 +20,26 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen">
     <div v-if="series" :class="revealClass">
-      <div class="relative h-80 overflow-hidden bg-linear-to-br from-emerald-600 to-slate-800">
+      <!-- Hero: the theme colour fading into the always-dark hero colour, the banner under a black scrim -->
+      <div class="relative h-80 overflow-hidden bg-linear-to-br from-primary-strong to-hero">
         <img v-if="series.banner_url || series.image_url" v-img-fade :src="series.banner_url || series.image_url!" alt="" class="h-full w-full object-cover opacity-40" >
         <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
         <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
           <div class="container mx-auto max-w-6xl 2xl:max-w-7xl">
-            <NuxtLink v-if="series.parent" :to="`/franchises/${series.parent.id}`" class="mb-2 inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-white">
+            <NuxtLink v-if="series.parent" :to="`/franchises/${series.parent.id}`" class="mb-2 inline-flex items-center gap-1.5 text-sm text-on-media/80 transition-colors duration-150 ease-out hover:text-on-media">
               <Layers class="h-4 w-4" />
               {{ series.parent.name }} ›
             </NuxtLink>
-            <h1 class="text-3xl font-bold text-white md:text-4xl">{{ displayName(series) }}</h1>
-            <p v-if="originalName(series)" class="mt-1 text-white/75">{{ originalName(series) }}</p>
-            <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-white/90">
+            <h1 class="text-3xl font-bold text-on-media md:text-4xl">{{ displayName(series) }}</h1>
+            <p v-if="originalName(series)" class="mt-1 text-on-media/75">{{ originalName(series) }}</p>
+            <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-on-media/90">
               <span v-if="series.children_count" class="flex items-center gap-2"><Layers class="h-5 w-5" />{{ $t('catalog.children_count', { count: series.children_count }) }}</span>
               <span class="flex items-center gap-2"><Film class="h-5 w-5" />{{ $t('catalog.entries_count', { count: series.entries_count ?? 0 }) }}</span>
               <span class="flex items-center gap-2"><Disc3 class="h-5 w-5" />{{ $t('catalog.albums_count', { count: series.albums_count ?? 0 }) }}</span>
-              <NuxtLink :to="`/contribute/franchise/${series.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1.5 text-sm text-white hover:bg-white/25">
+              <NuxtLink :to="`/contribute/franchise/${series.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-on-media/15 px-3 py-1.5 text-sm text-on-media transition-colors duration-150 ease-out hover:bg-on-media/25">
                 <Pencil class="h-4 w-4" />
                 {{ $t('catalog.edit') }}
               </NuxtLink>
@@ -51,22 +52,22 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
 
       <div class="container mx-auto max-w-6xl space-y-6 px-4 py-8 md:px-8 2xl:max-w-7xl">
         <div v-if="series.description || series.links.length" class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <section v-if="series.description" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm lg:col-span-2">
-            <h2 class="mb-3 text-lg font-bold">{{ $t('catalog.description') }}</h2>
-            <p class="whitespace-pre-wrap leading-relaxed text-gray-700">{{ series.description }}</p>
+          <section v-if="series.description" class="card p-6 lg:col-span-2">
+            <h2 class="mb-3 text-lg font-bold text-title">{{ $t('catalog.description') }}</h2>
+            <p class="whitespace-pre-wrap leading-relaxed text-body">{{ series.description }}</p>
           </section>
-          <section v-if="series.links.length" class="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-            <h2 class="mb-3 text-lg font-bold">{{ $t('catalog.links') }}</h2>
+          <section v-if="series.links.length" class="card p-6">
+            <h2 class="mb-3 text-lg font-bold text-title">{{ $t('catalog.links') }}</h2>
             <a
               v-for="link in series.links"
               :key="link.id"
               :href="link.url"
               target="_blank"
               rel="noopener noreferrer"
-              class="group flex items-center gap-3 rounded-lg p-2 hover:bg-gray-50"
+              class="group flex items-center gap-3 rounded-lg p-2 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
             >
-              <ExternalLink :size="16" class="text-gray-400 group-hover:text-emerald-700" />
-              <span class="truncate text-gray-700 group-hover:text-emerald-700">{{ providerLabel(link.provider?.name) || link.url }}</span>
+              <ExternalLink :size="16" class="text-meta transition-colors group-hover:text-primary" />
+              <span class="truncate text-body transition-colors group-hover:text-primary">{{ providerLabel(link.provider?.name) || link.url }}</span>
             </a>
           </section>
         </div>
@@ -78,34 +79,34 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
           <section
             v-for="child in series.children"
             :key="child.id"
-            class="space-y-4 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-5 shadow-sm"
+            class="card space-y-4 p-5"
           >
             <NuxtLink :to="`/franchises/${child.id}`" class="group flex flex-wrap items-center gap-3">
-              <span class="rounded-full border border-emerald-200 bg-white px-2 py-0.5 text-xs font-semibold text-emerald-700">{{ $t('catalog.sub_series') }}</span>
-              <h2 class="text-lg font-bold tracking-tight text-slate-900 group-hover:text-emerald-700">{{ displayName(child) }}</h2>
-              <span class="text-xs text-slate-500">
+              <span class="rounded-full bg-primary/15 px-2 py-0.5 text-xs font-semibold text-primary">{{ $t('catalog.sub_series') }}</span>
+              <h2 class="text-lg font-bold tracking-tight text-title transition-colors group-hover:text-primary">{{ displayName(child) }}</h2>
+              <span class="text-xs text-meta">
                 {{ $t('catalog.entries_count', { count: child.entries_count ?? 0 }) }} · {{ $t('catalog.albums_count', { count: child.albums_count ?? 0 }) }}
               </span>
             </NuxtLink>
             <FranchiseEntriesSection :entries="child.entries" />
           </section>
 
-          <section v-if="series.entries.length || !series.children.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+          <section v-if="series.entries.length || !series.children.length" class="card p-5">
             <FranchiseEntriesSection :entries="series.entries" />
           </section>
 
-          <section v-if="series.albums.length" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-            <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <Disc3 class="h-4 w-4 text-emerald-600" />
+          <section v-if="series.albums.length" class="card p-5">
+            <h2 class="mb-3 flex items-center gap-2 text-sm font-semibold text-body">
+              <Disc3 class="h-4 w-4 text-primary" />
               {{ $t('catalog.whole_series_albums') }}
             </h2>
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
               <NuxtLink v-for="album in series.albums" :key="album.id" :to="`/albums/${album.id}`" class="group">
-                <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+                <div class="aspect-square overflow-hidden rounded-lg bg-sunken">
                   <img v-if="album.image_url" :src="album.image_url" :alt="album.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" >
-                  <div v-else class="flex h-full items-center justify-center"><Disc3 class="h-8 w-8 text-gray-300" /></div>
+                  <div v-else class="flex h-full items-center justify-center"><Disc3 class="h-8 w-8 text-faint" /></div>
                 </div>
-                <h3 class="mt-2 line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-emerald-700">{{ album.title }}</h3>
+                <h3 class="mt-2 line-clamp-2 text-sm font-medium text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ album.title }}</h3>
               </NuxtLink>
             </div>
           </section>
@@ -116,15 +117,14 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
           </template>
         </div>
 
-        <section v-if="currentTab === 'albums'" class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <section v-if="currentTab === 'albums'" class="card p-5">
           <FranchiseAlbumsSection :franchise-id="series.id" />
         </section>
       </div>
     </div>
 
-    <div v-else-if="status === 'error'" class="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-gray-500">
-      <Boxes :size="56" class="text-gray-300" />
-      <p>{{ $t('catalog.not_found') }}</p>
+    <div v-else-if="status === 'error'" class="flex min-h-[60vh] items-center justify-center">
+      <UiEmpty :title="$t('catalog.not_found')" :icon="Boxes" />
     </div>
 
     <SkeletonCatalogDetail v-else hero="gradient" />

@@ -1,27 +1,27 @@
 <template>
-  <div class="min-h-screen bg-[#f5f5f5]">
+  <div class="min-h-screen">
     <div v-if="article" :class="revealClass">
       <ArticleHero :article="article" :word-count="article.word_count" :reading-time="readingTime" />
 
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
         <div class="flex items-start gap-6">
           <div class="min-w-0 flex-1 space-y-4">
-            <div class="flex flex-wrap items-center gap-2 rounded-2xl bg-white px-5 py-3 text-xs text-gray-500 shadow-sm">
-              <span v-if="article.type" class="rounded-md bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">{{ typeName(article.type) }}</span>
-              <span v-for="tag in article.tags" :key="tag.id" class="rounded-md bg-slate-50 px-2 py-0.5">#{{ tagName(tag) }}</span>
-              <a v-if="article.is_repost" href="#article-license" class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-amber-700 hover:bg-amber-100">
+            <div class="card flex flex-wrap items-center gap-2 px-5 py-3 text-xs text-meta">
+              <span v-if="article.type" class="rounded-md bg-primary/15 px-2 py-0.5 font-semibold text-primary">{{ typeName(article.type) }}</span>
+              <span v-for="tag in article.tags" :key="tag.id" class="rounded-md bg-btn px-2 py-0.5 text-btn-content">#{{ tagName(tag) }}</span>
+              <a v-if="article.is_repost" href="#article-license" class="inline-flex items-center gap-1 rounded-md bg-warning/15 px-2 py-0.5 text-warning transition-colors duration-150 ease-out hover:bg-warning/25">
                 <Repeat2 :size="12" />{{ t('article_ui.declaration.reposted') }}
               </a>
               <a
                 v-else-if="license" :href="licenseUrl ?? '#article-license'" :target="licenseUrl ? '_blank' : undefined" :rel="licenseUrl ? 'license noopener' : undefined"
-                class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-0.5 hover:bg-slate-100" :title="t(`article_ui.licenses.${license.key}.summary`)">
+                class="inline-flex items-center gap-1 rounded-md bg-btn px-2 py-0.5 text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="t(`article_ui.licenses.${license.key}.summary`)">
                 <Copyright v-if="!license.url" :size="12" /><span v-else class="font-mono text-[10px] font-bold">cc</span>
                 {{ license.url ? license.short : t(`article_ui.licenses.${license.key}.name`) }}<ExternalLink v-if="licenseUrl" :size="10" />
               </a>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>
               <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('article_ui.views', { count: article.views_count }) }}</span>
               <button
-                type="button" class="btn btn-xs gap-1 rounded-full" :class="article.liked ? 'btn-error text-white' : 'btn-ghost'"
+                type="button" class="btn btn-xs gap-1 rounded-full" :class="article.liked ? 'btn-error' : 'btn-ghost'"
                 :disabled="liking || (isAuthenticated && !article.can.like)" :aria-pressed="article.liked"
                 :title="isAuthenticated && !article.can.like ? t('article_ui.like_own') : t(article.liked ? 'article_ui.unlike' : 'article_ui.like')" @click="toggleLike">
                 <Heart :size="12" :fill="article.liked ? 'currentColor' : 'none'" />{{ article.likes_count }}
@@ -35,8 +35,8 @@
             <ArticleLicenseNotice :article="article" />
             <ArticleLinkCards :links="article.links" />
             <DiscussionCommentSection v-if="article.discussion_topic_id" :topic-id="article.discussion_topic_id" />
-            <section v-if="moreByAuthor.length" class="rounded-2xl bg-white p-5 shadow-sm">
-              <h2 class="text-sm font-bold text-gray-900">{{ t('article_ui.reader.more_by', { name: article.author?.nickname || article.author?.username }) }}</h2>
+            <section v-if="moreByAuthor.length" class="card p-5">
+              <h2 class="text-sm font-bold text-title">{{ t('article_ui.reader.more_by', { name: article.author?.nickname || article.author?.username }) }}</h2>
               <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <ArticleCard v-for="item in moreByAuthor" :key="item.id" :article="item" />
               </div>
@@ -51,14 +51,14 @@
       </div>
 
       <ArticleReportDialog v-if="article.can.report" v-model:open="reportOpen" :article-id="article.id" @reported="reported = true" />
-      <p v-if="reported" class="fixed bottom-6 right-6 z-50 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 shadow-lg" role="status">
-        {{ t('article_ui.report.done') }}
+      <p v-if="reported" class="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-popover px-4 py-3 text-sm text-body shadow-overlay ring-1 ring-line" role="status">
+        <Icon name="lucide:circle-check" class="size-4 shrink-0 text-success" />{{ t('article_ui.report.done') }}
       </p>
       <DiscussionNotice />
       <CommonToast :toast="toast" />
     </div>
 
-    <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-gray-500">
+    <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center p-6 text-center text-sm text-meta">
       {{ localizeError(error) }}
     </div>
 

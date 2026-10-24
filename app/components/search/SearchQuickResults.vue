@@ -12,30 +12,30 @@
         aria-autocomplete="list"
         :placeholder="$t('search.placeholder')"
         maxlength="100"
-        class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-10 pr-3 transition-all duration-200 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gray-900"
+        class="input w-full pl-10"
         @focus="focused = true"
         @keydown.down.prevent="move(1)"
         @keydown.up.prevent="move(-1)"
         @keydown.enter.prevent="submit"
         @keydown.esc.prevent="dismiss"
       >
-      <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
     </div>
 
     <div
       v-if="open"
       :id="listId"
       role="listbox"
-      class="-mx-3 -mb-3 mt-3 max-h-[60vh] overflow-y-auto border-t border-gray-100 py-1"
+      class="-mx-3 -mb-3 mt-3 max-h-[60vh] overflow-y-auto border-t border-line py-1"
     >
-      <p v-if="!searchable(query.trim())" class="px-4 py-3 text-sm text-gray-500">{{ $t('search.too_short') }}</p>
-      <p v-else-if="loading && !groups.length" class="px-4 py-3 text-sm text-gray-500">{{ $t('search.searching') }}</p>
-      <p v-else-if="failed" class="px-4 py-3 text-sm text-red-600">{{ $t('errors.request_failed') }}</p>
-      <p v-else-if="!groups.length" class="px-4 py-3 text-sm text-gray-500">{{ $t('search.no_results') }}</p>
+      <p v-if="!searchable(query.trim())" class="px-4 py-3 text-sm text-meta">{{ $t('search.too_short') }}</p>
+      <p v-else-if="loading && !groups.length" class="px-4 py-3 text-sm text-meta">{{ $t('search.searching') }}</p>
+      <p v-else-if="failed" class="px-4 py-3 text-sm text-danger">{{ $t('errors.request_failed') }}</p>
+      <p v-else-if="!groups.length" class="px-4 py-3 text-sm text-meta">{{ $t('search.no_results') }}</p>
       <template v-for="group in groups" :key="group.type">
-        <p class="flex items-center justify-between px-3 pb-1 pt-2 text-xs font-semibold text-gray-400">
+        <p class="flex items-center justify-between px-3 pb-1 pt-2 text-xs font-semibold text-faint">
           <span>{{ $t(`search.types.${group.type}`) }}</span>
-          <NuxtLink v-if="group.total > group.items.length" :to="{ path: '/search', query: { q: query.trim(), type: group.type } }" class="font-normal hover:text-gray-700" @click="close()">
+          <NuxtLink v-if="group.total > group.items.length" :to="{ path: '/search', query: { q: query.trim(), type: group.type } }" class="font-normal transition-colors hover:text-primary" @click="close()">
             {{ $t('search.more', { count: group.total_is_capped ? $t('search.capped', { count: group.total }) : group.total }) }}
           </NuxtLink>
         </p>
@@ -47,12 +47,12 @@
           :aria-selected="indexOf(item) === active"
           :result="item"
           compact
-          :class="indexOf(item) === active ? 'bg-gray-100' : 'hover:bg-gray-50'"
+          :class="indexOf(item) === active ? 'bg-ghost-hover' : 'hover:bg-ghost-hover'"
           @click="close()"
           @mouseenter="active = indexOf(item)"
         />
       </template>
-      <NuxtLink v-if="searchable(query.trim())" :to="{ path: '/search', query: { q: query.trim() } }" class="mt-1 block border-t border-gray-100 px-4 py-2 text-center text-sm text-gray-600 hover:bg-gray-50" @click="close()">
+      <NuxtLink v-if="searchable(query.trim())" :to="{ path: '/search', query: { q: query.trim() } }" class="mt-1 block border-t border-line px-4 py-2 text-center text-sm font-semibold text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="close()">
         {{ $t('search.view_all') }}
       </NuxtLink>
     </div>

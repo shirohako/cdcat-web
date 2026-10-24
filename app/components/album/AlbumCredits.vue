@@ -1,15 +1,15 @@
 <template>
-  <CatalogSection v-if="groups.length" :title="$t('album.section.credits')" :icon="Users" tone="emerald">
-    <dl class="divide-y divide-gray-50">
+  <CatalogSection v-if="groups.length" :title="$t('album.section.credits')" :icon="Users">
+    <dl class="divide-y divide-line">
       <div v-for="group in groups" :key="group.role" class="flex gap-3 px-5 py-2.5">
         <dt class="w-28 shrink-0">
           <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold" :class="getAlbumRolePalette(group.category).badge">{{ roleName(group.role) }}</span>
         </dt>
-        <dd class="flex min-w-0 flex-wrap gap-x-1 text-sm text-gray-700">
+        <dd class="flex min-w-0 flex-wrap gap-x-1 text-sm text-body">
           <template v-for="(person, index) in group.people" :key="index">
-            <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="hover:text-emerald-700 hover:underline">{{ person.name }}</NuxtLink>
+            <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="transition-colors hover:text-primary">{{ person.name }}</NuxtLink>
             <span v-else>{{ person.name }}</span>
-            <span v-if="person.detail" class="text-gray-400">({{ person.detail }})</span><span v-if="index < group.people.length - 1">,</span>
+            <span v-if="person.detail" class="text-meta">({{ person.detail }})</span><span v-if="index < group.people.length - 1">,</span>
           </template>
         </dd>
       </div>

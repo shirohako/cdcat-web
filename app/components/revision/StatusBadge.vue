@@ -10,10 +10,11 @@ import type { RevisionStatus } from '~/types/revision'
 defineProps<{ status: RevisionStatus }>()
 
 const TONES: Record<RevisionStatus, { badge: string, dot: string }> = {
-  pending: { badge: 'border-amber-200 bg-amber-50 text-amber-700', dot: 'bg-amber-500' },
-  changes_requested: { badge: 'border-orange-200 bg-orange-50 text-orange-700', dot: 'bg-orange-500' },
-  approved: { badge: 'border-emerald-200 bg-emerald-50 text-emerald-700', dot: 'bg-emerald-500' },
-  rejected: { badge: 'border-rose-200 bg-rose-50 text-rose-700', dot: 'bg-rose-500' },
-  withdrawn: { badge: 'border-gray-200 bg-white text-gray-500', dot: 'bg-gray-300' },
+  pending: { badge: 'border-warning/30 bg-warning/10 text-warning', dot: 'bg-warning' },
+  // Its own orange, so it stays apart from pending.
+  changes_requested: { badge: 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-400/30 dark:bg-orange-400/10 dark:text-orange-300', dot: 'bg-orange-500' },
+  approved: { badge: 'border-success/30 bg-success/10 text-success', dot: 'bg-success' },
+  rejected: { badge: 'border-danger/30 bg-danger/10 text-danger', dot: 'bg-danger' },
+  withdrawn: { badge: 'border-line text-meta', dot: 'bg-faint' },
 }
 </script>

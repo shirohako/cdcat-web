@@ -1,8 +1,8 @@
 <template>
-  <li v-if="image" class="flex gap-3 rounded-xl border p-3" :class="errors.length ? 'border-rose-200 bg-rose-50/40' : 'border-gray-200'">
-    <a :href="file?.url" target="_blank" rel="noopener" class="block h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+  <li v-if="image" class="flex gap-3 rounded-xl border p-3" :class="errors.length ? 'border-danger/25 bg-danger/10' : 'border-line'">
+    <a :href="file?.url" target="_blank" rel="noopener" class="block h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-sunken">
       <img v-if="file" :src="file.thumbnail_url" alt="" class="h-full w-full object-cover" loading="lazy">
-      <span v-else class="flex h-full items-center justify-center p-2 text-center text-[11px] text-rose-500">{{ $t('editor.image.missing') }}</span>
+      <span v-else class="flex h-full items-center justify-center p-2 text-center text-[11px] text-danger">{{ $t('editor.image.missing') }}</span>
     </a>
     <div class="min-w-0 flex-1 space-y-2">
       <div class="flex flex-wrap items-center gap-2">
@@ -25,16 +25,16 @@
         <span class="ml-auto flex gap-0.5">
           <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="emit('move', -1)"><ArrowUp :size="12" /></button>
           <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="emit('move', 1)"><ArrowDown :size="12" /></button>
-          <button type="button" class="btn btn-ghost btn-xs px-1.5 text-gray-400 hover:text-error" :aria-label="$t('common.delete')" @click="removeImage(album, imageId)"><Trash2 :size="12" /></button>
+          <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="removeImage(album, imageId)"><Trash2 :size="12" /></button>
         </span>
       </div>
       <input v-model="image.caption" class="input input-sm w-full" maxlength="500" :placeholder="$t('editor.image.caption_placeholder')">
       <details :open="hasAttributes">
-        <summary class="cursor-pointer text-[11px] font-medium text-gray-500">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
+        <summary class="cursor-pointer text-[11px] font-medium text-meta transition-colors hover:text-primary">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
         <EditorAttributeRows v-model="album.image_attributes" compact subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
       </details>
-      <p v-if="file" class="text-[10px] text-gray-400">{{ file.width }} × {{ file.height }}</p>
-      <p v-for="error in errors" :key="error.path" class="text-[11px] text-error">{{ error.message }}</p>
+      <p v-if="file" class="text-[10px] text-meta">{{ file.width }} × {{ file.height }}</p>
+      <p v-for="error in errors" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
     </div>
   </li>
 </template>

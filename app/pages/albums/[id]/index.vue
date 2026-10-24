@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div v-if="album && !mergedInto" :class="revealClass">
       <AlbumHero :album="album" @open-cover="gallery?.openCover()" @favorited="value => mutate(current => ({ ...current, is_favorited: value }))" />
       <CatalogPendingBanner :pending="album.is_pending" :revision="album.pending_revision" />
@@ -25,7 +25,7 @@
 
           <div class="space-y-6 lg:col-span-1">
             <AlbumArtistCard :artists="album.artists" />
-            <div v-if="album.is_pending" class="rounded-xl border border-dashed border-amber-200 bg-amber-50/50 p-4 text-sm text-amber-800">
+            <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
             <AlbumTracking v-else :album-id="String(album.id)" :initial-tracking="album.user_tracking" @tracked="setTracking" />

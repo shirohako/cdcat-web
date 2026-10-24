@@ -1,18 +1,18 @@
 <template>
-  <EditorModal v-model="open" :title="title ?? $t('editor.image.from_url')" :description="description ?? $t('editor.dialog.image_url_hint')" :icon="Link2" tone="blue" @submit="submit">
+  <EditorModal v-model="open" :title="title ?? $t('editor.image.from_url')" :description="description ?? $t('editor.dialog.image_url_hint')" :icon="Link2" @submit="submit">
     <div class="space-y-3">
       <label class="block">
-        <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.image_url') }}</span>
+        <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.image_url') }}</span>
         <input v-model.trim="url" data-autofocus type="url" inputmode="url" class="input w-full" :class="{ 'input-error': error }" placeholder="https://" :disabled="busy">
       </label>
-      <div class="flex h-40 items-center justify-center overflow-hidden rounded-xl border border-dashed border-gray-200 bg-gray-50">
+      <div class="flex h-40 items-center justify-center overflow-hidden rounded-xl border border-dashed border-line bg-sunken">
         <img v-if="previewable && !broken" :src="url" alt="" class="max-h-full max-w-full object-contain" referrerpolicy="no-referrer" @error="broken = true">
-        <span v-else class="flex flex-col items-center gap-1.5 px-4 text-center text-xs text-gray-400">
+        <span v-else class="flex flex-col items-center gap-1.5 px-4 text-center text-xs text-meta">
           <ImageOff v-if="broken" :size="22" /><ImageIcon v-else :size="22" />
           {{ $t(broken ? 'editor.dialog.image_no_preview' : 'editor.dialog.image_preview') }}
         </span>
       </div>
-      <p v-if="error" class="text-xs text-error">{{ error }}</p>
+      <p v-if="error" class="text-xs text-danger">{{ error }}</p>
       <slot />
     </div>
     <template #footer>

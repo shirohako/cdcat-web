@@ -1,21 +1,21 @@
 <template>
   <EditorModal v-model="open" :title="$t('editor.toc.title', { n: disc?.position ?? '' })" wide>
     <div class="space-y-4">
-      <p class="text-sm text-gray-600">{{ $t('editor.toc.hint') }}</p>
+      <p class="text-sm text-body">{{ $t('editor.toc.hint') }}</p>
       <ul v-if="tocs.length" class="space-y-2">
-        <li v-for="toc in tocs" :key="toc.id" class="flex flex-wrap items-center gap-3 rounded-lg border border-gray-100 px-3 py-2 text-xs">
-          <span class="font-medium text-gray-700">{{ $t('editor.toc.tracks', { first: toc.first_track, last: toc.last_track }) }}</span>
-          <span class="font-mono text-gray-500">{{ $t('editor.toc.leadout', { offset: toc.leadout_offset }) }}</span>
-          <span class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] uppercase text-gray-500">{{ toc.source }}</span>
-          <span v-if="toc.last_track - toc.first_track + 1 !== trackCount" class="text-amber-600">{{ $t('editor.toc.count_mismatch', { count: trackCount }) }}</span>
+        <li v-for="toc in tocs" :key="toc.id" class="flex flex-wrap items-center gap-3 rounded-lg bg-sunken px-3 py-2 text-xs">
+          <span class="font-medium text-body">{{ $t('editor.toc.tracks', { first: toc.first_track, last: toc.last_track }) }}</span>
+          <span class="font-mono text-meta">{{ $t('editor.toc.leadout', { offset: toc.leadout_offset }) }}</span>
+          <span class="rounded bg-btn px-1.5 py-0.5 text-[10px] uppercase text-btn-content">{{ toc.source }}</span>
+          <span v-if="toc.last_track - toc.first_track + 1 !== trackCount" class="text-warning">{{ $t('editor.toc.count_mismatch', { count: trackCount }) }}</span>
           <button type="button" class="btn btn-ghost btn-xs ml-auto px-1.5" :aria-label="$t('common.delete')" @click="remove(toc.id)"><Trash2 :size="12" /></button>
         </li>
       </ul>
-      <p v-else class="text-xs text-gray-400">{{ $t('editor.toc.none') }}</p>
+      <p v-else class="text-xs text-meta">{{ $t('editor.toc.none') }}</p>
       <div class="space-y-2">
         <textarea v-model="text" rows="6" class="textarea w-full font-mono text-[11px]" :placeholder="PLACEHOLDER" />
-        <p v-if="text && !parsed" class="text-xs text-error">{{ $t('editor.toc.unreadable') }}</p>
-        <p v-else-if="parsed" class="text-xs text-gray-500">{{ $t('editor.toc.tracks', { first: parsed.first_track, last: parsed.last_track }) }} · {{ $t('editor.toc.leadout', { offset: parsed.leadout_offset }) }}</p>
+        <p v-if="text && !parsed" class="text-xs text-danger">{{ $t('editor.toc.unreadable') }}</p>
+        <p v-else-if="parsed" class="text-xs text-meta">{{ $t('editor.toc.tracks', { first: parsed.first_track, last: parsed.last_track }) }} · {{ $t('editor.toc.leadout', { offset: parsed.leadout_offset }) }}</p>
       </div>
     </div>
     <template #footer>

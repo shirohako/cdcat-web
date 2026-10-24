@@ -73,9 +73,9 @@ defineExpose({ insert, focus: () => editor.value?.focus() })
 
 <template>
   <div :class="variant === 'compact' ? 'space-y-2' : 'space-y-3'">
-    <p v-if="replyTo?.user" class="flex items-center gap-1 text-xs text-slate-500">
+    <p v-if="replyTo?.user" class="flex items-center gap-1 text-xs text-meta">
       {{ t('discussions.composer.replying_to', { name: replyTo.user.nickname || replyTo.user.username }) }}
-      <button type="button" class="ml-1 text-slate-400 hover:text-slate-600" :aria-label="t('common.cancel')" @click="emit('cancel')"><X :size="12" /></button>
+      <button type="button" class="ml-1 transition-colors duration-150 ease-out hover:text-primary" :aria-label="t('common.cancel')" @click="emit('cancel')"><X :size="12" /></button>
     </p>
     <ClientOnly>
       <MarkdownEditor
@@ -85,12 +85,12 @@ defineExpose({ insert, focus: () => editor.value?.focus() })
         @submit="submit"
       />
       <template #fallback>
-        <div class="rounded-xl border border-slate-200 bg-slate-50" :class="variant === 'compact' ? 'h-28' : 'h-72'" />
+        <div class="rounded-xl border border-line bg-field" :class="variant === 'compact' ? 'h-28' : 'h-72'" />
       </template>
     </ClientOnly>
     <div class="flex flex-wrap items-center justify-end gap-2">
-      <p v-if="error" role="alert" class="mr-auto text-sm text-rose-600">{{ error }}</p>
-      <span v-else class="mr-auto hidden text-xs text-slate-400 sm:inline">{{ t('discussions.composer.shortcut') }}</span>
+      <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
+      <span v-else class="mr-auto hidden text-xs text-meta sm:inline">{{ t('discussions.composer.shortcut') }}</span>
       <button v-if="variant === 'compact'" type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</button>
       <button type="button" class="btn btn-primary" :class="variant === 'compact' ? 'btn-sm' : ''" :disabled="busy || !draft.raw.trim()" @click="submit">
         <Loader2 v-if="busy" :size="14" class="animate-spin" /><Send v-else :size="14" />

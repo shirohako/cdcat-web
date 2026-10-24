@@ -1,39 +1,39 @@
 <template>
   <div class="space-y-4 text-sm">
-    <p v-if="!changes.length" class="py-6 text-center text-gray-400">{{ $t('versions.no_changes') }}</p>
+    <p v-if="!changes.length" class="py-6 text-center text-faint">{{ $t('versions.no_changes') }}</p>
 
-    <table v-if="fieldChanges.length" class="table table-sm">
+    <table v-if="fieldChanges.length" class="w-full">
       <tbody>
         <tr v-for="change in fieldChanges" :key="change.name">
-          <th class="w-32 align-top text-xs font-medium text-gray-500">{{ fieldLabel(change.name) }}</th>
-          <td class="align-top"><span class="rounded bg-rose-50 px-1 text-rose-700 line-through decoration-rose-300">{{ valueLabel(fields.get(change.name), change.from, references) }}</span></td>
-          <td class="w-4 align-top text-gray-300">→</td>
-          <td class="align-top"><span class="rounded bg-emerald-50 px-1 text-emerald-700">{{ valueLabel(fields.get(change.name), change.to, references) }}</span></td>
+          <th class="w-32 py-1 pr-3 text-left align-top text-xs font-medium text-meta">{{ fieldLabel(change.name) }}</th>
+          <td class="py-1 align-top"><span class="rounded bg-danger/10 px-1 text-danger line-through decoration-danger/40">{{ valueLabel(fields.get(change.name), change.from, references) }}</span></td>
+          <td class="w-4 px-1 py-1 align-top text-faint">→</td>
+          <td class="py-1 align-top"><span class="rounded bg-success/10 px-1 text-success">{{ valueLabel(fields.get(change.name), change.to, references) }}</span></td>
         </tr>
       </tbody>
     </table>
 
-    <div v-for="group in collectionChanges" :key="group.name" class="rounded-lg border border-gray-100">
-      <h4 class="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-3 py-1.5 text-xs font-semibold text-gray-600">
+    <div v-for="group in collectionChanges" :key="group.name" class="overflow-hidden rounded-lg border border-line">
+      <h4 class="flex items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-xs font-semibold text-body">
         {{ collectionLabel(group.name) }}
-        <span v-if="group.added" class="text-emerald-600">+{{ group.added }}</span>
-        <span v-if="group.removed" class="text-rose-600">−{{ group.removed }}</span>
-        <span v-if="group.changed" class="text-amber-600">~{{ group.changed }}</span>
+        <span v-if="group.added" class="text-success">+{{ group.added }}</span>
+        <span v-if="group.removed" class="text-danger">−{{ group.removed }}</span>
+        <span v-if="group.changed" class="text-warning">~{{ group.changed }}</span>
       </h4>
-      <ul class="divide-y divide-gray-50">
+      <ul class="divide-y divide-line">
         <li v-for="row in group.rows" :key="row.id" class="px-3 py-1.5">
           <template v-if="row.op === 'add' || row.op === 'remove'">
-            <span class="mr-2 inline-block w-3 font-bold" :class="row.op === 'add' ? 'text-emerald-600' : 'text-rose-600'">{{ row.op === 'add' ? '+' : '−' }}</span>
-            <span :class="row.op === 'remove' ? 'text-gray-500 line-through decoration-rose-300' : 'text-gray-800'">{{ rowSummary(group.name, row.value) }}</span>
+            <span class="mr-2 inline-block w-3 font-bold" :class="row.op === 'add' ? 'text-success' : 'text-danger'">{{ row.op === 'add' ? '+' : '−' }}</span>
+            <span :class="row.op === 'remove' ? 'text-meta line-through decoration-danger/40' : 'text-title'">{{ rowSummary(group.name, row.value) }}</span>
           </template>
           <template v-else>
-            <span class="mr-2 inline-block w-3 font-bold text-amber-600">~</span>
-            <span class="text-xs text-gray-400">{{ rowLabel(group.name, row.id) }}</span>
+            <span class="mr-2 inline-block w-3 font-bold text-warning">~</span>
+            <span class="text-xs text-meta">{{ rowLabel(group.name, row.id) }}</span>
             <span v-for="field in row.fields" :key="field.name" class="ml-3 inline-flex flex-wrap items-baseline gap-1 text-xs">
-              <span class="text-gray-500">{{ fieldLabel(field.name) }}:</span>
-              <span class="text-rose-700 line-through decoration-rose-300">{{ field.from }}</span>
-              <span class="text-gray-300">→</span>
-              <span class="text-emerald-700">{{ field.to }}</span>
+              <span class="text-meta">{{ fieldLabel(field.name) }}:</span>
+              <span class="text-danger line-through decoration-danger/40">{{ field.from }}</span>
+              <span class="text-faint">→</span>
+              <span class="text-success">{{ field.to }}</span>
             </span>
           </template>
         </li>

@@ -1,60 +1,43 @@
 <template>
   <!-- Spans the full width above the sidebar; z-50 keeps its dropdowns over the sidebar. -->
-  <header class="fixed inset-x-0 top-0 z-50 h-16 bg-white border-b border-gray-200">
+  <header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-line bg-card">
     <div class="h-full px-4 flex items-center justify-between">
       <!-- Left Section: Menu Toggle & Logo -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3">
         <!-- Mobile Menu Toggle -->
-        <button
-          class="grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100 lg:hidden"
-          aria-label="Toggle mobile menu"
-          @click="toggleMobileMenu"
-        >
-          <Icon name="lucide:menu" class="w-5 h-5 text-gray-700" />
-        </button>
+        <UiIconButton icon="lucide:menu" label="Toggle mobile menu" class="lg:hidden" @click="toggleMobileMenu" />
 
         <!-- Desktop Sidebar Toggle -->
-        <button
-          class="group hidden size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100 lg:grid"
-          aria-label="Toggle sidebar"
-          @click="toggleSidebar"
-        >
-          <Icon
-            name="lucide:menu"
-            class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
-          />
-        </button>
+        <UiIconButton icon="lucide:menu" label="Toggle sidebar" class="max-lg:hidden" @click="toggleSidebar" />
 
-        <!-- Logo -->
-        <NuxtLink to="/" class="flex h-9 items-center gap-2 text-2xl font-bold leading-none tracking-tight text-gray-900">
+        <!-- Logo: the site name in the theme colour, with vivia's hover pill -->
+        <NuxtLink
+          to="/"
+          class="flex h-10 items-center gap-2 rounded-lg px-2 text-2xl font-bold leading-none tracking-tight text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover"
+        >
           <!-- The name follows, so the picture needs no alt text of its own. -->
           <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg">
           CDCAT
         </NuxtLink>
       </div>
 
-      <!-- Right Section: Search, Language Switcher & User -->
-      <div class="flex items-center gap-2">
+      <!-- Right Section: Search, Appearance, Language Switcher & User -->
+      <div class="flex items-center gap-1">
         <!-- Search: an icon that opens a search box ("/" opens it too) -->
         <div class="sm:relative">
-          <button
-            class="group grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100"
-            :class="{ 'bg-gray-100': showSearch }"
-            :aria-label="$t('search.title')"
+          <UiIconButton
+            icon="lucide:search"
+            :label="$t('search.title')"
             :title="$t('search.shortcut')"
+            :class="{ 'bg-ghost-hover text-primary': showSearch }"
             :aria-expanded="showSearch"
             @click="toggleSearch"
-          >
-            <Icon
-              name="lucide:search"
-              class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
-            />
-          </button>
+          />
 
           <transition name="dropdown">
             <div
               v-if="showSearch"
-              class="fixed inset-x-4 top-[4.5rem] rounded-lg border border-gray-200 bg-white p-3 shadow-lg
+              class="fixed inset-x-4 top-[4.5rem] rounded-xl bg-popover p-3 shadow-overlay ring-1 ring-line
                      sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[28rem]"
             >
               <SearchQuickResults autofocus @dismiss="showSearch = false" />
@@ -62,34 +45,58 @@
           </transition>
         </div>
 
+        <!-- Appearance: dark or light, and the theme colour -->
+        <div class="sm:relative">
+          <button
+            type="button"
+            class="btn btn-ghost btn-square"
+            :class="{ 'bg-ghost-hover text-primary': showAppearance }"
+            :aria-label="$t('appearance.open')"
+            :title="$t('appearance.open')"
+            :aria-expanded="showAppearance"
+            @click="toggleAppearance"
+          >
+            <!-- vivia's sun and moon, cross-fading with the theme -->
+            <span class="relative grid size-5 place-items-center">
+              <Icon name="lucide:moon" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
+              <Icon name="lucide:sun" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
+            </span>
+          </button>
+
+          <transition name="dropdown">
+            <div
+              v-if="showAppearance"
+              class="fixed right-4 top-[4.5rem] rounded-xl bg-popover shadow-overlay ring-1 ring-line
+                     sm:absolute sm:right-0 sm:top-full sm:mt-2"
+            >
+              <AppAppearance />
+            </div>
+          </transition>
+        </div>
+
         <!-- Language Switcher -->
         <div class="relative">
-          <button
-            class="group grid size-9 place-items-center rounded-lg transition-colors duration-200 hover:bg-gray-100"
-            aria-label="Switch language"
+          <UiIconButton
+            icon="lucide:languages"
+            label="Switch language"
+            :class="{ 'bg-ghost-hover text-primary': showLanguageMenu }"
             @click="toggleLanguageMenu"
-          >
-            <Icon
-              name="lucide:languages"
-              class="w-5 h-5 text-gray-700 transition-transform duration-200 group-hover:scale-110"
-            />
-          </button>
+          />
 
           <!-- Language Dropdown -->
           <transition name="dropdown">
             <div
               v-if="showLanguageMenu"
-              class="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200
-                     overflow-hidden"
+              class="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line"
             >
               <button
                 v-for="option in availableLocales"
                 :key="option.code"
                 :class="[
-                  'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors duration-150',
+                  'w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-150 ease-out',
                   currentLocale === option.code
-                    ? 'bg-gray-900 text-white'
-                    : 'text-gray-700 hover:bg-gray-50'
+                    ? 'bg-ghost-hover font-semibold text-primary'
+                    : 'text-body hover:bg-ghost-hover hover:text-primary'
                 ]"
                 @click="switchLanguage(option.code)"
               >
@@ -107,17 +114,18 @@
         <NotificationBell v-if="isAuthenticated" />
 
         <!-- User Menu or Login/Register Buttons -->
-        <div v-if="isAuthenticated" class="relative">
+        <div v-if="isAuthenticated" class="relative ml-1">
           <button
-            class="group flex h-9 items-center gap-1.5 rounded-lg pl-0.5 pr-1.5
-                   transition-colors duration-200 hover:bg-gray-100"
+            class="group flex h-10 items-center gap-1.5 rounded-lg pl-1 pr-1.5
+                   transition-colors duration-150 ease-out hover:bg-ghost-hover"
+            :class="{ 'bg-ghost-hover': showUserMenu }"
             aria-label="User menu"
             @click="toggleUserMenu"
           >
             <div
               class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden
-                     ring-2 ring-transparent group-hover:ring-gray-300 transition-all duration-200"
-              :class="user?.avatar_url ? '' : 'bg-gray-900'"
+                     ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-150"
+              :class="user?.avatar_url ? '' : 'bg-primary'"
             >
               <NuxtImg
                 v-if="user?.avatar_url"
@@ -125,11 +133,11 @@
                 alt="avatar"
                 class="w-full h-full object-cover"
               />
-              <span v-else class="text-white text-sm font-semibold">{{ userInitial }}</span>
+              <span v-else class="text-on-primary text-sm font-semibold">{{ userInitial }}</span>
             </div>
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 text-gray-600 transition-transform duration-200"
+              class="w-4 h-4 text-meta transition-transform duration-200"
               :class="{ 'rotate-180': showUserMenu }"
             />
           </button>
@@ -138,39 +146,38 @@
           <transition name="dropdown">
             <div
               v-if="showUserMenu"
-              class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200
-                     overflow-hidden"
+              class="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line"
             >
-              <div class="p-4 border-b border-gray-200">
-                <p class="font-semibold text-gray-900">{{ user?.nickname }}</p>
-                <p class="text-sm text-gray-500">@{{ user?.username }}</p>
+              <div class="p-4 border-b border-line">
+                <p class="font-semibold text-title">{{ user?.nickname }}</p>
+                <p class="text-sm text-meta">@{{ user?.username }}</p>
               </div>
-              <div class="py-2">
+              <div class="p-1">
                 <NuxtLink
                   v-for="item in userMenuItems"
                   :key="item.name"
                   :to="item.name === 'profile' ? `/profile/${user?.username}` : item.path"
-                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700
-                         hover:bg-gray-50 transition-colors duration-150"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-body
+                         transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                 >
                   <Icon :name="item.icon" class="w-4 h-4" />
                   <span>{{ $t(item.i18nKey) }}</span>
                 </NuxtLink>
               </div>
-              <div v-if="hasPermission('admin.access')" class="border-t border-gray-200 py-2">
+              <div v-if="hasPermission('admin.access')" class="border-t border-line p-1">
                 <NuxtLink
                   to="/admin"
-                  class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
                   @click="showUserMenu = false"
                 >
                   <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
                   <span>{{ $t('admin.console') }}</span>
                 </NuxtLink>
               </div>
-              <div class="border-t border-gray-200">
+              <div class="border-t border-line p-1">
                 <button
-                  class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600
-                         hover:bg-red-50 transition-colors duration-150"
+                  class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-danger
+                         transition-colors duration-150 ease-out hover:bg-danger/10"
                   @click="handleLogout"
                 >
                   <Icon name="lucide:log-out" class="w-4 h-4" />
@@ -182,26 +189,20 @@
         </div>
 
         <!-- Login/Register Buttons (Not Authenticated) -->
-        <div v-else class="flex items-center gap-2">
-          <NuxtLink
-            to="/auth/login"
-            class="inline-flex h-9 items-center rounded-lg px-4 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100"
-          >
+        <div v-else class="ml-1 flex items-center gap-2">
+          <UiButton to="/auth/login" variant="ghost">
             {{ $t('user.login') }}
-          </NuxtLink>
-          <NuxtLink
-            to="/auth/register"
-            class="inline-flex h-9 items-center rounded-lg bg-gray-900 px-4 text-sm font-medium text-white transition-colors duration-200 hover:bg-gray-800"
-          >
+          </UiButton>
+          <UiButton to="/auth/register" variant="primary">
             {{ $t('user.register') }}
-          </NuxtLink>
+          </UiButton>
         </div>
       </div>
     </div>
 
     <!-- Click outside to close dropdowns -->
     <div
-      v-if="showLanguageMenu || showUserMenu || showSearch"
+      v-if="showLanguageMenu || showUserMenu || showSearch || showAppearance"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
     />
@@ -224,10 +225,12 @@ const emit = defineEmits<{
 
 const { t, locale, locales, setLocale } = useI18n()
 const { user, isAuthenticated, logout, hasPermission } = useAuth()
+const { theme } = useAppearance()
 
 const showUserMenu = ref(false)
 const showLanguageMenu = ref(false)
 const showSearch = ref(false)
+const showAppearance = ref(false)
 
 const currentLocale = computed(() => locale.value)
 const availableLocales = computed(() => locales.value)
@@ -257,6 +260,12 @@ const toggleSearch = () => {
   showSearch.value = next
 }
 
+const toggleAppearance = () => {
+  const next = !showAppearance.value
+  closeAllDropdowns()
+  showAppearance.value = next
+}
+
 const toggleLanguageMenu = () => {
   const next = !showLanguageMenu.value
   closeAllDropdowns()
@@ -273,6 +282,7 @@ const closeAllDropdowns = () => {
   showUserMenu.value = false
   showLanguageMenu.value = false
   showSearch.value = false
+  showAppearance.value = false
 }
 
 // Opening a search result (or any other page) closes the menus.

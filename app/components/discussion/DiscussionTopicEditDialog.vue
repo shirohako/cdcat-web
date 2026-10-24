@@ -71,30 +71,30 @@ async function save() {
   <DiscussionDialog v-model:open="open" :title="t('discussions.topic.edit_title')" width="max-w-2xl" :busy="busy">
     <form id="discussion-topic-edit" class="space-y-4" @submit.prevent="save">
       <template v-if="!articleTopic">
-        <label class="block text-sm font-medium text-slate-700">
+        <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.title') }}
-          <input v-model="title" required minlength="4" maxlength="120" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-sky-400">
+          <input v-model="title" required minlength="4" maxlength="120" class="input mt-1 w-full">
         </label>
-        <label class="block text-sm font-medium text-slate-700">
+        <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.category') }}
-          <select v-model="categoryId" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+          <select v-model="categoryId" class="select mt-1 w-full">
             <option v-for="category in choices" :key="category.id" :value="category.id">{{ category.parent_id ? '\u3000' : '' }}{{ categoryName(category) }}</option>
           </select>
         </label>
       </template>
-      <div class="text-sm font-medium text-slate-700">
+      <div class="text-sm font-medium text-body">
         {{ t('discussions.fields.tags') }}
         <CommonTagPicker v-model="tags" class="mt-1" :max="5" :allow-staff="canModerate" />
       </div>
-      <div class="text-sm font-medium text-slate-700">
+      <div class="text-sm font-medium text-body">
         {{ t('discussions.fields.links') }}
         <CommonContentLinkPicker v-model="links" class="mt-1" :max="10" />
       </div>
-      <label v-if="asModerator" class="block text-sm font-medium text-slate-700">
+      <label v-if="asModerator" class="block text-sm font-medium text-body">
         {{ t('discussions.moderation.reason_optional') }}
-        <input v-model="reason" maxlength="2000" class="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm">
+        <input v-model="reason" maxlength="2000" class="input mt-1 w-full">
       </label>
-      <p v-if="error" role="alert" class="text-sm text-rose-600">{{ error }}</p>
+      <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
     </form>
     <template #footer>
       <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>

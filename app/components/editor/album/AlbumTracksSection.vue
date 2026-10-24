@@ -1,17 +1,17 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" tone="indigo" :description="$t('editor.album.tracks_hint')">
+  <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" :description="$t('editor.album.tracks_hint')">
     <template #actions>
       <button type="button" class="btn btn-xs gap-1" @click="pasteOpen = true"><ClipboardPaste :size="12" />{{ $t('editor.paste.button') }}</button>
     </template>
 
     <div class="space-y-4 p-3 sm:p-5">
-      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
 
-      <div v-if="!album.tracks.length" class="rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/40 px-4 py-6 text-center">
-        <p class="text-sm font-medium text-indigo-900">{{ $t('editor.album.empty_tracklist') }}</p>
-        <p class="mt-1 text-xs text-indigo-700/80">{{ $t('editor.album.empty_tracklist_hint') }}</p>
+      <div v-if="!album.tracks.length" class="rounded-xl border-2 border-dashed border-primary/30 bg-primary/10 px-4 py-6 text-center">
+        <p class="text-sm font-medium text-title">{{ $t('editor.album.empty_tracklist') }}</p>
+        <p class="mt-1 text-xs text-meta">{{ $t('editor.album.empty_tracklist_hint') }}</p>
         <button type="button" class="btn btn-primary btn-sm mt-3 gap-1" @click="pasteOpen = true"><ClipboardPaste :size="14" />{{ $t('editor.paste.button') }}</button>
       </div>
 
@@ -24,7 +24,7 @@
 
       <div class="flex flex-wrap items-center gap-2">
         <EditorAddButton @click="addDisc(album)">{{ $t('editor.album.add_disc') }}</EditorAddButton>
-        <span class="ml-auto text-xs text-gray-400">{{ $t('editor.album.totals', { discs: discs.length, tracks: album.tracks.length }) }}</span>
+        <span class="ml-auto text-xs text-meta">{{ $t('editor.album.totals', { discs: discs.length, tracks: album.tracks.length }) }}</span>
       </div>
     </div>
 

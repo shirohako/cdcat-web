@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <header class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ $t('menu.vinyl') }}</h1>
-        <p class="text-sm text-gray-500">{{ $t('albums.vinyl_subtitle') }}</p>
+        <h1 class="text-2xl font-bold text-title">{{ $t('menu.vinyl') }}</h1>
+        <p class="text-sm text-meta">{{ $t('albums.vinyl_subtitle') }}</p>
       </header>
       <CommonLoadError v-if="status === 'error'" class="mb-4" @retry="refresh()" />
       <CollectionLoadingSkeleton v-if="loading" variant="covers" />
@@ -16,7 +16,7 @@
         >
           <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
         </div>
-        <p v-if="!albums.length" class="py-16 text-center text-sm text-gray-400">{{ $t('albums.no_results') }}</p>
+        <p v-if="!albums.length" class="py-16 text-center text-sm text-meta">{{ $t('albums.no_results') }}</p>
       </template>
       <CommonPagination class="mt-6" :page="page" :total-pages="lastPage" :disabled="refetching" @update:page="page = $event" />
     </div>

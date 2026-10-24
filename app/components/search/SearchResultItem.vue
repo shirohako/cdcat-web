@@ -1,16 +1,16 @@
 <template>
-  <NuxtLink :to="searchResultPath(result)" class="flex min-w-0 items-center gap-3" :class="compact ? 'px-3 py-2' : 'p-3'">
+  <NuxtLink :to="searchResultPath(result)" class="flex min-w-0 items-center gap-3 transition-colors duration-150 ease-out" :class="compact ? 'px-3 py-2' : 'p-3'">
     <img v-if="result.image_url" :src="result.image_url" alt="" loading="lazy" class="shrink-0 object-cover" :class="[compact ? 'h-9 w-9' : 'h-12 w-12', round ? 'rounded-full' : 'rounded']">
-    <span v-else class="flex shrink-0 items-center justify-center bg-gray-100 text-gray-300" :class="[compact ? 'h-9 w-9' : 'h-12 w-12', round ? 'rounded-full' : 'rounded']">
+    <span v-else class="flex shrink-0 items-center justify-center bg-sunken text-faint" :class="[compact ? 'h-9 w-9' : 'h-12 w-12', round ? 'rounded-full' : 'rounded']">
       <component :is="icon" :size="compact ? 16 : 20" />
     </span>
     <span class="min-w-0 flex-1">
       <span class="flex min-w-0 items-center gap-1.5">
-        <span class="truncate font-medium text-gray-900" :class="compact ? 'text-sm' : ''">{{ result.title }}</span>
+        <span class="truncate font-medium text-title" :class="compact ? 'text-sm' : ''">{{ result.title }}</span>
         <CatalogPendingBadge v-if="result.is_pending" class="shrink-0" />
       </span>
-      <span v-if="subtitle" class="block truncate text-xs text-gray-500">{{ subtitle }}</span>
-      <span v-if="matchedText" class="block truncate text-[11px] text-gray-400">{{ $t('search.matched', { text: matchedText }) }}</span>
+      <span v-if="subtitle" class="block truncate text-xs text-meta">{{ subtitle }}</span>
+      <span v-if="matchedText" class="block truncate text-[11px] text-meta">{{ $t('search.matched', { text: matchedText }) }}</span>
     </span>
   </NuxtLink>
 </template>
@@ -20,6 +20,7 @@ import type { DatePrecision } from '~/types/entry'
 import type { SearchResult } from '~/types/search'
 import { Disc3, Mic2, Music, Network, Tag, Tv } from '@lucide/vue'
 
+// The row's background (hover, the active option) comes from where it is listed: the search page or the navbar popup.
 const props = defineProps<{ result: SearchResult, compact?: boolean }>()
 const { t } = useI18n()
 const { formatDate, formatDuration, enumLabel } = useCatalogDisplay()

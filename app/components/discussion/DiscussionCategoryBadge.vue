@@ -12,7 +12,7 @@ const NuxtLink = resolveComponent('NuxtLink')
   <component
     :is="link ? NuxtLink : 'span'" v-if="category"
     :to="link ? `/discussions/c/${category.slug}` : undefined"
-    class="inline-flex max-w-full items-center gap-1 rounded-md font-medium transition hover:brightness-95"
+    class="inline-flex max-w-full items-center gap-1 rounded-md font-medium transition duration-150 ease-out hover:brightness-95 dark:hover:brightness-125"
     :class="[tone.chip, size === 'xs' ? 'px-1.5 py-0.5 text-[11px]' : 'px-2 py-1 text-xs']"
   >
     <span class="size-1.5 shrink-0 rounded-full" :class="tone.dot" aria-hidden="true" />

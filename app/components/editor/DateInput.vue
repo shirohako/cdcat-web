@@ -9,8 +9,8 @@
       @change="commit"
       @blur="commit"
     >
-    <span v-if="invalid" class="text-xs text-error">{{ $t('editor.date_invalid') }}</span>
-    <span v-else-if="date" class="text-xs text-gray-400">{{ formatDate(date, precision) }}</span>
+    <span v-if="invalid" class="text-xs text-danger">{{ $t('editor.date_invalid') }}</span>
+    <span v-else-if="date" class="text-xs text-meta">{{ formatDate(date, precision) }}</span>
   </div>
 </template>
 

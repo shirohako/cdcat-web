@@ -1,9 +1,6 @@
 <template>
-  <div v-if="tocItems.length > 0" class="bg-white rounded-2xl shadow-sm overflow-hidden sticky top-6">
-    <div class="flex items-center gap-2 px-4 py-3 bg-linear-to-r from-violet-500 to-indigo-500">
-      <List :size="14" class="text-white/90" />
-      <span class="text-sm font-semibold text-white">{{ $t('article_ui.toc') }}</span>
-    </div>
+  <div v-if="tocItems.length > 0" class="card overflow-hidden sticky top-6">
+    <UiSectionTitle :title="$t('article_ui.toc')" :icon="List" as="div" size="sm" class="px-4 pt-4 pb-1" />
 
     <nav class="px-3 py-3 max-h-[60vh] overflow-y-auto toc-scroll">
       <ul class="space-y-0.5">
@@ -14,10 +11,10 @@
         >
           <a
             :href="`#${item.id}`"
-            class="block text-xs py-1 px-2 rounded-lg truncate transition-all duration-200 leading-snug"
+            class="block text-xs py-1 px-2 rounded-lg truncate transition-colors duration-150 ease-out leading-snug"
             :class="activeId === item.id
-              ? 'text-violet-600 font-semibold bg-violet-50'
-              : 'text-gray-500 hover:text-violet-500 hover:bg-gray-50'"
+              ? 'text-primary font-semibold bg-ghost-hover'
+              : 'text-meta hover:text-primary hover:bg-ghost-hover'"
             @click.prevent="scrollTo(item.id)"
           >
             {{ item.text }}
@@ -79,5 +76,6 @@ onUnmounted(() => observer?.disconnect());
 <style scoped>
 .toc-scroll::-webkit-scrollbar { width: 3px; }
 .toc-scroll::-webkit-scrollbar-track { background: transparent; }
-.toc-scroll::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
+.toc-scroll::-webkit-scrollbar-thumb { background: var(--line); border-radius: 99px; }
+.toc-scroll::-webkit-scrollbar-thumb:hover { background: var(--faint); }
 </style>

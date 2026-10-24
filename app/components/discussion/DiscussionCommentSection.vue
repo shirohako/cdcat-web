@@ -98,38 +98,39 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
 </script>
 
 <template>
-  <section id="comments" class="scroll-mt-20 space-y-4 rounded-2xl bg-white p-5 shadow-sm">
-    <header class="flex flex-wrap items-center gap-2">
-      <MessageCircle :size="18" class="text-sky-500" />
-      <h2 class="text-base font-bold text-gray-900">{{ t('discussions.comments.title') }}</h2>
-      <span v-if="topic" class="text-sm text-gray-400">{{ topic.replies_count }}</span>
+  <section id="comments" class="scroll-mt-20 space-y-4">
+    <!-- The floors are cards of their own, as on the topic page, so the section itself is not one. -->
+    <header class="flex flex-wrap items-center gap-2 px-1 pt-2">
+      <MessageCircle :size="18" class="text-primary" />
+      <h2 class="text-base font-bold text-title">{{ t('discussions.comments.title') }}</h2>
+      <span v-if="topic" class="text-sm text-meta">{{ topic.replies_count }}</span>
     </header>
     <template v-if="topic">
       <CommonLoadError v-if="status === 'error'" @retry="refresh()" />
       <div class="space-y-3" :class="pending ? 'opacity-60' : ''">
         <DiscussionFloor v-for="floor in comments" :key="floor.id" :post="floor" @update="replacePost" />
-        <p v-if="!comments.length" class="py-6 text-center text-sm text-gray-400">{{ t('discussions.comments.empty') }}</p>
+        <p v-if="!comments.length" class="py-6 text-center text-sm text-meta">{{ t('discussions.comments.empty') }}</p>
       </div>
       <CommonPagination v-if="data && data.pagination.last_page > 1" v-model:page="page" :total-pages="data.pagination.last_page" :disabled="pending" />
-      <div class="border-t border-gray-100 pt-4">
+      <div class="card p-4 sm:p-5">
         <template v-if="topic.viewer.can.reply">
           <LazyDiscussionComposer v-if="composerOpen" ref="composer" :topic-id="topicId" autofocus @posted="posted" @cancel="composerOpen = false" />
           <button
             v-else type="button"
-            class="flex w-full items-center gap-2 rounded-xl border border-dashed border-gray-200 px-4 py-3 text-left text-sm text-gray-400 transition hover:border-sky-300 hover:text-sky-700"
+            class="flex w-full items-center gap-2 rounded-xl border border-dashed border-line px-4 py-3 text-left text-sm text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
             @click="composerOpen = true">
             <PenLine :size="15" />{{ t('discussions.comments.write') }}
           </button>
         </template>
-        <p v-else-if="!isAuthenticated" class="text-center text-sm text-gray-500">
-          <NuxtLink :to="{ path: '/auth/login', query: { redirect: `${route.path}#comments` } }" class="font-medium text-sky-700 hover:underline">{{ t('discussions.comments.login') }}</NuxtLink>
+        <p v-else-if="!isAuthenticated" class="text-center text-sm text-meta">
+          <NuxtLink :to="{ path: '/auth/login', query: { redirect: `${route.path}#comments` } }" class="link font-medium">{{ t('discussions.comments.login') }}</NuxtLink>
         </p>
-        <p v-else class="text-center text-sm text-gray-500">{{ t('discussions.composer.closed') }}</p>
+        <p v-else class="text-center text-sm text-meta">{{ t('discussions.composer.closed') }}</p>
       </div>
     </template>
-    <p v-else-if="status === 'error'" class="text-sm text-gray-500">{{ localizeError(error) }}</p>
+    <p v-else-if="status === 'error'" class="card p-5 text-sm text-meta">{{ localizeError(error) }}</p>
     <SkeletonStatus v-else class="space-y-3">
-      <div v-for="row in 2" :key="row" class="flex gap-3 rounded-2xl border border-slate-200/80 p-4">
+      <div v-for="row in 2" :key="row" class="card flex gap-3 p-4">
         <div class="skeleton size-9 shrink-0 rounded-full" />
         <div class="flex-1 space-y-2.5">
           <div class="skeleton h-3 w-24 rounded-full" />

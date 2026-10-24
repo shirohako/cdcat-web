@@ -23,10 +23,10 @@ const dismiss = () => {
 <template>
   <div
     v-if="visible && announcement" role="status"
-    class="flex items-start gap-3 border-b px-4 py-2.5 text-sm"
-    :class="announcement.level === 'warning' ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-sky-200 bg-sky-50 text-sky-900'"
+    class="flex items-start gap-3 border-b px-4 py-2.5 text-sm text-body"
+    :class="announcement.level === 'warning' ? 'border-warning/25 bg-warning/10' : 'border-info/25 bg-info/10'"
   >
-    <Icon :name="announcement.level === 'warning' ? 'lucide:triangle-alert' : 'lucide:info'" class="mt-0.5 size-4 shrink-0" />
+    <Icon :name="announcement.level === 'warning' ? 'lucide:triangle-alert' : 'lucide:info'" class="mt-0.5 size-4 shrink-0" :class="announcement.level === 'warning' ? 'text-warning' : 'text-info'" />
     <p class="min-w-0 flex-1 whitespace-pre-line wrap-break-word">{{ announcement.content }}</p>
     <button type="button" class="shrink-0 rounded p-0.5 opacity-70 hover:opacity-100" :aria-label="t('site.dismiss_announcement')" @click="dismiss">
       <Icon name="lucide:x" class="size-4" />

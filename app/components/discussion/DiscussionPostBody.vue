@@ -62,13 +62,13 @@ async function reveal() {
 
 <template>
   <div>
-    <div v-if="notice" class="flex flex-wrap items-center gap-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500">
+    <div v-if="notice" class="flex flex-wrap items-center gap-2 rounded-lg bg-sunken px-3 py-2 text-sm text-meta">
       <component :is="notice.icon" :size="14" class="shrink-0" />
       <span>{{ notice.text }}</span>
-      <button v-if="canExpand" type="button" class="text-xs font-medium text-sky-600 hover:underline disabled:opacity-50" :disabled="revealing" @click="toggle">
+      <button v-if="canExpand" type="button" class="link text-xs font-medium disabled:opacity-50" :disabled="revealing" @click="toggle">
         {{ expanded ? t('discussions.post.collapse') : t('discussions.post.expand') }}
       </button>
-      <span v-if="revealError" class="text-xs text-rose-600">{{ revealError }}</span>
+      <span v-if="revealError" class="text-xs text-danger">{{ revealError }}</span>
     </div>
     <RichContent v-if="raw !== null && (!notice || expanded)" :class="notice ? 'mt-2 opacity-80' : ''" :content="raw" format="markdown" :env="env" />
     <CommonConfirmDialog

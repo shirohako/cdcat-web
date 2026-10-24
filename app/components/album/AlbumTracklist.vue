@@ -1,10 +1,10 @@
 <template>
-  <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic" tone="indigo">
+  <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic">
     <template #actions>
       <select
         v-if="languages.length"
         v-model="languageKey"
-        class="select select-sm h-8 text-xs max-w-44 text-xs text-gray-600"
+        class="select select-sm h-8 max-w-44 text-xs text-body"
         :aria-label="$t('album.tracklist.language')"
       >
         <option value="">{{ $t('album.tracklist.original') }}</option>
@@ -15,7 +15,7 @@
       <NuxtLink
         v-if="albumId"
         :to="{ path: `/contribute/album/${albumId}`, query: { mode: 'translate', locale } }"
-        class="hidden items-center gap-1 hover:text-gray-600 sm:flex"
+        class="hidden items-center gap-1 transition-colors hover:text-primary sm:flex"
         :title="$t('editor.mode_translate')"
       ><Languages :size="12" />{{ $t('album.tracklist.translate') }}</NuxtLink>
       <span class="hidden items-center gap-1 sm:flex"><Users :size="12" />{{ $t('album.tracklist.credits_toggle') }}</span>
@@ -24,68 +24,68 @@
 
     <div v-if="discs.length">
       <template v-for="disc in discs" :key="disc.id">
-        <div v-if="discs.length > 1 || disc.bonus || disc.format !== 'cd' || disc.title" :id="`disc-${disc.id}`" class="flex scroll-mt-20 items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-2 sm:px-5">
-          <Disc3 :size="12" class="shrink-0 text-gray-400" />
-          <span class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-gray-500">Disc {{ disc.position }}</span>
-          <span v-if="disc.format !== 'cd'" class="shrink-0 rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-bold text-gray-600">{{ enumLabel('disc_format', disc.format) }}</span>
-          <span v-if="disc.shownTitle" class="truncate text-[11px] text-gray-500">— {{ disc.shownTitle }}</span>
+        <div v-if="discs.length > 1 || disc.bonus || disc.format !== 'cd' || disc.title" :id="`disc-${disc.id}`" class="flex scroll-mt-20 items-center gap-2 border-b border-line bg-sunken px-4 py-2 sm:px-5">
+          <Disc3 :size="12" class="shrink-0 text-meta" />
+          <span class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-meta">Disc {{ disc.position }}</span>
+          <span v-if="disc.format !== 'cd'" class="shrink-0 rounded bg-btn px-1.5 py-0.5 text-[10px] font-bold text-btn-content">{{ enumLabel('disc_format', disc.format) }}</span>
+          <span v-if="disc.shownTitle" class="truncate text-[11px] text-meta">— {{ disc.shownTitle }}</span>
           <span
             v-if="disc.bonus"
-            class="tooltip tooltip-bottom shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600"
+            class="tooltip tooltip-bottom shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200"
             :data-tip="disc.bonus.name"
           >{{ $t('content_display.bonus') }}</span>
-          <span class="ml-auto shrink-0 rounded-full bg-gray-200/80 px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-gray-500">{{ disc.tracks.length }}</span>
+          <span class="ml-auto shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-btn-content">{{ disc.tracks.length }}</span>
         </div>
 
         <div
           v-for="track in disc.tracks"
           :id="`track-${track.id}`"
           :key="track.id"
-          class="group flex scroll-mt-20 items-center gap-2 border-b border-gray-100 px-4 py-3 transition-colors last:border-b-0 hover:bg-indigo-50/50 sm:gap-3 sm:px-5"
+          class="group flex scroll-mt-20 items-center gap-2 border-b border-line px-4 py-3 transition-colors duration-150 ease-out last:border-b-0 hover:bg-card-hover sm:gap-3 sm:px-5"
         >
-          <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-gray-400 group-hover:text-indigo-500">{{ track.number }}</span>
+          <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-meta transition-colors group-hover:text-primary">{{ track.number }}</span>
 
           <button
             v-if="!locked"
             type="button"
             :disabled="!!toggling[track.id]"
-            class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 sm:opacity-0 sm:group-hover:opacity-100"
-            :class="{ 'sm:opacity-100!': favorited[track.id] }"
+            class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-ghost-hover disabled:cursor-not-allowed disabled:opacity-40"
+            :class="favorited[track.id] ? '' : 'sm:opacity-0 sm:group-hover:opacity-100'"
             :title="$t(favorited[track.id] ? 'content_display.unfavorite' : 'content_display.favorite')"
             @click="toggleFavorite(track.id)"
           >
-            <Heart :size="14" :fill="favorited[track.id] ? 'currentColor' : 'none'" :class="favorited[track.id] ? 'text-red-500' : 'text-gray-400'" />
+            <Heart :size="14" :fill="favorited[track.id] ? 'currentColor' : 'none'" :class="favorited[track.id] ? 'text-red-500 dark:text-red-400' : 'text-meta'" />
           </button>
 
           <div class="min-w-0 flex-1">
             <div class="flex min-w-0 flex-wrap items-center gap-1.5">
-              <NuxtLink :to="`/tracks/${track.id}`" class="text-sm font-medium leading-snug hover:underline" :class="track.translated === false ? 'text-gray-500' : 'text-gray-900'">
+              <NuxtLink :to="`/tracks/${track.id}`" class="text-sm font-medium leading-snug transition-colors hover:text-primary" :class="track.translated === false ? 'text-meta' : 'text-title'">
                 {{ track.shownTitle }}
               </NuxtLink>
               <span v-if="track.is_instrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-600"><Music2 :size="11" :stroke-width="2.5" /></span>
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary"><Music2 :size="11" :stroke-width="2.5" /></span>
               </span>
             </div>
-            <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-gray-400">{{ track.subtitle }}</p>
-            <p v-if="track.originals.length" class="mt-0.5 truncate text-xs text-gray-500">
-              <span class="text-gray-400">{{ $t('album.tracklist.original_songs') }}</span>
+            <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-meta">{{ track.subtitle }}</p>
+            <p v-if="track.originals.length" class="mt-0.5 truncate text-xs text-meta">
+              <span class="text-meta">{{ $t('album.tracklist.original_songs') }}</span>
               <template v-for="(original, index) in track.originals" :key="index">
-                <NuxtLink v-if="original.track" :to="`/tracks/${original.track.id}`" class="hover:text-indigo-600 hover:underline">{{ original.title }}</NuxtLink>
+                <NuxtLink v-if="original.track" :to="`/tracks/${original.track.id}`" class="transition-colors hover:text-primary">{{ original.title }}</NuxtLink>
                 <span v-else>{{ original.title }}</span>
-                <span v-if="index < track.originals.length - 1" class="text-gray-300"> / </span>
+                <span v-if="index < track.originals.length - 1" class="text-faint"> / </span>
               </template>
             </p>
 
-            <div v-if="showCredits && (track.creditGroups.length || track.attributes.length)" class="mt-2 space-y-1 border-t border-gray-100 pt-2 text-xs">
+            <div v-if="showCredits && (track.creditGroups.length || track.attributes.length)" class="mt-2 space-y-1 border-t border-line pt-2 text-xs">
               <div v-for="group in track.creditGroups" :key="group.role" class="flex items-baseline gap-2">
                 <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold" :class="getAlbumRolePalette(group.category).badge">
                   {{ roleName(group.role) }}
                 </span>
-                <span class="text-gray-600">
+                <span class="text-body">
                   <template v-for="(person, index) in group.people" :key="index">
-                    <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="hover:text-gray-800 hover:underline">{{ person.name }}</NuxtLink>
+                    <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="transition-colors hover:text-primary">{{ person.name }}</NuxtLink>
                     <span v-else>{{ person.name }}</span>
-                    <span v-if="person.detail" class="text-gray-400"> ({{ person.detail }})</span>
+                    <span v-if="person.detail" class="text-meta"> ({{ person.detail }})</span>
                     <span v-if="index < group.people.length - 1">, </span>
                   </template>
                 </span>
@@ -95,17 +95,17 @@
           </div>
 
           <div class="flex shrink-0 flex-col items-center justify-center gap-1 sm:items-end">
-            <span class="text-xs tabular-nums text-gray-400">{{ formatDuration(track.duration) || '--' }}</span>
+            <span class="text-xs tabular-nums text-meta">{{ formatDuration(track.duration) || '--' }}</span>
             <button
               v-if="!track.is_instrumental"
               type="button"
               class="inline-flex cursor-pointer items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium transition-colors"
-              :class="track.lyrics_count ? 'bg-sky-50 text-sky-500 hover:bg-sky-100' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+              :class="track.lyrics_count ? 'bg-primary/10 text-primary hover:bg-primary/20' : 'bg-btn text-meta hover:bg-btn-hover'"
               @click="openLyrics(track)"
             >
               <FileText :size="10" />
               <span class="hidden sm:inline">{{ $t('album.tracklist.lyric') }}</span>
-              <span v-if="track.translations_count" class="text-teal-500">+{{ track.translations_count }}</span>
+              <span v-if="track.translations_count" class="text-teal-500 dark:text-teal-400">+{{ track.translations_count }}</span>
             </button>
           </div>
         </div>
@@ -113,10 +113,10 @@
     </div>
 
     <div v-else class="flex items-center justify-center gap-3 px-6 py-5">
-      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100"><ListMusic :size="15" class="text-indigo-400" /></div>
+      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sunken"><ListMusic :size="15" class="text-faint" /></div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">{{ $t('album.empty.tracklist_title') }}</p>
-        <p class="mt-0.5 text-xs text-gray-500">{{ $t('album.empty.tracklist_desc') }}</p>
+        <p class="text-sm font-semibold text-body">{{ $t('album.empty.tracklist_title') }}</p>
+        <p class="mt-0.5 text-xs text-meta">{{ $t('album.empty.tracklist_desc') }}</p>
       </div>
     </div>
   </CatalogSection>

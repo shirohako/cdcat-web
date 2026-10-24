@@ -1,100 +1,100 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.basic')" :icon="Info" tone="blue">
+  <CatalogSection :title="$t('editor.album.section.basic')" :icon="Info">
     <div class="grid gap-6 p-5 md:grid-cols-[13rem_1fr]">
       <div>
-        <p class="mb-1.5 text-sm font-medium text-gray-700">{{ $t('editor.album.cover') }} <span class="text-error">*</span></p>
+        <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span></p>
         <EditorAlbumCoverSlot />
       </div>
 
       <div class="min-w-0 space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.title') }} <span class="text-error">*</span></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.title') }} <span class="text-danger">*</span></span>
           <input v-model="album.title" class="input w-full text-base" :class="{ 'input-error': errorAt('title') }" :placeholder="$t('editor.album.title_placeholder')" maxlength="500">
-          <span v-if="errorAt('title')" class="mt-1 block text-xs text-error">{{ errorAt('title') }}</span>
+          <span v-if="errorAt('title')" class="mt-1 block text-xs text-danger">{{ errorAt('title') }}</span>
         </label>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.release_date') }} <span class="text-error">*</span></span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }} <span class="text-danger">*</span></span>
             <EditorDateInput v-model:date="album.release_date" v-model:precision="album.release_date_precision" />
-            <span v-if="errorAt('release_date')" class="mt-1 block text-xs text-error">{{ errorAt('release_date') }}</span>
+            <span v-if="errorAt('release_date')" class="mt-1 block text-xs text-danger">{{ errorAt('release_date') }}</span>
           </div>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }} <span class="text-error">*</span></span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
             <select v-model="album.type" class="select select-sm w-full" :class="{ 'select-error': errorAt('type') }">
               <option :value="null" disabled>{{ $t('editor.album.type_placeholder') }}</option>
               <option v-for="value in enums.album_type ?? []" :key="value" :value="value">{{ enumLabel('album_type', value) }}</option>
             </select>
-            <span v-if="errorAt('type')" class="mt-1 block text-xs text-error">{{ errorAt('type') }}</span>
+            <span v-if="errorAt('type')" class="mt-1 block text-xs text-danger">{{ errorAt('type') }}</span>
           </label>
         </div>
 
         <div>
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.album.release_event') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.album.release_event') }}</span>
           <EditorPickedRef v-if="album.release_event_id" :id="album.release_event_id" type="events" :references="references" :icon="CalendarDays" class="max-w-sm" @remove="album.release_event_id = null" />
           <EditorEntityPicker v-else kind="event" class="max-w-sm" :placeholder="$t('editor.album.release_event_placeholder')" @select="pickEvent" />
-          <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.album.release_event_hint') }}</p>
+          <p class="mt-1 text-[11px] text-meta">{{ $t('editor.album.release_event_hint') }}</p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.catalog_number') }} <span class="text-[11px] font-normal text-gray-400">· {{ $t('editor.recommended') }}</span></span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }} <span class="text-[11px] font-normal text-meta">· {{ $t('editor.recommended') }}</span></span>
             <input v-model="catalogNumber" class="input input-sm w-full font-mono" placeholder="KICA-1234">
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.barcode') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
             <input v-model="barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
           </label>
-          <p class="text-[11px] text-gray-400 sm:col-span-2">
+          <p class="text-[11px] text-meta sm:col-span-2">
             {{ $t('editor.album.first_edition_hint') }}
-            <button type="button" class="text-primary hover:underline" @click="editor.go('editions')">{{ $t('editor.album.section.editions') }}</button>
+            <button type="button" class="link" @click="editor.go('editions')">{{ $t('editor.album.section.editions') }}</button>
           </p>
         </div>
 
         <div>
-          <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.categories') }}</span>
+          <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.categories') }}</span>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="value in enums.album_category ?? []"
               :key="value"
               type="button"
-              class="rounded-full border px-2.5 py-1 text-xs transition-colors"
-              :class="album.categories.includes(value) ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              class="chip chip-sm"
+              :class="{ 'chip-selected': album.categories.includes(value) }"
               @click="toggleCategory(value)"
             >{{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </div>
-          <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-gray-500">
+          <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-meta">
             {{ $t('editor.album.categories_suggested') }}
-            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-blue-300 px-2 py-0.5 text-blue-700 hover:bg-blue-50" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
+            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-primary/45 px-2 py-0.5 text-primary transition-colors hover:bg-primary/10" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </p>
-          <p class="mt-1 text-[11px] text-gray-400">{{ $t('editor.album.categories_hint') }}</p>
+          <p class="mt-1 text-[11px] text-meta">{{ $t('editor.album.categories_hint') }}</p>
         </div>
 
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.description') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.description') }}</span>
           <textarea v-model="album.description" rows="4" class="textarea w-full text-sm" :placeholder="$t('editor.album.description_placeholder')" />
         </label>
       </div>
     </div>
 
-    <div class="border-t border-gray-100 px-5 py-4">
-      <h3 class="mb-1 text-sm font-semibold text-gray-700">{{ $t('editor.album.other_names') }}</h3>
+    <div class="border-t border-line px-5 py-4">
+      <h3 class="mb-1 text-sm font-semibold text-body">{{ $t('editor.album.other_names') }}</h3>
       <EditorTitleRows v-model="album.titles" />
     </div>
 
-    <details class="border-t border-gray-100 px-5 py-3">
-      <summary class="cursor-pointer text-sm font-medium text-gray-600">{{ $t('editor.advanced') }}</summary>
+    <details class="border-t border-line px-5 py-3">
+      <summary class="cursor-pointer text-sm font-medium text-body transition-colors hover:text-primary">{{ $t('editor.advanced') }}</summary>
       <div class="mt-3 grid gap-4 sm:grid-cols-2">
         <label class="block">
-          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('catalog.field.slug') }}</span>
+          <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.slug') }}</span>
           <input v-model="album.slug" class="input input-sm w-full font-mono" :class="{ 'input-error': errorAt('slug') }" placeholder="my-album-2024">
-          <span v-if="errorAt('slug')" class="mt-1 block text-xs text-error">{{ errorAt('slug') }}</span>
+          <span v-if="errorAt('slug')" class="mt-1 block text-xs text-danger">{{ errorAt('slug') }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-xs font-medium text-gray-600">{{ $t('catalog.field.banner_url') }}</span>
+          <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.banner_url') }}</span>
           <input v-model="album.banner_url" type="url" class="input input-sm w-full" placeholder="https://">
         </label>
-        <label class="flex items-center gap-2 text-sm text-gray-700">
+        <label class="flex items-center gap-2 text-sm text-body">
           <input v-model="album.is_adult" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.album.is_adult') }}
         </label>
       </div>

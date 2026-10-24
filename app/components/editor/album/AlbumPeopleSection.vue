@@ -1,72 +1,72 @@
 <template>
   <div class="space-y-6">
-    <CatalogSection :title="$t('catalog.collection.artists')" :icon="Users" tone="indigo" :description="$t('editor.album.artists_hint')">
+    <CatalogSection :title="$t('catalog.collection.artists')" :icon="Users" :description="$t('editor.album.artists_hint')">
       <div class="space-y-3 p-5">
-        <p v-if="preview" class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
-          <span class="mr-2 text-[11px] uppercase tracking-wider text-gray-400">{{ $t('editor.preview') }}</span>{{ preview }}
+        <p v-if="preview" class="rounded-lg bg-sunken px-3 py-2 text-sm text-body">
+          <span class="mr-2 text-[11px] uppercase tracking-wider text-meta">{{ $t('editor.preview') }}</span>{{ preview }}
         </p>
         <EditorAlbumRowErrors collection="artists" />
 
         <ul v-if="artists.length" class="space-y-1.5">
           <EditorListRow v-for="(row, index) in artists" :key="row.id" :invalid="rowError('artists', row.id)" @edit="editArtist(row)" @remove="remove(album.artists, row)">
             <span class="flex shrink-0 flex-col" @click.stop>
-              <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.artists, row, -1)"><ChevronUp :size="14" /></button>
-              <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === artists.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.artists, row, 1)"><ChevronDown :size="14" /></button>
+              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.artists, row, -1)"><ChevronUp :size="14" /></button>
+              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === artists.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.artists, row, 1)"><ChevronDown :size="14" /></button>
             </span>
-            <span class="min-w-0 truncate text-sm font-medium text-gray-900">{{ nameOf('artist', row.artist_id) || '—' }}</span>
-            <span v-if="isNew(row.artist_id)" class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
-            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-gray-500">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
-            <span v-if="index < artists.length - 1" class="shrink-0 rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-500" :title="$t('catalog.field.join_phrase')">{{ shownPhrase(row.join_phrase) }}</span>
+            <span class="min-w-0 truncate text-sm font-medium text-title">{{ nameOf('artist', row.artist_id) || '—' }}</span>
+            <span v-if="isNew(row.artist_id)" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-meta">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
+            <span v-if="index < artists.length - 1" class="shrink-0 rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content" :title="$t('catalog.field.join_phrase')">{{ shownPhrase(row.join_phrase) }}</span>
           </EditorListRow>
         </ul>
         <EditorAddButton @click="editArtist(null)">{{ $t('editor.dialog.artist_add') }}</EditorAddButton>
       </div>
     </CatalogSection>
 
-    <CatalogSection :title="$t('catalog.collection.labels')" :icon="Building2" tone="amber" :description="$t('editor.album.labels_hint')">
+    <CatalogSection :title="$t('catalog.collection.labels')" :icon="Building2" :description="$t('editor.album.labels_hint')">
       <div class="space-y-3 p-5">
         <EditorAlbumRowErrors collection="labels" />
         <ul v-if="labels.length" class="space-y-1.5">
           <EditorListRow v-for="(row, index) in labels" :key="row.id" :invalid="rowError('labels', row.id)" @edit="editLabel(row)" @remove="remove(album.labels, row)">
             <span class="flex shrink-0 flex-col" @click.stop>
-              <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.labels, row, -1)"><ChevronUp :size="14" /></button>
-              <button type="button" class="text-gray-300 hover:text-gray-600 disabled:opacity-30" :disabled="index === labels.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.labels, row, 1)"><ChevronDown :size="14" /></button>
+              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.labels, row, -1)"><ChevronUp :size="14" /></button>
+              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === labels.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.labels, row, 1)"><ChevronDown :size="14" /></button>
             </span>
-            <span class="min-w-0 truncate text-sm font-medium text-gray-900">{{ nameOf('label', row.label_id) || '—' }}</span>
-            <span v-if="isNew(row.label_id)" class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
-            <span class="shrink-0 rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700">{{ enumLabel('label_role', row.role) }}</span>
-            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-gray-500">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
+            <span class="min-w-0 truncate text-sm font-medium text-title">{{ nameOf('label', row.label_id) || '—' }}</span>
+            <span v-if="isNew(row.label_id)" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+            <span class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('label_role', row.role) }}</span>
+            <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-meta">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
           </EditorListRow>
         </ul>
         <EditorAddButton @click="editLabel(null)">{{ $t('editor.dialog.label_add') }}</EditorAddButton>
       </div>
     </CatalogSection>
 
-    <EditorModal v-model="dialog" :title="dialogTitle" :description="kind === 'artist' ? $t('editor.album.artists_hint') : $t('editor.album.labels_hint')" :icon="kind === 'artist' ? Users : Building2" :tone="kind === 'artist' ? 'indigo' : 'amber'" @submit="save(false)">
+    <EditorModal v-model="dialog" :title="dialogTitle" :description="kind === 'artist' ? $t('editor.album.artists_hint') : $t('editor.album.labels_hint')" :icon="kind === 'artist' ? Users : Building2" @submit="save(false)">
       <div class="space-y-4">
         <div ref="picker">
-          <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t(kind === 'artist' ? 'editor.dialog.credit_artist' : 'editor.dialog.label') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t(kind === 'artist' ? 'editor.dialog.credit_artist' : 'editor.dialog.label') }}</span>
           <EditorPickedRef v-if="form.ref !== null" :id="form.ref" :type="kind" :references="editor.references" :pending="editor.pending.value" :icon="kind === 'artist' ? User : Building2" @remove="form.ref = null" />
-          <div v-else-if="form.newName" class="flex h-[2.125rem] items-center gap-2 rounded-[0.58rem] border border-emerald-200 bg-emerald-50 pl-2.5 pr-1 text-sm text-emerald-950">
-            <component :is="kind === 'artist' ? User : Building2" :size="14" class="shrink-0 text-emerald-500" />
+          <div v-else-if="form.newName" class="flex h-8 items-center gap-2 rounded-lg border border-success/25 bg-success/10 pl-2.5 pr-1 text-sm text-title">
+            <component :is="kind === 'artist' ? User : Building2" :size="14" class="shrink-0 text-success" />
             <span class="min-w-0 flex-1 truncate font-medium">{{ form.newName }}</span>
-            <span class="shrink-0 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700">{{ $t('editor.new') }}</span>
-            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-emerald-500 hover:bg-emerald-100" :aria-label="$t('common.delete')" @click="form.newName = ''"><X :size="13" /></button>
+            <span class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-success/70 transition-colors hover:bg-success/15 hover:text-success" :aria-label="$t('common.delete')" @click="form.newName = ''"><X :size="13" /></button>
           </div>
           <EditorEntityPicker v-else :kind="kind" allow-create data-autofocus :exclude="kind === 'artist' ? takenArtists : []" :placeholder="$t(kind === 'artist' ? 'editor.album.add_artist' : 'editor.album.add_label')" @select="pick" @create="form.newName = $event" />
-          <span v-if="tried && form.ref === null && !form.newName" class="mt-1 block text-xs text-error">{{ $t(kind === 'artist' ? 'editor.dialog.artist_required' : 'editor.dialog.label_required') }}</span>
+          <span v-if="tried && form.ref === null && !form.newName" class="mt-1 block text-xs text-danger">{{ $t(kind === 'artist' ? 'editor.dialog.artist_required' : 'editor.dialog.label_required') }}</span>
         </div>
         <EditorArtistTypePicker v-if="kind === 'artist' && form.ref === null && form.newName" v-model="form.newType" :invalid="tried && !form.newType" />
 
         <div v-if="kind === 'label'">
-          <span class="mb-1.5 block text-sm font-medium text-gray-700">{{ $t('catalog.field.role') }}</span>
+          <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.role') }}</span>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="value in enums.label_role ?? []"
               :key="value"
               type="button"
-              class="rounded-full border px-3 py-1 text-xs transition-colors"
-              :class="form.role === value ? 'border-amber-400 bg-amber-50 font-medium text-amber-800' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              class="chip chip-sm"
+              :class="{ 'chip-selected': form.role === value }"
               :aria-pressed="form.role === value"
               @click="form.role = value"
             >{{ enumLabel('label_role', value) }}</button>
@@ -75,45 +75,45 @@
 
         <div class="grid gap-4" :class="{ 'sm:grid-cols-[minmax(0,1fr)_9rem]': kind === 'artist' }">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.album.credited_as_placeholder') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.album.credited_as_placeholder') }}</span>
             <input v-model="form.creditedAs" class="input input-sm w-full" maxlength="200" :placeholder="kind === 'artist' ? $t('editor.artist_examples.credited_placeholder') : ''">
-            <span class="mt-1 block text-[11px] text-gray-400">{{ $t('editor.dialog.shown_as_hint') }}</span>
+            <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.shown_as_hint') }}</span>
           </label>
           <label v-if="kind === 'artist'" class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.join_phrase') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.join_phrase') }}</span>
             <input v-model="form.joinPhrase" class="input input-sm w-full font-mono" placeholder=", ">
           </label>
         </div>
 
         <template v-if="kind === 'artist'">
           <div class="-mt-2 flex flex-wrap items-center gap-1.5">
-            <span class="text-[11px] text-gray-400">{{ $t('editor.dialog.join_phrase_hint') }}</span>
+            <span class="text-[11px] text-meta">{{ $t('editor.dialog.join_phrase_hint') }}</span>
             <button
               v-for="phrase in JOIN_PHRASES"
               :key="phrase"
               type="button"
-              class="rounded-md border px-2 py-0.5 font-mono text-[11px] transition-colors"
-              :class="form.joinPhrase === phrase ? 'border-indigo-400 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'"
+              class="chip chip-sm font-mono"
+              :class="{ 'chip-selected': form.joinPhrase === phrase }"
               :title="JSON.stringify(phrase)"
               @click="form.joinPhrase = form.joinPhrase === phrase ? '' : phrase"
             >{{ phrase.trim() || phrase }}</button>
           </div>
 
-          <div class="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">
-            <span class="mr-2 text-[11px] uppercase tracking-wider text-gray-400">{{ $t('editor.preview') }}</span>
+          <div class="rounded-lg bg-sunken px-3 py-2 text-sm text-body">
+            <span class="mr-2 text-[11px] uppercase tracking-wider text-meta">{{ $t('editor.preview') }}</span>
             <template v-for="(part, index) in dialogPreview" :key="index">
-              <span :class="part.mine ? 'rounded bg-indigo-100 px-0.5 font-semibold text-indigo-800' : ''">{{ part.name }}</span><span class="whitespace-pre text-gray-400">{{ part.join }}</span>
+              <span :class="part.mine ? 'rounded bg-primary/15 px-0.5 font-semibold text-primary' : ''">{{ part.name }}</span><span class="whitespace-pre text-meta">{{ part.join }}</span>
             </template>
           </div>
 
-          <details class="group rounded-xl border border-amber-200 bg-amber-50/60 px-3.5 py-2.5 text-xs text-amber-900" open>
-            <summary class="flex cursor-pointer list-none items-center gap-1.5 font-semibold">
-              <Lightbulb :size="14" class="shrink-0 text-amber-500" />{{ $t('editor.artist_examples.title') }}
+          <details class="group rounded-xl border border-warning/25 bg-warning/10 px-3.5 py-2.5 text-xs text-body" open>
+            <summary class="flex cursor-pointer list-none items-center gap-1.5 font-semibold text-title">
+              <Lightbulb :size="14" class="shrink-0 text-warning" />{{ $t('editor.artist_examples.title') }}
               <ChevronDown :size="13" class="ml-auto shrink-0 transition-transform group-open:rotate-180" />
             </summary>
             <ul class="mt-2 space-y-2">
               <li v-for="example in ARTIST_EXAMPLES" :key="example.key" class="flex flex-col gap-1 sm:flex-row sm:items-start sm:gap-2.5">
-                <span class="w-fit shrink-0 rounded-md border border-amber-200 bg-white px-2 py-0.5 font-medium text-gray-800 sm:w-40">{{ example.printed }}</span>
+                <span class="w-fit shrink-0 rounded-md border border-warning/25 bg-card px-2 py-0.5 font-medium text-title sm:w-40">{{ example.printed }}</span>
                 <span class="leading-5">{{ $t(`editor.artist_examples.${example.key}`) }}</span>
               </li>
             </ul>
@@ -121,7 +121,7 @@
         </template>
       </div>
       <template #footer>
-        <span v-if="addedCount" class="mr-auto text-xs text-emerald-600">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
+        <span v-if="addedCount" class="mr-auto text-xs text-success">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
         <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
         <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>

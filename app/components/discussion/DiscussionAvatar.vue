@@ -15,7 +15,7 @@ const tone = computed(() => {
 </script>
 
 <template>
-  <span class="inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-semibold text-white" :class="[SIZES[size], user?.avatar_url ? 'bg-slate-100' : tone]">
+  <span class="inline-grid shrink-0 place-items-center overflow-hidden rounded-full font-semibold text-white" :class="[SIZES[size], user?.avatar_url ? 'bg-sunken' : tone]">
     <img v-if="user?.avatar_url" :src="user.avatar_url" :alt="user.nickname || user.username" class="size-full object-cover" loading="lazy" referrerpolicy="no-referrer">
     <span v-else aria-hidden="true">{{ initial }}</span>
   </span>

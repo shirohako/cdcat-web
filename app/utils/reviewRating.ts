@@ -10,11 +10,11 @@ export const reviewRatingKey = (rating: ReviewRating) => `reviews.ratings.${KEYS
 
 /** Chip classes (text and background) for a rating. */
 export const reviewRatingTone = (rating: ReviewRating) => ({
-  5: 'bg-rose-50 text-rose-600 ring-rose-200',
-  4: 'bg-amber-50 text-amber-700 ring-amber-200',
-  3: 'bg-sky-50 text-sky-700 ring-sky-200',
-  2: 'bg-slate-100 text-slate-600 ring-slate-200',
-  1: 'bg-gray-100 text-gray-500 ring-gray-200',
+  5: 'bg-rose-50 text-rose-600 ring-rose-200 dark:bg-rose-400/15 dark:text-rose-300 dark:ring-rose-400/25',
+  4: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-400/15 dark:text-amber-300 dark:ring-amber-400/25',
+  3: 'bg-sky-50 text-sky-700 ring-sky-200 dark:bg-sky-400/15 dark:text-sky-300 dark:ring-sky-400/25',
+  2: 'bg-btn text-btn-content ring-line',
+  1: 'bg-faint/20 text-meta ring-faint/40',
 })[rating]
 
 /** Bar fill for a rating in the distribution. */
@@ -22,6 +22,6 @@ export const reviewRatingBar = (rating: ReviewRating) => ({
   5: 'bg-rose-400',
   4: 'bg-amber-400',
   3: 'bg-sky-400',
-  2: 'bg-slate-400',
-  1: 'bg-gray-300',
+  2: 'bg-meta',
+  1: 'bg-faint',
 })[rating]

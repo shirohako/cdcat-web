@@ -1,16 +1,16 @@
 <template>
   <div class="space-y-6">
-    <section class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 overflow-hidden">
-      <div class="p-6 pb-5 border-b border-gray-100">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.profile.title') }}</h2>
-        <p class="text-sm text-gray-500 mt-1">{{ t('account_pages.profile.description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="p-6 pb-5 border-b border-line">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.profile.title') }}</h2>
+        <p class="text-sm text-meta mt-1">{{ t('account_pages.profile.description') }}</p>
       </div>
 
       <div class="p-6 space-y-8">
         <!-- Avatar -->
         <div class="flex items-center gap-6">
           <div class="relative group shrink-0">
-            <div class="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center ring-1 ring-black/5 overflow-hidden">
+            <div class="w-20 h-20 rounded-full bg-sunken flex items-center justify-center ring-1 ring-line overflow-hidden">
               <NuxtImg
                 v-if="avatarPreview"
                 :src="avatarPreview"
@@ -18,23 +18,23 @@
                 class="w-full h-full object-cover"
                 @error="avatarPreview = ''"
               />
-              <UserIcon v-else :size="32" class="text-gray-400" />
+              <UserIcon v-else :size="32" class="text-faint" />
             </div>
             <button
               type="button"
-              class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
+              class="absolute inset-0 rounded-full bg-scrim flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
               @click="showAvatarInput = !showAvatarInput"
             >
-              <Camera :size="18" class="text-white" />
+              <Camera :size="18" class="text-on-media" />
             </button>
           </div>
           <div class="space-y-2 flex-1 max-w-sm">
-            <p class="text-sm font-medium text-gray-900">{{ t('account_pages.profile.avatar') }}</p>
+            <p class="text-sm font-medium text-title">{{ t('account_pages.profile.avatar') }}</p>
             <div v-if="showAvatarInput" class="flex gap-2">
               <input
                 v-model="form.avatar_url"
                 type="url"
-                class="input input-bordered input-sm flex-1 bg-white text-sm"
+                class="input input-sm flex-1 text-sm"
                 placeholder="https://example.com/avatar.jpg"
                 @input="onAvatarUrlInput"
               />
@@ -49,25 +49,25 @@
               </button>
             </div>
             <p v-if="avatarStatus" :class="avatarStatus.class">{{ avatarStatus.message }}</p>
-            <p v-else class="text-xs text-gray-400">{{ t('account_pages.profile.avatar_hint') }}</p>
+            <p v-else class="text-xs text-meta">{{ t('account_pages.profile.avatar_hint') }}</p>
           </div>
         </div>
 
         <!-- Banner -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="banner" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.banner') }}</label>
+          <label for="banner" class="text-sm font-medium text-body">{{ t('account_pages.profile.banner') }}</label>
           <div class="flex gap-2">
             <input
               id="banner"
               v-model="form.banner_url"
               type="url"
-              class="input input-bordered flex-1 bg-white"
+              class="input flex-1"
               placeholder="https://example.com/banner.jpg"
             />
             <button
               v-if="form.banner?.trim() && form.banner.trim() === originalBanner"
               type="button"
-              class="btn btn-ghost btn-sm shrink-0 text-gray-500"
+              class="btn btn-ghost btn-sm shrink-0"
               :disabled="isUpdatingBanner"
               @click="clearBanner"
             >
@@ -84,7 +84,7 @@
               <span v-else>{{ t('common.save') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">{{ t('account_pages.profile.banner_hint') }}</p>
+          <p class="text-xs text-meta">{{ t('account_pages.profile.banner_hint') }}</p>
           <p v-if="bannerStatus" :class="bannerStatus.class">
             {{ bannerStatus.message }}
           </p>
@@ -92,13 +92,13 @@
 
         <!-- Username -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="username" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.username') }}</label>
+          <label for="username" class="text-sm font-medium text-body">{{ t('account_pages.profile.username') }}</label>
           <div class="flex gap-2">
             <input
               id="username"
               v-model="form.username"
               type="text"
-              class="input input-bordered flex-1 bg-white"
+              class="input flex-1"
               placeholder="unique_username"
               @change="validateUsername"
             />
@@ -112,7 +112,7 @@
               <span v-else>{{ t('account_pages.profile.update') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">{{ t('account_pages.profile.username_hint') }}</p>
+          <p class="text-xs text-meta">{{ t('account_pages.profile.username_hint') }}</p>
           <p v-if="usernameStatus" :class="usernameStatus.class">
             {{ usernameStatus.message }}
           </p>
@@ -120,13 +120,13 @@
 
         <!-- Nickname -->
         <div class="grid gap-1.5 max-w-sm">
-          <label for="nickname" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.nickname') }}</label>
+          <label for="nickname" class="text-sm font-medium text-body">{{ t('account_pages.profile.nickname') }}</label>
           <div class="flex gap-2">
             <input
               id="nickname"
               v-model="form.nickname"
               type="text"
-              class="input input-bordered flex-1 bg-white"
+              class="input flex-1"
               :placeholder="t('account_pages.profile.nickname_placeholder')"
             />
             <button
@@ -139,7 +139,7 @@
               <span v-else>{{ t('account_pages.profile.update') }}</span>
             </button>
           </div>
-          <p class="text-xs text-gray-400">{{ t('account_pages.profile.nickname_hint') }}</p>
+          <p class="text-xs text-meta">{{ t('account_pages.profile.nickname_hint') }}</p>
           <p v-if="nicknameStatus" :class="nicknameStatus.class">
             {{ nicknameStatus.message }}
           </p>
@@ -148,35 +148,35 @@
         <!-- Bio -->
         <div class="grid gap-1.5">
           <div class="flex items-center justify-between">
-            <label for="bio" class="text-sm font-medium text-gray-700">{{ t('account_pages.profile.bio') }}</label>
-            <span class="text-xs text-gray-400">{{ t('account_pages.profile.markdown') }}</span>
+            <label for="bio" class="text-sm font-medium text-body">{{ t('account_pages.profile.bio') }}</label>
+            <span class="text-xs text-meta">{{ t('account_pages.profile.markdown') }}</span>
           </div>
           <textarea
             id="bio"
             v-model="form.bio"
             rows="4"
-            class="textarea textarea-bordered w-full bg-white resize-none font-mono text-sm"
+            class="textarea w-full resize-none font-mono text-sm"
             :disabled="isLoadingBio"
             :placeholder="t('account_pages.profile.bio_placeholder')"
             maxlength="500"
           />
           <div class="grid gap-2">
             <div class="flex items-center justify-between">
-              <p class="text-xs text-gray-400">{{ t('account_pages.profile.bio_hint') }}</p>
-              <p class="text-xs text-gray-400">{{ form.bio?.length || 0 }}/500</p>
+              <p class="text-xs text-meta">{{ t('account_pages.profile.bio_hint') }}</p>
+              <p class="text-xs text-meta">{{ form.bio?.length || 0 }}/500</p>
             </div>
-            <div class="flex flex-wrap gap-2 text-xs text-gray-500">
-              <span class="px-2 py-1 bg-gray-50 rounded">**{{ t('account_pages.profile.markdown_bold') }}**</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">*{{ t('account_pages.profile.markdown_italic') }}*</span>
-              <span class="px-2 py-1 bg-gray-50 rounded"># {{ t('account_pages.profile.markdown_heading') }}</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">- {{ t('account_pages.profile.markdown_list') }}</span>
-              <span class="px-2 py-1 bg-gray-50 rounded">[{{ t('account_pages.profile.markdown_link') }}](url)</span>
+            <div class="flex flex-wrap gap-2 text-xs text-meta">
+              <span class="px-2 py-1 bg-sunken rounded">**{{ t('account_pages.profile.markdown_bold') }}**</span>
+              <span class="px-2 py-1 bg-sunken rounded">*{{ t('account_pages.profile.markdown_italic') }}*</span>
+              <span class="px-2 py-1 bg-sunken rounded"># {{ t('account_pages.profile.markdown_heading') }}</span>
+              <span class="px-2 py-1 bg-sunken rounded">- {{ t('account_pages.profile.markdown_list') }}</span>
+              <span class="px-2 py-1 bg-sunken rounded">[{{ t('account_pages.profile.markdown_link') }}](url)</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="px-6 py-4 bg-gray-50/60 border-t border-gray-100 flex items-center justify-between">
+      <div class="px-6 py-4 bg-sunken border-t border-line flex items-center justify-between">
         <p v-if="bioStatus" :class="bioStatus.class">
           {{ bioStatus.message }}
         </p>
@@ -248,7 +248,7 @@ const updateBanner = async () => {
     })
 
     bannerStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.banner_updated')
     }
 
@@ -256,7 +256,7 @@ const updateBanner = async () => {
     await fetchUser()
   } catch (error) {
     bannerStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
@@ -275,7 +275,7 @@ const clearBanner = async () => {
     })
 
     bannerStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.banner_cleared')
     }
 
@@ -284,7 +284,7 @@ const clearBanner = async () => {
     await fetchUser()
   } catch (error) {
     bannerStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.clear_failed')
     }
   } finally {
@@ -321,7 +321,7 @@ const updateAvatar = async () => {
     })
 
     avatarStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.avatar_updated')
     }
 
@@ -330,7 +330,7 @@ const updateAvatar = async () => {
     await fetchUser()
   } catch (error) {
     avatarStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
@@ -378,13 +378,13 @@ const validateUsername = () => {
   const isValid = /^[a-zA-Z0-9_]{3,20}$/.test(username)
   if (isValid) {
     usernameStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.username_available')
     }
     return true
   } else {
     usernameStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: t('account_pages.profile.username_invalid')
     }
     return false
@@ -408,7 +408,7 @@ const updateUsername = async () => {
     })
 
     usernameStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.username_updated')
     }
 
@@ -416,7 +416,7 @@ const updateUsername = async () => {
     await fetchUser()
   } catch (error) {
     usernameStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
@@ -428,7 +428,7 @@ const updateNickname = async () => {
   const nickname = form.nickname.trim()
   if (!nickname) {
     nicknameStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: t('account_pages.profile.nickname_required')
     }
     return
@@ -444,14 +444,14 @@ const updateNickname = async () => {
     })
 
     nicknameStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.nickname_updated')
     }
 
     await fetchUser()
   } catch (error) {
     nicknameStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {
@@ -470,7 +470,7 @@ const updateBio = async () => {
     })
 
     bioStatus.value = {
-      class: 'text-xs text-emerald-600 font-medium',
+      class: 'text-xs text-success font-medium',
       message: t('account_pages.profile.bio_updated')
     }
 
@@ -478,7 +478,7 @@ const updateBio = async () => {
     await fetchUser()
   } catch (error) {
     bioStatus.value = {
-      class: 'text-xs text-red-600 font-medium',
+      class: 'text-xs text-danger font-medium',
       message: localizeError(error, 'account_pages.profile.update_failed')
     }
   } finally {

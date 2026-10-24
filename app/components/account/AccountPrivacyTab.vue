@@ -61,32 +61,29 @@ const unblock = (user: UserSummary) => run(() => $api(`/v1/me/blocks/${encodeURI
 
 <template>
   <div class="space-y-6">
-    <section class="overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-black/5">
-      <div class="border-b border-gray-100 p-6 pb-5">
-        <h2 class="text-base font-semibold text-gray-900">{{ t('account_pages.privacy.blocks_title') }}</h2>
-        <p class="mt-1 text-sm text-gray-500">{{ t('account_pages.privacy.blocks_description') }}</p>
+    <section class="card overflow-hidden">
+      <div class="border-b border-line p-6 pb-5">
+        <h2 class="text-base font-semibold text-title">{{ t('account_pages.privacy.blocks_title') }}</h2>
+        <p class="mt-1 text-sm text-meta">{{ t('account_pages.privacy.blocks_description') }}</p>
       </div>
       <div class="space-y-4 p-6">
         <form class="flex gap-2" @submit.prevent="block">
-          <input v-model="username" maxlength="33" class="min-w-0 flex-1 rounded-lg border border-gray-200 px-3 py-2 text-sm outline-none focus:border-blue-400" :placeholder="t('account_pages.privacy.username_placeholder')">
+          <input v-model="username" maxlength="33" class="input min-w-0 flex-1" :placeholder="t('account_pages.privacy.username_placeholder')">
           <button type="submit" class="btn btn-sm" :disabled="busy || !username.trim()">{{ t('account_pages.privacy.block') }}</button>
         </form>
-        <p v-if="message" class="text-sm" :class="failed ? 'text-rose-600' : 'text-emerald-600'" role="status">{{ message }}</p>
+        <p v-if="message" class="text-sm" :class="failed ? 'text-danger' : 'text-success'" role="status">{{ message }}</p>
         <SkeletonRows v-if="loading" :count="3" thumb="round" />
-        <ul v-else-if="blocks.length" class="divide-y divide-gray-100 rounded-xl border border-gray-100">
+        <ul v-else-if="blocks.length" class="divide-y divide-line rounded-xl bg-sunken">
           <li v-for="item in blocks" :key="item.user?.id" class="flex items-center gap-3 px-4 py-2.5">
             <DiscussionAvatar :user="item.user" size="sm" />
             <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-gray-800">{{ item.user?.nickname || item.user?.username }}</p>
-              <p class="text-xs text-gray-400">@{{ item.user?.username }} · {{ t('account_pages.privacy.blocked_on', { date: formatDate(item.created_at) }) }}</p>
+              <p class="truncate text-sm font-medium text-title">{{ item.user?.nickname || item.user?.username }}</p>
+              <p class="text-xs text-meta">@{{ item.user?.username }} · {{ t('account_pages.privacy.blocked_on', { date: formatDate(item.created_at) }) }}</p>
             </div>
             <button v-if="item.user" type="button" class="btn btn-ghost btn-xs" :disabled="busy" @click="unblock(item.user)">{{ t('account_pages.privacy.unblock') }}</button>
           </li>
         </ul>
-        <div v-else class="flex flex-col items-center py-8 text-center">
-          <div class="mb-3 grid size-12 place-items-center rounded-2xl bg-gray-50"><UserX :size="22" class="text-gray-300" /></div>
-          <p class="text-sm text-gray-400">{{ t('account_pages.privacy.no_blocks') }}</p>
-        </div>
+        <UiEmpty v-else :title="t('account_pages.privacy.no_blocks')" :icon="UserX" />
       </div>
     </section>
   </div>

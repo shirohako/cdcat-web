@@ -1,14 +1,14 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.editions')" :icon="Package" tone="emerald" :description="$t('editor.editions.hint')">
+  <CatalogSection :title="$t('editor.album.section.editions')" :icon="Package" :description="$t('editor.editions.hint')">
     <div class="space-y-4 p-3 sm:p-5">
-      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
-      <p v-if="unticked.length" class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+      <p v-if="unticked.length" class="rounded-lg border border-warning/25 bg-warning/10 px-3 py-2 text-xs text-warning">
         {{ $t('editor.editions.unticked', { discs: unticked.map(disc => $t('editor.album.disc_n', { n: disc.position })).join('、') }) }}
       </p>
 
-      <div v-if="!products.length" class="rounded-xl border border-dashed border-gray-300 px-4 py-5 text-center text-sm text-gray-500">
+      <div v-if="!products.length" class="rounded-xl border border-dashed border-line px-4 py-5 text-center text-sm text-meta">
         {{ $t('editor.editions.none') }}
       </div>
 
@@ -16,33 +16,33 @@
         <li
           v-for="(product, index) in products"
           :key="product.id"
-          class="group flex items-start gap-3 rounded-xl border bg-white p-3 transition-colors"
-          :class="errorsOf(product.id).length ? 'border-rose-200 bg-rose-50/30' : 'border-gray-200 hover:border-gray-300'"
+          class="group flex items-start gap-3 rounded-xl p-3 transition-colors"
+          :class="errorsOf(product.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
         >
-          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-700">{{ index + 1 }}</span>
+          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{{ index + 1 }}</span>
           <div class="min-w-0 flex-1 cursor-pointer" @click="edit(product)">
             <p class="flex flex-wrap items-center gap-1.5">
-              <span class="truncate text-sm font-semibold text-gray-900">{{ product.name || enumLabel('edition_type', product.edition_type) }}</span>
-              <span class="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] text-emerald-700">{{ enumLabel('edition_type', product.edition_type) }}</span>
-              <span class="rounded-md bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] text-gray-600" :title="$t('editor.editions.format_hint')">{{ formatOf(product.disc_ids) || '—' }}</span>
-              <span v-if="product.is_hires" class="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700">Hi-Res</span>
+              <span class="truncate text-sm font-semibold text-title">{{ product.name || enumLabel('edition_type', product.edition_type) }}</span>
+              <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('edition_type', product.edition_type) }}</span>
+              <span class="rounded-md bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content" :title="$t('editor.editions.format_hint')">{{ formatOf(product.disc_ids) || '—' }}</span>
+              <span v-if="product.is_hires" class="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">Hi-Res</span>
             </p>
-            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-500">
-              <span v-if="product.catalog_number" class="font-mono text-gray-700">{{ product.catalog_number }}</span>
+            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-meta">
+              <span v-if="product.catalog_number" class="font-mono text-body">{{ product.catalog_number }}</span>
               <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
               <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
               <span v-if="product.region">{{ product.region }}</span>
               <span v-if="product.price">{{ product.price }} {{ product.currency ?? '' }}</span>
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
-              <span v-if="!product.is_available" class="text-gray-400">{{ $t('editor.dialog.unavailable') }}</span>
+              <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
             </p>
-            <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-error">{{ error.message }}</p>
+            <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="flex shrink-0 gap-0.5">
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.products, product, -1)"><ArrowUp :size="12" /></button>
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === products.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.products, product, 1)"><ArrowDown :size="12" /></button>
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.edit')" @click="edit(product)"><PencilLine :size="12" /></button>
-            <button type="button" class="btn btn-ghost btn-xs px-1.5 text-gray-400 hover:text-error" :aria-label="$t('common.delete')" @click="removeProduct(album, product.id)"><Trash2 :size="12" /></button>
+            <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="removeProduct(album, product.id)"><Trash2 :size="12" /></button>
           </span>
         </li>
       </ul>
@@ -50,21 +50,21 @@
       <EditorAddButton @click="edit(null)">{{ $t('editor.editions.add') }}</EditorAddButton>
     </div>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.edition_edit' : 'editor.editions.add')" :description="$t('editor.editions.hint')" :icon="Package" tone="emerald" wide @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.edition_edit' : 'editor.editions.add')" :description="$t('editor.editions.hint')" :icon="Package" wide @submit="save">
       <div v-if="form" class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem]">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('editor.dialog.edition_name') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.edition_name') }}</span>
             <input v-model="form.name" data-autofocus class="input input-sm w-full" :placeholder="$t('editor.editions.name_placeholder')">
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.edition_type') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}</span>
             <select v-model="form.edition_type" class="select select-sm w-full">
               <option v-for="value in enums.edition_type ?? []" :key="value" :value="value">{{ enumLabel('edition_type', value) }}</option>
             </select>
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.medium') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}</span>
             <select v-model="form.medium" class="select select-sm w-full">
               <option v-for="value in enums.product_medium ?? []" :key="value" :value="value">{{ enumLabel('product_medium', value) }}</option>
             </select>
@@ -73,61 +73,61 @@
 
         <div v-if="form.edition_type === 'limited'" class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.limited_rule') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}</span>
             <select v-model="form.limited_rule" class="select select-sm w-full">
               <option :value="null">—</option>
               <option v-for="value in enums.limited_rule ?? []" :key="value" :value="value">{{ enumLabel('limited_rule', value) }}</option>
             </select>
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.limited_name') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}</span>
             <input v-model="form.limited_name" class="input input-sm w-full" :placeholder="$t('editor.editions.limited_name_placeholder')">
           </label>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.catalog_number') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}</span>
             <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5">
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.barcode') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
             <input v-model="form.barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
           </label>
           <div>
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.release_date') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
             <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" />
-            <span class="mt-1 block text-[11px] text-gray-400">{{ $t('editor.dialog.edition_date_hint') }}</span>
+            <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
           </div>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.region') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}</span>
             <CommonRegionSelect :model-value="form.region ?? ''" class="select-sm w-full" @update:model-value="form.region = $event || null" />
           </label>
           <div class="flex gap-2">
             <label class="block min-w-0 flex-1">
-              <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.price') }}</span>
+              <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.price') }}</span>
               <input v-model="form.price" class="input input-sm w-full" inputmode="decimal" placeholder="3300">
             </label>
             <label class="block w-24">
-              <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.currency') }}</span>
+              <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.currency') }}</span>
               <input v-model="form.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies">
             </label>
           </div>
-          <div class="flex items-end gap-5 pb-1.5 text-sm text-gray-700">
+          <div class="flex items-end gap-5 pb-1.5 text-sm text-body">
             <label class="flex items-center gap-1.5"><input v-model="form.is_hires" type="checkbox" class="checkbox checkbox-sm">Hi-Res</label>
             <label class="flex items-center gap-1.5"><input v-model="form.is_available" type="checkbox" class="checkbox checkbox-sm">{{ $t('catalog.field.is_available') }}</label>
           </div>
         </div>
 
         <div>
-          <p class="mb-1.5 flex items-center gap-2 text-sm font-medium text-gray-700">
+          <p class="mb-1.5 flex items-center gap-2 text-sm font-medium text-body">
             {{ $t('editor.editions.discs') }}
-            <span class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[11px] font-normal text-gray-600">{{ formatOf(form.disc_ids) || '—' }}</span>
+            <span class="rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] font-normal text-btn-content">{{ formatOf(form.disc_ids) || '—' }}</span>
           </p>
           <div class="flex flex-wrap gap-2">
-            <label v-for="disc in mainDiscs" :key="disc.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="ticked(form.disc_ids, disc.id) ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-gray-200 text-gray-500 hover:border-gray-300'">
+            <label v-for="disc in mainDiscs" :key="disc.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="ticked(form.disc_ids, disc.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line text-meta hover:bg-card-hover'">
               <input type="checkbox" class="checkbox checkbox-xs" :checked="ticked(form.disc_ids, disc.id)" @change="setProductDisc(form, disc.id, ($event.target as HTMLInputElement).checked)">
-              {{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-32 truncate text-gray-400"> · {{ disc.title }}</span>
+              {{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-32 truncate text-faint"> · {{ disc.title }}</span>
             </label>
           </div>
         </div>

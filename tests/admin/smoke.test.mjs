@@ -183,7 +183,7 @@ test('login reports a profile fetch failure instead of navigating as a successfu
   await page.locator('input[type="email"]').fill('admin@example.test')
   await page.locator('input[type="password"]').fill('test-password')
   await page.locator('form button[type="submit"]').click()
-  await page.locator('.bg-red-50 p').waitFor()
+  await page.getByRole('alert').waitFor()
   assert.equal(new URL(page.url()).pathname, '/auth/login')
   assert.ok(api.state.requests.some(request => request.path === '/v1/me' && request.token === 'staff'))
   assert.deepEqual(errors, [])

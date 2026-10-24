@@ -32,8 +32,8 @@ const pagination = computed(() => data.value?.pagination || { total: 0, per_page
         v-for="value in ['', ...ENTRY_ALBUM_RELATIONS]"
         :key="value"
         type="button"
-        class="h-8 shrink-0 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors"
-        :class="relation === value ? 'bg-emerald-600 text-white ring-emerald-600' : 'bg-white text-slate-500 ring-slate-200 hover:text-slate-900'"
+        class="h-8 shrink-0 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150 ease-out"
+        :class="relation === value ? 'bg-primary text-on-primary ring-primary' : 'bg-btn text-btn-content ring-transparent hover:bg-btn-hover'"
         :aria-pressed="relation === value"
         @click="relation = value"
       >
@@ -57,18 +57,18 @@ const pagination = computed(() => data.value?.pagination || { total: 0, per_page
         :inert="refetching"
       >
         <NuxtLink v-for="album in albums" :key="album.id" :to="`/albums/${album.id}`" class="group">
-          <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+          <div class="aspect-square overflow-hidden rounded-lg bg-sunken">
             <img v-if="album.image_url" :src="album.image_url" :alt="album.title" class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy" >
-            <div v-else class="flex h-full items-center justify-center"><Disc3 class="h-8 w-8 text-gray-300" /></div>
+            <div v-else class="flex h-full items-center justify-center"><Disc3 class="h-8 w-8 text-faint" /></div>
           </div>
-          <h4 class="mt-2 line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-emerald-700">{{ album.title }}</h4>
-          <p class="truncate text-xs text-gray-500">{{ [album.catalog_number, album.release_date].filter(Boolean).join(' · ') }}</p>
-          <p v-if="album.entries?.length" class="truncate text-xs text-gray-400">
+          <h4 class="mt-2 line-clamp-2 text-sm font-medium text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ album.title }}</h4>
+          <p class="truncate text-xs text-meta">{{ [album.catalog_number, album.release_date].filter(Boolean).join(' · ') }}</p>
+          <p v-if="album.entries?.length" class="truncate text-xs text-meta">
             {{ album.entries.map(entry => `${entry.name} · ${albumRelationLabel(entry.relation_type)}`).join(' / ') }}
           </p>
         </NuxtLink>
       </div>
-      <p v-else class="py-10 text-center text-sm text-gray-500">{{ $t('catalog.no_albums') }}</p>
+      <p v-else class="py-10 text-center text-sm text-meta">{{ $t('catalog.no_albums') }}</p>
 
       <CommonPagination
         :page="pagination.current_page"

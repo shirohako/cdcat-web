@@ -1,19 +1,17 @@
 <template>
   <section>
-    <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <div class="card p-5">
       <!-- Header -->
       <div class="mb-5 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors cursor-pointer" @click="$emit('back')">
+          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-meta hover:bg-ghost-hover hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('back')">
             <ArrowLeft :size="16" />
           </button>
-          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-gray-900">
-            <Mic2 :size="18" class="text-gray-400" />
+          <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-title">
+            <Mic2 :size="18" class="text-meta" />
             {{ $t('profile.top_artists') }}
           </h2>
-          <span v-if="pagination.total" class="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-600 ring-1 ring-violet-200/60">
-            {{ pagination.total }}
-          </span>
+          <UiCount v-if="pagination.total" :value="pagination.total" size="sm" />
         </div>
       </div>
 
@@ -22,16 +20,11 @@
 
       <!-- Error -->
       <div v-else-if="status === 'error' && !response" class="flex min-h-[20vh] items-center justify-center">
-        <p class="text-sm text-gray-400">{{ error?.message }}</p>
+        <p class="text-sm text-meta">{{ error?.message }}</p>
       </div>
 
       <!-- Empty -->
-      <div v-else-if="!artists.length" class="flex flex-col items-center justify-center py-10 text-center">
-        <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-violet-50">
-          <Mic2 :size="26" class="text-violet-400" />
-        </div>
-        <p class="text-sm font-medium text-gray-400">{{ $t('profile.no_favorite_artists') }}</p>
-      </div>
+      <UiEmpty v-else-if="!artists.length" :title="$t('profile.no_favorite_artists')" :icon="Mic2" />
 
       <!-- Artists list -->
       <template v-else>
@@ -40,21 +33,21 @@
             v-for="artist in artists"
             :key="artist.id"
             :to="`/artists/${artist.id}`"
-            class="group flex items-center gap-3 rounded-xl border border-black/5 bg-white px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-gray-200 hover:shadow-sm"
+            class="group flex items-center gap-3 rounded-xl bg-sunken px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
           >
-            <div class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-linear-to-br from-purple-200 to-blue-200 ring-1 ring-black/5 transition-transform duration-300 group-hover:scale-110">
+            <div class="h-10 w-10 shrink-0 overflow-hidden rounded-full bg-sunken ring-1 ring-line transition-transform duration-300 group-hover:scale-110">
               <img v-if="artist.image_url" :src="artist.image_url" :alt="artist.name" class="w-full h-full object-cover">
-              <div v-else class="w-full h-full flex items-center justify-center text-white/60">
+              <div v-else class="w-full h-full flex items-center justify-center text-faint">
                 <Mic2 :size="16" />
               </div>
             </div>
             <div class="min-w-0 flex-1">
-              <span class="block text-sm font-medium text-gray-700 group-hover:text-blue-700 transition-colors truncate">
+              <span class="block text-sm font-medium text-body group-hover:text-primary transition-colors truncate">
                 {{ artist.name }}
               </span>
-              <span v-if="artist.favorited_at" class="text-[11px] text-gray-400">{{ formatDate(artist.favorited_at) }}</span>
+              <span v-if="artist.favorited_at" class="text-[11px] text-meta">{{ formatDate(artist.favorited_at) }}</span>
             </div>
-            <ChevronRight :size="14" class="ml-auto text-gray-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all shrink-0" />
+            <ChevronRight :size="14" class="ml-auto text-faint group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
           </NuxtLink>
         </div>
 

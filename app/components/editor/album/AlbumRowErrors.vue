@@ -1,5 +1,5 @@
 <template>
-  <ul v-if="errors.length" class="space-y-0.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+  <ul v-if="errors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
     <li v-for="error in errors" :key="error.path"><span v-if="where(error.path)" class="font-medium">{{ where(error.path) }}: </span>{{ error.message }}</li>
   </ul>
 </template>

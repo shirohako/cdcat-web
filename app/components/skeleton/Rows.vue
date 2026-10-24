@@ -1,11 +1,11 @@
 <template>
   <SkeletonStatus :page="page">
-    <div :class="cards ? 'space-y-3' : 'divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white'">
+    <div :class="cards ? 'space-y-3' : 'card divide-y divide-line overflow-hidden'">
       <div
         v-for="row in count"
         :key="row"
         class="flex items-center gap-3"
-        :class="cards ? 'rounded-xl border border-gray-200 bg-white p-4 shadow-sm' : 'px-4 py-3'"
+        :class="cards ? 'card p-4' : 'px-4 py-3'"
       >
         <div v-if="thumb === 'square'" class="skeleton size-12 shrink-0 rounded-lg" />
         <div v-else-if="thumb === 'round'" class="skeleton size-10 shrink-0 rounded-full" />

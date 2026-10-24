@@ -1,0 +1,171 @@
+/*
+ * Theme tokens, after the hexo theme vivia (MIT, github.com/saicaca/hexo-theme-vivia): every surface is an OKLCH
+ * colour tinted by one hue, --hue, which app.vue sets on <html> together with data-theme. Dark is the default.
+ *
+ * The tokens resolve var(--hue) where they are declared, so setting --hue on a descendant changes nothing; a subtree
+ * can still pin a theme with its own data-theme attribute. Hand-written CSS uses these raw tokens (markdown.css is not
+ * compiled by Tailwind, so Tailwind's palette variables are not reliably there); templates use the Tailwind names
+ * declared in the @theme block below (bg-card, text-meta, border-line …).
+ */
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@layer base {
+  :root {
+    --hue: 250;
+  }
+
+  :root,
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    --primary: oklch(0.75 0.14 var(--hue));
+    --primary-strong: oklch(0.65 0.12 var(--hue));
+    --on-primary: oklch(0.25 0.02 var(--hue));
+
+    --page: oklch(0.16 0.014 var(--hue));
+    --card: oklch(0.25 0.02 var(--hue));
+    --card-hover: oklch(0.3 0.03 var(--hue));
+    --card-active: oklch(0.35 0.035 var(--hue));
+    --popover: oklch(0.28 0.025 var(--hue));
+    --sunken: oklch(0.2 0.02 var(--hue));
+    --field: oklch(0.2 0.02 var(--hue));
+    --ghost-hover: oklch(0.2 0.02 var(--hue));
+    --ghost-active: oklch(0.17 0.017 var(--hue));
+    --btn: oklch(0.38 0.04 var(--hue));
+    --btn-hover: oklch(0.45 0.045 var(--hue));
+    --btn-active: oklch(0.5 0.05 var(--hue));
+    --btn-content: oklch(1 0 0 / 0.75);
+    --link-hover: oklch(0.4 0.08 var(--hue));
+    --link-active: oklch(0.35 0.07 var(--hue));
+    --code: oklch(0.4 0.04 var(--hue));
+    --codeblock: oklch(0.2 0.02 var(--hue));
+    --badge: oklch(0.75 0.12 var(--hue));
+    --on-badge: oklch(0.25 0.02 var(--hue));
+    --selection: oklch(0.4 0.08 var(--hue));
+
+    /* Text and lines are white or black at a fixed strength, so they sit right on any surface. */
+    --title: oklch(1 0 0 / 0.9);
+    --body: oklch(1 0 0 / 0.75);
+    --meta: oklch(1 0 0 / 0.5);
+    --faint: oklch(1 0 0 / 0.3);
+    --line: oklch(1 0 0 / 0.1);
+
+    /* Status colours keep their own hues whatever the theme colour is. */
+    --success: oklch(0.75 0.15 155);
+    --warning: oklch(0.8 0.14 75);
+    --danger: oklch(0.7 0.17 25);
+    --info: oklch(0.75 0.12 235);
+
+    /* The same in both themes: always-dark heroes and anything drawn over pictures. */
+    --hero: oklch(0.14 0.02 var(--hue));
+    --scrim: oklch(0 0 0 / 0.6);
+    --on-media: oklch(1 0 0);
+
+    --skeleton: oklch(1 0 0 / 0.06);
+    --skeleton-band: oklch(1 0 0 / 0.06);
+    --overlay-shadow: 0 12px 32px oklch(0 0 0 / 0.45), 0 2px 8px oklch(0 0 0 / 0.3);
+  }
+
+  [data-theme="light"] {
+    color-scheme: light;
+
+    --primary: oklch(0.7 0.14 var(--hue));
+    --primary-strong: oklch(0.6 0.12 var(--hue));
+    --on-primary: oklch(1 0 0 / 0.9);
+
+    --page: oklch(0.95 0.01 var(--hue));
+    --card: oklch(1 0 0);
+    /* A touch darker than vivia's 0.98, so tiles on --sunken still change on hover. */
+    --card-hover: oklch(0.965 0.012 var(--hue));
+    --card-active: oklch(0.9 0.03 var(--hue));
+    --popover: oklch(1 0 0);
+    --sunken: oklch(0.98 0.005 var(--hue));
+    --field: oklch(0.98 0.005 var(--hue));
+    --ghost-hover: oklch(0.95 0.025 var(--hue));
+    --ghost-active: oklch(0.98 0.01 var(--hue));
+    --btn: oklch(0.95 0.025 var(--hue));
+    --btn-hover: oklch(0.9 0.05 var(--hue));
+    --btn-active: oklch(0.85 0.08 var(--hue));
+    --btn-content: oklch(0.55 0.12 var(--hue));
+    --link-hover: oklch(0.95 0.025 var(--hue));
+    --link-active: oklch(0.9 0.05 var(--hue));
+    --code: oklch(0.95 0.02 var(--hue));
+    --badge: oklch(0.95 0.02 var(--hue));
+    --on-badge: oklch(0.55 0.12 var(--hue));
+    --selection: oklch(0.9 0.05 var(--hue));
+
+    --title: oklch(0 0 0 / 0.9);
+    --body: oklch(0 0 0 / 0.75);
+    --meta: oklch(0 0 0 / 0.5);
+    --faint: oklch(0 0 0 / 0.3);
+    --line: oklch(0 0 0 / 0.1);
+
+    --success: oklch(0.58 0.14 155);
+    --warning: oklch(0.66 0.15 65);
+    --danger: oklch(0.58 0.2 25);
+    --info: oklch(0.58 0.13 240);
+
+    --skeleton: oklch(0.93 0.012 var(--hue));
+    --skeleton-band: oklch(1 0 0 / 0.7);
+    --overlay-shadow: 0 12px 32px oklch(0.2 0.02 var(--hue) / 0.14), 0 2px 6px oklch(0.2 0.02 var(--hue) / 0.08);
+  }
+
+  body {
+    background-color: var(--page);
+    color: var(--body);
+  }
+
+  ::selection {
+    background-color: var(--selection);
+  }
+
+  :where(a, button, summary, [role="button"], [tabindex]):focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* `inline` makes each utility read the token at run time, so a theme or hue switch needs no new CSS. */
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-on-primary: var(--on-primary);
+
+  --color-page: var(--page);
+  --color-card: var(--card);
+  --color-card-hover: var(--card-hover);
+  --color-card-active: var(--card-active);
+  --color-popover: var(--popover);
+  --color-sunken: var(--sunken);
+  --color-field: var(--field);
+  --color-ghost-hover: var(--ghost-hover);
+  --color-ghost-active: var(--ghost-active);
+  --color-btn: var(--btn);
+  --color-btn-hover: var(--btn-hover);
+  --color-btn-active: var(--btn-active);
+  --color-btn-content: var(--btn-content);
+  --color-link-hover: var(--link-hover);
+  --color-link-active: var(--link-active);
+  --color-code: var(--code);
+  --color-codeblock: var(--codeblock);
+  --color-badge: var(--badge);
+  --color-on-badge: var(--on-badge);
+
+  --color-title: var(--title);
+  --color-body: var(--body);
+  --color-meta: var(--meta);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
+  --color-hero: var(--hero);
+  --color-scrim: var(--scrim);
+  --color-on-media: var(--on-media);
+
+  --shadow-overlay: var(--overlay-shadow);
+}

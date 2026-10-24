@@ -1,13 +1,11 @@
 <template>
-  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="card overflow-hidden">
     <!-- Header -->
-    <div class="px-5 py-3 border-b border-gray-100 flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-        <Link2 :size="15" class="text-indigo-500" />
-      </div>
-      <h2 class="text-base font-bold text-gray-900">{{ $t('album.section.links') }}</h2>
-      <span v-if="links && links.length > 0" class="ml-auto text-xs text-gray-400">{{ $t('content_display.links', { count: links.length }) }}</span>
-    </div>
+    <UiSectionTitle :title="$t('album.section.links')" :icon="Link2" class="px-5 pb-2 pt-4">
+      <template v-if="links && links.length > 0" #actions>
+        <span class="text-xs text-meta">{{ $t('content_display.links', { count: links.length }) }}</span>
+      </template>
+    </UiSectionTitle>
 
     <!-- Links grouped by category -->
     <div v-if="links && links.length > 0">
@@ -17,7 +15,7 @@
           <span class="text-[10px] font-bold tracking-widest uppercase" :class="categoryStyle(category).label">
             {{ categoryLabel(category) }}
           </span>
-          <div class="flex-1 h-px bg-gray-100"/>
+          <div class="flex-1 h-px bg-line"/>
         </div>
 
         <!-- Links in this category -->
@@ -27,7 +25,7 @@
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center gap-3 px-5 py-2.5 hover:bg-gray-50/80 transition-colors group"
+          class="group flex items-center gap-3 px-5 py-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
         >
           <!-- Icon -->
           <div
@@ -39,10 +37,10 @@
 
           <!-- Name + domain -->
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-800 leading-snug">
+            <p class="text-sm font-medium text-title leading-snug transition-colors group-hover:text-primary">
               {{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}
             </p>
-            <p class="text-[11px] text-gray-400 truncate leading-none mt-0.5">
+            <p class="text-[11px] text-meta truncate leading-none mt-0.5">
               {{ getDomain(link.url) }}
             </p>
           </div>
@@ -50,7 +48,7 @@
           <!-- Arrow -->
           <ExternalLink
             :size="13"
-            class="shrink-0 text-gray-300 group-hover:text-indigo-400 transition-colors"
+            class="shrink-0 text-faint group-hover:text-primary transition-colors"
           />
         </a>
 
@@ -60,12 +58,12 @@
 
     <!-- Empty state -->
     <div v-else class="flex items-center justify-center gap-3 py-5 px-5">
-      <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center shrink-0">
-        <Link2 :size="15" class="text-indigo-300" />
+      <div class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center shrink-0">
+        <Link2 :size="15" class="text-faint" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-500">{{ $t('album.empty.links_title') }}</p>
-        <p class="text-xs text-gray-400 mt-0.5">{{ $t('album.empty.links_desc') }}</p>
+        <p class="text-sm font-semibold text-meta">{{ $t('album.empty.links_title') }}</p>
+        <p class="text-xs text-meta mt-0.5">{{ $t('album.empty.links_desc') }}</p>
       </div>
     </div>
   </section>
@@ -114,12 +112,13 @@ const categoryLabel = (category: string) => {
 
 const categoryStyle = (category: string) => {
   const map: Record<string, { bg: string; icon: string; label: string }> = {
-    official:  { bg: 'bg-blue-50',   icon: 'text-blue-500',   label: 'text-blue-400' },
-    streaming: { bg: 'bg-green-50',  icon: 'text-green-500',  label: 'text-green-500' },
-    shop:      { bg: 'bg-orange-50', icon: 'text-orange-500', label: 'text-orange-400' },
-    social:    { bg: 'bg-violet-50', icon: 'text-violet-500', label: 'text-violet-400' },
-    database:  { bg: 'bg-amber-50',  icon: 'text-amber-500',  label: 'text-amber-500' },
-    other:     { bg: 'bg-gray-100',  icon: 'text-gray-400',   label: 'text-gray-400' },
+    // Each category keeps its own colour, with a partner for the dark theme; "other" uses the theme's neutrals.
+    official:  { bg: 'bg-blue-50 dark:bg-blue-400/15',     icon: 'text-blue-500 dark:text-blue-400',     label: 'text-blue-400 dark:text-blue-300' },
+    streaming: { bg: 'bg-green-50 dark:bg-green-400/15',   icon: 'text-green-500 dark:text-green-400',   label: 'text-green-500 dark:text-green-400' },
+    shop:      { bg: 'bg-orange-50 dark:bg-orange-400/15', icon: 'text-orange-500 dark:text-orange-400', label: 'text-orange-400 dark:text-orange-300' },
+    social:    { bg: 'bg-violet-50 dark:bg-violet-400/15', icon: 'text-violet-500 dark:text-violet-400', label: 'text-violet-400 dark:text-violet-300' },
+    database:  { bg: 'bg-amber-50 dark:bg-amber-400/15',   icon: 'text-amber-500 dark:text-amber-400',   label: 'text-amber-500 dark:text-amber-400' },
+    other:     { bg: 'bg-sunken',                          icon: 'text-meta',                            label: 'text-meta' },
   };
   return map[category] ?? map['other']!;
 };

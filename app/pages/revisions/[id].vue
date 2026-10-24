@@ -1,20 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gray-50/50">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-5xl px-4 py-8 md:px-8">
-      <NuxtLink to="/revisions" class="mb-4 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900"><ArrowLeft :size="14" />{{ $t('revision_page.back') }}</NuxtLink>
+      <NuxtLink to="/revisions" class="mb-4 inline-flex items-center gap-1 text-sm text-meta transition-colors hover:text-primary"><ArrowLeft :size="14" />{{ $t('revision_page.back') }}</NuxtLink>
 
       <div v-if="revision" :class="revealClass">
         <header class="mb-5 flex flex-wrap items-start gap-3">
           <div class="min-w-0 flex-1">
-            <h1 class="text-2xl font-bold text-gray-900">{{ heading }}</h1>
-            <p v-if="revision.summary" class="mt-1 whitespace-pre-line text-gray-700">{{ revision.summary }}</p>
-            <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+            <h1 class="text-2xl font-bold text-title">{{ heading }}</h1>
+            <p v-if="revision.summary" class="mt-1 whitespace-pre-line text-body">{{ revision.summary }}</p>
+            <p class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
               <span>#{{ revision.id }}</span>
               <span v-if="revision.kind === 'lyric'">{{ $t('revision_page.kind.lyric') }}</span>
               <span v-if="revision.origin !== 'manual'">{{ $t(`revision_page.origin.${revision.origin}`) }}</span>
               <span v-if="revision.submitter">{{ $t('revision_page.by', { name: revision.submitter.nickname || revision.submitter.username }) }}</span>
               <span :title="exact(revision.updated_at)">{{ $t('revision_page.updated', { at: ago(revision.updated_at) }) }}</span>
-              <span v-if="revision.requires_content_manage && revision.status === 'pending'" class="text-amber-700">{{ $t('revision_page.requires_manage') }}</span>
+              <span v-if="revision.requires_content_manage && revision.status === 'pending'" class="text-warning">{{ $t('revision_page.requires_manage') }}</span>
             </p>
           </div>
           <RevisionStatusBadge :status="revision.status" />
@@ -24,27 +24,27 @@
           <NuxtLink v-if="isOpenRevision(revision.status) && editor" :to="editor" class="btn btn-primary btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
           <!-- With edits kept in this browser, resubmitting here would send the revision without them. -->
           <button v-if="revision.status === 'changes_requested' && !localEditsAt" type="button" class="btn btn-sm" :disabled="busy" @click="submit">{{ $t('revision_page.resubmit') }}</button>
-          <button v-if="revision.status === 'pending' || revision.status === 'changes_requested'" type="button" class="btn btn-ghost btn-sm text-error" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
+          <button v-if="revision.status === 'pending' || revision.status === 'changes_requested'" type="button" class="btn btn-ghost btn-sm text-danger" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
         </div>
-        <p v-if="mine && localEditsAt && isOpenRevision(revision.status)" class="mb-5 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+        <p v-if="mine && localEditsAt && isOpenRevision(revision.status)" class="mb-5 rounded-xl border border-info/25 bg-info/10 px-4 py-3 text-sm text-info">
           {{ $t('revision_page.local_edits', { at: ago(localEditsAt) }) }}
         </p>
-        <p v-if="message" class="mb-4 text-sm text-error">{{ message }}</p>
+        <p v-if="message" class="mb-4 text-sm text-danger">{{ message }}</p>
 
         <!-- New content this revision put live; it waits for this review (docs/catalog/editing.md#待审内容). -->
-        <div v-if="liveContent.length" class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p class="font-semibold">{{ $t('revision_page.live_content') }}</p>
+        <div v-if="liveContent.length" class="mb-5 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <p class="font-semibold text-warning">{{ $t('revision_page.live_content') }}</p>
           <ul class="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
             <li v-for="entry in liveContent" :key="`${entry.type}:${entry.id}`">
-              <span class="text-xs text-amber-700">{{ enumLabel('catalog_type', entry.type) }}</span>
-              <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" class="ml-1 hover:underline">{{ entry.label }}</NuxtLink>
+              <span class="text-xs text-meta">{{ enumLabel('catalog_type', entry.type) }}</span>
+              <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" class="link link-muted ml-1">{{ entry.label }}</NuxtLink>
               <span v-else class="ml-1">{{ entry.label }}</span>
             </li>
           </ul>
         </div>
 
-        <div v-if="revision.review_comment" class="mb-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p class="font-semibold">{{ $t('revision_page.review_comment') }}<span v-if="revision.reviewer" class="font-normal"> · {{ revision.reviewer.nickname || revision.reviewer.username }}</span></p>
+        <div v-if="revision.review_comment" class="mb-5 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+          <p class="font-semibold text-warning">{{ $t('revision_page.review_comment') }}<span v-if="revision.reviewer" class="font-normal"> · {{ revision.reviewer.nickname || revision.reviewer.username }}</span></p>
           <p class="mt-1 whitespace-pre-line">{{ revision.review_comment }}</p>
         </div>
 
@@ -58,7 +58,7 @@
             @resolved="refresh()"
           />
         </div>
-        <div v-if="problems.length" class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+        <div v-if="problems.length" class="mb-5 rounded-xl border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
           <p class="font-semibold">{{ $t('revision_page.errors') }}</p>
           <ul class="mt-1 list-inside list-disc space-y-0.5">
             <li v-for="problem in problems" :key="problem.path"><span class="font-mono text-xs opacity-70">{{ problem.path }}</span> {{ problem.message }}</li>
@@ -67,21 +67,21 @@
 
         <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_16rem]">
           <div class="min-w-0 space-y-3">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400">{{ $t('revision_page.items') }}</h2>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-meta">{{ $t('revision_page.items') }}</h2>
             <RevisionItems :items="revision.items ?? []" :references="revision.references ?? {}" :approved="revision.status === 'approved'" />
           </div>
           <aside class="space-y-5">
             <div v-if="revision.sources.length">
-              <h2 class="mb-2 text-sm font-bold uppercase tracking-wider text-gray-400">{{ $t('revision_page.sources') }}</h2>
+              <h2 class="mb-2 text-sm font-bold uppercase tracking-wider text-meta">{{ $t('revision_page.sources') }}</h2>
               <ul class="space-y-1 text-sm">
                 <li v-for="source in revision.sources" :key="source" class="break-all">
-                  <a v-if="/^https?:\/\//.test(source)" :href="source" target="_blank" rel="noopener nofollow" class="text-primary hover:underline">{{ source }}</a>
-                  <span v-else class="text-gray-700">{{ source }}</span>
+                  <a v-if="/^https?:\/\//.test(source)" :href="source" target="_blank" rel="noopener nofollow" class="link">{{ source }}</a>
+                  <span v-else class="text-body">{{ source }}</span>
                 </li>
               </ul>
             </div>
             <div>
-              <h2 class="mb-3 text-sm font-bold uppercase tracking-wider text-gray-400">{{ $t('revision_page.timeline') }}</h2>
+              <h2 class="mb-3 text-sm font-bold uppercase tracking-wider text-meta">{{ $t('revision_page.timeline') }}</h2>
               <RevisionTimeline :events="revision.events ?? []" />
             </div>
           </aside>

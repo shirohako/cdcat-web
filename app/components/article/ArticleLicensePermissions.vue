@@ -15,8 +15,8 @@ const { t } = useI18n()
 
 const PERMISSIONS = ['reprint', 'commercial', 'derivatives'] as const
 const TONES: Record<LicensePermission, string> = {
-  yes: 'bg-emerald-50 text-emerald-700',
-  share_alike: 'bg-amber-50 text-amber-700',
-  no: 'bg-slate-100 text-slate-400 line-through',
+  yes: 'bg-success/10 text-success',
+  share_alike: 'bg-warning/10 text-warning',
+  no: 'bg-sunken text-meta line-through',
 }
 </script>

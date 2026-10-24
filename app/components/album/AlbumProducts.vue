@@ -1,23 +1,21 @@
 <template>
-  <section class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+  <section class="card overflow-hidden">
     <!-- Header -->
-    <div class="px-6 py-3 border-b border-gray-100 flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
-        <Package :size="16" class="text-blue-600" />
-      </div>
-      <h2 class="text-base font-bold text-gray-900">{{ $t('album.section.products') }}</h2>
-      <span v-if="products && products.length > 1" class="ml-auto text-xs text-gray-400">{{ $t('content_display.versions', { count: products.length }) }}</span>
-    </div>
+    <UiSectionTitle :title="$t('album.section.products')" :icon="Package" class="px-5 pb-2 pt-4">
+      <template v-if="products && products.length > 1" #actions>
+        <span class="text-xs text-meta">{{ $t('content_display.versions', { count: products.length }) }}</span>
+      </template>
+    </UiSectionTitle>
 
     <!-- Product List -->
     <div v-if="products && products.length" class="grid grid-cols-1">
       <div
         v-for="product in products"
         :key="product.id"
-        class="group flex items-center gap-4 border-b border-gray-100 px-5 py-4 transition-colors last:border-b-0 hover:bg-gray-50/60"
+        class="group flex items-center gap-4 border-b border-line px-5 py-4 transition-colors duration-150 ease-out last:border-b-0 hover:bg-card-hover"
       >
         <!-- Thumbnail: the edition's own cover when there is one -->
-        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-gray-100">
+        <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg">
           <img
             :src="editionCovers[product.id] || pressedCdImageUrl"
             :alt="product.name || 'Product'"
@@ -30,42 +28,42 @@
           <!-- Row 1: Name + Badges + Price -->
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center flex-wrap gap-1.5 min-w-0">
-              <span class="text-sm font-semibold text-gray-900 leading-snug">
+              <span class="text-sm font-semibold text-title leading-snug">
                 {{ product.name || formatEditionType(product.edition_type) }}
               </span>
               <!-- Edition type badge -->
               <span
                 v-if="product.edition_type === 'limited'"
-                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-amber-100 text-amber-700 shrink-0"
+                class="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-amber-100 text-amber-700 shrink-0 dark:bg-amber-400/20 dark:text-amber-200"
               >
                 <Lock :size="8" />
                 {{ limitedRuleLabel(product.limited_rule) || $t('content_display.limited') }}
               </span>
               <span
                 v-else
-                class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-100 text-gray-500 shrink-0"
+                class="inline-flex items-center px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-btn text-btn-content shrink-0"
               >{{ $t('content_display.regular') }}</span>
               <!-- Out of Print -->
               <span
                 v-if="!product.is_available"
-                class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-gray-200 text-gray-400 shrink-0"
+                class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-sunken text-meta shrink-0"
               >{{ $t('content_display.out_of_print') }}</span>
             </div>
             <!-- Price -->
-            <span v-if="formattedPrice(product)" class="shrink-0 text-sm font-bold text-gray-800 tabular-nums">
+            <span v-if="formattedPrice(product)" class="shrink-0 text-sm font-bold text-title tabular-nums">
               {{ formattedPrice(product) }}
             </span>
           </div>
 
           <!-- Row 2: Catalog Number (always reserve space) -->
           <div class="h-4 flex items-center">
-            <span v-if="product.catalog_number" class="font-mono text-[11px] text-gray-400 bg-gray-50 border border-gray-100 px-1.5 py-0.5 rounded leading-none">
+            <span v-if="product.catalog_number" class="font-mono text-[11px] text-meta bg-sunken border border-line px-1.5 py-0.5 rounded leading-none">
               {{ product.catalog_number }}
             </span>
           </div>
 
           <!-- Row 3: Limited Name -->
-          <p v-if="product.edition_type === 'limited' && product.limited_name" class="text-xs text-amber-600/80 leading-snug">
+          <p v-if="product.edition_type === 'limited' && product.limited_name" class="text-xs text-amber-600/80 leading-snug dark:text-amber-300/80">
             {{ product.limited_name }}
           </p>
 
@@ -80,16 +78,16 @@
             <!-- Hi-Res -->
             <span
               v-if="product.is_hires"
-              class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-violet-100 text-violet-700"
+              class="px-1.5 py-0.5 text-[10px] font-bold tracking-wide rounded-full bg-violet-100 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200"
             >Hi-Res</span>
             <!-- Format, e.g. 2CD+BD, and the discs it contains -->
-            <span v-if="product.format_label" class="text-xs font-semibold text-gray-600">{{ product.format_label }}</span>
-            <span v-if="product.disc_ids.length && discNumbers.size > 1" class="text-[11px] text-gray-400">
+            <span v-if="product.format_label" class="text-xs font-semibold text-body">{{ product.format_label }}</span>
+            <span v-if="product.disc_ids.length && discNumbers.size > 1" class="text-[11px] text-meta">
               {{ $t('album.products.contains_discs', { discs: product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).join(', ') }) }}
             </span>
-            <span v-if="product.region" class="text-[11px] text-gray-400">{{ regionName(product.region) }}</span>
+            <span v-if="product.region" class="text-[11px] text-meta">{{ regionName(product.region) }}</span>
             <!-- Release Date -->
-            <span v-if="product.release_date" class="ml-auto flex items-center gap-1 text-[11px] text-gray-400">
+            <span v-if="product.release_date" class="ml-auto flex items-center gap-1 text-[11px] text-meta">
               <CalendarDays :size="11" />
               {{ formatDate(product.release_date, product.release_date_precision) }}
             </span>
@@ -99,12 +97,12 @@
     </div>
 
     <div v-else class="flex items-center justify-center gap-3 py-5 px-6">
-      <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-        <Package :size="15" class="text-blue-400" />
+      <div class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center shrink-0">
+        <Package :size="15" class="text-faint" />
       </div>
       <div class="text-left">
-        <p class="text-sm font-semibold text-gray-600">{{ $t('album.empty.products_title') }}</p>
-        <p class="text-xs text-gray-500 mt-0.5">{{ $t('album.empty.products_desc') }}</p>
+        <p class="text-sm font-semibold text-body">{{ $t('album.empty.products_title') }}</p>
+        <p class="text-xs text-meta mt-0.5">{{ $t('album.empty.products_desc') }}</p>
       </div>
     </div>
   </section>
@@ -140,8 +138,8 @@ const mediumLabel = (medium: MediumType) => {
 };
 
 const mediumStyle = (medium: MediumType) => {
-  if (medium === 'digital') return 'bg-blue-100 text-blue-700';
-  return 'bg-gray-100 text-gray-600';
+  if (medium === 'digital') return 'bg-blue-100 text-blue-700 dark:bg-blue-400/20 dark:text-blue-200';
+  return 'bg-btn text-btn-content';
 };
 
 const formatEditionType = (type: EditionType) => {

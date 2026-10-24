@@ -1,58 +1,58 @@
 <template>
-  <CatalogSection :title="$t('reviews.title')" :icon="MessageSquare" tone="amber">
+  <CatalogSection :title="$t('reviews.title')" :icon="MessageSquare">
     <template #actions>
       <span>{{ $t('reviews.count', { count: total }) }}</span>
-      <div v-if="total > 1" class="join">
+      <div v-if="total > 1" class="flex items-center gap-1">
         <button
           v-for="option in SORTS"
           :key="option"
           type="button"
-          class="btn join-item btn-xs"
-          :class="sort === option ? 'btn-neutral' : 'btn-ghost'"
+          class="chip chip-sm"
+          :class="{ 'chip-selected': sort === option }"
           @click="sort = option"
         >{{ $t(`reviews.sort.${option}`) }}</button>
       </div>
     </template>
 
-    <div class="border-b border-gray-100 px-5 py-4">
+    <div class="border-b border-line px-5 py-4">
       <template v-if="isAuthenticated">
-        <div v-if="mine" class="rounded-lg bg-amber-50/60 px-3 py-2.5">
-          <p class="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-amber-600">
+        <div v-if="mine" class="rounded-lg bg-primary/10 px-3 py-2.5">
+          <p class="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-primary">
             {{ $t('reviews.mine') }}
             <span v-if="mine.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1" :class="reviewRatingTone(mine.rating)">{{ $t(reviewRatingKey(mine.rating)) }}</span>
-            <span v-if="mine.is_hidden" class="rounded bg-gray-200 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">{{ $t('reviews.hidden') }}</span>
+            <span v-if="mine.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-[10px] font-medium text-btn-content">{{ $t('reviews.hidden') }}</span>
           </p>
           <RichContent :content="mine.content" format="markdown" class="text-sm" />
-          <div class="mt-1.5 flex gap-3 text-[11px]">
-            <button type="button" class="text-gray-500 hover:underline" @click="openEditor">{{ $t('common.edit') }}</button>
-            <button type="button" class="text-error hover:underline" @click="remove">{{ $t('common.delete') }}</button>
+          <div class="mt-1.5 flex gap-3 text-[11px] text-meta">
+            <button type="button" class="link link-muted" @click="openEditor">{{ $t('common.edit') }}</button>
+            <button type="button" class="link text-danger hover:bg-danger/10" @click="remove">{{ $t('common.delete') }}</button>
           </div>
         </div>
         <div v-else class="flex flex-wrap items-center gap-3">
-          <button type="button" class="btn btn-neutral btn-sm gap-1.5" @click="openEditor"><PenLine :size="14" />{{ $t('reviews.write') }}</button>
-          <span class="text-xs text-gray-400">{{ $t('reviews.rating_hint') }}</span>
+          <button type="button" class="btn btn-primary btn-sm gap-1.5" @click="openEditor"><PenLine :size="14" />{{ $t('reviews.write') }}</button>
+          <span class="text-xs text-meta">{{ $t('reviews.rating_hint') }}</span>
         </div>
       </template>
-      <p v-else class="text-sm text-gray-500">
+      <p v-else class="text-sm text-meta">
         <NuxtLink :to="loginPath" class="link">{{ $t('reviews.login') }}</NuxtLink>
       </p>
     </div>
 
-    <ul v-if="reviews.length" class="divide-y divide-gray-50">
+    <ul v-if="reviews.length" class="divide-y divide-line">
       <li v-for="review in reviews" :key="review.id" class="flex gap-3 px-5 py-4">
-        <NuxtLink :to="`/profile/${review.user?.username}`" class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-gray-100">
+        <NuxtLink :to="`/profile/${review.user?.username}`" class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-sunken">
           <img v-if="review.user?.avatar_url" :src="review.user.avatar_url" :alt="review.user.nickname" class="h-full w-full object-cover">
         </NuxtLink>
         <div class="min-w-0 flex-1">
           <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-            <NuxtLink :to="`/profile/${review.user?.username}`" class="font-semibold text-gray-700 hover:underline">{{ review.user?.nickname || review.user?.username }}</NuxtLink>
+            <NuxtLink :to="`/profile/${review.user?.username}`" class="font-semibold text-body transition-colors hover:text-primary">{{ review.user?.nickname || review.user?.username }}</NuxtLink>
             <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1" :class="reviewRatingTone(review.rating)">{{ $t(reviewRatingKey(review.rating)) }}</span>
-            <span v-if="review.tracking_status" class="rounded bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-500">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
-            <time class="text-gray-400" :datetime="review.created_at" :title="exact(review.created_at)">{{ ago(review.created_at) }}</time>
+            <span v-if="review.tracking_status" class="rounded bg-btn px-1.5 py-0.5 text-[10px] text-btn-content">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
+            <time class="text-meta" :datetime="review.created_at" :title="exact(review.created_at)">{{ ago(review.created_at) }}</time>
             <button
               v-if="isAuthenticated && review.user_id !== user?.id"
               type="button"
-              class="ml-auto text-gray-300 hover:text-gray-500"
+              class="ml-auto text-faint transition-colors hover:text-meta"
               :title="$t('reviews.report')"
               @click="reporting = review"
             ><Flag :size="12" /></button>
@@ -60,9 +60,9 @@
 
           <div class="relative mt-1" :class="{ 'max-h-56 overflow-hidden': isLong(review) && !expanded.has(review.id) }">
             <RichContent :content="review.content" format="markdown" class="text-sm" />
-            <div v-if="isLong(review) && !expanded.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-white" />
+            <div v-if="isLong(review) && !expanded.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card" />
           </div>
-          <button v-if="isLong(review)" type="button" class="mt-1 text-xs font-medium text-gray-500 hover:text-gray-800" @click="toggleExpanded(review.id)">
+          <button v-if="isLong(review)" type="button" class="mt-1 text-xs font-medium text-meta transition-colors hover:text-primary" @click="toggleExpanded(review.id)">
             {{ $t(expanded.has(review.id) ? 'reviews.collapse' : 'reviews.expand') }}
           </button>
 
@@ -72,7 +72,7 @@
               :key="reaction.type"
               type="button"
               class="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors disabled:cursor-default disabled:opacity-60"
-              :class="review.my_reactions.includes(reaction.type) ? reaction.active : 'text-gray-400 hover:bg-gray-100 hover:text-gray-600'"
+              :class="review.my_reactions.includes(reaction.type) ? reaction.active : 'text-meta hover:bg-ghost-hover hover:text-primary'"
               :disabled="review.user_id === user?.id || reacting === review.id"
               :aria-pressed="review.my_reactions.includes(reaction.type)"
               @click="react(review, reaction.type)"
@@ -85,7 +85,7 @@
         </div>
       </li>
     </ul>
-    <SkeletonStatus v-else-if="pending" class="divide-y divide-gray-50">
+    <SkeletonStatus v-else-if="pending" class="divide-y divide-line">
       <div v-for="row in 2" :key="row" class="flex gap-3 px-5 py-4">
         <div class="skeleton size-9 shrink-0 rounded-full" />
         <div class="flex-1 space-y-2 pt-0.5">
@@ -94,9 +94,9 @@
         </div>
       </div>
     </SkeletonStatus>
-    <p v-else class="px-5 py-6 text-center text-sm text-gray-400">{{ $t('reviews.empty') }}</p>
+    <p v-else class="px-5 py-6 text-center text-sm text-meta">{{ $t('reviews.empty') }}</p>
 
-    <div v-if="page < lastPage" class="border-t border-gray-50 px-5 py-2 text-center">
+    <div v-if="page < lastPage" class="border-t border-line px-5 py-2 text-center">
       <button type="button" class="btn btn-ghost btn-xs" :disabled="pending" @click="load(page + 1)">{{ $t('reviews.more') }}</button>
     </div>
   </CatalogSection>
@@ -111,7 +111,7 @@
 
   <dialog class="modal" :open="!!reporting">
     <div class="modal-box max-w-sm">
-      <h3 class="mb-3 font-bold">{{ $t('reviews.report') }}</h3>
+      <h3 class="mb-3 font-bold text-title">{{ $t('reviews.report') }}</h3>
       <select v-model="reportReason" class="select select-sm mb-2 w-full">
         <option v-for="reason in REPORT_REASONS" :key="reason" :value="reason">{{ $t(`shouts.reasons.${reason}`) }}</option>
       </select>
@@ -136,9 +136,9 @@ const emit = defineEmits<{ changed: [] }>()
 
 const SORTS: ReviewSort[] = ['latest', 'useful']
 const REACTIONS = [
-  { type: 'useful', icon: ThumbsUp, active: 'bg-blue-50 text-blue-600' },
-  { type: 'dislike', icon: ThumbsDown, active: 'bg-red-50 text-red-500' },
-  { type: 'fun', icon: Laugh, active: 'bg-amber-50 text-amber-600' },
+  { type: 'useful', icon: ThumbsUp, active: 'bg-blue-50 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300' },
+  { type: 'dislike', icon: ThumbsDown, active: 'bg-red-50 text-red-500 dark:bg-red-400/15 dark:text-red-300' },
+  { type: 'fun', icon: Laugh, active: 'bg-amber-50 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300' },
 ] as const
 const REPORT_REASONS = ['spam', 'abuse', 'spoiler', 'off_topic', 'infringement', 'illegal', 'other'] as const
 

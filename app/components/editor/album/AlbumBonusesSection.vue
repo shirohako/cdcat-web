@@ -1,36 +1,36 @@
 <template>
-  <CatalogSection :title="$t('editor.album.section.bonuses')" :icon="Gift" tone="pink" :description="$t('editor.bonuses.hint')">
+  <CatalogSection :title="$t('editor.album.section.bonuses')" :icon="Gift" :description="$t('editor.bonuses.hint')">
     <div class="space-y-4 p-3 sm:p-5">
-      <p v-if="!bonuses.length" class="text-sm text-gray-400">{{ $t('editor.bonuses.none') }}</p>
+      <p v-if="!bonuses.length" class="text-sm text-meta">{{ $t('editor.bonuses.none') }}</p>
 
       <ul v-else class="space-y-2">
         <li
           v-for="(bonus, index) in bonuses"
           :key="bonus.id"
-          class="flex items-start gap-3 rounded-xl border bg-white p-3 transition-colors"
-          :class="errorsOf(bonus.id).length ? 'border-rose-200 bg-rose-50/30' : 'border-pink-100 hover:border-pink-200'"
+          class="flex items-start gap-3 rounded-xl p-3 transition-colors"
+          :class="errorsOf(bonus.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
         >
-          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-50 text-pink-500"><Gift :size="13" /></span>
+          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-50 text-pink-500 dark:bg-pink-400/15 dark:text-pink-400"><Gift :size="13" /></span>
           <div class="min-w-0 flex-1 cursor-pointer" @click="edit(bonus)">
             <p class="flex flex-wrap items-center gap-1.5">
-              <span class="truncate text-sm font-semibold text-gray-900">{{ bonus.name || '—' }}</span>
-              <span class="rounded-md bg-pink-50 px-1.5 py-0.5 text-[11px] text-pink-700">{{ enumLabel('bonus_type', bonus.type) }}</span>
-              <span v-if="bonus.is_digital" class="rounded-md bg-sky-50 px-1.5 py-0.5 text-[11px] text-sky-700">{{ $t('editor.dialog.digital') }}</span>
+              <span class="truncate text-sm font-semibold text-title">{{ bonus.name || '—' }}</span>
+              <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('bonus_type', bonus.type) }}</span>
+              <span v-if="bonus.is_digital" class="rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">{{ $t('editor.dialog.digital') }}</span>
             </p>
-            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-500">
+            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-meta">
               <span v-if="bonus.shop">{{ bonus.shop }}</span>
               <span v-if="bonus.availability">{{ enumLabel('limited_rule', bonus.availability) }}</span>
               <span v-if="bonus.event_id" class="inline-flex items-center gap-1"><CalendarDays :size="11" />{{ eventName(bonus.event_id) }}</span>
               <span v-if="bonus.product_ids.length">{{ bonus.product_ids.map(productNameOf).join(' / ') }}</span>
-              <span v-for="disc in discsOf(bonus.id)" :key="disc.id" class="inline-flex items-center gap-1 text-pink-700"><Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }}</span>
+              <span v-for="disc in discsOf(bonus.id)" :key="disc.id" class="inline-flex items-center gap-1 text-pink-700 dark:text-pink-300"><Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }}</span>
             </p>
-            <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-error">{{ error.message }}</p>
+            <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="flex shrink-0 gap-0.5">
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.bonuses, bonus, -1)"><ArrowUp :size="12" /></button>
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === bonuses.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.bonuses, bonus, 1)"><ArrowDown :size="12" /></button>
             <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.edit')" @click="edit(bonus)"><PencilLine :size="12" /></button>
-            <button type="button" class="btn btn-ghost btn-xs px-1.5 text-gray-400 hover:text-error" :aria-label="$t('common.delete')" @click="remove(bonus.id)"><Trash2 :size="12" /></button>
+            <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="remove(bonus.id)"><Trash2 :size="12" /></button>
           </span>
         </li>
       </ul>
@@ -38,16 +38,16 @@
       <EditorAddButton @click="edit(null)">{{ $t('editor.bonuses.add') }}</EditorAddButton>
     </div>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.bonus_edit' : 'editor.bonuses.add')" :description="$t('editor.bonuses.hint')" :icon="Gift" tone="rose" wide @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.bonus_edit' : 'editor.bonuses.add')" :description="$t('editor.bonuses.hint')" :icon="Gift" wide @submit="save">
       <div v-if="form" class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_11rem]">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.name') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}</span>
             <input v-model="form.name" data-autofocus class="input input-sm w-full" :class="{ 'input-error': tried && !form.name.trim() }" :placeholder="$t('editor.bonuses.name_placeholder')">
-            <span v-if="tried && !form.name.trim()" class="mt-1 block text-xs text-error">{{ $t('editor.dialog.name_required') }}</span>
+            <span v-if="tried && !form.name.trim()" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.name_required') }}</span>
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.type') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}</span>
             <select v-model="form.type" class="select select-sm w-full">
               <option v-for="value in enums.bonus_type ?? []" :key="value" :value="value">{{ enumLabel('bonus_type', value) }}</option>
             </select>
@@ -56,30 +56,30 @@
 
         <div class="grid gap-4 sm:grid-cols-3">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.shop') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.shop') }}</span>
             <input v-model="form.shop" class="input input-sm w-full" maxlength="100" :placeholder="$t('editor.bonuses.shop_placeholder')">
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.availability') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.availability') }}</span>
             <select v-model="form.availability" class="select select-sm w-full">
               <option :value="null">—</option>
               <option v-for="value in enums.limited_rule ?? []" :key="value" :value="value">{{ enumLabel('limited_rule', value) }}</option>
             </select>
           </label>
           <div>
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.event_id') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.event_id') }}</span>
             <EditorPickedRef v-if="form.event_id" :id="form.event_id" type="events" :references="editor.references" :icon="CalendarDays" @remove="form.event_id = null" />
             <EditorEntityPicker v-else kind="event" @select="pickEvent" />
           </div>
         </div>
 
-        <label class="flex items-center gap-1.5 text-sm text-gray-700"><input v-model="form.is_digital" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.bonuses.is_digital') }}</label>
+        <label class="flex items-center gap-1.5 text-sm text-body"><input v-model="form.is_digital" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.bonuses.is_digital') }}</label>
 
         <div v-if="products.length > 1">
-          <p class="text-sm font-medium text-gray-700">{{ $t('editor.bonuses.editions') }}</p>
-          <p class="mb-1.5 text-[11px] text-gray-400">{{ $t('editor.bonuses.editions_hint') }}</p>
+          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.editions') }}</p>
+          <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.editions_hint') }}</p>
           <div class="flex flex-wrap gap-2">
-            <label v-for="product in products" :key="product.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="has(form.product_ids, product.id) ? 'border-pink-300 bg-pink-50 text-pink-800' : 'border-gray-200 text-gray-500 hover:border-gray-300'">
+            <label v-for="product in products" :key="product.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="has(form.product_ids, product.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line text-meta hover:bg-card-hover'">
               <input type="checkbox" class="checkbox checkbox-xs" :checked="has(form.product_ids, product.id)" @change="toggleProduct(product.id)">
               {{ productName(product) }}
             </label>
@@ -87,19 +87,19 @@
         </div>
 
         <div>
-          <p class="text-sm font-medium text-gray-700">{{ $t('editor.bonuses.discs') }}</p>
-          <p class="mb-1.5 text-[11px] text-gray-400">{{ $t('editor.bonuses.discs_hint') }}</p>
+          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.discs') }}</p>
+          <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.discs_hint') }}</p>
           <div class="flex flex-wrap items-center gap-2">
-            <span v-for="disc in linkedDiscs" :key="disc.id" class="inline-flex items-center gap-1 rounded-lg bg-pink-50 px-2 py-1 text-xs text-pink-800">
-              <Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-28 truncate text-pink-500"> · {{ disc.title }}</span>
-              <button type="button" class="ml-0.5 text-pink-400 hover:text-pink-700" :title="$t('editor.bonuses.unlink_disc')" @click="unlinkDisc(disc.id)"><X :size="11" /></button>
+            <span v-for="disc in linkedDiscs" :key="disc.id" class="inline-flex items-center gap-1 rounded-lg bg-pink-50 px-2 py-1 text-xs text-pink-800 dark:bg-pink-400/15 dark:text-pink-300">
+              <Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-28 truncate text-pink-500 dark:text-pink-400"> · {{ disc.title }}</span>
+              <button type="button" class="ml-0.5 text-pink-400 transition-colors hover:text-pink-700 dark:hover:text-pink-200" :title="$t('editor.bonuses.unlink_disc')" @click="unlinkDisc(disc.id)"><X :size="11" /></button>
             </span>
-            <span v-for="(disc, index) in newDiscs" :key="disc.key" class="inline-flex items-center gap-1 rounded-lg border border-dashed border-pink-300 bg-white px-1.5 py-0.5 text-xs text-pink-800">
+            <span v-for="(disc, index) in newDiscs" :key="disc.key" class="inline-flex items-center gap-1 rounded-lg border border-dashed border-pink-300 bg-card px-1.5 py-0.5 text-xs text-pink-800 dark:border-pink-400/40 dark:text-pink-300">
               <Disc3 :size="11" />{{ $t('editor.dialog.new_disc') }}
               <select v-model="disc.format" class="select select-xs h-6 min-h-0 w-20 border-0 bg-transparent text-xs" :aria-label="$t('catalog.field.format')">
                 <option v-for="value in enums.disc_format ?? []" :key="value" :value="value">{{ enumLabel('disc_format', value) }}</option>
               </select>
-              <button type="button" class="text-pink-400 hover:text-pink-700" :aria-label="$t('common.delete')" @click="newDiscs.splice(index, 1)"><X :size="11" /></button>
+              <button type="button" class="text-pink-400 transition-colors hover:text-pink-700 dark:hover:text-pink-200" :aria-label="$t('common.delete')" @click="newDiscs.splice(index, 1)"><X :size="11" /></button>
             </span>
             <EditorAddButton small @click="newDiscs.push({ key: newKey('nd'), format: 'cd' })">{{ $t('editor.bonuses.add_disc') }}</EditorAddButton>
             <select v-if="freeDiscs.length" class="select select-sm h-7 w-44 text-xs" @change="useDisc">
@@ -111,11 +111,11 @@
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.description') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.description') }}</span>
             <textarea v-model="form.description" rows="3" class="textarea textarea-sm w-full text-sm" />
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-gray-700">{{ $t('catalog.field.note') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}</span>
             <textarea v-model="form.note" rows="3" class="textarea textarea-sm w-full text-sm" maxlength="500" />
           </label>
         </div>

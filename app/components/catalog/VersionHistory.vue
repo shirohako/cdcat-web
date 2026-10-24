@@ -1,51 +1,51 @@
 <template>
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <aside class="lg:col-span-1">
-      <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-        <h2 class="border-b border-gray-100 px-4 py-3 text-sm font-bold text-gray-900">{{ $t('versions.list') }}</h2>
-        <SkeletonStatus v-if="loading" class="divide-y divide-gray-50">
+      <div class="card overflow-hidden">
+        <h2 class="border-b border-line px-4 py-3 text-sm font-bold text-title">{{ $t('versions.list') }}</h2>
+        <SkeletonStatus v-if="loading" class="divide-y divide-line">
           <div v-for="row in 6" :key="row" class="space-y-1.5 px-4 py-2.5">
             <div class="skeleton h-3.5 w-1/3 rounded-full" />
             <div class="skeleton h-2.5 w-3/4 rounded-full" />
           </div>
         </SkeletonStatus>
-        <ul v-else class="max-h-[70vh] divide-y divide-gray-50 overflow-y-auto transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
+        <ul v-else class="max-h-[70vh] divide-y divide-line overflow-y-auto transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
           <li v-for="version in versions" :key="version.version">
             <button
               type="button"
-              class="w-full px-4 py-2.5 text-left transition-colors hover:bg-gray-50"
-              :class="{ 'bg-indigo-50/70': version.version === selected }"
+              class="w-full px-4 py-2.5 text-left transition-colors duration-150 ease-out"
+              :class="version.version === selected ? 'bg-primary/10' : 'hover:bg-card-hover'"
               @click="selected = version.version"
             >
               <p class="flex items-center gap-2 text-sm">
-                <span class="font-mono font-semibold text-gray-700">v{{ version.version }}</span>
+                <span class="font-mono font-semibold text-title">v{{ version.version }}</span>
                 <span class="rounded px-1.5 py-0.5 text-[10px] font-semibold" :class="causeStyle(version.cause)">{{ enumLabel('version_cause', version.cause) }}</span>
                 <span v-if="version.is_deleted" class="badge badge-error badge-xs">{{ $t('versions.deleted') }}</span>
               </p>
-              <p class="mt-0.5 truncate text-xs text-gray-500">{{ version.reason || summaryText(version) }}</p>
-              <p class="mt-0.5 text-[11px] text-gray-400">
+              <p class="mt-0.5 truncate text-xs text-meta">{{ version.reason || summaryText(version) }}</p>
+              <p class="mt-0.5 text-[11px] text-faint">
                 {{ version.actor ? (version.actor.nickname || version.actor.username) : $t('versions.system') }} · {{ ago(version.created_at) }}
               </p>
             </button>
           </li>
         </ul>
-        <div v-if="lastPage > 1" class="border-t border-gray-100 px-4 py-2">
+        <div v-if="lastPage > 1" class="border-t border-line px-4 py-2">
           <CommonPagination :page="page" :total-pages="lastPage" :disabled="refetching" @update:page="page = $event" />
         </div>
       </div>
     </aside>
 
     <section class="lg:col-span-2">
-      <div class="overflow-hidden rounded-xl border border-gray-100 bg-white shadow-sm">
-        <div class="flex flex-wrap items-center gap-2 border-b border-gray-100 px-5 py-3 text-sm">
-          <h2 class="font-bold text-gray-900">{{ $t('versions.changes') }}</h2>
+      <div class="card overflow-hidden">
+        <div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-3 text-sm">
+          <h2 class="font-bold text-title">{{ $t('versions.changes') }}</h2>
           <template v-if="selected !== null">
             <select v-model="from" class="select select-sm h-8 text-xs ml-auto">
               <option :value="null">{{ $t('versions.previous') }}</option>
               <option v-for="version in versions.filter(item => item.version < selected!)" :key="version.version" :value="version.version">v{{ version.version }}</option>
             </select>
-            <span class="text-gray-400">→ v{{ selected }}</span>
-            <NuxtLink v-if="selectedVersion?.revision_id" :to="`/revisions/${selectedVersion.revision_id}`" class="hover:underline text-xs text-gray-500">{{ $t('versions.revision', { id: selectedVersion.revision_id }) }}</NuxtLink>
+            <span class="text-faint">→ v{{ selected }}</span>
+            <NuxtLink v-if="selectedVersion?.revision_id" :to="`/revisions/${selectedVersion.revision_id}`" class="link text-xs">{{ $t('versions.revision', { id: selectedVersion.revision_id }) }}</NuxtLink>
             <NuxtLink v-if="canRestore && selected !== latest" :to="`/admin/content/${resource}/${id}?restore=${selected}`" class="btn btn-xs btn-outline">{{ $t('versions.restore') }}</NuxtLink>
           </template>
         </div>
@@ -53,7 +53,7 @@
           <SkeletonStatus v-if="diffPending && !diff" class="space-y-2.5 py-2">
             <div v-for="line in 5" :key="line" class="skeleton h-3 rounded-full" :class="['w-2/3', 'w-full', 'w-1/2', 'w-5/6', 'w-3/5'][line - 1]" />
           </SkeletonStatus>
-          <p v-else-if="diffError" class="py-6 text-center text-sm text-gray-400">{{ localizeError(diffError) }}</p>
+          <p v-else-if="diffError" class="py-6 text-center text-sm text-faint">{{ localizeError(diffError) }}</p>
           <CatalogDiffView
             v-else-if="diff"
             class="transition-opacity"
@@ -138,11 +138,11 @@ const summaryText = (version: ContentVersion) => {
 }
 
 const causeStyle = (cause: VersionCause) => ({
-  create: 'bg-emerald-100 text-emerald-700',
-  edit: 'bg-sky-100 text-sky-700',
-  delete: 'bg-rose-100 text-rose-700',
-  restore: 'bg-amber-100 text-amber-700',
-  merge: 'bg-violet-100 text-violet-700',
-  purge: 'bg-gray-800 text-white',
-}[cause as string] ?? 'bg-gray-100 text-gray-600')
+  create: 'bg-success/15 text-success',
+  edit: 'bg-info/15 text-info',
+  delete: 'bg-danger/15 text-danger',
+  restore: 'bg-warning/15 text-warning',
+  merge: 'bg-primary/15 text-primary',
+  purge: 'bg-title text-page',
+}[cause as string] ?? 'bg-btn text-btn-content')
 </script>

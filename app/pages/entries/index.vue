@@ -51,7 +51,7 @@ const goToPage = (page: number) => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-base-100">
+  <div class="min-h-screen">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
@@ -60,14 +60,13 @@ const goToPage = (page: number) => {
             :title="$t('menu.entry')"
             :description="$t('content_display.entry_desc')"
             icon="lucide:panels-top-left"
-            tone="rose"
             :filters="typeFilters"
             :filter-label="$t('catalog.type')"
             @update:model-value="selectType"
           >
             <template #action>
               <button
-                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 p-0 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-0 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
                 @click="navigateTo('/contribute?type=entry')"
               >
                 <Plus class="h-3.5 w-3.5" />
@@ -75,13 +74,13 @@ const goToPage = (page: number) => {
               </button>
             </template>
           </CollectionPageHeader>
-          <div class="flex flex-col gap-2.5 border-b border-slate-100 px-4 py-3 sm:flex-row sm:items-center sm:px-6">
+          <div class="flex flex-col gap-2.5 border-b border-line px-4 py-3 sm:flex-row sm:items-center sm:px-6">
             <form class="flex min-w-0 flex-1 items-center gap-2" role="search" @submit.prevent="submitSearch">
-              <label class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg bg-white px-3 ring-1 ring-slate-200 focus-within:ring-rose-300">
-                <Search class="h-4 w-4 shrink-0 text-slate-400" />
-                <input v-model="searchInput" type="search" class="min-w-0 flex-1 bg-transparent text-sm outline-none" :placeholder="$t('catalog.search_placeholder')" :aria-label="$t('catalog.search')" >
+              <label class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg bg-field px-3 ring-1 ring-line focus-within:ring-primary">
+                <Search class="h-4 w-4 shrink-0 text-faint" />
+                <input v-model="searchInput" type="search" class="min-w-0 flex-1 bg-transparent text-sm text-title outline-none placeholder:text-faint" :placeholder="$t('catalog.search_placeholder')" :aria-label="$t('catalog.search')" >
               </label>
-              <button type="submit" class="h-9 shrink-0 rounded-lg bg-slate-900 px-3 text-xs font-semibold text-white hover:bg-slate-700">{{ $t('catalog.search') }}</button>
+              <button type="submit" class="btn btn-primary btn-sm h-9 shrink-0 text-xs">{{ $t('catalog.search') }}</button>
             </form>
             <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             <div v-if="formats.length" class="flex gap-1.5 overflow-x-auto">
@@ -89,8 +88,8 @@ const goToPage = (page: number) => {
                 v-for="format in formats"
                 :key="format"
                 type="button"
-                class="h-8 shrink-0 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors"
-                :class="selectedFormat === format ? 'bg-rose-600 text-white ring-rose-600' : 'bg-white text-slate-500 ring-slate-200 hover:text-slate-900'"
+                class="h-8 shrink-0 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150 ease-out"
+                :class="selectedFormat === format ? 'bg-primary text-on-primary ring-primary' : 'bg-btn text-btn-content ring-transparent hover:bg-btn-hover'"
                 :aria-pressed="selectedFormat === format"
                 @click="selectFormat(format)"
               >
@@ -104,17 +103,17 @@ const goToPage = (page: number) => {
 
         <CollectionLoadingSkeleton v-if="loading" variant="list" />
 
-        <div v-else-if="status === 'error' && !data" class="flex min-h-72 items-center justify-center text-sm text-red-600">
+        <div v-else-if="status === 'error' && !data" class="flex min-h-72 items-center justify-center text-sm text-danger">
           {{ $t('common.load_failed') }}
         </div>
 
         <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <div class="space-y-3">
             <NuxtLink v-for="entry in entries" :key="entry.id" :to="`/entries/${entry.id}`" class="group block">
-              <article class="flex gap-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg">
-                <div class="relative h-32 w-22 shrink-0 overflow-hidden rounded-lg bg-linear-to-br from-gray-50 to-gray-100">
+              <article class="flex gap-4 rounded-xl bg-sunken p-4 transition-colors duration-150 ease-out group-hover:bg-card-hover group-active:bg-card-active">
+                <div class="relative h-32 w-22 shrink-0 overflow-hidden rounded-lg bg-btn">
                   <img v-if="entry.image_url" v-img-fade :src="entry.image_url" :alt="displayName(entry)" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" >
-                  <div v-else class="flex h-full items-center justify-center text-gray-300">
+                  <div v-else class="flex h-full items-center justify-center text-faint">
                     <Film :size="36" />
                   </div>
                 </div>
@@ -122,24 +121,24 @@ const goToPage = (page: number) => {
                 <div class="flex min-w-0 flex-1 flex-col justify-between gap-2">
                   <div>
                     <div class="mb-1 flex flex-wrap items-center gap-2">
-                      <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-xs font-medium text-rose-700">
+                      <span class="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary">
                         <Icon :name="ENTRY_TYPE_ICONS[entry.type] || 'lucide:shapes'" class="h-3 w-3" />
                         {{ typeWithFormat(entry.type, entry.format) }}
                       </span>
-                      <span v-for="platform in (entry.platforms || []).slice(0, 3)" :key="platform" class="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{{ platform }}</span>
+                      <span v-for="platform in (entry.platforms || []).slice(0, 3)" :key="platform" class="rounded-full bg-btn px-2 py-0.5 text-xs text-btn-content">{{ platform }}</span>
                     </div>
-                    <h3 class="line-clamp-2 text-lg font-bold transition-colors group-hover:text-rose-600">{{ displayName(entry) }}</h3>
-                    <p v-if="originalName(entry)" class="truncate text-sm text-gray-500">{{ originalName(entry) }}</p>
-                    <p v-if="entry.description" class="mt-1 line-clamp-2 text-sm text-gray-600">{{ entry.description }}</p>
+                    <h3 class="line-clamp-2 text-lg font-bold text-title transition-colors group-hover:text-primary">{{ displayName(entry) }}</h3>
+                    <p v-if="originalName(entry)" class="truncate text-sm text-meta">{{ originalName(entry) }}</p>
+                    <p v-if="entry.description" class="mt-1 line-clamp-2 text-sm text-body">{{ entry.description }}</p>
                   </div>
 
-                  <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                  <div class="flex flex-wrap items-center gap-4 text-sm text-body">
                     <span v-if="entry.release_date" class="flex items-center gap-1.5">
-                      <Calendar :size="15" class="text-gray-400" />
+                      <Calendar :size="15" class="text-meta" />
                       {{ formatReleaseDate(entry.release_date, entry.release_date_precision) }}
                     </span>
                     <span class="flex items-center gap-1.5">
-                      <Music2 :size="15" class="text-gray-400" />
+                      <Music2 :size="15" class="text-meta" />
                       {{ $t('catalog.albums_count', { count: entry.albums_count ?? 0 }) }}
                     </span>
                   </div>
@@ -148,9 +147,8 @@ const goToPage = (page: number) => {
             </NuxtLink>
           </div>
 
-          <div v-if="!entries.length" class="flex min-h-72 flex-col items-center justify-center text-center">
-            <Film :size="56" class="mx-auto mb-4 text-gray-300" />
-            <p class="text-gray-500">{{ $t('catalog.no_entries') }}</p>
+          <div v-if="!entries.length" class="flex min-h-72 items-center justify-center">
+            <UiEmpty :title="$t('catalog.no_entries')" :icon="Film" />
           </div>
 
           <CommonPagination
