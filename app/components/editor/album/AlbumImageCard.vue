@@ -6,22 +6,9 @@
     </a>
     <div class="min-w-0 flex-1 space-y-2">
       <div class="flex flex-wrap items-center gap-2">
-        <select v-model="image.kind" class="select select-sm w-36" :aria-label="$t('catalog.field.kind')">
-          <option v-for="value in kinds" :key="value" :value="value" :disabled="value === 'cover' && !isCover && hasCover">{{ enumLabel('image_kind', value) }}</option>
-        </select>
+        <UiSelect v-model="image.kind" :options="kindOptions" size="sm" class="w-36" :aria-label="$t('catalog.field.kind')" />
         <input v-model="image.label" class="input input-sm w-28" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')">
-        <select :value="scope" class="select select-sm w-44" :aria-label="$t('editor.image.scope')" @change="setScope(($event.target as HTMLSelectElement).value)">
-          <option value="album">{{ $t('editor.image.scope_album') }}</option>
-          <optgroup v-if="products.length" :label="$t('catalog.collection.products')">
-            <option v-for="product in products" :key="product.id" :value="`p:${product.id}`">{{ product.name || product.catalog_number || enumLabel('edition_type', product.edition_type) }}</option>
-          </optgroup>
-          <optgroup v-if="bonuses.length" :label="$t('catalog.collection.bonuses')">
-            <option v-for="bonus in bonuses" :key="bonus.id" :value="`b:${bonus.id}`">{{ bonus.name || '…' }}</option>
-          </optgroup>
-          <optgroup :label="$t('catalog.collection.discs')">
-            <option v-for="disc in discs" :key="disc.id" :value="`d:${disc.id}`">{{ $t('editor.album.disc_n', { n: disc.position }) }}</option>
-          </optgroup>
-        </select>
+        <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-44" :aria-label="$t('editor.image.scope')" @change="setScope" />
         <span class="ml-auto flex gap-0.5">
           <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="emit('move', -1)"><ArrowUp :size="12" /></button>
           <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="emit('move', 1)"><ArrowDown :size="12" /></button>
@@ -42,6 +29,7 @@
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Trash2 } from '@lucide/vue'
 import { coverOf, removeImage, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
 import { byOrder, sameId } from '~/utils/documentRows'
@@ -52,6 +40,7 @@ const emit = defineEmits<{ move: [delta: number] }>()
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
+const { t } = useI18n()
 
 const album = computed(() => editor.album.value)
 const image = computed(() => album.value.images.find(row => sameId(row.id, props.imageId)) ?? null)
@@ -63,6 +52,17 @@ const file = computed(() => image.value ? editor.references.images?.[String(imag
 const errors = computed(() => editor.errorsIn(`images.${props.imageId}`))
 const hasCover = computed(() => !!coverOf(album.value))
 const isCover = computed(() => image.value?.kind === 'cover')
+const kindOptions = computed<UiSelectOption<string>[]>(() => kinds.value.map(value => ({
+  value,
+  label: enumLabel('image_kind', value),
+  disabled: value === 'cover' && !isCover.value && hasCover.value,
+})))
+const scopeOptions = computed<UiSelectOption<string>[]>(() => [
+  { value: 'album', label: t('editor.image.scope_album') },
+  ...products.value.map(product => ({ value: `p:${product.id}`, label: product.name || product.catalog_number || enumLabel('edition_type', product.edition_type), group: t('catalog.collection.products') })),
+  ...bonuses.value.map(bonus => ({ value: `b:${bonus.id}`, label: bonus.name || '…', group: t('catalog.collection.bonuses') })),
+  ...discs.value.map(disc => ({ value: `d:${disc.id}`, label: t('editor.album.disc_n', { n: disc.position }), group: t('catalog.collection.discs') })),
+])
 const attributeCount = computed(() => album.value.image_attributes.filter(row => sameId(row.album_image_id, props.imageId)).length)
 const hasAttributes = computed(() => attributeCount.value > 0)
 

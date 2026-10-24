@@ -2,6 +2,7 @@
 import { Search } from '@lucide/vue'
 import type { Pagination } from '~/types/article'
 import type { DiscussionPostSummary, DiscussionTopicCard } from '~/types/discussion'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 /** Searches topic titles and first posts, or every post's text; spoilers are never matched. */
 const route = useRoute()
@@ -15,6 +16,10 @@ const q = computed(() => String(route.query.q ?? '').trim())
 const scope = computed(() => route.query.scope === 'posts' ? 'posts' : 'topics')
 const category = computed(() => route.query.category ? String(route.query.category) : '')
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
+const categoryOptions = computed<UiSelectOption<string>[]>(() => [
+  { value: '', label: t('discussions.search.all_categories') },
+  ...flat.value.map(item => ({ value: item.slug, label: `${item.parent_id ? '\u3000' : ''}${categoryName(item)}` })),
+])
 const input = ref(q.value)
 watch(q, (value) => { input.value = value })
 
@@ -60,10 +65,10 @@ useSeoMeta({ title: () => q.value ? t('discussions.search.title_for', { q: q.val
         >
           {{ t(`discussions.search.scope.${value}`) }}
         </button>
-        <select :value="category" class="select select-sm ml-auto" :aria-label="t('discussions.fields.category')" @change="update({ category: ($event.target as HTMLSelectElement).value || null })">
-          <option value="">{{ t('discussions.search.all_categories') }}</option>
-          <option v-for="item in flat" :key="item.id" :value="item.slug">{{ item.parent_id ? '\u3000' : '' }}{{ categoryName(item) }}</option>
-        </select>
+        <UiSelect
+          :model-value="category" :options="categoryOptions" size="sm" class="ml-auto" :aria-label="t('discussions.fields.category')"
+          @update:model-value="value => update({ category: value || null })"
+        />
       </div>
 
       <div class="mt-5">

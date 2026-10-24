@@ -5,15 +5,11 @@
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-body">{{ $t('editor.translate.language') }}</span>
-          <select v-model="locale" class="select select-sm w-48">
-            <option v-for="code in LOCALES" :key="code" :value="code">{{ localeName(code) }}</option>
-          </select>
+          <UiSelect v-model="locale" :options="localeOptions" size="sm" class="w-48" />
         </label>
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.kind') }}</span>
-          <select v-model="kind" class="select select-sm w-40">
-            <option v-for="value in KINDS" :key="value" :value="value">{{ enumLabel('title_kind', value) }}</option>
-          </select>
+          <UiSelect v-model="kind" :options="kindOptions" size="sm" class="w-40" />
         </label>
         <p class="pb-2 text-[11px] text-meta">{{ $t(`editor.translate.kind_hint.${kind}`) }}</p>
       </div>
@@ -43,6 +39,7 @@
 <script setup lang="ts">
 import type { TitleCollection } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Languages } from '@lucide/vue'
 import { setTitleIn, sortedDiscs, titleIn, tracksOn } from '~/utils/albumDocument'
 
@@ -62,6 +59,8 @@ const { enumLabel, localeName } = useCatalogDisplay()
 const album = computed(() => editor.album.value)
 const locale = ref(props.initialLocale && LOCALES.includes(props.initialLocale) ? props.initialLocale : LOCALES.includes(uiLocale.value) && uiLocale.value !== 'ja' ? uiLocale.value : 'en')
 const kind = ref<typeof KINDS[number]>('translation')
+const localeOptions = computed<UiSelectOption<string>[]>(() => LOCALES.map(code => ({ value: code, label: localeName(code) })))
+const kindOptions = computed<UiSelectOption<typeof KINDS[number]>[]>(() => KINDS.map(value => ({ value, label: enumLabel('title_kind', value) })))
 watch(locale, (code) => { if (code.endsWith('-Latn') || code.endsWith('-Hrkt')) kind.value = 'transliteration' })
 
 interface Row {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeft, Calendar, CalendarDays, Disc3, ExternalLink, MapPin } from '@lucide/vue'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 interface SeriesEvent {
   id: number
@@ -50,6 +51,7 @@ const SORTS = {
 } as const
 type SortKey = keyof typeof SORTS
 const sortKeys = Object.keys(SORTS) as SortKey[]
+const sortOptions = computed<UiSelectOption<SortKey>[]>(() => sortKeys.map(key => ({ value: key, label: t(`collection_pages.events.sorts.${key}`) })))
 // Changing the order starts again from the first page.
 const sort = computed<SortKey>({
   get: () => (sortKeys as string[]).includes(String(route.query.sort)) ? route.query.sort as SortKey : 'newest',
@@ -138,9 +140,7 @@ useHead({
           <p class="text-sm text-meta">{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</p>
           <label class="flex items-center gap-2 text-sm text-body">
             {{ t('collection_pages.events.sort_label') }}
-            <select v-model="sort" class="select select-sm">
-              <option v-for="key in sortKeys" :key="key" :value="key">{{ t(`collection_pages.events.sorts.${key}`) }}</option>
-            </select>
+            <UiSelect v-model="sort" :options="sortOptions" size="sm" />
           </label>
         </div>
 

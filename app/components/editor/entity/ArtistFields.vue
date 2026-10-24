@@ -9,10 +9,7 @@
         </label>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
-          <select v-model="doc.type" class="select select-sm w-full" :class="{ 'select-error': editor.errorAt('type') }">
-            <option :value="null" disabled>{{ $t('editor.entity.artist_type_placeholder') }}</option>
-            <option v-for="value in enums.artist_type ?? []" :key="value" :value="value">{{ enumLabel('artist_type', value) }}</option>
-          </select>
+          <UiSelect v-model="doc.type" :options="typeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-full" :invalid="!!editor.errorAt('type')" />
           <span v-if="editor.errorAt('type')" class="mt-1 block text-xs text-danger">{{ editor.errorAt('type') }}</span>
         </label>
         <label class="flex items-center gap-2 self-end pb-2 text-sm text-body">
@@ -59,6 +56,7 @@
 
 <script setup lang="ts">
 import type { ArtistDocument } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Languages, Network, UserRound } from '@lucide/vue'
 
 const editor = useEntityEditor()
@@ -66,4 +64,5 @@ const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const doc = computed(() => editor.doc.value as unknown as ArtistDocument)
 const enums = computed(() => schema.value?.enums ?? {})
+const typeOptions = computed<UiSelectOption<string | null>[]>(() => (enums.value.artist_type ?? []).map(value => ({ value, label: enumLabel('artist_type', value) })))
 </script>

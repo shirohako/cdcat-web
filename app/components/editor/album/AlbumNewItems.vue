@@ -10,10 +10,7 @@
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">{{ enumLabel('catalog_type', item.resource_type) }}</span>
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
-          <select v-if="item.resource_type === 'artist'" v-model="docOf(item).type" class="select select-sm w-36" :class="{ 'select-error': !docOf(item).type }" :aria-label="$t('catalog.field.type')">
-            <option :value="null" disabled>{{ $t('editor.entity.artist_type_placeholder') }}</option>
-            <option v-for="value in enums.artist_type ?? []" :key="value" :value="value">{{ enumLabel('artist_type', value) }}</option>
-          </select>
+          <UiSelect v-if="item.resource_type === 'artist'" v-model="docOf(item).type" :options="artistTypeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-36" :invalid="!docOf(item).type" :aria-label="$t('catalog.field.type')" />
           <span class="text-[11px] text-meta">{{ usage(item.ref) }}</span>
           <button type="button" class="btn btn-ghost btn-xs ml-auto px-1.5 text-meta hover:text-danger" :title="$t('editor.new_items.remove')" @click="remove(item.ref)"><Trash2 :size="12" /></button>
         </div>
@@ -32,6 +29,7 @@
 
 <script setup lang="ts">
 import type { DraftItem } from '~/composables/useRevisionDraft'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Sparkles, Trash2 } from '@lucide/vue'
 
 /** Artists and labels created in this revision, and other entities it edits. */
@@ -41,6 +39,7 @@ const { confirm } = useConfirm()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const enums = computed(() => schema.value?.enums ?? {})
+const artistTypeOptions = computed<UiSelectOption<string | null>[]>(() => (enums.value.artist_type ?? []).map(value => ({ value, label: enumLabel('artist_type', value) })))
 
 const others = computed(() => editor.draft.items.value.filter(item => item.ref !== editor.mainRef.value))
 const created = computed(() => others.value.filter(item => item.action === 'create'))

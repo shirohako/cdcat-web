@@ -1,18 +1,13 @@
 <template>
   <div>
     <template v-if="!definition"><input class="input input-sm w-full" disabled></template>
-    <select v-else-if="definition.value_type === 'choice'" v-model="model" class="select select-sm w-full">
-      <option :value="null" disabled>—</option>
-      <option v-for="choice in definition.choices ?? []" :key="choice.value" :value="choice.value">{{ localizedContent(choice.names, choice.value) }}</option>
-    </select>
+    <UiSelect v-else-if="definition.value_type === 'choice'" :model-value="model as UiSelectValue" :options="choiceOptions" placeholder="—" size="sm" class="w-full" @update:model-value="value => model = value" />
     <input v-else-if="definition.value_type === 'boolean'" v-model="model" type="checkbox" class="checkbox checkbox-sm mt-1.5">
     <input v-else-if="definition.value_type === 'integer'" v-model.number="model" type="number" step="1" class="input input-sm w-full">
     <input v-else-if="definition.value_type === 'decimal'" v-model="model" inputmode="decimal" class="input input-sm w-full">
     <div v-else-if="definition.value_type === 'date'" class="flex gap-2">
       <input :value="dated.date" type="date" class="input input-sm flex-1" @input="model = { ...dated, date: ($event.target as HTMLInputElement).value }">
-      <select :value="dated.precision" class="select select-sm w-24" @change="model = { ...dated, precision: ($event.target as HTMLSelectElement).value }">
-        <option v-for="precision in DATE_PRECISIONS" :key="precision" :value="precision">{{ $t(`catalog.precision.${precision}`) }}</option>
-      </select>
+      <UiSelect :model-value="dated.precision" :options="precisionOptions" size="sm" class="w-24" @change="value => model = { ...dated, precision: value }" />
     </div>
     <div v-else-if="definition.value_type === 'reference'" class="space-y-1">
       <div v-if="reference" class="flex items-center gap-2 text-sm">
@@ -20,9 +15,7 @@
         <button type="button" class="btn btn-ghost btn-xs" @click="model = null">×</button>
       </div>
       <div v-else class="flex gap-2">
-        <select v-model="referenceType" class="select select-sm w-28">
-          <option v-for="type in definition.reference_types ?? []" :key="type" :value="type">{{ enumLabel('catalog_type', type) }}</option>
-        </select>
+        <UiSelect v-model="referenceType" :options="referenceTypeOptions" size="sm" class="w-28" />
         <EditorEntityPicker :kind="referenceType as PickerKind" class="flex-1" @select="pick" />
       </div>
     </div>
@@ -33,6 +26,7 @@
 <script setup lang="ts">
 import type { AttributeDefinition, CatalogReferences } from '~/types/catalog'
 import type { PickedEntity, PickerKind } from './EntityPicker.vue'
+import type { UiSelectOption, UiSelectValue } from '~/components/ui/Select.vue'
 import { DATE_PRECISIONS } from '~/types/entry'
 
 const props = defineProps<{ definition: AttributeDefinition | null, references: CatalogReferences }>()
@@ -41,6 +35,11 @@ const emit = defineEmits<{ picked: [type: string, id: number, row: Record<string
 
 const { localizedContent } = useLocaleFormatting()
 const { enumLabel } = useCatalogDisplay()
+const { t } = useI18n()
+
+const choiceOptions = computed<UiSelectOption<string>[]>(() => (props.definition?.choices ?? []).map(choice => ({ value: choice.value, label: localizedContent(choice.names, choice.value) })))
+const precisionOptions = computed<UiSelectOption<string>[]>(() => DATE_PRECISIONS.map(precision => ({ value: precision, label: t(`catalog.precision.${precision}`) })))
+const referenceTypeOptions = computed<UiSelectOption<string>[]>(() => (props.definition?.reference_types ?? []).map(type => ({ value: type, label: enumLabel('catalog_type', type) })))
 
 const dated = computed(() => (model.value && typeof model.value === 'object' ? model.value : { date: '', precision: 'day' }) as { date: string, precision: string })
 const reference = computed(() => model.value && typeof model.value === 'object' && 'type' in model.value ? model.value as { type: string, id: number } : null)

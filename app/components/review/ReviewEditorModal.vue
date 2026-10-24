@@ -42,9 +42,7 @@
             <label class="mb-2 block text-sm font-semibold text-body">
               <span class="flex items-center gap-1.5"><Globe :size="13" />{{ $t('reviews.language') }}</span>
             </label>
-            <select v-model="form.language" class="select select-sm w-full max-w-xs">
-              <option v-for="code in LANGUAGE_CODES" :key="code" :value="code">{{ languageName(code) }}</option>
-            </select>
+            <UiSelect v-model="form.language" :options="languageOptions" size="sm" class="w-full max-w-xs" />
           </div>
 
           <div>
@@ -76,6 +74,7 @@
 
 <script setup lang="ts">
 import type { AlbumReview, ReviewDraft, ReviewRating } from '~/types/reviews'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { REVIEW_MAX_LENGTH } from '~/types/reviews'
 import { Globe, Loader2, MessageSquare, X } from '@lucide/vue'
 
@@ -95,6 +94,7 @@ const emit = defineEmits<{
 const { $api } = useNuxtApp()
 const { locale } = useI18n()
 const { languageName } = useLocaleFormatting()
+const languageOptions = computed<UiSelectOption<string>[]>(() => LANGUAGE_CODES.map(code => ({ value: code, label: languageName(code) })))
 const { localizeError } = useLocalizedApiError()
 
 const defaultLanguage = (LANGUAGE_CODES as readonly string[]).includes(locale.value) ? locale.value : 'zh-Hans'

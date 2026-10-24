@@ -1,17 +1,14 @@
 <template>
   <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic">
     <template #actions>
-      <select
+      <UiSelect
         v-if="languages.length"
         v-model="languageKey"
-        class="select select-sm h-8 max-w-44 text-xs text-body"
+        :options="languageOptions"
+        size="sm"
+        class="h-8 max-w-44 text-xs text-body"
         :aria-label="$t('album.tracklist.language')"
-      >
-        <option value="">{{ $t('album.tracklist.original') }}</option>
-        <option v-for="language in languages" :key="language.key" :value="language.key">
-          {{ language.label }} ({{ language.count }}/{{ language.total }})
-        </option>
-      </select>
+      />
       <NuxtLink
         v-if="albumId"
         :to="{ path: `/contribute/album/${albumId}`, query: { mode: 'translate', locale } }"
@@ -126,6 +123,7 @@
 
 <script setup lang="ts">
 import type { AlbumBonus, AlbumDisc, AlbumTrack, TracklistLanguage } from '~/types/album'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Disc3, FileText, Heart, Languages, ListMusic, Music2, Users } from '@lucide/vue'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
 
@@ -139,7 +137,7 @@ const props = defineProps<{
   locked?: boolean
 }>()
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavoriteTrack } = useFavorites()
 const route = useRoute()
@@ -153,6 +151,11 @@ const languages = computed(() => props.languages.map(language => ({
   key: `${language.locale}|${language.kind}`,
   label: `${localeName(language.locale)}${language.kind === 'transliteration' ? '' : ` · ${enumLabel('title_kind', language.kind)}`}`,
 })))
+
+const languageOptions = computed<UiSelectOption<string>[]>(() => [
+  { value: '', label: t('album.tracklist.original') },
+  ...languages.value.map(language => ({ value: language.key, label: `${language.label} (${language.count}/${language.total})` })),
+])
 
 /** Starts in the UI language when the tracklist has an official name or a translation in it. */
 const languageKey = ref(languages.value.find(language => language.kind !== 'transliteration' && (UI_LOCALES[locale.value] ?? [locale.value]).includes(language.locale))?.key ?? '')

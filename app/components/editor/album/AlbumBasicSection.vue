@@ -21,10 +21,7 @@
           </div>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
-            <select v-model="album.type" class="select select-sm w-full" :class="{ 'select-error': errorAt('type') }">
-              <option :value="null" disabled>{{ $t('editor.album.type_placeholder') }}</option>
-              <option v-for="value in enums.album_type ?? []" :key="value" :value="value">{{ enumLabel('album_type', value) }}</option>
-            </select>
+            <UiSelect v-model="album.type" :options="typeOptions" :placeholder="$t('editor.album.type_placeholder')" size="sm" class="w-full" :invalid="!!errorAt('type')" />
             <span v-if="errorAt('type')" class="mt-1 block text-xs text-danger">{{ errorAt('type') }}</span>
           </label>
         </div>
@@ -104,6 +101,7 @@
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { CalendarDays, Info } from '@lucide/vue'
 import { firstProduct } from '~/utils/albumDocument'
 
@@ -116,6 +114,7 @@ const album = computed(() => editor.album.value)
 const references = editor.references
 const errorAt = (field: string) => editor.errorAt(field)
 const enums = computed(() => schema.value?.enums ?? {})
+const typeOptions = computed<UiSelectOption<string | null>[]>(() => (enums.value.album_type ?? []).map(value => ({ value, label: enumLabel('album_type', value) })))
 
 /** Categories that follow from the linked entries: a game's album is a game album, and so on. */
 const ENTRY_CATEGORIES: Record<string, string> = { game: 'game', anime: 'animation', book: 'publication', manga: 'publication', movie: 'live_action', tv: 'live_action', stage: 'live_action' }

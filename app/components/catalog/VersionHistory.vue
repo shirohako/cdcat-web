@@ -40,10 +40,7 @@
         <div class="flex flex-wrap items-center gap-2 border-b border-line px-5 py-3 text-sm">
           <h2 class="font-bold text-title">{{ $t('versions.changes') }}</h2>
           <template v-if="selected !== null">
-            <select v-model="from" class="select select-sm h-8 text-xs ml-auto">
-              <option :value="null">{{ $t('versions.previous') }}</option>
-              <option v-for="version in versions.filter(item => item.version < selected!)" :key="version.version" :value="version.version">v{{ version.version }}</option>
-            </select>
+            <UiSelect v-model="from" :options="fromOptions" size="sm" class="h-8 text-xs ml-auto" />
             <span class="text-faint">→ v{{ selected }}</span>
             <NuxtLink v-if="selectedVersion?.revision_id" :to="`/revisions/${selectedVersion.revision_id}`" class="link text-xs">{{ $t('versions.revision', { id: selectedVersion.revision_id }) }}</NuxtLink>
             <NuxtLink v-if="canRestore && selected !== latest" :to="`/admin/content/${resource}/${id}?restore=${selected}`" class="btn btn-xs btn-outline">{{ $t('versions.restore') }}</NuxtLink>
@@ -69,6 +66,7 @@
 <script setup lang="ts">
 import type { CatalogType, ContentVersion, VersionCause, VersionDiff } from '~/types/catalog'
 import { CATALOG_RESOURCES } from '~/types/catalog'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 const props = defineProps<{ type: CatalogType, id: number }>()
 
@@ -102,6 +100,10 @@ watch(versions, (list) => {
   if (selected.value === null) selected.value = list[0]?.version ?? null
 }, { immediate: true })
 watch(selected, () => { from.value = null })
+const fromOptions = computed<UiSelectOption<number | null>[]>(() => [
+  { value: null, label: t('versions.previous') },
+  ...versions.value.filter(item => selected.value !== null && item.version < selected.value).map(version => ({ value: version.version, label: `v${version.version}` })),
+])
 const selectedVersion = computed(() => versions.value.find(version => version.version === selected.value) ?? null)
 
 const diff = ref<VersionDiff | null>(null)

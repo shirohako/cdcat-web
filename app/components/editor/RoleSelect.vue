@@ -1,14 +1,10 @@
 <template>
-  <select v-model="model" class="select select-sm" :class="{ 'select-error': invalid }" :title="invalid ? $t('editor.credits.role_level') : undefined">
-    <option v-if="invalid" :value="model">{{ roleName(model) }} ⚠</option>
-    <optgroup v-for="group in groups" :key="group.category" :label="enumLabel('credit_role_category', group.category)">
-      <option v-for="role in group.roles" :key="role.key" :value="role.key">{{ roleName(role.key) }}</option>
-    </optgroup>
-  </select>
+  <UiSelect v-model="model" :options="options" size="sm" :invalid="invalid" :title="invalid ? $t('editor.credits.role_level') : undefined" />
 </template>
 
 <script setup lang="ts">
 import type { CreditRoleDefinition } from '~/types/catalog'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 /** A credit role from the dictionary, limited to roles allowed at this level (album or track). */
 const props = defineProps<{ level: 'album' | 'track' }>()
@@ -25,4 +21,12 @@ const groups = computed(() => {
   for (const role of roles.value) byCategory.set(role.category, [...(byCategory.get(role.category) ?? []), role])
   return [...byCategory].map(([category, list]) => ({ category, roles: list }))
 })
+const options = computed<UiSelectOption<string>[]>(() => [
+  ...(invalid.value ? [{ value: model.value, label: `${roleName(model.value)} ⚠` }] : []),
+  ...groups.value.flatMap(group => group.roles.map(role => ({
+    value: role.key,
+    label: roleName(role.key),
+    group: enumLabel('credit_role_category', group.category),
+  }))),
+])
 </script>

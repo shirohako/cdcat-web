@@ -2,6 +2,7 @@
 import { Loader2 } from '@lucide/vue'
 import type { ContentLinkSummary, TagSummary } from '~/types/article'
 import type { DiscussionTopicDetail } from '~/types/discussion'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { TAG_NAME_MAX, tagErrorKey, tagPayload } from '~/utils/tags'
 
 /**
@@ -26,6 +27,7 @@ const busy = ref(false)
 const error = ref('')
 const articleTopic = computed(() => props.topic?.article_id != null && !props.asModerator)
 const choices = computed(() => flat.value.filter(category => props.asModerator || category.topic_permission === 'everyone' || category.id === props.topic?.category?.id))
+const categoryOptions = computed<UiSelectOption<number | null>[]>(() => choices.value.map(category => ({ value: category.id, label: `${category.parent_id ? '\u3000' : ''}${categoryName(category)}` })))
 
 watch(() => props.topic, (topic) => {
   if (!topic) return
@@ -77,9 +79,7 @@ async function save() {
         </label>
         <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.category') }}
-          <select v-model="categoryId" class="select mt-1 w-full">
-            <option v-for="category in choices" :key="category.id" :value="category.id">{{ category.parent_id ? '\u3000' : '' }}{{ categoryName(category) }}</option>
-          </select>
+          <UiSelect v-model="categoryId" :options="categoryOptions" class="mt-1 w-full" />
         </label>
       </template>
       <div class="text-sm font-medium text-body">

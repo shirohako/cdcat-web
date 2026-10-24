@@ -75,9 +75,7 @@
   <dialog class="modal" :open="!!reporting">
     <div class="modal-box max-w-sm">
       <h3 class="mb-3 font-bold text-title">{{ $t('shouts.report') }}</h3>
-      <select v-model="reportReason" class="select select-sm mb-2 w-full">
-        <option v-for="reason in REPORT_REASONS" :key="reason" :value="reason">{{ $t(`shouts.reasons.${reason}`) }}</option>
-      </select>
+      <UiSelect v-model="reportReason" :options="reportReasonOptions" size="sm" class="mb-2 w-full" />
       <textarea v-model="reportNote" rows="2" class="textarea w-full text-sm" :placeholder="$t('shouts.report_note')" />
       <div class="modal-action">
         <button type="button" class="btn btn-ghost btn-sm" @click="reporting = null">{{ $t('common.cancel') }}</button>
@@ -91,6 +89,7 @@
 
 <script setup lang="ts">
 import type { Shout, ShoutPage } from '~/types/shout'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { SHOUT_MAX_LENGTH } from '~/types/shout'
 import { Flag, MessageSquareQuote } from '@lucide/vue'
 
@@ -170,6 +169,7 @@ const remove = async () => {
 
 const reporting = ref<Shout | null>(null)
 const reportReason = ref<typeof REPORT_REASONS[number]>('spam')
+const reportReasonOptions = computed<UiSelectOption<typeof REPORT_REASONS[number]>[]>(() => REPORT_REASONS.map(reason => ({ value: reason, label: t(`shouts.reasons.${reason}`) })))
 const reportNote = ref('')
 const report = async () => {
   if (!reporting.value) return

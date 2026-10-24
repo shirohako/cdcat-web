@@ -64,15 +64,7 @@
           <p class="text-sm text-meta">
             {{ t('collection_pages.reviews.count', { count: total }) }}
           </p>
-          <select
-            v-model="sortBy"
-            class="select select-sm text-sm"
-          >
-            <option value="date_desc">{{ t('collection_pages.reviews.sort_newest') }}</option>
-            <option value="date_asc">{{ t('collection_pages.reviews.sort_oldest') }}</option>
-            <option value="score_desc">{{ t('reviews.sort.liked_most') }}</option>
-            <option value="score_asc">{{ t('reviews.sort.liked_least') }}</option>
-          </select>
+          <UiSelect v-model="sortBy" :options="sortOptions" size="sm" class="text-sm" />
         </div>
 
         <!-- Error State -->
@@ -142,6 +134,7 @@
 
 <script setup lang="ts">
 import type { AlbumReview, ReviewDraft, ReviewPage, ReviewRating } from '~/types/reviews'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import ReviewsList from '~/components/review/ReviewsList.vue'
 
 type SortBy = 'date_desc' | 'date_asc' | 'score_desc' | 'score_asc'
@@ -167,6 +160,12 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const sortBy = ref<SortBy>('date_desc')
+const sortOptions = computed<UiSelectOption<SortBy>[]>(() => [
+  { value: 'date_desc', label: t('collection_pages.reviews.sort_newest') },
+  { value: 'date_asc', label: t('collection_pages.reviews.sort_oldest') },
+  { value: 'score_desc', label: t('reviews.sort.liked_most') },
+  { value: 'score_asc', label: t('reviews.sort.liked_least') },
+])
 const editingReview = ref<ReviewDraft | null>(null)
 const deleteConfirm = reactive({ show: false, reviewId: 0, loading: false })
 

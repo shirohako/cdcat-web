@@ -6,9 +6,7 @@
           <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(rows, row, -1)"><ChevronUp :size="14" /></button>
           <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === shown.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(rows, row, 1)"><ChevronDown :size="14" /></button>
         </div>
-        <select v-if="relations" :value="get(row, 'relation_type')" class="select select-sm w-40" @change="set(row, 'relation_type', ($event.target as HTMLSelectElement).value)">
-          <option v-for="value in relations.values" :key="value" :value="value">{{ enumLabel(relations.group, value) }}</option>
-        </select>
+        <UiSelect v-if="relations" :model-value="get(row, 'relation_type') as string" :options="relationOptions" size="sm" class="w-40" @change="value => set(row, 'relation_type', value)" />
         <EditorRefLabel :id="refId(row)" :type="kind" :references="references" class="min-w-32 flex-1 text-sm font-medium" />
         <template v-for="extra in extras" :key="extra.name">
           <EditorDateInput
@@ -34,9 +32,7 @@
       </li>
     </ul>
     <div class="flex flex-wrap items-center gap-2">
-      <select v-if="relations" v-model="nextRelation" class="select select-sm w-40" :aria-label="$t('catalog.field.relation_type')">
-        <option v-for="value in relations.values" :key="value" :value="value">{{ enumLabel(relations.group, value) }}</option>
-      </select>
+      <UiSelect v-if="relations" v-model="nextRelation" :options="relationOptions" size="sm" class="w-40" :aria-label="$t('catalog.field.relation_type')" />
       <EditorEntityPicker :kind="kind" class="min-w-56 max-w-md flex-1" :placeholder="placeholder" :exclude="[...(exclude ?? []), ...shown.map(row => get(row, field) as number)]" @select="add" />
     </div>
   </div>
@@ -46,6 +42,7 @@
 import type { PickedEntity, PickerKind } from './EntityPicker.vue'
 import type { FieldError } from '~/composables/useAlbumEditor'
 import type { CatalogReferences } from '~/types/catalog'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import type { RowId } from '~/types/document'
 import type { DatePrecision } from '~/types/entry'
 import { ChevronDown, ChevronUp, Trash2 } from '@lucide/vue'
@@ -74,6 +71,7 @@ const emit = defineEmits<{ picked: [PickedEntity] }>()
 
 const { enumLabel } = useCatalogDisplay()
 const shown = computed(() => props.ordered ? byOrder(rows.value) : rows.value)
+const relationOptions = computed<UiSelectOption<string>[]>(() => props.relations ? props.relations.values.map(value => ({ value, label: enumLabel(props.relations!.group, value) })) : [])
 const nextRelation = ref(props.relations?.default ?? props.relations?.values[0] ?? '')
 const errorsOf = (id: RowId) => props.errors?.(id) ?? []
 

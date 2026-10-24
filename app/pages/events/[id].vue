@@ -2,6 +2,7 @@
 import type { AlbumSimple } from '~/types/album'
 import type { EventCircle, EventDetail, VenueMapData } from '~/types/event'
 import type { GenreFamily } from '~/utils/eventVenue'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Disc3, Layers, MapPin, Palette, Search, Star, Users, X } from '@lucide/vue'
 
 const route = useRoute()
@@ -88,6 +89,14 @@ const genreOptions = computed(() => {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([code, count]) => ({ code, count, label: genreShortLabel(code, genres.value) }))
 })
+const genreSelectOptions = computed<UiSelectOption<string | null>[]>(() => [
+  { value: null, label: t('event_page.filters.all_genres') },
+  ...genreOptions.value.map(option => ({ value: option.code, label: `${option.label} (${option.count})` })),
+])
+const hallSelectOptions = computed<UiSelectOption<number | null>[]>(() => [
+  { value: null, label: t('event_page.filters.all_halls') },
+  ...(map.value?.halls ?? []).map(item => ({ value: item.id, label: item.name })),
+])
 watch(family, () => {
   if (genre.value && family.value && genreFamily(genre.value, genres.value) !== family.value) genre.value = null
 })
@@ -195,14 +204,8 @@ useSeoMeta({
                   {{ t(`event_page.families.${item.key}`) }}
                   <span class="tabular-nums opacity-60">{{ familyCounts[item.key] ?? 0 }}</span>
                 </button>
-                <select v-model="genre" class="select select-sm" :class="{ 'border-primary bg-primary/10': genre }">
-                  <option :value="null">{{ t('event_page.filters.all_genres') }}</option>
-                  <option v-for="option in genreOptions" :key="option.code" :value="option.code">{{ option.label }} ({{ option.count }})</option>
-                </select>
-                <select v-if="map && map.halls.length > 1" v-model="hall" class="select select-sm" :class="{ 'border-primary bg-primary/10': hall }">
-                  <option :value="null">{{ t('event_page.filters.all_halls') }}</option>
-                  <option v-for="item in map.halls" :key="item.id" :value="item.id">{{ item.name }}</option>
-                </select>
+                <UiSelect v-model="genre" :options="genreSelectOptions" size="sm" :class="{ 'border-primary bg-primary/10': genre }" />
+                <UiSelect v-if="map && map.halls.length > 1" v-model="hall" :options="hallSelectOptions" size="sm" :class="{ 'border-primary bg-primary/10': hall }" />
                 <button type="button" class="chip" :class="{ 'chip-selected': onlyChecked }" :aria-pressed="onlyChecked" @click="onlyChecked = !onlyChecked">
                   <!-- The checklist's gold star -->
                   <Star :size="14" :class="onlyChecked ? 'text-amber-500 dark:text-amber-400' : 'opacity-60'" :fill="onlyChecked ? 'currentColor' : 'none'" />

@@ -15,42 +15,21 @@
           <!-- Region -->
           <div class="grid gap-1.5 max-w-sm">
             <label for="region" class="text-sm font-medium text-body">{{ t('account_pages.preferences.region') }}</label>
-            <select
-              id="region"
-              v-model="form.region"
-              class="select w-full"
-            >
-              <option value="">{{ t('account_pages.preferences.select_region') }}</option>
-              <option v-for="code in regionCodes" :key="code" :value="code">{{ regionName(code) }}</option>
-            </select>
+            <UiSelect id="region" v-model="form.region" :options="regionOptions" class="w-full" />
             <p class="text-xs text-meta">{{ t('account_pages.preferences.region_hint') }}</p>
           </div>
 
           <!-- Currency -->
           <div class="grid gap-1.5 max-w-sm">
             <label for="currency" class="text-sm font-medium text-body">{{ t('account_pages.preferences.currency') }}</label>
-            <select
-              id="currency"
-              v-model="form.currency"
-              class="select w-full"
-            >
-              <option value="">{{ t('account_pages.preferences.select_currency') }}</option>
-              <option v-for="code in currencyCodes" :key="code" :value="code">{{ currencyName(code) }} ({{ code }})</option>
-            </select>
+            <UiSelect id="currency" v-model="form.currency" :options="currencyOptions" class="w-full" />
             <p class="text-xs text-meta">{{ t('account_pages.preferences.currency_hint') }}</p>
           </div>
 
           <!-- Language -->
           <div class="grid gap-1.5 max-w-sm">
             <label for="language" class="text-sm font-medium text-body">{{ t('account_pages.preferences.language') }}</label>
-            <select
-              id="language"
-              v-model="form.locale"
-              class="select w-full"
-            >
-              <option value="">{{ t('account_pages.preferences.select_language') }}</option>
-              <option v-for="code in languageCodes" :key="code" :value="code">{{ languageName(code) }}</option>
-            </select>
+            <UiSelect id="language" v-model="form.locale" :options="languageOptions" class="w-full" />
             <p class="text-xs text-meta">{{ t('account_pages.preferences.language_hint') }}</p>
           </div>
 
@@ -149,6 +128,18 @@ const { localizeError } = useLocalizedApiError()
 const regionCodes = ['CN', 'HK', 'TW', 'US', 'JP', 'KR', 'SG']
 const currencyCodes = ['CNY', 'HKD', 'TWD', 'USD', 'JPY', 'KRW', 'SGD', 'EUR']
 const languageCodes = ['zh-CN', 'zh-TW', 'en', 'ja', 'ko']
+const regionOptions = computed(() => [
+  { value: '', label: t('account_pages.preferences.select_region') },
+  ...regionCodes.map(code => ({ value: code, label: regionName(code) })),
+])
+const currencyOptions = computed(() => [
+  { value: '', label: t('account_pages.preferences.select_currency') },
+  ...currencyCodes.map(code => ({ value: code, label: `${currencyName(code)} (${code})` })),
+])
+const languageOptions = computed(() => [
+  { value: '', label: t('account_pages.preferences.select_language') },
+  ...languageCodes.map(code => ({ value: code, label: languageName(code) })),
+])
 
 const isLoading = ref(true)
 const isSaving = ref(false)

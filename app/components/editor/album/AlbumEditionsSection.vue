@@ -59,25 +59,18 @@
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}</span>
-            <select v-model="form.edition_type" class="select select-sm w-full">
-              <option v-for="value in enums.edition_type ?? []" :key="value" :value="value">{{ enumLabel('edition_type', value) }}</option>
-            </select>
+            <UiSelect v-model="form.edition_type" :options="editionTypeOptions" size="sm" class="w-full" />
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}</span>
-            <select v-model="form.medium" class="select select-sm w-full">
-              <option v-for="value in enums.product_medium ?? []" :key="value" :value="value">{{ enumLabel('product_medium', value) }}</option>
-            </select>
+            <UiSelect v-model="form.medium" :options="mediumOptions" size="sm" class="w-full" />
           </label>
         </div>
 
         <div v-if="form.edition_type === 'limited'" class="grid gap-4 sm:grid-cols-2">
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}</span>
-            <select v-model="form.limited_rule" class="select select-sm w-full">
-              <option :value="null">—</option>
-              <option v-for="value in enums.limited_rule ?? []" :key="value" :value="value">{{ enumLabel('limited_rule', value) }}</option>
-            </select>
+            <UiSelect v-model="form.limited_rule" :options="limitedRuleOptions" size="sm" class="w-full" />
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}</span>
@@ -146,6 +139,7 @@
 <script setup lang="ts">
 import type { AlbumProductRow } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
 import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
 import { moveRow, sameId } from '~/utils/documentRows'
@@ -156,6 +150,12 @@ const { enumLabel, formatDate } = useCatalogDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
+const editionTypeOptions = computed<UiSelectOption<string>[]>(() => (enums.value.edition_type ?? []).map(value => ({ value, label: enumLabel('edition_type', value) })))
+const mediumOptions = computed<UiSelectOption<string>[]>(() => (enums.value.product_medium ?? []).map(value => ({ value, label: enumLabel('product_medium', value) })))
+const limitedRuleOptions = computed<UiSelectOption<string | null>[]>(() => [
+  { value: null, label: '—' },
+  ...(enums.value.limited_rule ?? []).map(value => ({ value, label: enumLabel('limited_rule', value) })),
+])
 const products = computed(() => sortedProducts(album.value))
 const mainDiscs = computed(() => mainDiscsOf(album.value))
 const unticked = computed(() => untickedDiscs(album.value))

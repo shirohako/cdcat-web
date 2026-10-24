@@ -121,6 +121,48 @@
   }
 }
 
+/* Scrollbars everywhere (page, sidebar, menus, editor, code blocks): a thin rounded thumb floating on a
+   clear track, a little see-through, in the text colour of the current theme; it firms up on hover and takes
+   the theme colour while dragged. Chromium and Safari get the full look through ::-webkit-scrollbar.
+   Chromium also understands scrollbar-color, which would switch that look off, so the standard properties
+   are only given to browsers without ::-webkit-scrollbar (Firefox: colour and thin width only). Utilities
+   such as `[&::-webkit-scrollbar]:hidden` still win, being in a later layer. */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 2.5px solid transparent;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--title) 15%, transparent) padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--title) 30%, transparent);
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    background-color: color-mix(in oklab, var(--primary) 60%, transparent);
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    :root {
+      scrollbar-color: color-mix(in oklab, var(--title) 20%, transparent) transparent;
+    }
+
+    * {
+      scrollbar-width: thin;
+    }
+  }
+}
+
 /* 字体定义 - 多语言优化 */
 @layer base {
   button:not(:disabled),

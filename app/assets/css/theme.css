@@ -120,6 +120,13 @@
     background-color: var(--selection);
   }
 
+  /* Native selects that are left (UiSelect draws its own list): their option list would otherwise show the
+     field's light text on the browser's white popup in the dark theme. */
+  :where(select) :where(option, optgroup) {
+    background-color: var(--popover);
+    color: var(--title);
+  }
+
   :where(a, button, summary, [role="button"], [tabindex]):focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;

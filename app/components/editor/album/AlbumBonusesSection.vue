@@ -48,9 +48,7 @@
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}</span>
-            <select v-model="form.type" class="select select-sm w-full">
-              <option v-for="value in enums.bonus_type ?? []" :key="value" :value="value">{{ enumLabel('bonus_type', value) }}</option>
-            </select>
+            <UiSelect v-model="form.type" :options="typeOptions" size="sm" class="w-full" />
           </label>
         </div>
 
@@ -61,10 +59,7 @@
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.availability') }}</span>
-            <select v-model="form.availability" class="select select-sm w-full">
-              <option :value="null">—</option>
-              <option v-for="value in enums.limited_rule ?? []" :key="value" :value="value">{{ enumLabel('limited_rule', value) }}</option>
-            </select>
+            <UiSelect v-model="form.availability" :options="availabilityOptions" size="sm" class="w-full" />
           </label>
           <div>
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.event_id') }}</span>
@@ -96,16 +91,11 @@
             </span>
             <span v-for="(disc, index) in newDiscs" :key="disc.key" class="inline-flex items-center gap-1 rounded-lg border border-dashed border-pink-300 bg-card px-1.5 py-0.5 text-xs text-pink-800 dark:border-pink-400/40 dark:text-pink-300">
               <Disc3 :size="11" />{{ $t('editor.dialog.new_disc') }}
-              <select v-model="disc.format" class="select select-xs h-6 min-h-0 w-20 border-0 bg-transparent text-xs" :aria-label="$t('catalog.field.format')">
-                <option v-for="value in enums.disc_format ?? []" :key="value" :value="value">{{ enumLabel('disc_format', value) }}</option>
-              </select>
+              <UiSelect v-model="disc.format" :options="formatOptions" size="xs" class="h-6 min-h-0 w-20 border-0 bg-transparent text-xs" :aria-label="$t('catalog.field.format')" />
               <button type="button" class="text-pink-400 transition-colors hover:text-pink-700 dark:hover:text-pink-200" :aria-label="$t('common.delete')" @click="newDiscs.splice(index, 1)"><X :size="11" /></button>
             </span>
             <EditorAddButton small @click="newDiscs.push({ key: newKey('nd'), format: 'cd' })">{{ $t('editor.bonuses.add_disc') }}</EditorAddButton>
-            <select v-if="freeDiscs.length" class="select select-sm h-7 w-44 text-xs" @change="useDisc">
-              <option value="">{{ $t('editor.bonuses.use_disc') }}</option>
-              <option v-for="disc in freeDiscs" :key="disc.id" :value="String(disc.id)">{{ $t('editor.album.disc_n', { n: disc.position }) }}{{ disc.title ? ` · ${disc.title}` : '' }}</option>
-            </select>
+            <UiSelect v-if="freeDiscs.length" model-value="" :options="freeDiscOptions" :placeholder="$t('editor.bonuses.use_disc')" size="sm" class="h-7 w-44 text-xs" @change="useDisc" />
           </div>
         </div>
 
@@ -132,6 +122,7 @@
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { AlbumBonusRow, AlbumProductRow } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, CalendarDays, Disc3, Gift, PencilLine, Trash2, X } from '@lucide/vue'
 import { addDisc, blankBonus, mainDiscs, removeBonus, setDiscBonus, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
 import { newKey } from '~/utils/documentKeys'
@@ -145,6 +136,12 @@ const { enumLabel } = useCatalogDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
+const typeOptions = computed<UiSelectOption<string>[]>(() => (enums.value.bonus_type ?? []).map(value => ({ value, label: enumLabel('bonus_type', value) })))
+const availabilityOptions = computed<UiSelectOption<string | null>[]>(() => [
+  { value: null, label: '—' },
+  ...(enums.value.limited_rule ?? []).map(value => ({ value, label: enumLabel('limited_rule', value) })),
+])
+const formatOptions = computed<UiSelectOption<string>[]>(() => (enums.value.disc_format ?? []).map(value => ({ value, label: enumLabel('disc_format', value) })))
 const bonuses = computed(() => byOrder(album.value.bonuses))
 const products = computed(() => sortedProducts(album.value))
 const errorsOf = (id: RowId) => editor.errorsIn(`bonuses.${id}`)
@@ -180,6 +177,12 @@ const freeDiscs = computed(() => {
   return free.length > 1 ? free : []
 })
 
+/** Picking one links it; the select itself always shows the prompt. */
+const freeDiscOptions = computed<UiSelectOption<string>[]>(() => freeDiscs.value.map(disc => ({
+  value: String(disc.id),
+  label: `${t('editor.album.disc_n', { n: disc.position })}${disc.title ? ` · ${disc.title}` : ''}`,
+})))
+
 const edit = (bonus: AlbumBonusRow | null) => {
   editing.value = bonus
   form.value = bonus ? JSON.parse(JSON.stringify(bonus)) : blankBonus(album.value)
@@ -194,10 +197,8 @@ const toggleProduct = (productId: RowId) => {
   form.value.product_ids = has(form.value.product_ids, productId) ? form.value.product_ids.filter(id => !sameId(id, productId)) : [...form.value.product_ids, productId]
 }
 const unlinkDisc = (discId: RowId) => { linked.value = linked.value.filter(id => !sameId(id, discId)) }
-const useDisc = (event: Event) => {
-  const select = event.target as HTMLSelectElement
-  const disc = freeDiscs.value.find(item => String(item.id) === select.value)
-  select.value = ''
+const useDisc = (value: string) => {
+  const disc = freeDiscs.value.find(item => String(item.id) === value)
   if (disc) linked.value = [...linked.value, disc.id]
 }
 

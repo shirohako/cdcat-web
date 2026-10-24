@@ -12,11 +12,7 @@
       <div class="space-y-4">
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_key') }}</span>
-          <select v-model="form.key" data-autofocus class="select select-sm w-full" @change="form.value = null">
-            <option v-for="definition in definitions" :key="definition.key" :value="definition.key" :disabled="!definition.is_multiple && taken(definition.key, editing)">
-              {{ fieldLabel(definition.key) }}
-            </option>
-          </select>
+          <UiSelect v-model="form.key" :options="keyOptions" data-autofocus size="sm" class="w-full" @change="form.value = null" />
           <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-meta">{{ hint(form.key) }}</span>
         </label>
         <div>
@@ -36,6 +32,7 @@
 <script setup lang="ts">
 import type { CatalogReferences } from '~/types/catalog'
 import type { AttributeRow, RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ListChecks } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
@@ -93,6 +90,11 @@ const remove = (row: AttributeRow) => {
 
 const dialog = ref(false)
 const editing = ref<AttributeRow | null>(null)
+const keyOptions = computed<UiSelectOption<string>[]>(() => definitions.value.map(definition => ({
+  value: definition.key,
+  label: fieldLabel(definition.key),
+  disabled: !definition.is_multiple && taken(definition.key, editing.value),
+})))
 const form = reactive({ key: '', value: null as unknown })
 const tried = ref(false)
 

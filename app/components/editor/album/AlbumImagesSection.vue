@@ -36,10 +36,7 @@
       <EditorImageImportDialog v-model="urlOpen" :busy="importing" :error="urlError" @import="fromUrl">
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.kind') }}</span>
-          <select v-model="urlKind" class="select select-sm w-full">
-            <option value="">{{ $t('editor.dialog.image_kind_guess') }}</option>
-            <option v-for="value in kinds" :key="value" :value="value" :disabled="value === 'cover'">{{ enumLabel('image_kind', value) }}</option>
-          </select>
+          <UiSelect v-model="urlKind" :options="urlKindOptions" size="sm" class="w-full" />
         </label>
       </EditorImageImportDialog>
 
@@ -52,6 +49,7 @@
 
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Images, Link2, Upload } from '@lucide/vue'
 import { addImage, coverOf } from '~/utils/albumDocument'
 import { byOrder, moveRow, sameId } from '~/utils/documentRows'
@@ -83,6 +81,10 @@ const urlOpen = ref(false)
 const urlError = ref('')
 /** The kind for an imported image; blank guesses it from the address. */
 const urlKind = ref('')
+const urlKindOptions = computed<UiSelectOption<string>[]>(() => [
+  { value: '', label: t('editor.dialog.image_kind_guess') },
+  ...kinds.value.map(value => ({ value, label: enumLabel('image_kind', value), disabled: value === 'cover' })),
+])
 
 const guessKind = (name: string) => {
   const lower = name.toLowerCase()

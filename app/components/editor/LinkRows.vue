@@ -31,10 +31,7 @@
         </label>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.link_provider_id') }}</span>
-          <select v-model="form.provider" class="select select-sm w-full" @change="pickedByHand = true">
-            <option :value="null" disabled>—</option>
-            <option v-for="provider in providers" :key="provider.id" :value="provider.id">{{ providerName(provider.name) }}</option>
-          </select>
+          <UiSelect v-model="form.provider" :options="providerOptions" placeholder="—" size="sm" class="w-full" @change="pickedByHand = true" />
           <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_provider_hint') }}</span>
         </label>
       </div>
@@ -48,6 +45,7 @@
 
 <script setup lang="ts">
 import type { LinkRow } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder } from '~/utils/documentRows'
@@ -58,6 +56,7 @@ const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const providers = computed(() => schema.value?.link_providers ?? [])
 const providerName = (name: string) => name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+const providerOptions = computed<UiSelectOption<number | null>[]>(() => providers.value.map(provider => ({ value: provider.id, label: providerName(provider.name) })))
 const providerOf = (id: number | null) => {
   const provider = providers.value.find(item => item.id === id)
   return provider ? providerName(provider.name) : '—'

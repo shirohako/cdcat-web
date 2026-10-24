@@ -2,6 +2,7 @@
 import { Loader2, Send } from '@lucide/vue'
 import type { ContentLinkSummary, ContentLinkType, TagSummary } from '~/types/article'
 import type { DiscussionCategoryDetail, DiscussionReferences } from '~/types/discussion'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { TAG_NAME_MAX, tagErrorKey, tagPayload } from '~/utils/tags'
 
 /**
@@ -25,6 +26,7 @@ const fieldErrors = ref<Record<string, string>>({})
 const appliedTemplate = ref('')
 
 const choices = computed(() => flat.value.filter(category => !category.is_archived && (category.topic_permission === 'everyone' || canModerate.value)))
+const categoryOptions = computed<UiSelectOption<number | null>[]>(() => choices.value.map(category => ({ value: category.id, label: `${category.parent_id ? '\u3000' : ''}${categoryName(category)}` })))
 const selected = computed(() => flat.value.find(category => category.id === draft.value.category_id) ?? null)
 
 onMounted(async () => {
@@ -104,10 +106,7 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
         <h1 class="text-xl font-bold text-title">{{ t('discussions.new.title') }}</h1>
         <label class="block text-sm font-medium text-body">
           {{ t('discussions.fields.category') }}
-          <select v-model="draft.category_id" class="select mt-1 w-full" :class="{ 'select-error': fieldErrors.category_id }">
-            <option :value="null" disabled>{{ t('discussions.new.choose_category') }}</option>
-            <option v-for="category in choices" :key="category.id" :value="category.id">{{ category.parent_id ? '\u3000' : '' }}{{ categoryName(category) }}</option>
-          </select>
+          <UiSelect v-model="draft.category_id" :options="categoryOptions" :placeholder="t('discussions.new.choose_category')" :invalid="Boolean(fieldErrors.category_id)" class="mt-1 w-full" />
           <span v-if="fieldErrors.category_id" class="mt-1 block text-xs text-danger">{{ fieldErrors.category_id }}</span>
           <span v-else-if="selected?.kind === 'question'" class="mt-1 block text-xs text-success">{{ t('discussions.new.question_hint') }}</span>
         </label>

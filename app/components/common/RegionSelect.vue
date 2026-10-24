@@ -1,15 +1,11 @@
 <template>
-  <select
-    :value="modelValue"
-    class="select w-full"
+  <UiSelect
+    :model-value="modelValue"
+    :options="options"
+    class="w-full"
     v-bind="$attrs"
-    @change="onchange"
-  >
-    <option value="">{{ $t('account_pages.preferences.select_region') }}</option>
-    <option v-for="c in countries" :key="c.code" :value="c.value">
-      {{ c.flag }} {{ c.name }}
-    </option>
-  </select>
+    @update:model-value="onchange"
+  />
 </template>
 
 <script setup>
@@ -26,8 +22,8 @@ defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const onchange = (e) => {
-  emit('update:modelValue', e.target.value)
+const onchange = (value) => {
+  emit('update:modelValue', value)
 }
 
 // 主要国家列表（ISO 3166-1 alpha-2）
@@ -65,4 +61,11 @@ const countries = computed(() => mainCountryCodes.map((code) => {
     flag: getEmojiFlag(code),
   }
 }).sort((a, b) => a.name.localeCompare(b.name)))
+
+const { t } = useI18n()
+
+const options = computed(() => [
+  { value: '', label: t('account_pages.preferences.select_region') },
+  ...countries.value.map(c => ({ value: c.value, label: `${c.flag} ${c.name}` })),
+])
 </script>

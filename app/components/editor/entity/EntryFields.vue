@@ -9,16 +9,11 @@
         </label>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}</span>
-          <select v-model="doc.type" class="select select-sm w-full">
-            <option v-for="value in ENTRY_TYPES" :key="value" :value="value">{{ enumLabel('entry_type', value) }}</option>
-          </select>
+          <UiSelect v-model="doc.type" :options="typeOptions" size="sm" class="w-full" />
         </label>
         <label v-if="formats.length" class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.format') }}</span>
-          <select v-model="doc.format" class="select select-sm w-full">
-            <option :value="null">{{ $t('catalog.form.format_none') }}</option>
-            <option v-for="value in formats" :key="value" :value="value">{{ enumLabel('format', value) }}</option>
-          </select>
+          <UiSelect v-model="doc.format" :options="formatOptions" size="sm" class="w-full" />
         </label>
         <div>
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
@@ -91,15 +86,22 @@
 
 <script setup lang="ts">
 import type { EntryDocument } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Clapperboard, Disc3, Languages, Network } from '@lucide/vue'
 import { ENTRY_FORMATS, ENTRY_TYPES } from '~/types/entry'
 
 const editor = useEntityEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
+const { t } = useI18n()
 const doc = computed(() => editor.doc.value as unknown as EntryDocument)
 const enums = computed(() => schema.value?.enums ?? {})
 const formats = computed(() => ENTRY_FORMATS[doc.value.type as keyof typeof ENTRY_FORMATS] ?? [])
+const typeOptions = computed<UiSelectOption<string>[]>(() => ENTRY_TYPES.map(value => ({ value, label: enumLabel('entry_type', value) })))
+const formatOptions = computed<UiSelectOption<string | null>[]>(() => [
+  { value: null, label: t('catalog.form.format_none') },
+  ...formats.value.map(value => ({ value, label: enumLabel('format', value) })),
+])
 
 // A format of another type does not apply after the type changes.
 watch(() => doc.value.type, () => {

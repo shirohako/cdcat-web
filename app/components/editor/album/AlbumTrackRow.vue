@@ -53,9 +53,7 @@
         </label>
         <label v-if="discs.length > 1" class="block">
           <span class="mb-1 block text-[11px] text-meta">{{ $t('editor.album.move_to_disc') }}</span>
-          <select :value="String(track.disc_id)" class="select select-sm w-32" @change="moveTo(($event.target as HTMLSelectElement).value)">
-            <option v-for="disc in discs" :key="disc.id" :value="String(disc.id)">{{ $t('editor.album.disc_n', { n: disc.position }) }}</option>
-          </select>
+          <UiSelect :model-value="String(track.disc_id)" :options="discOptions" size="sm" class="w-32" @change="moveTo" />
         </label>
         <div class="flex gap-1">
           <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('catalog.form.move_up')" @click="moveTrack(album, track.id, -1)"><ArrowUp :size="14" /></button>
@@ -75,6 +73,7 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, ChevronDown, Music2, X } from '@lucide/vue'
 import { findTrack, moveTrack, moveTrackToDisc, removeTrack, sortedDiscs } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
@@ -88,6 +87,7 @@ const { confirm } = useConfirm()
 const album = computed(() => editor.album.value)
 const track = computed(() => findTrack(album.value, props.trackId))
 const discs = computed(() => sortedDiscs(album.value))
+const discOptions = computed<UiSelectOption<string>[]>(() => discs.value.map(disc => ({ value: String(disc.id), label: t('editor.album.disc_n', { n: disc.position }) })))
 const open = ref(false)
 
 const errorAt = (field: string) => editor.errorAt('tracks', props.trackId, field)

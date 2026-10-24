@@ -3,9 +3,7 @@
     <div :id="`editor-disc-${disc.id}`" class="flex flex-wrap items-center gap-2 border-b border-line bg-sunken px-3 py-2">
       <Disc3 :size="14" class="shrink-0 text-meta" />
       <span class="shrink-0 text-sm font-bold text-body">{{ $t('editor.album.disc_n', { n: disc.position }) }}</span>
-      <select v-model="disc.format" class="select select-sm h-8 w-28 text-xs" :aria-label="$t('catalog.field.format')">
-        <option v-for="value in formats" :key="value" :value="value">{{ enumLabel('disc_format', value) }}</option>
-      </select>
+      <UiSelect v-model="disc.format" :options="formatOptions" size="sm" class="h-8 w-28 text-xs" :aria-label="$t('catalog.field.format')" />
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
@@ -37,6 +35,7 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Disc3, Trash2 } from '@lucide/vue'
 import { addTrack, findDisc, moveDisc, removeDisc, sortedDiscs, tracksOn } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
@@ -53,6 +52,7 @@ const { enumLabel, formatDuration } = useCatalogDisplay()
 const album = computed(() => editor.album.value)
 const disc = computed(() => findDisc(album.value, props.discId))
 const formats = computed(() => schema.value?.enums?.disc_format ?? [])
+const formatOptions = computed<UiSelectOption<string>[]>(() => formats.value.map(value => ({ value, label: enumLabel('disc_format', value) })))
 const tracks = computed(() => tracksOn(album.value, props.discId))
 const discs = computed(() => sortedDiscs(album.value))
 const first = computed(() => sameId(discs.value[0]?.id, props.discId))

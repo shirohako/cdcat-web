@@ -87,16 +87,17 @@
           <transition name="dropdown">
             <div
               v-if="showLanguageMenu"
-              class="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line"
+              class="absolute right-0 mt-2 w-44 space-y-0.5 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line"
             >
+              <!-- The current language is tinted with the theme colour; hovering only lifts the others, so the two never look alike. -->
               <button
                 v-for="option in availableLocales"
                 :key="option.code"
                 :class="[
                   'w-full flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors duration-150 ease-out',
                   currentLocale === option.code
-                    ? 'bg-ghost-hover font-semibold text-primary'
-                    : 'text-body hover:bg-ghost-hover hover:text-primary'
+                    ? 'bg-primary/15 font-semibold text-primary'
+                    : 'text-body hover:bg-ghost-hover hover:text-title'
                 ]"
                 @click="switchLanguage(option.code)"
               >

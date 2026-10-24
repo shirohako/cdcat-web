@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Loader2 } from '@lucide/vue'
 import type { DiscussionPost } from '~/types/discussion'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 type Action = 'hide' | 'unhide' | 'delete' | 'edit' | 'silence'
 
@@ -19,6 +20,10 @@ const action = ref<Action>('hide')
 const reason = ref('')
 const raw = ref('')
 const days = ref<number | null>(3)
+const dayOptions = computed<UiSelectOption<number | null>[]>(() => [
+  ...[1, 3, 7, 30].map(value => ({ value, label: t('discussions.moderation.days', { count: value }) })),
+  { value: null, label: t('discussions.moderation.forever') },
+])
 const busy = ref(false)
 const error = ref('')
 
@@ -106,10 +111,7 @@ async function submit() {
       </ClientOnly>
       <label v-if="action === 'silence'" class="block text-sm">
         {{ t('discussions.moderation.duration') }}
-        <select v-model="days" class="select mt-1 w-full">
-          <option v-for="value in [1, 3, 7, 30]" :key="value" :value="value">{{ t('discussions.moderation.days', { count: value }) }}</option>
-          <option :value="null">{{ t('discussions.moderation.forever') }}</option>
-        </select>
+        <UiSelect v-model="days" :options="dayOptions" class="mt-1 w-full" />
       </label>
       <label class="block text-sm">
         {{ needsReason ? t('discussions.moderation.reason') : t('discussions.moderation.reason_optional') }}

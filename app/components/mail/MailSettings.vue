@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Lock } from '@lucide/vue'
 import type { MailSubscription } from '~/types/mail'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 /**
  * The mail language and one switch per category. The parent saves each change and passes the
  * result back in: the account settings tab, and the settings page behind the link in group mail.
  */
-const props = defineProps<{
+defineProps<{
   mailLocale: string
   subscriptions: MailSubscription[]
   busy?: boolean
@@ -21,12 +22,11 @@ const { t, locale, locales } = useI18n()
 const languages = computed(() => locales.value.map(item => typeof item === 'string' ? { code: item, name: item } : { code: item.code, name: item.name ?? item.code }))
 const localized = (values?: Record<string, string>) => values?.[locale.value] ?? values?.en ?? ''
 
-// The select keeps showing the saved language until the parent confirms the new one.
-function changeLocale(event: Event) {
-  const select = event.target as HTMLSelectElement
-  const code = select.value
-  select.value = props.mailLocale
-  emit('locale', code)
+// The select keeps showing the saved language until the parent confirms the new one: it is bound one way
+// (with an update listener, so UiSelect doesn't keep the pick locally) and picking only asks the parent.
+const languageOptions = computed<UiSelectOption<string>[]>(() => languages.value.map(language => ({ value: language.code, label: language.name })))
+const changeLocale = (code?: string) => {
+  if (code) emit('locale', code)
 }
 </script>
 
@@ -34,9 +34,7 @@ function changeLocale(event: Event) {
   <div class="space-y-6">
     <div class="grid max-w-sm gap-1.5">
       <label for="mail-locale" class="text-sm font-medium text-body">{{ t('mail_settings.language') }}</label>
-      <select id="mail-locale" :value="mailLocale" :disabled="busy" class="select w-full" @change="changeLocale">
-        <option v-for="language in languages" :key="language.code" :value="language.code">{{ language.name }}</option>
-      </select>
+      <UiSelect id="mail-locale" :model-value="mailLocale" :options="languageOptions" :disabled="busy" class="w-full" @update:model-value="changeLocale" />
       <p class="text-xs text-meta">{{ t('mail_settings.language_help') }}</p>
     </div>
 

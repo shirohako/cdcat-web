@@ -32,7 +32,7 @@ const choose = (event: MouseEvent) => {
     class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-45"
     :class="danger
       ? 'text-danger hover:bg-danger/10'
-      : active ? 'bg-ghost-hover font-semibold text-primary' : 'text-body hover:bg-ghost-hover hover:text-primary'"
+      : active ? 'bg-primary/15 font-semibold text-primary' : 'text-body hover:bg-ghost-hover hover:text-title'"
     @click="choose"
   >
     <UiIcon v-if="icon" :icon="icon" class="size-4 shrink-0" />

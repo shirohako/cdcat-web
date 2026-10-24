@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { FileText, FolderOpen, PenLine, Search, Sparkles } from '@lucide/vue'
 import type { ArticleCard, Pagination } from '~/types/article'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,6 +14,10 @@ const { types, typeName } = useArticleTypes()
 const type = computed(() => typeof route.query.type === 'string' && /^[a-z][a-z0-9_]{1,19}$/.test(route.query.type) ? route.query.type : null)
 const typeOptions = computed(() => types.value.filter(item => item.is_active || item.key === type.value))
 const sort = computed(() => route.query.sort === 'popular' ? 'popular' : 'latest')
+const sortOptions = computed<UiSelectOption<'latest' | 'popular'>[]>(() => [
+  { value: 'latest', label: t('article_ui.list.latest') },
+  { value: 'popular', label: t('article_ui.list.popular') },
+])
 const search = computed(() => route.query.search ? String(route.query.search) : '')
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
 const filtered = computed(() => type.value || search.value)
@@ -96,10 +101,10 @@ useHead({ title: computed(() => t('content_display.articles')) })
             </button>
           </div>
           <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
-            <select :value="sort" class="select select-xs" :aria-label="t('article_ui.list.sort')" @change="update({ sort: ($event.target as HTMLSelectElement).value === 'popular' ? 'popular' : null })">
-              <option value="latest">{{ t('article_ui.list.latest') }}</option>
-              <option value="popular">{{ t('article_ui.list.popular') }}</option>
-            </select>
+            <UiSelect
+              :model-value="sort" :options="sortOptions" size="xs" :aria-label="t('article_ui.list.sort')"
+              @update:model-value="value => update({ sort: value === 'popular' ? 'popular' : null })"
+            />
             <form class="flex items-center gap-1.5 rounded-lg border border-line bg-field px-2.5 py-1.5 transition-colors duration-150 ease-out focus-within:border-primary" role="search" @submit.prevent="submitSearch">
               <Search :size="13" class="text-meta" />
               <input v-model="searchInput" type="search" maxlength="100" class="w-36 bg-transparent text-xs text-title outline-none placeholder:text-faint" :placeholder="t('article_ui.list.search')">

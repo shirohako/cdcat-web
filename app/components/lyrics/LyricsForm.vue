@@ -3,9 +3,7 @@
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.kind') }}</span>
-        <select v-model="form.kind" class="select select-sm" :disabled="!!lyric">
-          <option v-for="kind in LYRIC_KINDS" :key="kind" :value="kind" :disabled="kind === 'original' && hasOtherOriginal">{{ enumLabel('lyric_kind', kind) }}</option>
-        </select>
+        <UiSelect v-model="form.kind" :options="kindOptions" size="sm" :disabled="!!lyric" />
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.language') }}</span>
@@ -16,18 +14,13 @@
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.format') }}</span>
-        <select v-model="form.format" class="select select-sm">
-          <option v-for="format in LYRIC_FORMATS" :key="format" :value="format">{{ $t(`lyrics_ui.format_${format}`) }}</option>
-        </select>
+        <UiSelect v-model="form.format" :options="formatOptions" size="sm" />
       </label>
     </div>
 
     <label v-if="form.kind !== 'original' && originals.length" class="form-control">
       <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.translation_of') }}</span>
-      <select v-model="form.translation_of_id" class="select select-sm">
-        <option :value="null">—</option>
-        <option v-for="original in originals" :key="original.id" :value="original.id">{{ localeName(original.language) }}</option>
-      </select>
+      <UiSelect v-model="form.translation_of_id" :options="originalOptions" size="sm" />
     </label>
 
     <label class="form-control">
@@ -65,8 +58,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Lyric, LyricInput, LyricSummary } from '~/types/lyric'
+import type { Lyric, LyricFormat, LyricInput, LyricKind, LyricSummary } from '~/types/lyric'
 import type { Revision } from '~/types/revision'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { LYRIC_FORMATS, LYRIC_KINDS } from '~/types/lyric'
 
 const props = defineProps<{ trackId: number, lyric: Lyric | null, originals: LyricSummary[] }>()
@@ -90,6 +84,14 @@ const form = reactive<LyricInput>({
   summary: '',
 })
 const hasOtherOriginal = computed(() => props.originals.some(original => original.id !== props.lyric?.id))
+
+const { t } = useI18n()
+const kindOptions = computed<UiSelectOption<LyricKind>[]>(() => LYRIC_KINDS.map(kind => ({ value: kind, label: enumLabel('lyric_kind', kind), disabled: kind === 'original' && hasOtherOriginal.value })))
+const formatOptions = computed<UiSelectOption<LyricFormat>[]>(() => LYRIC_FORMATS.map(format => ({ value: format, label: t(`lyrics_ui.format_${format}`) })))
+const originalOptions = computed<UiSelectOption<number | null>[]>(() => [
+  { value: null, label: '—' },
+  ...props.originals.map(original => ({ value: original.id, label: localeName(original.language) })),
+])
 
 const saving = ref(false)
 const errorMessage = ref('')

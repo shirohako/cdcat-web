@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DiscussionTopicList } from '~/types/discussion'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 
 type Tab = 'latest' | 'new' | 'hot' | 'featured' | 'unread' | 'watching'
 
@@ -17,6 +18,11 @@ const { isAuthenticated } = useAuth()
 const tabs = computed<Tab[]>(() => isAuthenticated.value ? ['latest', 'new', 'hot', 'featured', 'unread', 'watching'] : ['latest', 'new', 'hot', 'featured'])
 const tab = computed<Tab>(() => tabs.value.includes(route.query.tab as Tab) ? route.query.tab as Tab : 'latest')
 const status = computed(() => ['solved', 'unsolved'].includes(String(route.query.status)) ? String(route.query.status) : null)
+const statusOptions = computed<UiSelectOption<string>[]>(() => [
+  { value: '', label: t('discussions.list.status_all') },
+  { value: 'unsolved', label: t('discussions.list.status_unsolved') },
+  { value: 'solved', label: t('discussions.list.status_solved') },
+])
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
 
 const update = (changes: Record<string, string | null | undefined>) => {
@@ -55,14 +61,10 @@ const { data, status: loadStatus, refresh, loading, refetching, revealKey, revea
           {{ t(`discussions.list.tab.${value}`) }}
         </button>
       </nav>
-      <select
-        v-if="question" :value="status ?? ''" class="select select-sm ml-auto"
-        :aria-label="t('discussions.list.status')" @change="update({ status: ($event.target as HTMLSelectElement).value || null })"
-      >
-        <option value="">{{ t('discussions.list.status_all') }}</option>
-        <option value="unsolved">{{ t('discussions.list.status_unsolved') }}</option>
-        <option value="solved">{{ t('discussions.list.status_solved') }}</option>
-      </select>
+      <UiSelect
+        v-if="question" :model-value="status ?? ''" :options="statusOptions" size="sm" class="ml-auto"
+        :aria-label="t('discussions.list.status')" @update:model-value="value => update({ status: value || null })"
+      />
     </div>
     <template v-if="data">
       <CommonLoadError v-if="loadStatus === 'error'" class="mb-3" @retry="refresh()" />
