@@ -67,8 +67,8 @@ continues</p>
 </thead>
 <tbody>
 <tr>
-<td>1</td>
-<td style="text-align:center"><strong>2</strong></td>
+<td data-label="Column A">1</td>
+<td style="text-align:center" data-label="Column B"><strong>2</strong></td>
 </tr>
 </tbody>
 </table>

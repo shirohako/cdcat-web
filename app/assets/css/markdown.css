@@ -530,7 +530,7 @@
     content: counter(markdown-step);
     position: absolute;
     left: 0;
-    /* Center the 1rem badge against the roughly 1.5rem first line. */
+    /* Center the 1rem badge against the first line: about 1.5rem in sm text (see the base override below). */
     top: 0.25rem;
     display: grid;
     width: 1rem;
@@ -544,6 +544,11 @@
     font-weight: 700;
     line-height: 1;
     z-index: 1;
+  }
+
+  /* Base text has a 1.8rem first line, so the badge comes down to its middle. */
+  .markdown-body-base .markdown-container-steps > ol > li::before {
+    top: 0.4rem;
   }
 
   /* Loose Markdown lists wrap each item in a paragraph; their margins would leave large gaps. */

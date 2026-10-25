@@ -196,4 +196,11 @@ describe('Markdown renderer', () => {
     expect(html).not.toContain('markdown-container')
     expect(html).toContain('unknown')
   })
+
+  it('labels table cells with their column heading, escaped', () => {
+    const html = renderMarkdown('| **Item** | <b>Use & keep</b> | |\n|---|---|---|\n| A | B | C |')
+    expect(html).toContain('<td data-label="Item">A</td>')
+    expect(html).toContain('<td data-label="&lt;b&gt;Use &amp; keep&lt;/b&gt;">B</td>')
+    expect(html).toContain('<td>C</td>')
+  })
 })

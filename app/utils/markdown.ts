@@ -281,6 +281,28 @@ md.core.ruler.push('psray_heading_ids', (state) => {
 })
 
 /**
+ * Every body cell gets its column's heading as `data-label` (plain text, escaped like any attribute), so a narrow
+ * layout can stack a row and still name each value, as the legal pages do.
+ */
+md.core.ruler.push('cdcat_table_labels', (state) => {
+  let labels: string[] = []
+  let column = 0
+  for (let index = 0; index < state.tokens.length; index += 1) {
+    const token = state.tokens[index]!
+    if (token.type === 'thead_open') labels = []
+    else if (token.type === 'tr_open') column = 0
+    else if (token.type === 'th_open') {
+      const inline = state.tokens[index + 1]
+      labels.push(inline?.type === 'inline' ? (inline.children?.map(child => child.content).join('') || inline.content) : '')
+    }
+    else if (token.type === 'td_open') {
+      const label = labels[column++]
+      if (label) token.attrSet('data-label', label)
+    }
+  }
+})
+
+/**
  * A deliberately small, safe subset of Pandoc's bracketed-span attributes:
  *
  *   [text]{color=red}
