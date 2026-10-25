@@ -105,6 +105,7 @@ usePageSeo({
     return composeDescription(lead, plainText(value.description), descriptionLength(locale.value))
   },
   image: () => album.value?.cover?.medium_url || album.value?.image_url,
+  card: () => album.value?.share_card_url,
   type: 'music.album',
   noindex: () => album.value?.is_pending,
   adult: () => album.value?.is_adult,

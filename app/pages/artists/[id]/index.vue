@@ -264,6 +264,7 @@ usePageSeo({
       )
     : undefined,
   image: () => artist.value?.image_url,
+  card: () => artist.value?.share_card_url,
   type: 'profile',
   noindex: () => artist.value?.is_pending,
   error,

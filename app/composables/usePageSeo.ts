@@ -10,6 +10,11 @@ export interface PageSeoOptions {
   image?: MaybeRefOrGetter<string | null | undefined>
   /** A wide image (banner, key visual, article cover): shared as a large card instead of a thumbnail. */
   wideImage?: boolean
+  /**
+   * The share card the backend drew for the page (1200×630 JPEG, docs/share-cards in the API repo). Shared
+   * as a large card in place of `image`, which stays the fallback until the card exists.
+   */
+  card?: MaybeRefOrGetter<string | null | undefined>
   /** og:type, `website` by default. */
   type?: string
   noindex?: MaybeRefOrGetter<boolean | null | undefined>
@@ -76,9 +81,13 @@ export function usePageSeo(options: PageSeoOptions) {
     const text = toValue(options.description)
     return text ? truncateText(text, descriptionLength(locale.value)) : undefined
   })
+  const card = computed(() => {
+    const url = toValue(options.card)
+    return url ? absolute(url) : undefined
+  })
   const image = computed(() => {
     const url = toValue(options.image)
-    return url ? absolute(url) : undefined
+    return card.value ?? (url ? absolute(url) : undefined)
   })
 
   useSeoMeta({
@@ -89,7 +98,11 @@ export function usePageSeo(options: PageSeoOptions) {
     ogType: (options.type ?? 'website') as 'website',
     ogUrl: canonical,
     ogImage: image,
-    twitterCard: () => (image.value && options.wideImage ? 'summary_large_image' : 'summary'),
+    ogImageWidth: () => (card.value ? 1200 : undefined),
+    ogImageHeight: () => (card.value ? 630 : undefined),
+    ogImageType: () => (card.value ? 'image/jpeg' as const : undefined),
+    ogImageAlt: () => (image.value ? title.value : undefined),
+    twitterCard: () => (image.value && (card.value || options.wideImage) ? 'summary_large_image' : 'summary'),
     robots: () => (noindex.value ? 'noindex, follow' : undefined),
   })
 

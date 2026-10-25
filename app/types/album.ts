@@ -243,6 +243,8 @@ export interface Album extends PendingFields {
   /** How many picked each rating: [count of 1, …, count of 5]; null when nobody rated. */
   rating_distribution: number[] | null
   ranking: number | null
+  /** The page's share card (og:image, 1200×630 JPEG); null until the backend has drawn it. */
+  share_card_url?: string | null
   articles?: AlbumArticle[]
   contributors: Array<Omit<UserSummary, 'id'>>
   is_favorited: boolean

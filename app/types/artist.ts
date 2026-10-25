@@ -21,6 +21,8 @@ export interface ArtistDetail extends PendingFields {
   followers_count: number
   albums_count: number
   shouts_count: number
+  /** The page's share card (og:image, 1200×630 JPEG); null until the backend has drawn it. */
+  share_card_url?: string | null
   is_favorited: boolean
   titles?: CatalogTitle[]
   links?: CatalogLink[]

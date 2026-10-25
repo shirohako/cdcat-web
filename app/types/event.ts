@@ -19,6 +19,8 @@ export interface EventDetail {
   circles_count?: number
   released_albums_count?: number
   has_map?: boolean
+  /** The page's share card (og:image, 1200×630 JPEG); null until the backend has drawn it. */
+  share_card_url?: string | null
 }
 
 export interface VenueHall {

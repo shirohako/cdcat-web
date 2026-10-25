@@ -176,6 +176,7 @@ usePageSeo({
     return composeDescription(lead, plainText(localizedContent(value.description)), descriptionLength(locale.value))
   },
   image: () => event.value?.main_visual_url,
+  card: () => event.value?.share_card_url,
   error,
   breadcrumbs: () => event.value
     ? [
