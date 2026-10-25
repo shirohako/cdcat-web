@@ -12,7 +12,7 @@ const { data, revealClass } = await usePageData(() => `profile-articles-${props.
 </script>
 
 <template>
-  <section v-if="data?.articles.length" class="card p-5" :class="revealClass">
+  <section v-if="data?.articles.length" class="card p-5 @container" :class="revealClass">
     <header class="mb-4 flex items-center gap-2">
       <Newspaper :size="16" class="text-primary" />
       <h2 class="text-base font-bold text-title">{{ t('article_ui.profile.title') }}</h2>
@@ -21,7 +21,7 @@ const { data, revealClass } = await usePageData(() => `profile-articles-${props.
         {{ t('article_ui.profile.all') }}
       </NuxtLink>
     </header>
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 @lg:grid-cols-2 @4xl:grid-cols-3">
       <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
     </div>
   </section>

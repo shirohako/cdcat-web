@@ -82,10 +82,12 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
           </CollectionPageHeader>
         </template>
 
-        <section v-if="showFeatured && (featured.length || featuredLoading)" class="mb-8">
+        <!-- Article grids count columns by the room they get (container queries), so the sidebar's width doesn't squeeze
+             four cards into a row: one, two from 512px, three from 896px. -->
+        <section v-if="showFeatured && (featured.length || featuredLoading)" class="mb-8 @container">
           <h2 class="mb-3 inline-flex items-center gap-1.5 text-sm font-bold text-body"><Sparkles :size="15" class="text-primary" />{{ t('article_ui.list.featured') }}</h2>
-          <CollectionLoadingSkeleton v-if="featuredLoading" variant="articles" :count="3" grid-class="grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" />
-          <div v-else class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <CollectionLoadingSkeleton v-if="featuredLoading" variant="articles" :count="3" />
+          <div v-else class="grid grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3">
             <ArticleCard v-for="article in featured" :key="article.id" :article="article" />
           </div>
         </section>
@@ -118,8 +120,8 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
         <div v-else-if="status === 'error' && !data" class="flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-meta">
           {{ t('common.load_failed') }}<button type="button" class="link" @click="refresh()">{{ t('common.retry') }}</button>
         </div>
-        <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
-          <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div v-else :key="revealKey" class="transition-opacity @container" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
+          <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3">
             <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
           </div>
           <UiEmpty v-else :title="filtered ? t('article_ui.list.no_match') : t('content_display.no_articles')" :icon="FileText" class="min-h-72" />

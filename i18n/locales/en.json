@@ -538,7 +538,6 @@
     "like": "Like",
     "unlike": "Unlike",
     "like_own": "You cannot like your own article",
-    "minutes": "{count} min",
     "statuses": {
       "draft": "Draft",
       "published": "Published",

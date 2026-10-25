@@ -538,7 +538,6 @@
     "like": "いいね",
     "unlike": "いいねを取り消す",
     "like_own": "自分の記事にはいいねできません",
-    "minutes": "{count} 分",
     "statuses": {
       "draft": "下書き",
       "published": "公開中",

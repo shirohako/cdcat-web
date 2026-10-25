@@ -1,5 +1,6 @@
 <template>
-  <SkeletonStatus page>
+  <!-- The article grid counts columns by its own width (container queries), so the frame is the container. -->
+  <SkeletonStatus page :class="{ '@container': variant === 'articles' }">
     <div v-if="variant === 'artists'" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-xl bg-sunken p-2.5">
         <div class="skeleton size-12 shrink-0 rounded-full" />
@@ -41,7 +42,7 @@
         v-for="item in total"
         :key="item"
         class="flex flex-col overflow-hidden"
-        :class="variant === 'events' ? 'card' : variant === 'articles' ? 'rounded-2xl bg-sunken' : 'rounded-xl bg-sunken'"
+        :class="variant === 'events' ? 'card' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : 'rounded-xl bg-sunken'"
       >
         <div class="skeleton" :class="mediaClass" />
 
@@ -53,21 +54,23 @@
           <div class="flex h-6 items-end border-t border-line"><div class="skeleton h-3 w-1/4 rounded-full" /></div>
         </div>
 
-        <!-- ArticleCard: title, summary and the author footer. -->
-        <div v-else-if="variant === 'articles'" class="flex flex-1 flex-col p-4">
+        <!-- ArticleCard: an inset cover, then type, title, summary, and the poster with the date under the name. -->
+        <div v-else-if="variant === 'articles'" class="flex flex-1 flex-col px-2.5 pb-2.5 pt-3">
+          <div class="skeleton mb-2.5 h-2.5 w-12 rounded-full" />
           <div class="space-y-2">
             <div class="skeleton h-3.5 w-full rounded-full" />
             <div class="skeleton h-3.5 w-3/5 rounded-full" />
           </div>
-          <div class="mb-3 mt-3 space-y-1.5">
-            <div class="skeleton h-2.5 w-full rounded-full" />
+          <div class="mt-3 space-y-1.5">
             <div class="skeleton h-2.5 w-full rounded-full" />
             <div class="skeleton h-2.5 w-2/3 rounded-full" />
           </div>
-          <div class="mt-auto flex items-center gap-2 border-t border-line pt-3">
-            <div class="skeleton size-5 shrink-0 rounded-full" />
-            <div class="skeleton h-2.5 w-16 rounded-full" />
-            <div class="skeleton ml-auto h-2.5 w-12 rounded-full" />
+          <div class="mt-auto flex items-center gap-2.5 pt-4">
+            <div class="skeleton size-8 shrink-0 rounded-full" />
+            <div class="flex-1 space-y-1.5">
+              <div class="skeleton h-2.5 w-20 rounded-full" />
+              <div class="skeleton h-2 w-14 rounded-full" />
+            </div>
           </div>
         </div>
 
@@ -115,7 +118,7 @@ const total = computed(() => props.count ?? COUNTS[props.variant])
 const defaultGrid = computed(() => {
   switch (props.variant) {
     case 'wide': return 'grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4'
-    case 'articles': return 'grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+    case 'articles': return 'grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3'
     case 'events': return props.portrait ? 'grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
     default: return 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5'
   }
@@ -124,6 +127,7 @@ const defaultGrid = computed(() => {
 const mediaClass = computed(() => {
   if (props.variant === 'covers') return 'aspect-square'
   if (props.variant === 'events' && props.portrait) return 'aspect-[5/7]'
+  if (props.variant === 'articles') return 'aspect-video rounded-lg'
   return 'aspect-video'
 })
 </script>

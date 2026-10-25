@@ -538,7 +538,6 @@
     "like": "喜歡",
     "unlike": "取消喜歡",
     "like_own": "不能喜歡自己的文章",
-    "minutes": "{count} 分鐘",
     "statuses": {
       "draft": "草稿",
       "published": "已發布",

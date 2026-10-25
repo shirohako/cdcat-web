@@ -35,9 +35,9 @@
             <ArticleLicenseNotice :article="article" />
             <ArticleLinkCards :links="article.links" />
             <DiscussionCommentSection v-if="article.discussion_topic_id" :topic-id="article.discussion_topic_id" />
-            <section v-if="moreByAuthor.length" class="card p-5">
+            <section v-if="moreByAuthor.length" class="card p-5 @container">
               <h2 class="text-sm font-bold text-title">{{ t('article_ui.reader.more_by', { name: article.author?.nickname || article.author?.username }) }}</h2>
-              <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div class="mt-3 grid grid-cols-1 gap-4 @lg:grid-cols-2 @4xl:grid-cols-3">
                 <ArticleCard v-for="item in moreByAuthor" :key="item.id" :article="item" />
               </div>
             </section>
