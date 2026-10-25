@@ -590,6 +590,16 @@
 
 @keyframes ui-spin { to { transform: rotate(360deg); } }
 
+/* A bell being rung, swinging from its top: the notification bell on hover. After Uiverse.io's
+   vinodjangid07/tricky-bullfrog-41 (MIT, Copyright (c) 2023 Uiverse.io). */
+@keyframes ui-bell-ring {
+  15% { transform: rotate(10deg); }
+  30% { transform: rotate(-10deg); }
+  45% { transform: rotate(5deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(2deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn,
   .chip,

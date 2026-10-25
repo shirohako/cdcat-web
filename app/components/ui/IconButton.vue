@@ -5,7 +5,8 @@ import { NuxtLink } from '#components'
 
 /**
  * A square button that shows only an icon. `label` names it for screen readers and shows in a UiTooltip, unless
- * `tooltip` gives other text for that (e.g. a shortcut). Attributes go to the button.
+ * `tooltip` gives other text for that (e.g. a shortcut). `iconClass` replaces the icon's size, to even out glyphs that
+ * look bigger or smaller than their neighbours at the same size. Attributes go to the button.
  */
 defineOptions({ inheritAttrs: false })
 
@@ -13,6 +14,7 @@ withDefaults(defineProps<{
   icon: string | Component
   label: string
   tooltip?: string
+  iconClass?: string
   variant?: 'default' | 'primary' | 'ghost' | 'outline' | 'danger'
   size?: 'xs' | 'sm' | 'md'
   to?: RouteLocationRaw
@@ -20,7 +22,7 @@ withDefaults(defineProps<{
   disabled?: boolean
   loading?: boolean
   round?: boolean
-}>(), { tooltip: undefined, variant: 'ghost', size: 'md', to: undefined, pressed: undefined })
+}>(), { tooltip: undefined, iconClass: undefined, variant: 'ghost', size: 'md', to: undefined, pressed: undefined })
 
 const VARIANTS = { default: '', primary: 'btn-primary', ghost: 'btn-ghost', outline: 'btn-outline', danger: 'btn-error' }
 const SIZES = { xs: 'btn-xs', sm: 'btn-sm', md: '' }
@@ -41,7 +43,7 @@ const ICON_SIZES = { xs: 'size-3.5', sm: 'size-4', md: 'size-5' }
       v-bind="$attrs"
     >
       <UiSpinner v-if="loading" size="xs" />
-      <UiIcon v-else :icon="icon" :class="ICON_SIZES[size]" />
+      <UiIcon v-else :icon="icon" :class="iconClass ?? ICON_SIZES[size]" />
     </component>
   </UiTooltip>
 </template>

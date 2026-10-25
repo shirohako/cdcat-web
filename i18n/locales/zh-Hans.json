@@ -3272,7 +3272,13 @@
     "dismiss_announcement": "关闭公告",
     "toggle_menu": "展开或收起菜单",
     "toggle_sidebar": "展开或收起侧栏",
-    "switch_language": "语言"
+    "switch_language": "语言",
+    "user_menu": "账户菜单",
+    "user_menu_groups": {
+      "library": "收藏与记录",
+      "contribute": "创作与贡献",
+      "account": "账户"
+    }
   },
   "appearance": {
     "title": "外观",
@@ -3743,6 +3749,7 @@
     "mark_all": "全部标为已读",
     "view_all": "查看全部通知",
     "empty": "暂无通知",
+    "empty_hint": "文章、讨论和编辑审核有新动态时，会在这里提醒你。",
     "reason": "原因：",
     "filters": {
       "all": "全部",

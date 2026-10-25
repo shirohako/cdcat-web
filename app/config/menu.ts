@@ -70,13 +70,30 @@ export const menuItems: MenuItem[] = [
   }
 ]
 
-export const userMenuItems = [
-  { name: 'profile', i18nKey: 'user.profile', icon: 'lucide:user', path: '/profile' },
-  { name: 'favorites', i18nKey: 'user.favorites', icon: 'lucide:heart', path: '/favorites' },
-  { name: 'tracking', i18nKey: 'user.tracking', icon: 'lucide:bookmark', path: '/tracking' },
-  { name: 'revisions', i18nKey: 'user.revisions', icon: 'lucide:git-pull-request', path: '/revisions' },
-  { name: 'reviews', i18nKey: 'user.reviews', icon: 'lucide:message-square-text', path: '/reviews' },
-  { name: 'articles', i18nKey: 'user.articles', icon: 'lucide:newspaper', path: '/articles/mine' },
-  { name: 'notifications', i18nKey: 'user.notifications', icon: 'lucide:bell', path: '/notifications' },
-  { name: 'account', i18nKey: 'user.account', icon: 'lucide:settings', path: '/account' }
-]
+/**
+ * The account menu, in groups under small headings (`site.user_menu_groups.*`). The profile is not a row: the menu's
+ * header (avatar and name) links to it. Notifications aren't either: the bell beside it has them.
+ */
+export const userMenuGroups = [
+  {
+    key: 'library',
+    items: [
+      { name: 'favorites', i18nKey: 'user.favorites', icon: 'lucide:heart', path: '/favorites' },
+      { name: 'tracking', i18nKey: 'user.tracking', icon: 'lucide:bookmark', path: '/tracking' },
+      { name: 'reviews', i18nKey: 'user.reviews', icon: 'lucide:message-square-text', path: '/reviews' },
+    ],
+  },
+  {
+    key: 'contribute',
+    items: [
+      { name: 'articles', i18nKey: 'user.articles', icon: 'lucide:newspaper', path: '/articles/mine' },
+      { name: 'revisions', i18nKey: 'user.revisions', icon: 'lucide:git-pull-request', path: '/revisions' },
+    ],
+  },
+  {
+    key: 'account',
+    items: [
+      { name: 'account', i18nKey: 'user.account', icon: 'lucide:settings', path: '/account' },
+    ],
+  },
+] as const

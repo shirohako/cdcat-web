@@ -1336,7 +1336,13 @@
     "dismiss_announcement": "お知らせを閉じる",
     "toggle_menu": "メニューを開閉",
     "toggle_sidebar": "サイドバーを開閉",
-    "switch_language": "言語"
+    "switch_language": "言語",
+    "user_menu": "アカウントメニュー",
+    "user_menu_groups": {
+      "library": "ライブラリ",
+      "contribute": "投稿と編集",
+      "account": "アカウント"
+    }
   },
   "appearance": {
     "title": "外観",
@@ -1807,6 +1813,7 @@
     "mark_all": "すべて既読にする",
     "view_all": "すべての通知を見る",
     "empty": "通知はありません",
+    "empty_hint": "記事・ディスカッション・編集の審査に動きがあると、ここに表示されます。",
     "reason": "理由：",
     "filters": {
       "all": "すべて",

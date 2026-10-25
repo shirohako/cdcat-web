@@ -1336,7 +1336,13 @@
     "dismiss_announcement": "Dismiss announcement",
     "toggle_menu": "Open or close the menu",
     "toggle_sidebar": "Expand or collapse the sidebar",
-    "switch_language": "Language"
+    "switch_language": "Language",
+    "user_menu": "Account menu",
+    "user_menu_groups": {
+      "library": "Library",
+      "contribute": "Writing & edits",
+      "account": "Account"
+    }
   },
   "appearance": {
     "title": "Appearance",
@@ -1807,6 +1813,7 @@
     "mark_all": "Mark all as read",
     "view_all": "View all notifications",
     "empty": "No notifications",
+    "empty_hint": "Replies, likes and review results for your articles, discussions and edits will show up here.",
     "reason": "Reason: ",
     "filters": {
       "all": "All",

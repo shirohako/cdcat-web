@@ -52,6 +52,9 @@ export default defineNuxtConfig({
   ],
 
   icon: {
+    // The icons' own CSS (width/height: 1em) goes in Tailwind's base layer. Unlayered, it beat every size-* class,
+    // since unlayered rules win over layered ones, and every icon came out at the font size around it.
+    cssLayer: 'base',
     customCollections: [
       {
         prefix: 'cdcat',

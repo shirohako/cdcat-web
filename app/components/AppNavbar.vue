@@ -21,7 +21,9 @@
         </NuxtLink>
       </div>
 
-      <!-- Right Section: Search, Appearance, Language Switcher & User -->
+      <!-- Right Section: Search, Appearance, Language Switcher & User. Every control is a 40px square; the glyphs are
+           sized by eye rather than all at 20px (search 20, moon 19, sun 21, the dense languages glyph and the bell 18),
+           so they look the same size, and the avatar is 26px with 7px of room around it on hover. -->
       <div class="flex items-center gap-1">
         <!-- Search: an icon that opens a search box ("/" opens it too) -->
         <div class="sm:relative">
@@ -57,9 +59,9 @@
               @click="toggleAppearance"
             >
               <!-- vivia's sun and moon, cross-fading with the theme -->
-              <span class="relative grid size-5 place-items-center">
-                <Icon name="lucide:moon" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
-                <Icon name="lucide:sun" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
+              <span class="relative grid size-[21px] place-items-center">
+                <Icon name="lucide:moon" class="absolute size-[19px] transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
+                <Icon name="lucide:sun" class="absolute size-[21px] transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
               </span>
             </button>
           </UiTooltip>
@@ -79,6 +81,7 @@
         <div class="relative">
           <UiIconButton
             icon="lucide:languages"
+            icon-class="size-[18px]"
             :label="$t('site.switch_language')"
             :class="{ 'bg-ghost-hover text-primary': showLanguageMenu }"
             @click="toggleLanguageMenu"
@@ -113,20 +116,20 @@
           </transition>
         </div>
 
-        <NotificationBell v-if="isAuthenticated" />
+        <NotificationBell v-if="isAuthenticated" v-model:open="showNotifications" />
 
         <!-- User Menu or Login/Register Buttons -->
         <div v-if="isAuthenticated" class="relative ml-1">
           <button
-            class="group flex h-10 items-center gap-1.5 rounded-lg pl-1 pr-1.5
-                   transition-colors duration-150 ease-out hover:bg-ghost-hover"
+            type="button"
+            class="flex h-10 items-center gap-1 rounded-lg pl-[7px] pr-1.5 transition-colors duration-150 ease-out hover:bg-ghost-hover"
             :class="{ 'bg-ghost-hover': showUserMenu }"
-            aria-label="User menu"
+            :aria-label="$t('site.user_menu')"
+            :aria-expanded="showUserMenu"
             @click="toggleUserMenu"
           >
             <div
-              class="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden
-                     ring-2 ring-transparent group-hover:ring-primary/50 transition-all duration-150"
+              class="flex size-[26px] items-center justify-center overflow-hidden rounded-full"
               :class="user?.avatar_url ? '' : 'bg-primary'"
             >
               <NuxtImg
@@ -135,55 +138,89 @@
                 alt="avatar"
                 class="w-full h-full object-cover"
               />
-              <span v-else class="text-on-primary text-sm font-semibold">{{ userInitial }}</span>
+              <span v-else class="text-on-primary text-xs font-semibold">{{ userInitial }}</span>
             </div>
+            <!-- Turns over while the menu is open. -->
             <Icon
               name="lucide:chevron-down"
-              class="w-4 h-4 text-meta transition-transform duration-200"
+              class="size-4 text-meta transition-transform duration-200 motion-reduce:transition-none"
               :class="{ 'rotate-180': showUserMenu }"
             />
           </button>
 
-          <!-- User Dropdown -->
+          <!-- User Dropdown: a header that links to the profile, then the rows in groups (what one keeps, what one
+               writes, the account), each closed by a line, and a footer with the admin console (staff only) on the left
+               and signing out on the right. The current page is tinted. -->
           <transition name="dropdown">
             <div
               v-if="showUserMenu"
-              class="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line"
+              role="menu"
+              :aria-label="$t('site.user_menu')"
+              class="absolute right-0 mt-2 w-60 rounded-xl bg-popover p-1.5 shadow-overlay ring-1 ring-line"
+              @mouseleave="glideAway"
             >
-              <div class="p-4 border-b border-line">
-                <p class="font-semibold text-title">{{ user?.nickname }}</p>
-                <p class="text-sm text-meta">@{{ user?.username }}</p>
-              </div>
-              <div class="p-1">
-                <NuxtLink
-                  v-for="item in userMenuItems"
+              <!-- One highlight for all the rows, gliding to the one under the pointer, as in the sidebar. -->
+              <div class="pointer-events-none absolute inset-x-1.5 top-0 rounded-lg bg-ghost-hover" :style="menuHighlight" aria-hidden="true" />
+              <NuxtLink
+                :to="`/profile/${user?.username}`"
+                role="menuitem"
+                class="group/profile relative flex items-center gap-3 rounded-lg bg-card-hover p-2 transition-colors duration-150 ease-out hover:bg-card-active"
+                @mouseenter="glideAway"
+              >
+                <span class="grid size-9 shrink-0 place-items-center overflow-hidden rounded-full" :class="user?.avatar_url ? '' : 'bg-primary'">
+                  <NuxtImg v-if="user?.avatar_url" :src="user.avatar_url" alt="" class="size-full object-cover" />
+                  <span v-else class="text-sm font-semibold text-on-primary">{{ userInitial }}</span>
+                </span>
+                <span class="min-w-0 flex-1">
+                  <span class="block truncate text-sm font-semibold text-title">{{ user?.nickname || user?.username }}</span>
+                  <span class="block truncate text-xs text-meta">@{{ user?.username }}</span>
+                  <span class="sr-only">{{ $t('user.profile') }}</span>
+                </span>
+                <Icon
+                  name="lucide:chevron-right"
+                  class="size-4 shrink-0 text-faint transition duration-150 ease-out group-hover/profile:translate-x-0.5 group-hover/profile:text-primary"
+                />
+              </NuxtLink>
+
+              <div v-for="group in userMenuGroups" :key="group.key" role="group" :aria-label="$t(`site.user_menu_groups.${group.key}`)">
+                <p class="px-3 pb-1 pt-2 text-[11px] font-semibold tracking-wide text-faint" aria-hidden="true">
+                  {{ $t(`site.user_menu_groups.${group.key}`) }}
+                </p>
+                <UiMenuItem
+                  v-for="item in group.items"
                   :key="item.name"
-                  :to="item.name === 'profile' ? `/profile/${user?.username}` : item.path"
-                  class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-body
-                         transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+                  :to="item.path"
+                  :icon="item.icon"
+                  :active="isCurrent(item.path)"
+                  glide
+                  @mouseenter="glideTo($event.currentTarget)"
                 >
-                  <Icon :name="item.icon" class="w-4 h-4" />
-                  <span>{{ $t(item.i18nKey) }}</span>
-                </NuxtLink>
+                  {{ $t(item.i18nKey) }}
+                </UiMenuItem>
+                <!-- Lighter than UiMenuDivider and inset to the text: it only closes the group. -->
+                <div role="separator" class="mx-3 my-1 h-px bg-line/35" />
               </div>
-              <div v-if="hasPermission('admin.access')" class="border-t border-line p-1">
+
+              <!-- Smaller than the rows: these are actions, not places one browses to. Signing out only turns red on hover. -->
+              <div class="relative flex items-center gap-1 pt-0.5" @mouseenter="glideAway">
                 <NuxtLink
+                  v-if="hasPermission('admin.access')"
                   to="/admin"
-                  class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+                  role="menuitem"
+                  class="inline-flex min-w-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-[13px] text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-title"
                   @click="showUserMenu = false"
                 >
-                  <Icon name="lucide:layout-dashboard" class="w-4 h-4" />
-                  <span>{{ $t('admin.console') }}</span>
+                  <Icon name="lucide:layout-dashboard" class="size-3.5 shrink-0" />
+                  <span class="truncate">{{ $t('admin.console') }}</span>
                 </NuxtLink>
-              </div>
-              <div class="border-t border-line p-1">
                 <button
-                  class="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-danger
-                         transition-colors duration-150 ease-out hover:bg-danger/10"
+                  type="button"
+                  role="menuitem"
+                  class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-[13px] text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger"
                   @click="handleLogout"
                 >
-                  <Icon name="lucide:log-out" class="w-4 h-4" />
-                  <span>{{ $t('user.logout') }}</span>
+                  <Icon name="lucide:log-out" class="size-3.5 shrink-0" />
+                  {{ $t('user.logout') }}
                 </button>
               </div>
             </div>
@@ -204,7 +241,7 @@
 
     <!-- Click outside to close dropdowns -->
     <div
-      v-if="showLanguageMenu || showUserMenu || showSearch || showAppearance"
+      v-if="showLanguageMenu || showUserMenu || showSearch || showAppearance || showNotifications"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
     />
@@ -212,7 +249,7 @@
 </template>
 
 <script setup lang="ts">
-import { userMenuItems } from '~/config/menu'
+import { userMenuGroups } from '~/config/menu'
 import { localDrafts } from '~/utils/localDrafts'
 import { queryLanguage, withoutLanguageQuery, type SiteLocale } from '~/utils/languageQuery'
 
@@ -231,9 +268,13 @@ const { user, isAuthenticated, logout, hasPermission } = useAuth()
 const { theme } = useAppearance()
 
 const showUserMenu = ref(false)
+const { enter: glideTo, leave: glideAway, style: menuHighlight } = useGlideHighlight()
+// Reopened, the menu starts without a highlight until the pointer is on a row.
+watch(showUserMenu, (open) => { if (!open) glideAway() })
 const showLanguageMenu = ref(false)
 const showSearch = ref(false)
 const showAppearance = ref(false)
+const showNotifications = ref(false)
 
 const currentLocale = computed(() => locale.value)
 const availableLocales = computed(() => locales.value)
@@ -290,14 +331,31 @@ const closeAllDropdowns = () => {
   showLanguageMenu.value = false
   showSearch.value = false
   showAppearance.value = false
+  showNotifications.value = false
 }
+
+// The bell opens its list itself; the other menus close then, as they do for each other.
+watch(showNotifications, (open) => {
+  if (!open) return
+  showUserMenu.value = false
+  showLanguageMenu.value = false
+  showSearch.value = false
+  showAppearance.value = false
+})
 
 // Opening a search result (or any other page) closes the menus.
 const route = useRoute()
 watch(() => route.fullPath, closeAllDropdowns)
 
-// "/" anywhere outside a text field opens the search box.
+/** Whether a row of the user menu is the page being shown (or a page under it). */
+const isCurrent = (path: string) => route.path === path || route.path.startsWith(`${path}/`)
+
+// "/" anywhere outside a text field opens the search box; Escape closes whichever menu is open.
 const onKey = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && (showUserMenu.value || showLanguageMenu.value || showSearch.value || showAppearance.value || showNotifications.value)) {
+    closeAllDropdowns()
+    return
+  }
   if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
   const target = event.target as HTMLElement | null
   if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return

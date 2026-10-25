@@ -2,7 +2,10 @@
 import { Bell, CheckCheck } from '@lucide/vue'
 import type { NotificationItem } from '~/types/article'
 
-/** The navbar bell: unread badge, polled every minute, and the latest notifications on click. */
+/**
+ * The navbar bell: unread badge, polled every minute, and the latest notifications on click. The navbar binds
+ * `v-model:open`, so opening it closes the navbar's other menus and they close it.
+ */
 const { t, locale } = useI18n()
 const { $api } = useNuxtApp()
 const route = useRoute()
@@ -10,7 +13,7 @@ const router = useRouter()
 const { unread, refresh, startPolling, stopPolling } = useNotifications()
 const { text, detail, link } = useNotificationText()
 
-const open = ref(false)
+const open = defineModel<boolean>('open', { default: false })
 const loading = ref(false)
 const items = ref<NotificationItem[]>([])
 const root = useTemplateRef<HTMLElement>('root')
@@ -23,8 +26,10 @@ watch(() => route.fullPath, () => {
 })
 
 async function toggle() {
-  open.value = !open.value
-  if (!open.value) return
+  // With the navbar's v-model, `open` only changes once the navbar re-renders, so decide from the old value.
+  const opening = !open.value
+  open.value = opening
+  if (!opening) return
   loading.value = true
   try {
     const response = await $api<{ notifications: NotificationItem[], unread_count: number }>('/v1/me/notifications', { query: { per_page: 8 } })
@@ -67,23 +72,45 @@ const ago = (value: string) => {
 <template>
   <div ref="root" class="relative">
     <button
-      type="button" class="btn btn-ghost btn-square relative" :class="{ 'bg-ghost-hover text-primary': open }"
+      type="button" class="group btn btn-ghost btn-square relative" :class="{ 'bg-ghost-hover text-primary': open }"
       :aria-label="unread ? t('notifications.bell_unread', { count: unread }) : t('notifications.title')" :aria-expanded="open" @click.stop="toggle">
-      <Bell :size="20" />
+      <!-- 18px: at 20 the bell looks bigger than the navbar's other icons. On hover it rings (ui-bell-ring in ui.css). -->
+      <Bell :size="18" class="origin-top motion-safe:group-hover:animate-[ui-bell-ring_0.9s_both]" />
       <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-danger px-1 text-center text-[10px] font-bold leading-4 text-on-primary">
         {{ unread > 99 ? '99+' : unread }}
       </span>
     </button>
     <transition name="dropdown">
-      <div v-if="open" class="absolute right-0 mt-2 w-80 overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line">
+      <!-- On phones it spans the screen under the navbar, as the search box does; the bell isn't at the right edge. -->
+      <div
+        v-if="open"
+        class="fixed inset-x-4 top-[4.5rem] overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line
+               sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80"
+      >
         <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
           <span class="text-sm font-semibold text-title">{{ t('notifications.title') }}</span>
           <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors hover:text-primary" @click="markRead(null)">
             <CheckCheck :size="13" />{{ t('notifications.mark_all') }}
           </button>
         </div>
-        <p v-if="loading" class="px-4 py-6 text-center text-xs text-faint">{{ t('common.loading') }}</p>
-        <p v-else-if="!items.length" class="px-4 py-6 text-center text-xs text-faint">{{ t('notifications.empty') }}</p>
+        <!-- Loading: rows shaped like the notifications, shimmering. -->
+        <SkeletonStatus v-if="loading" class="divide-y divide-line">
+          <div v-for="row in 3" :key="row" class="flex gap-2.5 px-4 py-3">
+            <div class="skeleton mt-1.5 size-2 shrink-0 rounded-full" />
+            <div class="flex-1 space-y-1.5">
+              <div class="skeleton h-3 w-11/12 rounded-full" />
+              <div class="skeleton h-2.5 w-1/3 rounded-full" />
+            </div>
+          </div>
+        </SkeletonStatus>
+        <!-- Nothing yet: a bell in a soft ring of the theme colour, and what will show up here. -->
+        <div v-else-if="!items.length" class="flex flex-col items-center px-6 pb-7 pt-8 text-center">
+          <span class="grid size-12 place-items-center rounded-full bg-primary/12 text-primary ring-8 ring-primary/5">
+            <Bell :size="20" />
+          </span>
+          <p class="mt-4 text-sm font-semibold text-title">{{ t('notifications.empty') }}</p>
+          <p class="mt-1 text-xs leading-5 text-meta">{{ t('notifications.empty_hint') }}</p>
+        </div>
         <ul v-else class="max-h-96 divide-y divide-line overflow-y-auto">
           <li v-for="item in items" :key="item.id">
             <button type="button" class="flex w-full gap-2.5 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="openItem(item)">

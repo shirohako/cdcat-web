@@ -1336,7 +1336,13 @@
     "dismiss_announcement": "關閉公告",
     "toggle_menu": "展開或收合選單",
     "toggle_sidebar": "展開或收合側欄",
-    "switch_language": "語言"
+    "switch_language": "語言",
+    "user_menu": "帳戶選單",
+    "user_menu_groups": {
+      "library": "收藏與記錄",
+      "contribute": "創作與貢獻",
+      "account": "帳戶"
+    }
   },
   "appearance": {
     "title": "外觀",
@@ -1807,6 +1813,7 @@
     "mark_all": "全部標為已讀",
     "view_all": "查看全部通知",
     "empty": "目前沒有通知",
+    "empty_hint": "文章、討論和編輯審核有新動態時，會在這裡提醒你。",
     "reason": "原因：",
     "filters": {
       "all": "全部",

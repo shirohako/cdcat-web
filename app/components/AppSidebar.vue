@@ -90,39 +90,19 @@ const closeMobile = () => {
   emit('closeMobile')
 }
 
-// The hover highlight follows the pointer from item to item. Coming in from outside the list it appears in
-// place (only fading in), so it never slides over from wherever it was last.
+// The hover highlight glides from item to item (useGlideHighlight); the hovered item's text takes the theme colour.
 const hovered = ref<string | null>(null)
-const highlight = reactive({ top: 0, height: 0, visible: false, glide: false })
-const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const { enter: glideTo, leave: glideAway, style: highlightStyle } = useGlideHighlight()
 
 const enter = (event: MouseEvent, name: string) => {
-  const item = event.currentTarget as HTMLElement
-  highlight.glide = highlight.visible
-  highlight.top = item.offsetTop
-  highlight.height = item.offsetHeight
-  highlight.visible = true
+  glideTo(event.currentTarget)
   hovered.value = name
 }
 
 const leave = () => {
-  highlight.visible = false
+  glideAway()
   hovered.value = null
 }
-
-const reducedMotion = ref(false)
-onMounted(() => { reducedMotion.value = window.matchMedia('(prefers-reduced-motion: reduce)').matches })
-
-const highlightStyle = computed(() => ({
-  height: `${highlight.height}px`,
-  transform: `translateY(${highlight.top}px)`,
-  opacity: highlight.visible ? 1 : 0,
-  transition: reducedMotion.value
-    ? 'none'
-    : highlight.glide
-      ? `transform 280ms ${EASE}, height 280ms ${EASE}, opacity 150ms ease-out`
-      : 'opacity 150ms ease-out',
-}))
 </script>
 
 <style scoped>
