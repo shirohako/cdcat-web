@@ -7,10 +7,11 @@ import { DEFAULT_HUE, HUE_PRESETS } from '~/composables/useAppearance'
  */
 const { theme, hue, setTheme, previewHue, setHue, resetHue } = useAppearance()
 
-const themes = [
-  { value: 'dark', icon: 'lucide:moon' },
-  { value: 'light', icon: 'lucide:sun' },
-] as const
+const { t } = useI18n()
+const themes = computed(() => [
+  { value: 'dark' as const, label: t('appearance.dark'), icon: 'lucide:moon' },
+  { value: 'light' as const, label: t('appearance.light'), icon: 'lucide:sun' },
+])
 
 // The slider's track shows the theme colour at every hue, as the swatches draw it.
 const track = `linear-gradient(to right, ${Array.from({ length: 13 }, (_, index) => `oklch(0.75 0.14 ${index * 30})`).join(', ')})`
@@ -21,21 +22,14 @@ const sliderValue = (event: Event) => Number((event.target as HTMLInputElement).
 <template>
   <div class="w-72 p-4">
     <p class="text-xs font-semibold tracking-wide text-meta">{{ $t('appearance.title') }}</p>
-    <div class="mt-2.5 grid grid-cols-2 gap-1 rounded-xl bg-sunken p-1 ring-1 ring-line" role="radiogroup" :aria-label="$t('appearance.title')">
-      <button
-        v-for="option in themes"
-        :key="option.value"
-        type="button"
-        role="radio"
-        :aria-checked="theme === option.value"
-        class="flex h-9 items-center justify-center gap-2 rounded-lg text-sm font-semibold transition-colors duration-150 ease-out"
-        :class="theme === option.value ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'"
-        @click="setTheme(option.value)"
-      >
-        <Icon :name="option.icon" class="size-4" />
-        {{ $t(`appearance.${option.value}`) }}
-      </button>
-    </div>
+    <UiSegmented
+      :model-value="theme"
+      :items="themes"
+      :label="$t('appearance.title')"
+      block
+      class="mt-2.5"
+      @update:model-value="value => value && setTheme(value)"
+    />
 
     <div class="mt-5 flex items-center justify-between">
       <p class="text-sm font-semibold text-title">{{ $t('appearance.color') }}</p>
