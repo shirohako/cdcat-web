@@ -318,11 +318,12 @@
       "confirm_password_placeholder": "再次輸入密碼",
       "password_mismatch": "密碼不一致",
       "birthday": "生日",
-      "birthday_hint": "生日將用於找回密碼時的身分驗證",
+      "birthday_hint": "用於確認你已年滿 {age} 歲，不會公開顯示",
       "agree_prefix": "我同意 CDCat 的",
       "terms_of_service": "服務條款",
       "and": "和",
       "privacy_policy": "隱私政策",
+      "agree_suffix": "",
       "create_account": "建立帳號",
       "creating_account": "註冊中...",
       "or_use": "或者使用",
@@ -409,6 +410,7 @@
       "deletion_impact_changed": "刪除影響已變更，請重新預覽並提交。",
       "revision_already_processed": "此修訂已被處理。",
       "registration_closed": "目前暫停註冊。",
+      "under_minimum_age": "你尚未達到註冊年齡，暫時無法註冊。",
       "operation_in_progress": "相同的操作正在進行，請稍後再試。",
       "job_not_retryable": "此失敗任務無法在後台重試。",
       "article_not_found": "文章不存在或尚未發布。",
@@ -909,7 +911,29 @@
     "telegram_group": "Telegram 群組",
     "telegram_join": "點擊加入群組",
     "discord_group": "Discord 社群",
-    "not_open": "暫未開放"
+    "not_open": "暫未開放",
+    "legal_title": "條款與政策",
+    "legal_desc": "使用 CDCat 時的規則，以及我們如何對待你的資料。",
+    "terms_desc": "使用規則、內容授權和社群管理。",
+    "privacy_desc": "我們蒐集哪些資料、如何使用，以及你的權利。"
+  },
+  "legal": {
+    "terms_title": "服務條款",
+    "privacy_title": "隱私政策",
+    "eyebrow": "條款與政策",
+    "effective": "生效日期",
+    "updated": "更新於",
+    "at_a_glance": "簡單概括",
+    "toc": "目錄",
+    "in_short": "簡單來說",
+    "copy_link": "複製本節連結",
+    "link_copied": "連結已複製",
+    "copy_failed": "無法複製，請手動複製：{url}",
+    "switch_label": "切換文件",
+    "questions_title": "還有疑問？",
+    "questions_text": "關於這些條款或你的資料，歡迎寫信給我們。",
+    "next_doc": "繼續閱讀",
+    "read_next": "前往閱讀"
   },
   "home": {
     "hero_title": "探索繁星閃耀的夜空，找到屬於你的聲音座標",
@@ -2934,6 +2958,8 @@
       "franchises": "瀏覽 CDCat 收錄的作品系列及相關專輯。",
       "articles": "CDCat 使用者撰寫的音樂評論、專題與資料整理。",
       "about": "認識 CDCat：專注同人與日系音樂、由社群共同編輯的音樂資料庫。",
+      "terms": "CDCat 服務條款：使用規則、貢獻內容的授權（資料庫資料以 CC BY-SA 4.0 分享）、社群規則與版權檢舉流程。",
+      "privacy": "CDCat 隱私政策：我們蒐集哪些資料、如何使用，以及你的權利。不放廣告，不出售資料。",
       "discussion_tag": "CDCat 討論區中標記為 #{tag} 的話題。"
     }
   }

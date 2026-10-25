@@ -318,11 +318,12 @@
       "confirm_password_placeholder": "Re-enter your password",
       "password_mismatch": "Passwords do not match",
       "birthday": "Birthday",
-      "birthday_hint": "Used for identity verification when recovering your password",
+      "birthday_hint": "Used to confirm you're at least {age}. Never shown publicly.",
       "agree_prefix": "I agree to CDCat's",
       "terms_of_service": "Terms of Service",
       "and": "and",
       "privacy_policy": "Privacy Policy",
+      "agree_suffix": "",
       "create_account": "Create Account",
       "creating_account": "Creating account...",
       "or_use": "Or continue with",
@@ -409,6 +410,7 @@
       "deletion_impact_changed": "The deletion impact changed. Preview and submit again.",
       "revision_already_processed": "This revision has already been processed.",
       "registration_closed": "Registration is currently closed.",
+      "under_minimum_age": "You're not old enough to create an account yet.",
       "operation_in_progress": "The same operation is already running. Try again later.",
       "job_not_retryable": "This failed job cannot be retried from the admin panel.",
       "article_not_found": "This article does not exist or is not published.",
@@ -909,7 +911,29 @@
     "telegram_group": "Telegram group",
     "telegram_join": "Join the group",
     "discord_group": "Discord community",
-    "not_open": "Not open yet"
+    "not_open": "Not open yet",
+    "legal_title": "Terms & policies",
+    "legal_desc": "The rules for using CDCat, and how we handle your information.",
+    "terms_desc": "The rules of use, content licensing and moderation.",
+    "privacy_desc": "What we collect, how we use it and your rights."
+  },
+  "legal": {
+    "terms_title": "Terms of Service",
+    "privacy_title": "Privacy Policy",
+    "eyebrow": "Terms & policies",
+    "effective": "Effective",
+    "updated": "Updated",
+    "at_a_glance": "At a glance",
+    "toc": "Contents",
+    "in_short": "In short",
+    "copy_link": "Copy link to this section",
+    "link_copied": "Link copied",
+    "copy_failed": "Couldn't copy the link: {url}",
+    "switch_label": "Switch document",
+    "questions_title": "Still have questions?",
+    "questions_text": "Write to us about these terms or your data.",
+    "next_doc": "Read next",
+    "read_next": "Start reading"
   },
   "home": {
     "hero_title": "Find your coordinates in a sky full of sound",
@@ -2934,6 +2958,8 @@
       "franchises": "Browse franchises on CDCat and the albums that go with them.",
       "articles": "Music reviews, features and research written by CDCat users.",
       "about": "About CDCat, a community-edited database of doujin and Japanese music.",
+      "terms": "CDCat's Terms of Service: the rules for using the site, how contributions are licensed (catalog data under CC BY-SA 4.0), community rules and copyright complaints.",
+      "privacy": "CDCat's Privacy Policy: what we collect, how we use it and your rights. No ads, and we never sell your data.",
       "discussion_tag": "Topics tagged #{tag} in the CDCat forum."
     }
   }

@@ -318,11 +318,12 @@
       "confirm_password_placeholder": "再次输入密码",
       "password_mismatch": "密码不匹配",
       "birthday": "生日",
-      "birthday_hint": "生日将用于找回密码时的身份验证",
+      "birthday_hint": "用于确认你已年满 {age} 岁，不会公开显示",
       "agree_prefix": "我同意 CDCat 的",
-      "terms_of_service": "服务条款",
+      "terms_of_service": "用户协议",
       "and": "和",
       "privacy_policy": "隐私政策",
+      "agree_suffix": "",
       "create_account": "创建账号",
       "creating_account": "注册中...",
       "or_use": "或者使用",
@@ -409,6 +410,7 @@
       "deletion_impact_changed": "删除影响已变化，请重新预览并提交。",
       "revision_already_processed": "该修订已被处理。",
       "registration_closed": "当前暂停注册。",
+      "under_minimum_age": "你还未达到注册年龄，暂时无法注册。",
       "operation_in_progress": "相同的操作正在进行，请稍后再试。",
       "job_not_retryable": "这个失败任务不能在后台重试。",
       "article_not_found": "文章不存在或尚未发布。",
@@ -2845,7 +2847,29 @@
     "telegram_group": "Telegram 交流群",
     "telegram_join": "点击加入群聊",
     "discord_group": "Discord 社区",
-    "not_open": "暂未开放"
+    "not_open": "暂未开放",
+    "legal_title": "条款与政策",
+    "legal_desc": "使用 CDCat 时的规则，以及我们如何对待你的信息。",
+    "terms_desc": "使用规则、内容授权和社区管理。",
+    "privacy_desc": "我们收集哪些信息、如何使用，以及你的权利。"
+  },
+  "legal": {
+    "terms_title": "用户协议",
+    "privacy_title": "隐私政策",
+    "eyebrow": "条款与政策",
+    "effective": "生效日期",
+    "updated": "更新于",
+    "at_a_glance": "简单概括",
+    "toc": "目录",
+    "in_short": "简单来说",
+    "copy_link": "复制本节链接",
+    "link_copied": "链接已复制",
+    "copy_failed": "无法复制，请手动复制：{url}",
+    "switch_label": "切换文档",
+    "questions_title": "还有疑问？",
+    "questions_text": "关于这些条款或你的数据，欢迎写信给我们。",
+    "next_doc": "接着阅读",
+    "read_next": "前往阅读"
   },
   "home": {
     "hero_title": "探索繁星璀璨的夜空，找到属于你的声音坐标",
@@ -4870,6 +4894,8 @@
       "franchises": "浏览 CDCat 收录的作品系列及相关专辑。",
       "articles": "CDCat 用户撰写的音乐评论、专题与资料整理。",
       "about": "了解 CDCat：面向同人与日系音乐、由社区共同编辑的音乐数据库。",
+      "terms": "CDCat 用户协议：使用规则、贡献内容的授权（资料库数据以 CC BY-SA 4.0 共享）、社区规则与版权投诉流程。",
+      "privacy": "CDCat 隐私政策：我们收集哪些信息、如何使用，以及你的权利。不投放广告，不出售数据。",
       "discussion_tag": "CDCat 讨论区中标记为 #{tag} 的话题。"
     }
   }

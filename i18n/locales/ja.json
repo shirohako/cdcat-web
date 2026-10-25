@@ -318,11 +318,12 @@
       "confirm_password_placeholder": "パスワードを再入力",
       "password_mismatch": "パスワードが一致しません",
       "birthday": "生年月日",
-      "birthday_hint": "パスワード再設定時の本人確認に使用します",
+      "birthday_hint": "{age}歳以上であることの確認に使います。公開されません",
       "agree_prefix": "CDCatの",
       "terms_of_service": "利用規約",
       "and": "と",
       "privacy_policy": "プライバシーポリシー",
+      "agree_suffix": "に同意します",
       "create_account": "アカウント作成",
       "creating_account": "登録中...",
       "or_use": "または",
@@ -409,6 +410,7 @@
       "deletion_impact_changed": "削除の影響が変わりました。再確認して送信してください。",
       "revision_already_processed": "この修正はすでに処理されています。",
       "registration_closed": "現在、新規登録を停止しています。",
+      "under_minimum_age": "登録できる年齢に達していないため、登録できません。",
       "operation_in_progress": "同じ操作を実行中です。しばらくしてから再試行してください。",
       "job_not_retryable": "この失敗したジョブは管理画面から再試行できません。",
       "article_not_found": "記事が存在しないか、まだ公開されていません。",
@@ -909,7 +911,29 @@
     "telegram_group": "Telegramグループ",
     "telegram_join": "クリックして参加",
     "discord_group": "Discordコミュニティ",
-    "not_open": "準備中"
+    "not_open": "準備中",
+    "legal_title": "規約とポリシー",
+    "legal_desc": "CDCatを使うときのルールと、あなたの情報の取り扱いについて。",
+    "terms_desc": "利用のルール、コンテンツのライセンス、コミュニティの運営。",
+    "privacy_desc": "収集する情報とその使い方、あなたの権利。"
+  },
+  "legal": {
+    "terms_title": "利用規約",
+    "privacy_title": "プライバシーポリシー",
+    "eyebrow": "規約とポリシー",
+    "effective": "施行日",
+    "updated": "最終更新",
+    "at_a_glance": "ひと目でわかる要点",
+    "toc": "目次",
+    "in_short": "かんたんに言うと",
+    "copy_link": "この節へのリンクをコピー",
+    "link_copied": "リンクをコピーしました",
+    "copy_failed": "コピーできませんでした：{url}",
+    "switch_label": "ドキュメントの切り替え",
+    "questions_title": "ご不明な点は？",
+    "questions_text": "規約やあなたのデータについて、お気軽にメールでお問い合わせください。",
+    "next_doc": "続けて読む",
+    "read_next": "読む"
   },
   "home": {
     "hero_title": "星降る音の世界で、あなたの座標を見つけよう",
@@ -2934,6 +2958,8 @@
       "franchises": "CDCatに登録されたシリーズと関連アルバムを探せます。",
       "articles": "CDCatユーザーによる音楽レビュー・特集・資料まとめ。",
       "about": "CDCatについて：コミュニティで編集する、同人音楽と日本の音楽のデータベース。",
+      "terms": "CDCatの利用規約：利用のルール、投稿内容のライセンス（カタログデータはCC BY-SA 4.0）、コミュニティのルール、著作権侵害の通知方法。",
+      "privacy": "CDCatのプライバシーポリシー：収集する情報とその利用方法、あなたの権利。広告なし、データの販売なし。",
       "discussion_tag": "CDCatの掲示板で #{tag} が付いた話題。"
     }
   }

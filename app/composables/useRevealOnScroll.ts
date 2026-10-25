@@ -2,9 +2,9 @@ import type { Ref } from 'vue'
 
 /**
  * Fades the elements marked `data-reveal` inside `root` in as they scroll into view, once each: the attribute turns
- * "out" while waiting and "in" when it's time, and the page's CSS animates between the two. Elements already on screen
- * when the page mounts are left alone, so nothing that was server-rendered visible blinks out; with reduced motion or
- * without IntersectionObserver nothing is hidden at all.
+ * "out" while waiting and "in" when it's time, and assets/css/ui.css animates between the two. Elements already on
+ * screen when the page mounts are left alone, so nothing that was server-rendered visible blinks out; with reduced
+ * motion or without IntersectionObserver nothing is hidden at all.
  */
 export function useRevealOnScroll(root: Readonly<Ref<HTMLElement | null>>) {
   let observer: IntersectionObserver | undefined

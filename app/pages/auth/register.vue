@@ -182,7 +182,7 @@
               class="input w-full h-11"
               required
             />
-            <p class="text-xs text-meta mt-1">{{ $t('auth.register.birthday_hint') }}</p>
+            <p class="text-xs text-meta mt-1">{{ $t('auth.register.birthday_hint', { age: MIN_AGE }) }}</p>
           </div>
 
           <!-- Terms & Conditions -->
@@ -194,15 +194,17 @@
               class="checkbox checkbox-sm mt-0.5 cursor-pointer"
               required
             />
+            <!-- The documents open in a new tab, so reading them doesn't lose what's been filled in here. -->
             <label for="terms" class="text-sm text-body cursor-pointer">
               {{ $t('auth.register.agree_prefix') }}
-              <NuxtLink to="/terms" class="link font-semibold">
+              <NuxtLink to="/terms" target="_blank" class="link font-semibold">
                 {{ $t('auth.register.terms_of_service') }}
               </NuxtLink>
               {{ $t('auth.register.and') }}
-              <NuxtLink to="/privacy" class="link font-semibold">
+              <NuxtLink to="/privacy" target="_blank" class="link font-semibold">
                 {{ $t('auth.register.privacy_policy') }}
               </NuxtLink>
+              {{ $t('auth.register.agree_suffix') }}
             </label>
           </div>
 
@@ -247,6 +249,7 @@
 
 <script setup lang="ts">
 import { Music, Mail, Lock, Eye, EyeOff, User, UserPlus, ArrowRight, ArrowLeft, ShieldCheck, Cake } from '@lucide/vue'
+import { MIN_AGE } from '~/legal/constants'
 
 const router = useRouter()
 const { $api } = useNuxtApp()

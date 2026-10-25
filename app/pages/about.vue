@@ -166,6 +166,30 @@
       </ol>
     </section>
 
+    <section>
+      <UiSectionTitle :title="t('about_page.legal_title')" :description="t('about_page.legal_desc')" size="lg" />
+      <!-- The rows of the lists below, each on its own card, side by side. -->
+      <div class="mt-5 grid gap-4 sm:grid-cols-2">
+        <NuxtLink
+          v-for="(doc, index) in legalDocs"
+          :key="doc.to"
+          :to="doc.to"
+          class="group flex items-center gap-4 rounded-lg bg-card px-5 py-4 transition-colors duration-150 ease-out hover:bg-card-hover"
+          :style="{ '--i': index }"
+          data-reveal
+        >
+          <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" :style="{ '--shift': doc.shift }">
+            <Icon :name="doc.icon" class="size-4.5" />
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-title">{{ doc.title }}</p>
+            <p class="mt-0.5 text-xs leading-5 text-meta">{{ doc.desc }}</p>
+          </div>
+          <Icon name="lucide:chevron-right" class="size-4 shrink-0 text-meta transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+        </NuxtLink>
+      </div>
+    </section>
+
     <section class="grid items-start gap-14 lg:grid-cols-2 lg:gap-8">
       <div>
         <UiSectionTitle :title="t('about_page.docs_title')" :description="t('about_page.docs_desc')" size="lg" />
@@ -285,6 +309,11 @@ const TELEGRAM_URL = 'https://t.me/+EVBlRRnTJAE3YTY9'
 const { t } = useI18n()
 useRevealOnScroll(useTemplateRef('page'))
 
+const legalDocs = computed(() => [
+  { to: '/terms', title: t('legal.terms_title'), desc: t('about_page.terms_desc'), icon: 'lucide:file-text', shift: 80 },
+  { to: '/privacy', title: t('legal.privacy_title'), desc: t('about_page.privacy_desc'), icon: 'lucide:shield-check', shift: 190 },
+])
+
 // The hero's strings mark their highlighted words with {placeholders}; a control character stands in for each, so
 // the translated sentence can be split around it whatever its word order.
 const MARK = '\u0001'
@@ -314,7 +343,7 @@ const title = computed(() => {
 // However long the title, its characters are all in within about 0.7s.
 const titleStep = computed(() => `${Math.min(28, Math.round(700 / title.value.count))}ms`)
 
-/** Each highlighted keyword of the lead, with the colour of its mark (see .accent). */
+/** Each highlighted keyword of the lead, with the colour of its mark (see .accent in assets/css/ui.css). */
 const LEAD_MARKS: Record<string, number> = { lovers: 40, nonprofit: 150, doujin: 80, japanese: -60 }
 const lead = computed(() => {
   const marked = Object.fromEntries(Object.keys(LEAD_MARKS).map(key => [key, `${MARK}${key}${MARK}`]))
@@ -324,7 +353,7 @@ const lead = computed(() => {
     : { mark: false, text })
 })
 
-// `shift` turns each card's colour away from the theme hue, in degrees (see .accent below).
+// `shift` turns each card's colour away from the theme hue, in degrees (see .accent in assets/css/ui.css).
 const highlights = computed(() => [
   {
     key: 'archive',
@@ -416,41 +445,6 @@ usePageSeo({
 </script>
 
 <style scoped>
-/*
- * Each card's own colour: the theme hue turned by --shift, as light and as saturated as --primary, so the page keeps
- * to whatever hue the reader picked. The illustrations draw with --accent, --accent-soft and --on-accent, and turn
- * hues of their own from --accent-l and --accent-c. Their animations run while the card (.art-host) is hovered.
- */
-.accent {
-  --accent-l: 0.75;
-  --accent-c: 0.12;
-  --accent: oklch(var(--accent-l) var(--accent-c) calc(var(--hue) + var(--shift, 0)));
-  --accent-soft: color-mix(in oklab, var(--accent) 20%, transparent);
-  --on-accent: oklch(0.25 0.03 calc(var(--hue) + var(--shift, 0)));
-}
-
-[data-theme="light"] .accent {
-  --accent-l: 0.63;
-  --accent-c: 0.13;
-  --on-accent: oklch(1 0 0 / 0.92);
-}
-
-/* useRevealOnScroll: cards below the fold wait hidden, then rise in, a beat apart within a row (--i). */
-[data-reveal="out"] {
-  opacity: 0;
-}
-
-[data-reveal="in"] {
-  animation: reveal 600ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--i, 0) * 90ms) backwards;
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-    translate: 0 18px;
-  }
-}
-
 /*
  * Hero: the title's characters rise in one after another (--i × --step), then the highlighted phrase gets a
  * hand-drawn underline. Hovering the title sends a wave through it (on .glyph, so the entrance on .char never

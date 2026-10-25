@@ -32,6 +32,7 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   REVISION_ITEM_APPLIED: 'errors.codes.revision_item_applied',
   DUPLICATE_SUSPECTED: 'errors.codes.duplicate_suspected',
   REGISTRATION_CLOSED: 'errors.codes.registration_closed',
+  UNDER_MINIMUM_AGE: 'errors.codes.under_minimum_age',
   OPERATION_IN_PROGRESS: 'errors.codes.operation_in_progress',
   JOB_NOT_RETRYABLE: 'errors.codes.job_not_retryable',
   ARTICLE_NOT_FOUND: 'errors.codes.article_not_found',
