@@ -66,6 +66,10 @@ const choice = ref<string | number | boolean | null>('a')
 const notify = ref(true)
 const dialog = ref(false)
 const confirmDialog = ref(false)
+const tooltipSides = ['top', 'right', 'bottom', 'left'] as const
+const shortcuts = [['/', '搜索'], ['Esc', '关闭弹出层'], ['↑ ↓', '在列表里移动'], ['Enter', '选择']] as const
+const shareFormat = ref<string | number | boolean | null>('link')
+const shareOptions = [{ value: 'link', label: '链接' }, { value: 'markdown', label: 'Markdown' }, { value: 'bbcode', label: 'BBCode' }]
 const editorText = ref('## 编辑器\n\n**粗体**、*斜体*、`代码`，还有 [链接](https://example.com)。\n\n::: tip 提示\n切换主题时编辑器跟着变。\n:::\n')
 
 const askConfirm = async () => {
@@ -334,7 +338,6 @@ const markdownEnv: MarkdownEnv = {
         <UiButton size="sm" @click="showToast('出错了', 'error')">错误提示</UiButton>
         <UiButton size="sm" @click="askConfirm">确认对话框</UiButton>
         <UiButton size="sm" variant="danger" @click="confirmDialog = true">删除确认</UiButton>
-        <span class="tooltip" data-tip="提示文字"><UiButton size="sm" variant="ghost">悬停看提示</UiButton></span>
       </div>
       <div class="grid gap-3 sm:grid-cols-3">
         <div class="skeleton h-24 rounded-xl" />
@@ -434,6 +437,82 @@ const markdownEnv: MarkdownEnv = {
           <UiMenuItem>右对齐菜单</UiMenuItem>
           <UiMenuItem disabled>不可用</UiMenuItem>
         </UiMenu>
+      </div>
+    </section>
+
+    <!-- Tooltips and popovers -->
+    <section class="card space-y-5 p-5">
+      <UiSectionTitle
+        title="Tooltip 与弹出卡片"
+        description="UiTooltip 反色、只做展示：悬停或键盘聚焦时显示，触屏上点按（按钮和链接上长按）。要点的内容放进点击打开的 UiPopover。"
+      />
+      <div class="flex flex-wrap items-center gap-2">
+        <UiTooltip v-for="side in tooltipSides" :key="side" :text="`placement: ${side}`" :placement="side">
+          <UiButton size="sm">{{ side }}</UiButton>
+        </UiTooltip>
+        <UiIconButton icon="lucide:heart" label="收藏" />
+        <UiIconButton icon="lucide:share-2" label="分享" />
+        <UiIconButton icon="lucide:search" label="搜索" tooltip="按 / 搜索" />
+        <UiTooltip text="这是一段比较长的提示文字，超出宽度会自动换行，靠近屏幕边缘时会翻到另一侧。">
+          <span class="link text-sm">长文字</span>
+        </UiTooltip>
+        <UiTooltip text="触屏上点一下就显示，点别处收起。">
+          <span class="text-sm text-meta underline decoration-dotted underline-offset-4">普通文字（触屏点按）</span>
+        </UiTooltip>
+        <UiTooltip text="触屏上要长按才显示，点按照常跳转。">
+          <NuxtLink to="/albums" class="link text-sm">链接（触屏长按）</NuxtLink>
+        </UiTooltip>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <UiTooltip class="w-72">
+          <UiButton size="sm" icon="lucide:disc-3">复杂排版：专辑</UiButton>
+          <template #content>
+            <div class="flex gap-3">
+              <UiCover src="/icon.png" alt="" class="size-16 shrink-0" />
+              <div class="min-w-0">
+                <p class="line-clamp-2 font-semibold leading-snug text-title">東方紅魔郷 ～ the Embodiment of Scarlet Devil</p>
+                <p class="mt-0.5 text-xs text-meta">上海アリス幻樂団 · 2002-08-11</p>
+                <div class="mt-1.5 flex flex-wrap gap-1">
+                  <UiBadge size="xs" tone="primary">CD</UiBadge>
+                  <UiBadge size="xs" tone="success" dot>已发布</UiBadge>
+                </div>
+              </div>
+            </div>
+            <p class="mt-2.5 border-t border-line pt-2.5 text-xs leading-5">气泡带着相反的 data-theme，里面的 token 和 Ui 组件不写 dark: 也是对的。</p>
+          </template>
+        </UiTooltip>
+        <UiTooltip placement="bottom">
+          <UiButton size="sm" icon="lucide:keyboard">复杂排版：快捷键</UiButton>
+          <template #content>
+            <p class="mb-2 text-xs font-semibold text-title">快捷键</p>
+            <dl class="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5 text-xs">
+              <template v-for="[key, action] in shortcuts" :key="key">
+                <dt><kbd class="rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content">{{ key }}</kbd></dt>
+                <dd>{{ action }}</dd>
+              </template>
+            </dl>
+          </template>
+        </UiTooltip>
+        <UiPopover label="分享" class="w-80">
+          <template #trigger="{ toggle, attrs }">
+            <UiButton size="sm" icon="lucide:share-2" v-bind="attrs" @click="toggle">弹出卡片</UiButton>
+          </template>
+          <template #default="{ close }">
+            <p class="font-semibold text-title">分享这张专辑</p>
+            <p class="mt-1 text-xs text-meta">卡片里可以放链接、按钮和表单；点外面、按 Esc 或离开页面就会关闭。</p>
+            <UiSelect v-model="shareFormat" :options="shareOptions" size="sm" class="mt-3 w-full" />
+            <div class="mt-3 flex items-center gap-2">
+              <NuxtLink to="/albums" class="link text-xs">打开专辑页</NuxtLink>
+              <UiButton size="sm" variant="primary" class="ml-auto" @click="close(); showToast('已复制链接', 'success')">复制链接</UiButton>
+            </div>
+          </template>
+        </UiPopover>
+        <UiPopover placement="right-start" class="w-64">
+          <template #trigger="{ toggle, attrs }">
+            <UiIconButton icon="lucide:info" label="弹出卡片（右侧）" v-bind="attrs" @click="toggle" />
+          </template>
+          <p class="text-xs leading-5">靠近屏幕边缘时翻到另一侧，高度不够时卡片里面滚动。触发器是带 Tooltip 的 UiIconButton。</p>
+        </UiPopover>
       </div>
     </section>
 

@@ -3270,7 +3270,10 @@
     }
   },
   "site": {
-    "dismiss_announcement": "关闭公告"
+    "dismiss_announcement": "关闭公告",
+    "toggle_menu": "展开或收起菜单",
+    "toggle_sidebar": "展开或收起侧栏",
+    "switch_language": "语言"
   },
   "appearance": {
     "title": "外观",

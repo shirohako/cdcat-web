@@ -1334,7 +1334,10 @@
     }
   },
   "site": {
-    "dismiss_announcement": "關閉公告"
+    "dismiss_announcement": "關閉公告",
+    "toggle_menu": "展開或收合選單",
+    "toggle_sidebar": "展開或收合側欄",
+    "switch_language": "語言"
   },
   "appearance": {
     "title": "外觀",

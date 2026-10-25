@@ -1334,7 +1334,10 @@
     }
   },
   "site": {
-    "dismiss_announcement": "Dismiss announcement"
+    "dismiss_announcement": "Dismiss announcement",
+    "toggle_menu": "Open or close the menu",
+    "toggle_sidebar": "Expand or collapse the sidebar",
+    "switch_language": "Language"
   },
   "appearance": {
     "title": "Appearance",

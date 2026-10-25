@@ -26,11 +26,9 @@
           <span class="shrink-0 text-[11px] font-bold uppercase tracking-wider text-meta">Disc {{ disc.position }}</span>
           <span v-if="disc.format !== 'cd'" class="shrink-0 rounded bg-btn px-1.5 py-0.5 text-[10px] font-bold text-btn-content">{{ enumLabel('disc_format', disc.format) }}</span>
           <span v-if="disc.shownTitle" class="truncate text-[11px] text-meta">— {{ disc.shownTitle }}</span>
-          <span
-            v-if="disc.bonus"
-            class="tooltip tooltip-bottom shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200"
-            :data-tip="disc.bonus.name"
-          >{{ $t('content_display.bonus') }}</span>
+          <UiTooltip v-if="disc.bonus" :text="disc.bonus.name" placement="bottom">
+            <span class="shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200">{{ $t('content_display.bonus') }}</span>
+          </UiTooltip>
           <span class="ml-auto shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-btn-content">{{ disc.tracks.length }}</span>
         </div>
 
@@ -59,9 +57,9 @@
               <NuxtLink :to="`/tracks/${track.id}`" class="text-sm font-medium leading-snug transition-colors hover:text-primary" :class="track.translated === false ? 'text-meta' : 'text-title'">
                 {{ track.shownTitle }}
               </NuxtLink>
-              <span v-if="track.is_instrumental" class="tooltip tooltip-bottom shrink-0" :data-tip="$t('content_display.instrumental')">
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/15 text-primary"><Music2 :size="11" :stroke-width="2.5" /></span>
-              </span>
+              <UiTooltip v-if="track.is_instrumental" :text="$t('content_display.instrumental')" placement="bottom">
+                <span role="img" :aria-label="$t('content_display.instrumental')" class="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary"><Music2 :size="11" :stroke-width="2.5" /></span>
+              </UiTooltip>
             </div>
             <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-meta">{{ track.subtitle }}</p>
             <p v-if="track.originals.length" class="mt-0.5 truncate text-xs text-meta">

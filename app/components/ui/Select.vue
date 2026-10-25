@@ -124,7 +124,7 @@ const place = () => {
 
 const show = async () => {
   if (props.disabled || open.value) return
-  layer.value = trigger.value?.closest<HTMLElement>('dialog[open]') ?? 'body'
+  if (trigger.value) layer.value = floatingLayer(trigger.value)
   query.value = ''
   open.value = true
   active.value = selectedIndex.value >= 0 ? selectedIndex.value : step(-1, 1)
@@ -271,7 +271,8 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
       <div
         v-if="open"
         ref="panel"
-        class="fixed left-0 top-0 z-[80] flex flex-col overflow-hidden rounded-[10px] bg-popover p-1.5 shadow-overlay ring-1 ring-line"
+        data-ui-layer
+        class="fixed left-0 top-0 z-[80] flex flex-col overflow-hidden rounded-[10px] bg-popover p-1 shadow-overlay ring-1 ring-line"
         @keydown="onPanelKeydown"
       >
         <input
@@ -286,7 +287,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
           :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
           :aria-label="searchPlaceholder || undefined"
           :placeholder="searchPlaceholder"
-          class="input input-sm mb-1.5 w-full shrink-0"
+          class="input input-sm mb-1 w-full shrink-0"
           autocomplete="off"
           spellcheck="false"
         >
@@ -297,11 +298,11 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
           role="listbox"
           tabindex="-1"
           :aria-activedescendant="active >= 0 ? `${listId}-${active}` : undefined"
-          class="min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain outline-none [&::-webkit-scrollbar]:w-2"
+          class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain outline-none [&::-webkit-scrollbar]:w-2"
         >
-          <li v-if="!rows.length" role="presentation" class="px-3.5 py-2.5 text-sm text-faint">{{ $t('common.no_matches') }}</li>
+          <li v-if="!rows.length" role="presentation" class="px-3 py-2 text-sm text-faint">{{ $t('common.no_matches') }}</li>
           <template v-for="row in rows" :key="row.index">
-            <li v-if="row.heading" role="presentation" class="px-3.5 pb-1 pt-3 text-[11px] font-semibold tracking-wide text-faint">
+            <li v-if="row.heading" role="presentation" class="px-3 pb-1 pt-2.5 text-[11px] font-semibold tracking-wide text-faint">
               {{ row.heading }}
             </li>
             <li
@@ -310,7 +311,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
               :data-index="row.index"
               :aria-selected="row.index === selectedIndex"
               :aria-disabled="row.option.disabled || undefined"
-              class="flex cursor-pointer items-center gap-2.5 rounded-md px-3.5 py-2.5 text-sm transition-colors duration-100 ease-out"
+              class="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-100 ease-out"
               :class="[
                 row.option.disabled ? 'cursor-not-allowed opacity-45' : '',
                 row.index === selectedIndex

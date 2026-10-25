@@ -1334,7 +1334,10 @@
     }
   },
   "site": {
-    "dismiss_announcement": "お知らせを閉じる"
+    "dismiss_announcement": "お知らせを閉じる",
+    "toggle_menu": "メニューを開閉",
+    "toggle_sidebar": "サイドバーを開閉",
+    "switch_language": "言語"
   },
   "appearance": {
     "title": "外観",

@@ -586,35 +586,6 @@
     width: 100%;
     color: transparent;
   }
-
-  /* Tooltips invert the theme: light on dark pages, dark on light ones. */
-  .tooltip { position: relative; }
-  .tooltip::after {
-    position: absolute;
-    z-index: 80;
-    bottom: calc(100% + 0.5rem);
-    left: 50%;
-    max-width: 15rem;
-    transform: translate(-50%, 0.2rem);
-    border-radius: 0.375rem;
-    padding: 0.35rem 0.55rem;
-    background: var(--title);
-    color: var(--page);
-    content: attr(data-tip);
-    font-size: 0.7rem;
-    font-weight: 500;
-    line-height: 1rem;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 140ms ease, transform 140ms ease;
-  }
-  .tooltip-bottom::after { top: calc(100% + 0.5rem); bottom: auto; transform: translate(-50%, -0.2rem); }
-  .tooltip-right::after { top: 50%; bottom: auto; left: calc(100% + 0.5rem); transform: translate(-0.2rem, -50%); }
-  .tooltip:hover::after,
-  .tooltip:focus-within::after { transform: translate(-50%, 0); opacity: 1; }
-  .tooltip-right:hover::after,
-  .tooltip-right:focus-within::after { transform: translate(0, -50%); }
 }
 
 @keyframes ui-spin { to { transform: rotate(360deg); } }

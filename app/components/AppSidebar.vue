@@ -1,6 +1,5 @@
 <template>
   <aside
-    ref="aside"
     :class="[
       'fixed left-0 top-16 bottom-0 bg-card border-r border-line z-40',
       'transition-all duration-300 ease-in-out',
@@ -21,39 +20,30 @@
           aria-hidden="true"
         />
         <li v-for="item in menuItems" :key="item.name" @mouseenter="enter($event, item.name)">
-          <!-- vivia's navigation links: the theme colour on hover, the current one filled -->
-          <NuxtLink
-            :to="item.path"
-            :class="[
-              'relative flex h-11 items-center rounded-lg',
-              isCollapsed ? 'justify-center px-3' : 'gap-3.5 px-3.5',
-              'transition-colors duration-200 ease-out',
-              isActive(item.path) ? 'bg-primary text-on-primary' : hovered === item.name ? 'text-primary' : 'text-body'
-            ]"
-          >
-            <Icon :name="item.icon" class="size-5 shrink-0" />
-            <transition name="fade">
-              <span v-if="!isCollapsed" class="whitespace-nowrap font-semibold text-[15px]">
-                {{ $t(item.i18nKey) }}
-              </span>
-            </transition>
-          </NuxtLink>
+          <!-- vivia's navigation links: the theme colour on hover, the current one filled. Collapsed, the name moves
+               to the link's label and a tooltip beside the sidebar (teleported, so the scrolling nav can't clip it). -->
+          <UiTooltip :text="$t(item.i18nKey)" placement="right" :offset="20" :delay="0" :disabled="!isCollapsed">
+            <NuxtLink
+              :to="item.path"
+              :aria-label="isCollapsed ? $t(item.i18nKey) : undefined"
+              :class="[
+                'relative flex h-11 items-center rounded-lg',
+                isCollapsed ? 'justify-center px-3' : 'gap-3.5 px-3.5',
+                'transition-colors duration-200 ease-out',
+                isActive(item.path) ? 'bg-primary text-on-primary' : hovered === item.name ? 'text-primary' : 'text-body'
+              ]"
+            >
+              <Icon :name="item.icon" class="size-5 shrink-0" />
+              <transition name="fade">
+                <span v-if="!isCollapsed" class="whitespace-nowrap font-semibold text-[15px]">
+                  {{ $t(item.i18nKey) }}
+                </span>
+              </transition>
+            </NuxtLink>
+          </UiTooltip>
         </li>
       </ul>
     </nav>
-
-    <!-- Collapsed, the hovered item's name shows beside the sidebar. It lives outside the scrolling nav,
-         which would otherwise clip it or grow a horizontal scrollbar. -->
-    <div
-      v-if="isCollapsed"
-      class="pointer-events-none absolute left-full ml-3 -translate-y-1/2 whitespace-nowrap rounded-lg bg-popover px-3 py-1.5
-             text-sm font-medium text-title shadow-overlay ring-1 ring-line transition-opacity duration-150"
-      :class="hovered ? 'opacity-100' : 'opacity-0'"
-      :style="{ top: `${tooltipTop}px` }"
-      aria-hidden="true"
-    >
-      {{ tooltipLabel }}
-    </div>
 
     <!-- Footer: only while expanded; the collapsed bar shows nothing here. -->
     <div class="mt-auto shrink-0 p-4">
@@ -106,16 +96,8 @@ const hovered = ref<string | null>(null)
 const highlight = reactive({ top: 0, height: 0, visible: false, glide: false })
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
-const aside = useTemplateRef<HTMLElement>('aside')
-const tooltipTop = ref(0)
-const tooltipLabel = ref('')
-const { t } = useI18n()
-
 const enter = (event: MouseEvent, name: string) => {
   const item = event.currentTarget as HTMLElement
-  const box = item.getBoundingClientRect()
-  tooltipTop.value = box.top - (aside.value?.getBoundingClientRect().top ?? 0) + box.height / 2
-  tooltipLabel.value = t(menuItems.find(entry => entry.name === name)?.i18nKey ?? '')
   highlight.glide = highlight.visible
   highlight.top = item.offsetTop
   highlight.height = item.offsetHeight

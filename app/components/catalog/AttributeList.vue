@@ -2,7 +2,9 @@
   <dl v-if="groups.length" class="space-y-2 text-sm">
     <div v-for="group in groups" :key="group.key" class="flex gap-3">
       <dt class="w-24 shrink-0 text-xs leading-5 text-meta">
-        <span class="tooltip tooltip-right" :data-tip="hint(group.key)">{{ attributeName(group.key) }}</span>
+        <UiTooltip :text="hint(group.key)" placement="right">
+          <span>{{ attributeName(group.key) }}</span>
+        </UiTooltip>
       </dt>
       <dd class="flex min-w-0 flex-wrap gap-x-2 gap-y-1 text-body">
         <template v-for="attribute in group.values" :key="attribute.id">

@@ -5,10 +5,10 @@
       <!-- Left Section: Menu Toggle & Logo -->
       <div class="flex items-center gap-3">
         <!-- Mobile Menu Toggle -->
-        <UiIconButton icon="lucide:menu" label="Toggle mobile menu" class="lg:hidden" @click="toggleMobileMenu" />
+        <UiIconButton icon="lucide:menu" :label="$t('site.toggle_menu')" class="lg:hidden" @click="toggleMobileMenu" />
 
         <!-- Desktop Sidebar Toggle -->
-        <UiIconButton icon="lucide:menu" label="Toggle sidebar" class="max-lg:hidden" @click="toggleSidebar" />
+        <UiIconButton icon="lucide:menu" :label="$t('site.toggle_sidebar')" class="max-lg:hidden" @click="toggleSidebar" />
 
         <!-- Logo: the site name in the theme colour, with vivia's hover pill -->
         <NuxtLink
@@ -28,7 +28,7 @@
           <UiIconButton
             icon="lucide:search"
             :label="$t('search.title')"
-            :title="$t('search.shortcut')"
+            :tooltip="$t('search.shortcut')"
             :class="{ 'bg-ghost-hover text-primary': showSearch }"
             :aria-expanded="showSearch"
             @click="toggleSearch"
@@ -47,21 +47,22 @@
 
         <!-- Appearance: dark or light, and the theme colour -->
         <div class="sm:relative">
-          <button
-            type="button"
-            class="btn btn-ghost btn-square"
-            :class="{ 'bg-ghost-hover text-primary': showAppearance }"
-            :aria-label="$t('appearance.open')"
-            :title="$t('appearance.open')"
-            :aria-expanded="showAppearance"
-            @click="toggleAppearance"
-          >
-            <!-- vivia's sun and moon, cross-fading with the theme -->
-            <span class="relative grid size-5 place-items-center">
-              <Icon name="lucide:moon" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
-              <Icon name="lucide:sun" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
-            </span>
-          </button>
+          <UiTooltip :text="$t('appearance.open')">
+            <button
+              type="button"
+              class="btn btn-ghost btn-square"
+              :class="{ 'bg-ghost-hover text-primary': showAppearance }"
+              :aria-label="$t('appearance.open')"
+              :aria-expanded="showAppearance"
+              @click="toggleAppearance"
+            >
+              <!-- vivia's sun and moon, cross-fading with the theme -->
+              <span class="relative grid size-5 place-items-center">
+                <Icon name="lucide:moon" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
+                <Icon name="lucide:sun" class="absolute size-5 transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
+              </span>
+            </button>
+          </UiTooltip>
 
           <transition name="dropdown">
             <div
@@ -78,7 +79,7 @@
         <div class="relative">
           <UiIconButton
             icon="lucide:languages"
-            label="Switch language"
+            :label="$t('site.switch_language')"
             :class="{ 'bg-ghost-hover text-primary': showLanguageMenu }"
             @click="toggleLanguageMenu"
           />
