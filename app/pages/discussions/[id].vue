@@ -203,10 +203,15 @@ async function showNew() {
 const onVisibility = () => { if (document.visibilityState === 'hidden') sendRead(true) }
 const onLeave = () => sendRead(true)
 
+// The first jump lands the reader on the post as the page opens; later ones (another page of posts, a new reply) glide.
+let landed = false
 async function scrollToFocus() {
   await nextTick()
   if (!mounted || !focusId.value) return
-  document.getElementById(`post-${focusId.value}`)?.scrollIntoView({ block: 'center' })
+  const post = document.getElementById(`post-${focusId.value}`)
+  if (!post) return
+  post.scrollIntoView({ block: 'center', behavior: landed ? 'auto' : 'instant' })
+  landed = true
 }
 
 onMounted(() => {

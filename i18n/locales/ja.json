@@ -1374,8 +1374,6 @@
     "dark": "ダーク",
     "light": "ライト",
     "color": "テーマカラー",
-    "hue": "色相 {hue}",
-    "reset": "デフォルトに戻す",
     "preset": "色相 {hue} を使う"
   },
   "event_picker": {

@@ -9,7 +9,9 @@ const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home
 /**
  * Nuxt's default scroll behaviour (nuxt/dist/pages/runtime/router.options.js, which the package doesn't
  * export), plus one step: pages now render before their data (composables/usePageData.ts), so a #hash
- * target or the height a saved position needs may not be there yet. Wait for it first.
+ * target or the height a saved position needs may not be there yet. Wait for it first. And because the page
+ * scrolls smoothly (html { scroll-behavior } in main.css), a new page's scroll is asked to be instant; only
+ * jumps within the same page glide.
  */
 export default <RouterConfig>{
   scrollBehavior(to, from, savedPosition) {
@@ -35,7 +37,7 @@ export default <RouterConfig>{
         : to.hash ? () => !!document.getElementById(to.hash.slice(1)) : undefined
       const scroll = async () => {
         if (ready && !(await waitFor(ready, isCurrent))) return resolve(false)
-        requestAnimationFrame(() => resolve(isCurrent() ? position(to, savedPosition, hashBehavior) : false))
+        requestAnimationFrame(() => resolve(isCurrent() ? position(to, savedPosition, 'instant') : false))
       }
       nuxtApp.hooks.hookOnce('page:loading:end', () => {
         // Wait for the old page to finish leaving, as Nuxt's default does (an internal API).
@@ -87,7 +89,7 @@ function hashScrollMargin(hash: string) {
 }
 
 function position(to: RouteLocationNormalized, savedPosition: { left: number, top: number } | null, behavior: ScrollBehavior) {
-  if (savedPosition) return savedPosition
+  if (savedPosition) return { ...savedPosition, behavior }
   if (to.hash) return { el: to.hash, top: hashScrollMargin(to.hash), behavior }
-  return { left: 0, top: 0 }
+  return { left: 0, top: 0, behavior }
 }

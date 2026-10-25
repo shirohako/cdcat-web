@@ -96,7 +96,7 @@ useHead({
           <button
             type="button" :aria-expanded="group.expanded" :aria-controls="`admin-group-${group.key}`"
             :disabled="Boolean(query.trim()) || group.key === current?.group"
-            class="flex items-center justify-between rounded-md px-2 py-1.5 text-xs font-semibold tracking-wider text-slate-500 hover:text-slate-300 disabled:cursor-default disabled:hover:text-slate-500"
+            class="flex items-center justify-between rounded-md px-2 py-1.5 text-xs font-semibold tracking-wider text-slate-500 hover:text-slate-300 disabled:cursor-(--cursor-arrow) disabled:hover:text-slate-500"
             @click="toggleGroup(group.key)"
           >
             <span>{{ t(group.label) }}<template v-if="!group.expanded"> · {{ group.total }}</template></span>

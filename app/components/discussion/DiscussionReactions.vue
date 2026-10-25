@@ -62,7 +62,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
       :class="[
         item.reacted ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover',
         compact ? 'h-6 px-1.5' : 'h-7 px-2',
-        canReact ? '' : 'cursor-default',
+        canReact ? '' : 'cursor-(--cursor-arrow)',
       ]"
       :title="who[item.reaction] || undefined"
       :aria-pressed="item.reacted"

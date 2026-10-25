@@ -1374,8 +1374,6 @@
     "dark": "Dark",
     "light": "Light",
     "color": "Theme colour",
-    "hue": "Hue {hue}",
-    "reset": "Reset",
     "preset": "Use hue {hue}"
   },
   "event_picker": {

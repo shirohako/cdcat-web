@@ -27,7 +27,7 @@
           <span v-if="disc.format !== 'cd'" class="shrink-0 rounded bg-btn px-1.5 py-0.5 text-[10px] font-bold text-btn-content">{{ enumLabel('disc_format', disc.format) }}</span>
           <span v-if="disc.shownTitle" class="truncate text-[11px] text-meta">— {{ disc.shownTitle }}</span>
           <UiTooltip v-if="disc.bonus" :text="disc.bonus.name" placement="bottom">
-            <span class="shrink-0 cursor-default rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200">{{ $t('content_display.bonus') }}</span>
+            <span class="shrink-0 cursor-(--cursor-arrow) rounded-full bg-pink-100 px-1.5 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200">{{ $t('content_display.bonus') }}</span>
           </UiTooltip>
           <span class="ml-auto shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-btn-content">{{ disc.tracks.length }}</span>
         </div>

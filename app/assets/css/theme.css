@@ -1,6 +1,8 @@
 /*
  * Theme tokens, after the hexo theme vivia (MIT, github.com/saicaca/hexo-theme-vivia): every surface is an OKLCH
- * colour tinted by one hue, --hue, which app.vue sets on <html> together with data-theme. Dark is the default.
+ * colour tinted by one hue, --hue, which app.vue sets on <html> together with data-theme (light unless the visitor
+ * picked dark, useAppearance.ts). The bare :root below only backs markup without data-theme and holds the tokens
+ * both themes share.
  *
  * The tokens resolve var(--hue) where they are declared, so setting --hue on a descendant changes nothing; a subtree
  * can still pin a theme with its own data-theme attribute. Hand-written CSS uses these raw tokens (markdown.css is not

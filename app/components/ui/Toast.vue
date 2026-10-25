@@ -6,7 +6,8 @@ import { TOASTER, type ToastAction as ToastActionItem, type ToastColor } from '~
  * One toast, after Nuxt UI's Toast: an icon, the title and description, actions, a close button and a bar counting
  * down the time left. It closes itself when the time runs out (paused while the toaster says so or while it is
  * being swiped), on a swipe to the right past SWIPE_THRESHOLD, or on Escape while focused. UiToaster lays them out;
- * pages call useToast().
+ * pages call useToast(). The root has no position class: `.ui-toast` makes it absolute, and a `relative` utility
+ * would win over that rule, put the toasts back in the flow and squash them into the toaster's height.
  */
 const props = withDefaults(defineProps<{
   title?: string
@@ -161,7 +162,7 @@ defineExpose({ height })
     :data-state="open ? 'open' : 'closed'"
     :data-swipe="swipe"
     :data-orientation="orientation"
-    class="group relative flex touch-pan-y gap-2.5 overflow-hidden rounded-lg bg-popover p-4 shadow-overlay ring-1 ring-line focus-visible:outline-3"
+    class="group flex touch-pan-y gap-2.5 overflow-hidden rounded-md bg-popover p-4 shadow-overlay ring-1 ring-line focus-visible:outline-3"
     :class="[COLORS[color].root, orientation === 'horizontal' ? 'items-center' : 'items-start']"
     :style="{ '--height': height, '--toast-swipe-move-x': `${swipeX}px`, '--toast-swipe-end-x': `${swipeX}px` }"
     @pointerdown="onPointerdown"

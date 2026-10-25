@@ -110,7 +110,7 @@ const errorText = (key: string) => props.errors[key]
         <div class="space-y-1.5" role="radiogroup" :aria-label="t('article_ui.declaration.license_of')">
           <label
             v-for="item in ARTICLE_LICENSES" :key="item.key"
-            class="flex cursor-pointer items-start gap-2.5 rounded-lg border px-2.5 py-2 transition-colors duration-150 ease-out has-[:disabled]:cursor-default has-[:disabled]:opacity-60"
+            class="flex cursor-pointer items-start gap-2.5 rounded-lg border px-2.5 py-2 transition-colors duration-150 ease-out has-[:disabled]:cursor-(--cursor-arrow) has-[:disabled]:opacity-60"
             :class="license === item.key ? 'border-primary bg-primary/10' : 'border-line hover:bg-card-hover'">
             <input v-model="license" type="radio" name="writer-license" :value="item.key" :disabled="disabled" class="radio radio-sm mt-0.5 shrink-0">
             <span class="min-w-0">

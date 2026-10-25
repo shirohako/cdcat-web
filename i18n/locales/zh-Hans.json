@@ -3310,8 +3310,6 @@
     "dark": "暗色",
     "light": "亮色",
     "color": "主题色",
-    "hue": "色相 {hue}",
-    "reset": "恢复默认",
     "preset": "使用色相 {hue}"
   },
   "event_picker": {

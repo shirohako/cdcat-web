@@ -124,7 +124,7 @@ function remove(link: ContentLinkSummary) {
       <ul v-else-if="results.length" class="mt-2 max-h-64 space-y-1 overflow-y-auto">
         <li v-for="result in results" :key="`${result.type}:${result.id}`">
           <button
-            type="button" class="flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-card-hover disabled:cursor-default disabled:opacity-50"
+            type="button" class="flex w-full items-center gap-2.5 rounded-md p-1.5 text-left transition-colors hover:bg-card-hover disabled:cursor-(--cursor-arrow) disabled:opacity-50"
             :disabled="isLinked(result) || full" @click="add(result)">
             <div class="size-8 shrink-0 overflow-hidden rounded bg-btn">
               <img v-if="result.image_url" :src="result.image_url" :alt="result.title" class="size-full object-cover" loading="lazy" referrerpolicy="no-referrer">

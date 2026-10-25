@@ -506,7 +506,7 @@ defineExpose({ focusCircle, focusHall, showOverview })
   transition: opacity 0.2s;
 }
 .venue-piece.is-empty {
-  cursor: default;
+  cursor: var(--cursor-arrow);
   stroke: var(--line);
 }
 .venue-piece.is-dimmed {

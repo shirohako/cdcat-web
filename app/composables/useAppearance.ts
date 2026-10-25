@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 
 export type Theme = 'dark' | 'light'
 
-export const DEFAULT_THEME: Theme = 'dark'
+export const DEFAULT_THEME: Theme = 'light'
 export const DEFAULT_HUE = 250
 /** vivia's preset theme colours, as OKLCH hues. */
 export const HUE_PRESETS = [0, 30, 60, 180, 250, 270, 300, 330, 345] as const
@@ -41,17 +41,14 @@ export const toHue = (value: unknown): number | null => {
  * The visitor's theme (dark or light) and theme colour (a hue), kept in cookies so the server renders the right
  * colours. app.vue puts the applied pair on <html>: the admin console isn't themed yet, so it always gets the light
  * theme in the default colour. The setters also write <html> straight away, because head updates wait while a page
- * is loading and the hue slider has to follow the pointer.
+ * is loading.
  */
 export const useAppearance = () => {
   const cookies = appearanceCookies()
   const route = useRoute()
-  // The hue being dragged on the slider, saved to the cookie once the slider is let go.
-  const draftHue = useState<number | null>('appearance-draft-hue', () => null)
 
-  const theme = computed<Theme>(() => cookies.theme.value === 'light' ? 'light' : DEFAULT_THEME)
-  const savedHue = computed(() => toHue(cookies.hue.value) ?? DEFAULT_HUE)
-  const hue = computed(() => draftHue.value ?? savedHue.value)
+  const theme = computed<Theme>(() => cookies.theme.value === 'dark' || cookies.theme.value === 'light' ? cookies.theme.value : DEFAULT_THEME)
+  const hue = computed(() => toHue(cookies.hue.value) ?? DEFAULT_HUE)
 
   const themed = computed(() => route.path !== '/admin' && !route.path.startsWith('/admin/'))
   const appliedTheme = computed<Theme>(() => themed.value ? theme.value : 'light')
@@ -69,22 +66,11 @@ export const useAppearance = () => {
     paintTheme(value)
   }
 
-  /** Shows a hue without saving it, while the slider moves. */
-  const previewHue = (value: number) => {
-    const next = toHue(value)
-    if (next === null) return
-    draftHue.value = next
-    paintHue(next)
-  }
-
   const setHue = (value: number) => {
     const next = toHue(value) ?? DEFAULT_HUE
-    draftHue.value = null
     cookies.hue.value = next
     paintHue(next)
   }
 
-  const resetHue = () => setHue(DEFAULT_HUE)
-
-  return { theme, hue, appliedTheme, appliedHue, setTheme, previewHue, setHue, resetHue }
+  return { theme, hue, appliedTheme, appliedHue, setTheme, setHue }
 }

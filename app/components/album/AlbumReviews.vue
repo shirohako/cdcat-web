@@ -71,7 +71,7 @@
               v-for="reaction in REACTIONS"
               :key="reaction.type"
               type="button"
-              class="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors disabled:cursor-default disabled:opacity-60"
+              class="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors disabled:cursor-(--cursor-arrow) disabled:opacity-60"
               :class="review.my_reactions.includes(reaction.type) ? reaction.active : 'text-meta hover:bg-ghost-hover hover:text-primary'"
               :disabled="review.user_id === user?.id || reacting === review.id"
               :aria-pressed="review.my_reactions.includes(reaction.type)"

@@ -1374,8 +1374,6 @@
     "dark": "暗色",
     "light": "亮色",
     "color": "主題色",
-    "hue": "色相 {hue}",
-    "reset": "恢復預設",
     "preset": "使用色相 {hue}"
   },
   "event_picker": {
