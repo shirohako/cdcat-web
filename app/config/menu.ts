@@ -9,10 +9,10 @@ export interface MenuItem {
 
 export const menuItems: MenuItem[] = [
   {
-    name: 'dashboard',
-    i18nKey: 'menu.dashboard',
+    name: 'home',
+    i18nKey: 'menu.home',
     path: '/',
-    icon: 'lucide:layout-dashboard'
+    icon: 'lucide:house'
   },
   {
     name: 'album',

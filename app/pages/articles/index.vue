@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileText, FolderOpen, PenLine, Search, Sparkles } from '@lucide/vue'
+import { FileText, FolderOpen, Sparkles } from '@lucide/vue'
 import type { ArticleCard } from '~/types/article'
 import type { Pagination } from '~/types/api'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
@@ -14,6 +14,10 @@ const { types, typeName } = useArticleTypes()
 // Deactivated types stay in the filter only while they are the one selected, so old links keep working.
 const type = computed(() => typeof route.query.type === 'string' && /^[a-z][a-z0-9_]{1,19}$/.test(route.query.type) ? route.query.type : null)
 const typeOptions = computed(() => types.value.filter(item => item.is_active || item.key === type.value))
+const typeFilters = computed(() => [
+  { value: 'all', label: t('article_ui.list.all_types') },
+  ...typeOptions.value.map(option => ({ value: option.key, label: typeName(option.key) })),
+])
 const sort = computed(() => route.query.sort === 'popular' ? 'popular' : 'latest')
 const sortOptions = computed<UiSelectOption<'latest' | 'popular'>[]>(() => [
   { value: 'latest', label: t('article_ui.list.latest') },
@@ -65,19 +69,32 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
       <div class="absolute bottom-0 left-1/2 h-64 w-64 rounded-full bg-linear-to-br from-primary/10 to-primary/5 blur-3xl" />
     </div>
 
-    <div class="container relative mx-auto max-w-6xl px-4 py-10 md:px-8 2xl:max-w-7xl">
+    <div class="container relative mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-          <CollectionPageHeader :title="t('content_display.articles')" :description="t('content_display.articles_desc')" icon="lucide:newspaper">
-            <template #action>
-              <div class="flex items-center gap-2">
-                <NuxtLink v-if="isAuthenticated" to="/articles/mine" class="btn btn-sm gap-1.5 px-2.5 text-xs sm:h-9 sm:px-3.5">
-                  <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
-                </NuxtLink>
-                <NuxtLink v-if="isAuthenticated" to="/articles/new" class="btn btn-primary btn-sm h-8 w-8 shrink-0 p-0 text-xs sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5">
-                  <PenLine :size="14" /><span class="hidden sm:inline">{{ t('content_display.new_article') }}</span>
-                </NuxtLink>
-              </div>
+          <CollectionPageHeader
+            v-model:search="searchInput"
+            :model-value="type ?? 'all'"
+            :title="t('content_display.articles')"
+            :description="t('content_display.articles_desc')"
+            icon="lucide:newspaper"
+            :create="isAuthenticated ? { to: '/articles/new', label: t('content_display.new_article') } : undefined"
+            :filters="typeFilters"
+            :filter-label="t('content_display.type')"
+            :search-placeholder="t('article_ui.list.search')"
+            @update:model-value="value => update({ type: value === 'all' ? null : value })"
+            @search="submitSearch"
+          >
+            <template v-if="isAuthenticated" #action>
+              <NuxtLink to="/articles/mine" class="btn btn-sm h-8 gap-1.5 px-2.5 text-xs sm:h-9 sm:px-3.5" :aria-label="t('article_ui.mine.title')">
+                <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
+              </NuxtLink>
+            </template>
+            <template #filter-end>
+              <UiSelect
+                :model-value="sort" :options="sortOptions" size="sm" :aria-label="t('article_ui.list.sort')"
+                @update:model-value="value => update({ sort: value === 'popular' ? 'popular' : null })"
+              />
             </template>
           </CollectionPageHeader>
         </template>
@@ -91,29 +108,6 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
             <ArticleCard v-for="article in featured" :key="article.id" :article="article" />
           </div>
         </section>
-
-        <div class="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div class="flex flex-wrap gap-1.5">
-            <button type="button" class="chip chip-sm" :class="{ 'chip-selected': !type }" @click="update({ type: null })">
-              {{ t('article_ui.list.all_types') }}
-            </button>
-            <button
-              v-for="option in typeOptions" :key="option.key" type="button" class="chip chip-sm"
-              :class="{ 'chip-selected': type === option.key }" @click="update({ type: option.key })">
-              {{ typeName(option.key) }}
-            </button>
-          </div>
-          <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
-            <UiSelect
-              :model-value="sort" :options="sortOptions" size="xs" :aria-label="t('article_ui.list.sort')"
-              @update:model-value="value => update({ sort: value === 'popular' ? 'popular' : null })"
-            />
-            <form class="flex items-center gap-1.5 rounded-lg border border-line bg-field px-2.5 py-1.5 transition-colors duration-150 ease-out focus-within:border-primary" role="search" @submit.prevent="submitSearch">
-              <Search :size="13" class="text-meta" />
-              <input v-model="searchInput" type="search" maxlength="100" class="w-36 bg-transparent text-xs text-title outline-none placeholder:text-faint" :placeholder="t('article_ui.list.search')">
-            </form>
-          </div>
-        </div>
 
         <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
         <CollectionLoadingSkeleton v-if="loading" variant="articles" />

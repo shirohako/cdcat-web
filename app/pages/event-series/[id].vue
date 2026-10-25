@@ -83,10 +83,15 @@ const description = computed(() => series.value ? localizedContent(series.value.
 const bannerUrl = computed(() => series.value ? eventSeriesBanner(series.value) : null)
 
 // The series decides the visual format (Comic Market and M3 portrait catalogs, TGS landscape),
-// so every card in a series shares one ratio and a missing visual keeps its slot.
+// so every card in a series shares one ratio and a missing visual keeps its slot. Portrait cards
+// go three to a row on phones; each card tightens its text by its own width (@container).
 const landscape = computed(() => series.value?.visual_orientation === 'landscape')
 const visualRatio = computed(() => landscape.value ? '16 / 9' : '5 / 7')
-const gridClass = computed(() => landscape.value ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4')
+const gridClass = computed(() => landscape.value ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-3 md:grid-cols-4 xl:grid-cols-5')
+
+const startDate = (event: SeriesEvent) => event.start_date
+  ? formatDate(event.start_date, { year: 'numeric', month: '2-digit', day: '2-digit' })
+  : undefined
 
 const formatEventDate = (event: SeriesEvent) => {
   const options = { year: 'numeric', month: '2-digit', day: '2-digit' } as const
@@ -171,51 +176,61 @@ usePageSeo({
           v-else-if="events.length"
           ref="eventsList"
           :key="eventsRevealKey"
-          class="grid scroll-mt-6 gap-4 transition-opacity"
+          class="grid scroll-mt-6 gap-2.5 transition-opacity sm:gap-4"
           :class="[gridClass, eventsRevealClass, { 'pointer-events-none opacity-60': eventsRefetching }]"
           :inert="eventsRefetching"
         >
-          <div
+          <!-- Raised like ArticleCard (a hairline ring, a soft shadow, the visual inset), since it sits on the page
+               rather than in a card. The name's link stretches over the whole card; the albums link stays above it. -->
+          <article
             v-for="event in events"
             :key="event.id"
-            class="card flex flex-col overflow-hidden"
+            class="group @container relative flex flex-col rounded-[14px] bg-card p-1.5 shadow-[0_1px_2px_oklch(0_0_0/0.05)] ring-1 ring-line transition-shadow duration-200 ease-out
+                   hover:shadow-[0_14px_32px_-16px_color-mix(in_oklch,var(--primary)_60%,transparent)] hover:ring-primary/40"
           >
-            <NuxtLink :to="`/events/${event.id}`" class="block bg-sunken" :style="{ aspectRatio: visualRatio }">
-              <img v-if="event.main_visual_url" v-img-fade :src="event.main_visual_url" :alt="event.name" loading="lazy" class="h-full w-full object-contain">
-              <div v-else class="flex h-full w-full items-center justify-center">
-                <CalendarDays class="h-10 w-10 text-faint" />
-              </div>
-            </NuxtLink>
-            <div class="flex flex-1 flex-col justify-between p-5">
-              <div>
-                <span class="mb-3 inline-block rounded-md bg-btn px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-btn-content">{{ event.slug }}</span>
-                <h2 class="mb-4 text-lg font-bold leading-snug text-title">
-                  <NuxtLink :to="`/events/${event.id}`" class="transition-colors duration-150 ease-out hover:text-primary">{{ event.name || event.slug }}</NuxtLink>
-                </h2>
-              </div>
-              <div class="space-y-2 text-sm text-body">
-                <div class="flex items-center gap-2">
-                  <Calendar :size="15" class="shrink-0 text-meta" />
-                  <span class="truncate font-medium">{{ formatEventDate(event) }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <Disc3 :size="15" class="shrink-0 text-meta" />
+            <div class="overflow-hidden rounded-lg bg-sunken" :style="{ aspectRatio: visualRatio }">
+              <img
+                v-if="event.main_visual_url" v-img-fade :src="event.main_visual_url" :alt="event.name" loading="lazy"
+                class="size-full object-contain transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+              >
+              <EventVisualPlaceholder
+                v-else :code="event.slug" :date="startDate(event)" :landscape="landscape"
+                class="transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
+              />
+            </div>
+
+            <div class="flex flex-1 flex-col px-1 pb-1 pt-2 @min-[9rem]:px-2.5 @min-[9rem]:pb-2.5 @min-[9rem]:pt-3">
+              <p class="mb-1 truncate text-[10px] font-semibold uppercase tracking-wide text-primary @min-[9rem]:mb-1.5 @min-[9rem]:text-[11px]">{{ event.slug }}</p>
+              <h2 class="line-clamp-2 text-[13px] font-bold leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary @min-[9rem]:text-[15px]">
+                <NuxtLink
+                  :to="`/events/${event.id}`"
+                  class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-primary"
+                >{{ event.name || event.slug }}</NuxtLink>
+              </h2>
+
+              <div class="mt-auto space-y-1 pt-2.5 text-[11px] text-meta @min-[9rem]:space-y-1.5 @min-[9rem]:pt-3.5 @min-[9rem]:text-xs">
+                <p class="flex items-center gap-1.5">
+                  <Calendar class="size-3.5 shrink-0" />
+                  <span class="truncate font-medium text-body">{{ formatEventDate(event) }}</span>
+                </p>
+                <p class="flex min-w-0 items-center gap-1.5">
+                  <Disc3 class="size-3.5 shrink-0" />
                   <NuxtLink
                     v-if="event.released_albums_count"
                     :to="{ path: '/albums', query: { event: event.id } }"
-                    class="link"
+                    class="link relative z-10 truncate"
                   >
                     {{ t('content_display.albums_count', { count: event.released_albums_count }) }}
                   </NuxtLink>
-                  <span v-else class="text-meta">{{ t('content_display.albums_count', { count: 0 }) }}</span>
-                </div>
-                <div v-if="event.venue || event.location" class="flex items-center gap-2">
-                  <MapPin :size="15" class="shrink-0 text-meta" />
+                  <span v-else class="truncate">{{ t('content_display.albums_count', { count: 0 }) }}</span>
+                </p>
+                <p v-if="event.venue || event.location" class="flex items-center gap-1.5">
+                  <MapPin class="size-3.5 shrink-0" />
                   <span class="truncate" :title="[event.venue, event.location].filter(Boolean).join(' · ')">{{ [event.venue, event.location].filter(Boolean).join(' · ') }}</span>
-                </div>
+                </p>
               </div>
             </div>
-          </div>
+          </article>
         </div>
 
         <div v-else-if="eventsStatus !== 'error'" class="card flex min-h-40 items-center justify-center text-sm text-meta">

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Boxes, Disc3, Film, Layers, Plus, Search } from '@lucide/vue'
+import { Boxes, Disc3, Film, Layers } from '@lucide/vue'
 import type { FranchiseSummary } from '~/types/entry'
 import type { Pagination } from '~/types/api'
 
@@ -42,28 +42,18 @@ const goToPage = (page: number) => {
     <CollectionPageCard>
       <template #header>
         <CollectionPageHeader
+          v-model:search="searchInput"
           :title="$t('content_display.series')"
           :description="$t('content_display.series_desc')"
-          icon="lucide:boxes"
+          icon="lucide:library"
+          :create="{ to: '/contribute?type=franchise', label: $t('common.new') }"
+          :search-placeholder="$t('catalog.search_placeholder')"
+          @search="submitSearch"
         >
-          <template #action>
-            <button
-              class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-0 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-              @click="navigateTo('/contribute?type=franchise')"
-            >
-              <Plus class="h-3.5 w-3.5" />
-              <span class="hidden sm:inline">{{ $t('common.new') }}</span>
-            </button>
+          <template #search-end>
+            <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
           </template>
         </CollectionPageHeader>
-        <form class="flex items-center gap-2 border-b border-line px-4 py-3 sm:px-6" role="search" @submit.prevent="submitSearch">
-          <label class="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg bg-field px-3 ring-1 ring-line focus-within:ring-primary">
-            <Search class="h-4 w-4 shrink-0 text-faint" />
-            <input v-model="searchInput" type="search" class="min-w-0 flex-1 bg-transparent text-sm text-title outline-none placeholder:text-faint" :placeholder="$t('catalog.search_placeholder')" :aria-label="$t('catalog.search')" >
-          </label>
-          <button type="submit" class="btn btn-primary btn-sm h-9 shrink-0 text-xs">{{ $t('catalog.search') }}</button>
-          <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
-        </form>
       </template>
 
       <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />

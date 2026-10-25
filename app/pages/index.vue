@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen relative overflow-hidden">
     <div
-      class="relative z-10 container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 py-16 md:py-24 space-y-16"
+      class="relative z-10 container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 pt-8 pb-16 md:pb-24 space-y-16"
     >
-      <!-- Hero -->
-      <section class="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
-        <div class="space-y-6">
+      <!-- Hero, one card: the pitch on the left, search and shortcuts on the right, a hairline between. -->
+      <section class="card grid overflow-hidden lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="space-y-6 p-6 md:p-10">
           <div class="space-y-4 animate-rise">
             <div class="flex items-center gap-4">
               <!-- The name follows, so the picture needs no alt text of its own. -->
@@ -52,7 +52,7 @@
           <div
             class="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-rise-slower"
           >
-            <div class="card py-3.5 px-4">
+            <div class="rounded-xl bg-sunken py-3.5 px-4">
               <div
                 class="flex items-center gap-2 font-semibold text-title"
               >
@@ -61,7 +61,7 @@
               </div>
               <p class="text-sm text-body mt-1">{{ t('home.database_desc') }}</p>
             </div>
-            <div class="card py-3.5 px-4">
+            <div class="rounded-xl bg-sunken py-3.5 px-4">
               <div class="flex items-center gap-2 font-semibold text-title">
                 <Search :size="18" class="text-primary" />
                 <span>{{ t('home.timeline') }}</span>
@@ -70,7 +70,7 @@
                 {{ t('home.timeline_desc') }}
               </p>
             </div>
-            <div class="card py-3.5 px-4">
+            <div class="rounded-xl bg-sunken py-3.5 px-4">
               <div class="flex items-center gap-2 font-semibold text-title">
                 <Radio :size="18" class="text-primary" />
                 <span>{{ t('home.community') }}</span>
@@ -82,8 +82,8 @@
           </div>
         </div>
 
-        <div class="relative">
-          <div class="card p-5 animate-rise-quick">
+        <div class="flex flex-col justify-center border-t border-line p-6 md:p-8 lg:border-l lg:border-t-0">
+          <div class="animate-rise-quick">
             <div class="flex items-center">
               <div
                 class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-3 py-1 text-xs font-semibold"

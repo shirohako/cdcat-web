@@ -3,28 +3,20 @@
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-      <CollectionPageHeader
-        v-model="selectedType"
-        :title="$t('artists.title')"
-        :description="$t('artists.subtitle')"
-        icon="lucide:users-round"
-        :filters="artistTypes"
-        :filter-label="$t('content_display.type')"
-        @update:model-value="selectType"
-      >
-        <template #filter-end>
-          <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
-        </template>
-        <template #action>
-          <button
-            class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-0 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-            @click="navigateTo('/contribute?type=artist')"
+          <CollectionPageHeader
+            :model-value="selectedType"
+            :title="$t('artists.title')"
+            :description="$t('artists.subtitle')"
+            icon="lucide:mic-2"
+            :create="{ to: '/contribute?type=artist', label: $t('artists.new') }"
+            :filters="artistTypes"
+            :filter-label="$t('content_display.type')"
+            @update:model-value="selectType"
           >
-            <Plus class="h-3.5 w-3.5" />
-            <span class="hidden sm:inline">{{ $t('artists.new') }}</span>
-          </button>
-        </template>
-      </CollectionPageHeader>
+            <template #filter-end>
+              <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
+            </template>
+          </CollectionPageHeader>
         </template>
 
       <!-- A failed refetch keeps the last results below this. -->
@@ -106,7 +98,7 @@
 </template>
 
 <script setup>
-import { Users, Disc3, Heart, Plus } from "@lucide/vue";
+import { Users, Disc3, Heart } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();

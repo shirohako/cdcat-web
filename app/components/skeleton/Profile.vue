@@ -5,7 +5,7 @@
       <div class="card overflow-hidden">
         <div class="skeleton h-38 sm:h-44 md:h-52" />
         <div class="relative border-t border-line px-4 pb-4 sm:px-6 sm:pb-6">
-          <div class="skeleton absolute -top-22 left-4 size-30 rounded-full border-3 border-card sm:-top-28 sm:left-6 sm:size-38 sm:border-4" />
+          <div class="skeleton absolute -top-12 left-4 size-20 rounded-full border-3 border-white sm:-top-16 sm:left-6 sm:size-26 sm:border-4" />
           <div class="space-y-2.5 pt-12 sm:pl-44 sm:pt-4">
             <div class="skeleton h-6 w-40 rounded-md" />
             <div class="skeleton h-3.5 w-24 rounded-full" />

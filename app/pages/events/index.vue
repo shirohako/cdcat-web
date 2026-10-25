@@ -33,13 +33,13 @@ usePageSeo({
 
 <template>
   <div class="min-h-screen">
-    <div class="container mx-auto px-4 md:px-6 py-10 max-w-6xl 2xl:max-w-7xl">
+    <div class="container mx-auto px-4 md:px-8 py-8 max-w-6xl 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
           <CollectionPageHeader
             :title="t('collection_pages.events.title')"
             :description="t('collection_pages.events.description')"
-            icon="lucide:calendar-days"
+            icon="lucide:calendar"
           />
         </template>
 

@@ -42,7 +42,7 @@
         v-for="item in total"
         :key="item"
         class="flex flex-col overflow-hidden"
-        :class="variant === 'events' ? 'card' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : 'rounded-xl bg-sunken'"
+        :class="variant === 'events' ? '@container rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : 'rounded-xl bg-sunken'"
       >
         <div class="skeleton" :class="mediaClass" />
 
@@ -71,6 +71,16 @@
               <div class="skeleton h-2.5 w-20 rounded-full" />
               <div class="skeleton h-2 w-14 rounded-full" />
             </div>
+          </div>
+        </div>
+
+        <!-- Event cards: an inset visual, then the code, the name, and the date and album rows at the foot. -->
+        <div v-else-if="variant === 'events'" class="flex flex-1 flex-col px-1 pb-1 pt-2 @min-[9rem]:px-2.5 @min-[9rem]:pb-2.5 @min-[9rem]:pt-3">
+          <div class="skeleton mb-2 h-2.5 w-10 rounded-full" />
+          <div class="skeleton h-3.5 w-4/5 rounded-full" />
+          <div class="mt-auto space-y-1.5 pt-3.5">
+            <div class="skeleton h-2.5 w-3/4 rounded-full" />
+            <div class="skeleton h-2.5 w-1/2 rounded-full" />
           </div>
         </div>
 
@@ -119,14 +129,14 @@ const defaultGrid = computed(() => {
   switch (props.variant) {
     case 'wide': return 'grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4'
     case 'articles': return 'grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3'
-    case 'events': return props.portrait ? 'grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
+    case 'events': return props.portrait ? 'grid-cols-3 gap-2.5 sm:gap-4 md:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'
     default: return 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5'
   }
 })
 
 const mediaClass = computed(() => {
   if (props.variant === 'covers') return 'aspect-square'
-  if (props.variant === 'events' && props.portrait) return 'aspect-[5/7]'
+  if (props.variant === 'events') return props.portrait ? 'aspect-[5/7] rounded-lg' : 'aspect-video rounded-lg'
   if (props.variant === 'articles') return 'aspect-video rounded-lg'
   return 'aspect-video'
 })

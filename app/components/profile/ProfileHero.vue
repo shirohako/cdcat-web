@@ -23,7 +23,7 @@
         class="relative border-t border-line px-4 pb-4 sm:px-6 sm:pb-6"
       >
         <div
-          class="absolute -top-22 left-4 h-30 w-30 overflow-hidden rounded-full border-3 border-card bg-sunken sm:-top-28 sm:left-6 sm:h-38 sm:w-38 sm:border-4"
+          class="absolute -top-12 left-4 size-20 overflow-hidden rounded-full border-3 border-white bg-sunken sm:-top-16 sm:left-6 sm:size-26 sm:border-4"
         >
           <img
             v-if="displayAvatar"
@@ -37,7 +37,7 @@
             v-else
             class="grid h-full w-full place-items-center text-body"
           >
-            <User :size="30" class="text-faint sm:h-9 sm:w-9" />
+            <User :size="26" class="text-faint sm:h-8 sm:w-8" />
           </span>
         </div>
 
