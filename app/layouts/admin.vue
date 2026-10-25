@@ -78,7 +78,7 @@ useHead({
       <div class="flex items-center gap-2.5 px-1.5">
         <NuxtLink to="/admin" class="flex min-w-0 flex-1 items-center gap-2.5">
           <span class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-400 text-[#0f1115]"><Icon name="lucide:music" class="size-[18px]" /></span>
-          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCAT</b><span class="text-xs text-slate-400">{{ t('admin_pages.console') }}</span></span>
+          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCat</b><span class="text-xs text-slate-400">{{ t('admin_pages.console') }}</span></span>
         </NuxtLink>
         <button type="button" class="rounded p-1 text-slate-400 hover:text-white lg:hidden" :aria-label="t('admin_pages.close_menu')" @click="open = false">
           <Icon name="lucide:x" class="size-5" />

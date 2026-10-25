@@ -291,7 +291,7 @@ const markdownEnv: MarkdownEnv = {
         <UiAvatar name="Marisa" size="sm" />
         <UiAvatar name="Sakuya" />
         <UiAvatar name="Remilia" size="lg" />
-        <UiAvatar src="/icon.png" name="CDCAT" size="xl" />
+        <UiAvatar src="/icon.png" name="CDCat" size="xl" />
       </div>
       <div class="flex flex-wrap items-end gap-4">
         <UiCover src="/icon.png" alt="封面" class="size-24" />

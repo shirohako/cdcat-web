@@ -3,7 +3,7 @@ import { breadcrumbLd, type LdRef } from '~/utils/structuredData'
 import { descriptionLength, nameWithOriginal, truncateText } from '~/utils/seoText'
 
 export interface PageSeoOptions {
-  /** Without the site name; the title template adds "| CDCAT". */
+  /** Without the site name; the title template adds "| CDCat". */
   title?: MaybeRefOrGetter<string | null | undefined>
   /** Plain text; cut to the locale's snippet length. */
   description?: MaybeRefOrGetter<string | null | undefined>
@@ -34,7 +34,7 @@ export interface PageSeoOptions {
   error?: Ref<{ statusCode?: number } | null | undefined>
 }
 
-export const SITE_NAME = 'CDCAT'
+export const SITE_NAME = 'CDCat'
 
 /** Parameters that never change what a page shows. */
 const NEUTRAL_QUERY = /^(lang|l|utm_\w+|ref)$/

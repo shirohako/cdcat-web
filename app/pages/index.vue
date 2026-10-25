@@ -16,7 +16,7 @@
                 height="80"
                 class="size-16 md:size-20 rounded-2xl ring-4 ring-card"
               >
-              <p class="text-3xl md:text-4xl font-black tracking-tight text-title">CDCAT</p>
+              <p class="text-3xl md:text-4xl font-black tracking-tight text-title">CDCat</p>
             </div>
             <h1
               class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-title"

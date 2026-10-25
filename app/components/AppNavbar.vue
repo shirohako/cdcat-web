@@ -17,7 +17,7 @@
         >
           <!-- The name follows, so the picture needs no alt text of its own. -->
           <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg">
-          CDCAT
+          CDCat
         </NuxtLink>
       </div>
 

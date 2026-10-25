@@ -59,7 +59,7 @@
     <div class="mt-auto shrink-0 p-4">
       <transition name="fade">
         <div v-if="!isCollapsed" class="whitespace-nowrap text-xs text-faint text-center">
-          © 2026 CDCAT
+          © 2026 CDCat
         </div>
       </transition>
     </div>

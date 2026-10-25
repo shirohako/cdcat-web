@@ -90,9 +90,9 @@ describe('eventLd and breadcrumbLd', () => {
   })
 
   it('numbers the crumbs from one', () => {
-    const ld = breadcrumbLd([{ name: 'CDCAT', url: 'https://cdcat.net/' }, { name: 'アルバム', url: 'https://cdcat.net/albums' }]) as { itemListElement: unknown[] }
+    const ld = breadcrumbLd([{ name: 'CDCat', url: 'https://cdcat.net/' }, { name: 'アルバム', url: 'https://cdcat.net/albums' }]) as { itemListElement: unknown[] }
     expect(ld.itemListElement).toEqual([
-      { '@type': 'ListItem', 'position': 1, 'name': 'CDCAT', 'item': 'https://cdcat.net/' },
+      { '@type': 'ListItem', 'position': 1, 'name': 'CDCat', 'item': 'https://cdcat.net/' },
       { '@type': 'ListItem', 'position': 2, 'name': 'アルバム', 'item': 'https://cdcat.net/albums' },
     ])
   })
