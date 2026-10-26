@@ -113,6 +113,8 @@ const submit = async () => {
   try {
     emit('submitted', await props.draft.submit())
   } catch (error) {
+    // The page's own submit asked first and the user said no.
+    if (error instanceof DOMException && error.name === 'AbortError') return
     const name = errorName(error)
     if (name === 'REVISION_CONFLICT') conflicts.value = revisionConflicts(error)
     else if (name === 'VALIDATION_FAILED') errors.value = revisionFieldErrors(error)

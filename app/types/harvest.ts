@@ -204,7 +204,12 @@ export type HarvestReleaseReason = 'earlier_date' | 'source' | 'listing' | 'even
 export interface HarvestMerged {
   title: HarvestPicked<string>
   titles: Array<{ title: string, locale: string, kind: string, source: string }>
-  circle: { name: string | null, artist_id: number | null, event_circle_id: number | null, event_id: number | null, by: string | null, source: string | null }
+  circle: {
+    name: string | null, artist_id: number | null, event_circle_id: number | null, event_id: number | null, by: string | null, source: string | null
+    /** False when the name is only a producer's: no circle is created from it. */
+    named?: boolean
+    links?: string[]
+  }
   release: {
     kind: HarvestReleaseKind
     /** The suggested event the kind is relative to. */
@@ -254,6 +259,55 @@ export interface HarvestCandidateEvent extends HarvestEventSummary {
   event_circle: { id: number, name: string, space_code: string | null } | null
 }
 
+/** What the review page makes of a credited name (CreditMatcher, docs/harvest/README.md#人员). */
+export type HarvestPersonState = 'linked' | 'ignored' | 'link' | 'circle' | 'name' | 'new' | 'namesake' | 'conflict' | 'pending' | 'circle_only' | 'short' | 'suspect'
+
+/** The album's circle: linked, a circle by its name, a new one, or a warning; unknown and unnamed when the sources name none. */
+export type HarvestCircleState = 'linked' | 'name' | 'new' | 'unknown' | 'unnamed' | 'namesake' | 'pending' | 'person_only' | 'shop' | 'short' | 'suspect'
+
+/** The document of an artist the draft may create: the name, type and the source's pages. */
+export interface HarvestNewArtist {
+  name: string
+  type: string
+  links: Array<{ id: string, link_provider_id: number, url: string }>
+  titles?: Array<{ id: string, title: string, locale: string, kind: string }>
+}
+
+export interface HarvestPerson {
+  key: string
+  /** The spellings the sources use; a new artist takes the first. */
+  names: string[]
+  state: HarvestPersonState
+  artist_id: number | null
+  /** The album's circle is created with the album, and this name is the circle. */
+  follows_circle: boolean
+  /** The artists the reviewer chooses between. */
+  candidates: number[]
+  db_keys: string[]
+  create: HarvestNewArtist | null
+}
+
+export interface HarvestCircleMatch {
+  state: HarvestCircleState
+  name: string | null
+  artist_id: number | null
+  candidates: number[]
+  /** A shop's name without its shop words. */
+  suggestion: string | null
+  create: HarvestNewArtist | null
+}
+
+/** An artist the review page mentions, with how many albums it is on and its pages on other sites. */
+export interface HarvestArtistReference {
+  id: number
+  name: string
+  type: string | null
+  image_url: string | null
+  is_pending: boolean
+  albums?: number
+  pages?: Array<{ provider: string, url: string }>
+}
+
 export interface HarvestCandidateDetail {
   candidate: {
     id: number
@@ -293,6 +347,9 @@ export interface HarvestCandidateDetail {
     listings: HarvestListing[]
   }>
   duplicates: import('~/types/revision').DuplicateCandidate[]
+  /** Who each credited name is here: linked, created with the album, or left to the reviewer. */
+  people: HarvestPerson[]
+  circle_match: HarvestCircleMatch
   references: import('~/types/catalog').CatalogReferences
   /** Within the list's filters, which the review page passes on. */
   neighbors: { previous: number | null, next: number | null, position: number | null, total: number }

@@ -31,6 +31,7 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   CONTENT_PENDING: 'errors.codes.content_pending',
   REVISION_ITEM_APPLIED: 'errors.codes.revision_item_applied',
   DUPLICATE_SUSPECTED: 'errors.codes.duplicate_suspected',
+  HARVEST_ARTISTS_CHANGED: 'errors.codes.harvest_artists_changed',
   REGISTRATION_CLOSED: 'errors.codes.registration_closed',
   UNDER_MINIMUM_AGE: 'errors.codes.under_minimum_age',
   OPERATION_IN_PROGRESS: 'errors.codes.operation_in_progress',

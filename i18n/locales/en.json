@@ -444,6 +444,7 @@
       "content_pending": "This content is awaiting approval; you can do this once it is approved.",
       "revision_item_applied": "This item is already live; edit the content itself instead.",
       "duplicate_suspected": "This may duplicate an existing album; please confirm first.",
+      "harvest_artists_changed": "Artists with some of these names appeared after the draft was made. They are printed names again; choose who they are, or create them, under 人员核对.",
       "invalid_credentials": "The email or password is incorrect.",
       "user_inactive": "This account has been disabled.",
       "mail_link_invalid": "This link is invalid. Sign in to change your email settings in your account.",

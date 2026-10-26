@@ -2,10 +2,12 @@
 import type { RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
-import type { HarvestCandidateDetail, HarvestMergedImage } from '~/types/harvest'
+import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage } from '~/types/harvest'
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
+import { peopleWarnings } from '~/utils/harvestPeople'
+import { errorName } from '~/utils/revisionErrors'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import { draftKey, localDrafts } from '~/utils/localDrafts'
 import { setCover } from '~/utils/albumDocument'
@@ -15,6 +17,8 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 interface EditorHandle {
   album: AlbumDocument
   remember: (type: string, id: number, row: object) => void
+  createItem: (type: 'artist', document: Record<string, unknown>, prefix?: string) => string
+  removeItem: (ref: string) => void
 }
 
 const { $api } = useNuxtApp()
@@ -82,9 +86,45 @@ const go = (target: number | null) => target && navigateTo({ path: `/admin/harve
 const next = () => go(detail.value?.neighbors.next ?? null)
 const previous = () => go(detail.value?.neighbors.previous ?? null)
 
-const approve = (payload: RevisionDraftPayload) => $api<Revision>(`/v1/admin/harvest/candidates/${id.value}/approve`, {
-  method: 'POST', body: { ...payload, lock_version: detail.value?.candidate.lock_version },
-})
+// ---- people: who the credited names and the circle are here (docs/harvest/README.md#人员) ----
+
+/** After an approval stopped on names that have namesakes by now: the people as the server sees them then. */
+const peopleNow = ref<Pick<HarvestCandidateDetail, 'people' | 'circle_match' | 'references'> | null>(null)
+watch(detail, () => { peopleNow.value = null })
+const people = computed(() => peopleNow.value?.people ?? detail.value?.people ?? [])
+const circleMatch = computed(() => peopleNow.value?.circle_match ?? detail.value?.circle_match ?? null)
+const artistRefs = computed(() => ({ ...detail.value?.references.artist, ...peopleNow.value?.references.artist }) as unknown as Record<string, HarvestArtistReference>)
+/** Printed names in the credits still left to the reviewer, flagged in the editor too. */
+const nameNotes = computed(() => Object.fromEntries((editor.value ? peopleWarnings(editor.value.album, people.value, circleMatch.value) : [])
+  .filter(warning => warning.open && warning.kind === 'person')
+  .flatMap(warning => warning.names.map(name => [name, harvestPeopleWarningLabels[warning.state] ?? warning.state]))))
+
+const { confirm } = useConfirm()
+/** Submits the draft; names still left to the reviewer are confirmed first, and stay printed names. */
+const approve = async (payload: RevisionDraftPayload) => {
+  const document = payload.items.find(item => item.resource_type === 'album')?.document as unknown as AlbumDocument | undefined
+  const left = document ? peopleWarnings(document, people.value, circleMatch.value).filter(warning => warning.open) : []
+  if (left.length && !await confirm({
+    title: `还有 ${left.length} 个名字没处理，仍然提交吗？`,
+    description: `${left.map(warning => warning.names[0]).join('、')} 会保持纯署名${left.some(warning => warning.kind === 'circle') ? '，专辑也没有专辑艺人' : ''}。`,
+    confirmText: '仍然提交',
+  })) throw new DOMException('The reviewer went back to the names', 'AbortError')
+  try {
+    return await $api<Revision>(`/v1/admin/harvest/candidates/${id.value}/approve`, {
+      method: 'POST', body: { ...payload, lock_version: detail.value?.candidate.lock_version },
+    })
+  } catch (error) {
+    if (errorName(error) === 'HARVEST_ARTISTS_CHANGED') await artistsChanged(error)
+    throw error
+  }
+}
+/** Names the draft created that have namesakes by now go back to printed names, for the reviewer to choose. */
+const artistsChanged = async (error: unknown) => {
+  const refs = (error as { details?: { details?: { refs?: Array<{ ref: string }> } } }).details?.details?.refs ?? []
+  for (const changed of refs) editor.value?.removeItem(changed.ref)
+  const fresh = await $api<HarvestCandidateDetail | { moved_to: number }>(`/v1/admin/harvest/candidates/${id.value}`, { query: filters.value }).catch(() => null)
+  if (fresh && 'candidate' in fresh) peopleNow.value = { people: fresh.people, circle_match: fresh.circle_match, references: fresh.references }
+}
 const approved = async () => {
   const following = detail.value?.neighbors.next
   if (following) return go(following)
@@ -508,6 +548,8 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
           </div>
         </details>
 
+        <AdminHarvestPeopleCheck v-if="open && draftReady" :people="people" :circle="circleMatch" :credits="detail.candidate.merged.credits" :artists="artistRefs" :editor="editor" />
+
         <section v-if="open" :class="card">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 px-4 py-3">
             <h2 class="flex items-center gap-2 font-semibold">
@@ -517,7 +559,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
             <button type="button" class="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-50" @click="prepareDraft(true)">按来源重新生成草稿</button>
           </div>
           <div class="bg-slate-50">
-            <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" @submitted="approved" @discarded="prepareDraft(true)" />
+            <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" @submitted="approved" @discarded="prepareDraft(true)" />
             <p v-else class="px-4 py-8 text-center text-xs text-slate-400">正在准备草稿…</p>
           </div>
         </section>

@@ -17,8 +17,8 @@ export interface AlbumEditorContext {
   references: CatalogReferences
   /** Names of the items created in this revision, by ref without "@" */
   pending: ComputedRef<Record<string, string>>
-  /** Adds a create item; returns "@ref" for the album document to point at. */
-  createItem: (type: NewItemType, document: Record<string, unknown>) => string
+  /** Adds a create item (its ref starts with `prefix`, "ar" / "lb" by default); returns "@ref" for the album document to point at. */
+  createItem: (type: NewItemType, document: Record<string, unknown>, prefix?: string) => string
   /** Removes a create item and every reference to it. */
   removeItem: (ref: string) => void
   /** Whether any item of the revision still points at "@ref". */
@@ -32,6 +32,8 @@ export interface AlbumEditorContext {
   errorsIn: (collection: string) => FieldError[]
   go: (section: AlbumSection) => void
   notify: (message: string, type?: 'success' | 'error' | 'info') => void
+  /** Printed names in the credits that need a person to look at them, with why (the harvest review page) */
+  nameNotes: ComputedRef<Record<string, string>>
 }
 
 export const ALBUM_REF = 'album'

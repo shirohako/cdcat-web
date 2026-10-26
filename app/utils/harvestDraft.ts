@@ -3,7 +3,8 @@ import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { AlbumDocument, RowId } from '~/types/document'
 import type { HarvestCandidateDetail } from '~/types/harvest'
 import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument, setTitleIn } from '~/utils/albumDocument'
-import { newKey } from '~/utils/documentKeys'
+import { newKey, newRef } from '~/utils/documentKeys'
+import { DRAFT_REF, draftPeople } from '~/utils/harvestPeople'
 
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }
@@ -18,14 +19,23 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
  * title and names, release date and event (the suggested first release, none for a resale or when no
  * source names one), the description of the highest-priority source that has one, the circle as
- * album artist, the tracklist, the edition's catalog number and price, credits (unresolved names as
- * the printed name only) and links. The cover is picked by the reviewer, because only a picked image
- * is stored.
+ * album artist, the tracklist, the edition's catalog number and price, credits and links. The circle
+ * and the credited names are linked or created as the server suggests (utils/harvestPeople); the
+ * names left to the reviewer stay printed names. The cover is picked by the reviewer, because only
+ * a picked image is stored.
  */
 export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: DraftItem[], summary: string, sources: string[] } {
   const { candidate, event } = detail
   const merged = candidate.merged
   const doc: AlbumDocument = emptyAlbumDocument()
+  const artists: DraftItem[] = []
+  const people = draftPeople(detail.people ?? [], detail.circle_match ?? null,
+    id => (detail.references.artist?.[String(id)] as { name?: string } | undefined)?.name,
+    (document) => {
+      const ref = newRef(DRAFT_REF)
+      artists.push({ ref, resource_type: 'artist', action: 'create', document: JSON.parse(JSON.stringify(document)) as Record<string, unknown> })
+      return `@${ref}`
+    })
   doc.title = merged.title.value ?? candidate.title
   doc.type = TYPES[merged.kind_hint ?? ''] ?? 'album'
   if (merged.release.date) {
@@ -39,7 +49,8 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     if (title.kind === 'official' && title.title === doc.title) continue
     setTitleIn(doc, 'titles', null, title.locale, title.kind, title.title)
   }
-  if (candidate.artist_id) doc.artists = [{ id: newKey('aa'), artist_id: candidate.artist_id, credited_as: null, join_phrase: null }]
+  const circle = detail.circle_match ? people.circle() : candidate.artist_id
+  if (circle) doc.artists = [{ id: newKey('aa'), artist_id: circle, credited_as: null, join_phrase: null }]
 
   const digital = merged.media.length > 0 && merged.media.every(medium => medium === 'digital')
   const first = doc.discs[0]!
@@ -73,7 +84,8 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     if (!credit.role) continue
     const trackId = credit.track ? tracks.get(`${credit.track.disc}-${credit.track.number}`) : null
     if (credit.track && !trackId) continue
-    addCredit(doc, { artist_id: credit.artist_id, credited_as: credit.artist_id ? null : credit.name, role: credit.role, detail: credit.detail }, trackId ? [trackId] : null)
+    const who = people.credit(credit.name) ?? { artist_id: credit.artist_id, credited_as: credit.artist_id ? null : credit.name }
+    addCredit(doc, { ...who, role: credit.role, detail: credit.detail }, trackId ? [trackId] : null)
   }
 
   const seen = new Set<string>()
@@ -84,7 +96,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
   }
 
   return {
-    items: [{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: doc as unknown as Record<string, unknown> }],
+    items: [{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: doc as unknown as Record<string, unknown> }, ...artists],
     summary: event ? `采集：${event.name}「${doc.title}」` : `采集：「${doc.title}」`,
     sources: [...new Set(merged.sources.map(source => source.url))].slice(0, 20),
   }

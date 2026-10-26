@@ -6,6 +6,11 @@ export const articleStatusLabels: Record<string, string> = { draft: '草稿', pu
 export const artistTypeLabels: Record<string, string> = { person: '个人', group: '团队', company: '公司', virtual: '虚拟艺人', circle: '同人社团', character: '角色' }
 export const auditResultLabels: Record<string, string> = { submitted: '已提交', success: '成功', failed: '失败' }
 export const entityTypeLabels: Record<string, string> = { album: '专辑', artist: '艺术家', entry: '条目', franchise: '系列', track: '曲目', label: '厂牌', lyric: '歌词' }
+/** Why a credited name or the circle is left to the reviewer (CreditMatcher), short enough for a badge. */
+export const harvestPeopleWarningLabels: Record<string, string> = {
+  namesake: '撞名', conflict: '可能是另一个人', pending: '同名的在审核中', circle_only: '同名的是社团', person_only: '同名的是个人',
+  shop: '像是商店名', short: '名字太短', suspect: '名字可疑',
+}
 export const harvestStatusLabels: Record<string, string> = {
   pending: '待审',
   approving: '通过中',

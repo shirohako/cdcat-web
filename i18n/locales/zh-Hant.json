@@ -444,6 +444,7 @@
       "content_pending": "內容還在審核中，通過審核後才能這樣做。",
       "revision_item_applied": "這一項已經上線，請直接編輯內容本身。",
       "duplicate_suspected": "可能和已有的專輯重複，請先確認。",
+      "harvest_artists_changed": "草稿產生後，站內出現了同名的藝術家。這些名字已改回純署名，請在「人員核對」裡選擇是哪一位或新建。",
       "invalid_credentials": "電子郵件或密碼不正確。",
       "user_inactive": "此帳號已被停用。",
       "mail_link_invalid": "連結無效，請登入後在帳號設定裡修改郵件設定。",

@@ -444,6 +444,7 @@
       "content_pending": "内容还在审核中，通过审核后才能这样做。",
       "revision_item_applied": "这一项已经上线，请直接编辑内容本身。",
       "duplicate_suspected": "可能和已有的专辑重复，请先确认。",
+      "harvest_artists_changed": "草稿生成后，站内出现了同名的艺术家。这些名字已改回纯署名，请在「人员核对」里选择是哪一位或新建。",
       "invalid_credentials": "邮箱或密码不正确。",
       "user_inactive": "该账号已被停用。",
       "mail_link_invalid": "链接无效，请登录后在账号设置里修改邮件设置。",

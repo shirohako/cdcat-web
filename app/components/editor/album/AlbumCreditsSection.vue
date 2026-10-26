@@ -17,6 +17,7 @@
                     <span class="truncate text-sm font-medium text-title">{{ personName(group) }}</span>
                     <span v-if="typeof group.artist_id === 'string'" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
                     <span v-if="group.artist_id === null" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.credits.link_artist')">{{ $t('editor.dialog.name_only') }}</span>
+                    <span v-if="group.artist_id === null && group.credited_as && editor.nameNotes.value[group.credited_as]" class="shrink-0 rounded-md bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold text-warning" :title="editor.nameNotes.value[group.credited_as]">⚠ {{ editor.nameNotes.value[group.credited_as] }}</span>
                   </span>
                   <span v-if="subline(group)" class="block truncate text-[11px] text-meta">{{ subline(group) }}</span>
                 </span>

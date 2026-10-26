@@ -130,7 +130,7 @@ import { newDraftScope } from '~/utils/localDrafts'
  * submitted together. Sections mount one at a time; `mode=translate` opens the tracklist translator.
  * `revisionId` continues a revision sent back for changes, `draftScope` a new album's draft (?draft=).
  * `embedded` (the harvest review page) sends the draft to `submitTo` and emits `submitted` and
- * `discarded` instead of leaving the page.
+ * `discarded` instead of leaving the page; its `nameNotes` flag printed names in the credits.
  */
 const props = defineProps<{
   albumId?: number | null
@@ -140,6 +140,8 @@ const props = defineProps<{
   locale?: string
   embedded?: boolean
   submitTo?: (payload: RevisionDraftPayload) => Promise<Revision>
+  /** Printed names that still need a person to look at them, with why */
+  nameNotes?: Record<string, string>
 }>()
 const emit = defineEmits<{ submitted: [revision: Revision], discarded: [] }>()
 
@@ -192,8 +194,8 @@ const pending = computed(() => Object.fromEntries(items.value
   .filter(item => item.action === 'create' && item.ref !== mainRef.value)
   .map(item => [item.ref, String(item.document?.name ?? item.document?.title ?? item.ref) || '…'])))
 
-const createItem = (type: NewItemType, document: Record<string, unknown>) => {
-  const ref = newRef(type === 'artist' ? 'ar' : 'lb')
+const createItem = (type: NewItemType, document: Record<string, unknown>, prefix?: string) => {
+  const ref = newRef(prefix ?? (type === 'artist' ? 'ar' : 'lb'))
   items.value.push({ ref, resource_type: type, action: 'create', document })
   return `@${ref}`
 }
@@ -307,12 +309,14 @@ const itemLabels = computed(() => Object.fromEntries(items.value.map((item) => {
   return [item.ref, row?.title ?? row?.name ?? `#${item.resource_id}`]
 })))
 
+const nameNotes = computed(() => props.nameNotes ?? {})
+
 const context: AlbumEditorContext = {
   albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,
-  remember, errors, errorAt, errorsIn, go, notify: showToast,
+  remember, errors, errorAt, errorsIn, go, notify: showToast, nameNotes,
 }
 provide(albumEditorKey, context)
-defineExpose({ album, draft, references, remember, go })
+defineExpose({ album, draft, references, remember, go, createItem, removeItem })
 
 // ---- loading ----
 
