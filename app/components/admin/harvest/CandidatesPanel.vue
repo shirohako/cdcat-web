@@ -32,7 +32,7 @@ const adult = filter('adult')
 const sort = filter('sort')
 const q = filter('q')
 const setPage = (value: number) => router.push({ query: { ...route.query, page: value > 1 ? String(value) : undefined } })
-const clear = () => router.push({ query: { tab: route.query.tab } })
+const clear = () => router.push({ query: {} })
 const filtered = computed(() => HARVEST_FILTER_KEYS.some(key => key !== 'sort' && filters.value[key]))
 
 const query = computed(() => ({ ...filters.value, page: page.value }))
@@ -44,9 +44,9 @@ const { data, pending, error, refresh } = await useAsyncData(
 const { data: tasks } = await useAsyncData('admin-harvest-task-options', () => $api<{ tasks: HarvestTaskRow[] }>('/v1/admin/harvest/tasks'), { lazy: true })
 
 const label = (key: string) => props.sources.find(item => item.source === key)?.label ?? key
-const taskLabel = (task: HarvestTaskRow) => `${task.source_label} · ${task.entry_label} · ${task.label ?? task.key}`
+const taskLabel = (task: HarvestTaskRow) => `#${task.id} ${task.source_label} · ${task.entry_label} · ${task.label ?? task.key}`
 /** The review page keeps the list's filters, so previous / next stay in it. */
-const reviewLink = (id: number) => ({ path: `/admin/harvest/review/${id}`, query: filters.value })
+const reviewLink = (id: number) => ({ path: `/admin/harvest/candidates/${id}`, query: filters.value })
 const select = 'rounded-lg border border-slate-300 px-2 py-1.5'
 </script>
 

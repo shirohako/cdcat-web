@@ -94,7 +94,7 @@ const roleName = (key: string | null) => roles.value?.find(role => role.key === 
                 </p>
                 <p v-if="identity.candidates.length" class="mt-1 flex flex-wrap gap-x-2 text-xs text-slate-600">
                   {{ t('admin_pages.harvest.names.used_in') }}
-                  <NuxtLink v-for="candidate in identity.candidates" :key="candidate.id" :to="`/admin/harvest/review/${candidate.id}`" class="max-w-56 truncate text-sky-700 hover:underline">{{ candidate.title }}</NuxtLink>
+                  <NuxtLink v-for="candidate in identity.candidates" :key="candidate.id" :to="`/admin/harvest/candidates/${candidate.id}`" class="max-w-56 truncate text-sky-700 hover:underline">{{ candidate.title }}</NuxtLink>
                 </p>
               </div>
               <div class="flex flex-wrap gap-3 text-xs">

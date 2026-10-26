@@ -22,6 +22,7 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
         <table class="w-full min-w-180 text-left text-sm">
           <thead class="border-b border-slate-100 text-xs text-slate-500">
             <tr>
+              <th class="px-4 py-2 font-normal">{{ t('admin_pages.harvest.tasks.id') }}</th>
               <th class="px-4 py-2 font-normal">{{ t('admin_pages.harvest.tasks.task') }}</th>
               <th class="px-4 py-2 font-normal">{{ t('admin_pages.harvest.tasks.event_mode') }}</th>
               <th class="px-4 py-2 font-normal">{{ t('admin_pages.harvest.tasks.records') }}</th>
@@ -31,6 +32,7 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
           </thead>
           <tbody class="divide-y divide-slate-100">
             <tr v-for="task in data?.tasks" :key="task.id" class="align-top">
+              <td class="px-4 py-3 font-mono text-xs tabular-nums text-slate-500">#{{ task.id }}</td>
               <td class="px-4 py-3">
                 <p class="font-medium">
                   <a v-if="task.url" :href="task.url" target="_blank" rel="noopener noreferrer" class="hover:underline">{{ task.label ?? task.key }}</a>
@@ -46,7 +48,7 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
                 <span v-if="task.delisted" class="block text-xs text-slate-500">{{ t('admin_pages.harvest.tasks.delisted', { count: task.delisted }) }}</span>
               </td>
               <td class="px-4 py-3 text-xs tabular-nums">
-                <NuxtLink :to="{ path: '/admin/harvest', query: { task_id: String(task.id) } }" class="text-sky-700 hover:underline">{{ t('admin_pages.harvest.tasks.pending', { count: task.candidates.pending ?? 0 }) }}</NuxtLink>
+                <NuxtLink :to="{ path: '/admin/harvest/candidates', query: { task_id: String(task.id) } }" class="text-sky-700 hover:underline">{{ t('admin_pages.harvest.tasks.pending', { count: task.candidates.pending ?? 0 }) }}</NuxtLink>
                 <span v-if="task.candidates.approved" class="ml-2 text-slate-500">{{ t('admin_pages.harvest.status.approved') }} {{ task.candidates.approved }}</span>
               </td>
               <td class="px-4 py-3 text-xs text-slate-500">
