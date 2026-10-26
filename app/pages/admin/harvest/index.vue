@@ -4,20 +4,20 @@ import type { HarvestOverview } from '~/types/harvest'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const { $api } = useNuxtApp()
-const harvestTabLabels: Record<string, string> = { tasks: '任务', coverage: '社团覆盖', names: '名字对照', submissions: '提交记录' }
+const harvestTabLabels: Record<string, string> = { coverage: '社团覆盖', names: '名字对照', submissions: '提交记录' }
 const harvestError = useHarvestError()
 const { hasPermission } = useAuth()
 const route = useRoute()
 const router = useRouter()
 const { data, pending, error, refresh } = await useAsyncData('admin-harvest-overview', () => $api<HarvestOverview>('/v1/admin/harvest/overview'))
 
-// The review queue has its own page (/admin/harvest/candidates).
-const tabs = ['tasks', 'coverage', 'names', 'submissions'] as const
+// The review queue and the tasks have their own pages (/admin/harvest/candidates, /admin/harvest/tasks).
+const tabs = ['coverage', 'names', 'submissions'] as const
 type Tab = typeof tabs[number]
 const tab = computed<Tab>({
-  get: () => tabs.includes(route.query.tab as Tab) ? route.query.tab as Tab : 'tasks',
+  get: () => tabs.includes(route.query.tab as Tab) ? route.query.tab as Tab : 'coverage',
   // The event is shared by coverage and the name map.
-  set: value => router.push({ query: { tab: value === 'tasks' ? undefined : value, event_id: route.query.event_id || undefined } }),
+  set: value => router.push({ query: { tab: value === 'coverage' ? undefined : value, event_id: route.query.event_id || undefined } }),
 })
 
 // A new key reloads a list after merging.
@@ -88,8 +88,7 @@ useHead({ title: '采集概况' })
       </button>
     </nav>
 
-    <AdminHarvestTasksPanel v-if="tab === 'tasks'" :key="`tasks-${version}`" :sources="data?.sources ?? []" />
-    <AdminHarvestCoveragePanel v-else-if="tab === 'coverage'" :key="`coverage-${version}`" />
+    <AdminHarvestCoveragePanel v-if="tab === 'coverage'" :key="`coverage-${version}`" />
     <AdminHarvestNamesPanel v-else-if="tab === 'names'" :key="`names-${version}`" />
     <AdminHarvestSubmissionsPanel v-else :key="`submissions-${version}`" />
   </div>

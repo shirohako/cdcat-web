@@ -46,6 +46,10 @@ export interface HarvestTaskRow extends HarvestTaskSummary {
   event: HarvestEventSummary | null
   records: number
   delisted: number
+  /** Records that share a candidate with another record of the task (the same album as several items). */
+  merged: number
+  /** Records in no candidate yet (not merged so far). */
+  unplaced: number
   /** When the task last saw one of its items listed. */
   listed_at: string | null
   candidates: Partial<Record<HarvestCandidateStatus, number>>
@@ -110,6 +114,8 @@ export interface HarvestCandidateRow {
   sources: string[]
   release_date: string | null
   cover_url: string | null
+  /** The album's official site, as a source marks it. */
+  official_url: string | null
   /** Every task that listed its records no longer lists them (or the pages are gone). */
   delisted: boolean
   duplicates: number

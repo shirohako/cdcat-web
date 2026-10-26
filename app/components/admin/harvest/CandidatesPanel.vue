@@ -186,6 +186,7 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
                   <span v-if="candidate.delisted" class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">已下架</span>
                   <span v-if="candidate.sources_changed_at" class="whitespace-nowrap rounded bg-sky-50 px-1.5 py-0.5 text-sky-800">来源有更新</span>
                   <span v-if="candidate.is_adult" class="whitespace-nowrap rounded bg-pink-50 px-1.5 py-0.5 text-pink-800">成人</span>
+                  <a v-if="candidate.official_url" :href="candidate.official_url" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-0.5 whitespace-nowrap rounded bg-emerald-50 px-1.5 py-0.5 text-emerald-800 hover:bg-emerald-100" :title="`打开专辑官网：${candidate.official_url}`">有官网<Icon name="lucide:external-link" class="size-3" /></a>
                 </div>
               </td>
             </tr>

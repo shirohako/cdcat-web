@@ -212,6 +212,16 @@ const useTitle = (value: string) => { if (editor.value) editor.value.album.title
 const useDescription = (value: string) => { if (editor.value) editor.value.album.description = value.trim() || null }
 /** The site name of a source, as the records label it. */
 const sourceName = (source: string) => detail.value?.records.find(record => record.source === source)?.label ?? source
+/** The album's official sites, as the sources mark their links; opened from the sources card. */
+const officialLinks = computed(() => [...new Map((detail.value?.candidate.merged.links ?? [])
+  .filter(link => link.kind === 'official').map(link => [link.url, link])).values()])
+const host = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}
 /** Whether the field comparison has anything to show: what the sources disagree on, and the numbers and price. */
 const comparesFields = computed(() => {
   const merged = detail.value?.candidate.merged
@@ -295,6 +305,16 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               <section :class="card">
                 <h3 :class="cardHead">
                   <Icon name="lucide:link" class="size-4 text-slate-400" />来源<span class="text-xs font-normal text-slate-500">{{ detail.records.length }}</span>
+                  <span v-if="officialLinks.length" class="ml-auto flex flex-wrap justify-end gap-1.5">
+                    <a
+                      v-for="link in officialLinks.slice(0, 3)" :key="link.url" :href="link.url" target="_blank" rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs font-normal text-slate-700 hover:bg-slate-50"
+                      :title="`专辑官网（${sourceName(link.source)} 给的链接）：${link.url}`"
+                    >
+                      <Icon name="lucide:globe" class="size-3.5 text-slate-500" />官网<span v-if="officialLinks.length > 1" class="text-slate-500">· {{ host(link.url) }}</span>
+                      <Icon name="lucide:external-link" class="size-3 text-slate-400" />
+                    </a>
+                  </span>
                 </h3>
                 <ul class="divide-y divide-slate-100">
                   <li v-for="record in detail.records" :key="`${record.record_id}-${record.part}`" class="px-4 py-3">

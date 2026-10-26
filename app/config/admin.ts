@@ -46,6 +46,7 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/events', permission: 'events.manage', label: '活动', icon: 'lucide:calendar-days', group: 'events' },
   { path: '/admin/event-series', permission: 'events.manage', label: '活动系列', icon: 'lucide:calendar-range', group: 'events' },
   { path: '/admin/harvest', permission: 'harvest.manage', label: '采集概况', icon: 'lucide:radar', group: 'harvest' },
+  { path: '/admin/harvest/tasks', permission: 'harvest.manage', label: '采集任务', icon: 'lucide:clipboard-list', group: 'harvest' },
   { path: '/admin/harvest/candidates', permission: 'harvest.manage', label: '待审核候选', icon: 'lucide:list-todo', group: 'harvest' },
   { path: '/admin/credit-roles', permission: 'content.manage', label: '角色字典', icon: 'lucide:contact', group: 'catalog_settings' },
   { path: '/admin/attribute-definitions', permission: 'content.manage', label: '属性定义', icon: 'lucide:list-checks', group: 'catalog_settings' },
