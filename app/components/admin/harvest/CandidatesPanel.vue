@@ -9,7 +9,7 @@ const harvestCandidateAdultLabels: Record<string, string> = { label: '成人', '
 const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', matched: '已关联社团', unmatched: '未关联社团' }
 const harvestCandidateCompleteLabels: Record<string, string> = { label: '完整度', complete: '资料齐全', incomplete: '资料不全', no_cover: '缺封面', no_tracks: '缺曲目' }
 const harvestCandidateDuplicatesLabels: Record<string, string> = { label: '站内重复', strong: '站内已有（强匹配）', any: '可能重复', none: '站内没有' }
-const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', title: '按标题', updated: '最近更新', sources: '来源多的在前', created: '最新加入' }
+const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间' }
 const harvestReleaseKindLabels: Record<string, string> = { first: '首发', resale: '再贩', unknown: '未知' }
 const route = useRoute()
 const router = useRouter()
@@ -34,11 +34,27 @@ const releaseKind = filter('release_kind')
 const duplicates = filter('duplicates')
 const circle = filter('circle')
 const adult = filter('adult')
-const sort = filter('sort')
+/** Each order and the way it goes first, as CandidateQuery::SORTS; a second click on a column flips it. */
+const sortDirections: Record<string, 'asc' | 'desc'> = { circle: 'asc', id: 'desc', title: 'asc', release: 'desc', sources: 'desc', updated: 'desc' }
+const sortKey = computed(() => filters.value.sort ?? 'circle')
+const sortDir = computed(() => filters.value.dir ?? sortDirections[sortKey.value])
+const setSort = (key: string, dir?: 'asc' | 'desc') => router.push({ query: { ...route.query, sort: key && key !== 'circle' ? key : undefined, dir, page: undefined } })
+const sort = computed({ get: () => filters.value.sort ?? '', set: value => void setSort(value) })
+const sortBy = (key: string) => setSort(key, sortKey.value === key && sortDir.value === sortDirections[key] ? (sortDirections[key] === 'asc' ? 'desc' : 'asc') : undefined)
+const ariaSort = (key: string) => sortKey.value !== key ? 'none' : sortDir.value === 'asc' ? 'ascending' : 'descending'
+const columns: { label: string, sort?: string, hint?: string, right?: boolean }[] = [
+  { label: 'ID', sort: 'id' },
+  { label: '标题', sort: 'title' },
+  { label: '社团', sort: 'circle' },
+  { label: '活动 · 发售日期', sort: 'release', hint: '按发售日期排序' },
+  { label: '来源', sort: 'sources', hint: '按来源数排序' },
+  { label: '曲目', right: true },
+  { label: '标记' },
+]
 const q = filter('q')
 const setPage = (value: number) => router.push({ query: { ...route.query, page: value > 1 ? String(value) : undefined } })
 const clear = () => router.push({ query: {} })
-const filtered = computed(() => HARVEST_FILTER_KEYS.some(key => key !== 'sort' && filters.value[key]))
+const filtered = computed(() => HARVEST_FILTER_KEYS.some(key => key !== 'sort' && key !== 'dir' && filters.value[key]))
 
 const query = computed(() => ({ ...filters.value, page: page.value }))
 const { data, pending, error, refresh } = await useAsyncData(
@@ -96,7 +112,7 @@ const select = 'rounded-lg border border-slate-300 px-2 py-1.5'
         <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>
       </select>
       <select v-model="sort" :class="select">
-        <option v-for="value in ['', 'title', 'updated', 'sources', 'created']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
+        <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
       </select>
       <span class="text-slate-500">{{ data?.pagination.total ?? 0 }}</span>
       <button v-if="filtered" type="button" class="text-xs underline" @click="clear">清除筛选</button>
@@ -105,50 +121,54 @@ const select = 'rounded-lg border border-slate-300 px-2 py-1.5'
     <section class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
       <AdminListState :pending="pending" :error="error" :empty="!data?.candidates.length" @retry="refresh()">
         <table class="w-full min-w-240 text-left text-sm">
-          <thead class="border-b border-slate-100 text-xs text-slate-500">
+          <thead class="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
             <tr>
-              <th class="px-4 py-2 font-normal">ID</th>
-              <th class="px-4 py-2 font-normal">标题</th>
-              <th class="px-4 py-2 font-normal">社团</th>
-              <th class="px-4 py-2 font-normal">活动 · 发售日期</th>
-              <th class="px-4 py-2 font-normal">来源</th>
-              <th class="px-4 py-2 text-right font-normal">曲目</th>
-              <th class="px-4 py-2 font-normal">标记</th>
+              <th v-for="column in columns" :key="column.label" class="whitespace-nowrap px-4 py-2.5 font-medium" :class="column.right && 'text-right'" :aria-sort="column.sort ? ariaSort(column.sort) : undefined">
+                <button v-if="column.sort" type="button" class="group inline-flex items-center gap-1 hover:text-slate-900" :class="sortKey === column.sort && 'text-slate-900'" :title="column.hint" @click="sortBy(column.sort)">
+                  {{ column.label }}
+                  <Icon v-if="sortKey === column.sort" :name="sortDir === 'asc' ? 'lucide:arrow-up' : 'lucide:arrow-down'" class="size-3.5" />
+                  <Icon v-else name="lucide:chevrons-up-down" class="size-3.5 text-slate-300 group-hover:text-slate-500" />
+                </button>
+                <template v-else>{{ column.label }}</template>
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            <tr v-for="candidate in data?.candidates" :key="candidate.id" class="align-top">
-              <td class="px-4 py-3 font-mono text-xs tabular-nums text-slate-500">#{{ candidate.id }}</td>
-              <td class="min-w-56 px-4 py-3">
-                <NuxtLink :to="reviewLink(candidate.id)" class="font-medium hover:underline">{{ candidate.title }}</NuxtLink>
+            <tr v-for="candidate in data?.candidates" :key="candidate.id" class="align-top even:bg-slate-50/70 hover:bg-sky-50/60">
+              <td class="whitespace-nowrap px-4 py-3 font-mono text-xs leading-5 tabular-nums text-slate-500">#{{ candidate.id }}</td>
+              <td class="min-w-64 space-y-1 px-4 py-3">
+                <NuxtLink :to="reviewLink(candidate.id)" class="block font-medium leading-snug hover:underline">{{ candidate.title }}</NuxtLink>
                 <p v-if="candidate.catalog_numbers.length" class="font-mono text-xs text-slate-500">{{ candidate.catalog_numbers.join(' / ') }}</p>
-                <p v-if="candidate.reject_reason" class="text-xs text-slate-500">{{ candidate.reject_reason }}</p>
-                <p v-if="candidate.error" class="text-xs text-red-700">{{ candidate.error }}</p>
+                <p v-if="candidate.reject_reason" class="text-xs leading-5 text-slate-500">{{ candidate.reject_reason }}</p>
+                <p v-if="candidate.error" class="text-xs leading-5 text-red-700">{{ candidate.error }}</p>
               </td>
-              <td class="px-4 py-3 text-xs" :class="candidate.artist_id ? 'text-slate-700' : 'text-amber-700'">{{ candidate.circle_name ?? '未知社团' }}</td>
-              <td class="px-4 py-3 text-xs text-slate-600">
-                {{ candidate.event?.name ?? '未关联活动' }}
-                <span v-if="candidate.release_date" class="block tabular-nums text-slate-500">{{ candidate.release_date }}</span>
+              <td class="min-w-36 max-w-56 px-4 py-3 text-xs leading-5" :class="candidate.artist_id ? 'text-slate-700' : 'text-amber-700'">
+                <NuxtLink v-if="candidate.artist_id" :to="`/artists/${candidate.artist_id}`" target="_blank" class="hover:underline">{{ candidate.circle_name ?? '未知社团' }}</NuxtLink>
+                <template v-else>{{ candidate.circle_name ?? '未知社团' }}</template>
               </td>
-              <td class="px-4 py-3">
-                <div class="flex flex-wrap gap-1 text-xs">
-                  <span v-for="item in candidate.sources" :key="item" class="rounded bg-slate-100 px-1.5 py-0.5">{{ label(item) }}</span>
+              <td class="min-w-44 px-4 py-3 text-xs leading-5">
+                <span :class="candidate.event ? 'text-slate-700' : 'text-slate-400'">{{ candidate.event?.name ?? '未关联活动' }}</span>
+                <span v-if="candidate.release_date" class="mt-0.5 block tabular-nums text-slate-500">{{ candidate.release_date }}</span>
+              </td>
+              <td class="min-w-28 px-4 py-3">
+                <div class="flex flex-wrap gap-1.5 text-xs">
+                  <span v-for="item in candidate.sources" :key="item" class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">{{ label(item) }}</span>
                 </div>
               </td>
-              <td class="px-4 py-3 text-right text-xs tabular-nums">
+              <td class="whitespace-nowrap px-4 py-3 text-right text-xs leading-5 tabular-nums">
                 <template v-if="candidate.has_tracks">{{ candidate.tracks }}</template>
                 <span v-else class="text-amber-700">缺曲目</span>
               </td>
-              <td class="px-4 py-3">
-                <div class="flex max-w-64 flex-wrap gap-1 text-xs">
-                  <span v-if="status === 'all'" class="rounded bg-slate-900 px-1.5 py-0.5 text-white">{{ harvestStatusLabels[candidate.status] }}</span>
-                  <span v-if="candidate.release_kind !== 'first'" class="rounded px-1.5 py-0.5" :class="candidate.release_kind === 'resale' ? 'bg-violet-100 text-violet-800' : 'bg-slate-100 text-slate-500'">{{ harvestReleaseKindLabels[candidate.release_kind] }}</span>
-                  <span v-if="!candidate.has_cover" class="rounded bg-amber-50 px-1.5 py-0.5 text-amber-800">缺封面</span>
-                  <span v-if="candidate.strong_duplicate" class="rounded bg-red-50 px-1.5 py-0.5 text-red-700">站内已有</span>
-                  <span v-else-if="candidate.duplicates" class="rounded bg-orange-50 px-1.5 py-0.5 text-orange-800">可能重复</span>
-                  <span v-if="candidate.delisted" class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">已下架</span>
-                  <span v-if="candidate.sources_changed_at" class="rounded bg-sky-50 px-1.5 py-0.5 text-sky-800">来源有更新</span>
-                  <span v-if="candidate.is_adult" class="rounded bg-pink-50 px-1.5 py-0.5 text-pink-800">成人</span>
+              <td class="min-w-40 px-4 py-3">
+                <div class="flex max-w-64 flex-wrap gap-1.5 text-xs">
+                  <span v-if="status === 'all'" class="whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-white">{{ harvestStatusLabels[candidate.status] }}</span>
+                  <span v-if="candidate.release_kind !== 'first'" class="whitespace-nowrap rounded px-1.5 py-0.5" :class="candidate.release_kind === 'resale' ? 'bg-violet-100 text-violet-800' : 'bg-slate-100 text-slate-500'">{{ harvestReleaseKindLabels[candidate.release_kind] }}</span>
+                  <span v-if="!candidate.has_cover" class="whitespace-nowrap rounded bg-amber-50 px-1.5 py-0.5 text-amber-800">缺封面</span>
+                  <span v-if="candidate.strong_duplicate" class="whitespace-nowrap rounded bg-red-50 px-1.5 py-0.5 text-red-700">站内已有</span>
+                  <span v-else-if="candidate.duplicates" class="whitespace-nowrap rounded bg-orange-50 px-1.5 py-0.5 text-orange-800">可能重复</span>
+                  <span v-if="candidate.delisted" class="whitespace-nowrap rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">已下架</span>
+                  <span v-if="candidate.sources_changed_at" class="whitespace-nowrap rounded bg-sky-50 px-1.5 py-0.5 text-sky-800">来源有更新</span>
+                  <span v-if="candidate.is_adult" class="whitespace-nowrap rounded bg-pink-50 px-1.5 py-0.5 text-pink-800">成人</span>
                 </div>
               </td>
             </tr>

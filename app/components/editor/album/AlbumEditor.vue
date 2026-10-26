@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen">
-    <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
+  <div :class="{ 'min-h-screen': !embedded }">
+    <div :class="embedded ? 'p-4 md:p-5' : 'container mx-auto max-w-7xl px-3 py-6 md:px-6'">
       <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
 
       <div v-else-if="loadError" class="mx-auto max-w-lg space-y-3 py-16 text-center">
@@ -9,10 +9,10 @@
       </div>
 
       <template v-else-if="ready">
-        <header class="mb-5 flex flex-wrap items-end gap-3">
+        <header class="flex flex-wrap items-end gap-3" :class="embedded ? 'mb-4' : 'mb-5'">
           <div class="min-w-0 flex-1">
-            <p class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
-            <h1 class="truncate text-2xl font-bold text-title">{{ album.title || $t('editor.album.untitled') }}</h1>
+            <p v-if="!embedded" class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
+            <component :is="embedded ? 'h3' : 'h1'" class="truncate font-bold text-title" :class="embedded ? 'text-lg' : 'text-2xl'">{{ album.title || $t('editor.album.untitled') }}</component>
             <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="link link-muted">{{ $t('editor.album.view') }}</NuxtLink>
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>

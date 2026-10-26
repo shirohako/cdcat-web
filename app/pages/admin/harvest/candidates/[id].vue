@@ -15,7 +15,6 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 interface EditorHandle {
   album: AlbumDocument
   remember: (type: string, id: number, row: object) => void
-  go: (section: string) => void
 }
 
 const { $api } = useNuxtApp()
@@ -27,7 +26,11 @@ const harvestReleaseReasonLabels: Record<string, string> = {
   event_name: '依据：来源写的活动名对上了这届活动。',
   date: '依据：来源的发售日期在这届活动期间。',
 }
-const harvestViaLabels: Record<string, string> = { fixed: '固定任务', name: '活动名', date: '发售日期' }
+const harvestCircleByLabels: Record<string, string> = {
+  identity: '审核时记住的对应', handle: 'X 账号', url: '链接', name: '社团名', artist: '署名的人是参展社团',
+  circle: '参展社团（同名）', contains: '参展社团（名字包含）', manual: '手动指定',
+}
+const harvestViaLabels: Record<string, string> = { fixed: '任务固定在这届', name: '活动名对上', date: '发售日期在活动内' }
 const harvestError = useHarvestError()
 const { user } = useAuth()
 const route = useRoute()
@@ -174,6 +177,24 @@ const sizeNote = (preview: { width: number, height: number }) => [
 ].filter(Boolean).join('，')
 
 const useTitle = (value: string) => { if (editor.value) editor.value.album.title = value }
+const useDescription = (value: string) => { if (editor.value) editor.value.album.description = value.trim() || null }
+/** The site name of a source, as the records label it. */
+const sourceName = (source: string) => detail.value?.records.find(record => record.source === source)?.label ?? source
+/** Whether the field comparison has anything to show: what the sources disagree on, and the numbers and price. */
+const comparesFields = computed(() => {
+  const merged = detail.value?.candidate.merged
+  return Boolean(merged && (merged.title.alternatives.length || merged.catalog_numbers.value?.length || merged.price.value || merged.tracklist.alternatives.length))
+})
+// Each group of the source comparison is a white card on the grey page, its title inside.
+const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white'
+const cardHead = 'flex items-center gap-2 border-b border-slate-100 px-4 py-2.5 font-semibold'
+/** The linked circle's artist, from the references that come with the candidate. */
+const circleArtist = computed(() => {
+  const artistId = detail.value?.candidate.artist_id
+  const row = artistId ? detail.value?.references.artist?.[artistId] : undefined
+  return row as { id: number, name: string, type: string | null, image_url: string | null, is_pending: boolean } | undefined
+})
+const circleInitial = computed(() => Array.from((circleArtist.value?.name ?? detail.value?.candidate.circle_name ?? '?').trim())[0]?.toUpperCase() ?? '?')
 const eventName = (eventId: number) => detail.value?.events.find(event => event.id === eventId)?.name ?? `#${eventId}`
 const listingNote = (listing: Record<string, unknown> | null) => [
   typeof listing?.event === 'string' ? listing.event : null,
@@ -181,20 +202,6 @@ const listingNote = (listing: Record<string, unknown> | null) => [
 ].filter(Boolean).join(' · ')
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 
-// Shortcuts outside text fields: J next, K previous, R not collected, S to the submit section.
-const onKey = (event: KeyboardEvent) => {
-  const target = event.target as HTMLElement | null
-  if (event.ctrlKey || event.metaKey || event.altKey || target?.closest('input, textarea, select, [contenteditable="true"]')) return
-  const key = event.key.toLowerCase()
-  if (key === 'j') next()
-  else if (key === 'k') previous()
-  else if (key === 'r' && open.value) rejectOpen.value = true
-  else if (key === 's' && open.value) editor.value?.go('submit')
-  else return
-  event.preventDefault()
-}
-onMounted(() => window.addEventListener('keydown', onKey))
-onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
 </script>
 
@@ -203,7 +210,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
     <AdminListState :pending="pending && !detail" :error="error" @retry="refresh()">
       <template v-if="detail">
         <header class="sticky top-0 z-20 -mx-4 flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-          <NuxtLink :to="{ path: '/admin/harvest/candidates', query: filters }" class="text-sm text-slate-500 hover:underline">← 返回候选列表</NuxtLink>
+          <NuxtLink :to="{ path: '/admin/harvest/candidates', query: filters }" class="text-sm text-slate-500 hover:underline">← 返回待审核候选</NuxtLink>
           <div class="min-w-0 flex-1">
             <p class="truncate font-semibold">{{ detail.candidate.title }}</p>
             <p class="text-xs text-slate-500">
@@ -221,7 +228,6 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
             <button v-else-if="['rejected', 'linked', 'excluded'].includes(detail.candidate.status)" type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="act('restore', {}, 'refresh')">放回待审</button>
           </div>
         </header>
-        <p class="text-xs text-slate-500">快捷键：J 下一条 · K 上一条 · R 不收录 · S 去提交</p>
         <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
         <div v-if="!open" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
@@ -252,144 +258,269 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
           <EditorEntityPicker kind="album" placeholder="搜索专辑" class="max-w-md" @select="act('link', { album_id: $event.id })" />
         </div>
 
-        <details class="rounded-xl border border-slate-200 bg-white" open>
-          <summary class="cursor-pointer px-4 py-3 font-semibold">来源对照</summary>
-          <div class="grid gap-4 border-t border-slate-100 p-4 text-sm lg:grid-cols-2">
-            <section class="space-y-2">
-              <h3 class="font-medium">来源</h3>
-              <ul class="space-y-1">
-                <li v-for="record in detail.records" :key="`${record.record_id}-${record.part}`" class="flex flex-wrap items-baseline gap-2">
-                  <span class="rounded bg-slate-100 px-1.5 text-xs">{{ record.label }}</span>
-                  <a :href="record.url" target="_blank" rel="noopener noreferrer" class="min-w-0 max-w-full truncate text-sky-700 hover:underline">{{ record.title }}</a>
-                  <span v-if="record.gone" class="text-xs text-red-700">已消失</span>
-                  <span v-if="record.delisted" class="text-xs text-amber-700">已下架</span>
-                  <span class="text-xs text-slate-400">抓取于 {{ time(record.fetched_at) }}</span>
-                  <button v-if="open && detail.records.length > 1" type="button" class="text-xs underline" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</button>
-                  <ul v-if="record.listings.length || record.events.length" class="w-full space-y-0.5 pl-4 text-xs text-slate-500">
-                    <li v-for="listing in record.listings" :key="listing.task.id">
-                      列出它的任务：
-                      <a v-if="listing.task.url" :href="listing.task.url" target="_blank" rel="noopener noreferrer" class="text-sky-700 hover:underline">{{ listing.task.label ?? listing.task.key }}</a>
-                      <template v-else>{{ listing.task.label ?? listing.task.key }}</template>
-                      （{{ listing.task.source_label }} · {{ listing.task.entry_label }}）
-                      <template v-if="listingNote(listing.listing)"> · {{ listingNote(listing.listing) }}</template>
-                      <span v-if="listing.delisted_at" class="text-amber-700"> · 已下架</span>
-                    </li>
-                    <li v-if="record.events.length">
-                      关联活动：
-                      <template v-for="(link, index) in record.events" :key="link.event_id">{{ index ? '、' : '' }}{{ eventName(link.event_id) }}（{{ harvestViaLabels[link.via] }}）</template>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-              <h3 class="pt-2 font-medium">关联的活动</h3>
-              <p v-if="!detail.events.length" class="text-xs text-amber-700">没有关联到任何活动。</p>
-              <ul v-else class="space-y-1 text-xs">
-                <li v-for="event in detail.events" :key="event.id" class="flex flex-wrap items-baseline gap-2">
-                  <span class="font-medium" :class="{ 'text-slate-900': event.suggested }">{{ event.name }}</span>
-                  <span class="text-slate-500">{{ event.start_date }}</span>
-                  <span class="rounded bg-slate-100 px-1.5">{{ harvestViaLabels[event.via] }}</span>
-                  <span v-if="event.suggested" class="rounded bg-emerald-50 px-1.5 text-emerald-800">建议首发</span>
-                  <span v-if="event.event_circle" class="text-slate-500">摊位 {{ event.event_circle.space_code ?? '—' }}</span>
-                </li>
-              </ul>
-              <p v-if="detail.candidate.merged.event_hints.length" class="flex flex-wrap gap-1 text-xs">
-                <span class="text-slate-500">来源里的活动线索：</span>
-                <span v-for="hint in detail.candidate.merged.event_hints" :key="hint.text" class="rounded bg-slate-100 px-1.5" :title="hint.sources.join(', ')">{{ hint.text }}</span>
-              </p>
-              <h3 class="pt-2 font-medium">社团</h3>
-              <p v-if="detail.candidate.artist_id || detail.candidate.circle_name">
-                {{ detail.candidate.circle_name }}
-                <span v-if="detail.event_circle" class="text-xs text-slate-500">摊位 {{ detail.event_circle.space_code ?? '—' }}</span>
-              </p>
-              <p v-if="!detail.candidate.artist_id" class="text-xs text-amber-700">没有认出社团，请在「人员」里选择专辑艺人。</p>
-
-              <template v-if="detail.duplicates.length">
-                <h3 class="pt-2 font-medium">站内疑似重复</h3>
-                <ul class="space-y-1">
-                  <li v-for="dup in detail.duplicates" :key="dup.album_id" class="flex flex-wrap items-baseline gap-2">
-                    <span class="rounded px-1.5 text-xs" :class="dup.strength === 'strong' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-800'">{{ dup.strength === 'strong' ? '强匹配' : '标题相似' }}</span>
-                    <NuxtLink :to="`/albums/${dup.album_id}`" target="_blank" class="text-sky-700 hover:underline">{{ dup.album?.title ?? `#${dup.album_id}` }}</NuxtLink>
-                    <span class="text-xs text-slate-500">{{ dup.album?.catalog_number }}</span>
-                    <button v-if="open" type="button" class="text-xs underline" :disabled="busy" @click="act('link', { album_id: dup.album_id })">就是这张</button>
+        <details class="group" open>
+          <summary class="flex cursor-pointer list-none items-center gap-2 font-semibold">
+            <Icon name="lucide:chevron-right" class="size-4 text-slate-400 transition-transform group-open:rotate-90" />
+            来源对照
+            <span class="text-xs font-normal text-slate-500">{{ detail.records.length }} 个来源 · {{ detail.events.length }} 届活动</span>
+          </summary>
+          <div class="mt-3 grid items-start gap-4 text-sm lg:grid-cols-2">
+            <div class="min-w-0 space-y-4">
+              <section :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:link" class="size-4 text-slate-400" />来源<span class="text-xs font-normal text-slate-500">{{ detail.records.length }}</span>
+                </h3>
+                <ul class="divide-y divide-slate-100">
+                  <li v-for="record in detail.records" :key="`${record.record_id}-${record.part}`" class="px-4 py-3">
+                    <div class="flex items-start gap-2">
+                      <span class="mt-px shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">{{ record.label }}</span>
+                      <div class="min-w-0 flex-1">
+                        <a :href="record.url" target="_blank" rel="noopener noreferrer" class="break-words font-medium text-sky-700 hover:underline">{{ record.title }}<Icon name="lucide:external-link" class="ml-1 inline size-3 align-[-1px] text-sky-600/70" /></a>
+                        <p class="mt-0.5 flex flex-wrap gap-x-2 text-xs text-slate-500">
+                          <span>抓取于 {{ time(record.fetched_at) }}</span>
+                          <span v-if="record.gone" class="text-red-700">已消失</span>
+                          <span v-if="record.delisted" class="text-amber-700">已下架</span>
+                        </p>
+                      </div>
+                      <button v-if="open && detail.records.length > 1" type="button" class="shrink-0 rounded border border-slate-200 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-50" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</button>
+                    </div>
+                    <dl v-if="record.listings.length || record.events.length" class="mt-2.5 grid grid-cols-[3rem_1fr] gap-x-2 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5">
+                      <template v-for="listing in record.listings" :key="listing.task.id">
+                        <dt class="text-slate-500">任务</dt>
+                        <dd class="min-w-0">
+                          <a v-if="listing.task.url" :href="listing.task.url" target="_blank" rel="noopener noreferrer" class="text-sky-700 hover:underline">{{ listing.task.label ?? listing.task.key }}</a>
+                          <template v-else>{{ listing.task.label ?? listing.task.key }}</template>
+                          <span class="text-slate-500"> · {{ listing.task.source_label }} {{ listing.task.entry_label }}</span>
+                          <span v-if="listingNote(listing.listing)" class="block text-slate-500">{{ listingNote(listing.listing) }}</span>
+                          <span v-if="listing.delisted_at" class="block text-amber-700">已从这个任务的列表下架</span>
+                        </dd>
+                      </template>
+                      <template v-if="record.events.length">
+                        <dt class="text-slate-500">活动</dt>
+                        <dd class="flex flex-wrap gap-x-3 gap-y-1">
+                          <span v-for="link in record.events" :key="link.event_id">{{ eventName(link.event_id) }}<span class="text-slate-500">（{{ harvestViaLabels[link.via] }}）</span></span>
+                        </dd>
+                      </template>
+                    </dl>
                   </li>
                 </ul>
-              </template>
+              </section>
 
-              <form v-if="open" class="flex flex-wrap items-end gap-2 pt-2 text-xs" @submit.prevent="mergeInto && act('merge', { into_id: Number(mergeInto) })">
-                <label>合并到另一条候选<input v-model="mergeInto" inputmode="numeric" class="mt-1 block w-28 rounded border border-slate-300 px-2 py-1"></label>
-                <button type="submit" class="rounded border px-2 py-1" :disabled="busy || !mergeInto">合并</button>
-                <span class="text-slate-500">填另一条候选的编号（候选列表里的 #数字，也是地址里的数字）。</span>
-              </form>
-            </section>
+              <section :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:calendar" class="size-4 text-slate-400" />活动<span class="text-xs font-normal text-slate-500">{{ detail.events.length }}</span>
+                </h3>
+                <p v-if="!detail.events.length" class="px-4 py-3 text-xs text-amber-700">没有关联到任何活动。</p>
+                <ul v-else class="divide-y divide-slate-100 text-xs">
+                  <li v-for="event in detail.events" :key="event.id" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5" :class="event.suggested && 'bg-emerald-50/60'">
+                    <span class="font-medium text-slate-900">{{ event.name }}</span>
+                    <span class="tabular-nums text-slate-500">{{ event.start_date }}</span>
+                    <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ harvestViaLabels[event.via] }}</span>
+                    <span v-if="event.event_circle" class="text-slate-500">摊位 {{ event.event_circle.space_code ?? '—' }}</span>
+                    <span v-if="event.suggested" class="ml-auto inline-flex items-center gap-1">
+                      <span class="rounded bg-emerald-100 px-1.5 py-0.5 font-medium text-emerald-800">建议</span>
+                      <UiTooltip placement="top-end" class="w-80">
+                        <span tabindex="0" aria-label="建议首发是什么" class="inline-flex cursor-help rounded-full text-slate-400 hover:text-slate-600 focus-visible:outline-2 focus-visible:outline-sky-500">
+                          <Icon name="lucide:circle-question-mark" class="size-3.5" />
+                        </span>
+                        <template #content>
+                          <div class="space-y-1.5 text-xs leading-5">
+                            <p class="font-semibold">建议首发</p>
+                            <p>根据来源推测，这张专辑最可能是在这届活动首发的。</p>
+                            <p>审核时，草稿的「发行活动」默认填这一届，可以在编辑器里改；首发还是再贩，也是跟这一届比出来的。</p>
+                            <p>挑选顺序：先看「任务固定在这届」和「活动名对上」的活动，取开始最早的一届；都没有，再看「发售日期在活动内」的。</p>
+                          </div>
+                        </template>
+                      </UiTooltip>
+                    </span>
+                  </li>
+                </ul>
+                <div v-if="detail.candidate.merged.event_hints.length" class="flex flex-wrap items-center gap-2 border-t border-slate-100 bg-slate-50/70 px-4 py-2.5 text-xs">
+                  <span class="mr-1 text-slate-500">来源里的活动线索：</span>
+                  <span v-for="hint in detail.candidate.merged.event_hints" :key="hint.text" class="rounded-md bg-white px-2 py-0.5 text-slate-700 shadow-xs ring-1 ring-slate-300" :title="hint.sources.map(sourceName).join('、')">{{ hint.text }}</span>
+                </div>
+              </section>
 
-            <section class="space-y-2">
-              <h3 class="font-medium">字段对照</h3>
-              <dl class="space-y-1">
-                <div v-if="detail.candidate.merged.title.alternatives.length">
-                  <dt class="text-xs text-slate-500">标题</dt>
-                  <dd v-for="alt in [{ value: detail.candidate.merged.title.value, source: detail.candidate.merged.title.source }, ...detail.candidate.merged.title.alternatives]" :key="`${alt.source}-${alt.value}`" class="flex gap-2">
-                    <span class="text-xs text-slate-400">{{ alt.source }}</span><span class="min-w-0 flex-1">{{ alt.value }}</span>
-                    <button v-if="open && alt.value" type="button" class="text-xs underline" @click="useTitle(alt.value)">采用</button>
-                  </dd>
-                </div>
-                <div v-if="detail.candidate.merged.catalog_numbers.value?.length">
-                  <dt class="text-xs text-slate-500">编号</dt>
-                  <dd class="font-mono text-xs">{{ detail.candidate.merged.catalog_numbers.value.join(' / ') }}<span v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="ml-2 text-slate-500">{{ alt.source }}: {{ alt.value.join(' / ') }}</span></dd>
-                </div>
-                <div v-if="detail.candidate.merged.price.value">
-                  <dt class="text-xs text-slate-500">价格</dt>
-                  <dd class="text-xs">{{ detail.candidate.merged.price.value.amount }} {{ detail.candidate.merged.price.value.currency }}<span v-for="alt in detail.candidate.merged.price.alternatives" :key="alt.source" class="ml-2 text-slate-500">{{ alt.source }}: {{ alt.value.amount }}</span></dd>
-                </div>
-                <div v-if="detail.candidate.merged.tracklist.alternatives.length">
-                  <dt class="text-xs text-slate-500">其他来源的曲目表</dt>
-                  <dd v-for="alt in detail.candidate.merged.tracklist.alternatives" :key="`${alt.record_id}-${alt.part}`" class="text-xs">{{ alt.source }}：{{ alt.tracks }} 轨</dd>
-                </div>
-              </dl>
-
-              <h3 class="pt-2 font-medium">封面候选</h3>
-              <p class="text-xs text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。</p>
-              <p v-if="coverNote" class="text-xs text-emerald-700">{{ coverNote }}</p>
-              <button v-if="!showImages && remoteCount" type="button" class="rounded border px-2 py-1 text-xs" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</button>
-              <div v-if="shownImages.length" class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                <figure v-for="image in shownImages" :key="image.url" class="space-y-1 rounded border border-slate-200 p-1 text-xs">
-                  <div class="flex aspect-square items-center justify-center overflow-hidden bg-slate-50">
-                    <img v-if="typeof previews[image.url] === 'object'" :src="(previews[image.url] as { src: string }).src" alt="" class="max-h-full max-w-full object-contain">
-                    <span v-else class="text-slate-400">{{ previews[image.url] === 'failed' ? '×' : '…' }}</span>
+              <section :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:users" class="size-4 text-slate-400" />社团
+                </h3>
+                <div class="flex items-start gap-3 px-4 py-3">
+                  <NuxtLink v-if="detail.candidate.artist_id" :to="`/artists/${detail.candidate.artist_id}`" target="_blank" class="shrink-0" :aria-label="`打开艺术家页 #${detail.candidate.artist_id}`">
+                    <img v-if="circleArtist?.image_url" :src="circleArtist.image_url" alt="" class="size-12 rounded-full object-cover ring-1 ring-slate-200">
+                    <span v-else class="flex size-12 items-center justify-center rounded-full bg-slate-100 text-lg font-semibold text-slate-500 ring-1 ring-slate-200">{{ circleInitial }}</span>
+                  </NuxtLink>
+                  <span v-else class="flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 ring-1 ring-amber-200">
+                    <Icon name="lucide:user-round-x" class="size-5" />
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <p class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <NuxtLink v-if="detail.candidate.artist_id" :to="`/artists/${detail.candidate.artist_id}`" target="_blank" class="font-medium text-sky-700 hover:underline">{{ circleArtist?.name ?? detail.candidate.circle_name ?? '未知社团' }}</NuxtLink>
+                      <span v-else class="font-medium">{{ detail.candidate.circle_name ?? '未知社团' }}</span>
+                      <span v-if="detail.candidate.artist_id" class="font-mono text-xs text-slate-500">#{{ detail.candidate.artist_id }}</span>
+                      <span v-if="circleArtist?.type" class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{{ artistTypeLabels[circleArtist.type] ?? circleArtist.type }}</span>
+                      <span v-if="circleArtist?.is_pending" class="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-800">待审核</span>
+                    </p>
+                    <dl v-if="detail.candidate.artist_id || detail.event_circle" class="mt-1.5 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-0.5 text-xs leading-5">
+                      <template v-if="detail.candidate.circle_name && circleArtist && detail.candidate.circle_name !== circleArtist.name">
+                        <dt class="text-slate-500">来源写作</dt>
+                        <dd>{{ detail.candidate.circle_name }}</dd>
+                      </template>
+                      <template v-if="detail.candidate.artist_id && detail.candidate.circle_by">
+                        <dt class="text-slate-500">关联依据</dt>
+                        <dd>{{ harvestCircleByLabels[detail.candidate.circle_by] ?? detail.candidate.circle_by }}</dd>
+                      </template>
+                      <template v-if="detail.event_circle">
+                        <dt class="text-slate-500">摊位</dt>
+                        <dd>
+                          <template v-if="detail.candidate.merged.circle.event_id">{{ eventName(detail.candidate.merged.circle.event_id) }} · </template>
+                          <span class="font-mono">{{ detail.event_circle.space_code ?? '—' }}</span>
+                        </dd>
+                      </template>
+                    </dl>
+                    <p v-if="!detail.candidate.artist_id" class="mt-1 text-xs text-amber-700">没有认出社团，请在「人员」里选择专辑艺人。</p>
                   </div>
-                  <figcaption class="flex flex-wrap items-center gap-1">
-                    <span class="text-slate-500">{{ image.source }}</span>
-                    <span v-if="image.local" class="rounded bg-emerald-50 px-1 text-emerald-800">本站已有</span>
-                    <template v-if="typeof previews[image.url] === 'object'">
-                      <span>{{ (previews[image.url] as { width: number }).width }}×{{ (previews[image.url] as { height: number }).height }}</span>
-                      <span class="text-amber-700">{{ sizeNote(previews[image.url] as { width: number, height: number }) }}</span>
-                    </template>
-                    <button v-if="open" type="button" class="ml-auto underline" :disabled="busy || !editor" @click="useCover(image.url)">设为封面</button>
-                  </figcaption>
-                </figure>
-              </div>
+                </div>
+              </section>
 
-              <details v-if="detail.candidate.merged.descriptions.length" class="pt-2">
-                <summary class="cursor-pointer font-medium">来源描述</summary>
-                <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id" class="mt-2">
-                  <p class="text-xs text-slate-500">{{ text.source }}</p>
-                  <p class="max-h-48 overflow-y-auto whitespace-pre-line rounded bg-slate-50 p-2 text-xs">{{ text.text }}</p>
+              <section v-if="detail.duplicates.length" :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:copy" class="size-4 text-slate-400" />站内疑似重复<span class="text-xs font-normal text-slate-500">{{ detail.duplicates.length }}</span>
+                </h3>
+                <ul class="divide-y divide-slate-100">
+                  <li v-for="dup in detail.duplicates" :key="dup.album_id" class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-2.5">
+                    <span class="rounded px-1.5 py-0.5 text-xs" :class="dup.strength === 'strong' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-800'">{{ dup.strength === 'strong' ? '强匹配' : '标题相似' }}</span>
+                    <NuxtLink :to="`/albums/${dup.album_id}`" target="_blank" class="min-w-0 text-sky-700 hover:underline">{{ dup.album?.title ?? `#${dup.album_id}` }}</NuxtLink>
+                    <span v-if="dup.album?.catalog_number" class="font-mono text-xs text-slate-500">{{ dup.album.catalog_number }}</span>
+                    <button v-if="open" type="button" class="ml-auto rounded border border-slate-200 px-2 py-0.5 text-xs hover:bg-slate-50" :disabled="busy" @click="act('link', { album_id: dup.album_id })">就是这张</button>
+                  </li>
+                </ul>
+              </section>
+
+              <form v-if="open" :class="card" @submit.prevent="mergeInto && act('merge', { into_id: Number(mergeInto) })">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:merge" class="size-4 text-slate-400" /><label for="merge-into">合并到另一条候选</label>
+                </h3>
+                <div class="px-4 py-3 text-xs">
+                  <p class="text-slate-500">填另一条候选的编号（列表里的 #数字，也是地址里的数字）。</p>
+                  <div class="mt-2 flex gap-2">
+                    <input id="merge-into" v-model="mergeInto" inputmode="numeric" placeholder="编号" class="w-28 rounded border border-slate-300 px-2 py-1">
+                    <button type="submit" class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-50" :disabled="busy || !mergeInto">合并</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="min-w-0 space-y-4">
+              <section v-if="comparesFields" :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:columns-2" class="size-4 text-slate-400" />字段对照
+                </h3>
+                <dl class="grid grid-cols-[4.5rem_1fr] gap-x-3 gap-y-2.5 px-4 py-3">
+                  <template v-if="detail.candidate.merged.title.alternatives.length">
+                    <dt class="pt-0.5 text-xs text-slate-500">标题</dt>
+                    <dd class="space-y-1">
+                      <div v-for="alt in [{ value: detail.candidate.merged.title.value, source: detail.candidate.merged.title.source }, ...detail.candidate.merged.title.alternatives]" :key="`${alt.source}-${alt.value}`" class="flex items-baseline gap-2">
+                        <span class="w-16 shrink-0 truncate text-xs text-slate-500">{{ alt.source ? sourceName(alt.source) : '' }}</span>
+                        <span class="min-w-0 flex-1 break-words">{{ alt.value }}</span>
+                        <button v-if="open && alt.value" type="button" class="shrink-0 text-xs text-sky-700 hover:underline" @click="useTitle(alt.value)">采用</button>
+                      </div>
+                    </dd>
+                  </template>
+                  <template v-if="detail.candidate.merged.catalog_numbers.value?.length">
+                    <dt class="pt-0.5 text-xs text-slate-500">编号</dt>
+                    <dd class="space-y-0.5">
+                      <p class="font-mono text-xs">{{ detail.candidate.merged.catalog_numbers.value.join(' / ') }}</p>
+                      <p v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="text-xs text-slate-500">{{ sourceName(alt.source) }}：<span class="font-mono">{{ alt.value.join(' / ') }}</span></p>
+                    </dd>
+                  </template>
+                  <template v-if="detail.candidate.merged.price.value">
+                    <dt class="pt-0.5 text-xs text-slate-500">价格</dt>
+                    <dd class="space-y-0.5 text-xs">
+                      <p class="tabular-nums">{{ detail.candidate.merged.price.value.amount }} {{ detail.candidate.merged.price.value.currency }}</p>
+                      <p v-for="alt in detail.candidate.merged.price.alternatives" :key="alt.source" class="tabular-nums text-slate-500">{{ sourceName(alt.source) }}：{{ alt.value.amount }}</p>
+                    </dd>
+                  </template>
+                  <template v-if="detail.candidate.merged.tracklist.alternatives.length">
+                    <dt class="pt-0.5 text-xs text-slate-500">曲目表</dt>
+                    <dd class="space-y-0.5 text-xs">
+                      <p v-for="alt in detail.candidate.merged.tracklist.alternatives" :key="`${alt.record_id}-${alt.part}`">{{ sourceName(alt.source) }}：{{ alt.tracks }} 轨<span class="text-slate-500">（草稿用的是 {{ detail.candidate.merged.tracklist.source ? sourceName(detail.candidate.merged.tracklist.source) : '—' }}）</span></p>
+                    </dd>
+                  </template>
+                </dl>
+              </section>
+
+              <section :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:image" class="size-4 text-slate-400" />封面候选
+                  <button v-if="!showImages && remoteCount" type="button" class="ml-auto rounded border border-slate-300 px-2 py-0.5 text-xs font-normal hover:bg-slate-50" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</button>
+                </h3>
+                <div class="space-y-3 px-4 py-3">
+                  <p class="text-xs leading-5 text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。</p>
+                  <p v-if="coverNote" class="text-xs text-emerald-700">{{ coverNote }}</p>
+                  <p v-if="!shownImages.length && !remoteCount" class="text-xs text-slate-400">来源里没有图片。</p>
+                  <div v-if="shownImages.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <figure v-for="image in shownImages" :key="image.url" class="overflow-hidden rounded-lg border border-slate-200 text-xs">
+                      <div class="flex aspect-square items-center justify-center bg-slate-50">
+                        <img v-if="typeof previews[image.url] === 'object'" :src="(previews[image.url] as { src: string }).src" alt="" class="max-h-full max-w-full object-contain">
+                        <span v-else class="text-slate-400">{{ previews[image.url] === 'failed' ? '取不到' : '…' }}</span>
+                      </div>
+                      <figcaption class="space-y-1 border-t border-slate-100 p-2">
+                        <p class="flex flex-wrap items-center gap-1.5">
+                          <span class="text-slate-600">{{ sourceName(image.source) }}</span>
+                          <span v-if="image.local" class="rounded bg-emerald-50 px-1 text-emerald-800">本站已有</span>
+                          <span v-if="typeof previews[image.url] === 'object'" class="ml-auto tabular-nums text-slate-500">{{ (previews[image.url] as { width: number }).width }}×{{ (previews[image.url] as { height: number }).height }}</span>
+                        </p>
+                        <p v-if="typeof previews[image.url] === 'object' && sizeNote(previews[image.url] as { width: number, height: number })" class="text-amber-700">{{ sizeNote(previews[image.url] as { width: number, height: number }) }}</p>
+                        <button v-if="open" type="button" class="w-full rounded border border-slate-200 py-1 hover:bg-slate-50" :disabled="busy || !editor" @click="useCover(image.url)">设为封面</button>
+                      </figcaption>
+                    </figure>
+                  </div>
+                </div>
+              </section>
+
+              <details v-if="detail.candidate.merged.descriptions.length" class="group/desc" :class="card">
+                <summary class="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 font-semibold group-open/desc:border-b group-open/desc:border-slate-100">
+                  <Icon name="lucide:file-text" class="size-4 text-slate-400" />来源描述
+                  <Icon name="lucide:chevron-down" class="ml-auto size-4 text-slate-400 transition-transform group-open/desc:rotate-180" />
+                </summary>
+                <div class="space-y-3 px-4 py-3">
+                  <p v-if="open && detail.candidate.merged.descriptions.length > 1" class="text-xs text-slate-500">草稿默认填第一条，点「采用」换成别的来源。</p>
+                  <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id">
+                    <p class="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                      {{ sourceName(text.source) }}
+                      <button v-if="open" type="button" class="ml-auto text-sky-700 hover:underline" :disabled="!editor" @click="useDescription(text.text)">采用</button>
+                    </p>
+                    <p class="max-h-48 overflow-y-auto whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-5">{{ text.text }}</p>
+                  </div>
                 </div>
               </details>
-              <div v-if="detail.candidate.merged.notes.length" class="pt-2 text-xs text-slate-600">
-                <p class="font-medium">备注</p>
-                <p v-for="note in detail.candidate.merged.notes" :key="note">{{ note }}</p>
-              </div>
-            </section>
+
+              <section v-if="detail.candidate.merged.notes.length" :class="card">
+                <h3 :class="cardHead">
+                  <Icon name="lucide:sticky-note" class="size-4 text-slate-400" />备注
+                </h3>
+                <ul class="list-disc space-y-0.5 py-3 pl-8 pr-4 text-xs leading-5 text-slate-600">
+                  <li v-for="note in detail.candidate.merged.notes" :key="note">{{ note }}</li>
+                </ul>
+              </section>
+            </div>
           </div>
         </details>
 
-        <template v-if="open">
-          <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-            <span>资料核对完后，在编辑器的「提交」一节点提交，就会以你的名义建成专辑。</span>
-            <button type="button" class="underline" @click="prepareDraft(true)">按来源重新生成草稿</button>
+        <section v-if="open" :class="card">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 px-4 py-3">
+            <h2 class="flex items-center gap-2 font-semibold">
+              <Icon name="lucide:disc-3" class="size-4 text-slate-400" />新建专辑
+            </h2>
+            <p class="min-w-0 flex-1 text-xs text-slate-500">资料核对完后，在「提交」一节提交，就会以你的名义建成专辑。</p>
+            <button type="button" class="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-50" @click="prepareDraft(true)">按来源重新生成草稿</button>
           </div>
-          <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" @submitted="approved" @discarded="prepareDraft(true)" />
-        </template>
+          <div class="bg-slate-50">
+            <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" @submitted="approved" @discarded="prepareDraft(true)" />
+            <p v-else class="px-4 py-8 text-center text-xs text-slate-400">正在准备草稿…</p>
+          </div>
+        </section>
       </template>
     </AdminListState>
   </div>

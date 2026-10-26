@@ -17,9 +17,10 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
 /**
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
  * title and names, release date and event (the suggested first release, none for a resale or when no
- * source names one), the circle as album artist, the tracklist, the edition's catalog number and
- * price, credits (unresolved names as the printed name only) and links. The cover is picked by the
- * reviewer, because only a picked image is stored.
+ * source names one), the description of the highest-priority source that has one, the circle as
+ * album artist, the tracklist, the edition's catalog number and price, credits (unresolved names as
+ * the printed name only) and links. The cover is picked by the reviewer, because only a picked image
+ * is stored.
  */
 export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: DraftItem[], summary: string, sources: string[] } {
   const { candidate, event } = detail
@@ -33,6 +34,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
   }
   doc.release_event_id = merged.release.kind === 'resale' ? null : (event?.id ?? null)
   doc.is_adult = candidate.is_adult
+  doc.description = merged.descriptions[0]?.text.trim() || null
   for (const title of merged.titles) {
     if (title.kind === 'official' && title.title === doc.title) continue
     setTitleIn(doc, 'titles', null, title.locale, title.kind, title.title)
