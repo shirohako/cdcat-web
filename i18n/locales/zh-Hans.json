@@ -2198,12 +2198,35 @@
     },
     "harvest": {
       "title": "采集概况",
-      "description": "采集器（单独的程序，在任何电脑上都能运行）从公开的数据库和商店收集某一届活动的专辑，导出成数据包上传到这里，或者用令牌直接提交。同一张专辑的来源记录合并成一条候选，逐条审核后才会建成专辑。",
-      "add_event": "添加活动",
-      "add_event_help": "选一届活动查看它的候选",
-      "no_events": "还没有活动收到采集数据。",
-      "circles_covered": "社团 {covered} / {total}",
-      "open": "打开",
+      "description": "采集器（单独的程序，在任何电脑上都能运行）按任务从公开的数据库和商店收集专辑，导出成数据包上传到这里，或者用令牌直接提交。同一张专辑的来源记录，不管来自哪个任务、哪届活动，都合并成一条候选；活动只是候选上的建议首发活动。逐条审核后才会建成专辑。",
+      "tabs": {
+        "candidates": "候选",
+        "coverage": "社团覆盖",
+        "names": "名字对照",
+        "tasks": "任务",
+        "submissions": "提交记录"
+      },
+      "unprocessed": "{count} 条新记录等待合并",
+      "process_now": "立即合并",
+      "processed": "已合并 {records} 条记录，更新 {candidates} 条候选",
+      "images": "采集图片 {count} 张（{size}）",
+      "no_event": "未关联活动",
+      "via": {
+        "fixed": "固定任务",
+        "name": "活动名",
+        "date": "发售日期"
+      },
+      "event_modes": {
+        "none": "不附加活动",
+        "fixed": "固定活动",
+        "auto": "自动判断"
+      },
+      "events": {
+        "all": "所有活动",
+        "pick": "选择活动",
+        "other": "搜索其他活动",
+        "option": "{name}（{count}）"
+      },
       "status": {
         "pending": "待审",
         "approving": "通过中",
@@ -2219,18 +2242,13 @@
         "resale": "再贩",
         "unknown": "未知"
       },
-      "event": {
-        "tabs": {
-          "sources": "来源",
-          "candidates": "候选",
-          "coverage": "社团覆盖",
-          "names": "名字对照",
-          "submissions": "提交记录"
-        },
-        "unprocessed": "{count} 条新记录等待合并",
-        "process_now": "立即合并",
-        "processed": "已合并 {records} 条记录，更新 {candidates} 条候选",
-        "back": "返回采集概况"
+      "release_reason": {
+        "earlier_date": "依据：来源的发售日期早于这届活动。",
+        "source": "依据：来源写明是再贩。",
+        "listing": "依据：固定在这届活动的任务把它标为再贩。",
+        "event_fixed": "依据：固定在这届活动的任务列出了它。",
+        "event_name": "依据：来源写的活动名对上了这届活动。",
+        "date": "依据：来源的发售日期在这届活动期间。"
       },
       "candidates": {
         "search": "标题或社团",
@@ -2247,19 +2265,25 @@
         "duplicates": {
           "": "站内重复",
           "strong": "站内已有（强匹配）",
-          "any": "可能重复"
+          "any": "可能重复",
+          "none": "站内没有"
         },
         "circle": {
           "": "社团",
           "matched": "已关联社团",
           "unmatched": "未关联社团"
         },
-        "adult": "成人",
+        "adult": {
+          "": "成人",
+          "1": "只看成人",
+          "0": "不含成人"
+        },
         "sort": {
           "circle": "按社团",
           "title": "按标题",
           "updated": "最近更新",
-          "sources": "来源多的在前"
+          "sources": "来源多的在前",
+          "created": "最新加入"
         },
         "tracks": "{count} 轨",
         "no_cover": "缺封面",
@@ -2269,10 +2293,20 @@
         "changed": "来源有更新",
         "review": "审核",
         "unknown_circle": "未知社团",
-        "empty": "没有符合条件的候选"
+        "empty": "没有符合条件的候选",
+        "task": "任务",
+        "any_task": "所有任务",
+        "event_match": {
+          "label": "活动的关联方式",
+          "any": "关联到这届的",
+          "suggested": "建议首发是这届的"
+        },
+        "adult_badge": "成人",
+        "delisted": "已下架",
+        "clear": "清除筛选"
       },
       "coverage": {
-        "description": "本届参展社团中，有 {covered} / {total} 个已有候选。下面列出还没有候选的社团，可以按它们的链接手动补录。",
+        "description": "{event} 的参展社团中，有 {covered} / {total} 个已有候选。下面列出还没有候选的社团，可以按它们的链接手动补录。",
         "filter": {
           "none": "没有候选的",
           "mentioned": "简介提到新譜但没有候选的",
@@ -2281,10 +2315,11 @@
         "search": "社团名",
         "candidates": "{count} 条候选",
         "links": "链接",
-        "xfd": "试听视频"
+        "xfd": "试听视频",
+        "pick_event": "选一届活动，查看它的参展社团里哪些还没有候选。没有候选的活动可以用「搜索其他活动」找到。"
       },
       "names": {
-        "description": "来源里的人名、社团名和角色名。每个名字处理一次，之后所有候选和以后的活动都沿用；还没处理的人名会先以纯署名写入专辑。",
+        "description": "来源里的人名、社团名和角色名。每个名字处理一次，之后所有候选都沿用；还没处理的人名会先以纯署名写入专辑。选了活动时只列关联到这届活动的候选用到的名字。",
         "kinds": {
           "person": "人名",
           "circle": "社团",
@@ -2328,7 +2363,7 @@
       "review": {
         "title": "标题",
         "back": "返回候选列表",
-        "position": "第 {position} / {total} 条待审",
+        "position": "第 {position} / {total} 条",
         "previous": "上一条",
         "next": "下一条",
         "skip": "跳过",
@@ -2351,8 +2386,8 @@
         "approved": "已建档：",
         "closed": "这条候选已经处理过（{status}）。",
         "by": "由 {name} 于 {time} 处理",
-        "resale": "来源显示这是再贩：草稿没有挂到本届活动，发行日期取最早的来源。",
-        "unknown_release": "没有来源确认这是本届首发，请核对发行日期和活动。",
+        "resale": "这是再贩：草稿没有挂活动，发行日期取来源里最早的日期。",
+        "unknown_release": "没有来源确认这是 {event} 首发，请核对发行日期和活动。",
         "sources_changed": "建档之后来源有更新。",
         "panel": "来源对照",
         "sources": "来源",
@@ -2361,8 +2396,8 @@
         "delisted": "已下架",
         "fetched": "抓取于 {time}",
         "covers": "封面候选",
-        "covers_help": "点「设为封面」才会下载到本站；封面要求正方形、至少 500px。",
-        "load_images": "显示图片",
+        "covers_help": "采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。",
+        "load_images": "取回其他来源的图片",
         "use_cover": "设为封面",
         "cover_set": "已设为封面（{width}×{height}）",
         "not_square": "不是正方形",
@@ -2384,27 +2419,27 @@
         "merge_go": "合并",
         "circle": "社团",
         "circle_unknown": "没有认出社团，请在「人员」里选择专辑艺人。",
-        "event_circle": "本届摊位 {space}",
+        "event_circle": "摊位 {space}",
         "shortcuts": "快捷键：J 下一条 · K 上一条 · R 不收录 · S 去提交",
-        "submit_hint": "资料核对完后，在编辑器的「提交」一节点提交，就会以你的名义建成专辑。"
-      },
-      "last_seen": "最近列出 {time}",
-      "sources": {
-        "description": "各来源提交到这一届的记录。采集器在哪里运行、抓了多少，见采集器自己的网页。",
-        "empty": "还没有这一届的记录：在采集器里跑完以后导出数据包上传，或者用令牌提交。",
-        "records": "记录",
-        "delisted": "已下架",
-        "gone": "已消失",
-        "non_music": "非音乐",
-        "last_seen": "最近列出"
+        "submit_hint": "资料核对完后，在编辑器的「提交」一节点提交，就会以你的名义建成专辑。",
+        "no_event_release": "没有记录关联到活动：请核对发行日期，需要时在编辑器里选上首发活动。",
+        "events": "关联的活动",
+        "no_events": "没有关联到任何活动。",
+        "suggested": "建议首发",
+        "event_hints": "来源里的活动线索：",
+        "listed_by": "列出它的任务：",
+        "linked_to": "关联活动：",
+        "listing_resale": "列表标为再贩",
+        "local": "本站已有"
       },
       "import": {
         "title": "导入数据包",
-        "help": "上传采集器导出的 .jsonl.gz 文件。同一条记录以采集时间更新的为准，重复上传不会产生重复数据。",
+        "help": "上传采集器导出的 zip（可以一次选多卷，按顺序上传），也收 .jsonl.gz 和 .jsonl。每个文件不超过 25 MB。同一条记录以采集时间更新的为准，重复上传不会产生重复数据。",
         "pick": "选择文件",
         "uploading": "正在导入……",
-        "done": "导入了 {records} 条记录：新增 {new}，有变化 {changed}，无变化 {unchanged}",
-        "too_large": "文件太大，请按活动分开导出，或者用令牌直接提交。"
+        "done": "导入了 {records} 条记录：新增 {new}，有变化 {changed}，无变化 {unchanged}；图片 {images} 张",
+        "too_large": "文件太大，请导出时分卷（每卷不超过 20 MB），或者用令牌直接提交。",
+        "progress": "正在导入第 {current} / {total} 个文件：{file}"
       },
       "submissions": {
         "title": "提交记录",
@@ -2421,7 +2456,11 @@
           "unchanged": "无变化",
           "stale": "比站内旧",
           "invalid": "格式不对",
-          "unknown_event": "活动对不上"
+          "unknown_event": "活动对不上",
+          "unknown_task": "任务对不上",
+          "images_new": "新图片",
+          "images_known": "已有图片",
+          "images_invalid": "图片有问题"
         },
         "by": "{name}",
         "install": "采集器 {instance}",
@@ -2429,7 +2468,7 @@
       },
       "tokens": {
         "title": "采集器令牌",
-        "help": "采集器用令牌把数据直接提交到本站。令牌只能用来提交采集数据，不能登录或访问其他接口；在采集器网页的「设置 → 本站」里填入。",
+        "help": "采集器用令牌把数据和图片直接提交到本站。令牌只能用来提交采集数据，不能登录或访问其他接口；在采集器网页的「设置 → 本站」里填入。",
         "name": "用途（例如：家里的电脑）",
         "create": "新建令牌",
         "created": "令牌只显示这一次，请马上复制到采集器里：",
@@ -2441,6 +2480,20 @@
         "revoke": "吊销",
         "revoke_title": "吊销令牌「{name}」？",
         "revoke_help": "用这个令牌的采集器之后就不能提交了。"
+      },
+      "tasks": {
+        "description": "采集器的任务：一个站点的一个入口，例如 Bangumi 的一个目录、BOOTH 的一个店铺、一届活动的活动页。任务由数据包带来，在采集器里新建和运行。",
+        "task": "任务",
+        "event_mode": "活动",
+        "records": "列出的记录",
+        "candidates": "候选",
+        "last_seen": "最近提交",
+        "delisted": "已下架 {count}",
+        "pending": "待审 {count}",
+        "listed_at": "最近列出 {time}",
+        "source_records": "{source} {count} 条",
+        "non_music": "非音乐 {count}",
+        "gone": "已消失 {count}"
       }
     }
   },

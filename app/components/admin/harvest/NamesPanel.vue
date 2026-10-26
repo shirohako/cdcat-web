@@ -2,17 +2,23 @@
 import type { AdminCreditRole } from '~/types/admin'
 import type { HarvestIdentity, HarvestPagination } from '~/types/harvest'
 
-const props = defineProps<{ eventId: number }>()
+/** The name map; with the page's event_id, only names candidates linked to that event use. */
 const { $api } = useNuxtApp()
 const { t } = useAdminI18n()
 const harvestError = useHarvestError()
+const route = useRoute()
+const router = useRouter()
 
+const eventId = computed({
+  get: () => /^\d+$/.test(String(route.query.event_id ?? '')) ? String(route.query.event_id) : '',
+  set: value => router.push({ query: { ...route.query, event_id: value || undefined } }),
+})
 const kind = ref<'person' | 'circle' | 'role'>('person')
 const status = ref<'unresolved' | 'resolved' | 'ignored' | 'all'>('unresolved')
 const q = ref('')
 const page = ref(1)
-watch([kind, status, q], () => { page.value = 1 })
-const query = computed(() => ({ kind: kind.value, status: status.value, q: q.value || undefined, event_id: props.eventId, page: page.value }))
+watch([kind, status, q, eventId], () => { page.value = 1 })
+const query = computed(() => ({ kind: kind.value, status: status.value, q: q.value || undefined, event_id: eventId.value || undefined, page: page.value }))
 const { data, pending, error, refresh } = await useAsyncData(
   () => `admin-harvest-names-${JSON.stringify(query.value)}`,
   () => $api<{ identities: HarvestIdentity[], pagination: HarvestPagination }>('/v1/admin/harvest/identities', { query: query.value }),
@@ -65,6 +71,7 @@ const roleName = (key: string | null) => roles.value?.find(role => role.key === 
         <option v-for="value in ['unresolved', 'resolved', 'ignored', 'all']" :key="value" :value="value">{{ t(`admin_pages.harvest.names.statuses.${value}`) }}</option>
       </select>
       <input v-model.lazy="q" type="search" :placeholder="t('admin_pages.harvest.names.search')" class="w-56 rounded-lg border border-slate-300 px-2 py-1.5">
+      <AdminHarvestEventSelect v-model="eventId" />
       <span class="text-slate-500">{{ data?.pagination.total ?? 0 }}</span>
     </div>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>

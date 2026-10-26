@@ -16,9 +16,10 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
 
 /**
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
- * title and names, release date and event, the circle as album artist, the tracklist, the edition's
- * catalog number and price, credits (unresolved names as the printed name only) and links. The
- * cover is picked by the reviewer, because only a picked image is downloaded.
+ * title and names, release date and event (the suggested first release, none for a resale or when no
+ * source names one), the circle as album artist, the tracklist, the edition's catalog number and
+ * price, credits (unresolved names as the printed name only) and links. The cover is picked by the
+ * reviewer, because only a picked image is stored.
  */
 export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: DraftItem[], summary: string, sources: string[] } {
   const { candidate, event } = detail
@@ -30,7 +31,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     doc.release_date = fullDate(merged.release.date)
     doc.release_date_precision = merged.release.precision ?? 'day'
   }
-  doc.release_event_id = merged.release.kind === 'resale' ? null : event.id
+  doc.release_event_id = merged.release.kind === 'resale' ? null : (event?.id ?? null)
   doc.is_adult = candidate.is_adult
   for (const title of merged.titles) {
     if (title.kind === 'official' && title.title === doc.title) continue
@@ -82,7 +83,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
 
   return {
     items: [{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: doc as unknown as Record<string, unknown> }],
-    summary: `采集：${event.name}「${doc.title}」`,
+    summary: event ? `采集：${event.name}「${doc.title}」` : `采集：「${doc.title}」`,
     sources: [...new Set(merged.sources.map(source => source.url))].slice(0, 20),
   }
 }

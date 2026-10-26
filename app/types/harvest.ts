@@ -1,6 +1,6 @@
 /**
  * Harvesting (docs/harvest/README.md): bundles harvesters hand in, and the review queue. The
- * harvester itself (settings, runs) is a separate program with its own page.
+ * harvester itself (settings, tasks, runs) is a separate program with its own page.
  */
 
 export interface HarvestEventSummary {
@@ -8,44 +8,75 @@ export interface HarvestEventSummary {
   name: string
   slug: string | null
   start_date: string | null
+  end_date: string | null
 }
 
-export interface HarvestOverviewRow {
-  event: HarvestEventSummary
+/** How a record is linked to an event: a task fixed to it, an event name or tag that matched, or a release date that fell on it. */
+export type HarvestVia = 'fixed' | 'name' | 'date'
+
+export type HarvestEventMode = 'none' | 'fixed' | 'auto'
+
+export type HarvestCandidateStatus = 'pending' | 'approving' | 'approved' | 'linked' | 'rejected' | 'excluded' | 'merged'
+
+export type HarvestReleaseKind = 'first' | 'resale' | 'unknown'
+
+/** GET /admin/harvest/overview */
+export interface HarvestOverview {
   candidates: Partial<Record<HarvestCandidateStatus, number>>
-  circles: number
-  covered_circles: number
-  /** When a harvester last saw one of the event's items listed. */
-  last_seen_at: string | null
+  /** Records handed in that are not merged into candidates yet. */
+  unprocessed: number
+  sources: Array<{ source: string, label: string, records: number, gone: number, non_music: number, updated_at: string | null }>
+  tasks: number
+  images: { count: number, bytes: number }
 }
 
-/** What one source handed in for an event. */
-export interface HarvestEventSource {
+/** A task: one entry of one site ("bangumi:index:95778"), as harvesters name it. */
+export interface HarvestTaskSummary {
+  id: number
+  key: string
   source: string
-  label: string
+  source_label: string
+  entry: string
+  entry_label: string
+  label: string | null
+  url: string | null
+}
+
+/** GET /admin/harvest/tasks */
+export interface HarvestTaskRow extends HarvestTaskSummary {
+  event_mode: HarvestEventMode
+  event: HarvestEventSummary | null
   records: number
   delisted: number
-  gone: number
-  non_music: number
+  /** When the task last saw one of its items listed. */
+  listed_at: string | null
+  candidates: Partial<Record<HarvestCandidateStatus, number>>
+  /** When a bundle last named the task. */
   last_seen_at: string | null
-  updated_at: string | null
+  created_at: string | null
 }
 
-export interface HarvestEventDetail {
-  event: HarvestEventSummary & { circles: number }
-  sources: HarvestEventSource[]
-  candidates: Partial<Record<HarvestCandidateStatus, number>>
-  unprocessed: number
+/** GET /admin/harvest/events: events candidates are linked to. */
+export interface HarvestEventRow {
+  event: HarvestEventSummary
+  candidates: number
+  pending: number
+  /** Candidates that have it as the suggested first release. */
+  suggested: number
+  circles: number
+  covered_circles: number
 }
 
 export type HarvestSubmissionVia = 'upload' | 'api' | 'command'
+
+export type HarvestSubmissionCount = 'records' | 'new' | 'changed' | 'unchanged' | 'stale' | 'invalid' | 'unknown_event' | 'unknown_task' | 'images_new' | 'images_known' | 'images_invalid'
 
 export interface HarvestSubmission {
   id: number
   via: HarvestSubmissionVia
   file_name: string | null
   records: number
-  counts: Partial<Record<'records' | 'new' | 'changed' | 'unchanged' | 'stale' | 'invalid' | 'unknown_event', number>>
+  counts: Partial<Record<HarvestSubmissionCount, number>>
   errors: string[]
   harvester_instance: string | null
   harvester_version: string | null
@@ -63,8 +94,6 @@ export interface HarvestToken {
   token?: string
 }
 
-export type HarvestCandidateStatus = 'pending' | 'approving' | 'approved' | 'linked' | 'rejected' | 'excluded' | 'merged'
-
 export interface HarvestCandidateRow {
   id: number
   title: string
@@ -73,14 +102,19 @@ export interface HarvestCandidateRow {
   event_circle_id: number | null
   circle_by: string | null
   status: HarvestCandidateStatus
-  release_kind: 'first' | 'resale' | 'unknown'
+  /** The suggested first-release event; null when no record is linked to one. */
+  event: HarvestEventSummary | null
+  release_kind: HarvestReleaseKind
   is_adult: boolean
   has_cover: boolean
   has_tracks: boolean
   tracks: number
   catalog_numbers: string[]
   sources: string[]
+  release_date: string | null
   cover_url: string | null
+  /** Every task that listed its records no longer lists them (or the pages are gone). */
+  delisted: boolean
   duplicates: number
   strong_duplicate: boolean
   album_id: number | null
@@ -116,7 +150,7 @@ export interface HarvestIdentity {
   credit_role: string | null
   occurrences: number
   artist: { id: number, name: string, type: string } | null
-  candidates: Array<{ id: number, title: string, event_id: number }>
+  candidates: Array<{ id: number, title: string, event_id: number | null }>
 }
 
 export interface HarvestPagination {
@@ -152,11 +186,35 @@ export interface HarvestMergedCredit {
   source: string
 }
 
+export interface HarvestMergedImage {
+  url: string
+  kind: string
+  width: number | null
+  height: number | null
+  sha256: string | null
+  /** A harvester handed the file in: previews and the cover come from this site's copy. */
+  local: boolean
+  source: string
+  referer: string
+}
+
+/** Why the release kind was decided: resale (earlier_date, source, listing), first (event_fixed, event_name, date). */
+export type HarvestReleaseReason = 'earlier_date' | 'source' | 'listing' | 'event_fixed' | 'event_name' | 'date'
+
 export interface HarvestMerged {
   title: HarvestPicked<string>
   titles: Array<{ title: string, locale: string, kind: string, source: string }>
-  circle: { name: string | null, artist_id: number | null, event_circle_id: number | null, by: string | null, source: string | null }
-  release: { kind: 'first' | 'resale' | 'unknown', date: string | null, precision: 'day' | 'month' | 'year' | null, source: string | null, notes: string[] }
+  circle: { name: string | null, artist_id: number | null, event_circle_id: number | null, event_id: number | null, by: string | null, source: string | null }
+  release: {
+    kind: HarvestReleaseKind
+    /** The suggested event the kind is relative to. */
+    event_id: number | null
+    date: string | null
+    precision: 'day' | 'month' | 'year' | null
+    source: string | null
+    notes: string[]
+    reason: HarvestReleaseReason | null
+  }
   catalog_numbers: HarvestPicked<string[]>
   barcode: HarvestPicked<string>
   price: HarvestPicked<{ amount: number, currency: string, note: string | null }>
@@ -171,23 +229,42 @@ export interface HarvestMerged {
     alternatives: Array<{ source: string, record_id: number, part: number, tracks: number }>
   }
   credits: HarvestMergedCredit[]
-  images: Array<{ url: string, kind: string, width: number | null, height: number | null, source: string, referer: string }>
+  images: HarvestMergedImage[]
   links: Array<{ url: string, kind: string, source: string, provider_id: number | null, provider: string | null }>
+  /** What the sources call the event: the item's own event, event names and tags, and what the lists said. */
+  event_hints: Array<{ text: string, sources: string[] }>
   descriptions: Array<{ source: string, record_id: number, text: string }>
   notes: string[]
+  delisted: boolean
   sources: Array<{ source: string, record_id: number, part: number, url: string, kind: string, gone: boolean, delisted: boolean, title: string }>
+}
+
+/** A task that listed a record, and what its list said (title, price, event, resale …). */
+export interface HarvestListing {
+  task: HarvestTaskSummary
+  listing: Record<string, unknown> | null
+  first_seen_at: string | null
+  last_seen_at: string | null
+  delisted_at: string | null
+}
+
+export interface HarvestCandidateEvent extends HarvestEventSummary {
+  via: HarvestVia
+  suggested: boolean
+  event_circle: { id: number, name: string, space_code: string | null } | null
 }
 
 export interface HarvestCandidateDetail {
   candidate: {
     id: number
     title: string
+    event_id: number | null
     circle_name: string | null
     artist_id: number | null
     event_circle_id: number | null
     circle_by: string | null
     status: HarvestCandidateStatus
-    release_kind: 'first' | 'resale' | 'unknown'
+    release_kind: HarvestReleaseKind
     is_adult: boolean
     has_cover: boolean
     has_tracks: boolean
@@ -203,10 +280,20 @@ export interface HarvestCandidateDetail {
     sources_changed_at: string | null
     album: { id: number, title: string } | null
   }
-  event: HarvestEventSummary
+  /** The suggested first release (after approval, the album's release event); null when no record is linked to an event. */
+  event: HarvestEventSummary | null
+  /** Every event the records are linked to, the suggested one first. */
+  events: HarvestCandidateEvent[]
   event_circle: { id: number, name: string, space_code: string | null, image_url: string | null, description: string | null, links: Array<{ type: string, url: string }> | null } | null
-  records: Array<HarvestMerged['sources'][number] & { label: string, fetched_at: string | null, kind_reason: string | null }>
+  records: Array<HarvestMerged['sources'][number] & {
+    label: string
+    fetched_at: string | null
+    kind_reason: string | null
+    events: Array<{ event_id: number, via: HarvestVia }>
+    listings: HarvestListing[]
+  }>
   duplicates: import('~/types/revision').DuplicateCandidate[]
   references: import('~/types/catalog').CatalogReferences
+  /** Within the list's filters, which the review page passes on. */
   neighbors: { previous: number | null, next: number | null, position: number | null, total: number }
 }

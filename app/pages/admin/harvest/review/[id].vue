@@ -2,9 +2,10 @@
 import type { RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
-import type { HarvestCandidateDetail } from '~/types/harvest'
+import type { HarvestCandidateDetail, HarvestMergedImage } from '~/types/harvest'
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft } from '~/utils/harvestDraft'
+import { harvestFilters } from '~/utils/harvestFilters'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import { draftKey, localDrafts } from '~/utils/localDrafts'
 import { setCover } from '~/utils/albumDocument'
@@ -23,12 +24,14 @@ const harvestError = useHarvestError()
 const { user } = useAuth()
 const route = useRoute()
 const id = computed(() => Number(route.params.id))
+/** The list's filters, passed on: previous / next and the way back stay within that list. */
+const filters = computed(() => harvestFilters(route.query))
 
-const { data, pending, error, refresh } = await useAsyncData(`admin-harvest-candidate-${id.value}`,
-  () => $api<HarvestCandidateDetail | { moved_to: number }>(`/v1/admin/harvest/candidates/${id.value}`), { watch: [id] })
+const { data, pending, error, refresh } = await useAsyncData(() => `admin-harvest-candidate-${id.value}-${JSON.stringify(filters.value)}`,
+  () => $api<HarvestCandidateDetail | { moved_to: number }>(`/v1/admin/harvest/candidates/${id.value}`, { query: filters.value }), { watch: [id, filters] })
 const detail = computed(() => data.value && 'candidate' in data.value ? data.value : null)
 watch(data, (value) => {
-  if (value && 'moved_to' in value) navigateTo(`/admin/harvest/review/${value.moved_to}`, { replace: true })
+  if (value && 'moved_to' in value) navigateTo({ path: `/admin/harvest/review/${value.moved_to}`, query: filters.value }, { replace: true })
 }, { immediate: true })
 
 const open = computed(() => detail.value && ['pending', 'excluded'].includes(detail.value.candidate.status))
@@ -64,7 +67,7 @@ onMounted(() => {
   watch(detail, () => { void prepareDraft() })
 })
 
-const go = (target: number | null) => target && navigateTo(`/admin/harvest/review/${target}`)
+const go = (target: number | null) => target && navigateTo({ path: `/admin/harvest/review/${target}`, query: filters.value })
 const next = () => go(detail.value?.neighbors.next ?? null)
 const previous = () => go(detail.value?.neighbors.previous ?? null)
 
@@ -73,7 +76,7 @@ const approve = (payload: RevisionDraftPayload) => $api<Revision>(`/v1/admin/har
 })
 const approved = async () => {
   const following = detail.value?.neighbors.next
-  if (following) return navigateTo(`/admin/harvest/review/${following}`)
+  if (following) return go(following)
   await refresh()
 }
 
@@ -84,10 +87,10 @@ const act = async (path: string, body: Record<string, unknown> = {}, after: 'nex
   try {
     const following = detail.value.neighbors.next
     const result = await $api<{ moved_to?: number, new_id?: number }>(`/v1/admin/harvest/candidates/${id.value}/${path}`, {
-      method: 'POST', body: { lock_version: detail.value.candidate.lock_version, ...body },
+      method: 'POST', query: filters.value, body: { lock_version: detail.value.candidate.lock_version, ...body },
     })
-    if (result?.moved_to) return navigateTo(`/admin/harvest/review/${result.moved_to}`)
-    if (after === 'next' && following) return navigateTo(`/admin/harvest/review/${following}`)
+    if (result?.moved_to) return go(result.moved_to)
+    if (after === 'next' && following) return go(following)
     await refresh()
   } catch (e) {
     message.value = harvestError(e)
@@ -108,9 +111,12 @@ const reject = async () => {
 const linkOpen = ref(false)
 const mergeInto = ref('')
 
-// ---- images: previews come through the crawler; only the one picked is stored ----
+// ---- images: harvested copies are previewed from this site, the others fetched from the source on request; only the one picked is stored ----
 const previews = reactive<Record<string, { src: string, width: number, height: number } | 'loading' | 'failed'>>({})
 const showImages = ref(false)
+const images = computed(() => detail.value?.candidate.merged.images ?? [])
+const remoteCount = computed(() => images.value.filter(image => !image.local).length)
+const shownImages = computed<HarvestMergedImage[]>(() => showImages.value ? images.value : images.value.filter(image => image.local))
 const loadPreview = async (url: string) => {
   if (previews[url]) return
   previews[url] = 'loading'
@@ -128,8 +134,11 @@ const loadPreview = async (url: string) => {
     previews[url] = 'failed'
   }
 }
-watch(showImages, (value) => {
-  if (value) for (const image of detail.value?.candidate.merged.images ?? []) void loadPreview(image.url)
+// Previews are made in the browser (object URLs), so after mounting.
+onMounted(() => {
+  watch(shownImages, (list) => {
+    for (const image of list) void loadPreview(image.url)
+  }, { immediate: true })
 })
 onBeforeUnmount(() => {
   for (const preview of Object.values(previews)) if (typeof preview === 'object') URL.revokeObjectURL(preview.src)
@@ -157,6 +166,11 @@ const sizeNote = (preview: { width: number, height: number }) => [
 ].filter(Boolean).join('，')
 
 const useTitle = (value: string) => { if (editor.value) editor.value.album.title = value }
+const eventName = (eventId: number) => detail.value?.events.find(event => event.id === eventId)?.name ?? `#${eventId}`
+const listingNote = (listing: Record<string, unknown> | null) => [
+  typeof listing?.event === 'string' ? listing.event : null,
+  listing?.resale === true ? t('admin_pages.harvest.review.listing_resale') : null,
+].filter(Boolean).join(' · ')
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 
 // Shortcuts outside text fields: J next, K previous, R not collected, S to the submit section.
@@ -181,11 +195,11 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
     <AdminListState :pending="pending && !detail" :error="error" @retry="refresh()">
       <template v-if="detail">
         <header class="sticky top-0 z-20 -mx-4 flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-          <NuxtLink :to="`/admin/harvest/${detail.event.id}?tab=candidates`" class="text-sm text-slate-500 hover:underline">← {{ t('admin_pages.harvest.review.back') }}</NuxtLink>
+          <NuxtLink :to="{ path: '/admin/harvest', query: filters }" class="text-sm text-slate-500 hover:underline">← {{ t('admin_pages.harvest.review.back') }}</NuxtLink>
           <div class="min-w-0 flex-1">
             <p class="truncate font-semibold">{{ detail.candidate.title }}</p>
             <p class="text-xs text-slate-500">
-              {{ detail.event.name }} · {{ t(`admin_pages.harvest.status.${detail.candidate.status}`) }}
+              <span :class="{ 'text-amber-700': !detail.event }">{{ detail.event?.name ?? t('admin_pages.harvest.no_event') }}</span> · {{ t(`admin_pages.harvest.status.${detail.candidate.status}`) }}
               <template v-if="detail.neighbors.position"> · {{ t('admin_pages.harvest.review.position', { position: detail.neighbors.position, total: detail.neighbors.total }) }}</template>
             </p>
           </div>
@@ -211,7 +225,10 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
           <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">{{ t('admin_pages.harvest.review.sources_changed') }}</p>
         </div>
         <div v-else-if="detail.candidate.release_kind !== 'first'" class="rounded-lg border px-4 py-2 text-sm" :class="detail.candidate.release_kind === 'resale' ? 'border-violet-200 bg-violet-50 text-violet-900' : 'border-amber-200 bg-amber-50 text-amber-900'">
-          {{ detail.candidate.release_kind === 'resale' ? t('admin_pages.harvest.review.resale') : t('admin_pages.harvest.review.unknown_release') }}
+          <template v-if="detail.candidate.release_kind === 'resale'">{{ t('admin_pages.harvest.review.resale') }}</template>
+          <template v-else-if="detail.event">{{ t('admin_pages.harvest.review.unknown_release', { event: detail.event.name }) }}</template>
+          <template v-else>{{ t('admin_pages.harvest.review.no_event_release') }}</template>
+          <span v-if="detail.candidate.merged.release.reason" class="block text-xs">{{ t(`admin_pages.harvest.release_reason.${detail.candidate.merged.release.reason}`) }}</span>
           <span v-for="note in detail.candidate.merged.release.notes" :key="note" class="block text-xs">{{ note }}</span>
         </div>
 
@@ -240,8 +257,37 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
                   <span v-if="record.delisted" class="text-xs text-amber-700">{{ t('admin_pages.harvest.review.delisted') }}</span>
                   <span class="text-xs text-slate-400">{{ t('admin_pages.harvest.review.fetched', { time: time(record.fetched_at) }) }}</span>
                   <button v-if="open && detail.records.length > 1" type="button" class="text-xs underline" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">{{ t('admin_pages.harvest.review.split') }}</button>
+                  <ul v-if="record.listings.length || record.events.length" class="w-full space-y-0.5 pl-4 text-xs text-slate-500">
+                    <li v-for="listing in record.listings" :key="listing.task.id">
+                      {{ t('admin_pages.harvest.review.listed_by') }}
+                      <a v-if="listing.task.url" :href="listing.task.url" target="_blank" rel="noopener noreferrer" class="text-sky-700 hover:underline">{{ listing.task.label ?? listing.task.key }}</a>
+                      <template v-else>{{ listing.task.label ?? listing.task.key }}</template>
+                      （{{ listing.task.source_label }} · {{ listing.task.entry_label }}）
+                      <template v-if="listingNote(listing.listing)"> · {{ listingNote(listing.listing) }}</template>
+                      <span v-if="listing.delisted_at" class="text-amber-700"> · {{ t('admin_pages.harvest.review.delisted') }}</span>
+                    </li>
+                    <li v-if="record.events.length">
+                      {{ t('admin_pages.harvest.review.linked_to') }}
+                      <template v-for="(link, index) in record.events" :key="link.event_id">{{ index ? '、' : '' }}{{ eventName(link.event_id) }}（{{ t(`admin_pages.harvest.via.${link.via}`) }}）</template>
+                    </li>
+                  </ul>
                 </li>
               </ul>
+              <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.events') }}</h3>
+              <p v-if="!detail.events.length" class="text-xs text-amber-700">{{ t('admin_pages.harvest.review.no_events') }}</p>
+              <ul v-else class="space-y-1 text-xs">
+                <li v-for="event in detail.events" :key="event.id" class="flex flex-wrap items-baseline gap-2">
+                  <span class="font-medium" :class="{ 'text-slate-900': event.suggested }">{{ event.name }}</span>
+                  <span class="text-slate-500">{{ event.start_date }}</span>
+                  <span class="rounded bg-slate-100 px-1.5">{{ t(`admin_pages.harvest.via.${event.via}`) }}</span>
+                  <span v-if="event.suggested" class="rounded bg-emerald-50 px-1.5 text-emerald-800">{{ t('admin_pages.harvest.review.suggested') }}</span>
+                  <span v-if="event.event_circle" class="text-slate-500">{{ t('admin_pages.harvest.review.event_circle', { space: event.event_circle.space_code ?? '—' }) }}</span>
+                </li>
+              </ul>
+              <p v-if="detail.candidate.merged.event_hints.length" class="flex flex-wrap gap-1 text-xs">
+                <span class="text-slate-500">{{ t('admin_pages.harvest.review.event_hints') }}</span>
+                <span v-for="hint in detail.candidate.merged.event_hints" :key="hint.text" class="rounded bg-slate-100 px-1.5" :title="hint.sources.join(', ')">{{ hint.text }}</span>
+              </p>
               <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.circle') }}</h3>
               <p v-if="detail.candidate.artist_id || detail.candidate.circle_name">
                 {{ detail.candidate.circle_name }}
@@ -295,15 +341,16 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
               <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.covers') }}</h3>
               <p class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.covers_help') }}</p>
               <p v-if="coverNote" class="text-xs text-emerald-700">{{ coverNote }}</p>
-              <button v-if="!showImages && detail.candidate.merged.images.length" type="button" class="rounded border px-2 py-1 text-xs" @click="showImages = true">{{ t('admin_pages.harvest.review.load_images') }}（{{ detail.candidate.merged.images.length }}）</button>
-              <div v-if="showImages" class="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                <figure v-for="image in detail.candidate.merged.images" :key="image.url" class="space-y-1 rounded border border-slate-200 p-1 text-xs">
+              <button v-if="!showImages && remoteCount" type="button" class="rounded border px-2 py-1 text-xs" @click="showImages = true">{{ t('admin_pages.harvest.review.load_images') }}（{{ remoteCount }}）</button>
+              <div v-if="shownImages.length" class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                <figure v-for="image in shownImages" :key="image.url" class="space-y-1 rounded border border-slate-200 p-1 text-xs">
                   <div class="flex aspect-square items-center justify-center overflow-hidden bg-slate-50">
                     <img v-if="typeof previews[image.url] === 'object'" :src="(previews[image.url] as { src: string }).src" alt="" class="max-h-full max-w-full object-contain">
                     <span v-else class="text-slate-400">{{ previews[image.url] === 'failed' ? '×' : '…' }}</span>
                   </div>
                   <figcaption class="flex flex-wrap items-center gap-1">
                     <span class="text-slate-500">{{ image.source }}</span>
+                    <span v-if="image.local" class="rounded bg-emerald-50 px-1 text-emerald-800">{{ t('admin_pages.harvest.review.local') }}</span>
                     <template v-if="typeof previews[image.url] === 'object'">
                       <span>{{ (previews[image.url] as { width: number }).width }}×{{ (previews[image.url] as { height: number }).height }}</span>
                       <span class="text-amber-700">{{ sizeNote(previews[image.url] as { width: number, height: number }) }}</span>
