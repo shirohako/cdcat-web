@@ -10,7 +10,7 @@ export type AlbumType = typeof ALBUM_TYPES[number]
 
 /** VGMdb-style categories; an empty list means a composer's discography album. */
 export const ALBUM_CATEGORIES = [
-  'game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'multimedia_franchise', 'game_adjacent', 'event',
+  'game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event',
 ] as const
 export type AlbumCategory = typeof ALBUM_CATEGORIES[number]
 

@@ -1550,9 +1550,8 @@
       "publication": "Publication",
       "audio_drama": "Audio drama",
       "tokusatsu": "Tokusatsu",
-      "live_action": "Live action",
-      "multimedia_franchise": "Multimedia project",
-      "game_adjacent": "Game-related",
+      "live_action": "Film, TV & stage",
+      "doujin": "Doujin",
       "event": "Event"
     },
     "disc_format": {

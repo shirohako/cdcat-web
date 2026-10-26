@@ -1550,9 +1550,8 @@
       "publication": "出版物",
       "audio_drama": "ドラマ CD",
       "tokusatsu": "特撮",
-      "live_action": "実写",
-      "multimedia_franchise": "メディアミックス",
-      "game_adjacent": "ゲーム関連",
+      "live_action": "映画・ドラマ・舞台",
+      "doujin": "同人",
       "event": "イベント"
     },
     "disc_format": {

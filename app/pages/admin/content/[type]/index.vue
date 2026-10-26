@@ -17,9 +17,8 @@ const contentCategoryLabels: Record<string, string> = {
   publication: '出版物',
   audio_drama: '广播剧',
   tokusatsu: '特摄',
-  live_action: '真人影视',
-  multimedia_franchise: '跨媒体企划',
-  game_adjacent: '游戏相关',
+  live_action: '影视舞台',
+  doujin: '同人创作',
   event: '活动',
 }
 const contentDescriptionLabels: Record<string, string> = {
@@ -63,7 +62,7 @@ const sorts: Record<AdminContentType, string[]> = {
   track: ['id', 'title', 'created_at'],
   lyric: ['id', 'language', 'created_at', 'updated_at'],
 }
-const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'multimedia_franchise', 'game_adjacent', 'event']
+const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event']
 const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other']
 const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'track_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)

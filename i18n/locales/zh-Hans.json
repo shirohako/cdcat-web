@@ -1550,9 +1550,8 @@
       "publication": "出版物",
       "audio_drama": "广播剧",
       "tokusatsu": "特摄",
-      "live_action": "真人影视",
-      "multimedia_franchise": "跨媒体企划",
-      "game_adjacent": "游戏相关",
+      "live_action": "影视舞台",
+      "doujin": "同人创作",
       "event": "活动"
     },
     "disc_format": {
