@@ -11,7 +11,6 @@ const props = withDefaults(defineProps<{
   confirmPhrase?: string
 }>(), { reasonRequired: false, busy: false, confirmDisabled: false, description: '', confirmText: '', confirmPhrase: '' })
 const emit = defineEmits<{ 'update:modelValue': [value: boolean], confirm: [reason: string] }>()
-const { t } = useAdminI18n()
 const dialog = useTemplateRef('dialog')
 const reason = ref('')
 const typed = ref('')
@@ -40,16 +39,16 @@ const confirm = () => {
       <p v-if="description" class="mt-2 text-sm text-slate-600">{{ description }}</p>
       <slot />
       <label v-if="reasonRequired" class="mt-4 block text-sm">
-        {{ t('admin_pages.reason') }}
+        原因（必填）
         <textarea v-model="reason" required maxlength="2000" :disabled="busy" rows="3" class="mt-2 w-full rounded-lg border border-slate-300 p-2" />
       </label>
       <label v-if="confirmPhrase" class="mt-4 block text-sm">
-        {{ t('admin_pages.type_to_confirm', { phrase: confirmPhrase }) }}
+        请输入 {{ confirmPhrase }} 确认
         <input v-model="typed" type="text" autocomplete="off" :disabled="busy" :placeholder="confirmPhrase" class="mt-2 w-full rounded-lg border border-slate-300 p-2 font-mono">
       </label>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-50" @click="close">{{ t('common.cancel') }}</button>
-        <button type="submit" :disabled="busy || confirmDisabled || !phraseMatches || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? t('common.saving') : (confirmText || t('admin_pages.confirm')) }}</button>
+        <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-50" @click="close">取消</button>
+        <button type="submit" :disabled="busy || confirmDisabled || !phraseMatches || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? '保存中…' : (confirmText || '确认') }}</button>
       </div>
     </form>
   </dialog>

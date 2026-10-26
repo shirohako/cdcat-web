@@ -10,7 +10,7 @@ const emit = defineEmits<{ errors: [errors: Record<string, string[]>] }>()
 
 const { $api } = useNuxtApp()
 const { user } = useAuth()
-const { t, localeName, mailError, fieldErrors } = useAdminMail()
+const { localeName, mailError, fieldErrors } = useAdminMail()
 const available = computed(() => filledMailLocales(props.contents))
 const chosen = ref<AdminMailLocale[]>([])
 watch(available, (locales) => {
@@ -46,21 +46,21 @@ const send = async () => {
 
 <template>
   <section class="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-    <h3 class="font-medium">{{ t('admin_pages.mail.test.title') }}</h3>
-    <p class="mt-1 text-xs text-slate-500">{{ t('admin_pages.mail.test.help', { email: user?.email ?? '' }) }}</p>
-    <p v-if="!available.length" class="mt-3 text-xs text-slate-500">{{ t('admin_pages.mail.test.nothing') }}</p>
+    <h3 class="font-medium">发测试邮件</h3>
+    <p class="mt-1 text-xs text-slate-500">把当前内容（不用先保存）发到你自己的邮箱 {{ user?.email ?? '' }}，每种语言一封，标题前会加「[测试]」。</p>
+    <p v-if="!available.length" class="mt-3 text-xs text-slate-500">先写好至少一种语言的标题和正文。</p>
     <div v-else class="mt-3 flex flex-wrap items-center gap-3">
       <label v-for="locale in available" :key="locale" class="flex items-center gap-1.5">
         <input type="checkbox" :checked="chosen.includes(locale)" :disabled="busy || disabled" @change="toggle(locale)">{{ localeName(locale) }}
       </label>
       <button type="button" :disabled="busy || disabled || !target || !chosen.length" class="rounded-lg border border-slate-300 px-3 py-1.5 disabled:opacity-40" @click="send">
-        {{ busy ? t('admin_pages.mail.test.sending') : t('admin_pages.mail.test.send') }}
+        {{ busy ? '发送中…' : '发给我' }}
       </button>
     </div>
     <p v-if="message" role="alert" class="mt-3 text-xs text-red-700">{{ message }}</p>
     <ul v-if="results.length" class="mt-3 space-y-1 text-xs" role="status">
       <li v-for="result in results" :key="result.locale" :class="result.status === 'sent' ? 'text-emerald-700' : 'text-red-700'">
-        {{ localeName(result.locale) }}：{{ result.status === 'sent' ? t('admin_pages.mail.test.sent') : t('admin_pages.mail.test.failed', { error: result.error ?? '' }) }}
+        {{ localeName(result.locale) }}：{{ result.status === 'sent' ? '已发送' : `失败：${result.error ?? ''}` }}
       </li>
     </ul>
   </section>

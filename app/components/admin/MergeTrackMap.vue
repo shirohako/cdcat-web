@@ -10,7 +10,6 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const emit = defineEmits<{ 'update:modelValue': [value: Record<string, number | null>] }>()
-const { t } = useAdminI18n()
 
 const byId = computed(() => new Map(props.targetTracks.map(track => [track.id, track])))
 const position = (track: AdminMergeTrack) => `${track.disc_number}-${String(track.track_number).padStart(2, '0')}`
@@ -28,8 +27,8 @@ const choose = (source: number, value: string) => {
     <table class="w-full min-w-[32rem] text-sm">
       <thead class="text-left text-xs text-slate-500">
         <tr>
-          <th class="py-1.5 pr-3 font-medium">{{ t('admin_pages.content.merge_track_source') }}</th>
-          <th class="py-1.5 font-medium">{{ t('admin_pages.content.merge_track_target') }}</th>
+          <th class="py-1.5 pr-3 font-medium">这张专辑的曲目</th>
+          <th class="py-1.5 font-medium">对应到保留方的曲目</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
@@ -41,11 +40,11 @@ const choose = (source: number, value: string) => {
             <select
               :value="modelValue[track.id] ?? ''"
               :disabled="disabled"
-              :aria-label="t('admin_pages.content.merge_track_target_for', { title: track.title })"
+              :aria-label="`“${track.title}”对应的曲目`"
               class="w-full rounded-lg border border-slate-300 bg-white px-2 py-1"
               @change="choose(track.id, ($event.target as HTMLSelectElement).value)"
             >
-              <option value="">{{ t('admin_pages.content.merge_track_none') }}</option>
+              <option value="">不对应（收藏会删除）</option>
               <option v-for="target in targetTracks" :key="target.id" :value="target.id">{{ position(target) }} {{ target.title }}</option>
             </select>
           </td>

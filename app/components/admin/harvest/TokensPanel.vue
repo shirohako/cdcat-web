@@ -2,7 +2,6 @@
 import type { HarvestToken } from '~/types/harvest'
 
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
 const harvestError = useHarvestError()
 
 const { data, pending, error, refresh } = await useAsyncData('admin-harvest-tokens', () => $api<{ tokens: HarvestToken[] }>('/v1/admin/harvest/tokens'))
@@ -53,17 +52,17 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
 
 <template>
   <section class="space-y-3 rounded-xl border border-slate-200 bg-white p-5">
-    <h2 class="font-semibold">{{ t('admin_pages.harvest.tokens.title') }}</h2>
-    <p class="text-sm text-slate-600">{{ t('admin_pages.harvest.tokens.help') }}</p>
+    <h2 class="font-semibold">采集器令牌</h2>
+    <p class="text-sm text-slate-600">采集器用令牌把数据和图片直接提交到本站。令牌只能用来提交采集数据，不能登录或访问其他接口；在采集器网页的「设置 → 本站」里填入。</p>
     <form class="flex flex-wrap gap-2" @submit.prevent="create">
-      <input v-model="name" maxlength="60" :placeholder="t('admin_pages.harvest.tokens.name')" :aria-label="t('admin_pages.harvest.tokens.name')" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
-      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white disabled:opacity-50" :disabled="busy || !name.trim()">{{ t('admin_pages.harvest.tokens.create') }}</button>
+      <input v-model="name" maxlength="60" placeholder="用途（例如：家里的电脑）" aria-label="用途（例如：家里的电脑）" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
+      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white disabled:opacity-50" :disabled="busy || !name.trim()">新建令牌</button>
     </form>
     <div v-if="fresh?.token" role="status" class="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
-      <p class="text-amber-900">{{ t('admin_pages.harvest.tokens.created') }}</p>
+      <p class="text-amber-900">令牌只显示这一次，请马上复制到采集器里：</p>
       <div class="flex gap-2">
         <code class="min-w-0 flex-1 break-all rounded bg-white px-2 py-1 font-mono text-xs">{{ fresh.token }}</code>
-        <button type="button" class="shrink-0 rounded border border-amber-300 bg-white px-2 py-1" @click="copy">{{ copied ? t('admin_pages.harvest.tokens.copied') : t('admin_pages.harvest.tokens.copy') }}</button>
+        <button type="button" class="shrink-0 rounded border border-amber-300 bg-white px-2 py-1" @click="copy">{{ copied ? '已复制' : '复制' }}</button>
       </div>
     </div>
     <p v-if="failure" role="alert" class="text-sm text-red-700">{{ failure }}</p>
@@ -71,11 +70,11 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
       <ul class="divide-y divide-slate-100 text-sm">
         <li v-for="token in data?.tokens" :key="token.id" class="flex items-center gap-3 py-2">
           <span class="flex-1 font-medium">{{ token.name }}</span>
-          <span class="text-xs text-slate-500">{{ token.last_used_at ? t('admin_pages.harvest.tokens.last_used', { time: time(token.last_used_at) }) : t('admin_pages.harvest.tokens.never_used') }}</span>
-          <button type="button" class="text-xs text-red-700 underline" @click="revoking = token">{{ t('admin_pages.harvest.tokens.revoke') }}</button>
+          <span class="text-xs text-slate-500">{{ token.last_used_at ? `最近使用 ${time(token.last_used_at)}` : '没用过' }}</span>
+          <button type="button" class="text-xs text-red-700 underline" @click="revoking = token">吊销</button>
         </li>
       </ul>
     </AdminListState>
-    <AdminConfirmDialog v-model="revokeOpen" :title="t('admin_pages.harvest.tokens.revoke_title', { name: revoking?.name ?? '' })" :description="t('admin_pages.harvest.tokens.revoke_help')" :busy="busy" @confirm="revoke" />
+    <AdminConfirmDialog v-model="revokeOpen" :title="`吊销令牌「${revoking?.name ?? ''}」？`" description="用这个令牌的采集器之后就不能提交了。" :busy="busy" @confirm="revoke" />
   </section>
 </template>

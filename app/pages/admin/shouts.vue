@@ -6,8 +6,9 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
-const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
+const shoutActionLabels: Record<Action['kind'], string> = { hide: '隐藏留言', unhide: '取消隐藏', delete: '删除留言' }
+const shoutDoneLabels: Record<Action['kind'], string> = { hide: '已隐藏', unhide: '已取消隐藏', delete: '已删除' }
+const shoutHelpLabels: Record<Action['kind'], string> = { hide: '隐藏后只有作者自己能看到。', unhide: '留言会重新显示。', delete: '永久删除这条留言。' }
 
 const filterKeys = ['search', 'is_hidden', 'artist_id', 'user_id'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
@@ -39,10 +40,10 @@ const run = async (reason: string) => {
   try {
     if (current.kind === 'delete') await $api(`/v1/admin/shouts/${current.shout.id}`, { method: 'DELETE', body: { reason } })
     else await $api(`/v1/admin/shouts/${current.shout.id}/hidden`, { method: 'PUT', body: { hidden: current.kind === 'hide', reason } })
-    notice.value = t(`admin_pages.shouts.done_${current.kind}`)
+    notice.value = shoutDoneLabels[current.kind]
     await refresh()
   } catch (failure) {
-    message.value = localizeError(failure, 'admin_pages.action_failed')
+    message.value = adminError(failure, '操作失败，请重试。')
   } finally {
     action.value = null
     busy.value = false
@@ -50,31 +51,31 @@ const run = async (reason: string) => {
 }
 
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
-useHead({ title: computed(() => t('admin_pages.shouts.title')) })
+useHead({ title: '留言' })
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
     <header>
-      <h1 class="text-3xl font-bold">{{ t('admin_pages.shouts.title') }}</h1>
-      <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.shouts.description') }}</p>
+      <h1 class="text-3xl font-bold">留言</h1>
+      <p class="mt-2 text-sm text-slate-600">艺术家页上的留言。可以隐藏或删除违规留言，举报在「举报处理」里处理。</p>
     </header>
 
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
-        <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.shouts.search')" :aria-label="t('admin_pages.shouts.search')" class="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <select v-model="filters.is_hidden" :aria-label="t('admin_pages.shouts.visibility')" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
-          <option value="">{{ t('admin_pages.all_statuses') }}</option>
-          <option value="0">{{ t('admin_pages.shouts.statuses.visible') }}</option>
-          <option value="1">{{ t('admin_pages.shouts.statuses.hidden') }}</option>
+        <input v-model="filters.search" type="search" maxlength="100" placeholder="搜索留言内容" aria-label="搜索留言内容" class="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <select v-model="filters.is_hidden" aria-label="显示状态" class="rounded-lg border border-slate-300 bg-white px-3 py-2">
+          <option value="">全部状态</option>
+          <option value="0">显示中</option>
+          <option value="1">已隐藏</option>
         </select>
-        <input v-model="filters.artist_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.shouts.artist_id')" :aria-label="t('admin_pages.shouts.artist_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
+        <input v-model="filters.artist_id" inputmode="numeric" pattern="[0-9]*" placeholder="艺术家 ID" aria-label="艺术家 ID" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" placeholder="用户 ID" aria-label="用户 ID" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
+        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
       </form>
     </AdminFilterBar>
 
-    <p class="text-sm text-slate-500">{{ t('common.items_total', { count: pagination.total }) }}</p>
+    <p class="text-sm text-slate-500">共 {{ pagination.total }} 条</p>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
@@ -87,15 +88,15 @@ useHead({ title: computed(() => t('admin_pages.shouts.title')) })
               <p class="mt-1 text-xs text-slate-500">
                 <NuxtLink v-if="shout.user" :to="`/admin/users/${shout.user.id}`" class="underline">{{ shout.user.nickname || shout.user.username }}</NuxtLink>
                 ·
-                <NuxtLink v-if="shout.artist" :to="`/artists/${shout.artist.id}`" target="_blank" class="underline">{{ t('admin_pages.types.artist') }} {{ shout.artist.name }}</NuxtLink>
+                <NuxtLink v-if="shout.artist" :to="`/artists/${shout.artist.id}`" target="_blank" class="underline">艺术家 {{ shout.artist.name }}</NuxtLink>
                 · {{ time(shout.updated_at) }}
-                <span v-if="shout.is_hidden" class="ml-1 rounded bg-amber-100 px-1.5 text-amber-800">{{ t('admin_pages.shouts.statuses.hidden') }}</span>
+                <span v-if="shout.is_hidden" class="ml-1 rounded bg-amber-100 px-1.5 text-amber-800">已隐藏</span>
               </p>
             </div>
             <div class="flex gap-2 text-xs">
-              <button v-if="!shout.is_hidden" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="action = { shout, kind: 'hide' }">{{ t('admin_pages.shouts.hide') }}</button>
-              <button v-else type="button" class="rounded-lg border px-2.5 py-1.5" @click="action = { shout, kind: 'unhide' }">{{ t('admin_pages.shouts.unhide') }}</button>
-              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="action = { shout, kind: 'delete' }">{{ t('common.delete') }}</button>
+              <button v-if="!shout.is_hidden" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="action = { shout, kind: 'hide' }">隐藏留言</button>
+              <button v-else type="button" class="rounded-lg border px-2.5 py-1.5" @click="action = { shout, kind: 'unhide' }">取消隐藏</button>
+              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="action = { shout, kind: 'delete' }">删除</button>
             </div>
           </li>
         </ul>
@@ -103,6 +104,6 @@ useHead({ title: computed(() => t('admin_pages.shouts.title')) })
       </AdminListState>
     </section>
 
-    <AdminConfirmDialog v-model="actionOpen" :busy="busy" reason-required :title="action ? t(`admin_pages.shouts.${action.kind}`) : ''" :description="action ? t(`admin_pages.shouts.${action.kind}_help`) : ''" @confirm="run" />
+    <AdminConfirmDialog v-model="actionOpen" :busy="busy" reason-required :title="action ? shoutActionLabels[action.kind] : ''" :description="action ? shoutHelpLabels[action.kind] : ''" @confirm="run" />
   </div>
 </template>

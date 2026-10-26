@@ -16,12 +16,11 @@ withDefaults(defineProps<{
 }>(), { allowAll: true, allowNone: false, search: false })
 
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
 const { data } = await useAsyncData('admin-harvest-events', () => $api<{ events: HarvestEventRow[] }>('/v1/admin/harvest/events'), { lazy: true })
 /** Events picked by searching, which the list may not have. */
 const found = ref<PickedEntity[]>([])
 const options = computed(() => {
-  const rows = (data.value?.events ?? []).map(row => ({ id: String(row.event.id), label: t('admin_pages.harvest.events.option', { name: row.event.name, count: row.candidates }) }))
+  const rows = (data.value?.events ?? []).map(row => ({ id: String(row.event.id), label: `${row.event.name}（${row.candidates}）` }))
   const known = new Set(rows.map(row => row.id))
   return [...rows, ...found.value.filter(event => !known.has(String(event.id))).map(event => ({ id: String(event.id), label: event.label }))]
 })
@@ -33,14 +32,14 @@ const pick = (event: PickedEntity) => {
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <select v-model="model" :aria-label="t('admin_pages.harvest.events.pick')" class="max-w-72 rounded-lg border border-slate-300 px-2 py-1.5">
-      <option v-if="allowAll" value="">{{ t('admin_pages.harvest.events.all') }}</option>
-      <option v-else value="" disabled>{{ t('admin_pages.harvest.events.pick') }}</option>
-      <option v-if="allowNone" value="none">{{ t('admin_pages.harvest.no_event') }}</option>
+    <select v-model="model" aria-label="选择活动" class="max-w-72 rounded-lg border border-slate-300 px-2 py-1.5">
+      <option v-if="allowAll" value="">所有活动</option>
+      <option v-else value="" disabled>选择活动</option>
+      <option v-if="allowNone" value="none">未关联活动</option>
       <option v-for="option in options" :key="option.id" :value="option.id">{{ option.label }}</option>
       <!-- An event from the address that the list does not have. -->
       <option v-if="model && model !== 'none' && !options.some(option => option.id === model)" :value="model">#{{ model }}</option>
     </select>
-    <EditorEntityPicker v-if="search" kind="event" class="w-56" :placeholder="t('admin_pages.harvest.events.other')" @select="pick" />
+    <EditorEntityPicker v-if="search" kind="event" class="w-56" placeholder="搜索其他活动" @select="pick" />
   </div>
 </template>

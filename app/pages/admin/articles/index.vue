@@ -6,7 +6,8 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
+const articleSortLabels: Record<string, string> = { updated_at: '按更新时间', published_at: '按发布时间', views_count: '按浏览量', likes_count: '按喜欢量' }
+const articleTabLabels: Record<string, string> = { all: '全部', reported: '有举报', published: '已发布', hidden: '已隐藏', locked: '已锁定', draft: '草稿' }
 const { types, typeName } = useArticleTypes()
 
 // Tabs map onto list filters; everything, newest first, is the default view.
@@ -46,34 +47,34 @@ const statusTone: Record<string, string> = {
   locked: 'border-rose-200 text-rose-700', draft: 'border-slate-200 text-slate-500',
 }
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
-useHead({ title: computed(() => t('admin_pages.articles.title')) })
+useHead({ title: '文章管理' })
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
     <header>
-      <h1 class="text-3xl font-bold">{{ t('admin_pages.articles.title') }}</h1>
-      <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.articles.description') }}</p>
+      <h1 class="text-3xl font-bold">文章管理</h1>
+      <p class="mt-2 text-sm text-slate-600">管理所有文章：隐藏、锁定、编辑推荐、编辑和删除都会写入操作日志并通知作者。发布不需要审核。</p>
     </header>
     <nav class="flex gap-1 overflow-x-auto border-b border-slate-200 text-sm">
       <NuxtLink
         v-for="tab in tabs" :key="tab.key" :to="{ query: tab.query }" class="-mb-px shrink-0 border-b-2 px-3 py-2"
         :class="activeTab === tab.key ? 'border-slate-900 font-semibold text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800'">
-        {{ t(`admin_pages.articles.tabs.${tab.key}`) }}
+        {{ articleTabLabels[tab.key] }}
       </NuxtLink>
     </nav>
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
-        <input v-model="filters.search" type="search" maxlength="100" :placeholder="t('admin_pages.articles.search')" :aria-label="t('admin_pages.articles.search')" :class="[field, 'w-56']">
-        <select v-model="filters.type" :aria-label="t('admin_pages.articles.type')" :class="field">
-          <option value="">{{ t('admin_pages.articles.all_types') }}</option>
-          <option v-for="option in types" :key="option.key" :value="option.key">{{ typeName(option.key, 'zh-Hans') }}{{ option.is_active ? '' : `（${t('admin_pages.article_types.inactive')}）` }}</option>
+        <input v-model="filters.search" type="search" maxlength="100" placeholder="搜索标题" aria-label="搜索标题" :class="[field, 'w-56']">
+        <select v-model="filters.type" aria-label="类型" :class="field">
+          <option value="">全部类型</option>
+          <option v-for="option in types" :key="option.key" :value="option.key">{{ typeName(option.key, 'zh-Hans') }}{{ option.is_active ? '' : `（${'已停用'}）` }}</option>
         </select>
-        <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" :placeholder="t('admin_pages.user_id')" :aria-label="t('admin_pages.user_id')" :class="[field, 'w-28']">
-        <select v-model="filters.sort_by" :aria-label="t('admin_pages.sort_by')" :class="field">
-          <option v-for="sort in SORTS" :key="sort" :value="sort === 'updated_at' ? '' : sort">{{ t(`admin_pages.articles.sorts.${sort}`) }}</option>
+        <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" placeholder="用户 ID" aria-label="用户 ID" :class="[field, 'w-28']">
+        <select v-model="filters.sort_by" aria-label="排序字段" :class="field">
+          <option v-for="sort in SORTS" :key="sort" :value="sort === 'updated_at' ? '' : sort">{{ articleSortLabels[sort] }}</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
+        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
       </form>
     </AdminFilterBar>
     <section class="rounded-xl border border-slate-200 bg-white">
@@ -82,24 +83,24 @@ useHead({ title: computed(() => t('admin_pages.articles.title')) })
           <table class="w-full min-w-175 text-left text-sm">
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
               <tr>
-                <th class="px-4 py-3">{{ t('admin_pages.articles.article') }}</th><th class="px-4 py-3">{{ t('admin_pages.articles.author') }}</th>
-                <th class="px-4 py-3">{{ t('admin_pages.articles.status') }}</th>
-                <th class="px-4 py-3 text-right">{{ t('admin_pages.articles.views_count') }}</th><th class="px-4 py-3 text-right">{{ t('admin_pages.articles.likes_count') }}</th>
-                <th class="px-4 py-3">{{ t('admin_pages.articles.reports') }}</th>
-                <th class="px-4 py-3">{{ t('admin_pages.content.sorts.updated_at') }}</th>
+                <th class="px-4 py-3">文章</th><th class="px-4 py-3">作者</th>
+                <th class="px-4 py-3">状态</th>
+                <th class="px-4 py-3 text-right">浏览</th><th class="px-4 py-3 text-right">喜欢</th>
+                <th class="px-4 py-3">举报</th>
+                <th class="px-4 py-3">更新时间</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="article in data?.items" :key="article.id">
                 <td class="max-w-md px-4 py-3">
-                  <NuxtLink :to="`/admin/articles/${article.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ article.title || t('admin_pages.articles.untitled') }}</NuxtLink>
+                  <NuxtLink :to="`/admin/articles/${article.id}`" class="font-medium underline decoration-slate-200 underline-offset-4">{{ article.title || '无标题' }}</NuxtLink>
                   <p class="mt-0.5 text-xs text-slate-500">
                     <span v-if="article.type">{{ typeName(article.type, 'zh-Hans') }}</span>
-                    <span v-if="article.featured" class="ml-2 text-violet-600">{{ t('admin_pages.articles.featured') }}</span>
+                    <span v-if="article.featured" class="ml-2 text-violet-600">编辑推荐</span>
                   </p>
                 </td>
                 <td class="px-4 py-3">{{ article.author?.nickname || article.author?.username || '—' }}</td>
-                <td class="px-4 py-3"><span class="rounded-full border px-2 py-0.5 text-xs" :class="statusTone[article.status]">{{ t(`admin_pages.articles.statuses.${article.status}`) }}</span></td>
+                <td class="px-4 py-3"><span class="rounded-full border px-2 py-0.5 text-xs" :class="statusTone[article.status]">{{ articleStatusLabels[article.status] }}</span></td>
                 <td class="px-4 py-3 text-right tabular-nums text-slate-600">{{ article.views_count.toLocaleString() }}</td>
                 <td class="px-4 py-3 text-right tabular-nums text-slate-600">{{ article.likes_count.toLocaleString() }}</td>
                 <td class="px-4 py-3 tabular-nums" :class="article.pending_reports ? 'font-semibold text-rose-600' : 'text-slate-400'">{{ article.pending_reports || '—' }}</td>

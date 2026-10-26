@@ -3,9 +3,9 @@
     <div class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8 2xl:max-w-7xl">
       <header class="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">{{ t('admin_pages.console') }}</p>
-          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">{{ t('admin_pages.users.title') }}</h1>
-          <p class="mt-1 text-sm text-slate-600">{{ t('admin_pages.users.description') }}</p>
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">管理后台</p>
+          <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900">用户管理</h1>
+          <p class="mt-1 text-sm text-slate-600">管理用户账号、角色和状态。</p>
         </div>
       </header>
 
@@ -30,19 +30,19 @@
 
       <AdminFilterBar>
         <form class="flex flex-wrap items-center gap-2" @submit.prevent="applyFilters()">
-          <input v-model="search" type="search" minlength="2" maxlength="100" :aria-label="t('admin_pages.search')" :placeholder="t('admin_pages.search')" class="w-64 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
-          <select :value="selectedRole" :aria-label="t('admin_pages.users.role')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" @change="applyFilters(($event.target as HTMLSelectElement).value)">
-            <option value="">{{ t('admin_pages.all_roles') }}</option>
+          <input v-model="search" type="search" minlength="2" maxlength="100" aria-label="搜索用户名、昵称或邮箱" placeholder="搜索用户名、昵称或邮箱" class="w-64 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+          <select :value="selectedRole" aria-label="角色" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm" @change="applyFilters(($event.target as HTMLSelectElement).value)">
+            <option value="">全部角色</option>
             <option v-for="role in rolesData" :key="role.name" :value="role.name">{{ role.name }}</option>
           </select>
-          <select v-model="status" :aria-label="t('admin_pages.users.status')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
-            <option value="">{{ t('admin_pages.all_statuses') }}</option><option value="active">{{ t('admin_pages.users.active') }}</option><option value="disabled">{{ t('admin_pages.users.disabled') }}</option>
+          <select v-model="status" aria-label="状态" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+            <option value="">全部状态</option><option value="active">正常</option><option value="disabled">已停用</option>
           </select>
-          <select v-model="sortBy" :aria-label="t('admin_pages.sort_by')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
+          <select v-model="sortBy" aria-label="排序字段" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
             <option v-for="option in sortOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
           </select>
-          <select v-model="sortOrder" :aria-label="t('admin_pages.sort_order')" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="desc">{{ t('admin_pages.descending') }}</option><option value="asc">{{ t('admin_pages.ascending') }}</option></select>
-          <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">{{ t('admin_pages.filters') }}</button>
+          <select v-model="sortOrder" aria-label="排序方向" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="desc">降序</option><option value="asc">升序</option></select>
+          <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">筛选条件</button>
         </form>
       </AdminFilterBar>
       <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -51,13 +51,13 @@
           <table class="w-full min-w-200 text-left text-sm">
             <thead>
               <tr class="border-b border-slate-100 bg-slate-50/60">
-                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.user') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.role') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.status') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.user_detail.reviews') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.user_detail.contributions') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.joined') }}</th>
-                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">{{ t('admin_pages.users.last_login') }}</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">用户</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">角色</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">状态</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">评价数</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">已批准修订数</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">注册时间</th>
+                <th class="px-4 py-3 text-left text-xs font-semibold tracking-wide text-slate-500">最近活跃</th>
                 <th v-if="canAssignRoles" class="w-24 px-4 py-3" />
               </tr>
             </thead>
@@ -66,7 +66,7 @@
               <tr v-if="pending">
                 <td :colspan="canAssignRoles ? 8 : 7" class="px-5 py-16 text-center text-sm text-slate-400">
                   <Icon name="lucide:loader-circle" class="mx-auto mb-2 h-5 w-5 animate-spin opacity-40" />
-                  {{ t('common.loading') }}
+                  加载中…
                 </td>
               </tr>
 
@@ -114,7 +114,7 @@
                         : 'border-slate-200 bg-slate-50 text-slate-500'"
                     >
                       <span class="h-1.5 w-1.5 rounded-full" :class="u.is_active ? 'bg-emerald-500' : 'bg-slate-300'" />
-                      {{ u.is_active ? t('admin_pages.users.active') : t('admin_pages.users.disabled') }}
+                      {{ u.is_active ? '正常' : '已停用' }}
                     </span>
                   </td>
 
@@ -132,14 +132,14 @@
                       :disabled="!u.can_manage"
                       @click="openRoleModal(u)"
                     >
-                      {{ t('admin_pages.users.edit_role') }}
+                      编辑角色
                     </button>
                   </td>
                 </tr>
 
                 <tr v-if="users.length === 0">
                   <td :colspan="canAssignRoles ? 8 : 7" class="px-5 py-16 text-center text-sm text-slate-400">
-                    {{ t('admin_pages.users.empty') }}
+                    暂无用户
                   </td>
                 </tr>
               </template>
@@ -167,7 +167,7 @@
           <!-- 标题 -->
           <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
-              <h2 class="text-sm font-semibold text-slate-900">{{ t('admin_pages.users.assign_role') }}</h2>
+              <h2 class="text-sm font-semibold text-slate-900">分配角色</h2>
               <p class="mt-0.5 text-xs text-slate-500">
                 {{ roleModal.user?.nickname || roleModal.user?.username }}
               </p>
@@ -205,7 +205,7 @@
                   class="mt-0.5 truncate text-xs"
                   :class="roleModal.selected === role.name ? 'text-slate-300' : 'text-slate-400'"
                 >
-                  {{ t('admin_pages.users.permissions_count', { count: role.permissions.length }) }}
+                  {{ role.permissions.length }} 项权限
                 </p>
               </div>
               <Icon
@@ -226,7 +226,7 @@
               <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-slate-100">
                 <Icon name="lucide:user-minus" class="h-3.5 w-3.5" />
               </div>
-              <p class="text-xs font-semibold">{{ t('admin_pages.users.no_role') }}</p>
+              <p class="text-xs font-semibold">无角色</p>
               <Icon
                 v-if="roleModal.selected === null"
                 name="lucide:check"
@@ -241,15 +241,15 @@
               class="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
               @click="closeRoleModal"
             >
-              {{ t('common.cancel') }}
+              取消
             </button>
             <button
               class="rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
               :disabled="roleModal.saving || roleModal.selected === roleModal.user?.roles"
               @click="saveRole"
             >
-              <span v-if="roleModal.saving">{{ t('common.saving') }}</span>
-              <span v-else>{{ t('common.save') }}</span>
+              <span v-if="roleModal.saving">保存中…</span>
+              <span v-else>保存</span>
             </button>
           </div>
         </div>
@@ -311,9 +311,7 @@ type RoleInfo = {
 
 const { $api } = useNuxtApp()
 const { hasPermission, user: currentUser } = useAuth()
-const { t } = useAdminI18n()
 const { intlLocale, formatDate: formatLocalizedDate } = useLocaleFormatting('zh-CN')
-const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
 
 const canAssignRoles = computed(() => hasPermission('users.assign-roles'))
 const route = useRoute()
@@ -327,9 +325,9 @@ const status = ref(String(route.query.status || ''))
 const sortBy = ref(String(route.query.sort_by || 'id'))
 const sortOrder = ref(String(route.query.sort_order || 'desc'))
 const sortOptions = computed(() => [
-  { value: 'id', label: 'ID' }, { value: 'username', label: t('admin_pages.user_detail.username') },
-  { value: 'joined_at', label: t('admin_pages.users.joined') }, { value: 'last_seen_at', label: t('admin_pages.users.last_login') },
-  { value: 'reviews_count', label: t('admin_pages.user_detail.reviews') }, { value: 'contributions_count', label: t('admin_pages.user_detail.contributions') },
+  { value: 'id', label: 'ID' }, { value: 'username', label: '用户名' },
+  { value: 'joined_at', label: '注册时间' }, { value: 'last_seen_at', label: '最近活跃' },
+  { value: 'reviews_count', label: '评价数' }, { value: 'contributions_count', label: '已批准修订数' },
 ])
 watch(() => route.query, value => { status.value = String(value.status || ''); sortBy.value = String(value.sort_by || 'id'); sortOrder.value = String(value.sort_order || 'desc') })
 const selectedRole = computed(() => String(route.query.role || ''))
@@ -359,7 +357,7 @@ const availableRoles = computed(() => (rolesData.value ?? []).filter(role =>
 ))
 
 const summary = computed(() => [
-  { label: t('admin_pages.users.total'), value: pagination.value.total, icon: 'lucide:users', help: t('admin_pages.users.total_help') },
+  { label: '用户总数', value: pagination.value.total, icon: 'lucide:users', help: '当前筛选条件下的账号数' },
 ])
 
 // ===== Role Modal =====
@@ -387,10 +385,10 @@ const saveRole = async () => {
       body: { role: roleModal.selected },
     })
     await refresh()
-    showToast(t('admin_pages.users.role_updated'))
+    showToast('角色已更新')
     roleModal.open = false
   } catch (e) {
-    showToast(localizeError(e, 'admin_pages.users.update_failed'), 'error')
+    showToast(adminError(e, '角色更新失败。'), 'error')
   } finally {
     roleModal.saving = false
   }
@@ -440,7 +438,7 @@ const formatRelativeTime = (iso: string) => {
 
 onUnmounted(() => { if (toastTimer) clearTimeout(toastTimer) })
 
-useHead({ title: computed(() => t('admin_pages.users.title')) })
+useHead({ title: '用户管理' })
 </script>
 
 <style scoped>

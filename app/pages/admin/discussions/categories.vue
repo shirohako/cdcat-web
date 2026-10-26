@@ -5,8 +5,6 @@ import type { AdminDiscussionCategory } from '~/types/admin'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
-const { localizeError } = useLocalizedApiError(t)
 const { data, pending, error, refresh } = await useAsyncData('admin-discussion-categories',
   () => $api<{ items: AdminDiscussionCategory[], colors: string[] }>('/v1/admin/discussions/categories'))
 
@@ -50,7 +48,7 @@ async function run(action: () => Promise<unknown>, done: string) {
     notice.value = done
     await refresh()
   }
-  catch (failure) { message.value = localizeError(failure, 'admin_pages.action_failed') }
+  catch (failure) { message.value = adminError(failure, '操作失败，请重试。') }
   finally { busy.value = false }
 }
 
@@ -65,14 +63,14 @@ const save = () => run(async () => {
   }
   await $api(editing.value ? `/v1/admin/discussions/categories/${form.id}` : '/v1/admin/discussions/categories', { method: editing.value ? 'PUT' : 'POST', body })
   reset()
-}, t('admin_pages.saved'))
+}, '已保存')
 
 const deleting = ref<AdminDiscussionCategory | null>(null)
 const deleteOpen = computed({ get: () => deleting.value !== null, set: (open) => { if (!open) deleting.value = null } })
 const remove = (reason: string) => run(async () => {
   await $api(`/v1/admin/discussions/categories/${deleting.value!.id}`, { method: 'DELETE', body: { reason: reason || undefined } })
   deleting.value = null
-}, t('admin_pages.discussions.categories.deleted'))
+}, '版块已删除')
 
 // Drag a category among its siblings; children follow their parent.
 const dragged = ref<number | null>(null)
@@ -92,25 +90,25 @@ function drop(target: AdminDiscussionCategory) {
 const saveOrder = () => run(async () => {
   await $api('/v1/admin/discussions/categories/order', { method: 'PUT', body: { items: ordered.value.map(item => ({ id: item.id, parent_id: item.parent_id, sort_order: item.sort_order })) } })
   dirtyOrder.value = false
-}, t('admin_pages.discussions.categories.ordered'))
+}, '排序已保存')
 
 const field = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2'
-useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) })
+useHead({ title: '讨论版块' })
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
     <header>
-      <h1 class="text-3xl font-bold">{{ t('admin_pages.discussions.categories.title') }}</h1>
-      <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.discussions.categories.description') }}</p>
+      <h1 class="text-3xl font-bold">讨论版块</h1>
+      <p class="mt-2 text-sm text-slate-600">最多两层。拖动调整同级顺序；还有主题的版块不能删除，要先移走。</p>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
     <div class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
       <section class="rounded-xl border border-slate-200 bg-white">
         <div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 text-xs text-slate-500">
-          <span>{{ t('admin_pages.discussions.categories.drag_hint') }}</span>
-          <button v-if="dirtyOrder" type="button" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white disabled:opacity-50" :disabled="busy" @click="saveOrder">{{ t('admin_pages.discussions.categories.save_order') }}</button>
+          <span>拖动条目调整同级版块的顺序</span>
+          <button v-if="dirtyOrder" type="button" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white disabled:opacity-50" :disabled="busy" @click="saveOrder">保存排序</button>
         </div>
         <AdminListState :pending="pending" :error="error" :empty="!ordered.length" @retry="refresh()">
           <ul class="divide-y divide-slate-100">
@@ -128,64 +126,68 @@ useHead({ title: computed(() => t('admin_pages.discussions.categories.title')) }
                   <Lock v-if="category.visibility === 'moderators'" :size="12" class="ml-1 inline text-slate-400" />
                 </p>
                 <p class="mt-0.5 flex flex-wrap gap-1.5 text-[11px] text-slate-500">
-                  <span v-if="category.kind === 'question'" class="rounded bg-emerald-50 px-1 text-emerald-700">{{ t('admin_pages.discussions.categories.kinds.question') }}</span>
-                  <span v-if="category.topic_permission === 'moderators'" class="rounded bg-indigo-50 px-1 text-indigo-700">{{ t('admin_pages.discussions.categories.moderators_only') }}</span>
-                  <span v-if="!category.show_in_latest" class="rounded bg-slate-100 px-1">{{ t('admin_pages.discussions.categories.not_in_latest') }}</span>
-                  <span v-if="!category.show_in_list" class="rounded bg-slate-100 px-1">{{ t('admin_pages.discussions.categories.not_in_list') }}</span>
-                  <span v-if="category.is_archived" class="rounded bg-amber-50 px-1 text-amber-700">{{ t('admin_pages.discussions.categories.archived') }}</span>
-                  <span v-if="category.is_system" class="rounded bg-sky-50 px-1 text-sky-700">{{ t('admin_pages.discussions.categories.system') }}</span>
-                  <span>{{ t('admin_pages.discussions.categories.topics', { count: category.topics_count }) }}</span>
+                  <span v-if="category.kind === 'question'" class="rounded bg-emerald-50 px-1 text-emerald-700">问答</span>
+                  <span v-if="category.topic_permission === 'moderators'" class="rounded bg-indigo-50 px-1 text-indigo-700">仅版主发主题</span>
+                  <span v-if="!category.show_in_latest" class="rounded bg-slate-100 px-1">不进「最新」</span>
+                  <span v-if="!category.show_in_list" class="rounded bg-slate-100 px-1">不在版块列表</span>
+                  <span v-if="category.is_archived" class="rounded bg-amber-50 px-1 text-amber-700">已归档</span>
+                  <span v-if="category.is_system" class="rounded bg-sky-50 px-1 text-sky-700">系统版块</span>
+                  <span>{{ category.topics_count }} 个主题</span>
                 </p>
               </div>
               <div class="flex shrink-0 gap-2 text-xs">
-                <button type="button" class="underline" @click="edit(category)">{{ t('common.edit') }}</button>
-                <button v-if="!category.is_system" type="button" class="text-red-700 underline disabled:opacity-40" :disabled="category.topics_count > 0" @click="deleting = category">{{ t('common.delete') }}</button>
+                <button type="button" class="underline" @click="edit(category)">编辑</button>
+                <button v-if="!category.is_system" type="button" class="text-red-700 underline disabled:opacity-40" :disabled="category.topics_count > 0" @click="deleting = category">删除</button>
               </div>
             </li>
           </ul>
         </AdminListState>
       </section>
       <form class="h-fit space-y-3 rounded-xl border border-slate-200 bg-white p-4 text-sm" @submit.prevent="save">
-        <h2 class="font-semibold">{{ editing ? t('admin_pages.discussions.categories.edit') : t('admin_pages.discussions.categories.create') }}</h2>
-        <label class="block">{{ t('admin_pages.discussions.categories.name') }}<input v-model="form.name" required maxlength="50" :class="field"></label>
+        <h2 class="font-semibold">{{ editing ? '编辑版块' : '新建版块' }}</h2>
+        <label class="block">名称<input v-model="form.name" required maxlength="50" :class="field"></label>
         <label class="block">Slug<input v-model="form.slug" required maxlength="60" pattern="[a-z0-9]+(-[a-z0-9]+)*" :class="[field, 'font-mono']"></label>
-        <label class="block">{{ t('admin_pages.discussions.categories.parent') }}
+        <label class="block">上级版块
           <select v-model="form.parent_id" :class="field">
-            <option :value="null">{{ t('admin_pages.discussions.categories.top_level') }}</option>
+            <option :value="null">（顶级版块）</option>
             <option v-for="parent in parents.filter(item => item.id !== form.id)" :key="parent.id" :value="parent.id">{{ parent.name }}</option>
           </select>
         </label>
-        <label class="block">{{ t('admin_pages.discussions.categories.category_description') }}<textarea v-model="form.description" maxlength="1000" rows="2" :class="field" /></label>
+        <label class="block">说明<textarea v-model="form.description" maxlength="1000" rows="2" :class="field" /></label>
         <div class="grid grid-cols-3 gap-2">
           <label class="block text-xs">繁體<input v-model="form.name_zh_hant" maxlength="50" :class="field"></label>
           <label class="block text-xs">English<input v-model="form.name_en" maxlength="50" :class="field"></label>
           <label class="block text-xs">日本語<input v-model="form.name_ja" maxlength="50" :class="field"></label>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <label class="block">{{ t('admin_pages.discussions.categories.color') }}
+          <label class="block">颜色
             <select v-model="form.color" :class="field"><option v-for="color in data?.colors ?? []" :key="color" :value="color">{{ color }}</option></select>
           </label>
-          <label class="block">{{ t('admin_pages.discussions.categories.icon') }}<input v-model="form.icon" maxlength="50" pattern="[a-z0-9-]+" placeholder="message-circle" :class="field"></label>
+          <label class="block">图标（lucide 名称）<input v-model="form.icon" maxlength="50" pattern="[a-z0-9-]+" placeholder="message-circle" :class="field"></label>
         </div>
         <div class="grid grid-cols-2 gap-2">
-          <label class="block">{{ t('admin_pages.discussions.categories.kind') }}
-            <select v-model="form.kind" :class="field"><option value="discussion">{{ t('admin_pages.discussions.categories.kinds.discussion') }}</option><option value="question">{{ t('admin_pages.discussions.categories.kinds.question') }}</option></select>
+          <label class="block">类型
+            <select v-model="form.kind" :class="field"><option value="discussion">普通</option><option value="question">问答</option></select>
           </label>
-          <label class="block">{{ t('admin_pages.discussions.categories.visibility') }}
-            <select v-model="form.visibility" :class="field"><option value="public">{{ t('admin_pages.discussions.categories.visibilities.public') }}</option><option value="moderators">{{ t('admin_pages.discussions.categories.visibilities.moderators') }}</option></select>
+          <label class="block">可见范围
+            <select v-model="form.visibility" :class="field"><option value="public">公开</option><option value="moderators">仅版主</option></select>
           </label>
         </div>
-        <label class="flex items-center gap-2"><input v-model="form.topic_permission" type="checkbox" true-value="moderators" false-value="everyone">{{ t('admin_pages.discussions.categories.moderators_only_help') }}</label>
-        <label class="flex items-center gap-2"><input v-model="form.show_in_latest" type="checkbox">{{ t('admin_pages.discussions.categories.show_in_latest') }}</label>
-        <label class="flex items-center gap-2"><input v-model="form.show_in_list" type="checkbox">{{ t('admin_pages.discussions.categories.show_in_list') }}</label>
-        <label class="flex items-center gap-2"><input v-model="form.is_archived" type="checkbox">{{ t('admin_pages.discussions.categories.archive_help') }}</label>
-        <label class="block">{{ t('admin_pages.discussions.categories.template') }}<textarea v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'font-mono text-xs']" :placeholder="t('admin_pages.discussions.categories.template_placeholder')" /></label>
+        <label class="flex items-center gap-2"><input v-model="form.topic_permission" type="checkbox" true-value="moderators" false-value="everyone">只有版主能发主题（其他人可以回复）</label>
+        <label class="flex items-center gap-2"><input v-model="form.show_in_latest" type="checkbox">出现在讨论区首页的「最新」里</label>
+        <label class="flex items-center gap-2"><input v-model="form.show_in_list" type="checkbox">显示在版块列表和侧栏里（关掉后仍可通过链接打开）</label>
+        <label class="flex items-center gap-2"><input v-model="form.is_archived" type="checkbox">归档：不能再发主题和回复</label>
+        <label class="block">发帖模板<textarea
+v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'font-mono text-xs']" placeholder="发主题时预填到编辑器里，例如：
+曲目信息：
+试听链接：
+出处：" /></label>
         <div class="flex justify-end gap-2">
-          <button v-if="editing" type="button" class="rounded-lg border px-3 py-2" @click="reset">{{ t('common.cancel') }}</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ t('common.save') }}</button>
+          <button v-if="editing" type="button" class="rounded-lg border px-3 py-2" @click="reset">取消</button>
+          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">保存</button>
         </div>
       </form>
     </div>
-    <AdminConfirmDialog v-model="deleteOpen" :busy="busy" :title="t('admin_pages.discussions.categories.delete_title', { name: deleting?.name })" :description="t('admin_pages.discussions.categories.delete_help')" @confirm="remove" />
+    <AdminConfirmDialog v-model="deleteOpen" :busy="busy" :title="`删除版块「${deleting?.name}」？`" description="版块里没有主题和子版块时才能删除。" @confirm="remove" />
   </div>
 </template>

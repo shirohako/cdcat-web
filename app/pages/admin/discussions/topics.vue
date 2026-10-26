@@ -12,8 +12,23 @@ type Action = 'pin' | 'feature' | 'unfeature' | 'lock' | 'unlock' | 'move' | 'hi
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
-const { localizeError } = useLocalizedApiError(t)
+const topicConfirmLabels: Record<string, string> = { 'pin': '设置置顶', 'feature': '设为精华', 'unfeature': '取消精华', 'lock': '锁定主题', 'unlock': '解锁主题', 'move': '移动主题', 'hide': '折叠主题', 'unhide': '取消折叠', 'delete': '删除主题' }
+const discussionTopicActionLabels: Record<string, string> = { pin: '置顶', feature: '加精', unfeature: '取消精华', lock: '锁定', unlock: '解锁', move: '移动' }
+const discussionTopicConfirmHelpLabels: Record<string, string> = {
+  pin: '版块置顶只在所在版块顶部显示，全站置顶在讨论首页也显示。',
+  feature: '主题会出现在精华列表。',
+  unfeature: '主题不再出现在精华列表。',
+  lock: '锁定后只有版主能回复。',
+  unlock: '所有人恢复可以回复。',
+  move: '主题和全部回复一起移到新版块。',
+  hide: '折叠 1 楼，主题从列表和搜索里消失，链接仍能打开。作者会收到通知和原因。',
+  unhide: '1 楼恢复显示，主题回到列表。',
+  delete: '主题和全部回复永久删除，原文写入操作日志，作者会收到通知。',
+}
+const discussionTopicFlagLabels: Record<string, string> = { pinned: '置顶中', featured: '精华', locked: '已锁定', article: '文章评论' }
+const discussionTopicPinScopeLabels: Record<string, string> = { none: '不置顶', category: '版块置顶', global: '全站置顶' }
+const discussionTopicPinnedLabels: Record<string, string> = { category: '版块置顶', global: '全站置顶' }
+const discussionTopicSortLabels: Record<string, string> = { created: '按发布时间', last_posted: '按最后回复', posts: '按回复数', views: '按浏览量' }
 
 const filterKeys = ['search', 'user', 'category', 'status', 'flag', 'sort'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
@@ -65,11 +80,11 @@ async function act(reason: string) {
       await $api(`/v1/admin/discussions/posts/${topic.first_post_id}`, { method: 'PATCH', body: { status: action === 'hide' ? 'hidden' : 'visible', ...extra } })
     }
     if (action === 'delete') await $api(topicUrl, { method: 'DELETE', body: extra })
-    notice.value = t('admin_pages.saved')
+    notice.value = '已保存'
     acting.value = null
     await refresh()
   }
-  catch (failure) { message.value = localizeError(failure, 'admin_pages.action_failed') }
+  catch (failure) { message.value = adminError(failure, '操作失败，请重试。') }
   finally { busy.value = false }
 }
 
@@ -77,71 +92,71 @@ const tone: Record<string, string> = { visible: 'bg-emerald-50 text-emerald-700'
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 const field = 'rounded-lg border border-slate-300 px-3 py-1.5 text-sm'
 const button = 'rounded-lg border px-2.5 py-1.5'
-useHead({ title: computed(() => t('admin_pages.discussions.topics.title')) })
+useHead({ title: '主题' })
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl space-y-5 p-4 sm:p-8">
     <header>
-      <h1 class="text-3xl font-bold">{{ t('admin_pages.discussions.topics.title') }}</h1>
-      <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.discussions.topics.description') }}</p>
+      <h1 class="text-3xl font-bold">主题</h1>
+      <p class="mt-2 text-sm text-slate-600">按主题管理：置顶、加精、锁定、移动版块、折叠（折叠 1 楼）和删除。单条帖子和回复在「全部帖子」里处理；文章评论主题跟随文章，不能移动、折叠或删除。</p>
     </header>
     <form class="flex flex-wrap items-end gap-2 rounded-xl border border-slate-200 bg-white p-3" @submit.prevent="apply">
-      <input v-model="filters.search" type="search" maxlength="100" :class="[field, 'min-w-48 flex-1']" :placeholder="t('admin_pages.discussions.topics.search')">
-      <input v-model="filters.user" maxlength="32" :class="[field, 'w-36']" :placeholder="t('admin_pages.discussions.posts.user')">
+      <input v-model="filters.search" type="search" maxlength="100" :class="[field, 'min-w-48 flex-1']" placeholder="搜索标题">
+      <input v-model="filters.user" maxlength="32" :class="[field, 'w-36']" placeholder="用户名">
       <select v-model="filters.category" :class="field">
-        <option value="">{{ t('admin_pages.discussions.topics.all_categories') }}</option>
+        <option value="">全部版块</option>
         <option v-for="category in categories" :key="category.id" :value="category.slug">{{ category.parent_id ? '└ ' : '' }}{{ category.name }}</option>
       </select>
       <select v-model="filters.status" :class="field">
-        <option value="">{{ t('admin_pages.all_statuses') }}</option>
-        <option v-for="value in ['visible', 'hidden']" :key="value" :value="value">{{ t(`admin_pages.discussions.post_statuses.${value}`) }}</option>
+        <option value="">全部状态</option>
+        <option v-for="value in ['visible', 'hidden']" :key="value" :value="value">{{ postStatusLabels[value] }}</option>
       </select>
       <select v-model="filters.flag" :class="field">
-        <option value="">{{ t('admin_pages.discussions.topics.any_flag') }}</option>
-        <option v-for="value in ['pinned', 'featured', 'locked', 'article']" :key="value" :value="value">{{ t(`admin_pages.discussions.topics.flags.${value}`) }}</option>
+        <option value="">全部主题</option>
+        <option v-for="value in ['pinned', 'featured', 'locked', 'article']" :key="value" :value="value">{{ discussionTopicFlagLabels[value] }}</option>
       </select>
       <select v-model="filters.sort" :class="field">
-        <option v-for="value in ['created', 'last_posted', 'posts', 'views']" :key="value" :value="value === 'created' ? '' : value">{{ t(`admin_pages.discussions.topics.sorts.${value}`) }}</option>
+        <option v-for="value in ['created', 'last_posted', 'posts', 'views']" :key="value" :value="value === 'created' ? '' : value">{{ discussionTopicSortLabels[value] }}</option>
       </select>
-      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white">{{ t('admin_pages.apply') }}</button>
+      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white">应用</button>
     </form>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
     <AdminListState :pending="pending" :error="error" :empty="!data?.items.length" @retry="refresh()">
-      <p class="mb-2 text-sm text-slate-500">{{ t('common.items_total', { count: data?.pagination.total ?? 0 }) }}</p>
+      <p class="mb-2 text-sm text-slate-500">共 {{ data?.pagination.total ?? 0 }} 条</p>
       <ul class="space-y-2">
         <li v-for="topic in data?.items" :key="topic.id" class="rounded-xl border border-slate-200 bg-white p-4 text-sm">
           <div class="flex flex-wrap items-start gap-3">
             <div class="min-w-0 flex-1">
               <p class="flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
-                <span class="rounded px-1.5 py-0.5 font-medium" :class="tone[topic.status]">{{ t(`admin_pages.discussions.post_statuses.${topic.status}`) }}</span>
-                <span v-if="topic.pinned_scope" class="rounded bg-sky-50 px-1.5 py-0.5 text-sky-700">{{ t(`admin_pages.discussions.topics.pinned.${topic.pinned_scope}`) }}</span>
-                <span v-if="topic.featured" class="rounded bg-violet-50 px-1.5 py-0.5 text-violet-700">{{ t('admin_pages.discussions.topics.flags.featured') }}</span>
-                <span v-if="topic.locked" class="rounded bg-rose-50 px-1.5 py-0.5 text-rose-700">{{ t('admin_pages.discussions.topics.flags.locked') }}</span>
-                <span v-if="topic.article_id" class="rounded bg-amber-50 px-1.5 py-0.5 text-amber-700">{{ t('admin_pages.discussions.topics.flags.article') }}</span>
+                <span class="rounded px-1.5 py-0.5 font-medium" :class="tone[topic.status]">{{ postStatusLabels[topic.status] }}</span>
+                <span v-if="topic.pinned_scope" class="rounded bg-sky-50 px-1.5 py-0.5 text-sky-700">{{ discussionTopicPinnedLabels[topic.pinned_scope] }}</span>
+                <span v-if="topic.featured" class="rounded bg-violet-50 px-1.5 py-0.5 text-violet-700">精华</span>
+                <span v-if="topic.locked" class="rounded bg-rose-50 px-1.5 py-0.5 text-rose-700">已锁定</span>
+                <span v-if="topic.article_id" class="rounded bg-amber-50 px-1.5 py-0.5 text-amber-700">文章评论</span>
                 <span v-if="topic.category">· {{ topic.category.name }}</span>
               </p>
               <NuxtLink :to="`/discussions/${topic.id}`" target="_blank" class="mt-1 block font-semibold text-slate-900 underline decoration-slate-200 underline-offset-4">{{ topic.title }}</NuxtLink>
               <p class="mt-1 text-xs text-slate-400">
                 <NuxtLink v-if="topic.user" :to="{ query: { user: topic.user.username } }" class="hover:text-slate-700">{{ topic.user.nickname || topic.user.username }}</NuxtLink>
                 · {{ time(topic.created_at) }}
-                · {{ t('admin_pages.discussions.topics.stats', { replies: topic.replies_count, views: topic.views_count }) }}
-                <template v-if="topic.last_posted_at"> · {{ t('admin_pages.discussions.topics.last_posted', { time: time(topic.last_posted_at) }) }}</template>
-                <template v-if="topic.status === 'hidden' && topic.status_reason"> · {{ t('admin_pages.discussions.posts.reason', { reason: topic.status_reason }) }}</template>
-                · <NuxtLink :to="`/admin/discussions/posts?topic_id=${topic.id}`" class="underline hover:text-slate-700">{{ t('admin_pages.discussions.topics.view_posts') }}</NuxtLink>
+                · {{ topic.replies_count }} 回复 · {{ topic.views_count }} 浏览
+                <template v-if="topic.last_posted_at"> · 最后回复 {{ time(topic.last_posted_at) }}</template>
+                <template v-if="topic.status === 'hidden' && topic.status_reason"> · 原因：{{ topic.status_reason }}</template>
+                · <NuxtLink :to="`/admin/discussions/posts?topic_id=${topic.id}`" class="underline hover:text-slate-700">查看帖子</NuxtLink>
               </p>
             </div>
             <div class="flex shrink-0 flex-wrap gap-1.5 text-xs">
-              <button type="button" :class="button" @click="start(topic, 'pin')">{{ t('admin_pages.discussions.topics.actions.pin') }}</button>
-              <button type="button" :class="button" @click="start(topic, topic.featured ? 'unfeature' : 'feature')">{{ t(`admin_pages.discussions.topics.actions.${topic.featured ? 'unfeature' : 'feature'}`) }}</button>
-              <button type="button" :class="button" @click="start(topic, topic.locked ? 'unlock' : 'lock')">{{ t(`admin_pages.discussions.topics.actions.${topic.locked ? 'unlock' : 'lock'}`) }}</button>
-              <button v-if="!topic.article_id" type="button" :class="button" @click="start(topic, 'move')">{{ t('admin_pages.discussions.topics.actions.move') }}</button>
+              <button type="button" :class="button" @click="start(topic, 'pin')">置顶</button>
+              <button type="button" :class="button" @click="start(topic, topic.featured ? 'unfeature' : 'feature')">{{ discussionTopicActionLabels[topic.featured ? 'unfeature' : 'feature'] }}</button>
+              <button type="button" :class="button" @click="start(topic, topic.locked ? 'unlock' : 'lock')">{{ discussionTopicActionLabels[topic.locked ? 'unlock' : 'lock'] }}</button>
+              <button v-if="!topic.article_id" type="button" :class="button" @click="start(topic, 'move')">移动</button>
               <template v-if="topic.first_post_id && !topic.article_id">
-                <button v-if="topic.status === 'visible'" type="button" :class="[button, 'border-amber-300 text-amber-700']" @click="start(topic, 'hide')">{{ t('admin_pages.discussions.actions.hide') }}</button>
-                <button v-else type="button" :class="button" @click="start(topic, 'unhide')">{{ t('admin_pages.discussions.actions.unhide') }}</button>
+                <button v-if="topic.status === 'visible'" type="button" :class="[button, 'border-amber-300 text-amber-700']" @click="start(topic, 'hide')">折叠</button>
+                <button v-else type="button" :class="button" @click="start(topic, 'unhide')">取消折叠</button>
               </template>
-              <button v-if="!topic.article_id" type="button" :class="[button, 'border-red-300 text-red-700']" @click="start(topic, 'delete')">{{ t('admin_pages.discussions.actions.delete') }}</button>
+              <button v-if="!topic.article_id" type="button" :class="[button, 'border-red-300 text-red-700']" @click="start(topic, 'delete')">删除</button>
             </div>
           </div>
         </li>
@@ -150,18 +165,18 @@ useHead({ title: computed(() => t('admin_pages.discussions.topics.title')) })
     </AdminListState>
     <AdminConfirmDialog
       v-model="actOpen" :busy="busy" :reason-required="acting ? ['hide', 'delete'].includes(acting.action) : false"
-      :title="acting ? t(`admin_pages.discussions.topics.confirm.${acting.action}`, { title: acting.topic.title }) : ''"
-      :description="acting ? t(`admin_pages.discussions.topics.confirm_help.${acting.action}`) : ''"
+      :title="acting ? `${topicConfirmLabels[acting.action]}：${acting.topic.title}` : ''"
+      :description="acting ? discussionTopicConfirmHelpLabels[acting.action] : ''"
       :confirm-disabled="acting?.action === 'move' && (!moveTo || moveTo === acting.topic.category_id)" @confirm="act"
     >
       <label v-if="acting?.action === 'pin'" class="mt-4 block text-sm">
-        {{ t('admin_pages.discussions.topics.pin_scope') }}
+        置顶范围
         <select v-model="pinScope" class="mt-2 w-full rounded-lg border border-slate-300 p-2">
-          <option v-for="value in ['none', 'category', 'global']" :key="value" :value="value">{{ t(`admin_pages.discussions.topics.pin_scopes.${value}`) }}</option>
+          <option v-for="value in ['none', 'category', 'global']" :key="value" :value="value">{{ discussionTopicPinScopeLabels[value] }}</option>
         </select>
       </label>
       <label v-if="acting?.action === 'move'" class="mt-4 block text-sm">
-        {{ t('admin_pages.discussions.topics.move_to') }}
+        移动到
         <select v-model="moveTo" class="mt-2 w-full rounded-lg border border-slate-300 p-2">
           <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.parent_id ? '└ ' : '' }}{{ category.name }}</option>
         </select>

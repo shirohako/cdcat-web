@@ -19,7 +19,15 @@ interface EditorHandle {
 }
 
 const { $api } = useNuxtApp()
-const { t, tm, rt } = useAdminI18n()
+const harvestReleaseReasonLabels: Record<string, string> = {
+  earlier_date: '依据：来源的发售日期早于这届活动。',
+  source: '依据：来源写明是再贩。',
+  listing: '依据：固定在这届活动的任务把它标为再贩。',
+  event_fixed: '依据：固定在这届活动的任务列出了它。',
+  event_name: '依据：来源写的活动名对上了这届活动。',
+  date: '依据：来源的发售日期在这届活动期间。',
+}
+const harvestViaLabels: Record<string, string> = { fixed: '固定任务', name: '活动名', date: '发售日期' }
 const harvestError = useHarvestError()
 const { user } = useAuth()
 const route = useRoute()
@@ -99,7 +107,7 @@ const act = async (path: string, body: Record<string, unknown> = {}, after: 'nex
   }
 }
 
-const rejectPresets = computed(() => (tm('admin_pages.harvest.review.reject_presets') as unknown[]).map(item => rt(item as Parameters<typeof rt>[0])))
+const rejectPresets = ['不是音乐', '周边或书籍', '重复的条目', '不是这届活动的作品']
 const rejectOpen = ref(false)
 const rejectReason = ref('')
 const reject = async () => {
@@ -153,7 +161,7 @@ const useCover = async (url: string) => {
     const image = await $api<CatalogImage>(`/v1/admin/harvest/candidates/${id.value}/images`, { method: 'POST', body: { url } })
     editor.value.remember('images', image.id, image)
     setCover(editor.value.album, image.id)
-    coverNote.value = t('admin_pages.harvest.review.cover_set', { width: image.width ?? '?', height: image.height ?? '?' })
+    coverNote.value = `已设为封面（${image.width ?? '?'}×${image.height ?? '?'}）`
   } catch (e) {
     message.value = harvestError(e)
   } finally {
@@ -161,15 +169,15 @@ const useCover = async (url: string) => {
   }
 }
 const sizeNote = (preview: { width: number, height: number }) => [
-  Math.abs(preview.width - preview.height) > Math.max(preview.width, preview.height) * 0.01 ? t('admin_pages.harvest.review.not_square') : null,
-  Math.min(preview.width, preview.height) < 500 ? t('admin_pages.harvest.review.too_small') : null,
+  Math.abs(preview.width - preview.height) > Math.max(preview.width, preview.height) * 0.01 ? '不是正方形' : null,
+  Math.min(preview.width, preview.height) < 500 ? '小于 500px' : null,
 ].filter(Boolean).join('，')
 
 const useTitle = (value: string) => { if (editor.value) editor.value.album.title = value }
 const eventName = (eventId: number) => detail.value?.events.find(event => event.id === eventId)?.name ?? `#${eventId}`
 const listingNote = (listing: Record<string, unknown> | null) => [
   typeof listing?.event === 'string' ? listing.event : null,
-  listing?.resale === true ? t('admin_pages.harvest.review.listing_resale') : null,
+  listing?.resale === true ? '列表标为再贩' : null,
 ].filter(Boolean).join(' · ')
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 
@@ -187,7 +195,7 @@ const onKey = (event: KeyboardEvent) => {
 }
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
-useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.harvest.review.title')) })
+useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
 </script>
 
 <template>
@@ -195,153 +203,153 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
     <AdminListState :pending="pending && !detail" :error="error" @retry="refresh()">
       <template v-if="detail">
         <header class="sticky top-0 z-20 -mx-4 flex flex-wrap items-center gap-3 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-          <NuxtLink :to="{ path: '/admin/harvest/candidates', query: filters }" class="text-sm text-slate-500 hover:underline">← {{ t('admin_pages.harvest.review.back') }}</NuxtLink>
+          <NuxtLink :to="{ path: '/admin/harvest/candidates', query: filters }" class="text-sm text-slate-500 hover:underline">← 返回候选列表</NuxtLink>
           <div class="min-w-0 flex-1">
             <p class="truncate font-semibold">{{ detail.candidate.title }}</p>
             <p class="text-xs text-slate-500">
-              <span :class="{ 'text-amber-700': !detail.event }">{{ detail.event?.name ?? t('admin_pages.harvest.no_event') }}</span> · {{ t(`admin_pages.harvest.status.${detail.candidate.status}`) }}
-              <template v-if="detail.neighbors.position"> · {{ t('admin_pages.harvest.review.position', { position: detail.neighbors.position, total: detail.neighbors.total }) }}</template>
+              <span :class="{ 'text-amber-700': !detail.event }">{{ detail.event?.name ?? '未关联活动' }}</span> · {{ harvestStatusLabels[detail.candidate.status] }}
+              <template v-if="detail.neighbors.position"> · 第 {{ detail.neighbors.position }} / {{ detail.neighbors.total }} 条</template>
             </p>
           </div>
           <div class="flex flex-wrap gap-2 text-sm">
-            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.previous" @click="previous">{{ t('admin_pages.harvest.review.previous') }}</button>
-            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.next" @click="next">{{ open ? t('admin_pages.harvest.review.skip') : t('admin_pages.harvest.review.next') }}</button>
+            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.previous" @click="previous">上一条</button>
+            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.next" @click="next">{{ open ? '跳过' : '下一条' }}</button>
             <template v-if="open">
-              <button type="button" class="rounded-lg border border-red-200 px-3 py-1.5 text-red-700" :disabled="busy" @click="rejectOpen = true">{{ t('admin_pages.harvest.review.reject') }}</button>
-              <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="linkOpen = !linkOpen">{{ t('admin_pages.harvest.review.link') }}</button>
+              <button type="button" class="rounded-lg border border-red-200 px-3 py-1.5 text-red-700" :disabled="busy" @click="rejectOpen = true">不收录</button>
+              <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="linkOpen = !linkOpen">站内已有</button>
             </template>
-            <button v-else-if="['rejected', 'linked', 'excluded'].includes(detail.candidate.status)" type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="act('restore', {}, 'refresh')">{{ t('admin_pages.harvest.review.restore') }}</button>
+            <button v-else-if="['rejected', 'linked', 'excluded'].includes(detail.candidate.status)" type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="act('restore', {}, 'refresh')">放回待审</button>
           </div>
         </header>
-        <p class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.shortcuts') }}</p>
+        <p class="text-xs text-slate-500">快捷键：J 下一条 · K 上一条 · R 不收录 · S 去提交</p>
         <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
         <div v-if="!open" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
-          <p>{{ t('admin_pages.harvest.review.closed', { status: t(`admin_pages.harvest.status.${detail.candidate.status}`) }) }}
-            <template v-if="detail.candidate.album">{{ t('admin_pages.harvest.review.approved') }}<NuxtLink :to="`/albums/${detail.candidate.album.id}`" class="text-sky-700 hover:underline">{{ detail.candidate.album.title }}</NuxtLink></template>
+          <p>这条候选已经处理过（{{ harvestStatusLabels[detail.candidate.status] }}）。
+            <template v-if="detail.candidate.album">已建档：<NuxtLink :to="`/albums/${detail.candidate.album.id}`" class="text-sky-700 hover:underline">{{ detail.candidate.album.title }}</NuxtLink></template>
           </p>
-          <p v-if="detail.candidate.reviewer" class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.by', { name: detail.candidate.reviewer.nickname || detail.candidate.reviewer.username, time: time(detail.candidate.reviewed_at) }) }}</p>
+          <p v-if="detail.candidate.reviewer" class="text-xs text-slate-500">由 {{ detail.candidate.reviewer.nickname || detail.candidate.reviewer.username }} 于 {{ time(detail.candidate.reviewed_at) }} 处理</p>
           <p v-if="detail.candidate.reject_reason" class="text-xs text-slate-600">{{ detail.candidate.reject_reason }}</p>
-          <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">{{ t('admin_pages.harvest.review.sources_changed') }}</p>
+          <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">建档之后来源有更新。</p>
         </div>
         <div v-else-if="detail.candidate.release_kind !== 'first'" class="rounded-lg border px-4 py-2 text-sm" :class="detail.candidate.release_kind === 'resale' ? 'border-violet-200 bg-violet-50 text-violet-900' : 'border-amber-200 bg-amber-50 text-amber-900'">
-          <template v-if="detail.candidate.release_kind === 'resale'">{{ t('admin_pages.harvest.review.resale') }}</template>
-          <template v-else-if="detail.event">{{ t('admin_pages.harvest.review.unknown_release', { event: detail.event.name }) }}</template>
-          <template v-else>{{ t('admin_pages.harvest.review.no_event_release') }}</template>
-          <span v-if="detail.candidate.merged.release.reason" class="block text-xs">{{ t(`admin_pages.harvest.release_reason.${detail.candidate.merged.release.reason}`) }}</span>
+          <template v-if="detail.candidate.release_kind === 'resale'">这是再贩：草稿没有挂活动，发行日期取来源里最早的日期。</template>
+          <template v-else-if="detail.event">没有来源确认这是 {{ detail.event.name }} 首发，请核对发行日期和活动。</template>
+          <template v-else>没有记录关联到活动：请核对发行日期，需要时在编辑器里选上首发活动。</template>
+          <span v-if="detail.candidate.merged.release.reason" class="block text-xs">{{ harvestReleaseReasonLabels[detail.candidate.merged.release.reason] }}</span>
           <span v-for="note in detail.candidate.merged.release.notes" :key="note" class="block text-xs">{{ note }}</span>
         </div>
 
         <form v-if="rejectOpen" class="flex flex-wrap items-end gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm" @submit.prevent="reject">
-          <label class="min-w-64 flex-1">{{ t('admin_pages.harvest.review.reject_reason') }}<input v-model="rejectReason" required maxlength="500" class="mt-1 w-full rounded border border-slate-300 px-2 py-1.5"></label>
+          <label class="min-w-64 flex-1">原因<input v-model="rejectReason" required maxlength="500" class="mt-1 w-full rounded border border-slate-300 px-2 py-1.5"></label>
           <button v-for="preset in rejectPresets" :key="preset" type="button" class="rounded border bg-white px-2 py-1 text-xs" @click="rejectReason = preset">{{ preset }}</button>
-          <button type="submit" class="rounded bg-red-700 px-3 py-1.5 text-white" :disabled="busy">{{ t('admin_pages.harvest.review.reject') }}</button>
-          <button type="button" class="rounded border px-3 py-1.5" @click="rejectOpen = false">{{ t('common.cancel') }}</button>
+          <button type="submit" class="rounded bg-red-700 px-3 py-1.5 text-white" :disabled="busy">不收录</button>
+          <button type="button" class="rounded border px-3 py-1.5" @click="rejectOpen = false">取消</button>
         </form>
         <div v-if="linkOpen" class="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-          <p class="font-medium">{{ t('admin_pages.harvest.review.link_title') }}</p>
-          <p class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.link_help') }}</p>
-          <EditorEntityPicker kind="album" :placeholder="t('admin_pages.harvest.review.link_pick')" class="max-w-md" @select="act('link', { album_id: $event.id })" />
+          <p class="font-medium">关联到站内已有的专辑</p>
+          <p class="text-xs text-slate-500">这张专辑已经在站内，候选会记录对应的专辑，不再建新的。</p>
+          <EditorEntityPicker kind="album" placeholder="搜索专辑" class="max-w-md" @select="act('link', { album_id: $event.id })" />
         </div>
 
         <details class="rounded-xl border border-slate-200 bg-white" open>
-          <summary class="cursor-pointer px-4 py-3 font-semibold">{{ t('admin_pages.harvest.review.panel') }}</summary>
+          <summary class="cursor-pointer px-4 py-3 font-semibold">来源对照</summary>
           <div class="grid gap-4 border-t border-slate-100 p-4 text-sm lg:grid-cols-2">
             <section class="space-y-2">
-              <h3 class="font-medium">{{ t('admin_pages.harvest.review.sources') }}</h3>
+              <h3 class="font-medium">来源</h3>
               <ul class="space-y-1">
                 <li v-for="record in detail.records" :key="`${record.record_id}-${record.part}`" class="flex flex-wrap items-baseline gap-2">
                   <span class="rounded bg-slate-100 px-1.5 text-xs">{{ record.label }}</span>
                   <a :href="record.url" target="_blank" rel="noopener noreferrer" class="min-w-0 max-w-full truncate text-sky-700 hover:underline">{{ record.title }}</a>
-                  <span v-if="record.gone" class="text-xs text-red-700">{{ t('admin_pages.harvest.review.gone') }}</span>
-                  <span v-if="record.delisted" class="text-xs text-amber-700">{{ t('admin_pages.harvest.review.delisted') }}</span>
-                  <span class="text-xs text-slate-400">{{ t('admin_pages.harvest.review.fetched', { time: time(record.fetched_at) }) }}</span>
-                  <button v-if="open && detail.records.length > 1" type="button" class="text-xs underline" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">{{ t('admin_pages.harvest.review.split') }}</button>
+                  <span v-if="record.gone" class="text-xs text-red-700">已消失</span>
+                  <span v-if="record.delisted" class="text-xs text-amber-700">已下架</span>
+                  <span class="text-xs text-slate-400">抓取于 {{ time(record.fetched_at) }}</span>
+                  <button v-if="open && detail.records.length > 1" type="button" class="text-xs underline" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</button>
                   <ul v-if="record.listings.length || record.events.length" class="w-full space-y-0.5 pl-4 text-xs text-slate-500">
                     <li v-for="listing in record.listings" :key="listing.task.id">
-                      {{ t('admin_pages.harvest.review.listed_by') }}
+                      列出它的任务：
                       <a v-if="listing.task.url" :href="listing.task.url" target="_blank" rel="noopener noreferrer" class="text-sky-700 hover:underline">{{ listing.task.label ?? listing.task.key }}</a>
                       <template v-else>{{ listing.task.label ?? listing.task.key }}</template>
                       （{{ listing.task.source_label }} · {{ listing.task.entry_label }}）
                       <template v-if="listingNote(listing.listing)"> · {{ listingNote(listing.listing) }}</template>
-                      <span v-if="listing.delisted_at" class="text-amber-700"> · {{ t('admin_pages.harvest.review.delisted') }}</span>
+                      <span v-if="listing.delisted_at" class="text-amber-700"> · 已下架</span>
                     </li>
                     <li v-if="record.events.length">
-                      {{ t('admin_pages.harvest.review.linked_to') }}
-                      <template v-for="(link, index) in record.events" :key="link.event_id">{{ index ? '、' : '' }}{{ eventName(link.event_id) }}（{{ t(`admin_pages.harvest.via.${link.via}`) }}）</template>
+                      关联活动：
+                      <template v-for="(link, index) in record.events" :key="link.event_id">{{ index ? '、' : '' }}{{ eventName(link.event_id) }}（{{ harvestViaLabels[link.via] }}）</template>
                     </li>
                   </ul>
                 </li>
               </ul>
-              <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.events') }}</h3>
-              <p v-if="!detail.events.length" class="text-xs text-amber-700">{{ t('admin_pages.harvest.review.no_events') }}</p>
+              <h3 class="pt-2 font-medium">关联的活动</h3>
+              <p v-if="!detail.events.length" class="text-xs text-amber-700">没有关联到任何活动。</p>
               <ul v-else class="space-y-1 text-xs">
                 <li v-for="event in detail.events" :key="event.id" class="flex flex-wrap items-baseline gap-2">
                   <span class="font-medium" :class="{ 'text-slate-900': event.suggested }">{{ event.name }}</span>
                   <span class="text-slate-500">{{ event.start_date }}</span>
-                  <span class="rounded bg-slate-100 px-1.5">{{ t(`admin_pages.harvest.via.${event.via}`) }}</span>
-                  <span v-if="event.suggested" class="rounded bg-emerald-50 px-1.5 text-emerald-800">{{ t('admin_pages.harvest.review.suggested') }}</span>
-                  <span v-if="event.event_circle" class="text-slate-500">{{ t('admin_pages.harvest.review.event_circle', { space: event.event_circle.space_code ?? '—' }) }}</span>
+                  <span class="rounded bg-slate-100 px-1.5">{{ harvestViaLabels[event.via] }}</span>
+                  <span v-if="event.suggested" class="rounded bg-emerald-50 px-1.5 text-emerald-800">建议首发</span>
+                  <span v-if="event.event_circle" class="text-slate-500">摊位 {{ event.event_circle.space_code ?? '—' }}</span>
                 </li>
               </ul>
               <p v-if="detail.candidate.merged.event_hints.length" class="flex flex-wrap gap-1 text-xs">
-                <span class="text-slate-500">{{ t('admin_pages.harvest.review.event_hints') }}</span>
+                <span class="text-slate-500">来源里的活动线索：</span>
                 <span v-for="hint in detail.candidate.merged.event_hints" :key="hint.text" class="rounded bg-slate-100 px-1.5" :title="hint.sources.join(', ')">{{ hint.text }}</span>
               </p>
-              <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.circle') }}</h3>
+              <h3 class="pt-2 font-medium">社团</h3>
               <p v-if="detail.candidate.artist_id || detail.candidate.circle_name">
                 {{ detail.candidate.circle_name }}
-                <span v-if="detail.event_circle" class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.event_circle', { space: detail.event_circle.space_code ?? '—' }) }}</span>
+                <span v-if="detail.event_circle" class="text-xs text-slate-500">摊位 {{ detail.event_circle.space_code ?? '—' }}</span>
               </p>
-              <p v-if="!detail.candidate.artist_id" class="text-xs text-amber-700">{{ t('admin_pages.harvest.review.circle_unknown') }}</p>
+              <p v-if="!detail.candidate.artist_id" class="text-xs text-amber-700">没有认出社团，请在「人员」里选择专辑艺人。</p>
 
               <template v-if="detail.duplicates.length">
-                <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.duplicates') }}</h3>
+                <h3 class="pt-2 font-medium">站内疑似重复</h3>
                 <ul class="space-y-1">
                   <li v-for="dup in detail.duplicates" :key="dup.album_id" class="flex flex-wrap items-baseline gap-2">
-                    <span class="rounded px-1.5 text-xs" :class="dup.strength === 'strong' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-800'">{{ dup.strength === 'strong' ? t('admin_pages.harvest.review.strong') : t('admin_pages.harvest.review.weak') }}</span>
+                    <span class="rounded px-1.5 text-xs" :class="dup.strength === 'strong' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-800'">{{ dup.strength === 'strong' ? '强匹配' : '标题相似' }}</span>
                     <NuxtLink :to="`/albums/${dup.album_id}`" target="_blank" class="text-sky-700 hover:underline">{{ dup.album?.title ?? `#${dup.album_id}` }}</NuxtLink>
                     <span class="text-xs text-slate-500">{{ dup.album?.catalog_number }}</span>
-                    <button v-if="open" type="button" class="text-xs underline" :disabled="busy" @click="act('link', { album_id: dup.album_id })">{{ t('admin_pages.harvest.review.same_album') }}</button>
+                    <button v-if="open" type="button" class="text-xs underline" :disabled="busy" @click="act('link', { album_id: dup.album_id })">就是这张</button>
                   </li>
                 </ul>
               </template>
 
               <form v-if="open" class="flex flex-wrap items-end gap-2 pt-2 text-xs" @submit.prevent="mergeInto && act('merge', { into_id: Number(mergeInto) })">
-                <label>{{ t('admin_pages.harvest.review.merge') }}<input v-model="mergeInto" inputmode="numeric" class="mt-1 block w-28 rounded border border-slate-300 px-2 py-1"></label>
-                <button type="submit" class="rounded border px-2 py-1" :disabled="busy || !mergeInto">{{ t('admin_pages.harvest.review.merge_go') }}</button>
-                <span class="text-slate-500">{{ t('admin_pages.harvest.review.merge_help') }}</span>
+                <label>合并到另一条候选<input v-model="mergeInto" inputmode="numeric" class="mt-1 block w-28 rounded border border-slate-300 px-2 py-1"></label>
+                <button type="submit" class="rounded border px-2 py-1" :disabled="busy || !mergeInto">合并</button>
+                <span class="text-slate-500">填另一条候选的编号（候选列表里的 #数字，也是地址里的数字）。</span>
               </form>
             </section>
 
             <section class="space-y-2">
-              <h3 class="font-medium">{{ t('admin_pages.harvest.review.fields') }}</h3>
+              <h3 class="font-medium">字段对照</h3>
               <dl class="space-y-1">
                 <div v-if="detail.candidate.merged.title.alternatives.length">
-                  <dt class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.title') }}</dt>
+                  <dt class="text-xs text-slate-500">标题</dt>
                   <dd v-for="alt in [{ value: detail.candidate.merged.title.value, source: detail.candidate.merged.title.source }, ...detail.candidate.merged.title.alternatives]" :key="`${alt.source}-${alt.value}`" class="flex gap-2">
                     <span class="text-xs text-slate-400">{{ alt.source }}</span><span class="min-w-0 flex-1">{{ alt.value }}</span>
-                    <button v-if="open && alt.value" type="button" class="text-xs underline" @click="useTitle(alt.value)">{{ t('admin_pages.harvest.review.use') }}</button>
+                    <button v-if="open && alt.value" type="button" class="text-xs underline" @click="useTitle(alt.value)">采用</button>
                   </dd>
                 </div>
                 <div v-if="detail.candidate.merged.catalog_numbers.value?.length">
-                  <dt class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.catalog_numbers') }}</dt>
+                  <dt class="text-xs text-slate-500">编号</dt>
                   <dd class="font-mono text-xs">{{ detail.candidate.merged.catalog_numbers.value.join(' / ') }}<span v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="ml-2 text-slate-500">{{ alt.source }}: {{ alt.value.join(' / ') }}</span></dd>
                 </div>
                 <div v-if="detail.candidate.merged.price.value">
-                  <dt class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.price') }}</dt>
+                  <dt class="text-xs text-slate-500">价格</dt>
                   <dd class="text-xs">{{ detail.candidate.merged.price.value.amount }} {{ detail.candidate.merged.price.value.currency }}<span v-for="alt in detail.candidate.merged.price.alternatives" :key="alt.source" class="ml-2 text-slate-500">{{ alt.source }}: {{ alt.value.amount }}</span></dd>
                 </div>
                 <div v-if="detail.candidate.merged.tracklist.alternatives.length">
-                  <dt class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.tracklists') }}</dt>
-                  <dd v-for="alt in detail.candidate.merged.tracklist.alternatives" :key="`${alt.record_id}-${alt.part}`" class="text-xs">{{ t('admin_pages.harvest.review.tracks_count', { source: alt.source, count: alt.tracks }) }}</dd>
+                  <dt class="text-xs text-slate-500">其他来源的曲目表</dt>
+                  <dd v-for="alt in detail.candidate.merged.tracklist.alternatives" :key="`${alt.record_id}-${alt.part}`" class="text-xs">{{ alt.source }}：{{ alt.tracks }} 轨</dd>
                 </div>
               </dl>
 
-              <h3 class="pt-2 font-medium">{{ t('admin_pages.harvest.review.covers') }}</h3>
-              <p class="text-xs text-slate-500">{{ t('admin_pages.harvest.review.covers_help') }}</p>
+              <h3 class="pt-2 font-medium">封面候选</h3>
+              <p class="text-xs text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。</p>
               <p v-if="coverNote" class="text-xs text-emerald-700">{{ coverNote }}</p>
-              <button v-if="!showImages && remoteCount" type="button" class="rounded border px-2 py-1 text-xs" @click="showImages = true">{{ t('admin_pages.harvest.review.load_images') }}（{{ remoteCount }}）</button>
+              <button v-if="!showImages && remoteCount" type="button" class="rounded border px-2 py-1 text-xs" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</button>
               <div v-if="shownImages.length" class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 <figure v-for="image in shownImages" :key="image.url" class="space-y-1 rounded border border-slate-200 p-1 text-xs">
                   <div class="flex aspect-square items-center justify-center overflow-hidden bg-slate-50">
@@ -350,25 +358,25 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
                   </div>
                   <figcaption class="flex flex-wrap items-center gap-1">
                     <span class="text-slate-500">{{ image.source }}</span>
-                    <span v-if="image.local" class="rounded bg-emerald-50 px-1 text-emerald-800">{{ t('admin_pages.harvest.review.local') }}</span>
+                    <span v-if="image.local" class="rounded bg-emerald-50 px-1 text-emerald-800">本站已有</span>
                     <template v-if="typeof previews[image.url] === 'object'">
                       <span>{{ (previews[image.url] as { width: number }).width }}×{{ (previews[image.url] as { height: number }).height }}</span>
                       <span class="text-amber-700">{{ sizeNote(previews[image.url] as { width: number, height: number }) }}</span>
                     </template>
-                    <button v-if="open" type="button" class="ml-auto underline" :disabled="busy || !editor" @click="useCover(image.url)">{{ t('admin_pages.harvest.review.use_cover') }}</button>
+                    <button v-if="open" type="button" class="ml-auto underline" :disabled="busy || !editor" @click="useCover(image.url)">设为封面</button>
                   </figcaption>
                 </figure>
               </div>
 
               <details v-if="detail.candidate.merged.descriptions.length" class="pt-2">
-                <summary class="cursor-pointer font-medium">{{ t('admin_pages.harvest.review.descriptions') }}</summary>
+                <summary class="cursor-pointer font-medium">来源描述</summary>
                 <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id" class="mt-2">
                   <p class="text-xs text-slate-500">{{ text.source }}</p>
                   <p class="max-h-48 overflow-y-auto whitespace-pre-line rounded bg-slate-50 p-2 text-xs">{{ text.text }}</p>
                 </div>
               </details>
               <div v-if="detail.candidate.merged.notes.length" class="pt-2 text-xs text-slate-600">
-                <p class="font-medium">{{ t('admin_pages.harvest.review.notes') }}</p>
+                <p class="font-medium">备注</p>
                 <p v-for="note in detail.candidate.merged.notes" :key="note">{{ note }}</p>
               </div>
             </section>
@@ -377,8 +385,8 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? t('admin_pages.
 
         <template v-if="open">
           <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-            <span>{{ t('admin_pages.harvest.review.submit_hint') }}</span>
-            <button type="button" class="underline" @click="prepareDraft(true)">{{ t('admin_pages.harvest.review.rebuild') }}</button>
+            <span>资料核对完后，在编辑器的「提交」一节点提交，就会以你的名义建成专辑。</span>
+            <button type="button" class="underline" @click="prepareDraft(true)">按来源重新生成草稿</button>
           </div>
           <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" @submitted="approved" @discarded="prepareDraft(true)" />
         </template>

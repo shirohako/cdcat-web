@@ -7,7 +7,10 @@ const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
 const { hasPermission } = useAuth()
-const { t, localeName } = useAdminMail()
+const { localeName } = useAdminMail()
+const linkedLabels: Record<string, string> = { 'campaign_id': '群发', 'template_id': '模板', 'user_id': '用户' }
+const mailBounceTypeLabels: Record<string, string> = { hard: '硬退信', soft: '软退信' }
+const mailSkipReasonLabels: Record<string, string> = { unsubscribed: '已退订', inactive: '账号禁用', suppressed: '在退信名单' }
 const statuses: AdminMailLogStatus[] = ['pending', 'sent', 'failed', 'skipped', 'cancelled']
 const deliveryStatuses: (AdminMailDeliveryStatus | 'none')[] = ['delivered', 'delayed', 'bounced', 'complained', 'none']
 // Typed in the filter bar; campaign, template and user arrive from links elsewhere and show as chips.
@@ -36,33 +39,33 @@ const deliveryClass: Record<AdminMailDeliveryStatus, string> = {
 }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'medium' }).format(new Date(value)) : '—'
 const field = 'rounded-lg border border-slate-300 bg-white px-3 py-2'
-useHead({ title: computed(() => t('admin_pages.mail.logs.title')) })
+useHead({ title: '发送记录' })
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl space-y-5 p-4 sm:p-8">
     <header>
-      <h1 class="text-3xl font-bold">{{ t('admin_pages.mail.logs.title') }}</h1>
-      <p class="mt-2 text-sm text-slate-600">{{ t('admin_pages.mail.logs.description') }}</p>
+      <h1 class="text-3xl font-bold">发送记录</h1>
+      <p class="mt-2 text-sm text-slate-600">每一封发出的邮件都有一条记录，系统邮件和群发都在这里。记录里不保存正文。</p>
     </header>
     <AdminFilterBar>
       <form class="flex flex-wrap items-end gap-2 text-sm" @submit.prevent="applyFilters">
-        <input v-model="filters.search" maxlength="255" :placeholder="t('admin_pages.mail.logs.search')" :aria-label="t('admin_pages.mail.logs.search')" :class="[field, 'w-60']">
-        <select v-model="filters.status" :aria-label="t('admin_pages.mail.logs.status')" :class="field">
-          <option value="">{{ t('admin_pages.all_statuses') }}</option>
-          <option v-for="status in statuses" :key="status" :value="status">{{ t(`admin_pages.mail.log_status.${status}`) }}</option>
+        <input v-model="filters.search" maxlength="255" placeholder="搜索邮箱或用户名" aria-label="搜索邮箱或用户名" :class="[field, 'w-60']">
+        <select v-model="filters.status" aria-label="状态" :class="field">
+          <option value="">全部状态</option>
+          <option v-for="status in statuses" :key="status" :value="status">{{ mailLogStatusLabels[status] }}</option>
         </select>
-        <select v-model="filters.delivery_status" :aria-label="t('admin_pages.mail.logs.delivery')" :class="field">
-          <option value="">{{ t('admin_pages.mail.logs.all_deliveries') }}</option>
-          <option v-for="status in deliveryStatuses" :key="status" :value="status">{{ t(`admin_pages.mail.delivery_status.${status}`) }}</option>
+        <select v-model="filters.delivery_status" aria-label="投递" :class="field">
+          <option value="">全部投递状态</option>
+          <option v-for="status in deliveryStatuses" :key="status" :value="status">{{ mailDeliveryStatusLabels[status] }}</option>
         </select>
-        <label class="flex items-center gap-1">{{ t('admin_pages.from') }}<input v-model="filters.from" type="date" :class="[field, 'px-2']"></label>
-        <label class="flex items-center gap-1">{{ t('admin_pages.to') }}<input v-model="filters.to" type="date" :class="[field, 'px-2']"></label>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">{{ t('admin_pages.apply') }}</button>
+        <label class="flex items-center gap-1">从<input v-model="filters.from" type="date" :class="[field, 'px-2']"></label>
+        <label class="flex items-center gap-1">至<input v-model="filters.to" type="date" :class="[field, 'px-2']"></label>
+        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
       </form>
       <div v-if="linked.length" class="flex flex-wrap gap-2 text-xs">
-        <button v-for="link in linked" :key="link.key" type="button" class="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1" :aria-label="t('admin_pages.mail.logs.drop_filter')" @click="dropLink(link.key)">
-          {{ t(`admin_pages.mail.logs.linked.${link.key}`, { id: link.value }) }}<Icon name="lucide:x" class="size-3" />
+        <button v-for="link in linked" :key="link.key" type="button" class="flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1" aria-label="去掉这个筛选" @click="dropLink(link.key)">
+          {{ linkedLabels[link.key] }} #{{ link.value }}<Icon name="lucide:x" class="size-3" />
         </button>
       </div>
     </AdminFilterBar>
@@ -73,13 +76,13 @@ useHead({ title: computed(() => t('admin_pages.mail.logs.title')) })
           <table class="w-full min-w-240 text-left text-sm">
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
               <tr>
-                <th class="px-4 py-3">{{ t('admin_pages.mail.logs.time') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.recipient') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.mail') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.locale') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.status') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.delivery') }}</th>
-                <th class="px-3 py-3">{{ t('admin_pages.mail.logs.error') }}</th>
+                <th class="px-4 py-3">时间</th>
+                <th class="px-3 py-3">收件人</th>
+                <th class="px-3 py-3">邮件</th>
+                <th class="px-3 py-3">语言</th>
+                <th class="px-3 py-3">状态</th>
+                <th class="px-3 py-3">投递</th>
+                <th class="px-3 py-3">错误</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -99,10 +102,10 @@ useHead({ title: computed(() => t('admin_pages.mail.logs.title')) })
                   </td>
                   <td class="px-3 py-3 text-xs">{{ localeName(log.locale) }}</td>
                   <td class="px-3 py-3 text-xs" :class="statusClass[log.status]">
-                    {{ t(`admin_pages.mail.log_status.${log.status}`) }}<template v-if="log.skip_reason">（{{ t(`admin_pages.mail.skip_reasons.${log.skip_reason}`) }}）</template>
+                    {{ mailLogStatusLabels[log.status] }}<template v-if="log.skip_reason">（{{ mailSkipReasonLabels[log.skip_reason] }}）</template>
                   </td>
                   <td class="px-3 py-3 text-xs">
-                    <span v-if="log.delivery_status" :class="deliveryClass[log.delivery_status]">{{ t(`admin_pages.mail.delivery_status.${log.delivery_status}`) }}<template v-if="log.bounce_type">（{{ t(`admin_pages.mail.bounce_types.${log.bounce_type}`) }}）</template></span>
+                    <span v-if="log.delivery_status" :class="deliveryClass[log.delivery_status]">{{ mailDeliveryStatusLabels[log.delivery_status] }}<template v-if="log.bounce_type">（{{ mailBounceTypeLabels[log.bounce_type] }}）</template></span>
                     <span v-else class="text-slate-400">—</span>
                   </td>
                   <td class="max-w-xs truncate px-3 py-3 text-xs text-red-700" :title="log.error ?? undefined">{{ log.error }}</td>
@@ -110,13 +113,13 @@ useHead({ title: computed(() => t('admin_pages.mail.logs.title')) })
                 <tr v-if="expanded === log.id" class="bg-slate-50">
                   <td colspan="7" class="px-4 py-3">
                     <dl class="grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
-                      <div><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.subject') }}：</dt><dd class="inline">{{ log.subject || '—' }}</dd></div>
-                      <div><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.mailer') }}：</dt><dd class="inline font-mono">{{ log.mailer || '—' }}</dd></div>
-                      <div><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.sent_at') }}：</dt><dd class="inline">{{ time(log.sent_at) }}</dd></div>
-                      <div><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.message_id') }}：</dt><dd class="inline break-all font-mono">{{ log.message_id || '—' }}</dd></div>
-                      <div><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.delivery_updated_at') }}：</dt><dd class="inline">{{ time(log.delivery_updated_at) }}</dd></div>
-                      <div class="sm:col-span-2"><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.delivery_detail') }}：</dt><dd class="inline break-all font-mono">{{ log.delivery_detail || '—' }}</dd></div>
-                      <div v-if="log.error" class="sm:col-span-2"><dt class="inline text-slate-500">{{ t('admin_pages.mail.logs.error') }}：</dt><dd class="inline break-all font-mono text-red-700">{{ log.error }}</dd></div>
+                      <div><dt class="inline text-slate-500">标题：</dt><dd class="inline">{{ log.subject || '—' }}</dd></div>
+                      <div><dt class="inline text-slate-500">Mailer：</dt><dd class="inline font-mono">{{ log.mailer || '—' }}</dd></div>
+                      <div><dt class="inline text-slate-500">交给发信服务的时间：</dt><dd class="inline">{{ time(log.sent_at) }}</dd></div>
+                      <div><dt class="inline text-slate-500">Message-ID：</dt><dd class="inline break-all font-mono">{{ log.message_id || '—' }}</dd></div>
+                      <div><dt class="inline text-slate-500">投递状态更新时间：</dt><dd class="inline">{{ time(log.delivery_updated_at) }}</dd></div>
+                      <div class="sm:col-span-2"><dt class="inline text-slate-500">对方服务器的回应：</dt><dd class="inline break-all font-mono">{{ log.delivery_detail || '—' }}</dd></div>
+                      <div v-if="log.error" class="sm:col-span-2"><dt class="inline text-slate-500">错误：</dt><dd class="inline break-all font-mono text-red-700">{{ log.error }}</dd></div>
                     </dl>
                   </td>
                 </tr>
@@ -127,6 +130,6 @@ useHead({ title: computed(() => t('admin_pages.mail.logs.title')) })
         <footer v-if="data" class="border-t border-slate-100 px-5 py-3"><CommonPagination v-model:page="page" :total-pages="data.pagination.last_page" :disabled="pending" /></footer>
       </AdminListState>
     </section>
-    <p class="text-xs text-slate-500">{{ t('admin_pages.mail.logs.retention') }}</p>
+    <p class="text-xs text-slate-500">发送记录保留 180 天。「已发送」只表示发信服务已经接收，之后的情况看投递状态。</p>
   </div>
 </template>

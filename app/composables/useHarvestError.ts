@@ -9,8 +9,6 @@ interface HarvestErrorLike {
  * those are shown as sent; anything else gets the generic text.
  */
 export const useHarvestError = () => {
-  const { t } = useAdminI18n()
-  const { localizeError } = useLocalizedApiError((key, params) => params ? t(key, params) : t(key))
   return (input: unknown): string => {
     const error = (input && typeof input === 'object' ? input : {}) as HarvestErrorLike
     const fields = error.details?.details
@@ -19,6 +17,6 @@ export const useHarvestError = () => {
       if (first) return Array.isArray(first) ? String(first[0]) : String(first)
     }
     if (error.details?.message && /^(HARVEST|INVALID_INPUT|RESOURCE_CONFLICT)/.test(error.details.name ?? '')) return error.details.message
-    return localizeError(input)
+    return adminError(input)
   }
 }

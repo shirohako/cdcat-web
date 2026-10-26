@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<{
 const contents = defineModel<AdminMailContents>({ required: true })
 
 const { $api } = useNuxtApp()
-const { t, localeName, mailError } = useAdminMail()
+const { localeName, mailError } = useAdminMail()
 const locales = ADMIN_MAIL_LOCALES
 const active = ref<AdminMailLocale>('en')
 const version = computed(() => contents.value[active.value] ?? { subject: '', body: '' })
@@ -96,69 +96,69 @@ const previewProblems = computed(() => [...(preview.value?.problems.subject ?? [
 
 <template>
   <div class="space-y-4">
-    <div class="flex flex-wrap gap-2" role="tablist" :aria-label="t('admin_pages.mail.editor.languages')">
+    <div class="flex flex-wrap gap-2" role="tablist" aria-label="语言版本">
       <button
         v-for="locale in locales" :key="locale" type="button" role="tab" :aria-selected="active === locale"
         class="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm" :class="active === locale ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-300 bg-white'"
         @click="active = locale"
       >
         {{ localeName(locale) }}<span v-if="locale === 'en'" :class="active === locale ? 'text-amber-300' : 'text-red-600'">*</span>
-        <span v-if="hasErrors(locale)" class="size-2 rounded-full bg-red-500" :title="t('admin_pages.mail.editor.has_errors')" />
-        <span v-else-if="written(locale)" class="size-2 rounded-full bg-emerald-500" :title="t('admin_pages.mail.editor.written')" />
+        <span v-if="hasErrors(locale)" class="size-2 rounded-full bg-red-500" title="这个语言有问题" />
+        <span v-else-if="written(locale)" class="size-2 rounded-full bg-emerald-500" title="已填写" />
       </button>
     </div>
-    <p class="text-xs text-slate-500">{{ active === 'en' ? t('admin_pages.mail.editor.english_help') : t('admin_pages.mail.editor.fallback_help') }}</p>
+    <p class="text-xs text-slate-500">{{ active === 'en' ? '英文版必填。收件人的语言没有对应版本时，会收到英文版。' : '可以不写：不写时，这个语言的收件人会收到英文版。' }}</p>
     <p v-for="message in localeMessages" :key="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
     <div class="grid gap-5 xl:grid-cols-2">
       <div class="min-w-0 space-y-3">
-        <label class="block text-sm">{{ t('admin_pages.mail.editor.subject') }}
+        <label class="block text-sm">标题
           <input ref="subjectInput" v-model="subject" :disabled="disabled" maxlength="200" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 disabled:bg-slate-50" @focus="lastField = 'subject'">
         </label>
         <p v-for="message in messagesFor('subject')" :key="message" class="text-xs text-red-700">{{ message }}</p>
         <div v-if="!disabled" class="rounded-lg border border-dashed border-slate-300 p-3 text-xs">
-          <p class="text-slate-500">{{ t('admin_pages.mail.editor.variables_help') }}</p>
+          <p class="text-slate-500">点击插入变量，会插到标题或正文里光标所在的位置：</p>
           <div class="mt-2 flex flex-wrap gap-1.5">
             <button
               v-for="name in variables" :key="name" type="button" class="rounded-md border px-2 py-1 font-mono"
               :class="required.includes(name) ? 'border-amber-400 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50 text-slate-700'"
-              :title="secret.includes(name) ? t('admin_pages.mail.editor.secret_variable') : required.includes(name) ? t('admin_pages.mail.editor.required_variable') : undefined"
+              :title="secret.includes(name) ? '不能放进标题' : required.includes(name) ? '每种语言的正文都必须包含' : undefined"
               @click="insertVariable(name)"
             >
               {{ token(name) }}<Icon v-if="secret.includes(name)" name="lucide:lock" class="ml-1 inline size-3" />
             </button>
           </div>
-          <p v-if="required.length" class="mt-2 text-amber-800">{{ t('admin_pages.mail.editor.required_list', { names: required.map(token).join('、') }) }}</p>
-          <p v-if="secret.length" class="mt-1 text-slate-500">{{ t('admin_pages.mail.editor.secret_list', { names: secret.map(token).join('、') }) }}</p>
+          <p v-if="required.length" class="mt-2 text-amber-800">必须出现在正文里：{{ required.map(token).join('、') }}</p>
+          <p v-if="secret.length" class="mt-1 text-slate-500">不能放进标题：{{ secret.map(token).join('、') }}</p>
         </div>
         <div class="text-sm" @focusin="lastField = 'body'">
-          <span>{{ t('admin_pages.mail.editor.body') }}</span>
+          <span>正文</span>
           <div class="mt-1">
             <MarkdownEditor :key="active" ref="editor" v-model="body" mode="edit" :guide-url="null" :disabled="disabled" :max-length="50000" />
           </div>
         </div>
         <p v-for="message in messagesFor('body')" :key="message" class="text-xs text-red-700">{{ message }}</p>
-        <p class="text-xs text-slate-500">{{ t('admin_pages.mail.editor.markdown_help') }}</p>
+        <p class="text-xs text-slate-500">正文是普通 Markdown，支持标题、粗体、列表、表格和链接；站内的扩展语法（容器、剧透、站内条目标记）不能用。链接要以 http、https、mailto 或 / 开头，图片只能用 https 地址。</p>
         <button v-if="active !== 'en' && written(active) && !disabled" type="button" class="text-xs text-red-700 underline" @click="removeLocale">
-          {{ t('admin_pages.mail.editor.remove_locale', { language: localeName(active) }) }}
+          删除{{ localeName(active) }}版本
         </button>
       </div>
 
-      <section class="min-w-0 space-y-2" :aria-label="t('admin_pages.mail.editor.preview')">
+      <section class="min-w-0 space-y-2" aria-label="预览">
         <div class="flex items-center justify-between gap-2 text-sm">
-          <h3 class="font-medium">{{ t('admin_pages.mail.editor.preview') }}<span v-if="previewing" class="ml-2 text-xs font-normal text-slate-400">{{ t('admin_pages.mail.editor.rendering') }}</span></h3>
-          <button v-if="preview" type="button" class="text-xs underline" @click="showText = !showText">{{ showText ? t('admin_pages.mail.editor.show_html') : t('admin_pages.mail.editor.show_text') }}</button>
+          <h3 class="font-medium">预览<span v-if="previewing" class="ml-2 text-xs font-normal text-slate-400">渲染中…</span></h3>
+          <button v-if="preview" type="button" class="text-xs underline" @click="showText = !showText">{{ showText ? '看 HTML 版' : '看纯文本版' }}</button>
         </div>
-        <p v-if="!target" class="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">{{ t('admin_pages.mail.editor.no_preview') }}</p>
+        <p v-if="!target" class="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">选择类型后显示预览。</p>
         <p v-else-if="previewError" role="alert" class="text-sm text-red-700">{{ previewError }}</p>
         <template v-if="target && preview">
-          <p class="rounded-lg bg-slate-50 px-3 py-2 text-sm"><span class="text-slate-500">{{ t('admin_pages.mail.editor.subject') }}：</span>{{ preview.subject || '—' }}</p>
+          <p class="rounded-lg bg-slate-50 px-3 py-2 text-sm"><span class="text-slate-500">标题：</span>{{ preview.subject || '—' }}</p>
           <ul v-if="previewProblems.length" class="space-y-1 rounded-lg bg-amber-50 p-3 text-xs text-amber-900">
             <li v-for="problem in previewProblems" :key="problem">{{ problem }}</li>
           </ul>
           <pre v-if="showText" class="max-h-[640px] overflow-auto whitespace-pre-wrap rounded-lg border border-slate-200 bg-white p-4 text-xs">{{ preview.text }}</pre>
-          <iframe v-else :srcdoc="preview.html" sandbox="" :title="t('admin_pages.mail.editor.preview')" class="h-[640px] w-full rounded-lg border border-slate-200 bg-white" />
-          <p class="text-xs text-slate-500">{{ t('admin_pages.mail.editor.sample_help') }}</p>
+          <iframe v-else :srcdoc="preview.html" sandbox="" title="预览" class="h-[640px] w-full rounded-lg border border-slate-200 bg-white" />
+          <p class="text-xs text-slate-500">预览里的变量用的是示例值：你自己的昵称、验证码 ABC123 等。</p>
         </template>
       </section>
     </div>

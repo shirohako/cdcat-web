@@ -3,7 +3,7 @@ import type { HarvestCoverageCircle, HarvestEventSummary, HarvestPagination } fr
 
 /** Circles of one event and how many candidates each has there; the event is the page's event_id. */
 const { $api } = useNuxtApp()
-const { t } = useAdminI18n()
+const harvestCoverageFilterLabels: Record<string, string> = { none: '没有候选的', mentioned: '简介提到新譜但没有候选的', all: '全部社团' }
 const route = useRoute()
 const router = useRouter()
 
@@ -31,14 +31,14 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
     <div class="flex flex-wrap items-center gap-2 text-sm">
       <AdminHarvestEventSelect v-model="eventId" :allow-all="false" search />
     </div>
-    <p v-if="!eventId" class="max-w-3xl text-sm text-slate-600">{{ t('admin_pages.harvest.coverage.pick_event') }}</p>
+    <p v-if="!eventId" class="max-w-3xl text-sm text-slate-600">选一届活动，查看它的参展社团里哪些还没有候选。没有候选的活动可以用「搜索其他活动」找到。</p>
     <template v-else>
-      <p v-if="data" class="max-w-3xl text-sm text-slate-600">{{ t('admin_pages.harvest.coverage.description', { event: data.event.name, covered: data.summary.covered, total: data.summary.circles }) }}</p>
+      <p v-if="data" class="max-w-3xl text-sm text-slate-600">{{ data.event.name }} 的参展社团中，有 {{ data.summary.covered }} / {{ data.summary.circles }} 个已有候选。下面列出还没有候选的社团，可以按它们的链接手动补录。</p>
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <button v-for="value in (['none', 'mentioned', 'all'] as const)" :key="value" type="button" class="rounded-full px-3 py-1" :class="filter === value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'" @click="filter = value">
-          {{ t(`admin_pages.harvest.coverage.filter.${value}`) }}
+          {{ harvestCoverageFilterLabels[value] }}
         </button>
-        <input v-model.lazy="q" type="search" :placeholder="t('admin_pages.harvest.coverage.search')" class="w-56 rounded-lg border border-slate-300 px-2 py-1.5">
+        <input v-model.lazy="q" type="search" placeholder="社团名" class="w-56 rounded-lg border border-slate-300 px-2 py-1.5">
         <span class="text-slate-500">{{ data?.pagination.total ?? 0 }}</span>
       </div>
       <section class="rounded-xl border border-slate-200 bg-white">
@@ -47,13 +47,13 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
             <li v-for="circle in data?.circles" :key="circle.id" class="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[10rem_1fr]">
               <div>
                 <p class="font-medium">{{ circle.name }}</p>
-                <p class="text-xs text-slate-500">{{ circle.space_code ?? '—' }} · {{ t('admin_pages.harvest.coverage.candidates', { count: circle.candidates }) }}</p>
+                <p class="text-xs text-slate-500">{{ circle.space_code ?? '—' }} · {{ circle.candidates }} 条候选</p>
               </div>
               <div class="min-w-0 space-y-1">
                 <p v-if="circle.description" class="line-clamp-3 whitespace-pre-line text-xs text-slate-600">{{ circle.description }}</p>
                 <p class="flex flex-wrap gap-x-3 gap-y-1 text-xs">
                   <a v-for="link in circle.links" :key="link.url" :href="link.url" target="_blank" rel="noopener noreferrer" class="max-w-64 truncate text-sky-700 hover:underline">{{ linkLabel(link.url) }}</a>
-                  <a v-for="embed in circle.embeds.filter(e => e.type === 'youtube')" :key="embed.id" :href="`https://www.youtube.com/watch?v=${embed.id}`" target="_blank" rel="noopener noreferrer" class="text-rose-700 hover:underline">{{ t('admin_pages.harvest.coverage.xfd') }}</a>
+                  <a v-for="embed in circle.embeds.filter(e => e.type === 'youtube')" :key="embed.id" :href="`https://www.youtube.com/watch?v=${embed.id}`" target="_blank" rel="noopener noreferrer" class="text-rose-700 hover:underline">试听视频</a>
                 </p>
               </div>
             </li>

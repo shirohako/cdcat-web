@@ -4,7 +4,6 @@ import { adminGroups, adminMenu, allowedBy, findAdminMenuItem, type AdminGroupKe
 const route = useRoute()
 const { $api } = useNuxtApp()
 const { hasPermission, user } = useAuth()
-const { t } = useAdminI18n()
 const open = ref(false)
 const query = ref('')
 const searchInput = useTemplateRef('searchInput')
@@ -33,7 +32,7 @@ const groups = computed(() => {
   const needle = query.value.trim().toLowerCase()
   return adminGroups.map((group) => {
     const items = links.value.filter(item => item.group === group.key)
-    const matches = needle ? items.filter(item => t(item.label).toLowerCase().includes(needle)) : items
+    const matches = needle ? items.filter(item => item.label.toLowerCase().includes(needle)) : items
     const expanded = Boolean(needle) || group.key === current.value?.group || !collapsed.value.includes(group.key)
     return { ...group, items: matches, total: items.length, expanded }
   }).filter(group => group.items.length)
@@ -72,26 +71,26 @@ useHead({
 
 <template>
   <div class="admin-shell min-h-screen bg-[#f1f2f4] text-slate-900" lang="zh-Hans" @keydown.esc="open = false">
-    <button v-if="open" type="button" class="fixed inset-0 z-30 bg-black/40 lg:hidden" :aria-label="t('admin_pages.close_menu_backdrop')" @click="open = false" />
+    <button v-if="open" type="button" class="fixed inset-0 z-30 bg-black/40 lg:hidden" aria-label="关闭菜单遮罩" @click="open = false" />
 
     <aside class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col gap-4 bg-[#0f1115] px-3.5 py-4 text-slate-300 transition-transform lg:translate-x-0" :class="open ? 'translate-x-0' : '-translate-x-full'">
       <div class="flex items-center gap-2.5 px-1.5">
         <NuxtLink to="/admin" class="flex min-w-0 flex-1 items-center gap-2.5">
           <span class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-400 text-[#0f1115]"><Icon name="lucide:music" class="size-[18px]" /></span>
-          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCat</b><span class="text-xs text-slate-400">{{ t('admin_pages.console') }}</span></span>
+          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCat</b><span class="text-xs text-slate-400">管理后台</span></span>
         </NuxtLink>
-        <button type="button" class="rounded p-1 text-slate-400 hover:text-white lg:hidden" :aria-label="t('admin_pages.close_menu')" @click="open = false">
+        <button type="button" class="rounded p-1 text-slate-400 hover:text-white lg:hidden" aria-label="关闭菜单" @click="open = false">
           <Icon name="lucide:x" class="size-5" />
         </button>
       </div>
 
       <label class="flex items-center gap-2 rounded-[10px] border border-[#262a31] bg-[#1a1d23] px-2.5 py-2 text-[13px] text-slate-400 focus-within:border-amber-400/60">
         <Icon name="lucide:search" class="size-[15px] shrink-0" />
-        <input ref="searchInput" v-model="query" type="search" :placeholder="t('admin_pages.search_menu')" :aria-label="t('admin_pages.search_menu')" class="min-w-0 flex-1 bg-transparent text-slate-100 placeholder:text-slate-500 focus:outline-none" @keydown.esc.stop="query = ''">
+        <input ref="searchInput" v-model="query" type="search" placeholder="搜索菜单" aria-label="搜索菜单" class="min-w-0 flex-1 bg-transparent text-slate-100 placeholder:text-slate-500 focus:outline-none" @keydown.esc.stop="query = ''">
         <kbd class="hidden rounded border border-slate-700 px-1.5 font-mono text-[11px] lg:inline">⌘K</kbd>
       </label>
 
-      <nav class="admin-nav -mx-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-1" :aria-label="t('admin_pages.console')">
+      <nav class="admin-nav -mx-1 flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-1" aria-label="管理后台">
         <div v-for="group in groups" :key="group.key" class="flex flex-col gap-0.5">
           <button
             type="button" :aria-expanded="group.expanded" :aria-controls="`admin-group-${group.key}`"
@@ -99,7 +98,7 @@ useHead({
             class="flex items-center justify-between rounded-md px-2 py-1.5 text-xs font-semibold tracking-wider text-slate-500 hover:text-slate-300 disabled:cursor-(--cursor-arrow) disabled:hover:text-slate-500"
             @click="toggleGroup(group.key)"
           >
-            <span>{{ t(group.label) }}<template v-if="!group.expanded"> · {{ group.total }}</template></span>
+            <span>{{ group.label }}<template v-if="!group.expanded"> · {{ group.total }}</template></span>
             <Icon name="lucide:chevron-down" class="size-3.5 transition-transform" :class="group.expanded ? '' : '-rotate-90'" />
           </button>
           <div v-show="group.expanded" :id="`admin-group-${group.key}`" class="flex flex-col gap-0.5">
@@ -110,12 +109,12 @@ useHead({
               :class="current?.path === item.path ? 'bg-[#1f232b] font-medium text-white' : 'text-[#c3c7cf] hover:bg-white/5 hover:text-white'"
             >
               <Icon :name="item.icon" class="size-4 shrink-0" />
-              <span class="flex-1 truncate">{{ t(item.label) }}</span>
+              <span class="flex-1 truncate">{{ item.label }}</span>
               <span v-if="item.path === '/admin/revisions' && pendingCount" class="rounded-full bg-amber-400 px-1.5 font-mono text-[11px] leading-[18px] text-slate-900">{{ pendingCount }}</span>
             </NuxtLink>
           </div>
         </div>
-        <p v-if="!groups.length" class="px-2.5 py-2 text-sm text-slate-500">{{ t('admin_pages.no_menu_match') }}</p>
+        <p v-if="!groups.length" class="px-2.5 py-2 text-sm text-slate-500">没有匹配的菜单</p>
       </nav>
 
       <div class="flex items-center gap-2.5 border-t border-[#1f2329] px-1.5 pt-3">
@@ -125,19 +124,19 @@ useHead({
           <span class="truncate text-slate-100">{{ user?.nickname || user?.username }}</span>
           <span class="truncate text-xs text-slate-400">{{ user?.roles || '—' }}</span>
         </span>
-        <NuxtLink to="/" class="shrink-0 text-xs text-slate-400 hover:text-white">{{ t('admin_pages.back_to_site') }}</NuxtLink>
+        <NuxtLink to="/" class="shrink-0 text-xs text-slate-400 hover:text-white">返回主站</NuxtLink>
       </div>
     </aside>
 
     <div class="lg:pl-64">
       <header class="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-8">
-        <button type="button" class="-ml-1 rounded p-1 text-slate-600 lg:hidden" :aria-label="t('admin_pages.open_menu')" :aria-expanded="open" @click="open = !open">
+        <button type="button" class="-ml-1 rounded p-1 text-slate-600 lg:hidden" aria-label="展开菜单" :aria-expanded="open" @click="open = !open">
           <Icon name="lucide:menu" class="size-5" />
         </button>
-        <nav class="flex min-w-0 items-center gap-2 text-[13px] text-slate-500" :aria-label="t('admin_pages.breadcrumb')">
-          <NuxtLink to="/admin" class="shrink-0 hover:text-slate-900">{{ t('admin_pages.console') }}</NuxtLink>
-          <template v-if="currentGroup && current?.path !== '/admin'"><span aria-hidden="true">/</span><span class="shrink-0">{{ t(currentGroup.label) }}</span></template>
-          <template v-if="current"><span aria-hidden="true">/</span><span class="truncate font-medium text-slate-900" aria-current="page">{{ t(current.label) }}</span></template>
+        <nav class="flex min-w-0 items-center gap-2 text-[13px] text-slate-500" aria-label="当前位置">
+          <NuxtLink to="/admin" class="shrink-0 hover:text-slate-900">管理后台</NuxtLink>
+          <template v-if="currentGroup && current?.path !== '/admin'"><span aria-hidden="true">/</span><span class="shrink-0">{{ currentGroup.label }}</span></template>
+          <template v-if="current"><span aria-hidden="true">/</span><span class="truncate font-medium text-slate-900" aria-current="page">{{ current.label }}</span></template>
         </nav>
       </header>
       <main><slot /></main>
