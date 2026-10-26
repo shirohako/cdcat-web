@@ -2272,6 +2272,17 @@
     "preview_changes": "檢視改動（{count}）",
     "will_delete": "將被刪除",
     "fix_errors": "請修正標紅的問題。",
+    "check": {
+      "required_title": "還有必填項沒填",
+      "required_hint": "填好下面這些才能提交，點一項直接過去。",
+      "go_fill": "去填寫",
+      "suggested_title": "還可以再補充一些",
+      "suggested_hint": "下面這些不是必填，補上會讓資料更完整。",
+      "improve": "再完善一下",
+      "submit_anyway": "保持這樣提交",
+      "errors_title": "提交沒有通過檢查",
+      "failed_title": "沒能提交"
+    },
     "submit_publish": "發布",
     "submit_review": "提交審核",
     "save_draft": "儲存草稿",

@@ -2272,6 +2272,17 @@
     "preview_changes": "查看改动（{count}）",
     "will_delete": "将被删除",
     "fix_errors": "请修正标红的问题。",
+    "check": {
+      "required_title": "还有必填项没填",
+      "required_hint": "填好下面这些才能提交，点一项直接过去。",
+      "go_fill": "去填写",
+      "suggested_title": "还可以再补充一些",
+      "suggested_hint": "下面这些不是必填，补上会让资料更完整。",
+      "improve": "再完善一下",
+      "submit_anyway": "保持这样提交",
+      "errors_title": "提交没有通过检查",
+      "failed_title": "没能提交"
+    },
     "submit_publish": "发布",
     "submit_review": "提交审核",
     "save_draft": "保存草稿",

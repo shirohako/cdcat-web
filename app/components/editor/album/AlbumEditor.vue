@@ -108,7 +108,11 @@
                     </li>
                   </ul>
                 </div>
-                <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="itemLabels" @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" />
+                <EditorRevisionSubmitPanel
+                  :draft="draft" :originals="originals" :labels="itemLabels"
+                  :required="requiredChecks.filter(check => !check.done)" :suggested="suggested"
+                  @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" @go="go($event as AlbumSection)"
+                />
               </div>
             </CatalogSection>
 

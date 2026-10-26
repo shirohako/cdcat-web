@@ -2272,6 +2272,17 @@
     "preview_changes": "Review changes ({count})",
     "will_delete": "Will be deleted",
     "fix_errors": "Please fix the problems marked in red.",
+    "check": {
+      "required_title": "Some required items are missing",
+      "required_hint": "Fill these in to submit. Pick one to go there.",
+      "go_fill": "Fill them in",
+      "suggested_title": "A few things worth adding",
+      "suggested_hint": "None of these is required, but they make the entry more complete.",
+      "improve": "Add more first",
+      "submit_anyway": "Submit as it is",
+      "errors_title": "The submission did not pass the checks",
+      "failed_title": "Could not submit"
+    },
     "submit_publish": "Publish",
     "submit_review": "Submit for review",
     "save_draft": "Save draft",

@@ -45,6 +45,29 @@
       <button v-if="draft.persisted.value" type="button" class="btn btn-ghost btn-sm text-danger" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</button>
       <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
+
+    <UiDialog v-if="check" v-model="checkOpen" :title="check.title" :description="check.description" :icon="check.icon" :tone="check.tone" size="sm">
+      <ul v-if="check.items.length" class="space-y-1 text-sm">
+        <li v-for="item in check.items" :key="item.key">
+          <button v-if="item.section" type="button" class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-title transition-colors hover:bg-sunken" @click="goTo(item.section)">
+            <span class="h-1.5 w-1.5 shrink-0 rounded-full" :class="check.kind === 'suggested' ? 'bg-info' : 'bg-danger'" />
+            <span class="min-w-0 flex-1">{{ item.label }}</span>
+            <ChevronRight :size="14" class="shrink-0 text-meta" />
+          </button>
+          <p v-else class="rounded-lg px-2.5 py-1.5 text-body">
+            <span v-if="item.path" class="mr-1.5 font-mono text-xs text-meta">{{ item.path }}</span>{{ item.label }}
+          </p>
+        </li>
+      </ul>
+      <template #footer>
+        <template v-if="check.kind === 'suggested'">
+          <button type="button" class="btn btn-sm btn-ghost" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.improve') }}</button>
+          <button type="button" class="btn btn-sm btn-primary" @click="send">{{ $t('editor.check.submit_anyway') }}</button>
+        </template>
+        <button v-else-if="check.kind === 'required'" type="button" class="btn btn-sm btn-primary" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.go_fill') }}</button>
+        <button v-else type="button" class="btn btn-sm btn-primary" @click="checkOpen = false">{{ $t('common.got_it') }}</button>
+      </template>
+    </UiDialog>
   </div>
 </template>
 
@@ -54,7 +77,11 @@ import type { useRevisionDraft } from '~/composables/useRevisionDraft'
 import type { DuplicateCandidate, Revision, RevisionConflict } from '~/types/revision'
 import type { DiffCollection } from '~/utils/documentDiff'
 import { documentDiff } from '~/utils/documentDiff'
+import { ChevronRight } from '@lucide/vue'
 import { errorName, revisionConflicts, revisionFieldErrors } from '~/utils/revisionErrors'
+
+/** Something the editor checks before submitting, and the section where it is fixed. */
+interface SubmitCheck { key: string, label: string, section: string }
 
 const props = defineProps<{
   draft: ReturnType<typeof useRevisionDraft>
@@ -62,8 +89,12 @@ const props = defineProps<{
   originals: Record<string, Record<string, unknown> | null>
   /** Names of items for the preview, by ref. */
   labels?: Record<string, string>
+  /** What must be filled in before submitting: a dialog lists them instead of sending */
+  required?: SubmitCheck[]
+  /** What is worth adding: a dialog lists them, and the editor may submit anyway */
+  suggested?: SubmitCheck[]
 }>()
-const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [] }>()
+const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [], go: [section: string] }>()
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -106,7 +137,40 @@ const message = ref('')
 /** "items.album.tracks.t1.title" → "tracks.t1.title" */
 const shortPath = (path: string) => path.replace(/^items\.[^.]+\./, '')
 
-const submit = async () => {
+// ---- the dialog the submit button answers with: what is missing, what is worth adding, what the server refused ----
+
+interface CheckDialog {
+  kind: 'required' | 'suggested' | 'errors' | 'failed'
+  title: string
+  description?: string
+  icon: string
+  tone: 'danger' | 'info' | 'warning'
+  items: Array<{ key: string, label: string, section?: string, path?: string }>
+}
+const check = ref<CheckDialog | null>(null)
+const checkOpen = ref(false)
+const show = (dialog: CheckDialog) => {
+  check.value = dialog
+  checkOpen.value = true
+}
+const goTo = (section?: string) => {
+  checkOpen.value = false
+  if (section) emit('go', section)
+}
+
+/** Required items first (nothing is sent), then suggestions (the editor may go ahead), then the server's checks. */
+const submit = () => {
+  if (props.required?.length) {
+    return show({ kind: 'required', title: t('editor.check.required_title'), description: t('editor.check.required_hint'), icon: 'lucide:circle-alert', tone: 'danger', items: props.required })
+  }
+  if (props.suggested?.length) {
+    return show({ kind: 'suggested', title: t('editor.check.suggested_title'), description: t('editor.check.suggested_hint'), icon: 'lucide:lightbulb', tone: 'info', items: props.suggested })
+  }
+  return send()
+}
+
+const send = async () => {
+  checkOpen.value = false
   errors.value = []
   conflicts.value = []
   message.value = ''
@@ -123,6 +187,13 @@ const submit = async () => {
       emit('duplicates', details?.candidates ?? [])
     }
     if (!conflicts.value.length && !errors.value.length) message.value = localizeError(error)
+    if (errors.value.length) {
+      show({ kind: 'errors', title: t('editor.check.errors_title'), description: t('editor.fix_errors'), icon: 'lucide:circle-x', tone: 'danger',
+        items: errors.value.map(entry => ({ key: entry.path, label: entry.message, path: shortPath(entry.path) })) })
+    }
+    else if (message.value && name !== 'DUPLICATE_SUSPECTED') {
+      show({ kind: 'failed', title: t('editor.check.failed_title'), icon: 'lucide:triangle-alert', tone: 'warning', items: [{ key: 'message', label: message.value }] })
+    }
   } finally {
     emit('errors', errors.value)
   }

@@ -2272,6 +2272,17 @@
     "preview_changes": "変更を確認（{count}）",
     "will_delete": "削除されます",
     "fix_errors": "赤で示した問題を直してください。",
+    "check": {
+      "required_title": "必須項目が未入力です",
+      "required_hint": "以下を入力すると送信できます。項目を選ぶとその場所へ移動します。",
+      "go_fill": "入力する",
+      "suggested_title": "追加するとよい項目があります",
+      "suggested_hint": "必須ではありませんが、追加すると情報がより充実します。",
+      "improve": "もう少し整える",
+      "submit_anyway": "このまま送信",
+      "errors_title": "送信内容にエラーがあります",
+      "failed_title": "送信できませんでした"
+    },
     "submit_publish": "公開",
     "submit_review": "審査に提出",
     "save_draft": "下書きを保存",
