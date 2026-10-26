@@ -8,6 +8,7 @@
           <h1 class="truncate text-xl font-bold text-title">{{ name || `#${id}` }}</h1>
         </div>
       </div>
+      <CatalogContributors v-if="contributors?.length" :contributors="contributors" class="mb-6" />
       <CatalogVersionHistory :id="id" :type="type" />
     </div>
   </div>
@@ -33,6 +34,9 @@ const { data: latest } = useAsyncData(`versions:${props.type}:${id}:latest`, asy
   const version = list.versions[0]
   return version ? await $api<ContentVersion>(`/v1/${resource}/${id}/versions/${version.version}`) : null
 })
+/** The people whose edits made a version, above the history. */
+const { data: contributors } = useAsyncData(`versions:${props.type}:${id}:contributors`,
+  () => $api<{ contributors: Array<{ username: string, nickname: string | null, avatar_url: string | null }> }>(`/v1/${resource}/${id}/contributors`).then(result => result.contributors))
 const snapshot = computed(() => latest.value?.snapshot as Record<string, unknown> | null | undefined)
 const name = computed(() => String(snapshot.value?.title ?? snapshot.value?.name ?? (props.type === 'lyric' && snapshot.value?.language ? snapshot.value.language : '')))
 const backLink = computed(() => props.type === 'lyric' && snapshot.value?.track_id ? `/tracks/${snapshot.value.track_id}` : `/${resource}/${id}`)

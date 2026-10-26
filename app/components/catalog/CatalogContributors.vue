@@ -23,7 +23,7 @@
             :src="user.avatar_url"
             :alt="user.nickname || user.username"
             class="w-full h-full object-cover"
-          />
+          >
           <span v-else class="text-sm font-bold text-meta">
             {{ (user.nickname || user.username || '?').charAt(0).toUpperCase() }}
           </span>

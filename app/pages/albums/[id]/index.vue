@@ -35,7 +35,6 @@
             <AlbumLinks :links="album.links" />
             <AlbumArticles :articles="album.articles ?? []" />
             <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" />
-            <AlbumContributors :contributors="album.contributors" />
           </div>
         </div>
       </div>
