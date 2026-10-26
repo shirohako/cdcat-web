@@ -54,7 +54,7 @@ const activityLink = (item: AdminUserActivity) => {
 }
 const selectType = (type: ActivityType) => router.push({ query: { ...route.query, type, page: undefined } })
 const { data: roles, pending: rolesPending, error: rolesError, refresh: refreshRoles } = await useAsyncData('admin-user-role-options', () => hasPermission('users.assign-roles') ? $api<AdminRole[]>('/v1/admin/roles') : Promise.resolve([]))
-const availableRoles = computed(() => (roles.value ?? []).filter(role => role.name !== 'staff' && (actor.value?.roles === 'staff' || (role.level < (actor.value?.role_level ?? 0) && role.permissions.every(hasPermission)))))
+const availableRoles = computed(() => (roles.value ?? []).filter(role => role.name !== 'admin' && (actor.value?.roles === 'admin' || (role.level < (actor.value?.role_level ?? 0) && role.permissions.every(hasPermission)))))
 const dialog = ref(false)
 const action = ref<UserAction | 'role'>('disable')
 const selectedRole = ref('')
@@ -99,7 +99,7 @@ useHead({ title: '用户详情' })
       <template v-if="user">
         <section class="rounded-xl border border-slate-200 bg-white p-5">
           <div class="flex flex-wrap items-start justify-between gap-4"><div><h2 class="text-lg font-semibold">基本资料</h2><p class="mt-2 text-sm text-slate-600">@{{ user.username }} · {{ user.roles || '无角色' }} · {{ user.is_active ? '正常' : '已停用' }}</p></div><dl class="flex gap-6 text-sm"><div><dt class="text-slate-500">已批准修订数</dt><dd class="mt-1 text-2xl font-semibold">{{ user.contributions_count }}</dd></div><div><dt class="text-slate-500">评价数</dt><dd class="mt-1 text-2xl font-semibold">{{ user.reviews_count }}</dd></div></dl></div>
-          <p v-if="!canManage" class="mt-4 text-sm text-amber-800">该账号仅可查看，不能操作自己、管理员（staff）或等级不低于自己的用户。</p>
+          <p v-if="!canManage" class="mt-4 text-sm text-amber-800">该账号仅可查看，不能操作自己、超级管理员（admin）或等级不低于自己的用户。</p>
           <p v-if="user.role_names.length > 1" class="mt-4 text-sm text-amber-800">该用户仍有多个存量角色，请使用单角色收敛命令处理。</p>
           <form class="mt-6 space-y-5" @submit.prevent="save">
             <div class="grid gap-4 md:grid-cols-2"><label v-for="field in fields" :key="field.key" class="block text-sm">{{ fieldLabels[field.key] }}<input v-model="profile[field.key]" :type="field.type" :required="field.required" :disabled="!canManage || busy" :maxlength="field.key === 'username' ? 32 : field.type === 'url' ? 2048 : 255" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50"></label></div>

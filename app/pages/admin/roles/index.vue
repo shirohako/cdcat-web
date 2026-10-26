@@ -27,7 +27,7 @@ useHead({ title: '角色与权限' })
 <template>
   <div class="mx-auto max-w-6xl space-y-6 p-4 sm:p-8">
     <header class="flex flex-wrap items-center justify-between gap-4"><div><h1 class="text-3xl font-bold">角色与权限</h1><p class="mt-2 text-sm text-slate-600">设置角色等级和权限，权限项由代码定义。</p></div><NuxtLink to="/admin/roles/new" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">新建角色</NuxtLink></header>
-    <p class="text-sm text-slate-500">staff（管理员）受保护；member 不能改名或删除。</p>
+    <p class="text-sm text-slate-500">admin（超级管理员）拥有全部权限，staff（管理员）拥有除分配角色、管理角色以外的全部权限，这两个角色由代码定义，不能修改或删除；member 不能改名或删除。只有超级管理员能分配角色和修改角色。</p>
     <AdminListState :pending="pending" :error="error" :empty="!data?.length" @retry="refresh()">
       <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white"><table class="w-full text-left text-sm"><thead class="bg-slate-50 text-slate-600"><tr><th class="p-4">角色名称</th><th class="p-4">角色等级</th><th class="p-4">使用人数</th><th class="p-4">权限矩阵</th><th class="p-4" /></tr></thead><tbody class="divide-y divide-slate-100"><tr v-for="role in data" :key="role.id"><td class="p-4 font-medium">{{ role.name }}</td><td class="p-4">{{ role.level }}</td><td class="p-4">{{ role.users_count }}</td><td class="p-4">{{ role.permissions.length }} 项权限</td><td class="flex gap-3 p-4"><NuxtLink :to="`/admin/roles/${role.id}`" class="underline">{{ role.can_manage ? '编辑角色' : '查看角色' }}</NuxtLink><button v-if="role.can_delete" type="button" class="text-red-700" @click="remove(role)">删除角色</button></td></tr></tbody></table></div>
     </AdminListState>

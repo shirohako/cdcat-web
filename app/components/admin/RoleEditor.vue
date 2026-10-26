@@ -9,7 +9,7 @@ const busy = ref(false)
 const message = ref('')
 const readOnly = computed(() => props.role ? !props.role.can_manage : false)
 const groups = computed(() => [...new Set(props.catalog.map(permission => permission.group))].map(name => ({ name, items: props.catalog.filter(permission => permission.group === name) })))
-const maxLevel = computed(() => user.value?.roles === 'staff' ? 2147483647 : Math.max(0, (user.value?.role_level ?? 0) - 1))
+const maxLevel = computed(() => user.value?.roles === 'admin' ? 2147483647 : Math.max(0, (user.value?.role_level ?? 0) - 1))
 const save = async () => {
   if (busy.value || readOnly.value) return
   busy.value = true

@@ -50,6 +50,7 @@ export const auditActionLabels: Record<string, string> = {
   users_revoke_tokens: '作废用户登录会话',
   users_send_reset: '发送密码重置验证码',
   users_clear_verification_limit: '清除验证码限制',
+  users_bootstrap_admin: '建立初始超级管理员',
   users_bootstrap_staff: '建立初始管理员',
   users_reconcile_roles: '收敛用户角色',
   roles_create: '创建角色',
