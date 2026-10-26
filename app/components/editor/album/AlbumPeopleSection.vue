@@ -10,13 +10,14 @@
         <ul v-if="artists.length" class="space-y-1.5">
           <EditorListRow v-for="(row, index) in artists" :key="row.id" :invalid="rowError('artists', row.id)" @edit="editArtist(row)" @remove="remove(album.artists, row)">
             <span class="flex shrink-0 flex-col" @click.stop>
-              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.artists, row, -1)"><ChevronUp :size="14" /></button>
-              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === artists.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.artists, row, 1)"><ChevronDown :size="14" /></button>
+              <button type="button" class="rounded bg-btn text-btn-content transition-colors hover:bg-btn-hover disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.artists, row, -1)"><ChevronUp :size="14" /></button>
+              <button type="button" class="rounded bg-btn text-btn-content transition-colors hover:bg-btn-hover disabled:opacity-30" :disabled="index === artists.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.artists, row, 1)"><ChevronDown :size="14" /></button>
             </span>
             <span class="min-w-0 truncate text-sm font-medium text-title">{{ nameOf('artist', row.artist_id) || '—' }}</span>
             <span v-if="isNew(row.artist_id)" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
             <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-meta">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
             <span v-if="index < artists.length - 1" class="shrink-0 rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content" :title="$t('catalog.field.join_phrase')">{{ shownPhrase(row.join_phrase) }}</span>
+            <template #actions><EditorViewLink :id="row.artist_id" type="artist" /></template>
           </EditorListRow>
         </ul>
         <EditorAddButton @click="editArtist(null)">{{ $t('editor.dialog.artist_add') }}</EditorAddButton>
@@ -29,13 +30,14 @@
         <ul v-if="labels.length" class="space-y-1.5">
           <EditorListRow v-for="(row, index) in labels" :key="row.id" :invalid="rowError('labels', row.id)" @edit="editLabel(row)" @remove="remove(album.labels, row)">
             <span class="flex shrink-0 flex-col" @click.stop>
-              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.labels, row, -1)"><ChevronUp :size="14" /></button>
-              <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === labels.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.labels, row, 1)"><ChevronDown :size="14" /></button>
+              <button type="button" class="rounded bg-btn text-btn-content transition-colors hover:bg-btn-hover disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(album.labels, row, -1)"><ChevronUp :size="14" /></button>
+              <button type="button" class="rounded bg-btn text-btn-content transition-colors hover:bg-btn-hover disabled:opacity-30" :disabled="index === labels.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(album.labels, row, 1)"><ChevronDown :size="14" /></button>
             </span>
             <span class="min-w-0 truncate text-sm font-medium text-title">{{ nameOf('label', row.label_id) || '—' }}</span>
             <span v-if="isNew(row.label_id)" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
             <span class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('label_role', row.role) }}</span>
             <span v-if="row.credited_as" class="min-w-0 truncate text-xs text-meta">{{ $t('editor.dialog.shown_as', { name: row.credited_as }) }}</span>
+            <template #actions><EditorViewLink :id="row.label_id" type="label" /></template>
           </EditorListRow>
         </ul>
         <EditorAddButton @click="editLabel(null)">{{ $t('editor.dialog.label_add') }}</EditorAddButton>
@@ -122,7 +124,7 @@
       </div>
       <template #footer>
         <span v-if="addedCount" class="mr-auto text-xs text-success">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
-        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
+        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
         <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>

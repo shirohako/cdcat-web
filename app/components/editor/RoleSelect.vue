@@ -10,7 +10,7 @@ import type { UiSelectOption } from '~/components/ui/Select.vue'
 const props = defineProps<{ level: 'album' | 'track' }>()
 const model = defineModel<string>({ required: true })
 
-const { schema, roleName } = useCatalogSchema()
+const { schema, roleName, roleNameEn } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 
 const allowed = (role: CreditRoleDefinition) => props.level === 'album' ? role.is_album_role : role.is_track_role
@@ -26,6 +26,8 @@ const options = computed<UiSelectOption<string>[]>(() => [
   ...groups.value.flatMap(group => group.roles.map(role => ({
     value: role.key,
     label: roleName(role.key),
+    hint: roleNameEn(role.key) || undefined,
+    keywords: role.names?.en,
     group: enumLabel('credit_role_category', group.category),
   }))),
 ])

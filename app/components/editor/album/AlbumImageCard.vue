@@ -10,9 +10,9 @@
         <input v-model="image.label" class="input input-sm w-28" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')">
         <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-44" :aria-label="$t('editor.image.scope')" @change="setScope" />
         <span class="ml-auto flex gap-0.5">
-          <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="emit('move', -1)"><ArrowUp :size="12" /></button>
-          <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="emit('move', 1)"><ArrowDown :size="12" /></button>
-          <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="removeImage(album, imageId)"><Trash2 :size="12" /></button>
+          <button type="button" class="btn btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="emit('move', -1)"><ArrowUp :size="12" /></button>
+          <button type="button" class="btn btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="emit('move', 1)"><ArrowDown :size="12" /></button>
+          <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :aria-label="$t('common.delete')" @click="removeImage(album, imageId)"><Trash2 :size="12" /></button>
         </span>
       </div>
       <input v-model="image.caption" class="input input-sm w-full" maxlength="500" :placeholder="$t('editor.image.caption_placeholder')">

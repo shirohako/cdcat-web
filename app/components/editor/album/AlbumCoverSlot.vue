@@ -17,7 +17,7 @@
         <Upload :size="14" class="shrink-0" /><span class="truncate">{{ $t(coverImage ? 'editor.image.replace' : 'editor.image.upload') }}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
       </label>
-      <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
+      <button type="button" class="btn btn-sm px-2" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
     <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }}</p>

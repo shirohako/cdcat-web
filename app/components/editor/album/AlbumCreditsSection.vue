@@ -7,21 +7,77 @@
 
       <template v-for="section in sections" :key="section.key">
         <div v-if="section.groups.length">
-          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-meta">{{ section.label }}</h3>
-          <ul class="space-y-1.5">
+          <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-meta">{{ section.label }}</h3>
+            <UiTabs
+              v-if="section.key === 'tracks'"
+              v-model="trackView"
+              variant="segmented"
+              size="sm"
+              :label="$t('editor.credits.on_tracks')"
+              :items="[
+                { value: 'track', label: $t('editor.credits.by_track') },
+                { value: 'person', label: $t('editor.credits.by_person') },
+                { value: 'role', label: $t('editor.credits.by_role') },
+              ]"
+            />
+          </div>
+
+          <div v-if="section.key === 'tracks' && trackView === 'track'" class="space-y-3">
+            <div v-for="item in byTrack" :key="String(item.track.id)">
+              <p class="mb-1 flex min-w-0 items-center gap-2 px-1 text-xs">
+                <EditorAlbumTrackRanges :track-ids="[item.track.id]" class="shrink-0" />
+                <span class="truncate font-medium text-title">{{ item.track.title || '—' }}</span>
+              </p>
+              <ul class="space-y-1.5">
+                <EditorAlbumCreditRow
+                  v-for="credit in item.credits"
+                  :key="String(credit.row.id)"
+                  :group="credit.group"
+                  :person="personName(credit.group)"
+                  :subline="subline(credit.group)"
+                  :invalid="editor.errorsIn(`credits.${credit.row.id}`).length > 0"
+                  @edit="edit(credit.group)"
+                  @remove="removeFromTrack(credit.group, item.track.id)"
+                />
+              </ul>
+            </div>
+          </div>
+
+          <div v-else-if="section.key === 'tracks' && trackView === 'role'" class="space-y-3">
+            <div v-for="item in byRole(section.groups)" :key="item.role">
+              <p class="mb-1 flex min-w-0 items-baseline gap-1.5 px-1 text-xs">
+                <span class="font-medium text-primary">{{ roleName(item.role) }}</span>
+                <span v-if="roleNameEn(item.role)" class="text-[11px] text-meta">{{ roleNameEn(item.role) }}</span>
+              </p>
+              <ul class="space-y-1.5">
+                <template v-for="group in item.groups" :key="group.key">
+                  <EditorAlbumCreditRow :group="group" :person="personName(group)" :subline="subline(group)" :track-ids="group.album ? undefined : group.trackIds" hide-role :invalid="groupErrors(group).length > 0" @edit="edit(group)" @remove="removeCreditGroup(album, group)" />
+                  <p v-for="error in groupErrors(group)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <div v-else-if="section.key === 'tracks' && trackView === 'person'" class="space-y-3">
+            <div v-for="item in byPerson(section.groups)" :key="item.key">
+              <p class="mb-1 flex min-w-0 items-center gap-2 px-1 text-xs">
+                <span class="truncate font-medium text-title">{{ personName(item.groups[0]!) }}</span>
+                <EditorAlbumCreditWho :artist-id="item.groups[0]!.artist_id" />
+                <EditorViewLink :id="item.groups[0]!.artist_id" type="artist" class="ml-auto" />
+              </p>
+              <ul class="space-y-1.5">
+                <template v-for="group in item.groups" :key="group.key">
+                  <EditorAlbumCreditRow :group="group" :person="personName(group)" :subline="subline(group)" :track-ids="group.album ? undefined : group.trackIds" hide-person :invalid="groupErrors(group).length > 0" @edit="edit(group)" @remove="removeCreditGroup(album, group)" />
+                  <p v-for="error in groupErrors(group)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
+                </template>
+              </ul>
+            </div>
+          </div>
+
+          <ul v-else class="space-y-1.5">
             <template v-for="group in section.groups" :key="group.key">
-              <EditorListRow :invalid="groupErrors(group).length > 0" @edit="edit(group)" @remove="removeCreditGroup(album, group)">
-                <span class="w-24 shrink-0 truncate text-xs sm:w-32" :class="roleAllowed(group) ? 'text-primary' : 'text-danger'">{{ roleName(group.role) }}<span v-if="!roleAllowed(group)"> ⚠</span></span>
-                <span class="min-w-0 flex-1">
-                  <span class="flex min-w-0 items-center gap-1.5">
-                    <span class="truncate text-sm font-medium text-title">{{ personName(group) }}</span>
-                    <span v-if="typeof group.artist_id === 'string'" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
-                    <span v-if="group.artist_id === null" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.credits.link_artist')">{{ $t('editor.dialog.name_only') }}</span>
-                    <span v-if="group.artist_id === null && group.credited_as && editor.nameNotes.value[group.credited_as]" class="shrink-0 rounded-md bg-warning/15 px-1.5 py-0.5 text-[10px] font-bold text-warning" :title="editor.nameNotes.value[group.credited_as]">⚠ {{ editor.nameNotes.value[group.credited_as] }}</span>
-                  </span>
-                  <span v-if="subline(group)" class="block truncate text-[11px] text-meta">{{ subline(group) }}</span>
-                </span>
-              </EditorListRow>
+              <EditorAlbumCreditRow :group="group" :person="personName(group)" :subline="subline(group)" :track-ids="group.album ? undefined : group.trackIds" :invalid="groupErrors(group).length > 0" @edit="edit(group)" @remove="removeCreditGroup(album, group)" />
               <p v-for="error in groupErrors(group)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
             </template>
           </ul>
@@ -82,7 +138,7 @@
       </div>
       <template #footer>
         <span v-if="addedCount" class="mr-auto text-xs text-success">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
-        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
+        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
         <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>
@@ -95,12 +151,12 @@ import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { CreditGroup } from '~/utils/albumDocument'
 import type { AggregateRef, RowId } from '~/types/document'
 import { User, UserPlus, Users, X } from '@lucide/vue'
-import { addCredit, creditGroups, orderedTracks, removeCreditGroup, setCreditTracks, trackRanges, updateCreditGroup } from '~/utils/albumDocument'
+import { addCredit, creditGroups, orderedTracks, removeCreditGroup, setCreditTracks, updateCreditGroup } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
 const editor = useAlbumEditor()
 const { t } = useI18n()
-const { schema, roleOrder, roleName } = useCatalogSchema()
+const { roleOrder, roleName, roleNameEn } = useCatalogSchema()
 const album = computed(() => editor.album.value)
 
 const levelErrors = computed(() => editor.errorsIn('credits').filter(error => error.path.split('.').length === 3))
@@ -117,6 +173,46 @@ const sections = computed(() => {
   ]
 })
 
+/** Track credits under each track (the default), under each person, or under each role; each row is a person's role on some tracks. */
+const trackView = ref<'track' | 'person' | 'role'>('track')
+
+/** Every track with credits of its own, in tracklist order: each credit with the group it belongs to. */
+const byTrack = computed(() => {
+  const groups = creditGroups(album.value).filter(group => !group.album)
+  return orderedTracks(album.value).map((track) => {
+    const credits = groups.flatMap(group => group.rows.filter(row => sameId(row.track_id!, track.id)).map(row => ({ row, group })))
+      .sort((a, b) => roleOrder(a.group.role) - roleOrder(b.group.role))
+    return { track, credits }
+  }).filter(item => item.credits.length)
+})
+
+/**
+ * The groups under each person: the same artist, or for printed names the same name. People come
+ * in the order of their first group (role, then first track); under one, the groups keep that order.
+ */
+const byPerson = (groups: CreditGroup[]) => {
+  const people = new Map<string, CreditGroup[]>()
+  for (const group of groups) {
+    const key = group.artist_id !== null ? `a:${group.artist_id}` : `n:${(group.credited_as ?? '').trim().toLowerCase()}`
+    people.set(key, [...(people.get(key) ?? []), group])
+  }
+  return [...people].map(([key, list]) => ({ key, groups: list }))
+}
+
+/** The groups (already in role, then first-track order) under each of their roles. */
+const byRole = (groups: CreditGroup[]) => {
+  const roles = new Map<string, CreditGroup[]>()
+  for (const group of groups) roles.set(group.role, [...(roles.get(group.role) ?? []), group])
+  return [...roles].map(([role, list]) => ({ role, groups: list }))
+}
+
+/** Takes one track out of a group; the group goes when it has no track left. */
+const removeFromTrack = (group: CreditGroup, trackId: RowId) => {
+  const rest = group.trackIds.filter(id => !sameId(id, trackId))
+  if (rest.length) setCreditTracks(album.value, group, rest)
+  else removeCreditGroup(album.value, group)
+}
+
 const artistName = (id: AggregateRef | null) => {
   if (id === null) return ''
   if (typeof id === 'string') return editor.pending.value[id.replace(/^@/, '')] ?? ''
@@ -126,14 +222,7 @@ const personName = (group: CreditGroup) => group.artist_id === null ? (group.cre
 const subline = (group: CreditGroup) => [
   group.artist_id !== null && group.credited_as ? t('editor.dialog.shown_as', { name: group.credited_as }) : null,
   group.detail,
-  group.album ? null : `${t('editor.credits.tracks')} ${trackRanges(album.value, group.trackIds)}`,
 ].filter(Boolean).join(' · ')
-
-/** Whether the role may be used at the group's level (album or track). */
-const roleAllowed = (group: CreditGroup) => {
-  const role = schema.value?.credit_roles?.find(item => item.key === group.role)
-  return !role || (group.album ? role.is_album_role : role.is_track_role)
-}
 
 // ---- the dialog: adds credits, or edits one group ----
 

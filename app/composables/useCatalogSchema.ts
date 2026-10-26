@@ -17,6 +17,11 @@ export const useCatalogSchema = () => {
 
   /** The role's name in the UI language; unknown or retired roles show their key. */
   const roleName = (key: string) => localizedContent(roles.value.get(key)?.names, key.replaceAll('_', ' '))
+  /** The role's English name, for showing next to the UI language's one; empty in the English UI or when they read the same. */
+  const roleNameEn = (key: string) => {
+    const english = roles.value.get(key)?.names?.en
+    return locale.value === 'en' || !english || english === roleName(key) ? '' : english
+  }
   const roleCategory = (key: string) => roles.value.get(key)?.category ?? 'other'
   /** Position of the role in the dictionary, for sorting credits the way the admin ordered them. */
   const roleOrder = (key: string) => {
@@ -32,5 +37,5 @@ export const useCatalogSchema = () => {
   }
   const attributeDefinition = (key: string) => attributes.value.get(key) ?? null
 
-  return { schema, pending, roleName, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
+  return { schema, pending, roleName, roleNameEn, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
 }

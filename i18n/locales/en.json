@@ -2398,7 +2398,6 @@
       "hint": "One row per person and role. Credit the whole album, or pick the tracks.",
       "whole_album": "Whole album",
       "on_tracks": "Tracks",
-      "tracks": "Tracks",
       "all_tracks": "All tracks",
       "no_tracks": "No tracks",
       "none": "No credits yet.",
@@ -2408,6 +2407,10 @@
       "link_artist": "Link an artist",
       "unlink_artist": "Unlink the artist and keep the name",
       "scope": "Credited on",
+      "existing": "Existing",
+      "by_person": "By person",
+      "by_role": "By role",
+      "by_track": "By track",
       "role_level": "This role is not used at this level"
     },
     "editions": {

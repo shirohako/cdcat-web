@@ -2398,7 +2398,6 @@
       "hint": "每人每个角色一行。可以署名在整张专辑上，也可以选择曲目。",
       "whole_album": "整张专辑",
       "on_tracks": "部分曲目",
-      "tracks": "曲目",
       "all_tracks": "全部曲目",
       "no_tracks": "没有曲目",
       "none": "还没有制作人员。",
@@ -2408,6 +2407,10 @@
       "link_artist": "关联艺术家",
       "unlink_artist": "取消关联，保留署名",
       "scope": "署名范围",
+      "existing": "已有",
+      "by_person": "按人分组",
+      "by_role": "按角色分组",
+      "by_track": "按曲目分组",
       "role_level": "这个角色不用在这一层"
     },
     "editions": {

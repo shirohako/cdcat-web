@@ -22,7 +22,7 @@
     </div>
     <template #footer>
       <span class="mr-auto text-xs text-meta">{{ $t('editor.paste.count', { count: total }) }}</span>
-      <button type="button" class="btn btn-ghost btn-sm" @click="open = false">{{ $t('common.cancel') }}</button>
+      <button type="button" class="btn btn-sm" @click="open = false">{{ $t('common.cancel') }}</button>
       <button type="button" class="btn btn-primary btn-sm" :disabled="!total" @click="apply">{{ $t('editor.paste.apply') }}</button>
     </template>
   </EditorModal>

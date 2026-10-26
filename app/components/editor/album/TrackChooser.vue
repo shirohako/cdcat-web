@@ -3,7 +3,7 @@
   <div v-if="inline" class="overflow-hidden rounded-lg border border-line">
     <p class="flex items-center gap-2 border-b border-line bg-card px-3 py-1.5 text-xs text-body">
       <span class="min-w-0 flex-1 truncate">{{ summary }}</span>
-      <button type="button" class="link shrink-0" @click="selectAll">{{ $t('common.all') }}</button>
+      <button type="button" class="btn btn-xs shrink-0" @click="selectAll">{{ $t('common.all') }}</button>
     </p>
     <div class="max-h-56 overflow-y-auto">
       <EditorAlbumTrackChooserList :model-value="model" @toggle="toggle" @set-disc="setDisc" />
@@ -53,6 +53,6 @@ const summary = computed(() => {
   const all = orderedTracks(album.value)
   if (!model.value.length) return t('editor.credits.no_tracks')
   if (all.length > 1 && all.every(track => has(track.id))) return t('editor.credits.all_tracks')
-  return `${t('editor.credits.tracks')} ${trackRanges(album.value, model.value)}`
+  return trackRanges(album.value, model.value)
 })
 </script>

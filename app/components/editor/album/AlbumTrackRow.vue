@@ -21,19 +21,16 @@
         @keydown.enter.prevent="emit('next')"
       >
       <EditorDurationInput v-model="track.duration" class="hidden shrink-0 sm:block" />
-      <button
-        type="button"
-        class="btn btn-ghost btn-sm shrink-0 px-1.5"
-        :class="{ 'text-faint hover:text-primary': !track.is_instrumental }"
-        :title="$t('catalog.field.is_instrumental')"
-        :aria-pressed="track.is_instrumental"
-        @click="track.is_instrumental = !track.is_instrumental"
-      ><Music2 :size="14" /></button>
+      <label class="flex shrink-0 cursor-pointer items-center gap-1 px-1 text-xs" :class="track.is_instrumental ? 'text-primary' : 'text-meta'" :title="$t('catalog.field.is_instrumental')">
+        <input v-model="track.is_instrumental" type="checkbox" class="checkbox checkbox-xs">
+        <Music2 :size="13" aria-hidden="true" />
+        <span class="hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
+      </label>
       <button v-if="badge" type="button" class="hidden shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium sm:inline" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
-      <button type="button" class="btn btn-ghost btn-sm shrink-0 px-1.5" :aria-expanded="open" :title="$t('editor.album.track_details')" @click="open = !open">
+      <button type="button" class="btn btn-sm shrink-0 px-1.5" :aria-expanded="open" :title="$t('editor.album.track_details')" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </button>
-      <button type="button" class="btn btn-ghost btn-sm shrink-0 px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="remove"><X :size="14" /></button>
+      <button type="button" class="btn btn-sm shrink-0 px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :aria-label="$t('common.delete')" @click="remove"><X :size="14" /></button>
     </div>
     <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-[11px] text-danger">{{ error.message }}</p>
 
@@ -56,8 +53,8 @@
           <UiSelect :model-value="String(track.disc_id)" :options="discOptions" size="sm" class="w-32" @change="moveTo" />
         </label>
         <div class="flex gap-1">
-          <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('catalog.form.move_up')" @click="moveTrack(album, track.id, -1)"><ArrowUp :size="14" /></button>
-          <button type="button" class="btn btn-ghost btn-sm px-2" :title="$t('catalog.form.move_down')" @click="moveTrack(album, track.id, 1)"><ArrowDown :size="14" /></button>
+          <button type="button" class="btn btn-sm px-2" :title="$t('catalog.form.move_up')" @click="moveTrack(album, track.id, -1)"><ArrowUp :size="14" /></button>
+          <button type="button" class="btn btn-sm px-2" :title="$t('catalog.form.move_down')" @click="moveTrack(album, track.id, 1)"><ArrowDown :size="14" /></button>
         </div>
       </div>
 

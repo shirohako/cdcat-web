@@ -7,10 +7,10 @@
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
-        <button type="button" class="btn btn-ghost btn-xs px-1.5 text-[11px]" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" class="text-primary">·{{ tocCount }}</span></button>
-        <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="moveDisc(album, disc.id, -1)"><ArrowUp :size="12" /></button>
-        <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="moveDisc(album, disc.id, 1)"><ArrowDown :size="12" /></button>
-        <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :title="$t('editor.album.remove_disc')" @click="remove"><Trash2 :size="12" /></button>
+        <button type="button" class="btn btn-xs px-1.5 text-[11px]" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" class="text-primary">·{{ tocCount }}</span></button>
+        <button type="button" class="btn btn-xs px-1.5" :disabled="first" :title="$t('catalog.form.move_up')" @click="moveDisc(album, disc.id, -1)"><ArrowUp :size="12" /></button>
+        <button type="button" class="btn btn-xs px-1.5" :disabled="last" :title="$t('catalog.form.move_down')" @click="moveDisc(album, disc.id, 1)"><ArrowDown :size="12" /></button>
+        <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :title="$t('editor.album.remove_disc')" @click="remove"><Trash2 :size="12" /></button>
       </span>
     </div>
     <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ error.message }}</p>

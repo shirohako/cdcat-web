@@ -8,10 +8,10 @@
       <slot />
     </div>
     <slot name="actions" />
-    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-meta transition-colors hover:bg-ghost-hover hover:text-primary" :aria-label="$t('common.edit')" @click="emit('edit')">
+    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-btn text-btn-content transition-colors hover:bg-btn-hover" :aria-label="$t('common.edit')" @click="emit('edit')">
       <PencilLine :size="14" />
     </button>
-    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-meta transition-colors hover:bg-danger/10 hover:text-danger" :aria-label="$t('common.delete')" @click="emit('remove')">
+    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-danger/10 text-danger transition-colors hover:bg-danger/20" :aria-label="$t('common.delete')" @click="emit('remove')">
       <Trash2 :size="14" />
     </button>
   </li>

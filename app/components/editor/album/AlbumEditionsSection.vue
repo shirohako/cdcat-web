@@ -39,10 +39,10 @@
             <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="flex shrink-0 gap-0.5">
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.products, product, -1)"><ArrowUp :size="12" /></button>
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :disabled="index === products.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.products, product, 1)"><ArrowDown :size="12" /></button>
-            <button type="button" class="btn btn-ghost btn-xs px-1.5" :aria-label="$t('common.edit')" @click="edit(product)"><PencilLine :size="12" /></button>
-            <button type="button" class="btn btn-ghost btn-xs px-1.5 text-meta hover:text-danger" :aria-label="$t('common.delete')" @click="removeProduct(album, product.id)"><Trash2 :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.products, product, -1)"><ArrowUp :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5" :disabled="index === products.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.products, product, 1)"><ArrowDown :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5" :aria-label="$t('common.edit')" @click="edit(product)"><PencilLine :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :aria-label="$t('common.delete')" @click="removeProduct(album, product.id)"><Trash2 :size="12" /></button>
           </span>
         </li>
       </ul>
@@ -129,7 +129,7 @@
         <option v-for="code in ['JPY', 'CNY', 'USD', 'EUR', 'TWD', 'HKD', 'KRW', 'GBP']" :key="code" :value="code" />
       </datalist>
       <template #footer>
-        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
+        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>
     </EditorModal>

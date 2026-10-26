@@ -350,11 +350,10 @@ export function updateCreditGroup(doc: AlbumDocument, group: CreditGroup, patch:
   dedupeCredits(doc)
 }
 
-/** Track numbers as ranges: "1–3, 5", or "1: 1–3 · 2: 4" on albums with several discs. */
-export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
+/** The tracks among `trackIds` as number ranges per disc ("1–3", "5"), in disc order; discs without any are left out. */
+export function trackRangeParts(doc: AlbumDocument, trackIds: RowId[]): Array<{ disc: number, ranges: string[] }> {
   const has = (id: RowId) => trackIds.some(item => sameId(item, id))
-  const discs = sortedDiscs(doc)
-  return discs.map((disc) => {
+  return sortedDiscs(doc).map((disc) => {
     const tracks = tracksOn(doc, disc.id)
     const ranges: string[] = []
     let start = -1
@@ -368,8 +367,13 @@ export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
         start = -1
       }
     })
-    return ranges.length ? (discs.length > 1 ? `${disc.position}: ${ranges.join(', ')}` : ranges.join(', ')) : ''
-  }).filter(Boolean).join(' · ')
+    return { disc: disc.position, ranges }
+  }).filter(part => part.ranges.length)
+}
+
+/** The same as text, in every UI language: "Disc 1 Track 1–3, 5 · Disc 2 Track 4". */
+export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
+  return trackRangeParts(doc, trackIds).map(part => `Disc ${part.disc} Track ${part.ranges.join(', ')}`).join(' · ')
 }
 
 /** Credits `fields` on the whole album (trackIds null) or on each of the tracks. */

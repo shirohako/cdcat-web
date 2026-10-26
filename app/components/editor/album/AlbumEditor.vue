@@ -38,7 +38,7 @@
           <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
           <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
+          <button type="button" class="btn btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
@@ -81,7 +81,7 @@
               <template v-if="suggested.length">
                 <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.recommended') }}</p>
                 <ul class="space-y-1.5 text-xs text-meta">
-                  <li v-for="item in suggested" :key="item.key"><button type="button" class="link link-muted" @click="go(item.section)">+ {{ item.label }}</button></li>
+                  <li v-for="item in suggested" :key="item.key"><button type="button" class="btn btn-xs" @click="go(item.section)">+ {{ item.label }}</button></li>
                 </ul>
               </template>
             </div>
@@ -102,9 +102,9 @@
               <div class="space-y-4 p-5">
                 <div v-if="missing.length" class="rounded-lg border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
                   <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
-                  <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                  <ul class="mt-2 flex flex-wrap gap-1.5">
                     <li v-for="check in requiredChecks.filter(item => !item.done)" :key="check.key">
-                      <button type="button" class="link link-muted" @click="go(check.section)">{{ check.label }}</button>
+                      <button type="button" class="btn btn-xs" @click="go(check.section)">{{ check.label }}</button>
                     </li>
                   </ul>
                 </div>

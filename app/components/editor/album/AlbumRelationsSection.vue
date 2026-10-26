@@ -64,7 +64,7 @@
         </label>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-ghost btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
+        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
         <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>
     </EditorModal>
