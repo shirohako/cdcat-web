@@ -18,8 +18,6 @@ export type HarvestEventMode = 'none' | 'fixed' | 'auto'
 
 export type HarvestCandidateStatus = 'pending' | 'approving' | 'approved' | 'linked' | 'rejected' | 'excluded' | 'merged'
 
-export type HarvestReleaseKind = 'first' | 'resale' | 'unknown'
-
 /** GET /admin/harvest/overview */
 export interface HarvestOverview {
   candidates: Partial<Record<HarvestCandidateStatus, number>>
@@ -104,7 +102,6 @@ export interface HarvestCandidateRow {
   status: HarvestCandidateStatus
   /** The suggested first-release event; null when no record is linked to one. */
   event: HarvestEventSummary | null
-  release_kind: HarvestReleaseKind
   is_adult: boolean
   has_cover: boolean
   has_tracks: boolean
@@ -198,9 +195,6 @@ export interface HarvestMergedImage {
   referer: string
 }
 
-/** Why the release kind was decided: resale (earlier_date, source, listing), first (event_fixed, event_name, date). */
-export type HarvestReleaseReason = 'earlier_date' | 'source' | 'listing' | 'event_fixed' | 'event_name' | 'date'
-
 export interface HarvestMerged {
   title: HarvestPicked<string>
   titles: Array<{ title: string, locale: string, kind: string, source: string }>
@@ -210,15 +204,11 @@ export interface HarvestMerged {
     named?: boolean
     links?: string[]
   }
+  /** The suggested event, and the earliest full date the sources give (else the event's first day, else a partial date). */
   release: {
-    kind: HarvestReleaseKind
-    /** The suggested event the kind is relative to. */
     event_id: number | null
     date: string | null
     precision: 'day' | 'month' | 'year' | null
-    source: string | null
-    notes: string[]
-    reason: HarvestReleaseReason | null
   }
   catalog_numbers: HarvestPicked<string[]>
   barcode: HarvestPicked<string>
@@ -318,8 +308,7 @@ export interface HarvestCandidateDetail {
     event_circle_id: number | null
     circle_by: string | null
     status: HarvestCandidateStatus
-    release_kind: HarvestReleaseKind
-    is_adult: boolean
+      is_adult: boolean
     has_cover: boolean
     has_tracks: boolean
     lock_version: number

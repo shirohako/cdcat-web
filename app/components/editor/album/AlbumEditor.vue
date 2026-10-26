@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'min-h-screen': !embedded }">
+  <div ref="root" :class="embedded ? 'embedded-editor scroll-mt-24' : 'min-h-screen'">
     <div :class="embedded ? 'p-4 md:p-5' : 'container mx-auto max-w-7xl px-3 py-6 md:px-6'">
       <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
 
@@ -9,22 +9,27 @@
       </div>
 
       <template v-else-if="ready">
-        <header class="flex flex-wrap items-end gap-3" :class="embedded ? 'mb-4' : 'mb-5'">
+        <header class="flex flex-wrap gap-3" :class="embedded ? 'card mb-4 items-center px-4 py-3' : 'mb-5 items-end'">
           <div class="min-w-0 flex-1">
             <p v-if="!embedded" class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
-            <component :is="embedded ? 'h3' : 'h1'" class="truncate font-bold text-title" :class="embedded ? 'text-lg' : 'text-2xl'">{{ album.title || $t('editor.album.untitled') }}</component>
+            <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-2xl font-bold'">{{ album.title || $t('editor.album.untitled') }}</component>
             <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="link link-muted">{{ $t('editor.album.view') }}</NuxtLink>
               <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>
               <NuxtLink to="/revisions" class="link link-muted">{{ $t('editor.my_revisions') }}</NuxtLink>
             </p>
+            <EditorDraftStatus v-else :draft="draft" compact class="mt-1.5" @discard="restart" />
           </div>
-          <div class="flex gap-1 rounded-xl bg-sunken p-1 text-sm ring-1 ring-line">
-            <button type="button" class="rounded-lg px-3 py-1.5 font-semibold transition-colors" :class="!translating ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="go('basic')">
-              <PencilLine :size="14" class="mr-1 inline" />{{ $t('editor.mode_edit') }}
-            </button>
-            <button type="button" class="rounded-lg px-3 py-1.5 font-semibold transition-colors" :class="translating ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="go('translate')">
-              <Languages :size="14" class="mr-1 inline" />{{ $t('editor.mode_translate') }}
+          <div class="flex gap-1 bg-sunken ring-1 ring-line" :class="embedded ? 'rounded-lg p-0.5 text-xs' : 'rounded-xl p-1 text-sm'">
+            <button
+              v-for="option in [{ key: 'basic', on: !translating, icon: PencilLine, label: $t('editor.mode_edit') }, { key: 'translate', on: translating, icon: Languages, label: $t('editor.mode_translate') }] as const"
+              :key="option.key"
+              type="button"
+              class="inline-flex items-center gap-1 font-semibold transition-colors"
+              :class="[embedded ? 'rounded-md px-2.5 py-1' : 'rounded-lg px-3 py-1.5', option.on ? ['bg-card text-primary ring-1 ring-line', embedded && 'shadow-xs'] : 'text-meta hover:text-title']"
+              @click="go(option.key)"
+            >
+              <component :is="option.icon" :size="embedded ? 13 : 14" />{{ option.label }}
             </button>
           </div>
         </header>
@@ -39,17 +44,22 @@
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
-        <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
+        <div v-if="!embedded" class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
 
-        <div class="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
-          <aside class="space-y-4 lg:sticky lg:top-20 lg:self-start">
-            <nav class="-mx-3 flex gap-1 overflow-x-auto px-3 pb-1 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
+        <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'gap-5' : 'gap-6'">
+          <aside class="space-y-4 lg:sticky lg:self-start" :class="embedded ? 'lg:top-24' : 'lg:top-20'">
+            <nav
+              class="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
+              :class="embedded ? 'card p-1.5' : '-mx-3 px-3 pb-1 lg:mx-0 lg:px-0'"
+            >
               <button
                 v-for="section in sections"
                 :key="section.key"
                 type="button"
                 class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-                :class="active === section.key ? 'bg-card font-semibold text-primary' : 'text-body hover:bg-card/60 hover:text-primary'"
+                :class="active === section.key
+                  ? (embedded ? 'bg-primary/10 font-semibold text-primary' : 'bg-card font-semibold text-primary')
+                  : (embedded ? 'text-body hover:bg-sunken hover:text-primary' : 'text-body hover:bg-card/60 hover:text-primary')"
                 @click="go(section.key)"
               >
                 <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
@@ -288,9 +298,13 @@ const translating = computed(() => active.value === 'translate')
 const sections = computed(() => (translating.value ? SECTIONS.filter(section => section.key === 'submit') : SECTIONS)
   .map(section => ({ ...section, label: t(section.key === 'submit' ? 'editor.section_submit' : `editor.album.section.${section.key}`) })))
 
+const root = ref<HTMLElement | null>(null)
+/** Opens a section at its top: the page's top, or embedded, the editor's when it has scrolled out of view. */
 const go = (section: AlbumSection) => {
   active.value = section
-  if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
+  if (!import.meta.client) return
+  if (!props.embedded) window.scrollTo({ top: 0, behavior: 'smooth' })
+  else if (root.value && root.value.getBoundingClientRect().top < 0) root.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 const missing = computed(() => missingRequired(album.value))
@@ -441,3 +455,12 @@ const submitted = (revision: Revision) => {
   }
 }
 </script>
+
+<style scoped>
+/* Embedded among the admin's bordered cards (the harvest review page): the editor's cards get a border and a light shadow too. */
+.embedded-editor :deep(.card) {
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05);
+}
+</style>

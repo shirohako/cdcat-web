@@ -10,7 +10,6 @@ const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', 
 const harvestCandidateCompleteLabels: Record<string, string> = { label: '完整度', complete: '资料齐全', incomplete: '资料不全', no_cover: '缺封面', no_tracks: '缺曲目' }
 const harvestCandidateDuplicatesLabels: Record<string, string> = { label: '站内重复', strong: '站内已有（强匹配）', any: '可能重复', none: '站内没有' }
 const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间' }
-const harvestReleaseKindLabels: Record<string, string> = { first: '首发', resale: '再贩', unknown: '未知' }
 const route = useRoute()
 const router = useRouter()
 
@@ -30,7 +29,6 @@ const eventMatch = filter('event_match')
 const taskId = filter('task_id')
 const source = filter('source')
 const complete = filter('complete')
-const releaseKind = filter('release_kind')
 const duplicates = filter('duplicates')
 const circle = filter('circle')
 const adult = filter('adult')
@@ -68,57 +66,77 @@ const label = (key: string) => props.sources.find(item => item.source === key)?.
 const taskLabel = (task: HarvestTaskRow) => `#${task.id} ${task.source_label} · ${task.entry_label} · ${task.label ?? task.key}`
 /** The review page keeps the list's filters, so previous / next stay in it. */
 const reviewLink = (id: number) => ({ path: `/admin/harvest/candidates/${id}`, query: filters.value })
-const select = 'rounded-lg border border-slate-300 px-2 py-1.5'
+const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:border-slate-500 focus:outline-none'
 </script>
 
 <template>
   <div class="space-y-4">
-    <div class="flex flex-wrap gap-1 text-sm">
-      <button v-for="item in statuses" :key="item" type="button" class="rounded-full px-3 py-1" :class="(status || 'pending') === item ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'" @click="status = item === 'pending' ? '' : item">
-        {{ harvestStatusLabels[item] }}
-      </button>
-    </div>
-    <div class="flex flex-wrap items-center gap-2 text-sm">
-      <AdminHarvestEventSelect v-model="eventId" allow-none search />
-      <select v-if="eventId && eventId !== 'none'" v-model="eventMatch" aria-label="活动的关联方式" :class="select">
-        <option value="">关联到这届的</option>
-        <option value="suggested">建议首发是这届的</option>
-      </select>
-      <select v-model="taskId" aria-label="任务" :class="select" class="max-w-72">
-        <option value="">所有任务</option>
-        <option v-for="task in tasks?.tasks ?? []" :key="task.id" :value="String(task.id)">{{ taskLabel(task) }}</option>
-      </select>
-      <select v-model="source" aria-label="来源" :class="select">
-        <option value="">所有来源</option>
-        <option v-for="item in sources" :key="item.source" :value="item.source">{{ item.label }}</option>
-      </select>
-    </div>
-    <div class="flex flex-wrap items-center gap-2 text-sm">
-      <input v-model.lazy="q" type="search" placeholder="标题或社团" :class="select" class="w-56">
-      <select v-model="complete" :class="select">
-        <option v-for="value in ['', 'complete', 'incomplete', 'no_cover', 'no_tracks']" :key="value" :value="value">{{ harvestCandidateCompleteLabels[value || 'label'] }}</option>
-      </select>
-      <select v-model="releaseKind" :class="select">
-        <option value="">首发/再贩</option>
-        <option v-for="kind in ['first', 'resale', 'unknown']" :key="kind" :value="kind">{{ harvestReleaseKindLabels[kind] }}</option>
-      </select>
-      <select v-model="duplicates" :class="select">
-        <option v-for="value in ['', 'strong', 'any', 'none']" :key="value" :value="value">{{ harvestCandidateDuplicatesLabels[value || 'label'] }}</option>
-      </select>
-      <select v-model="circle" :class="select">
-        <option v-for="value in ['', 'matched', 'unmatched']" :key="value" :value="value">{{ harvestCandidateCircleLabels[value || 'label'] }}</option>
-      </select>
-      <select v-model="adult" :class="select">
-        <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>
-      </select>
-      <select v-model="sort" :class="select">
-        <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
-      </select>
-      <span class="text-slate-500">{{ data?.pagination.total ?? 0 }}</span>
-      <button v-if="filtered" type="button" class="text-xs underline" @click="clear">清除筛选</button>
-    </div>
+    <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
+      <div class="flex flex-wrap items-end justify-between gap-3 px-5 pb-3 pt-4">
+        <div class="min-w-0">
+          <slot />
+        </div>
+        <p class="shrink-0 text-sm text-slate-500"><span class="text-2xl font-semibold tabular-nums text-slate-900">{{ data?.pagination.total ?? 0 }}</span> 条</p>
+      </div>
+      <nav class="flex gap-1 overflow-x-auto border-b border-slate-200 px-3" aria-label="状态">
+        <button
+          v-for="item in statuses" :key="item" type="button" class="-mb-px shrink-0 border-b-2 px-3 py-2 text-sm transition-colors"
+          :class="(status || 'pending') === item ? 'border-slate-900 font-medium text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-800'"
+          @click="status = item === 'pending' ? '' : item"
+        >
+          {{ harvestStatusLabels[item] }}
+        </button>
+      </nav>
+      <div class="space-y-2.5 bg-slate-50/70 px-5 py-3.5 text-sm">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="w-8 shrink-0 text-xs text-slate-500">范围</span>
+          <AdminHarvestEventSelect v-model="eventId" allow-none search />
+          <select v-if="eventId && eventId !== 'none'" v-model="eventMatch" aria-label="活动的关联方式" :class="select">
+            <option value="">关联到这届的</option>
+            <option value="suggested">建议首发是这届的</option>
+          </select>
+          <select v-model="taskId" aria-label="任务" :class="select" class="max-w-72">
+            <option value="">所有任务</option>
+            <option v-for="task in tasks?.tasks ?? []" :key="task.id" :value="String(task.id)">{{ taskLabel(task) }}</option>
+          </select>
+          <select v-model="source" aria-label="来源" :class="select">
+            <option value="">所有来源</option>
+            <option v-for="item in sources" :key="item.source" :value="item.source">{{ item.label }}</option>
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="w-8 shrink-0 text-xs text-slate-500">条件</span>
+          <label class="relative">
+            <Icon name="lucide:search" class="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-slate-400" />
+            <input v-model.lazy="q" type="search" placeholder="标题或社团" aria-label="标题或社团" :class="select" class="w-56 pl-8">
+          </label>
+          <select v-model="complete" aria-label="完整度" :class="select">
+            <option v-for="value in ['', 'complete', 'incomplete', 'no_cover', 'no_tracks']" :key="value" :value="value">{{ harvestCandidateCompleteLabels[value || 'label'] }}</option>
+          </select>
+          <select v-model="duplicates" aria-label="站内重复" :class="select">
+            <option v-for="value in ['', 'strong', 'any', 'none']" :key="value" :value="value">{{ harvestCandidateDuplicatesLabels[value || 'label'] }}</option>
+          </select>
+          <select v-model="circle" aria-label="社团" :class="select">
+            <option v-for="value in ['', 'matched', 'unmatched']" :key="value" :value="value">{{ harvestCandidateCircleLabels[value || 'label'] }}</option>
+          </select>
+          <select v-model="adult" aria-label="成人" :class="select">
+            <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>
+          </select>
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="w-8 shrink-0 text-xs text-slate-500">排序</span>
+          <select v-model="sort" aria-label="排序" :class="select">
+            <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
+          </select>
+          <span class="text-xs text-slate-400">也可以点表格的表头排序</span>
+          <button v-if="filtered" type="button" class="ml-auto inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-slate-200/60" @click="clear">
+            <Icon name="lucide:x" class="size-3.5" />清除筛选
+          </button>
+        </div>
+      </div>
+    </section>
 
-    <section class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+    <section class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
       <AdminListState :pending="pending" :error="error" :empty="!data?.candidates.length" @retry="refresh()">
         <table class="w-full min-w-240 text-left text-sm">
           <thead class="border-b border-slate-200 bg-slate-50 text-xs text-slate-500">
@@ -162,7 +180,6 @@ const select = 'rounded-lg border border-slate-300 px-2 py-1.5'
               <td class="min-w-40 px-4 py-3">
                 <div class="flex max-w-64 flex-wrap gap-1.5 text-xs">
                   <span v-if="status === 'all'" class="whitespace-nowrap rounded bg-slate-900 px-1.5 py-0.5 text-white">{{ harvestStatusLabels[candidate.status] }}</span>
-                  <span v-if="candidate.release_kind !== 'first'" class="whitespace-nowrap rounded px-1.5 py-0.5" :class="candidate.release_kind === 'resale' ? 'bg-violet-100 text-violet-800' : 'bg-slate-100 text-slate-500'">{{ harvestReleaseKindLabels[candidate.release_kind] }}</span>
                   <span v-if="!candidate.has_cover" class="whitespace-nowrap rounded bg-amber-50 px-1.5 py-0.5 text-amber-800">缺封面</span>
                   <span v-if="candidate.strong_duplicate" class="whitespace-nowrap rounded bg-red-50 px-1.5 py-0.5 text-red-700">站内已有</span>
                   <span v-else-if="candidate.duplicates" class="whitespace-nowrap rounded bg-orange-50 px-1.5 py-0.5 text-orange-800">可能重复</span>

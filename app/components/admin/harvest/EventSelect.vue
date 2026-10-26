@@ -32,7 +32,7 @@ const pick = (event: PickedEntity) => {
 
 <template>
   <div class="flex flex-wrap items-center gap-2">
-    <select v-model="model" aria-label="选择活动" class="max-w-72 rounded-lg border border-slate-300 px-2 py-1.5">
+    <select v-model="model" aria-label="选择活动" class="max-w-72 rounded-lg border border-slate-300 bg-white px-2 py-1.5">
       <option v-if="allowAll" value="">所有活动</option>
       <option v-else value="" disabled>选择活动</option>
       <option v-if="allowNone" value="none">未关联活动</option>

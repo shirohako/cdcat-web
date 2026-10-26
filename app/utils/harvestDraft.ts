@@ -17,8 +17,8 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
 
 /**
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
- * title and names, release date and event (the suggested first release, none for a resale or when no
- * source names one), the description of the highest-priority source that has one, the circle as
+ * title and names, release date and event (the suggested first release and the sources' earliest
+ * date), the description of the highest-priority source that has one, the circle as
  * album artist, the tracklist, the edition's catalog number and price, credits and links. The circle
  * and the credited names are linked or created as the server suggests (utils/harvestPeople); the
  * names left to the reviewer stay printed names. The cover is picked by the reviewer, because only
@@ -42,7 +42,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     doc.release_date = fullDate(merged.release.date)
     doc.release_date_precision = merged.release.precision ?? 'day'
   }
-  doc.release_event_id = merged.release.kind === 'resale' ? null : (event?.id ?? null)
+  doc.release_event_id = event?.id ?? null
   doc.is_adult = candidate.is_adult
   doc.description = merged.descriptions[0]?.text.trim() || null
   for (const title of merged.titles) {

@@ -22,14 +22,6 @@ interface EditorHandle {
 }
 
 const { $api } = useNuxtApp()
-const harvestReleaseReasonLabels: Record<string, string> = {
-  earlier_date: '依据：来源的发售日期早于这届活动。',
-  source: '依据：来源写明是再贩。',
-  listing: '依据：固定在这届活动的任务把它标为再贩。',
-  event_fixed: '依据：固定在这届活动的任务列出了它。',
-  event_name: '依据：来源写的活动名对上了这届活动。',
-  date: '依据：来源的发售日期在这届活动期间。',
-}
 const harvestCircleByLabels: Record<string, string> = {
   identity: '审核时记住的对应', handle: 'X 账号', url: '链接', name: '社团名', artist: '署名的人是参展社团',
   circle: '参展社团（同名）', contains: '参展社团（名字包含）', manual: '手动指定',
@@ -226,8 +218,8 @@ const comparesFields = computed(() => {
   return Boolean(merged && (merged.title.alternatives.length || merged.catalog_numbers.value?.length || merged.price.value || merged.tracklist.alternatives.length))
 })
 // Each group of the source comparison is a white card on the grey page, its title inside.
-const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white'
-const cardHead = 'flex items-center gap-2 border-b border-slate-100 px-4 py-2.5 font-semibold'
+const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
+const cardHead = 'flex items-center gap-2 border-b border-slate-100 bg-slate-50/70 px-4 py-2.5 font-semibold'
 /** The linked circle's artist, from the references that come with the candidate. */
 const circleArtist = computed(() => {
   const artistId = detail.value?.candidate.artist_id
@@ -278,13 +270,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
           <p v-if="detail.candidate.reject_reason" class="text-xs text-slate-600">{{ detail.candidate.reject_reason }}</p>
           <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">建档之后来源有更新。</p>
         </div>
-        <div v-else-if="detail.candidate.release_kind !== 'first'" class="rounded-lg border px-4 py-2 text-sm" :class="detail.candidate.release_kind === 'resale' ? 'border-violet-200 bg-violet-50 text-violet-900' : 'border-amber-200 bg-amber-50 text-amber-900'">
-          <template v-if="detail.candidate.release_kind === 'resale'">这是再贩：草稿没有挂活动，发行日期取来源里最早的日期。</template>
-          <template v-else-if="detail.event">没有来源确认这是 {{ detail.event.name }} 首发，请核对发行日期和活动。</template>
-          <template v-else>没有记录关联到活动：请核对发行日期，需要时在编辑器里选上首发活动。</template>
-          <span v-if="detail.candidate.merged.release.reason" class="block text-xs">{{ harvestReleaseReasonLabels[detail.candidate.merged.release.reason] }}</span>
-          <span v-for="note in detail.candidate.merged.release.notes" :key="note" class="block text-xs">{{ note }}</span>
-        </div>
+        <p v-else-if="!detail.event" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">没有记录关联到活动：请核对发行日期，需要时在编辑器里选上首发活动。</p>
 
         <form v-if="rejectOpen" class="flex flex-wrap items-end gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm" @submit.prevent="reject">
           <label class="min-w-64 flex-1">原因<input v-model="rejectReason" required maxlength="500" class="mt-1 w-full rounded border border-slate-300 px-2 py-1.5"></label>
@@ -367,7 +353,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                           <div class="space-y-1.5 text-xs leading-5">
                             <p class="font-semibold">建议首发</p>
                             <p>根据来源推测，这张专辑最可能是在这届活动首发的。</p>
-                            <p>审核时，草稿的「发行活动」默认填这一届，可以在编辑器里改；首发还是再贩，也是跟这一届比出来的。</p>
+                            <p>审核时，草稿的「首发活动」默认填这一届，可以在编辑器里改。</p>
                             <p>挑选顺序：先看「任务固定在这届」和「活动名对上」的活动，取开始最早的一届；都没有，再看「发售日期在活动内」的。</p>
                           </div>
                         </template>
@@ -520,7 +506,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               </section>
 
               <details v-if="detail.candidate.merged.descriptions.length" class="group/desc" :class="card">
-                <summary class="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 font-semibold group-open/desc:border-b group-open/desc:border-slate-100">
+                <summary class="flex cursor-pointer list-none items-center gap-2 bg-slate-50/70 px-4 py-2.5 font-semibold group-open/desc:border-b group-open/desc:border-slate-100">
                   <Icon name="lucide:file-text" class="size-4 text-slate-400" />来源描述
                   <Icon name="lucide:chevron-down" class="ml-auto size-4 text-slate-400 transition-transform group-open/desc:rotate-180" />
                 </summary>
@@ -551,7 +537,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
         <AdminHarvestPeopleCheck v-if="open && draftReady" :people="people" :circle="circleMatch" :credits="detail.candidate.merged.credits" :artists="artistRefs" :editor="editor" />
 
         <section v-if="open" :class="card">
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 px-4 py-3">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
             <h2 class="flex items-center gap-2 font-semibold">
               <Icon name="lucide:disc-3" class="size-4 text-slate-400" />新建专辑
             </h2>

@@ -96,12 +96,12 @@ const outcome = (person: HarvestPerson) => {
   return null
 }
 const settled = computed(() => props.people.filter(person => !warnings.value.some(warning => warning.key === person.key)))
-const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white'
+const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
 </script>
 
 <template>
   <section v-if="people.length || warnings.length" :class="card">
-    <h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-100 px-4 py-2.5 font-semibold">
+    <h3 class="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-slate-100 bg-slate-50/70 px-4 py-2.5 font-semibold">
       <Icon name="lucide:user-check" class="size-4 text-slate-400" />人员核对
       <span class="text-xs font-normal text-slate-500">自动关联 {{ counts.linked }} · 新建 {{ counts.created }} · 需要人工 {{ counts.manual }}</span>
       <span v-if="open.length" class="ml-auto rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">还有 {{ open.length }} 个没处理</span>
