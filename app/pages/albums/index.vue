@@ -4,64 +4,36 @@
       <CollectionPageCard>
         <template #header>
           <CollectionPageHeader
-            v-model:search="searchInput"
-            :model-value="selectedType"
             :title="$t('albums.title')"
             :description="$t('albums.subtitle')"
             icon="lucide:disc-3"
             :create="{ to: '/contribute?type=album', label: $t('albums.new') }"
-            :filters="albumTypes"
-            :filter-label="$t('content_display.type')"
-            :search-placeholder="t('albums.search_placeholder')"
-            search-in-filters
-            @update:model-value="selectType"
-            @search="applySearch()"
           >
-            <template #filter-end>
-              <UiSegmented :model-value="shownSort" :items="sortItems" size="sm" :label="t('albums.sort.label')" @update:model-value="selectSort" />
-            </template>
-            <template #search-end>
-              <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
-            </template>
-            <!-- Narrower filters -->
-            <template #filters="{ activeClass, idleClass }">
-              <!-- The event series pages link here with ?event=<id>. -->
-              <EventFilterMenu
-                :model-value="eventId"
-                :label="t('albums.event_filter_label')"
-                :active-class="activeClass"
-                :idle-class="idleClass"
-                @update:model-value="selectEvent"
-              />
-              <!-- An event fixes the year, so choosing one clears the other. -->
-              <CollectionYearFilter
-                :model-value="year"
-                :label="t('albums.year_filter')"
-                :active-class="activeClass"
-                :idle-class="idleClass"
-                @update:model-value="selectYear"
-              />
-              <span class="mx-1 hidden h-5 w-px bg-line sm:block" aria-hidden="true" />
-              <!-- Categories as chips, one at a time; the chosen one again clears it. -->
-              <div class="flex flex-wrap items-center gap-1.5" role="group" :aria-label="t('albums.category_filter')">
-                <button
-                  v-for="value in albumCategories"
-                  :key="value"
-                  type="button"
-                  class="inline-flex h-8 items-center rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150 ease-out"
-                  :class="category === value ? activeClass : idleClass"
-                  :aria-pressed="category === value"
-                  @click="selectFilter('category', category === value ? null : value)"
-                >
-                  {{ enumLabel('album_category', value) }}
-                </button>
-              </div>
-              <button v-if="filtered" type="button" class="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-medium text-meta transition-colors hover:bg-ghost-hover hover:text-primary" @click="clearFilters">
-                <Icon name="lucide:rotate-ccw" class="h-3.5 w-3.5" />
-                {{ t('albums.clear_filters') }}
-              </button>
+            <!-- The sort comes first: a full-width switch on phones, tabs on the header's line on wider screens. -->
+            <template #tabs>
+              <AlbumSortTabs :model-value="shownSort" :items="sortItems" :label="t('albums.sort.label')" @update:model-value="selectSort" />
             </template>
           </CollectionPageHeader>
+          <!-- The event series pages link here with ?event=<id>. -->
+          <AlbumListFilters
+            v-model:search="searchInput"
+            :categories="albumCategories.map(value => ({ value, label: enumLabel('album_category', value) }))"
+            :category="category"
+            :types="albumTypes"
+            :type="selectedType"
+            :event-id="eventId"
+            :year="year"
+            :pending="includePending"
+            :filtered="filtered"
+            :search-placeholder="t('albums.search_placeholder')"
+            @category="selectFilter('category', $event)"
+            @type="selectType"
+            @event="selectEvent"
+            @year="selectYear"
+            @pending="setIncludePending"
+            @search="applySearch()"
+            @clear="clearFilters"
+          />
         </template>
 
       <!-- A failed refetch keeps the last results below this. -->
@@ -126,14 +98,10 @@ const { t, te } = useI18n();
 // Types and categories as the database has them now (the catalog schema), the built-in lists until it loads.
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
-const TYPE_ICONS: Record<string, string> = {
-  album: 'lucide:disc-3', single: 'lucide:music-2', ep: 'lucide:list-music', compilation: 'lucide:library',
-  drama: 'lucide:audio-lines', radio: 'lucide:radio',
-}
 const albumTypes = computed(() => [
-  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
+  { value: 'all', label: t('common.all') },
   ...(schema.value?.enums.album_type ?? ALBUM_TYPES).map(value => ({
-    value, label: te(`albums.type.${value}`) ? t(`albums.type.${value}`) : enumLabel('album_type', value), icon: TYPE_ICONS[value] ?? 'lucide:disc',
+    value, label: te(`albums.type.${value}`) ? t(`albums.type.${value}`) : enumLabel('album_type', value),
   })),
 ])
 const albumCategories = computed(() => schema.value?.enums.album_category ?? [...ALBUM_CATEGORIES])
@@ -243,10 +211,13 @@ const clearFilters = () => {
 /** Enter or the search button; a query too short to search leaves the list as it is and says why. */
 // 最相关 only shows while searching, where it is what no choice means.
 const shownSort = computed(() => sort.value ?? (searchQuery.value ? 'relevance' : 'new'))
+const SORT_ICONS: Record<string, string> = {
+  relevance: 'lucide:crosshair', new: 'lucide:calendar-clock', trending: 'lucide:trending-up', top_rated: 'lucide:award',
+}
 const sortItems = computed(() => [
-  ...(searchQuery.value ? [{ value: 'relevance', label: t('albums.sort.relevance') }] : []),
-  ...SORTS.map(value => ({ value, label: t(`albums.sort.${value}`) })),
-])
+  ...(searchQuery.value ? ['relevance'] : []),
+  ...SORTS,
+].map(value => ({ value, label: t(`albums.sort.${value}`), icon: SORT_ICONS[value]! })))
 const selectSort = (value: string | undefined) => {
   const chosen = value === 'relevance' || (value === 'new' && !searchQuery.value) ? undefined : value
   router.push({ query: { ...route.query, sort: chosen, page: undefined } })

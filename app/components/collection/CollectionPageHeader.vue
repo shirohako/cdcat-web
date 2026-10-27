@@ -9,9 +9,10 @@ interface FilterOption {
  * The header of every list page's card (CollectionPageCard's #header), built the same way everywhere:
  *
  * - the icon, title and description, with #action and the `create` button on the right;
+ * - #tabs right under them, on the header's bottom line (the album list's sort);
  * - when `search` is bound (v-model:search), a search row: the box, its button, then #search-end (the pending switch);
  * - when there are filters, a grey bar: the type chips with #filter-end on one line, #filters (narrower filters,
- *   a result count) on the next, and the search row last when `searchInFilters` is set.
+ *   a result count) on the next.
  */
 withDefaults(defineProps<{
   title: string
@@ -23,8 +24,6 @@ withDefaults(defineProps<{
   modelValue?: string
   filterLabel?: string
   searchPlaceholder?: string
-  /** Put the search row at the foot of the grey filter bar instead of under the title. */
-  searchInFilters?: boolean
 }>(), {
   create: undefined,
   filters: () => [],
@@ -71,8 +70,10 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
       </div>
     </div>
 
+    <slot name="tabs" />
+
     <CollectionSearchRow
-      v-if="search !== undefined && !searchInFilters"
+      v-if="search !== undefined"
       v-model="search"
       class="border-t border-line px-4 py-3 sm:px-6"
       :placeholder="searchPlaceholder"
@@ -111,10 +112,6 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
       <div v-if="$slots.filters" class="flex flex-wrap items-center gap-2">
         <slot name="filters" :active-class="activeFilterClass" :idle-class="idleFilterClass" />
       </div>
-
-      <CollectionSearchRow v-if="search !== undefined && searchInFilters" v-model="search" :placeholder="searchPlaceholder" @submit="emit('search')">
-        <slot name="search-end" />
-      </CollectionSearchRow>
     </div>
   </section>
 </template>
