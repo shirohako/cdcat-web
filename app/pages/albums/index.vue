@@ -9,6 +9,9 @@
             icon="lucide:disc-3"
             :create="{ to: '/contribute?type=album', label: $t('albums.new') }"
           >
+            <template #icon>
+              <AlbumHeaderArt />
+            </template>
             <!-- The sort comes first: a full-width switch on phones, tabs on the header's line on wider screens. -->
             <template #tabs>
               <AlbumSortTabs :model-value="shownSort" :items="sortItems" :label="t('albums.sort.label')" @update:model-value="selectSort" />

@@ -8,7 +8,8 @@ interface FilterOption {
 /**
  * The header of every list page's card (CollectionPageCard's #header), built the same way everywhere:
  *
- * - the icon, title and description, with #action and the `create` button on the right;
+ * - the icon (or #icon, a page's own picture), title and description, with #action and the `create` button on the
+ *   right;
  * - #tabs right under them, on the header's bottom line (the album list's sort);
  * - when `search` is bound (v-model:search), a search row: the box, its button, then #search-end (the pending switch);
  * - when there are filters, a grey bar: the type chips with #filter-end on one line, #filters (narrower filters,
@@ -51,7 +52,7 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
   <section class="border-b border-line">
     <div class="flex items-start justify-between gap-3 px-4 py-3.5 sm:items-center sm:px-6 sm:py-4.5">
       <div class="flex min-w-0 items-center gap-3.5">
-        <UiIconTile :icon="icon" />
+        <slot name="icon"><UiIconTile :icon="icon" /></slot>
 
         <div class="min-w-0">
           <h1 class="text-2xl font-bold tracking-[-0.025em] text-title sm:text-[28px]">
