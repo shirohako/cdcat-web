@@ -24,7 +24,7 @@
         >
           <div
             :key="revealKey"
-            class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5"
+            class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5"
             :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
             :inert="refetching"
           >

@@ -50,6 +50,8 @@ export interface AlbumSimple {
   is_favorited: boolean
   /** Awaiting review; see PendingFields. */
   is_pending?: boolean
+  /** The album artists as credited, in order; only the album, artist-album and label-album lists send them. */
+  artists?: { id: number, name: string, join_phrase: string | null }[]
 }
 
 /** 这张专辑各收听状态的人数（tracking_stats；没有 total，和个人的 TrackingStats 不同） */

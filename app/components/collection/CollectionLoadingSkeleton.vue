@@ -127,7 +127,7 @@ const defaultGrid = computed(() => {
     case 'wide': return 'grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4'
     case 'articles': return 'grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3'
     case 'events': return props.portrait ? 'grid-cols-3 gap-2.5 sm:gap-4 md:grid-cols-4 xl:grid-cols-5' : 'grid-cols-1 gap-2.5 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'
-    default: return 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5'
+    default: return 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5'
   }
 })
 

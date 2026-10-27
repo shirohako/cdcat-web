@@ -128,6 +128,13 @@
       "top_rated": "Top rated",
       "relevance": "Best match"
     },
+    "card": {
+      "views": "{count} views",
+      "likes": "{count} favorites",
+      "discs": "{count} disc | {count} discs",
+      "tracks": "{count} track | {count} tracks",
+      "artist_separator": ", "
+    },
     "category_filter": "Category",
     "year_filter": "Year",
     "more_filters": "More filters",

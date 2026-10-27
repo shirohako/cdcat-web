@@ -128,6 +128,13 @@
       "top_rated": "高評分",
       "relevance": "最相關"
     },
+    "card": {
+      "views": "{count} 次查看",
+      "likes": "{count} 人收藏",
+      "discs": "{count} 張碟",
+      "tracks": "{count} 首曲目",
+      "artist_separator": "、"
+    },
     "category_filter": "類別",
     "year_filter": "年份",
     "more_filters": "更多篩選",

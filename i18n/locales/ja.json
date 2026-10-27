@@ -128,6 +128,13 @@
       "top_rated": "高評価",
       "relevance": "関連度"
     },
+    "card": {
+      "views": "{count} 回閲覧",
+      "likes": "{count} 人がお気に入り",
+      "discs": "{count} 枚",
+      "tracks": "{count} 曲",
+      "artist_separator": "、"
+    },
     "category_filter": "カテゴリー",
     "year_filter": "年",
     "more_filters": "その他の絞り込み",

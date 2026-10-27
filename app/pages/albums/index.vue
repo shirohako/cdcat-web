@@ -67,7 +67,7 @@
           @update:page="goToPage"
         >
           <!-- 专辑网格 -->
-          <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
+          <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5">
             <AlbumCard
               v-for="album in albumsData"
               :key="album.id"
