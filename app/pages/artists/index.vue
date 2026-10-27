@@ -37,60 +37,50 @@
 
       <!-- 艺术家列表 -->
       <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
-        <!-- 艺术家网格 -->
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          <NuxtLink
-            v-for="artist in artistsData"
-            :key="artist.id"
-            :to="`/artists/${artist.id}`"
-            class="group flex min-w-0 items-center gap-2.5 rounded-xl bg-sunken p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
-          >
-            <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card ring-1 ring-line">
-              <img
-                v-if="artist.image_url"
-                :src="artist.image_url"
-                :alt="artist.name"
-                class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              >
-              <div v-else class="text-faint">
-                <Users :size="22" />
-              </div>
-            </div>
-
-            <div class="min-w-0 flex-1">
-              <h3 class="truncate text-sm font-semibold text-title transition-colors group-hover:text-primary">
-                {{ artist.name }}
-              </h3>
-
-              <div class="mt-1.5 flex items-center gap-3.5 text-xs text-meta">
-                <div class="flex items-center gap-1.5">
-                  <Disc3 :size="13" class="text-meta" />
-                  <span class="font-medium">{{ artist.albums_count || 0 }}</span>
-                </div>
-                <div class="flex items-center gap-1.5">
-                  <Heart :size="13" :fill="artist.is_favorited ? 'currentColor' : 'none'" :class="artist.is_favorited ? 'text-rose-500 dark:text-rose-400' : 'text-meta group-hover:text-rose-400'" class="transition-colors" />
-                  <span class="font-medium">{{ artist.followers_count || 0 }}</span>
-                </div>
-              </div>
-            </div>
-          </NuxtLink>
-        </div>
-
-        <!-- 空状态 -->
-        <div v-if="artistsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="text-meta mb-4">
-            <Users :size="64" class="mx-auto" />
-          </div>
-          <p class="text-meta">{{ $t('artists.no_results') }}</p>
-        </div>
-
-        <CommonPagination
-          class="mt-6"
+        <CommonPagedList
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
+          :total="pagination.total"
+          :count="artistsData.length"
+          :per-page="pagination.per_page"
+          :top-after="15"
           :disabled="refetching"
           @update:page="goToPage"
-        />
+        >
+          <!-- 艺术家网格 -->
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <NuxtLink
+              v-for="artist in artistsData"
+              :key="artist.id"
+              :to="`/artists/${artist.id}`"
+              class="group flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out bg-black/[0.025] hover:bg-black/[0.065] active:bg-black/[0.09] dark:bg-white/[0.04] dark:hover:bg-white/[0.07] dark:active:bg-white/[0.1]"
+            >
+              <div class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card ring-1 ring-line">
+                <img
+                  v-if="artist.image_url"
+                  :src="artist.image_url"
+                  :alt="artist.name"
+                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                >
+                <div v-else class="text-faint">
+                  <Users :size="12" />
+                </div>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <UiTruncate :text="artist.name" tag="h3" class="text-[13px] font-medium text-title transition-colors group-hover:text-primary" />
+              </div>
+            </NuxtLink>
+          </div>
+
+          <!-- 空状态 -->
+          <div v-if="artistsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
+            <div class="text-meta mb-4">
+              <Users :size="64" class="mx-auto" />
+            </div>
+            <p class="text-meta">{{ $t('artists.no_results') }}</p>
+          </div>
+        </CommonPagedList>
       </div>
       </CollectionPageCard>
     </div>
@@ -98,7 +88,7 @@
 </template>
 
 <script setup>
-import { Users, Disc3, Heart } from "@lucide/vue";
+import { Users } from "@lucide/vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -125,12 +115,15 @@ const currentPage = computed(() => {
   return page > 0 ? page : 1;
 });
 
+/** Artists a page holds: whole rows in two to five columns. */
+const PER_PAGE = 60
+
 // 从 API 获取艺术家列表 - 使用 computed query 以响应路由变化
 const { includePending, setIncludePending } = usePendingToggle()
 const { data: artistsResponse, status, error, refresh, loading, refetching, revealKey, revealClass } = usePageAPI("/v1/artists", {
   query: computed(() => ({
     page: currentPage.value,
-    per_page: 18,
+    per_page: PER_PAGE,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     include_pending: includePending.value ? 1 : undefined,
   })),
@@ -152,7 +145,7 @@ const pagination = computed(() => {
   if (!artistsResponse.value?.pagination) {
     return {
       total: 0,
-      per_page: 15,
+      per_page: PER_PAGE,
       current_page: 1,
       last_page: 1,
     };

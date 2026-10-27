@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-const { appliedTheme, appliedHue } = useAppearance()
+const { appliedTheme, appliedHue, appliedPalette } = useAppearance()
 const { t, locale } = useI18n()
 const config = useRuntimeConfig()
 const absolute = useSiteUrl()
@@ -22,6 +22,8 @@ useHead({
     'data-theme': () => appliedTheme.value,
     // A string: a numeric 0 would be dropped as empty.
     'style': () => `--hue: ${appliedHue.value}`,
+    // ink: a near-black theme colour on faintly violet greys (theme.css); left out for the hue presets.
+    'data-palette': () => appliedPalette.value,
   },
   link: [
     { rel: 'icon', href: '/favicon.ico', sizes: 'any' },

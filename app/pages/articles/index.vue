@@ -78,7 +78,6 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
             :title="t('content_display.articles')"
             :description="t('content_display.articles_desc')"
             icon="lucide:newspaper"
-            :create="isAuthenticated ? { to: '/articles/new', label: t('content_display.new_article') } : undefined"
             :filters="typeFilters"
             :filter-label="t('content_display.type')"
             :search-placeholder="t('article_ui.list.search')"
@@ -88,6 +87,15 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
             <template v-if="isAuthenticated" #action>
               <NuxtLink to="/articles/mine" class="btn btn-sm h-8 gap-1.5 px-2.5 text-xs sm:h-9 sm:px-3.5" :aria-label="t('article_ui.mine.title')">
                 <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
+              </NuxtLink>
+              <!-- The list headers' old "new" button; the other lists use UiCreateButton. -->
+              <NuxtLink
+                to="/articles/new"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
+                :aria-label="t('content_display.new_article')"
+              >
+                <Icon name="lucide:plus" class="h-3.5 w-3.5" />
+                <span class="hidden sm:inline">{{ t('content_display.new_article') }}</span>
               </NuxtLink>
             </template>
             <template #filter-end>
@@ -115,13 +123,15 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
           {{ t('common.load_failed') }}<button type="button" class="link" @click="refresh()">{{ t('common.retry') }}</button>
         </div>
         <div v-else :key="revealKey" class="transition-opacity @container" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
-          <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3">
-            <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
-          </div>
-          <UiEmpty v-else :title="filtered ? t('article_ui.list.no_match') : t('content_display.no_articles')" :icon="FileText" class="min-h-72" />
-          <CommonPagination
-            v-if="data && data.pagination.last_page > 1" class="mt-6" :page="data.pagination.current_page" :total-pages="data.pagination.last_page"
-            :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })" />
+          <CommonPagedList
+            :page="data?.pagination.current_page ?? 1" :total-pages="data?.pagination.last_page ?? 1" :total="data?.pagination.total ?? 0"
+            :count="data?.articles.length ?? 0" :per-page="data?.pagination.per_page ?? 1" :top-after="6" :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })"
+          >
+            <div v-if="data?.articles.length" class="grid grid-cols-1 gap-5 @lg:grid-cols-2 @4xl:grid-cols-3">
+              <ArticleCard v-for="article in data.articles" :key="article.id" :article="article" />
+            </div>
+            <UiEmpty v-else :title="filtered ? t('article_ui.list.no_match') : t('content_display.no_articles')" :icon="FileText" class="min-h-72" />
+          </CommonPagedList>
         </div>
       </CollectionPageCard>
     </div>

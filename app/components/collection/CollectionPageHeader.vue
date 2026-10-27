@@ -17,7 +17,7 @@ withDefaults(defineProps<{
   title: string
   description: string
   icon: string
-  /** The "new" button, primary and on the right; only its icon shows on phones. */
+  /** The "new" button on the right: a plus in a circle (UiCreateButton), its label in a tooltip. */
   create?: { to: string, label: string }
   filters?: FilterOption[]
   modelValue?: string
@@ -40,10 +40,10 @@ const emit = defineEmits<{
 /** What is typed in the search row; leaving it unbound leaves the row out. */
 const search = defineModel<string>('search')
 
-// Filter chips as in vivia: the chosen one in the theme colour, the rest on the quiet button colour. #filter-end
-// and #filters get the same classes so extra filters match the row.
+// Filter chips: the chosen one in the theme colour, the rest plain grey in the light theme (the quiet button colour
+// in the dark one). #filter-end and #filters get the same classes so extra filters match the row.
 const activeFilterClass = 'bg-primary text-on-primary ring-primary'
-const idleFilterClass = 'bg-btn text-btn-content ring-transparent hover:bg-btn-hover'
+const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10 dark:bg-btn dark:text-btn-content dark:hover:bg-btn-hover'
 </script>
 
 <template>
@@ -65,15 +65,7 @@ const idleFilterClass = 'bg-btn text-btn-content ring-transparent hover:bg-btn-h
 
       <div v-if="$slots.action || create" class="flex shrink-0 items-center gap-2">
         <slot name="action" />
-        <NuxtLink
-          v-if="create"
-          :to="create.to"
-          class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-          :aria-label="create.label"
-        >
-          <Icon name="lucide:plus" class="h-3.5 w-3.5" />
-          <span class="hidden sm:inline">{{ create.label }}</span>
-        </NuxtLink>
+        <UiCreateButton v-if="create" :to="create.to" :label="create.label" />
       </div>
     </div>
 

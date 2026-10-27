@@ -105,9 +105,10 @@
     "subtitle": "浏览所有专辑、单曲与合辑",
     "new": "新建",
     "load_failed": "加载失败：{message}",
-    "found": "共找到 {count} 张专辑",
     "page_indicator": "（{current}/{last}）",
     "no_results": "没有找到专辑",
+    "no_search_results": "没有找到与「{query}」相关的专辑",
+    "search_too_short": "至少输入 2 个字符，汉字或假名 1 个即可",
     "event_filter_label": "活动",
     "disc_singular": "碟",
     "disc_plural": "碟",
@@ -136,7 +137,6 @@
     "subtitle": "浏览所有艺术家与社团",
     "new": "新建",
     "load_failed": "加载失败：{message}",
-    "found": "共找到 {count} 位艺术家",
     "page_indicator": "（第 {current} / {last} 页）",
     "no_results": "没有找到艺术家",
     "type": {
@@ -381,6 +381,13 @@
     "page_label": "前往第 {page} 页",
     "previousPage": "上一页",
     "nextPage": "下一页",
+    "pagination_back": "向前 {count} 页",
+    "pagination_forward": "向后 {count} 页",
+    "pagination_jump": "跳至 {input} 页",
+    "pagination_jump_label": "要前往的页码",
+    "results_all": "共找到 {total} 条记录",
+    "results_range": "正在浏览 {range}，共找到 {total} 条记录",
+    "results_one": "正在浏览第 {range} 条，共找到 {total} 条记录",
     "items_total": "共 {count} 条",
     "got_it": "知道了",
     "confirm_delete": "确认删除",
@@ -1314,7 +1321,9 @@
       "library": "收藏与记录",
       "contribute": "创作与贡献",
       "account": "账户"
-    }
+    },
+    "back_to_top": "回到顶部",
+    "read_percent": "已读 {percent}%"
   },
   "appearance": {
     "title": "外观",
@@ -1322,7 +1331,8 @@
     "dark": "暗色",
     "light": "亮色",
     "color": "主题色",
-    "preset": "使用色相 {hue}"
+    "preset": "使用色相 {hue}",
+    "ink": "墨色"
   },
   "event_picker": {
     "placeholder": "搜索活动，例如 C107 或 M3-2025",
@@ -2080,7 +2090,6 @@
       },
       "all_categories": "全部版块",
       "hint": "输入至少两个字开始搜索。",
-      "results": "共 {count} 条结果",
       "empty": "没有找到相关内容。",
       "reply_under": "#{floor} 的楼中楼"
     },
@@ -2693,7 +2702,6 @@
     "title": "搜索",
     "placeholder": "搜索专辑、曲目、艺术家…",
     "results_for": "“{q}”的搜索结果",
-    "view_all": "查看全部结果",
     "more": "查看全部 {count} 条",
     "no_results": "没有找到相关内容",
     "hint": "简体、繁体、日文汉字和假名都能互相搜到，也可以搜品番和条码",
@@ -2701,8 +2709,6 @@
     "include_pending": "包含审核中",
     "matched": "匹配：{text}",
     "all": "全部",
-    "searching": "搜索中…",
-    "shortcut": "按 / 键搜索",
     "capped": "超过 {count} 条",
     "disc_track": "碟 {disc} · 第 {track} 首",
     "types": {

@@ -1,6 +1,6 @@
 <template>
   <NuxtLink :to="`/albums/${album.id}`" class="group">
-    <div class="overflow-hidden rounded-xl bg-sunken transition-colors duration-150 ease-out group-hover:bg-card-hover group-active:bg-card-active">
+    <div class="overflow-hidden rounded-xl bg-black/[0.035] transition-colors duration-150 ease-out group-hover:bg-black/[0.06] group-active:bg-black/[0.09] dark:bg-white/[0.04] dark:group-hover:bg-white/[0.07] dark:group-active:bg-white/[0.1]">
       <div class="relative flex aspect-square items-center justify-center overflow-hidden">
         <img
           v-if="album.image_url"

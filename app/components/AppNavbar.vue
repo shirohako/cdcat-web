@@ -21,32 +21,10 @@
         </NuxtLink>
       </div>
 
-      <!-- Right Section: Search, Appearance, Language Switcher & User. Every control is a 40px square; the glyphs are
-           sized by eye rather than all at 20px (search 20, moon 19, sun 21, the dense languages glyph and the bell 18),
+      <!-- Right Section: Appearance, Language Switcher & User. Every control is a 40px square; the glyphs are
+           sized by eye rather than all at 20px (moon 19, sun 21, the dense languages glyph and the bell 18),
            so they look the same size, and the avatar is 26px with 7px of room around it on hover. -->
       <div class="flex items-center gap-1">
-        <!-- Search: an icon that opens a search box ("/" opens it too) -->
-        <div class="sm:relative">
-          <UiIconButton
-            icon="lucide:search"
-            :label="$t('search.title')"
-            :tooltip="$t('search.shortcut')"
-            :class="{ 'bg-ghost-hover text-primary': showSearch }"
-            :aria-expanded="showSearch"
-            @click="toggleSearch"
-          />
-
-          <transition name="dropdown">
-            <div
-              v-if="showSearch"
-              class="fixed inset-x-4 top-[4.5rem] rounded-xl bg-popover p-3 shadow-overlay ring-1 ring-line
-                     sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[28rem]"
-            >
-              <SearchQuickResults autofocus @dismiss="showSearch = false" />
-            </div>
-          </transition>
-        </div>
-
         <!-- Appearance: dark or light, and the theme colour -->
         <div class="sm:relative">
           <UiTooltip :text="$t('appearance.open')">
@@ -241,7 +219,7 @@
 
     <!-- Click outside to close dropdowns -->
     <div
-      v-if="showLanguageMenu || showUserMenu || showSearch || showAppearance || showNotifications"
+      v-if="showLanguageMenu || showUserMenu || showAppearance || showNotifications"
       class="fixed inset-0 -z-10"
       @click="closeAllDropdowns"
     />
@@ -272,7 +250,6 @@ const { enter: glideTo, leave: glideAway, style: menuHighlight } = useGlideHighl
 // Reopened, the menu starts without a highlight until the pointer is on a row.
 watch(showUserMenu, (open) => { if (!open) glideAway() })
 const showLanguageMenu = ref(false)
-const showSearch = ref(false)
 const showAppearance = ref(false)
 const showNotifications = ref(false)
 
@@ -302,12 +279,6 @@ const toggleMobileMenu = () => {
   emit('toggleMobileMenu')
 }
 
-const toggleSearch = () => {
-  const next = !showSearch.value
-  closeAllDropdowns()
-  showSearch.value = next
-}
-
 const toggleAppearance = () => {
   const next = !showAppearance.value
   closeAllDropdowns()
@@ -329,7 +300,6 @@ const toggleUserMenu = () => {
 const closeAllDropdowns = () => {
   showUserMenu.value = false
   showLanguageMenu.value = false
-  showSearch.value = false
   showAppearance.value = false
   showNotifications.value = false
 }
@@ -339,29 +309,21 @@ watch(showNotifications, (open) => {
   if (!open) return
   showUserMenu.value = false
   showLanguageMenu.value = false
-  showSearch.value = false
   showAppearance.value = false
 })
 
-// Opening a search result (or any other page) closes the menus.
+// Opening another page closes the menus.
 const route = useRoute()
 watch(() => route.fullPath, closeAllDropdowns)
 
 /** Whether a row of the user menu is the page being shown (or a page under it). */
 const isCurrent = (path: string) => route.path === path || route.path.startsWith(`${path}/`)
 
-// "/" anywhere outside a text field opens the search box; Escape closes whichever menu is open.
+// Escape closes whichever menu is open.
 const onKey = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && (showUserMenu.value || showLanguageMenu.value || showSearch.value || showAppearance.value || showNotifications.value)) {
+  if (event.key === 'Escape' && (showUserMenu.value || showLanguageMenu.value || showAppearance.value || showNotifications.value)) {
     closeAllDropdowns()
-    return
   }
-  if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
-  const target = event.target as HTMLElement | null
-  if (target && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))) return
-  event.preventDefault()
-  closeAllDropdowns()
-  showSearch.value = true
 }
 onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey))

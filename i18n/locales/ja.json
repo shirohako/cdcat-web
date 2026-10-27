@@ -105,9 +105,10 @@
     "subtitle": "すべてのアルバム・シングル・コンピレーションを表示",
     "new": "新規",
     "load_failed": "読み込みに失敗しました：{message}",
-    "found": "{count} 件のアルバムが見つかりました",
     "page_indicator": "（{current}/{last}）",
     "no_results": "アルバムが見つかりません",
+    "no_search_results": "「{query}」に一致するアルバムはありません",
+    "search_too_short": "2 文字以上入力してください（漢字・かなは 1 文字から）",
     "event_filter_label": "イベント",
     "disc_singular": "ディスク",
     "disc_plural": "ディスク",
@@ -136,7 +137,6 @@
     "subtitle": "すべてのアーティストとサークルを表示",
     "new": "新規",
     "load_failed": "読み込みに失敗しました：{message}",
-    "found": "{count} 件のアーティストが見つかりました",
     "page_indicator": "（{current}/{last} ページ）",
     "no_results": "アーティストが見つかりません",
     "type": {
@@ -381,6 +381,13 @@
     "page_label": "{page}ページへ移動",
     "previousPage": "前のページ",
     "nextPage": "次のページ",
+    "pagination_back": "{count} ページ戻る",
+    "pagination_forward": "{count} ページ進む",
+    "pagination_jump": "{input} ページへ",
+    "pagination_jump_label": "移動先のページ",
+    "results_all": "全 {total} 件",
+    "results_range": "{total} 件中 {range} 件を表示",
+    "results_one": "{total} 件中 {range} 件目を表示",
     "items_total": "全{count}件",
     "got_it": "OK",
     "confirm_delete": "削除する",
@@ -1314,7 +1321,9 @@
       "library": "ライブラリ",
       "contribute": "投稿と編集",
       "account": "アカウント"
-    }
+    },
+    "back_to_top": "トップへ戻る",
+    "read_percent": "{percent}% 読了"
   },
   "appearance": {
     "title": "外観",
@@ -1322,7 +1331,8 @@
     "dark": "ダーク",
     "light": "ライト",
     "color": "テーマカラー",
-    "preset": "色相 {hue} を使う"
+    "preset": "色相 {hue} を使う",
+    "ink": "インク"
   },
   "event_picker": {
     "placeholder": "イベントを検索（例：C107、M3-2025）",
@@ -2080,7 +2090,6 @@
       },
       "all_categories": "すべてのカテゴリー",
       "hint": "2 文字以上入力して検索します。",
-      "results": "{count} 件",
       "empty": "見つかりませんでした。",
       "reply_under": "#{floor} への返信"
     },
@@ -2693,7 +2702,6 @@
     "title": "検索",
     "placeholder": "アルバム・曲・アーティストを検索…",
     "results_for": "「{q}」の検索結果",
-    "view_all": "すべての結果を見る",
     "more": "{count} 件すべて見る",
     "no_results": "見つかりませんでした",
     "hint": "簡体字・繁体字・日本の漢字、ひらがなとカタカナは区別せずに検索できます。品番やバーコードでも検索できます",
@@ -2701,8 +2709,6 @@
     "include_pending": "承認待ちを含む",
     "matched": "一致：{text}",
     "all": "すべて",
-    "searching": "検索中…",
-    "shortcut": "/ キーで検索",
     "capped": "{count} 件以上",
     "disc_track": "Disc {disc} · {track} 曲目",
     "types": {

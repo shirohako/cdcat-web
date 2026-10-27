@@ -14,12 +14,12 @@
             :filter-label="$t('content_display.type')"
             :search-placeholder="t('albums.search_placeholder')"
             @update:model-value="selectType"
-            @search="applySearch"
+            @search="applySearch()"
           >
             <template #search-end>
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             </template>
-            <!-- Narrower filters and the result count -->
+            <!-- Narrower filters -->
             <template #filters="{ activeClass, idleClass }">
               <!-- The event series pages link here with ?event=<id>. -->
               <EventFilterChip
@@ -56,7 +56,6 @@
                 <Icon name="lucide:rotate-ccw" class="h-3.5 w-3.5" />
                 {{ t('albums.clear_filters') }}
               </button>
-              <span v-if="albumsResponse" class="ml-auto text-xs tabular-nums text-meta">{{ t('albums.found', { count: pagination.total }) }}</span>
             </template>
           </CollectionPageHeader>
         </template>
@@ -79,30 +78,32 @@
 
       <!-- 专辑列表 -->
       <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
-        <!-- 专辑网格 -->
-        <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
-          <AlbumCard
-            v-for="album in albumsData"
-            :key="album.id"
-            :album="album"
-          />
-        </div>
-
-        <!-- 空状态 -->
-        <div v-if="albumsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
-          <div class="text-meta mb-4">
-            <Disc3 :size="64" class="mx-auto" />
-          </div>
-          <p class="text-meta">{{ $t('albums.no_results') }}</p>
-        </div>
-
-        <CommonPagination
-          class="mt-6"
+        <CommonPagedList
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
+          :total="pagination.total"
+          :count="albumsData.length"
+          :per-page="pagination.per_page"
           :disabled="refetching"
           @update:page="goToPage"
-        />
+        >
+          <!-- 专辑网格 -->
+          <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5">
+            <AlbumCard
+              v-for="album in albumsData"
+              :key="album.id"
+              :album="album"
+            />
+          </div>
+
+          <!-- 空状态 -->
+          <div v-if="albumsData.length === 0" class="flex min-h-72 flex-col items-center justify-center text-center">
+            <div class="text-meta mb-4">
+              <Disc3 :size="64" class="mx-auto" />
+            </div>
+            <p class="text-meta">{{ searchQuery ? t('albums.no_search_results', { query: searchQuery }) : t('albums.no_results') }}</p>
+          </div>
+        </CommonPagedList>
       </div>
       </CollectionPageCard>
     </div>
@@ -140,13 +141,14 @@ const eventId = computed(() => {
 const category = computed(() => route.query.category ? String(route.query.category) : null)
 const format = computed(() => route.query.format ? String(route.query.format) : null)
 const { includePending, setIncludePending } = usePendingToggle()
-// The list endpoint needs at least two characters to search.
+// The list endpoint needs two characters, or one kanji or kana, to search.
 const searchQuery = computed(() => {
   const value = String(route.query.q || '').trim()
-  return value.replace(/\s/g, '').length >= 2 ? value : null
+  return searchable(value) ? value : null
 })
 const searchInput = ref(String(route.query.q || ''))
 watch(() => route.query.q, value => { searchInput.value = String(value || '') })
+const toast = useToast()
 
 usePageSeo({
   title: () => t('albums.title'),
@@ -223,8 +225,14 @@ const clearFilters = () => {
   router.push({ query: { pending: route.query.pending || undefined } })
 };
 
+/** Enter or the search button; a query too short to search leaves the list as it is and says why. */
 const applySearch = () => {
   const value = searchInput.value.trim()
+  if (value && !searchable(value)) {
+    // One id, so pressing Enter again pulses the toast instead of stacking copies.
+    toast.add({ id: 'albums-search-too-short', title: t('albums.search_too_short'), color: 'warning' })
+    return
+  }
   if (value === String(route.query.q || '')) return
   router.push({ query: { ...route.query, q: value || undefined, page: undefined } })
 };

@@ -3,15 +3,26 @@ import type { Ref } from 'vue'
 
 export type Theme = 'dark' | 'light'
 
+/**
+ * A theme colour: an OKLCH hue that every surface is tinted by (vivia's presets), or `ink`, a near-black theme colour
+ * on faintly violet greys (theme.css, [data-palette="ink"]).
+ */
+export type ThemeColor = number | 'ink'
+
 export const DEFAULT_THEME: Theme = 'light'
-export const DEFAULT_HUE = 250
-/** vivia's preset theme colours, as OKLCH hues. */
-export const HUE_PRESETS = [0, 30, 60, 180, 250, 270, 300, 330, 345] as const
+export const DEFAULT_COLOR: ThemeColor = 'ink'
+/** The hue the ink palette's greys lean to. */
+export const INK_HUE = 290
+/** The admin console isn't themed yet: always light, in vivia's blue. */
+export const ADMIN_HUE = 250
+/** The panel's choices: ink, then vivia's preset hues. */
+export const COLOR_PRESETS: readonly ThemeColor[] = ['ink', 0, 30, 60, 180, 250, 270, 300, 330, 345]
 
 const APPEARANCE_COOKIE = { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' } as const
 
 interface AppearanceCookies {
   theme: Ref<string | null | undefined>
+  /** The theme colour: a hue, or 'ink'. */
   hue: Ref<number | string | null | undefined>
 }
 
@@ -37,28 +48,36 @@ export const toHue = (value: unknown): number | null => {
   return Number.isFinite(number) ? Math.min(360, Math.max(0, Math.round(number))) : null
 }
 
+/** `ink`, a hue, or null for anything else. */
+export const toColor = (value: unknown): ThemeColor | null => value === 'ink' ? 'ink' : toHue(value)
+
 /**
- * The visitor's theme (dark or light) and theme colour (a hue), kept in cookies so the server renders the right
- * colours. app.vue puts the applied pair on <html>: the admin console isn't themed yet, so it always gets the light
- * theme in the default colour. The setters also write <html> straight away, because head updates wait while a page
- * is loading.
+ * The visitor's theme (dark or light) and theme colour (a hue or ink), kept in cookies so the server renders the right
+ * colours; the colour keeps the old cookie name, appearance_hue. app.vue puts what applies on <html> (data-theme,
+ * --hue, data-palette): the admin console isn't themed yet, so it always gets the light theme in ADMIN_HUE. The setters
+ * also write <html> straight away, because head updates wait while a page is loading.
  */
 export const useAppearance = () => {
   const cookies = appearanceCookies()
   const route = useRoute()
 
   const theme = computed<Theme>(() => cookies.theme.value === 'dark' || cookies.theme.value === 'light' ? cookies.theme.value : DEFAULT_THEME)
-  const hue = computed(() => toHue(cookies.hue.value) ?? DEFAULT_HUE)
+  const color = computed<ThemeColor>(() => toColor(cookies.hue.value) ?? DEFAULT_COLOR)
 
   const themed = computed(() => route.path !== '/admin' && !route.path.startsWith('/admin/'))
   const appliedTheme = computed<Theme>(() => themed.value ? theme.value : 'light')
-  const appliedHue = computed(() => themed.value ? hue.value : DEFAULT_HUE)
+  const appliedHue = computed(() => !themed.value ? ADMIN_HUE : color.value === 'ink' ? INK_HUE : color.value)
+  const appliedPalette = computed(() => themed.value && color.value === 'ink' ? 'ink' : undefined)
 
   const paintTheme = (value: Theme) => {
     if (import.meta.client) document.documentElement.dataset.theme = value
   }
-  const paintHue = (value: number) => {
-    if (import.meta.client) document.documentElement.style.setProperty('--hue', String(value))
+  const paintColor = (value: ThemeColor) => {
+    if (!import.meta.client) return
+    const root = document.documentElement
+    root.style.setProperty('--hue', String(value === 'ink' ? INK_HUE : value))
+    if (value === 'ink') root.dataset.palette = 'ink'
+    else delete root.dataset.palette
   }
 
   const setTheme = (value: Theme) => {
@@ -66,11 +85,11 @@ export const useAppearance = () => {
     paintTheme(value)
   }
 
-  const setHue = (value: number) => {
-    const next = toHue(value) ?? DEFAULT_HUE
+  const setColor = (value: ThemeColor) => {
+    const next = toColor(value) ?? DEFAULT_COLOR
     cookies.hue.value = next
-    paintHue(next)
+    paintColor(next)
   }
 
-  return { theme, hue, appliedTheme, appliedHue, setTheme, setHue }
+  return { theme, color, appliedTheme, appliedHue, appliedPalette, setTheme, setColor }
 }

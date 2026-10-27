@@ -54,34 +54,43 @@
         <p class="text-sm text-meta">{{ $t('revision_page.empty') }}</p>
       </div>
 
-      <ul v-else class="space-y-3 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
-        <li v-for="revision in revisions" :key="revision.id" class="card p-4">
-          <div class="flex flex-wrap items-start gap-3">
-            <div class="min-w-0 flex-1">
-              <NuxtLink :to="`/revisions/${revision.id}`" class="font-semibold text-title transition-colors hover:text-primary">{{ heading(revision) }}</NuxtLink>
-              <p v-if="revision.summary" class="mt-0.5 line-clamp-2 text-sm text-body">{{ revision.summary }}</p>
-              <p class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-meta">
-                <span v-if="revision.kind === 'lyric'" class="rounded bg-primary/10 px-1.5 py-0.5 text-primary">{{ $t('revision_page.kind.lyric') }}</span>
-                <span v-for="item in revision.items" :key="item.ref" class="rounded bg-btn px-1.5 py-0.5 text-btn-content">
-                  {{ $t(`revision_page.action.${item.action}`) }} · {{ enumLabel('catalog_type', item.resource_type) }}<template v-if="item.resource_id"> #{{ item.resource_id }}</template>
-                </span>
-                <span class="text-meta">#{{ revision.id }} · {{ ago(revision.updated_at) }}</span>
-              </p>
+      <CommonPagedList
+        v-else
+        v-model:page="page"
+        :total-pages="lastPage"
+        :total="data?.pagination.total ?? 0"
+        :count="revisions.length"
+        :per-page="data?.pagination.per_page ?? 1"
+        :top-after="4"
+        :disabled="refetching"
+      >
+        <ul class="space-y-3 transition-opacity" :class="{ 'pointer-events-none opacity-60': refetching }" :inert="refetching">
+          <li v-for="revision in revisions" :key="revision.id" class="card p-4">
+            <div class="flex flex-wrap items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <NuxtLink :to="`/revisions/${revision.id}`" class="font-semibold text-title transition-colors hover:text-primary">{{ heading(revision) }}</NuxtLink>
+                <p v-if="revision.summary" class="mt-0.5 line-clamp-2 text-sm text-body">{{ revision.summary }}</p>
+                <p class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-meta">
+                  <span v-if="revision.kind === 'lyric'" class="rounded bg-primary/10 px-1.5 py-0.5 text-primary">{{ $t('revision_page.kind.lyric') }}</span>
+                  <span v-for="item in revision.items" :key="item.ref" class="rounded bg-btn px-1.5 py-0.5 text-btn-content">
+                    {{ $t(`revision_page.action.${item.action}`) }} · {{ enumLabel('catalog_type', item.resource_type) }}<template v-if="item.resource_id"> #{{ item.resource_id }}</template>
+                  </span>
+                  <span class="text-meta">#{{ revision.id }} · {{ ago(revision.updated_at) }}</span>
+                </p>
+              </div>
+              <RevisionStatusBadge :status="revision.status" />
             </div>
-            <RevisionStatusBadge :status="revision.status" />
-          </div>
-          <p v-if="revision.review_comment && ['changes_requested', 'rejected'].includes(revision.status)" class="mt-3 whitespace-pre-line rounded-lg bg-warning/10 px-3 py-2 text-sm text-body">
-            <span class="font-medium text-warning">{{ $t('revision_page.review_comment') }}：</span>{{ revision.review_comment }}
-          </p>
-          <div class="mt-3 flex flex-wrap gap-2">
-            <NuxtLink v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
-            <NuxtLink :to="`/revisions/${revision.id}`" class="btn btn-ghost btn-sm">{{ $t('common.details') }}</NuxtLink>
-            <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-danger" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</button>
-          </div>
-        </li>
-      </ul>
-
-      <div v-if="lastPage > 1" class="mt-6"><CommonPagination v-model:page="page" :total-pages="lastPage" :disabled="refetching" /></div>
+            <p v-if="revision.review_comment && ['changes_requested', 'rejected'].includes(revision.status)" class="mt-3 whitespace-pre-line rounded-lg bg-warning/10 px-3 py-2 text-sm text-body">
+              <span class="font-medium text-warning">{{ $t('revision_page.review_comment') }}：</span>{{ revision.review_comment }}
+            </p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <NuxtLink v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
+              <NuxtLink :to="`/revisions/${revision.id}`" class="btn btn-ghost btn-sm">{{ $t('common.details') }}</NuxtLink>
+              <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-danger" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</button>
+            </div>
+          </li>
+        </ul>
+      </CommonPagedList>
       <p v-if="message" class="mt-4 text-sm text-danger">{{ message }}</p>
     </div>
   </div>
@@ -129,7 +138,7 @@ const setStatus = (value: typeof FILTERS[number]) => {
 // The reader's own revisions: always fetched fresh, and only in the browser.
 const { data, status: loadStatus, error, refresh, loading, refetching } = await usePageData(
   () => `me:revisions-${status.value}-${page.value}`,
-  ({ signal }) => $api<{ revisions: Revision[], pagination: { last_page: number } }>('/v1/me/revisions', {
+  ({ signal }) => $api<{ revisions: Revision[], pagination: { last_page: number, total: number, per_page: number } }>('/v1/me/revisions', {
     query: { status: status.value === 'all' ? undefined : status.value, page: page.value, per_page: 20 },
     signal,
   }),

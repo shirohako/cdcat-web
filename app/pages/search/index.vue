@@ -63,24 +63,26 @@
         <!-- 单一类型：分页 -->
         <div v-else class="mt-4">
           <CommonLoadError v-if="failed" class="mb-4" @retry="refreshPaged()" />
-          <p v-if="!results.length" class="py-12 text-center text-meta">{{ $t('search.no_results') }}</p>
-          <ul
-            v-else
-            :key="pagedRevealKey"
-            class="card divide-y divide-line overflow-hidden transition-opacity"
-            :class="[pagedRevealClass, { 'pointer-events-none opacity-60': refetching }]"
-            :inert="refetching"
-          >
-            <li v-for="item in results" :key="item.id" class="transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"><SearchResultItem :result="item" /></li>
-          </ul>
-          <CommonPagination
-            v-if="paged"
-            class="mt-6"
-            :page="paged.pagination.current_page"
-            :total-pages="paged.pagination.last_page"
+          <CommonPagedList
+            :page="paged?.pagination.current_page ?? 1"
+            :total-pages="paged?.pagination.last_page ?? 1"
+            :total="paged?.pagination.total ?? 0"
+            :count="results.length"
+            :per-page="paged?.pagination.per_page ?? 1"
             :disabled="refetching"
             @update:page="goToPage"
-          />
+          >
+            <p v-if="!results.length" class="py-12 text-center text-meta">{{ $t('search.no_results') }}</p>
+            <ul
+              v-else
+              :key="pagedRevealKey"
+              class="card divide-y divide-line overflow-hidden transition-opacity"
+              :class="[pagedRevealClass, { 'pointer-events-none opacity-60': refetching }]"
+              :inert="refetching"
+            >
+              <li v-for="item in results" :key="item.id" class="transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"><SearchResultItem :result="item" /></li>
+            </ul>
+          </CommonPagedList>
         </div>
       </template>
     </div>

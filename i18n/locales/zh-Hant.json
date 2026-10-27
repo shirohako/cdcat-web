@@ -105,9 +105,10 @@
     "subtitle": "瀏覽所有專輯、單曲與合輯",
     "new": "新增",
     "load_failed": "載入失敗：{message}",
-    "found": "共找到 {count} 張專輯",
     "page_indicator": "（{current}/{last}）",
     "no_results": "沒有找到專輯",
+    "no_search_results": "沒有找到與「{query}」相關的專輯",
+    "search_too_short": "至少輸入 2 個字元，漢字或假名 1 個即可",
     "event_filter_label": "活動",
     "disc_singular": "碟",
     "disc_plural": "碟",
@@ -136,7 +137,6 @@
     "subtitle": "瀏覽所有藝術家與社團",
     "new": "新增",
     "load_failed": "載入失敗：{message}",
-    "found": "共找到 {count} 位藝術家",
     "page_indicator": "（第 {current} / {last} 頁）",
     "no_results": "沒有找到藝術家",
     "type": {
@@ -381,6 +381,13 @@
     "page_label": "前往第 {page} 頁",
     "previousPage": "上一頁",
     "nextPage": "下一頁",
+    "pagination_back": "向前 {count} 頁",
+    "pagination_forward": "向後 {count} 頁",
+    "pagination_jump": "跳至 {input} 頁",
+    "pagination_jump_label": "要前往的頁碼",
+    "results_all": "共找到 {total} 筆記錄",
+    "results_range": "正在瀏覽 {range}，共找到 {total} 筆記錄",
+    "results_one": "正在瀏覽第 {range} 筆，共找到 {total} 筆記錄",
     "items_total": "共 {count} 筆",
     "got_it": "知道了",
     "confirm_delete": "確認刪除",
@@ -1314,7 +1321,9 @@
       "library": "收藏與記錄",
       "contribute": "創作與貢獻",
       "account": "帳戶"
-    }
+    },
+    "back_to_top": "回到頂部",
+    "read_percent": "已讀 {percent}%"
   },
   "appearance": {
     "title": "外觀",
@@ -1322,7 +1331,8 @@
     "dark": "暗色",
     "light": "亮色",
     "color": "主題色",
-    "preset": "使用色相 {hue}"
+    "preset": "使用色相 {hue}",
+    "ink": "墨色"
   },
   "event_picker": {
     "placeholder": "搜尋活動，例如 C107 或 M3-2025",
@@ -2080,7 +2090,6 @@
       },
       "all_categories": "全部版塊",
       "hint": "輸入至少兩個字開始搜尋。",
-      "results": "共 {count} 筆結果",
       "empty": "沒有找到相關內容。",
       "reply_under": "#{floor} 的樓中樓"
     },
@@ -2693,7 +2702,6 @@
     "title": "搜尋",
     "placeholder": "搜尋專輯、曲目、藝術家…",
     "results_for": "「{q}」的搜尋結果",
-    "view_all": "查看全部結果",
     "more": "查看全部 {count} 筆",
     "no_results": "沒有找到相關內容",
     "hint": "簡體、繁體、日文漢字和假名都能互相搜到，也可以搜品番和條碼",
@@ -2701,8 +2709,6 @@
     "include_pending": "包含審核中",
     "matched": "符合：{text}",
     "all": "全部",
-    "searching": "搜尋中…",
-    "shortcut": "按 / 鍵搜尋",
     "capped": "超過 {count} 筆",
     "disc_track": "碟 {disc} · 第 {track} 首",
     "types": {

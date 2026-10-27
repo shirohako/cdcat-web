@@ -75,24 +75,32 @@ useSeoMeta({ title: () => q.value ? t('discussions.search.title_for', { q: q.val
         <p v-if="!q" class="py-16 text-center text-sm text-meta">{{ t('discussions.search.hint') }}</p>
         <template v-else-if="data">
           <CommonLoadError v-if="status === 'error'" class="mb-3" @retry="refresh()" />
-          <p class="mb-3 text-xs text-meta">{{ t('discussions.search.results', { count: data.pagination.total }) }}</p>
-          <div :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
-            <DiscussionTopicList v-if="scope === 'topics'" :topics="data.topics ?? []" :empty="t('discussions.search.empty')" />
-            <div v-else class="card divide-y divide-line overflow-hidden">
-              <NuxtLink v-for="post in data.posts" :key="post.id" :to="`/discussions/${post.topic?.id}?post=${post.id}`" class="group block px-4 py-3 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
-                <p class="text-sm font-semibold text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ post.topic?.title }}</p>
-                <p class="mt-1 text-sm leading-6 text-body">{{ post.excerpt }}</p>
-                <p class="mt-1 flex flex-wrap items-center gap-2 text-xs text-meta">
-                  <DiscussionCategoryBadge :category="post.topic?.category ?? null" :link="false" />
-                  <span>{{ post.user?.nickname || post.user?.username }}</span>
-                  <span>{{ post.floor ? `#${post.floor}` : t('discussions.search.reply_under', { floor: post.parent_floor }) }}</span>
-                  <span>{{ ago(post.created_at) }}</span>
-                </p>
-              </NuxtLink>
-              <UiEmpty v-if="!data.posts?.length" :title="t('discussions.search.empty')" :icon="Search" class="min-h-64" />
+          <CommonPagedList
+            :page="data.pagination.current_page"
+            :total-pages="data.pagination.last_page"
+            :total="data.pagination.total"
+            :count="(scope === 'topics' ? data.topics : data.posts)?.length ?? 0"
+            :per-page="data.pagination.per_page"
+            :disabled="refetching"
+            @update:page="value => update({ page: value > 1 ? String(value) : null })"
+          >
+            <div :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
+              <DiscussionTopicList v-if="scope === 'topics'" :topics="data.topics ?? []" :empty="t('discussions.search.empty')" />
+              <div v-else class="card divide-y divide-line overflow-hidden">
+                <NuxtLink v-for="post in data.posts" :key="post.id" :to="`/discussions/${post.topic?.id}?post=${post.id}`" class="group block px-4 py-3 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
+                  <p class="text-sm font-semibold text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ post.topic?.title }}</p>
+                  <p class="mt-1 text-sm leading-6 text-body">{{ post.excerpt }}</p>
+                  <p class="mt-1 flex flex-wrap items-center gap-2 text-xs text-meta">
+                    <DiscussionCategoryBadge :category="post.topic?.category ?? null" :link="false" />
+                    <span>{{ post.user?.nickname || post.user?.username }}</span>
+                    <span>{{ post.floor ? `#${post.floor}` : t('discussions.search.reply_under', { floor: post.parent_floor }) }}</span>
+                    <span>{{ ago(post.created_at) }}</span>
+                  </p>
+                </NuxtLink>
+                <UiEmpty v-if="!data.posts?.length" :title="t('discussions.search.empty')" :icon="Search" class="min-h-64" />
+              </div>
             </div>
-          </div>
-          <CommonPagination v-if="data.pagination.last_page > 1" class="mt-5" :page="data.pagination.current_page" :total-pages="data.pagination.last_page" :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })" />
+          </CommonPagedList>
         </template>
         <p v-else-if="status === 'error'" class="py-16 text-center text-sm text-meta">{{ localizeError(error) }}</p>
         <SkeletonRows v-else-if="loading" page :count="6" :thumb="scope === 'topics' ? 'round' : 'none'" />

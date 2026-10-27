@@ -105,9 +105,10 @@
     "subtitle": "Explore all albums, singles and compilations",
     "new": "New",
     "load_failed": "Load failed: {message}",
-    "found": "Found {count} albums",
     "page_indicator": "({current}/{last})",
     "no_results": "No albums found",
+    "no_search_results": "No albums match “{query}”",
+    "search_too_short": "Type at least 2 characters, or 1 kanji or kana",
     "event_filter_label": "Event",
     "disc_singular": "Disc",
     "disc_plural": "Discs",
@@ -136,7 +137,6 @@
     "subtitle": "Explore all artists and circles",
     "new": "New",
     "load_failed": "Load failed: {message}",
-    "found": "Found {count} artists",
     "page_indicator": "(Page {current} of {last})",
     "no_results": "No artists found",
     "type": {
@@ -381,6 +381,13 @@
     "page_label": "Go to page {page}",
     "previousPage": "Previous page",
     "nextPage": "Next page",
+    "pagination_back": "Back {count} pages",
+    "pagination_forward": "Forward {count} pages",
+    "pagination_jump": "Go to {input}",
+    "pagination_jump_label": "Page to go to",
+    "results_all": "{total} records",
+    "results_range": "Showing {range} of {total} records",
+    "results_one": "Showing record {range} of {total}",
     "items_total": "{count} items",
     "got_it": "Got it",
     "confirm_delete": "Delete",
@@ -1314,7 +1321,9 @@
       "library": "Library",
       "contribute": "Writing & edits",
       "account": "Account"
-    }
+    },
+    "back_to_top": "Back to top",
+    "read_percent": "{percent}% read"
   },
   "appearance": {
     "title": "Appearance",
@@ -1322,7 +1331,8 @@
     "dark": "Dark",
     "light": "Light",
     "color": "Theme colour",
-    "preset": "Use hue {hue}"
+    "preset": "Use hue {hue}",
+    "ink": "Ink"
   },
   "event_picker": {
     "placeholder": "Search events, e.g. C107 or M3-2025",
@@ -2080,7 +2090,6 @@
       },
       "all_categories": "All categories",
       "hint": "Type at least two characters to search.",
-      "results": "{count} results",
       "empty": "Nothing found.",
       "reply_under": "reply under #{floor}"
     },
@@ -2693,7 +2702,6 @@
     "title": "Search",
     "placeholder": "Search albums, tracks, artists…",
     "results_for": "Results for “{q}”",
-    "view_all": "See all results",
     "more": "See all {count}",
     "no_results": "Nothing found",
     "hint": "Simplified, traditional and Japanese kanji, kana, catalog numbers and barcodes all work",
@@ -2701,8 +2709,6 @@
     "include_pending": "Include pending",
     "matched": "Matched: {text}",
     "all": "All",
-    "searching": "Searching…",
-    "shortcut": "Press / to search",
     "capped": "{count}+",
     "disc_track": "Disc {disc} · Track {track}",
     "types": {

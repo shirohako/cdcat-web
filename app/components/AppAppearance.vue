@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { HUE_PRESETS } from '~/composables/useAppearance'
+import type { ThemeColor } from '~/composables/useAppearance'
+import { COLOR_PRESETS } from '~/composables/useAppearance'
 
-/** The navbar's appearance panel: dark or light, and the theme colour, one of vivia's presets. Both apply at once. */
-const { theme, hue, setTheme, setHue } = useAppearance()
+/** The navbar's appearance panel: dark or light, and the theme colour, ink or one of vivia's presets. Both apply at once. */
+const { theme, color, setTheme, setColor } = useAppearance()
 
 const { t } = useI18n()
 const themes = computed(() => [
   { value: 'dark' as const, label: t('appearance.dark'), icon: 'lucide:moon' },
   { value: 'light' as const, label: t('appearance.light'), icon: 'lucide:sun' },
 ])
+
+/** A swatch: ink as it looks in the light theme, a hue as vivia shows it. */
+const swatch = (preset: ThemeColor) => preset === 'ink' ? 'oklch(0.19 0.027 298)' : `oklch(0.75 0.14 ${preset})`
 </script>
 
 <template>
@@ -24,17 +28,17 @@ const themes = computed(() => [
     />
 
     <p class="mt-5 text-sm font-semibold text-title">{{ $t('appearance.color') }}</p>
-    <div class="mt-3 grid grid-cols-9 gap-2">
+    <div class="mt-3 grid grid-cols-10 gap-1.5">
       <button
-        v-for="preset in HUE_PRESETS"
+        v-for="preset in COLOR_PRESETS"
         :key="preset"
         type="button"
         class="aspect-square rounded-md transition-transform duration-150 ease-out hover:scale-110"
-        :class="{ 'ring-2 ring-title ring-offset-2 ring-offset-popover': preset === hue }"
-        :style="{ backgroundColor: `oklch(0.75 0.14 ${preset})` }"
-        :aria-label="$t('appearance.preset', { hue: preset })"
-        :aria-pressed="preset === hue"
-        @click="setHue(preset)"
+        :class="preset === color ? 'ring-2 ring-title ring-offset-2 ring-offset-popover' : preset === 'ink' && 'ring-1 ring-inset ring-line'"
+        :style="{ backgroundColor: swatch(preset) }"
+        :aria-label="preset === 'ink' ? $t('appearance.ink') : $t('appearance.preset', { hue: preset })"
+        :aria-pressed="preset === color"
+        @click="setColor(preset)"
       />
     </div>
   </div>

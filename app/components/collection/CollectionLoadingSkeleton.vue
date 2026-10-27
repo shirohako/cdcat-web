@@ -1,13 +1,10 @@
 <template>
   <!-- The article grid counts columns by its own width (container queries), so the frame is the container. -->
   <SkeletonStatus page :class="{ '@container': variant === 'articles' }">
-    <div v-if="variant === 'artists'" class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-xl bg-sunken p-2.5">
-        <div class="skeleton size-12 shrink-0 rounded-full" />
-        <div class="min-w-0 flex-1 space-y-2">
-          <div class="skeleton h-3.5 w-3/5 rounded-full" />
-          <div class="skeleton h-2.5 w-2/5 rounded-full" />
-        </div>
+    <div v-if="variant === 'artists'" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-lg bg-black/[0.025] px-3 py-2.5 dark:bg-white/[0.04]">
+        <div class="skeleton size-6 shrink-0 rounded-full" />
+        <div class="skeleton h-3 w-3/5 rounded-full" />
       </div>
     </div>
 
@@ -42,7 +39,7 @@
         v-for="item in total"
         :key="item"
         class="flex flex-col overflow-hidden"
-        :class="variant === 'events' ? '@container rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : 'rounded-xl bg-sunken'"
+        :class="variant === 'events' ? '@container rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'covers' ? 'rounded-xl bg-black/[0.035] dark:bg-white/[0.04]' : 'rounded-xl bg-sunken'"
       >
         <div class="skeleton" :class="mediaClass" />
 
@@ -121,7 +118,7 @@ const props = withDefaults(defineProps<{
   gridClass: undefined,
 })
 
-const COUNTS: Record<Variant, number> = { covers: 10, artists: 12, list: 4, wide: 8, articles: 8, events: 8, labels: 12 }
+const COUNTS: Record<Variant, number> = { covers: 10, artists: 30, list: 4, wide: 8, articles: 8, events: 8, labels: 12 }
 
 const total = computed(() => props.count ?? COUNTS[props.variant])
 

@@ -27,6 +27,9 @@
         <slot />
       </div>
     </main>
+
+    <!-- Reading progress, and back to the top on a click; bottom right -->
+    <AppFloatButtons />
   </div>
 </template>
 
