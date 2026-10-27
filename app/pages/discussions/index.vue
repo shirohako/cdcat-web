@@ -13,9 +13,12 @@ usePageSeo({ title: () => t('discussions.title'), description: () => t('discussi
   <div class="relative min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight text-title sm:text-[28px]">{{ t('discussions.title') }}</h1>
-          <p class="mt-1 text-sm text-meta">{{ t('discussions.description') }}</p>
+        <div class="flex min-w-0 items-center gap-3.5">
+          <HeaderArtDiscussions />
+          <div class="min-w-0">
+            <h1 class="text-2xl font-bold tracking-tight text-title sm:text-[28px]">{{ t('discussions.title') }}</h1>
+            <p class="mt-1 text-sm text-meta">{{ t('discussions.description') }}</p>
+          </div>
         </div>
         <form class="hidden items-center gap-2 rounded-xl border border-line bg-field px-3 py-2 transition-colors duration-150 ease-out focus-within:border-primary lg:flex" role="search" @submit.prevent="search">
           <Search :size="15" class="text-meta" />

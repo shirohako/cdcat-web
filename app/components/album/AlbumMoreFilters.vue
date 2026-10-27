@@ -41,8 +41,10 @@ const { t } = useI18n()
       <EventFilterMenu :model-value="eventId" :label="t('albums.event_filter_label')" :active-class="on" :idle-class="off" @update:model-value="value => emit('event', value)" />
     </div>
     <p v-if="rows" class="text-xs font-semibold text-meta">{{ t('albums.review_filter') }}</p>
-    <div :class="rows ? '-ml-2' : '-mx-1 mt-4 border-t border-line pt-2'">
-      <CatalogPendingToggle :model-value="pending" @update:model-value="value => emit('pending', value)" />
+    <div :class="rows ? 'flex h-7.5 items-center' : 'mt-4 border-t border-line pt-3'">
+      <UiFlipCheckbox :model-value="pending" size="sm" @update:model-value="value => emit('pending', value)">
+        {{ t('pending.show_toggle') }}
+      </UiFlipCheckbox>
     </div>
   </div>
 </template>

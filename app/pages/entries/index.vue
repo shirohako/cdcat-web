@@ -62,13 +62,16 @@ const goToPage = (page: number) => {
             :title="$t('menu.entry')"
             :description="$t('content_display.entry_desc')"
             icon="lucide:film"
-            :create="{ to: '/contribute?type=entry', label: $t('common.new') }"
+            :create="{ to: '/contribute?type=entry', label: $t('common.contribute') }"
             :filters="typeFilters"
             :filter-label="$t('catalog.type')"
             :search-placeholder="$t('catalog.search_placeholder')"
             @update:model-value="selectType"
             @search="submitSearch"
           >
+            <template #icon>
+              <HeaderArtEntries />
+            </template>
             <template #search-end>
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             </template>

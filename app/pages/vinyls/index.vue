@@ -3,7 +3,11 @@
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <CollectionPageCard>
         <template #header>
-          <CollectionPageHeader :title="$t('menu.vinyl')" :description="$t('albums.vinyl_subtitle')" icon="lucide:disc" />
+          <CollectionPageHeader :title="$t('menu.vinyl')" :description="$t('albums.vinyl_subtitle')" icon="lucide:disc">
+            <template #icon>
+              <HeaderArtVinyls />
+            </template>
+          </CollectionPageHeader>
         </template>
 
         <CommonLoadError v-if="status === 'error'" class="mb-4" @retry="refresh()" />

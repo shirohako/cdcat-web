@@ -7,10 +7,10 @@
             :title="$t('albums.title')"
             :description="$t('albums.subtitle')"
             icon="lucide:disc-3"
-            :create="{ to: '/contribute?type=album', label: $t('albums.new') }"
+            :create="{ to: '/contribute?type=album', label: $t('common.contribute') }"
           >
             <template #icon>
-              <AlbumHeaderArt />
+              <HeaderArtAlbums />
             </template>
             <!-- The sort comes first: a full-width switch on phones, tabs on the header's line on wider screens. -->
             <template #tabs>

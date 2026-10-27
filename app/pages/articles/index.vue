@@ -84,6 +84,9 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
             @update:model-value="value => update({ type: value === 'all' ? null : value })"
             @search="submitSearch"
           >
+            <template #icon>
+              <HeaderArtArticles />
+            </template>
             <template v-if="isAuthenticated" #action>
               <NuxtLink to="/articles/mine" class="btn btn-sm h-8 gap-1.5 px-2.5 text-xs sm:h-9 sm:px-3.5" :aria-label="t('article_ui.mine.title')">
                 <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>

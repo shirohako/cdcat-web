@@ -27,14 +27,15 @@ const swatch = (preset: ThemeColor) => preset === 'ink' ? 'oklch(0.19 0.027 298)
       @update:model-value="value => value && setTheme(value)"
     />
 
-    <p class="mt-5 text-sm font-semibold text-title">{{ $t('appearance.color') }}</p>
-    <div class="mt-3 grid grid-cols-10 gap-1.5">
+    <p class="mt-5 text-xs font-semibold tracking-wide text-meta">{{ $t('appearance.color') }}</p>
+    <!-- The chosen swatch gets a thin ring just off its edge, which the gaps leave room for. -->
+    <div class="mt-2.5 grid grid-cols-10 gap-2">
       <button
         v-for="preset in COLOR_PRESETS"
         :key="preset"
         type="button"
         class="aspect-square rounded-md transition-transform duration-150 ease-out hover:scale-110"
-        :class="preset === color ? 'ring-2 ring-title ring-offset-2 ring-offset-popover' : preset === 'ink' && 'ring-1 ring-inset ring-line'"
+        :class="preset === color ? 'ring-[1.5px] ring-title ring-offset-[1.5px] ring-offset-popover' : preset === 'ink' && 'ring-1 ring-inset ring-line'"
         :style="{ backgroundColor: swatch(preset) }"
         :aria-label="preset === 'ink' ? $t('appearance.ink') : $t('appearance.preset', { hue: preset })"
         :aria-pressed="preset === color"

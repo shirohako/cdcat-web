@@ -103,7 +103,6 @@
   "albums": {
     "title": "アルバム",
     "subtitle": "すべてのアルバム・シングル・コンピレーションを表示",
-    "new": "新規",
     "load_failed": "読み込みに失敗しました：{message}",
     "page_indicator": "（{current}/{last}）",
     "no_results": "アルバムが見つかりません",
@@ -144,15 +143,9 @@
   "artists": {
     "title": "アーティスト",
     "subtitle": "すべてのアーティストとサークルを表示",
-    "new": "新規",
     "load_failed": "読み込みに失敗しました：{message}",
     "page_indicator": "（{current}/{last} ページ）",
     "no_results": "アーティストが見つかりません",
-    "type": {
-      "person": "個人",
-      "circle": "サークル",
-      "other": "その他"
-    },
     "detail": {
       "albums": "アルバム {count} 枚",
       "followers": "フォロワー {count} 人",
@@ -359,7 +352,6 @@
   },
   "common": {
     "search": "検索...",
-    "new": "新規作成",
     "discover": "アルバムを発見",
     "view": "表示",
     "previous": "前へ",
@@ -379,6 +371,7 @@
     "confirm": "確認",
     "details": "詳細",
     "all": "すべて",
+    "contribute": "追加する",
     "none": "なし",
     "other": "その他",
     "unnamed": "名称未設定",

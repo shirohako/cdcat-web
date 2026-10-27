@@ -103,7 +103,6 @@
   "albums": {
     "title": "專輯",
     "subtitle": "瀏覽所有專輯、單曲與合輯",
-    "new": "新增",
     "load_failed": "載入失敗：{message}",
     "page_indicator": "（{current}/{last}）",
     "no_results": "沒有找到專輯",
@@ -144,15 +143,9 @@
   "artists": {
     "title": "藝術家",
     "subtitle": "瀏覽所有藝術家與社團",
-    "new": "新增",
     "load_failed": "載入失敗：{message}",
     "page_indicator": "（第 {current} / {last} 頁）",
     "no_results": "沒有找到藝術家",
-    "type": {
-      "person": "個人",
-      "circle": "社團",
-      "other": "其他"
-    },
     "detail": {
       "albums": "{count} 張專輯",
       "followers": "{count} 位關注者",
@@ -359,7 +352,6 @@
   },
   "common": {
     "search": "搜尋...",
-    "new": "新增",
     "discover": "發現專輯",
     "view": "查看",
     "previous": "上一頁",
@@ -379,6 +371,7 @@
     "confirm": "確認",
     "details": "詳細資料",
     "all": "全部",
+    "contribute": "補充",
     "none": "無",
     "other": "其他",
     "unnamed": "未命名",

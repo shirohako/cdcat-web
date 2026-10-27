@@ -8,11 +8,14 @@
             :title="$t('artists.title')"
             :description="$t('artists.subtitle')"
             icon="lucide:mic-2"
-            :create="{ to: '/contribute?type=artist', label: $t('artists.new') }"
+            :create="{ to: '/contribute?type=artist', label: $t('common.contribute') }"
             :filters="artistTypes"
             :filter-label="$t('content_display.type')"
             @update:model-value="selectType"
           >
+            <template #icon>
+              <HeaderArtArtists />
+            </template>
             <template #filter-end>
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             </template>
@@ -89,16 +92,18 @@
 
 <script setup>
 import { Users } from "@lucide/vue";
+import { ARTIST_TYPES } from "~/types/artist";
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
+// The types as the database has them now (the catalog schema), the built-in list until it loads.
+const { schema } = useCatalogSchema()
+const { enumLabel } = useCatalogDisplay()
 const artistTypes = computed(() => [
-  { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
-  { value: 'person', label: t('artists.type.person'), icon: 'lucide:user-round' },
-  { value: 'circle', label: t('artists.type.circle'), icon: 'lucide:users-round' },
-  { value: 'other', label: t('artists.type.other'), icon: 'lucide:shapes' },
+  { value: 'all', label: t('common.all') },
+  ...(schema.value?.enums.artist_type ?? ARTIST_TYPES).map(value => ({ value, label: enumLabel('artist_type', value) })),
 ]);
 
 // From the URL, so back and forward switch the type too.

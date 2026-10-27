@@ -103,7 +103,6 @@
   "albums": {
     "title": "Albums",
     "subtitle": "Explore all albums, singles and compilations",
-    "new": "New",
     "load_failed": "Load failed: {message}",
     "page_indicator": "({current}/{last})",
     "no_results": "No albums found",
@@ -144,15 +143,9 @@
   "artists": {
     "title": "Artists",
     "subtitle": "Explore all artists and circles",
-    "new": "New",
     "load_failed": "Load failed: {message}",
     "page_indicator": "(Page {current} of {last})",
     "no_results": "No artists found",
-    "type": {
-      "person": "Person",
-      "circle": "Circle",
-      "other": "Other"
-    },
     "detail": {
       "albums": "{count} albums",
       "followers": "{count} followers",
@@ -359,7 +352,6 @@
   },
   "common": {
     "search": "Search...",
-    "new": "New",
     "discover": "Discover Albums",
     "view": "View",
     "previous": "Previous",
@@ -379,6 +371,7 @@
     "confirm": "Confirm",
     "details": "Details",
     "all": "All",
+    "contribute": "Contribute",
     "none": "None",
     "other": "Other",
     "unnamed": "Untitled",

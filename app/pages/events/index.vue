@@ -39,8 +39,11 @@ usePageSeo({
           <CollectionPageHeader
             :title="t('collection_pages.events.title')"
             :description="t('collection_pages.events.description')"
-            icon="lucide:calendar"
-          />
+            icon="lucide:calendar">
+            <template #icon>
+              <HeaderArtEvents />
+            </template>
+          </CollectionPageHeader>
         </template>
 
         <div v-if="data" :class="revealClass">

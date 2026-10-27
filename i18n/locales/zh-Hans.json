@@ -103,7 +103,6 @@
   "albums": {
     "title": "专辑",
     "subtitle": "浏览所有专辑、单曲与合辑",
-    "new": "新建",
     "load_failed": "加载失败：{message}",
     "page_indicator": "（{current}/{last}）",
     "no_results": "没有找到专辑",
@@ -144,15 +143,9 @@
   "artists": {
     "title": "艺术家",
     "subtitle": "浏览所有艺术家与社团",
-    "new": "新建",
     "load_failed": "加载失败：{message}",
     "page_indicator": "（第 {current} / {last} 页）",
     "no_results": "没有找到艺术家",
-    "type": {
-      "person": "个人",
-      "circle": "社团",
-      "other": "其他"
-    },
     "detail": {
       "albums": "{count} 张专辑",
       "followers": "{count} 位关注者",
@@ -359,7 +352,6 @@
   },
   "common": {
     "search": "搜索...",
-    "new": "新建",
     "discover": "发现专辑",
     "view": "查看",
     "previous": "上一页",
@@ -379,6 +371,7 @@
     "confirm": "确认",
     "details": "详情",
     "all": "全部",
+    "contribute": "补充",
     "none": "无",
     "other": "其他",
     "unnamed": "未命名",

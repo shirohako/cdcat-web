@@ -46,10 +46,13 @@ const goToPage = (page: number) => {
           :title="$t('content_display.series')"
           :description="$t('content_display.series_desc')"
           icon="lucide:library"
-          :create="{ to: '/contribute?type=franchise', label: $t('common.new') }"
+          :create="{ to: '/contribute?type=franchise', label: $t('common.contribute') }"
           :search-placeholder="$t('catalog.search_placeholder')"
           @search="submitSearch"
         >
+          <template #icon>
+            <HeaderArtSeries />
+          </template>
           <template #search-end>
             <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
           </template>
