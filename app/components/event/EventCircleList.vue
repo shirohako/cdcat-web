@@ -6,7 +6,7 @@
 
     <template v-else>
       <!-- Block index, by hall: jumps to the page and heading of a block -->
-      <nav class="sticky top-16 z-20 -mx-1 mb-4 space-y-1.5 rounded-2xl bg-card/80 p-2.5 ring-1 ring-line backdrop-blur" :aria-label="t('event_page.circles.index')">
+      <nav class="sticky top-14 z-20 -mx-1 mb-4 space-y-1.5 rounded-2xl bg-card/80 p-2.5 ring-1 ring-line backdrop-blur" :aria-label="t('event_page.circles.index')">
         <div v-for="group in index" :key="group.hall" class="flex items-start gap-2">
           <span class="w-24 shrink-0 truncate pt-1 text-[11px] font-semibold text-meta sm:w-28" :title="group.hall">{{ group.hall || t('event_page.circles.off_map') }}</span>
           <div class="flex flex-wrap gap-1">

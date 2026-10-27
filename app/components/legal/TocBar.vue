@@ -31,7 +31,7 @@ function revealCurrent({ el }: VNode) {
 
 <template>
   <!-- The strip around the card hides the cards scrolling past behind it. -->
-  <div class="sticky top-16 z-20 -mx-4 bg-page/90 px-4 py-2 backdrop-blur-md md:-mx-8 md:px-8">
+  <div class="sticky top-14 z-20 -mx-4 bg-page/90 px-4 py-2 backdrop-blur-md md:-mx-8 md:px-8">
     <UiPopover placement="bottom-start" :label="t('legal.toc')" class="w-[calc(100vw-2rem)] max-w-md p-2!">
       <template #trigger="{ open, toggle, attrs }">
         <button

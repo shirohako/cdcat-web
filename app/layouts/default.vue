@@ -18,7 +18,7 @@
     <!-- Main Content -->
     <main
       :class="[
-        'pt-16 transition-all duration-300 ease-in-out',
+        'pt-14 transition-all duration-300 ease-in-out',
         isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-56'
       ]"
     >

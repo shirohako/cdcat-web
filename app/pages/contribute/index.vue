@@ -27,7 +27,7 @@ usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-4rem)]">
+  <div class="min-h-[calc(100vh-3.5rem)]">
     <div class="mx-auto max-w-xl px-4 py-12 md:py-16">
       <h1 class="text-center text-2xl font-bold text-title md:text-3xl">{{ t('contribute_page.title') }}</h1>
       <p class="mt-3 text-center text-sm text-meta">

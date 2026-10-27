@@ -122,14 +122,18 @@
       "drama": "广播剧",
       "radio": "广播节目"
     },
+    "sort": {
+      "label": "排序",
+      "new": "新发布",
+      "trending": "近期热门",
+      "top_rated": "高评分",
+      "relevance": "最相关"
+    },
     "category_filter": "类别",
-    "format_filter": "介质",
+    "year_filter": "年份",
     "vinyl_subtitle": "以黑胶发行的专辑",
     "search_placeholder": "在专辑里搜索",
     "filters": "筛选",
-    "all_categories": "全部类别",
-    "all_formats": "全部介质",
-    "clear_filter": "清除{name}筛选",
     "clear_filters": "清除筛选"
   },
   "artists": {
@@ -1333,6 +1337,16 @@
     "color": "主题色",
     "preset": "使用色相 {hue}",
     "ink": "墨色"
+  },
+  "year_filter": {
+    "decade": "{decade} 年代"
+  },
+  "event_filter": {
+    "series": "活动系列",
+    "editions": "{count} 届",
+    "back": "返回活动系列",
+    "empty": "这个系列还没有活动",
+    "load_failed": "加载失败"
   },
   "event_picker": {
     "placeholder": "搜索活动，例如 C107 或 M3-2025",

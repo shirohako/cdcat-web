@@ -11,7 +11,7 @@ interface FilterOption {
  * - the icon, title and description, with #action and the `create` button on the right;
  * - when `search` is bound (v-model:search), a search row: the box, its button, then #search-end (the pending switch);
  * - when there are filters, a grey bar: the type chips with #filter-end on one line, #filters (narrower filters,
- *   a result count) on the next.
+ *   a result count) on the next, and the search row last when `searchInFilters` is set.
  */
 withDefaults(defineProps<{
   title: string
@@ -23,6 +23,8 @@ withDefaults(defineProps<{
   modelValue?: string
   filterLabel?: string
   searchPlaceholder?: string
+  /** Put the search row at the foot of the grey filter bar instead of under the title. */
+  searchInFilters?: boolean
 }>(), {
   create: undefined,
   filters: () => [],
@@ -69,26 +71,15 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
       </div>
     </div>
 
-    <form
-      v-if="search !== undefined"
-      class="flex flex-wrap items-center gap-2 border-t border-line px-4 py-3 sm:px-6"
-      role="search"
-      @submit.prevent="emit('search')"
+    <CollectionSearchRow
+      v-if="search !== undefined && !searchInFilters"
+      v-model="search"
+      class="border-t border-line px-4 py-3 sm:px-6"
+      :placeholder="searchPlaceholder"
+      @submit="emit('search')"
     >
-      <label class="flex h-9 min-w-48 flex-1 items-center gap-2 rounded-lg bg-field px-3 ring-1 ring-line focus-within:ring-primary">
-        <Icon name="lucide:search" class="h-4 w-4 shrink-0 text-faint" />
-        <input
-          v-model="search"
-          type="search"
-          maxlength="100"
-          class="min-w-0 flex-1 bg-transparent text-sm text-title outline-none placeholder:text-faint"
-          :placeholder="searchPlaceholder"
-          :aria-label="searchPlaceholder"
-        >
-      </label>
-      <button type="submit" class="btn btn-primary btn-sm h-9 shrink-0 text-xs">{{ $t('catalog.search') }}</button>
       <slot name="search-end" />
-    </form>
+    </CollectionSearchRow>
 
     <div v-if="filters.length || $slots.filters" class="space-y-2.5 border-t border-line bg-sunken px-4 py-2.5 sm:px-6 sm:py-3">
       <div v-if="filters.length" class="flex items-center gap-2.5">
@@ -120,6 +111,10 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
       <div v-if="$slots.filters" class="flex flex-wrap items-center gap-2">
         <slot name="filters" :active-class="activeFilterClass" :idle-class="idleFilterClass" />
       </div>
+
+      <CollectionSearchRow v-if="search !== undefined && searchInFilters" v-model="search" :placeholder="searchPlaceholder" @submit="emit('search')">
+        <slot name="search-end" />
+      </CollectionSearchRow>
     </div>
   </section>
 </template>

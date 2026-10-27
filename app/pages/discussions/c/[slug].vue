@@ -27,7 +27,7 @@ usePageSeo({
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <div v-if="status === 'error' && !category" class="card p-10 text-center text-sm text-meta">{{ localizeError(error) }}</div>
       <!-- The sidebar and the topics don't need the category first: they render and load right away. -->

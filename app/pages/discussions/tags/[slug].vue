@@ -21,7 +21,7 @@ usePageSeo({
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
         <DiscussionSidebar class="lg:sticky lg:top-20 lg:w-64 lg:shrink-0" />

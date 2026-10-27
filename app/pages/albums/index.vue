@@ -13,45 +13,49 @@
             :filters="albumTypes"
             :filter-label="$t('content_display.type')"
             :search-placeholder="t('albums.search_placeholder')"
+            search-in-filters
             @update:model-value="selectType"
             @search="applySearch()"
           >
+            <template #filter-end>
+              <UiSegmented :model-value="shownSort" :items="sortItems" size="sm" :label="t('albums.sort.label')" @update:model-value="selectSort" />
+            </template>
             <template #search-end>
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             </template>
             <!-- Narrower filters -->
             <template #filters="{ activeClass, idleClass }">
               <!-- The event series pages link here with ?event=<id>. -->
-              <EventFilterChip
+              <EventFilterMenu
                 :model-value="eventId"
                 :label="t('albums.event_filter_label')"
                 :active-class="activeClass"
                 :idle-class="idleClass"
-                align="start"
                 @update:model-value="selectEvent"
               />
-              <CollectionFilterSelect
-                :model-value="category"
-                :label="t('albums.category_filter')"
-                icon="lucide:tags"
-                :options="ALBUM_CATEGORIES.map(value => ({ value, label: enumLabel('album_category', value) }))"
-                :all-label="t('albums.all_categories')"
-                :clear-label="t('albums.clear_filter', { name: t('albums.category_filter') })"
+              <!-- An event fixes the year, so choosing one clears the other. -->
+              <CollectionYearFilter
+                :model-value="year"
+                :label="t('albums.year_filter')"
                 :active-class="activeClass"
                 :idle-class="idleClass"
-                @update:model-value="selectFilter('category', $event)"
+                @update:model-value="selectYear"
               />
-              <CollectionFilterSelect
-                :model-value="format"
-                :label="t('albums.format_filter')"
-                icon="lucide:disc"
-                :options="DISC_FORMATS.map(value => ({ value, label: enumLabel('disc_format', value) }))"
-                :all-label="t('albums.all_formats')"
-                :clear-label="t('albums.clear_filter', { name: t('albums.format_filter') })"
-                :active-class="activeClass"
-                :idle-class="idleClass"
-                @update:model-value="selectFilter('format', $event)"
-              />
+              <span class="mx-1 hidden h-5 w-px bg-line sm:block" aria-hidden="true" />
+              <!-- Categories as chips, one at a time; the chosen one again clears it. -->
+              <div class="flex flex-wrap items-center gap-1.5" role="group" :aria-label="t('albums.category_filter')">
+                <button
+                  v-for="value in albumCategories"
+                  :key="value"
+                  type="button"
+                  class="inline-flex h-8 items-center rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150 ease-out"
+                  :class="category === value ? activeClass : idleClass"
+                  :aria-pressed="category === value"
+                  @click="selectFilter('category', category === value ? null : value)"
+                >
+                  {{ enumLabel('album_category', value) }}
+                </button>
+              </div>
               <button v-if="filtered" type="button" class="inline-flex h-8 items-center gap-1 rounded-lg px-2 text-xs font-medium text-meta transition-colors hover:bg-ghost-hover hover:text-primary" @click="clearFilters">
                 <Icon name="lucide:rotate-ccw" class="h-3.5 w-3.5" />
                 {{ t('albums.clear_filters') }}
@@ -113,23 +117,26 @@
 <script setup lang="ts">
 import { Disc3 } from "@lucide/vue";
 import type { AlbumSimple } from '~/types/album'
-import { ALBUM_CATEGORIES, DISC_FORMATS } from '~/types/album'
+import { ALBUM_CATEGORIES, ALBUM_TYPES } from '~/types/album'
 
 const route = useRoute();
 const router = useRouter();
-const { t } = useI18n();
+const { t, te } = useI18n();
 
+// Types and categories as the database has them now (the catalog schema), the built-in lists until it loads.
+const { schema } = useCatalogSchema()
+const { enumLabel } = useCatalogDisplay()
+const TYPE_ICONS: Record<string, string> = {
+  album: 'lucide:disc-3', single: 'lucide:music-2', ep: 'lucide:list-music', compilation: 'lucide:library',
+  drama: 'lucide:audio-lines', radio: 'lucide:radio',
+}
 const albumTypes = computed(() => [
   { value: 'all', label: t('common.all'), icon: 'lucide:layout-grid' },
-  { value: 'album', label: t('albums.type.album'), icon: 'lucide:disc-3' },
-  { value: 'single', label: t('albums.type.single'), icon: 'lucide:music-2' },
-  { value: 'ep', label: t('albums.type.ep'), icon: 'lucide:list-music' },
-  { value: 'compilation', label: t('albums.type.compilation'), icon: 'lucide:library' },
-  { value: 'drama', label: t('albums.type.drama'), icon: 'lucide:audio-lines' },
-  { value: 'radio', label: t('albums.type.radio'), icon: 'lucide:radio' },
-]);
-
-const { enumLabel } = useCatalogDisplay()
+  ...(schema.value?.enums.album_type ?? ALBUM_TYPES).map(value => ({
+    value, label: te(`albums.type.${value}`) ? t(`albums.type.${value}`) : enumLabel('album_type', value), icon: TYPE_ICONS[value] ?? 'lucide:disc',
+  })),
+])
+const albumCategories = computed(() => schema.value?.enums.album_category ?? [...ALBUM_CATEGORIES])
 
 const selectedType = computed(() => String(route.query.type || 'all'));
 
@@ -139,8 +146,15 @@ const eventId = computed(() => {
   return id > 0 ? id : null;
 });
 const category = computed(() => route.query.category ? String(route.query.category) : null)
-const format = computed(() => route.query.format ? String(route.query.format) : null)
+const year = computed(() => {
+  const value = Number.parseInt(String(route.query.year || ''))
+  return value >= 1900 && value <= 2100 ? value : null
+})
 const { includePending, setIncludePending } = usePendingToggle()
+type AlbumSort = 'new' | 'trending' | 'top_rated'
+const SORTS: AlbumSort[] = ['new', 'trending', 'top_rated']
+/** The order picked in the URL; none means 新发布, or the closest matches first while searching. */
+const sort = computed(() => SORTS.find(value => value === route.query.sort) ?? null)
 // The list endpoint needs two characters, or one kanji or kana, to search.
 const searchQuery = computed(() => {
   const value = String(route.query.q || '').trim()
@@ -168,8 +182,9 @@ const { data: albumsResponse, status, error, refresh, loading, refetching, revea
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     release_event_id: eventId.value ?? undefined,
     category: category.value ?? undefined,
-    format: format.value ?? undefined,
+    year: year.value ?? undefined,
     search: searchQuery.value ?? undefined,
+    sort: sort.value ?? undefined,
     include_pending: includePending.value ? 1 : undefined,
   })),
 });
@@ -214,18 +229,29 @@ const goToPage = (page: number) => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-const selectFilter = (name: 'category' | 'format', value: string | null) => {
+const selectFilter = (name: 'category', value: string | null) => {
   router.push({ query: { ...route.query, [name]: value || undefined, page: undefined } });
 };
 
-/** Any filter narrowing the list; the pending switch is a view preference and stays. */
-const filtered = computed(() => selectedType.value !== 'all' || !!eventId.value || !!category.value || !!format.value || !!route.query.q)
+/** Any filter narrowing the list; the pending switch and the order are view preferences and stay. */
+const filtered = computed(() => selectedType.value !== 'all' || !!eventId.value || !!category.value || !!year.value || !!route.query.q)
 const clearFilters = () => {
   searchInput.value = ''
-  router.push({ query: { pending: route.query.pending || undefined } })
+  router.push({ query: { pending: route.query.pending || undefined, sort: route.query.sort || undefined } })
 };
 
 /** Enter or the search button; a query too short to search leaves the list as it is and says why. */
+// 最相关 only shows while searching, where it is what no choice means.
+const shownSort = computed(() => sort.value ?? (searchQuery.value ? 'relevance' : 'new'))
+const sortItems = computed(() => [
+  ...(searchQuery.value ? [{ value: 'relevance', label: t('albums.sort.relevance') }] : []),
+  ...SORTS.map(value => ({ value, label: t(`albums.sort.${value}`) })),
+])
+const selectSort = (value: string | undefined) => {
+  const chosen = value === 'relevance' || (value === 'new' && !searchQuery.value) ? undefined : value
+  router.push({ query: { ...route.query, sort: chosen, page: undefined } })
+}
+
 const applySearch = () => {
   const value = searchInput.value.trim()
   if (value && !searchable(value)) {
@@ -243,10 +269,15 @@ const selectEvent = (id: number | null) => {
     query: {
       ...route.query,
       event: id ?? undefined,
+      year: id ? undefined : route.query.year,
       page: undefined,
     },
   });
 };
+
+const selectYear = (value: number | null) => {
+  router.push({ query: { ...route.query, year: value ?? undefined, event: value ? undefined : route.query.event, page: undefined } })
+}
 
 const selectType = (type: string) => {
   router.push({

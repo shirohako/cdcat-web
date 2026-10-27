@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <!-- Profile content -->
     <template v-if="profile">
       <!-- Decorative background -->

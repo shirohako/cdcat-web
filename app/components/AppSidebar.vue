@@ -1,7 +1,7 @@
 <template>
   <aside
     :class="[
-      'fixed left-0 top-16 bottom-0 bg-card border-r border-line z-40',
+      'fixed left-0 top-14 bottom-0 bg-card border-r border-line z-40',
       'transition-all duration-300 ease-in-out',
       'flex flex-col',
       isCollapsed ? 'w-16' : 'w-56',
@@ -10,7 +10,7 @@
   >
     <!-- Navigation (the logo lives in the navbar, which runs across the top) -->
     <!-- Scrolls only vertically: nothing may widen it while the sidebar collapses. -->
-    <nav class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto py-6">
+    <nav class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto pb-6 pt-3">
       <ul :class="['relative space-y-2', isCollapsed ? 'px-2' : 'px-3']" @mouseleave="leave">
         <!-- One highlight for the whole list: it glides to the item under the pointer. -->
         <div
@@ -59,7 +59,7 @@
   <transition name="fade">
     <div
       v-if="isMobileOpen"
-      class="fixed inset-x-0 top-16 bottom-0 bg-black/50 z-30 lg:hidden"
+      class="fixed inset-x-0 top-14 bottom-0 bg-black/50 z-30 lg:hidden"
       @click="closeMobile"
     />
   </transition>

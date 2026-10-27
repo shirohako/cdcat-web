@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <!-- Decorative background -->
     <div aria-hidden="true" class="pointer-events-none absolute inset-0 overflow-hidden">
       <div class="absolute -top-32 -left-28 h-96 w-96 rounded-full bg-linear-to-br from-primary/15 to-primary/5 blur-3xl" />

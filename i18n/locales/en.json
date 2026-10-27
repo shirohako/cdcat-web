@@ -122,14 +122,18 @@
       "drama": "Drama CD",
       "radio": "Radio"
     },
+    "sort": {
+      "label": "Sort",
+      "new": "New releases",
+      "trending": "Trending",
+      "top_rated": "Top rated",
+      "relevance": "Best match"
+    },
     "category_filter": "Category",
-    "format_filter": "Media",
+    "year_filter": "Year",
     "vinyl_subtitle": "Albums released on vinyl",
     "search_placeholder": "Search albums",
     "filters": "Filter",
-    "all_categories": "All categories",
-    "all_formats": "All media",
-    "clear_filter": "Clear {name}",
     "clear_filters": "Clear filters"
   },
   "artists": {
@@ -1333,6 +1337,16 @@
     "color": "Theme colour",
     "preset": "Use hue {hue}",
     "ink": "Ink"
+  },
+  "year_filter": {
+    "decade": "{decade}s"
+  },
+  "event_filter": {
+    "series": "Event series",
+    "editions": "{count} editions",
+    "back": "Back to event series",
+    "empty": "No events in this series yet",
+    "load_failed": "Couldn't load"
   },
   "event_picker": {
     "placeholder": "Search events, e.g. C107 or M3-2025",

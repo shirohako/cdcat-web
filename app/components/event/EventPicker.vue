@@ -56,7 +56,7 @@ import { CalendarDays, Search, X } from '@lucide/vue'
 import type { EventOption } from '~/composables/useEventSearch'
 
 // Form-style event chooser for the album editor, with release-date suggestions.
-// The albums list uses the chip-style EventFilterChip instead.
+// The albums list uses the two-level EventFilterMenu instead.
 const props = defineProps<{
   modelValue: number | null
   releaseDate?: string

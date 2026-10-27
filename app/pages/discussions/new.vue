@@ -99,7 +99,7 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-4rem)]">
+  <div class="min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-4xl px-4 py-8 md:px-6">
       <nav class="mb-3 text-xs text-meta"><NuxtLink to="/discussions" class="transition-colors duration-150 ease-out hover:text-primary">{{ t('discussions.title') }}</NuxtLink> / {{ t('discussions.new.title') }}</nav>
       <form class="card space-y-5 p-5 sm:p-6" @submit.prevent="submit">

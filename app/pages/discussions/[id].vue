@@ -303,7 +303,7 @@ const { canonical } = usePageSeo({
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-5xl px-4 py-6 md:px-6">
       <div v-if="status === 'error' && !topic" class="card p-10 text-center">
         <p class="text-sm text-meta">{{ localizeError(error) }}</p>

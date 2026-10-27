@@ -196,7 +196,7 @@ const triggerAttrs = computed(() => ({
         tabindex="-1"
         data-ui-layer
         v-bind="$attrs"
-        class="fixed left-0 top-0 z-[80] max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-xl bg-popover p-4 text-sm text-body shadow-overlay outline-none ring-1 ring-line"
+        class="fixed left-0 top-0 z-[80] max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-4 text-sm text-body shadow-overlay outline-none ring-1 ring-line"
         :style="{
           translate: `${position.x}px ${position.y}px`,
           maxHeight: position.maxHeight ? `${position.maxHeight}px` : undefined,

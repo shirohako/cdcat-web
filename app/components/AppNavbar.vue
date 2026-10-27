@@ -1,6 +1,6 @@
 <template>
   <!-- Spans the full width above the sidebar; z-50 keeps its dropdowns over the sidebar. -->
-  <header class="fixed inset-x-0 top-0 z-50 h-16 border-b border-line bg-card">
+  <header class="fixed inset-x-0 top-0 z-50 h-14 border-b border-line bg-card">
     <div class="h-full px-4 flex items-center justify-between">
       <!-- Left Section: Menu Toggle & Logo -->
       <div class="flex items-center gap-3">
@@ -47,7 +47,7 @@
           <transition name="dropdown">
             <div
               v-if="showAppearance"
-              class="fixed right-4 top-[4.5rem] rounded-xl bg-popover shadow-overlay ring-1 ring-line
+              class="fixed right-4 top-16 rounded-xl bg-popover shadow-overlay ring-1 ring-line
                      sm:absolute sm:right-0 sm:top-full sm:mt-2"
             >
               <AppAppearance />

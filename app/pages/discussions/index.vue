@@ -10,7 +10,7 @@ usePageSeo({ title: () => t('discussions.title'), description: () => t('discussi
 </script>
 
 <template>
-  <div class="relative min-h-[calc(100vh-4rem)]">
+  <div class="relative min-h-[calc(100vh-3.5rem)]">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
       <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>

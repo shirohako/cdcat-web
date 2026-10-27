@@ -122,14 +122,18 @@
       "drama": "ドラマCD",
       "radio": "ラジオ"
     },
+    "sort": {
+      "label": "並び替え",
+      "new": "新着",
+      "trending": "最近の人気",
+      "top_rated": "高評価",
+      "relevance": "関連度"
+    },
     "category_filter": "カテゴリー",
-    "format_filter": "メディア",
+    "year_filter": "年",
     "vinyl_subtitle": "アナログレコードで発売された作品",
     "search_placeholder": "アルバムを検索",
     "filters": "絞り込み",
-    "all_categories": "すべてのカテゴリー",
-    "all_formats": "すべてのメディア",
-    "clear_filter": "{name}を解除",
     "clear_filters": "絞り込みを解除"
   },
   "artists": {
@@ -1333,6 +1337,16 @@
     "color": "テーマカラー",
     "preset": "色相 {hue} を使う",
     "ink": "インク"
+  },
+  "year_filter": {
+    "decade": "{decade} 年代"
+  },
+  "event_filter": {
+    "series": "イベントシリーズ",
+    "editions": "{count} 回",
+    "back": "イベントシリーズに戻る",
+    "empty": "このシリーズにはまだイベントがありません",
+    "load_failed": "読み込めませんでした"
   },
   "event_picker": {
     "placeholder": "イベントを検索（例：C107、M3-2025）",

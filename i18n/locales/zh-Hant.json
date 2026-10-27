@@ -122,14 +122,18 @@
       "drama": "廣播劇",
       "radio": "廣播節目"
     },
+    "sort": {
+      "label": "排序",
+      "new": "新發佈",
+      "trending": "近期熱門",
+      "top_rated": "高評分",
+      "relevance": "最相關"
+    },
     "category_filter": "類別",
-    "format_filter": "介質",
+    "year_filter": "年份",
     "vinyl_subtitle": "以黑膠發行的專輯",
     "search_placeholder": "在專輯裡搜尋",
     "filters": "篩選",
-    "all_categories": "全部類別",
-    "all_formats": "全部介質",
-    "clear_filter": "清除{name}篩選",
     "clear_filters": "清除篩選"
   },
   "artists": {
@@ -1333,6 +1337,16 @@
     "color": "主題色",
     "preset": "使用色相 {hue}",
     "ink": "墨色"
+  },
+  "year_filter": {
+    "decade": "{decade} 年代"
+  },
+  "event_filter": {
+    "series": "活動系列",
+    "editions": "{count} 屆",
+    "back": "返回活動系列",
+    "empty": "這個系列還沒有活動",
+    "load_failed": "載入失敗"
   },
   "event_picker": {
     "placeholder": "搜尋活動，例如 C107 或 M3-2025",
