@@ -27,10 +27,10 @@
             <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="flex shrink-0 gap-0.5">
-            <button type="button" class="btn btn-xs px-1.5" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.bonuses, bonus, -1)"><ArrowUp :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5" :disabled="index === bonuses.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.bonuses, bonus, 1)"><ArrowDown :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5" :aria-label="$t('common.edit')" @click="edit(bonus)"><PencilLine :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :aria-label="$t('common.delete')" @click="remove(bonus.id)"><Trash2 :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.bonuses, bonus, -1)"><ArrowUp :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="index === bonuses.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.bonuses, bonus, 1)"><ArrowDown :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('common.edit')" @click="edit(bonus)"><PencilLine :size="12" /></button>
+            <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="remove(bonus.id)"><Trash2 :size="12" /></button>
           </span>
         </li>
       </ul>
@@ -87,12 +87,12 @@
           <div class="flex flex-wrap items-center gap-2">
             <span v-for="disc in linkedDiscs" :key="disc.id" class="inline-flex items-center gap-1 rounded-lg bg-pink-50 px-2 py-1 text-xs text-pink-800 dark:bg-pink-400/15 dark:text-pink-300">
               <Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-28 truncate text-pink-500 dark:text-pink-400"> · {{ disc.title }}</span>
-              <button type="button" class="ml-0.5 text-pink-400 transition-colors hover:text-pink-700 dark:hover:text-pink-200" :title="$t('editor.bonuses.unlink_disc')" @click="unlinkDisc(disc.id)"><X :size="11" /></button>
+              <button type="button" class="ml-0.5 rounded bg-pink-100 p-0.5 text-pink-500 hover:bg-pink-200 hover:text-pink-700 dark:bg-pink-400/20 dark:hover:bg-pink-400/30 dark:hover:text-pink-200 ring-1 ring-inset ring-pink-300/50 shadow-xs transition active:translate-y-px" :title="$t('editor.bonuses.unlink_disc')" @click="unlinkDisc(disc.id)"><X :size="11" /></button>
             </span>
             <span v-for="(disc, index) in newDiscs" :key="disc.key" class="inline-flex items-center gap-1 rounded-lg border border-dashed border-pink-300 bg-card px-1.5 py-0.5 text-xs text-pink-800 dark:border-pink-400/40 dark:text-pink-300">
               <Disc3 :size="11" />{{ $t('editor.dialog.new_disc') }}
               <UiSelect v-model="disc.format" :options="formatOptions" size="xs" class="h-6 min-h-0 w-20 border-0 bg-transparent text-xs" :aria-label="$t('catalog.field.format')" />
-              <button type="button" class="text-pink-400 transition-colors hover:text-pink-700 dark:hover:text-pink-200" :aria-label="$t('common.delete')" @click="newDiscs.splice(index, 1)"><X :size="11" /></button>
+              <button type="button" class="rounded bg-pink-100 p-0.5 text-pink-500 hover:bg-pink-200 hover:text-pink-700 dark:bg-pink-400/20 dark:hover:bg-pink-400/30 dark:hover:text-pink-200 ring-1 ring-inset ring-pink-300/50 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="newDiscs.splice(index, 1)"><X :size="11" /></button>
             </span>
             <EditorAddButton small @click="newDiscs.push({ key: newKey('nd'), format: 'cd' })">{{ $t('editor.bonuses.add_disc') }}</EditorAddButton>
             <UiSelect v-if="freeDiscs.length" model-value="" :options="freeDiscOptions" :placeholder="$t('editor.bonuses.use_disc')" size="sm" class="h-7 w-44 text-xs" @change="useDisc" />
@@ -111,8 +111,8 @@
         </div>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+        <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</button>
+        <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>
     </EditorModal>
   </CatalogSection>

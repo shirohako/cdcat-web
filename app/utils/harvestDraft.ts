@@ -4,7 +4,8 @@ import type { AlbumDocument, RowId } from '~/types/document'
 import type { HarvestCandidateDetail } from '~/types/harvest'
 import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument, setTitleIn } from '~/utils/albumDocument'
 import { newKey, newRef } from '~/utils/documentKeys'
-import { DRAFT_REF, draftPeople } from '~/utils/harvestPeople'
+import { DRAFT_REF, draftPeople, setCirclePublisher } from '~/utils/harvestPeople'
+import { RELEASE_ROLES } from '~/types/album'
 
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }
@@ -18,8 +19,8 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
 /**
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
  * title and names, release date and event (the suggested first release and the sources' earliest
- * date), the description of the highest-priority source that has one, the circle as
- * album artist, the tracklist, the edition's catalog number and price, credits and links. The circle
+ * date), the description of the highest-priority source that has one, the circle as the
+ * album's publisher (an album-wide 发行 credit), the tracklist, the edition's catalog number and price, credits and links. The circle
  * and the credited names are linked or created as the server suggests (utils/harvestPeople); the
  * names left to the reviewer stay printed names. The cover is picked by the reviewer, because only
  * a picked image is stored.
@@ -50,7 +51,8 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     setTitleIn(doc, 'titles', null, title.locale, title.kind, title.title)
   }
   const circle = detail.circle_match ? people.circle() : candidate.artist_id
-  if (circle) doc.artists = [{ id: newKey('aa'), artist_id: circle, credited_as: null, join_phrase: null }]
+  // The circle publishes the album; reviewers add the 署名艺术家 the sources name.
+  if (circle) setCirclePublisher(doc, circle)
 
   const digital = merged.media.length > 0 && merged.media.every(medium => medium === 'digital')
   const first = doc.discs[0]!
@@ -82,8 +84,10 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
 
   for (const credit of merged.credits) {
     if (!credit.role) continue
-    const trackId = credit.track ? tracks.get(`${credit.track.disc}-${credit.track.number}`) : null
-    if (credit.track && !trackId) continue
+    // 发行, 厂牌 … are credited on the whole album only.
+    const albumOnly = credit.role !== 'artist' && (RELEASE_ROLES as readonly string[]).includes(credit.role)
+    const trackId = credit.track && !albumOnly ? tracks.get(`${credit.track.disc}-${credit.track.number}`) : null
+    if (credit.track && !albumOnly && !trackId) continue
     const who = people.credit(credit.name) ?? { artist_id: credit.artist_id, credited_as: credit.artist_id ? null : credit.name }
     addCredit(doc, { ...who, role: credit.role, detail: credit.detail }, trackId ? [trackId] : null)
   }

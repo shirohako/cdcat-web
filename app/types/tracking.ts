@@ -3,6 +3,8 @@
  * 用户可以追踪专辑的状态（只对专辑有效）
  */
 
+import type { AlbumByline } from './album'
+
 // 追踪状态枚举
 export type TrackingStatus = 'plan_to_listen' | 'wishlist' | 'completed' | 'owned' | 'dropped'
 
@@ -24,7 +26,7 @@ export interface TrackingAlbum {
   disc_count: number // 光盘数
   track_count: number // 轨道数
   type: 'album' | 'single' | 'ep' | 'compilation' // 类型
-  artists: Artist[] // 艺术家列表
+  byline: AlbumByline | null // 署名，见 App\Support\AlbumByline
   status: TrackingStatus // 当前追踪状态
   statusUpdatedAt: string // 状态更新时间
   addedAt: string // 添加到追踪时间

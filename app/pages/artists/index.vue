@@ -101,9 +101,11 @@ const { t } = useI18n();
 // The types as the database has them now (the catalog schema), the built-in list until it loads.
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
+// The English names, in a tooltip on the type chips
+const { labelEn } = useEnglishLabels()
 const artistTypes = computed(() => [
   { value: 'all', label: t('common.all') },
-  ...(schema.value?.enums.artist_type ?? ARTIST_TYPES).map(value => ({ value, label: enumLabel('artist_type', value) })),
+  ...(schema.value?.enums.artist_type ?? ARTIST_TYPES).map(value => ({ value, label: enumLabel('artist_type', value), hint: labelEn('artist_type', value) })),
 ]);
 
 // From the URL, so back and forward switch the type too.

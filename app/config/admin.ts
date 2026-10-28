@@ -40,14 +40,15 @@ export const adminMenu: AdminMenuItem[] = [
   { path: '/admin/content/tracks', permission: 'content.manage', label: '曲目', icon: 'lucide:music', group: 'music' },
   { path: '/admin/content/lyrics', permission: 'content.manage', label: '歌词', icon: 'lucide:file-text', group: 'music' },
   { path: '/admin/content/artists', permission: 'content.manage', label: '艺术家', icon: 'lucide:mic-vocal', group: 'artists' },
-  { path: '/admin/content/labels', permission: 'content.manage', label: '厂牌', icon: 'lucide:building-2', group: 'artists' },
   { path: '/admin/content/entries', permission: 'content.manage', label: '条目', icon: 'lucide:clapperboard', group: 'entries' },
   { path: '/admin/content/franchises', permission: 'content.manage', label: '系列', icon: 'lucide:layers', group: 'entries' },
   { path: '/admin/events', permission: 'events.manage', label: '活动', icon: 'lucide:calendar-days', group: 'events' },
   { path: '/admin/event-series', permission: 'events.manage', label: '活动系列', icon: 'lucide:calendar-range', group: 'events' },
   { path: '/admin/harvest', permission: 'harvest.manage', label: '采集概况', icon: 'lucide:radar', group: 'harvest' },
-  { path: '/admin/harvest/tasks', permission: 'harvest.manage', label: '采集任务', icon: 'lucide:clipboard-list', group: 'harvest' },
+  { path: '/admin/harvest/tasks', permission: 'harvest.manage', label: '任务', icon: 'lucide:clipboard-list', group: 'harvest' },
   { path: '/admin/harvest/candidates', permission: 'harvest.manage', label: '待审核候选', icon: 'lucide:list-todo', group: 'harvest' },
+  { path: '/admin/harvest/names', permission: 'harvest.manage', label: '名字对照', icon: 'lucide:id-card', group: 'harvest' },
+  { path: '/admin/harvest/coverage', permission: 'harvest.manage', label: '社团覆盖', icon: 'lucide:map-pinned', group: 'harvest' },
   { path: '/admin/credit-roles', permission: 'content.manage', label: '角色字典', icon: 'lucide:contact', group: 'catalog_settings' },
   { path: '/admin/attribute-definitions', permission: 'content.manage', label: '属性定义', icon: 'lucide:list-checks', group: 'catalog_settings' },
   { path: '/admin/link-providers', permission: 'content.manage', label: '链接提供方', icon: 'lucide:link', group: 'catalog_settings' },
@@ -81,7 +82,7 @@ export const findAdminMenuItem = (path: string, items: AdminMenuItem[] = adminMe
   items.find(item => item.path === path)
   ?? items.filter(item => item.path !== '/admin' && path.startsWith(`${item.path}/`)).sort((a, b) => b.path.length - a.path.length)[0]
 
-export const adminContentTypes = ['album', 'artist', 'label', 'entry', 'franchise', 'track', 'lyric'] as const
+export const adminContentTypes = ['album', 'artist', 'entry', 'franchise', 'track', 'lyric'] as const
 
 /**
  * Per content type (the singular morph alias, as in `resource_type`): the plural URL segment the
@@ -90,7 +91,6 @@ export const adminContentTypes = ['album', 'artist', 'label', 'entry', 'franchis
 export const adminContentRoutes: Record<AdminContentType, { api: string, front: string }> = {
   album: { api: 'albums', front: 'albums' },
   artist: { api: 'artists', front: 'artists' },
-  label: { api: 'labels', front: 'labels' },
   entry: { api: 'entries', front: 'entries' },
   franchise: { api: 'franchises', front: 'franchises' },
   track: { api: 'tracks', front: 'tracks' },
@@ -98,7 +98,7 @@ export const adminContentRoutes: Record<AdminContentType, { api: string, front: 
 }
 
 /** Types whose duplicates can be merged into another entity. */
-export const mergeableContentTypes: AdminContentType[] = ['album', 'artist', 'label']
+export const mergeableContentTypes: AdminContentType[] = ['album', 'artist']
 
 /** The editor of an entity; tracks are edited with their album and lyrics on their track's page. */
 export const adminEditorPath = (type: AdminContentType, id?: number | string | null) => {

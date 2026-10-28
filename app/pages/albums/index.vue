@@ -20,7 +20,7 @@
           <!-- The event series pages link here with ?event=<id>. -->
           <AlbumListFilters
             v-model:search="searchInput"
-            :categories="albumCategories.map(value => ({ value, label: enumLabel('album_category', value) }))"
+            :categories="albumCategories.map(value => ({ value, label: enumLabel('album_category', value), hint: labelEn('album_category', value) }))"
             :category="category"
             :types="albumTypes"
             :type="selectedType"
@@ -101,13 +101,19 @@ const { t, te } = useI18n();
 // Types and categories as the database has them now (the catalog schema), the built-in lists until it loads.
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
+// The English names, in a tooltip on the category chips
+const { labelEn } = useEnglishLabels()
 const albumTypes = computed(() => [
   { value: 'all', label: t('common.all') },
   ...(schema.value?.enums.album_type ?? ALBUM_TYPES).map(value => ({
     value, label: te(`albums.type.${value}`) ? t(`albums.type.${value}`) : enumLabel('album_type', value),
   })),
 ])
-const albumCategories = computed(() => schema.value?.enums.album_category ?? [...ALBUM_CATEGORIES])
+// 同人创作 comes first, right after 全部.
+const albumCategories = computed(() => {
+  const categories = schema.value?.enums.album_category ?? [...ALBUM_CATEGORIES]
+  return [...categories].sort((a, b) => Number(b === 'doujin') - Number(a === 'doujin'))
+})
 
 const selectedType = computed(() => String(route.query.type || 'all'));
 

@@ -1,7 +1,7 @@
 import type { AlbumSimple } from '~/types/album'
 
 /** GET /v1/search (docs/api/search.md) */
-export const SEARCH_TYPES = ['album', 'track', 'artist', 'label', 'entry', 'franchise'] as const
+export const SEARCH_TYPES = ['album', 'track', 'artist', 'entry', 'franchise'] as const
 export type SearchType = typeof SEARCH_TYPES[number]
 
 export interface SearchMatched {

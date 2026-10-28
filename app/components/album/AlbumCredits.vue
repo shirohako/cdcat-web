@@ -18,20 +18,34 @@
 </template>
 
 <script setup lang="ts">
+import type { AlbumDisc } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
 import { Users } from '@lucide/vue'
+import { RELEASE_ROLES } from '~/types/album'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
 
-const props = defineProps<{ credits: CatalogCredit[] }>()
+const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
 
 const { roleName, roleCategory, roleOrder } = useCatalogSchema()
 
-/** One row per role; a person credited under another name shows that name. */
+/**
+ * One row per role; a person credited under another name shows that name. An album with no credits
+ * of its own sums up its tracks' credits instead, each person once per role. The 署名与发行 roles are left
+ * to the hero, 专辑信息 and the tracklist.
+ */
 const groups = computed(() => {
+  const isWork = (credit: CatalogCredit) => !(RELEASE_ROLES as readonly string[]).includes(credit.role)
+  const own = props.credits.filter(isWork)
+  const credits = own.length ? own : (props.discs ?? []).flatMap(disc => disc.tracks.flatMap(track => track.credits)).filter(isWork)
   const map = new Map<string, { role: string, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }>()
-  for (const credit of props.credits) {
+  const seen = new Set<string>()
+  for (const credit of credits) {
+    const person = { name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail }
+    const key = JSON.stringify([credit.role, person.artistId ?? person.name, person.detail])
+    if (seen.has(key)) continue
+    seen.add(key)
     const group = map.get(credit.role) ?? { role: credit.role, category: credit.category ?? roleCategory(credit.role), people: [] }
-    group.people.push({ name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail })
+    group.people.push(person)
     map.set(credit.role, group)
   }
   return [...map.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))

@@ -24,8 +24,6 @@ export interface AlbumDocument {
   is_adult: boolean
   banner_url: string | null
   titles: TitleRow[]
-  artists: Array<{ id: RowId, artist_id: AggregateRef | null, credited_as: string | null, join_phrase: string | null, sort_order?: number }>
-  labels: Array<{ id: RowId, label_id: AggregateRef | null, role: string, credited_as: string | null, sort_order?: number }>
   products: Array<{
     id: RowId, name: string | null, edition_type: string, medium: string, limited_rule: string | null, limited_name: string | null,
     catalog_number: string | null, barcode: string | null, release_date: string | null, release_date_precision: DatePrecision,
@@ -65,26 +63,12 @@ export interface ArtistDocument {
   is_active: boolean
   bio: string | null
   image_url: string | null
-  titles: TitleRow[]
-  links: LinkRow[]
-  attributes: AttributeRow[]
-  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, note: string | null }>
-}
-
-export interface LabelDocument {
-  name: string
-  slug: string | null
-  country: string | null
-  description: string | null
-  image_url: string | null
-  begin_date: string | null
-  begin_date_precision: DatePrecision
-  end_date: string | null
-  end_date_precision: DatePrecision
+  /** Companies and circles that act as labels, e.g. ["LACA", "LACM"]. */
   catalog_prefixes: string[]
   titles: TitleRow[]
   links: LinkRow[]
   attributes: AttributeRow[]
+  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 
 export interface EntryDocument {

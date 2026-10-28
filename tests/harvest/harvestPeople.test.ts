@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { HarvestCircleMatch, HarvestNewArtist, HarvestPerson } from '../../app/types/harvest'
 import { addCredit, emptyAlbumDocument } from '../../app/utils/albumDocument'
-import { draftPeople, linkPrintedName, peopleWarnings, setAlbumArtist, settleSuggestions } from '../../app/utils/harvestPeople'
+import { albumPublisher, draftPeople, linkPrintedName, peopleWarnings, setCirclePublisher, settleSuggestions } from '../../app/utils/harvestPeople'
 
 const person = (names: string[], state: HarvestPerson['state'], extra: Partial<HarvestPerson> = {}): HarvestPerson => ({
   key: names[0]!.toLowerCase(), names, state, artist_id: null, follows_circle: false, candidates: [], db_keys: [],
@@ -61,7 +61,7 @@ describe('peopleWarnings', () => {
       ['person', 'Yuki Tanaka', true],
       ['person', 'ZUN', false],
     ])
-    setAlbumArtist(doc, 4)
+    setCirclePublisher(doc, 4)
     linkPrintedName(doc, ['yuki tanaka'], 1, 'Yuki Tanaka')
     expect(peopleWarnings(doc, people, circle('shop')).filter(warning => warning.open)).toEqual([])
     expect(doc.credits.find(row => row.role === 'composer')).toMatchObject({ artist_id: 1, credited_as: null })
@@ -85,9 +85,9 @@ describe('settleSuggestions', () => {
     ], circle('linked', { artist_id: 9 }), id => names[id], create)
 
     expect(changed).toBe(3)
-    expect(doc.artists.map(row => row.artist_id)).toEqual([9])
-    expect(doc.credits.map(row => [row.credited_as, row.artist_id])).toEqual([
-      [null, 7], [null, '@hv1'], ['Yuki Tanaka', null], ['Ayane', 5],
+    expect(albumPublisher(doc)).toBe(9)
+    expect(doc.credits.map(row => [row.role, row.credited_as, row.artist_id])).toEqual([
+      ['lyricist', null, 7], ['composer', null, '@hv1'], ['arranger', 'Yuki Tanaka', null], ['vocals', 'Ayane', 5], ['publisher', null, 9],
     ])
     expect(made.map(document => document.name)).toEqual(['Hoshino'])
   })

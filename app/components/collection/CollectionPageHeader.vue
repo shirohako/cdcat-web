@@ -3,6 +3,8 @@ interface FilterOption {
   value: string
   label: string
   icon?: string
+  /** A tooltip on the chip, e.g. the English name */
+  hint?: string
 }
 
 /**
@@ -91,18 +93,18 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
         </span>
 
         <div class="flex min-w-0 flex-1 gap-1.5 overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <button
-            v-for="filter in filters"
-            :key="filter.value"
-            type="button"
-            class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150"
-            :class="modelValue === filter.value ? activeFilterClass : idleFilterClass"
-            :aria-pressed="modelValue === filter.value"
-            @click="emit('update:modelValue', filter.value)"
-          >
-            <Icon v-if="filter.icon" :name="filter.icon" class="h-3.5 w-3.5" />
-            {{ filter.label }}
-          </button>
+          <UiTooltip v-for="filter in filters" :key="filter.value" :text="filter.hint">
+            <button
+              type="button"
+              class="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-3 text-xs font-medium ring-1 ring-inset transition-colors duration-150"
+              :class="modelValue === filter.value ? activeFilterClass : idleFilterClass"
+              :aria-pressed="modelValue === filter.value"
+              @click="emit('update:modelValue', filter.value)"
+            >
+              <Icon v-if="filter.icon" :name="filter.icon" class="h-3.5 w-3.5" />
+              {{ filter.label }}
+            </button>
+          </UiTooltip>
         </div>
 
         <div v-if="$slots['filter-end']" class="shrink-0">

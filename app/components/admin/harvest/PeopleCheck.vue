@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { AlbumDocument } from '~/types/document'
 import type { HarvestArtistReference, HarvestCircleMatch, HarvestMergedCredit, HarvestNewArtist, HarvestPerson } from '~/types/harvest'
-import { DRAFT_REF, linkPrintedName, peopleWarnings, sameName, setAlbumArtist, settleSuggestions, type PeopleWarning } from '~/utils/harvestPeople'
+import { albumPublisher, DRAFT_REF, linkPrintedName, peopleWarnings, sameName, setCirclePublisher, settleSuggestions, type PeopleWarning } from '~/utils/harvestPeople'
 
 /**
  * 人员核对 on the review page (docs/harvest/README.md#人员): what the draft did with each credited
@@ -57,14 +57,14 @@ const pick = (warning: PeopleWarning, id: number) => {
   if (!album.value || !props.editor) return
   const row = artist(id)
   if (row) props.editor.remember('artist', id, row)
-  if (warning.kind === 'circle') setAlbumArtist(album.value, id)
+  if (warning.kind === 'circle') setCirclePublisher(album.value, id)
   linkPrintedName(album.value, warning.names, id, row?.name)
 }
 /** A new artist the reviewer asked for: created as it is, not checked again on approval. */
 const createNew = (warning: PeopleWarning) => {
   if (!album.value || !props.editor || !warning.create) return
   const ref = props.editor.createItem('artist', clone(warning.create) as unknown as Record<string, unknown>)
-  if (warning.kind === 'circle') setAlbumArtist(album.value, ref)
+  if (warning.kind === 'circle') setCirclePublisher(album.value, ref)
   linkPrintedName(album.value, warning.names, ref, warning.create.name)
 }
 
@@ -75,7 +75,7 @@ const settleable = computed(() => {
   const printed = doc.credits.filter(row => row.artist_id === null && row.credited_as).map(row => row.credited_as!)
   const names = props.people.filter(person => ['linked', 'link', 'name', 'circle', 'new'].includes(person.state)
     && (person.artist_id || person.state === 'new' || person.follows_circle) && person.names.some(name => printed.some(text => sameName(text, name))))
-  const circle = !doc.artists.length && ['linked', 'name', 'new'].includes(props.circle?.state ?? '') ? 1 : 0
+  const circle = albumPublisher(doc) === null && ['linked', 'name', 'new'].includes(props.circle?.state ?? '') ? 1 : 0
   return names.length + circle
 })
 const settle = () => {

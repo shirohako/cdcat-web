@@ -33,19 +33,21 @@
       </div>
     </div>
 
-    <!-- The title and the artists under it; then one row with the date and the size of the release, which keeps the
+    <!-- The title and the byline under it; then one row with the date and the size of the release, which keeps the
          card nearer square -->
     <div class="flex flex-col gap-1 px-1.5 pb-1.5 pt-2">
-      <!-- Cut off, the title and the artists show in full in a tooltip -->
+      <!-- Cut off, the title and the byline show in full in a tooltip -->
       <UiTruncate :text="album.title" tag="h3" class="text-[13px] leading-5 font-bold text-title transition-colors group-hover:text-primary" />
-      <div class="flex h-4 min-w-0 items-center gap-1.5 text-[11px]" :class="shownArtists ? 'text-meta' : 'text-faint'">
-        <UserRound :size="11" class="shrink-0" />
-        <UiTruncate v-if="shownArtists" :text="shownArtists" :tooltip="allArtists" class="min-w-0" />
-        <span v-else>—</span>
-        <!-- More than two: the first two, and the rest counted, all of them in the tooltip -->
-        <UiTooltip v-if="moreArtists" :text="allArtists">
-          <span class="shrink-0 rounded bg-black/5 px-1 text-[10px] font-semibold leading-4 text-meta dark:bg-white/10">+{{ moreArtists }}</span>
-        </UiTooltip>
+      <!-- No byline: the line stays empty, so the cards of a row keep one height -->
+      <div class="flex h-4 min-w-0 items-center gap-1.5 text-[11px] text-meta">
+        <template v-if="bylineNames.length">
+          <UserRound :size="11" class="shrink-0" />
+          <!-- Several 署名艺术家 don't fit: Various Artists, with all of them in the tooltip -->
+          <UiTooltip v-if="various" :text="allArtists">
+            <span class="truncate">{{ VARIOUS_ARTISTS }}</span>
+          </UiTooltip>
+          <UiTruncate v-else :text="allArtists" class="min-w-0" />
+        </template>
       </div>
       <div class="mt-1 flex items-center justify-between gap-2 border-t border-line pt-2 text-[11px] tabular-nums text-meta">
         <span class="inline-flex min-w-0 items-center gap-1" :class="{ 'text-faint': !album.release_date }">
@@ -64,10 +66,11 @@
 <script setup lang="ts">
 import type { AlbumSimple } from '~/types/album'
 import { Calendar, Disc3, Heart, ListMusic, UserRound } from '@lucide/vue'
+import { VARIOUS_ARTISTS } from '~/utils/albumByline'
 
 const props = defineProps<{
   album: Pick<AlbumSimple, 'id' | 'title' | 'type' | 'image_url' | 'release_date' | 'disc_count' | 'track_count' | 'views_count' | 'favorites_count'>
-    & Partial<Pick<AlbumSimple, 'release_date_precision' | 'is_favorited' | 'is_pending' | 'artists'>>
+    & Partial<Pick<AlbumSimple, 'release_date_precision' | 'is_favorited' | 'is_pending' | 'byline'>>
 }>()
 
 const { t, te, locale } = useI18n()
@@ -76,14 +79,13 @@ const { t, te, locale } = useI18n()
 const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-[3px] text-[10px] font-medium leading-none text-on-media backdrop-blur-sm'
 
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
-/** Artists as credited: each name with its join phrase ("feat."), or a list separator where it has none. */
-const joinArtists = (list: NonNullable<AlbumSimple['artists']>) =>
-  list.map((artist, index) => artist.name + (index < list.length - 1 ? (artist.join_phrase ?? t('albums.card.artist_separator')) : '')).join('')
-/** The card names two artists at most; the rest are counted, and all of them are in the count's tooltip. */
-const SHOWN_ARTISTS = 2
-const shownArtists = computed(() => joinArtists((props.album.artists ?? []).slice(0, SHOWN_ARTISTS)))
-const moreArtists = computed(() => Math.max(0, (props.album.artists?.length ?? 0) - SHOWN_ARTISTS))
-const allArtists = computed(() => joinArtists(props.album.artists ?? []))
+/**
+ * The byline (App\Support\AlbumByline): the publishers, cut off when they don't fit and shown in full in a tooltip;
+ * else the 署名艺术家, one by name and several as Various Artists.
+ */
+const bylineNames = computed(() => (props.album.byline?.artists ?? []).map(artist => artist.name))
+const various = computed(() => props.album.byline?.role === 'artist' && bylineNames.value.length > 1)
+const allArtists = computed(() => bylineNames.value.join(', '))
 /**
  * The release date as digits, to its precision (2026.10.25, 2026.10, 2026): short and the same in every language, so
  * it fits beside the counts on a narrow card. The album page gives the date in full.

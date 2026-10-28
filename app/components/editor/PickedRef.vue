@@ -5,7 +5,7 @@
     <EditorRefLabel :id="id" :type="type" :references="references" :pending="pending" class="min-w-0 flex-1 font-medium" />
     <button
       type="button"
-      class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-primary/70 transition-colors hover:bg-primary/15 hover:text-primary"
+      class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary hover:bg-primary/20 ring-1 ring-inset ring-primary/25 shadow-xs transition active:translate-y-px"
       :aria-label="$t('common.delete')"
       @click="emit('remove')"
     ><X :size="13" /></button>

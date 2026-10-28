@@ -4,7 +4,7 @@ import type { AdminDashboard } from '~/types/admin'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { $api } = useNuxtApp()
 const { hasPermission } = useAuth()
-const metricLabels: Record<string, string> = { 'users': '用户', 'albums': '专辑', 'artists': '艺术家', 'labels': '厂牌', 'entries': '条目', 'franchises': '系列', 'tracks': '曲目', 'lyrics': '歌词', 'reviews': '评价', 'shouts': '留言', 'articles': '文章', 'events': '活动' }
+const metricLabels: Record<string, string> = { 'users': '用户', 'albums': '专辑', 'artists': '艺术家', 'entries': '条目', 'franchises': '系列', 'tracks': '曲目', 'lyrics': '歌词', 'reviews': '评价', 'shouts': '留言', 'articles': '文章', 'events': '活动' }
 const dashboardDayLabels: Record<string, string> = { '7': '近 7 天', '30': '近 30 天' }
 const range = ref<7 | 30>(7)
 const { data, pending, error, refresh } = await useAsyncData('admin-dashboard', () => $api<AdminDashboard>('/v1/admin/dashboard'))

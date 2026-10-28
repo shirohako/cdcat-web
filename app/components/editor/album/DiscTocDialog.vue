@@ -8,7 +8,7 @@
           <span class="font-mono text-meta">{{ $t('editor.toc.leadout', { offset: toc.leadout_offset }) }}</span>
           <span class="rounded bg-btn px-1.5 py-0.5 text-[10px] uppercase text-btn-content">{{ toc.source }}</span>
           <span v-if="toc.last_track - toc.first_track + 1 !== trackCount" class="text-warning">{{ $t('editor.toc.count_mismatch', { count: trackCount }) }}</span>
-          <button type="button" class="btn btn-xs ml-auto px-1.5" :aria-label="$t('common.delete')" @click="remove(toc.id)"><Trash2 :size="12" /></button>
+          <button type="button" class="btn btn-xs ml-auto px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="remove(toc.id)"><Trash2 :size="12" /></button>
         </li>
       </ul>
       <p v-else class="text-xs text-meta">{{ $t('editor.toc.none') }}</p>
@@ -19,8 +19,8 @@
       </div>
     </div>
     <template #footer>
-      <button type="button" class="btn btn-sm" @click="open = false">{{ $t('common.close') }}</button>
-      <button type="button" class="btn btn-primary btn-sm" :disabled="!parsed" @click="add">{{ $t('editor.toc.add') }}</button>
+      <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="open = false">{{ $t('common.close') }}</button>
+      <button type="button" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px" :disabled="!parsed" @click="add">{{ $t('editor.toc.add') }}</button>
     </template>
   </EditorModal>
 </template>

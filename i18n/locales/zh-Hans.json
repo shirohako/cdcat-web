@@ -35,7 +35,6 @@
       "bonuses": "特典",
       "credits": "制作人员",
       "tracklist": "曲目表",
-      "artists": "艺术家",
       "links": "相关链接",
       "articles": "相关文章",
       "contributors": "贡献者",
@@ -72,8 +71,6 @@
       "credits": "暂无制作人员信息。",
       "tracklist_title": "暂无曲目信息",
       "tracklist_desc": "该专辑尚未添加任何曲目",
-      "artists_title": "暂无艺术家信息",
-      "artists_desc": "该专辑尚未关联任何艺术家",
       "links_title": "暂无外部链接",
       "links_desc": "该专辑尚未添加任何链接",
       "articles_title": "暂无相关文章",
@@ -89,9 +86,9 @@
       "original": "原图 {width}×{height}"
     },
     "info": {
-      "labels": "厂牌",
       "release_event": "发行活动",
-      "attributes": "其他信息"
+      "attributes": "其他信息",
+      "people": "发行"
     },
     "products": {
       "contains_discs": "含 Disc {discs}"
@@ -132,8 +129,7 @@
       "views": "{count} 次查看",
       "likes": "{count} 人收藏",
       "discs": "{count} 张碟",
-      "tracks": "{count} 首曲目",
-      "artist_separator": "、"
+      "tracks": "{count} 首曲目"
     },
     "category_filter": "类别",
     "year_filter": "年份",
@@ -159,17 +155,18 @@
       "follow": "关注",
       "following": "已关注",
       "share": "分享",
-      "releases": "参与作品",
       "no_bio": "暂无艺术家简介。",
       "no_releases": "暂无专辑",
       "no_releases_desc": "该艺术家还没有关联的专辑。",
-      "as_artist": "作为艺术家",
       "inactive": "已停止活动",
       "relations": "相关艺术家",
-      "view_albums": "专辑",
-      "view_tracks": "曲目",
-      "no_tracks": "暂无参与曲目",
-      "credited_as": "署名为 {name}"
+      "credited_as": "署名为 {name}",
+      "tab_releases": "发行的专辑",
+      "tab_credits": "参与的专辑",
+      "no_credits": "暂无参与的专辑",
+      "albums_label": "专辑",
+      "album_roles": "整张专辑",
+      "catalog_prefixes": "品番前缀"
     }
   },
   "tracking": {
@@ -1569,7 +1566,6 @@
     "catalog_type": {
       "album": "专辑",
       "artist": "艺术家",
-      "label": "厂牌",
       "lyric": "歌词",
       "entry": "条目",
       "franchise": "系列"
@@ -1608,13 +1604,6 @@
       "sticker": "贴纸",
       "bonus_item": "特典",
       "illustration": "插图",
-      "other": "其他"
-    },
-    "label_role": {
-      "label": "厂牌",
-      "publisher": "发行",
-      "distributor": "经销",
-      "manufacturer": "制造",
       "other": "其他"
     },
     "artist_relation": {
@@ -1705,8 +1694,6 @@
       "sort_order": "顺序",
       "artist_id": "艺术家",
       "credited_as": "署名",
-      "join_phrase": "连接词",
-      "label_id": "厂牌",
       "role": "角色",
       "edition_type": "版本类型",
       "medium": "载体",
@@ -1760,8 +1747,6 @@
     },
     "collection": {
       "titles": "其他名称",
-      "artists": "艺术家",
-      "labels": "厂牌",
       "products": "版本",
       "bonuses": "特典",
       "discs": "碟片",
@@ -1781,6 +1766,7 @@
       "track_originals": "原曲"
     },
     "credit_role_category": {
+      "release": "署名与发行",
       "composition": "作曲",
       "lyrics": "作词",
       "arrangement": "编曲",
@@ -2139,14 +2125,6 @@
       "login": "登录后发表评论"
     }
   },
-  "labels": {
-    "title": "厂牌",
-    "subtitle": "唱片公司与厂牌",
-    "label": "厂牌",
-    "catalog_prefixes": "品番前缀",
-    "no_results": "没有找到厂牌",
-    "not_found": "厂牌不存在。"
-  },
   "tracks": {
     "not_found": "曲目不存在。",
     "originals_section": "原曲",
@@ -2330,17 +2308,16 @@
       "tracks": "至少一首曲目"
     },
     "suggested_item": {
-      "artists": "艺术家",
+      "byline": "署名艺术家或发行",
       "catalog_number": "品番",
       "categories": "类别",
       "links": "链接",
       "durations": "曲目时长",
-      "credits": "制作人员"
+      "credits": "参与创作的人"
     },
     "preview": "预览",
     "date_placeholder": "年-月-日",
     "date_invalid": "请写成 2024、2024-05 或 2024-05-12",
-    "mode_edit": "编辑",
     "mode_translate": "翻译曲目表",
     "my_revisions": "我的修订",
     "continue_draft": "继续编辑",
@@ -2368,18 +2345,12 @@
       "section": {
         "basic": "基本信息",
         "tracks": "碟片与曲目",
-        "people": "艺术家与厂牌",
-        "credits": "制作人员",
+        "credits": "参与创作的人",
         "editions": "版本",
         "bonuses": "特典",
         "images": "图片",
         "relations": "链接与关联"
       },
-      "artists_hint": "封面上署名的艺术家，按顺序填写。印的名字不同时填「署名为」，「feat.」「×」等写在连接词里。",
-      "labels_hint": "唱片公司、发行商、经销商。可以不填，同人专辑通常没有。",
-      "add_artist": "添加艺术家…",
-      "add_label": "添加厂牌…",
-      "credited_as_placeholder": "署名为",
       "tracks_hint": "曲目号按碟分别计数。在标题里按回车跳到下一首；展开曲目可以设置原曲、信息和链接。",
       "empty_tracklist": "还没有曲目",
       "empty_tracklist_hint": "可以从歌词本、商店页面或 VGMdb 粘贴曲目表，也可以一首一首添加。",
@@ -2399,7 +2370,10 @@
       "move_to_disc": "移到",
       "totals": "{discs} 张碟 · {tracks} 首曲目",
       "revision_mismatch": "这条修订不是编辑这张专辑的。",
-      "categories_suggested": "根据关联条目，建议："
+      "categories_suggested": "根据关联条目，建议：",
+      "byline_preview": "列表显示",
+      "byline_none": "没有发行，也没有整张专辑的署名艺术家：列表里不显示这一行",
+      "byline_various": "卡片上显示为 {name}"
     },
     "paste": {
       "button": "粘贴曲目表",
@@ -2428,8 +2402,8 @@
       "on_tracks": "部分曲目",
       "all_tracks": "全部曲目",
       "no_tracks": "没有曲目",
-      "none": "还没有制作人员。",
-      "add": "添加制作人员",
+      "none": "还没有参与创作的人。",
+      "add": "添加参与创作的人",
       "pick_artist": "选择或新建艺术家…",
       "name_only": "或者只填署名",
       "link_artist": "关联艺术家",
@@ -2474,6 +2448,10 @@
       "upload": "上传封面",
       "replace": "更换",
       "from_url": "从链接导入",
+      "from_clipboard": "从剪贴板粘贴",
+      "paste_hint": "也可以直接按 {keys} 粘贴图片。",
+      "clipboard_empty": "剪贴板里没有图片。",
+      "clipboard_denied": "浏览器没有允许读取剪贴板，请按 {keys} 粘贴。",
       "import": "导入",
       "too_small": "图片短边至少要 {size} 像素。",
       "not_square": "封面必须是正方形。",
@@ -2540,10 +2518,8 @@
       },
       "artist_name_placeholder": "最常见的署名",
       "entry_name_placeholder": "原名",
-      "founded": "成立",
-      "dissolved": "结束",
       "artist_relations_hint": "成员、声优、马甲和小分队。从这个艺术家的角度选择关系，对方会自动显示反向关系。",
-      "prefixes_hint": "品番前缀，用逗号分隔。添加专辑时用来猜测厂牌。",
+      "prefixes_hint": "品番前缀，用逗号分隔。公司和兼做厂牌的社团可以填。",
       "name_only_credit": "只填署名",
       "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。",
       "artist_type_placeholder": "请选择艺术家类型"
@@ -2588,17 +2564,8 @@
       "bonus_edit": "编辑特典",
       "digital": "数字",
       "new_disc": "新特典碟",
-      "artist_add": "添加艺术家",
-      "artist_edit": "编辑艺术家",
-      "artist_required": "请选择艺术家，或者输入名称新建。",
-      "label_add": "添加厂牌",
-      "label_edit": "编辑厂牌",
-      "label_required": "请选择厂牌，或者输入名称新建。",
-      "label": "厂牌",
       "shown_as": "署名为「{name}」",
-      "shown_as_hint": "实物上印的名字和库里的名称不同时填写。",
-      "join_phrase_hint": "和下一位艺术家之间的连接，如 &、feat.。",
-      "credit_edit": "编辑制作人员",
+      "credit_edit": "编辑参与创作的人",
       "name_only": "仅署名",
       "image_url": "图片地址",
       "image_url_hint": "粘贴图片的网址，确认预览无误后导入。",
@@ -2613,7 +2580,7 @@
       "credited_placeholder": "如 Yuki Kajiura",
       "featuring": "添加两位艺术家：先加梶浦由記，连接词选「feat.」；再加 Joelle。",
       "credited": "库里叫「梶浦由記」时，选择梶浦由記，「署名为」填 Yuki Kajiura。",
-      "circle": "封面只印社团名时只填社团；作曲、演唱等写在「制作人员」里。"
+      "circle": "封面只印社团名时只填社团；作曲、演唱等写在「参与创作的人」里。"
     },
     "originals": {
       "title": "原曲",
@@ -2734,7 +2701,6 @@
       "album": "专辑",
       "track": "曲目",
       "artist": "艺术家",
-      "label": "厂牌",
       "entry": "条目",
       "franchise": "系列"
     }
@@ -2872,7 +2838,7 @@
     "kinds": {
       "album": {
         "title": "专辑",
-        "desc": "曲目、发行信息、制作人员、商品和特典"
+        "desc": "曲目、发行信息、参与创作的人、商品和特典"
       },
       "artist": {
         "title": "艺术家",
@@ -2885,10 +2851,6 @@
       "franchise": {
         "title": "系列",
         "desc": "把多个条目归在一起"
-      },
-      "label": {
-        "title": "厂牌",
-        "desc": "发行或经销专辑的公司、品牌"
       }
     },
     "my_revisions": "查看我的修订",
@@ -2915,10 +2877,6 @@
       "lyrics": "附歌词",
       "instrumental": "纯音乐"
     },
-    "label": {
-      "lead": "唱片厂牌",
-      "founded": "成立于 {date}"
-    },
     "entry": {
       "albums": "关联 {count} 张专辑"
     },
@@ -2937,7 +2895,6 @@
       "albums": "浏览 CDCat 收录的专辑、单曲、EP 与合辑。",
       "vinyls": "浏览 CDCat 收录的黑胶唱片。",
       "artists": "浏览 CDCat 收录的艺术家、同人社团与虚拟歌手及其作品。",
-      "labels": "浏览 CDCat 收录的唱片厂牌与发行商。",
       "entries": "浏览 CDCat 收录的动画、游戏、影视等作品及其音乐。",
       "franchises": "浏览 CDCat 收录的作品系列及相关专辑。",
       "articles": "CDCat 用户撰写的音乐评论、专题与资料整理。",

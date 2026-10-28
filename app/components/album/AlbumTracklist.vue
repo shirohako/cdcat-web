@@ -62,6 +62,17 @@
               </UiTooltip>
             </div>
             <p v-if="track.subtitle" class="mt-0.5 truncate text-xs text-meta">{{ track.subtitle }}</p>
+            <!-- The track's own 署名艺术家, as on a compilation -->
+            <p v-if="track.artists.length" class="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-body">
+              <UserRound :size="11" class="shrink-0 text-meta" />
+              <span class="truncate">
+                <template v-for="(person, index) in track.artists" :key="index">
+                  <NuxtLink v-if="person.artistId" :to="`/artists/${person.artistId}`" class="transition-colors hover:text-primary">{{ person.name }}</NuxtLink>
+                  <span v-else>{{ person.name }}</span>
+                  <span v-if="index < track.artists.length - 1">, </span>
+                </template>
+              </span>
+            </p>
             <p v-if="track.originals.length" class="mt-0.5 truncate text-xs text-meta">
               <span class="text-meta">{{ $t('album.tracklist.original_songs') }}</span>
               <template v-for="(original, index) in track.originals" :key="index">
@@ -122,7 +133,7 @@
 <script setup lang="ts">
 import type { AlbumBonus, AlbumDisc, AlbumTrack, TracklistLanguage } from '~/types/album'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { Disc3, FileText, Heart, Languages, ListMusic, Music2, Users } from '@lucide/vue'
+import { Disc3, FileText, Heart, Languages, ListMusic, Music2, UserRound, Users } from '@lucide/vue'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
 
 const props = defineProps<{
@@ -173,9 +184,11 @@ watch(showCredits, value => localStorage.setItem(CREDITS_STORAGE_KEY, String(val
 
 interface CreditGroup { role: string, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }
 
+/** The track's credits by role, but its 署名艺术家, which show under the title. */
 const creditGroups = (track: AlbumTrack): CreditGroup[] => {
   const groups = new Map<string, CreditGroup>()
   for (const credit of track.credits) {
+    if (credit.role === 'artist') continue
     const group = groups.get(credit.role) ?? { role: credit.role, category: credit.category ?? roleCategory(credit.role), people: [] }
     group.people.push({ name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail })
     groups.set(credit.role, group)
@@ -197,6 +210,8 @@ const discs = computed(() => props.discs.map(disc => ({
       translated: chosen.value ? translated !== null : null,
       subtitle: translated && translated !== track.title ? track.title : '',
       creditGroups: creditGroups(track),
+      artists: track.credits.filter(credit => credit.role === 'artist')
+        .map(credit => ({ name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null })),
     }
   }),
 })))

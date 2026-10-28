@@ -35,6 +35,15 @@
 
               <h1 class="mb-1 wrap-break-word text-center text-lg font-bold leading-snug text-title md:text-left md:text-xl lg:text-2xl">{{ shownTitle }}</h1>
               <p v-if="originalTitle" class="mb-2 text-center text-sm text-body md:text-left">{{ originalTitle }}</p>
+              <!-- The track's own 署名艺术家, else the album's byline -->
+              <p v-if="artists.length" class="flex flex-wrap items-center justify-center gap-x-1 text-sm text-body md:justify-start">
+                <UserRound :size="13" class="text-meta" />
+                <template v-for="(artist, index) in artists" :key="`${artist.id}:${artist.name}`">
+                  <NuxtLink v-if="artist.id" :to="`/artists/${artist.id}`" class="link link-muted">{{ artist.name }}</NuxtLink>
+                  <span v-else>{{ artist.name }}</span>
+                  <span v-if="index < artists.length - 1" class="text-meta">,</span>
+                </template>
+              </p>
 
               <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-body md:justify-start">
                 <span v-if="track.duration" class="flex items-center gap-1.5">
@@ -102,7 +111,7 @@
 <script setup lang="ts">
 import type { TrackDetail } from '~/types/album'
 import { NuxtLink } from '#components'
-import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music, UserRound } from '@lucide/vue'
 
 /** The top of a track page: the album's cover and banner, the title, favorite, edit and moving to the next track. */
 const props = defineProps<{
@@ -122,6 +131,11 @@ const { localName, formatDuration } = useCatalogDisplay()
 const shownTitle = computed(() => localName(props.track.title, props.track.titles))
 const originalTitle = computed(() => shownTitle.value !== props.track.title ? props.track.title : '')
 const albumTitle = computed(() => props.track.album?.title ?? '')
+const artists = computed(() => {
+  const own = (props.track.credits ?? []).filter(credit => credit.role === 'artist')
+    .map(credit => ({ id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '' }))
+  return own.length ? own : (props.track.album?.byline?.artists ?? [])
+})
 const cover = computed(() => props.track.album?.image_url ?? null)
 const number = computed(() => props.track.number_label || String(props.track.track_number).padStart(2, '0'))
 const position = computed(() => props.multiDisc ? `Disc ${props.track.disc_number} · ${number.value}` : number.value)

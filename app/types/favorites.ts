@@ -3,6 +3,8 @@
  * 用户收藏功能：可收藏专辑(album)、歌曲(track)、艺术家(artist)
  */
 
+import type { AlbumByline } from './album'
+
 // ==================== TypeScript 类型定义 ====================
 
 export interface FavoriteAlbum {
@@ -11,7 +13,7 @@ export interface FavoriteAlbum {
   catalog_number?: string
   image_url?: string
   release_date?: string
-  artists?: Array<{ id: number; name: string; pivot?: { display_name?: string } }>
+  byline?: AlbumByline | null
   favorited_at: string
 }
 

@@ -35,7 +35,6 @@
       "bonuses": "Bonuses",
       "credits": "Credits",
       "tracklist": "Tracklist",
-      "artists": "Artists",
       "links": "Links",
       "articles": "Related Articles",
       "contributors": "Contributors",
@@ -72,8 +71,6 @@
       "credits": "No credits information.",
       "tracklist_title": "No tracks",
       "tracklist_desc": "No tracklist has been added yet",
-      "artists_title": "No artist info",
-      "artists_desc": "No artists are linked to this album yet",
       "links_title": "No external links",
       "links_desc": "No links have been added for this album yet",
       "articles_title": "No related articles",
@@ -89,9 +86,9 @@
       "original": "Original {width}×{height}"
     },
     "info": {
-      "labels": "Labels",
       "release_event": "Released at",
-      "attributes": "Details"
+      "attributes": "Details",
+      "people": "Release"
     },
     "products": {
       "contains_discs": "Discs {discs}"
@@ -132,8 +129,7 @@
       "views": "{count} views",
       "likes": "{count} favorites",
       "discs": "{count} disc | {count} discs",
-      "tracks": "{count} track | {count} tracks",
-      "artist_separator": ", "
+      "tracks": "{count} track | {count} tracks"
     },
     "category_filter": "Category",
     "year_filter": "Year",
@@ -159,17 +155,18 @@
       "follow": "Follow",
       "following": "Following",
       "share": "Share",
-      "releases": "Discography",
       "no_bio": "No artist biography yet.",
       "no_releases": "No releases yet",
       "no_releases_desc": "This artist has no linked music releases yet.",
-      "as_artist": "As artist",
       "inactive": "Inactive",
       "relations": "Related artists",
-      "view_albums": "Albums",
-      "view_tracks": "Tracks",
-      "no_tracks": "No credited tracks yet",
-      "credited_as": "as {name}"
+      "credited_as": "as {name}",
+      "tab_releases": "Releases",
+      "tab_credits": "Credits",
+      "no_credits": "No credited albums yet",
+      "albums_label": "Albums",
+      "album_roles": "Whole album",
+      "catalog_prefixes": "Catalog prefixes"
     }
   },
   "tracking": {
@@ -1569,7 +1566,6 @@
     "catalog_type": {
       "album": "Album",
       "artist": "Artist",
-      "label": "Label",
       "lyric": "Lyrics",
       "entry": "Entry",
       "franchise": "Series"
@@ -1608,13 +1604,6 @@
       "sticker": "Sticker",
       "bonus_item": "Bonus item",
       "illustration": "Illustration",
-      "other": "Other"
-    },
-    "label_role": {
-      "label": "Label",
-      "publisher": "Publisher",
-      "distributor": "Distributor",
-      "manufacturer": "Manufacturer",
       "other": "Other"
     },
     "artist_relation": {
@@ -1705,8 +1694,6 @@
       "sort_order": "Order",
       "artist_id": "Artist",
       "credited_as": "Credited as",
-      "join_phrase": "Joined with",
-      "label_id": "Label",
       "role": "Role",
       "edition_type": "Edition",
       "medium": "Medium",
@@ -1760,8 +1747,6 @@
     },
     "collection": {
       "titles": "Other names",
-      "artists": "Artists",
-      "labels": "Labels",
       "products": "Editions",
       "bonuses": "Bonuses",
       "discs": "Discs",
@@ -1781,6 +1766,7 @@
       "track_originals": "Originals"
     },
     "credit_role_category": {
+      "release": "Artists & release",
       "composition": "Composition",
       "lyrics": "Lyrics",
       "arrangement": "Arrangement",
@@ -2139,14 +2125,6 @@
       "login": "Sign in to comment"
     }
   },
-  "labels": {
-    "title": "Labels",
-    "subtitle": "Record labels and imprints",
-    "label": "Label",
-    "catalog_prefixes": "Catalog number prefixes",
-    "no_results": "No labels found",
-    "not_found": "This label does not exist."
-  },
   "tracks": {
     "not_found": "This track does not exist.",
     "originals_section": "Originals",
@@ -2330,7 +2308,7 @@
       "tracks": "At least one track"
     },
     "suggested_item": {
-      "artists": "Artists",
+      "byline": "Artist or publisher",
       "catalog_number": "Catalog number",
       "categories": "Categories",
       "links": "Links",
@@ -2340,7 +2318,6 @@
     "preview": "Preview",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "Use 2024, 2024-05 or 2024-05-12",
-    "mode_edit": "Edit",
     "mode_translate": "Translate tracklist",
     "my_revisions": "My revisions",
     "continue_draft": "Continue it",
@@ -2368,18 +2345,12 @@
       "section": {
         "basic": "Basics",
         "tracks": "Discs & tracks",
-        "people": "Artists & labels",
         "credits": "Credits",
         "editions": "Editions",
         "bonuses": "Bonuses",
         "images": "Images",
         "relations": "Links & relations"
       },
-      "artists_hint": "The artists on the cover, in order. Use “credited as” when the printed name differs, and the joiner for “feat.” or “×”.",
-      "labels_hint": "Record label, publisher, distributor. Optional: doujin releases usually have none.",
-      "add_artist": "Add an artist…",
-      "add_label": "Add a label…",
-      "credited_as_placeholder": "Credited as",
       "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.",
       "empty_tracklist": "No tracks yet",
       "empty_tracklist_hint": "Paste a tracklist from the booklet, a shop page or VGMdb, or add tracks one by one.",
@@ -2399,7 +2370,10 @@
       "move_to_disc": "Move to",
       "totals": "{discs} discs · {tracks} tracks",
       "revision_mismatch": "This revision does not edit this album.",
-      "categories_suggested": "Linked entries suggest:"
+      "categories_suggested": "Linked entries suggest:",
+      "byline_preview": "Shown in lists",
+      "byline_none": "No publisher and no album-wide artist: lists show no line here",
+      "byline_various": "cards show {name}"
     },
     "paste": {
       "button": "Paste tracklist",
@@ -2474,6 +2448,10 @@
       "upload": "Upload cover",
       "replace": "Replace",
       "from_url": "Import from a link",
+      "from_clipboard": "Paste from clipboard",
+      "paste_hint": "You can also paste an image with {keys}.",
+      "clipboard_empty": "There is no image on the clipboard.",
+      "clipboard_denied": "The browser did not allow reading the clipboard. Paste with {keys} instead.",
       "import": "Import",
       "too_small": "The image must be at least {size} px on its short side.",
       "not_square": "The cover must be square.",
@@ -2540,10 +2518,8 @@
       },
       "artist_name_placeholder": "The name as usually credited",
       "entry_name_placeholder": "The original title",
-      "founded": "Founded",
-      "dissolved": "Closed",
       "artist_relations_hint": "Members, voice actors, aliases and sub-units. Pick the relation as seen from this artist; the other artist shows the reverse.",
-      "prefixes_hint": "Catalog number prefixes, comma-separated. Used to guess the label when an album is added.",
+      "prefixes_hint": "Catalog number prefixes, comma-separated. For companies and circles that act as labels.",
       "name_only_credit": "Name only",
       "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",
       "artist_type_placeholder": "Choose the artist type"
@@ -2588,16 +2564,7 @@
       "bonus_edit": "Edit bonus",
       "digital": "Digital",
       "new_disc": "New bonus disc",
-      "artist_add": "Add artist",
-      "artist_edit": "Edit artist",
-      "artist_required": "Choose an artist, or type a name to create one.",
-      "label_add": "Add label",
-      "label_edit": "Edit label",
-      "label_required": "Choose a label, or type a name to create one.",
-      "label": "Label",
       "shown_as": "credited as “{name}”",
-      "shown_as_hint": "When the printed name differs from the catalog name.",
-      "join_phrase_hint": "What joins this artist to the next, e.g. & or feat.",
       "credit_edit": "Edit credit",
       "name_only": "Name only",
       "image_url": "Image address",
@@ -2734,7 +2701,6 @@
       "album": "Albums",
       "track": "Tracks",
       "artist": "Artists",
-      "label": "Labels",
       "entry": "Entries",
       "franchise": "Series"
     }
@@ -2885,10 +2851,6 @@
       "franchise": {
         "title": "Franchise",
         "desc": "Groups several entries together"
-      },
-      "label": {
-        "title": "Label",
-        "desc": "Companies and brands that release albums"
       }
     },
     "my_revisions": "See my revisions",
@@ -2915,10 +2877,6 @@
       "lyrics": "with lyrics",
       "instrumental": "instrumental"
     },
-    "label": {
-      "lead": "Record label",
-      "founded": "founded {date}"
-    },
     "entry": {
       "albums": "{count} related album | {count} related albums"
     },
@@ -2937,7 +2895,6 @@
       "albums": "Browse albums, singles, EPs and compilations on CDCat.",
       "vinyls": "Browse vinyl records on CDCat.",
       "artists": "Browse artists, doujin circles and virtual singers on CDCat, with their discographies.",
-      "labels": "Browse record labels and publishers on CDCat.",
       "entries": "Browse anime, games, films and other works on CDCat, with their music.",
       "franchises": "Browse franchises on CDCat and the albums that go with them.",
       "articles": "Music reviews, features and research written by CDCat users.",

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-interface Option { value: string, label: string }
+/** `hint`: a tooltip on the chip, e.g. the English name */
+interface Option { value: string, label: string, hint?: string }
 
 /**
  * The album list's filters, under the header (whose #tabs hold the sort). Categories come first, as chips: a row that
@@ -58,16 +59,16 @@ const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 p
     <div class="flex items-start gap-4 px-4 pt-3 sm:px-6 sm:pt-4">
       <div class="flex min-w-0 flex-1 gap-1.5 overflow-x-auto [scrollbar-width:none] sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden" role="group" :aria-label="t('albums.category_filter')">
         <button type="button" :class="[CHIP, category ? OFF : ON]" :aria-pressed="!category" @click="emit('category', null)">{{ t('common.all') }}</button>
-        <button
-          v-for="option in categories"
-          :key="option.value"
-          type="button"
-          :class="[CHIP, category === option.value ? ON : OFF]"
-          :aria-pressed="category === option.value"
-          @click="emit('category', category === option.value ? null : option.value)"
-        >
-          {{ option.label }}
-        </button>
+        <UiTooltip v-for="option in categories" :key="option.value" :text="option.hint">
+          <button
+            type="button"
+            :class="[CHIP, category === option.value ? ON : OFF]"
+            :aria-pressed="category === option.value"
+            @click="emit('category', category === option.value ? null : option.value)"
+          >
+            {{ option.label }}
+          </button>
+        </UiTooltip>
       </div>
       <CollectionSearchBox v-model="search" class="hidden w-52 shrink-0 sm:flex" :placeholder="searchPlaceholder" @submit="emit('search')" />
     </div>

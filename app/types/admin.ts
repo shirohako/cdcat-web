@@ -101,7 +101,7 @@ export interface AdminBatchResult {
   failed: number
 }
 
-export type AdminContentType = 'album' | 'artist' | 'label' | 'entry' | 'franchise' | 'track' | 'lyric'
+export type AdminContentType = 'album' | 'artist' | 'entry' | 'franchise' | 'track' | 'lyric'
 
 export interface AdminContentItem {
   id: number
@@ -175,6 +175,8 @@ export interface AdminCreditRole {
   sort_order: number
   is_active: boolean
   usage: { album: number, track: number }
+  /** A 署名与发行 role (App\Enums\ReleaseRole): only its names, aliases and order can change, and it cannot be deleted. */
+  is_reserved: boolean
 }
 
 /** GET /admin/attribute-definitions */
@@ -523,7 +525,7 @@ export interface AdminImageSummary {
   last_cleanup: { ran_at: string, days: number, checked: number, in_use: number, marked: number, removed: number, removed_bytes: number } | null
 }
 
-export type AdminImageUseType = 'album' | 'artist' | 'label' | 'entry' | 'franchise' | 'event' | 'event_series' | 'user' | 'article' | 'album_review' | 'discussion_post'
+export type AdminImageUseType = 'album' | 'artist' | 'entry' | 'franchise' | 'event' | 'event_series' | 'user' | 'article' | 'album_review' | 'discussion_post'
 
 /** GET /v1/admin/images/{id}: the uses are read live. */
 export interface AdminImageDetail extends AdminImage {

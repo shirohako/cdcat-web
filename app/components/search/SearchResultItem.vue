@@ -18,14 +18,14 @@
 <script setup lang="ts">
 import type { DatePrecision } from '~/types/entry'
 import type { SearchResult } from '~/types/search'
-import { Disc3, Mic2, Music, Network, Tag, Tv } from '@lucide/vue'
+import { Disc3, Mic2, Music, Network, Tv } from '@lucide/vue'
 
 // The row's background (hover, the active option) comes from where it is listed: the search page or the navbar popup.
 const props = defineProps<{ result: SearchResult, compact?: boolean }>()
 const { t } = useI18n()
 const { formatDate, formatDuration, enumLabel } = useCatalogDisplay()
 
-const ICONS = { album: Disc3, track: Music, artist: Mic2, label: Tag, entry: Tv, franchise: Network }
+const ICONS = { album: Disc3, track: Music, artist: Mic2, entry: Tv, franchise: Network }
 const icon = computed(() => ICONS[props.result.type])
 const round = computed(() => props.result.type === 'artist')
 
@@ -39,8 +39,6 @@ const subtitle = computed(() => {
       return join(meta.album_title, meta.disc_number && meta.track_number ? t('search.disc_track', { disc: meta.disc_number, track: meta.track_number }) : null, meta.duration ? formatDuration(meta.duration as number) : null)
     case 'artist':
       return join(enumLabel('artist_type', meta.artist_type as string | null))
-    case 'label':
-      return join(meta.country)
     case 'entry':
       return join(enumLabel('entry_type', meta.entry_type as string | null), meta.release_date)
     case 'franchise':

@@ -1,65 +1,54 @@
 <template>
-  <div ref="root" :class="embedded ? 'embedded-editor scroll-mt-24' : 'min-h-screen'">
+  <div ref="root" :class="embedded ? 'embedded-editor scroll-mt-24' : 'cards-raised min-h-screen'">
     <div :class="embedded ? 'p-4 md:p-5' : 'container mx-auto max-w-7xl px-3 py-6 md:px-6'">
-      <SkeletonForm v-if="loading" :fields="5" class="min-h-96" />
+      <SkeletonForm v-if="loading && embedded" :fields="5" class="min-h-96" />
+      <SkeletonAlbumEditor v-else-if="loading" />
 
       <div v-else-if="loadError" class="mx-auto max-w-lg space-y-3 py-16 text-center">
         <p class="alert alert-error justify-center">{{ loadError }}</p>
-        <NuxtLink :to="albumId ? `/albums/${albumId}` : '/albums'" class="btn btn-sm">{{ $t('common.go_back') }}</NuxtLink>
+        <NuxtLink :to="albumId ? `/albums/${albumId}` : '/albums'" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px">{{ $t('common.go_back') }}</NuxtLink>
       </div>
 
       <template v-else-if="ready">
-        <header class="flex flex-wrap gap-3" :class="embedded ? 'card mb-4 items-center px-4 py-3' : 'mb-5 items-end'">
+        <header class="card mb-4 flex flex-wrap gap-3" :class="embedded ? 'items-center px-4 py-3' : 'items-end px-5 py-4'">
           <div class="min-w-0 flex-1">
             <p v-if="!embedded" class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
             <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-2xl font-bold'">{{ album.title || $t('editor.album.untitled') }}</component>
-            <p v-if="!embedded" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-              <NuxtLink v-if="albumId" :to="`/albums/${albumId}`" class="link link-muted">{{ $t('editor.album.view') }}</NuxtLink>
-              <NuxtLink v-if="albumId" :to="`/albums/${albumId}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>
-              <NuxtLink to="/revisions" class="link link-muted">{{ $t('editor.my_revisions') }}</NuxtLink>
-            </p>
-            <EditorDraftStatus v-else :draft="draft" compact class="mt-1.5" @discard="restart" />
+            <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" />
           </div>
-          <div class="flex gap-1 bg-sunken ring-1 ring-line" :class="embedded ? 'rounded-lg p-0.5 text-xs' : 'rounded-xl p-1 text-sm'">
-            <button
-              v-for="option in [{ key: 'basic', on: !translating, icon: PencilLine, label: $t('editor.mode_edit') }, { key: 'translate', on: translating, icon: Languages, label: $t('editor.mode_translate') }] as const"
-              :key="option.key"
-              type="button"
-              class="inline-flex items-center gap-1 font-semibold transition-colors"
-              :class="[embedded ? 'rounded-md px-2.5 py-1' : 'rounded-lg px-3 py-1.5', option.on ? ['bg-card text-primary ring-1 ring-line', embedded && 'shadow-xs'] : 'text-meta hover:text-title']"
-              @click="go(option.key)"
+          <nav v-if="!embedded" class="flex flex-wrap items-center gap-2">
+            <NuxtLink
+              v-for="link in headerLinks"
+              :key="link.to"
+              :to="link.to"
+              class="inline-flex h-8 items-center gap-1.5 rounded-lg bg-btn px-3 text-xs font-semibold text-btn-content shadow-xs ring-1 ring-inset ring-line transition hover:bg-btn-hover active:translate-y-px"
             >
-              <component :is="option.icon" :size="embedded ? 13 : 14" />{{ option.label }}
-            </button>
-          </div>
+              <component :is="link.icon" :size="14" class="shrink-0" />{{ link.label }}
+            </NuxtLink>
+          </nav>
+          <EditorDraftStatus v-if="!embedded" :draft="draft" class="w-full border-t border-line pt-3" @discard="restart" />
         </header>
 
         <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
-          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
+          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px">{{ $t('editor.continue_draft') }}</NuxtLink>
+          <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
-        <div v-if="!embedded" class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
 
         <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'gap-5' : 'gap-6'">
           <aside class="space-y-4 lg:sticky lg:self-start" :class="embedded ? 'lg:top-24' : 'lg:top-20'">
-            <nav
-              class="flex gap-1 overflow-x-auto lg:flex-col lg:overflow-visible"
-              :class="embedded ? 'card p-1.5' : '-mx-3 px-3 pb-1 lg:mx-0 lg:px-0'"
-            >
+            <nav class="card flex gap-1 overflow-x-auto p-1.5 lg:flex-col lg:overflow-visible">
               <button
                 v-for="section in sections"
                 :key="section.key"
                 type="button"
-                class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors"
-                :class="active === section.key
-                  ? (embedded ? 'bg-primary/10 font-semibold text-primary' : 'bg-card font-semibold text-primary')
-                  : (embedded ? 'text-body hover:bg-sunken hover:text-primary' : 'text-body hover:bg-card/60 hover:text-primary')"
+                class="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors"
+                :class="active === section.key ? 'bg-primary/10 font-semibold text-primary' : 'text-body hover:bg-sunken hover:text-primary'"
                 @click="go(section.key)"
               >
                 <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
@@ -70,18 +59,33 @@
             </nav>
 
             <div class="card hidden p-4 text-sm lg:block">
-              <p class="mb-2 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.required') }}</p>
-              <ul class="space-y-1.5">
+              <p class="mb-1.5 flex items-center justify-between text-xs font-bold uppercase tracking-wider text-meta">
+                {{ $t('editor.required') }}<span class="font-semibold tabular-nums tracking-normal">{{ requiredChecks.filter(check => check.done).length }}/{{ requiredChecks.length }}</span>
+              </p>
+              <ul class="-mx-2 space-y-0.5">
                 <li v-for="check in requiredChecks" :key="check.key">
-                  <button type="button" class="flex items-center gap-2 text-left transition-colors hover:text-primary" :class="check.done ? 'text-meta' : 'text-title'" @click="go(check.section)">
-                    <CircleCheck v-if="check.done" :size="14" class="text-success" /><Circle v-else :size="14" class="text-warning" />{{ check.label }}
+                  <button
+                    type="button"
+                    class="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-btn"
+                    :class="check.done ? 'text-meta' : 'text-title'"
+                    @click="go(check.section)"
+                  >
+                    <CircleCheck v-if="check.done" :size="14" class="shrink-0 text-success" /><Circle v-else :size="14" class="shrink-0 text-warning" />
+                    <span class="min-w-0 flex-1 truncate">{{ check.label }}</span>
+                    <ChevronRight v-if="!check.done" :size="14" class="shrink-0 text-faint transition group-hover:translate-x-0.5 group-hover:text-primary" />
                   </button>
                 </li>
               </ul>
               <template v-if="suggested.length">
-                <p class="mb-2 mt-4 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.recommended') }}</p>
-                <ul class="space-y-1.5 text-xs text-meta">
-                  <li v-for="item in suggested" :key="item.key"><button type="button" class="btn btn-xs" @click="go(item.section)">+ {{ item.label }}</button></li>
+                <p class="mb-1.5 mt-3 border-t border-line pt-3 text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.recommended') }}</p>
+                <ul class="-mx-2 space-y-0.5">
+                  <li v-for="item in suggested" :key="item.key">
+                    <button type="button" class="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-body transition-colors hover:bg-btn" @click="go(item.section)">
+                      <CirclePlus :size="14" class="shrink-0 text-meta group-hover:text-primary" />
+                      <span class="min-w-0 flex-1 truncate">{{ item.label }}</span>
+                      <ChevronRight :size="14" class="shrink-0 text-faint transition group-hover:translate-x-0.5 group-hover:text-primary" />
+                    </button>
+                  </li>
                 </ul>
               </template>
             </div>
@@ -90,7 +94,6 @@
           <main class="min-w-0 space-y-6">
             <EditorAlbumDuplicateCandidates v-if="!albumId" ref="duplicatePanel" />
             <EditorAlbumBasicSection v-if="active === 'basic'" />
-            <EditorAlbumPeopleSection v-else-if="active === 'people'" />
             <EditorAlbumTracksSection v-else-if="active === 'tracks'" />
             <EditorAlbumCreditsSection v-else-if="active === 'credits'" />
             <EditorAlbumEditionsSection v-else-if="active === 'editions'" />
@@ -104,7 +107,7 @@
                   <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
                   <ul class="mt-2 flex flex-wrap gap-1.5">
                     <li v-for="check in requiredChecks.filter(item => !item.done)" :key="check.key">
-                      <button type="button" class="btn btn-xs" @click="go(check.section)">{{ check.label }}</button>
+                      <button type="button" class="btn btn-xs ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="go(check.section)">{{ check.label }}</button>
                     </li>
                   </ul>
                 </div>
@@ -131,7 +134,7 @@ import type { DraftItem, RevisionDraftPayload } from '~/composables/useRevisionD
 import type { CatalogReferences } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
-import { Contact, Gift, History, Images, Info, Languages, ListMusic, Network, Package, PencilLine, Send, Users, Circle, CircleCheck } from '@lucide/vue'
+import { ChevronRight, ClipboardList, Contact, Eye, Gift, History, Images, Info, Languages, ListMusic, Network, Package, Send, Circle, CircleCheck, CirclePlus } from '@lucide/vue'
 import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
 import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument, upgradeAlbumDocument } from '~/utils/albumDocument'
@@ -139,9 +142,9 @@ import { newRef } from '~/utils/documentKeys'
 import { newDraftScope } from '~/utils/localDrafts'
 
 /**
- * The album editor (docs/catalog/editing.md): the album document and any artists and labels
+ * The album editor (docs/catalog/editing.md): the album document and any artists
  * created on the way are items of one revision, kept as a draft in this browser while editing and
- * submitted together. Sections mount one at a time; `mode=translate` opens the tracklist translator.
+ * submitted together. Sections mount one at a time; `mode=translate` opens on the tracklist translator.
  * `revisionId` continues a revision sent back for changes, `draftScope` a new album's draft (?draft=).
  * `embedded` (the harvest review page) sends the draft to `submitTo` and emits `submitted` and
  * `discarded` instead of leaving the page; its `nameNotes` flag printed names in the credits.
@@ -264,7 +267,6 @@ const setErrors = (list: FieldError[]) => {
 
 const SECTION_FIELDS: Partial<Record<AlbumSection, string[]>> = {
   basic: ['title', 'slug', 'type', 'categories', 'release_date', 'release_date_precision', 'release_event_id', 'description', 'is_adult', 'banner_url', 'titles'],
-  people: ['artists', 'labels'],
   tracks: ['discs', 'tracks', 'disc_titles', 'track_titles', 'track_originals', 'disc_tocs', 'track_attributes'],
   credits: ['credits'],
   editions: ['products'],
@@ -289,18 +291,17 @@ const errorCounts = computed(() => {
 const SECTIONS: Array<{ key: AlbumSection, icon: Component }> = [
   { key: 'basic', icon: Info },
   { key: 'tracks', icon: ListMusic },
-  { key: 'people', icon: Users },
   { key: 'credits', icon: Contact },
   { key: 'editions', icon: Package },
   { key: 'bonuses', icon: Gift },
   { key: 'images', icon: Images },
   { key: 'relations', icon: Network },
+  { key: 'translate', icon: Languages },
   { key: 'submit', icon: Send },
 ]
 const active = ref<AlbumSection>(props.mode === 'translate' ? 'translate' : 'basic')
-const translating = computed(() => active.value === 'translate')
-const sections = computed(() => (translating.value ? SECTIONS.filter(section => section.key === 'submit') : SECTIONS)
-  .map(section => ({ ...section, label: t(section.key === 'submit' ? 'editor.section_submit' : `editor.album.section.${section.key}`) })))
+const SECTION_LABELS: Partial<Record<AlbumSection, string>> = { translate: 'editor.mode_translate', submit: 'editor.section_submit' }
+const sections = computed(() => SECTIONS.map(section => ({ ...section, label: t(SECTION_LABELS[section.key] ?? `editor.album.section.${section.key}`) })))
 
 const root = ref<HTMLElement | null>(null)
 /** Opens a section at its top: the page's top, or embedded, the editor's when it has scrolled out of view. */
@@ -317,7 +318,7 @@ const requiredChecks = computed(() => (['title', 'type', 'release_date', 'cover'
   key, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
 })))
 const missingIn = (section: AlbumSection) => requiredChecks.value.some(check => !check.done && check.section === section)
-const SUGGESTED_SECTIONS = { artists: 'people', catalog_number: 'basic', durations: 'tracks', credits: 'credits', categories: 'basic', links: 'relations' } as const
+const SUGGESTED_SECTIONS = { byline: 'credits', catalog_number: 'basic', durations: 'tracks', credits: 'credits', categories: 'basic', links: 'relations' } as const
 const suggested = computed(() => missingSuggested(album.value).map(key => ({ key, section: SUGGESTED_SECTIONS[key] as AlbumSection, label: t(`editor.suggested_item.${key}`) })))
 
 const itemLabels = computed(() => Object.fromEntries(items.value.map((item) => {
@@ -326,6 +327,12 @@ const itemLabels = computed(() => Object.fromEntries(items.value.map((item) => {
   const row = item.resource_id ? references[item.resource_type]?.[String(item.resource_id)] as { title?: string, name?: string } | undefined : undefined
   return [item.ref, row?.title ?? row?.name ?? `#${item.resource_id}`]
 })))
+
+/** The header's ways out: the album and its history once it exists, and the user's revisions. */
+const headerLinks = computed(() => [
+  ...(albumId ? [{ to: `/albums/${albumId}`, icon: Eye, label: t('editor.album.view') }, { to: `/albums/${albumId}/versions`, icon: History, label: t('versions.title') }] : []),
+  { to: '/revisions', icon: ClipboardList, label: t('editor.my_revisions') },
+])
 
 const nameNotes = computed(() => props.nameNotes ?? {})
 

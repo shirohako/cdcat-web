@@ -22,8 +22,21 @@ export const IMAGE_KINDS = [
 ] as const
 export type ImageKind = typeof IMAGE_KINDS[number]
 
-export const LABEL_ROLES = ['label', 'publisher', 'distributor', 'manufacturer', 'other'] as const
-export type LabelRole = typeof LABEL_ROLES[number]
+/**
+ * The credit roles of the 署名与发行 group (credit category `release`), in order: who the album is by
+ * (署名艺术家, also on tracks) and who publishes, labels, sells, makes and plans it. Backend: App\Enums\ReleaseRole.
+ */
+export const RELEASE_ROLES = ['artist', 'publisher', 'label', 'distributor', 'manufacturer', 'planning'] as const
+export type ReleaseRole = typeof RELEASE_ROLES[number]
+
+/**
+ * The line under an album's title: its publishers (`role` publisher); with none, its 署名艺术家 (`role` artist).
+ * `id` is null for a name-only credit. Cards show several 署名艺术家 as Various Artists. Backend: App\Support\AlbumByline.
+ */
+export interface AlbumByline {
+  role: 'publisher' | 'artist'
+  artists: { id: number | null, name: string }[]
+}
 
 export type EditionType = 'regular' | 'limited'
 export type MediumType = 'physical' | 'digital'
@@ -50,8 +63,8 @@ export interface AlbumSimple {
   is_favorited: boolean
   /** Awaiting review; see PendingFields. */
   is_pending?: boolean
-  /** The album artists as credited, in order; only the album, artist-album and label-album lists send them. */
-  artists?: { id: number, name: string, join_phrase: string | null }[]
+  /** Null when the album has neither a publisher nor a 署名艺术家. */
+  byline?: AlbumByline | null
 }
 
 /** 这张专辑各收听状态的人数（tracking_stats；没有 total，和个人的 TrackingStats 不同） */
@@ -61,24 +74,6 @@ export interface AlbumTrackingStats {
   wishlist: number
   owned: number
   dropped: number
-}
-
-export interface AlbumArtistRef {
-  id: number
-  name: string
-  type: string | null
-  image_url: string | null
-  credited_as: string | null
-  /** Joins this artist to the next one, e.g. " feat. " or " × ". */
-  join_phrase: string | null
-}
-
-export interface AlbumLabelRef {
-  id: number
-  name: string
-  image_url: string | null
-  role: LabelRole
-  credited_as: string | null
 }
 
 /** A 原曲 of a track: another track in the catalog, or only its name when it is not in the catalog. */
@@ -222,8 +217,7 @@ export interface Album extends PendingFields {
   track_count: number
   duration: number
   disc_formats: DiscFormat[]
-  artists: AlbumArtistRef[]
-  labels: AlbumLabelRef[]
+  byline: AlbumByline | null
   discs: AlbumDisc[]
   tracklist_languages: TracklistLanguage[]
   credits: CatalogCredit[]

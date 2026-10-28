@@ -23,7 +23,7 @@
       </li>
     </ul>
     <p v-if="message" class="text-sm text-danger">{{ message }}</p>
-    <button type="button" class="btn btn-sm btn-warning" :disabled="busy || Object.keys(choices).length < conflicts.length" @click="resolve">{{ $t('editor.resolve') }}</button>
+    <button type="button" class="btn btn-sm btn-warning shadow-xs transition active:translate-y-px" :disabled="busy || Object.keys(choices).length < conflicts.length" @click="resolve">{{ $t('editor.resolve') }}</button>
   </div>
 </template>
 

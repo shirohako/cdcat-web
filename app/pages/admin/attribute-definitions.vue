@@ -4,12 +4,12 @@ import type { AdminAttributeDefinition } from '~/types/admin'
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 const VALUE_TYPES = ['text', 'integer', 'decimal', 'date', 'url', 'boolean', 'choice', 'reference'] as const
-const SUBJECTS = ['album', 'track', 'album_image', 'artist', 'label'] as const
-const REFERENCE_TYPES = ['album', 'artist', 'label', 'entry', 'franchise'] as const
+const SUBJECTS = ['album', 'track', 'album_image', 'artist'] as const
+const REFERENCE_TYPES = ['album', 'artist', 'entry', 'franchise'] as const
 const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
 
 const { $api } = useNuxtApp()
-const attributeDefinitionSubjectLabels: Record<string, string> = { album: '专辑', track: '曲目', album_image: '专辑图片', artist: '艺术家', label: '厂牌' }
+const attributeDefinitionSubjectLabels: Record<string, string> = { album: '专辑', track: '曲目', album_image: '专辑图片', artist: '艺术家' }
 const attributeDefinitionValueTypeLabels: Record<string, string> = {
   text: '文本',
   integer: '整数',

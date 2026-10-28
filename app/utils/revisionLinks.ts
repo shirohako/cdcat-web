@@ -10,7 +10,7 @@ type ItemLike = Pick<RevisionItem, 'resource_type' | 'action'> & { resource_id?:
 export const mainItem = <T extends ItemLike>(items: T[] = []): T | null => items.find(item => item.resource_type === 'album') ?? items[0] ?? null
 
 const EDITORS: Partial<Record<CatalogType, string>> = {
-  album: '/contribute/album', artist: '/contribute/artist', label: '/contribute/label',
+  album: '/contribute/album', artist: '/contribute/artist',
   entry: '/contribute/entry', franchise: '/contribute/franchise',
 }
 

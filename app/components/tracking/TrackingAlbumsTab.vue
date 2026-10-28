@@ -56,8 +56,8 @@
                 {{ album.albumTitle }}
               </NuxtLink>
 
-              <p class="text-xs sm:text-sm text-body mt-1 line-clamp-1">
-                {{ album.artists.map(a => a.name).join(', ') }}
+              <p v-if="album.byline" class="text-xs sm:text-sm text-body mt-1 line-clamp-1">
+                {{ bylineText(album.byline, 1) }}
               </p>
 
               <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-meta">
@@ -140,6 +140,7 @@
 
 <script setup lang="ts">
 import type { TrackingStatus, TrackingAlbum } from '~/types/tracking'
+import { bylineText } from '~/utils/albumByline'
 
 interface Props {
   status: TrackingStatus

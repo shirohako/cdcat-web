@@ -12,7 +12,7 @@
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
           <UiSelect v-if="item.resource_type === 'artist'" v-model="docOf(item).type" :options="artistTypeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-36" :invalid="!docOf(item).type" :aria-label="$t('catalog.field.type')" />
           <span class="text-[11px] text-meta">{{ usage(item.ref) }}</span>
-          <button type="button" class="btn btn-xs ml-auto px-1.5 bg-danger/10 text-danger hover:bg-danger/20" :title="$t('editor.new_items.remove')" @click="remove(item.ref)"><Trash2 :size="12" /></button>
+          <button type="button" class="btn btn-xs ml-auto px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :title="$t('editor.new_items.remove')" @click="remove(item.ref)"><Trash2 :size="12" /></button>
         </div>
 
         <p v-for="error in errorsOf(item.ref)" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
@@ -32,7 +32,7 @@ import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Sparkles, Trash2 } from '@lucide/vue'
 
-/** Artists and labels created in this revision, and other entities it edits. */
+/** Artists created in this revision, and other entities it edits. */
 const editor = useAlbumEditor()
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -45,7 +45,7 @@ const others = computed(() => editor.draft.items.value.filter(item => item.ref !
 const created = computed(() => others.value.filter(item => item.action === 'create'))
 const edited = computed(() => others.value.filter(item => item.action === 'update'))
 
-/** The fields this panel edits on new artists and labels. */
+/** The fields this panel edits on new artists. */
 interface NewItemDocument {
   name?: string
   type?: string | null
@@ -57,7 +57,7 @@ const errorsOf = (ref: string) => editor.errors.value.filter(error => error.path
 const usage = (ref: string) => {
   const album = editor.album.value
   const target = `@${ref}`
-  const credits = album.credits.filter(credit => credit.artist_id === target).length + album.artists.filter(row => row.artist_id === target).length
+  const credits = album.credits.filter(credit => credit.artist_id === target).length
   if (credits) return t('editor.new_items.used_credits', { count: credits })
   return editor.referenced(target) ? t('editor.new_items.used_elsewhere') : t('editor.new_items.unused')
 }

@@ -9,6 +9,8 @@
           <div class="space-y-8 lg:col-span-2">
             <AlbumDescriptions v-if="album.description" :description="album.description" />
 
+            <AlbumCredits :credits="album.credits" :discs="album.discs" />
+
             <AlbumTracklist :album-id="album.id" :discs="album.discs" :bonuses="album.bonuses" :languages="album.tracklist_languages" :locked="album.is_pending" />
 
             <AlbumProducts :products="album.products" :discs="album.discs" :images="album.images" />
@@ -17,14 +19,11 @@
 
             <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
 
-            <AlbumCredits :credits="album.credits" />
-
             <!-- Albums awaiting review can only be viewed: reviews and tracking open after approval. -->
             <AlbumReviews v-if="!album.is_pending" ref="reviews" :album-id="album.id" @changed="refresh" />
           </div>
 
           <div class="space-y-6 lg:col-span-1">
-            <AlbumArtistCard :artists="album.artists" />
             <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
@@ -56,6 +55,7 @@ import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
 import { ldDate, musicAlbumLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { bylineText } from '~/utils/albumByline'
 
 const route = useRoute()
 const { t, locale } = useI18n()
@@ -84,9 +84,18 @@ const gallery = ref<{ openCover: () => void } | null>(null)
 const reviews = ref<{ openEditor: () => void } | null>(null)
 
 const shownTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : '')
-/** The artists as printed: "A feat. B". */
-const artistLine = computed(() => (album.value?.artists ?? [])
-  .map((artist, index, all) => `${artist.credited_as || artist.name}${index < all.length - 1 ? artist.join_phrase || ', ' : ''}`).join(''))
+/** The byline for the page title: the publishers, else up to three 署名艺术家, else Various Artists. */
+const artistLine = computed(() => bylineText(album.value?.byline))
+/** Album-wide credits in these roles, each artist once, for structured data. */
+const creditedAs = (roles: string[]) => {
+  const seen = new Map<string, { name: string, url?: string, type?: string | null }>()
+  for (const credit of album.value?.credits ?? []) {
+    const name = credit.credited_as || credit.artist?.name
+    if (!roles.includes(credit.role) || !name) continue
+    seen.set(credit.artist ? `id:${credit.artist.id}` : `name:${name}`, { name, url: credit.artist ? absolute(`/artists/${credit.artist.id}`) : undefined, type: credit.artist?.type })
+  }
+  return [...seen.values()]
+}
 
 usePageSeo({
   title: () => album.value ? [withOriginal(shownTitle.value, album.value.title), artistLine.value].filter(Boolean).join(' - ') : undefined,
@@ -121,9 +130,8 @@ usePageSeo({
       description: plainText(value.description),
       datePublished: ldDate(value.release_date, value.release_date_precision),
       genre: value.categories.map(category => enumLabel('album_category', category)),
-      artists: value.artists.map(artist => ({ name: artist.credited_as || artist.name, url: absolute(`/artists/${artist.id}`), type: artist.type })),
-      labels: value.labels.filter(label => label.role === 'label' || label.role === 'publisher')
-        .map(label => ({ name: label.credited_as || label.name, url: absolute(`/labels/${label.id}`) })),
+      artists: creditedAs(['artist']),
+      labels: creditedAs(['label', 'publisher']),
       catalogNumber: value.catalog_number,
       // The album's own discs; bonus discs come with some editions only.
       tracks: value.discs.filter(disc => !disc.bonus_id).flatMap(disc => disc.tracks)

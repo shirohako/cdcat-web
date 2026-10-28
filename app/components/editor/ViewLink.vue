@@ -4,7 +4,7 @@
     v-if="typeof id === 'number'"
     :to="`/${type}s/${id}`"
     target="_blank"
-    class="flex h-7 shrink-0 items-center gap-1 rounded-md bg-btn px-2 text-xs font-medium text-btn-content transition-colors hover:bg-btn-hover"
+    class="flex h-7 shrink-0 items-center gap-1 rounded-md bg-btn px-2 text-xs font-medium text-btn-content hover:bg-btn-hover ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px"
     :title="$t('common.view')"
     @click.stop
   >
@@ -16,7 +16,7 @@
 import { ExternalLink } from '@lucide/vue'
 
 defineProps<{
-  type: 'artist' | 'label'
+  type: 'artist'
   id: number | string | null
 }>()
 </script>

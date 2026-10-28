@@ -28,7 +28,7 @@
                 <span class="inline-flex items-center gap-2"><Users :size="16" class="text-meta" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
               </div>
               <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
-              <div v-if="artist.titles?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+              <div v-if="artist.titles?.length || artist.catalog_prefixes?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
                 <div v-if="artist.titles?.length" class="flex gap-3">
                   <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('catalog.other_names') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
@@ -37,6 +37,10 @@
                       <span class="text-[11px] text-meta">{{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}</span>
                     </li>
                   </ul>
+                </div>
+                <div v-if="artist.catalog_prefixes?.length" class="flex gap-3">
+                  <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('artists.detail.catalog_prefixes') }}</span>
+                  <span class="min-w-0 font-mono text-body">{{ artist.catalog_prefixes.join(', ') }}</span>
                 </div>
                 <div v-if="artist.relations?.length" class="flex gap-3">
                   <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t('artists.detail.relations') }}</span>
@@ -90,29 +94,30 @@
     <main v-if="artist" class="mx-auto w-full max-w-6xl space-y-6 px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl" :class="revealClass">
       <section class="card overflow-hidden">
         <header class="flex flex-wrap items-center gap-2 border-b border-line px-4 py-3 sm:px-6">
-          <Library :size="17" class="text-primary" />
-          <h2 class="mr-2 text-base font-semibold text-title">{{ $t('artists.detail.releases') }}</h2>
-          <button
-            v-for="tab in roleTabs"
-            :key="tab.role ?? 'all'"
-            type="button"
-            class="chip chip-sm"
-            :class="{ 'chip-selected': role === tab.role }"
-            @click="selectRole(tab.role)"
-          >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
+          <Library :size="17" class="mr-1 text-primary" />
           <UiTabs
             :model-value="view"
             variant="segmented"
             size="sm"
-            class="ml-auto"
-            :items="views.map(option => ({ value: option, label: option === 'albums' ? $t('artists.detail.view_albums') : $t('artists.detail.view_tracks') }))"
+            :label="$t('artists.detail.albums_label')"
+            :items="viewTabs"
             @update:model-value="option => option && selectView(option)"
           />
+          <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
+            <button
+              v-for="tab in roleTabs"
+              :key="tab.role ?? 'all'"
+              type="button"
+              class="chip chip-sm"
+              :class="{ 'chip-selected': role === tab.role }"
+              @click="selectRole(tab.role)"
+            >{{ tab.label }} <span class="opacity-60">{{ tab.count }}</span></button>
+          </div>
         </header>
         <div class="min-h-60 p-4 sm:p-6">
           <CollectionLoadingSkeleton v-if="albumsLoading" :grid-class="albumGridClass" :count="12" />
           <ArtistCreditedTracks
-            v-else-if="view === 'tracks' && trackGroups.length"
+            v-else-if="view === 'credits' && trackGroups.length"
             :key="albumsRevealKey"
             :groups="trackGroups"
             :artist-name="artist.name"
@@ -121,17 +126,21 @@
             :inert="albumsRefetching"
           />
           <div
-            v-else-if="view === 'albums' && albums.length"
+            v-else-if="view === 'releases' && albums.length"
             :key="albumsRevealKey"
             class="grid transition-opacity"
             :class="[albumGridClass, albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
             :inert="albumsRefetching"
           >
-            <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
+            <div v-for="album in albums" :key="album.id" class="flex min-w-0 flex-col gap-1.5">
+              <AlbumCard :album="album" />
+              <!-- What the artist did besides being the 署名艺术家: 发行、厂牌 … -->
+              <span v-if="otherRoles(album).length" class="self-start rounded bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ otherRoles(album).map(roleName).join('、') }}</span>
+            </div>
           </div>
           <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
             <Disc3 :size="26" class="text-faint" />
-            <p class="mt-3 text-sm font-medium text-body">{{ view === 'tracks' ? $t('artists.detail.no_tracks') : $t('artists.detail.no_releases') }}</p>
+            <p class="mt-3 text-sm font-medium text-body">{{ view === 'credits' ? $t('artists.detail.no_credits') : $t('artists.detail.no_releases') }}</p>
           </div>
           <CommonPagination class="mt-6" :page="albumPage" :total-pages="albumLastPage" :disabled="albumsRefetching" @update:page="albumPage = $event" />
         </div>
@@ -151,10 +160,11 @@
 </template>
 
 <script setup lang="ts">
-import type { AlbumSimple } from '~/types/album'
-import type { ArtistCreditedAlbum, ArtistDetail } from '~/types/artist'
+import type { ReleaseRole } from '~/types/album'
+import type { ArtistCreditedAlbum, ArtistDetail, ArtistReleasedAlbum } from '~/types/artist'
 import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
+import { RELEASE_ROLES } from '~/types/album'
 import { artistLdType, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
@@ -182,12 +192,16 @@ const pageCssVariables = {
   '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
 }
 
-// Discography: every album, as album artist, or by credited role; or the credited tracks grouped by album.
-// View, role and page live in the URL (?view=tracks, ?role=, ?page=).
+// 发行的专辑: the albums the artist is behind (an album-wide 署名与发行 credit), filtered by that role; 参与的专辑:
+// the albums of their other credits, grouped with the credited tracks, filtered by credit role.
+// View, role and page live in the URL (?view=credits, ?role=, ?page=); the old ?view=tracks is credits.
 type Releases = { pagination: { last_page: number }, roles: Record<string, number> }
-  & ({ view: 'albums', albums: AlbumSimple[] } | { view: 'tracks', albums: ArtistCreditedAlbum[], all: number })
-const views = ['albums', 'tracks'] as const
-const view = computed(() => route.query.view === 'tracks' ? 'tracks' : 'albums')
+  & ({ view: 'releases', albums: ArtistReleasedAlbum[] } | { view: 'credits', albums: ArtistCreditedAlbum[], all: number })
+const views = ['releases', 'credits'] as const
+const view = computed(() => route.query.view === 'credits' || route.query.view === 'tracks' ? 'credits' : 'releases')
+const viewTabs = computed(() => views.map(option => option === 'releases'
+  ? { value: option, label: t('artists.detail.tab_releases'), count: artist.value?.releases_count ?? 0 }
+  : { value: option, label: t('artists.detail.tab_credits'), count: artist.value?.credited_albums_count ?? 0 }))
 const role = computed(() => route.query.role ? String(route.query.role) : null)
 const albumPage = useQueryPage()
 const {
@@ -200,39 +214,40 @@ const {
   () => `artist:${artistId}:${view.value}:${role.value ?? 'all'}:${albumPage.value}`,
   async ({ signal, background }) => {
     const current = view.value
-    const result = await $api<Omit<Releases, 'view'>>(`/v1/artists/${artistId}/${current}`, {
-      params: { page: albumPage.value, ...(current === 'albums' ? { per_page: 30 } : {}), ...(role.value ? { role: role.value } : {}) },
+    const result = await $api<Omit<Releases, 'view'>>(`/v1/artists/${artistId}/${current === 'releases' ? 'albums' : 'tracks'}`, {
+      params: { page: albumPage.value, ...(current === 'releases' ? { per_page: 30 } : {}), ...(role.value ? { role: role.value } : {}) },
       signal,
       progress: !background,
     })
     return { ...result, view: current } as Releases
   },
 )
-const albums = computed(() => albumData.value?.view === 'albums' ? albumData.value.albums : [])
-const trackGroups = computed(() => albumData.value?.view === 'tracks' ? albumData.value.albums : [])
+const albums = computed(() => albumData.value?.view === 'releases' ? albumData.value.albums : [])
+const trackGroups = computed(() => albumData.value?.view === 'credits' ? albumData.value.albums : [])
+const otherRoles = (album: ArtistReleasedAlbum) => album.artist_roles.filter(value => value !== 'artist')
 const albumLastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
 // The tabs keep the last known counts of the same view while another role's list loads.
 const lastCounts = shallowRef<{ view: string, roles: Record<string, number>, all: number }>({ view: '', roles: {}, all: 0 })
 watch(albumData, (data) => {
-  if (data) lastCounts.value = { view: data.view, roles: data.roles, all: data.view === 'tracks' ? data.all : 0 }
+  if (data) lastCounts.value = { view: data.view, roles: data.roles, all: data.view === 'credits' ? data.all : 0 }
 })
 const counts = computed(() => lastCounts.value.view === view.value ? lastCounts.value : { roles: {}, all: 0 })
 const roleCounts = computed(() => counts.value.roles)
+// Releases filter by the 署名与发行 roles (in their fixed order), credits by the other credit roles.
 const roleTabs = computed(() => [
-  { role: null, label: t('common.all'), count: view.value === 'tracks' ? counts.value.all : (artist.value?.albums_count ?? 0) },
+  { role: null, label: t('common.all'), count: view.value === 'credits' ? counts.value.all : (artist.value?.releases_count ?? 0) },
   ...Object.entries(roleCounts.value)
     .filter(([, count]) => count > 0)
-    .sort(([a], [b]) => (a === 'artist' ? -1 : b === 'artist' ? 1 : roleOrder(a) - roleOrder(b)))
-    .map(([key, count]) => ({ role: key, label: key === 'artist' ? t('artists.detail.as_artist') : roleName(key), count })),
+    .sort(([a], [b]) => view.value === 'credits' ? roleOrder(a) - roleOrder(b) : RELEASE_ROLES.indexOf(a as ReleaseRole) - RELEASE_ROLES.indexOf(b as ReleaseRole))
+    .map(([key, count]) => ({ role: key, label: roleName(key), count })),
 ])
 const selectRole = (value: string | null) => {
   router.push({ query: { ...route.query, role: value ?? undefined, page: undefined } })
 }
-// Album artists have no track credits, so that tab does not carry over to the track view.
-const selectView = (value: 'albums' | 'tracks') => {
+// The two tabs filter by different roles, so the role filter does not carry over.
+const selectView = (value: 'releases' | 'credits') => {
   if (value === view.value) return
-  const keepRole = value === 'albums' || role.value !== 'artist'
-  router.push({ query: { ...route.query, view: value === 'tracks' ? 'tracks' : undefined, role: keepRole ? role.value ?? undefined : undefined, page: undefined } })
+  router.push({ query: { ...route.query, view: value === 'credits' ? 'credits' : undefined, role: undefined, page: undefined } })
 }
 
 const isFavorited = computed(() => artist.value?.is_favorited ?? false)

@@ -37,7 +37,6 @@ const imageKindLabels: Record<string, string> = {
 const imageUseTypeLabels: Record<string, string> = {
   album: '专辑',
   artist: '艺术家',
-  label: '厂牌',
   entry: '条目',
   franchise: '系列',
   event: '活动',
@@ -57,7 +56,6 @@ const addressLink = (use: Address) => {
   switch (use.type) {
     case 'album': return `/albums/${use.id}`
     case 'artist': return `/artists/${use.id}`
-    case 'label': return `/labels/${use.id}`
     case 'entry': return `/entries/${use.id}`
     case 'franchise': return `/franchises/${use.id}`
     case 'event': return '/admin/events'

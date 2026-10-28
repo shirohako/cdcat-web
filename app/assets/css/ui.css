@@ -144,7 +144,7 @@
   .select,
   .textarea {
     width: auto;
-    border: 1px solid var(--line);
+    border: 1px solid var(--field-line);
     border-radius: 0.5rem;
     background-color: var(--field);
     color: var(--title);
@@ -190,7 +190,7 @@
   .textarea:focus {
     border-color: var(--primary);
     outline: none;
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 22%, transparent);
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 15%, transparent);
   }
 
   .input:disabled,
@@ -396,6 +396,16 @@
   .card {
     border-radius: 1rem;
     background-color: var(--card);
+  }
+
+  /* Cards on a busy page (the album editor and its placeholder): a faint hairline, a soft low shadow and tighter
+     corners lift them off the page, so stacked sections read apart. */
+  .cards-raised .card {
+    border-radius: 0.5rem;
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--line) 40%, transparent),
+      0 1px 2px oklch(0.2 0.02 var(--hue) / 0.04),
+      0 8px 24px -12px oklch(0.2 0.02 var(--hue) / 0.14);
   }
 
   /* Filter pills and other one-off toggles; .chip-selected marks the chosen one. */

@@ -1,15 +1,15 @@
-// Shared shapes of the catalog API (albums, artists, labels, lyrics, entries, franchises).
+// Shared shapes of the catalog API (albums, artists, lyrics, entries, franchises).
 // Backend docs: docs/api/catalog.md, versions.md, revisions.md; data model docs/catalog/README.md.
 
 import type { DatePrecision } from './entry'
 
 /** Aggregate types edited through revisions, as the API names them. */
-export const CATALOG_TYPES = ['album', 'artist', 'label', 'lyric', 'entry', 'franchise'] as const
+export const CATALOG_TYPES = ['album', 'artist', 'lyric', 'entry', 'franchise'] as const
 export type CatalogType = typeof CATALOG_TYPES[number]
 
 /** URL segment of each type: /v1/albums/{id}/versions … */
 export const CATALOG_RESOURCES: Record<CatalogType, string> = {
-  album: 'albums', artist: 'artists', label: 'labels', lyric: 'lyrics', entry: 'entries', franchise: 'franchises',
+  album: 'albums', artist: 'artists', lyric: 'lyrics', entry: 'entries', franchise: 'franchises',
 }
 
 /**
@@ -106,7 +106,7 @@ export interface CatalogCredit {
   id: number
   role: string
   category?: string | null
-  artist: { id: number, name: string, image_url?: string | null } | null
+  artist: { id: number, name: string, image_url?: string | null, type?: string | null } | null
   credited_as: string | null
   detail: string | null
 }

@@ -8,13 +8,12 @@ const route = useRoute()
 const { t } = useI18n()
 const { isAuthenticated } = useAuth()
 
-type Kind = 'album' | 'artist' | 'entry' | 'franchise' | 'label'
+type Kind = 'album' | 'artist' | 'entry' | 'franchise'
 const kinds: { key: Kind, icon: string }[] = [
   { key: 'album', icon: 'lucide:disc-3' },
   { key: 'artist', icon: 'lucide:mic-vocal' },
   { key: 'entry', icon: 'lucide:clapperboard' },
   { key: 'franchise', icon: 'lucide:library-big' },
-  { key: 'label', icon: 'lucide:building-2' },
 ]
 // The list page the visitor came from marks its row.
 const highlighted = computed(() => kinds.some(kind => kind.key === route.query.type) ? route.query.type as Kind : null)

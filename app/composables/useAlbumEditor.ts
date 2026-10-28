@@ -4,8 +4,8 @@ import type { AlbumDocument } from '~/types/document'
 import type { useRevisionDraft } from './useRevisionDraft'
 
 export interface FieldError { path: string, message: string }
-export type NewItemType = 'artist' | 'label'
-export type AlbumSection = 'basic' | 'people' | 'tracks' | 'credits' | 'editions' | 'bonuses' | 'images' | 'relations' | 'translate' | 'submit'
+export type NewItemType = 'artist'
+export type AlbumSection = 'basic' | 'tracks' | 'credits' | 'editions' | 'bonuses' | 'images' | 'relations' | 'translate' | 'submit'
 
 /** What the album editor shares with its sections (components/editor/album). */
 export interface AlbumEditorContext {

@@ -12,7 +12,6 @@ export const searchResultPath = (result: Pick<SearchResult, 'type' | 'id' | 'met
     case 'album': return `/albums/${result.id}`
     case 'track': return `/tracks/${result.id}`
     case 'artist': return `/artists/${result.id}`
-    case 'label': return `/labels/${result.id}`
     case 'entry': return `/entries/${result.id}`
     case 'franchise': return `/franchises/${result.id}`
   }

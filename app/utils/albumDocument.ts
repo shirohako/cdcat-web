@@ -30,8 +30,6 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   is_adult: false,
   banner_url: null,
   titles: [],
-  artists: [],
-  labels: [],
   products: [],
   bonuses: [],
   discs: [{ id: newKey('d'), position: 1, title: null, format: 'cd', bonus_id: null }],
@@ -49,10 +47,25 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   entries: [],
 })
 
-/** Brings a document kept in a draft up to date: tracks lose `work_id`, and `track_originals` exists. */
+/** A row of 艺术家与发行, which drafts from before 2026-10-28 still have; a row without roles was an album artist. */
+type OldAlbumArtist = { artist_id: AggregateRef | null, roles?: string[], credited_as: string | null }
+
+/**
+ * Brings a document kept in a draft up to date: tracks lose `work_id`, `track_originals` exists, the old
+ * 艺术家与发行 rows become album-wide credits, one per role (署名艺术家, 发行 …), and the old label rows, which
+ * point at labels that are gone, are dropped.
+ */
 export function upgradeAlbumDocument(doc: AlbumDocument) {
   for (const track of doc.tracks as Array<AlbumDocument['tracks'][number] & { work_id?: unknown }>) delete track.work_id
   doc.track_originals ??= []
+  const old = doc as AlbumDocument & { artists?: OldAlbumArtist[], labels?: unknown }
+  for (const row of old.artists ?? []) {
+    for (const role of row.roles?.length ? row.roles : ['artist']) {
+      addCredit(doc, { artist_id: row.artist_id, credited_as: row.credited_as, role, detail: null }, null)
+    }
+  }
+  delete old.artists
+  delete old.labels
 }
 
 // ---- discs and tracks -------------------------------------------------------------------------
@@ -447,11 +460,11 @@ export const missingRequired = (doc: AlbumDocument): RequiredItem[] => [
   ...(!doc.tracks.some(track => track.title.trim()) ? ['tracks' as const] : []),
 ]
 
-export type SuggestedItem = 'artists' | 'catalog_number' | 'durations' | 'credits' | 'categories' | 'links'
+export type SuggestedItem = 'byline' | 'catalog_number' | 'durations' | 'credits' | 'categories' | 'links'
 
 /** Optional information worth adding (docs/catalog/README.md#必填项); shown as hints, never enforced. */
 export const missingSuggested = (doc: AlbumDocument): SuggestedItem[] => [
-  ...(!doc.artists.length ? ['artists' as const] : []),
+  ...(!doc.credits.some(row => row.track_id === null && (row.role === 'publisher' || row.role === 'artist')) ? ['byline' as const] : []),
   ...(!doc.products.some(product => product.catalog_number?.trim()) ? ['catalog_number' as const] : []),
   ...(doc.tracks.some(track => track.duration === null) ? ['durations' as const] : []),
   ...(!doc.credits.length ? ['credits' as const] : []),

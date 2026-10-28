@@ -92,7 +92,7 @@ const message = ref('')
 const notice = ref('')
 
 // ===== Recount =====
-const recountable = computed(() => ['album', 'artist', 'label'].includes(type.value))
+const recountable = computed(() => ['album', 'artist'].includes(type.value))
 const recount = async () => {
   busy.value = true
   message.value = ''
@@ -134,9 +134,9 @@ const confirmDelete = async (reason: string) => {
   }
 }
 
-// ===== Merge (albums, artists, labels) =====
+// ===== Merge (albums, artists) =====
 const mergeable = computed(() => mergeableContentTypes.includes(type.value))
-const mergeKind = computed(() => type.value as 'album' | 'artist' | 'label')
+const mergeKind = computed(() => type.value as 'album' | 'artist')
 const mergeTarget = ref<{ id: number, label: string } | null>(null)
 const merge = ref<AdminMergePreview | null>(null)
 const mergeOpen = ref(false)

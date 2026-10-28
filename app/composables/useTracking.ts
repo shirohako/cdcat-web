@@ -27,7 +27,7 @@ const mapApiTracking = (item: any): TrackingAlbum => {
     disc_count: item.disc_count ?? 1,
     track_count: item.track_count ?? 0,
     type: item.type ?? 'album',
-    artists: item.artists ?? [],
+    byline: item.byline ?? null,
     status: statusRaw,
     statusUpdatedAt: tracking.updated_at ?? '',
     addedAt: tracking.created_at ?? ''

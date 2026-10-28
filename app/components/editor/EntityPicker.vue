@@ -28,7 +28,7 @@
         v-else-if="query"
         type="button"
         tabindex="-1"
-        class="flex h-6 w-6 items-center justify-center rounded-md text-faint transition-colors hover:bg-ghost-hover hover:text-primary"
+        class="flex h-6 w-6 items-center justify-center rounded-md bg-btn text-btn-content hover:bg-btn-hover ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px"
         :aria-label="$t('common.clear')"
         @mousedown.prevent
         @click="clear"
@@ -96,7 +96,7 @@ import type { EventOption } from '~/composables/useEventSearch'
 import type { DatePrecision } from '~/types/entry'
 import { Loader2, Plus, Search, X } from '@lucide/vue'
 
-export type PickerKind = 'artist' | 'label' | 'track' | 'entry' | 'album' | 'franchise' | 'event'
+export type PickerKind = 'artist' | 'track' | 'entry' | 'album' | 'franchise' | 'event'
 
 export interface PickedEntity {
   id: number
@@ -178,8 +178,7 @@ const describeTrack = (row: Row) => {
 
 /** Most kinds search their own list endpoint with `search`; tracks go through the site search, which takes `q`. */
 const endpoints: Record<PickerKind, { url: string, key: string, param?: string, query?: Record<string, string>, map: (row: Row) => PickedEntity }> = {
-  artist: { url: '/v1/artists', key: 'artists', map: row => ({ id: row.id, label: row.name ?? '', subtitle: row.type ? enumLabel('artist_type', row.type) : '', image_url: row.image_url ?? null, type: row.type }) },
-  label: { url: '/v1/labels', key: 'labels', map: row => ({ id: row.id, label: row.name ?? '', subtitle: (row.catalog_prefixes ?? []).join(', '), image_url: row.image_url ?? null }) },
+  artist: { url: '/v1/artists', key: 'artists', map: row => ({ id: row.id, label: row.name ?? '', subtitle: [row.type ? enumLabel('artist_type', row.type) : null, (row.catalog_prefixes ?? []).join(', ')].filter(Boolean).join(' · '), image_url: row.image_url ?? null, type: row.type }) },
   track: { url: '/v1/search', key: 'results', param: 'q', query: { type: 'track' }, map: row => ({ id: row.id, label: row.title ?? '', subtitle: describeTrack(row), image_url: row.image_url ?? null, album_title: row.meta?.album_title ?? null }) },
   entry: { url: '/v1/entries', key: 'entries', map: row => ({ id: row.id, label: row.name ?? '', subtitle: [row.type ? enumLabel('entry_type', row.type) : null, formatDate(row.release_date, row.release_date_precision)].filter(Boolean).join(' · '), image_url: row.image_url ?? null, type: row.type }) },
   album: { url: '/v1/albums', key: 'albums', map: row => ({ id: row.id, label: row.title ?? '', subtitle: [row.catalog_number, formatDate(row.release_date, row.release_date_precision)].filter(Boolean).join(' · '), image_url: row.image_url ?? null }) },

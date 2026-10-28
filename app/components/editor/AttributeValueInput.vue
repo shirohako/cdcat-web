@@ -12,7 +12,7 @@
     <div v-else-if="definition.value_type === 'reference'" class="space-y-1">
       <div v-if="reference" class="flex items-center gap-2 text-sm">
         <EditorRefLabel :id="reference.id" :type="reference.type" :references="localReferences" />
-        <button type="button" class="btn btn-ghost btn-xs" @click="model = null">×</button>
+        <button type="button" class="btn btn-xs ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="model = null">×</button>
       </div>
       <div v-else class="flex gap-2">
         <UiSelect v-model="referenceType" :options="referenceTypeOptions" size="sm" class="w-28" />

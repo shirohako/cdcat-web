@@ -7,19 +7,19 @@
     </UiTooltip>
     <span v-if="draft.restoredAt.value" class="inline-flex items-center gap-1.5 rounded-full bg-info/10 py-0.5 pl-2.5 pr-1 text-info ring-1 ring-info/20">
       <History :size="12" class="shrink-0" />{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}
-      <button type="button" class="rounded-full px-2 font-semibold hover:bg-info/15" @click="discard">{{ $t('editor.restored_discard') }}</button>
+      <button type="button" class="rounded-full bg-info/15 px-2 font-semibold hover:bg-info/25 ring-1 ring-inset ring-info/25 shadow-xs transition active:translate-y-px" @click="discard">{{ $t('editor.restored_discard') }}</button>
     </span>
   </div>
   <div v-else class="space-y-2">
     <div v-if="draft.restoredAt.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-info/25 bg-info/10 px-4 py-2.5 text-sm text-body">
       <History :size="16" class="shrink-0 text-info" />
       <span class="min-w-0 flex-1">{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}</span>
-      <button type="button" class="btn btn-ghost btn-xs" @click="discard">{{ $t('editor.restored_discard') }}</button>
+      <button type="button" class="btn btn-xs bg-info/15 text-info hover:bg-info/25 ring-1 ring-inset ring-info/25 shadow-xs transition active:translate-y-px" @click="discard">{{ $t('editor.restored_discard') }}</button>
     </div>
     <p class="flex flex-wrap items-center gap-1.5 text-xs text-meta">
       <span class="inline-block h-2 w-2 rounded-full" :class="dotClass" />
       {{ label }}
-      <NuxtLink v-if="draft.revisionId.value" :to="`/revisions/${draft.revisionId.value}`" class="link link-muted">#{{ draft.revisionId.value }}</NuxtLink>
+      <NuxtLink v-if="draft.revisionId.value" :to="`/revisions/${draft.revisionId.value}`" class="rounded bg-btn px-1.5 py-0.5 font-medium text-btn-content shadow-xs ring-1 ring-inset ring-line transition hover:bg-btn-hover active:translate-y-px">#{{ draft.revisionId.value }}</NuxtLink>
       <span class="text-faint">·</span>
       <span>{{ $t('editor.local_hint') }}</span>
     </p>

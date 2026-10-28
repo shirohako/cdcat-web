@@ -13,14 +13,15 @@
       <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-card/70 text-meta"><span class="loading loading-spinner" /></div>
     </div>
     <div class="flex gap-1.5">
-      <label class="btn btn-sm min-w-0 flex-1 cursor-pointer" :class="{ 'btn-disabled': busy }">
+      <label class="btn btn-sm min-w-0 flex-1 cursor-pointer ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :class="{ 'btn-disabled': busy }">
         <Upload :size="14" class="shrink-0" /><span class="truncate">{{ $t(coverImage ? 'editor.image.replace' : 'editor.image.upload') }}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
       </label>
-      <button type="button" class="btn btn-sm px-2" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
+      <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="busy" :title="$t('editor.image.from_clipboard')" :aria-label="$t('editor.image.from_clipboard')" @click="fromClipboard"><ClipboardPaste :size="14" /></button>
+      <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
-    <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }}</p>
+    <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }} {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</p>
     <EditorImageImportDialog v-model="showUrl" :busy="busy" :error="message" :description="$t('editor.image.cover_rules', { size: limits.coverMinSize })" @import="fromUrl" />
     <EditorImageCropDialog :file="cropFile" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>
@@ -28,10 +29,10 @@
 
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
-import { ImagePlus, Link2, Upload } from '@lucide/vue'
+import { ClipboardPaste, ImagePlus, Link2, Upload } from '@lucide/vue'
 import { coverOf, setCover } from '~/utils/albumDocument'
 
-/** The album's cover: upload, crop to a square, or import from a link. */
+/** The album's cover: upload, paste from the clipboard (the button, or Ctrl+V / ⌘V on the page), crop to a square, or import from a link. */
 const editor = useAlbumEditor()
 const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
@@ -66,12 +67,17 @@ const send = async (file: Blob, name: string) => {
   }
 }
 
-const pick = async (event: Event) => {
+const pick = (event: Event) => {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
   message.value = ''
-  if (!file) return
+  if (file) void take(file)
+}
+
+/** A chosen or pasted file: too large or too small is refused, a square one is uploaded, any other shape goes to the crop dialog. */
+const take = async (file: File) => {
+  message.value = ''
   if (file.size > limits.value.maxBytes) {
     message.value = t('editor.image.too_large')
     return
@@ -87,6 +93,39 @@ const pick = async (event: Event) => {
     message.value = t('editor.image.unreadable')
   }
 }
+
+const pasteKeys = import.meta.client && /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'Ctrl+V'
+const named = (blob: Blob) => new File([blob], `pasted.${blob.type.split('/')[1] ?? 'png'}`, { type: blob.type })
+
+/** The clipboard button. Browsers that refuse to read it (or ask and are told no) are pointed at the paste keys. */
+const fromClipboard = async () => {
+  message.value = ''
+  if (!navigator.clipboard?.read) {
+    message.value = t('editor.image.clipboard_denied', { keys: pasteKeys })
+    return
+  }
+  try {
+    for (const item of await navigator.clipboard.read()) {
+      const type = item.types.find(value => value.startsWith('image/'))
+      if (type) return await take(named(await item.getType(type)))
+    }
+    message.value = t('editor.image.clipboard_empty')
+  } catch {
+    message.value = t('editor.image.clipboard_denied', { keys: pasteKeys })
+  }
+}
+
+/** Ctrl+V / ⌘V anywhere on the section takes a pasted image, unless it goes into a text field or an open dialog. */
+const onPaste = (event: ClipboardEvent) => {
+  const target = event.target as HTMLElement | null
+  if (busy.value || target?.closest('input, textarea, [contenteditable="true"], [role="dialog"]')) return
+  const file = [...(event.clipboardData?.files ?? [])].find(entry => entry.type.startsWith('image/'))
+  if (!file) return
+  event.preventDefault()
+  void take(file)
+}
+onMounted(() => document.addEventListener('paste', onPaste))
+onBeforeUnmount(() => document.removeEventListener('paste', onPaste))
 
 const uploadCropped = async (blob: Blob) => {
   cropFile.value = null

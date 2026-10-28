@@ -3,6 +3,7 @@ import type { AdminCreditRole } from '~/types/admin'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
+// 署名与发行 (release) holds only the reserved roles, so new roles can't pick it.
 const CATEGORIES = ['composition', 'lyrics', 'arrangement', 'vocals', 'performance', 'production', 'engineering', 'artwork', 'other'] as const
 const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
 const LEVELS = ['is_album_role', 'is_track_role'] as const
@@ -10,6 +11,7 @@ const LEVELS = ['is_album_role', 'is_track_role'] as const
 const { $api } = useNuxtApp()
 const levelLabels: Record<typeof LEVELS[number], string> = { 'is_album_role': '专辑', 'is_track_role': '曲目' }
 const creditRoleCategoryLabels: Record<string, string> = {
+  release: '署名与发行',
   composition: '作曲',
   lyrics: '作词',
   arrangement: '编曲',
@@ -32,6 +34,8 @@ const empty = () => ({
 })
 const form = reactive(empty())
 const editing = ref<string | null>(null)
+/** Editing a 署名与发行 role: its category, levels and 启用 stay as they are. */
+const reserved = computed(() => roles.value.some(role => role.key === editing.value && role.is_reserved))
 const formOpen = ref(false)
 const busy = ref(false)
 const message = ref('')
@@ -112,6 +116,7 @@ useHead({ title: '角色字典' })
     <AdminFilterBar>
       <select v-model="category" aria-label="分类" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm">
         <option value="">全部分类</option>
+        <option value="release">{{ creditRoleCategoryLabels.release }}</option>
         <option v-for="value in CATEGORIES" :key="value" :value="value">{{ creditRoleCategoryLabels[value] }}</option>
       </select>
     </AdminFilterBar>
@@ -126,9 +131,11 @@ useHead({ title: '角色字典' })
           <span class="mt-1 block text-xs text-slate-500">小写字母开头，可含数字和下划线，如 composer。</span>
         </label>
         <label class="block">分类
-          <select v-model="form.category" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+          <select v-model="form.category" :disabled="reserved" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 disabled:bg-slate-100">
+            <option v-if="reserved" value="release">{{ creditRoleCategoryLabels.release }}</option>
             <option v-for="value in CATEGORIES" :key="value" :value="value">{{ creditRoleCategoryLabels[value] }}</option>
           </select>
+          <span v-if="reserved" class="mt-1 block text-xs text-slate-500">系统保留的「署名与发行」角色：只能改名称、别名和排序。</span>
         </label>
         <label v-for="language in LANGUAGES" :key="language" class="block">名称（{{ language }}）<span v-if="language === 'en'" class="text-red-600"> *</span>
           <input v-model="form.names[language]" :required="language === 'en'" maxlength="100" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
@@ -140,14 +147,14 @@ useHead({ title: '角色字典' })
         <fieldset class="sm:col-span-2">
           <legend>可用层级</legend>
           <div class="mt-1 flex flex-wrap gap-4">
-            <label v-for="level in LEVELS" :key="level" class="flex items-center gap-1.5"><input v-model="form[level]" type="checkbox">{{ levelLabels[level] }}</label>
+            <label v-for="level in LEVELS" :key="level" class="flex items-center gap-1.5"><input v-model="form[level]" type="checkbox" :disabled="reserved">{{ levelLabels[level] }}</label>
           </div>
           <span class="mt-1 block text-xs text-slate-500">专辑层级的角色记在整张专辑上，曲目层级的角色记在单个曲目上。</span>
         </fieldset>
         <label class="block">排序
           <input v-model.number="form.sort_order" type="number" min="0" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
         </label>
-        <label class="flex items-center gap-1.5 self-end pb-2"><input v-model="form.is_active" type="checkbox">启用</label>
+        <label class="flex items-center gap-1.5 self-end pb-2"><input v-model="form.is_active" type="checkbox" :disabled="reserved">启用</label>
         <label class="block sm:col-span-2">原因（可选，写入操作日志）
           <input v-model="form.reason" maxlength="2000" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
         </label>
@@ -175,14 +182,14 @@ useHead({ title: '角色字典' })
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="role in shown" :key="role.key" :class="{ 'opacity-50': !role.is_active }">
-                <td class="px-4 py-3 font-mono text-xs">{{ role.key }}<span v-if="!role.is_active" class="ml-1 font-sans text-slate-500">（已停用）</span></td>
+                <td class="px-4 py-3 font-mono text-xs">{{ role.key }}<span v-if="role.is_reserved" class="ml-1 font-sans text-slate-500">（系统保留）</span><span v-if="!role.is_active" class="ml-1 font-sans text-slate-500">（已停用）</span></td>
                 <td class="px-3 py-3">{{ role.names['zh-Hans'] || role.names.en }} <span class="text-xs text-slate-500">{{ role.names.en }}</span></td>
                 <td class="px-3 py-3 text-xs">{{ creditRoleCategoryLabels[role.category] }}</td>
                 <td class="px-3 py-3 text-xs">{{ LEVELS.filter(level => role[level]).map(level => levelLabels[level]).join(' · ') }}</td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ role.usage.album }} / {{ role.usage.track }}</td>
                 <td class="px-3 py-3 text-right text-xs">
                   <button type="button" class="underline" @click="open(role)">编辑</button>
-                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="used(role) > 0" :title="used(role) ? '已有署名使用这个角色，只能停用。' : undefined" @click="deleting = role">删除</button>
+                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="role.is_reserved || used(role) > 0" :title="role.is_reserved ? '系统保留的角色，不能删除。' : used(role) ? '已有署名使用这个角色，只能停用。' : undefined" @click="deleting = role">删除</button>
                 </td>
               </tr>
             </tbody>

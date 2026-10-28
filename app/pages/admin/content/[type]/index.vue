@@ -23,11 +23,10 @@ const contentCategoryLabels: Record<string, string> = {
 }
 const contentDescriptionLabels: Record<string, string> = {
   album: '检索和维护专辑，包括碟片、曲目、制作人员、版本、特典、图片和外部链接。编辑在编辑器里进行，有自动通过权限时立即生效。',
-  artist: '检索和维护艺术家，可以按类型、地区和是否活跃筛选，也可以合并重复的艺术家。',
+  artist: '检索和维护艺术家，包括作为厂牌、发行方的公司和社团（品番前缀），可以按类型、地区和是否活跃筛选，也可以合并重复的艺术家。',
   entry: '检索和维护条目（动画、游戏等），以及它们与专辑、其他条目的关联。',
   franchise: '检索和维护系列，包括分组以及系列下的条目和专辑。',
   track: '跨专辑检索曲目。曲目随专辑一起编辑，点击曲名进入所属专辑的编辑器。',
-  label: '检索和维护厂牌和品番前缀。',
   lyric: '跨曲目检索歌词。歌词在曲目页编辑，日常巡查见「歌词巡查」。',
 }
 const contentSortLabels: Record<string, string> = {
@@ -48,7 +47,7 @@ const contentSortLabels: Record<string, string> = {
   language: '语言',
   track_count: '曲目数',
 }
-const contentTabsLabels: Record<string, string> = { album: '专辑', artist: '艺术家', entry: '条目', franchise: '系列', track: '曲目', label: '厂牌', lyric: '歌词' }
+const contentTabsLabels: Record<string, string> = { album: '专辑', artist: '艺术家', entry: '条目', franchise: '系列', track: '曲目', lyric: '歌词' }
 const { typeLabel, typeWithFormat } = useEntryDisplay()
 
 const type = computed(() => adminContentTypeOf(route.params.type)!)
@@ -56,7 +55,6 @@ const segment = computed(() => adminContentRoutes[type.value].api)
 const sorts: Record<AdminContentType, string[]> = {
   album: ['id', 'title', 'release_date', 'created_at', 'updated_at', 'reviews_count', 'views_count', 'rating', 'track_count'],
   artist: ['id', 'name', 'albums_count', 'followers_count', 'created_at', 'updated_at'],
-  label: ['id', 'name', 'albums_count', 'created_at', 'updated_at'],
   entry: ['id', 'name', 'release_date', 'created_at', 'updated_at'],
   franchise: ['id', 'name', 'entries_count', 'albums_count', 'created_at', 'updated_at'],
   track: ['id', 'title', 'created_at'],
@@ -81,14 +79,13 @@ const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page
 const label = (item: AdminContentItem) => String(item.title ?? item.name ?? (type.value === 'lyric' ? (item.track as { title?: string } | null)?.title : null) ?? `#${item.id}`)
 const editable = computed(() => type.value !== 'track')
 const creatable = computed(() => !!adminEditorPath(type.value))
-const recountable = computed(() => ['album', 'artist', 'label'].includes(type.value))
+const recountable = computed(() => ['album', 'artist'].includes(type.value))
 const frontLink = (item: AdminContentItem) => type.value === 'track' ? `/tracks/${item.id}`
   : type.value === 'lyric' ? `/tracks/${item.track_id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
 const detail = (item: AdminContentItem) => [
   ...(type.value === 'album' ? [item.catalog_number, item.type, item.release_date, item.track_count ? `${item.track_count} 曲` : null] : []),
-  ...(type.value === 'label' ? [((item.catalog_prefixes as string[] | undefined) ?? []).join(', '), `${item.albums_count} 张专辑`] : []),
   ...(type.value === 'lyric' ? [(item.track as { album?: { title: string } } | null)?.album?.title, item.kind, item.language, item.excerpt] : []),
-  ...(type.value === 'artist' ? [item.type && artistTypeLabels[item.type], item.is_active === false ? '已停止活动' : null] : []),
+  ...(type.value === 'artist' ? [item.type && artistTypeLabels[item.type], ((item.catalog_prefixes as string[] | undefined) ?? []).join(', '), item.is_active === false ? '已停止活动' : null] : []),
   ...(type.value === 'entry' ? [typeWithFormat(item.type as string, item.format as string | null), item.release_date, `${item.albums_count} 张专辑`] : []),
   ...(type.value === 'franchise' ? [item.parent_id ? `↳ #${item.parent_id}` : null, `${item.entries_count} 个条目`, `${item.albums_count} 张专辑`] : []),
   ...(type.value === 'track' ? [(item.album as { title: string } | null)?.title, `${item.disc_number}-${item.track_number}`, item.lyrics_count ? `${item.lyrics_count} 份歌词` : null] : []),

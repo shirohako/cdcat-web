@@ -1,7 +1,6 @@
 import type { AggregateRef, AlbumDocument } from '../types/document'
 import type { HarvestCircleMatch, HarvestNewArtist, HarvestPerson } from '../types/harvest'
-import { creditGroups, updateCreditGroup } from './albumDocument'
-import { newKey } from './documentKeys'
+import { addCredit, creditGroups, updateCreditGroup } from './albumDocument'
 
 /**
  * The people of a harvest candidate in its album draft (docs/harvest/README.md#人员): the names the
@@ -85,7 +84,7 @@ export interface PeopleWarning {
   state: string
   candidates: number[]
   create: HarvestNewArtist | null
-  /** Still a printed name in the draft (the circle: the album has no artist yet) */
+  /** Still a printed name in the draft (the circle: the album has no publisher yet) */
   open: boolean
 }
 
@@ -94,7 +93,7 @@ export function peopleWarnings(doc: AlbumDocument, people: HarvestPerson[], circ
   const printed = new Set(doc.credits.filter(row => row.artist_id === null && row.credited_as).map(row => normalize(row.credited_as!)))
   const warnings: PeopleWarning[] = []
   if (circle && !CIRCLE_SETTLED.has(circle.state)) {
-    warnings.push({ key: 'circle', kind: 'circle', names: circle.name ? [circle.name] : [], state: circle.state, candidates: circle.candidates, create: circle.create, open: doc.artists.length === 0 })
+    warnings.push({ key: 'circle', kind: 'circle', names: circle.name ? [circle.name] : [], state: circle.state, candidates: circle.candidates, create: circle.create, open: albumPublisher(doc) === null })
   }
   for (const person of people) {
     if (SETTLED.has(person.state)) continue
@@ -115,27 +114,35 @@ export function linkPrintedName(doc: AlbumDocument, names: string[], artistId: A
   }
 }
 
-/** Makes the artist the album's (the circle), unless the album has one. */
-export function setAlbumArtist(doc: AlbumDocument, artistId: AggregateRef) {
-  if (!doc.artists.length) doc.artists.push({ id: newKey('aa'), artist_id: artistId, credited_as: null, join_phrase: null })
+/** The artist of the album's first album-wide 发行 credit (the circle, in a harvest draft); null when there is none. */
+export function albumPublisher(doc: AlbumDocument): AggregateRef | null {
+  const row = doc.credits.find(credit => credit.track_id === null && credit.role === 'publisher')
+  return row ? row.artist_id ?? null : null
+}
+
+/** Makes the circle the album's publisher (an album-wide 发行 credit), unless the album has one already. */
+export function setCirclePublisher(doc: AlbumDocument, artistId: AggregateRef) {
+  if (!doc.credits.some(credit => credit.track_id === null && credit.role === 'publisher')) {
+    addCredit(doc, { artist_id: artistId, credited_as: null, role: 'publisher', detail: null }, null)
+  }
 }
 
 /**
  * Brings a draft up to the server's suggestions, as a new draft would have them: printed names it
- * settles are linked or get their new artist, and an album without an artist gets the circle (a
- * name that is the circle follows the album artist the draft has). Returns how many changed.
+ * settles are linked or get their new artist, and an album without a publisher gets the circle as one (a name
+ * that is the circle follows the first publisher). Returns how many changed.
  */
 export function settleSuggestions(doc: AlbumDocument, people: HarvestPerson[], circle: HarvestCircleMatch | null, artistName: (id: number) => string | undefined, create: CreateArtist): number {
   const suggested = draftPeople(people, circle, artistName, create)
   let changed = 0
-  if (!doc.artists.length) {
+  if (albumPublisher(doc) === null) {
     const artist = suggested.circle()
     if (artist) {
-      setAlbumArtist(doc, artist)
+      setCirclePublisher(doc, artist)
       changed++
     }
   }
-  const albumArtist = doc.artists[0]?.artist_id ?? null
+  const albumArtist = albumPublisher(doc)
   for (const group of creditGroups(doc)) {
     if (group.artist_id !== null || !group.credited_as) continue
     const person = suggested.person(group.credited_as)

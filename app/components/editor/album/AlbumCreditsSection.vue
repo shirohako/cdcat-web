@@ -5,6 +5,13 @@
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
 
+      <!-- What album lists will show under the title (App\Support\AlbumByline): the publishers, else the 署名艺术家 -->
+      <p class="rounded-lg bg-sunken px-3 py-2 text-xs text-body">
+        <span class="mr-2 text-[11px] uppercase tracking-wider text-meta">{{ $t('editor.album.byline_preview') }}</span>
+        <template v-if="bylinePreview">{{ bylinePreview }}</template>
+        <span v-else class="text-meta">{{ $t('editor.album.byline_none') }}</span>
+      </p>
+
       <template v-for="section in sections" :key="section.key">
         <div v-if="section.groups.length">
           <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -117,7 +124,7 @@
             <User :size="14" class="shrink-0 text-success" />
             <span class="min-w-0 flex-1 truncate font-medium">{{ form.newArtist }}</span>
             <span class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
-            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-success/70 transition-colors hover:bg-success/15 hover:text-success" :aria-label="$t('common.delete')" @click="form.newArtist = ''"><X :size="13" /></button>
+            <button type="button" class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-success/15 text-success hover:bg-success/25 ring-1 ring-inset ring-success/25 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="form.newArtist = ''"><X :size="13" /></button>
           </div>
           <EditorEntityPicker v-else kind="artist" allow-create data-autofocus :placeholder="$t('editor.credits.pick_artist')" @select="pick" @create="form.newArtist = $event" />
         </div>
@@ -138,9 +145,9 @@
       </div>
       <template #footer>
         <span v-if="addedCount" class="mr-auto text-xs text-success">{{ $t('editor.dialog.credit_added', { count: addedCount }) }}</span>
-        <button type="button" class="btn btn-sm" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
-        <button v-if="!editing" type="button" class="btn btn-sm" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+        <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="dialog = false">{{ $t(addedCount ? 'common.close' : 'common.cancel') }}</button>
+        <button v-if="!editing" type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="save(true)">{{ $t('editor.dialog.add_another') }}</button>
+        <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
       </template>
     </EditorModal>
   </CatalogSection>
@@ -152,6 +159,7 @@ import type { CreditGroup } from '~/utils/albumDocument'
 import type { AggregateRef, RowId } from '~/types/document'
 import { User, UserPlus, Users, X } from '@lucide/vue'
 import { addCredit, creditGroups, orderedTracks, removeCreditGroup, setCreditTracks, updateCreditGroup } from '~/utils/albumDocument'
+import { VARIOUS_ARTISTS } from '~/utils/albumByline'
 import { sameId } from '~/utils/documentRows'
 
 const editor = useAlbumEditor()
@@ -219,6 +227,17 @@ const artistName = (id: AggregateRef | null) => {
   return String((editor.references.artist?.[String(id)] as { name?: string } | undefined)?.name ?? `#${id}`)
 }
 const personName = (group: CreditGroup) => group.artist_id === null ? (group.credited_as || '—') : artistName(group.artist_id)
+
+/** The byline as lists will show it: the album-wide publishers, else its 署名艺术家 (several of them: Various Artists on cards). */
+const bylinePreview = computed(() => {
+  for (const role of ['publisher', 'artist']) {
+    const names = [...new Set(album.value.credits.filter(row => row.track_id === null && row.role === role)
+      .map(row => row.credited_as || artistName(row.artist_id)).filter(Boolean))]
+    if (!names.length) continue
+    return role === 'artist' && names.length > 1 ? `${names.join(', ')}（${t('editor.album.byline_various', { name: VARIOUS_ARTISTS })}）` : names.join(', ')
+  }
+  return ''
+})
 const subline = (group: CreditGroup) => [
   group.artist_id !== null && group.credited_as ? t('editor.dialog.shown_as', { name: group.credited_as }) : null,
   group.detail,

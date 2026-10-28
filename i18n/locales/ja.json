@@ -35,7 +35,6 @@
       "bonuses": "特典",
       "credits": "クレジット",
       "tracklist": "トラックリスト",
-      "artists": "アーティスト",
       "links": "リンク",
       "articles": "関連記事",
       "contributors": "貢献者",
@@ -72,8 +71,6 @@
       "credits": "クレジット情報がありません。",
       "tracklist_title": "曲目情報がありません",
       "tracklist_desc": "このアルバムには曲目がまだ追加されていません",
-      "artists_title": "アーティスト情報がありません",
-      "artists_desc": "このアルバムにはアーティストがまだ紐づいていません",
       "links_title": "外部リンクがありません",
       "links_desc": "このアルバムにはリンクがまだ追加されていません",
       "articles_title": "関連記事はありません",
@@ -89,9 +86,9 @@
       "original": "元画像 {width}×{height}"
     },
     "info": {
-      "labels": "レーベル",
       "release_event": "頒布イベント",
-      "attributes": "その他の情報"
+      "attributes": "その他の情報",
+      "people": "発売"
     },
     "products": {
       "contains_discs": "Disc {discs} 収録"
@@ -132,8 +129,7 @@
       "views": "{count} 回閲覧",
       "likes": "{count} 人がお気に入り",
       "discs": "{count} 枚",
-      "tracks": "{count} 曲",
-      "artist_separator": "、"
+      "tracks": "{count} 曲"
     },
     "category_filter": "カテゴリー",
     "year_filter": "年",
@@ -159,17 +155,18 @@
       "follow": "フォロー",
       "following": "フォロー中",
       "share": "共有",
-      "releases": "参加作品",
       "no_bio": "アーティスト紹介はまだありません。",
       "no_releases": "アルバムはまだありません",
       "no_releases_desc": "このアーティストに関連付けられたアルバムはまだありません。",
-      "as_artist": "アーティストとして",
       "inactive": "活動終了",
       "relations": "関連アーティスト",
-      "view_albums": "アルバム",
-      "view_tracks": "楽曲",
-      "no_tracks": "参加楽曲はまだありません",
-      "credited_as": "{name} 名義"
+      "credited_as": "{name} 名義",
+      "tab_releases": "リリース",
+      "tab_credits": "参加作品",
+      "no_credits": "参加作品はまだありません",
+      "albums_label": "アルバム",
+      "album_roles": "アルバム全体",
+      "catalog_prefixes": "品番プレフィックス"
     }
   },
   "tracking": {
@@ -1569,7 +1566,6 @@
     "catalog_type": {
       "album": "アルバム",
       "artist": "アーティスト",
-      "label": "レーベル",
       "lyric": "歌詞",
       "entry": "作品",
       "franchise": "シリーズ"
@@ -1608,13 +1604,6 @@
       "sticker": "ステッカー",
       "bonus_item": "特典",
       "illustration": "イラスト",
-      "other": "その他"
-    },
-    "label_role": {
-      "label": "レーベル",
-      "publisher": "発売元",
-      "distributor": "販売元",
-      "manufacturer": "製造元",
       "other": "その他"
     },
     "artist_relation": {
@@ -1705,8 +1694,6 @@
       "sort_order": "順序",
       "artist_id": "アーティスト",
       "credited_as": "クレジット名義",
-      "join_phrase": "連結",
-      "label_id": "レーベル",
       "role": "役割",
       "edition_type": "形態",
       "medium": "メディア",
@@ -1760,8 +1747,6 @@
     },
     "collection": {
       "titles": "別名",
-      "artists": "アーティスト",
-      "labels": "レーベル",
       "products": "形態",
       "bonuses": "特典",
       "discs": "ディスク",
@@ -1781,6 +1766,7 @@
       "track_originals": "原曲"
     },
     "credit_role_category": {
+      "release": "アーティスト・発売",
       "composition": "作曲",
       "lyrics": "作詞",
       "arrangement": "編曲",
@@ -2139,14 +2125,6 @@
       "login": "ログインしてコメントする"
     }
   },
-  "labels": {
-    "title": "レーベル",
-    "subtitle": "レコード会社とレーベル",
-    "label": "レーベル",
-    "catalog_prefixes": "品番の接頭辞",
-    "no_results": "レーベルが見つかりません",
-    "not_found": "このレーベルは存在しません。"
-  },
   "tracks": {
     "not_found": "このトラックは存在しません。",
     "originals_section": "原曲",
@@ -2330,7 +2308,7 @@
       "tracks": "1 曲以上のトラック"
     },
     "suggested_item": {
-      "artists": "アーティスト",
+      "byline": "アーティストまたは発売元",
       "catalog_number": "品番",
       "categories": "カテゴリ",
       "links": "リンク",
@@ -2340,7 +2318,6 @@
     "preview": "プレビュー",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "2024、2024-05、2024-05-12 のように入力してください",
-    "mode_edit": "編集",
     "mode_translate": "トラックリストを翻訳",
     "my_revisions": "自分の修正",
     "continue_draft": "続きを編集",
@@ -2368,18 +2345,12 @@
       "section": {
         "basic": "基本情報",
         "tracks": "ディスクとトラック",
-        "people": "アーティストとレーベル",
         "credits": "クレジット",
         "editions": "エディション",
         "bonuses": "特典",
         "images": "画像",
         "relations": "リンクと関連"
       },
-      "artists_hint": "ジャケットに記載されたアーティストを順番に。表記が異なる場合は「クレジット名」を、「feat.」「×」などは区切りに入力します。",
-      "labels_hint": "レコード会社、発売元、販売元。同人作品では空欄が普通です。",
-      "add_artist": "アーティストを追加…",
-      "add_label": "レーベルを追加…",
-      "credited_as_placeholder": "クレジット名",
       "tracks_hint": "トラック番号はディスクごとに数えます。タイトルで Enter を押すと次のトラックへ。トラックを開くと原曲、情報、リンクを設定できます。",
       "empty_tracklist": "トラックがまだありません",
       "empty_tracklist_hint": "ブックレット、ショップのページ、VGMdb からトラックリストを貼り付けるか、1 曲ずつ追加してください。",
@@ -2399,7 +2370,10 @@
       "move_to_disc": "移動先",
       "totals": "{discs} 枚 · {tracks} 曲",
       "revision_mismatch": "この修正はこのアルバムのものではありません。",
-      "categories_suggested": "関連作品からのおすすめ："
+      "categories_suggested": "関連作品からのおすすめ：",
+      "byline_preview": "一覧での表示",
+      "byline_none": "発売元もアルバム全体のアーティストもないため、一覧には表示されません",
+      "byline_various": "カードでは {name} と表示"
     },
     "paste": {
       "button": "トラックリストを貼り付け",
@@ -2474,6 +2448,10 @@
       "upload": "ジャケットをアップロード",
       "replace": "差し替え",
       "from_url": "リンクから取り込む",
+      "from_clipboard": "クリップボードから貼り付け",
+      "paste_hint": "{keys} で画像を直接貼り付けることもできます。",
+      "clipboard_empty": "クリップボードに画像がありません。",
+      "clipboard_denied": "ブラウザがクリップボードの読み取りを許可しませんでした。{keys} で貼り付けてください。",
       "import": "取り込む",
       "too_small": "画像の短辺は {size} px 以上必要です。",
       "not_square": "ジャケットは正方形にしてください。",
@@ -2540,10 +2518,8 @@
       },
       "artist_name_placeholder": "よく使われるクレジット名",
       "entry_name_placeholder": "原題",
-      "founded": "設立",
-      "dissolved": "終了",
       "artist_relations_hint": "メンバー、声優、別名義、ユニット。このアーティストから見た関係を選ぶと、相手には逆の関係が表示されます。",
-      "prefixes_hint": "品番の接頭辞をカンマ区切りで。アルバム追加時にレーベルの推測に使います。",
+      "prefixes_hint": "品番の接頭辞をカンマ区切りで。会社やレーベルを兼ねるサークル向けです。",
       "name_only_credit": "表記名だけ",
       "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。",
       "artist_type_placeholder": "アーティストの種類を選択"
@@ -2588,16 +2564,7 @@
       "bonus_edit": "特典を編集",
       "digital": "デジタル",
       "new_disc": "新しい特典ディスク",
-      "artist_add": "アーティストを追加",
-      "artist_edit": "アーティストを編集",
-      "artist_required": "アーティストを選ぶか、名前を入力して新規作成してください。",
-      "label_add": "レーベルを追加",
-      "label_edit": "レーベルを編集",
-      "label_required": "レーベルを選ぶか、名前を入力して新規作成してください。",
-      "label": "レーベル",
       "shown_as": "「{name}」名義",
-      "shown_as_hint": "印刷された名前がカタログ上の名前と違うときに入力。",
-      "join_phrase_hint": "次のアーティストとのつなぎ。例：&、feat.",
       "credit_edit": "クレジットを編集",
       "name_only": "表記のみ",
       "image_url": "画像の URL",
@@ -2734,7 +2701,6 @@
       "album": "アルバム",
       "track": "曲",
       "artist": "アーティスト",
-      "label": "レーベル",
       "entry": "作品",
       "franchise": "シリーズ"
     }
@@ -2885,10 +2851,6 @@
       "franchise": {
         "title": "シリーズ",
         "desc": "複数の作品をまとめる"
-      },
-      "label": {
-        "title": "レーベル",
-        "desc": "アルバムを発売・販売する会社やブランド"
       }
     },
     "my_revisions": "マイリビジョンを見る",
@@ -2915,10 +2877,6 @@
       "lyrics": "歌詞あり",
       "instrumental": "インストゥルメンタル"
     },
-    "label": {
-      "lead": "レーベル",
-      "founded": "{date}設立"
-    },
     "entry": {
       "albums": "関連アルバム{count}枚"
     },
@@ -2937,7 +2895,6 @@
       "albums": "CDCatに登録されたアルバム・シングル・EP・コンピレーションを探せます。",
       "vinyls": "CDCatに登録されたアナログレコードを探せます。",
       "artists": "CDCatに登録されたアーティスト・同人サークル・バーチャルシンガーとその作品を探せます。",
-      "labels": "CDCatに登録されたレーベル・発売元を探せます。",
       "entries": "CDCatに登録されたアニメ・ゲーム・映像作品などとその音楽を探せます。",
       "franchises": "CDCatに登録されたシリーズと関連アルバムを探せます。",
       "articles": "CDCatユーザーによる音楽レビュー・特集・資料まとめ。",

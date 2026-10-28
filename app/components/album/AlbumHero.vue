@@ -33,16 +33,26 @@
               </h1>
               <p v-if="originalTitle" class="mb-2 text-center text-sm text-body md:text-left">{{ originalTitle }}</p>
 
-              <!-- Artists, joined as printed: "A feat. B", "A × B" -->
-              <p v-if="album.artists.length" class="mb-4 text-center text-sm text-body md:mb-5 md:text-left">
-                <template v-for="(artist, index) in album.artists" :key="artist.id">
-                  <NuxtLink :to="`/artists/${artist.id}`" class="link link-muted inline-flex items-center gap-1">
-                    <UserRound v-if="index === 0" :size="13" class="text-meta" />
-                    {{ artist.credited_as || artist.name }}
-                  </NuxtLink>
-                  <span v-if="index < album.artists.length - 1" class="whitespace-pre text-meta">{{ artist.join_phrase || ', ' }}</span>
-                </template>
-              </p>
+              <!-- The byline: the publishers, else the 署名艺术家, every one of them here; then the 署名艺术家 under
+                   publishers. Who labels, sells or makes the album is in 专辑信息. -->
+              <div class="mb-4 flex flex-col items-center gap-1 md:mb-5 md:items-start">
+                <p v-if="album.byline" class="flex flex-wrap items-center justify-center gap-x-1 text-sm text-body md:justify-start">
+                  <component :is="album.byline.role === 'publisher' ? Building2 : UserRound" :size="13" class="text-meta" />
+                  <template v-for="(artist, index) in album.byline.artists" :key="`${artist.id}:${artist.name}`">
+                    <NuxtLink v-if="artist.id" :to="`/artists/${artist.id}`" class="link link-muted">{{ artist.name }}</NuxtLink>
+                    <span v-else>{{ artist.name }}</span>
+                    <span v-if="index < album.byline.artists.length - 1" class="text-meta">,</span>
+                  </template>
+                </p>
+                <p v-if="bylineArtists.length" class="flex flex-wrap items-center justify-center gap-x-1 text-xs text-body md:justify-start">
+                  <UserRound :size="12" class="text-meta" />
+                  <template v-for="(artist, index) in bylineArtists" :key="artist.key">
+                    <NuxtLink v-if="artist.id" :to="`/artists/${artist.id}`" class="link link-muted">{{ artist.name }}</NuxtLink>
+                    <span v-else>{{ artist.name }}</span>
+                    <span v-if="index < bylineArtists.length - 1" class="text-meta">,</span>
+                  </template>
+                </p>
+              </div>
 
               <div class="flex flex-col items-center gap-y-1.5 text-sm text-body md:items-start">
                 <div class="flex flex-wrap items-center justify-center gap-2 md:justify-start">
@@ -90,12 +100,6 @@
                   </span>
                 </div>
 
-                <p v-if="album.labels.length" class="flex flex-wrap items-center justify-center gap-x-2 text-xs text-body md:justify-start">
-                  <Building2 :size="13" class="shrink-0 text-meta" />
-                  <NuxtLink v-for="label in album.labels" :key="`${label.id}-${label.role}`" :to="`/labels/${label.id}`" class="link link-muted">
-                    {{ label.credited_as || label.name }}<span v-if="label.role !== 'label'" class="text-meta"> ({{ enumLabel('label_role', label.role) }})</span>
-                  </NuxtLink>
-                </p>
               </div>
             </div>
 
@@ -177,6 +181,18 @@ const { localName, formatDate, formatDuration, enumLabel } = useCatalogDisplay()
 
 const shownTitle = computed(() => localName(props.album.title, props.album.titles))
 const originalTitle = computed(() => shownTitle.value !== props.album.title ? props.album.title : '')
+/** The album-wide 署名艺术家 when the byline names the publishers instead, each once. */
+const bylineArtists = computed(() => {
+  if (props.album.byline?.role !== 'publisher') return []
+  const seen = new Map<string, { key: string, id: number | null, name: string }>()
+  for (const credit of props.album.credits) {
+    if (credit.role !== 'artist') continue
+    const name = credit.credited_as || credit.artist?.name || ''
+    const key = credit.artist ? `id:${credit.artist.id}` : `name:${name}`
+    if (name && !seen.has(key)) seen.set(key, { key, id: credit.artist?.id ?? null, name })
+  }
+  return [...seen.values()]
+})
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
 const background = computed(() => props.album.banner_url || coverUrl.value)
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)

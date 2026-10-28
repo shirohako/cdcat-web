@@ -12,7 +12,7 @@
           <span class="min-w-0 truncate">{{ row.original_title }}</span>
           <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
         </template>
-        <button type="button" class="btn btn-xs ml-auto px-1.5" :aria-label="$t('common.delete')" @click="remove(row.id)"><X :size="12" /></button>
+        <button type="button" class="btn btn-xs ml-auto px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="remove(row.id)"><X :size="12" /></button>
         <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
       </li>
     </ul>

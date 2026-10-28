@@ -42,9 +42,15 @@
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
             <input v-model="barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
           </label>
-          <p class="text-[11px] text-meta sm:col-span-2">
+          <p class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-meta sm:col-span-2">
             {{ $t('editor.album.first_edition_hint') }}
-            <button type="button" class="link" @click="editor.go('editions')">{{ $t('editor.album.section.editions') }}</button>
+            <button
+              type="button"
+              class="group inline-flex h-5 items-center gap-0.5 rounded-[5px] border border-field-line pl-1.5 pr-1 font-semibold text-title transition-colors hover:border-faint hover:bg-btn"
+              @click="editor.go('editions')"
+            >
+              {{ $t('editor.album.section.editions') }}<ChevronRight :size="12" class="shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </button>
           </p>
         </div>
 
@@ -62,7 +68,7 @@
           </div>
           <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-meta">
             {{ $t('editor.album.categories_suggested') }}
-            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-primary/45 px-2 py-0.5 text-primary transition-colors hover:bg-primary/10" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
+            <button v-for="value in suggestedCategories" :key="value" type="button" class="rounded-full border border-dashed border-primary/45 bg-primary/10 px-2 py-0.5 text-primary hover:bg-primary/20 shadow-xs transition active:translate-y-px" @click="toggleCategory(value)">+ {{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </p>
           <p class="mt-1 text-[11px] text-meta">{{ $t('editor.album.categories_hint') }}</p>
         </div>
@@ -79,9 +85,9 @@
       <EditorTitleRows v-model="album.titles" />
     </div>
 
-    <details class="border-t border-line px-5 py-3">
-      <summary class="cursor-pointer text-sm font-medium text-body transition-colors hover:text-primary">{{ $t('editor.advanced') }}</summary>
-      <div class="mt-3 grid gap-4 sm:grid-cols-2">
+    <div class="border-t border-line px-5 py-4">
+      <h3 class="mb-3 text-sm font-semibold text-body">{{ $t('editor.advanced') }}</h3>
+      <div class="grid gap-4 sm:grid-cols-2">
         <label class="block">
           <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.slug') }}</span>
           <input v-model="album.slug" class="input input-sm w-full font-mono" :class="{ 'input-error': errorAt('slug') }" placeholder="my-album-2024">
@@ -95,14 +101,14 @@
           <input v-model="album.is_adult" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.album.is_adult') }}
         </label>
       </div>
-    </details>
+    </div>
   </CatalogSection>
 </template>
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { CalendarDays, Info } from '@lucide/vue'
+import { CalendarDays, ChevronRight, Info } from '@lucide/vue'
 import { firstProduct } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()
