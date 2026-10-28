@@ -5,9 +5,13 @@
       "ariaLabel": "Markdown 编辑器",
       "edit": "编辑",
       "preview": "预览",
+      "split": "分屏",
+      "mode": "编辑模式",
       "previewEmpty": "预览内容会显示在这里。",
       "help": "语法说明",
       "helpHint": "第一次写作？使用 Markdown 可以让你更舒适地创作。使用说明和语法请参考这里。",
+      "helpClose": "关闭说明",
+      "helpOpen": "语法说明（在新窗口打开）",
       "toolbar": {
         "heading": "标题",
         "bold": "粗体",

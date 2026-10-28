@@ -4,7 +4,7 @@ import {
   AlertTriangle, Bold, Braces, ChevronDown, Code, ExternalLink, Eye, EyeOff,
   Heading2, HelpCircle, Highlighter, Image, Info, Italic, Lightbulb, Link,
   ListChecks, ListOrdered, Palette, Pencil, Quote, ShieldAlert, Strikethrough,
-  Type, Underline,
+  Type, Underline, X,
 } from 'lucide'
 import { basicSetup, EditorView } from 'codemirror'
 import { Compartment, EditorState, Prec } from '@codemirror/state'
@@ -26,6 +26,8 @@ import {
   type MarkdownCompleter, type MarkdownEditAction,
 } from '~/utils/markdownEditor'
 
+type EditorMode = 'edit' | 'split' | 'preview'
+
 const props = withDefaults(defineProps<{
   disabled?: boolean
   error?: string
@@ -35,8 +37,14 @@ const props = withDefaults(defineProps<{
    * pass `null` to drop the banner. The compact variant never shows it.
    */
   guideUrl?: string | null
-  /** `split` shows the editor beside the preview (one at a time on small screens). */
-  mode?: 'split' | 'edit' | 'preview'
+  /**
+   * The starting mode: `split` shows the editor beside the preview (one at a time on small screens). The toolbar's
+   * mode buttons switch it (`update:mode`); without this prop the editor starts in the mode last picked in this
+   * browser, else `split`.
+   */
+  mode?: EditorMode
+  /** Shows the mode buttons; off where the page has its own switch and drives `mode`. */
+  modeSwitch?: boolean
   /**
    * `compact` is the small editor for sub-replies: a short box, the common
    * buttons only, and a preview toggle instead of a split view.
@@ -61,7 +69,8 @@ const props = withDefaults(defineProps<{
   error: '',
   placeholder: '',
   guideUrl: undefined,
-  mode: 'split',
+  mode: undefined,
+  modeSwitch: true,
   variant: 'full',
   fill: false,
   maxLength: undefined,
@@ -69,13 +78,15 @@ const props = withDefaults(defineProps<{
   complete: undefined,
   upload: undefined,
 })
-const emit = defineEmits<{ save: [], submit: [] }>()
+const emit = defineEmits<{ 'save': [], 'submit': [], 'update:mode': [EditorMode] }>()
 
 const model = defineModel<string>({ required: true })
 const { t } = useMarkdownT()
 const { appliedTheme } = useAppearance()
 const editorHost = ref<HTMLElement>()
 const fileInput = ref<HTMLInputElement>()
+const MODE_KEY = 'cdcat:editor-mode'
+const mode = ref<EditorMode>(props.mode ?? 'split')
 const mobilePane = ref<'edit' | 'preview'>('edit')
 const compactPreview = ref(false)
 const preview = ref(model.value)
@@ -92,6 +103,18 @@ const compact = computed(() => props.variant === 'compact')
 // `undefined` means "not specified", which falls back to the default guide;
 // an explicit `null` is a deliberate request to hide the banner.
 const guideHref = computed(() => compact.value ? null : props.guideUrl === undefined ? MARKDOWN_GUIDE_URL : props.guideUrl)
+/** Closing the guide banner is remembered in this browser; a ? in the toolbar still opens the guide. */
+const GUIDE_CLOSED_KEY = 'cdcat:editor-guide-closed'
+const guideClosed = ref(false)
+onMounted(() => {
+  try { guideClosed.value = localStorage.getItem(GUIDE_CLOSED_KEY) === '1' }
+  catch { /* storage unavailable */ }
+})
+function closeGuide() {
+  guideClosed.value = true
+  try { localStorage.setItem(GUIDE_CLOSED_KEY, '1') }
+  catch { /* storage unavailable */ }
+}
 const length = computed(() => Array.from(model.value ?? '').length)
 const tooLong = computed(() => props.maxLength !== undefined && length.value > props.maxLength)
 
@@ -340,19 +363,50 @@ watch(appliedTheme, (value) => {
   view?.dispatch({ effects: darkMode.reconfigure(EditorView.darkTheme.of(value === 'dark')) })
 })
 
+// The mode follows the page when it drives it; otherwise it starts from the one last picked in this browser.
+watch(() => props.mode, (value) => {
+  if (value) mode.value = value
+})
+onMounted(() => {
+  if (props.mode || !props.modeSwitch) return
+  try {
+    const stored = localStorage.getItem(MODE_KEY)
+    if (stored === 'edit' || stored === 'split' || stored === 'preview') mode.value = stored
+  }
+  catch { /* storage unavailable */ }
+})
+
+function setMode(value: EditorMode) {
+  mode.value = value
+  emit('update:mode', value)
+  if (props.mode) return
+  try { localStorage.setItem(MODE_KEY, value) }
+  catch { /* storage unavailable */ }
+}
+
+const modeItems = computed(() => (['edit', 'split', 'preview'] as const).map(value => ({
+  value, label: t(`markdown.editor.${value}`), icon: { edit: 'lucide:pen-line', split: 'lucide:columns-2', preview: 'lucide:eye' }[value],
+})))
+/** Phones show one pane at a time, so split is left out there and picks the pane instead. */
+const phoneMode = computed(() => mode.value === 'split' ? mobilePane.value : mode.value)
+function setPhoneMode(value: 'edit' | 'preview') {
+  if (mode.value === 'split') mobilePane.value = value
+  else setMode(value)
+}
+
 // CodeMirror measures its layout when shown again, e.g. after the preview-only mode.
-watch(() => [props.mode, compactPreview.value], async () => {
+watch(() => [mode.value, mobilePane.value, compactPreview.value], async () => {
   await nextTick()
   view?.requestMeasure()
 })
 
 const editorVisibility = computed(() => {
   if (compact.value) return compactPreview.value ? 'hidden' : 'block'
-  return props.mode === 'preview' ? 'hidden' : props.mode === 'edit' ? 'block' : mobilePane.value === 'edit' ? 'block' : 'hidden md:block'
+  return mode.value === 'preview' ? 'hidden' : mode.value === 'edit' ? 'block' : mobilePane.value === 'edit' ? 'block' : 'hidden md:block'
 })
 const previewVisibility = computed(() => {
   if (compact.value) return compactPreview.value ? 'block' : 'hidden'
-  return props.mode === 'edit' ? 'hidden' : props.mode === 'preview' ? 'block' : mobilePane.value === 'preview' ? 'block' : 'hidden md:block'
+  return mode.value === 'edit' ? 'hidden' : mode.value === 'preview' ? 'block' : mobilePane.value === 'preview' ? 'block' : 'hidden md:block'
 })
 
 /** Replaces the selection with `text`, e.g. a quote or an image the page inserted. */
@@ -437,22 +491,32 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
 </script>
 
 <template>
-  <a
-    v-if="guideHref"
-    :href="guideHref"
-    target="_blank"
-    rel="noopener noreferrer"
-    class="group mb-3 flex items-center gap-2.5 rounded-xl border border-primary/25 bg-primary/8 px-3 py-2 text-left transition-colors duration-150 ease-out hover:bg-primary/14 sm:px-3.5"
-  >
-    <span class="grid size-7 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
-      <MdIcon :icon="HelpCircle" class="size-4" />
-    </span>
-    <span class="min-w-0 flex-1">
-      <span class="block text-sm font-bold text-title">{{ t('markdown.editor.help') }}</span>
-      <span class="block text-xs leading-4 text-meta">{{ t('markdown.editor.helpHint') }}</span>
-    </span>
-    <MdIcon :icon="ExternalLink" class="size-4 shrink-0 text-primary transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-  </a>
+  <div v-if="guideHref && !guideClosed" class="mb-3 flex items-center rounded-xl border border-primary/25 bg-primary/8">
+    <a
+      :href="guideHref"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex min-w-0 flex-1 items-center gap-2.5 rounded-l-xl px-3 py-2 text-left sm:px-3.5"
+    >
+      <span class="grid size-7 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
+        <MdIcon :icon="HelpCircle" class="size-4" />
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-sm font-bold text-title">{{ t('markdown.editor.help') }}</span>
+        <span class="block text-xs leading-4 text-meta">{{ t('markdown.editor.helpHint') }}</span>
+      </span>
+      <MdIcon :icon="ExternalLink" class="size-4 shrink-0 text-primary" />
+    </a>
+    <button
+      type="button"
+      class="mx-1.5 grid size-7 shrink-0 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-primary/14 hover:text-primary"
+      :title="t('markdown.editor.helpClose')"
+      :aria-label="t('markdown.editor.helpClose')"
+      @click="closeGuide"
+    >
+      <MdIcon :icon="X" class="size-4" />
+    </button>
+  </div>
 
   <div class="overflow-hidden rounded-xl border bg-field" :class="[error || tooLong ? 'border-danger/60' : 'border-line', fill ? 'flex h-full min-h-0 flex-col' : '']">
     <div
@@ -547,6 +611,18 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             </template>
           </MdDropdown>
         </div>
+
+        <a
+          v-if="guideHref && guideClosed"
+          :href="guideHref"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="grid size-8 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+          :title="t('markdown.editor.helpOpen')"
+          :aria-label="t('markdown.editor.helpOpen')"
+        >
+          <MdIcon :icon="HelpCircle" class="size-4" />
+        </a>
       </div>
 
       <div v-if="compact" class="order-2 flex items-center gap-2">
@@ -563,45 +639,54 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
         </button>
       </div>
 
-      <MdDropdown
-        v-else
-        align="right"
-        class="order-2 flex w-full items-center self-center md:w-auto md:justify-self-end md:border-l md:border-line md:pl-2"
-        panel-class="w-[min(22rem,calc(100vw-1rem))] max-h-[min(22rem,calc(100vh-2rem))] overflow-y-auto p-1.5"
-      >
-        <button
-          type="button"
-          :disabled="disabled"
-          class="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong disabled:opacity-40 md:w-auto"
+      <div v-else class="order-2 flex w-full items-center self-center md:w-auto md:justify-self-end md:border-l md:border-line md:pl-2">
+        <MdDropdown
+          align="right"
+          class="flex w-full items-center md:w-auto"
+          panel-class="w-[min(22rem,calc(100vw-1rem))] max-h-[min(22rem,calc(100vh-2rem))] overflow-y-auto p-1.5"
         >
-          <MdIcon :icon="Braces" class="size-4" />
-          {{ t('markdown.editor.toolbar.advanced') }}
-        </button>
-        <template #menu="{ close }">
           <button
-            v-for="definition in markdownContainers"
-            :key="definition.name"
             type="button"
-            role="menuitem"
-            class="flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover focus:bg-ghost-hover focus:outline-none"
-            @click="insertContainer(definition.name); close()"
+            :disabled="disabled"
+            class="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-primary px-3 text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong disabled:opacity-40 md:w-auto"
           >
-            <span class="grid size-8 shrink-0 place-items-center rounded-lg" :class="containerMenuMeta[definition.name].iconClass">
-              <MdIcon :icon="containerMenuMeta[definition.name].icon" class="size-4" />
-            </span>
-            <span class="min-w-0 flex-1">
-              <span class="flex min-w-0 items-baseline gap-2">
-                <span class="truncate text-[13px] font-semibold text-title">{{ t(definition.labelKey) }}</span>
-                <span class="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
-              </span>
-              <span class="mt-0.5 block truncate text-[11px] leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
-            </span>
+            <MdIcon :icon="Braces" class="size-4" />
+            {{ t('markdown.editor.toolbar.advanced') }}
           </button>
-        </template>
-      </MdDropdown>
+          <template #menu="{ close }">
+            <button
+              v-for="definition in markdownContainers"
+              :key="definition.name"
+              type="button"
+              role="menuitem"
+              class="flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover focus:bg-ghost-hover focus:outline-none"
+              @click="insertContainer(definition.name); close()"
+            >
+              <span class="grid size-8 shrink-0 place-items-center rounded-lg" :class="containerMenuMeta[definition.name].iconClass">
+                <MdIcon :icon="containerMenuMeta[definition.name].icon" class="size-4" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="flex min-w-0 items-baseline gap-2">
+                  <span class="truncate text-[13px] font-semibold text-title">{{ t(definition.labelKey) }}</span>
+                  <span class="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
+                </span>
+                <span class="mt-0.5 block truncate text-[11px] leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
+              </span>
+            </button>
+          </template>
+        </MdDropdown>
+      </div>
     </div>
 
-    <div v-if="mode === 'split' && !compact" class="flex shrink-0 border-b border-line bg-card p-1 md:hidden">
+    <!-- The mode buttons, on a row of their own under the toolbar; phones leave split out and pick the pane instead. -->
+    <div v-if="!compact && modeSwitch" class="flex shrink-0 items-center justify-end border-b border-line bg-card px-2 py-1">
+      <UiSegmented class="max-md:hidden" :model-value="mode" :items="modeItems" size="sm" :label="t('markdown.editor.mode')" @update:model-value="value => value && setMode(value)" />
+      <UiSegmented
+        class="md:hidden" :model-value="phoneMode" :items="modeItems.filter(item => item.value !== 'split')" size="sm" :label="t('markdown.editor.mode')"
+        @update:model-value="value => value && setPhoneMode(value as 'edit' | 'preview')" />
+    </div>
+
+    <div v-if="mode === 'split' && !compact && !modeSwitch" class="flex shrink-0 border-b border-line bg-card p-1 md:hidden">
       <button
         v-for="pane in (['edit', 'preview'] as const)"
         :key="pane"

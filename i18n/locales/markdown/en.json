@@ -5,9 +5,13 @@
       "ariaLabel": "Markdown editor",
       "edit": "Edit",
       "preview": "Preview",
+      "split": "Split",
+      "mode": "Editor mode",
       "previewEmpty": "Your preview will appear here.",
       "help": "Syntax guide",
       "helpHint": "Writing for the first time? Markdown makes writing easier. See the guide for usage and syntax.",
+      "helpClose": "Hide the guide",
+      "helpOpen": "Syntax guide (opens in a new window)",
       "toolbar": {
         "heading": "Heading",
         "bold": "Bold",

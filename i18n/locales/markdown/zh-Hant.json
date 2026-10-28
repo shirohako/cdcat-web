@@ -5,9 +5,13 @@
       "ariaLabel": "Markdown 編輯器",
       "edit": "編輯",
       "preview": "預覽",
+      "split": "分屏",
+      "mode": "編輯模式",
       "previewEmpty": "預覽內容會顯示在這裡。",
       "help": "語法說明",
       "helpHint": "第一次寫作？使用 Markdown 可以讓你更舒適地創作。使用說明和語法請參考這裡。",
+      "helpClose": "關閉說明",
+      "helpOpen": "語法說明（在新視窗開啟）",
       "toolbar": {
         "heading": "標題",
         "bold": "粗體",

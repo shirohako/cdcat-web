@@ -6,24 +6,36 @@
           <span class="eyebrow-line h-px w-6 bg-primary" aria-hidden="true" />
           {{ t('about_page.label') }}
         </p>
-        <h1
-          class="hero-title mt-5 text-balance text-3xl font-bold leading-tight tracking-tight text-title md:text-[2.75rem] md:leading-[1.2]"
-          :style="{ '--step': titleStep, '--count': title.count }"
-        >
-          <!-- Read as one line; the split-up copy below is only for the eyes. -->
-          <span class="sr-only">{{ title.text }}</span>
-          <span aria-hidden="true">
-            <template v-for="(unit, u) in title.units" :key="u">
-              <template v-if="unit.space">{{ ' ' }}</template>
-              <span v-else class="unit" :class="{ 'unit-em': unit.em }">
-                <span v-for="glyph in unit.chars" :key="glyph.i" class="char" :style="{ '--i': glyph.i }"><span class="glyph">{{ glyph.char }}</span></span>
-                <svg v-if="unit.em" class="underline" viewBox="0 0 100 12" preserveAspectRatio="none">
-                  <path d="M2 8.5C20 4.5 44 3.5 64 5.5S90 9 98 5" pathLength="1" />
-                </svg>
-              </span>
-            </template>
-          </span>
-        </h1>
+        <!-- On phones the CD case on the right is left out; the site's icon sits beside the title instead. -->
+        <div class="mt-5 flex items-center gap-4">
+          <img
+            src="/images/brand/icon-256.webp"
+            srcset="/images/brand/icon-256.webp 256w, /images/brand/icon-512.webp 512w"
+            sizes="64px"
+            alt=""
+            width="256"
+            height="256"
+            class="size-16 shrink-0 rounded-xl ring-1 ring-line md:hidden"
+          >
+          <h1
+            class="hero-title min-w-0 text-balance text-3xl font-bold leading-tight tracking-tight text-title md:text-[2.75rem] md:leading-[1.2]"
+            :style="{ '--step': titleStep, '--count': title.count }"
+          >
+            <!-- Read as one line; the split-up copy below is only for the eyes. -->
+            <span class="sr-only">{{ title.text }}</span>
+            <span aria-hidden="true">
+              <template v-for="(unit, u) in title.units" :key="u">
+                <template v-if="unit.space">{{ ' ' }}</template>
+                <span v-else class="unit" :class="{ 'unit-em': unit.em }">
+                  <span v-for="glyph in unit.chars" :key="glyph.i" class="char" :style="{ '--i': glyph.i }"><span class="glyph">{{ glyph.char }}</span></span>
+                  <svg v-if="unit.em" class="underline" viewBox="0 0 100 12" preserveAspectRatio="none">
+                    <path d="M2 8.5C20 4.5 44 3.5 64 5.5S90 9 98 5" pathLength="1" />
+                  </svg>
+                </span>
+              </template>
+            </span>
+          </h1>
+        </div>
         <p class="hero-lead isolate mt-5 text-base leading-8 text-body md:text-lg">
           <template v-for="(part, p) in lead" :key="p">
             <span v-if="part.mark" class="mark accent" :style="{ '--shift': part.shift, '--n': part.order }">{{ part.text }}</span>
@@ -45,7 +57,7 @@
       </div>
 
       <!-- A CD case: the site's picture as the cover, an obi down the spine, the disc half out. Hovering pulls it further. -->
-      <div class="group relative mx-auto aspect-4/3 w-full max-w-68 md:max-w-none" aria-hidden="true">
+      <div class="group relative mx-auto hidden aspect-4/3 w-full md:block" aria-hidden="true">
         <svg
           viewBox="0 0 200 200"
           class="absolute top-[5%] right-0 aspect-square h-[90%] w-auto transition-transform duration-700 ease-out group-hover:translate-x-[6%] group-hover:rotate-60 motion-reduce:transition-none"

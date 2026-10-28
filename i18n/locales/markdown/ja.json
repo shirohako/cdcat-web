@@ -5,9 +5,13 @@
       "ariaLabel": "Markdown エディター",
       "edit": "編集",
       "preview": "プレビュー",
+      "split": "分割",
+      "mode": "表示モード",
       "previewEmpty": "プレビューがここに表示されます。",
       "help": "書き方ガイド",
       "helpHint": "Markdown を使うと、コメントを読みやすく整えられます。使い方や記法はこちらで確認できます。",
+      "helpClose": "ガイドを閉じる",
+      "helpOpen": "書き方ガイド（新しいウィンドウで開きます）",
       "toolbar": {
         "heading": "見出し",
         "bold": "太字",

@@ -297,7 +297,7 @@ const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value =
           </div>
           <div class="min-h-0 flex-1">
             <MarkdownEditor
-              ref="editor" v-model="form.content" :mode="mode" fill :disabled="readOnly" :error="fieldErrors.content"
+              ref="editor" v-model="form.content" :mode="mode" :mode-switch="false" fill :disabled="readOnly" :error="fieldErrors.content"
               :placeholder="t('article_ui.start_writing')" @save="save()" />
           </div>
         </main>
