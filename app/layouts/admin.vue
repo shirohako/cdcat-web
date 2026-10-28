@@ -76,8 +76,8 @@ useHead({
     <aside class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col gap-4 bg-[#0f1115] px-3.5 py-4 text-slate-300 transition-transform lg:translate-x-0" :class="open ? 'translate-x-0' : '-translate-x-full'">
       <div class="flex items-center gap-2.5 px-1.5">
         <NuxtLink to="/admin" class="flex min-w-0 flex-1 items-center gap-2.5">
-          <span class="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-amber-400 text-[#0f1115]"><Icon name="lucide:music" class="size-[18px]" /></span>
-          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCat</b><span class="text-xs text-slate-400">管理后台</span></span>
+          <img src="/icon.png" alt="" width="36" height="36" class="size-9 shrink-0 rounded-[10px]">
+          <span class="flex min-w-0 flex-col leading-tight"><b class="text-[15px] text-white">CDCat</b><span class="text-xs text-slate-400">管理</span></span>
         </NuxtLink>
         <button type="button" class="rounded p-1 text-slate-400 hover:text-white lg:hidden" aria-label="关闭菜单" @click="open = false">
           <Icon name="lucide:x" class="size-5" />

@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import type { HarvestOverview } from '~/types/harvest'
 
-definePageMeta({ layout: 'admin', middleware: 'admin' })
+definePageMeta({
+  layout: 'admin',
+  // The name map and the coverage were tabs here; old links go to their own pages.
+  middleware: ['admin', (to) => {
+    const tab = String(to.query.tab ?? '')
+    if (['names', 'coverage'].includes(tab)) return navigateTo({ path: `/admin/harvest/${tab}`, query: { event_id: to.query.event_id || undefined } }, { replace: true })
+  }],
+})
 
 const { $api } = useNuxtApp()
-const harvestTabLabels: Record<string, string> = { coverage: '社团覆盖', names: '名字对照', submissions: '提交记录' }
 const harvestError = useHarvestError()
 const { hasPermission } = useAuth()
-const route = useRoute()
-const router = useRouter()
 const { data, pending, error, refresh } = await useAsyncData('admin-harvest-overview', () => $api<HarvestOverview>('/v1/admin/harvest/overview'))
 
-// The review queue and the tasks have their own pages (/admin/harvest/candidates, /admin/harvest/tasks).
-const tabs = ['coverage', 'names', 'submissions'] as const
-type Tab = typeof tabs[number]
-const tab = computed<Tab>({
-  get: () => tabs.includes(route.query.tab as Tab) ? route.query.tab as Tab : 'coverage',
-  // The event is shared by coverage and the name map.
-  set: value => router.push({ query: { tab: value === 'coverage' ? undefined : value, event_id: route.query.event_id || undefined } }),
-})
+// The review queue, the tasks, the name map and the coverage have their own pages.
 
 // A new key reloads a list after merging.
 const version = ref(0)
@@ -82,14 +79,9 @@ useHead({ title: '采集概况' })
       <AdminHarvestTokensPanel v-if="hasPermission('harvest.submit')" />
     </div>
 
-    <nav class="flex gap-1 overflow-x-auto border-b border-slate-200 text-sm" role="tablist">
-      <button v-for="item in tabs" :key="item" type="button" role="tab" :aria-selected="tab === item" class="-mb-px whitespace-nowrap border-b-2 px-4 py-2 font-medium" :class="tab === item ? 'border-slate-900 text-slate-900' : 'border-transparent text-slate-500 hover:text-slate-900'" @click="tab = item">
-        {{ harvestTabLabels[item] }}
-      </button>
-    </nav>
-
-    <AdminHarvestCoveragePanel v-if="tab === 'coverage'" :key="`coverage-${version}`" />
-    <AdminHarvestNamesPanel v-else-if="tab === 'names'" :key="`names-${version}`" />
-    <AdminHarvestSubmissionsPanel v-else :key="`submissions-${version}`" />
+    <section class="space-y-3">
+      <h2 class="font-semibold">提交记录</h2>
+      <AdminHarvestSubmissionsPanel :key="version" />
+    </section>
   </div>
 </template>

@@ -45,8 +45,8 @@ type Row = typeof rows.value[number]
 const source = ref('')
 const q = ref('')
 const state = ref<'' | 'waiting' | 'finished' | 'empty'>('')
-const sortKey = ref<'id' | 'records' | 'merged' | 'waiting' | 'done' | 'progress' | 'last_seen_at'>('waiting')
-const sortDir = ref<'asc' | 'desc'>('desc')
+const sortKey = ref<'id' | 'records' | 'merged' | 'waiting' | 'done' | 'progress' | 'last_seen_at'>('id')
+const sortDir = ref<'asc' | 'desc'>('asc')
 const sortBy = (key: typeof sortKey.value) => {
   if (sortKey.value === key) sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc'
   else [sortKey.value, sortDir.value] = [key, key === 'id' ? 'asc' : 'desc']
@@ -76,14 +76,14 @@ const candidatesOf = (task: Row, status?: string) => ({ path: '/admin/harvest/ca
 const percent = (progress: number | null) => progress === null ? '—' : `${Math.floor(progress * 100)}%`
 const time = (at: string | null) => at ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(at)) : '—'
 const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:border-slate-500 focus:outline-none'
-useHead({ title: '采集任务' })
+useHead({ title: '任务' })
 </script>
 
 <template>
   <div class="mx-auto max-w-7xl space-y-4 p-4 sm:p-8">
     <section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
       <div class="px-5 pb-4 pt-4">
-        <h1 class="text-2xl font-bold">采集任务</h1>
+        <h1 class="text-2xl font-bold">任务</h1>
         <p class="mt-1 max-w-3xl text-sm text-slate-500">采集器的任务是一个站点的一个入口，例如 Bangumi 的一个目录、BOOTH 的一个店铺、一届活动的活动页，由数据包带来，在采集器里新建和运行。一条候选被几个任务列到时，在每个任务里都算一次。</p>
         <p v-if="overview?.sources.length" class="mt-3 flex flex-wrap gap-2 text-xs">
           <span v-for="item in overview.sources" :key="item.source" class="rounded-full bg-slate-100 px-2 py-1 tabular-nums">
