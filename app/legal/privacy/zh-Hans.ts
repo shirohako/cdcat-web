@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL, MIN_AGE, NOTICE_DAYS, REQUEST_DAYS } from '../constants'
-import { md, type LegalContent } from '../types'
+import { md } from '~/documents/sections'
+import type { LegalContent } from '../types'
 
 export default {
   intro: '这份政策说明 CDCat 收集哪些信息、为什么收集，以及你有哪些选择。简单来说：我们只收集运营网站所需的信息，不投放广告，也绝不出售你的数据。',

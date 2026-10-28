@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
-import { sectionNumber, sectionShift, type LegalSection } from '~/legal'
+import { sectionNumber, sectionShift, type DocSectionLink } from '~/documents/sections'
 
 /**
  * The table of contents below lg: a card that sticks under the navbar, naming the section you're in beside its number
@@ -8,9 +8,8 @@ import { sectionNumber, sectionShift, type LegalSection } from '~/legal'
  * colour. Tapping it opens the full list in a UiPopover (which handles focus, Escape and outside taps), scrolled to
  * the current section; picking a section closes it.
  */
-const props = defineProps<{ sections: LegalSection[], active: number, progress: number }>()
+const props = defineProps<{ sections: DocSectionLink[], active: number, progress: number, label: string }>()
 const emit = defineEmits<{ navigate: [id: string] }>()
-const { t } = useI18n()
 
 const current = computed(() => props.sections[props.active])
 
@@ -32,7 +31,7 @@ function revealCurrent({ el }: VNode) {
 <template>
   <!-- The strip around the card hides the cards scrolling past behind it. -->
   <div class="sticky top-14 z-20 -mx-4 bg-page/90 px-4 py-2 backdrop-blur-md md:-mx-8 md:px-8">
-    <UiPopover placement="bottom-start" :label="t('legal.toc')" class="w-[calc(100vw-2rem)] max-w-md p-2!">
+    <UiPopover placement="bottom-start" :label="label" class="w-[calc(100vw-2rem)] max-w-md p-2!">
       <template #trigger="{ open, toggle, attrs }">
         <button
           type="button"
@@ -56,7 +55,7 @@ function revealCurrent({ el }: VNode) {
       <template #default="{ close }">
         <p class="mx-1 flex items-center gap-2 border-b border-line px-2 pb-2.5 pt-1.5 text-sm font-semibold text-title">
           <Icon name="lucide:list-tree" class="size-4 text-meta" />
-          {{ t('legal.toc') }}
+          {{ label }}
         </p>
         <ol class="relative mt-1.5 max-h-[60vh] space-y-px overflow-y-auto overscroll-contain" @vue:mounted="revealCurrent">
           <li v-for="(section, index) in sections" :key="section.id" class="accent" :style="{ '--shift': sectionShift(index) }">

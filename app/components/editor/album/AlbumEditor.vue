@@ -103,7 +103,7 @@
             <EditorAlbumTranslateSection v-else-if="active === 'translate'" :initial-locale="locale" />
             <CatalogSection v-else :title="$t('editor.section_submit')" :icon="Send">
               <div class="space-y-4 p-5">
-                <div v-if="missing.length" class="rounded-lg border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
+                <div v-if="requiredChecks.some(check => !check.done)" class="rounded-lg border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
                   <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
                   <ul class="mt-2 flex flex-wrap gap-1.5">
                     <li v-for="check in requiredChecks.filter(item => !item.done)" :key="check.key">
@@ -314,9 +314,14 @@ const go = (section: AlbumSection) => {
 
 const missing = computed(() => missingRequired(album.value))
 const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const
-const requiredChecks = computed(() => (['title', 'type', 'release_date', 'cover', 'tracks'] as const).map(key => ({
-  key, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
-})))
+/** Artists made in the credits whose type nobody has picked yet: required too, but listed only while there are some. */
+const untypedArtists = computed(() => items.value.filter(item => item.action === 'create' && item.resource_type === 'artist' && !item.document?.type).length)
+const requiredChecks = computed(() => [
+  ...(['title', 'type', 'release_date', 'cover', 'tracks'] as const).map(key => ({
+    key: key as string, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
+  })),
+  ...(untypedArtists.value ? [{ key: 'artist_types', section: 'credits' as AlbumSection, done: false, label: t('editor.required_item.artist_types', { count: untypedArtists.value }) }] : []),
+])
 const missingIn = (section: AlbumSection) => requiredChecks.value.some(check => !check.done && check.section === section)
 const SUGGESTED_SECTIONS = { byline: 'credits', catalog_number: 'basic', durations: 'tracks', credits: 'credits', categories: 'basic', links: 'relations' } as const
 const suggested = computed(() => missingSuggested(album.value).map(key => ({ key, section: SUGGESTED_SECTIONS[key] as AlbumSection, label: t(`editor.suggested_item.${key}`) })))

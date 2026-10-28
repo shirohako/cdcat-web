@@ -75,6 +75,8 @@ export interface CreditRoleDefinition {
   key: string
   category: string
   names: LocalizedText
+  /** Other spellings, from other sites and booklets ("Composer", "作曲"), for reading pasted credits */
+  aliases?: string[]
   is_album_role: boolean
   is_track_role: boolean
 }

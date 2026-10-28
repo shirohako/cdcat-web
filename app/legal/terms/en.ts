@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL, DATA_LICENSE, MIN_AGE, NOTICE_DAYS, REQUEST_DAYS } from '../constants'
-import { md, type LegalContent } from '../types'
+import { md } from '~/documents/sections'
+import type { LegalContent } from '../types'
 
 export default {
   intro: 'These terms set out the rules for using CDCat: what you can expect from us, what we expect from you, and how the things you contribute may be used. Each section starts with a short summary in plain words.',

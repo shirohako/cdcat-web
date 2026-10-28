@@ -849,14 +849,14 @@
     "guides_title": "利用ガイド",
     "guides_desc": "データ編集に参加する方は、まずこちらをご覧ください。",
     "guide_basics_tag": "サイトの基本",
-    "guide_basics_title": "ロール、権限、審査の流れ",
-    "guide_basics_desc": "CDCatで投稿が公開されるまでの流れを説明します。",
+    "guide_basics_title": "CDCat の設計",
+    "guide_basics_desc": "アルバム、アーティスト、イベント、エントリーなどがそれぞれ何で、どうつながっているか。",
     "guide_research_tag": "資料調査",
     "guide_research_title": "インターネットで音楽情報を調べる方法",
     "guide_research_desc": "データを投稿する前に確認したい調査方法です。",
     "guide_submit_tag": "投稿ガイド",
     "guide_submit_title": "新しいアルバムの追加と誤りの修正",
-    "guide_submit_desc": "CDCatが音楽情報を審査する方法を説明します。",
+    "guide_submit_desc": "エディターの使い方：アルバムの追加から誤りの修正まで、各項目の意味を説明します。",
     "docs_title": "開発に参加する",
     "docs_desc": "CDCatのサイトのフロントエンドはGitHubで公開しています。プログラミングができる方の参加を歓迎します。",
     "api_docs": "公開API",
@@ -895,6 +895,15 @@
     "questions_text": "規約やあなたのデータについて、お気軽にメールでお問い合わせください。",
     "next_doc": "続けて読む",
     "read_next": "読む"
+  },
+  "guide": {
+    "updated": "最終更新",
+    "source_language": "現在は簡体字中国語版のみです",
+    "switch_label": "ガイドを切り替え",
+    "toc": "目次",
+    "questions_title": "わからないことがあれば",
+    "questions_text": "ディスカッションで質問するか、このガイドのわかりにくい点を教えてください。",
+    "ask": "ディスカッションへ"
   },
   "home": {
     "hero_title": "星降る音の世界で、あなたの座標を見つけよう",
@@ -2305,7 +2314,8 @@
       "type": "アルバムの種類",
       "release_date": "発売日",
       "cover": "正方形のジャケット",
-      "tracks": "1 曲以上のトラック"
+      "tracks": "1 曲以上のトラック",
+      "artist_types": "新しいアーティストの種類（{count} 件）"
     },
     "suggested_item": {
       "byline": "アーティストまたは発売元",
@@ -2385,6 +2395,25 @@
       "apply": "反映",
       "applied": "{added} 曲を追加、{updated} 曲を更新しました"
     },
+    "paste_credits": {
+      "button": "クレジットを貼り付け",
+      "title": "クレジットを貼り付け",
+      "hint": "ブックレットやショップのページのクレジットをまとめて貼り付けます。1行に1つの役割で、「作曲・編曲：ミナト（M1–M3）、Yuki（M4）」のように書きます。かっこ内の曲番号は担当した曲で、なければアルバム全体です。「01. 曲名」の下の行は空行までその曲のもの、「Disc 2」のあとの曲番号は2枚目のものになります。",
+      "existing": "登録済みのアーティスト",
+      "new": "新しいアーティスト",
+      "namesakes": "同名が {count} 件",
+      "missing_tracks": "その曲目はありません：{tracks}",
+      "nothing": "クレジットが見つかりません。各行を「役割：名前」の形で書いてください。",
+      "skipped": "{lines} 行目は読み取れなかったため追加しません",
+      "looking": "アーティストを検索中…",
+      "unsettled": "黄色の行はまだ決まっていないため追加しません",
+      "apply": "{count} 件を追加",
+      "added": "{count} 件を追加しました",
+      "col_role": "役割",
+      "col_who": "担当者",
+      "col_tracks": "曲目",
+      "unknown_roles": "読み取れない役割：{words}"
+    },
     "toc": {
       "button": "ディスク TOC（リッピングソフト用）",
       "title": "Disc {n} の TOC",
@@ -2397,23 +2426,38 @@
       "add": "TOC を追加"
     },
     "credits": {
-      "hint": "1 人 1 役割につき 1 行。アルバム全体にも、選んだトラックにもクレジットできます。",
+      "hint": "まずアーティストと発売元を入力し、それ以外の担当者は役割ごとに1行ずつ、または曲ごとに入力します。",
       "whole_album": "アルバム全体",
-      "on_tracks": "トラック",
-      "all_tracks": "全トラック",
-      "no_tracks": "トラックなし",
-      "none": "クレジットはまだありません。",
-      "add": "クレジットを追加",
+      "none": "ほかの担当者はまだいません。下の役割から1行追加するか、クレジットをまとめて貼り付けてください。",
       "pick_artist": "アーティストを選択・新規作成…",
-      "name_only": "または表記名だけ入力",
       "link_artist": "アーティストを関連付け",
       "unlink_artist": "関連付けを外し、表記名を残す",
-      "scope": "クレジット範囲",
-      "existing": "既存",
-      "by_person": "人ごと",
-      "by_role": "役割ごと",
-      "by_track": "曲ごと",
-      "role_level": "この役割はこの階層では使いません"
+      "printed_as": "表記「{name}」",
+      "pick_type": "種類を選ぶ",
+      "remove_person": "{name}を外す",
+      "printed_hint": "アーティスト名と違うときだけ入力",
+      "detail_hint": "楽器、担当キャラクター…",
+      "add_person": "担当者を追加",
+      "name_only_option": "表記「{name}」だけ入力",
+      "roles_label": "役割",
+      "pick_role": "役割を選ぶ",
+      "role_search": "役割を検索（日中英どれでも）",
+      "no_tracks_on": "クリア",
+      "remove_line": "この行を削除",
+      "add_line": "行を追加：",
+      "more_roles": "ほかの役割…",
+      "add_role": "役割を追加",
+      "no_tracks_hint": "まだトラックがありません。「ディスクとトラック」でトラックを追加してから、曲ごとに入力してください。",
+      "same_as_previous": "前の曲と同じ",
+      "same_confirm_title": "前の曲と同じにしますか？",
+      "same_confirm_desc": "この曲の今のクレジット {count} 件が、前の曲のものに置き換わります。",
+      "byline_title": "アーティスト・発売",
+      "byline_hint": "アルバム一覧のタイトルの下に出る1行を決めます",
+      "byline_more": "レーベル、販売元、製造元、企画",
+      "contributors": "担当者",
+      "view_label": "表示",
+      "view_by_role": "役割ごと",
+      "view_by_track": "曲ごと"
     },
     "editions": {
       "hint": "エディションは個別に買える形態です。初回限定盤と通常盤、CD と配信など。含まれるディスクにチェックを入れます。",
@@ -2549,14 +2593,7 @@
       "entry_edit": "関連作品を編集",
       "entry": "作品",
       "entry_required": "作品を選んでください。",
-      "credit_role": "役割",
-      "credit_artist": "アーティスト",
       "credited_as": "クレジット表記",
-      "credited_as_hint": "アーティスト名と違うときだけ入力。該当するアーティストがいなければ、ここだけ入力します。",
-      "credit_person_required": "アーティストを選ぶか、クレジット表記を入力してください。",
-      "credit_tracks_required": "曲を一つ以上選んでください。",
-      "credit_added": "{count} 件追加しました",
-      "add_another": "追加して続ける",
       "edition_edit": "エディションを編集",
       "edition_name": "エディション名",
       "edition_date_hint": "アルバムの発売日と違うときだけ入力。",
@@ -2564,8 +2601,6 @@
       "bonus_edit": "特典を編集",
       "digital": "デジタル",
       "new_disc": "新しい特典ディスク",
-      "shown_as": "「{name}」名義",
-      "credit_edit": "クレジットを編集",
       "name_only": "表記のみ",
       "image_url": "画像の URL",
       "image_url_hint": "画像の URL を貼り付け、プレビューを確認してから取り込んでください。",
@@ -2574,13 +2609,6 @@
       "image_kind_guess": "URL から推測",
       "new_artist_type": "新しいアーティストの種類",
       "new_artist_type_required": "新しいアーティストの種類を選んでください。"
-    },
-    "artist_examples": {
-      "title": "例：ジャケットの表記 → 入力のしかた",
-      "credited_placeholder": "例：Yuki Kajiura",
-      "featuring": "アーティストを二人追加：梶浦由記（つなぎは「feat.」）、続けて Joelle。",
-      "credited": "カタログ上が「梶浦由記」なら梶浦由記を選び、「クレジット表記」に Yuki Kajiura と入力。",
-      "circle": "サークル名だけの表記ならサークルのみ。作曲・歌唱などは「クレジット」に入力。"
     },
     "originals": {
       "title": "原曲",
@@ -2901,7 +2929,9 @@
       "about": "CDCatについて：コミュニティで編集する、同人音楽と日本の音楽のデータベース。",
       "terms": "CDCatの利用規約：利用のルール、投稿内容のライセンス（カタログデータはCC BY-SA 4.0）、コミュニティのルール、著作権侵害の通知方法。",
       "privacy": "CDCatのプライバシーポリシー：収集する情報とその利用方法、あなたの権利。広告なし、データの販売なし。",
-      "discussion_tag": "CDCatの掲示板で #{tag} が付いた話題。"
+      "discussion_tag": "CDCatの掲示板で #{tag} が付いた話題。",
+      "guide_design": "CDCat の設計：アルバム、アーティスト、イベント、エントリー、シリーズ、レコード、ディスカッション、記事の役割とつながり。",
+      "guide_editor": "CDCat エディターの使い方：アルバムの追加、曲目・クレジット・エディション・特典の入力、審査への提出、既存データの修正。"
     }
   }
 }

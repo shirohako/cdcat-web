@@ -398,28 +398,15 @@ export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'arti
   dedupeCredits(doc)
 }
 
-export function removeCreditGroup(doc: AlbumDocument, group: CreditGroup) {
-  const ids = new Set(group.rows.map(row => String(row.id)))
+export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
+  const ids = new Set(rows.map(row => String(row.id)))
   doc.credits = doc.credits.filter(row => !ids.has(String(row.id)))
 }
 
-/** Sets the tracks of a track-level group: rows of kept tracks keep their ids. */
-export function setCreditTracks(doc: AlbumDocument, group: CreditGroup, trackIds: RowId[]) {
-  const wanted = new Set(trackIds.map(String))
-  const removed = new Set(group.rows.filter(row => row.track_id === null || !wanted.has(String(row.track_id))).map(row => String(row.id)))
-  doc.credits = doc.credits.filter(row => !removed.has(String(row.id)))
-  const have = new Set(group.rows.filter(row => !removed.has(String(row.id))).map(row => String(row.track_id)))
-  const fields = { artist_id: group.artist_id, credited_as: group.credited_as, role: group.role, detail: group.detail }
-  const missing = trackIds.filter(id => !have.has(String(id)))
-  if (missing.length) addCredit(doc, fields, missing)
-}
-
-/** Moves a group between the whole album and tracks; going to tracks credits every track. */
-export function setCreditScope(doc: AlbumDocument, group: CreditGroup, album: boolean) {
-  if (group.album === album) return
-  const fields = { artist_id: group.artist_id, credited_as: group.credited_as, role: group.role, detail: group.detail }
-  removeCreditGroup(doc, group)
-  addCredit(doc, fields, album ? null : orderedTracks(doc).map(track => track.id))
+/** Changes these credit rows in place (their ids stay), dropping any that become duplicates of others. */
+export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>>) {
+  for (const row of rows) Object.assign(row, patch)
+  dedupeCredits(doc)
 }
 
 // ---- names in other languages -----------------------------------------------------------------

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { sectionNumber, sectionShift, type LegalSection } from '~/legal'
+import { sectionNumber, sectionShift, type DocSectionLink } from '~/documents/sections'
 
 /**
  * The desktop table of contents, a numbered list on a card beside the text. A soft block in the current section's
@@ -7,9 +7,8 @@ import { sectionNumber, sectionShift, type LegalSection } from '~/legal'
  * from the items' measured offsets, re-measured whenever the list changes size (titles wrap differently per language
  * and width). The parent makes the card sticky and reports `active`.
  */
-const props = defineProps<{ sections: LegalSection[], active: number }>()
+const props = defineProps<{ sections: DocSectionLink[], active: number, label: string }>()
 const emit = defineEmits<{ navigate: [id: string] }>()
-const { t } = useI18n()
 
 const scroller = useTemplateRef<HTMLElement>('scroller')
 const list = useTemplateRef<HTMLOListElement>('list')
@@ -51,10 +50,10 @@ function pick(event: MouseEvent, id: string) {
 </script>
 
 <template>
-  <nav :aria-label="t('legal.toc')" class="flex min-h-0 flex-col">
+  <nav :aria-label="label" class="flex min-h-0 flex-col">
     <p class="mx-1 flex items-center gap-2 border-b border-line px-2 pb-3 pt-2 text-sm font-semibold text-title">
       <Icon name="lucide:list-tree" class="size-4 text-meta" />
-      {{ t('legal.toc') }}
+      {{ label }}
     </p>
 
     <div ref="scroller" class="toc-scroller mt-2 min-h-0 flex-1 overflow-y-auto overscroll-contain">

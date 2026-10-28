@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { sectionNumber, sectionShift, type LegalSection } from '~/legal'
+import { sectionNumber, sectionShift } from '~/documents/sections'
+import type { LegalSection } from '~/legal'
 
 /**
  * One numbered section of a legal document, on its own card: its badge and heading in the section's own colour, a
@@ -56,9 +57,7 @@ async function copyLink() {
       </span>{{ section.summary }}
     </p>
 
-    <div class="body mt-5">
-      <RichContent :content="section.body" format="markdown" size="base" />
-    </div>
+    <DocProse :content="section.body" class="mt-5" />
   </section>
 </template>
 
@@ -87,99 +86,6 @@ async function copyLink() {
 @media (prefers-reduced-motion: reduce) {
   .badge.is-flashing {
     animation: none;
-  }
-}
-
-/*
- * Tables in the text: framed, full width, a tinted header row, the first column naming each row. Once the text is
- * too narrow for the columns, each row stacks into a block of its own, the values named by the cells' data-label
- * (set by the Markdown renderer).
- */
-.body {
-  container: legal-body / inline-size;
-}
-
-.body :deep(table) {
-  display: table;
-  width: 100%;
-  border: 1px solid var(--line);
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: 6px;
-  font-size: 14px;
-  line-height: 1.65;
-}
-
-.body :deep(:is(th, td)) {
-  padding: 0.7rem 0.9rem;
-}
-
-.body :deep(th) {
-  border-bottom: 1px solid var(--line);
-  padding-block: 0.5rem;
-  background: var(--sunken);
-  color: var(--meta);
-  font-size: 12px;
-  font-weight: 600;
-}
-
-/* The header's tint stays inside the frame's rounded corners. */
-.body :deep(th:first-child) {
-  border-top-left-radius: 5px;
-}
-
-.body :deep(th:last-child) {
-  border-top-right-radius: 5px;
-}
-
-.body :deep(td) {
-  border-bottom: 1px solid var(--line);
-  color: var(--body);
-}
-
-.body :deep(tr:last-child td) {
-  border-bottom: 0;
-}
-
-.body :deep(td:first-child) {
-  min-width: 6em;
-  color: var(--title);
-  font-weight: 600;
-}
-
-@container legal-body (max-width: 34rem) {
-  .body :deep(:is(table, tbody, tr, td)) {
-    display: block;
-  }
-
-  .body :deep(thead) {
-    display: none;
-  }
-
-  .body :deep(tr) {
-    padding: 0.75rem 0.9rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .body :deep(tr:last-child) {
-    border-bottom: 0;
-  }
-
-  .body :deep(td) {
-    padding: 0;
-    border: 0;
-  }
-
-  .body :deep(td + td) {
-    margin-top: 0.5rem;
-  }
-
-  .body :deep(td:not(:first-child)[data-label]::before) {
-    content: attr(data-label);
-    display: block;
-    color: var(--meta);
-    font-size: 12px;
-    font-weight: 600;
   }
 }
 </style>

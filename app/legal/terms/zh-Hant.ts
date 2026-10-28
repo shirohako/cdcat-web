@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL, DATA_LICENSE, MIN_AGE, NOTICE_DAYS, REQUEST_DAYS } from '../constants'
-import { md, type LegalContent } from '../types'
+import { md } from '~/documents/sections'
+import type { LegalContent } from '../types'
 
 export default {
   intro: '這份條款說明使用 CDCat 的規則：你可以期待我們做什麼，我們希望你遵守什麼，以及你貢獻的內容可以如何被使用。每一節開頭都有一段白話摘要。',

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   addBonus, addCredit, addDisc, addProduct, addTrack, coverOf, creditGroups, emptyAlbumDocument, importTracklist,
   missingRequired, moveDisc, moveTrack, moveTrackToDisc, orderedTracks, pruneAlbumDocument, removeBonus, removeDisc,
-  removeProduct, removeTrack, setCover, setCreditScope, setCreditTracks, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
+  removeProduct, removeTrack, setCover, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
   tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument,
 } from '../../app/utils/albumDocument'
 import { parseTracklist } from '../../app/utils/tracklistParser'
@@ -132,18 +132,13 @@ describe('credits', () => {
     const [a, b, c] = orderedTracks(doc)
     addCredit(doc, { artist_id: 3, credited_as: null, role: 'composer', detail: null }, [a!.id, b!.id])
     addCredit(doc, { artist_id: 3, credited_as: null, role: 'lyricist', detail: null }, [a!.id])
-    let groups = creditGroups(doc)
-    expect(groups.map(group => [group.role, group.trackIds.length])).toEqual([['composer', 2], ['lyricist', 1]])
+    addCredit(doc, { artist_id: 3, credited_as: null, role: 'lyricist', detail: null }, [c!.id])
+    const groups = creditGroups(doc)
+    expect(groups.map(group => [group.role, group.trackIds.length])).toEqual([['composer', 2], ['lyricist', 2]])
 
-    setCreditTracks(doc, groups[0]!, [b!.id, c!.id])
-    groups = creditGroups(doc)
-    expect(groups[0]!.trackIds).toEqual([b!.id, c!.id])
-
+    // Edited into the same group as another, the rows that become duplicates go.
     updateCreditGroup(doc, groups[1]!, { role: 'composer' })
     expect(creditGroups(doc).map(group => [group.role, group.trackIds.length])).toEqual([['composer', 3]])
-
-    setCreditScope(doc, creditGroups(doc)[0]!, true)
-    expect(doc.credits.map(credit => credit.track_id)).toEqual([null])
   })
 })
 

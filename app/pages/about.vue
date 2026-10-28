@@ -414,7 +414,7 @@ const guides = computed(() => [
     tag: t('about_page.guide_basics_tag'),
     title: t('about_page.guide_basics_title'),
     desc: t('about_page.guide_basics_desc'),
-    link: null as string | null,
+    link: '/help/design' as string | null,
     art: AboutArtRoles,
     shift: -50
   },
@@ -432,7 +432,7 @@ const guides = computed(() => [
     tag: t('about_page.guide_submit_tag'),
     title: t('about_page.guide_submit_title'),
     desc: t('about_page.guide_submit_desc'),
-    link: null as string | null,
+    link: '/help/editor' as string | null,
     art: AboutArtSubmit,
     shift: 50
   }

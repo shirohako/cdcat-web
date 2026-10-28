@@ -35,14 +35,16 @@
       ><X :size="13" /></button>
     </span>
 
-    <!-- Rendered on <body> so sections and dialogs with overflow-hidden don't clip it. -->
+    <!-- Rendered on <body> so sections and dialogs with overflow-hidden don't clip it. Above popovers, and one of
+         their layers, so a search inside a popover's card neither hides under it nor closes it when picked from. -->
     <Teleport to="body">
       <div
         v-if="expanded"
         :id="listId"
         ref="panel"
         role="listbox"
-        class="fixed z-[60] overflow-y-auto rounded-xl bg-popover py-1 shadow-overlay ring-1 ring-line"
+        data-ui-layer
+        class="fixed z-[90] overflow-y-auto rounded-xl bg-popover py-1 shadow-overlay ring-1 ring-line"
         :style="panelStyle"
         @mousedown.prevent
       >
@@ -51,7 +53,7 @@
         <p v-else-if="stale && !results.length" class="px-3 py-2 text-xs text-meta">{{ $t('catalog.form.searching') }}</p>
         <p v-else-if="!results.length" class="px-3 py-2 text-xs text-meta">{{ $t('catalog.form.no_results') }}</p>
 
-        <template v-for="(option, index) in options" :key="option.kind === 'item' ? option.item.id : 'create'">
+        <template v-for="(option, index) in options" :key="option.kind === 'item' ? option.item.id : option.kind">
           <div
             v-if="option.kind === 'item'"
             :id="optionId(index)"
@@ -78,12 +80,13 @@
             :id="optionId(index)"
             role="option"
             :aria-selected="index === active"
-            class="flex cursor-pointer items-center gap-2 border-t border-line px-3 py-2 text-sm text-primary"
-            :class="{ 'bg-ghost-hover': index === active }"
+            class="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm"
+            :class="[option.kind === 'create' ? 'border-t border-line text-primary' : 'text-body', { 'bg-ghost-hover': index === active }]"
             @mousemove="active = index"
             @click="choose(option)"
           >
-            <Plus :size="14" class="shrink-0" /><span class="truncate">{{ $t(createLabel ?? 'editor.create_new', { name: option.name }) }}</span>
+            <component :is="option.kind === 'create' ? Plus : Quote" :size="14" class="shrink-0" />
+            <span class="truncate">{{ option.kind === 'create' ? $t(createLabel ?? 'editor.create_new', { name: option.name }) : $t('editor.credits.name_only_option', { name: option.name }) }}</span>
           </div>
         </template>
       </div>
@@ -94,7 +97,7 @@
 <script setup lang="ts">
 import type { EventOption } from '~/composables/useEventSearch'
 import type { DatePrecision } from '~/types/entry'
-import { Loader2, Plus, Search, X } from '@lucide/vue'
+import { Loader2, Plus, Quote, Search, X } from '@lucide/vue'
 
 export type PickerKind = 'artist' | 'track' | 'entry' | 'album' | 'franchise' | 'event'
 
@@ -118,10 +121,12 @@ const props = defineProps<{
   allowCreate?: boolean
   /** The i18n key of the "create" option, given `name`; "Create {name}" by default. */
   createLabel?: string
+  /** Also offer to keep just the typed name, for credits with no artist behind them yet. */
+  allowName?: boolean
   /** Leave out content awaiting review (e.g. merge targets); editors include it by default. */
   excludePending?: boolean
 }>()
-const emit = defineEmits<{ select: [item: PickedEntity], create: [name: string] }>()
+const emit = defineEmits<{ select: [item: PickedEntity], create: [name: string], name: [name: string] }>()
 
 const { $api } = useNuxtApp()
 const { t } = useI18n()
@@ -146,11 +151,12 @@ const term = computed(() => query.value.trim())
 const stale = computed(() => resultsFor.value !== term.value)
 const expanded = computed(() => open.value && term.value.length > 0)
 
-type Option = { kind: 'item', item: PickedEntity } | { kind: 'create', name: string }
+type Option = { kind: 'item', item: PickedEntity } | { kind: 'create' | 'name', name: string }
 const options = computed<Option[]>(() => {
   const list: Option[] = term.value.length < 2 ? [] : results.value.map(item => ({ kind: 'item', item }))
   // Offering "create" before the search has answered invites duplicates.
   if (props.allowCreate && term.value && (term.value.length < 2 || !stale.value)) list.push({ kind: 'create', name: term.value })
+  if (props.allowName && term.value && (term.value.length < 2 || !stale.value)) list.push({ kind: 'name', name: term.value })
   return list
 })
 
@@ -248,7 +254,8 @@ const reset = () => {
 
 const choose = (option: Option) => {
   if (option.kind === 'item') emit('select', option.item)
-  else emit('create', option.name)
+  else if (option.kind === 'create') emit('create', option.name)
+  else emit('name', option.name)
   reset()
   // Focus stays here so the next one can be typed straight away; typing reopens the list.
   open.value = false

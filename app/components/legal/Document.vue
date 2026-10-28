@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { sectionShift, type LegalDoc, type LegalKind } from '~/legal'
+import { sectionShift } from '~/documents/sections'
+import type { LegalDoc, LegalKind } from '~/legal'
 import { CONTACT_EMAIL } from '~/legal/constants'
 
 /**
  * A legal document page, all on cards: the hero (title, intro, an illustration, the dates and the terms/privacy
  * switch), four "at a glance" tiles, then the table of contents beside the numbered sections and two closing cards.
- *
- * It tracks the reading position for both tables of contents: the current section is the last one whose top has
- * passed the reading line (just under the navbar, and under the mobile contents bar below lg), and how far through the
- * whole text the reader is (the mobile bar's progress line). A pick from the contents scrolls smoothly and writes the
- * #hash with history.replaceState (router.replace would make router.options.ts jump there instead); while that scroll
- * runs, the current section stays the picked one.
+ * useDocReading follows the reading position for both tables of contents.
  */
 const props = defineProps<{ doc: LegalDoc, kind: LegalKind }>()
 const { t, locale } = useI18n()
@@ -31,107 +27,7 @@ const sectionIndex = computed(() => new Map(props.doc.sections.map((section, ind
 const root = useTemplateRef<HTMLElement>('root')
 const content = useTemplateRef<HTMLElement>('content')
 useRevealOnScroll(root)
-
-const active = ref(0)
-const progress = ref(0)
-const flashId = ref<string | null>(null)
-
-// The reading line: the fixed navbar, a little air, and below lg the sticky contents bar.
-const NAVBAR = 64
-const AIR = 16
-const BAR = 60
-let wide: MediaQueryList | undefined
-const readingLine = () => NAVBAR + AIR + (wide?.matches ? 0 : BAR)
-const clamp = (value: number) => Math.min(1, Math.max(0, value))
-
-let frame = 0
-let locked = false
-let unlockTimer: ReturnType<typeof setTimeout> | undefined
-let flashTimer: ReturnType<typeof setTimeout> | undefined
-
-function track() {
-  frame = 0
-  const box = content.value
-  const elements = props.doc.sections.map(section => document.getElementById(section.id))
-  if (!box || elements.some(element => !element)) return
-  const line = readingLine()
-  const tops = elements.map(element => element!.getBoundingClientRect().top)
-  const bounds = box.getBoundingClientRect()
-  const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2
-
-  if (!locked) {
-    let index = 0
-    tops.forEach((top, at) => { if (top - line <= 1) index = at })
-    active.value = atBottom ? elements.length - 1 : index
-  }
-  progress.value = atBottom ? 1 : clamp((line - bounds.top) / Math.max(1, bounds.height - (window.innerHeight - line)))
-}
-const scheduleTrack = () => { frame ||= requestAnimationFrame(track) }
-
-function unlockWhenSettled() {
-  clearTimeout(unlockTimer)
-  const unlock = () => {
-    locked = false
-    clearTimeout(unlockTimer)
-    window.removeEventListener('scrollend', unlock)
-    scheduleTrack()
-  }
-  window.addEventListener('scrollend', unlock, { once: true })
-  // No scrollend when the target is already in place, or in browsers without the event.
-  unlockTimer = setTimeout(unlock, 1000)
-}
-
-function navigate(id: string) {
-  const target = document.getElementById(id)
-  if (!target) return
-  const index = sectionIndex.value.get(id)
-  if (index !== undefined) {
-    active.value = index
-    locked = true
-    unlockWhenSettled()
-    flashId.value = id
-    clearTimeout(flashTimer)
-    flashTimer = setTimeout(() => { flashId.value = null }, 900)
-  }
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - readingLine() + 1, behavior: reduced ? 'auto' : 'smooth' })
-  history.replaceState(history.state, '', `#${encodeURIComponent(id)}`)
-}
-
-/**
- * RichContent renders plain <a> elements: without this, a #section link would jump and a link to the other document
- * would reload the whole site. Links that handled their own click (the contents, NuxtLinks) are left alone.
- */
-function followLink(event: MouseEvent) {
-  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
-  const link = (event.target as Element).closest('a')
-  const href = link?.getAttribute('href')
-  if (!link || !href || link.target === '_blank') return
-  if (href.startsWith('#')) {
-    event.preventDefault()
-    navigate(decodeURIComponent(href.slice(1)))
-  }
-  else if (href.startsWith('/') && !href.startsWith('//')) {
-    event.preventDefault()
-    void navigateTo(href)
-  }
-}
-
-onMounted(() => {
-  wide = window.matchMedia('(min-width: 1024px)')
-  window.addEventListener('scroll', scheduleTrack, { passive: true })
-  window.addEventListener('resize', scheduleTrack, { passive: true })
-  track()
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', scheduleTrack)
-  window.removeEventListener('resize', scheduleTrack)
-  cancelAnimationFrame(frame)
-  clearTimeout(unlockTimer)
-  clearTimeout(flashTimer)
-})
-// A new language moves every section.
-watch(() => props.doc, () => nextTick(track))
+const { active, progress, flashId, navigate, followLink } = useDocReading(content, () => props.doc.sections.map(section => section.id))
 </script>
 
 <template>
@@ -201,20 +97,22 @@ watch(() => props.doc, () => nextTick(track))
 
     <div class="mt-10 lg:mt-12 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-5 xl:grid-cols-[16rem_minmax(0,1fr)]">
       <aside class="hidden rounded-lg bg-card p-2 lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100vh-6rem)] lg:self-start">
-        <LegalToc
+        <DocToc
           class="w-full"
           :sections="doc.sections"
           :active="active"
+          :label="t('legal.toc')"
           @navigate="navigate"
         />
       </aside>
 
       <div class="min-w-0">
-        <LegalTocBar
+        <DocTocBar
           class="lg:hidden"
           :sections="doc.sections"
           :active="active"
           :progress="progress"
+          :label="t('legal.toc')"
           @navigate="navigate"
         />
         <div ref="content" class="space-y-4 pt-2 md:space-y-5 lg:pt-0">

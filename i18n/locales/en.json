@@ -849,14 +849,14 @@
     "guides_title": "Contributor guides",
     "guides_desc": "Start here if you would like to help edit the database.",
     "guide_basics_tag": "Site basics",
-    "guide_basics_title": "Roles, permissions, and review",
-    "guide_basics_desc": "Learn how contributions move through CDCat.",
+    "guide_basics_title": "How CDCat is designed",
+    "guide_basics_desc": "What albums, artists, events, entries and the rest are, and how they connect.",
     "guide_research_tag": "Research",
     "guide_research_title": "How to research music online",
     "guide_research_desc": "What to look for before contributing metadata.",
     "guide_submit_tag": "Submission guide",
     "guide_submit_title": "Add releases and correct errors",
-    "guide_submit_desc": "Learn how CDCat reviews music metadata.",
+    "guide_submit_desc": "How to use the editor, from adding an album to correcting one, and what every option means.",
     "docs_title": "Build it with us",
     "docs_desc": "CDCat's website frontend is open source on GitHub. If you can code, come help make it better.",
     "api_docs": "Public API",
@@ -895,6 +895,15 @@
     "questions_text": "Write to us about these terms or your data.",
     "next_doc": "Read next",
     "read_next": "Start reading"
+  },
+  "guide": {
+    "updated": "Updated",
+    "source_language": "Only in Simplified Chinese for now",
+    "switch_label": "Switch guide",
+    "toc": "Contents",
+    "questions_title": "Still have questions?",
+    "questions_text": "Ask in the forum, or tell us what this guide leaves unclear.",
+    "ask": "Go to the forum"
   },
   "home": {
     "hero_title": "Find your coordinates in a sky full of sound",
@@ -2305,7 +2314,8 @@
       "type": "Album type",
       "release_date": "Release date",
       "cover": "Square cover",
-      "tracks": "At least one track"
+      "tracks": "At least one track",
+      "artist_types": "Types of new artists ({count})"
     },
     "suggested_item": {
       "byline": "Artist or publisher",
@@ -2385,6 +2395,25 @@
       "apply": "Apply",
       "applied": "{added} added, {updated} updated"
     },
+    "paste_credits": {
+      "button": "Paste credits",
+      "title": "Paste credits",
+      "hint": "Paste a whole credit list from the booklet or a shop page, one role per line, like “Composer & Arranger: Minato (M1–M3), Yuki (M4)”. Track numbers in brackets are the tracks someone worked on; without them it is the whole album. The lines under “01. Title” are that track’s, up to a blank line, and numbers after “Disc 2” are on disc 2.",
+      "existing": "Existing artists",
+      "new": "New artist",
+      "namesakes": "{count} artists of this name",
+      "missing_tracks": "No such tracks: {tracks}",
+      "nothing": "No credits found in this text. Write each line as “Role: name”.",
+      "skipped": "Line {lines} wasn’t understood and won’t be added",
+      "looking": "Looking up artists…",
+      "unsettled": "Yellow rows aren’t settled and won’t be added",
+      "apply": "Add {count}",
+      "added": "Added {count} credits",
+      "col_role": "Role",
+      "col_who": "Who",
+      "col_tracks": "Tracks",
+      "unknown_roles": "Not recognised: {words}"
+    },
     "toc": {
       "button": "Disc TOC, for CD rippers",
       "title": "TOC of disc {n}",
@@ -2397,23 +2426,38 @@
       "add": "Add TOC"
     },
     "credits": {
-      "hint": "One row per person and role. Credit the whole album, or pick the tracks.",
+      "hint": "Start with the byline and publisher, then everyone else: line by line by role, or track by track.",
       "whole_album": "Whole album",
-      "on_tracks": "Tracks",
-      "all_tracks": "All tracks",
-      "no_tracks": "No tracks",
-      "none": "No credits yet.",
-      "add": "Add a credit",
+      "none": "No other credits yet. Start a line with a role below, or paste a whole credit list.",
       "pick_artist": "Pick or create an artist…",
-      "name_only": "Or just the printed name",
       "link_artist": "Link an artist",
       "unlink_artist": "Unlink the artist and keep the name",
-      "scope": "Credited on",
-      "existing": "Existing",
-      "by_person": "By person",
-      "by_role": "By role",
-      "by_track": "By track",
-      "role_level": "This role is not used at this level"
+      "printed_as": "printed as “{name}”",
+      "pick_type": "Pick a type",
+      "remove_person": "Remove {name}",
+      "printed_hint": "Only when it differs from the artist’s name",
+      "detail_hint": "Instrument, character voiced…",
+      "add_person": "Add a person",
+      "name_only_option": "Use the name “{name}” only",
+      "roles_label": "Roles",
+      "pick_role": "Pick a role",
+      "role_search": "Search roles in any language",
+      "no_tracks_on": "Clear",
+      "remove_line": "Remove this line",
+      "add_line": "Add a line:",
+      "more_roles": "More roles…",
+      "add_role": "Add a role",
+      "no_tracks_hint": "There are no tracks yet. Add them under Discs & tracks, then fill this in by track.",
+      "same_as_previous": "Same as previous",
+      "same_confirm_title": "Make it the same as the previous track?",
+      "same_confirm_desc": "The {count} credits this track has now will be replaced with the previous track’s.",
+      "byline_title": "Byline & release",
+      "byline_hint": "What album lists show under the title",
+      "byline_more": "Label, distributor, manufacturer, planning",
+      "contributors": "Contributors",
+      "view_label": "View",
+      "view_by_role": "By role",
+      "view_by_track": "By track"
     },
     "editions": {
       "hint": "An edition is a version you can buy, e.g. limited and regular, or CD and download. Tick the discs it contains.",
@@ -2549,14 +2593,7 @@
       "entry_edit": "Edit linked title",
       "entry": "Title",
       "entry_required": "Choose a title.",
-      "credit_role": "Role",
-      "credit_artist": "Artist",
       "credited_as": "Credited as",
-      "credited_as_hint": "Only when it differs from the artist’s name. With no artist to link, fill in just this.",
-      "credit_person_required": "Choose an artist or enter the credited name.",
-      "credit_tracks_required": "Choose at least one track.",
-      "credit_added": "{count} added",
-      "add_another": "Add another",
       "edition_edit": "Edit edition",
       "edition_name": "Edition name",
       "edition_date_hint": "Only when it differs from the album’s release date.",
@@ -2564,8 +2601,6 @@
       "bonus_edit": "Edit bonus",
       "digital": "Digital",
       "new_disc": "New bonus disc",
-      "shown_as": "credited as “{name}”",
-      "credit_edit": "Edit credit",
       "name_only": "Name only",
       "image_url": "Image address",
       "image_url_hint": "Paste the image’s address and check the preview before importing.",
@@ -2574,13 +2609,6 @@
       "image_kind_guess": "Guess from the address",
       "new_artist_type": "Type of the new artist",
       "new_artist_type_required": "Choose the new artist’s type."
-    },
-    "artist_examples": {
-      "title": "Examples: printed on the cover → what to enter",
-      "credited_placeholder": "e.g. Yuki Kajiura",
-      "featuring": "Add two artists: Yuki Kajiura with the join phrase “feat.”, then Joelle.",
-      "credited": "When the catalog lists her as 梶浦由記, choose that artist and enter Yuki Kajiura under “Credited as”.",
-      "circle": "When only the circle is printed, enter just the circle; composers and singers go under Credits."
     },
     "originals": {
       "title": "Originals",
@@ -2901,7 +2929,9 @@
       "about": "About CDCat, a community-edited database of doujin and Japanese music.",
       "terms": "CDCat's Terms of Service: the rules for using the site, how contributions are licensed (catalog data under CC BY-SA 4.0), community rules and copyright complaints.",
       "privacy": "CDCat's Privacy Policy: what we collect, how we use it and your rights. No ads, and we never sell your data.",
-      "discussion_tag": "Topics tagged #{tag} in the CDCat forum."
+      "discussion_tag": "Topics tagged #{tag} in the CDCat forum.",
+      "guide_design": "How CDCat is designed: what albums, artists, events, entries, series, vinyl, discussions and articles are for, and how they connect.",
+      "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data."
     }
   }
 }

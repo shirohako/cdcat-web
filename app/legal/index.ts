@@ -38,17 +38,4 @@ function warnOnClashingIds(kind: LegalKind, content: LegalContent) {
   }
 }
 
-// The about page's hue turns, cycled, so neighbouring sections never share a colour (see .accent in ui.css).
-const SHIFTS = [0, 80, 150, -90, 40, -60, 190]
-
-/** The --shift of the section at `index`, for its badge, its table of contents entry and its summary. */
-export function sectionShift(index: number): number {
-  return SHIFTS[index % SHIFTS.length]!
-}
-
-/** "01", "02" …: section numbers, as the table of contents and the badges show them. */
-export function sectionNumber(index: number): string {
-  return String(index + 1).padStart(2, '0')
-}
-
 export type { LegalDoc, LegalKind, LegalSection } from './types'

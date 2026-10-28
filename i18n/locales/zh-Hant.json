@@ -849,14 +849,14 @@
     "guides_title": "使用說明",
     "guides_desc": "如果想參與編輯，可以先從以下內容開始。",
     "guide_basics_tag": "網站基礎",
-    "guide_basics_title": "使用者群組、權限與審核流程",
-    "guide_basics_desc": "了解 CDCat 的基本貢獻流程。",
+    "guide_basics_title": "了解 CDCat 的設計",
+    "guide_basics_desc": "專輯、藝術家、活動、條目……各是什麼，又怎樣連在一起。",
     "guide_research_tag": "資料蒐集",
     "guide_research_title": "如何從網路尋找音樂資料",
     "guide_research_desc": "提交資料前應了解的研究方式。",
     "guide_submit_tag": "提交規範",
     "guide_submit_title": "新增專輯與修正錯誤",
-    "guide_submit_desc": "了解 CDCat 如何審核音樂資料。",
+    "guide_submit_desc": "編輯器怎麼用：從新增專輯到修正錯誤，每個選項是什麼意思。",
     "docs_title": "一起開發",
     "docs_desc": "CDCat 的網站前端已在 GitHub 開源，歡迎會寫程式的朋友一起改進。",
     "api_docs": "開放介面（API）",
@@ -895,6 +895,15 @@
     "questions_text": "關於這些條款或你的資料，歡迎寫信給我們。",
     "next_doc": "繼續閱讀",
     "read_next": "前往閱讀"
+  },
+  "guide": {
+    "updated": "更新於",
+    "source_language": "這份說明暫時只有簡體中文版",
+    "switch_label": "切換說明",
+    "toc": "目錄",
+    "questions_title": "還有疑問？",
+    "questions_text": "到討論區提問，或者告訴我們說明裡哪裡沒講清楚。",
+    "ask": "前往討論區"
   },
   "home": {
     "hero_title": "探索繁星閃耀的夜空，找到屬於你的聲音座標",
@@ -2305,7 +2314,8 @@
       "type": "專輯類型",
       "release_date": "發行日期",
       "cover": "正方形封面",
-      "tracks": "至少一首曲目"
+      "tracks": "至少一首曲目",
+      "artist_types": "新藝術家的類型（{count} 位）"
     },
     "suggested_item": {
       "byline": "署名藝術家或發行",
@@ -2385,6 +2395,25 @@
       "apply": "套用",
       "applied": "新增 {added} 首，更新 {updated} 首"
     },
+    "paste_credits": {
+      "button": "貼上人員表",
+      "title": "貼上人員表",
+      "hint": "把歌詞本或商店頁面上的人員表整段貼進來，每行一個角色，如「作曲・編曲：ミナト（M1–M3）、Yuki（M4）」。括號裡的曲號是參與的曲目，沒有就是整張專輯；「01. 曲名」下面幾行算這首曲目的，空一行結束；「Disc 2」之後的曲號在第 2 張碟上。",
+      "existing": "已有的藝術家",
+      "new": "新增藝術家",
+      "namesakes": "同名的有 {count} 位",
+      "missing_tracks": "沒有這些曲目：{tracks}",
+      "nothing": "這段文字裡沒有認出人員。每行要寫成「角色：名字」。",
+      "skipped": "第 {lines} 行沒有認出來，不會加進去",
+      "looking": "正在查找藝術家…",
+      "unsettled": "標黃的行還沒選好，不會加進去",
+      "apply": "新增 {count} 條",
+      "added": "已新增 {count} 條",
+      "col_role": "角色",
+      "col_who": "誰",
+      "col_tracks": "曲目",
+      "unknown_roles": "沒認出：{words}"
+    },
     "toc": {
       "button": "碟片 TOC（供抓軌軟體使用）",
       "title": "Disc {n} 的 TOC",
@@ -2397,23 +2426,38 @@
       "add": "新增 TOC"
     },
     "credits": {
-      "hint": "每人每個角色一行。可以署名在整張專輯上，也可以選擇曲目。",
+      "hint": "先填署名與發行，再填其他參與創作的人：可以按角色一行一行填，也可以按曲目填。",
       "whole_album": "整張專輯",
-      "on_tracks": "部分曲目",
-      "all_tracks": "全部曲目",
-      "no_tracks": "沒有曲目",
-      "none": "還沒有參與創作的人。",
-      "add": "新增參與創作的人",
+      "none": "還沒有其他參與創作的人。點下面的角色新增一行，或者用「貼上人員表」一次貼進來。",
       "pick_artist": "選擇或新建藝術家…",
-      "name_only": "或者只填署名",
       "link_artist": "關聯藝術家",
       "unlink_artist": "取消關聯，保留署名",
-      "scope": "署名範圍",
-      "existing": "已有",
-      "by_person": "按人分組",
-      "by_role": "按角色分組",
-      "by_track": "按曲目分組",
-      "role_level": "這個角色不用在這一層"
+      "printed_as": "印作「{name}」",
+      "pick_type": "選類型",
+      "remove_person": "移除 {name}",
+      "printed_hint": "和藝術家名字不同時才填",
+      "detail_hint": "樂器、所配的角色……",
+      "add_person": "新增人",
+      "name_only_option": "只填署名「{name}」",
+      "roles_label": "角色",
+      "pick_role": "選擇角色",
+      "role_search": "搜尋角色，中英日都可以",
+      "no_tracks_on": "清空",
+      "remove_line": "刪除這一行",
+      "add_line": "新增一行：",
+      "more_roles": "更多角色…",
+      "add_role": "新增角色",
+      "no_tracks_hint": "還沒有曲目。先在「碟片與曲目」裡新增曲目，再按曲目填寫。",
+      "same_as_previous": "和上一首相同",
+      "same_confirm_title": "換成和上一首相同？",
+      "same_confirm_desc": "這首曲目現有的 {count} 條會換成上一首的人員。",
+      "byline_title": "署名與發行",
+      "byline_hint": "決定專輯標題下面顯示的那一行",
+      "byline_more": "廠牌、經銷、製造、企劃",
+      "contributors": "參與創作",
+      "view_label": "檢視方式",
+      "view_by_role": "按角色",
+      "view_by_track": "按曲目"
     },
     "editions": {
       "hint": "版本是能單獨買到的一種形態，例如初回限定盤和通常盤、CD 和數位版。勾選它包含的碟。",
@@ -2549,14 +2593,7 @@
       "entry_edit": "編輯關聯作品",
       "entry": "作品",
       "entry_required": "請選擇作品。",
-      "credit_role": "角色",
-      "credit_artist": "藝術家",
       "credited_as": "署名",
-      "credited_as_hint": "和藝術家名稱不同時才填；沒有對應的藝術家時只填這裡。",
-      "credit_person_required": "請選擇藝術家，或者填寫署名。",
-      "credit_tracks_required": "至少選一首曲目。",
-      "credit_added": "已新增 {count} 筆",
-      "add_another": "新增並繼續",
       "edition_edit": "編輯版本",
       "edition_name": "版本名稱",
       "edition_date_hint": "和專輯發售日不同時才填。",
@@ -2564,8 +2601,6 @@
       "bonus_edit": "編輯特典",
       "digital": "數位",
       "new_disc": "新特典碟",
-      "shown_as": "署名為「{name}」",
-      "credit_edit": "編輯參與創作的人",
       "name_only": "僅署名",
       "image_url": "圖片網址",
       "image_url_hint": "貼上圖片的網址，確認預覽無誤後匯入。",
@@ -2574,13 +2609,6 @@
       "image_kind_guess": "按網址猜測",
       "new_artist_type": "新藝術家的類型",
       "new_artist_type_required": "請選擇新藝術家的類型。"
-    },
-    "artist_examples": {
-      "title": "範例：封面上印的 → 怎麼填",
-      "credited_placeholder": "如 Yuki Kajiura",
-      "featuring": "新增兩位藝術家：先加梶浦由記，連接詞選「feat.」；再加 Joelle。",
-      "credited": "資料庫裡叫「梶浦由記」時，選擇梶浦由記，「署名為」填 Yuki Kajiura。",
-      "circle": "封面只印社團名時只填社團；作曲、演唱等寫在「參與創作的人」裡。"
     },
     "originals": {
       "title": "原曲",
@@ -2901,7 +2929,9 @@
       "about": "認識 CDCat：專注同人與日系音樂、由社群共同編輯的音樂資料庫。",
       "terms": "CDCat 服務條款：使用規則、貢獻內容的授權（資料庫資料以 CC BY-SA 4.0 分享）、社群規則與版權檢舉流程。",
       "privacy": "CDCat 隱私政策：我們蒐集哪些資料、如何使用，以及你的權利。不放廣告，不出售資料。",
-      "discussion_tag": "CDCat 討論區中標記為 #{tag} 的話題。"
+      "discussion_tag": "CDCat 討論區中標記為 #{tag} 的話題。",
+      "guide_design": "CDCat 是怎樣設計的：專輯、藝術家、活動、條目、系列、黑膠、討論和文章各做什麼，彼此怎樣關聯。",
+      "guide_editor": "CDCat 編輯器使用說明：怎樣新增專輯，填寫曲目、參與創作的人、版本和特典，提交審核，以及修正已有的資料。"
     }
   }
 }
