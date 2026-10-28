@@ -34,7 +34,7 @@ const choose = (event: MouseEvent) => {
     :type="to && !disabled ? undefined : 'button'"
     :disabled="to && !disabled ? undefined : disabled"
     role="menuitem"
-    class="group relative flex w-full items-center gap-2.5 rounded-lg px-3 py-1.5 text-left text-sm transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-45"
+    class="group relative flex w-full items-center gap-2.5 rounded-sm px-3 py-1.5 text-left text-sm transition-colors duration-150 ease-out disabled:cursor-not-allowed disabled:opacity-45"
     :class="danger
       ? 'text-danger hover:bg-danger/10'
       : active ? 'bg-primary/15 font-semibold text-primary' : glide ? 'text-body hover:text-title' : 'text-body hover:bg-ghost-hover hover:text-title'"

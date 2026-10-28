@@ -583,7 +583,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
             :key="definition.name"
             type="button"
             role="menuitem"
-            class="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover focus:bg-ghost-hover focus:outline-none"
+            class="flex w-full items-center gap-2.5 rounded-sm px-2.5 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover focus:bg-ghost-hover focus:outline-none"
             @click="insertContainer(definition.name); close()"
           >
             <span class="grid size-8 shrink-0 place-items-center rounded-lg" :class="containerMenuMeta[definition.name].iconClass">

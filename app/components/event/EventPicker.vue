@@ -23,7 +23,7 @@
         :aria-label="t('event_picker.placeholder')"
         class="input input-sm w-full pl-8"
       >
-      <ul v-if="search.trim()" class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg bg-popover py-1 shadow-overlay ring-1 ring-line">
+      <ul v-if="search.trim()" class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-md bg-popover py-1 shadow-overlay ring-1 ring-line">
         <li v-if="searching" class="px-3 py-2 text-xs text-meta">{{ t('event_picker.searching') }}</li>
         <li v-else-if="!results.length" class="px-3 py-2 text-xs text-meta">{{ t('event_picker.no_results') }}</li>
         <li v-for="event in results" :key="event.id">

@@ -80,53 +80,47 @@ const ago = (value: string) => {
         {{ unread > 99 ? '99+' : unread }}
       </span>
     </button>
-    <transition name="dropdown">
-      <!-- On phones it spans the screen under the navbar, as the search box does; the bell isn't at the right edge. -->
-      <div
-        v-if="open"
-        class="fixed inset-x-4 top-[4.5rem] overflow-hidden rounded-xl bg-popover shadow-overlay ring-1 ring-line
-               sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80"
-      >
-        <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
-          <span class="text-sm font-semibold text-title">{{ t('notifications.title') }}</span>
-          <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors hover:text-primary" @click="markRead(null)">
-            <CheckCheck :size="13" />{{ t('notifications.mark_all') }}
-          </button>
-        </div>
-        <!-- Loading: rows shaped like the notifications, shimmering. -->
-        <SkeletonStatus v-if="loading" class="divide-y divide-line">
-          <div v-for="row in 3" :key="row" class="flex gap-2.5 px-4 py-3">
-            <div class="skeleton mt-1.5 size-2 shrink-0 rounded-full" />
-            <div class="flex-1 space-y-1.5">
-              <div class="skeleton h-3 w-11/12 rounded-full" />
-              <div class="skeleton h-2.5 w-1/3 rounded-full" />
-            </div>
-          </div>
-        </SkeletonStatus>
-        <!-- Nothing yet: a bell in a soft ring of the theme colour, and what will show up here. -->
-        <div v-else-if="!items.length" class="flex flex-col items-center px-6 pb-7 pt-8 text-center">
-          <span class="grid size-12 place-items-center rounded-full bg-primary/12 text-primary ring-8 ring-primary/5">
-            <Bell :size="20" />
-          </span>
-          <p class="mt-4 text-sm font-semibold text-title">{{ t('notifications.empty') }}</p>
-          <p class="mt-1 text-xs leading-5 text-meta">{{ t('notifications.empty_hint') }}</p>
-        </div>
-        <ul v-else class="max-h-96 divide-y divide-line overflow-y-auto">
-          <li v-for="item in items" :key="item.id">
-            <button type="button" class="flex w-full gap-2.5 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="openItem(item)">
-              <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-primary'" />
-              <span class="min-w-0 flex-1">
-                <span class="block text-sm leading-snug" :class="item.read ? 'text-meta' : 'text-title'">{{ text(item) }}</span>
-                <span v-if="detail(item)" class="mt-0.5 block truncate text-xs text-meta">{{ detail(item) }}</span>
-                <span class="mt-0.5 block text-[11px] text-faint">{{ ago(item.updated_at) }}</span>
-              </span>
-            </button>
-          </li>
-        </ul>
-        <NuxtLink to="/notifications" class="block border-t border-line px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover">
-          {{ t('notifications.view_all') }}
-        </NuxtLink>
+    <!-- On phones it spans the screen under the navbar, as the search box does; the bell isn't at the right edge. -->
+    <UiDropdown :open="open" align="end" screen class="sm:w-80">
+      <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
+        <span class="text-sm font-semibold text-title">{{ t('notifications.title') }}</span>
+        <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors hover:text-primary" @click="markRead(null)">
+          <CheckCheck :size="13" />{{ t('notifications.mark_all') }}
+        </button>
       </div>
-    </transition>
+      <!-- Loading: rows shaped like the notifications, shimmering. -->
+      <SkeletonStatus v-if="loading" class="divide-y divide-line">
+        <div v-for="row in 3" :key="row" class="flex gap-2.5 px-4 py-3">
+          <div class="skeleton mt-1.5 size-2 shrink-0 rounded-full" />
+          <div class="flex-1 space-y-1.5">
+            <div class="skeleton h-3 w-11/12 rounded-full" />
+            <div class="skeleton h-2.5 w-1/3 rounded-full" />
+          </div>
+        </div>
+      </SkeletonStatus>
+      <!-- Nothing yet: a bell in a soft ring of the theme colour, and what will show up here. -->
+      <div v-else-if="!items.length" class="flex flex-col items-center px-6 pb-7 pt-8 text-center">
+        <span class="grid size-12 place-items-center rounded-full bg-primary/12 text-primary ring-8 ring-primary/5">
+          <Bell :size="20" />
+        </span>
+        <p class="mt-4 text-sm font-semibold text-title">{{ t('notifications.empty') }}</p>
+        <p class="mt-1 text-xs leading-5 text-meta">{{ t('notifications.empty_hint') }}</p>
+      </div>
+      <ul v-else class="max-h-96 divide-y divide-line overflow-y-auto">
+        <li v-for="item in items" :key="item.id">
+          <button type="button" class="flex w-full gap-2.5 px-4 py-3 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="openItem(item)">
+            <span class="mt-1.5 size-2 shrink-0 rounded-full" :class="item.read ? 'bg-transparent' : 'bg-primary'" />
+            <span class="min-w-0 flex-1">
+              <span class="block text-sm leading-snug" :class="item.read ? 'text-meta' : 'text-title'">{{ text(item) }}</span>
+              <span v-if="detail(item)" class="mt-0.5 block truncate text-xs text-meta">{{ detail(item) }}</span>
+              <span class="mt-0.5 block text-[11px] text-faint">{{ ago(item.updated_at) }}</span>
+            </span>
+          </button>
+        </li>
+      </ul>
+      <NuxtLink to="/notifications" class="block border-t border-line px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover">
+        {{ t('notifications.view_all') }}
+      </NuxtLink>
+    </UiDropdown>
   </div>
 </template>

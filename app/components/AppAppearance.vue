@@ -16,7 +16,7 @@ const swatch = (preset: ThemeColor) => preset === 'ink' ? 'oklch(0.19 0.027 298)
 </script>
 
 <template>
-  <div class="w-84 max-w-[calc(100vw-2rem)] p-4">
+  <div class="p-4">
     <p class="text-xs font-semibold tracking-wide text-meta">{{ $t('appearance.title') }}</p>
     <UiSegmented
       :model-value="theme"

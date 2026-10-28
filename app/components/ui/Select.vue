@@ -272,7 +272,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
         v-if="open"
         ref="panel"
         data-ui-layer
-        class="fixed left-0 top-0 z-[80] flex flex-col overflow-hidden rounded-[10px] bg-popover p-1 shadow-overlay ring-1 ring-line"
+        class="fixed left-0 top-0 z-[80] flex flex-col overflow-hidden rounded-md bg-popover p-1 shadow-overlay ring-1 ring-line"
         @keydown="onPanelKeydown"
       >
         <input
@@ -311,7 +311,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
               :data-index="row.index"
               :aria-selected="row.index === selectedIndex"
               :aria-disabled="row.option.disabled || undefined"
-              class="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-1.5 text-sm transition-colors duration-100 ease-out"
+              class="flex cursor-pointer items-center gap-2.5 rounded-sm px-3 py-1.5 text-sm transition-colors duration-100 ease-out"
               :class="[
                 row.option.disabled ? 'cursor-not-allowed opacity-45' : '',
                 row.index === selectedIndex

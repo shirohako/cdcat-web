@@ -118,11 +118,11 @@ const choose = (edition: Edition | null, close?: () => void) => {
   emit('update:modelValue', edition?.id ?? null)
 }
 
-const ROW = 'flex w-full items-center gap-2 rounded-md px-2.5 text-left transition-colors duration-150 ease-out'
+const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transition-colors duration-150 ease-out'
 </script>
 
 <template>
-  <UiPopover v-model:open="open" placement="bottom-start" :label="label" class="w-[calc(100vw-2rem)] overflow-hidden! p-0! sm:w-[34rem]">
+  <UiPopover v-model:open="open" placement="bottom-start" :label="label" class="w-[calc(100vw-2rem)] overflow-hidden! rounded-md! p-0! sm:w-[34rem]">
     <template #trigger="{ toggle, attrs }">
       <!-- Chosen: the bar's chosen colour; its name reopens the menu, × clears it. -->
       <div v-if="modelValue" class="inline-flex h-8 items-center rounded-lg text-xs font-medium ring-1 ring-inset" :class="activeClass">

@@ -526,7 +526,7 @@
     width: 100%;
     align-items: center;
     gap: 0.5rem;
-    border-radius: 0.5rem;
+    border-radius: 0.25rem;
     padding: 0.5rem 0.65rem;
     color: var(--body);
     text-decoration: none;

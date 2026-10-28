@@ -63,22 +63,8 @@ watch(() => route.fullPath, close)
       :toggle="toggle"
       :attrs="{ 'aria-haspopup': 'menu', 'aria-expanded': open, 'aria-controls': open ? panelId : undefined }"
     />
-    <Transition
-      enter-active-class="transition duration-150 ease-out"
-      enter-from-class="-translate-y-1 opacity-0"
-      leave-active-class="transition duration-100 ease-in"
-      leave-to-class="-translate-y-1 opacity-0"
-    >
-      <div
-        v-if="open"
-        :id="panelId"
-        role="menu"
-        :aria-label="label"
-        class="absolute top-full z-40 mt-1.5 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line"
-        :class="[width, align === 'end' ? 'right-0' : 'left-0']"
-      >
-        <slot />
-      </div>
-    </Transition>
+    <UiDropdown :id="panelId" :open="open" :align="align" role="menu" :aria-label="label" class="p-1" :class="width">
+      <slot />
+    </UiDropdown>
   </div>
 </template>

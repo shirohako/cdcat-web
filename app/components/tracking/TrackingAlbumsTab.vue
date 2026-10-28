@@ -40,7 +40,7 @@
                   :alt="album.albumTitle"
                   class="w-full h-full object-cover"
                   loading="lazy"
-                />
+                >
                 <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>
@@ -82,11 +82,11 @@
                 </button>
                 <ul
                   tabindex="0"
-                  class="dropdown-content z-1 menu w-44 rounded-xl bg-popover p-1.5 shadow-overlay ring-1 ring-line"
+                  class="dropdown-content z-1 menu w-44 rounded-md bg-popover p-1.5 shadow-overlay ring-1 ring-line"
                 >
                   <li v-for="s in otherStatuses(album.status)" :key="s">
                     <a
-                      class="flex items-center gap-2 text-sm rounded-lg"
+                      class="flex items-center gap-2 text-sm rounded-sm"
                       @click="handleStatusChange(album.id, s)"
                     >
                       <Icon :name="statusIcon(s)" class="w-4 h-4" :class="statusTextColor(s)" />
@@ -109,9 +109,9 @@
               <button
                 type="button"
                 :disabled="removingId === album.id"
-                @click="handleRemove(album.id)"
                 class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger flex-none disabled:opacity-40 disabled:cursor-not-allowed"
                 :title="$t('tracking.remove')"
+                @click="handleRemove(album.id)"
               >
                 <Icon
                   v-if="removingId !== album.id"
@@ -148,7 +148,7 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  'update:stats': [void]
+  'update:stats': []
 }>()
 
 const { getTrackingAlbums, setAlbumTracking, deleteAlbumTracking } = useTracking()

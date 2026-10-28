@@ -79,15 +79,15 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
       <SmilePlus :size="compact ? 12 : 14" />
     </button>
     <!-- w-max: an absolute box is otherwise only as wide as the chips row, which squeezes the grid. -->
-    <div v-if="pickerOpen" class="absolute bottom-full left-0 z-20 mb-1.5 grid w-max grid-cols-8 gap-0.5 rounded-xl bg-popover p-1.5 shadow-overlay ring-1 ring-line" role="menu">
+    <UiDropdown :open="pickerOpen" side="top" class="grid w-max grid-cols-8 gap-0.5 p-1.5" role="menu">
       <button
         v-for="reaction in DISCUSSION_REACTIONS" :key="reaction" type="button" role="menuitem"
-        class="grid size-8 place-items-center rounded-lg text-lg transition-colors duration-150 ease-out hover:bg-ghost-hover"
+        class="grid size-8 place-items-center rounded-sm text-lg transition-colors duration-150 ease-out hover:bg-ghost-hover"
         :class="reactions.find(item => item.reaction === reaction)?.reacted ? 'bg-primary/15' : ''"
         :aria-label="t(`discussions.reactions.names.${reaction}`)" :title="t(`discussions.reactions.names.${reaction}`)" @click="toggle(reaction)"
       >
         {{ DISCUSSION_REACTION_EMOJI[reaction] }}
       </button>
-    </div>
+    </UiDropdown>
   </div>
 </template>

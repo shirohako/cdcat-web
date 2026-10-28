@@ -44,7 +44,7 @@
         ref="panel"
         role="listbox"
         data-ui-layer
-        class="fixed z-[90] overflow-y-auto rounded-xl bg-popover py-1 shadow-overlay ring-1 ring-line"
+        class="fixed z-[90] overflow-y-auto rounded-md bg-popover py-1 shadow-overlay ring-1 ring-line"
         :style="panelStyle"
         @mousedown.prevent
       >

@@ -39,10 +39,10 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
     >
       <component :is="icons[current]" :size="14" />{{ t(`discussions.levels.${current}`) }}<ChevronDown :size="12" />
     </button>
-    <div v-if="open" class="absolute right-0 top-full z-30 mt-1 w-64 overflow-hidden rounded-xl bg-popover p-1 shadow-overlay ring-1 ring-line" role="menu">
+    <UiDropdown :open="open" align="end" class="w-64 p-1" role="menu">
       <button
         v-for="option in NOTIFICATION_LEVELS" :key="option" type="button" role="menuitemradio" :aria-checked="option === current"
-        class="flex w-full items-start gap-2.5 rounded-lg px-3 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="choose(option)"
+        class="flex w-full items-start gap-2.5 rounded-sm px-3 py-2 text-left transition-colors duration-150 ease-out hover:bg-ghost-hover" @click="choose(option)"
       >
         <component :is="icons[option]" :size="15" class="mt-0.5 shrink-0 text-meta" />
         <span class="min-w-0 flex-1">
@@ -51,6 +51,6 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
         </span>
         <Check v-if="option === current" :size="14" class="mt-0.5 text-primary" />
       </button>
-    </div>
+    </UiDropdown>
   </div>
 </template>
