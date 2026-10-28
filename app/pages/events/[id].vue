@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AlbumSimple } from '~/types/album'
-import type { EventCircle, EventDetail, VenueMapData } from '~/types/event'
+import type { EventBooth, EventDetail, VenueMapData } from '~/types/event'
 import type { GenreFamily } from '~/utils/eventVenue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Disc3, Layers, MapPin, Palette, Search, Star, Users, X } from '@lucide/vue'
@@ -18,8 +18,8 @@ const { data: event, status, error, revealClass } = await usePageAPI<EventDetail
 
 // The map and the circle list are large and only useful in the browser: load them there.
 const { data: map, status: mapStatus } = usePageAPI<VenueMapData>(`/v1/events/${eventId}/map`, { server: false })
-const { data: circleData, status: circlesStatus, error: circlesError, refresh: refreshCircles } = usePageAPI<{ circles: EventCircle[] }>(`/v1/events/${eventId}/circles`, { server: false })
-const circles = computed(() => circleData.value?.circles ?? [])
+const { data: circleData, status: circlesStatus, error: circlesError, refresh: refreshCircles } = usePageAPI<{ booths: EventBooth[] }>(`/v1/events/${eventId}/booths`, { server: false })
+const circles = computed(() => circleData.value?.booths ?? [])
 const checklist = useEventChecklist(eventId)
 
 const spaces = computed(() => map.value ? buildSpaces(map.value, circles.value) : [])
@@ -136,13 +136,13 @@ const { data: albumData, loading: albumsLoading, refetching: albumsRefetching } 
   query: computed(() => ({ release_event_id: eventId, page: albumPage.value, per_page: 24 })),
 })
 const albumCircle = computed(() => {
-  const out = new Map<number, EventCircle>()
+  const out = new Map<number, EventBooth>()
   for (const circle of circles.value) for (const id of circle.album_ids) if (!out.has(id)) out.set(id, circle)
   return out
 })
 
 const stats = computed(() => {
-  const out = [{ key: 'circles', label: t('event_page.stats.circles'), value: event.value?.circles_count ?? 0 }]
+  const out = [{ key: 'circles', label: t('event_page.stats.circles'), value: event.value?.booths_count ?? 0 }]
   if (map.value) {
     out.push({ key: 'spaces', label: t('event_page.stats.spaces'), value: map.value.spaces.length })
     out.push({ key: 'halls', label: t('event_page.stats.halls'), value: map.value.halls.length })
@@ -169,7 +169,7 @@ usePageSeo({
     const lead = sentence([
       eventDates.value && t('seo.event.date', { date: eventDates.value }),
       place && t('seo.event.venue', { venue: place }),
-      count('seo.event.circles', value.circles_count),
+      count('seo.event.circles', value.booths_count),
       count('seo.event.albums', value.released_albums_count),
       value.has_map && t('seo.event.map'),
     ])
@@ -293,7 +293,7 @@ usePageSeo({
             <div class="mb-4 flex items-center gap-1 border-b border-line">
               <button type="button" class="tab-button" :class="{ 'is-active': tab === 'circles' }" @click="tab = 'circles'">
                 <Users :size="16" />{{ t('event_page.tabs.circles') }}
-                <span class="tab-count">{{ filtering || followedHall ? `${listCircles.length}/${circles.length}` : (event.circles_count ?? circles.length) }}</span>
+                <span class="tab-count">{{ filtering || followedHall ? `${listCircles.length}/${circles.length}` : (event.booths_count ?? circles.length) }}</span>
               </button>
               <button type="button" class="tab-button" :class="{ 'is-active': tab === 'albums' }" @click="tab = 'albums'">
                 <Disc3 :size="16" />{{ t('event_page.tabs.albums') }}

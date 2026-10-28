@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { HarvestCoverageCircle, HarvestEventSummary, HarvestPagination } from '~/types/harvest'
+import type { HarvestCoverageBooth, HarvestEventSummary, HarvestPagination } from '~/types/harvest'
 
-/** Circles of one event and how many candidates each has there; the event is the page's event_id. */
+/** Booths of one event and how many candidates each has there; the event is the page's event_id. */
 const { $api } = useNuxtApp()
 const harvestCoverageFilterLabels: Record<string, string> = { none: '没有候选的', mentioned: '简介提到新譜但没有候选的', all: '全部社团' }
 const route = useRoute()
@@ -19,7 +19,7 @@ const query = computed(() => ({ event_id: eventId.value, filter: filter.value, q
 const { data, pending, error, refresh } = await useAsyncData(
   () => `admin-harvest-coverage-${JSON.stringify(query.value)}`,
   () => eventId.value
-    ? $api<{ circles: HarvestCoverageCircle[], pagination: HarvestPagination, event: HarvestEventSummary, summary: { circles: number, covered: number } }>('/v1/admin/harvest/coverage', { query: query.value })
+    ? $api<{ booths: HarvestCoverageBooth[], pagination: HarvestPagination, event: HarvestEventSummary, summary: { booths: number, covered: number } }>('/v1/admin/harvest/coverage', { query: query.value })
     : Promise.resolve(null),
   { watch: [query] },
 )
@@ -33,7 +33,7 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
     </div>
     <p v-if="!eventId" class="max-w-3xl text-sm text-slate-600">选一届活动，查看它的参展社团里哪些还没有候选。没有候选的活动可以用「搜索其他活动」找到。</p>
     <template v-else>
-      <p v-if="data" class="max-w-3xl text-sm text-slate-600">{{ data.event.name }} 的参展社团中，有 {{ data.summary.covered }} / {{ data.summary.circles }} 个已有候选。下面列出还没有候选的社团，可以按它们的链接手动补录。</p>
+      <p v-if="data" class="max-w-3xl text-sm text-slate-600">{{ data.event.name }} 的参展社团中，有 {{ data.summary.covered }} / {{ data.summary.booths }} 个已有候选。下面列出还没有候选的社团，可以按它们的链接手动补录。</p>
       <div class="flex flex-wrap items-center gap-2 text-sm">
         <button v-for="value in (['none', 'mentioned', 'all'] as const)" :key="value" type="button" class="rounded-full px-3 py-1" :class="filter === value ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700'" @click="filter = value">
           {{ harvestCoverageFilterLabels[value] }}
@@ -42,9 +42,9 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
         <span class="text-slate-500">{{ data?.pagination.total ?? 0 }}</span>
       </div>
       <section class="rounded-xl border border-slate-200 bg-white">
-        <AdminListState :pending="pending" :error="error" :empty="!data?.circles.length" @retry="refresh()">
+        <AdminListState :pending="pending" :error="error" :empty="!data?.booths.length" @retry="refresh()">
           <ul class="divide-y divide-slate-100">
-            <li v-for="circle in data?.circles" :key="circle.id" class="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[10rem_1fr]">
+            <li v-for="circle in data?.booths" :key="circle.id" class="grid gap-2 px-4 py-3 text-sm sm:grid-cols-[10rem_1fr]">
               <div>
                 <p class="font-medium">{{ circle.name }}</p>
                 <p class="text-xs text-slate-500">{{ circle.space_code ?? '—' }} · {{ circle.candidates }} 条候选</p>

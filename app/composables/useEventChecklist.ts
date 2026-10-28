@@ -1,5 +1,5 @@
 /**
- * The member's 想去 list for one event: circle ids, loaded after sign-in and changed optimistically.
+ * The member's 想去 list for one event: booth ids, loaded after sign-in and changed optimistically.
  * Guests are sent to the login page when they try to add a circle.
  */
 export const useEventChecklist = (eventId: MaybeRefOrGetter<number>) => {
@@ -15,8 +15,8 @@ export const useEventChecklist = (eventId: MaybeRefOrGetter<number>) => {
       return
     }
     try {
-      const data = await $api<{ circle_ids: number[] }>(`/v1/me/events/${toValue(eventId)}/checklist`, { progress: false })
-      ids.value = new Set(data.circle_ids)
+      const data = await $api<{ booth_ids: number[] }>(`/v1/me/events/${toValue(eventId)}/checklist`, { progress: false })
+      ids.value = new Set(data.booth_ids)
     } catch {
       // the list is a convenience; the page works without it
     }

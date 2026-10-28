@@ -118,14 +118,16 @@
               </div>
             </section>
 
-            <section v-if="circle.artist">
-              <h3 class="drawer-heading">{{ t('event_page.circle.artist') }}</h3>
-              <NuxtLink :to="`/artists/${circle.artist.id}`" class="flex items-center gap-3 rounded-xl bg-sunken p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
-                <img v-if="circle.artist.image_url" v-img-fade :src="circle.artist.image_url" alt="" class="size-10 rounded-full object-cover">
-                <span v-else class="flex size-10 items-center justify-center rounded-full bg-btn text-faint"><UserRound :size="18" /></span>
-                <span class="min-w-0 flex-1 truncate text-sm font-semibold text-title">{{ circle.artist.name }}</span>
-                <ChevronRight :size="16" class="text-meta" />
-              </NuxtLink>
+            <section v-if="circle.artists.length">
+              <h3 class="drawer-heading">{{ t('event_page.circle.artist', circle.artists.length) }}</h3>
+              <div class="space-y-2">
+                <NuxtLink v-for="artist in circle.artists" :key="artist.id" :to="`/artists/${artist.id}`" class="flex items-center gap-3 rounded-xl bg-sunken p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
+                  <img v-if="artist.image_url" v-img-fade :src="artist.image_url" alt="" class="size-10 rounded-full object-cover">
+                  <span v-else class="flex size-10 items-center justify-center rounded-full bg-btn text-faint"><UserRound :size="18" /></span>
+                  <span class="min-w-0 flex-1 truncate text-sm font-semibold text-title">{{ artist.name }}</span>
+                  <ChevronRight :size="16" class="text-meta" />
+                </NuxtLink>
+              </div>
             </section>
 
             <section v-if="circle.album_ids.length">
@@ -153,11 +155,11 @@
 
 <script setup lang="ts">
 import type { AlbumSimple } from '~/types/album'
-import type { EventCircle, VenueMapData } from '~/types/event'
+import type { EventBooth, VenueMapData } from '~/types/event'
 import { ChevronRight, ExternalLink, LocateFixed, Play, Star, UserRound, Users, X } from '@lucide/vue'
 
 const props = defineProps<{
-  circle: EventCircle | null
+  circle: EventBooth | null
   eventId: number
   genres: VenueMapData['genres']
   spaceLabel: string
@@ -183,14 +185,16 @@ watch(() => props.circle?.id, async () => {
   albums.value = []
   const circle = props.circle
   nextTick(() => panel.value?.focus())
-  if (!circle?.artist || !circle.album_ids.length) return
+  if (!circle?.artists.length || !circle.album_ids.length) return
   albumsLoading.value = true
   try {
-    const data = await $api<{ albums: AlbumSimple[] }>('/v1/albums', {
-      query: { release_event_id: props.eventId, artist_id: circle.artist.id, per_page: 12 },
+    // A booth several circles share lists the albums of each, once.
+    const lists = await Promise.all(circle.artists.map(artist => $api<{ albums: AlbumSimple[] }>('/v1/albums', {
+      query: { release_event_id: props.eventId, artist_id: artist.id, per_page: 12 },
       progress: false,
-    })
-    if (props.circle?.id === circle.id) albums.value = data.albums
+    })))
+    const byId = new Map(lists.flatMap(list => list.albums).map(album => [album.id, album]))
+    if (props.circle?.id === circle.id) albums.value = circle.album_ids.flatMap(id => byId.get(id) ?? []).slice(0, 12)
   } catch {
     albums.value = []
   } finally {

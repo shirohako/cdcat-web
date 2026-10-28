@@ -362,7 +362,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                     <span class="font-medium text-slate-900">{{ event.name }}</span>
                     <span class="tabular-nums text-slate-500">{{ event.start_date }}</span>
                     <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ harvestViaLabels[event.via] }}</span>
-                    <span v-if="event.event_circle" class="text-slate-500">摊位 {{ event.event_circle.space_code ?? '—' }}</span>
+                    <span v-if="event.event_booth" class="text-slate-500">摊位 {{ event.event_booth.space_code ?? '—' }}</span>
                     <span v-if="event.suggested" class="ml-auto inline-flex items-center gap-1">
                       <span class="rounded bg-emerald-100 px-1.5 py-0.5 font-medium text-emerald-800">建议</span>
                       <UiTooltip placement="top-end" class="w-80">
@@ -407,7 +407,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                       <span v-if="circleArtist?.type" class="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">{{ artistTypeLabels[circleArtist.type] ?? circleArtist.type }}</span>
                       <span v-if="circleArtist?.is_pending" class="rounded bg-amber-50 px-1.5 py-0.5 text-xs text-amber-800">待审核</span>
                     </p>
-                    <dl v-if="detail.candidate.artist_id || detail.event_circle" class="mt-1.5 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-0.5 text-xs leading-5">
+                    <dl v-if="detail.candidate.artist_id || detail.event_booth" class="mt-1.5 grid grid-cols-[4.5rem_1fr] gap-x-2 gap-y-0.5 text-xs leading-5">
                       <template v-if="detail.candidate.circle_name && circleArtist && detail.candidate.circle_name !== circleArtist.name">
                         <dt class="text-slate-500">来源写作</dt>
                         <dd>{{ detail.candidate.circle_name }}</dd>
@@ -416,11 +416,11 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                         <dt class="text-slate-500">关联依据</dt>
                         <dd>{{ harvestCircleByLabels[detail.candidate.circle_by] ?? detail.candidate.circle_by }}</dd>
                       </template>
-                      <template v-if="detail.event_circle">
+                      <template v-if="detail.event_booth">
                         <dt class="text-slate-500">摊位</dt>
                         <dd>
                           <template v-if="detail.candidate.merged.circle.event_id">{{ eventName(detail.candidate.merged.circle.event_id) }} · </template>
-                          <span class="font-mono">{{ detail.event_circle.space_code ?? '—' }}</span>
+                          <span class="font-mono">{{ detail.event_booth.space_code ?? '—' }}</span>
                         </dd>
                       </template>
                     </dl>

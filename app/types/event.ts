@@ -16,7 +16,8 @@ export interface EventDetail {
   main_visual_url: string | null
   main_visual_width: number | null
   main_visual_height: number | null
-  circles_count?: number
+  /** Booths of the organizer's list, catalog-only ones included */
+  booths_count?: number
   released_albums_count?: number
   has_map?: boolean
   /** The page's share card (og:image, 1200×630 JPEG); null until the backend has drawn it. */
@@ -56,7 +57,8 @@ export interface VenueMapData {
   genres: Record<string, { label: string, group: string }>
 }
 
-export interface EventCircle {
+/** A booth as the organizer lists it (GET /v1/events/{id}/booths): any number of artists, or none. */
+export interface EventBooth {
   id: number
   space_id: number | null
   space_code: string | null
@@ -73,7 +75,7 @@ export interface EventCircle {
   image_url: string | null
   embeds: { type: 'youtube', id: string }[]
   is_adult: boolean
-  artist: { id: number, name: string, image_url: string | null } | null
-  /** Albums of the circle's artist released at this event */
+  artists: { id: number, name: string, image_url: string | null }[]
+  /** Albums of the booth's artists released at this event */
   album_ids: number[]
 }

@@ -82,14 +82,14 @@
 </template>
 
 <script setup lang="ts">
-import type { EventCircle, VenueMapData } from '~/types/event'
+import type { EventBooth, VenueMapData } from '~/types/event'
 import { Disc3, SearchX, Star, Users } from '@lucide/vue'
 
 const PER_PAGE = 60
 
 const props = defineProps<{
   /** Already filtered, in the organizer's order */
-  circles: EventCircle[]
+  circles: EventBooth[]
   genres: VenueMapData['genres']
   checked: ReadonlySet<number>
   selectedId: number | null
@@ -99,7 +99,7 @@ const props = defineProps<{
 defineEmits<{ 'select': [id: number], 'toggle-check': [id: number] }>()
 const { t } = useI18n()
 
-interface Block { key: string, area: string | null, label: string, hall: string, circles: EventCircle[] }
+interface Block { key: string, area: string | null, label: string, hall: string, circles: EventBooth[] }
 
 // Blocks in the order they first appear; circles without a space (catalog-only) form the last one.
 // A block's hall comes from its circles' desks on the map, so an area the map does not have has none.
@@ -134,7 +134,7 @@ const totalPages = computed(() => Math.max(1, Math.ceil(ordered.value.length / P
 const from = computed(() => (page.value - 1) * PER_PAGE)
 const pageParts = computed(() => {
   const items = ordered.value.slice(from.value, from.value + PER_PAGE)
-  const parts: { block: Block, circles: EventCircle[], continued: boolean }[] = []
+  const parts: { block: Block, circles: EventBooth[], continued: boolean }[] = []
   for (const circle of items) {
     const key = circle.area ?? ''
     const last = parts.at(-1)
@@ -172,5 +172,5 @@ watch(() => props.selectedId, (id) => {
 })
 
 // No genre family: a quiet neutral that follows the theme.
-const familyColor = (circle: EventCircle) => GENRE_FAMILIES.find(f => f.key === genreFamily(circle.genre, props.genres))?.color ?? 'var(--faint)'
+const familyColor = (circle: EventBooth) => GENRE_FAMILIES.find(f => f.key === genreFamily(circle.genre, props.genres))?.color ?? 'var(--faint)'
 </script>

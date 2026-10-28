@@ -65,8 +65,8 @@ export interface HarvestEventRow {
   pending: number
   /** Candidates that have it as the suggested first release. */
   suggested: number
-  circles: number
-  covered_circles: number
+  booths: number
+  covered_booths: number
 }
 
 export type HarvestSubmissionVia = 'upload' | 'api' | 'command'
@@ -101,7 +101,7 @@ export interface HarvestCandidateRow {
   title: string
   circle_name: string | null
   artist_id: number | null
-  event_circle_id: number | null
+  event_booth_id: number | null
   circle_by: string | null
   status: HarvestCandidateStatus
   /** The suggested first-release event; null when no record is linked to one. */
@@ -129,12 +129,13 @@ export interface HarvestCandidateRow {
   updated_at: string | null
 }
 
-export interface HarvestCoverageCircle {
+export interface HarvestCoverageBooth {
   id: number
   name: string
   space_code: string | null
   genre: string | null
-  artist_id: number | null
+  /** The artists linked to the booth */
+  artist_ids: number[]
   description: string | null
   links: Array<{ type: string, url: string }>
   embeds: Array<{ type: string, id: string }>
@@ -205,7 +206,7 @@ export interface HarvestMerged {
   title: HarvestPicked<string>
   titles: Array<{ title: string, locale: string, kind: string, source: string }>
   circle: {
-    name: string | null, artist_id: number | null, event_circle_id: number | null, event_id: number | null, by: string | null, source: string | null
+    name: string | null, artist_id: number | null, event_booth_id: number | null, event_id: number | null, by: string | null, source: string | null
     /** False when the name is only a producer's: no circle is created from it. */
     named?: boolean
     links?: string[]
@@ -252,7 +253,7 @@ export interface HarvestListing {
 export interface HarvestCandidateEvent extends HarvestEventSummary {
   via: HarvestVia
   suggested: boolean
-  event_circle: { id: number, name: string, space_code: string | null } | null
+  event_booth: { id: number, name: string, space_code: string | null } | null
 }
 
 /** What the review page makes of a credited name (CreditMatcher, docs/harvest/README.md#人员). */
@@ -311,7 +312,7 @@ export interface HarvestCandidateDetail {
     event_id: number | null
     circle_name: string | null
     artist_id: number | null
-    event_circle_id: number | null
+    event_booth_id: number | null
     circle_by: string | null
     status: HarvestCandidateStatus
       is_adult: boolean
@@ -333,7 +334,7 @@ export interface HarvestCandidateDetail {
   event: HarvestEventSummary | null
   /** Every event the records are linked to, the suggested one first. */
   events: HarvestCandidateEvent[]
-  event_circle: { id: number, name: string, space_code: string | null, image_url: string | null, description: string | null, links: Array<{ type: string, url: string }> | null } | null
+  event_booth: { id: number, name: string, space_code: string | null, image_url: string | null, description: string | null, links: Array<{ type: string, url: string }> | null } | null
   records: Array<HarvestMerged['sources'][number] & {
     label: string
     fetched_at: string | null

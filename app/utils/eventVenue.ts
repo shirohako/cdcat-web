@@ -1,4 +1,4 @@
-import type { EventCircle, VenueMapData } from '~/types/event'
+import type { EventBooth, VenueMapData } from '~/types/event'
 
 /** One desk on the map, with the circles that share it. */
 export interface VenueSpace {
@@ -17,7 +17,7 @@ export interface VenueSpace {
 export interface VenuePiece {
   key: string
   spaceId: number
-  circle: EventCircle | null
+  circle: EventBooth | null
   x: number
   y: number
   w: number
@@ -30,8 +30,8 @@ const PARTS: Record<string, string[]> = { ab: ['ab'], a: ['a', 'b'], b: ['a', 'b
  * Desks with their circles. A desk is cut along its longer side: two circles share a desk by
  * halves, mini spaces by thirds; a half nobody took stays empty.
  */
-export function buildSpaces(map: VenueMapData, circles: EventCircle[]): VenueSpace[] {
-  const bySpace = new Map<number, EventCircle[]>()
+export function buildSpaces(map: VenueMapData, circles: EventBooth[]): VenueSpace[] {
+  const bySpace = new Map<number, EventBooth[]>()
   for (const circle of circles) {
     if (circle.space_id === null) continue
     const list = bySpace.get(circle.space_id) ?? []
@@ -88,8 +88,8 @@ export function foldSearch(value: string) {
   return value.normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60))
 }
 
-export function circleSearchText(circle: EventCircle) {
-  return foldSearch([circle.name, circle.name_kana, circle.space_code, circle.twitter_handle && `@${circle.twitter_handle}`, ...circle.keywords, circle.artist?.name]
+export function circleSearchText(circle: EventBooth) {
+  return foldSearch([circle.name, circle.name_kana, circle.space_code, circle.twitter_handle && `@${circle.twitter_handle}`, ...circle.keywords, ...circle.artists.map(artist => artist.name)]
     .filter(Boolean).join(' '))
 }
 
@@ -136,7 +136,7 @@ export interface CircleVideo {
  * The catalog's YouTube embeds plus links that point at a single video (not a channel or a
  * profile), one card per video.
  */
-export function circleVideos(circle: Pick<EventCircle, 'embeds' | 'links'>): CircleVideo[] {
+export function circleVideos(circle: Pick<EventBooth, 'embeds' | 'links'>): CircleVideo[] {
   const videos = new Map<string, CircleVideo>()
   const youtube = (id: string) => videos.set(`yt:${id}`, {
     key: `yt:${id}`,

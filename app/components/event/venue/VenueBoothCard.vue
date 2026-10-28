@@ -41,12 +41,13 @@
           <span class="truncate">@{{ circle.twitter_handle }}</span>
         </a>
         <NuxtLink
-          v-if="circle.artist"
-          :to="`/artists/${circle.artist.id}`"
+          v-for="artist in circle.artists.slice(0, 2)"
+          :key="artist.id"
+          :to="`/artists/${artist.id}`"
           class="inline-flex min-w-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
         >
           <UserRound :size="13" class="shrink-0 opacity-60" />
-          <span class="truncate">{{ t('event_page.circle.artist_page') }}</span>
+          <span class="truncate">{{ circle.artists.length === 1 ? t('event_page.circle.artist_page') : artist.name }}</span>
         </NuxtLink>
         <button type="button" class="ml-auto shrink-0 rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong" @click="$emit('open')">
           {{ t('event_page.circle.details') }}
