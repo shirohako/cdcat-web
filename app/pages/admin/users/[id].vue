@@ -104,12 +104,12 @@ useHead({ title: '用户详情' })
           <form class="mt-6 space-y-5" @submit.prevent="save">
             <div class="grid gap-4 md:grid-cols-2"><label v-for="field in fields" :key="field.key" class="block text-sm">{{ fieldLabels[field.key] }}<input v-model="profile[field.key]" :type="field.type" :required="field.required" :disabled="!canManage || busy" :maxlength="field.key === 'username' ? 32 : field.type === 'url' ? 2048 : 255" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50"></label></div>
             <label class="block text-sm">简介<textarea v-model="profile.bio" :disabled="!canManage || busy" rows="3" maxlength="10000" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50" /></label>
-            <button v-if="canManage" type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-50">保存资料</button>
+            <UiButton v-if="canManage" type="submit" variant="primary" :disabled="busy">保存资料</UiButton>
           </form>
           <div v-if="canManage" class="mt-6 flex flex-wrap gap-3 border-t pt-5 text-sm">
-            <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction(user.is_active ? 'disable' : 'enable')">{{ user.is_active ? '禁用账号' : '启用账号' }}</button>
-            <button v-if="hasPermission('users.assign-roles')" type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction('role')">分配角色</button>
-            <button v-for="operation in (['revoke', 'send_reset', 'clear_limit'] as const)" :key="operation" type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="openAction(operation)">{{ actionLabels[operation] }}</button>
+            <UiButton :variant="user.is_active ? 'danger-soft' : 'default'" :disabled="busy" @click="openAction(user.is_active ? 'disable' : 'enable')">{{ user.is_active ? '禁用账号' : '启用账号' }}</UiButton>
+            <UiButton v-if="hasPermission('users.assign-roles')" :disabled="busy" @click="openAction('role')">分配角色</UiButton>
+            <UiButton v-for="operation in (['revoke', 'send_reset', 'clear_limit'] as const)" :key="operation" :disabled="busy" @click="openAction(operation)">{{ actionLabels[operation] }}</UiButton>
           </div>
         </section>
         <section class="mt-6 rounded-xl border border-slate-200 bg-white p-5">

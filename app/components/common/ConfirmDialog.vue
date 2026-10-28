@@ -17,16 +17,16 @@
     </label>
 
     <template #footer>
-      <button v-if="variant === 'warning'" type="button" class="btn btn-sm btn-warning" @click="onConfirm">
+      <UiButton v-if="variant === 'warning'" variant="primary" size="sm" @click="onConfirm">
         {{ $t('common.got_it') }}
-      </button>
+      </UiButton>
       <template v-else>
-        <button type="button" class="btn btn-sm btn-ghost" @click="onCancel">
+        <UiButton size="sm" @click="onCancel">
           {{ $t('common.cancel') }}
-        </button>
-        <button type="button" class="btn btn-sm btn-error" :disabled="!phraseMatches" @click="onConfirm">
+        </UiButton>
+        <UiButton variant="danger" size="sm" :disabled="!phraseMatches" @click="onConfirm">
           {{ confirmText ?? $t('common.confirm_delete') }}
-        </button>
+        </UiButton>
       </template>
     </template>
   </UiDialog>

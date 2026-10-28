@@ -27,10 +27,10 @@
             <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="flex shrink-0 gap-0.5">
-            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="index === 0" :title="$t('catalog.form.move_up')" @click="moveRow(album.bonuses, bonus, -1)"><ArrowUp :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="index === bonuses.length - 1" :title="$t('catalog.form.move_down')" @click="moveRow(album.bonuses, bonus, 1)"><ArrowDown :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('common.edit')" @click="edit(bonus)"><PencilLine :size="12" /></button>
-            <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="remove(bonus.id)"><Trash2 :size="12" /></button>
+            <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.bonuses, bonus, -1)" />
+            <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === bonuses.length - 1" @click="moveRow(album.bonuses, bonus, 1)" />
+            <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(bonus)" />
+            <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(bonus.id)" />
           </span>
         </li>
       </ul>
@@ -111,8 +111,8 @@
         </div>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+        <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" class="shadow-xs active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</UiButton>
       </template>
     </EditorModal>
   </CatalogSection>

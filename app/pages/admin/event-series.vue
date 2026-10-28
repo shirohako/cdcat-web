@@ -71,7 +71,7 @@ useHead({ title: '活动系列' })
         <h1 class="text-3xl font-bold">活动系列</h1>
         <p class="mt-2 text-sm text-slate-600">维护活动所属的系列，例如 M3、Comic Market。仍有活动的系列不能删除。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="editSeries()">新建活动系列</button>
+      <UiButton variant="primary" @click="editSeries()">新建活动系列</UiButton>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !seriesOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -88,8 +88,8 @@ useHead({ title: '活动系列' })
         <img v-if="seriesForm.banner_url" :src="seriesForm.banner_url" alt="" class="aspect-video w-full max-w-sm rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
-          <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="seriesOpen = false">取消</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ busy ? '保存中…' : '保存' }}</button>
+          <UiButton :disabled="busy" @click="seriesOpen = false">取消</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy">{{ busy ? '保存中…' : '保存' }}</UiButton>
         </div>
       </form>
     </section>
@@ -104,7 +104,7 @@ useHead({ title: '活动系列' })
                 <td class="px-4 py-3 font-medium"><div class="flex items-center gap-3"><img v-if="item.banner_url" :src="item.banner_url" alt="" loading="lazy" class="aspect-video w-16 shrink-0 rounded bg-slate-50 object-contain"><div v-else class="aspect-video w-16 shrink-0 rounded bg-slate-100" /><div>{{ item.name }}<p class="text-xs font-normal text-slate-500">{{ item.slug }} · {{ seriesOrientationLabels[item.visual_orientation] }}</p></div></div></td>
                 <td class="px-4 py-3">{{ item.location }}</td>
                 <td class="px-4 py-3 tabular-nums"><NuxtLink v-if="item.events_count" :to="{ path: '/admin/events', query: { series_id: item.id } }" class="underline decoration-slate-300 underline-offset-4">{{ item.events_count }}</NuxtLink><span v-else class="text-slate-400">0</span></td>
-                <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><button type="button" class="underline" @click="editSeries(item)">编辑</button><button type="button" class="text-red-700" @click="startDelete(item)">删除</button></div></td>
+                <td class="px-4 py-3"><div class="flex justify-end gap-2"><UiButton size="xs" @click="editSeries(item)">编辑</UiButton><UiButton variant="danger-soft" size="xs" @click="startDelete(item)">删除</UiButton></div></td>
               </tr>
             </tbody>
           </table>

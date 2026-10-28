@@ -27,21 +27,12 @@
 
       <!-- Actions -->
       <div class="mt-8 flex items-center gap-3">
-        <NuxtLink
-          to="/"
-          class="btn btn-primary rounded-full px-5"
-        >
-          <Home :size="15" />
+        <UiButton to="/" variant="primary" :icon="Home">
           {{ $t('common.back_home') }}
-        </NuxtLink>
-        <button
-          type="button"
-          class="btn rounded-full px-5"
-          @click="$router.back()"
-        >
-          <ArrowLeft :size="15" />
+        </UiButton>
+        <UiButton :icon="ArrowLeft" @click="$router.back()">
           {{ $t('common.go_back') }}
-        </button>
+        </UiButton>
       </div>
     </div>
   </div>

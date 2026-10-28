@@ -59,46 +59,48 @@
             </div>
 
             <div class="mt-4 flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                class="btn btn-xs h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
-                :class="isFavorited ? 'border-red-500 bg-red-500 text-white hover:bg-red-600 dark:border-red-400 dark:bg-red-400 dark:text-red-950 dark:hover:bg-red-500' : 'btn-outline border-red-400 text-red-600 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/15'"
+              <UiButton
+                :variant="isFavorited ? 'danger' : 'danger-soft'"
+                size="sm"
+                class="flex-1 lg:flex-none"
                 :disabled="isToggling || (track.is_pending && !isFavorited)"
                 :title="track.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFavorite"
               >
-                <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />
+                <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
                 {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}<span v-if="favoritesCount" class="opacity-70">{{ favoritesCount }}</span>
-              </button>
-              <NuxtLink
+              </UiButton>
+              <UiButton
                 :to="isAuthenticated ? editPath : `/auth/login?redirect=${editPath}`"
-                class="btn btn-xs btn-outline h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
+                variant="outline"
+                size="sm"
+                :icon="Edit"
+                class="flex-1 lg:flex-none"
                 :title="$t('tracks.edit_hint')"
               >
-                <Edit :size="13" />
                 {{ $t('common.edit') }}
-              </NuxtLink>
+              </UiButton>
               <div class="flex gap-1.5 md:ml-auto">
-                <component
-                  :is="previous ? NuxtLink : 'span'"
+                <UiButton
                   :to="previous ? `/tracks/${previous.id}` : undefined"
-                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 lg:h-8"
-                  :class="{ 'btn-disabled opacity-40': !previous }"
+                  :disabled="!previous"
+                  size="sm"
+                  :icon="ChevronLeft"
                   :title="previous ? previous.title : undefined"
                   :aria-label="$t('tracks.previous')"
                 >
-                  <ChevronLeft :size="14" /><span class="hidden sm:inline">{{ $t('tracks.previous') }}</span>
-                </component>
-                <component
-                  :is="next ? NuxtLink : 'span'"
+                  <span class="hidden sm:inline">{{ $t('tracks.previous') }}</span>
+                </UiButton>
+                <UiButton
                   :to="next ? `/tracks/${next.id}` : undefined"
-                  class="btn btn-xs btn-ghost h-7 min-h-0 gap-1 lg:h-8"
-                  :class="{ 'btn-disabled opacity-40': !next }"
+                  :disabled="!next"
+                  size="sm"
+                  :icon-right="ChevronRight"
                   :title="next ? next.title : undefined"
                   :aria-label="$t('tracks.next')"
                 >
-                  <span class="hidden sm:inline">{{ $t('tracks.next') }}</span><ChevronRight :size="14" />
-                </component>
+                  <span class="hidden sm:inline">{{ $t('tracks.next') }}</span>
+                </UiButton>
               </div>
             </div>
           </div>
@@ -110,7 +112,6 @@
 
 <script setup lang="ts">
 import type { TrackDetail } from '~/types/album'
-import { NuxtLink } from '#components'
 import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music, UserRound } from '@lucide/vue'
 
 /** The top of a track page: the album's cover and banner, the title, favorite, edit and moving to the next track. */

@@ -103,21 +103,12 @@
         </div>
 
         <div class="px-6 py-4 bg-sunken border-t border-line flex justify-end gap-2">
-          <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
+          <UiButton size="sm" @click="cancelEdit">
             {{ t('common.cancel') }}
-          </button>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm gap-1.5"
-            :disabled="isSubmitting"
-            @click="submitPassword"
-          >
-            <span v-if="isSubmitting" class="loading loading-spinner loading-xs"></span>
-            <template v-else>
-              <Lock :size="14" />
-              {{ t('account_pages.security.update') }}
-            </template>
-          </button>
+          </UiButton>
+          <UiButton variant="primary" size="sm" :icon="Lock" :loading="isSubmitting" @click="submitPassword">
+            {{ t('account_pages.security.update') }}
+          </UiButton>
         </div>
         </div>
       </Transition>

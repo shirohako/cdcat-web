@@ -67,22 +67,17 @@ const edit = {
 
     <div class="flex flex-wrap items-center gap-1.5">
       <span class="mr-1 text-xs text-meta">{{ t('editor.credits.add_line') }}</span>
-      <button
+      <UiButton
         v-for="role in COMMON_ROLES"
         :key="role"
-        type="button"
-        class="inline-flex h-7 items-center gap-1 rounded-md border border-dashed border-primary/45 bg-primary/8 px-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
+        variant="add"
+        size="xs"
+        icon="lucide:plus"
+        icon-class="size-3"
+        class="gap-1"
         @click="start([role])"
-      >
-        <Icon name="lucide:plus" class="size-3" />{{ roleName(role) }}
-      </button>
-      <button
-        type="button"
-        class="inline-flex h-7 items-center gap-1 rounded-md bg-btn px-2 text-xs font-semibold text-btn-content ring-1 ring-inset ring-line transition-colors hover:bg-btn-hover"
-        @click="start([])"
-      >
-        {{ t('editor.credits.more_roles') }}
-      </button>
+      >{{ roleName(role) }}</UiButton>
+      <UiButton size="xs" class="ring-1 ring-inset ring-line" @click="start([])">{{ t('editor.credits.more_roles') }}</UiButton>
     </div>
   </div>
 </template>

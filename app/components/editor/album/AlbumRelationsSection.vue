@@ -64,8 +64,8 @@
         </label>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+        <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" class="shadow-xs active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</UiButton>
       </template>
     </EditorModal>
   </div>

@@ -21,10 +21,10 @@
         </header>
 
         <div v-if="mine" class="mb-5 flex flex-wrap gap-2">
-          <NuxtLink v-if="isOpenRevision(revision.status) && editor" :to="editor" class="btn btn-primary btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
+          <UiButton v-if="isOpenRevision(revision.status) && editor" :to="editor" variant="primary" size="sm">{{ $t('revision_page.continue') }}</UiButton>
           <!-- With edits kept in this browser, resubmitting here would send the revision without them. -->
-          <button v-if="revision.status === 'changes_requested' && !localEditsAt" type="button" class="btn btn-sm" :disabled="busy" @click="submit">{{ $t('revision_page.resubmit') }}</button>
-          <button v-if="revision.status === 'pending' || revision.status === 'changes_requested'" type="button" class="btn btn-ghost btn-sm text-danger" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</button>
+          <UiButton v-if="revision.status === 'changes_requested' && !localEditsAt" size="sm" :disabled="busy" @click="submit">{{ $t('revision_page.resubmit') }}</UiButton>
+          <UiButton v-if="revision.status === 'pending' || revision.status === 'changes_requested'" variant="danger-soft" size="sm" :disabled="busy" @click="withdraw">{{ $t('revision_page.withdraw') }}</UiButton>
         </div>
         <p v-if="mine && localEditsAt && isOpenRevision(revision.status)" class="mb-5 rounded-xl border border-info/25 bg-info/10 px-4 py-3 text-sm text-info">
           {{ $t('revision_page.local_edits', { at: ago(localEditsAt) }) }}

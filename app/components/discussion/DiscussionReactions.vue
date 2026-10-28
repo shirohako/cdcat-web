@@ -71,13 +71,10 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
     >
       <span class="text-sm leading-none">{{ DISCUSSION_REACTION_EMOJI[item.reaction] }}</span>{{ item.count }}
     </button>
-    <button
-      v-if="canReact" type="button"
-      class="grid place-items-center rounded-full border border-dashed border-faint text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
-      :class="compact ? 'size-6' : 'size-7'" :aria-label="t('discussions.reactions.add')" :aria-expanded="pickerOpen" @click.stop="pickerOpen = !pickerOpen"
-    >
-      <SmilePlus :size="compact ? 12 : 14" />
-    </button>
+    <UiButton
+      v-if="canReact" variant="add" size="xs" round :icon="SmilePlus" :label="t('discussions.reactions.add')"
+      :aria-expanded="pickerOpen" @click.stop="pickerOpen = !pickerOpen"
+    />
     <!-- w-max: an absolute box is otherwise only as wide as the chips row, which squeezes the grid. -->
     <UiDropdown :open="pickerOpen" side="top" class="grid w-max grid-cols-8 gap-0.5 p-1.5" role="menu">
       <button

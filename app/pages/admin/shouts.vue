@@ -71,7 +71,7 @@ useHead({ title: '留言' })
         </select>
         <input v-model="filters.artist_id" inputmode="numeric" pattern="[0-9]*" placeholder="艺术家 ID" aria-label="艺术家 ID" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <input v-model="filters.user_id" inputmode="numeric" pattern="[0-9]*" placeholder="用户 ID" aria-label="用户 ID" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
 
@@ -93,10 +93,10 @@ useHead({ title: '留言' })
                 <span v-if="shout.is_hidden" class="ml-1 rounded bg-amber-100 px-1.5 text-amber-800">已隐藏</span>
               </p>
             </div>
-            <div class="flex gap-2 text-xs">
-              <button v-if="!shout.is_hidden" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="action = { shout, kind: 'hide' }">隐藏留言</button>
-              <button v-else type="button" class="rounded-lg border px-2.5 py-1.5" @click="action = { shout, kind: 'unhide' }">取消隐藏</button>
-              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="action = { shout, kind: 'delete' }">删除</button>
+            <div class="flex gap-2">
+              <UiButton v-if="!shout.is_hidden" size="sm" @click="action = { shout, kind: 'hide' }">隐藏留言</UiButton>
+              <UiButton v-else size="sm" @click="action = { shout, kind: 'unhide' }">取消隐藏</UiButton>
+              <UiButton variant="danger-soft" size="sm" @click="action = { shout, kind: 'delete' }">删除</UiButton>
             </div>
           </li>
         </ul>

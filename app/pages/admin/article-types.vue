@@ -83,7 +83,7 @@ useHead({ title: '文章类型' })
         <h1 class="text-3xl font-bold">文章类型</h1>
         <p class="mt-2 text-sm text-slate-600">写文章时可选的类型。key 创建后不能改；被文章用过的类型不能删除，可以停用：停用后不能再选，已有的文章保留原类型。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="open()">新建类型</button>
+      <UiButton variant="primary" @click="open()">新建类型</UiButton>
     </header>
 
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -108,8 +108,8 @@ useHead({ title: '文章类型' })
         </label>
         <p v-if="message" role="alert" class="text-red-700 sm:col-span-2">{{ message }}</p>
         <div class="flex gap-2 sm:col-span-2">
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">保存</button>
-          <button type="button" class="rounded-lg border px-4 py-2" @click="formOpen = false">取消</button>
+          <UiButton type="submit" variant="primary" :disabled="busy">保存</UiButton>
+          <UiButton @click="formOpen = false">取消</UiButton>
         </div>
       </form>
     </section>
@@ -138,8 +138,8 @@ useHead({ title: '文章类型' })
                   <span class="rounded px-1.5 py-0.5" :class="type.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'">{{ type.is_active ? '启用' : '已停用' }}</span>
                 </td>
                 <td class="px-3 py-3 text-right text-xs">
-                  <button type="button" class="underline" @click="open(type)">编辑</button>
-                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="used(type) > 0" :title="used(type) ? '已被文章使用，只能停用' : undefined" @click="deleting = type">删除</button>
+                  <UiButton size="xs" @click="open(type)">编辑</UiButton>
+                  <UiButton variant="danger-soft" size="xs" class="ml-2" :disabled="used(type) > 0" :title="used(type) ? '已被文章使用，只能停用' : undefined" @click="deleting = type">删除</UiButton>
                 </td>
               </tr>
             </tbody>

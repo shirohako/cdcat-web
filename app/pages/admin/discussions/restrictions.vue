@@ -95,7 +95,7 @@ useHead({ title: '用户限制' })
                   <p v-if="item.revoked_at" class="text-slate-400">{{ time(item.revoked_at) }} 由 {{ item.revoked_by?.nickname || item.revoked_by?.username }} 解除</p>
                 </td>
                 <td class="px-4 py-2 text-xs">{{ item.reason }}</td>
-                <td class="px-4 py-2 text-right text-xs"><button v-if="item.active" type="button" class="underline" @click="revoking = item">解除</button></td>
+                <td class="px-4 py-2 text-right text-xs"><UiButton v-if="item.active" size="xs" @click="revoking = item">解除</UiButton></td>
               </tr>
             </tbody>
           </table>
@@ -113,7 +113,7 @@ useHead({ title: '用户限制' })
         </label>
         <label class="block">原因（必填）<textarea v-model="form.reason" required maxlength="2000" rows="3" :class="field" /></label>
         <p class="text-xs text-slate-500">{{ discussionRestrictionHelpLabels[scope] }}</p>
-        <div class="flex justify-end"><button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">禁言</button></div>
+        <div class="flex justify-end"><UiButton type="submit" variant="primary" :disabled="busy">禁言</UiButton></div>
       </form>
     </div>
     <AdminConfirmDialog v-model="revokeOpen" :busy="busy" :title="`解除对 ${revoking?.user?.nickname || revoking?.user?.username} 的禁言？`" @confirm="revoke" />

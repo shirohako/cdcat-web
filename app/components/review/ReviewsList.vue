@@ -8,10 +8,9 @@
       <Icon name="lucide:message-square-text" class="w-16 h-16 text-faint mb-4" />
       <p class="text-lg text-meta mb-2">{{ $t('reviews.mine_empty') }}</p>
       <p class="text-sm text-meta mb-6">{{ $t('reviews.mine_empty_hint') }}</p>
-      <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-        <Icon name="lucide:search" class="w-4 h-4" />
+      <UiButton to="/albums" variant="primary" size="sm" icon="lucide:search">
         {{ $t('reviews.discover_albums') }}
-      </NuxtLink>
+      </UiButton>
     </div>
 
     <!-- Reviews List: dimmed while another page loads -->
@@ -68,14 +67,14 @@
                   <RichContent :content="review.content" format="markdown" class="text-sm" />
                   <div v-if="isLongContent(review.content) && !expandedIds.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-linear-to-t from-sunken" />
                 </div>
-                <button
+                <UiButton
                   v-if="isLongContent(review.content)"
-                  type="button"
-                  class="link mt-1 text-xs font-medium"
+                  size="xs"
+                  class="mt-1"
                   @click="toggleExpand(review.id)"
                 >
                   {{ $t(expandedIds.has(review.id) ? 'reviews.collapse' : 'reviews.expand') }}
-                </button>
+                </UiButton>
               </div>
 
               <!-- Row 5: Reactions + Date + Actions -->
@@ -117,24 +116,8 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1">
-                  <button
-                    type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-meta
-                           transition-colors hover:bg-ghost-hover hover:text-primary"
-                    :title="$t('common.edit')"
-                    @click="emit('edit', review)"
-                  >
-                    <Icon name="lucide:pencil" class="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    class="inline-flex items-center justify-center w-8 h-8 rounded-full text-meta
-                           transition-colors hover:bg-danger/10 hover:text-danger"
-                    :title="$t('common.delete')"
-                    @click="emit('delete', review.id)"
-                  >
-                    <Icon name="lucide:trash-2" class="w-4 h-4" />
-                  </button>
+                  <UiButton size="sm" round icon="lucide:pencil" :label="$t('common.edit')" @click="emit('edit', review)" />
+                  <UiButton variant="danger-soft" size="sm" round icon="lucide:trash-2" :label="$t('common.delete')" @click="emit('delete', review.id)" />
                 </div>
               </div>
             </div>

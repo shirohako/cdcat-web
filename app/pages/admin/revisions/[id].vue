@@ -138,12 +138,12 @@ useHead({ title: computed(() => heading.value) })
 
         <div v-if="reviewable || checkable" class="flex flex-wrap items-center gap-2">
           <template v-if="reviewable">
-            <button type="button" :disabled="busy || needsManage" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-40" @click="decision = 'approve'">通过</button>
-            <button type="button" :disabled="busy" class="rounded-lg border border-orange-300 bg-white px-4 py-2 text-sm text-orange-700 disabled:opacity-40" @click="decision = 'request_changes'">退回修改</button>
-            <button type="button" :disabled="busy" class="rounded-lg border border-red-300 bg-white px-4 py-2 text-sm text-red-700 disabled:opacity-40" @click="decision = 'reject'">拒绝</button>
+            <UiButton variant="primary" :disabled="busy || needsManage" @click="decision = 'approve'">通过</UiButton>
+            <UiButton :disabled="busy" @click="decision = 'request_changes'">退回修改</UiButton>
+            <UiButton variant="danger-soft" :disabled="busy" @click="decision = 'reject'">拒绝</UiButton>
             <span v-if="needsManage" class="text-xs text-amber-700">批准删除实体或移除有依赖的曲目需要内容管理权限。</span>
           </template>
-          <button v-if="checkable" type="button" :disabled="busy" class="rounded-lg border bg-white px-4 py-2 text-sm disabled:opacity-40" @click="check">标记已巡查</button>
+          <UiButton v-if="checkable" :disabled="busy" @click="check">标记已巡查</UiButton>
           <span class="text-xs text-slate-500">审核人不能代改；要补充内容请自己另提一条修订。</span>
         </div>
         <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -182,11 +182,11 @@ useHead({ title: computed(() => heading.value) })
                   <span v-if="group.acknowledged.includes(candidate.album_id)" class="text-amber-700"> · 提交人已确认不是同一张</span>
                 </p>
               </div>
-              <NuxtLink
+              <UiButton
                 v-if="group.albumId && !candidate.album.is_pending && hasPermission('content.manage')"
                 :to="{ path: `/admin/content/albums/${group.albumId}`, query: { tab: 'actions', merge_target: candidate.album.id } }"
-                class="rounded-lg border px-3 py-1.5 text-xs hover:bg-slate-50"
-              >合并到这张</NuxtLink>
+                size="xs"
+              >合并到这张</UiButton>
             </li>
           </ul>
         </section>

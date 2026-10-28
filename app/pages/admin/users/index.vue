@@ -42,7 +42,7 @@
             <option v-for="option in sortOptions" :key="option.value" :value="option.value">{{ option.label }}</option>
           </select>
           <select v-model="sortOrder" aria-label="排序方向" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="desc">降序</option><option value="asc">升序</option></select>
-          <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">筛选条件</button>
+          <UiButton type="submit" variant="primary">筛选条件</UiButton>
         </form>
       </AdminFilterBar>
       <section class="rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -126,14 +126,14 @@
 
                   <!-- 操作 -->
                   <td v-if="canAssignRoles" class="px-4 py-3.5">
-                    <button
-                      class="whitespace-nowrap rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-700 disabled:opacity-40"
-                      type="button"
+                    <UiButton
+                      size="xs"
+                      class="whitespace-nowrap"
                       :disabled="!u.can_manage"
                       @click="openRoleModal(u)"
                     >
                       编辑角色
-                    </button>
+                    </UiButton>
                   </td>
                 </tr>
 
@@ -237,20 +237,18 @@
 
           <!-- 底部 -->
           <div class="flex justify-end gap-2 border-t border-slate-100 px-5 py-4">
-            <button
-              class="rounded-lg border border-slate-200 px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
-              @click="closeRoleModal"
-            >
+            <UiButton size="sm" @click="closeRoleModal">
               取消
-            </button>
-            <button
-              class="rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+            </UiButton>
+            <UiButton
+              variant="primary"
+              size="sm"
               :disabled="roleModal.saving || roleModal.selected === roleModal.user?.roles"
               @click="saveRole"
             >
               <span v-if="roleModal.saving">保存中…</span>
               <span v-else>保存</span>
-            </button>
+            </UiButton>
           </div>
         </div>
       </div>

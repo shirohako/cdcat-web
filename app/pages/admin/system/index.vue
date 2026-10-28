@@ -75,7 +75,7 @@ useHead({ title: '运维' })
         <h1 class="text-3xl font-bold">运维</h1>
         <p class="mt-2 text-sm text-slate-600">运行状态、调度器和队列心跳、定时任务结果，以及白名单内的运维操作。</p>
       </div>
-      <button type="button" :disabled="pending" class="rounded-lg border bg-white px-4 py-2 text-sm disabled:opacity-50" @click="refresh()">刷新</button>
+      <UiButton :disabled="pending" @click="refresh()">刷新</UiButton>
     </header>
     <AdminSystemNav />
     <AdminListState :pending="pending" :error="error" @retry="refresh()">
@@ -139,12 +139,12 @@ useHead({ title: '运维' })
         </div>
         <label v-if="cache.targets.includes('album_contributors')" class="mt-3 block">专辑 ID（可选，不填则清除全部专辑）<input v-model="cache.album_id" inputmode="numeric" pattern="[0-9]*" class="mt-1 w-40 rounded-lg border border-slate-300 px-3 py-2"></label>
         <label class="mt-3 block">原因（可选，写入操作日志）<input v-model="cache.reason" maxlength="2000" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
-        <button type="submit" :disabled="busy || !cache.targets.length" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">清除选中的缓存</button>
+        <UiButton type="submit" variant="primary" :disabled="busy || !cache.targets.length" class="mt-4">清除选中的缓存</UiButton>
       </form>
       <section class="rounded-xl border border-slate-200 bg-white p-5 text-sm">
         <h2 class="font-semibold">测试邮件</h2>
         <p class="mt-1 text-slate-600">使用固定模板发送到你自己的邮箱，每分钟最多一次。结果由队列执行后回写。</p>
-        <button type="button" :disabled="busy" class="mt-4 rounded-lg border px-4 py-2 disabled:opacity-40" @click="sendTestMail">发送测试邮件</button>
+        <UiButton :disabled="busy" class="mt-4" @click="sendTestMail">发送测试邮件</UiButton>
         <p v-if="mailAuditId" role="status" class="mt-3">
           操作 #{{ mailAuditId }}：
           <span :class="statusClass[mailLog?.result ?? 'unknown']">{{ mailLog ? auditResultLabels[mailLog.result] : '已提交' }}</span>

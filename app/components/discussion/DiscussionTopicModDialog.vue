@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import type { DiscussionTopicDetail } from '~/types/discussion'
 
 /** Pin, feature, lock or delete (for good) a topic. Editing its fields is the edit dialog. */
@@ -86,9 +85,9 @@ const remove = () => {
       <p v-if="error" role="alert" class="text-danger">{{ error }}</p>
     </form>
     <template #footer>
-      <button type="button" class="btn btn-error btn-sm mr-auto" :disabled="busy" @click="remove">{{ t('discussions.moderation.delete_topic') }}</button>
-      <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>
-      <button type="submit" form="discussion-topic-mod" class="btn btn-primary btn-sm" :disabled="busy"><Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.save') }}</button>
+      <UiButton variant="danger" size="sm" class="mr-auto" :disabled="busy" @click="remove">{{ t('discussions.moderation.delete_topic') }}</UiButton>
+      <UiButton size="sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</UiButton>
+      <UiButton type="submit" form="discussion-topic-mod" variant="primary" size="sm" :loading="busy">{{ t('common.save') }}</UiButton>
     </template>
   </DiscussionDialog>
 </template>

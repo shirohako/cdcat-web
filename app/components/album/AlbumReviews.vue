@@ -23,18 +23,18 @@
             <span v-if="mine.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-[10px] font-medium text-btn-content">{{ $t('reviews.hidden') }}</span>
           </p>
           <RichContent :content="mine.content" format="markdown" class="text-sm" />
-          <div class="mt-1.5 flex gap-3 text-[11px] text-meta">
-            <button type="button" class="link link-muted" @click="openEditor">{{ $t('common.edit') }}</button>
-            <button type="button" class="link text-danger hover:bg-danger/10" @click="remove">{{ $t('common.delete') }}</button>
+          <div class="mt-1.5 flex gap-1.5">
+            <UiButton size="xs" @click="openEditor">{{ $t('common.edit') }}</UiButton>
+            <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
           </div>
         </div>
         <div v-else class="flex flex-wrap items-center gap-3">
-          <button type="button" class="btn btn-primary btn-sm gap-1.5" @click="openEditor"><PenLine :size="14" />{{ $t('reviews.write') }}</button>
+          <UiButton variant="primary" size="sm" :icon="PenLine" @click="openEditor">{{ $t('reviews.write') }}</UiButton>
           <span class="text-xs text-meta">{{ $t('reviews.rating_hint') }}</span>
         </div>
       </template>
       <p v-else class="text-sm text-meta">
-        <NuxtLink :to="loginPath" class="link">{{ $t('reviews.login') }}</NuxtLink>
+        <UiButton :to="loginPath" size="sm">{{ $t('reviews.login') }}</UiButton>
       </p>
     </div>
 
@@ -49,38 +49,39 @@
             <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1" :class="reviewRatingTone(review.rating)">{{ $t(reviewRatingKey(review.rating)) }}</span>
             <span v-if="review.tracking_status" class="rounded bg-btn px-1.5 py-0.5 text-[10px] text-btn-content">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
             <time class="text-meta" :datetime="review.created_at" :title="exact(review.created_at)">{{ ago(review.created_at) }}</time>
-            <button
+            <UiButton
               v-if="isAuthenticated && review.user_id !== user?.id"
-              type="button"
-              class="ml-auto text-faint transition-colors hover:text-meta"
-              :title="$t('reviews.report')"
+              :icon="Flag"
+              :label="$t('reviews.report')"
+              size="xs"
+              class="ml-auto"
               @click="reporting = review"
-            ><Flag :size="12" /></button>
+            />
           </p>
 
           <div class="relative mt-1" :class="{ 'max-h-56 overflow-hidden': isLong(review) && !expanded.has(review.id) }">
             <RichContent :content="review.content" format="markdown" class="text-sm" />
             <div v-if="isLong(review) && !expanded.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card" />
           </div>
-          <button v-if="isLong(review)" type="button" class="mt-1 text-xs font-medium text-meta transition-colors hover:text-primary" @click="toggleExpanded(review.id)">
+          <UiButton v-if="isLong(review)" size="xs" class="mt-1" @click="toggleExpanded(review.id)">
             {{ $t(expanded.has(review.id) ? 'reviews.collapse' : 'reviews.expand') }}
-          </button>
+          </UiButton>
 
           <div class="mt-2 flex flex-wrap items-center gap-1">
-            <button
+            <UiButton
               v-for="reaction in REACTIONS"
               :key="reaction.type"
-              type="button"
-              class="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors disabled:cursor-(--cursor-arrow) disabled:opacity-60"
-              :class="review.my_reactions.includes(reaction.type) ? reaction.active : 'text-meta hover:bg-ghost-hover hover:text-primary'"
+              size="xs"
+              :icon="reaction.icon"
+              class="gap-1 disabled:opacity-60"
+              :class="review.my_reactions.includes(reaction.type) ? reaction.active : ''"
               :disabled="review.user_id === user?.id || reacting === review.id"
-              :aria-pressed="review.my_reactions.includes(reaction.type)"
+              :pressed="review.my_reactions.includes(reaction.type)"
               @click="react(review, reaction.type)"
             >
-              <component :is="reaction.icon" :size="12" />
               <span>{{ $t(`reviews.reactions.${reaction.type}`) }}</span>
               <span v-if="review[`${reaction.type}_count`] > 0" class="tabular-nums">{{ review[`${reaction.type}_count`] }}</span>
-            </button>
+            </UiButton>
           </div>
         </div>
       </li>
@@ -97,7 +98,7 @@
     <p v-else class="px-5 py-6 text-center text-sm text-meta">{{ $t('reviews.empty') }}</p>
 
     <div v-if="page < lastPage" class="border-t border-line px-5 py-2 text-center">
-      <button type="button" class="btn btn-ghost btn-xs" :disabled="pending" @click="load(page + 1)">{{ $t('reviews.more') }}</button>
+      <UiButton size="xs" :disabled="pending" @click="load(page + 1)">{{ $t('reviews.more') }}</UiButton>
     </div>
   </CatalogSection>
 
@@ -115,8 +116,8 @@
       <UiSelect v-model="reportReason" :options="reportReasonOptions" size="sm" class="mb-2 w-full" />
       <textarea v-model="reportNote" rows="2" class="textarea w-full text-sm" :placeholder="$t('shouts.report_note')" />
       <div class="modal-action">
-        <button type="button" class="btn btn-ghost btn-sm" @click="reporting = null">{{ $t('common.cancel') }}</button>
-        <button type="button" class="btn btn-sm btn-error" @click="report">{{ $t('reviews.report') }}</button>
+        <UiButton size="sm" @click="reporting = null">{{ $t('common.cancel') }}</UiButton>
+        <UiButton variant="danger" size="sm" @click="report">{{ $t('reviews.report') }}</UiButton>
       </div>
     </div>
     <div class="modal-backdrop" @click="reporting = null" />

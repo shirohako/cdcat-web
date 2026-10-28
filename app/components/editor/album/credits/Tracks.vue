@@ -37,12 +37,7 @@ const toggle = (id: RowId) => {
         @click="toggle(track.id)"
       >{{ track.number_label || track.track_number }}</button>
     </template>
-    <button
-      v-if="all.length"
-      type="button"
-      class="h-6 rounded-[5px] bg-btn px-1.5 text-[11px] font-semibold text-btn-content ring-1 ring-inset ring-line transition-colors hover:bg-btn-hover"
-      @click="model = allOn ? [] : [...all]"
-    >{{ allOn ? t('editor.credits.no_tracks_on') : t('common.all') }}</button>
+    <UiButton v-if="all.length" size="xs" class="ring-1 ring-inset ring-line" @click="model = allOn ? [] : [...all]">{{ allOn ? t('editor.credits.no_tracks_on') : t('common.all') }}</UiButton>
     <span v-if="!model.length" class="text-[11px] text-meta">{{ t('editor.credits.whole_album') }}</span>
   </span>
 </template>

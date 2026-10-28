@@ -123,7 +123,7 @@ useHead({ title: computed(() => contentTabsLabels[type.value]) })
         <h1 class="mt-1 text-3xl font-bold">{{ contentTabsLabels[type] }}</h1>
         <p class="mt-2 text-sm text-slate-600">{{ contentDescriptionLabels[type] }}</p>
       </div>
-      <NuxtLink v-if="creatable" :to="adminEditorPath(type)!" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">新建{{ contentTabsLabels[type] }}</NuxtLink>
+      <UiButton v-if="creatable" :to="adminEditorPath(type)!" variant="primary">新建{{ contentTabsLabels[type] }}</UiButton>
     </header>
 
     <AdminFilterBar>
@@ -173,13 +173,13 @@ useHead({ title: computed(() => contentTabsLabels[type.value]) })
           <option v-for="sort in sorts[type]" :key="sort" :value="sort">{{ contentSortLabels[sort] }}</option>
         </select>
         <select v-model="filters.sort_order" aria-label="排序方向" class="rounded-lg border border-slate-300 bg-white px-3 py-2"><option value="">降序</option><option value="asc">升序</option></select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
 
     <div class="flex flex-wrap items-center gap-3 text-sm">
       <span class="text-slate-500">共 {{ pagination.total }} 条</span>
-      <button v-if="recountable" type="button" :disabled="busy || !selected.length" class="ml-auto rounded-lg border bg-white px-3 py-1.5 disabled:opacity-40" @click="recount(selected)">重算选中的 {{ selected.length }} 项</button>
+      <UiButton v-if="recountable" size="sm" class="ml-auto" :disabled="busy || !selected.length" @click="recount(selected)">重算选中的 {{ selected.length }} 项</UiButton>
     </div>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -216,7 +216,7 @@ useHead({ title: computed(() => contentTabsLabels[type.value]) })
                 <td class="px-3 py-3 text-xs text-slate-500">{{ time(item.created_at) }}</td>
                 <td class="px-3 py-3">
                   <div class="flex justify-end gap-3 whitespace-nowrap text-xs">
-                    <NuxtLink :to="frontLink(item)" target="_blank" class="text-slate-500 underline">前台预览</NuxtLink>
+                    <UiButton :to="frontLink(item)" target="_blank" size="xs">前台预览</UiButton>
                   </div>
                 </td>
               </tr>

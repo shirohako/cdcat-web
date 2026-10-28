@@ -2,9 +2,9 @@
   <div class="space-y-2">
     <ul v-if="shown.length" class="space-y-2">
       <li v-for="(row, index) in shown" :key="String(row.id)" class="flex flex-wrap items-center gap-2 rounded-lg px-3 py-2" :class="errorsOf(row.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken'">
-        <div v-if="ordered" class="flex flex-col">
-          <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === 0" :aria-label="$t('catalog.form.move_up')" @click="moveRow(rows, row, -1)"><ChevronUp :size="14" /></button>
-          <button type="button" class="text-faint transition-colors hover:text-primary disabled:opacity-30" :disabled="index === shown.length - 1" :aria-label="$t('catalog.form.move_down')" @click="moveRow(rows, row, 1)"><ChevronDown :size="14" /></button>
+        <div v-if="ordered" class="flex gap-1">
+          <UiButton :icon="ChevronUp" :label="$t('catalog.form.move_up')" size="xs" :disabled="index === 0" @click="moveRow(rows, row, -1)" />
+          <UiButton :icon="ChevronDown" :label="$t('catalog.form.move_down')" size="xs" :disabled="index === shown.length - 1" @click="moveRow(rows, row, 1)" />
         </div>
         <UiSelect v-if="relations" :model-value="get(row, 'relation_type') as string" :options="relationOptions" size="sm" class="w-40" @change="value => set(row, 'relation_type', value)" />
         <EditorRefLabel :id="refId(row)" :type="kind" :references="references" class="min-w-32 flex-1 text-sm font-medium" />
@@ -27,7 +27,7 @@
             @change="setExtra(row, extra, ($event.target as HTMLInputElement).value)"
           >
         </template>
-        <button type="button" class="btn btn-ghost btn-sm px-2" :aria-label="$t('common.delete')" @click="remove(row)"><Trash2 :size="14" /></button>
+        <UiButton :icon="Trash2" :label="$t('common.delete')" icon-class="size-3.5" size="sm" @click="remove(row)" />
         <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
       </li>
     </ul>

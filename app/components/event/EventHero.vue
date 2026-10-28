@@ -67,24 +67,19 @@
           </div>
 
           <div class="mt-6 flex flex-wrap gap-2">
-            <button
-              v-if="hasMap"
-              type="button"
-              class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong"
-              @click="$emit('jump-map')"
-            >
-              <MapIcon :size="16" />{{ t('event_page.hero.open_map') }}
-            </button>
-            <a
+            <UiButton v-if="hasMap" variant="primary" :icon="MapIcon" @click="$emit('jump-map')">
+              {{ t('event_page.hero.open_map') }}
+            </UiButton>
+            <UiButton
               v-for="link in links"
               :key="link.url"
               :href="link.url"
               target="_blank"
               rel="noopener"
-              class="inline-flex items-center gap-2 rounded-lg bg-on-media/10 px-4 py-2 text-sm font-medium text-on-media ring-1 ring-on-media/15 transition-colors duration-150 ease-out hover:bg-on-media/15"
+              :icon-right="ExternalLink"
             >
-              {{ link.label }}<ExternalLink :size="14" class="text-on-media/60" />
-            </a>
+              {{ link.label }}
+            </UiButton>
           </div>
         </div>
       </div>

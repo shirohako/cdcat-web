@@ -23,7 +23,7 @@ const search = defineModel<string>({ required: true })
         :aria-label="placeholder"
       >
     </label>
-    <button type="submit" class="btn btn-primary btn-sm h-9 shrink-0 text-xs">{{ $t('catalog.search') }}</button>
+    <UiButton type="submit" variant="primary" size="sm" class="shrink-0">{{ $t('catalog.search') }}</UiButton>
     <slot />
   </form>
 </template>

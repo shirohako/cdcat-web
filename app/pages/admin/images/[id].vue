@@ -105,11 +105,10 @@ useHead({ title: computed(() => `图片 #${id.value}`) })
       <NuxtLink to="/admin/images" class="text-sm text-slate-600 underline">返回列表</NuxtLink>
       <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
         <h1 class="text-3xl font-bold">图片 #{{ id }}</h1>
-        <button
-          v-if="image" type="button" :disabled="busy || image.in_use" :title="image.in_use ? '这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。' : undefined"
-          class="rounded-lg border border-red-300 px-3 py-2 text-sm text-red-700 disabled:cursor-not-allowed disabled:opacity-40" @click="deleteOpen = true">
-          删除图片
-        </button>
+        <!-- The hint sits on a wrapper: a disabled button takes no pointer events, so it would show no title. -->
+        <span v-if="image" :title="image.in_use ? '这张图片还在使用中，不能删除。请先在上面列出的地方把它换掉。' : undefined">
+          <UiButton variant="danger-soft" size="sm" :disabled="busy || image.in_use" @click="deleteOpen = true">删除图片</UiButton>
+        </span>
       </div>
     </header>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -134,7 +133,7 @@ useHead({ title: computed(() => `图片 #${id.value}`) })
                     <NuxtLink :to="`/albums/${use.album_id}`" target="_blank" class="underline">#{{ use.album_id }} {{ use.title }}</NuxtLink>
                     <span class="ml-2 text-slate-500">{{ imageKindLabels[use.kind] }}<template v-if="use.label"> · {{ use.label }}</template><template v-if="scope(use)"> · {{ scope(use) }}</template></span>
                   </span>
-                  <NuxtLink :to="`/contribute/album/${use.album_id}`" class="text-xs underline">编辑专辑</NuxtLink>
+                  <UiButton :to="`/contribute/album/${use.album_id}`" size="xs">编辑专辑</UiButton>
                 </li>
               </ul>
             </template>

@@ -9,7 +9,9 @@
     <div :class="['max-w-xl', { 'xl:order-last': !flip }]">
       <p class="text-[0.8125rem] font-bold tracking-[0.14em] text-meta">{{ kicker }}</p>
       <h2 class="landing-display mt-3 whitespace-pre-line text-[2.25rem] leading-[1.15] text-title sm:text-[2.75rem]">{{ title }}</h2>
-      <p class="mt-4 text-base leading-[1.9] text-body">{{ body }}</p>
+      <!-- Medium and in the title colour, so it holds up beside the heavy display face (fonts without a medium,
+           such as Microsoft YaHei, still get the darker colour). -->
+      <p class="mt-4 text-base font-medium leading-[1.9] text-title">{{ body }}</p>
       <ul v-if="tags.length" class="mt-6 flex flex-wrap gap-2">
         <li
           v-for="tag in tags"

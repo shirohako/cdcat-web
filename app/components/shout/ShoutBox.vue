@@ -15,23 +15,23 @@
           <div class="mt-1 flex items-center gap-2">
             <span class="text-[11px] tabular-nums text-meta">{{ draft.length }} / {{ SHOUT_MAX_LENGTH }}</span>
             <span v-if="errorMessage" class="text-xs text-danger">{{ errorMessage }}</span>
-            <button v-if="mine" type="button" class="btn btn-ghost btn-xs ml-auto" @click="editing = false">{{ $t('common.cancel') }}</button>
-            <button type="button" class="btn btn-primary btn-xs" :class="{ 'ml-auto': !mine }" :disabled="saving || !draft.trim()" @click="save">
+            <UiButton v-if="mine" size="xs" class="ml-auto" @click="editing = false">{{ $t('common.cancel') }}</UiButton>
+            <UiButton variant="primary" size="xs" :class="{ 'ml-auto': !mine }" :disabled="saving || !draft.trim()" @click="save">
               {{ $t(mine ? 'shouts.update' : 'shouts.post') }}
-            </button>
+            </UiButton>
           </div>
         </div>
         <div v-else class="rounded-lg bg-primary/10 px-3 py-2 text-sm">
           <p class="mb-1 text-[11px] font-semibold text-primary">{{ $t('shouts.mine') }}</p>
           <p class="whitespace-pre-line text-title">{{ mine.content }}</p>
           <div class="mt-1 flex gap-3 text-[11px] text-meta">
-            <button type="button" class="link link-muted" @click="startEdit">{{ $t('common.edit') }}</button>
-            <button type="button" class="text-danger hover:underline" @click="remove">{{ $t('common.delete') }}</button>
+            <UiButton size="xs" @click="startEdit">{{ $t('common.edit') }}</UiButton>
+            <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
           </div>
         </div>
       </template>
       <p v-else class="text-sm text-meta">
-        <NuxtLink :to="`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`" class="link">{{ $t('shouts.login') }}</NuxtLink>
+        <UiButton :to="`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`" size="sm">{{ $t('shouts.login') }}</UiButton>
       </p>
     </div>
 
@@ -44,13 +44,14 @@
           <p class="flex flex-wrap items-center gap-x-2 text-xs">
             <NuxtLink :to="`/profile/${shout.user?.username}`" class="font-semibold text-body transition-colors duration-150 ease-out hover:text-primary">{{ shout.user?.nickname || shout.user?.username }}</NuxtLink>
             <time class="text-meta" :datetime="shout.updated_at" :title="exact(shout.updated_at)">{{ ago(shout.updated_at) }}</time>
-            <button
+            <UiButton
               v-if="isAuthenticated && shout.user?.username !== user?.username"
-              type="button"
-              class="ml-auto text-faint transition-colors duration-150 ease-out hover:text-primary"
-              :title="$t('shouts.report')"
+              size="xs"
+              :icon="Flag"
+              :label="$t('shouts.report')"
+              class="ml-auto"
               @click="reporting = shout"
-            ><Flag :size="12" /></button>
+            />
           </p>
           <p class="mt-0.5 whitespace-pre-line wrap-break-word text-sm text-title">{{ shout.content }}</p>
         </div>
@@ -68,7 +69,7 @@
     <p v-else class="px-5 py-6 text-center text-sm text-meta">{{ $t('shouts.empty') }}</p>
 
     <div v-if="page < lastPage" class="border-t border-line px-5 py-2 text-center">
-      <button type="button" class="btn btn-ghost btn-xs" :disabled="pending" @click="loadMore">{{ $t('shouts.more') }}</button>
+      <UiButton size="xs" :disabled="pending" @click="loadMore">{{ $t('shouts.more') }}</UiButton>
     </div>
   </CatalogSection>
 
@@ -78,8 +79,8 @@
       <UiSelect v-model="reportReason" :options="reportReasonOptions" size="sm" class="mb-2 w-full" />
       <textarea v-model="reportNote" rows="2" class="textarea w-full text-sm" :placeholder="$t('shouts.report_note')" />
       <div class="modal-action">
-        <button type="button" class="btn btn-ghost btn-sm" @click="reporting = null">{{ $t('common.cancel') }}</button>
-        <button type="button" class="btn btn-sm btn-error" @click="report">{{ $t('shouts.report') }}</button>
+        <UiButton size="sm" @click="reporting = null">{{ $t('common.cancel') }}</UiButton>
+        <UiButton variant="danger" size="sm" @click="report">{{ $t('shouts.report') }}</UiButton>
       </div>
     </div>
     <div class="modal-backdrop bg-black/50" @click="reporting = null" />

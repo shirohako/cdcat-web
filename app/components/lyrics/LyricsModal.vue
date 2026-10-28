@@ -9,9 +9,9 @@
     tone="sky"
   >
     <template #actions>
-      <NuxtLink v-if="trackId" :to="`/tracks/${trackId}`" class="btn btn-ghost btn-xs mt-0.5 shrink-0 gap-1 font-normal text-meta hover:text-primary" @click="open = false">
-        {{ $t('lyrics_ui.open_track') }}<ArrowUpRight :size="12" />
-      </NuxtLink>
+      <UiButton v-if="trackId" :to="`/tracks/${trackId}`" size="xs" :icon-right="ArrowUpRight" class="mt-0.5 shrink-0" @click="open = false">
+        {{ $t('lyrics_ui.open_track') }}
+      </UiButton>
     </template>
     <LyricsPanel v-if="trackId" :key="trackId" :track-id="trackId" />
   </EditorModal>

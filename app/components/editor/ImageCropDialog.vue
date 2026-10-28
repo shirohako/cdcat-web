@@ -14,10 +14,8 @@
     </div>
     <div v-else class="flex justify-center py-10"><span class="loading loading-spinner" /></div>
     <template #footer>
-      <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="emit('cancel')">{{ $t('common.cancel') }}</button>
-      <button type="button" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px" :disabled="!image || busy" @click="apply">
-        <span v-if="busy" class="loading loading-spinner loading-xs" />{{ $t('editor.crop.apply') }}
-      </button>
+      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="emit('cancel')">{{ $t('common.cancel') }}</UiButton>
+      <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!image" :loading="busy" @click="apply">{{ $t('editor.crop.apply') }}</UiButton>
     </template>
   </EditorModal>
 </template>

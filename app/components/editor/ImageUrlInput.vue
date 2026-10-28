@@ -11,8 +11,8 @@
           <Upload :size="14" />{{ $t(model ? 'editor.image.replace' : 'editor.image.upload_file') }}
           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="busy" @change="pick">
         </label>
-        <button type="button" class="btn btn-ghost btn-sm gap-1" :disabled="busy" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
-        <button v-if="model" type="button" class="btn btn-ghost btn-sm gap-1 text-meta hover:text-danger" :disabled="busy" @click="model = null"><Trash2 :size="14" />{{ $t('editor.image.remove') }}</button>
+        <UiButton :icon="Link2" icon-class="size-3.5" size="sm" class="gap-1" :disabled="busy" @click="openUrl">{{ $t('editor.image.from_url') }}</UiButton>
+        <UiButton v-if="model" variant="danger-soft" :icon="Trash2" icon-class="size-3.5" size="sm" class="gap-1" :disabled="busy" @click="model = null">{{ $t('editor.image.remove') }}</UiButton>
       </div>
       <p v-if="message" class="text-xs text-danger">{{ message }}</p>
     </div>

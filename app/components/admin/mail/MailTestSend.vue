@@ -53,9 +53,9 @@ const send = async () => {
       <label v-for="locale in available" :key="locale" class="flex items-center gap-1.5">
         <input type="checkbox" :checked="chosen.includes(locale)" :disabled="busy || disabled" @change="toggle(locale)">{{ localeName(locale) }}
       </label>
-      <button type="button" :disabled="busy || disabled || !target || !chosen.length" class="rounded-lg border border-slate-300 px-3 py-1.5 disabled:opacity-40" @click="send">
+      <UiButton size="sm" :disabled="busy || disabled || !target || !chosen.length" @click="send">
         {{ busy ? '发送中…' : '发给我' }}
-      </button>
+      </UiButton>
     </div>
     <p v-if="message" role="alert" class="mt-3 text-xs text-red-700">{{ message }}</p>
     <ul v-if="results.length" class="mt-3 space-y-1 text-xs" role="status">

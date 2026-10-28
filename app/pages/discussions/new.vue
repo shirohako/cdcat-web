@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2, Send } from '@lucide/vue'
+import { Send } from '@lucide/vue'
 import type { ContentLinkSummary, ContentLinkType, TagSummary } from '~/types/article'
 import type { DiscussionCategoryDetail, DiscussionReferences } from '~/types/discussion'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
@@ -134,8 +134,8 @@ useSeoMeta({ title: () => t('discussions.new.title'), robots: 'noindex' })
         <div class="flex flex-wrap items-center justify-end gap-3 border-t border-line pt-4">
           <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
           <span v-else class="mr-auto text-xs text-meta">{{ t('discussions.new.draft_hint') }}</span>
-          <NuxtLink to="/discussions" class="btn btn-ghost">{{ t('common.cancel') }}</NuxtLink>
-          <button type="submit" class="btn btn-primary" :disabled="busy"><Loader2 v-if="busy" :size="15" class="animate-spin" /><Send v-else :size="15" />{{ t('discussions.new.submit') }}</button>
+          <UiButton to="/discussions">{{ t('common.cancel') }}</UiButton>
+          <UiButton type="submit" variant="primary" :icon="Send" :loading="busy">{{ t('discussions.new.submit') }}</UiButton>
         </div>
       </form>
     </div>

@@ -105,9 +105,9 @@ useHead({ title: '歌词巡查' })
         </label>
         <form class="flex gap-2" @submit.prevent="setQuery({ track_id: trackId.trim() || undefined })">
           <input v-model="trackId" inputmode="numeric" pattern="[0-9]*" placeholder="曲目 ID" aria-label="曲目 ID" class="w-28 rounded-lg border border-slate-300 bg-white px-3 py-2">
-          <button type="submit" class="rounded-lg border bg-white px-3 py-2">应用</button>
+          <UiButton type="submit">应用</UiButton>
         </form>
-        <button v-if="queue === 'unchecked'" type="button" :disabled="busy || !selected.length" class="ml-auto rounded-lg border border-emerald-300 bg-white px-3 py-2 text-emerald-700 disabled:opacity-40" @click="checkSelected">巡查选中的 {{ selected.length }} 条</button>
+        <UiButton v-if="queue === 'unchecked'" :disabled="busy || !selected.length" class="ml-auto" @click="checkSelected">巡查选中的 {{ selected.length }} 条</UiButton>
       </div>
     </AdminFilterBar>
 
@@ -146,15 +146,15 @@ useHead({ title: '歌词巡查' })
           </div>
 
           <div class="mt-3 flex flex-wrap gap-2 text-sm">
-            <button v-if="checkable(revision)" type="button" :disabled="busy" class="rounded-lg border border-emerald-300 px-3 py-1.5 text-emerald-700 disabled:opacity-40" @click="check(revision)">标记已巡查</button>
-            <button v-if="revision.status === 'pending'" type="button" :disabled="busy" class="rounded-lg bg-emerald-600 px-3 py-1.5 text-white disabled:opacity-40" @click="approve(revision)">通过</button>
-            <NuxtLink v-if="revision.status === 'pending'" :to="`/admin/revisions/${revision.id}`" class="rounded-lg border px-3 py-1.5">审核详情</NuxtLink>
-            <NuxtLink
+            <UiButton v-if="checkable(revision)" size="sm" :disabled="busy" @click="check(revision)">标记已巡查</UiButton>
+            <UiButton v-if="revision.status === 'pending'" variant="primary" size="sm" :disabled="busy" @click="approve(revision)">通过</UiButton>
+            <UiButton v-if="revision.status === 'pending'" :to="`/admin/revisions/${revision.id}`" size="sm">审核详情</UiButton>
+            <UiButton
               v-if="revision.lyric && item(revision)?.result_version && item(revision)!.result_version! > 1"
               :to="`/admin/content/lyrics/${revision.lyric.id}?restore=${item(revision)!.result_version! - 1}`"
-              class="rounded-lg border px-3 py-1.5"
-            >恢复上一版</NuxtLink>
-            <button type="button" :disabled="busy" class="ml-auto rounded-lg border border-red-300 px-3 py-1.5 text-red-700 disabled:opacity-40" @click="purgeTarget = revision">清除</button>
+              size="sm"
+            >恢复上一版</UiButton>
+            <UiButton variant="danger-soft" size="sm" :disabled="busy" class="ml-auto" @click="purgeTarget = revision">清除</UiButton>
           </div>
         </li>
       </ul>

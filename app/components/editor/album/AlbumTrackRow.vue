@@ -27,10 +27,10 @@
         <span class="hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
       </label>
       <button v-if="badge" type="button" class="hidden shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium sm:inline" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
-      <button type="button" class="btn btn-sm shrink-0 px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-expanded="open" :title="$t('editor.album.track_details')" @click="open = !open">
+      <UiButton :label="$t('editor.album.track_details')" size="sm" class="shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :aria-expanded="open" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
-      </button>
-      <button type="button" class="btn btn-sm shrink-0 px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="remove"><X :size="14" /></button>
+      </UiButton>
+      <UiButton variant="danger-soft" :icon="X" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
     </div>
     <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-[11px] text-danger">{{ error.message }}</p>
 
@@ -53,8 +53,8 @@
           <UiSelect :model-value="String(track.disc_id)" :options="discOptions" size="sm" class="w-32" @change="moveTo" />
         </label>
         <div class="flex gap-1">
-          <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :title="$t('catalog.form.move_up')" @click="moveTrack(album, track.id, -1)"><ArrowUp :size="14" /></button>
-          <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :title="$t('catalog.form.move_down')" @click="moveTrack(album, track.id, 1)"><ArrowDown :size="14" /></button>
+          <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="moveTrack(album, track.id, -1)" />
+          <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="moveTrack(album, track.id, 1)" />
         </div>
       </div>
 

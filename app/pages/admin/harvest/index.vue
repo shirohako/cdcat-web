@@ -62,7 +62,7 @@ useHead({ title: '采集概况' })
     <AdminListState :pending="pending && !data" :error="error" @retry="refresh()">
       <div v-if="data?.unprocessed" class="flex flex-wrap items-center gap-3 rounded-lg border border-sky-200 bg-sky-50 px-4 py-2 text-sm text-sky-900">
         {{ data.unprocessed }} 条新记录等待合并
-        <button type="button" class="rounded border border-sky-300 bg-white px-2 py-1" :disabled="processing" @click="processNow">立即合并</button>
+        <UiButton size="sm" :disabled="processing" @click="processNow">立即合并</UiButton>
         <span v-if="processError" class="text-red-700">{{ processError }}</span>
       </div>
       <p v-if="processNotice" role="status" class="text-sm text-emerald-700">{{ processNotice }}</p>

@@ -80,7 +80,7 @@ const { data, status: loadStatus, refresh, loading, refetching, revealKey, revea
       />
     </template>
     <div v-else-if="loadStatus === 'error'" class="card flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-meta">
-      {{ t('common.load_failed') }}<button type="button" class="link" @click="refresh()">{{ t('common.retry') }}</button>
+      {{ t('common.load_failed') }}<UiButton size="xs" @click="refresh()">{{ t('common.retry') }}</UiButton>
     </div>
     <SkeletonStatus v-else-if="loading" page class="card divide-y divide-line overflow-hidden">
       <div v-for="row in 8" :key="row" class="flex items-center gap-3 px-4 py-4">

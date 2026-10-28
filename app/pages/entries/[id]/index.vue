@@ -105,10 +105,9 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
                   <Music2 :size="18" />
                   {{ $t('catalog.albums_count', { count: entry.albums_count ?? entry.albums.length }) }}
                 </span>
-                <NuxtLink :to="`/contribute/entry/${entry.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-on-media/15 px-3 py-1.5 text-sm transition-colors duration-150 ease-out hover:bg-on-media/25">
-                  <Pencil class="h-4 w-4" />
+                <UiButton :to="`/contribute/entry/${entry.id}`" size="sm" :icon="Pencil" class="ml-auto">
                   {{ $t('catalog.edit') }}
-                </NuxtLink>
+                </UiButton>
               </div>
             </div>
           </div>

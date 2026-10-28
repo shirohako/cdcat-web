@@ -42,6 +42,6 @@ const shownIcon = computed(() => props.icon === false ? null : props.icon ?? TON
         <slot name="actions" />
       </div>
     </div>
-    <UiIconButton v-if="dismissible" icon="lucide:x" :label="$t('common.close')" size="xs" class="-mr-1.5 shrink-0" @click="emit('dismiss')" />
+    <UiButton v-if="dismissible" variant="ghost" icon="lucide:x" :label="$t('common.close')" size="xs" class="-mr-1.5 shrink-0" @click="emit('dismiss')" />
   </div>
 </template>

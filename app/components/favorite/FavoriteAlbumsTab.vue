@@ -11,10 +11,9 @@
       icon="lucide:disc-3"
     >
       <template #actions>
-        <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-          <Icon name="lucide:search" class="w-4 h-4" />
+        <UiButton to="/albums" variant="primary" size="sm" icon="lucide:search">
           {{ $t('collection_components.browse_albums') }}
-        </NuxtLink>
+        </UiButton>
       </template>
     </UiEmpty>
 
@@ -67,27 +66,25 @@
 
             <!-- Actions -->
             <div class="shrink-0 flex items-center justify-center sm:justify-end gap-2 sm:gap-1">
-              <NuxtLink
+              <UiButton
                 :to="`/albums/${album.id}`"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-body transition-colors hover:bg-ghost-hover hover:text-primary flex-none"
-                :aria-label="$t('collection_components.view_album', { name: album.title })"
-                :title="$t('collection_components.view')"
-              >
-                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5" />
-              </NuxtLink>
-              <button
-                type="button"
+                icon="lucide:arrow-right"
+                :label="$t('collection_components.view_album', { name: album.title })"
+                :tooltip="$t('collection_components.view')"
+                size="sm"
+                round
+                class="flex-none"
+              />
+              <UiButton
+                :icon="unliked[album.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
+                :icon-class="unliked[album.id] ? 'size-4 text-meta' : 'size-4 text-red-600 dark:text-red-400'"
+                :label="$t(unliked[album.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
                 :disabled="!!unlikeLoading[album.id]"
+                size="sm"
+                round
+                class="flex-none"
                 @click="handleToggle(album.id)"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full transition-colors hover:bg-ghost-hover flex-none disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                :title="$t(unliked[album.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
-              >
-                <Icon
-                  :name="unliked[album.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
-                  class="w-4 h-4 sm:w-5 sm:h-5"
-                  :class="unliked[album.id] ? 'text-meta' : 'text-red-600 dark:text-red-400'"
-                />
-              </button>
+              />
             </div>
           </div>
         </div>

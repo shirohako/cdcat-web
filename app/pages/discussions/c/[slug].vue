@@ -56,12 +56,12 @@ usePageSeo({
               </div>
               <div class="flex items-center gap-2">
                 <DiscussionLevelMenu v-if="isAuthenticated" v-model:level="level" kind="category" :target-id="category.id" />
-                <NuxtLink
+                <UiButton
                   v-if="category.can.post" :to="{ path: '/discussions/new', query: newTopic }"
-                  class="btn btn-primary btn-sm"
+                  variant="primary" size="sm" :icon="PenSquare"
                 >
-                  <PenSquare :size="13" />{{ t('discussions.new_topic') }}
-                </NuxtLink>
+                  {{ t('discussions.new_topic') }}
+                </UiButton>
               </div>
             </div>
             <div v-if="category.children.length" class="flex flex-wrap gap-2 border-t border-line px-5 py-3">

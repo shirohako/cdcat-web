@@ -72,7 +72,16 @@
     --ui-btn-color: oklch(0.22 0.04 65);
   }
 
-  /* A text button: no surface until hovered, then vivia's quiet background and the theme colour. */
+  /* Destructive actions beside others (删除, 撤回, 移除): red on a red tint; .btn-error stays for confirming. */
+  .btn-danger-soft {
+    --ui-btn-bg: color-mix(in oklab, var(--danger) 10%, transparent);
+    --ui-btn-hover: color-mix(in oklab, var(--danger) 18%, transparent);
+    --ui-btn-active: color-mix(in oklab, var(--danger) 26%, transparent);
+    --ui-btn-color: var(--danger);
+  }
+
+  /* A text button: no surface until hovered, then vivia's quiet background and the theme colour. Only for UiButton's
+     agreed exceptions (navbar icons, editor toolbars, close ×, icons inside inputs). */
   .btn-ghost {
     --ui-btn-bg: transparent;
     --ui-btn-hover: var(--ghost-hover);
@@ -109,6 +118,13 @@
     --ui-btn-hover-color: var(--primary);
   }
 
+  .btn-lg {
+    min-height: 3rem;
+    padding: 0.625rem 1.5rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
   .btn-sm {
     min-height: 2rem;
     padding: 0.3125rem 0.75rem;
@@ -131,6 +147,7 @@
   }
 
   .btn-circle { border-radius: 999px; }
+  .btn-lg:is(.btn-square, .btn-circle) { width: 3rem; }
   .btn-sm:is(.btn-square, .btn-circle) { width: 2rem; }
   .btn-xs:is(.btn-square, .btn-circle) { width: 1.75rem; }
 

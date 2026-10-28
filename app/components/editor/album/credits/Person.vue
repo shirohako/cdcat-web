@@ -106,8 +106,8 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       </div>
       <p v-if="note" class="rounded-md bg-warning/10 px-2.5 py-1.5 text-xs text-warning">⚠ {{ note }}</p>
       <div class="flex flex-wrap justify-between gap-2 border-t border-line pt-3">
-        <button v-if="person.artist_id !== null" type="button" class="btn btn-xs bg-btn text-btn-content ring-1 ring-inset ring-line hover:bg-btn-hover" @click="unlink">{{ t('editor.credits.unlink_artist') }}</button>
-        <button type="button" class="btn btn-xs ml-auto bg-danger/10 text-danger ring-1 ring-inset ring-danger/20 hover:bg-danger/20" @click="emit('remove')">{{ t('common.delete') }}</button>
+        <UiButton v-if="person.artist_id !== null" size="xs" class="ring-1 ring-inset ring-line" @click="unlink">{{ t('editor.credits.unlink_artist') }}</UiButton>
+        <UiButton variant="danger-soft" size="xs" class="ml-auto ring-1 ring-inset ring-danger/20" @click="emit('remove')">{{ t('common.delete') }}</UiButton>
       </div>
     </div>
   </UiPopover>

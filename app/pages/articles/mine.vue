@@ -59,7 +59,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
         <h1 class="text-2xl font-bold text-title">{{ t('article_ui.mine.title') }}</h1>
         <p class="mt-1 text-sm text-meta">{{ t('article_ui.mine.description') }}</p>
       </div>
-      <NuxtLink to="/articles/new" class="btn btn-primary btn-sm"><Plus :size="15" />{{ t('article_ui.write') }}</NuxtLink>
+      <UiButton to="/articles/new" variant="primary" size="sm" :icon="Plus">{{ t('article_ui.write') }}</UiButton>
     </header>
 
     <NuxtLink v-if="localNew" to="/articles/new" class="mt-6 flex items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-warning transition-colors duration-150 ease-out hover:bg-warning/15">
@@ -82,7 +82,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
     <CommonLoadError v-if="loadStatus === 'error' && data" class="mt-4" @retry="refresh()" />
     <SkeletonRows v-if="loading" page class="mt-4" :count="6" />
     <div v-else-if="loadStatus === 'error' && !data" class="py-16 text-center text-sm text-danger">
-      {{ localizeError(error) }} <button type="button" class="underline" @click="refresh()">{{ t('common.retry') }}</button>
+      {{ localizeError(error) }} <UiButton size="xs" class="align-middle" @click="refresh()">{{ t('common.retry') }}</UiButton>
     </div>
     <UiEmpty v-else-if="!data?.articles.length" :title="t('article_ui.mine.empty')" :icon="FileText" class="mt-4" />
     <ul
@@ -111,11 +111,9 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
           </p>
         </div>
         <div class="flex items-center gap-1">
-          <NuxtLink v-if="article.status === 'published'" :to="`/articles/${article.id}`" class="btn btn-ghost btn-sm" :title="t('article_ui.mine.view')">
-            <ExternalLink :size="14" />
-          </NuxtLink>
-          <NuxtLink :to="`/articles/${article.id}/edit`" class="btn btn-ghost btn-sm"><PenLine :size="14" />{{ t('common.edit') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm text-danger" :title="t('common.delete')" @click="deleting = article"><Trash2 :size="14" /></button>
+          <UiButton v-if="article.status === 'published'" :to="`/articles/${article.id}`" size="sm" :icon="ExternalLink" :label="t('article_ui.mine.view')" />
+          <UiButton :to="`/articles/${article.id}/edit`" size="sm" :icon="PenLine">{{ t('common.edit') }}</UiButton>
+          <UiButton variant="danger-soft" size="sm" :icon="Trash2" :label="t('common.delete')" @click="deleting = article" />
         </div>
       </li>
     </ul>

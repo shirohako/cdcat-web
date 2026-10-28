@@ -130,8 +130,8 @@ useHead({ title: '审核中心' })
           <input type="checkbox" :checked="filters[flag] === '1'" @change="filters[flag] = ($event.target as HTMLInputElement).checked ? '1' : ''">{{ revisionFlagLabels[flag] }}
         </label>
         <span v-if="filters.resource_id" class="rounded-lg bg-slate-200 px-3 py-2">实体 #{{ filters.resource_id }}</span>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
-        <button type="button" class="rounded-lg border bg-white px-3 py-2" @click="resetFilters">重置</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
+        <UiButton @click="resetFilters">重置</UiButton>
       </form>
     </AdminFilterBar>
 
@@ -141,10 +141,10 @@ useHead({ title: '审核中心' })
       <NuxtLink :to="{ query: { status: 'pending', has_conflicts: '1' } }" class="rounded-full bg-rose-50 px-3 py-1 text-rose-800">有冲突</NuxtLink>
       <template v-if="canReview">
         <span class="ml-auto text-slate-500">已选择 {{ selected.length }} 条</span>
-        <button type="button" :disabled="!selected.length" class="rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-emerald-700 disabled:opacity-40" @click="openBatch('approve')">批量批准</button>
-        <button type="button" :disabled="!selected.length" class="rounded-lg border border-orange-300 bg-white px-3 py-1.5 text-orange-700 disabled:opacity-40" @click="openBatch('request_changes')">批量退回</button>
-        <button type="button" :disabled="!selected.length" class="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-red-700 disabled:opacity-40" @click="openBatch('reject')">批量驳回</button>
-        <button type="button" :disabled="!selected.length" class="rounded-lg border bg-white px-3 py-1.5 disabled:opacity-40" @click="openBatch('check')">批量标记已巡查</button>
+        <UiButton size="sm" :disabled="!selected.length" @click="openBatch('approve')">批量批准</UiButton>
+        <UiButton size="sm" :disabled="!selected.length" @click="openBatch('request_changes')">批量退回</UiButton>
+        <UiButton variant="danger-soft" size="sm" :disabled="!selected.length" @click="openBatch('reject')">批量驳回</UiButton>
+        <UiButton size="sm" :disabled="!selected.length" @click="openBatch('check')">批量标记已巡查</UiButton>
       </template>
     </div>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -152,7 +152,7 @@ useHead({ title: '审核中心' })
     <section v-if="batchResult" role="status" class="rounded-xl border border-slate-200 bg-white p-4 text-sm">
       <div class="flex items-center justify-between gap-3">
         <p class="font-medium">成功 {{ batchResult.succeeded }} 条，失败 {{ batchResult.failed }} 条</p>
-        <button type="button" class="text-slate-500" @click="batchResult = null">关闭</button>
+        <UiButton size="xs" @click="batchResult = null">关闭</UiButton>
       </div>
       <ul v-if="batchResult.failed" class="mt-2 space-y-1 text-red-700">
         <li v-for="item in batchResult.results.filter(result => !result.success)" :key="item.id">

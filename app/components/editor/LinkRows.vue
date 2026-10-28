@@ -5,9 +5,7 @@
         <span class="max-w-36 shrink-0 truncate rounded-md bg-btn px-1.5 py-0.5 text-[11px] font-medium text-btn-content">{{ providerOf(row.link_provider_id) }}</span>
         <span class="min-w-0 truncate text-sm text-body">{{ bare(row.url) || '—' }}</span>
         <template #actions>
-          <a v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-btn text-btn-content hover:bg-btn-hover ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('editor.dialog.open_link')">
-            <ExternalLink :size="14" />
-          </a>
+          <UiButton v-if="row.url" :href="row.url" target="_blank" rel="noopener noreferrer" external :icon="ExternalLink" :label="$t('editor.dialog.open_link')" size="xs" class="shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" />
         </template>
       </EditorListRow>
     </ul>
@@ -36,8 +34,8 @@
         </label>
       </div>
       <template #footer>
-        <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</button>
+        <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" class="shadow-xs active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</UiButton>
       </template>
     </EditorModal>
   </div>

@@ -41,6 +41,6 @@ const save = async () => {
       </div>
     </div>
     <p v-if="message" role="alert" class="rounded-lg bg-red-50 p-4 text-sm text-red-700">{{ message }}</p>
-    <div class="flex gap-3"><button v-if="!readOnly" type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-5 py-2.5 text-sm text-white disabled:opacity-50">{{ busy ? '保存中…' : '保存' }}</button><NuxtLink to="/admin/roles" class="rounded-lg border bg-white px-5 py-2.5 text-sm">返回列表</NuxtLink></div>
+    <div class="flex gap-3"><UiButton v-if="!readOnly" type="submit" variant="primary" :disabled="busy">{{ busy ? '保存中…' : '保存' }}</UiButton><UiButton to="/admin/roles">返回列表</UiButton></div>
   </form>
 </template>

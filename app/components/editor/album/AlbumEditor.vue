@@ -6,7 +6,7 @@
 
       <div v-else-if="loadError" class="mx-auto max-w-lg space-y-3 py-16 text-center">
         <p class="alert alert-error justify-center">{{ loadError }}</p>
-        <NuxtLink :to="albumId ? `/albums/${albumId}` : '/albums'" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px">{{ $t('common.go_back') }}</NuxtLink>
+        <UiButton :to="albumId ? `/albums/${albumId}` : '/albums'" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px">{{ $t('common.go_back') }}</UiButton>
       </div>
 
       <template v-else-if="ready">
@@ -17,14 +17,15 @@
             <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" />
           </div>
           <nav v-if="!embedded" class="flex flex-wrap items-center gap-2">
-            <NuxtLink
+            <UiButton
               v-for="link in headerLinks"
               :key="link.to"
               :to="link.to"
-              class="inline-flex h-8 items-center gap-1.5 rounded-lg bg-btn px-3 text-xs font-semibold text-btn-content shadow-xs ring-1 ring-inset ring-line transition hover:bg-btn-hover active:translate-y-px"
-            >
-              <component :is="link.icon" :size="14" class="shrink-0" />{{ link.label }}
-            </NuxtLink>
+              :icon="link.icon"
+              icon-class="size-3.5"
+              size="sm"
+              class="gap-1.5 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
+            >{{ link.label }}</UiButton>
           </nav>
           <EditorDraftStatus v-if="!embedded" :draft="draft" class="w-full border-t border-line pt-3" @discard="restart" />
         </header>
@@ -32,8 +33,8 @@
         <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
-          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
+          <UiButton :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px">{{ $t('editor.continue_draft') }}</UiButton>
+          <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="openRevisions = []">{{ $t('editor.ignore') }}</UiButton>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
@@ -107,7 +108,7 @@
                   <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
                   <ul class="mt-2 flex flex-wrap gap-1.5">
                     <li v-for="check in requiredChecks.filter(item => !item.done)" :key="check.key">
-                      <button type="button" class="btn btn-xs ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="go(check.section)">{{ check.label }}</button>
+                      <UiButton size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="go(check.section)">{{ check.label }}</UiButton>
                     </li>
                   </ul>
                 </div>

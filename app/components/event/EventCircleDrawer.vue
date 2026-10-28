@@ -32,23 +32,18 @@
             </div>
             <div class="relative mt-4 flex gap-2">
               <!-- Checked: the checklist's gold star, the same in both themes (the header is always dark). -->
-              <button
-                type="button"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-colors duration-150 ease-out"
-                :class="checked ? 'bg-amber-400 text-amber-950 hover:bg-amber-300' : 'bg-primary text-on-primary hover:bg-primary-strong'"
+              <UiButton
+                :variant="checked ? 'default' : 'primary'"
+                class="flex-1"
+                :class="checked ? 'bg-amber-400 text-amber-950 hover:bg-amber-300' : ''"
                 @click="$emit('toggle-check')"
               >
-                <Star :size="16" :fill="checked ? 'currentColor' : 'none'" />
+                <Star class="size-4 shrink-0" :fill="checked ? 'currentColor' : 'none'" />
                 {{ checked ? t('event_page.checklist.remove') : t('event_page.checklist.add') }}
-              </button>
-              <button
-                v-if="circle.space_id"
-                type="button"
-                class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-on-media/10 px-3 py-2 text-sm font-medium ring-1 ring-on-media/20 transition-colors duration-150 ease-out hover:bg-on-media/15"
-                @click="$emit('locate')"
-              >
-                <LocateFixed :size="16" />{{ t('event_page.circle.locate') }}
-              </button>
+              </UiButton>
+              <UiButton v-if="circle.space_id" :icon="LocateFixed" @click="$emit('locate')">
+                {{ t('event_page.circle.locate') }}
+              </UiButton>
             </div>
           </div>
 

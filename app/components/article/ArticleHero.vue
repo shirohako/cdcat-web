@@ -53,15 +53,15 @@
     </NuxtLink>
 
     <!-- 编辑按钮（仅作者可见） -->
-    <NuxtLink
+    <UiButton
       v-if="isAuthor"
       :to="`/articles/${article.id}/edit`"
-      class="absolute top-4 right-4 md:right-8 inline-flex items-center gap-1.5 text-sm text-on-media/80 hover:text-on-media
-             bg-black/20 hover:bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-lg transition-colors duration-150 ease-out"
+      size="sm"
+      :icon="Pencil"
+      class="absolute top-4 right-4 md:right-8"
     >
-      <Pencil :size="14" />
       {{ $t('common.edit') }}
-    </NuxtLink>
+    </UiButton>
   </div>
 </template>
 

@@ -189,28 +189,42 @@ const markdownEnv: MarkdownEnv = {
 
     <!-- Actions -->
     <section class="card space-y-5 p-5">
-      <UiSectionTitle title="按钮与链接" description="悬停只换背景和颜色，不上浮、不加阴影。" />
+      <UiSectionTitle title="按钮与链接" description="按钮静止时都有底色或描边；悬停只换背景和颜色，不上浮、不加阴影。" />
       <div class="flex flex-wrap items-center gap-2">
         <UiButton>默认</UiButton>
         <UiButton variant="primary">主要</UiButton>
-        <UiButton variant="ghost">文字</UiButton>
         <UiButton variant="outline">描边</UiButton>
         <UiButton variant="danger">删除</UiButton>
+        <UiButton variant="danger-soft" icon="lucide:trash-2">移除</UiButton>
+        <UiButton variant="add" icon="lucide:plus">添加一行</UiButton>
         <UiButton icon="lucide:heart" :pressed="true">已收藏</UiButton>
         <UiButton loading>保存中</UiButton>
         <UiButton disabled>不可用</UiButton>
         <UiButton icon-right="lucide:arrow-right" to="/albums">链接按钮</UiButton>
       </div>
       <div class="flex flex-wrap items-center gap-2">
+        <UiButton size="lg" variant="primary">大号</UiButton>
+        <UiButton size="lg">大号</UiButton>
         <UiButton size="sm" variant="primary" icon="lucide:plus">小号</UiButton>
         <UiButton size="sm">小号</UiButton>
         <UiButton size="xs" variant="primary">超小</UiButton>
-        <UiButton size="xs" variant="ghost" icon="lucide:pencil">编辑</UiButton>
-        <button type="button" class="btn btn-sm btn-add"><Icon name="lucide:plus" class="size-4" />添加一行</button>
-        <UiIconButton icon="lucide:settings" label="设置" />
-        <UiIconButton icon="lucide:heart" label="收藏" variant="default" :pressed="true" />
-        <UiIconButton icon="lucide:trash-2" label="删除" variant="danger" size="sm" />
-        <UiIconButton icon="lucide:x" label="关闭" size="xs" round />
+        <UiButton size="xs" icon="lucide:pencil">编辑</UiButton>
+        <UiButton size="xs" variant="danger-soft">删除</UiButton>
+        <UiButton size="xs" variant="add" icon="lucide:plus">添加</UiButton>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <UiButton icon="lucide:settings" label="设置" size="lg" />
+        <UiButton icon="lucide:settings" label="设置" />
+        <UiButton icon="lucide:heart" label="收藏" :pressed="true" />
+        <UiButton icon="lucide:plus" label="新建" variant="primary" />
+        <UiButton icon="lucide:pencil" label="编辑" variant="outline" size="sm" />
+        <UiButton icon="lucide:trash-2" label="删除" variant="danger-soft" size="sm" />
+        <UiButton icon="lucide:share-2" label="分享" size="xs" round />
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs text-meta">ghost 静止时没有底色，只用于导航栏图标、编辑器工具栏、对话框和提示的关闭 ×、输入框里的图标：</span>
+        <UiButton variant="ghost" icon="lucide:menu" label="菜单" />
+        <UiButton variant="ghost" icon="lucide:x" label="关闭" size="xs" round />
       </div>
       <p class="text-sm text-body">
         正文里的 <UiLink to="/albums">主题色链接</UiLink>，
@@ -232,7 +246,7 @@ const markdownEnv: MarkdownEnv = {
       <UiCard padding="none" class="overflow-hidden">
         <div class="p-5 pb-3">
           <UiSectionTitle title="列表" :count="3" size="sm">
-            <template #actions><UiLink to="/albums" class="text-xs">全部</UiLink></template>
+            <template #actions><UiButton to="/albums" size="xs">全部</UiButton></template>
           </UiSectionTitle>
         </div>
         <div class="space-y-0.5 px-3 pb-3">
@@ -325,7 +339,7 @@ const markdownEnv: MarkdownEnv = {
       <UiAlert tone="info" title="信息">普通说明，例如编辑规则。</UiAlert>
       <UiAlert tone="success">修改已保存。</UiAlert>
       <UiAlert tone="warning" title="待审核" dismissible>这条修改要等审核通过才会公开。
-        <template #actions><UiButton size="xs" variant="ghost">查看修订</UiButton></template>
+        <template #actions><UiButton size="xs">查看修订</UiButton></template>
       </UiAlert>
       <UiAlert tone="danger" title="出错了">请求失败，请稍后再试。</UiAlert>
       <CommonLoadError @retry="showToast('重试中…', 'info')" />
@@ -432,7 +446,7 @@ const markdownEnv: MarkdownEnv = {
         </UiMenu>
         <UiMenu align="end" width="w-40">
           <template #trigger="{ toggle, attrs }">
-            <UiIconButton icon="lucide:ellipsis" label="菜单" v-bind="attrs" @click="toggle" />
+            <UiButton icon="lucide:ellipsis" label="菜单" v-bind="attrs" @click="toggle" />
           </template>
           <UiMenuItem>右对齐菜单</UiMenuItem>
           <UiMenuItem disabled>不可用</UiMenuItem>
@@ -450,9 +464,9 @@ const markdownEnv: MarkdownEnv = {
         <UiTooltip v-for="side in tooltipSides" :key="side" :text="`placement: ${side}`" :placement="side">
           <UiButton size="sm">{{ side }}</UiButton>
         </UiTooltip>
-        <UiIconButton icon="lucide:heart" label="收藏" />
-        <UiIconButton icon="lucide:share-2" label="分享" />
-        <UiIconButton icon="lucide:search" label="搜索" tooltip="按 / 搜索" />
+        <UiButton icon="lucide:heart" label="收藏" />
+        <UiButton icon="lucide:share-2" label="分享" />
+        <UiButton icon="lucide:search" label="搜索" tooltip="按 / 搜索" />
         <UiTooltip text="这是一段比较长的提示文字，超出宽度会自动换行，靠近屏幕边缘时会翻到另一侧。">
           <span class="link text-sm">长文字</span>
         </UiTooltip>
@@ -509,9 +523,9 @@ const markdownEnv: MarkdownEnv = {
         </UiPopover>
         <UiPopover placement="right-start" class="w-64">
           <template #trigger="{ toggle, attrs }">
-            <UiIconButton icon="lucide:info" label="弹出卡片（右侧）" v-bind="attrs" @click="toggle" />
+            <UiButton icon="lucide:info" label="弹出卡片（右侧）" v-bind="attrs" @click="toggle" />
           </template>
-          <p class="text-xs leading-5">靠近屏幕边缘时翻到另一侧，高度不够时卡片里面滚动。触发器是带 Tooltip 的 UiIconButton。</p>
+          <p class="text-xs leading-5">靠近屏幕边缘时翻到另一侧，高度不够时卡片里面滚动。触发器是带 Tooltip 的图标按钮（给了 label 的 UiButton）。</p>
         </UiPopover>
       </div>
     </section>
@@ -542,7 +556,7 @@ const markdownEnv: MarkdownEnv = {
         </template>
       </UiField>
       <template #footer>
-        <UiButton variant="ghost" @click="dialog = false">取消</UiButton>
+        <UiButton @click="dialog = false">取消</UiButton>
         <UiButton type="submit" variant="primary">保存</UiButton>
       </template>
     </UiDialog>

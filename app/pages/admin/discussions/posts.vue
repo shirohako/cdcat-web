@@ -79,7 +79,7 @@ useHead({ title: '全部帖子' })
         <option value="">全部状态</option>
         <option v-for="value in ['visible', 'hidden']" :key="value" :value="value">{{ postStatusLabels[value] }}</option>
       </select>
-      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white">应用</button>
+      <UiButton type="submit" variant="primary" size="sm">应用</UiButton>
     </form>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -102,11 +102,11 @@ useHead({ title: '全部帖子' })
                 <template v-if="canSeeIp && post.ip_address"> · <NuxtLink :to="{ query: { ip: post.ip_address } }" class="font-mono hover:text-slate-700">{{ post.ip_address }}</NuxtLink></template>
               </p>
             </div>
-            <div class="flex shrink-0 flex-wrap gap-1.5 text-xs">
-              <button v-if="post.status === 'visible'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="acting = { post, action: 'hide' }">折叠</button>
-              <button v-if="post.status === 'hidden'" type="button" class="rounded-lg border px-2.5 py-1.5" @click="acting = { post, action: 'unhide' }">取消折叠</button>
-              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="acting = { post, action: 'delete' }">删除</button>
-              <button v-if="post.user" type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="acting = { post, action: 'purge' }">清理广告号</button>
+            <div class="flex shrink-0 flex-wrap gap-1.5">
+              <UiButton v-if="post.status === 'visible'" size="xs" @click="acting = { post, action: 'hide' }">折叠</UiButton>
+              <UiButton v-if="post.status === 'hidden'" size="xs" @click="acting = { post, action: 'unhide' }">取消折叠</UiButton>
+              <UiButton variant="danger-soft" size="xs" @click="acting = { post, action: 'delete' }">删除</UiButton>
+              <UiButton v-if="post.user" variant="danger-soft" size="xs" @click="acting = { post, action: 'purge' }">清理广告号</UiButton>
             </div>
           </div>
         </li>

@@ -260,14 +260,14 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               <template v-if="detail.neighbors.position"> · 第 {{ detail.neighbors.position }} / {{ detail.neighbors.total }} 条</template>
             </p>
           </div>
-          <div class="flex flex-wrap gap-2 text-sm">
-            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.previous" @click="previous">上一条</button>
-            <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="!detail.neighbors.next" @click="next">{{ open ? '跳过' : '下一条' }}</button>
+          <div class="flex flex-wrap gap-2">
+            <UiButton size="sm" :disabled="!detail.neighbors.previous" @click="previous">上一条</UiButton>
+            <UiButton size="sm" :disabled="!detail.neighbors.next" @click="next">{{ open ? '跳过' : '下一条' }}</UiButton>
             <template v-if="open">
-              <button type="button" class="rounded-lg border border-red-200 px-3 py-1.5 text-red-700" :disabled="busy" @click="rejectOpen = true">不收录</button>
-              <button type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="linkOpen = !linkOpen">站内已有</button>
+              <UiButton variant="danger-soft" size="sm" :disabled="busy" @click="rejectOpen = true">不收录</UiButton>
+              <UiButton size="sm" :disabled="busy" @click="linkOpen = !linkOpen">站内已有</UiButton>
             </template>
-            <button v-else-if="['rejected', 'linked', 'excluded'].includes(detail.candidate.status)" type="button" class="rounded-lg border px-3 py-1.5" :disabled="busy" @click="act('restore', {}, 'refresh')">放回待审</button>
+            <UiButton v-else-if="['rejected', 'linked', 'excluded'].includes(detail.candidate.status)" size="sm" :disabled="busy" @click="act('restore', {}, 'refresh')">放回待审</UiButton>
           </div>
         </header>
         <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -284,9 +284,9 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
 
         <form v-if="rejectOpen" class="flex flex-wrap items-end gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm" @submit.prevent="reject">
           <label class="min-w-64 flex-1">原因<input v-model="rejectReason" required maxlength="500" class="mt-1 w-full rounded border border-slate-300 px-2 py-1.5"></label>
-          <button v-for="preset in rejectPresets" :key="preset" type="button" class="rounded border bg-white px-2 py-1 text-xs" @click="rejectReason = preset">{{ preset }}</button>
-          <button type="submit" class="rounded bg-red-700 px-3 py-1.5 text-white" :disabled="busy">不收录</button>
-          <button type="button" class="rounded border px-3 py-1.5" @click="rejectOpen = false">取消</button>
+          <UiButton v-for="preset in rejectPresets" :key="preset" size="xs" @click="rejectReason = preset">{{ preset }}</UiButton>
+          <UiButton type="submit" variant="danger" size="sm" :disabled="busy">不收录</UiButton>
+          <UiButton size="sm" @click="rejectOpen = false">取消</UiButton>
         </form>
         <div v-if="linkOpen" class="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
           <p class="font-medium">关联到站内已有的专辑</p>
@@ -306,14 +306,13 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                 <h3 :class="cardHead">
                   <Icon name="lucide:link" class="size-4 text-slate-400" />来源<span class="text-xs font-normal text-slate-500">{{ detail.records.length }}</span>
                   <span v-if="officialLinks.length" class="ml-auto flex flex-wrap justify-end gap-1.5">
-                    <a
+                    <UiButton
                       v-for="link in officialLinks.slice(0, 3)" :key="link.url" :href="link.url" target="_blank" rel="noopener noreferrer"
-                      class="inline-flex items-center gap-1 rounded-md border border-slate-300 bg-white px-2 py-0.5 text-xs font-normal text-slate-700 hover:bg-slate-50"
+                      size="xs" icon="lucide:globe" icon-right="lucide:external-link" class="font-normal"
                       :title="`专辑官网（${sourceName(link.source)} 给的链接）：${link.url}`"
                     >
-                      <Icon name="lucide:globe" class="size-3.5 text-slate-500" />官网<span v-if="officialLinks.length > 1" class="text-slate-500">· {{ host(link.url) }}</span>
-                      <Icon name="lucide:external-link" class="size-3 text-slate-400" />
-                    </a>
+                      官网<span v-if="officialLinks.length > 1" class="text-slate-500">· {{ host(link.url) }}</span>
+                    </UiButton>
                   </span>
                 </h3>
                 <ul class="divide-y divide-slate-100">
@@ -328,7 +327,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                           <span v-if="record.delisted" class="text-amber-700">已下架</span>
                         </p>
                       </div>
-                      <button v-if="open && detail.records.length > 1" type="button" class="shrink-0 rounded border border-slate-200 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-50" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</button>
+                      <UiButton v-if="open && detail.records.length > 1" size="xs" class="shrink-0" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</UiButton>
                     </div>
                     <dl v-if="record.listings.length || record.events.length" class="mt-2.5 grid grid-cols-[3rem_1fr] gap-x-2 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5">
                       <template v-for="listing in record.listings" :key="listing.task.id">
@@ -438,7 +437,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                     <span class="rounded px-1.5 py-0.5 text-xs" :class="dup.strength === 'strong' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-800'">{{ dup.strength === 'strong' ? '强匹配' : '标题相似' }}</span>
                     <NuxtLink :to="`/albums/${dup.album_id}`" target="_blank" class="min-w-0 text-sky-700 hover:underline">{{ dup.album?.title ?? `#${dup.album_id}` }}</NuxtLink>
                     <span v-if="dup.album?.catalog_number" class="font-mono text-xs text-slate-500">{{ dup.album.catalog_number }}</span>
-                    <button v-if="open" type="button" class="ml-auto rounded border border-slate-200 px-2 py-0.5 text-xs hover:bg-slate-50" :disabled="busy" @click="act('link', { album_id: dup.album_id })">就是这张</button>
+                    <UiButton v-if="open" size="xs" class="ml-auto" :disabled="busy" @click="act('link', { album_id: dup.album_id })">就是这张</UiButton>
                   </li>
                 </ul>
               </section>
@@ -451,7 +450,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   <p class="text-slate-500">填另一条候选的编号（列表里的 #数字，也是地址里的数字）。</p>
                   <div class="mt-2 flex gap-2">
                     <input id="merge-into" v-model="mergeInto" inputmode="numeric" placeholder="编号" class="w-28 rounded border border-slate-300 px-2 py-1">
-                    <button type="submit" class="rounded border border-slate-300 px-3 py-1 hover:bg-slate-50" :disabled="busy || !mergeInto">合并</button>
+                    <UiButton type="submit" size="xs" :disabled="busy || !mergeInto">合并</UiButton>
                   </div>
                 </div>
               </form>
@@ -469,7 +468,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                       <div v-for="alt in [{ value: detail.candidate.merged.title.value, source: detail.candidate.merged.title.source }, ...detail.candidate.merged.title.alternatives]" :key="`${alt.source}-${alt.value}`" class="flex items-baseline gap-2">
                         <span class="w-16 shrink-0 truncate text-xs text-slate-500">{{ alt.source ? sourceName(alt.source) : '' }}</span>
                         <span class="min-w-0 flex-1 break-words">{{ alt.value }}</span>
-                        <button v-if="open && alt.value" type="button" class="shrink-0 text-xs text-sky-700 hover:underline" @click="useTitle(alt.value)">采用</button>
+                        <UiButton v-if="open && alt.value" size="xs" class="shrink-0" @click="useTitle(alt.value)">采用</UiButton>
                       </div>
                     </dd>
                   </template>
@@ -499,7 +498,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               <section :class="card">
                 <h3 :class="cardHead">
                   <Icon name="lucide:image" class="size-4 text-slate-400" />封面候选
-                  <button v-if="!showImages && remoteCount" type="button" class="ml-auto rounded border border-slate-300 px-2 py-0.5 text-xs font-normal hover:bg-slate-50" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</button>
+                  <UiButton v-if="!showImages && remoteCount" size="xs" class="ml-auto font-normal" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</UiButton>
                 </h3>
                 <div class="space-y-3 px-4 py-3">
                   <p class="text-xs leading-5 text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。</p>
@@ -518,7 +517,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                           <span v-if="typeof previews[image.url] === 'object'" class="ml-auto tabular-nums text-slate-500">{{ (previews[image.url] as { width: number }).width }}×{{ (previews[image.url] as { height: number }).height }}</span>
                         </p>
                         <p v-if="typeof previews[image.url] === 'object' && sizeNote(previews[image.url] as { width: number, height: number })" class="text-amber-700">{{ sizeNote(previews[image.url] as { width: number, height: number }) }}</p>
-                        <button v-if="open" type="button" class="w-full rounded border border-slate-200 py-1 hover:bg-slate-50" :disabled="busy || !editor" @click="useCover(image.url)">设为封面</button>
+                        <UiButton v-if="open" size="xs" block :disabled="busy || !editor" @click="useCover(image.url)">设为封面</UiButton>
                       </figcaption>
                     </figure>
                   </div>
@@ -535,7 +534,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id">
                     <p class="mb-1 flex items-center gap-2 text-xs text-slate-500">
                       {{ sourceName(text.source) }}
-                      <button v-if="open" type="button" class="ml-auto text-sky-700 hover:underline" :disabled="!editor" @click="useDescription(text.text)">采用</button>
+                      <UiButton v-if="open" size="xs" class="ml-auto" :disabled="!editor" @click="useDescription(text.text)">采用</UiButton>
                     </p>
                     <p class="max-h-48 overflow-y-auto whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-5">{{ text.text }}</p>
                   </div>
@@ -562,7 +561,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               <Icon name="lucide:disc-3" class="size-4 text-slate-400" />新建专辑
             </h2>
             <p class="min-w-0 flex-1 text-xs text-slate-500">资料核对完后，在「提交」一节提交，就会以你的名义建成专辑。</p>
-            <button type="button" class="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-50" @click="prepareDraft(true)">按来源重新生成草稿</button>
+            <UiButton size="xs" @click="prepareDraft(true)">按来源重新生成草稿</UiButton>
           </div>
           <div class="bg-slate-50">
             <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" @submitted="approved" @discarded="prepareDraft(true)" />

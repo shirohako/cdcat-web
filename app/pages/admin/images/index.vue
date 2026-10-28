@@ -53,7 +53,7 @@ useHead({ title: '图片' })
         <dt class="text-slate-500">保留天数</dt>
         <dd class="mt-1 text-lg font-semibold">
           {{ summary.retention_days }} 天
-          <NuxtLink v-if="hasPermission('system.settings')" to="/admin/settings" class="ml-1 text-xs font-normal text-slate-500 underline">修改</NuxtLink>
+          <UiButton v-if="hasPermission('system.settings')" to="/admin/settings" size="xs" class="ml-1 align-middle">修改</UiButton>
         </dd>
       </div>
       <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -86,8 +86,8 @@ useHead({ title: '图片' })
           <option value="size">文件大小</option>
           <option value="unused_since">最先清理</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
-        <button type="button" class="rounded-lg border px-3 py-2" @click="resetFilters">重置</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
+        <UiButton @click="resetFilters">重置</UiButton>
       </form>
     </AdminFilterBar>
 

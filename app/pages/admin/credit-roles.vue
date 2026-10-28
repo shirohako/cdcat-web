@@ -110,7 +110,7 @@ useHead({ title: '角色字典' })
         <h1 class="text-3xl font-bold">角色字典</h1>
         <p class="mt-2 text-sm text-slate-600">制作人员可选的角色（作曲、编曲、Vocal……）。key 创建后不能改；被使用的角色不能删除，可以停用。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="open()">新建角色</button>
+      <UiButton variant="primary" @click="open()">新建角色</UiButton>
     </header>
 
     <AdminFilterBar>
@@ -160,8 +160,8 @@ useHead({ title: '角色字典' })
         </label>
         <p v-if="message" role="alert" class="text-red-700 sm:col-span-2">{{ message }}</p>
         <div class="flex gap-2 sm:col-span-2">
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">保存</button>
-          <button type="button" class="rounded-lg border px-4 py-2" @click="formOpen = false">取消</button>
+          <UiButton type="submit" variant="primary" :disabled="busy">保存</UiButton>
+          <UiButton @click="formOpen = false">取消</UiButton>
         </div>
       </form>
     </section>
@@ -188,8 +188,8 @@ useHead({ title: '角色字典' })
                 <td class="px-3 py-3 text-xs">{{ LEVELS.filter(level => role[level]).map(level => levelLabels[level]).join(' · ') }}</td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ role.usage.album }} / {{ role.usage.track }}</td>
                 <td class="px-3 py-3 text-right text-xs">
-                  <button type="button" class="underline" @click="open(role)">编辑</button>
-                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="role.is_reserved || used(role) > 0" :title="role.is_reserved ? '系统保留的角色，不能删除。' : used(role) ? '已有署名使用这个角色，只能停用。' : undefined" @click="deleting = role">删除</button>
+                  <UiButton size="xs" @click="open(role)">编辑</UiButton>
+                  <UiButton variant="danger-soft" size="xs" class="ml-2" :disabled="role.is_reserved || used(role) > 0" :title="role.is_reserved ? '系统保留的角色，不能删除。' : used(role) ? '已有署名使用这个角色，只能停用。' : undefined" @click="deleting = role">删除</UiButton>
                 </td>
               </tr>
             </tbody>

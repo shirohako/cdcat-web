@@ -53,9 +53,7 @@ const moderatorItem = 'flex w-full items-center gap-2 rounded-sm px-3 py-2 text-
 
 <template>
   <div ref="root" class="relative">
-    <button type="button" class="grid size-7 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" :aria-label="t('discussions.post.more')" :aria-expanded="open" @click.stop="open = !open">
-      <MoreHorizontal :size="16" />
-    </button>
+    <UiButton size="xs" :icon="MoreHorizontal" :label="t('discussions.post.more')" :aria-expanded="open" @click.stop="open = !open" />
     <UiDropdown :open="open" align="end" class="w-48 p-1" role="menu">
       <button type="button" role="menuitem" :class="item" @click="copyLink"><Link2 :size="14" />{{ t('discussions.post.copy_link') }}</button>
       <button v-if="isAuthenticated" type="button" role="menuitem" :class="item" @click="toggleBookmark">

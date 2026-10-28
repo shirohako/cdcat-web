@@ -21,7 +21,7 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
   <section class="card overflow-hidden">
     <UiSectionTitle :title="t('discussions.related.title')" :icon="MessageCircle" :count="total || undefined" class="px-5 pb-2 pt-4">
       <template #actions>
-        <NuxtLink :to="start" class="link inline-flex items-center gap-1 text-xs font-medium"><PenSquare :size="12" />{{ t('discussions.related.start') }}</NuxtLink>
+        <UiButton :to="start" size="xs" :icon="PenSquare">{{ t('discussions.related.start') }}</UiButton>
       </template>
     </UiSectionTitle>
     <div v-if="topics.length" class="divide-y divide-line">
@@ -32,7 +32,9 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
         </div>
         <span class="flex shrink-0 items-center gap-1 text-xs tabular-nums text-meta"><MessageSquare :size="12" />{{ topic.replies_count }}</span>
       </NuxtLink>
-      <NuxtLink v-if="total > topics.length" :to="{ path: '/discussions', query: {} }" class="block px-4 py-2 text-center text-xs text-meta transition-colors duration-150 ease-out hover:text-primary">{{ t('discussions.related.more', { count: total }) }}</NuxtLink>
+      <div v-if="total > topics.length" class="px-4 py-2 text-center">
+        <UiButton :to="{ path: '/discussions', query: {} }" size="xs">{{ t('discussions.related.more', { count: total }) }}</UiButton>
+      </div>
     </div>
     <SkeletonStatus v-else-if="loading" class="space-y-3 px-4 py-3">
       <div v-for="row in 2" :key="row" class="space-y-1.5">

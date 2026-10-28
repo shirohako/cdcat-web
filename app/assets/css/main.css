@@ -327,18 +327,21 @@
     --font-sans-en: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
-    /* 简体中文 - macOS: PingFang SC, HarmonyOS, Windows: YaHei UI > YaHei, Android/Linux: Noto */
-    --font-sans-zh-hans: "PingFang SC", "HarmonyOS Sans SC",
+    /* 中日文正文统一用思源黑体网页字体（@fontsource-variable/noto-sans-*，nuxt.config 引入）：可变字重，按字符切片按需下载，
+       各平台一致；系统字体只在字体下载完之前顶上。 */
+
+    /* 简体中文 - 思源黑体 SC；之前 macOS: PingFang SC, HarmonyOS, Windows: YaHei UI > YaHei, Android/Linux: Noto */
+    --font-sans-zh-hans: "Noto Sans SC Variable", "PingFang SC", "HarmonyOS Sans SC",
       "Microsoft YaHei UI", "Microsoft YaHei",
       "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "WenQuanYi Micro Hei";
 
-    /* 繁体中文 - macOS: PingFang TC, Windows: JhengHei UI > JhengHei, Android/Linux: Noto */
-    --font-sans-zh-hant: "PingFang TC", "HarmonyOS Sans TC",
+    /* 繁体中文 - 思源黑体 TC；之前 macOS: PingFang TC, Windows: JhengHei UI > JhengHei, Android/Linux: Noto */
+    --font-sans-zh-hant: "Noto Sans TC Variable", "PingFang TC", "HarmonyOS Sans TC",
       "Microsoft JhengHei UI", "Microsoft JhengHei",
       "Noto Sans CJK TC", "Noto Sans TC", "Source Han Sans TC";
 
-    /* 日文 - macOS: Hiragino, Windows: Yu Gothic UI > Meiryo UI, Android/Linux: Noto */
-    --font-sans-ja: "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    /* 日文 - 思源黑体 JP；之前 macOS: Hiragino, Windows: Yu Gothic UI > Meiryo UI, Android/Linux: Noto */
+    --font-sans-ja: "Noto Sans JP Variable", "Hiragino Kaku Gothic ProN", "Hiragino Sans",
       "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Meiryo",
       "Noto Sans CJK JP", "Noto Sans JP", "Source Han Sans JP";
 

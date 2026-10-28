@@ -78,17 +78,17 @@ const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 p
       <CollectionSearchBox v-model="search" class="flex min-w-0 flex-1" :placeholder="searchPlaceholder" @submit="emit('search')" />
       <UiPopover placement="bottom-end" :label="t('albums.more_filters')" class="w-[min(20rem,calc(100vw-2rem))] p-3.5!">
         <template #trigger="{ toggle, attrs }">
-          <button
-            type="button"
-            class="inline-flex h-7.5 shrink-0 items-center gap-1 rounded-md px-2.5"
-            :class="hiddenOn ? ON : OFF"
+          <UiButton
+            :variant="hiddenOn ? 'primary' : 'default'"
+            size="sm"
+            icon="lucide:ellipsis"
+            class="shrink-0 gap-1"
             :aria-label="t('albums.more_filters')"
             v-bind="attrs"
             @click="toggle"
           >
-            <Icon name="lucide:ellipsis" class="size-4" />
-            <span v-if="hiddenOn" class="text-xs font-semibold tabular-nums">{{ hiddenOn }}</span>
-          </button>
+            <span v-if="hiddenOn" class="tabular-nums">{{ hiddenOn }}</span>
+          </UiButton>
         </template>
         <AlbumMoreFilters
           :types="types" :type="type" :event-id="eventId" :year="year" :pending="pending" :chip="CHIP" :on="ON" :off="OFF"
@@ -99,19 +99,19 @@ const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 p
 
     <!-- Wider screens: 更多筛选, and what in it is on -->
     <div class="hidden flex-wrap items-center gap-2 px-6 pb-4 pt-3 sm:flex">
-      <button
-        type="button"
-        class="inline-flex h-7.5 items-center gap-1.5 rounded-md px-2.5 text-[13px] font-medium ring-1 ring-inset ring-line transition-colors duration-150 ease-out hover:bg-black/5 dark:hover:bg-white/5"
-        :class="moreOpen ? 'bg-black/5 dark:bg-white/5' : ''"
+      <UiButton
+        variant="outline"
+        size="sm"
+        icon="lucide:sliders-horizontal"
+        class="gap-1.5"
         :aria-expanded="moreOpen"
         :aria-controls="morePanelId"
         @click="moreOpen = !moreOpen"
       >
-        <Icon name="lucide:sliders-horizontal" class="size-3.5" />
         {{ t('albums.more_filters') }}
         <span v-if="hiddenOn" class="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold tabular-nums text-on-primary">{{ hiddenOn }}</span>
         <Icon name="lucide:chevron-down" class="size-3 opacity-60 transition-transform duration-200 ease-out" :class="moreOpen ? 'rotate-180' : ''" />
-      </button>
+      </UiButton>
 
       <button v-if="type !== 'all'" type="button" :class="TAG" :aria-label="t('albums.remove_filter', { name: typeLabel })" @click="emit('type', 'all')">
         {{ typeLabel }}<Icon name="lucide:x" class="size-3 opacity-60" />
@@ -125,9 +125,9 @@ const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 p
       <button v-if="pending" type="button" :class="TAG" @click="emit('pending', false)">
         {{ t('albums.pending_tag') }}<Icon name="lucide:x" class="size-3 opacity-60" />
       </button>
-      <button v-if="filtered" type="button" class="ml-1 text-xs font-medium text-meta transition-colors hover:text-primary" @click="emit('clear')">
+      <UiButton v-if="filtered" size="xs" class="ml-1" @click="emit('clear')">
         {{ t('albums.clear_filters') }}
-      </button>
+      </UiButton>
     </div>
 
     <!-- 更多筛选 folds open here, pushing the list down; the grid rows animate the height. -->

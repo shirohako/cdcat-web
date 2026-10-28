@@ -11,10 +11,9 @@
       icon="lucide:disc-3"
     >
       <template #actions>
-        <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-          <Icon name="lucide:search" class="w-4 h-4" />
+        <UiButton to="/albums" variant="primary" size="sm" icon="lucide:search">
           {{ $t('common.discover') }}
-        </NuxtLink>
+        </UiButton>
       </template>
     </UiEmpty>
 
@@ -97,33 +96,27 @@
               </div>
 
               <!-- View -->
-              <NuxtLink
+              <UiButton
                 :to="`/albums/${album.albumId}`"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary flex-none"
-                :aria-label="album.albumTitle"
-              >
-                <Icon name="lucide:arrow-right" class="w-4 h-4 sm:w-5 sm:h-5" />
-              </NuxtLink>
+                icon="lucide:arrow-right"
+                :label="$t('collection_components.view_album', { name: album.albumTitle })"
+                :tooltip="$t('collection_components.view')"
+                size="sm"
+                round
+                class="flex-none"
+              />
 
               <!-- Remove -->
-              <button
-                type="button"
-                :disabled="removingId === album.id"
-                class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger flex-none disabled:opacity-40 disabled:cursor-not-allowed"
-                :title="$t('tracking.remove')"
+              <UiButton
+                variant="danger-soft"
+                icon="lucide:trash-2"
+                :label="$t('tracking.remove')"
+                size="sm"
+                round
+                :loading="removingId === album.id"
+                class="flex-none"
                 @click="handleRemove(album.id)"
-              >
-                <Icon
-                  v-if="removingId !== album.id"
-                  name="lucide:trash-2"
-                  class="w-4 h-4 sm:w-5 sm:h-5"
-                />
-                <Icon
-                  v-else
-                  name="lucide:loader"
-                  class="w-4 h-4 sm:w-5 sm:h-5 animate-spin"
-                />
-              </button>
+              />
             </div>
           </div>
         </div>

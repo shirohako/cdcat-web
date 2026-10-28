@@ -37,9 +37,7 @@ useHead({ title: '工作台' })
           class="rounded-lg px-3.5 py-1.5 font-medium" :class="range === days ? 'bg-slate-900 text-white' : 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50'"
           @click="range = days"
         >{{ dashboardDayLabels[days] }}</button>
-        <button type="button" :disabled="pending" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50" @click="refresh()">
-          <Icon name="lucide:refresh-cw" class="size-3.5" :class="pending ? 'animate-spin' : ''" />刷新
-        </button>
+        <UiButton size="sm" icon="lucide:refresh-cw" :loading="pending" @click="refresh()">刷新</UiButton>
       </div>
     </header>
 

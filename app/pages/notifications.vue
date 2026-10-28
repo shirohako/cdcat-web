@@ -46,7 +46,7 @@ useHead({ title: computed(() => t('notifications.title')) })
   <div class="container mx-auto max-w-3xl px-4 py-8 md:px-6">
     <header class="flex flex-wrap items-center justify-between gap-3">
       <h1 class="inline-flex items-center gap-2 text-2xl font-bold text-title"><Bell :size="22" class="text-primary" />{{ t('notifications.title') }}</h1>
-      <button v-if="unread" type="button" class="btn btn-outline btn-sm" @click="markRead(null)"><CheckCheck :size="14" />{{ t('notifications.mark_all') }}</button>
+      <UiButton v-if="unread" variant="outline" size="sm" :icon="CheckCheck" @click="markRead(null)">{{ t('notifications.mark_all') }}</UiButton>
     </header>
 
     <nav class="mt-5 flex gap-1 border-b border-line">

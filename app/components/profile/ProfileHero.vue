@@ -41,13 +41,7 @@
           </span>
         </div>
 
-        <button
-          type="button"
-          class="absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
-          :aria-label="moreActionsLabel"
-        >
-          <MoreVertical :size="18" />
-        </button>
+        <UiButton :icon="MoreVertical" :label="moreActionsLabel" size="sm" round class="absolute right-3 top-3" />
 
         <h1
           class="mt-12 truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-title sm:mt-14 sm:text-[1.28rem] md:text-[1.42rem]"
@@ -78,14 +72,9 @@
           >
             {{ profileBio }}
           </p>
-          <button
-            v-if="bioCollapsible"
-            type="button"
-            class="link mt-1 border-none text-[0.8rem] font-semibold sm:text-[0.84rem]"
-            @click="bioExpanded = !bioExpanded"
-          >
+          <UiButton v-if="bioCollapsible" size="xs" class="mt-1" @click="bioExpanded = !bioExpanded">
             {{ bioExpanded ? bioCollapseLabel : bioExpandLabel }}
-          </button>
+          </UiButton>
         </div>
       </div>
     </header>

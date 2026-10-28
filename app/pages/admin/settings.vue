@@ -100,7 +100,7 @@ useHead({ title: '站点设置' })
         <div class="flex items-center justify-end gap-3">
           <p v-if="notice" role="status" class="mr-auto text-emerald-700">{{ notice }}</p>
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50">{{ busy ? '保存中…' : '保存' }}</button>
+          <UiButton type="submit" variant="primary" :disabled="busy">{{ busy ? '保存中…' : '保存' }}</UiButton>
         </div>
       </form>
     </AdminListState>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle2, Circle, Loader2, XCircle } from '@lucide/vue'
+import { CheckCircle2, Circle, XCircle } from '@lucide/vue'
 
 export interface SubmitCheck {
   key: string
@@ -47,11 +47,10 @@ const confirm = () => { if (!props.busy && !blocked.value) emit('confirm') }
       </ul>
       <p v-if="error" role="alert" class="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">{{ error }}</p>
       <footer class="flex justify-end gap-2">
-        <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="close">{{ t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm" :disabled="busy || blocked">
-          <Loader2 v-if="busy" :size="14" class="animate-spin" />
+        <UiButton size="sm" :disabled="busy" @click="close">{{ t('common.cancel') }}</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" :loading="busy" :disabled="blocked">
           {{ t(`article_ui.submit.${action}_confirm`) }}
-        </button>
+        </UiButton>
       </footer>
     </form>
   </dialog>

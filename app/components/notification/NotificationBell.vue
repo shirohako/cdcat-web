@@ -84,9 +84,7 @@ const ago = (value: string) => {
     <UiDropdown :open="open" align="end" screen class="sm:w-80">
       <div class="flex items-center justify-between border-b border-line px-4 py-2.5">
         <span class="text-sm font-semibold text-title">{{ t('notifications.title') }}</span>
-        <button v-if="unread" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors hover:text-primary" @click="markRead(null)">
-          <CheckCheck :size="13" />{{ t('notifications.mark_all') }}
-        </button>
+        <UiButton v-if="unread" size="xs" :icon="CheckCheck" @click="markRead(null)">{{ t('notifications.mark_all') }}</UiButton>
       </div>
       <!-- Loading: rows shaped like the notifications, shimmering. -->
       <SkeletonStatus v-if="loading" class="divide-y divide-line">
@@ -118,9 +116,9 @@ const ago = (value: string) => {
           </button>
         </li>
       </ul>
-      <NuxtLink to="/notifications" class="block border-t border-line px-4 py-2.5 text-center text-xs font-semibold text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover">
-        {{ t('notifications.view_all') }}
-      </NuxtLink>
+      <div class="border-t border-line p-2">
+        <UiButton to="/notifications" size="sm" block>{{ t('notifications.view_all') }}</UiButton>
+      </div>
     </UiDropdown>
   </div>
 </template>

@@ -129,9 +129,7 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
             <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
           </select>
           <span class="text-xs text-slate-400">也可以点表格的表头排序</span>
-          <button v-if="filtered" type="button" class="ml-auto inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-slate-200/60" @click="clear">
-            <Icon name="lucide:x" class="size-3.5" />清除筛选
-          </button>
+          <UiButton v-if="filtered" size="xs" icon="lucide:x" class="ml-auto" @click="clear">清除筛选</UiButton>
         </div>
       </div>
     </section>

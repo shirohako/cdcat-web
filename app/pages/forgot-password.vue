@@ -20,13 +20,14 @@
             </div>
             <h1 class="text-2xl font-black text-title mb-2">{{ $t('auth.forgot_password.success_title') }}</h1>
             <p class="text-body mb-6">{{ $t('auth.forgot_password.success_message') }}</p>
-            <NuxtLink
+            <UiButton
               to="/auth/login"
-              class="btn btn-primary h-11 px-6"
+              variant="primary"
+              size="lg"
+              :icon="LogIn"
             >
-              <LogIn :size="18" />
               <span>{{ $t('auth.forgot_password.back_to_login') }}</span>
-            </NuxtLink>
+            </UiButton>
           </div>
         </template>
 
@@ -65,16 +66,19 @@
               />
             </div>
 
-            <button
+            <UiButton
               type="submit"
-              class="btn btn-primary group flex w-full h-11"
-              :disabled="!formData.email || isSendingCode"
+              variant="primary"
+              size="lg"
+              :icon="Mail"
+              :loading="isSendingCode"
+              :disabled="!formData.email"
+              block
+              class="group"
             >
-              <div v-if="isSendingCode" class="loading loading-spinner"></div>
-              <Mail v-else :size="20" />
               <span>{{ isSendingCode ? $t('auth.forgot_password.sending') : $t('auth.forgot_password.send_code') }}</span>
               <ArrowRight v-if="!isSendingCode" :size="18" class="transition-transform duration-150 ease-out group-hover:translate-x-1" />
-            </button>
+            </UiButton>
           </form>
 
           <!-- Back to Login -->
@@ -107,13 +111,12 @@
               <Mail :size="16" />
               <span>{{ formData.email }}</span>
             </div>
-            <button
-              type="button"
+            <UiButton
+              size="xs"
               @click="step = 1; errorMessage = ''; errorDetails = []"
-              class="link text-xs font-semibold cursor-pointer"
             >
               {{ $t('auth.forgot_password.change_email') }}
-            </button>
+            </UiButton>
           </div>
 
           <!-- Error Message -->
@@ -141,14 +144,13 @@
                   class="input h-11 flex-1"
                   required
                 />
-                <button
-                  type="button"
-                  @click="handleSendCode"
+                <UiButton
                   :disabled="countdown > 0 || isSendingCode"
-                  class="btn h-11 shrink-0"
+                  class="shrink-0"
+                  @click="handleSendCode"
                 >
                   {{ countdown > 0 ? `${countdown}s` : $t('auth.forgot_password.resend') }}
-                </button>
+                </UiButton>
               </div>
             </div>
 
@@ -225,16 +227,19 @@
             </div>
 
             <!-- Submit Button -->
-            <button
+            <UiButton
               type="submit"
-              class="btn btn-primary group flex w-full h-11"
-              :disabled="!isResetFormValid || isLoading"
+              variant="primary"
+              size="lg"
+              :icon="KeyRound"
+              :loading="isLoading"
+              :disabled="!isResetFormValid"
+              block
+              class="group"
             >
-              <div v-if="isLoading" class="loading loading-spinner"></div>
-              <KeyRound v-else :size="20" />
               <span>{{ isLoading ? $t('auth.forgot_password.resetting') : $t('auth.forgot_password.reset') }}</span>
               <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-150 ease-out group-hover:translate-x-1" />
-            </button>
+            </UiButton>
           </form>
 
           <!-- Back to Login -->

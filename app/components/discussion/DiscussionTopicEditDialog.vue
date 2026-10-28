@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import type { ContentLinkSummary, TagSummary } from '~/types/article'
 import type { DiscussionTopicDetail } from '~/types/discussion'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
@@ -97,8 +96,8 @@ async function save() {
       <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
     </form>
     <template #footer>
-      <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>
-      <button type="submit" form="discussion-topic-edit" class="btn btn-primary btn-sm" :disabled="busy"><Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.save') }}</button>
+      <UiButton size="sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</UiButton>
+      <UiButton type="submit" form="discussion-topic-edit" variant="primary" size="sm" :loading="busy">{{ t('common.save') }}</UiButton>
     </template>
   </DiscussionDialog>
 </template>

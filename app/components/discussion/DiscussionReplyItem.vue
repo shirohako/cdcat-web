@@ -55,9 +55,7 @@ async function remove() {
         <DiscussionPostBody v-else :post="reply" class="mt-1 text-[13px]" />
         <div v-if="!editing && reply.status === 'visible'" class="mt-1.5 flex flex-wrap items-center gap-2">
           <DiscussionReactions :post-id="reply.id" :reactions="reply.reactions" :can-react="reply.can.react" compact @update:reactions="value => emit('update', { ...reply, reactions: value })" />
-          <button v-if="context.topic.value.viewer.can.reply" type="button" class="inline-flex items-center gap-1 text-xs text-meta transition-colors duration-150 ease-out hover:text-primary" @click="emit('reply', reply)">
-            <Reply :size="12" />{{ t('discussions.post.reply') }}
-          </button>
+          <UiButton v-if="context.topic.value.viewer.can.reply" size="xs" :icon="Reply" @click="emit('reply', reply)">{{ t('discussions.post.reply') }}</UiButton>
         </div>
       </div>
     </div>

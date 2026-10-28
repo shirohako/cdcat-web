@@ -8,12 +8,8 @@
       <slot />
     </div>
     <slot name="actions" />
-    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-btn text-btn-content hover:bg-btn-hover ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :aria-label="$t('common.edit')" @click="emit('edit')">
-      <PencilLine :size="14" />
-    </button>
-    <button type="button" class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :aria-label="$t('common.delete')" @click="emit('remove')">
-      <Trash2 :size="14" />
-    </button>
+    <UiButton :icon="PencilLine" :label="$t('common.edit')" size="xs" class="shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="emit('edit')" />
+    <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" size="xs" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="emit('remove')" />
   </li>
 </template>
 

@@ -14,7 +14,7 @@
             class="input h-11 w-full pl-11"
           >
         </div>
-        <button type="submit" class="btn btn-primary h-11">{{ $t('search.title') }}</button>
+        <UiButton type="submit" variant="primary">{{ $t('search.title') }}</UiButton>
         <CatalogPendingToggle :model-value="includePending" @update:model-value="setPending" />
       </form>
       <p class="mt-2 text-xs text-meta">{{ $t('search.hint') }}</p>
@@ -50,9 +50,9 @@
           <section v-for="group in groups" :key="group.type">
             <h2 class="flex items-center justify-between text-sm font-semibold text-body">
               <span>{{ $t(`search.types.${group.type}`) }} <span class="font-normal text-meta">{{ countText(group.total, group.total_is_capped) }}</span></span>
-              <NuxtLink v-if="group.total > group.items.length" :to="{ query: { ...route.query, type: group.type } }" class="text-xs font-normal text-meta transition-colors duration-150 ease-out hover:text-primary">
+              <UiButton v-if="group.total > group.items.length" :to="{ query: { ...route.query, type: group.type } }" size="xs">
                 {{ $t('search.more', { count: countText(group.total, group.total_is_capped) }) }}
-              </NuxtLink>
+              </UiButton>
             </h2>
             <ul class="card mt-2 divide-y divide-line overflow-hidden">
               <li v-for="item in group.items" :key="item.id" class="transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"><SearchResultItem :result="item" /></li>

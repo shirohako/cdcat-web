@@ -171,7 +171,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
           <p class="mt-1 text-sm text-slate-600">{{ event.slug }} · {{ event.booths_count ?? 0 }} 个摊位 · {{ event.released_albums_count ?? 0 }} 张专辑</p>
         </div>
       </div>
-      <NuxtLink :to="`/events/${eventId}`" target="_blank" class="rounded-lg border border-slate-300 px-4 py-2 text-sm">查看活动页</NuxtLink>
+      <UiButton :to="`/events/${eventId}`" target="_blank">查看活动页</UiButton>
     </header>
 
     <nav class="flex gap-1 border-b border-slate-200 text-sm">
@@ -187,11 +187,8 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">导入</h2>
         <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
-        <label class="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" :class="busy || working ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'">
-          <Icon name="lucide:upload" class="size-4" />
-          {{ busy ? '正在上传…' : '上传导入包' }}
-          <input ref="bundleInput" type="file" accept=".zip,application/zip" class="sr-only" :disabled="busy || Boolean(working)" @change="uploadBundle">
-        </label>
+        <UiButton variant="primary" icon="lucide:upload" class="mt-4" :disabled="busy || Boolean(working)" @click="bundleInput?.click()">{{ busy ? '正在上传…' : '上传导入包' }}</UiButton>
+        <input ref="bundleInput" type="file" accept=".zip,application/zip" class="hidden" :disabled="busy || Boolean(working)" @change="uploadBundle">
       </section>
 
       <section v-if="latest" class="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
@@ -201,7 +198,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
             <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" :class="statusClass(latest.status)">{{ eventVenueStatusLabels[latest.status] }}</span>
             <span class="text-xs text-slate-500">{{ new Date(latest.created_at).toLocaleString() }} · {{ latest.creator?.nickname || latest.creator?.username }}</span>
           </div>
-          <button v-if="latest.status === 'ready'" type="button" class="rounded-lg bg-emerald-700 px-4 py-2 text-sm text-white disabled:opacity-50" :disabled="busy" @click="applyImport(latest)">应用导入</button>
+          <UiButton v-if="latest.status === 'ready'" variant="primary" :disabled="busy" @click="applyImport(latest)">应用导入</UiButton>
         </div>
         <p v-if="bundleLine(latest)" class="text-xs text-slate-500">{{ bundleLine(latest) }}</p>
         <p v-if="working" class="text-sm text-slate-500">正在处理，页面会自动刷新…</p>
@@ -279,7 +276,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
           <label class="block">楼层<input v-model="hallForms[hall.id]!.floor" :class="input"></label>
           <label class="block">显示名称<input v-model="hallForms[hall.id]!.name" required :class="input"></label>
           <label class="block">顺序<input v-model.number="hallForms[hall.id]!.sort_order" type="number" min="0" :class="input"></label>
-          <button type="submit" class="rounded-lg border border-slate-300 px-4 py-2" :disabled="busy">保存 <span class="text-xs text-slate-400">({{ hall.spaces_count }})</span></button>
+          <UiButton type="submit" :disabled="busy">保存 <span class="text-xs text-slate-400">({{ hall.spaces_count }})</span></UiButton>
         </form>
       </section>
       <p v-else class="text-sm text-slate-500">还没有导入会场图。</p>

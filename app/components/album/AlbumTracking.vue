@@ -25,21 +25,12 @@
 
       <!-- 底部操作栏 -->
       <div class="flex items-center mt-4 pt-3 border-t border-line" :class="currentStatus ? 'justify-between' : 'justify-end'">
-        <button
-          v-if="currentStatus"
-          class="flex items-center gap-1 text-xs text-meta hover:text-danger transition-colors"
-          @click="handleRemoveTracking"
-        >
-          <Icon name="lucide:x" class="w-3.5 h-3.5" />
-          <span>{{ $t('tracking.widget.remove') }}</span>
-        </button>
-        <NuxtLink
-          to="/tracking"
-          class="flex items-center gap-1 text-xs text-meta hover:text-primary transition-colors"
-        >
-          <span>{{ $t('tracking.widget.manage') }}</span>
-          <Icon name="lucide:arrow-right" class="w-3.5 h-3.5" />
-        </NuxtLink>
+        <UiButton v-if="currentStatus" variant="danger-soft" size="xs" icon="lucide:x" @click="handleRemoveTracking">
+          {{ $t('tracking.widget.remove') }}
+        </UiButton>
+        <UiButton to="/tracking" size="xs" icon-right="lucide:arrow-right">
+          {{ $t('tracking.widget.manage') }}
+        </UiButton>
       </div>
     </div>
   </section>

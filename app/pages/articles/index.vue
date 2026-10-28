@@ -88,18 +88,14 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
               <HeaderArtArticles />
             </template>
             <template v-if="isAuthenticated" #action>
-              <NuxtLink to="/articles/mine" class="btn btn-sm h-8 gap-1.5 px-2.5 text-xs sm:h-9 sm:px-3.5" :aria-label="t('article_ui.mine.title')">
-                <FolderOpen :size="14" /><span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
-              </NuxtLink>
+              <!-- Icon-only below sm only, so named with aria-label: `label` would keep them square at every width. -->
+              <UiButton to="/articles/mine" size="sm" :icon="FolderOpen" class="max-sm:w-8 max-sm:px-0" :aria-label="t('article_ui.mine.title')">
+                <span class="hidden sm:inline">{{ t('article_ui.mine.title') }}</span>
+              </UiButton>
               <!-- The list headers' old "new" button; the other lists use UiCreateButton. -->
-              <NuxtLink
-                to="/articles/new"
-                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-xs font-semibold text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong sm:h-9 sm:w-auto sm:gap-2 sm:px-3.5"
-                :aria-label="t('content_display.new_article')"
-              >
-                <Icon name="lucide:plus" class="h-3.5 w-3.5" />
+              <UiButton to="/articles/new" variant="primary" size="sm" icon="lucide:plus" class="max-sm:w-8 max-sm:px-0" :aria-label="t('content_display.new_article')">
                 <span class="hidden sm:inline">{{ t('content_display.new_article') }}</span>
-              </NuxtLink>
+              </UiButton>
             </template>
             <template #filter-end>
               <UiSelect
@@ -123,7 +119,7 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
         <CommonLoadError v-if="status === 'error' && data" class="mb-4" @retry="refresh()" />
         <CollectionLoadingSkeleton v-if="loading" variant="articles" />
         <div v-else-if="status === 'error' && !data" class="flex min-h-60 flex-col items-center justify-center gap-2 text-sm text-meta">
-          {{ t('common.load_failed') }}<button type="button" class="link" @click="refresh()">{{ t('common.retry') }}</button>
+          {{ t('common.load_failed') }}<UiButton size="xs" @click="refresh()">{{ t('common.retry') }}</UiButton>
         </div>
         <div v-else :key="revealKey" class="transition-opacity @container" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <CommonPagedList

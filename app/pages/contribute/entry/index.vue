@@ -135,7 +135,7 @@ const createFromScratch = () => {
 
           <div v-if="existingEntryId" class="alert alert-warning">
             <span>{{ $t('catalog.contribute.already_imported') }}</span>
-            <NuxtLink :to="`/entries/${existingEntryId}`" class="btn btn-sm">{{ $t('catalog.contribute.view_existing') }}</NuxtLink>
+            <UiButton :to="`/entries/${existingEntryId}`" size="sm">{{ $t('catalog.contribute.view_existing') }}</UiButton>
           </div>
           <div v-if="errorMessage" class="alert alert-error">
             <span>{{ errorMessage }}</span>
@@ -143,13 +143,12 @@ const createFromScratch = () => {
         </div>
 
         <div class="modal-action">
-          <button type="button" class="btn btn-ghost" :disabled="isLoading" @click="showBangumiModal = false">
+          <UiButton :disabled="isLoading" @click="showBangumiModal = false">
             {{ $t('common.cancel') }}
-          </button>
-          <button type="button" class="btn btn-primary" :disabled="!canImport" @click="importFromBangumi">
-            <span v-if="isLoading" class="loading loading-spinner loading-sm" />
+          </UiButton>
+          <UiButton variant="primary" :loading="isLoading" :disabled="!canImport" @click="importFromBangumi">
             {{ isLoading ? $t('catalog.contribute.importing') : $t('catalog.contribute.import') }}
-          </button>
+          </UiButton>
         </div>
       </div>
       <form method="dialog" class="modal-backdrop">

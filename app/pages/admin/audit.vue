@@ -89,7 +89,7 @@ useHead({ title: '操作日志' })
         </select>
         <label class="flex items-center gap-1">从<input v-model="filters.from" type="date" :class="[field, 'px-2']"></label>
         <label class="flex items-center gap-1">至<input v-model="filters.to" type="date" :class="[field, 'px-2']"></label>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>

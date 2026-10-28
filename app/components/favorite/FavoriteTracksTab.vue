@@ -11,10 +11,9 @@
       icon="lucide:music"
     >
       <template #actions>
-        <NuxtLink to="/albums" class="btn btn-primary btn-sm gap-2">
-          <Icon name="lucide:search" class="w-4 h-4" />
+        <UiButton to="/albums" variant="primary" size="sm" icon="lucide:search">
           {{ $t('collection_components.browse_albums') }}
-        </NuxtLink>
+        </UiButton>
       </template>
     </UiEmpty>
 
@@ -80,19 +79,15 @@
               <!-- Actions -->
               <td class="px-6 py-4 text-center">
                 <div class="flex items-center justify-center gap-2">
-                  <button
-                    type="button"
+                  <UiButton
+                    :icon="unliked[track.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
+                    :icon-class="unliked[track.id] ? 'size-4 text-meta' : 'size-4 text-red-600 dark:text-red-400'"
+                    :label="$t(unliked[track.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
                     :disabled="!!unlikeLoading[track.id]"
+                    size="xs"
+                    round
                     @click="handleToggle(track.id)"
-                    class="transition-colors p-1 rounded hover:bg-ghost-hover disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                    :title="$t(unliked[track.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
-                  >
-                    <Icon
-                      :name="unliked[track.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
-                      class="w-4 h-4"
-                      :class="unliked[track.id] ? 'text-meta' : 'text-red-600 dark:text-red-400'"
-                    />
-                  </button>
+                  />
                 </div>
               </td>
             </tr>
@@ -141,19 +136,15 @@
 
             <!-- Actions -->
             <div class="shrink-0 flex items-center gap-1">
-              <button
-                type="button"
+              <UiButton
+                :icon="unliked[track.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
+                :icon-class="unliked[track.id] ? 'size-4 text-meta' : 'size-4 text-red-600 dark:text-red-400'"
+                :label="$t(unliked[track.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
                 :disabled="!!unliked[track.id] || !!unlikeLoading[track.id]"
+                size="xs"
+                round
                 @click="handleToggle(track.id)"
-                class="p-1.5 rounded transition-colors hover:bg-ghost-hover disabled:opacity-40 disabled:cursor-not-allowed"
-                :title="$t(unliked[track.id] ? 'collection_components.unfavorited' : 'collection_components.remove_favorite')"
-              >
-                <Icon
-                  :name="unliked[track.id] ? 'heroicons-outline:heart' : 'heroicons-solid:heart'"
-                  class="w-4 h-4"
-                  :class="unliked[track.id] ? 'text-meta' : 'text-red-600 dark:text-red-400'"
-                />
-              </button>
+              />
             </div>
           </div>
         </div>

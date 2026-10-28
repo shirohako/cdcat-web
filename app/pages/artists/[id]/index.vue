@@ -60,22 +60,18 @@
               </div>
             </div>
             <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
-              <button
-                class="inline-flex h-9 items-center gap-2 rounded-md px-4 text-xs font-semibold transition-colors duration-150 ease-out disabled:cursor-wait disabled:opacity-60"
-                :class="isFavorited ? 'bg-primary text-on-primary hover:bg-primary-strong' : 'bg-btn text-btn-content hover:bg-btn-hover'"
+              <UiButton
+                :variant="isFavorited ? 'primary' : 'default'"
+                size="sm"
+                :icon="isFavorited ? UserCheck : UserPlus"
                 :disabled="isToggling || (artist.is_pending && !isFavorited)"
                 :title="artist.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFollow"
               >
-                <UserCheck v-if="isFavorited" :size="15" /><UserPlus v-else :size="15" />
                 {{ isFavorited ? $t('artists.detail.following') : $t('artists.detail.follow') }}
-              </button>
-              <NuxtLink :to="`/artists/${artist.id}/versions`" class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-btn text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="$t('versions.title')">
-                <History :size="15" />
-              </NuxtLink>
-              <NuxtLink :to="`/contribute/artist/${artist.id}`" class="inline-flex h-9 w-9 items-center justify-center rounded-md bg-btn text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="$t('common.edit')">
-                <Edit :size="15" />
-              </NuxtLink>
+              </UiButton>
+              <UiButton :to="`/artists/${artist.id}/versions`" size="sm" :icon="History" :label="$t('versions.title')" />
+              <UiButton :to="`/contribute/artist/${artist.id}`" size="sm" :icon="Edit" :label="$t('common.edit')" />
             </div>
           </div>
           <div v-else-if="status === 'error'" class="flex min-h-28 items-center justify-center text-sm text-meta">{{ $t('common.load_failed') }}</div>

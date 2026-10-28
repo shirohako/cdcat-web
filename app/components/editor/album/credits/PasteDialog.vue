@@ -204,8 +204,8 @@ const apply = () => {
     </div>
     <template #footer>
       <span class="mr-auto text-xs text-meta">{{ looking ? t('editor.paste_credits.looking') : rows.some(row => !ready(row)) ? t('editor.paste_credits.unsettled') : '' }}</span>
-      <button type="button" class="btn btn-sm bg-btn text-btn-content ring-1 ring-inset ring-line shadow-xs transition hover:bg-btn-hover active:translate-y-px" @click="open = false">{{ t('common.cancel') }}</button>
-      <button type="button" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px" :disabled="!count || looking" @click="apply">{{ t('editor.paste_credits.apply', { count }) }}</button>
+      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="open = false">{{ t('common.cancel') }}</UiButton>
+      <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!count || looking" @click="apply">{{ t('editor.paste_credits.apply', { count }) }}</UiButton>
     </template>
   </EditorModal>
 </template>

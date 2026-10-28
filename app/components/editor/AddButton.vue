@@ -1,7 +1,5 @@
 <template>
-  <button type="button" class="btn btn-add gap-1" :class="small ? 'btn-xs' : 'btn-sm'">
-    <Plus :size="small ? 12 : 14" class="shrink-0" /><slot />
-  </button>
+  <UiButton variant="add" :size="small ? 'xs' : 'sm'" :icon="Plus" :icon-class="small ? 'size-3' : 'size-3.5'" class="gap-1"><slot /></UiButton>
 </template>
 
 <script setup lang="ts">

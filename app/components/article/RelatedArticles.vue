@@ -18,7 +18,7 @@ const articles = computed(() => data.value ?? [])
   <section v-if="articles.length" class="card overflow-hidden" :class="revealClass">
     <UiSectionTitle :title="t('article_ui.related.title')" :icon="FileText" class="px-5 pb-2 pt-4">
       <template #actions>
-        <NuxtLink :to="{ path: '/articles', query: {} }" class="text-xs text-meta transition-colors duration-150 ease-out hover:text-primary">{{ t('article_ui.related.all') }}</NuxtLink>
+        <UiButton :to="{ path: '/articles', query: {} }" size="xs">{{ t('article_ui.related.all') }}</UiButton>
       </template>
     </UiSectionTitle>
     <div class="divide-y divide-line">

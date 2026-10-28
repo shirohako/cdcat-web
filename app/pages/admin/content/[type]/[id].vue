@@ -198,10 +198,10 @@ useHead({ title: computed(() => name.value) })
           <p class="text-xs text-slate-500">{{ entityTypeLabels[type] }} #{{ id }} · 当前第 {{ latest }} 版</p>
           <h1 class="mt-1 text-2xl font-bold">{{ name }}</h1>
         </div>
-        <div class="flex flex-wrap gap-3 text-sm">
-          <NuxtLink v-if="editor" :to="editor" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white">在编辑器中修改</NuxtLink>
-          <NuxtLink v-if="hasPermission('audit.view')" :to="{ path: '/admin/audit', query: { target_type: type, target_id: id } }" class="underline">操作日志</NuxtLink>
-          <NuxtLink :to="type === 'lyric' ? `/lyrics/${id}/versions` : `/${paths.front}/${id}`" target="_blank" class="underline">前台预览</NuxtLink>
+        <div class="flex flex-wrap gap-2">
+          <UiButton v-if="editor" :to="editor" variant="primary" size="sm">在编辑器中修改</UiButton>
+          <UiButton v-if="hasPermission('audit.view')" :to="{ path: '/admin/audit', query: { target_type: type, target_id: id } }" size="sm">操作日志</UiButton>
+          <UiButton :to="type === 'lyric' ? `/lyrics/${id}/versions` : `/${paths.front}/${id}`" target="_blank" size="sm">前台预览</UiButton>
         </div>
       </header>
     </AdminListState>
@@ -216,7 +216,7 @@ useHead({ title: computed(() => name.value) })
       <section v-if="restore" class="rounded-xl border border-amber-200 bg-white p-5">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <h2 class="font-semibold">恢复到第 {{ restore.version }} 版（当前第 {{ restore.current_version }} 版）</h2>
-          <button type="button" class="text-sm text-slate-500" @click="restore = null">关闭</button>
+          <UiButton size="xs" @click="restore = null">关闭</UiButton>
         </div>
         <p class="mt-1 text-sm text-slate-600">恢复会生成一条修订并立即生效，下面是恢复后相对当前内容的改动。已删除的行按原 ID 回来；收藏、评论等互动数据不会恢复。</p>
         <ul v-if="restore.problems.length" role="alert" class="mt-3 list-inside list-disc text-sm text-red-700">
@@ -227,7 +227,7 @@ useHead({ title: computed(() => name.value) })
           <p v-if="!restore.changes.length" class="text-sm text-slate-500">没有变化</p>
           <CatalogDiffView v-else :type="type as CatalogType" :changes="restore.changes" :references="restore.references" />
         </div>
-        <button v-if="canRestore" type="button" :disabled="busy || !!restore.problems.length || !restore.changes.length || !!restore.impact?.blockers.length" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-40" @click="restoreOpen = true">确认恢复</button>
+        <UiButton v-if="canRestore" variant="primary" class="mt-4" :disabled="busy || !!restore.problems.length || !restore.changes.length || !!restore.impact?.blockers.length" @click="restoreOpen = true">确认恢复</UiButton>
       </section>
 
       <section class="rounded-xl border border-slate-200 bg-white">
@@ -246,9 +246,9 @@ useHead({ title: computed(() => name.value) })
                   <template v-if="version.reason"> · {{ version.reason }}</template>
                 </p>
               </div>
-              <div class="flex gap-3 text-xs">
-                <NuxtLink :to="`/${paths.api}/${id}/versions?version=${version.version}`" target="_blank" class="underline">查看</NuxtLink>
-                <button v-if="canRestore && version.version !== latest && !version.is_deleted" type="button" class="underline" @click="previewRestore(version.version)">预览恢复</button>
+              <div class="flex gap-2">
+                <UiButton :to="`/${paths.api}/${id}/versions?version=${version.version}`" target="_blank" size="xs">查看</UiButton>
+                <UiButton v-if="canRestore && version.version !== latest && !version.is_deleted" size="xs" @click="previewRestore(version.version)">预览恢复</UiButton>
               </div>
             </li>
           </ol>
@@ -275,7 +275,7 @@ useHead({ title: computed(() => name.value) })
       <section v-if="recountable" class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">重算统计</h2>
         <p class="mt-1 text-sm text-slate-600">按源数据重新计算曲目数、评论数、评分、收藏和追踪计数等派生统计。</p>
-        <button type="button" :disabled="busy" class="mt-4 rounded-lg border px-4 py-2 text-sm disabled:opacity-40" @click="recount">重算统计</button>
+        <UiButton class="mt-4" :disabled="busy" @click="recount">重算统计</UiButton>
       </section>
       <section v-if="mergeable" class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">合并到另一个{{ entityTypeLabels[type] }}</h2>
@@ -283,7 +283,7 @@ useHead({ title: computed(() => name.value) })
         <div class="mt-4 flex flex-wrap items-center gap-2">
           <span v-if="mergeTarget" class="rounded-lg bg-slate-100 px-3 py-2 text-sm">{{ mergeTarget.label }} #{{ mergeTarget.id }} <button type="button" class="ml-1 text-slate-500" @click="resetMerge">×</button></span>
           <EditorEntityPicker v-else :kind="mergeKind" :exclude="[Number(id)]" exclude-pending class="min-w-64" placeholder="搜索要保留的一方" @select="mergeTarget = { id: Number($event.id), label: $event.label }; trackMap = {}" />
-          <button type="button" :disabled="!mergeTarget" class="rounded-lg border px-4 py-2 text-sm disabled:opacity-40" @click="previewMerge">预览合并</button>
+          <UiButton :disabled="!mergeTarget" @click="previewMerge">预览合并</UiButton>
         </div>
         <div v-if="merge && mergeTarget" class="mt-4 text-sm">
           <p>将“{{ name }}”合并到“{{ mergeTarget.label }}”（#{{ mergeTarget.id }}）</p>
@@ -307,13 +307,13 @@ useHead({ title: computed(() => name.value) })
             <AdminMergeTrackMap class="mt-2" :source-tracks="merge.source_tracks" :target-tracks="merge.target_tracks ?? []" :model-value="trackMap" :disabled="busy" @update:model-value="changeTrackMap" />
           </div>
           <ul v-if="merge.blockers.length" role="alert" class="mt-3 list-inside list-disc text-red-700"><li v-for="blocker in merge.blockers" :key="blocker">{{ blocker }}</li></ul>
-          <button type="button" :disabled="Boolean(merge.blockers.length)" class="mt-4 rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="mergeOpen = true">确认合并</button>
+          <UiButton variant="primary" class="mt-4" :disabled="Boolean(merge.blockers.length)" @click="mergeOpen = true">确认合并</UiButton>
         </div>
       </section>
       <section class="rounded-xl border border-red-200 bg-white p-5">
         <h2 class="font-semibold text-red-800">永久删除</h2>
         <p class="mt-1 text-sm text-slate-600">永久删除，不进回收站。会一并清理列出的子数据，并写入操作日志。</p>
-        <button type="button" class="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm text-red-700" @click="startDelete">预览删除影响</button>
+        <UiButton variant="danger-soft" class="mt-4" @click="startDelete">预览删除影响</UiButton>
       </section>
     </div>
 

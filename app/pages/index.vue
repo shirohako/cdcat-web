@@ -8,10 +8,10 @@
           {{ t('landing.hero.kicker') }}
         </p>
         <h1 class="landing-display mt-5 whitespace-pre-line text-[2.5rem] leading-[1.14] text-title sm:text-5xl xl:text-[3.5rem]">{{ t('landing.hero.title') }}</h1>
-        <p class="mt-4 text-base leading-[1.9] text-body md:text-[1.0625rem]">{{ t('landing.hero.body') }}</p>
+        <p class="mt-4 text-base font-medium leading-[1.9] text-title md:text-[1.0625rem]">{{ t('landing.hero.body') }}</p>
         <div class="mt-7 flex flex-wrap gap-2.5">
-          <NuxtLink to="/albums" class="btn btn-primary min-h-12 px-6 text-base">{{ t('landing.hero.browse') }}</NuxtLink>
-          <NuxtLink to="/contribute" class="btn min-h-12 px-6 text-base">{{ t('landing.hero.contribute') }}</NuxtLink>
+          <UiButton to="/albums" variant="primary" size="lg">{{ t('landing.hero.browse') }}</UiButton>
+          <UiButton to="/contribute" size="lg">{{ t('landing.hero.contribute') }}</UiButton>
         </div>
       </div>
       <LandingTeardownFigure
@@ -88,10 +88,10 @@
       </svg>
       <div class="max-w-2xl">
         <h2 class="landing-display text-[2rem] leading-[1.2] text-title sm:text-[2.5rem]">{{ t('landing.community.title') }}</h2>
-        <p class="mt-3 text-base leading-[1.9] text-body">{{ t('landing.community.body') }}</p>
+        <p class="mt-3 text-base font-medium leading-[1.9] text-title">{{ t('landing.community.body') }}</p>
         <div class="mt-6 flex flex-wrap gap-2.5">
-          <NuxtLink to="/contribute" class="btn btn-primary min-h-12 px-6 text-base">{{ t('landing.community.contribute') }}</NuxtLink>
-          <NuxtLink to="/help/editor" class="btn min-h-12 px-6 text-base">{{ t('landing.community.guide') }}</NuxtLink>
+          <UiButton to="/contribute" variant="primary" size="lg">{{ t('landing.community.contribute') }}</UiButton>
+          <UiButton to="/help/editor" size="lg">{{ t('landing.community.guide') }}</UiButton>
         </div>
       </div>
     </section>

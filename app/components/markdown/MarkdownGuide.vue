@@ -8,7 +8,7 @@
  * whatever head/meta helper you already use.
  */
 import { computed, onUnmounted, ref } from 'vue'
-import { Check, Clipboard, ExternalLink, List, ShieldCheck } from 'lucide'
+import { Check, ExternalLink, List, ShieldCheck } from 'lucide'
 import RichContent from './RichContent.vue'
 import MdIcon from './internal/MdIcon.vue'
 import { useMarkdownT } from '~/utils/markdownI18n'
@@ -167,9 +167,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
         <article v-for="example in basics" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
           <div class="flex items-center justify-between bg-sunken px-3 py-2">
             <h3 class="text-xs font-semibold text-body">{{ example.label }}</h3>
-            <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
-              <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
-            </button>
+            <UiButton size="xs" :icon="copiedSource === example.source ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(example.source)" @click="copy(example.source)" />
           </div>
           <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <div class="p-3">
@@ -185,9 +183,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
           <article v-for="example in imageSizingExamples" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
             <div class="flex items-center justify-between bg-sunken px-3 py-2">
               <h4 class="text-xs font-semibold text-body">{{ example.label }}</h4>
-              <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
-                <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
-              </button>
+              <UiButton size="xs" :icon="copiedSource === example.source ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(example.source)" @click="copy(example.source)" />
             </div>
             <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
             <RichContent class="markdown-image-example p-3" :content="example.source" format="markdown" />
@@ -203,9 +199,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
         <article v-for="example in inlineFormatting" :key="example.label" class="overflow-hidden rounded-lg ring-1 ring-line">
           <div class="flex items-center justify-between bg-sunken px-3 py-2">
             <h3 class="text-xs font-semibold text-body">{{ example.label }}</h3>
-            <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
-              <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
-            </button>
+            <UiButton size="xs" :icon="copiedSource === example.source ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(example.source)" @click="copy(example.source)" />
           </div>
           <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <RichContent class="p-3" :content="example.source" format="markdown" />
@@ -226,9 +220,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
             </header>
             <div class="relative border-b border-line p-3 pr-9">
               <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
-              <button type="button" :aria-label="copyLabel(example.source)" class="absolute right-3 top-3 text-faint transition-colors hover:text-primary" @click="copy(example.source)">
-                <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
-              </button>
+              <UiButton size="xs" :icon="copiedSource === example.source ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(example.source)" class="absolute right-2 top-2" @click="copy(example.source)" />
             </div>
             <RichContent class="p-3" :content="example.source" format="markdown" />
           </article>
@@ -253,9 +245,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
               <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
                   <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
-                  <button type="button" :aria-label="copyLabel(containerExample(definition.name))" class="text-on-media/45 transition-colors hover:text-on-media" @click="copy(containerExample(definition.name))">
-                    <MdIcon :icon="copiedSource === containerExample(definition.name) ? Check : Clipboard" class="size-4" />
-                  </button>
+                  <UiButton size="xs" :icon="copiedSource === containerExample(definition.name) ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(containerExample(definition.name))" @click="copy(containerExample(definition.name))" />
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ containerExample(definition.name) }}</code></pre>
               </div>
@@ -278,9 +268,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
               <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
                   <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
-                  <button type="button" :aria-label="copyLabel(inlineSpoilerExample)" class="text-on-media/45 transition-colors hover:text-on-media" @click="copy(inlineSpoilerExample)">
-                    <MdIcon :icon="copiedSource === inlineSpoilerExample ? Check : Clipboard" class="size-4" />
-                  </button>
+                  <UiButton size="xs" :icon="copiedSource === inlineSpoilerExample ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(inlineSpoilerExample)" @click="copy(inlineSpoilerExample)" />
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ inlineSpoilerExample }}</code></pre>
               </div>
@@ -320,9 +308,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
           <header class="border-b border-line bg-sunken px-3 py-2.5">
             <div class="flex items-center justify-between gap-2">
               <h3 class="text-sm font-semibold text-title">{{ example.label }}</h3>
-              <button type="button" :aria-label="copyLabel(example.source)" class="text-faint transition-colors hover:text-primary" @click="copy(example.source)">
-                <MdIcon :icon="copiedSource === example.source ? Check : Clipboard" class="size-3.5" />
-              </button>
+              <UiButton size="xs" :icon="copiedSource === example.source ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(example.source)" @click="copy(example.source)" />
             </div>
             <p class="mt-1 text-xs leading-5 text-meta">{{ example.hint }}</p>
           </header>

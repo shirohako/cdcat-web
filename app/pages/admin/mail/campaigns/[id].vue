@@ -241,9 +241,9 @@ useHead({ title: computed(() => campaign.value?.title || '群发') })
         <h1 class="text-3xl font-bold">{{ campaign.title }}</h1>
         <AdminMailCampaignStatus :status="campaign.status" />
         <div class="ml-auto flex flex-wrap gap-2 text-sm">
-          <NuxtLink v-if="!editable" :to="`/admin/mail/logs?campaign_id=${campaign.id}`" class="rounded-lg border px-3 py-2">发送记录</NuxtLink>
-          <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-40" @click="duplicate">复制为新草稿</button>
-          <button v-if="campaign.status === 'draft'" type="button" :disabled="busy" class="rounded-lg border border-red-200 px-3 py-2 text-red-700 disabled:opacity-40" @click="remove">删除</button>
+          <UiButton v-if="!editable" :to="`/admin/mail/logs?campaign_id=${campaign.id}`" size="sm">发送记录</UiButton>
+          <UiButton size="sm" :disabled="busy" @click="duplicate">复制为新草稿</UiButton>
+          <UiButton v-if="campaign.status === 'draft'" variant="danger-soft" size="sm" :disabled="busy" @click="remove">删除</UiButton>
         </div>
       </div>
     </header>
@@ -257,14 +257,14 @@ useHead({ title: computed(() => campaign.value?.title || '群发') })
         <div v-if="campaign.last_error" role="alert" class="rounded-lg bg-red-50 p-4 text-sm text-red-800">
           <p class="font-medium">发信服务出错</p>
           <p class="mt-1 break-all font-mono text-xs">{{ campaign.last_error }}</p>
-          <button v-if="campaign.status === 'sending'" type="button" :disabled="busy" class="mt-3 rounded-lg bg-slate-900 px-3 py-1.5 text-white disabled:opacity-40" @click="resume">继续发送</button>
+          <UiButton v-if="campaign.status === 'sending'" variant="primary" size="sm" :disabled="busy" class="mt-3" @click="resume">继续发送</UiButton>
         </div>
 
         <!-- Draft or scheduled: everything can still change. -->
         <template v-if="editable">
           <div v-if="campaign.status === 'scheduled'" class="flex flex-wrap items-center gap-3 rounded-lg bg-sky-50 p-4 text-sm text-sky-900">
             <span>定时于 {{ time(campaign.scheduled_at) }} 发送</span>
-            <button type="button" :disabled="busy" class="rounded-lg border border-sky-300 bg-white px-3 py-1.5 disabled:opacity-40" @click="unschedule">取消定时</button>
+            <UiButton size="sm" :disabled="busy" @click="unschedule">取消定时</UiButton>
           </div>
           <div v-if="problems.length" class="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
             <p class="font-medium">发送前还需要解决这些问题：</p>
@@ -293,7 +293,7 @@ useHead({ title: computed(() => campaign.value?.title || '群发') })
                   <option v-for="template in templates" :key="template.id" :value="template.id">{{ template.name }}</option>
                 </select>
               </label>
-              <button type="button" :disabled="!templateId || busy" class="rounded-lg border px-3 py-2 disabled:opacity-40" @click="loadTemplate">载入模板</button>
+              <UiButton :disabled="!templateId || busy" @click="loadTemplate">载入模板</UiButton>
               <span v-if="campaign.mail_template" class="text-xs text-slate-500">基于模板「{{ campaign.mail_template.name }}」</span>
             </div>
           </section>
@@ -312,10 +312,10 @@ useHead({ title: computed(() => campaign.value?.title || '群发') })
           <AdminMailTestSend :target="target" :contents="form.contents" :disabled="busy" @errors="errors = $event" />
 
           <div class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-slate-200 bg-white/95 py-4 text-sm backdrop-blur">
-            <button type="button" :disabled="busy || !dirty" class="rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-40" @click="save">保存</button>
-            <button type="button" :disabled="busy || !campaign.configured || !form.mail_category_id" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="openSend">
+            <UiButton :disabled="busy || !dirty" @click="save">保存</UiButton>
+            <UiButton variant="primary" :disabled="busy || !campaign.configured || !form.mail_category_id" @click="openSend">
               {{ campaign.status === 'scheduled' ? '重新定时或立即发送…' : '发送…' }}
-            </button>
+            </UiButton>
             <span v-if="dirty" class="text-xs text-amber-700">有未保存的修改</span>
           </div>
         </template>
@@ -325,7 +325,7 @@ useHead({ title: computed(() => campaign.value?.title || '群发') })
           <section class="rounded-xl border border-slate-200 bg-white p-5">
             <div class="flex flex-wrap items-center justify-between gap-3">
               <h2 class="text-lg font-semibold">发送情况</h2>
-              <button v-if="campaign.status === 'sending'" type="button" :disabled="busy" class="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 disabled:opacity-40" @click="stopOpen = true">停止发送</button>
+              <UiButton v-if="campaign.status === 'sending'" variant="danger-soft" size="sm" :disabled="busy" @click="stopOpen = true">停止发送</UiButton>
             </div>
             <div v-if="campaign.recipients_count" class="mt-4 h-2 overflow-hidden rounded-full bg-slate-100" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
               <div class="h-full bg-emerald-500 transition-all" :style="{ width: `${progress}%` }" />

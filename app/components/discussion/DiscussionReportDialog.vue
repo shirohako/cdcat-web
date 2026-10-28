@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import { DISCUSSION_REPORT_REASONS, type DiscussionReportReason } from '~/types/discussion'
 
 /** Reports a post to the moderators. */
@@ -52,8 +51,8 @@ async function submit() {
       <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
     </form>
     <template #footer>
-      <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>
-      <button type="submit" form="discussion-report" class="btn btn-primary btn-sm" :disabled="busy"><Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('discussions.report.submit') }}</button>
+      <UiButton size="sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</UiButton>
+      <UiButton type="submit" form="discussion-report" variant="primary" size="sm" :loading="busy">{{ t('discussions.report.submit') }}</UiButton>
     </template>
   </DiscussionDialog>
 </template>

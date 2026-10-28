@@ -49,9 +49,7 @@ async function remove(bookmark: Bookmark) {
             {{ t('discussions.bookmarks.saved', { time: ago(bookmark.created_at) }) }}
           </p>
         </NuxtLink>
-        <button type="button" class="grid size-8 place-items-center rounded-lg text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-danger" :aria-label="t('discussions.post.unbookmark')" @click="remove(bookmark)">
-          <BookmarkX :size="15" />
-        </button>
+        <UiButton size="sm" :icon="BookmarkX" :label="t('discussions.post.unbookmark')" @click="remove(bookmark)" />
       </div>
     </div>
     <UiEmpty v-else-if="status !== 'error'" class="min-h-60" :title="t('discussions.bookmarks.empty')" :icon="MessageCircle" />

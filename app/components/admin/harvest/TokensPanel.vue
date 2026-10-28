@@ -56,13 +56,13 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
     <p class="text-sm text-slate-600">采集器用令牌把数据和图片直接提交到本站。令牌只能用来提交采集数据，不能登录或访问其他接口；在采集器网页的「设置 → 本站」里填入。</p>
     <form class="flex flex-wrap gap-2" @submit.prevent="create">
       <input v-model="name" maxlength="60" placeholder="用途（例如：家里的电脑）" aria-label="用途（例如：家里的电脑）" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm">
-      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white disabled:opacity-50" :disabled="busy || !name.trim()">新建令牌</button>
+      <UiButton type="submit" variant="primary" size="sm" :disabled="busy || !name.trim()">新建令牌</UiButton>
     </form>
     <div v-if="fresh?.token" role="status" class="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
       <p class="text-amber-900">令牌只显示这一次，请马上复制到采集器里：</p>
       <div class="flex gap-2">
         <code class="min-w-0 flex-1 break-all rounded bg-white px-2 py-1 font-mono text-xs">{{ fresh.token }}</code>
-        <button type="button" class="shrink-0 rounded border border-amber-300 bg-white px-2 py-1" @click="copy">{{ copied ? '已复制' : '复制' }}</button>
+        <UiButton size="sm" class="shrink-0" @click="copy">{{ copied ? '已复制' : '复制' }}</UiButton>
       </div>
     </div>
     <p v-if="failure" role="alert" class="text-sm text-red-700">{{ failure }}</p>
@@ -71,7 +71,7 @@ const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', 
         <li v-for="token in data?.tokens" :key="token.id" class="flex items-center gap-3 py-2">
           <span class="flex-1 font-medium">{{ token.name }}</span>
           <span class="text-xs text-slate-500">{{ token.last_used_at ? `最近使用 ${time(token.last_used_at)}` : '没用过' }}</span>
-          <button type="button" class="text-xs text-red-700 underline" @click="revoking = token">吊销</button>
+          <UiButton variant="danger-soft" size="xs" @click="revoking = token">吊销</UiButton>
         </li>
       </ul>
     </AdminListState>

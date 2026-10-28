@@ -110,7 +110,7 @@ const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white shadow
 
     <div v-if="settleable" class="flex flex-wrap items-center gap-2 border-b border-sky-100 bg-sky-50 px-4 py-2 text-xs text-sky-900">
       <span>草稿里有 {{ settleable }} 个署名还没按建议关联或新建（草稿比建议早，或者被改回了署名）。</span>
-      <button type="button" class="rounded border border-sky-300 bg-white px-2 py-0.5 hover:bg-sky-100" @click="settle">按建议处理</button>
+      <UiButton size="xs" @click="settle">按建议处理</UiButton>
     </div>
 
     <ul v-if="warnings.length" class="divide-y divide-slate-100">
@@ -140,11 +140,11 @@ const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white shadow
                   <template v-for="page in artist(id)?.pages ?? []" :key="page.url"> · <a :href="page.url" target="_blank" rel="noopener noreferrer" class="hover:underline">{{ page.provider }}</a></template>
                 </p>
               </div>
-              <button type="button" class="shrink-0 rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-50" :disabled="!editor" @click="pick(warning, id)">就是这位</button>
+              <UiButton size="xs" class="shrink-0" :disabled="!editor" @click="pick(warning, id)">就是这位</UiButton>
             </li>
           </ul>
           <div class="mt-2 flex flex-wrap items-center gap-2">
-            <button v-if="warning.create" type="button" class="rounded border border-slate-300 px-2 py-0.5 text-xs hover:bg-slate-50" :disabled="!editor" @click="createNew(warning)">新建「{{ warning.create.name }}」</button>
+            <UiButton v-if="warning.create" size="xs" :disabled="!editor" @click="createNew(warning)">新建「{{ warning.create.name }}」</UiButton>
             <span class="text-xs text-slate-400">也可以在编辑器的「{{ warning.kind === 'circle' ? '人员' : '制作人员' }}」里手动选；不处理就保持纯署名。</span>
           </div>
         </template>

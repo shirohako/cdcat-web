@@ -35,13 +35,9 @@
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            class="shrink-0 px-3 py-1.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors duration-150 ease-out text-xs font-medium whitespace-nowrap"
-            @click="editing = true"
-          >
+          <UiButton size="xs" class="shrink-0 whitespace-nowrap" @click="editing = true">
             {{ user?.email ? t('account_pages.email.change') : t('account_pages.email.link') }}
-          </button>
+          </UiButton>
         </div>
 
         <!-- Edit form -->
@@ -87,16 +83,15 @@
                   :placeholder="t('account_pages.email.code_placeholder')"
                   @keyup.enter="submit"
                 />
-                <button
-                  type="button"
-                  :disabled="!form.newEmail || countdown > 0 || isSendingCode"
-                  class="shrink-0 px-3 py-1.5 text-xs font-medium rounded-md border transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  :class="countdown > 0 ? 'bg-sunken text-meta border-line' : 'bg-primary/10 text-primary border-primary/25 hover:bg-primary/20'"
+                <UiButton
+                  size="sm"
+                  class="shrink-0"
+                  :loading="isSendingCode"
+                  :disabled="!form.newEmail || countdown > 0"
                   @click="sendCode"
                 >
-                  <span v-if="isSendingCode" class="loading loading-spinner loading-xs"></span>
-                  <span v-else>{{ countdown > 0 ? `${countdown}s` : t('account_pages.email.send_code') }}</span>
-                </button>
+                  {{ countdown > 0 ? `${countdown}s` : t('account_pages.email.send_code') }}
+                </UiButton>
               </div>
               <p class="text-xs text-meta">{{ t('account_pages.email.code_hint') }}</p>
             </div>
@@ -108,21 +103,19 @@
         v-if="editing"
         class="px-6 py-4 bg-sunken border-t border-line flex justify-end gap-2"
       >
-        <button type="button" class="btn btn-ghost btn-sm" @click="cancelEdit">
+        <UiButton size="sm" @click="cancelEdit">
           {{ t('common.cancel') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm gap-1.5"
-          :disabled="!canSubmit || isSubmitting"
+        </UiButton>
+        <UiButton
+          variant="primary"
+          size="sm"
+          :icon="Mail"
+          :loading="isSubmitting"
+          :disabled="!canSubmit"
           @click="submit"
         >
-          <span v-if="isSubmitting" class="loading loading-spinner loading-xs"></span>
-          <template v-else>
-            <Mail :size="14" />
-            {{ t('account_pages.email.confirm_change') }}
-          </template>
-        </button>
+          {{ t('account_pages.email.confirm_change') }}
+        </UiButton>
       </div>
     </section>
   </div>

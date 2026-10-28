@@ -175,7 +175,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
           </template>
           <p v-else-if="seriesFailed" class="px-2.5 py-2 text-meta">
             {{ t('event_filter.load_failed') }}
-            <button type="button" class="link ml-1" @click="loadSeries()">{{ t('common.retry') }}</button>
+            <UiButton size="xs" class="ml-1 align-middle" @click="loadSeries()">{{ t('common.retry') }}</UiButton>
           </p>
           <div v-else class="space-y-1.5 px-1 pt-1">
             <div v-for="row in 3" :key="row" class="skeleton h-9 rounded-md" />
@@ -185,9 +185,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
         <!-- Level two: the active series' editions, by year -->
         <div class="min-w-0 flex-1 flex-col sm:flex" :class="pane === 'editions' ? 'flex' : 'hidden'">
           <div class="flex h-10 shrink-0 items-center gap-1 border-b border-line px-1.5 sm:px-3">
-            <button type="button" class="grid size-7 place-items-center rounded-md text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-title sm:hidden" :aria-label="t('event_filter.back')" @click="pane = 'series'">
-              <Icon name="lucide:chevron-left" class="h-4 w-4" />
-            </button>
+            <UiButton icon="lucide:chevron-left" :label="t('event_filter.back')" size="xs" icon-class="size-4" class="sm:hidden" @click="pane = 'series'" />
             <span class="truncate font-semibold text-title">{{ activeSeries?.name }}</span>
           </div>
 
@@ -220,7 +218,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
             </template>
             <p v-else-if="activeEditions === 'failed'" class="px-2.5 py-6 text-center text-meta">
               {{ t('event_filter.load_failed') }}
-              <button type="button" class="link ml-1" @click="activeId && loadEditions(activeId)">{{ t('common.retry') }}</button>
+              <UiButton size="xs" class="ml-1 align-middle" @click="activeId && loadEditions(activeId)">{{ t('common.retry') }}</UiButton>
             </p>
             <div v-else class="space-y-1.5 px-1 pt-3">
               <div v-for="row in 6" :key="row" class="skeleton h-7 rounded-md" />

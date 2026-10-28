@@ -75,14 +75,7 @@ const copyPrevious = async (index: number) => {
       <p class="flex items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-xs">
         <span class="w-8 shrink-0 font-mono text-faint">{{ track.number_label || String(track.track_number).padStart(2, '0') }}</span>
         <span class="min-w-0 flex-1 truncate font-semibold text-title">{{ track.title || '—' }}</span>
-        <button
-          v-if="canCopy(index)"
-          type="button"
-          class="inline-flex h-6 shrink-0 items-center gap-1 rounded-md bg-btn px-2 text-[11px] font-semibold text-btn-content ring-1 ring-inset ring-line transition-colors hover:bg-btn-hover"
-          @click="copyPrevious(index)"
-        >
-          <Icon name="lucide:copy" class="size-3" />{{ t('editor.credits.same_as_previous') }}
-        </button>
+        <UiButton v-if="canCopy(index)" size="xs" icon="lucide:copy" icon-class="size-3" class="shrink-0 gap-1 ring-1 ring-inset ring-line" @click="copyPrevious(index)">{{ t('editor.credits.same_as_previous') }}</UiButton>
       </p>
       <div class="space-y-2 px-3 py-2">
         <EditorAlbumCreditsRoleRow

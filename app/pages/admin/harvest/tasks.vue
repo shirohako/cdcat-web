@@ -116,9 +116,7 @@ useHead({ title: '任务' })
           <option value="empty">没有候选</option>
         </select>
         <span class="text-xs text-slate-500">{{ shown.length }} 个任务</span>
-        <button v-if="filtered" type="button" class="ml-auto inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-slate-600 hover:bg-slate-200/60" @click="clear">
-          <Icon name="lucide:x" class="size-3.5" />清除筛选
-        </button>
+        <UiButton v-if="filtered" size="xs" icon="lucide:x" class="ml-auto" @click="clear">清除筛选</UiButton>
       </div>
     </section>
 

@@ -13,14 +13,9 @@
           </div>
           <div class="flex items-center gap-3">
             <span class="tabular-nums text-2xl font-bold text-title">{{ tracksCount }}</span>
-            <button
-              v-if="tracksCount > 0"
-              class="btn btn-xs gap-1 cursor-pointer"
-              @click="$emit('view-all-tracks')"
-            >
+            <UiButton v-if="tracksCount > 0" size="xs" :icon-right="ChevronRight" @click="$emit('view-all-tracks')">
               {{ $t('common.view_all') }}
-              <ChevronRight :size="14" />
-            </button>
+            </UiButton>
           </div>
         </div>
 

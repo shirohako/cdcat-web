@@ -78,7 +78,7 @@ useHead({ title: '评价管理' })
           <option value="">默认排序</option>
           <option value="rating">评分</option><option value="useful_count">有用数</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -93,10 +93,10 @@ useHead({ title: '评价管理' })
             <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-xs ring-1" :class="reviewRatingTone(review.rating)">{{ ratingLabels[review.rating] }}</span>
             <span v-if="review.is_hidden" class="rounded bg-amber-100 px-1.5 text-xs text-amber-800">已隐藏</span>
             <span class="text-xs text-slate-500">{{ time(review.created_at) }}</span>
-            <span class="ml-auto flex gap-2 text-xs">
-              <button v-if="!review.is_hidden" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1 text-amber-700" @click="action = { review, kind: 'hide' }">隐藏评价</button>
-              <button v-else type="button" class="rounded-lg border px-2.5 py-1" @click="action = { review, kind: 'unhide' }">取消隐藏</button>
-              <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1 text-red-700" @click="action = { review, kind: 'delete' }">删除</button>
+            <span class="ml-auto flex gap-2">
+              <UiButton v-if="!review.is_hidden" size="xs" @click="action = { review, kind: 'hide' }">隐藏评价</UiButton>
+              <UiButton v-else size="xs" @click="action = { review, kind: 'unhide' }">取消隐藏</UiButton>
+              <UiButton variant="danger-soft" size="xs" @click="action = { review, kind: 'delete' }">删除</UiButton>
             </span>
           </div>
           <p class="mt-2 line-clamp-6 whitespace-pre-wrap text-sm text-slate-700">{{ review.content }}</p>

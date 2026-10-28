@@ -145,14 +145,14 @@ useHead({ title: computed(() => creating.value ? '新建群发模板' : template
             <option v-for="locale in locales" :key="locale" :value="locale">{{ localeName(locale) }}</option>
           </select>
         </label>
-        <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-40" @click="reset">恢复</button>
+        <UiButton :disabled="busy" @click="reset">恢复</UiButton>
         <p class="w-full text-xs text-slate-500">会用代码里的默认文案覆盖当前内容，覆盖后不能撤销。</p>
       </section>
 
       <div class="sticky bottom-0 flex flex-wrap items-center gap-3 border-t border-slate-200 bg-white/95 py-4 text-sm backdrop-blur">
-        <button type="button" :disabled="busy || (!dirty && !creating)" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40" @click="save">{{ creating ? '新建群发模板' : '保存' }}</button>
+        <UiButton variant="primary" :disabled="busy || (!dirty && !creating)" @click="save">{{ creating ? '新建群发模板' : '保存' }}</UiButton>
         <span v-if="dirty && !creating" class="text-xs text-amber-700">有未保存的修改</span>
-        <button v-if="template && !system" type="button" :disabled="busy" class="ml-auto rounded-lg border border-red-200 px-3 py-2 text-red-700 disabled:opacity-40" @click="remove">删除</button>
+        <UiButton v-if="template && !system" variant="danger-soft" :disabled="busy" class="ml-auto" @click="remove">删除</UiButton>
       </div>
     </AdminListState>
   </div>

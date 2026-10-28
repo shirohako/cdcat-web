@@ -12,7 +12,7 @@
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
           <UiSelect v-if="item.resource_type === 'artist'" v-model="docOf(item).type" :options="artistTypeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-36" :invalid="!docOf(item).type" :aria-label="$t('catalog.field.type')" />
           <span class="text-[11px] text-meta">{{ usage(item.ref) }}</span>
-          <button type="button" class="btn btn-xs ml-auto px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :title="$t('editor.new_items.remove')" @click="remove(item.ref)"><Trash2 :size="12" /></button>
+          <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.new_items.remove')" icon-class="size-3" size="xs" class="ml-auto ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(item.ref)" />
         </div>
 
         <p v-for="error in errorsOf(item.ref)" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>

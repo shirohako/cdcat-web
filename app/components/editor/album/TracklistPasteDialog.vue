@@ -22,8 +22,8 @@
     </div>
     <template #footer>
       <span class="mr-auto text-xs text-meta">{{ $t('editor.paste.count', { count: total }) }}</span>
-      <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="open = false">{{ $t('common.cancel') }}</button>
-      <button type="button" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px" :disabled="!total" @click="apply">{{ $t('editor.paste.apply') }}</button>
+      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="open = false">{{ $t('common.cancel') }}</UiButton>
+      <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!total" @click="apply">{{ $t('editor.paste.apply') }}</UiButton>
     </template>
   </EditorModal>
 </template>

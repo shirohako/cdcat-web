@@ -20,15 +20,15 @@
               </a>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>
               <span class="inline-flex items-center gap-1"><Eye :size="12" />{{ t('article_ui.views', { count: article.views_count }) }}</span>
-              <button
-                type="button" class="btn btn-xs gap-1 rounded-full" :class="article.liked ? 'btn-error' : 'btn-ghost'"
-                :disabled="liking || (isAuthenticated && !article.can.like)" :aria-pressed="article.liked"
+              <UiButton
+                size="xs" :variant="article.liked ? 'danger' : 'default'"
+                :disabled="liking || (isAuthenticated && !article.can.like)" :pressed="article.liked"
                 :title="isAuthenticated && !article.can.like ? t('article_ui.like_own') : t(article.liked ? 'article_ui.unlike' : 'article_ui.like')" @click="toggleLike">
-                <Heart :size="12" :fill="article.liked ? 'currentColor' : 'none'" />{{ article.likes_count }}
-              </button>
+                <Heart :size="14" :fill="article.liked ? 'currentColor' : 'none'" />{{ article.likes_count }}
+              </UiButton>
               <span class="ml-auto flex items-center gap-1">
-                <NuxtLink v-if="article.can.manage" :to="`/admin/articles/${article.id}`" class="btn btn-ghost btn-xs"><Shield :size="12" />{{ t('article_ui.reader.manage') }}</NuxtLink>
-                <button v-if="article.can.report" type="button" class="btn btn-ghost btn-xs" @click="reportOpen = true"><Flag :size="12" />{{ t('article_ui.report.title') }}</button>
+                <UiButton v-if="article.can.manage" :to="`/admin/articles/${article.id}`" size="xs" :icon="Shield">{{ t('article_ui.reader.manage') }}</UiButton>
+                <UiButton v-if="article.can.report" size="xs" :icon="Flag" @click="reportOpen = true">{{ t('article_ui.report.title') }}</UiButton>
               </span>
             </div>
             <ArticleContent ref="contentRef" :content="article.content" :published-at="article.published_at ?? ''" />

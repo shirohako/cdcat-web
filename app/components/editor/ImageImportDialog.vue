@@ -16,10 +16,8 @@
       <slot />
     </div>
     <template #footer>
-      <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="open = false">{{ $t('common.cancel') }}</button>
-      <button type="submit" class="btn btn-primary btn-sm shadow-xs transition active:translate-y-px" :disabled="!previewable || busy">
-        <span v-if="busy" class="loading loading-spinner loading-xs" />{{ $t('editor.image.import') }}
-      </button>
+      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="open = false">{{ $t('common.cancel') }}</UiButton>
+      <UiButton type="submit" variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!previewable" :loading="busy">{{ $t('editor.image.import') }}</UiButton>
     </template>
   </EditorModal>
 </template>

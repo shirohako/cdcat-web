@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle2, Loader2, MessageSquareReply, Quote } from '@lucide/vue'
+import { CheckCircle2, MessageSquareReply, Quote } from '@lucide/vue'
 import type { Pagination } from '~/types/api'
 import type { DiscussionPost, DiscussionReferences } from '~/types/discussion'
 
@@ -133,21 +133,17 @@ function quote() {
         <div v-if="!editing && post.status === 'visible'" class="mt-3 flex flex-wrap items-center gap-2">
           <DiscussionReactions :post-id="post.id" :reactions="post.reactions" :can-react="post.can.react" @update:reactions="value => emit('update', { ...post, reactions: value, replies: replies })" />
           <span class="ml-auto flex items-center gap-1">
-            <button v-if="topic.viewer.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" @click="quote">
-              <Quote :size="13" />{{ t('discussions.post.quote') }}
-            </button>
-            <button v-if="post.can.reply" type="button" class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary" @click="openComposer(null)">
-              <MessageSquareReply :size="13" />{{ t('discussions.post.reply') }}
-            </button>
+            <UiButton v-if="topic.viewer.can.reply" size="xs" :icon="Quote" @click="quote">{{ t('discussions.post.quote') }}</UiButton>
+            <UiButton v-if="post.can.reply" size="xs" :icon="MessageSquareReply" @click="openComposer(null)">{{ t('discussions.post.reply') }}</UiButton>
           </span>
         </div>
 
         <section v-if="!isFirst && (replies.length || composerOpen)" class="mt-3 rounded-xl bg-sunken p-1.5">
           <DiscussionReplyItem v-for="reply in replies" :key="reply.id" :reply="reply" @reply="target => openComposer(target)" @update="updateReply" @removed="removeReply" />
           <div v-if="!shownAll || (repliesPage && repliesPage.last_page > 1)" class="flex items-center gap-3 px-3 py-1.5 text-xs">
-            <button v-if="!shownAll" type="button" class="link font-medium" :disabled="loadingReplies" @click="loadReplies(1)">
-              <Loader2 v-if="loadingReplies" :size="12" class="inline animate-spin" />{{ t('discussions.post.view_all_replies', { count: post.replies_count }) }}
-            </button>
+            <UiButton v-if="!shownAll" size="xs" :loading="loadingReplies" @click="loadReplies(1)">
+              {{ t('discussions.post.view_all_replies', { count: post.replies_count }) }}
+            </UiButton>
             <CommonPagination v-else-if="repliesPage" :page="repliesPage.current_page" :total-pages="repliesPage.last_page" :disabled="loadingReplies" @update:page="loadReplies" />
           </div>
           <div v-if="composerOpen" class="p-2">

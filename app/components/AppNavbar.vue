@@ -5,10 +5,10 @@
       <!-- Left Section: Menu Toggle & Logo -->
       <div class="flex items-center gap-3">
         <!-- Mobile Menu Toggle -->
-        <UiIconButton icon="lucide:menu" :label="$t('site.toggle_menu')" class="lg:hidden" @click="toggleMobileMenu" />
+        <UiButton variant="ghost" icon="lucide:menu" :label="$t('site.toggle_menu')" class="lg:hidden" @click="toggleMobileMenu" />
 
         <!-- Desktop Sidebar Toggle -->
-        <UiIconButton icon="lucide:menu" :label="$t('site.toggle_sidebar')" class="max-lg:hidden" @click="toggleSidebar" />
+        <UiButton variant="ghost" icon="lucide:menu" :label="$t('site.toggle_sidebar')" class="max-lg:hidden" @click="toggleSidebar" />
 
         <!-- Logo: the site name in the theme colour, with vivia's hover pill -->
         <NuxtLink
@@ -52,7 +52,8 @@
 
         <!-- Language Switcher -->
         <div class="relative">
-          <UiIconButton
+          <UiButton
+            variant="ghost"
             icon="lucide:languages"
             icon-class="size-[18px]"
             :label="$t('site.switch_language')"
@@ -196,7 +197,7 @@
 
         <!-- Login/Register Buttons (Not Authenticated); on phones, where the two don't fit, one icon with both in a menu -->
         <div v-else class="ml-1 hidden items-center gap-2 sm:flex">
-          <UiButton to="/auth/login" variant="ghost">
+          <UiButton to="/auth/login">
             {{ $t('user.login') }}
           </UiButton>
           <UiButton to="/auth/register" variant="primary">
@@ -204,7 +205,8 @@
           </UiButton>
         </div>
         <div v-if="!isAuthenticated" class="relative sm:hidden">
-          <UiIconButton
+          <UiButton
+            variant="ghost"
             icon="lucide:log-in"
             icon-class="size-[19px]"
             :label="$t('user.login')"

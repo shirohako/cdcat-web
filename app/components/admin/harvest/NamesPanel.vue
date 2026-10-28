@@ -100,16 +100,16 @@ const roleName = (key: string | null) => roles.value?.find(role => role.key === 
                   <NuxtLink v-for="candidate in identity.candidates" :key="candidate.id" :to="`/admin/harvest/candidates/${candidate.id}`" class="max-w-56 truncate text-sky-700 hover:underline">{{ candidate.title }}</NuxtLink>
                 </p>
               </div>
-              <div class="flex flex-wrap gap-3 text-xs">
+              <div class="flex flex-wrap gap-2">
                 <template v-if="identity.kind === 'role'">
-                  <button type="button" class="underline" @click="start(identity, 'role')">对应角色</button>
+                  <UiButton size="xs" @click="start(identity, 'role')">对应角色</UiButton>
                 </template>
                 <template v-else>
-                  <button type="button" class="underline" @click="start(identity, 'link')">关联到艺术家</button>
-                  <button type="button" class="underline" @click="start(identity, 'create')">新建艺术家</button>
+                  <UiButton size="xs" @click="start(identity, 'link')">关联到艺术家</UiButton>
+                  <UiButton size="xs" @click="start(identity, 'create')">新建艺术家</UiButton>
                 </template>
-                <button v-if="identity.status !== 'ignored'" type="button" class="underline" :disabled="busy" @click="resolve(identity, { action: 'ignore' })">忽略</button>
-                <button v-if="identity.status !== 'unresolved'" type="button" class="underline" :disabled="busy" @click="resolve(identity, { action: 'reset' })">重新处理</button>
+                <UiButton v-if="identity.status !== 'ignored'" size="xs" :disabled="busy" @click="resolve(identity, { action: 'ignore' })">忽略</UiButton>
+                <UiButton v-if="identity.status !== 'unresolved'" size="xs" :disabled="busy" @click="resolve(identity, { action: 'reset' })">重新处理</UiButton>
               </div>
             </div>
             <div v-if="open?.id === identity.id" class="mt-3 rounded-lg bg-slate-50 p-3">
@@ -121,16 +121,16 @@ const roleName = (key: string | null) => roles.value?.find(role => role.key === 
                     <option v-for="type in artistTypes" :key="type" :value="type">{{ artistTypeLabels[type] }}</option>
                   </select>
                 </label>
-                <button type="submit" class="rounded bg-slate-900 px-3 py-1.5 text-white" :disabled="busy">新建艺术家</button>
+                <UiButton type="submit" variant="primary" size="xs" :disabled="busy">新建艺术家</UiButton>
               </form>
               <form v-else class="flex flex-wrap items-end gap-2 text-xs" @submit.prevent="resolve(identity, { action: 'role', credit_role: roleKey })">
                 <select v-model="roleKey" required class="rounded border border-slate-300 px-2 py-1">
                   <option value="">选择角色</option>
                   <option v-for="role in roles ?? []" :key="role.key" :value="role.key">{{ role.names['zh-Hans'] ?? role.key }}（{{ role.key }}）</option>
                 </select>
-                <button type="submit" class="rounded bg-slate-900 px-3 py-1.5 text-white" :disabled="busy || !roleKey">保存</button>
+                <UiButton type="submit" variant="primary" size="xs" :disabled="busy || !roleKey">保存</UiButton>
               </form>
-              <button type="button" class="mt-2 text-xs underline" @click="open = null">取消</button>
+              <UiButton size="xs" class="mt-2" @click="open = null">取消</UiButton>
             </div>
           </li>
         </ul>

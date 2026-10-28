@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, MapPin } from '@lucide/vue'
+import { CalendarClock, CalendarDays, MapPin } from '@lucide/vue'
 
 interface EventSeriesSummary {
   id: number
@@ -10,6 +10,9 @@ interface EventSeriesSummary {
   events_count: number
   latest_start_date: string | null
 }
+
+/** One column fewer than the franchise grid from md up, so the facts fit beside their icons. */
+const GRID = 'grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4'
 
 const { t } = useI18n()
 const { formatDate } = useLocaleFormatting()
@@ -51,14 +54,14 @@ usePageSeo({
             {{ t('collection_pages.events.no_series') }}
           </div>
 
-          <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
+          <div v-else :class="['grid', GRID]">
             <NuxtLink
               v-for="series in seriesList"
               :key="series.id"
               :to="`/event-series/${series.id}`"
-              class="group block overflow-hidden rounded-xl bg-sunken transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
+              class="group flex flex-col overflow-hidden rounded-xl bg-sunken transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
             >
-              <div class="relative aspect-video overflow-hidden">
+              <div class="relative aspect-video shrink-0 overflow-hidden">
                 <img
                   v-if="series.banner_url"
                   v-img-fade
@@ -71,16 +74,21 @@ usePageSeo({
                   <CalendarDays class="h-12 w-12 text-primary/40" />
                 </div>
               </div>
-              <div class="space-y-1.5 p-4">
-                <h2 class="truncate font-bold text-title transition-colors group-hover:text-primary">{{ series.name }}</h2>
-                <div v-if="series.location" class="flex items-center gap-1.5 text-xs text-body">
-                  <MapPin class="h-3.5 w-3.5 shrink-0 text-meta" />
-                  <span class="truncate">{{ series.location }}</span>
-                </div>
-                <div class="flex items-center gap-1.5 text-xs text-body">
-                  <CalendarDays class="h-3.5 w-3.5 shrink-0 text-meta" />
-                  <span>{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</span>
-                  <span v-if="series.latest_start_date" class="truncate text-meta">· {{ t('collection_pages.events.latest', { date: latestDate(series) }) }}</span>
+              <!-- The name takes up to two lines; the facts get a row each at the foot, so cards in a row line up.
+                   The icons sit in the text on its baseline, centred on the glyphs (0.37em up) rather than on the
+                   line box, which puts them a pixel high in fonts with a tall ascent. -->
+              <div class="flex flex-1 flex-col p-4">
+                <h2 class="line-clamp-2 font-bold leading-snug text-title transition-colors group-hover:text-primary" :title="series.name">{{ series.name }}</h2>
+                <div class="mt-auto space-y-1.5 pt-3 text-xs text-meta">
+                  <p v-if="series.location" class="truncate" :title="series.location">
+                    <MapPin class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)]" />{{ series.location }}
+                  </p>
+                  <p class="truncate font-medium text-body">
+                    <CalendarDays class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)] text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}
+                  </p>
+                  <p v-if="series.latest_start_date" class="truncate">
+                    <CalendarClock class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)]" />{{ t('collection_pages.events.latest', { date: latestDate(series) }) }}
+                  </p>
                 </div>
               </div>
             </NuxtLink>
@@ -93,7 +101,7 @@ usePageSeo({
           </div>
         </div>
 
-        <CollectionLoadingSkeleton v-else variant="wide" />
+        <CollectionLoadingSkeleton v-else variant="wide" :grid-class="GRID" />
       </CollectionPageCard>
     </div>
   </div>

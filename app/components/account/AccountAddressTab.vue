@@ -6,14 +6,9 @@
           <h2 class="text-base font-semibold text-title">{{ t('account_pages.address.title') }}</h2>
           <p class="text-sm text-meta mt-1">{{ t('account_pages.address.description') }}</p>
         </div>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm gap-1.5"
-          @click="showAddForm = true"
-        >
-          <Plus :size="14" />
+        <UiButton variant="primary" size="sm" :icon="Plus" @click="showAddForm = true">
           {{ t('account_pages.address.add') }}
-        </button>
+        </UiButton>
       </div>
 
       <!-- Address List -->
@@ -38,20 +33,12 @@
             </p>
           </div>
           <div class="flex gap-2 shrink-0">
-            <button
-              type="button"
-              class="link text-sm"
-              @click="editAddress(index)"
-            >
+            <UiButton size="xs" @click="editAddress(index)">
               {{ t('common.edit') }}
-            </button>
-            <button
-              type="button"
-              class="text-sm text-danger transition-colors duration-150 ease-out hover:text-danger/80"
-              @click="deleteAddress(index)"
-            >
+            </UiButton>
+            <UiButton variant="danger-soft" size="xs" @click="deleteAddress(index)">
               {{ t('common.delete') }}
-            </button>
+            </UiButton>
           </div>
         </div>
       </div>
@@ -59,13 +46,9 @@
       <!-- Empty State -->
       <UiEmpty v-else :title="t('account_pages.address.empty')" :icon="MapPin">
         <template #actions>
-          <button
-            type="button"
-            class="link text-sm"
-            @click="showAddForm = true"
-          >
+          <UiButton size="xs" @click="showAddForm = true">
             {{ t('account_pages.address.add_now') }}
-          </button>
+          </UiButton>
         </template>
       </UiEmpty>
     </section>
@@ -185,20 +168,12 @@
               </div>
 
               <div class="px-6 py-4 bg-sunken border-t border-line rounded-b-2xl flex justify-end gap-2">
-                <button
-                  type="button"
-                  class="btn btn-ghost btn-sm"
-                  @click="closeForm"
-                >
+                <UiButton size="sm" @click="closeForm">
                   {{ t('common.cancel') }}
-                </button>
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  @click="saveAddress"
-                >
+                </UiButton>
+                <UiButton variant="primary" size="sm" @click="saveAddress">
                   {{ t('account_pages.address.save') }}
-                </button>
+                </UiButton>
               </div>
             </div>
           </Transition>
@@ -209,7 +184,7 @@
 </template>
 
 <script setup>
-import { Save, Plus, MapPin } from '@lucide/vue'
+import { Plus, MapPin } from '@lucide/vue'
 
 defineProps({
   user: { type: Object, default: null }

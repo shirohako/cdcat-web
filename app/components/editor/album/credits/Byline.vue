@@ -50,14 +50,7 @@ const preview = computed(() => {
         @update="update"
         @remove="remove"
       />
-      <button
-        v-if="!showMore"
-        type="button"
-        class="inline-flex h-7 items-center gap-1 rounded-md bg-btn px-2 text-xs font-semibold text-btn-content ring-1 ring-inset ring-line transition-colors hover:bg-btn-hover"
-        @click="showMore = true"
-      >
-        <Icon name="lucide:plus" class="size-3" />{{ t('editor.credits.byline_more') }}
-      </button>
+      <UiButton v-if="!showMore" size="xs" icon="lucide:plus" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" @click="showMore = true">{{ t('editor.credits.byline_more') }}</UiButton>
       <p class="rounded-md bg-sunken px-3 py-1.5 text-xs text-body">
         <span class="mr-2 text-[11px] uppercase tracking-wider text-meta">{{ t('editor.album.byline_preview') }}</span>
         <template v-if="preview">{{ preview }}</template>

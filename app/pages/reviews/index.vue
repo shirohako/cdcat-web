@@ -98,23 +98,23 @@
               <p class="text-sm text-meta mt-2">{{ t('collection_pages.reviews.delete_confirm') }}</p>
             </div>
             <div class="flex gap-3 mt-6">
-              <button
-                type="button"
-                class="btn btn-ghost btn-sm flex-1"
+              <UiButton
+                size="sm"
+                class="flex-1"
                 :disabled="deleteConfirm.loading"
                 @click="cancelDelete"
               >
                 {{ t('common.cancel') }}
-              </button>
-              <button
-                type="button"
-                class="btn btn-error btn-sm flex-1 gap-2"
-                :disabled="deleteConfirm.loading"
+              </UiButton>
+              <UiButton
+                variant="danger"
+                size="sm"
+                class="flex-1"
+                :loading="deleteConfirm.loading"
                 @click="confirmDelete"
               >
-                <Icon v-if="deleteConfirm.loading" name="lucide:loader" class="w-4 h-4 animate-spin" />
                 {{ t('common.delete') }}
-              </button>
+              </UiButton>
             </div>
           </div>
         </div>

@@ -1,7 +1,7 @@
 <template>
   <UiAlert tone="danger" compact>
     <span class="mr-3">{{ message || $t('common.load_failed') }}</span>
-    <button type="button" class="font-semibold text-danger underline underline-offset-2 hover:no-underline" @click="emit('retry')">{{ $t('common.retry') }}</button>
+    <UiButton variant="danger-soft" size="xs" class="align-middle" @click="emit('retry')">{{ $t('common.retry') }}</UiButton>
   </UiAlert>
 </template>
 

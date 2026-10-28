@@ -47,8 +47,8 @@ const confirm = () => {
         <input v-model="typed" type="text" autocomplete="off" :disabled="busy" :placeholder="confirmPhrase" class="mt-2 w-full rounded-lg border border-slate-300 p-2 font-mono">
       </label>
       <div class="mt-5 flex justify-end gap-2">
-        <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 text-sm disabled:opacity-50" @click="close">取消</button>
-        <button type="submit" :disabled="busy || confirmDisabled || !phraseMatches || (reasonRequired && !reason.trim())" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white disabled:opacity-50">{{ busy ? '保存中…' : (confirmText || '确认') }}</button>
+        <UiButton size="sm" :disabled="busy" @click="close">取消</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" :disabled="busy || confirmDisabled || !phraseMatches || (reasonRequired && !reason.trim())">{{ busy ? '保存中…' : (confirmText || '确认') }}</UiButton>
       </div>
     </form>
   </dialog>

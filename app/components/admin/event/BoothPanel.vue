@@ -158,12 +158,12 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
           <option v-for="(label, value) in boothStateLabels" :key="value" :value="value">{{ label }}</option>
         </select>
       </label>
-      <button type="submit" class="rounded-lg border border-slate-300 px-4 py-2">搜索</button>
+      <UiButton type="submit">搜索</UiButton>
       <span class="ml-auto flex items-center gap-2">
-        <button type="button" class="rounded-lg border border-slate-300 px-3 py-2" @click="selectPage">选中本页可新建的</button>
-        <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50" :disabled="busy || !selected.size" @click="createSelected">
+        <UiButton @click="selectPage">选中本页可新建的</UiButton>
+        <UiButton variant="primary" :disabled="busy || !selected.size" @click="createSelected">
           为选中的 {{ selected.size }} 个摊位新建艺术家
-        </button>
+        </UiButton>
       </span>
     </form>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -209,10 +209,10 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
                   </p>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3 text-right text-xs">
-                  <button type="button" class="rounded-lg border border-slate-300 px-2.5 py-1" @click="editing === booth.id ? (editing = null) : startEdit(booth)">{{ editing === booth.id ? '收起' : '设置' }}</button>
+                  <UiButton size="xs" @click="editing === booth.id ? (editing = null) : startEdit(booth)">{{ editing === booth.id ? '收起' : '设置' }}</UiButton>
                   <template v-if="!booth.artists_confirmed_at">
-                    <button v-if="booth.artists.length" type="button" class="ml-1 rounded-lg border border-slate-300 px-2.5 py-1" :disabled="busy" @click="confirmAsIs(booth)">确认</button>
-                    <button type="button" class="ml-1 rounded-lg border border-slate-300 px-2.5 py-1 text-red-700" :disabled="busy" @click="setNone(booth)">不关联</button>
+                    <UiButton v-if="booth.artists.length" size="xs" class="ml-1" :disabled="busy" @click="confirmAsIs(booth)">确认</UiButton>
+                    <UiButton variant="danger-soft" size="xs" class="ml-1" :disabled="busy" @click="setNone(booth)">不关联</UiButton>
                   </template>
                 </td>
               </tr>
@@ -236,7 +236,7 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
                               <input v-model="pick.name" class="w-56 rounded border border-slate-300 px-2 py-1" placeholder="名字">
                               <input v-model="pick.name_kana" class="w-48 rounded border border-slate-300 px-2 py-1" placeholder="读音（可空）">
                             </template>
-                            <button type="button" class="ml-auto text-xs text-slate-500 underline" @click="picks.splice(n, 1)">移除</button>
+                            <UiButton size="xs" class="ml-auto" @click="picks.splice(n, 1)">移除</UiButton>
                           </div>
                           <div v-if="pick.kind === 'new' && booth.links?.length" class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-600">
                             <span class="text-slate-500">带上链接：</span>
@@ -249,15 +249,15 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
                     </div>
                     <div v-if="booth.suggestions.length" class="flex flex-wrap items-center gap-2 text-xs">
                       <span class="text-slate-500">建议：</span>
-                      <button v-for="suggestion in booth.suggestions" :key="suggestion.artist.id" type="button" class="rounded-lg border border-slate-300 bg-white px-2 py-1 disabled:opacity-40" :disabled="picked(suggestion.artist.id)" @click="addExisting(suggestion.artist)">
+                      <UiButton v-for="suggestion in booth.suggestions" :key="suggestion.artist.id" size="xs" :disabled="picked(suggestion.artist.id)" @click="addExisting(suggestion.artist)">
                         + {{ suggestion.artist.name }} <span class="text-slate-400">#{{ suggestion.artist.id }} · {{ suggestionLabels[suggestion.by] }}</span>
-                      </button>
+                      </UiButton>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 text-xs">
                       <span class="text-slate-500">新建：</span>
-                      <button v-for="part in booth.name_parts ?? []" :key="part" type="button" class="rounded-lg border border-slate-300 bg-white px-2 py-1" @click="addNew(booth, part)">+ {{ part }}</button>
-                      <button type="button" class="rounded-lg border border-slate-300 bg-white px-2 py-1" @click="addNew(booth, booth.name)">+ 按整个名字</button>
-                      <button type="button" class="rounded-lg border border-slate-300 bg-white px-2 py-1" @click="addNew(booth, '')">+ 空白</button>
+                      <UiButton v-for="part in booth.name_parts ?? []" :key="part" size="xs" @click="addNew(booth, part)">+ {{ part }}</UiButton>
+                      <UiButton size="xs" @click="addNew(booth, booth.name)">+ 按整个名字</UiButton>
+                      <UiButton size="xs" @click="addNew(booth, '')">+ 空白</UiButton>
                     </div>
                     <div class="w-96 max-w-full">
                       <input v-model="artistQuery" type="search" class="w-full rounded border border-slate-300 px-2 py-1 text-sm" placeholder="搜索已有的艺术家">
@@ -266,8 +266,8 @@ const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').repla
                       </button>
                     </div>
                     <div class="flex gap-2">
-                      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white disabled:opacity-50" :disabled="busy" @click="save(booth, picks)">保存并标为已核对</button>
-                      <button type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm" @click="editing = null">取消</button>
+                      <UiButton variant="primary" size="sm" :disabled="busy" @click="save(booth, picks)">保存并标为已核对</UiButton>
+                      <UiButton size="sm" @click="editing = null">取消</UiButton>
                     </div>
                   </div>
                 </td>

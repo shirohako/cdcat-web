@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AlertTriangle, ArrowLeft, Columns2, EyeOff, Eye, History, ListTree, Loader2, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
+import { AlertTriangle, ArrowLeft, Columns2, EyeOff, Eye, History, ListTree, Lock, PenLine, Save, Settings2, X } from '@lucide/vue'
 import type { ArticleEditPayload } from '~/types/article'
 import type { MarkdownHeading } from '~/utils/markdown'
 import type { SubmitCheck } from './WriterSubmitDialog.vue'
@@ -213,25 +213,22 @@ const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value =
         <div class="hidden md:block">
           <UiSegmented v-model="mode" :items="modes" size="sm" :label="t('article_ui.writer.mode')" />
         </div>
-        <button type="button" class="btn btn-ghost btn-sm hidden lg:inline-flex" :aria-pressed="outlineOpen" :title="t('article_ui.writer.outline')" @click="outlineOpen = !outlineOpen">
-          <ListTree :size="15" />
-        </button>
-        <button type="button" class="btn btn-ghost btn-sm" :aria-pressed="settingsOpen" :title="t('article_ui.settings')" @click="settingsOpen = !settingsOpen">
-          <Settings2 :size="15" /><span class="hidden sm:inline">{{ t('article_ui.settings') }}</span>
-        </button>
+        <UiButton size="sm" :icon="ListTree" :label="t('article_ui.writer.outline')" :pressed="outlineOpen" class="hidden lg:inline-flex" @click="outlineOpen = !outlineOpen" />
+        <UiButton size="sm" :icon="Settings2" :pressed="settingsOpen" :title="t('article_ui.settings')" @click="settingsOpen = !settingsOpen">
+          <span class="hidden sm:inline">{{ t('article_ui.settings') }}</span>
+        </UiButton>
         <template v-if="!loading && !loadError && can.edit">
-          <button v-if="can.hide" type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="hideOpen = true">
-            <EyeOff :size="14" /><span class="hidden sm:inline">{{ t('article_ui.writer.actions.hide') }}</span>
-          </button>
-          <button
-            type="button" class="btn btn-sm" :class="can.publish ? 'btn-outline' : 'btn-primary'" :disabled="busy || (!dirty && !!draft.articleId.value)"
+          <UiButton v-if="can.hide" size="sm" :icon="EyeOff" :disabled="busy" @click="hideOpen = true">
+            <span class="hidden sm:inline">{{ t('article_ui.writer.actions.hide') }}</span>
+          </UiButton>
+          <UiButton
+            size="sm" :variant="can.publish ? 'outline' : 'primary'" :icon="Save" :loading="busy && !dialogOpen" :disabled="busy || (!dirty && !!draft.articleId.value)"
             :title="t('article_ui.writer.save_shortcut')" @click="save({ openAfter: true })">
-            <Loader2 v-if="busy && !dialogOpen" :size="14" class="animate-spin" /><Save v-else :size="14" />
             {{ t(`article_ui.writer.actions.${can.update ? 'update' : 'save_draft'}`) }}
-          </button>
-          <button v-if="can.publish" type="button" class="btn btn-primary btn-sm" :disabled="busy" @click="openPublish">
+          </UiButton>
+          <UiButton v-if="can.publish" variant="primary" size="sm" :disabled="busy" @click="openPublish">
             {{ t(`article_ui.writer.actions.${status === 'hidden' ? 'republish' : 'publish'}`) }}
-          </button>
+          </UiButton>
         </template>
       </div>
     </header>
@@ -247,7 +244,7 @@ const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value =
       <div>
         <AlertTriangle :size="28" class="mx-auto text-warning" />
         <p class="mt-3 text-sm text-body">{{ localizeError(loadError) }}</p>
-        <NuxtLink to="/articles/mine" class="btn btn-outline btn-sm mt-4">{{ t('article_ui.mine.title') }}</NuxtLink>
+        <UiButton to="/articles/mine" variant="outline" size="sm" class="mt-4">{{ t('article_ui.mine.title') }}</UiButton>
       </div>
     </div>
 
@@ -263,12 +260,12 @@ const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value =
         </p>
         <div v-if="restoredAt && dirty" class="flex flex-wrap items-center gap-2 bg-info/10 px-4 py-2 text-sm text-info">
           <History :size="15" />{{ t('article_ui.writer.local_restored', { time: time(restoredAt) }) }}
-          <button type="button" class="underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
+          <UiButton variant="danger-soft" size="xs" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</UiButton>
         </div>
         <div v-if="stale" class="flex flex-wrap items-center gap-2 bg-warning/10 px-4 py-2 text-sm text-warning">
           <History :size="15" />{{ t('article_ui.writer.local_stale', { time: time(stale.at) }) }}
-          <button type="button" class="font-semibold underline" @click="draft.restoreStale()">{{ t('article_ui.writer.local_restore') }}</button>
-          <button type="button" class="underline" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</button>
+          <UiButton size="xs" @click="draft.restoreStale()">{{ t('article_ui.writer.local_restore') }}</UiButton>
+          <UiButton variant="danger-soft" size="xs" @click="draft.discardLocal()">{{ t('article_ui.writer.local_discard') }}</UiButton>
         </div>
       </div>
 
@@ -333,8 +330,8 @@ const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value =
         <h2 class="text-lg font-bold text-title">{{ t('article_ui.writer.conflict_title') }}</h2>
         <p class="mt-2 text-sm text-body">{{ t('article_ui.writer.conflict_description', { time: time(conflict.article.updated_at) }) }}</p>
         <div class="mt-5 flex flex-wrap justify-end gap-2">
-          <button type="button" class="btn btn-outline btn-sm" @click="draft.useServer()">{{ t('article_ui.writer.conflict_use_server') }}</button>
-          <button type="button" class="btn btn-primary btn-sm" @click="draft.keepMine()">{{ t('article_ui.writer.conflict_keep_mine') }}</button>
+          <UiButton variant="outline" size="sm" @click="draft.useServer()">{{ t('article_ui.writer.conflict_use_server') }}</UiButton>
+          <UiButton variant="primary" size="sm" @click="draft.keepMine()">{{ t('article_ui.writer.conflict_keep_mine') }}</UiButton>
         </div>
       </div>
     </div>

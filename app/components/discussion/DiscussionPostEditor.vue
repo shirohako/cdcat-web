@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import type { DiscussionPost, DiscussionReferences } from '~/types/discussion'
 
 /** Edits the author's own post in place. Moderators edit others' posts through the moderation dialog. */
@@ -41,10 +40,8 @@ async function save() {
     </ClientOnly>
     <div class="flex items-center justify-end gap-2">
       <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
-      <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</button>
-      <button type="button" class="btn btn-primary btn-sm" :disabled="busy || !raw.trim()" @click="save">
-        <Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.save') }}
-      </button>
+      <UiButton size="sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</UiButton>
+      <UiButton variant="primary" size="sm" :loading="busy" :disabled="!raw.trim()" @click="save">{{ t('common.save') }}</UiButton>
     </div>
   </div>
 </template>

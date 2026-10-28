@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import type { DiscussionPost } from '~/types/discussion'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 
@@ -120,10 +119,10 @@ async function submit() {
       <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
     </form>
     <template #footer>
-      <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</button>
-      <button type="submit" form="discussion-moderation" class="btn btn-sm" :class="['delete', 'silence', 'hide'].includes(action) ? 'btn-error' : 'btn-primary'" :disabled="busy">
-        <Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('common.confirm') }}
-      </button>
+      <UiButton size="sm" :disabled="busy" @click="emit('close')">{{ t('common.cancel') }}</UiButton>
+      <UiButton type="submit" form="discussion-moderation" :variant="['delete', 'silence', 'hide'].includes(action) ? 'danger' : 'primary'" size="sm" :loading="busy">
+        {{ t('common.confirm') }}
+      </UiButton>
     </template>
   </DiscussionDialog>
 </template>

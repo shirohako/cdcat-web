@@ -73,7 +73,7 @@ useHead({ title: '标签库' })
       <section class="rounded-xl border border-slate-200 bg-white">
         <form class="flex gap-2 border-b border-slate-100 p-3" @submit.prevent="appliedSearch = search.trim()">
           <input v-model="search" type="search" maxlength="50" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm" placeholder="搜索标签">
-          <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-sm text-white">应用</button>
+          <UiButton type="submit" variant="primary">应用</UiButton>
         </form>
         <AdminListState :pending="pending" :error="error" :empty="!data?.items.length" @retry="refresh()">
           <table class="w-full text-left text-sm">
@@ -84,10 +84,10 @@ useHead({ title: '标签库' })
                 <td class="px-4 py-2 font-mono text-xs text-slate-500">{{ tag.slug }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.articles_count }}</td>
                 <td class="px-4 py-2 tabular-nums">{{ tag.discussion_topics_count }}</td>
-                <td class="space-x-2 whitespace-nowrap px-4 py-2 text-right text-xs">
-                  <button type="button" class="underline" @click="edit(tag)">编辑</button>
-                  <button type="button" class="underline" @click="mergeSource = tag; mergeTarget = null">合并</button>
-                  <button type="button" class="text-red-700 underline" @click="deleting = tag">删除</button>
+                <td class="space-x-2 whitespace-nowrap px-4 py-2 text-right">
+                  <UiButton size="xs" @click="edit(tag)">编辑</UiButton>
+                  <UiButton size="xs" @click="mergeSource = tag; mergeTarget = null">合并</UiButton>
+                  <UiButton variant="danger-soft" size="xs" @click="deleting = tag">删除</UiButton>
                 </td>
               </tr>
             </tbody>
@@ -103,8 +103,8 @@ useHead({ title: '标签库' })
         <label class="block">说明（可选）<textarea v-model="form.description" maxlength="500" rows="2" :class="field" /></label>
         <label class="flex items-center gap-2"><input v-model="form.is_staff_only" type="checkbox">只有管理者可以使用这个标签</label>
         <div class="flex justify-end gap-2">
-          <button v-if="editing" type="button" class="rounded-lg border px-3 py-2" @click="reset">取消</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">保存</button>
+          <UiButton v-if="editing" @click="reset">取消</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy">保存</UiButton>
         </div>
       </form>
     </div>

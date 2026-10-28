@@ -69,7 +69,7 @@ const unblock = (user: UserSummary) => run(() => $api(`/v1/me/blocks/${encodeURI
       <div class="space-y-4 p-6">
         <form class="flex gap-2" @submit.prevent="block">
           <input v-model="username" maxlength="33" class="input min-w-0 flex-1" :placeholder="t('account_pages.privacy.username_placeholder')">
-          <button type="submit" class="btn btn-sm" :disabled="busy || !username.trim()">{{ t('account_pages.privacy.block') }}</button>
+          <UiButton type="submit" size="sm" :disabled="busy || !username.trim()">{{ t('account_pages.privacy.block') }}</UiButton>
         </form>
         <p v-if="message" class="text-sm" :class="failed ? 'text-danger' : 'text-success'" role="status">{{ message }}</p>
         <SkeletonRows v-if="loading" :count="3" thumb="round" />
@@ -80,7 +80,7 @@ const unblock = (user: UserSummary) => run(() => $api(`/v1/me/blocks/${encodeURI
               <p class="truncate text-sm font-medium text-title">{{ item.user?.nickname || item.user?.username }}</p>
               <p class="text-xs text-meta">@{{ item.user?.username }} · {{ t('account_pages.privacy.blocked_on', { date: formatDate(item.created_at) }) }}</p>
             </div>
-            <button v-if="item.user" type="button" class="btn btn-ghost btn-xs" :disabled="busy" @click="unblock(item.user)">{{ t('account_pages.privacy.unblock') }}</button>
+            <UiButton v-if="item.user" size="xs" :disabled="busy" @click="unblock(item.user)">{{ t('account_pages.privacy.unblock') }}</UiButton>
           </li>
         </ul>
         <UiEmpty v-else :title="t('account_pages.privacy.no_blocks')" :icon="UserX" />

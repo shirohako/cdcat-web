@@ -109,7 +109,7 @@ useHead({ title: '举报处理' })
           v-for="value in [undefined, ...kinds]" :key="value ?? 'all'" :to="{ query: { ...route.query, type: value, page: undefined } }"
           class="rounded-md px-2 py-1" :class="type === value ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'">{{ reportTypeLabels[value ?? 'all'] }}</NuxtLink>
       </div>
-      <NuxtLink v-if="articleId || postId" :to="{ query: { ...route.query, article_id: undefined, post_id: undefined } }" class="self-center text-xs text-slate-500 underline" :class="bothKinds ? '' : 'ml-auto'">显示全部</NuxtLink>
+      <UiButton v-if="articleId || postId" :to="{ query: { ...route.query, article_id: undefined, post_id: undefined } }" size="xs" class="self-center" :class="bothKinds ? '' : 'ml-auto'">显示全部</UiButton>
     </nav>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -126,21 +126,21 @@ useHead({ title: '举报处理' })
                 · {{ group.reports_count }} 条举报
               </p>
             </div>
-            <div class="flex flex-wrap gap-1.5 text-xs">
-              <button type="button" class="rounded-lg border px-2.5 py-1.5" @click="start(group, 'dismiss')">驳回</button>
-              <button type="button" class="rounded-lg border px-2.5 py-1.5" @click="start(group, 'accept', 'none')">认可（不处置）</button>
+            <div class="flex flex-wrap gap-1.5">
+              <UiButton size="sm" @click="start(group, 'dismiss')">驳回</UiButton>
+              <UiButton size="sm" @click="start(group, 'accept', 'none')">认可（不处置）</UiButton>
               <template v-if="group.target.type === 'shout' || group.target.type === 'review'">
-                <button v-if="group.target.status !== 'hidden'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="start(group, 'accept', 'hide')">成立并隐藏</button>
-                <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">成立并删除</button>
+                <UiButton v-if="group.target.status !== 'hidden'" size="sm" @click="start(group, 'accept', 'hide')">成立并隐藏</UiButton>
+                <UiButton variant="danger-soft" size="sm" @click="start(group, 'accept', 'delete')">成立并删除</UiButton>
               </template>
               <template v-else-if="group.target.type === 'post'">
-                <button type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="start(group, 'accept', 'hide')">认可并折叠</button>
-                <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">认可并删除</button>
+                <UiButton size="sm" @click="start(group, 'accept', 'hide')">认可并折叠</UiButton>
+                <UiButton variant="danger-soft" size="sm" @click="start(group, 'accept', 'delete')">认可并删除</UiButton>
               </template>
               <template v-else>
-                <button v-if="group.target.status === 'published'" type="button" class="rounded-lg border border-amber-300 px-2.5 py-1.5 text-amber-700" @click="start(group, 'accept', 'hide')">隐藏文章</button>
-                <button v-if="group.target.status !== 'locked'" type="button" class="rounded-lg border border-rose-300 px-2.5 py-1.5 text-rose-700" @click="start(group, 'accept', 'lock')">锁定文章</button>
-                <button type="button" class="rounded-lg border border-red-300 px-2.5 py-1.5 text-red-700" @click="start(group, 'accept', 'delete')">认可并删除</button>
+                <UiButton v-if="group.target.status === 'published'" size="sm" @click="start(group, 'accept', 'hide')">隐藏文章</UiButton>
+                <UiButton v-if="group.target.status !== 'locked'" size="sm" @click="start(group, 'accept', 'lock')">锁定文章</UiButton>
+                <UiButton variant="danger-soft" size="sm" @click="start(group, 'accept', 'delete')">认可并删除</UiButton>
               </template>
             </div>
           </div>

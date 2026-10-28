@@ -70,10 +70,9 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
               <span v-if="series.children_count" class="flex items-center gap-2"><Layers class="h-5 w-5" />{{ $t('catalog.children_count', { count: series.children_count }) }}</span>
               <span class="flex items-center gap-2"><Film class="h-5 w-5" />{{ $t('catalog.entries_count', { count: series.entries_count ?? 0 }) }}</span>
               <span class="flex items-center gap-2"><Disc3 class="h-5 w-5" />{{ $t('catalog.albums_count', { count: series.albums_count ?? 0 }) }}</span>
-              <NuxtLink :to="`/contribute/franchise/${series.id}`" class="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-on-media/15 px-3 py-1.5 text-sm text-on-media transition-colors duration-150 ease-out hover:bg-on-media/25">
-                <Pencil class="h-4 w-4" />
+              <UiButton :to="`/contribute/franchise/${series.id}`" size="sm" :icon="Pencil" class="ml-auto">
                 {{ $t('catalog.edit') }}
-              </NuxtLink>
+              </UiButton>
             </div>
           </div>
         </div>

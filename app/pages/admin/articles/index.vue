@@ -74,7 +74,7 @@ useHead({ title: '文章管理' })
         <select v-model="filters.sort_by" aria-label="排序字段" :class="field">
           <option v-for="sort in SORTS" :key="sort" :value="sort === 'updated_at' ? '' : sort">{{ articleSortLabels[sort] }}</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
     <section class="rounded-xl border border-slate-200 bg-white">

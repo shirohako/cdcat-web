@@ -32,13 +32,9 @@
       </div>
 
       <div class="mt-6 flex justify-center">
-        <NuxtLink
-          :to="backTo"
-          class="inline-flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 hover:shadow-md"
-        >
-          <ArrowLeft :size="15" />
+        <UiButton :to="backTo" variant="primary" :icon="ArrowLeft">
           {{ backText }}
-        </NuxtLink>
+        </UiButton>
       </div>
     </div>
   </section>

@@ -98,18 +98,9 @@
             {{ statusMessage }}
           </p>
           <div v-else></div>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm gap-1.5"
-            :disabled="isSaving || !hasChanges"
-            @click="saveSettings"
-          >
-            <span v-if="isSaving" class="loading loading-spinner loading-xs"></span>
-            <template v-else>
-              <Save :size="14" />
-              {{ t('account_pages.preferences.save') }}
-            </template>
-          </button>
+          <UiButton variant="primary" size="sm" :icon="Save" :loading="isSaving" :disabled="!hasChanges" @click="saveSettings">
+            {{ t('account_pages.preferences.save') }}
+          </UiButton>
         </div>
       </template>
     </section>

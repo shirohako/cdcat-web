@@ -18,15 +18,15 @@ const isActive = (slug: string) => props.activeSlug === slug
 <template>
   <aside class="space-y-4">
     <div class="grid grid-cols-2 gap-2 lg:grid-cols-1">
-      <NuxtLink
+      <UiButton
         :to="isAuthenticated ? { path: '/discussions/new', query: newTopicQuery } : { path: '/auth/login', query: { redirect: '/discussions/new' } }"
-        class="btn btn-primary"
+        variant="primary" :icon="PenSquare"
       >
-        <PenSquare :size="15" />{{ t('discussions.new_topic') }}
-      </NuxtLink>
-      <NuxtLink to="/discussions/search" class="btn lg:hidden">
-        <Search :size="15" />{{ t('discussions.search.title') }}
-      </NuxtLink>
+        {{ t('discussions.new_topic') }}
+      </UiButton>
+      <UiButton to="/discussions/search" :icon="Search" class="lg:hidden">
+        {{ t('discussions.search.title') }}
+      </UiButton>
     </div>
 
     <nav class="card overflow-hidden" :aria-label="t('discussions.categories')">

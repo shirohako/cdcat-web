@@ -106,13 +106,14 @@
             <div v-if="album.streaming.length" class="mt-3 flex flex-wrap items-center justify-center gap-2 md:justify-start">
               <p class="flex shrink-0 items-center gap-1 text-sm text-body"><Headphones :size="13" class="text-meta" />{{ $t('content_display.streaming') }}</p>
               <div class="flex flex-wrap items-center gap-1.5">
-                <a
+                <UiButton
                   v-for="link in album.streaming"
                   :key="link.id"
                   :href="link.url"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="group inline-flex items-center gap-1 rounded-md bg-btn px-2.5 py-1.5 text-[11px] font-medium text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover"
+                  size="xs"
+                  class="group gap-1"
                   :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.name ?? '').color + '22' } : {}"
                   @mouseenter="hoveredLinkId = link.id"
                   @mouseleave="hoveredLinkId = null"
@@ -127,36 +128,34 @@
                       : { filter: 'grayscale(1)' }"
                   />
                   {{ providerName(link.provider?.name ?? '') }}
-                </a>
+                </UiButton>
               </div>
             </div>
 
             <div class="mt-3 flex flex-wrap gap-1.5">
-              <button
-                class="btn btn-xs h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
-                :class="isFavorited ? 'border-red-500 bg-red-500 text-white hover:bg-red-600 dark:border-red-400 dark:bg-red-400 dark:text-red-950 dark:hover:bg-red-500' : 'btn-outline border-red-400 text-red-600 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-400/15'"
+              <UiButton
+                :variant="isFavorited ? 'danger' : 'danger-soft'"
+                size="sm"
+                class="flex-1 lg:flex-none"
                 :disabled="isToggling || (album.is_pending && !isFavorited)"
                 :title="album.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleLike"
               >
-                <Heart :size="13" :fill="isFavorited ? 'currentColor' : 'none'" />
+                <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
                 {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
-              </button>
-              <NuxtLink
+              </UiButton>
+              <UiButton
                 :to="isAuthenticated ? `/contribute/album/${album.id}` : `/auth/login?redirect=/contribute/album/${album.id}`"
-                class="btn btn-xs btn-outline h-7 min-h-0 flex-1 gap-1.5 lg:h-8 lg:flex-none lg:px-5"
+                variant="outline"
+                size="sm"
+                :icon="Edit"
+                class="flex-1 lg:flex-none"
               >
-                <Edit :size="13" />
                 {{ $t('common.edit') }}
-              </NuxtLink>
-              <NuxtLink
-                :to="`/albums/${album.id}/versions`"
-                class="btn btn-xs btn-ghost h-7 min-h-0 gap-1.5 lg:h-8"
-                :title="$t('versions.title')"
-              >
-                <History :size="13" />
+              </UiButton>
+              <UiButton :to="`/albums/${album.id}/versions`" size="sm" :icon="History" :title="$t('versions.title')">
                 <span class="hidden sm:inline">{{ $t('versions.short', { version: album.version }) }}</span>
-              </NuxtLink>
+              </UiButton>
             </div>
           </div>
         </div>

@@ -94,11 +94,9 @@ function remove(link: ContentLinkSummary) {
           <p class="truncate text-sm font-medium text-title">{{ link.title }}</p>
           <p class="text-[11px] text-faint">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
         </div>
-        <button
-          type="button" class="grid size-7 place-items-center rounded-md text-faint transition-colors hover:bg-ghost-hover hover:text-danger disabled:opacity-40"
-          :disabled="disabled" :aria-label="t('article_ui.links.remove', { title: link.title })" @click="remove(link)">
-          <X :size="14" />
-        </button>
+        <UiButton
+          variant="danger-soft" size="xs" :icon="X" :label="t('article_ui.links.remove', { title: link.title })"
+          :disabled="disabled" @click="remove(link)" />
       </li>
     </ul>
 

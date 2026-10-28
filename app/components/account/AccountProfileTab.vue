@@ -38,15 +38,16 @@
                 placeholder="https://example.com/avatar.jpg"
                 @input="onAvatarUrlInput"
               />
-              <button
-                type="button"
-                class="btn btn-primary btn-sm shrink-0"
-                :disabled="isUpdatingAvatar || !isAvatarChanged"
+              <UiButton
+                variant="primary"
+                size="sm"
+                class="shrink-0"
+                :loading="isUpdatingAvatar"
+                :disabled="!isAvatarChanged"
                 @click="updateAvatar"
               >
-                <span v-if="isUpdatingAvatar" class="loading loading-spinner loading-xs"></span>
-                <span v-else>{{ t('common.save') }}</span>
-              </button>
+                {{ t('common.save') }}
+              </UiButton>
             </div>
             <p v-if="avatarStatus" :class="avatarStatus.class">{{ avatarStatus.message }}</p>
             <p v-else class="text-xs text-meta">{{ t('account_pages.profile.avatar_hint') }}</p>
@@ -64,25 +65,26 @@
               class="input flex-1"
               placeholder="https://example.com/banner.jpg"
             />
-            <button
+            <UiButton
               v-if="form.banner?.trim() && form.banner.trim() === originalBanner"
-              type="button"
-              class="btn btn-ghost btn-sm shrink-0"
+              size="sm"
+              class="shrink-0"
               :disabled="isUpdatingBanner"
               @click="clearBanner"
             >
               {{ t('account_pages.profile.clear') }}
-            </button>
-            <button
+            </UiButton>
+            <UiButton
               v-else
-              type="button"
-              class="btn btn-primary btn-sm shrink-0"
-              :disabled="isUpdatingBanner || !isBannerChanged"
+              variant="primary"
+              size="sm"
+              class="shrink-0"
+              :loading="isUpdatingBanner"
+              :disabled="!isBannerChanged"
               @click="updateBanner"
             >
-              <span v-if="isUpdatingBanner" class="loading loading-spinner loading-xs"></span>
-              <span v-else>{{ t('common.save') }}</span>
-            </button>
+              {{ t('common.save') }}
+            </UiButton>
           </div>
           <p class="text-xs text-meta">{{ t('account_pages.profile.banner_hint') }}</p>
           <p v-if="bannerStatus" :class="bannerStatus.class">
@@ -102,15 +104,16 @@
               placeholder="unique_username"
               @change="validateUsername"
             />
-            <button
-              type="button"
-              class="btn btn-primary btn-sm shrink-0"
-              :disabled="isUpdatingUsername || !isUsernameChanged"
+            <UiButton
+              variant="primary"
+              size="sm"
+              class="shrink-0"
+              :loading="isUpdatingUsername"
+              :disabled="!isUsernameChanged"
               @click="updateUsername"
             >
-              <span v-if="isUpdatingUsername" class="loading loading-spinner loading-xs"></span>
-              <span v-else>{{ t('account_pages.profile.update') }}</span>
-            </button>
+              {{ t('account_pages.profile.update') }}
+            </UiButton>
           </div>
           <p class="text-xs text-meta">{{ t('account_pages.profile.username_hint') }}</p>
           <p v-if="usernameStatus" :class="usernameStatus.class">
@@ -129,15 +132,16 @@
               class="input flex-1"
               :placeholder="t('account_pages.profile.nickname_placeholder')"
             />
-            <button
-              type="button"
-              class="btn btn-primary btn-sm shrink-0"
-              :disabled="isUpdatingNickname || !isNicknameChanged"
+            <UiButton
+              variant="primary"
+              size="sm"
+              class="shrink-0"
+              :loading="isUpdatingNickname"
+              :disabled="!isNicknameChanged"
               @click="updateNickname"
             >
-              <span v-if="isUpdatingNickname" class="loading loading-spinner loading-xs"></span>
-              <span v-else>{{ t('account_pages.profile.update') }}</span>
-            </button>
+              {{ t('account_pages.profile.update') }}
+            </UiButton>
           </div>
           <p class="text-xs text-meta">{{ t('account_pages.profile.nickname_hint') }}</p>
           <p v-if="nicknameStatus" :class="nicknameStatus.class">
@@ -181,18 +185,9 @@
           {{ bioStatus.message }}
         </p>
         <div v-else></div>
-        <button
-          type="button"
-          class="btn btn-primary btn-sm gap-1.5"
-          :disabled="isUpdatingBio || !isBioChanged"
-          @click="updateBio"
-        >
-          <span v-if="isUpdatingBio" class="loading loading-spinner loading-xs"></span>
-          <template v-else>
-            <Save :size="14" />
-            {{ t('account_pages.profile.update_bio') }}
-          </template>
-        </button>
+        <UiButton variant="primary" size="sm" :icon="Save" :loading="isUpdatingBio" :disabled="!isBioChanged" @click="updateBio">
+          {{ t('account_pages.profile.update_bio') }}
+        </UiButton>
       </div>
     </section>
   </div>

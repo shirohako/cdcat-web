@@ -109,16 +109,16 @@ useHead({ title: computed(() => data.value?.title ?? '文章管理') })
             <p v-if="data.status_reason" class="mt-1 text-sm text-rose-700">原因：{{ data.status_reason }}</p>
           </div>
           <div class="flex flex-wrap gap-2 text-sm">
-            <NuxtLink v-if="data.status === 'published'" :to="`/articles/${data.id}`" target="_blank" class="rounded-lg border px-3 py-2">前台预览</NuxtLink>
+            <UiButton v-if="data.status === 'published'" :to="`/articles/${data.id}`" target="_blank" size="sm">前台预览</UiButton>
             <template v-if="data.status === 'published'">
-              <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="toggleFeatured">{{ data.featured ? '取消推荐' : '设为推荐' }}</button>
-              <button type="button" :disabled="busy" class="rounded-lg border border-amber-300 px-3 py-2 text-amber-800 disabled:opacity-50" @click="pendingAction = 'hide'">隐藏</button>
+              <UiButton size="sm" :disabled="busy" @click="toggleFeatured">{{ data.featured ? '取消推荐' : '设为推荐' }}</UiButton>
+              <UiButton size="sm" :disabled="busy" @click="pendingAction = 'hide'">隐藏</UiButton>
             </template>
-            <button v-if="data.status === 'hidden' && data.status_changed_at" type="button" :disabled="busy" class="rounded-lg border border-emerald-300 px-3 py-2 text-emerald-700 disabled:opacity-50" @click="pendingAction = 'unhide'">重新公开</button>
-            <button v-if="data.status === 'locked'" type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="pendingAction = 'unlock'">解锁</button>
-            <button v-else type="button" :disabled="busy" class="rounded-lg border border-rose-300 px-3 py-2 text-rose-700 disabled:opacity-50" @click="pendingAction = 'lock'">锁定</button>
-            <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2 disabled:opacity-50" @click="startEdit">编辑</button>
-            <button type="button" :disabled="busy" class="rounded-lg border border-red-300 px-3 py-2 text-red-700 disabled:opacity-50" @click="deleteOpen = true">删除</button>
+            <UiButton v-if="data.status === 'hidden' && data.status_changed_at" size="sm" :disabled="busy" @click="pendingAction = 'unhide'">重新公开</UiButton>
+            <UiButton v-if="data.status === 'locked'" size="sm" :disabled="busy" @click="pendingAction = 'unlock'">解锁</UiButton>
+            <UiButton v-else variant="danger-soft" size="sm" :disabled="busy" @click="pendingAction = 'lock'">锁定</UiButton>
+            <UiButton size="sm" :disabled="busy" @click="startEdit">编辑</UiButton>
+            <UiButton variant="danger-soft" size="sm" :disabled="busy" @click="deleteOpen = true">删除</UiButton>
           </div>
         </header>
         <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -130,7 +130,7 @@ useHead({ title: computed(() => data.value?.title ?? '文章管理') })
             <li v-for="report in data.reports" :key="report.id">{{ reportReasonLabels[report.reason] }}<template v-if="report.note">：{{ report.note }}</template>
               <span class="text-xs text-rose-600/70"> — {{ report.reporter?.nickname || report.reporter?.username || '关键词过滤' }}</span></li>
           </ul>
-          <NuxtLink :to="`/admin/reports?article_id=${data.id}`" class="mt-2 inline-block text-xs underline">去处理举报</NuxtLink>
+          <UiButton :to="`/admin/reports?article_id=${data.id}`" size="xs" class="mt-2">去处理举报</UiButton>
         </section>
 
         <!-- Moderator edit, applied at once -->
@@ -144,8 +144,8 @@ useHead({ title: computed(() => data.value?.title ?? '文章管理') })
           <div class="sm:col-span-2"><MarkdownEditor v-model="edit.content" :guide-url="null" /></div>
           <label class="block sm:col-span-2">原因（必填）<input v-model="edit.reason" required maxlength="2000" :class="input"></label>
           <div class="flex justify-end gap-2 sm:col-span-2">
-            <button type="button" class="rounded-lg border px-4 py-2" @click="editing = false">取消</button>
-            <button type="submit" :disabled="busy || !edit.reason.trim()" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50">保存</button>
+            <UiButton @click="editing = false">取消</UiButton>
+            <UiButton type="submit" variant="primary" :disabled="busy || !edit.reason.trim()">保存</UiButton>
           </div>
         </form>
 
@@ -181,7 +181,7 @@ useHead({ title: computed(() => data.value?.title ?? '文章管理') })
               <h2 class="font-semibold">自定义链接</h2>
               <form class="mt-2 flex gap-2" @submit.prevent="saveSlug">
                 <input v-model="slug" maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-2 py-1.5 font-mono text-xs">
-                <button type="submit" :disabled="busy || slug === (data.slug ?? '')" class="rounded-lg border px-2.5 py-1.5 text-xs disabled:opacity-40">保存</button>
+                <UiButton type="submit" size="sm" :disabled="busy || slug === (data.slug ?? '')">保存</UiButton>
               </form>
             </section>
           </aside>

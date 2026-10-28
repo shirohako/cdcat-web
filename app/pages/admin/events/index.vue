@@ -76,6 +76,7 @@ const clearVisualSize = () => {
 // An uploaded visual is stored on this site (POST /v1/images); its size comes with it.
 const { limits: imageLimits, upload: uploadImage } = useImageUpload()
 const visualUploading = ref(false)
+const visualInput = useTemplateRef<HTMLInputElement>('visualInput')
 const visualError = ref('')
 const uploadVisual = async (e: Event) => {
   const picker = e.target as HTMLInputElement
@@ -153,7 +154,7 @@ useHead({ title: '活动' })
         <p class="mt-2 text-sm text-slate-600">维护单场活动。活动可以不属于任何系列，无系列的活动不会出现在前台活动页。仍被专辑引用的活动不能删除。</p>
       </div>
       <div class="flex gap-2">
-        <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="editEvent()">新建活动</button>
+        <UiButton variant="primary" @click="editEvent()">新建活动</UiButton>
       </div>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -176,11 +177,9 @@ useHead({ title: '活动' })
           <label for="event-visual-url">主视觉 / 场刊封面</label>
           <div class="mt-1 flex flex-wrap gap-2">
             <input id="event-visual-url" v-model="eventForm.main_visual_url" type="url" maxlength="2048" placeholder="https://" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2" :disabled="visualUploading" @input="clearVisualSize">
-            <label class="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-2" :class="visualUploading || busy ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-slate-50'">
-              <Icon name="lucide:upload" class="size-4" />{{ visualUploading ? '正在上传…' : '上传图片' }}
-              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="sr-only" :disabled="visualUploading || busy" @change="uploadVisual">
-            </label>
-            <button v-if="eventForm.main_visual_url" type="button" class="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-slate-600 hover:text-red-700" :disabled="visualUploading" @click="removeVisual">清除</button>
+            <UiButton icon="lucide:upload" class="shrink-0" :disabled="visualUploading || busy" @click="visualInput?.click()">{{ visualUploading ? '正在上传…' : '上传图片' }}</UiButton>
+            <input ref="visualInput" type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="visualUploading || busy" @change="uploadVisual">
+            <UiButton v-if="eventForm.main_visual_url" variant="danger-soft" class="shrink-0" :disabled="visualUploading" @click="removeVisual">清除</UiButton>
           </div>
           <span class="mt-1 block text-xs text-slate-500">{{ visualSizeText }}</span>
           <span v-if="visualError" role="alert" class="mt-1 block text-xs text-red-700">{{ visualError }}</span>
@@ -189,8 +188,8 @@ useHead({ title: '活动' })
         <img v-if="eventForm.main_visual_url" :src="eventForm.main_visual_url" alt="" class="max-h-56 w-auto max-w-full justify-self-start rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2" @load="readVisualSize" @error="clearVisualSize">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
-          <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="eventOpen = false">取消</button>
-          <button type="submit" :disabled="busy || visualUploading" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ busy ? '保存中…' : '保存' }}</button>
+          <UiButton :disabled="busy" @click="eventOpen = false">取消</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy || visualUploading">{{ busy ? '保存中…' : '保存' }}</UiButton>
         </div>
       </form>
     </section>
@@ -200,7 +199,7 @@ useHead({ title: '活动' })
         <input v-model="search" type="search" maxlength="100" placeholder="搜索名称或别名" aria-label="搜索名称或别名" class="w-56 rounded-lg border border-slate-300 bg-white px-3 py-2">
         <select v-model="seriesFilter" aria-label="活动系列" class="rounded-lg border border-slate-300 bg-white px-3 py-2"><option value="">全部系列</option><option value="none">无系列</option><option v-for="item in series" :key="item.id" :value="String(item.id)">{{ item.name }}</option></select>
         <select v-model="visualFilter" aria-label="配图" class="rounded-lg border border-slate-300 bg-white px-3 py-2"><option value="">全部配图</option><option value="missing">缺配图</option></select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
     <section class="rounded-xl border border-slate-200 bg-white">
@@ -215,7 +214,7 @@ useHead({ title: '活动' })
                 <td class="px-4 py-3">{{ event.series?.name ?? '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ event.start_date }}<template v-if="event.end_date && event.end_date !== event.start_date"> ~ {{ event.end_date }}</template></td>
                 <td class="px-4 py-3 tabular-nums">{{ event.released_albums_count }}</td>
-                <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><NuxtLink :to="`/admin/events/${event.id}`" class="underline">会场与社团</NuxtLink><button type="button" class="underline" @click="editEvent(event)">编辑</button><button type="button" class="text-red-700" @click="startDelete(event)">删除</button></div></td>
+                <td class="px-4 py-3"><div class="flex justify-end gap-2 whitespace-nowrap"><UiButton :to="`/admin/events/${event.id}`" size="xs">会场与社团</UiButton><UiButton size="xs" @click="editEvent(event)">编辑</UiButton><UiButton variant="danger-soft" size="xs" @click="startDelete(event)">删除</UiButton></div></td>
               </tr>
             </tbody>
           </table>

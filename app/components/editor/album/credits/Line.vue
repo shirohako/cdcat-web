@@ -39,15 +39,7 @@ const errors = computed(() => [...new Map(props.people.flatMap(errorsOf).map(err
         <EditorAlbumCreditsAddPerson v-if="roles.length" :start-open="!people.length" @add="emit('add-person', $event)" />
       </div>
       <EditorAlbumCreditsTracks :model-value="trackIds" class="ml-auto" @update:model-value="emit('tracks', $event)" />
-      <button
-        type="button"
-        class="grid size-7 shrink-0 place-items-center rounded-md bg-danger/10 text-danger ring-1 ring-inset ring-danger/20 transition-colors hover:bg-danger/20"
-        :aria-label="t('editor.credits.remove_line')"
-        :title="t('editor.credits.remove_line')"
-        @click="emit('remove')"
-      >
-        <Icon name="lucide:trash-2" class="size-3.5" />
-      </button>
+      <UiButton variant="danger-soft" icon="lucide:trash-2" :label="t('editor.credits.remove_line')" size="xs" class="shrink-0 ring-1 ring-inset ring-danger/20" @click="emit('remove')" />
     </div>
     <p v-for="error in errors" :key="error.path" class="mt-1.5 text-[11px] text-danger">{{ error.message }}</p>
   </li>

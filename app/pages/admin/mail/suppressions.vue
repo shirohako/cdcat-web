@@ -73,7 +73,7 @@ useHead({ title: '退信名单' })
         <label class="block grow">备注
           <input v-model="form.note" maxlength="500" :class="[field, 'mt-1 block w-full']">
         </label>
-        <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">添加</button>
+        <UiButton type="submit" variant="primary" :disabled="busy">添加</UiButton>
       </form>
     </section>
 
@@ -84,7 +84,7 @@ useHead({ title: '退信名单' })
           <option value="">全部原因</option>
           <option v-for="reason in reasons" :key="reason" :value="reason">{{ suppressionReasonLabels[reason] }}</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
 
@@ -96,7 +96,7 @@ useHead({ title: '退信名单' })
             <span class="rounded bg-slate-100 px-1.5 py-0.5 text-xs">{{ suppressionReasonLabels[suppression.reason] }}</span>
             <span v-if="suppression.note" class="max-w-md truncate text-xs text-slate-500" :title="suppression.note">{{ suppression.note }}</span>
             <span class="ml-auto text-xs text-slate-500">{{ time(suppression.created_at) }}<template v-if="suppression.created_by"> · {{ suppression.created_by.username }}</template></span>
-            <button type="button" :disabled="busy" class="text-xs text-red-700 underline disabled:opacity-40" @click="remove(suppression)">移出</button>
+            <UiButton variant="danger-soft" size="xs" :disabled="busy" @click="remove(suppression)">移出</UiButton>
           </li>
         </ul>
         <footer v-if="data" class="border-t border-slate-100 px-5 py-3"><CommonPagination v-model:page="page" :total-pages="data.pagination.last_page" :disabled="pending" /></footer>

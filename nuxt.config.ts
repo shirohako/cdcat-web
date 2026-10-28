@@ -133,5 +133,12 @@ export default defineNuxtConfig({
       ],
     },
   },
-  css: ['~/assets/css/main.css', '~/assets/css/markdown.css'],
+  // The body faces (font stacks in main.css). Only @font-face rules: a slice downloads when a page uses its characters.
+  css: [
+    '@fontsource-variable/noto-sans-sc/wght.css',
+    '@fontsource-variable/noto-sans-tc/wght.css',
+    '@fontsource-variable/noto-sans-jp/wght.css',
+    '~/assets/css/main.css',
+    '~/assets/css/markdown.css',
+  ],
 })

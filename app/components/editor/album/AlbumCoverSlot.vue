@@ -17,8 +17,8 @@
         <Upload :size="14" class="shrink-0" /><span class="truncate">{{ $t(coverImage ? 'editor.image.replace' : 'editor.image.upload') }}</span>
         <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
       </label>
-      <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="busy" :title="$t('editor.image.from_clipboard')" :aria-label="$t('editor.image.from_clipboard')" @click="fromClipboard"><ClipboardPaste :size="14" /></button>
-      <button type="button" class="btn btn-sm px-2 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :title="$t('editor.image.from_url')" @click="openUrl"><Link2 :size="14" /></button>
+      <UiButton :icon="ClipboardPaste" :label="$t('editor.image.from_clipboard')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="busy" @click="fromClipboard" />
+      <UiButton :icon="Link2" :label="$t('editor.image.from_url')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="openUrl" />
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
     <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }} {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</p>

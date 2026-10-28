@@ -91,7 +91,6 @@ async function act(reason: string) {
 const tone: Record<string, string> = { visible: 'bg-emerald-50 text-emerald-700', hidden: 'bg-amber-50 text-amber-700' }
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 const field = 'rounded-lg border border-slate-300 px-3 py-1.5 text-sm'
-const button = 'rounded-lg border px-2.5 py-1.5'
 useHead({ title: '主题' })
 </script>
 
@@ -119,7 +118,7 @@ useHead({ title: '主题' })
       <select v-model="filters.sort" :class="field">
         <option v-for="value in ['created', 'last_posted', 'posts', 'views']" :key="value" :value="value === 'created' ? '' : value">{{ discussionTopicSortLabels[value] }}</option>
       </select>
-      <button type="submit" class="rounded-lg bg-slate-900 px-3 py-1.5 text-sm text-white">应用</button>
+      <UiButton type="submit" variant="primary" size="sm">应用</UiButton>
     </form>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -147,16 +146,16 @@ useHead({ title: '主题' })
                 · <NuxtLink :to="`/admin/discussions/posts?topic_id=${topic.id}`" class="underline hover:text-slate-700">查看帖子</NuxtLink>
               </p>
             </div>
-            <div class="flex shrink-0 flex-wrap gap-1.5 text-xs">
-              <button type="button" :class="button" @click="start(topic, 'pin')">置顶</button>
-              <button type="button" :class="button" @click="start(topic, topic.featured ? 'unfeature' : 'feature')">{{ discussionTopicActionLabels[topic.featured ? 'unfeature' : 'feature'] }}</button>
-              <button type="button" :class="button" @click="start(topic, topic.locked ? 'unlock' : 'lock')">{{ discussionTopicActionLabels[topic.locked ? 'unlock' : 'lock'] }}</button>
-              <button v-if="!topic.article_id" type="button" :class="button" @click="start(topic, 'move')">移动</button>
+            <div class="flex shrink-0 flex-wrap gap-1.5">
+              <UiButton size="xs" @click="start(topic, 'pin')">置顶</UiButton>
+              <UiButton size="xs" @click="start(topic, topic.featured ? 'unfeature' : 'feature')">{{ discussionTopicActionLabels[topic.featured ? 'unfeature' : 'feature'] }}</UiButton>
+              <UiButton size="xs" @click="start(topic, topic.locked ? 'unlock' : 'lock')">{{ discussionTopicActionLabels[topic.locked ? 'unlock' : 'lock'] }}</UiButton>
+              <UiButton v-if="!topic.article_id" size="xs" @click="start(topic, 'move')">移动</UiButton>
               <template v-if="topic.first_post_id && !topic.article_id">
-                <button v-if="topic.status === 'visible'" type="button" :class="[button, 'border-amber-300 text-amber-700']" @click="start(topic, 'hide')">折叠</button>
-                <button v-else type="button" :class="button" @click="start(topic, 'unhide')">取消折叠</button>
+                <UiButton v-if="topic.status === 'visible'" size="xs" @click="start(topic, 'hide')">折叠</UiButton>
+                <UiButton v-else size="xs" @click="start(topic, 'unhide')">取消折叠</UiButton>
               </template>
-              <button v-if="!topic.article_id" type="button" :class="[button, 'border-red-300 text-red-700']" @click="start(topic, 'delete')">删除</button>
+              <UiButton v-if="!topic.article_id" variant="danger-soft" size="xs" @click="start(topic, 'delete')">删除</UiButton>
             </div>
           </div>
         </li>

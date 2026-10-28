@@ -30,28 +30,30 @@
         </div>
       </div>
       <div class="mt-3 flex items-center gap-2 border-t border-line pt-2.5">
-        <a
+        <UiButton
           v-if="circle.twitter_handle"
           :href="`https://x.com/${circle.twitter_handle}`"
           target="_blank"
           rel="noopener"
-          class="inline-flex min-w-0 items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+          size="xs"
+          icon="simple-icons:x"
+          class="min-w-0"
         >
-          <Icon name="simple-icons:x" class="size-3.5 shrink-0" />
           <span class="truncate">@{{ circle.twitter_handle }}</span>
-        </a>
-        <NuxtLink
-          v-for="artist in circle.artists.slice(0, 2)"
+        </UiButton>
+        <UiButton
+          v-for="artist in shownArtists"
           :key="artist.id"
           :to="`/artists/${artist.id}`"
-          class="inline-flex min-w-0 items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+          size="xs"
+          :icon="UserRound"
+          class="min-w-0"
         >
-          <UserRound :size="13" class="shrink-0 opacity-60" />
-          <span class="truncate">{{ circle.artists.length === 1 ? t('event_page.circle.artist_page') : artist.name }}</span>
-        </NuxtLink>
-        <button type="button" class="ml-auto shrink-0 rounded-lg bg-primary px-2.5 py-1 text-xs font-medium text-on-primary transition-colors duration-150 ease-out hover:bg-primary-strong" @click="$emit('open')">
+          <span class="truncate">{{ shownArtists.length === 1 ? t('event_page.circle.artist_page') : artist.name }}</span>
+        </UiButton>
+        <UiButton variant="primary" size="xs" class="ml-auto shrink-0" @click="$emit('open')">
           {{ t('event_page.circle.details') }}
-        </button>
+        </UiButton>
       </div>
     </template>
     <p v-else class="text-sm text-meta">
@@ -76,6 +78,8 @@ defineEmits<{ open: [], enter: [], leave: [] }>()
 const { t } = useI18n()
 
 const circle = computed(() => props.piece.circle)
+// The template's `v-if="circle"` doesn't narrow inside UiButton's slot, so these are worked out here.
+const shownArtists = computed(() => circle.value?.artists.slice(0, 2) ?? [])
 const familyColor = computed(() => {
   const family = genreFamily(circle.value?.genre, props.genres)
   return GENRE_FAMILIES.find(f => f.key === family)?.color ?? 'var(--meta)'

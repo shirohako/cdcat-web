@@ -84,12 +84,12 @@ useHead({ title: '失败任务' })
               <span class="font-mono text-xs text-slate-400">#{{ job.id }}</span>
               <span class="font-medium">{{ label(job) }}</span>
               <span class="text-xs text-slate-500">{{ job.queue }} · {{ time(job.failed_at) }}</span>
-              <div class="ml-auto flex gap-3 text-xs">
-                <button type="button" class="underline" :aria-expanded="detail?.id === job.id" @click="show(job)">查看详情</button>
+              <div class="ml-auto flex items-center gap-2 text-xs">
+                <UiButton size="xs" :aria-expanded="detail?.id === job.id" @click="show(job)">查看详情</UiButton>
                 <template v-if="canOperate">
-                  <button v-if="job.retryable" type="button" :disabled="busy" class="text-emerald-700 disabled:opacity-40" @click="retry(job)">重试</button>
+                  <UiButton v-if="job.retryable" size="xs" :disabled="busy" @click="retry(job)">重试</UiButton>
                   <span v-else class="text-slate-400">不可重试</span>
-                  <button type="button" class="text-red-700" @click="remove(job)">删除</button>
+                  <UiButton variant="danger-soft" size="xs" @click="remove(job)">删除</UiButton>
                 </template>
               </div>
             </div>

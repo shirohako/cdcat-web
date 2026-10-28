@@ -45,7 +45,7 @@ useHead({ title: '关键词过滤' })
       <label class="block">关键词<input v-model="form.word" required maxlength="100" :class="[field, 'mt-1 block w-56']"></label>
       <label class="block">动作<select v-model="form.action" :class="[field, 'mt-1 block']"><option value="block">屏蔽</option><option value="flag">标记</option></select></label>
       <label class="block flex-1">备注<input v-model="form.note" maxlength="500" :class="[field, 'mt-1 block w-full']"></label>
-      <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">添加</button>
+      <UiButton type="submit" variant="primary" :disabled="busy">添加</UiButton>
     </form>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -62,9 +62,9 @@ useHead({ title: '关键词过滤' })
               <td class="px-4 py-2 font-mono">{{ filter.word }}</td>
               <td class="px-4 py-2"><span class="rounded-full border px-2 py-0.5 text-xs" :class="filter.action === 'block' ? 'border-rose-200 text-rose-700' : 'border-amber-200 text-amber-700'">{{ wordFilterActionLabels[filter.action] }}</span></td>
               <td class="px-4 py-2 text-xs text-slate-500">{{ filter.note }}</td>
-              <td class="space-x-2 whitespace-nowrap px-4 py-2 text-right text-xs">
-                <button type="button" class="underline" :disabled="busy" @click="toggle(filter)">切换动作</button>
-                <button type="button" class="text-red-700 underline" :disabled="busy" @click="remove(filter)">删除</button>
+              <td class="space-x-2 whitespace-nowrap px-4 py-2 text-right">
+                <UiButton size="xs" :disabled="busy" @click="toggle(filter)">切换动作</UiButton>
+                <UiButton variant="danger-soft" size="xs" :disabled="busy" @click="remove(filter)">删除</UiButton>
               </td>
             </tr>
           </tbody>

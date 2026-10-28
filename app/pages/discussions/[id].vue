@@ -337,12 +337,8 @@ const { canonical } = usePageSeo({
             </h1>
             <div class="flex items-center gap-1.5">
               <DiscussionLevelMenu v-if="isAuthenticated" :level="topic.viewer.notification_level" kind="topic" :target-id="topic.id" @update:level="value => topic.viewer.notification_level = value" />
-              <button v-if="topic.viewer.can.edit" type="button" class="btn btn-outline btn-sm btn-square" :aria-label="t('discussions.topic.edit_title')" @click="editingTopic = topic">
-                <Pencil :size="14" />
-              </button>
-              <button v-if="moderator" type="button" class="grid size-8 place-items-center rounded-lg border border-indigo-200 text-indigo-600 transition-colors duration-150 ease-out hover:bg-indigo-50 dark:border-indigo-400/25 dark:text-indigo-400 dark:hover:bg-indigo-400/15" :aria-label="t('discussions.moderation.topic_title')" @click="moderatingTopic = topic">
-                <Shield :size="14" />
-              </button>
+              <UiButton v-if="topic.viewer.can.edit" variant="outline" size="sm" :icon="Pencil" :label="t('discussions.topic.edit_title')" @click="editingTopic = topic" />
+              <UiButton v-if="moderator" variant="outline" size="sm" :icon="Shield" :label="t('discussions.moderation.topic_title')" @click="moderatingTopic = topic" />
             </div>
           </div>
           <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-meta">
@@ -369,12 +365,12 @@ const { canonical } = usePageSeo({
         <ArticleLinkCards v-if="topic.links.length" :links="topic.links" class="mt-4" />
 
         <div class="mt-4 flex flex-wrap items-center gap-2">
-          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors duration-150 ease-out" :class="authorOnly ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover hover:text-primary'" @click="go({ author: authorOnly ? null : 'op', page: null })">
-            <UserRound :size="13" />{{ t('discussions.topic.only_op') }}
-          </button>
-          <button type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors duration-150 ease-out" :class="descending ? 'border-primary/40 bg-primary/15 text-primary' : 'border-line text-body hover:bg-ghost-hover hover:text-primary'" @click="go({ order: descending ? null : 'desc', page: null })">
-            <ArrowDownWideNarrow :size="13" />{{ t('discussions.topic.newest_first') }}
-          </button>
+          <UiButton variant="outline" size="sm" :icon="UserRound" :pressed="authorOnly" @click="go({ author: authorOnly ? null : 'op', page: null })">
+            {{ t('discussions.topic.only_op') }}
+          </UiButton>
+          <UiButton variant="outline" size="sm" :icon="ArrowDownWideNarrow" :pressed="descending" @click="go({ order: descending ? null : 'desc', page: null })">
+            {{ t('discussions.topic.newest_first') }}
+          </UiButton>
           <form class="flex items-center gap-1 text-xs text-meta" @submit.prevent="jumpToFloor">
             <label :for="`jump-${topic.id}`">{{ t('discussions.topic.jump') }}</label>
             <input :id="`jump-${topic.id}`" v-model="jump" inputmode="numeric" pattern="[0-9]*" class="input input-sm w-16 px-2 text-center text-xs" placeholder="#">
@@ -390,9 +386,9 @@ const { canonical } = usePageSeo({
           />
         </div>
 
-        <button v-if="newActivity" type="button" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 py-2.5 text-sm font-medium text-primary transition-colors duration-150 ease-out hover:bg-primary/15" @click="showNew">
-          <RefreshCw :size="14" />{{ t('discussions.topic.new_replies', { count: newCount }) }}
-        </button>
+        <UiButton v-if="newActivity" :icon="RefreshCw" block class="mt-4" @click="showNew">
+          {{ t('discussions.topic.new_replies', { count: newCount }) }}
+        </UiButton>
 
         <div v-if="pagination && pagination.last_page > 1" class="mt-5 flex justify-center">
           <CommonPagination :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" @update:page="value => go({ page: value > 1 ? value : null })" />
@@ -404,11 +400,11 @@ const { canonical } = usePageSeo({
             <DiscussionComposer ref="composer" :topic-id="topic.id" @posted="posted" />
           </template>
           <p v-else-if="!isAuthenticated" class="text-center text-sm text-meta">
-            <NuxtLink :to="{ path: '/auth/login', query: { redirect: route.fullPath } }" class="link font-medium">{{ t('discussions.composer.login') }}</NuxtLink>
+            <UiButton :to="{ path: '/auth/login', query: { redirect: route.fullPath } }" size="sm">{{ t('discussions.composer.login') }}</UiButton>
           </p>
           <p v-else class="flex items-center justify-center gap-1.5 text-sm text-meta"><Lock :size="14" />{{ topic.locked ? t('discussions.composer.locked') : t('discussions.composer.closed') }}</p>
           <p v-if="topic.viewer.can.delete && topic.replies_count === 0" class="mt-3 text-right text-xs">
-            <button type="button" class="text-danger hover:underline" @click="confirmDeleteTopic = true">{{ t('discussions.topic.delete') }}</button>
+            <UiButton variant="danger-soft" size="xs" @click="confirmDeleteTopic = true">{{ t('discussions.topic.delete') }}</UiButton>
           </p>
         </section>
       </template>

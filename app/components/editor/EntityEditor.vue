@@ -5,7 +5,7 @@
 
       <div v-else-if="loadError" class="mx-auto max-w-lg space-y-3 py-16 text-center">
         <p class="alert alert-error justify-center">{{ loadError }}</p>
-        <NuxtLink :to="id ? `/${resource}/${id}` : `/${resource}`" class="btn btn-sm">{{ $t('common.go_back') }}</NuxtLink>
+        <UiButton :to="id ? `/${resource}/${id}` : `/${resource}`" size="sm">{{ $t('common.go_back') }}</UiButton>
       </div>
 
       <template v-else-if="ready">
@@ -13,17 +13,17 @@
           <p class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(id ? 'editor.entity.edit_title' : 'editor.entity.new_title', { type: typeLabel }) }}</p>
           <h1 class="truncate text-2xl font-bold text-title">{{ name || $t('editor.entity.untitled') }}</h1>
           <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-            <NuxtLink v-if="id" :to="`/${resource}/${id}`" class="link link-muted">{{ $t('editor.entity.view') }}</NuxtLink>
-            <NuxtLink v-if="id" :to="`/${resource}/${id}/versions`" class="link link-muted">{{ $t('versions.title') }}</NuxtLink>
-            <NuxtLink to="/revisions" class="link link-muted">{{ $t('editor.my_revisions') }}</NuxtLink>
+            <UiButton v-if="id" :to="`/${resource}/${id}`" size="xs">{{ $t('editor.entity.view') }}</UiButton>
+            <UiButton v-if="id" :to="`/${resource}/${id}/versions`" size="xs">{{ $t('versions.title') }}</UiButton>
+            <UiButton to="/revisions" size="xs">{{ $t('editor.my_revisions') }}</UiButton>
           </p>
         </header>
 
         <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.entity.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
-          <NuxtLink :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" class="btn btn-sm">{{ $t('editor.continue_draft') }}</NuxtLink>
-          <button type="button" class="btn btn-ghost btn-sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</button>
+          <UiButton :to="{ query: { ...$route.query, revision: openRevisions[0]!.id } }" size="sm">{{ $t('editor.continue_draft') }}</UiButton>
+          <UiButton size="sm" @click="openRevisions = []">{{ $t('editor.ignore') }}</UiButton>
         </div>
         <div v-if="draft.status.value === 'changes_requested'" class="mb-4 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>

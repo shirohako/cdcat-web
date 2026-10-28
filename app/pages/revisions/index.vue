@@ -6,7 +6,7 @@
           <h1 class="text-3xl font-bold tracking-tight text-title">{{ $t('collection_pages.revisions.title') }}</h1>
           <p class="mt-1 text-sm text-meta">{{ $t('collection_pages.revisions.description') }}</p>
         </div>
-        <NuxtLink to="/contribute/album" class="btn btn-primary btn-sm gap-1"><Plus :size="14" />{{ $t('revision_page.new_album') }}</NuxtLink>
+        <UiButton to="/contribute/album" variant="primary" size="sm" :icon="Plus">{{ $t('revision_page.new_album') }}</UiButton>
       </header>
 
       <!-- Drafts kept in this browser; the list below holds submitted revisions only. -->
@@ -29,8 +29,8 @@
                 <span class="text-meta">{{ $t('revision_page.local_saved', { at: ago(item.updatedAt) }) }}</span>
               </p>
             </div>
-            <NuxtLink v-if="draftEditorPath(item)" :to="draftEditorPath(item)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
-            <button type="button" class="btn btn-ghost btn-sm text-danger" @click="discardLocal(item)">{{ $t('revision_page.delete_draft') }}</button>
+            <UiButton v-if="draftEditorPath(item)" :to="draftEditorPath(item)!" size="sm">{{ $t('revision_page.continue') }}</UiButton>
+            <UiButton variant="danger-soft" size="sm" @click="discardLocal(item)">{{ $t('revision_page.delete_draft') }}</UiButton>
           </li>
         </ul>
       </section>
@@ -84,9 +84,9 @@
               <span class="font-medium text-warning">{{ $t('revision_page.review_comment') }}：</span>{{ revision.review_comment }}
             </p>
             <div class="mt-3 flex flex-wrap gap-2">
-              <NuxtLink v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" class="btn btn-sm">{{ $t('revision_page.continue') }}</NuxtLink>
-              <NuxtLink :to="`/revisions/${revision.id}`" class="btn btn-ghost btn-sm">{{ $t('common.details') }}</NuxtLink>
-              <button v-if="revision.status === 'pending'" type="button" class="btn btn-ghost btn-sm text-danger" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</button>
+              <UiButton v-if="isOpenRevision(revision.status) && editorPath(revision)" :to="editorPath(revision)!" size="sm">{{ $t('revision_page.continue') }}</UiButton>
+              <UiButton :to="`/revisions/${revision.id}`" size="sm">{{ $t('common.details') }}</UiButton>
+              <UiButton v-if="revision.status === 'pending'" variant="danger-soft" size="sm" :disabled="busy === revision.id" @click="withdraw(revision)">{{ $t('revision_page.withdraw') }}</UiButton>
             </div>
           </li>
         </ul>

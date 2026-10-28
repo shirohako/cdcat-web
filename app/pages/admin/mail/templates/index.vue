@@ -20,7 +20,7 @@ useHead({ title: '邮件模板' })
         <h1 class="text-3xl font-bold">邮件模板</h1>
         <p class="mt-2 text-sm text-slate-600">系统邮件（验证码、找回密码、欢迎等）的文案在这里修改；群发模板是可以反复使用的群发内容。</p>
       </div>
-      <NuxtLink to="/admin/mail/templates/new" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">新建群发模板</NuxtLink>
+      <UiButton to="/admin/mail/templates/new" variant="primary">新建群发模板</UiButton>
     </header>
     <AdminListState :pending="pending" :error="error" @retry="refresh()">
       <section v-for="list in [{ key: 'system', items: system }, { key: 'campaign', items: group }]" :key="list.key" class="rounded-xl border border-slate-200 bg-white shadow-sm">

@@ -7,10 +7,10 @@
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
-        <button type="button" class="btn btn-xs px-1.5 text-[11px] ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" class="text-primary">·{{ tocCount }}</span></button>
-        <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="first" :title="$t('catalog.form.move_up')" @click="moveDisc(album, disc.id, -1)"><ArrowUp :size="12" /></button>
-        <button type="button" class="btn btn-xs px-1.5 ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="last" :title="$t('catalog.form.move_down')" @click="moveDisc(album, disc.id, 1)"><ArrowDown :size="12" /></button>
-        <button type="button" class="btn btn-xs px-1.5 bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" :title="$t('editor.album.remove_disc')" @click="remove"><Trash2 :size="12" /></button>
+        <UiButton size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" class="text-primary">·{{ tocCount }}</span></UiButton>
+        <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="moveDisc(album, disc.id, -1)" />
+        <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="moveDisc(album, disc.id, 1)" />
+        <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.album.remove_disc')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
       </span>
     </div>
     <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ error.message }}</p>

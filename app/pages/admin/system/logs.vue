@@ -37,7 +37,7 @@ useHead({ title: '应用日志' })
           <option value="">全部级别</option>
           <option v-for="item in levels" :key="item" :value="item">{{ item }}</option>
         </select>
-        <button type="button" class="rounded-lg border bg-white px-3 py-2" @click="refreshLog()">刷新</button>
+        <UiButton @click="refreshLog()">刷新</UiButton>
       </div>
       <p v-if="log?.truncated" class="mt-3 text-xs text-slate-500">文件较大，只显示末尾部分。</p>
       <section class="mt-3 rounded-xl border border-slate-200 bg-white">

@@ -43,7 +43,7 @@
             <UiSelect v-model="from" :options="fromOptions" size="sm" class="h-8 text-xs ml-auto" />
             <span class="text-faint">→ v{{ selected }}</span>
             <NuxtLink v-if="selectedVersion?.revision_id" :to="`/revisions/${selectedVersion.revision_id}`" class="link text-xs">{{ $t('versions.revision', { id: selectedVersion.revision_id }) }}</NuxtLink>
-            <NuxtLink v-if="canRestore && selected !== latest" :to="`/admin/content/${resource}/${id}?restore=${selected}`" class="btn btn-xs btn-outline">{{ $t('versions.restore') }}</NuxtLink>
+            <UiButton v-if="canRestore && selected !== latest" :to="`/admin/content/${resource}/${id}?restore=${selected}`" variant="outline" size="xs">{{ $t('versions.restore') }}</UiButton>
           </template>
         </div>
         <div class="px-5 py-4">

@@ -38,13 +38,13 @@ const leave = (event: FocusEvent) => {
       @name="emit('add', people.printed($event))"
     />
   </span>
-  <button
+  <UiButton
     v-else
-    type="button"
-    class="inline-flex h-7 items-center gap-1 rounded-md border border-dashed border-primary/45 bg-primary/8 px-2 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
-    :aria-label="label ? undefined : t('editor.credits.add_person')"
+    variant="add"
+    size="xs"
+    icon="lucide:plus"
+    :label="label ? undefined : t('editor.credits.add_person')"
+    class="gap-1"
     @click="adding = true"
-  >
-    <Icon name="lucide:plus" class="size-3.5" />{{ label }}
-  </button>
+  >{{ label }}</UiButton>
 </template>

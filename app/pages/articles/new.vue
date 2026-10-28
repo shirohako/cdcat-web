@@ -82,11 +82,11 @@ const date = (value: string | null) => value ? new Intl.DateTimeFormat(locale.va
           </NuxtLink>
         </li>
       </ul>
-      <NuxtLink v-if="draftTotal > drafts.length" to="/articles/mine?status=draft" class="link mt-2 inline-block text-xs">
+      <UiButton v-if="draftTotal > drafts.length" to="/articles/mine?status=draft" size="xs" class="mt-2">
         {{ t('article_ui.chooser.all_drafts', { count: draftTotal }) }}
-      </NuxtLink>
+      </UiButton>
 
-      <button type="button" class="btn btn-primary mt-6 w-full" @click="startNew"><Plus :size="16" />{{ t('article_ui.chooser.new') }}</button>
+      <UiButton variant="primary" :icon="Plus" block class="mt-6" @click="startNew">{{ t('article_ui.chooser.new') }}</UiButton>
       <p v-if="local" class="mt-2 text-center text-xs text-meta">{{ t('article_ui.chooser.new_drops_local') }}</p>
     </main>
   </div>

@@ -7,10 +7,9 @@
           {{ $t('profile.top_artists') }}
           <UiCount v-if="artists.length" :value="artists.length" size="sm" />
         </h2>
-        <button v-if="artists.length" class="inline-flex items-center gap-1 text-xs font-medium text-meta hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('view-all')">
+        <UiButton v-if="artists.length" size="xs" :icon-right="ChevronRight" @click="$emit('view-all')">
           {{ $t('common.view_all') }}
-          <ChevronRight :size="14" />
-        </button>
+        </UiButton>
       </div>
 
       <!-- Empty state -->

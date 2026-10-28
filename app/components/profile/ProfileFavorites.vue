@@ -7,10 +7,9 @@
           {{ $t('profile.favorites') }}
           <UiCount v-if="totalCount" :value="totalCount" size="sm" />
         </h2>
-        <button v-if="albums.length" class="inline-flex items-center gap-1 text-xs font-medium text-meta hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('view-all')">
+        <UiButton v-if="albums.length" size="xs" :icon-right="ChevronRight" @click="$emit('view-all')">
           {{ $t('common.view_all') }}
-          <ChevronRight :size="14" />
-        </button>
+        </UiButton>
       </div>
 
       <!-- Empty state -->

@@ -33,12 +33,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 
 <template>
   <div ref="root" class="relative">
-    <button
-      type="button" class="inline-flex h-8 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors duration-150 ease-out hover:bg-ghost-hover"
-      :class="current === 'watching' ? 'border-primary/40 text-primary' : 'border-line text-body hover:text-primary'" :aria-expanded="open" @click.stop="open = !open"
+    <UiButton
+      variant="outline" size="sm" :icon="icons[current]" :icon-right="ChevronDown" :class="current === 'watching' ? 'border-primary/40 text-primary' : ''"
+      :aria-expanded="open" @click.stop="open = !open"
     >
-      <component :is="icons[current]" :size="14" />{{ t(`discussions.levels.${current}`) }}<ChevronDown :size="12" />
-    </button>
+      {{ t(`discussions.levels.${current}`) }}
+    </UiButton>
     <UiDropdown :open="open" align="end" class="w-64 p-1" role="menu">
       <button
         v-for="option in NOTIFICATION_LEVELS" :key="option" type="button" role="menuitemradio" :aria-checked="option === current"

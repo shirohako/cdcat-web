@@ -139,15 +139,15 @@ const previewProblems = computed(() => [...(preview.value?.problems.subject ?? [
         </div>
         <p v-for="message in messagesFor('body')" :key="message" class="text-xs text-red-700">{{ message }}</p>
         <p class="text-xs text-slate-500">正文是普通 Markdown，支持标题、粗体、列表、表格和链接；站内的扩展语法（容器、剧透、站内条目标记）不能用。链接要以 http、https、mailto 或 / 开头，图片只能用 https 地址。</p>
-        <button v-if="active !== 'en' && written(active) && !disabled" type="button" class="text-xs text-red-700 underline" @click="removeLocale">
+        <UiButton v-if="active !== 'en' && written(active) && !disabled" variant="danger-soft" size="xs" @click="removeLocale">
           删除{{ localeName(active) }}版本
-        </button>
+        </UiButton>
       </div>
 
       <section class="min-w-0 space-y-2" aria-label="预览">
         <div class="flex items-center justify-between gap-2 text-sm">
           <h3 class="font-medium">预览<span v-if="previewing" class="ml-2 text-xs font-normal text-slate-400">渲染中…</span></h3>
-          <button v-if="preview" type="button" class="text-xs underline" @click="showText = !showText">{{ showText ? '看 HTML 版' : '看纯文本版' }}</button>
+          <UiButton v-if="preview" size="xs" @click="showText = !showText">{{ showText ? '看 HTML 版' : '看纯文本版' }}</UiButton>
         </div>
         <p v-if="!target" class="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">选择类型后显示预览。</p>
         <p v-else-if="previewError" role="alert" class="text-sm text-red-700">{{ previewError }}</p>

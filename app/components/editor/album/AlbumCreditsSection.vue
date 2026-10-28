@@ -1,9 +1,7 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.credits')" :icon="Users" :description="$t('editor.credits.hint')">
     <template #actions>
-      <button type="button" class="btn btn-xs gap-1 bg-btn text-btn-content ring-1 ring-inset ring-line shadow-xs transition hover:bg-btn-hover active:translate-y-px" @click="pasteOpen = true">
-        <ClipboardPaste :size="12" />{{ $t('editor.paste_credits.button') }}
-      </button>
+      <UiButton :icon="ClipboardPaste" icon-class="size-3" size="xs" class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="pasteOpen = true">{{ $t('editor.paste_credits.button') }}</UiButton>
     </template>
     <div class="space-y-5 p-3 sm:p-5">
       <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">

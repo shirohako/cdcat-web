@@ -31,10 +31,10 @@ usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('
       <h1 class="text-center text-2xl font-bold text-title md:text-3xl">{{ t('contribute_page.title') }}</h1>
       <p class="mt-3 text-center text-sm text-meta">
         {{ t('contribute_page.summary') }}
-        <button type="button" class="link ml-1 inline-flex items-center gap-0.5 font-medium" :aria-expanded="moreOpen" @click="moreOpen = !moreOpen">
+        <UiButton size="xs" class="ml-1 align-middle" :aria-expanded="moreOpen" @click="moreOpen = !moreOpen">
           {{ t(moreOpen ? 'contribute_page.less' : 'contribute_page.more') }}
-          <Icon name="lucide:chevron-down" class="h-3.5 w-3.5 transition-transform" :class="{ 'rotate-180': moreOpen }" />
-        </button>
+          <Icon name="lucide:chevron-down" class="size-3.5 transition-transform" :class="{ 'rotate-180': moreOpen }" />
+        </UiButton>
       </p>
 
       <ul v-if="moreOpen" class="card mt-4 space-y-2 p-4 text-[13px] leading-6 text-body">
@@ -62,7 +62,7 @@ usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('
 
       <p class="mt-4 text-center text-xs text-meta">
         <template v-if="isAuthenticated">
-          <NuxtLink to="/revisions" class="link link-muted">{{ t('contribute_page.my_revisions') }}</NuxtLink>
+          <UiButton to="/revisions" size="xs">{{ t('contribute_page.my_revisions') }}</UiButton>
         </template>
         <template v-else>{{ t('contribute_page.guest_note') }}</template>
       </p>

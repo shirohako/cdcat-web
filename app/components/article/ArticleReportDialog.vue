@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Loader2 } from '@lucide/vue'
 import { ARTICLE_REPORT_REASONS, type ArticleReportReason } from '~/types/article'
 
 /** Reports a published article to the moderators. */
@@ -66,8 +65,8 @@ async function submit() {
         :placeholder="t(reason === 'other' ? 'article_ui.report.note_required' : 'article_ui.report.note')" />
       <p v-if="error" role="alert" class="text-sm text-danger">{{ error }}</p>
       <footer class="flex justify-end gap-2">
-        <button type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="close">{{ t('common.cancel') }}</button>
-        <button type="submit" class="btn btn-primary btn-sm" :disabled="busy"><Loader2 v-if="busy" :size="14" class="animate-spin" />{{ t('article_ui.report.submit') }}</button>
+        <UiButton size="sm" :disabled="busy" @click="close">{{ t('common.cancel') }}</UiButton>
+        <UiButton type="submit" variant="primary" size="sm" :loading="busy">{{ t('article_ui.report.submit') }}</UiButton>
       </footer>
     </form>
   </dialog>

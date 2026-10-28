@@ -108,7 +108,7 @@ useHead({ title: '讨论版块' })
       <section class="rounded-xl border border-slate-200 bg-white">
         <div class="flex items-center justify-between border-b border-slate-100 px-4 py-2.5 text-xs text-slate-500">
           <span>拖动条目调整同级版块的顺序</span>
-          <button v-if="dirtyOrder" type="button" class="rounded-lg bg-slate-900 px-3 py-1.5 text-white disabled:opacity-50" :disabled="busy" @click="saveOrder">保存排序</button>
+          <UiButton v-if="dirtyOrder" variant="primary" size="xs" :disabled="busy" @click="saveOrder">保存排序</UiButton>
         </div>
         <AdminListState :pending="pending" :error="error" :empty="!ordered.length" @retry="refresh()">
           <ul class="divide-y divide-slate-100">
@@ -135,9 +135,9 @@ useHead({ title: '讨论版块' })
                   <span>{{ category.topics_count }} 个主题</span>
                 </p>
               </div>
-              <div class="flex shrink-0 gap-2 text-xs">
-                <button type="button" class="underline" @click="edit(category)">编辑</button>
-                <button v-if="!category.is_system" type="button" class="text-red-700 underline disabled:opacity-40" :disabled="category.topics_count > 0" @click="deleting = category">删除</button>
+              <div class="flex shrink-0 gap-2">
+                <UiButton size="xs" @click="edit(category)">编辑</UiButton>
+                <UiButton v-if="!category.is_system" variant="danger-soft" size="xs" :disabled="category.topics_count > 0" @click="deleting = category">删除</UiButton>
               </div>
             </li>
           </ul>
@@ -183,8 +183,8 @@ v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'font-mo
 试听链接：
 出处：" /></label>
         <div class="flex justify-end gap-2">
-          <button v-if="editing" type="button" class="rounded-lg border px-3 py-2" @click="reset">取消</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">保存</button>
+          <UiButton v-if="editing" @click="reset">取消</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy">保存</UiButton>
         </div>
       </form>
     </div>

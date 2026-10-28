@@ -12,7 +12,7 @@
               <Upload :size="14" />{{ $t('editor.image.upload_many') }}
               <input type="file" multiple accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
             </label>
-            <button type="button" class="btn btn-add btn-sm gap-1" @click="openUrl"><Link2 :size="14" />{{ $t('editor.image.from_url') }}</button>
+            <UiButton variant="add" :icon="Link2" icon-class="size-3.5" size="sm" class="gap-1" @click="openUrl">{{ $t('editor.image.from_url') }}</UiButton>
             <span v-if="uploading" class="flex items-center gap-1.5 text-xs text-meta"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</span>
           </div>
           <ul v-if="failures.length" class="space-y-0.5 text-xs text-danger">

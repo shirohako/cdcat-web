@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Loader2, Send, X } from '@lucide/vue'
+import { Send, X } from '@lucide/vue'
 import type { DiscussionPost, DiscussionReferences } from '~/types/discussion'
 
 /**
@@ -75,7 +75,7 @@ defineExpose({ insert, focus: () => editor.value?.focus() })
   <div :class="variant === 'compact' ? 'space-y-2' : 'space-y-3'">
     <p v-if="replyTo?.user" class="flex items-center gap-1 text-xs text-meta">
       {{ t('discussions.composer.replying_to', { name: replyTo.user.nickname || replyTo.user.username }) }}
-      <button type="button" class="ml-1 transition-colors duration-150 ease-out hover:text-primary" :aria-label="t('common.cancel')" @click="emit('cancel')"><X :size="12" /></button>
+      <UiButton size="xs" :icon="X" :label="t('common.cancel')" class="ml-1" @click="emit('cancel')" />
     </p>
     <ClientOnly>
       <MarkdownEditor
@@ -91,11 +91,10 @@ defineExpose({ insert, focus: () => editor.value?.focus() })
     <div class="flex flex-wrap items-center justify-end gap-2">
       <p v-if="error" role="alert" class="mr-auto text-sm text-danger">{{ error }}</p>
       <span v-else class="mr-auto hidden text-xs text-meta sm:inline">{{ t('discussions.composer.shortcut') }}</span>
-      <button v-if="variant === 'compact'" type="button" class="btn btn-ghost btn-sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</button>
-      <button type="button" class="btn btn-primary" :class="variant === 'compact' ? 'btn-sm' : ''" :disabled="busy || !draft.raw.trim()" @click="submit">
-        <Loader2 v-if="busy" :size="14" class="animate-spin" /><Send v-else :size="14" />
+      <UiButton v-if="variant === 'compact'" size="sm" :disabled="busy" @click="emit('cancel')">{{ t('common.cancel') }}</UiButton>
+      <UiButton variant="primary" :size="variant === 'compact' ? 'sm' : 'md'" :icon="Send" :loading="busy" :disabled="!draft.raw.trim()" @click="submit">
         {{ variant === 'compact' ? t('discussions.composer.send_reply') : t('discussions.composer.send_floor') }}
-      </button>
+      </UiButton>
     </div>
   </div>
 </template>

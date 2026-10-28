@@ -91,9 +91,9 @@ useSeoMeta({ title: () => t('mail_preferences.title'), robots: 'noindex' })
           <div class="mb-4 inline-flex size-14 items-center justify-center rounded-full bg-danger/10"><Link2Off :size="26" class="text-danger" /></div>
           <h2 class="text-lg font-bold text-title">{{ t('mail_preferences.invalid_title') }}</h2>
           <p class="mx-auto mt-2 max-w-sm text-sm text-body">{{ t('mail_preferences.invalid_message') }}</p>
-          <NuxtLink to="/account?tab=notifications" class="btn btn-primary mt-6 rounded-xl px-5">
+          <UiButton to="/account?tab=notifications" variant="primary" class="mt-6">
             {{ t('mail_preferences.go_to_account') }}
-          </NuxtLink>
+          </UiButton>
         </div>
 
         <SkeletonStatus v-else-if="loading" class="space-y-4">
@@ -120,20 +120,20 @@ useSeoMeta({ title: () => t('mail_preferences.title'), robots: 'noindex' })
             <Info :size="18" class="mt-0.5 shrink-0" />
             <span>{{ t('mail_preferences.required_notice', { name: categoryName }) }}</span>
           </p>
-          <button
-            v-else-if="category && categorySubscribed" type="button" :disabled="busy"
-            class="btn btn-primary mb-3 flex w-full gap-2 rounded-xl px-5 py-3"
+          <UiButton
+            v-else-if="category && categorySubscribed" variant="primary" size="lg" :icon="MailX" :disabled="busy" block
+            class="mb-3"
             @click="unsubscribeCategory"
           >
-            <MailX :size="18" />{{ t('mail_preferences.unsubscribe', { name: categoryName }) }}
-          </button>
-          <button
-            v-if="anyOptional" type="button" :disabled="busy"
-            class="btn btn-outline mb-8 w-full rounded-xl px-5 py-3"
+            {{ t('mail_preferences.unsubscribe', { name: categoryName }) }}
+          </UiButton>
+          <UiButton
+            v-if="anyOptional" variant="outline" size="lg" :disabled="busy" block
+            class="mb-8"
             @click="update({ unsubscribe_all: true }, 'all')"
           >
             {{ t('mail_preferences.unsubscribe_all') }}
-          </button>
+          </UiButton>
 
           <h2 class="mb-4 border-t border-line pt-6 text-sm font-semibold text-title">{{ t('mail_preferences.settings_title') }}</h2>
           <MailSettings

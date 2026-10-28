@@ -2,7 +2,7 @@
   <div class="min-h-screen">
     <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <div class="mb-6 flex flex-wrap items-center gap-3">
-        <NuxtLink :to="backLink" class="btn btn-ghost btn-sm gap-1"><ArrowLeft :size="14" />{{ $t('common.go_back') }}</NuxtLink>
+        <UiButton :to="backLink" size="sm" :icon="ArrowLeft">{{ $t('common.go_back') }}</UiButton>
         <div class="min-w-0">
           <p class="text-xs text-meta">{{ $t('versions.title') }} · {{ enumLabel('catalog_type', type) }}</p>
           <h1 class="truncate text-xl font-bold text-title">{{ name || `#${id}` }}</h1>

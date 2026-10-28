@@ -11,7 +11,7 @@ export const floatingLayer = (anchor: Element): HTMLElement | 'body' => anchor.c
 
 /**
  * The element a trigger wrapper (UiTooltip's or UiPopover's box-less `data-ui-trigger` span) stands for: its first
- * element, looking through wrappers nested in it, e.g. a UiIconButton (which has a tooltip) as a popover's trigger.
+ * element, looking through wrappers nested in it, e.g. an icon-only UiButton (which has a tooltip) as a popover's trigger.
  */
 export const triggerIn = (wrapper: Element | null) => {
   let element = wrapper?.firstElementChild ?? null

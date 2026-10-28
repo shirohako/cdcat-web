@@ -37,12 +37,11 @@
     />
 
     <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
-      <button type="button" class="btn btn-primary shadow-xs transition active:translate-y-px" :disabled="draft.busy.value || !totalChanges" @click="submit">
-        <span v-if="draft.busy.value" class="loading loading-spinner loading-xs" />
+      <UiButton variant="primary" class="shadow-xs active:translate-y-px" :disabled="!totalChanges" :loading="draft.busy.value" @click="submit">
         {{ $t(canAutoApprove ? 'editor.submit_publish' : 'editor.submit_review') }}
-      </button>
-      <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</button>
-      <button v-if="draft.persisted.value" type="button" class="btn btn-sm bg-danger/10 text-danger hover:bg-danger/20 ring-1 ring-inset ring-danger/20 shadow-xs transition active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</button>
+      </UiButton>
+      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</UiButton>
+      <UiButton v-if="draft.persisted.value" variant="danger-soft" size="sm" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
       <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
 
@@ -61,11 +60,11 @@
       </ul>
       <template #footer>
         <template v-if="check.kind === 'suggested'">
-          <button type="button" class="btn btn-sm ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.improve') }}</button>
-          <button type="button" class="btn btn-sm btn-primary shadow-xs transition active:translate-y-px" @click="send">{{ $t('editor.check.submit_anyway') }}</button>
+          <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.improve') }}</UiButton>
+          <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" @click="send">{{ $t('editor.check.submit_anyway') }}</UiButton>
         </template>
-        <button v-else-if="check.kind === 'required'" type="button" class="btn btn-sm btn-primary shadow-xs transition active:translate-y-px" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.go_fill') }}</button>
-        <button v-else type="button" class="btn btn-sm btn-primary shadow-xs transition active:translate-y-px" @click="checkOpen = false">{{ $t('common.got_it') }}</button>
+        <UiButton v-else-if="check.kind === 'required'" variant="primary" size="sm" class="shadow-xs active:translate-y-px" @click="goTo(check.items[0]?.section)">{{ $t('editor.check.go_fill') }}</UiButton>
+        <UiButton v-else variant="primary" size="sm" class="shadow-xs active:translate-y-px" @click="checkOpen = false">{{ $t('common.got_it') }}</UiButton>
       </template>
     </UiDialog>
   </div>

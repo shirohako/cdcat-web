@@ -52,7 +52,7 @@ useHead({ title: '群发' })
         <h1 class="text-3xl font-bold">群发</h1>
         <p class="mt-2 text-sm text-slate-600">按邮件类型给订阅的用户发邮件。除重要通知外，每封邮件都带退订链接；收件人收到的是自己邮件语言的版本。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="openCreate">新建群发</button>
+      <UiButton variant="primary" @click="openCreate">新建群发</UiButton>
     </header>
 
     <p v-if="data && !data.configured" role="alert" class="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">服务器还没有配置群发（缺少 MAIL_BULK_MAILER 或 APP_KEY），现在只能编辑和预览，不能发送。</p>
@@ -71,8 +71,8 @@ useHead({ title: '群发' })
         </label>
         <p v-if="message" role="alert" class="text-red-700 sm:col-span-2">{{ message }}</p>
         <div class="flex gap-2 sm:col-span-2">
-          <button type="submit" :disabled="busy || !form.mail_category_id" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">创建草稿</button>
-          <button type="button" class="rounded-lg border px-4 py-2" @click="creating = false">取消</button>
+          <UiButton type="submit" variant="primary" :disabled="busy || !form.mail_category_id">创建草稿</UiButton>
+          <UiButton @click="creating = false">取消</UiButton>
         </div>
       </form>
     </section>
@@ -84,7 +84,7 @@ useHead({ title: '群发' })
           <option value="">全部状态</option>
           <option v-for="status in statuses" :key="status" :value="status">{{ mailCampaignStatusLabels[status] }}</option>
         </select>
-        <button type="submit" class="rounded-lg bg-slate-900 px-3 py-2 text-white">应用</button>
+        <UiButton type="submit" variant="primary">应用</UiButton>
       </form>
     </AdminFilterBar>
 

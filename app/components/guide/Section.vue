@@ -103,7 +103,7 @@ async function copyLink() {
         {{ sectionNumber(index) }}
       </span>
       <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[22px]">{{ section.title }}</h2>
-      <UiIconButton
+      <UiButton
         icon="lucide:link"
         :label="t('legal.copy_link')"
         size="sm"

@@ -115,15 +115,10 @@ async function posted(post: DiscussionPost, incoming: DiscussionReferences, last
       <div class="card p-4 sm:p-5">
         <template v-if="topic.viewer.can.reply">
           <LazyDiscussionComposer v-if="composerOpen" ref="composer" :topic-id="topicId" autofocus @posted="posted" @cancel="composerOpen = false" />
-          <button
-            v-else type="button"
-            class="flex w-full items-center gap-2 rounded-xl border border-dashed border-line px-4 py-3 text-left text-sm text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
-            @click="composerOpen = true">
-            <PenLine :size="15" />{{ t('discussions.comments.write') }}
-          </button>
+          <UiButton v-else variant="add" block :icon="PenLine" @click="composerOpen = true">{{ t('discussions.comments.write') }}</UiButton>
         </template>
         <p v-else-if="!isAuthenticated" class="text-center text-sm text-meta">
-          <NuxtLink :to="{ path: '/auth/login', query: { redirect: `${route.path}#comments` } }" class="link font-medium">{{ t('discussions.comments.login') }}</NuxtLink>
+          <UiButton :to="{ path: '/auth/login', query: { redirect: `${route.path}#comments` } }" size="sm">{{ t('discussions.comments.login') }}</UiButton>
         </p>
         <p v-else class="text-center text-sm text-meta">{{ t('discussions.composer.closed') }}</p>
       </div>

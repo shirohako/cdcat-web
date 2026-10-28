@@ -251,14 +251,12 @@ usePageSeo({
                   {{ t('event_page.checklist.title') }}
                   <span class="tabular-nums opacity-60">{{ checklist.ids.value.size }}</span>
                 </button>
-                <button v-if="filtering" type="button" class="inline-flex items-center gap-1 px-2 text-xs font-medium text-meta transition-colors duration-150 ease-out hover:text-primary" @click="clearFilters">
-                  <X :size="13" />{{ t('event_page.filters.clear') }}
-                </button>
+                <UiButton v-if="filtering" size="xs" :icon="X" @click="clearFilters">{{ t('event_page.filters.clear') }}</UiButton>
                 <span class="ml-auto flex items-center gap-3 text-xs text-meta">
                   <span v-if="filtering">{{ t('event_page.filters.matching', { count: filtered.length, total: circles.length }) }}</span>
-                  <button type="button" class="inline-flex items-center gap-1.5 transition-colors duration-150 ease-out hover:text-primary" :aria-pressed="colorByGenre" @click="colorByGenre = !colorByGenre">
-                    <Palette :size="14" />{{ colorByGenre ? t('event_page.map.color_genre') : t('event_page.map.color_plain') }}
-                  </button>
+                  <UiButton size="xs" :icon="Palette" :pressed="colorByGenre" @click="colorByGenre = !colorByGenre">
+                    {{ colorByGenre ? t('event_page.map.color_genre') : t('event_page.map.color_plain') }}
+                  </UiButton>
                 </span>
               </div>
             </header>
@@ -328,16 +326,16 @@ usePageSeo({
                 <div v-if="followedHall" class="mb-3 flex flex-wrap items-center gap-2 rounded-xl border border-info/25 bg-info/10 px-3 py-2 text-sm text-body">
                   <MapPin :size="15" class="shrink-0 text-info" />
                   <span>{{ t('event_page.circles.following', { hall: followedHall.name, count: listCircles.length }) }}</span>
-                  <button type="button" class="link ml-auto font-medium" @click="followMap = false">{{ t('event_page.circles.show_all_halls') }}</button>
+                  <UiButton size="xs" class="ml-auto" @click="followMap = false">{{ t('event_page.circles.show_all_halls') }}</UiButton>
                 </div>
-                <button
+                <UiButton
                   v-else-if="!followMap && mapHall && !hall"
-                  type="button"
-                  class="link mb-3 text-xs"
+                  size="xs"
+                  class="mb-3"
                   @click="followMap = true"
                 >
                   {{ t('event_page.circles.follow_map') }}
-                </button>
+                </UiButton>
                 <EventCircleList
                   :circles="listCircles"
                   :genres="genres"
@@ -356,16 +354,18 @@ usePageSeo({
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" :class="{ 'pointer-events-none opacity-60': albumsRefetching }">
                   <div v-for="album in albumData.albums" :key="album.id" class="space-y-1.5">
                     <AlbumCard :album="album" />
-                    <button
+                    <UiButton
                       v-if="albumCircle.get(album.id)"
-                      type="button"
-                      class="flex w-full items-center gap-1.5 rounded-lg px-1.5 py-1 text-left text-xs text-body transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-primary"
+                      size="xs"
+                      :icon="MapPin"
+                      icon-class="size-3.5 text-primary"
+                      block
+                      class="justify-start"
                       @click="select(albumCircle.get(album.id)!.id)"
                     >
-                      <MapPin :size="13" class="shrink-0 text-primary" />
-                      <span class="font-mono font-semibold text-title">{{ albumCircle.get(album.id)!.space_code ?? t('event_page.circle.catalog_only') }}</span>
-                      <span class="truncate">{{ albumCircle.get(album.id)!.name }}</span>
-                    </button>
+                      <span class="font-mono text-title">{{ albumCircle.get(album.id)!.space_code ?? t('event_page.circle.catalog_only') }}</span>
+                      <span class="truncate font-normal">{{ albumCircle.get(album.id)!.name }}</span>
+                    </UiButton>
                   </div>
                 </div>
                 <CommonPagination :page="albumPage" :total-pages="albumData.pagination.last_page" :disabled="albumsRefetching" @update:page="albumPage = $event" />

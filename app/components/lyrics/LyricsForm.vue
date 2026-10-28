@@ -46,10 +46,8 @@
     <p v-if="errorMessage" class="text-sm text-danger">{{ errorMessage }}</p>
     <p class="text-[11px] text-meta">{{ $t('lyrics_ui.moderation_hint') }}</p>
     <div class="flex justify-end gap-2">
-      <button type="button" class="btn btn-sm btn-ghost" @click="$emit('cancel')">{{ $t('common.cancel') }}</button>
-      <button type="submit" class="btn btn-sm btn-primary" :disabled="saving">
-        <span v-if="saving" class="loading loading-spinner loading-xs" />{{ $t('common.save') }}
-      </button>
+      <UiButton size="sm" @click="$emit('cancel')">{{ $t('common.cancel') }}</UiButton>
+      <UiButton type="submit" variant="primary" size="sm" :loading="saving">{{ $t('common.save') }}</UiButton>
     </div>
   </form>
 </template>

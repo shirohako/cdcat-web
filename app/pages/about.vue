@@ -151,9 +151,19 @@
           </div>
           <h3 class="mt-3 font-semibold leading-6 text-title">{{ guide.title }}</h3>
           <p class="mt-1.5 text-sm leading-6 text-body">{{ guide.desc }}</p>
+          <!-- One small button tinted with the step's colour (the text keeps the title colour, so it reads on the
+               tint); a step without a guide yet gets the same button, disabled. -->
           <div class="mt-auto pt-4">
-            <UiLink v-if="guide.link" :to="guide.link" class="text-sm">{{ t('common.view') }}</UiLink>
-            <p v-else class="text-xs text-meta">{{ t('common.coming_soon') }}</p>
+            <UiButton
+              :to="guide.link ?? undefined"
+              :disabled="!guide.link"
+              :icon="guide.link ? undefined : 'lucide:hourglass'"
+              size="sm"
+              class="group/view [--ui-btn-active:color-mix(in_oklab,var(--accent)_42%,transparent)] [--ui-btn-bg:var(--accent-soft)] [--ui-btn-color:var(--title)] [--ui-btn-hover:color-mix(in_oklab,var(--accent)_32%,transparent)]"
+            >
+              {{ guide.link ? t('common.view') : t('common.coming_soon') }}
+              <Icon v-if="guide.link" name="lucide:arrow-right" class="size-4 transition-transform duration-150 ease-out group-hover/view:translate-x-0.5" />
+            </UiButton>
           </div>
           <!-- In the gap to the next step, level with the middle of the illustration. -->
           <Icon

@@ -86,14 +86,13 @@
                 class="input h-11 flex-1"
                 required
               />
-              <button
-                type="button"
-                @click="sendVerificationCode"
+              <UiButton
                 :disabled="!formData.email || countdown > 0 || isSendingCode"
-                class="btn h-11 shrink-0"
+                class="shrink-0"
+                @click="sendVerificationCode"
               >
                 {{ countdown > 0 ? `${countdown}s` : $t('auth.register.send_code') }}
-              </button>
+              </UiButton>
             </div>
           </div>
 
@@ -209,16 +208,18 @@
           </div>
 
           <!-- Submit Button -->
-          <button
+          <UiButton
             type="submit"
-            class="btn btn-primary flex w-full h-11"
-            :disabled="!isFormValid || isLoading"
+            variant="primary"
+            size="lg"
+            :icon="UserPlus"
+            :loading="isLoading"
+            :disabled="!isFormValid"
+            block
           >
-            <div v-if="isLoading" class="loading loading-spinner"></div>
-            <UserPlus v-else :size="20" />
             <span>{{ isLoading ? $t('auth.register.creating_account') : $t('auth.register.create_account') }}</span>
             <ArrowRight v-if="!isLoading" :size="18" class="transition-transform duration-150 ease-out group-hover:translate-x-1" />
-          </button>
+          </UiButton>
         </form>
 
         <!-- Login Link -->

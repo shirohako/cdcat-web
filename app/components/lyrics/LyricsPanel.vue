@@ -23,9 +23,7 @@
 
     <UiEmpty v-else-if="!lyrics.length" :title="$t('album.empty.lyrics_title')" :description="$t('lyrics_ui.empty_hint')" :icon="FileText">
       <template v-if="canSubmit" #actions>
-        <button type="button" class="btn btn-sm btn-primary gap-1" @click="startNew">
-          <Plus :size="14" />{{ $t('lyrics_ui.submit_lyrics_or_translation') }}
-        </button>
+        <UiButton variant="primary" size="sm" :icon="Plus" @click="startNew">{{ $t('lyrics_ui.submit_lyrics_or_translation') }}</UiButton>
       </template>
     </UiEmpty>
 
@@ -45,9 +43,9 @@
             {{ localeName(lyric.language) }}<span class="ml-1 opacity-70">{{ enumLabel('lyric_kind', lyric.kind) }}</span>
           </button>
         </div>
-        <button v-if="canSubmit" type="button" class="btn btn-ghost btn-xs shrink-0 gap-1 text-primary" @click="startNew">
-          <Plus :size="12" /><span class="hidden sm:inline">{{ $t('lyrics_ui.submit_lyrics_or_translation') }}</span>
-        </button>
+        <UiButton v-if="canSubmit" size="xs" :icon="Plus" class="shrink-0" @click="startNew">
+          <span class="hidden sm:inline">{{ $t('lyrics_ui.submit_lyrics_or_translation') }}</span>
+        </UiButton>
       </div>
 
       <div v-if="companions.length" class="mt-2.5 flex flex-wrap items-center gap-1.5 text-xs text-meta">
@@ -89,10 +87,10 @@
           <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate transition-colors hover:text-primary">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
           <span v-else-if="current.source" class="max-w-[16rem] truncate">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</span>
           <span class="ml-auto flex items-center gap-1">
-            <NuxtLink :to="`/lyrics/${current.id}/versions`" class="rounded px-1.5 py-0.5 transition-colors hover:bg-ghost-hover hover:text-primary">{{ $t('versions.short', { version: current.version }) }}</NuxtLink>
+            <UiButton :to="`/lyrics/${current.id}/versions`" size="xs">{{ $t('versions.short', { version: current.version }) }}</UiButton>
             <template v-if="canSubmit">
-              <button type="button" class="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-ghost-hover hover:text-primary" :title="$t('common.edit')" :aria-label="$t('common.edit')" @click="editing = 'edit'"><Pencil :size="12" /></button>
-              <button type="button" class="flex h-6 w-6 items-center justify-center rounded transition-colors hover:bg-danger/10 hover:text-danger" :title="$t('common.delete')" :aria-label="$t('common.delete')" @click="remove"><Trash2 :size="12" /></button>
+              <UiButton size="xs" :icon="Pencil" :label="$t('common.edit')" @click="editing = 'edit'" />
+              <UiButton variant="danger-soft" size="xs" :icon="Trash2" :label="$t('common.delete')" @click="remove" />
             </template>
           </span>
         </div>

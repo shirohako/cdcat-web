@@ -56,7 +56,7 @@ useSeoMeta({ title: () => q.value ? t('discussions.search.title_for', { q: q.val
           <Search :size="16" class="text-meta" />
           <input v-model="input" type="search" maxlength="100" autofocus class="h-11 flex-1 bg-transparent text-sm text-title outline-none placeholder:text-faint" :placeholder="t('discussions.search.placeholder')">
         </label>
-        <button type="submit" class="btn btn-primary">{{ t('discussions.search.submit') }}</button>
+        <UiButton type="submit" variant="primary">{{ t('discussions.search.submit') }}</UiButton>
       </form>
       <div class="mt-3 flex flex-wrap items-center gap-2">
         <button

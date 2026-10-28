@@ -61,11 +61,10 @@
         <div v-if="errorMessage" class="mx-6 rounded-xl border border-danger/25 bg-danger/10 px-4 py-2.5 text-sm text-danger">{{ errorMessage }}</div>
 
         <div class="flex shrink-0 items-center justify-end gap-2 border-t border-line px-6 py-4">
-          <button type="button" class="btn btn-ghost btn-sm" @click="emit('close')">{{ $t('common.cancel') }}</button>
-          <button type="button" class="btn btn-primary btn-sm gap-1.5" :disabled="!canSubmit || submitting" @click="submit">
-            <Loader2 v-if="submitting" :size="14" class="animate-spin" />
+          <UiButton size="sm" @click="emit('close')">{{ $t('common.cancel') }}</UiButton>
+          <UiButton variant="primary" size="sm" :loading="submitting" :disabled="!canSubmit" @click="submit">
             {{ $t(review ? 'reviews.update' : 'reviews.submit') }}
-          </button>
+          </UiButton>
         </div>
       </div>
     </div>
@@ -76,7 +75,7 @@
 import type { AlbumReview, ReviewDraft, ReviewRating } from '~/types/reviews'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { REVIEW_MAX_LENGTH } from '~/types/reviews'
-import { Globe, Loader2, MessageSquare, X } from '@lucide/vue'
+import { Globe, MessageSquare, X } from '@lucide/vue'
 
 const LANGUAGE_CODES = ['zh-Hans', 'zh-Hant', 'ja', 'en', 'ko', 'fr', 'de', 'es', 'pt', 'ru'] as const
 

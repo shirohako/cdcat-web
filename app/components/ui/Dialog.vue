@@ -36,7 +36,7 @@
                 <p v-if="description" class="mt-0.5 text-xs leading-5 text-meta">{{ description }}</p>
               </div>
               <slot name="actions" />
-              <UiIconButton icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 -mt-0.5" @click="close" />
+              <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 -mt-0.5" @click="close" />
             </header>
             <div class="min-h-0 overflow-y-auto px-5 pb-5 pt-1"><slot /></div>
             <footer v-if="$slots.footer" class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">

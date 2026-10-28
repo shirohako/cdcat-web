@@ -113,7 +113,7 @@ useHead({ title: '属性定义' })
         <h1 class="text-3xl font-bold">属性定义</h1>
         <p class="mt-2 max-w-3xl text-sm text-slate-600">记录不值得单独建表的信息，如封面角色、录音地点、BPM。每个属性写清楚填写说明和示例，用户知道才填。key 创建后不能改；已有值的定义不能改值类型，也不能删除，只能停用。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="open()">新建属性</button>
+      <UiButton variant="primary" @click="open()">新建属性</UiButton>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !formOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -162,9 +162,9 @@ useHead({ title: '属性定义' })
             <input v-model="choice.value" required pattern="[a-z0-9_-]+" placeholder="值" class="w-36 rounded-lg border border-slate-300 px-3 py-2 font-mono">
             <input v-model="choice.names['zh-Hans']" :placeholder="`名称（${'zh-Hans'}）`" class="w-40 rounded-lg border border-slate-300 px-3 py-2">
             <input v-model="choice.names.en" required :placeholder="`名称（${'en'}）`" class="w-40 rounded-lg border border-slate-300 px-3 py-2">
-            <button type="button" class="text-red-700" @click="form.choices.splice(index, 1)">删除</button>
+            <UiButton variant="danger-soft" @click="form.choices.splice(index, 1)">删除</UiButton>
           </div>
-          <button type="button" class="rounded-lg border px-3 py-1.5" @click="form.choices.push({ value: '', names: texts() })">添加选项</button>
+          <UiButton variant="add" size="sm" @click="form.choices.push({ value: '', names: texts() })">添加选项</UiButton>
         </fieldset>
         <label class="block">排序
           <input v-model.number="form.sort_order" type="number" min="0" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
@@ -174,8 +174,8 @@ useHead({ title: '属性定义' })
         </label>
         <p v-if="message" role="alert" class="text-red-700 sm:col-span-2">{{ message }}</p>
         <div class="flex gap-2 sm:col-span-2">
-          <button type="submit" :disabled="busy || !form.applies_to.length" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">保存</button>
-          <button type="button" class="rounded-lg border px-4 py-2" @click="formOpen = false">取消</button>
+          <UiButton type="submit" variant="primary" :disabled="busy || !form.applies_to.length">保存</UiButton>
+          <UiButton @click="formOpen = false">取消</UiButton>
         </div>
       </form>
     </section>
@@ -202,8 +202,8 @@ useHead({ title: '属性定义' })
                 <td class="px-3 py-3 text-xs">{{ definition.applies_to.map(subject => attributeDefinitionSubjectLabels[subject]).join('、') }}</td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ definition.values_count }}</td>
                 <td class="px-3 py-3 text-right text-xs">
-                  <button type="button" class="underline" @click="open(definition)">编辑</button>
-                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="definition.values_count > 0" :title="definition.values_count ? '已有值，只能停用。' : undefined" @click="deleting = definition">删除</button>
+                  <UiButton size="xs" @click="open(definition)">编辑</UiButton>
+                  <UiButton variant="danger-soft" size="xs" class="ml-2" :disabled="definition.values_count > 0" :title="definition.values_count ? '已有值，只能停用。' : undefined" @click="deleting = definition">删除</UiButton>
                 </td>
               </tr>
             </tbody>

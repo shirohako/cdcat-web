@@ -4,9 +4,7 @@
       <!-- Header -->
       <div class="mb-5 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <button class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-meta hover:bg-ghost-hover hover:text-primary transition-colors duration-150 ease-out cursor-pointer" @click="$emit('back')">
-            <ArrowLeft :size="16" />
-          </button>
+          <UiButton :icon="ArrowLeft" :label="$t('common.go_back')" size="sm" @click="$emit('back')" />
           <h2 class="flex items-center gap-2.5 text-base font-semibold leading-6 text-title">
             <Music :size="18" class="text-meta" />
             {{ $t('profile.favorite_tracks') }}

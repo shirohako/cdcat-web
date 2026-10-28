@@ -72,7 +72,7 @@ useHead({ title: '链接提供方' })
         <h1 class="text-3xl font-bold">链接提供方</h1>
         <p class="mt-2 text-sm text-slate-600">维护外部链接的名称、图标、类别、URL 规则和显示顺序。仍被引用的提供方不能删除。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="edit()">新建提供方</button>
+      <UiButton variant="primary" @click="edit()">新建提供方</UiButton>
     </header>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !formOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
@@ -87,8 +87,8 @@ useHead({ title: '链接提供方' })
         <label class="block">显示顺序<input v-model.number="form.sort_order" type="number" min="0" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
-          <button type="button" :disabled="busy" class="rounded-lg border px-3 py-2" @click="formOpen = false">取消</button>
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-3 py-2 text-white disabled:opacity-50">{{ busy ? '保存中…' : '保存' }}</button>
+          <UiButton :disabled="busy" @click="formOpen = false">取消</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy">{{ busy ? '保存中…' : '保存' }}</UiButton>
         </div>
       </form>
     </section>
@@ -107,7 +107,7 @@ useHead({ title: '链接提供方' })
                 <td class="px-4 py-3">{{ provider.category }}</td>
                 <td class="max-w-60 truncate px-4 py-3 font-mono text-xs">{{ provider.url_pattern || '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ provider.links_count }}</td>
-                <td class="px-4 py-3"><div class="flex justify-end gap-3 text-xs"><button type="button" class="underline" @click="edit(provider)">编辑</button><button type="button" class="text-red-700" @click="startDelete(provider)">删除</button></div></td>
+                <td class="px-4 py-3"><div class="flex justify-end gap-2"><UiButton size="xs" @click="edit(provider)">编辑</UiButton><UiButton variant="danger-soft" size="xs" @click="startDelete(provider)">删除</UiButton></div></td>
               </tr>
             </tbody>
           </table>

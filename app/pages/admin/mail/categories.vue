@@ -89,7 +89,7 @@ useHead({ title: '邮件类型' })
         <h1 class="text-3xl font-bold">邮件类型</h1>
         <p class="mt-2 text-sm text-slate-600">群发邮件都属于一个类型，用户在设置里按类型订阅或退订。必收类型发给所有正常账号，不能退订。</p>
       </div>
-      <button type="button" class="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white" @click="open()">新建类型</button>
+      <UiButton variant="primary" @click="open()">新建类型</UiButton>
     </header>
 
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
@@ -125,8 +125,8 @@ useHead({ title: '邮件类型' })
         </label>
         <p v-if="message" role="alert" class="text-red-700 sm:col-span-2">{{ message }}</p>
         <div class="flex gap-2 sm:col-span-2">
-          <button type="submit" :disabled="busy" class="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-40">保存</button>
-          <button type="button" class="rounded-lg border px-4 py-2" @click="formOpen = false">取消</button>
+          <UiButton type="submit" variant="primary" :disabled="busy">保存</UiButton>
+          <UiButton @click="formOpen = false">取消</UiButton>
         </div>
       </form>
     </section>
@@ -158,9 +158,12 @@ useHead({ title: '邮件类型' })
                 </td>
                 <td class="px-3 py-3 text-xs tabular-nums">{{ category.sort_order }}</td>
                 <td class="px-3 py-3 text-xs tabular-nums">群发 {{ category.usage.campaigns }} 次 · {{ category.usage.unsubscribed }} 人退订</td>
-                <td class="px-3 py-3 text-right text-xs">
-                  <button type="button" class="underline" @click="open(category)">编辑</button>
-                  <button type="button" class="ml-3 text-red-700 underline disabled:opacity-40" :disabled="category.usage.campaigns > 0" :title="category.usage.campaigns ? '群发用过的类型不能删除，可以停用' : undefined" @click="deleting = category">删除</button>
+                <td class="whitespace-nowrap px-3 py-3 text-right">
+                  <UiButton size="xs" @click="open(category)">编辑</UiButton>
+                  <!-- The hint sits on a wrapper: a disabled button takes no pointer events, so it would show no title. -->
+                  <span class="ml-2" :title="category.usage.campaigns ? '群发用过的类型不能删除，可以停用' : undefined">
+                    <UiButton variant="danger-soft" size="xs" :disabled="category.usage.campaigns > 0" @click="deleting = category">删除</UiButton>
+                  </span>
                 </td>
               </tr>
             </tbody>
