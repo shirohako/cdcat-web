@@ -317,7 +317,7 @@ onMounted(() => {
         }),
         EditorView.theme({
           '&': { minHeight: compact.value ? '6rem' : '18rem', height: '100%', fontSize: '14px', color: 'var(--title)', backgroundColor: 'var(--field)' },
-          '.cm-scroller': { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', lineHeight: '1.65' },
+          '.cm-scroller': { fontFamily: 'var(--font-mono-cjk)', lineHeight: '1.65' },
           '.cm-content': { padding: compact.value ? '8px 0' : '12px 0', caretColor: 'var(--primary)' },
           '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--primary)' },
           '.cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': { backgroundColor: 'var(--selection)' },

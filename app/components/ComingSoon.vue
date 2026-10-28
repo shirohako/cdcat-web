@@ -43,7 +43,7 @@
 <script setup>
 import { ArrowLeft } from '@lucide/vue'
 
-const props = defineProps({
+defineProps({
   backTo: {
     type: String,
     default: '/'

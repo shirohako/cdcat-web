@@ -5,7 +5,7 @@
 
     <!-- 加载状态 -->
     <div v-if="loading" class="flex justify-center py-5">
-      <span class="loading loading-spinner loading-sm"></span>
+      <span class="loading loading-spinner loading-sm"/>
     </div>
 
     <!-- 状态选择 -->

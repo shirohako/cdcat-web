@@ -92,7 +92,7 @@
                       type="text"
                       class="input w-full"
                       :placeholder="t('account_pages.address.recipient_placeholder')"
-                    />
+                    >
                   </div>
 
                   <!-- Phone -->
@@ -104,7 +104,7 @@
                       type="tel"
                       class="input w-full"
                       :placeholder="t('account_pages.address.phone_placeholder')"
-                    />
+                    >
                   </div>
 
                   <!-- Province -->
@@ -116,7 +116,7 @@
                       type="text"
                       class="input w-full"
                       :placeholder="t('account_pages.address.province_placeholder')"
-                    />
+                    >
                   </div>
 
                   <!-- City -->
@@ -128,7 +128,7 @@
                       type="text"
                       class="input w-full"
                       :placeholder="t('account_pages.address.city_placeholder')"
-                    />
+                    >
                   </div>
 
                   <!-- District -->
@@ -140,7 +140,7 @@
                       type="text"
                       class="input w-full"
                       :placeholder="t('account_pages.address.district_placeholder')"
-                    />
+                    >
                   </div>
 
                   <!-- Address -->
@@ -161,7 +161,7 @@
                       v-model="form.isDefault"
                       type="checkbox"
                       class="checkbox checkbox-sm"
-                    />
+                    >
                     <span class="text-sm text-body">{{ t('account_pages.address.set_default') }}</span>
                   </label>
                 </div>

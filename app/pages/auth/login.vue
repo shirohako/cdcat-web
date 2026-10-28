@@ -2,10 +2,10 @@
   <div class="min-h-screen relative overflow-hidden flex flex-col items-center justify-center p-4 gap-4">
     <!-- Decorative Background -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"></div>
-      <div class="absolute rounded-full bg-radial from-primary/15 to-transparent to-70% blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-radial from-primary/10 to-transparent to-70% [animation-delay:2s]"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-radial from-primary/15 to-transparent to-70% [animation-delay:4s]"></div>
+      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"/>
+      <div class="absolute rounded-full bg-radial from-primary/15 to-transparent to-70% blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"/>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-radial from-primary/10 to-transparent to-70% [animation-delay:2s]"/>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-radial from-primary/15 to-transparent to-70% [animation-delay:4s]"/>
     </div>
 
     <!-- Login Card -->
@@ -28,7 +28,7 @@
         </UiAlert>
 
         <!-- Login Form -->
-        <form @submit.prevent="handleLogin" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
+        <form class="space-y-4 animate-[fade-in_0.7s_ease_both]" @submit.prevent="handleLogin">
           <!-- Email Input -->
           <div class="flex flex-col gap-2">
             <label for="email" class="flex items-center gap-2 text-sm font-semibold text-body">
@@ -42,7 +42,7 @@
               :placeholder="$t('auth.login.email_placeholder')"
               class="input w-full h-11"
               required
-            />
+            >
           </div>
 
           <!-- Password Input -->
@@ -59,11 +59,11 @@
                 :placeholder="$t('auth.login.password_placeholder')"
                 class="input w-full h-11 pr-12"
                 required
-              />
+              >
               <button
                 type="button"
-                @click="showPassword = !showPassword"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-meta hover:text-primary transition-colors"
+                @click="showPassword = !showPassword"
               >
                 <Eye v-if="!showPassword" :size="20" />
                 <EyeOff v-if="showPassword" :size="20" />
@@ -78,7 +78,7 @@
                 v-model="formData.remember"
                 type="checkbox"
                 class="checkbox checkbox-sm cursor-pointer"
-              />
+              >
               <span class="text-body group-hover:text-title transition-colors">{{ $t('auth.login.remember_me') }}</span>
             </label>
             <NuxtLink
@@ -107,7 +107,7 @@
         <!-- Divider -->
         <div class="relative my-6">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-line"></div>
+            <div class="w-full border-t border-line"/>
           </div>
           <div class="relative flex justify-center text-xs uppercase">
             <span class="bg-card px-3 text-meta font-semibold tracking-wider">{{ $t('auth.login.or_use') }}</span>

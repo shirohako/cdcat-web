@@ -38,7 +38,7 @@
                   :src="artist.image_url"
                   :alt="artist.name"
                   class="w-full h-full object-cover"
-                />
+                >
                 <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:mic-2" class="w-6 h-6" />
                 </div>

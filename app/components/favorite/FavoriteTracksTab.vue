@@ -55,7 +55,7 @@
                       :src="track.album.image_url"
                       :alt="track.album?.title || track.title"
                       class="w-full h-full object-cover"
-                    />
+                    >
                     <div v-else class="w-full h-full flex items-center justify-center text-faint">
                       <Icon name="lucide:disc-3" class="w-4 h-4" />
                     </div>
@@ -110,7 +110,7 @@
                 :src="track.album.image_url"
                 :alt="track.title"
                 class="w-full h-full object-cover"
-              />
+              >
               <div v-else class="w-full h-full flex items-center justify-center text-faint">
                 <Icon name="lucide:disc-3" class="w-6 h-6" />
               </div>
@@ -151,8 +151,8 @@
       </div>
 
       <CommonPagination
-        class="mt-4"
         v-model:page="page"
+        class="mt-4"
         :total-pages="totalPages"
         :disabled="isLoading"
       />

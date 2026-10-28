@@ -3,7 +3,7 @@
  */
 
 // 成功响应
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: true
   data: T
   meta?: ApiMeta
@@ -15,7 +15,7 @@ export interface ApiMeta {
   pageSize?: number
   total?: number
   totalPages?: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // 错误响应
@@ -25,7 +25,7 @@ export interface ApiErrorResponse {
     code: string | number
     name: string
     message: string
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 

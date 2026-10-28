@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { getEmojiFlag, getCountryData, countries as allCountryCodes } from 'countries-list'
+import { getEmojiFlag, getCountryData } from 'countries-list'
 
 defineOptions({ inheritAttrs: false })
 

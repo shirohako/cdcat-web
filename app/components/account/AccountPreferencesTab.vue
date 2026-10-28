@@ -43,7 +43,7 @@
                   type="radio"
                   :value="1"
                   class="radio radio-sm"
-                />
+                >
                 <span class="text-sm text-body">{{ t('account_pages.preferences.male') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
@@ -52,7 +52,7 @@
                   type="radio"
                   :value="2"
                   class="radio radio-sm"
-                />
+                >
                 <span class="text-sm text-body">{{ t('account_pages.preferences.female') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
@@ -61,7 +61,7 @@
                   type="radio"
                   :value="3"
                   class="radio radio-sm"
-                />
+                >
                 <span class="text-sm text-body">{{ t('account_pages.preferences.other') }}</span>
               </label>
               <label class="flex items-center gap-2 cursor-pointer">
@@ -70,7 +70,7 @@
                   type="radio"
                   :value="0"
                   class="radio radio-sm"
-                />
+                >
                 <span class="text-sm text-body">{{ t('account_pages.preferences.undisclosed') }}</span>
               </label>
             </div>
@@ -88,7 +88,7 @@
                 type="checkbox"
                 class="toggle"
                 :aria-label="t('account_pages.preferences.adult_content')"
-              />
+              >
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@
           <p v-if="statusMessage" :class="statusClass" class="text-xs font-medium">
             {{ statusMessage }}
           </p>
-          <div v-else></div>
+          <div v-else/>
           <UiButton variant="primary" size="sm" :icon="Save" :loading="isSaving" :disabled="!hasChanges" @click="saveSettings">
             {{ t('account_pages.preferences.save') }}
           </UiButton>

@@ -8,6 +8,7 @@ import type {
   FavoriteTrack,
   FavoriteArtist,
 } from '~/types/favorites'
+import type { Pagination } from '~/types/api'
 
 export type FavoriteType = 'albums' | 'artists' | 'tracks'
 
@@ -22,10 +23,10 @@ export const useFavorites = () => {
   const getFavoriteAlbums = async (
     page: number = 1,
     perPage: number = 15
-  ): Promise<{ albums: FavoriteAlbum[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/me/favorites/albums', {
+  ): Promise<{ albums: FavoriteAlbum[]; pagination: Pagination }> => {
+    return await $api<{ albums: FavoriteAlbum[]; pagination: Pagination }>('/v1/me/favorites/albums', {
       params: { page, per_page: perPage }
-    }) as any
+    })
   }
 
   // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变
@@ -37,10 +38,10 @@ export const useFavorites = () => {
   const getFavoriteTracks = async (
     page: number = 1,
     perPage: number = 15
-  ): Promise<{ tracks: FavoriteTrack[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/me/favorites/tracks', {
+  ): Promise<{ tracks: FavoriteTrack[]; pagination: Pagination }> => {
+    return await $api<{ tracks: FavoriteTrack[]; pagination: Pagination }>('/v1/me/favorites/tracks', {
       params: { page, per_page: perPage }
-    }) as any
+    })
   }
 
   // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变
@@ -52,10 +53,10 @@ export const useFavorites = () => {
   const getFavoriteArtists = async (
     page: number = 1,
     perPage: number = 15
-  ): Promise<{ artists: FavoriteArtist[]; pagination: { total: number; per_page: number; current_page: number; last_page: number } }> => {
-    return await $api('/v1/me/favorites/artists', {
+  ): Promise<{ artists: FavoriteArtist[]; pagination: Pagination }> => {
+    return await $api<{ artists: FavoriteArtist[]; pagination: Pagination }>('/v1/me/favorites/artists', {
       params: { page, per_page: perPage }
-    }) as any
+    })
   }
 
   // 收藏或取消收藏：PUT 收藏、DELETE 取消，重复请求结果不变

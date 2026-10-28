@@ -62,9 +62,9 @@ import type { AlbumTrackingStats } from '~/types/album'
 import { BarChart3, Eye, Heart, Headphones, CircleCheck, Bookmark, Package, CircleX } from "@lucide/vue"
 
 withDefaults(defineProps<{
-  viewsCount: number
-  favoritesCount: number
-  trackingStats: AlbumTrackingStats
+  viewsCount?: number
+  favoritesCount?: number
+  trackingStats?: AlbumTrackingStats
 }>(), {
   viewsCount: 0,
   favoritesCount: 0,

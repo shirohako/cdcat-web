@@ -37,7 +37,7 @@
                 class="input input-sm flex-1 text-sm"
                 placeholder="https://example.com/avatar.jpg"
                 @input="onAvatarUrlInput"
-              />
+              >
               <UiButton
                 variant="primary"
                 size="sm"
@@ -64,7 +64,7 @@
               type="url"
               class="input flex-1"
               placeholder="https://example.com/banner.jpg"
-            />
+            >
             <UiButton
               v-if="form.banner?.trim() && form.banner.trim() === originalBanner"
               size="sm"
@@ -103,7 +103,7 @@
               class="input flex-1"
               placeholder="unique_username"
               @change="validateUsername"
-            />
+            >
             <UiButton
               variant="primary"
               size="sm"
@@ -131,7 +131,7 @@
               type="text"
               class="input flex-1"
               :placeholder="t('account_pages.profile.nickname_placeholder')"
-            />
+            >
             <UiButton
               variant="primary"
               size="sm"
@@ -184,7 +184,7 @@
         <p v-if="bioStatus" :class="bioStatus.class">
           {{ bioStatus.message }}
         </p>
-        <div v-else></div>
+        <div v-else/>
         <UiButton variant="primary" size="sm" :icon="Save" :loading="isUpdatingBio" :disabled="!isBioChanged" @click="updateBio">
           {{ t('account_pages.profile.update_bio') }}
         </UiButton>

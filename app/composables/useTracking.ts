@@ -9,14 +9,40 @@ import type {
   TrackingStats,
   GetTrackingAlbumsResponse
 } from '~/types/tracking'
+import type { Pagination } from '~/types/api'
+
+/** 一条追踪记录（API 的 album.tracking） */
+interface ApiTracking {
+  id?: number
+  status?: TrackingStatus
+  created_at?: string
+  updated_at?: string
+}
+
+/** API 返回的专辑，追踪信息在 tracking 里 */
+interface ApiTrackingItem {
+  id: number
+  title?: string
+  image_url?: string
+  release_date?: string
+  catalog_number?: string
+  disc_count?: number
+  track_count?: number
+  type?: TrackingAlbum['type']
+  byline?: TrackingAlbum['byline']
+  status?: TrackingStatus
+  tracking?: ApiTracking | null
+}
+
+type ApiTrackingStats = Partial<Omit<TrackingStats, 'total'>>
 
 /**
  * 将 API 返回的 album+tracking 数据映射为前端 TrackingAlbum 类型
  * API 返回的是 album 对象，tracking 信息嵌套在 album.tracking 中
  */
-const mapApiTracking = (item: any): TrackingAlbum => {
-  const tracking = item.tracking || {}
-  const statusRaw = tracking.status ?? item.status
+const mapApiTracking = (item: ApiTrackingItem): TrackingAlbum => {
+  const tracking: ApiTracking = item.tracking || {}
+  const statusRaw = (tracking.status ?? item.status) as TrackingStatus
   return {
     id: item.id,
     albumId: item.id,
@@ -48,7 +74,7 @@ export const useTracking = () => {
     page: number = 1,
     pageSize: number = 12
   ): Promise<GetTrackingAlbumsResponse> => {
-    const response = await $api<any>('/v1/me/tracking/albums', {
+    const response = await $api<{ albums?: ApiTrackingItem[]; data?: ApiTrackingItem[]; pagination?: Partial<Pagination> }>('/v1/me/tracking/albums', {
       params: {
         status,
         page,
@@ -71,7 +97,7 @@ export const useTracking = () => {
    * 获取追踪统计信息
    */
   const getTrackingStats = async (): Promise<TrackingStats> => {
-    const response = await $api<any>('/v1/me/tracking/stats')
+    const response = await $api<ApiTrackingStats & { stats?: ApiTrackingStats; total?: number }>('/v1/me/tracking/stats')
 
     const stats = response.stats ?? response
 
@@ -91,11 +117,11 @@ export const useTracking = () => {
    */
   const getAlbumTracking = async (albumId: number): Promise<{ status: TrackingStatus | null; trackingId: number | null }> => {
     try {
-      const response = await $api<any>(`/v1/me/tracking/albums/${albumId}`)
+      const response = await $api<ApiTracking & { tracking?: ApiTracking | null }>(`/v1/me/tracking/albums/${albumId}`)
       const tracking = response.tracking ?? response
       return { status: tracking?.status ?? null, trackingId: tracking?.id ?? null }
-    } catch (error: any) {
-      if (error.statusCode === 404) {
+    } catch (error) {
+      if ((error as { status?: number }).status === 404) {
         return { status: null, trackingId: null }
       }
       throw error
@@ -108,7 +134,7 @@ export const useTracking = () => {
    * @param status 追踪状态
    */
   const setAlbumTracking = async (albumId: number, status: TrackingStatus): Promise<{ status: TrackingStatus; id: number }> => {
-    const response = await $api<any>(`/v1/me/tracking/albums/${albumId}`, {
+    const response = await $api<{ status: TrackingStatus; id: number }>(`/v1/me/tracking/albums/${albumId}`, {
       method: 'PUT',
       body: { status }
     })

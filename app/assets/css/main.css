@@ -347,6 +347,22 @@
 
     /* 等宽字体 */
     --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
+
+    /* 当前语言的中日文字体，下面按 html[lang] 换 */
+    --font-sans-cjk: var(--font-sans-zh-hans), var(--font-sans-ja);
+
+    /* Markdown 编辑器：西文和代码等宽，中日文落到网站的思源黑体（等宽字体都没有 CJK 字形）。
+       generic monospace 放最后，免得系统先拿它的 CJK 兜底 */
+    --font-mono-cjk: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco,
+      var(--font-sans-cjk), monospace;
+  }
+
+  html[lang="zh-Hant"] {
+    --font-sans-cjk: var(--font-sans-zh-hant);
+  }
+
+  html[lang="ja"] {
+    --font-sans-cjk: var(--font-sans-ja);
   }
 
   /* In-page jumps (anchors, back to top, a post scrolled into view) glide; page switches and restored positions

@@ -22,7 +22,7 @@
             :src="article.cover_url"
             :alt="article.title"
             class="w-full h-full object-cover"
-          />
+          >
           <div v-else class="w-full h-full flex items-center justify-center">
             <FileText :size="18" class="text-faint" />
           </div>

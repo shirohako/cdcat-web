@@ -2,10 +2,10 @@
   <div class="min-h-screen relative overflow-hidden flex items-center justify-center p-4">
     <!-- Decorative Background -->
     <div class="absolute inset-0 pointer-events-none overflow-hidden">
-      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"></div>
-      <div class="absolute rounded-full bg-radial from-primary/15 to-transparent to-70% blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-radial from-primary/10 to-transparent to-70% [animation-delay:2s]"></div>
-      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-radial from-primary/15 to-transparent to-70% [animation-delay:4s]"></div>
+      <div class="absolute bottom-0 inset-x-0 h-[40%] bg-[linear-gradient(var(--line)_1px,transparent_1px),linear-gradient(90deg,var(--line)_1px,transparent_1px)] bg-size-[50px_50px] mask-[linear-gradient(to_top,black_0%,transparent_100%)] animate-[grid-flow_20s_linear_infinite]"/>
+      <div class="absolute rounded-full bg-radial from-primary/15 to-transparent to-70% blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-75 h-75 -bottom-25 -left-12.5"/>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-62.5 h-62.5 -bottom-20 right-[20%] bg-radial from-primary/10 to-transparent to-70% [animation-delay:2s]"/>
+      <div class="absolute rounded-full blur-2xl animate-[float-circle_15s_ease-in-out_infinite] w-50 h-50 -bottom-15 -right-7.5 bg-radial from-primary/15 to-transparent to-70% [animation-delay:4s]"/>
     </div>
 
     <!-- Card -->
@@ -50,7 +50,7 @@
           </UiAlert>
 
           <!-- Email Form -->
-          <form @submit.prevent="handleSendCode" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
+          <form class="space-y-4 animate-[fade-in_0.7s_ease_both]" @submit.prevent="handleSendCode">
             <div class="flex flex-col gap-2">
               <label for="email" class="flex items-center gap-2 text-sm font-semibold text-body">
                 <Mail :size="16" />
@@ -63,7 +63,7 @@
                 placeholder="example@email.com"
                 class="input w-full h-11"
                 required
-              />
+              >
             </div>
 
             <UiButton
@@ -127,7 +127,7 @@
           </UiAlert>
 
           <!-- Reset Form -->
-          <form @submit.prevent="handleResetPassword" class="space-y-4 animate-[fade-in_0.7s_ease_both]">
+          <form class="space-y-4 animate-[fade-in_0.7s_ease_both]" @submit.prevent="handleResetPassword">
             <!-- Verification Code -->
             <div class="flex flex-col gap-2">
               <label for="verificationCode" class="flex items-center gap-2 text-sm font-semibold text-body">
@@ -143,7 +143,7 @@
                   maxlength="6"
                   class="input h-11 flex-1"
                   required
-                />
+                >
                 <UiButton
                   :disabled="countdown > 0 || isSendingCode"
                   class="shrink-0"
@@ -169,11 +169,11 @@
                   class="input w-full h-11 pr-12"
                   required
                   minlength="8"
-                />
+                >
                 <button
                   type="button"
-                  @click="showPassword = !showPassword"
                   class="absolute right-3 top-1/2 -translate-y-1/2 text-meta hover:text-primary transition-colors"
+                  @click="showPassword = !showPassword"
                 >
                   <Eye v-if="!showPassword" :size="20" />
                   <EyeOff v-if="showPassword" :size="20" />
@@ -186,7 +186,7 @@
                   :key="i"
                   class="h-1 flex-1 rounded-full transition-colors duration-300"
                   :class="passwordStrength >= i ? 'bg-success' : 'bg-line'"
-                ></div>
+                />
               </div>
               <p class="text-xs text-meta mt-1">
                 {{ $t('auth.forgot_password.password_strength') }}:
@@ -208,11 +208,11 @@
                   :placeholder="$t('auth.forgot_password.confirm_placeholder')"
                   class="input w-full h-11 pr-12"
                   required
-                />
+                >
                 <button
                   type="button"
-                  @click="showConfirmPassword = !showConfirmPassword"
                   class="absolute right-3 top-1/2 -translate-y-1/2 text-meta hover:text-primary transition-colors"
+                  @click="showConfirmPassword = !showConfirmPassword"
                 >
                   <Eye v-if="!showConfirmPassword" :size="20" />
                   <EyeOff v-if="showConfirmPassword" :size="20" />

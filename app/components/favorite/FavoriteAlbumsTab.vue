@@ -38,7 +38,7 @@
                   :src="album.image_url"
                   :alt="album.title"
                   class="w-full h-full object-cover"
-                />
+                >
                 <div v-else class="w-full h-full flex items-center justify-center text-faint">
                   <Icon name="lucide:disc-3" class="w-8 h-8 sm:w-10 sm:h-10" />
                 </div>

@@ -2,7 +2,7 @@
   <!-- The article grid counts columns by its own width (container queries), so the frame is the container. -->
   <SkeletonStatus page :class="{ '@container': variant === 'articles' }">
     <div v-if="variant === 'artists'" class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-lg bg-black/[0.025] px-3 py-2.5 dark:bg-white/[0.04]">
+      <div v-for="item in total" :key="item" class="flex items-center gap-2.5 rounded-lg bg-black/[0.045] px-3 py-2.5 dark:bg-white/[0.06]">
         <div class="skeleton size-6 shrink-0 rounded-full" />
         <div class="skeleton h-3 w-3/5 rounded-full" />
       </div>

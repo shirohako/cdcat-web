@@ -59,7 +59,7 @@
               v-for="artist in artistsData"
               :key="artist.id"
               :to="`/artists/${artist.id}`"
-              class="group flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out bg-black/[0.025] hover:bg-black/[0.065] active:bg-black/[0.09] dark:bg-white/[0.04] dark:hover:bg-white/[0.07] dark:active:bg-white/[0.1]"
+              class="group flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out bg-black/[0.045] hover:bg-black/[0.08] active:bg-black/[0.11] dark:bg-white/[0.06] dark:hover:bg-white/[0.09] dark:active:bg-white/[0.12]"
             >
               <div class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card ring-1 ring-line">
                 <img

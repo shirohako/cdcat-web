@@ -2,7 +2,7 @@
  * 认证中间件
  * 保护需要登录才能访问的页面
  */
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to) => {
   const { isAuthenticated } = useAuth()
 
   // 如果用户未登录，重定向到登录页面

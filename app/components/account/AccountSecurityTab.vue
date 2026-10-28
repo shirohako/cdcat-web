@@ -45,7 +45,7 @@
                 class="input w-full"
                 :placeholder="t('account_pages.security.current_placeholder')"
                 @keyup.enter="submitPassword"
-              />
+              >
               <p class="text-xs text-meta">{{ t('account_pages.security.current_hint') }}</p>
             </div>
 
@@ -58,7 +58,7 @@
                 class="input w-full"
                 :placeholder="t('account_pages.security.new_placeholder')"
                 @keyup.enter="submitPassword"
-              />
+              >
               <div v-if="passwordForm.newPassword" class="space-y-1.5 mt-0.5">
                 <div class="flex gap-1">
                   <div
@@ -81,7 +81,7 @@
                 class="input w-full"
                 :placeholder="t('account_pages.security.confirm_placeholder')"
                 @keyup.enter="submitPassword"
-              />
+              >
               <p
                 v-if="passwordForm.confirmPassword && passwordForm.confirmPassword !== passwordForm.newPassword"
                 class="text-xs text-danger"

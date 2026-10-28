@@ -7,7 +7,7 @@
       :alt="article.title"
       class="absolute inset-0 w-full h-full object-cover scale-105"
       style="filter: brightness(0.6)"
-    />
+    >
     <div
       v-else
       class="absolute inset-0 bg-linear-to-br from-primary-strong to-hero"

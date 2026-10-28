@@ -66,7 +66,7 @@
                 type="email"
                 class="input w-full"
                 placeholder="your@email.com"
-              />
+              >
               <p class="text-xs text-meta">{{ t('account_pages.email.invalid') }}</p>
             </div>
 
@@ -82,7 +82,7 @@
                   class="input flex-1"
                   :placeholder="t('account_pages.email.code_placeholder')"
                   @keyup.enter="submit"
-                />
+                >
                 <UiButton
                   size="sm"
                   class="shrink-0"
