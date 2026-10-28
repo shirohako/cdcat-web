@@ -191,7 +191,7 @@ const saveLabel = computed(() => {
   if (!draft.articleId.value) return t('article_ui.writer.not_saved')
   return savedAt.value ? t('article_ui.writer.saved_at', { time: time(savedAt.value) }) : t('article_ui.writer.saved')
 })
-const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: PenLine }, { value: 'split', icon: Columns2 }, { value: 'preview', icon: Eye }]
+const modes = computed(() => (['edit', 'split', 'preview'] as const).map(value => ({ value, icon: { edit: PenLine, split: Columns2, preview: Eye }[value], label: t(`article_ui.writer.modes.${value}`) })))
 </script>
 
 <template>
@@ -210,13 +210,8 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
       </template>
 
       <div class="ml-auto flex items-center gap-1 sm:gap-2">
-        <div class="hidden items-center gap-0.5 rounded-lg bg-sunken p-0.5 ring-1 ring-line md:flex" role="radiogroup" :aria-label="t('article_ui.writer.mode')">
-          <button
-            v-for="item in modes" :key="item.value" type="button" role="radio" :aria-checked="mode === item.value"
-            class="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium transition-colors duration-150 ease-out"
-            :class="mode === item.value ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="mode = item.value">
-            <component :is="item.icon" :size="13" />{{ t(`article_ui.writer.modes.${item.value}`) }}
-          </button>
+        <div class="hidden md:block">
+          <UiSegmented v-model="mode" :items="modes" size="sm" :label="t('article_ui.writer.mode')" />
         </div>
         <button type="button" class="btn btn-ghost btn-sm hidden lg:inline-flex" :aria-pressed="outlineOpen" :title="t('article_ui.writer.outline')" @click="outlineOpen = !outlineOpen">
           <ListTree :size="15" />
@@ -299,14 +294,9 @@ const modes: { value: Mode, icon: typeof PenLine }[] = [{ value: 'edit', icon: P
             :placeholder="t('article_ui.title_placeholder')" :aria-label="t('article_ui.fields.title')" @input="resizeTitle" @keydown.enter.prevent="editor?.focus()" />
           <p v-if="fieldErrors.title" class="-mt-2 px-1 text-xs text-danger">{{ fieldErrors.title }}</p>
           <div class="flex md:hidden">
-            <div class="flex gap-0.5 rounded-lg bg-sunken p-0.5 ring-1 ring-line">
-              <button
-                v-for="item in modes.filter(entry => entry.value !== 'split')" :key="item.value" type="button"
-                class="inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-medium transition-colors duration-150 ease-out"
-                :class="mode === item.value || (mode === 'split' && item.value === 'edit') ? 'bg-card text-primary ring-1 ring-line' : 'text-meta hover:text-title'" @click="mode = item.value">
-                <component :is="item.icon" :size="13" />{{ t(`article_ui.writer.modes.${item.value}`) }}
-              </button>
-            </div>
+            <UiSegmented
+              :model-value="mode === 'split' ? 'edit' : mode" :items="modes.filter(item => item.value !== 'split')" size="sm"
+              :label="t('article_ui.writer.mode')" @update:model-value="value => value && (mode = value)" />
           </div>
           <div class="min-h-0 flex-1">
             <MarkdownEditor
