@@ -190,54 +190,73 @@
 
     <section>
       <UiSectionTitle :title="t('about_page.legal_title')" :description="t('about_page.legal_desc')" size="lg" />
-      <!-- The rows of the lists below, each on its own card, side by side. -->
+      <!-- The rows of the lists below, each on its own card, side by side. Hovering draws a line under the title in
+           the card's colour, fills and tilts its icon, and turns the › into an arrow. -->
       <div class="mt-5 grid gap-4 sm:grid-cols-2">
         <NuxtLink
           v-for="(doc, index) in legalDocs"
           :key="doc.to"
           :to="doc.to"
-          class="group flex items-center gap-4 rounded-lg bg-card px-5 py-4 transition-colors duration-150 ease-out hover:bg-card-hover"
-          :style="{ '--i': index }"
+          class="legal-card accent flex items-center gap-4 rounded-lg bg-card px-5 py-4"
+          :style="{ '--i': index, '--shift': doc.shift }"
           data-reveal
         >
-          <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" :style="{ '--shift': doc.shift }">
+          <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
             <Icon :name="doc.icon" class="size-4.5" />
           </span>
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-title">{{ doc.title }}</p>
+            <p class="title w-fit text-sm font-medium text-title">{{ doc.title }}</p>
             <p class="mt-0.5 text-xs leading-5 text-meta">{{ doc.desc }}</p>
           </div>
-          <Icon name="lucide:chevron-right" class="size-4 shrink-0 text-meta transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+          <span class="trail relative size-4 shrink-0 text-meta" aria-hidden="true">
+            <Icon name="lucide:chevron-right" class="rest absolute inset-0 size-4" />
+            <Icon name="lucide:arrow-right" class="go absolute inset-0 size-4" />
+          </span>
         </NuxtLink>
       </div>
     </section>
 
+    <!-- Two lists of rows inside one card, inset so a hovered row is a rounded block of its own colour. Its icon fills
+         and turns once; rows that aren't links stay still. -->
     <section class="grid items-start gap-14 lg:grid-cols-2 lg:gap-8">
       <div>
         <UiSectionTitle :title="t('about_page.docs_title')" :description="t('about_page.docs_desc')" size="lg" />
-        <ul class="mt-5 divide-y divide-line overflow-hidden rounded-lg bg-card" style="--i: 0" data-reveal>
+        <ul class="link-list mt-5 grid rounded-lg bg-card p-1.5" style="--i: 0" data-reveal>
+          <li>
+            <NuxtLink to="/join" class="link-row accent flex items-center gap-4 rounded-md px-3.5 py-3" style="--shift: 30">
+              <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
+                <Icon name="lucide:users-round" class="spin size-4.5" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-title">{{ t('about_page.recruit') }}</p>
+                <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.recruit_desc') }}</p>
+              </div>
+              <Icon name="lucide:chevron-right" class="trail size-4 shrink-0 text-meta" />
+            </NuxtLink>
+          </li>
           <li>
             <NuxtLink
               :to="SOURCE_URL"
               external
               target="_blank"
               rel="noopener noreferrer"
-              class="group flex items-center gap-4 px-5 py-4 transition-colors duration-150 ease-out hover:bg-card-hover"
+              class="link-row accent flex items-center gap-4 rounded-md px-3.5 py-3"
+              style="--shift: -90"
             >
-              <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: -90">
-                <Icon name="simple-icons:github" class="size-4" />
+              <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
+                <Icon name="simple-icons:github" class="spin size-4" />
               </span>
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium text-title">{{ t('about_page.frontend_repo') }}</p>
                 <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.frontend_repo_desc') }}</p>
               </div>
-              <span class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-meta transition-colors duration-150 ease-out group-hover:text-primary">
+              <span class="trail inline-flex shrink-0 items-center gap-1 text-xs font-medium text-meta">
                 GitHub
-                <Icon name="lucide:arrow-up-right" class="size-3.5" />
+                <Icon name="lucide:arrow-up-right" class="external size-3.5" />
               </span>
             </NuxtLink>
           </li>
-          <li class="flex items-center gap-4 px-5 py-4">
+          <li class="flex items-center gap-4 px-3.5 py-3">
             <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: 100">
               <Icon name="lucide:plug" class="size-4.5" />
             </span>
@@ -252,20 +271,20 @@
 
       <div>
         <UiSectionTitle :title="t('about_page.community_title')" :description="t('about_page.community_desc')" size="lg" />
-        <ul class="mt-5 divide-y divide-line overflow-hidden rounded-lg bg-card" style="--i: 1" data-reveal>
+        <ul class="link-list mt-5 grid rounded-lg bg-card p-1.5" style="--i: 1" data-reveal>
           <li>
-            <NuxtLink to="/discussions" class="group flex items-center gap-4 px-5 py-4 transition-colors duration-150 ease-out hover:bg-card-hover">
-              <span class="grid size-9 shrink-0 place-items-center rounded-md bg-primary/15 text-primary">
-                <Icon name="lucide:message-circle" class="size-4.5" />
+            <NuxtLink to="/discussions" class="link-row accent flex items-center gap-4 rounded-md px-3.5 py-3" style="--shift: 0">
+              <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
+                <Icon name="lucide:message-circle" class="spin size-4.5" />
               </span>
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium text-title">{{ t('about_page.discussions') }}</p>
                 <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.discussions_desc') }}</p>
               </div>
-              <Icon name="lucide:chevron-right" class="size-4 shrink-0 text-meta transition-transform duration-150 ease-out group-hover:translate-x-0.5" />
+              <Icon name="lucide:chevron-right" class="trail size-4 shrink-0 text-meta" />
             </NuxtLink>
           </li>
-          <li class="flex items-center gap-4 px-5 py-4">
+          <li class="flex items-center gap-4 px-3.5 py-3">
             <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: -60">
               <Icon name="simple-icons:qq" class="size-4" />
             </span>
@@ -283,19 +302,20 @@
               external
               target="_blank"
               rel="noopener noreferrer"
-              class="group flex items-center gap-4 px-5 py-4 transition-colors duration-150 ease-out hover:bg-card-hover"
+              class="link-row accent flex items-center gap-4 rounded-md px-3.5 py-3"
+              style="--shift: 150"
             >
-              <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: 150">
-                <Icon name="simple-icons:telegram" class="size-4" />
+              <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
+                <Icon name="simple-icons:telegram" class="spin size-4" />
               </span>
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium text-title">{{ t('about_page.telegram_group') }}</p>
                 <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.telegram_join') }}</p>
               </div>
-              <Icon name="lucide:arrow-up-right" class="size-4 shrink-0 text-meta transition-colors duration-150 ease-out group-hover:text-primary" />
+              <Icon name="lucide:arrow-up-right" class="trail external size-4 shrink-0 text-meta" />
             </NuxtLink>
           </li>
-          <li class="flex items-center gap-4 px-5 py-4">
+          <li class="flex items-center gap-4 px-3.5 py-3">
             <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: 40">
               <Icon name="simple-icons:discord" class="size-4" />
             </span>
@@ -324,9 +344,7 @@ import {
   AboutArtTimeline,
 } from '#components'
 
-const QQ_GROUP = '1007357274'
 const SOURCE_URL = 'https://github.com/shirohako/cdcat'
-const TELEGRAM_URL = 'https://t.me/+EVBlRRnTJAE3YTY9'
 
 const { t } = useI18n()
 useRevealOnScroll(useTemplateRef('page'))
@@ -583,7 +601,111 @@ usePageSeo({
   }
 }
 
+/*
+ * 条款与政策: the title's underline draws in from the left, the icon fills and tilts, and the › gives way to an arrow.
+ * 一起开发 and 交流群: a hovered row takes a wash of its own colour, its icon fills and turns once (only on the way in,
+ * so leaving doesn't spin it back), and its arrow moves off in its direction.
+ */
+.tile,
+.trail,
+.trail :is(.rest, .go, .external) {
+  transition: background-color 200ms ease-out, color 200ms ease-out, opacity 200ms ease-out, rotate 200ms ease-out,
+    scale 200ms ease-out, translate 200ms ease-out;
+}
+
+.legal-card .title {
+  padding-bottom: 1px;
+  background: linear-gradient(var(--accent), var(--accent)) left 100% / 0 2px no-repeat;
+  transition: background-size 280ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.legal-card .go {
+  opacity: 0;
+  translate: -6px 0;
+}
+
+.legal-card:is(:hover, :focus-visible) .title {
+  background-size: 100% 2px;
+}
+
+.legal-card:is(:hover, :focus-visible) .tile {
+  rotate: -6deg;
+}
+
+.legal-card:is(:hover, :focus-visible) .rest {
+  opacity: 0;
+  translate: 4px 0;
+}
+
+.legal-card:is(:hover, :focus-visible) .go {
+  opacity: 1;
+  translate: 0 0;
+}
+
+:is(.legal-card, .link-row):is(:hover, :focus-visible) .tile {
+  background-color: var(--accent);
+  color: var(--on-accent);
+}
+
+:is(.legal-card, .link-row):is(:hover, :focus-visible) .trail {
+  color: var(--accent);
+}
+
+/* The rows' dividers start under the text and step aside for a hovered row. */
+.link-list li {
+  position: relative;
+}
+
+.link-list li + li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0.875rem;
+  left: 4.125rem;
+  border-top: 1px solid var(--line);
+  transition: opacity 150ms ease-out;
+}
+
+.link-list li:has(> .link-row:is(:hover, :focus-visible))::before,
+.link-list li:has(> .link-row:is(:hover, :focus-visible)) + li::before {
+  opacity: 0;
+}
+
+.link-row {
+  transition: background-color 200ms ease-out;
+}
+
+.link-row:is(:hover, :focus-visible) {
+  background-color: color-mix(in oklab, var(--accent) 10%, var(--card));
+}
+
+.link-row:active {
+  background-color: color-mix(in oklab, var(--accent) 16%, var(--card));
+}
+
+.link-row:is(:hover, :focus-visible) .tile {
+  scale: 1.06;
+}
+
+.link-row:is(:hover, :focus-visible) .spin {
+  rotate: 360deg;
+  transition: rotate 650ms cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.link-row:is(:hover, :focus-visible) .trail:not(:has(.external)):not(.external) {
+  translate: 3px 0;
+}
+
+.link-row:is(:hover, :focus-visible) .external {
+  translate: 2px -2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .tile,
+  .trail,
+  .trail :is(.rest, .go, .external),
+  .legal-card .title,
+  .link-row .spin,
   .art-host :deep(svg *),
   .char,
   .glyph,

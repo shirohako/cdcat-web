@@ -4,6 +4,7 @@
       <CollectionPageCard>
         <template #header>
           <CollectionPageHeader
+            v-model:search="searchInput"
             :model-value="selectedType"
             :title="$t('artists.title')"
             :description="$t('artists.subtitle')"
@@ -11,12 +12,14 @@
             :create="{ to: '/contribute?type=artist', label: $t('common.contribute') }"
             :filters="artistTypes"
             :filter-label="$t('content_display.type')"
+            :search-placeholder="$t('artists.search_placeholder')"
             @update:model-value="selectType"
+            @search="applySearch"
           >
             <template #icon>
               <HeaderArtArtists />
             </template>
-            <template #filter-end>
+            <template #search-end>
               <CatalogPendingToggle :model-value="includePending" @update:model-value="setIncludePending" />
             </template>
           </CollectionPageHeader>
@@ -81,7 +84,7 @@
             <div class="text-meta mb-4">
               <Users :size="64" class="mx-auto" />
             </div>
-            <p class="text-meta">{{ $t('artists.no_results') }}</p>
+            <p class="text-meta">{{ searchQuery ? $t('artists.no_search_results', { query: searchQuery }) : $t('artists.no_results') }}</p>
           </div>
         </CommonPagedList>
       </div>
@@ -111,6 +114,15 @@ const artistTypes = computed(() => [
 // From the URL, so back and forward switch the type too.
 const selectedType = computed(() => route.query.type || 'all');
 
+// ?q=, like the album list: the endpoint needs two characters, or one kanji or kana, and orders by relevance.
+const searchQuery = computed(() => {
+  const value = String(route.query.q || '').trim();
+  return searchable(value) ? value : null;
+});
+const searchInput = ref(String(route.query.q || ''));
+watch(() => route.query.q, value => { searchInput.value = String(value || ''); });
+const toast = useToast();
+
 usePageSeo({
   title: () => t('artists.title'),
   description: () => t('seo.pages.artists'),
@@ -132,6 +144,7 @@ const { data: artistsResponse, status, error, refresh, loading, refetching, reve
     page: currentPage.value,
     per_page: PER_PAGE,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
+    search: searchQuery.value ?? undefined,
     include_pending: includePending.value ? 1 : undefined,
   })),
 });
@@ -184,5 +197,17 @@ const selectType = (type) => {
       page: undefined,
     },
   });
+};
+
+/** Enter or the search button; a query too short to search leaves the list as it is and says why. */
+const applySearch = () => {
+  const value = searchInput.value.trim();
+  if (value && !searchable(value)) {
+    // One id, so pressing Enter again pulses the toast instead of stacking copies.
+    toast.add({ id: 'artists-search-too-short', title: t('artists.search_too_short'), color: 'warning' });
+    return;
+  }
+  if (value === String(route.query.q || '')) return;
+  router.push({ query: { ...route.query, q: value || undefined, page: undefined } });
 };
 </script>

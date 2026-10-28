@@ -2,6 +2,8 @@
 
 Generated with the built-in image_gen tool on 2026-10-19. These are unofficial thematic illustrations, not official event posters or photographs of a specific edition. Final web assets are in `public/images/events/` and are used only when a series has no configured banner URL. The current covers are `m3-v2.webp` and `comic-market-v3.webp` (1280 × 720). See [the version 3 edit prompt](comic-market-artwork-v3.md) for the richer Comic Market colors and reduced foreground goods. Version 2 uses official mascot and logo reference images at the user's request; those character and logo designs belong to their respective owners. Version 1 assets are retained for comparison and rollback.
 
+The Reitaisai and VOC@LOiD M@STER covers were added on 2026-10-29. Their current assets are `reitaisai-v3.webp` and `vocamas-v2.webp`, with generated renditions of the actual official logos, omitting edition numbers. Reitaisai version 3 changes to an airy watercolor panorama with seven smaller Touhou characters; see [its prompt and artwork notes](reitaisai-artwork-v3.md). Logo sources and earlier edit prompts are recorded in [the official logo revision](event-series-artwork-official-logos.md); original prompts are in [their first artwork notes](event-series-artwork-reitaisai-vocamas.md).
+
 ## Research
 
 - M3: https://www.m3net.jp/other/kigyo.php — independent audio/media works, CD listening, Tokyo Ryutsu Center.

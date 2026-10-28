@@ -149,6 +149,9 @@
     "load_failed": "加载失败：{message}",
     "page_indicator": "（第 {current} / {last} 页）",
     "no_results": "没有找到艺术家",
+    "no_search_results": "没有找到与「{query}」相关的艺术家",
+    "search_placeholder": "搜索名称、别名或读音",
+    "search_too_short": "至少输入 2 个字符，汉字或假名 1 个即可",
     "detail": {
       "albums": "{count} 张专辑",
       "followers": "{count} 位关注者",
@@ -863,6 +866,8 @@
     "api_docs_desc": "让其他网站和应用读取 CDCat 的音乐资料，比如做歌词工具、封面匹配。",
     "frontend_repo": "网站源代码",
     "frontend_repo_desc": "修复问题、改进界面、添加新功能，都欢迎提交 Issue 或 Pull Request。",
+    "recruit": "人员募集",
+    "recruit_desc": "翻译、校对、美术、资料整理……不写代码也有很多事可以一起做。",
     "community_title": "交流群与反馈",
     "community_desc": "不会写代码也没关系。有想法、发现问题，都可以在讨论区或交流群告诉我们。",
     "discussions": "站内讨论区",
@@ -877,6 +882,14 @@
     "legal_desc": "使用 CDCat 时的规则，以及我们如何对待你的信息。",
     "terms_desc": "使用规则、内容授权和社区管理。",
     "privacy_desc": "我们收集哪些信息、如何使用，以及你的权利。"
+  },
+  "join_page": {
+    "source_language": "这个页面暂时只有简体中文版",
+    "telegram": "加入 Telegram 群",
+    "qq": "QQ 群",
+    "copy": "复制",
+    "copied": "已复制",
+    "qq_copy_failed": "无法复制，群号是 {number}"
   },
   "legal": {
     "terms_title": "用户协议",
@@ -2931,7 +2944,8 @@
       "privacy": "CDCat 隐私政策：我们收集哪些信息、如何使用，以及你的权利。不投放广告，不出售数据。",
       "discussion_tag": "CDCat 讨论区中标记为 #{tag} 的话题。",
       "guide_design": "CDCat 是怎样设计的：专辑、艺术家、活动、条目、系列、黑胶、讨论和文章各做什么，彼此怎样关联。",
-      "guide_editor": "CDCat 编辑器使用说明：怎样新建专辑，填写曲目、参与创作的人、版本和特典，提交审核，以及更正已有的资料。"
+      "guide_editor": "CDCat 编辑器使用说明：怎样新建专辑，填写曲目、参与创作的人、版本和特典，提交审核，以及更正已有的资料。",
+      "join": "CDCat 人员募集：翻译、校对、编辑、美术、设计、开发、资料整理和社区管理等岗位，欢迎喜欢音乐的你一起参与。"
     }
   }
 }

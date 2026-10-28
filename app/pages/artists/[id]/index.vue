@@ -99,7 +99,8 @@
             :items="viewTabs"
             @update:model-value="option => option && selectView(option)"
           />
-          <div class="flex flex-wrap items-center gap-2 sm:ml-auto">
+          <!-- 发行的专辑 shows them all; only 参与的专辑 filters by credit role. -->
+          <div v-if="view === 'credits'" class="flex flex-wrap items-center gap-2 sm:ml-auto">
             <button
               v-for="tab in roleTabs"
               :key="tab.role ?? 'all'"
@@ -128,11 +129,7 @@
             :class="[albumGridClass, albumsRevealClass, { 'pointer-events-none opacity-60': albumsRefetching }]"
             :inert="albumsRefetching"
           >
-            <div v-for="album in albums" :key="album.id" class="flex min-w-0 flex-col gap-1.5">
-              <AlbumCard :album="album" />
-              <!-- What the artist did besides being the 署名艺术家: 发行、厂牌 … -->
-              <span v-if="otherRoles(album).length" class="self-start rounded bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ otherRoles(album).map(roleName).join('、') }}</span>
-            </div>
+            <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
           </div>
           <div v-else class="flex min-h-48 flex-col items-center justify-center text-center">
             <Disc3 :size="26" class="text-faint" />
@@ -146,7 +143,6 @@
       <template v-if="!artist.is_pending">
         <ShoutBox :id="artist.id" resource="artists" />
         <ArticleRelatedArticles :id="artist.id" type="artist" />
-        <DiscussionRelatedDiscussions :id="artist.id" type="artist" />
       </template>
     </main>
     <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
@@ -156,11 +152,10 @@
 </template>
 
 <script setup lang="ts">
-import type { ReleaseRole } from '~/types/album'
-import type { ArtistCreditedAlbum, ArtistDetail, ArtistReleasedAlbum } from '~/types/artist'
+import type { ArtistCreditedAlbum, ArtistDetail } from '~/types/artist'
+import type { AlbumSimple } from '~/types/album'
 import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
-import { RELEASE_ROLES } from '~/types/album'
 import { artistLdType, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
@@ -188,17 +183,17 @@ const pageCssVariables = {
   '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
 }
 
-// 发行的专辑: the albums the artist is behind (an album-wide 署名与发行 credit), filtered by that role; 参与的专辑:
-// the albums of their other credits, grouped with the credited tracks, filtered by credit role.
+// 发行的专辑: every album the artist is behind (an album-wide 署名与发行 credit), unfiltered; 参与的专辑: the albums
+// of their other credits, grouped with the credited tracks, filtered by credit role.
 // View, role and page live in the URL (?view=credits, ?role=, ?page=); the old ?view=tracks is credits.
-type Releases = { pagination: { last_page: number }, roles: Record<string, number> }
-  & ({ view: 'releases', albums: ArtistReleasedAlbum[] } | { view: 'credits', albums: ArtistCreditedAlbum[], all: number })
+type Releases = { pagination: { last_page: number } }
+  & ({ view: 'releases', albums: AlbumSimple[] } | { view: 'credits', albums: ArtistCreditedAlbum[], all: number, roles: Record<string, number> })
 const views = ['releases', 'credits'] as const
 const view = computed(() => route.query.view === 'credits' || route.query.view === 'tracks' ? 'credits' : 'releases')
 const viewTabs = computed(() => views.map(option => option === 'releases'
   ? { value: option, label: t('artists.detail.tab_releases'), count: artist.value?.releases_count ?? 0 }
   : { value: option, label: t('artists.detail.tab_credits'), count: artist.value?.credited_albums_count ?? 0 }))
-const role = computed(() => route.query.role ? String(route.query.role) : null)
+const role = computed(() => view.value === 'credits' && route.query.role ? String(route.query.role) : null)
 const albumPage = useQueryPage()
 const {
   data: albumData,
@@ -220,21 +215,17 @@ const {
 )
 const albums = computed(() => albumData.value?.view === 'releases' ? albumData.value.albums : [])
 const trackGroups = computed(() => albumData.value?.view === 'credits' ? albumData.value.albums : [])
-const otherRoles = (album: ArtistReleasedAlbum) => album.artist_roles.filter(value => value !== 'artist')
 const albumLastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
-// The tabs keep the last known counts of the same view while another role's list loads.
-const lastCounts = shallowRef<{ view: string, roles: Record<string, number>, all: number }>({ view: '', roles: {}, all: 0 })
+// The credit-role chips keep the last known counts while another role's list loads.
+const counts = shallowRef<{ roles: Record<string, number>, all: number }>({ roles: {}, all: 0 })
 watch(albumData, (data) => {
-  if (data) lastCounts.value = { view: data.view, roles: data.roles, all: data.view === 'credits' ? data.all : 0 }
+  if (data?.view === 'credits') counts.value = { roles: data.roles, all: data.all }
 })
-const counts = computed(() => lastCounts.value.view === view.value ? lastCounts.value : { roles: {}, all: 0 })
-const roleCounts = computed(() => counts.value.roles)
-// Releases filter by the 署名与发行 roles (in their fixed order), credits by the other credit roles.
 const roleTabs = computed(() => [
-  { role: null, label: t('common.all'), count: view.value === 'credits' ? counts.value.all : (artist.value?.releases_count ?? 0) },
-  ...Object.entries(roleCounts.value)
+  { role: null, label: t('common.all'), count: counts.value.all },
+  ...Object.entries(counts.value.roles)
     .filter(([, count]) => count > 0)
-    .sort(([a], [b]) => view.value === 'credits' ? roleOrder(a) - roleOrder(b) : RELEASE_ROLES.indexOf(a as ReleaseRole) - RELEASE_ROLES.indexOf(b as ReleaseRole))
+    .sort(([a], [b]) => roleOrder(a) - roleOrder(b))
     .map(([key, count]) => ({ role: key, label: roleName(key), count })),
 ])
 const selectRole = (value: string | null) => {

@@ -174,12 +174,18 @@ useHead({
   // The home title already names the site.
   titleTemplate: '%s',
   meta: [{ name: 'keywords', content: computed(() => t('home.seo_keywords')) }],
-  // The first drawing and the title face are wanted at once; the other drawings load when their figures mount.
-  link: [
-    { rel: 'preload', href: '/landing/teardown/discman.json', as: 'fetch', crossorigin: 'anonymous' },
-    { rel: 'preload', href: '/landing/fonts/display.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }
-  ]
 })
+// The first drawing and the title face are wanted at once; the other drawings load when their figures mount. Only
+// the server-rendered page asks for them: coming back to the home page within the site, both are already loaded
+// (the font face, and the drawing cached by loadTeardown), and a fresh preload would go unused.
+if (import.meta.server) {
+  useHead({
+    link: [
+      { rel: 'preload', href: '/landing/teardown/discman.json', as: 'fetch', crossorigin: 'anonymous' },
+      { rel: 'preload', href: '/landing/fonts/display.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }
+    ]
+  })
+}
 </script>
 
 <style>

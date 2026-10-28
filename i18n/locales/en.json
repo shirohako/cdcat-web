@@ -149,6 +149,9 @@
     "load_failed": "Load failed: {message}",
     "page_indicator": "(Page {current} of {last})",
     "no_results": "No artists found",
+    "no_search_results": "No artists match “{query}”",
+    "search_placeholder": "Search names, aliases or readings",
+    "search_too_short": "Type at least 2 characters, or 1 kanji or kana",
     "detail": {
       "albums": "{count} albums",
       "followers": "{count} followers",
@@ -863,6 +866,8 @@
     "api_docs_desc": "Lets other sites and apps read CDCat's music data, for lyric tools, cover matching and more.",
     "frontend_repo": "Website source code",
     "frontend_repo_desc": "Bug fixes, design improvements and new features are all welcome as issues or pull requests.",
+    "recruit": "Join the team",
+    "recruit_desc": "Translation, proofreading, art, cataloguing… plenty to do without writing code.",
     "community_title": "Community and feedback",
     "community_desc": "No coding needed: share your ideas or report problems in the discussions or our groups.",
     "discussions": "Site discussions",
@@ -877,6 +882,14 @@
     "legal_desc": "The rules for using CDCat, and how we handle your information.",
     "terms_desc": "The rules of use, content licensing and moderation.",
     "privacy_desc": "What we collect, how we use it and your rights."
+  },
+  "join_page": {
+    "source_language": "This page is only in Simplified Chinese for now",
+    "telegram": "Join the Telegram group",
+    "qq": "QQ group",
+    "copy": "Copy",
+    "copied": "Copied",
+    "qq_copy_failed": "Couldn’t copy. The group number is {number}"
   },
   "legal": {
     "terms_title": "Terms of Service",
@@ -2931,7 +2944,8 @@
       "privacy": "CDCat's Privacy Policy: what we collect, how we use it and your rights. No ads, and we never sell your data.",
       "discussion_tag": "Topics tagged #{tag} in the CDCat forum.",
       "guide_design": "How CDCat is designed: what albums, artists, events, entries, series, vinyl, discussions and articles are for, and how they connect.",
-      "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data."
+      "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data.",
+      "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators."
     }
   }
 }
