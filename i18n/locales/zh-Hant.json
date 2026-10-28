@@ -906,67 +906,67 @@
     "ask": "前往討論區"
   },
   "home": {
-    "hero_title": "探索繁星閃耀的夜空，找到屬於你的聲音座標",
-    "hero_description": "CDCat 是專為資深樂迷打造的音樂資料庫。",
-    "browse_albums": "瀏覽專輯",
-    "discover_artists": "探索音樂人",
-    "database": "音樂資料庫",
-    "database_desc": "查詢專輯的詳細資料。",
-    "timeline": "聆聽紀錄",
-    "timeline_desc": "管理聽過與喜愛的音樂。",
-    "community": "交流社群",
-    "community_desc": "在這裡交流音樂、音響設備與作曲。",
-    "beta": "內部測試版本",
-    "search_question": "想找什麼？",
-    "search_example": "例如：東方紅魔鄉 / 初音未來 / M3-53",
-    "discover_more": "探索更多",
-    "find_music": "找音樂",
-    "find_artists": "找音樂人",
-    "gear_reviews": "器材評測",
-    "discussions": "交流討論",
-    "for_everyone": "滿足樂迷與創作者的需求",
-    "for_everyone_desc": "無論你是音樂創作者還是樂迷，都能使用 CDCat。",
-    "listener": "樂迷",
-    "listener_desc": "記錄與管理聽過的音樂、建立播放清單，並分享喜愛的歌曲。",
-    "creator": "音樂創作者",
-    "creator_desc": "宣傳自己的作品、新增販售連結，並聽取樂迷回饋。",
-    "offer_label": "我們提供",
-    "clean_data": "獨立、純淨的社群資料",
-    "clean_data_desc": "CDCat 不會擷取同類資料庫，所有資料皆由社群使用者提交與維護。",
-    "editable": "任何人皆可參與編輯",
-    "open_api": "開放 API",
-    "free": "免費使用",
-    "stats": {
-      "albums": "專輯",
-      "artists": "音樂人與社團",
-      "tracks": "單曲",
-      "reviews": "樂評"
-    },
-    "topics_label": "精選主題",
-    "beyond_music": "不只是音樂",
-    "beyond_music_desc": "音樂往往與遊戲、動畫、電影和電視節目一同誕生。完善的關聯設計讓你能從不同角度探索。",
-    "topic_entry_tag": "條目",
-    "topic_entry_title": "尋找某部動畫的所有音樂",
-    "topic_entry_desc": "從 Bangumi.tv 快速匯入動畫與遊戲條目，並將所有相關專輯連結在一起。",
-    "anime": "動畫",
-    "games": "遊戲",
-    "tv": "電視節目",
-    "topic_series_tag": "系列",
-    "topic_series_title": "探索同一 IP 旗下的所有音樂",
-    "topic_series_desc": "將同一 IP 旗下的遊戲、動畫、條目與專輯整理成清楚易懂的系列。",
-    "combined_entries": "整合條目",
-    "shared_theme": "相同主題",
-    "collector_title": "為收藏家打造的音樂網站",
-    "collector_desc": "除了專輯資料，也能查看詳細的商品版本與特典資訊。",
-    "products": "商品",
-    "products_desc": "整合實體版、限定版與數位版，清楚呈現版本關係及價格。",
-    "bonuses": "特典",
-    "bonuses_desc": "比較首批特典、店鋪特典、下載特典與期間限定特典。",
-    "links": "可信賴的連結",
-    "links_desc": "直接前往作者與授權店鋪，避免誤導性轉址。",
     "seo_title": "CDCat — 日系音樂資料庫｜同人、VOCALOID、動畫與遊戲",
     "seo_description": "在 CDCat 探索日系音樂、同人作品、VOCALOID、動畫遊戲配樂、活動紀錄與詳細曲目資訊。",
     "seo_keywords": "日系音樂,同人音樂,VOCALOID,東方Project,動畫原聲帶,遊戲音樂,音樂資料庫,曲目資訊"
+  },
+  "landing": {
+    "hero": {
+      "kicker": "日系音樂資料庫",
+      "title": "認真聽歌的人，\n值得一份認真的資料。",
+      "body": "CDCat 收錄同人、動畫、遊戲和 VOCALOID 的專輯、曲目與製作人員，由社群一點一點整理、校對。",
+      "browse": "瀏覽專輯",
+      "contribute": "參與編輯",
+      "figure": "隨身 CD 機的爆炸圖：上蓋、光碟、光學讀取頭、機芯、主機板和外殼",
+      "bubble": "拆開看看！"
+    },
+    "album": {
+      "kicker": "專輯資料",
+      "title": "細到每張碟、\n每一軌。",
+      "body": "曲目與時長，每首歌的作曲、編曲與歌詞，品番與價格，初回限定與店鋪特典，還有首發的活動。一張專輯值得記下的，這裡都有位置。",
+      "figure": "日版 CD 的爆炸圖：前蓋、歌詞本、光碟、托盤、背卡、側標與外盒",
+      "tags": {
+        "tracks": "曲目",
+        "credits": "製作人員",
+        "lyrics": "歌詞",
+        "catalog": "品番",
+        "editions": "版本",
+        "bonuses": "特典"
+      }
+    },
+    "listen": {
+      "kicker": "聽歌紀錄",
+      "title": "聽過的、想要的，\n都有地方放。",
+      "body": "替專輯標上想聽、想要、聽過或已入手，打個分數、寫幾句評價，喜歡的就收藏起來。",
+      "figure": "耳罩式耳機的爆炸圖：耳墊、發聲單元、藍牙電路板、電池與觸控蓋",
+      "tags": {
+        "plan": "想聽",
+        "wish": "想要",
+        "done": "聽過",
+        "owned": "已入手",
+        "review": "評價",
+        "favorite": "收藏"
+      }
+    },
+    "discover": {
+      "kicker": "發現",
+      "title": "順著一個名字，\n找到更多。",
+      "body": "從作曲者的名字找到署有這個名字的每一首歌，從一場 M3 找到當天首發的專輯，從一部動畫找到它的全部原聲。",
+      "figure": "黑膠唱盤的爆炸圖：唱片、止滑墊、轉盤、皮帶、唱臂與底座",
+      "tags": {
+        "artists": "藝術家",
+        "circles": "同人社團",
+        "events": "活動",
+        "entries": "條目",
+        "series": "系列"
+      }
+    },
+    "community": {
+      "title": "資料由大家一起補齊。",
+      "body": "登入後，任何人都可以補充新專輯、修正錯誤，每一次修改都留有紀錄。資料以 CC BY-SA 4.0 分享，可以免費使用。",
+      "contribute": "參與編輯",
+      "guide": "閱讀編輯指南"
+    }
   },
   "revision_entry": {
     "basic": "基本資訊",

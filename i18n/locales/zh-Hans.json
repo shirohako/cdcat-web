@@ -906,67 +906,67 @@
     "ask": "去讨论区"
   },
   "home": {
-    "hero_title": "探索繁星璀璨的夜空，找到属于你的声音坐标",
-    "hero_description": "CDCat 是一个面向重度听歌用户的音乐资料站点。",
-    "browse_albums": "浏览专辑",
-    "discover_artists": "发现艺术家",
-    "database": "音乐数据库",
-    "database_desc": "查询专辑的详细资料。",
-    "timeline": "听歌记录",
-    "timeline_desc": "管理自己听过和喜欢的音乐。",
-    "community": "交流社区",
-    "community_desc": "在这里交流音乐、音频设备与作曲。",
-    "beta": "内部测试版本",
-    "search_question": "你想找什么？",
-    "search_example": "例如：东方红魔乡 / 初音未来 / M3-53",
-    "discover_more": "发现更多",
-    "find_music": "找音乐",
-    "find_artists": "找音乐人",
-    "gear_reviews": "设备评测",
-    "discussions": "交流讨论",
-    "for_everyone": "满足听众与创作者的需求",
-    "for_everyone_desc": "无论你是音乐创作者还是听众，都可以使用 CDCat。",
-    "listener": "听众",
-    "listener_desc": "记录和管理听过的音乐，创建歌单并分享喜欢的曲目。",
-    "creator": "音乐创作者",
-    "creator_desc": "宣传自己的作品、添加售卖链接，并听取听众反馈。",
-    "offer_label": "我们提供",
-    "clean_data": "独立、纯净的社区数据",
-    "clean_data_desc": "CDCat 不会抓取同类数据库，所有资料均由社区用户提交和维护。",
-    "editable": "任何人可参与编辑",
-    "open_api": "开放接口",
-    "free": "免费使用",
-    "stats": {
-      "albums": "专辑",
-      "artists": "艺术家与社团",
-      "tracks": "单曲",
-      "reviews": "乐评"
-    },
-    "topics_label": "精选主题",
-    "beyond_music": "不仅仅是音乐",
-    "beyond_music_desc": "音乐往往与游戏、动画、电影和电视剧等内容共同诞生。完善的关联设计方便你从不同视角探索。",
-    "topic_entry_tag": "条目",
-    "topic_entry_title": "寻找某部动画的全部音乐",
-    "topic_entry_desc": "从 Bangumi.tv 快速导入动画和游戏条目，并将所有相关专辑关联到一起。",
-    "anime": "动画",
-    "games": "游戏",
-    "tv": "电视剧",
-    "topic_series_tag": "系列",
-    "topic_series_title": "探索同一 IP 下的全部音乐",
-    "topic_series_desc": "将同一 IP 下的游戏、动画、条目和专辑整理成结构清晰的系列。",
-    "combined_entries": "整合条目",
-    "shared_theme": "相同主题",
-    "collector_title": "为收藏家打造的音乐站",
-    "collector_desc": "在专辑资料之外，查看详细的商品版本和特典信息。",
-    "products": "商品",
-    "products_desc": "整合实体版、限定版和数字版，清楚展示版本关系与价格。",
-    "bonuses": "特典",
-    "bonuses_desc": "比较初回特典、店铺特典、下载特典和期间限定特典。",
-    "links": "可信链接",
-    "links_desc": "一键前往作者和授权店铺，避免误导性跳转。",
     "seo_title": "CDCat — 日系音乐数据库｜同人、VOCALOID、动画与游戏",
     "seo_description": "在 CDCat 探索日系音乐、同人作品、VOCALOID、动画游戏配乐、活动档案和详细曲目信息。",
     "seo_keywords": "日系音乐,同人音乐,VOCALOID,东方Project,动画原声,游戏音乐,音乐数据库,曲目信息"
+  },
+  "landing": {
+    "hero": {
+      "kicker": "日系音乐资料库",
+      "title": "认真听歌的人，\n值得一份认真的资料。",
+      "body": "CDCat 收录同人、动画、游戏和 VOCALOID 的专辑、曲目与制作人员，由社区一点点整理、校对。",
+      "browse": "浏览专辑",
+      "contribute": "参与编辑",
+      "figure": "随身 CD 机的爆炸图：顶盖、光盘、光学头、机芯、主板和外壳",
+      "bubble": "拆开看看！"
+    },
+    "album": {
+      "kicker": "专辑资料",
+      "title": "细到每张碟、\n每一轨。",
+      "body": "曲目和时长，每首歌的作曲、编曲与歌词，品番和价格，初回限定与店铺特典，还有首发的活动。一张专辑值得记下的，这里都有位置。",
+      "figure": "日版 CD 的爆炸图：前盖、歌词本、光盘、托盘、背卡、侧标和外盒",
+      "tags": {
+        "tracks": "曲目",
+        "credits": "制作人员",
+        "lyrics": "歌词",
+        "catalog": "品番",
+        "editions": "版本",
+        "bonuses": "特典"
+      }
+    },
+    "listen": {
+      "kicker": "听歌记录",
+      "title": "听过的、想要的，\n都有地方放。",
+      "body": "给专辑标上想听、想要、听过或已入手，打个分、写几句评价，喜欢的就收藏起来。",
+      "figure": "头戴耳机的爆炸图：耳垫、振膜单元、蓝牙电路板、电池和触控盖",
+      "tags": {
+        "plan": "想听",
+        "wish": "想要",
+        "done": "听过",
+        "owned": "已入手",
+        "review": "评价",
+        "favorite": "收藏"
+      }
+    },
+    "discover": {
+      "kicker": "发现",
+      "title": "顺着一个名字，\n找到更多。",
+      "body": "从作曲者的名字找到署有这个名字的每一首歌，从一场 M3 找到当天首发的专辑，从一部动画找到它的全部原声。",
+      "figure": "黑胶唱机的爆炸图：唱片、止滑垫、转盘、皮带、唱臂和机座",
+      "tags": {
+        "artists": "艺术家",
+        "circles": "同人社团",
+        "events": "活动",
+        "entries": "条目",
+        "series": "系列"
+      }
+    },
+    "community": {
+      "title": "资料由大家一起补全。",
+      "body": "登录后，任何人都可以补充新专辑、修正错误，每一次修改都留有记录。资料以 CC BY-SA 4.0 共享，可以免费使用。",
+      "contribute": "参与编辑",
+      "guide": "阅读编辑指南"
+    }
   },
   "revision_entry": {
     "basic": "基础信息",

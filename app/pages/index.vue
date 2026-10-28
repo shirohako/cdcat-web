@@ -1,505 +1,289 @@
 <template>
-  <div class="min-h-screen relative overflow-hidden">
-    <div
-      class="relative z-10 container mx-auto max-w-6xl 2xl:max-w-7xl px-4 md:px-8 pt-8 pb-16 md:pb-24 space-y-16"
+  <div class="landing mx-auto grid max-w-6xl gap-6 px-4 pb-20 pt-6 md:gap-8 md:px-8 md:pt-8 2xl:max-w-7xl">
+    <!-- The CD player, which comes apart by itself once the page is open; the mascot rides on its lid. -->
+    <section class="grid items-center gap-2 xl:grid-cols-[minmax(0,27rem)_minmax(0,1fr)] xl:gap-4">
+      <div class="max-w-xl px-1 pt-2 sm:px-3 xl:pb-8">
+        <p class="landing-kicker">
+          <span class="landing-dots" aria-hidden="true"><i /><i /><i /></span>
+          {{ t('landing.hero.kicker') }}
+        </p>
+        <h1 class="landing-display mt-5 whitespace-pre-line text-[2.5rem] leading-[1.14] text-title sm:text-5xl xl:text-[3.5rem]">{{ t('landing.hero.title') }}</h1>
+        <p class="mt-4 text-base leading-[1.9] text-body md:text-[1.0625rem]">{{ t('landing.hero.body') }}</p>
+        <div class="mt-7 flex flex-wrap gap-2.5">
+          <NuxtLink to="/albums" class="btn btn-primary min-h-12 px-6 text-base">{{ t('landing.hero.browse') }}</NuxtLink>
+          <NuxtLink to="/contribute" class="btn min-h-12 px-6 text-base">{{ t('landing.hero.contribute') }}</NuxtLink>
+        </div>
+      </div>
+      <LandingTeardownFigure
+        device="discman"
+        :view-box="HERO_BOX"
+        :tones="TONES.discman"
+        :labels="LABELS.discman"
+        :title="t('landing.hero.figure')"
+      >
+        <template #overlay="{ on, at }">
+          <!-- The mascot rides the lid, on a layer of its own so its floating never repaints the drawing. -->
+          <svg class="landing-ghost" viewBox="-1 -1 18 19.3" :style="{ ...at('lid', [139.7, 46.2]), width: `${(23.4 / HERO_BOX[2]) * 100}%` }" aria-hidden="true">
+            <BrandGhost />
+          </svg>
+          <span :class="['landing-bubble', { 'is-on': on }]" :style="spot(HERO_BOX, [151, 41])" aria-hidden="true">{{ t('landing.hero.bubble') }}</span>
+        </template>
+      </LandingTeardownFigure>
+    </section>
+
+    <LandingSection
+      card
+      :kicker="t('landing.album.kicker')"
+      :title="t('landing.album.title')"
+      :body="t('landing.album.body')"
+      :tags="tags('album', { tracks: 'sky', credits: 'pink', lyrics: 'lilac', catalog: 'butter', editions: 'mint', bonuses: 'coral' })"
     >
-      <!-- Hero, one card: the pitch on the left, search and shortcuts on the right, a hairline between. -->
-      <section class="card grid overflow-hidden lg:grid-cols-[1.1fr_0.9fr]">
-        <div class="space-y-6 p-6 md:p-10">
-          <div class="space-y-4 animate-rise">
-            <div class="flex items-center gap-4">
-              <!-- The name follows, so the picture needs no alt text of its own. -->
-              <img
-                src="/icon.png"
-                alt=""
-                width="80"
-                height="80"
-                class="size-16 md:size-20 rounded-2xl ring-4 ring-card"
-              >
-              <p class="text-3xl md:text-4xl font-black tracking-tight text-title">CDCat</p>
-            </div>
-            <h1
-              class="text-3xl md:text-4xl font-black leading-tight tracking-tight text-title"
-            >
-              {{ t('home.hero_title') }}
-            </h1>
-            <p class="text-lg text-body max-w-2xl">
-              {{ t('home.hero_description') }}
-            </p>
-          </div>
+      <LandingTeardownFigure
+        device="jewelcase"
+        :view-box="[56, 4, 334, 292]"
+        :tones="TONES.jewelcase"
+        :labels="LABELS.jewelcase"
+        :title="t('landing.album.figure')"
+      />
+    </LandingSection>
 
-          <div class="flex flex-col sm:flex-row gap-3 animate-rise-delayed">
-            <NuxtLink
-              to="/albums"
-              class="btn btn-primary group min-h-12 px-6 text-base"
-            >
-              <Music :size="20" />
-              {{ t('home.browse_albums') }}
-              <ArrowRight
-                :size="18"
-                class="transition-transform duration-150 ease-out group-hover:translate-x-1"
-              />
-            </NuxtLink>
-            <NuxtLink
-              to="/artists"
-              class="btn min-h-12 px-6 text-base"
-            >
-              <Users :size="20" />
-              {{ t('home.discover_artists') }}
-            </NuxtLink>
-          </div>
+    <LandingSection
+      flip
+      :kicker="t('landing.listen.kicker')"
+      :title="t('landing.listen.title')"
+      :body="t('landing.listen.body')"
+      :tags="tags('listen', { plan: 'pink', wish: 'butter', done: 'sky', owned: 'mint', review: 'lilac', favorite: 'coral' })"
+    >
+      <LandingTeardownFigure
+        device="headphones"
+        :view-box="[20, 30, 395, 266]"
+        :tones="TONES.headphones"
+        :labels="LABELS.headphones"
+        :title="t('landing.listen.figure')"
+      />
+    </LandingSection>
 
-          <div
-            class="grid grid-cols-1 sm:grid-cols-3 gap-3 animate-rise-slower"
-          >
-            <div class="rounded-xl bg-sunken py-3.5 px-4">
-              <div
-                class="flex items-center gap-2 font-semibold text-title"
-              >
-                <Disc3 :size="18" class="text-primary" />
-                <span>{{ t('home.database') }}</span>
-              </div>
-              <p class="text-sm text-body mt-1">{{ t('home.database_desc') }}</p>
-            </div>
-            <div class="rounded-xl bg-sunken py-3.5 px-4">
-              <div class="flex items-center gap-2 font-semibold text-title">
-                <Search :size="18" class="text-primary" />
-                <span>{{ t('home.timeline') }}</span>
-              </div>
-              <p class="text-sm text-body mt-1">
-                {{ t('home.timeline_desc') }}
-              </p>
-            </div>
-            <div class="rounded-xl bg-sunken py-3.5 px-4">
-              <div class="flex items-center gap-2 font-semibold text-title">
-                <Radio :size="18" class="text-primary" />
-                <span>{{ t('home.community') }}</span>
-              </div>
-              <p class="text-sm text-body mt-1">
-                {{ t('home.community_desc') }}
-              </p>
-            </div>
-          </div>
+    <LandingSection
+      card
+      :kicker="t('landing.discover.kicker')"
+      :title="t('landing.discover.title')"
+      :body="t('landing.discover.body')"
+      :tags="tags('discover', { artists: 'pink', circles: 'butter', events: 'sky', entries: 'lilac', series: 'mint' })"
+    >
+      <LandingTeardownFigure
+        device="turntable"
+        :view-box="[56, 20, 314, 262]"
+        :tones="TONES.turntable"
+        :labels="LABELS.turntable"
+        :title="t('landing.discover.figure')"
+      />
+    </LandingSection>
+
+    <section class="grid items-center gap-6 rounded-2xl bg-card px-5 py-8 sm:grid-cols-[7rem_minmax(0,1fr)] sm:p-10 xl:gap-10">
+      <svg class="w-20 sm:w-28" viewBox="-2 -9 23 30" aria-hidden="true">
+        <BrandGhost mouth="sing" />
+        <path class="landing-note" d="M17.5 -1.5v-5.2l3 -.9v5.2" />
+        <circle class="landing-note-head" cx="16.4" cy="-1.5" r="1.2" />
+        <circle class="landing-note-head" cx="19.4" cy="-2.4" r="1.2" />
+      </svg>
+      <div class="max-w-2xl">
+        <h2 class="landing-display text-[2rem] leading-[1.2] text-title sm:text-[2.5rem]">{{ t('landing.community.title') }}</h2>
+        <p class="mt-3 text-base leading-[1.9] text-body">{{ t('landing.community.body') }}</p>
+        <div class="mt-6 flex flex-wrap gap-2.5">
+          <NuxtLink to="/contribute" class="btn btn-primary min-h-12 px-6 text-base">{{ t('landing.community.contribute') }}</NuxtLink>
+          <NuxtLink to="/help/editor" class="btn min-h-12 px-6 text-base">{{ t('landing.community.guide') }}</NuxtLink>
         </div>
-
-        <div class="flex flex-col justify-center border-t border-line p-6 md:p-8 lg:border-l lg:border-t-0">
-          <div class="animate-rise-quick">
-            <div class="flex items-center">
-              <div
-                class="inline-flex items-center gap-2 rounded-full bg-primary text-on-primary px-3 py-1 text-xs font-semibold"
-              >
-                <Sparkles :size="14" />
-                <span>{{ t('home.beta') }}</span>
-              </div>
-            </div>
-
-            <div class="mt-6 space-y-4">
-              <div
-                class="rounded-xl bg-sunken p-4"
-              >
-                <p class="mb-3 text-sm font-semibold text-body">
-                  {{ t('home.search_question') }}
-                </p>
-                <form
-                  role="search"
-                  class="rounded-lg border border-line bg-field px-4 py-3 flex items-center gap-3 transition duration-150 ease-out focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/20"
-                  @submit.prevent="submitSearch"
-                >
-                  <Search :size="18" class="shrink-0 text-meta" />
-                  <input
-                    v-model="searchText"
-                    type="search"
-                    maxlength="100"
-                    :placeholder="t('home.search_example')"
-                    :aria-label="t('search.title')"
-                    class="min-w-0 flex-1 bg-transparent text-sm text-title placeholder:text-faint focus:outline-none"
-                  >
-                </form>
-              </div>
-
-              <p class="text-sm font-semibold text-body">{{ t('home.discover_more') }}</p>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="rounded-xl bg-sunken p-3.5">
-                  <div
-                    class="flex items-center gap-2 font-semibold text-title"
-                  >
-                    <Library :size="16" class="text-primary" />
-                    <span>{{ t('home.find_music') }}</span>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-sunken p-3.5">
-                  <div
-                    class="flex items-center gap-2 font-semibold text-title"
-                  >
-                    <Mic2 :size="16" class="text-primary" />
-                    <span>{{ t('home.find_artists') }}</span>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-sunken p-3.5">
-                  <div
-                    class="flex items-center gap-2 font-semibold text-title"
-                  >
-                    <CalendarDays :size="16" class="text-primary" />
-                    <span>{{ t('home.gear_reviews') }}</span>
-                  </div>
-                </div>
-                <div class="rounded-xl bg-sunken p-3.5">
-                  <div
-                    class="flex items-center gap-2 font-semibold text-title"
-                  >
-                    <Tag :size="16" class="text-primary" />
-                    <span>{{ t('home.discussions') }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Portal -->
-      <section class="space-y-6">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <div>
-            <h2 class="text-3xl font-bold text-title">{{ t('home.for_everyone') }}</h2>
-            <p class="text-body mt-1">
-              {{ t('home.for_everyone_desc') }}
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div
-            v-for="link in portalLinks"
-            :key="link.title"
-            class="card group flex items-start gap-4 p-5"
-          >
-            <div
-              class="h-12 w-12 rounded-xl flex items-center justify-center shrink-0 bg-primary/15 text-primary"
-            >
-              <component :is="link.icon" :size="22" />
-            </div>
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <h3 class="text-xl font-semibold text-title">
-                  {{ link.title }}
-                </h3>
-                <ArrowRight
-                  :size="16"
-                  class="text-meta transition-transform duration-150 ease-out group-hover:translate-x-1"
-                />
-              </div>
-              <p class="text-body">{{ link.desc }}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- What We Offer -->
-      <section
-        class="card p-6 md:p-10 space-y-10"
-      >
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <div>
-            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-              {{ t('home.offer_label') }}
-            </p>
-            <h2 class="text-3xl font-bold text-title">{{ t('home.clean_data') }}</h2>
-            <p class="text-body mt-1">
-              {{ t('home.clean_data_desc') }}
-            </p>
-          </div>
-          <div class="flex flex-wrap gap-2 text-xs text-body">
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.editable') }}</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.open_api') }}</span>
-            <span class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold">{{ t('home.free') }}</span>
-          </div>
-        </div>
-
-        <div class="grid md:grid-cols-4 gap-4">
-          <div
-            v-for="stat in stats"
-            :key="stat.label"
-            class="rounded-xl bg-sunken p-4 text-center"
-          >
-            <div class="text-3xl font-black text-title">
-              {{ stat.value }}
-            </div>
-            <div class="text-sm font-semibold text-body mt-1">
-              {{ stat.label }}
-            </div>
-            <p class="text-xs text-meta mt-1">{{ stat.desc }}</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- Featured Topics -->
-      <section class="space-y-6">
-        <div
-          class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-        >
-          <div>
-            <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-              {{ t('home.topics_label') }}
-            </p>
-            <h2 class="text-3xl font-bold text-title">{{ t('home.beyond_music') }}</h2>
-            <p class="text-body mt-1">
-              {{ t('home.beyond_music_desc') }}
-            </p>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div
-            v-for="topic in topics"
-            :key="topic.title"
-            class="card p-4.5"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <div
-                  class="h-11 w-11 rounded-full flex items-center justify-center bg-primary/15 text-primary"
-                >
-                  <component :is="topic.icon" :size="20" />
-                </div>
-                <div>
-                  <p class="text-xs uppercase tracking-[0.2em] text-meta">
-                    {{ topic.tag }}
-                  </p>
-                  <h3 class="text-lg font-semibold text-title">
-                    {{ topic.title }}
-                  </h3>
-                </div>
-              </div>
-            </div>
-            <p class="text-body mt-3">{{ topic.desc }}</p>
-            <div class="flex flex-wrap gap-2 mt-4">
-              <span
-                v-for="pill in topic.pills"
-                :key="pill"
-                class="inline-flex items-center gap-1.5 py-2 px-3 rounded-lg bg-btn text-btn-content font-semibold"
-              >
-                {{ pill }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Flow -->
-      <section
-        class="card p-8 md:p-12 overflow-hidden relative"
-      >
-        <div class="absolute inset-0 pointer-events-none">
-          <div class="absolute inset-0 opacity-30 hero-grid" />
-        </div>
-        <div class="relative z-10 space-y-8">
-          <div
-            class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-          >
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-                Flow
-              </p>
-              <h2 class="text-3xl font-bold text-title">{{ t('home.collector_title') }}</h2>
-              <p class="text-body mt-2">
-                {{ t('home.collector_desc') }}
-              </p>
-            </div>
-          </div>
-
-          <div class="grid md:grid-cols-3 gap-4">
-            <div
-              v-for="(item, index) in flow"
-              :key="item.title"
-              class="rounded-xl bg-sunken p-5"
-            >
-              <div class="flex items-center gap-3">
-                <div
-                  class="h-10 w-10 rounded-full bg-primary text-on-primary flex items-center justify-center text-sm font-bold"
-                >
-                  {{ index + 1 }}
-                </div>
-                <div>
-                  <p class="text-xs uppercase tracking-[0.2em] text-meta">
-                    {{ item.tag }}
-                  </p>
-                  <h3 class="text-lg font-semibold text-title">{{ item.title }}</h3>
-                </div>
-              </div>
-              <p class="text-body mt-3 leading-relaxed">
-                {{ item.desc }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
 </template>
 
-<script setup>
-import {
-  ArrowRight,
-  CalendarDays,
-  Disc3,
-  Library,
-  Mic2,
-  Music,
-  Radio,
-  Search,
-  Sparkles,
-  Tag,
-  Users,
-  ListMusic,
-  Globe2,
-} from "@lucide/vue";
+<script setup lang="ts">
+import type { TeardownLabel, TeardownTone } from '~/utils/teardown'
 
-const { t } = useI18n();
+/**
+ * The home page: an introduction to CDCat beside exploded drawings of music devices (components/landing,
+ * tools/teardown), each coming apart and back together on a loop while it is on screen.
+ */
+const { t } = useI18n()
 
-const searchText = ref('');
-const submitSearch = () => {
-  const text = searchText.value.trim();
-  if (text) navigateTo({ path: '/search', query: { q: text } });
-};
+const HERO_BOX: [number, number, number, number] = [56, 12, 314, 268]
 
-const portalLinks = computed(() => [
-  {
-    title: t('home.listener'),
-    desc: t('home.listener_desc'),
-    icon: Library,
-  },
-  {
-    title: t('home.creator'),
-    desc: t('home.creator_desc'),
-    icon: Mic2,
-  },
-]);
+type Device = 'discman' | 'jewelcase' | 'headphones' | 'turntable'
 
-const stats = computed(() => [
-  { value: "0K+", label: t('home.stats.albums'), desc: "" },
-  { value: "0K+", label: t('home.stats.artists'), desc: "" },
-  { value: "0K+", label: t('home.stats.tracks'), desc: "" },
-  { value: "0K+", label: t('home.stats.reviews'), desc: "" },
-]);
+/** Each part's colour. */
+const TONES: Record<Device, Record<string, TeardownTone>> = {
+  discman: { shell: 'butter', pcb: 'mint', chassis: 'lilac', sled: 'sky', hub: 'white', screws: 'white', disc: 'silver', lid: 'pink', buttons: 'coral' },
+  jewelcase: { base: 'white', inlay: 'mint', tray: 'lilac', disc: 'silver', booklet: 'pink', obi: 'butter' },
+  headphones: { 'left-cup': 'lilac', 'cushion': 'pink', 'mesh': 'silver', 'baffle': 'sky', 'driver': 'butter', 'shell': 'lilac', 'board': 'mint', 'battery': 'coral', 'cap': 'white', 'headband': 'lilac', 'pad': 'pink' },
+  turntable: { plinth: 'white', feet: 'lilac', sub: 'butter', platter: 'sky', mat: 'pink', record: 'night', arm: 'silver' }
+}
 
-const topics = computed(() => [
-  {
-    tag: t('home.topic_entry_tag'),
-    title: t('home.topic_entry_title'),
-    desc: t('home.topic_entry_desc'),
-    pills: [t('home.anime'), t('home.games'), t('home.tv')],
-    icon: Globe2,
-  },
-  {
-    tag: t('home.topic_series_tag'),
-    title: t('home.topic_series_title'),
-    desc: t('home.topic_series_desc'),
-    pills: [t('home.combined_entries'), t('home.shared_theme')],
-    icon: ListMusic,
-  },
-]);
+/** The parts' English names (the user's rule: never translated), placed in each drawing's units. */
+const LABELS: Record<Device, TeardownLabel[]> = {
+  discman: [
+    { anchor: 'buttons', text: 'Buttons', at: [306, 54], align: 'start', tone: 'coral' },
+    { anchor: 'lid', text: 'Top lid', at: [120, 60], align: 'end', tone: 'pink' },
+    { anchor: 'disc', text: 'Compact disc', at: [128, 122], align: 'end', tone: 'sky' },
+    { anchor: 'sled', text: 'Optical pickup', at: [120, 178], align: 'end', tone: 'lilac' },
+    { anchor: 'chassis', text: 'Chassis', at: [306, 178], align: 'start', tone: 'butter' },
+    { anchor: 'pcb', text: 'Main board', at: [306, 222], align: 'start', tone: 'mint' },
+    { anchor: 'shell', text: 'Bottom shell', at: [120, 256], align: 'end', tone: 'butter' }
+  ],
+  jewelcase: [
+    { anchor: 'lid', text: 'Front cover', at: [300, 18], align: 'start', tone: 'silver' },
+    { anchor: 'booklet', text: 'Booklet', at: [104, 90], align: 'center', tone: 'pink' },
+    { anchor: 'disc', text: 'Disc', at: [350, 124], align: 'start', tone: 'sky' },
+    { anchor: 'tray', text: 'Tray', at: [350, 176], align: 'start', tone: 'lilac' },
+    { anchor: 'inlay', text: 'Inlay', at: [350, 212], align: 'start', tone: 'mint' },
+    { anchor: 'obi', text: 'Obi strip', at: [118, 282], align: 'center', tone: 'butter' },
+    { anchor: 'base', text: 'Case', at: [350, 262], align: 'start', tone: 'coral' }
+  ],
+  headphones: [
+    { anchor: 'headband', text: 'Headband', at: [100, 36], align: 'end', tone: 'lilac' },
+    { anchor: 'cushion', text: 'Ear cushion', at: [160, 284], align: 'center', tone: 'pink' },
+    { anchor: 'driver', text: 'Driver', at: [252, 288], align: 'center', tone: 'butter' },
+    { anchor: 'board', text: 'Bluetooth board', at: [298, 150], align: 'center', tone: 'mint' },
+    { anchor: 'battery', text: 'Battery', at: [378, 182], align: 'center', tone: 'coral' },
+    { anchor: 'cap', text: 'Touch cover', at: [404, 280], align: 'end', tone: 'silver' }
+  ],
+  turntable: [
+    { anchor: 'record', text: 'Vinyl record', at: [300, 46], align: 'start', tone: 'pink' },
+    { anchor: 'mat', text: 'Slipmat', at: [100, 74], align: 'end', tone: 'pink' },
+    { anchor: 'platter', text: 'Platter', at: [100, 110], align: 'end', tone: 'sky' },
+    { anchor: 'sub', text: 'Belt', at: [88, 146], align: 'end', tone: 'butter' },
+    { anchor: 'arm', text: 'Tonearm', at: [314, 94], align: 'start', tone: 'silver' },
+    { anchor: 'plinth', text: 'Plinth', at: [100, 222], align: 'end', tone: 'lilac' }
+  ]
+}
 
-const flow = computed(() => [
-  {
-    tag: "Products",
-    title: t('home.products'),
-    desc: t('home.products_desc'),
-    icon: Search,
-  },
-  {
-    tag: "Tokuten",
-    title: t('home.bonuses'),
-    desc: t('home.bonuses_desc'),
-    icon: Library,
-  },
-  {
-    tag: "Links",
-    title: t('home.links'),
-    desc: t('home.links_desc'),
-    icon: Tag,
-  },
-]);
+const tags = (section: string, tones: Record<string, string>) =>
+  Object.entries(tones).map(([key, tone]) => ({ text: t(`landing.${section}.tags.${key}`), tone }))
 
-const absolute = useSiteUrl();
+/** A point of a drawing as a position over its figure. */
+const spot = ([x0, y0, w, h]: [number, number, number, number], [x, y]: [number, number]) =>
+  ({ left: `${((x - x0) / w) * 100}%`, top: `${((y - y0) / h) * 100}%` })
+
+const absolute = useSiteUrl()
 usePageSeo({
   title: () => t('home.seo_title'),
   description: () => t('home.seo_description'),
-  jsonLd: () => websiteLd({ name: SITE_NAME, url: absolute('/'), logo: absolute('/icon.png'), description: t('home.seo_description') }),
-});
+  jsonLd: () => websiteLd({ name: SITE_NAME, url: absolute('/'), logo: absolute('/icon.png'), description: t('home.seo_description') })
+})
 useHead({
   // The home title already names the site.
   titleTemplate: '%s',
   meta: [{ name: 'keywords', content: computed(() => t('home.seo_keywords')) }],
-});
+  // The first drawing and the title face are wanted at once; the other drawings load when their figures mount.
+  link: [
+    { rel: 'preload', href: '/landing/teardown/discman.json', as: 'fetch', crossorigin: 'anonymous' },
+    { rel: 'preload', href: '/landing/fonts/display.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }
+  ]
+})
 </script>
 
+<style>
+/* The display face for the home page's titles: Resource Han Rounded Heavy (SIL OFL), one font for Chinese,
+   Japanese, Korean and Latin, so changing language never changes or fetches a font. Cut down to the characters
+   the titles use in every locale (tools/landing-fonts.mjs); the page's lang picks the regional glyph forms. */
+@font-face {
+  font-family: "CDCat Display";
+  src: url("/landing/fonts/display.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+
+.landing {
+  --landing-pink: #f7c3d0;
+  --landing-butter: #fde7a4;
+  --landing-mint: #bfe7d2;
+  --landing-sky: #bcd8f6;
+  --landing-lilac: #d8cff6;
+  --landing-coral: #ffb7a5;
+  --landing-ink: #1d2444;
+}
+
+.landing-display {
+  font-family: "CDCat Display", sans-serif;
+  font-weight: 900;
+  text-wrap: balance;
+}
+</style>
+
 <style scoped>
-/* A faint grid behind the Flow card, in the line colour so it shows in both themes. */
-.hero-grid {
-  background-image:
-    linear-gradient(var(--line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--line) 1px, transparent 1px);
-  background-size: 32px 32px;
-  /* One grid step per loop, so the drift never jumps. */
-  animation: shimmer 4s linear infinite;
+.landing-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border-radius: 0.5rem;
+  background: var(--card);
+  padding: 0.5rem 0.75rem;
+  color: var(--meta);
+  font-size: 0.8125rem;
+  font-weight: 600;
 }
 
-/* The keyframes are scoped, so animations that use them must be declared here too: Tailwind's
-   `animate-[fade-in…]` would point at the unscoped name and never run.
-   `backwards`, not `both`: hidden during the delay, and no transform left behind afterwards. */
-.animate-rise-quick {
-  animation: fade-in 0.6s ease backwards;
+.landing-dots {
+  display: inline-flex;
+  gap: 0.3rem;
 }
 
-.animate-rise {
-  animation: fade-in 0.7s ease backwards;
+.landing-dots i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #f4a9bc;
 }
 
-.animate-rise-delayed {
-  animation: fade-in 0.8s ease backwards;
-  animation-delay: 0.05s;
+.landing-dots i:nth-child(2) { background: #f6d27a; }
+.landing-dots i:nth-child(3) { background: #9ad7b8; }
+
+.landing-ghost {
+  position: absolute;
+  z-index: 1;
+  overflow: visible;
+  will-change: transform;
 }
 
-.animate-rise-slower {
-  animation: fade-in 0.9s ease backwards;
-  animation-delay: 0.1s;
+/* The mascot's speech, over the lid it rides on; it pops up with the stickers. */
+.landing-bubble {
+  position: absolute;
+  z-index: 2;
+  border: 1px solid var(--landing-ink);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 0.3rem 0.7rem;
+  color: var(--landing-ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -100%) scale(0.7);
+  transform-origin: 50% 100%;
+  transition: opacity 0.25s ease-out, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: 0.5s;
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.landing-bubble.is-on {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
 }
 
-@keyframes shimmer {
-  0% {
-    background-position:
-      0 0,
-      0 0;
-  }
-  100% {
-    background-position:
-      32px 32px,
-      32px 32px;
-  }
+.landing-note {
+  fill: none;
+  stroke: var(--title);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.landing-note-head { fill: var(--title); }
+
+@media (max-width: 639px) {
+  .landing-bubble { font-size: 0.6875rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-grid,
-  .animate-rise-quick,
-  .animate-rise,
-  .animate-rise-delayed,
-  .animate-rise-slower {
-    animation: none;
-  }
+  .landing-bubble { transition: none; }
 }
 </style>

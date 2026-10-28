@@ -906,67 +906,67 @@
     "ask": "Go to the forum"
   },
   "home": {
-    "hero_title": "Find your coordinates in a sky full of sound",
-    "hero_description": "CDCat is a music database built for dedicated listeners.",
-    "browse_albums": "Browse releases",
-    "discover_artists": "Discover artists",
-    "database": "Music database",
-    "database_desc": "Look up detailed information about music releases.",
-    "timeline": "Your listening history",
-    "timeline_desc": "Keep track of the music you’ve heard and loved.",
-    "community": "Community",
-    "community_desc": "Discuss music, audio gear, and composition.",
-    "beta": "Beta version",
-    "search_question": "What are you looking for?",
-    "search_example": "Try: Touhou Koumakyou / Hatsune Miku / M3-53",
-    "discover_more": "Discover more",
-    "find_music": "Find music",
-    "find_artists": "Find musicians",
-    "gear_reviews": "Gear reviews",
-    "discussions": "Discussions",
-    "for_everyone": "Built for listeners and creators",
-    "for_everyone_desc": "Whether you make music or simply love it, CDCat has a place for you.",
-    "listener": "Listeners",
-    "listener_desc": "Track what you listen to, build playlists, and share the songs you love.",
-    "creator": "Music creators",
-    "creator_desc": "Showcase your releases, add store links, and hear from your listeners.",
-    "offer_label": "What we offer",
-    "clean_data": "Independent, community-curated data",
-    "clean_data_desc": "CDCat does not scrape competing databases. Every record is submitted and maintained by the community.",
-    "editable": "Open to contributors",
-    "open_api": "Open API",
-    "free": "Free to use",
-    "stats": {
-      "albums": "Releases",
-      "artists": "Artists and circles",
-      "tracks": "Tracks",
-      "reviews": "Reviews"
-    },
-    "topics_label": "Curated topics",
-    "beyond_music": "More than music",
-    "beyond_music_desc": "Music is often created alongside games, anime, films, and television. Rich relationships let you explore it from every angle.",
-    "topic_entry_tag": "Entries",
-    "topic_entry_title": "Find every song from an anime",
-    "topic_entry_desc": "Import anime and game entries from Bangumi.tv, then connect every related release in one place.",
-    "anime": "Anime",
-    "games": "Games",
-    "tv": "Television",
-    "topic_series_tag": "Series",
-    "topic_series_title": "Explore music across the same franchise",
-    "topic_series_desc": "Bring games, anime, entries, and releases from the same IP into a clear, structured series.",
-    "combined_entries": "Connected entries",
-    "shared_theme": "Shared theme",
-    "collector_title": "A music database made for collectors",
-    "collector_desc": "Go beyond the album with detailed product editions and bonus items.",
-    "products": "Products",
-    "products_desc": "See physical, limited, and digital editions together, with their relationships and prices.",
-    "bonuses": "Bonuses",
-    "bonuses_desc": "Compare first-press, store-exclusive, download, and limited-time bonuses.",
-    "links": "Trusted links",
-    "links_desc": "Go directly to official and authorized stores without misleading redirects.",
     "seo_title": "CDCat — Japanese Music Database for Doujin, Vocaloid, Anime and Games",
     "seo_description": "Explore Japanese music, doujin releases, Vocaloid, anime and game soundtracks, events, and detailed track credits on CDCat.",
     "seo_keywords": "Japanese music,doujin music,Vocaloid,Touhou Project,anime soundtrack,game music,music database,track credits"
+  },
+  "landing": {
+    "hero": {
+      "kicker": "Japanese music database",
+      "title": "Serious listeners deserve\nserious liner notes.",
+      "body": "CDCat catalogs albums, tracks and credits from doujin, anime, game and VOCALOID music, sorted and checked bit by bit by its community.",
+      "browse": "Browse albums",
+      "contribute": "Start editing",
+      "figure": "Exploded view of a portable CD player: top lid, disc, optical pickup, chassis, main board and bottom shell",
+      "bubble": "Let's take it apart!"
+    },
+    "album": {
+      "kicker": "Albums",
+      "title": "Down to every disc\nand every track.",
+      "body": "Track lists and lengths, who composed, arranged and wrote each song, catalog numbers and prices, first-press and shop bonuses, and the event where it came out. Whatever is worth noting about an album has a place here.",
+      "figure": "Exploded view of a Japanese CD release: front cover, booklet, disc, tray, inlay, obi strip and case",
+      "tags": {
+        "tracks": "Tracks",
+        "credits": "Credits",
+        "lyrics": "Lyrics",
+        "catalog": "Catalog no.",
+        "editions": "Editions",
+        "bonuses": "Bonuses"
+      }
+    },
+    "listen": {
+      "kicker": "Your listening",
+      "title": "What you've heard,\nwhat you want.",
+      "body": "Mark albums as plan to listen, wishlist, completed or owned, give them a score and a few words, and keep the ones you love as favorites.",
+      "figure": "Exploded view of over-ear headphones: ear cushion, driver, Bluetooth board, battery and touch cover",
+      "tags": {
+        "plan": "Plan to Listen",
+        "wish": "Wishlist",
+        "done": "Completed",
+        "owned": "Owned",
+        "review": "Reviews",
+        "favorite": "Favorites"
+      }
+    },
+    "discover": {
+      "kicker": "Discover",
+      "title": "Follow one name\nto find more.",
+      "body": "From a composer's name to every song credited to it, from an M3 to the albums that came out there, from an anime to its whole soundtrack.",
+      "figure": "Exploded view of a turntable: record, slipmat, platter, belt, tonearm and plinth",
+      "tags": {
+        "artists": "Artists",
+        "circles": "Circles",
+        "events": "Events",
+        "entries": "Entries",
+        "series": "Series"
+      }
+    },
+    "community": {
+      "title": "Filled in by everyone.",
+      "body": "Once signed in, anyone can add new albums and fix mistakes, and every change is kept in the history. The data is shared under CC BY-SA 4.0 and is free to use.",
+      "contribute": "Start editing",
+      "guide": "Read the editing guide"
+    }
   },
   "revision_entry": {
     "basic": "Basic information",

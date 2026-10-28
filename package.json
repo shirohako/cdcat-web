@@ -46,6 +46,7 @@
   },
   "packageManager": "pnpm@11.22.0",
   "devDependencies": {
+    "7z-wasm": "1.1.0",
     "@iconify-json/lucide": "^1.2.145",
     "@iconify-json/simple-icons": "1.2.60",
     "@types/d3-selection": "3.0.11",
@@ -53,6 +54,7 @@
     "@types/d3-zoom": "3.0.8",
     "@types/node": "^26.6.5",
     "playwright-core": "1.64.1",
+    "subset-font": "2.4.0",
     "typescript": "6.0.3",
     "vitest": "^5.0.5",
     "vue-tsc": "^3.3.13"
