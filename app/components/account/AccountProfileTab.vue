@@ -43,7 +43,7 @@
                 size="sm"
                 class="shrink-0"
                 :loading="isUpdatingAvatar"
-                :disabled="!isAvatarChanged"
+                :disabled="!isAvatarChanged || !form.avatar_url.trim()"
                 @click="updateAvatar"
               >
                 {{ t('common.save') }}

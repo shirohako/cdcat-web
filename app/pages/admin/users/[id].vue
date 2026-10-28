@@ -102,7 +102,7 @@ useHead({ title: '用户详情' })
           <p v-if="!canManage" class="mt-4 text-sm text-amber-800">该账号仅可查看，不能操作自己、超级管理员（admin）或等级不低于自己的用户。</p>
           <p v-if="user.role_names.length > 1" class="mt-4 text-sm text-amber-800">该用户仍有多个存量角色，请使用单角色收敛命令处理。</p>
           <form class="mt-6 space-y-5" @submit.prevent="save">
-            <div class="grid gap-4 md:grid-cols-2"><label v-for="field in fields" :key="field.key" class="block text-sm">{{ fieldLabels[field.key] }}<input v-model="profile[field.key]" :type="field.type" :required="field.required" :disabled="!canManage || busy" :maxlength="field.key === 'username' ? 32 : field.type === 'url' ? 2048 : 255" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50"></label></div>
+            <div class="grid gap-4 md:grid-cols-2"><label v-for="field in fields" :key="field.key" class="block text-sm">{{ fieldLabels[field.key] }}<input v-model="profile[field.key]" :type="field.type" :required="field.required" :placeholder="field.key === 'avatar_url' ? '留空则换成随机默认头像' : undefined" :disabled="!canManage || busy" :maxlength="field.key === 'username' ? 32 : field.type === 'url' ? 2048 : 255" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50"></label></div>
             <label class="block text-sm">简介<textarea v-model="profile.bio" :disabled="!canManage || busy" rows="3" maxlength="10000" class="mt-2 w-full rounded-lg border p-2.5 disabled:bg-slate-50" /></label>
             <UiButton v-if="canManage" type="submit" variant="primary" :disabled="busy">保存资料</UiButton>
           </form>
