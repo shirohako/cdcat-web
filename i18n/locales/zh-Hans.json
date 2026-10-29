@@ -2330,12 +2330,32 @@
     "rating_title": "评分",
     "no_ratings": "还没有人评分",
     "rating_count": "{count} 人评分",
-    "rating_few": "{count} 人评分，满 {min} 人显示平均分",
     "page_ratings": "本页评分",
     "page_rated": "本页已评分",
     "mine_empty": "还没有写过评价",
     "mine_empty_hint": "在专辑页写下你的感受，也可以顺便评分",
-    "discover_albums": "去找专辑"
+    "discover_albums": "去找专辑",
+    "score": {
+      "tbd": "TBD",
+      "based_on": "基于 {count} 人评分",
+      "out_of": "满分 5",
+      "verdict": {
+        "acclaim": "广受好评",
+        "favorable": "普遍好评",
+        "mixed": "褒贬不一",
+        "unfavorable": "普遍差评",
+        "dislike": "极度差评"
+      },
+      "group": {
+        "positive": "满足",
+        "mixed": "一般",
+        "negative": "遗憾"
+      },
+      "ratings": "{count} 评价",
+      "few": "{count} 人已评分",
+      "few_hint": "满 {min} 人后显示平均分",
+      "first": "来写下第一条评价吧"
+    }
   },
   "versions": {
     "title": "版本历史",

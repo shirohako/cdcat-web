@@ -2330,12 +2330,32 @@
     "rating_title": "Rating",
     "no_ratings": "No ratings yet",
     "rating_count": "{count} ratings",
-    "rating_few": "{count} ratings; the average shows from {min}",
     "page_ratings": "Ratings on this page",
     "page_rated": "Rated on this page",
     "mine_empty": "You haven't written any reviews yet",
     "mine_empty_hint": "Write one on an album page, with a rating if you like",
-    "discover_albums": "Find albums"
+    "discover_albums": "Find albums",
+    "score": {
+      "tbd": "TBD",
+      "based_on": "Based on {count} rating | Based on {count} ratings",
+      "out_of": "out of 5",
+      "verdict": {
+        "acclaim": "Universal acclaim",
+        "favorable": "Generally favorable",
+        "mixed": "Mixed or average",
+        "unfavorable": "Generally unfavorable",
+        "dislike": "Overwhelming dislike"
+      },
+      "group": {
+        "positive": "Satisfied",
+        "mixed": "So-so",
+        "negative": "Not for me"
+      },
+      "ratings": "{count} review | {count} reviews",
+      "few": "{count} rating so far | {count} ratings so far",
+      "few_hint": "The score shows from {min} ratings",
+      "first": "Be the first to write a review"
+    }
   },
   "versions": {
     "title": "History",

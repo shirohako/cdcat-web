@@ -17,6 +17,8 @@
 
             <AlbumBonuses :bonuses="album.bonuses" :products="album.products" :discs="album.discs" :images="album.images" />
 
+            <AlbumLinks :links="album.links" />
+
             <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
 
             <!-- Albums awaiting review can only be viewed: reviews and tracking open after approval. -->
@@ -24,6 +26,7 @@
           </div>
 
           <div class="space-y-6 lg:col-span-1">
+            <AlbumInfo :album="album" />
             <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
@@ -36,9 +39,14 @@
               :locked="album.is_pending"
               @tracked="setTracking"
             />
-            <AlbumRankings v-if="!album.is_pending" :rating="album.rating" :rating-count="album.rating_count" :distribution="album.rating_distribution" @write-review="reviews?.openEditor()" />
-            <AlbumInfo :album="album" />
-            <AlbumLinks :links="album.links" />
+            <AlbumRankings
+              v-if="!album.is_pending"
+              :rating="album.rating"
+              :rating-count="album.rating_count"
+              :distribution="album.rating_distribution"
+              :reviewed="!!reviews?.mine"
+              @write-review="reviews?.openEditor()"
+            />
             <AlbumArticles :articles="album.articles ?? []" />
             <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" />
           </div>
@@ -60,6 +68,7 @@
 <script setup lang="ts">
 import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
+import type { AlbumReview } from '~/types/reviews'
 import { ldDate, musicAlbumLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 import { bylineText } from '~/utils/albumByline'
@@ -92,7 +101,7 @@ const setTracking = (tracking: TrackingStatus | null, previous: TrackingStatus |
 })
 
 const gallery = ref<{ openCover: () => void } | null>(null)
-const reviews = ref<{ openEditor: () => void } | null>(null)
+const reviews = ref<{ openEditor: () => void, mine: AlbumReview | null } | null>(null)
 
 const shownTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : '')
 /** The byline for the page title: the publishers, else up to three 署名艺术家, else Various Artists. */

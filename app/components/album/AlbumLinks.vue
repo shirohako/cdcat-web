@@ -18,39 +18,41 @@
           <div class="flex-1 h-px bg-line"/>
         </div>
 
-        <!-- Links in this category -->
-        <a
-          v-for="link in group"
-          :key="link.id"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="group flex items-center gap-3 px-5 py-2.5"
-        >
-          <!-- Icon -->
-          <div
-            class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-            :class="categoryStyle(category).bg"
+        <!-- Links in this category: two columns in the page's wide column -->
+        <div class="grid px-2 sm:grid-cols-2">
+          <a
+            v-for="link in group"
+            :key="link.id"
+            :href="link.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex min-w-0 items-center gap-3 px-3 py-2.5"
           >
-            <Globe :size="13" :class="categoryStyle(category).icon" />
-          </div>
+            <!-- Icon -->
+            <div
+              class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+              :class="categoryStyle(category).bg"
+            >
+              <Globe :size="13" :class="categoryStyle(category).icon" />
+            </div>
 
-          <!-- Name + domain -->
-          <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-title leading-snug transition-colors group-hover:text-primary">
-              {{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}
-            </p>
-            <p class="text-[11px] text-meta truncate leading-none mt-0.5">
-              {{ getDomain(link.url) }}
-            </p>
-          </div>
+            <!-- Name + domain -->
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-title leading-snug transition-colors group-hover:text-primary">
+                {{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}
+              </p>
+              <p class="text-[11px] text-meta truncate leading-none mt-0.5">
+                {{ getDomain(link.url) }}
+              </p>
+            </div>
 
-          <!-- Arrow -->
-          <ExternalLink
-            :size="13"
-            class="shrink-0 text-faint transition-[color,translate] duration-150 ease-out group-hover:-translate-y-px group-hover:translate-x-0.5 group-hover:text-primary"
-          />
-        </a>
+            <!-- Arrow -->
+            <ExternalLink
+              :size="13"
+              class="shrink-0 text-faint transition-[color,translate] duration-150 ease-out group-hover:-translate-y-px group-hover:translate-x-0.5 group-hover:text-primary"
+            />
+          </a>
+        </div>
 
         <div class="h-1"/>
       </template>

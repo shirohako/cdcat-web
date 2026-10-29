@@ -25,16 +25,41 @@
             <label class="mb-2 block text-sm font-semibold text-body">
               {{ $t('reviews.rating') }} <span class="ml-1 text-xs font-normal text-meta">{{ $t('reviews.rating_hint') }}</span>
             </label>
-            <div class="flex flex-wrap gap-2">
-              <button
-                v-for="value in REVIEW_RATINGS"
-                :key="value"
-                type="button"
-                class="rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
-                :class="form.rating === value ? ['ring-2', reviewRatingTone(value)] : 'text-meta ring-1 ring-line hover:text-primary hover:ring-faint'"
-                :aria-pressed="form.rating === value"
-                @click="form.rating = form.rating === value ? null : value"
-              >{{ $t(reviewRatingKey(value)) }}</button>
+            <!-- After Metacritic's "my score": five parts, pale in their own level's colour; pointing at one fills the
+                 bar up to it in that level's colour, a press picks it (again: takes it back). The square and name show
+                 the level pointed at, else the picked one. -->
+            <div class="flex items-center gap-4">
+              <div class="-my-1.5 flex min-w-0 flex-1" @pointerleave="pointed = null">
+                <button
+                  v-for="value in LEVELS"
+                  :key="value"
+                  type="button"
+                  class="box-content flex-1 cursor-pointer py-1.5 focus-visible:outline-none"
+                  :class="value > 1 && 'pl-0.5'"
+                  :aria-label="$t(reviewRatingKey(value))"
+                  :aria-pressed="form.rating === value"
+                  @pointerenter="pointed = value"
+                  @focus="pointed = value"
+                  @blur="pointed = null"
+                  @click="form.rating = form.rating === value ? null : value"
+                >
+                  <span
+                    class="block h-2.5 transition-colors duration-150"
+                    :class="[
+                      shownRating && value <= shownRating ? REVIEW_LEVEL_COLORS[shownRating].solid : REVIEW_LEVEL_COLORS[value].pale,
+                      value === 1 && 'rounded-l-full',
+                      value === LEVELS.length && 'rounded-r-full',
+                    ]"
+                  />
+                </button>
+              </div>
+              <div class="flex w-32 shrink-0 items-center gap-2.5">
+                <span
+                  class="grid size-10 shrink-0 place-items-center rounded-md text-base font-black tabular-nums transition-colors duration-150"
+                  :class="shownRating ? REVIEW_LEVEL_COLORS[shownRating].solid : 'ring-2 ring-inset ring-faint'"
+                >{{ shownRating ?? '' }}</span>
+                <span v-if="shownRating" class="truncate text-sm font-semibold text-title">{{ $t(reviewRatingKey(shownRating)) }}</span>
+              </div>
             </div>
           </div>
 
@@ -102,6 +127,11 @@ const form = reactive({
   rating: (props.review?.rating ?? null) as ReviewRating | null,
   language: props.review?.language ?? defaultLanguage,
 })
+
+const LEVELS: ReviewRating[] = [1, 2, 3, 4, 5]
+/** The level under the pointer (or keyboard focus) in the rating picker */
+const pointed = ref<ReviewRating | null>(null)
+const shownRating = computed(() => pointed.value ?? form.rating)
 
 const targetAlbumId = computed(() => props.albumId ?? props.review?.album_id ?? null)
 

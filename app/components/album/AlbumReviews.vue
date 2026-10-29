@@ -24,12 +24,12 @@
           </p>
           <RichContent :content="mine.content" format="markdown" class="text-sm" />
           <div class="mt-1.5 flex gap-1.5">
-            <UiButton size="xs" @click="openEditor">{{ $t('common.edit') }}</UiButton>
+            <UiButton size="xs" @click="openEditor()">{{ $t('common.edit') }}</UiButton>
             <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
           </div>
         </div>
         <div v-else class="flex flex-wrap items-center gap-3">
-          <UiButton variant="primary" size="sm" :icon="PenLine" @click="openEditor">{{ $t('reviews.write') }}</UiButton>
+          <UiButton variant="primary" size="sm" :icon="PenLine" @click="openEditor()">{{ $t('reviews.write') }}</UiButton>
           <span class="text-xs text-meta">{{ $t('reviews.rating_hint') }}</span>
         </div>
       </template>
@@ -194,7 +194,8 @@ const openEditor = () => {
   }
   editorOpen.value = true
 }
-defineExpose({ openEditor })
+// The score card names its button after `mine`: write, or edit, a review.
+defineExpose({ openEditor, mine })
 
 const onSaved = async () => {
   editorOpen.value = false

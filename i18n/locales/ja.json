@@ -2330,12 +2330,32 @@
     "rating_title": "評価",
     "no_ratings": "まだ評価はありません",
     "rating_count": "{count} 人が評価",
-    "rating_few": "{count} 人が評価（{min} 人以上で平均を表示）",
     "page_ratings": "このページの評価",
     "page_rated": "このページの評価済み",
     "mine_empty": "まだレビューを書いていません",
     "mine_empty_hint": "アルバムページで感想を書き、評価もつけられます",
-    "discover_albums": "アルバムを探す"
+    "discover_albums": "アルバムを探す",
+    "score": {
+      "tbd": "TBD",
+      "based_on": "{count} 件の評価に基づく",
+      "out_of": "5 点満点",
+      "verdict": {
+        "acclaim": "絶賛",
+        "favorable": "好評",
+        "mixed": "賛否両論",
+        "unfavorable": "不評",
+        "dislike": "酷評"
+      },
+      "group": {
+        "positive": "満足",
+        "mixed": "ふつう",
+        "negative": "残念"
+      },
+      "ratings": "{count} 件の評価",
+      "few": "{count} 人が評価済み",
+      "few_hint": "{min} 人に達するとスコアを表示",
+      "first": "最初のレビューを書いてみましょう"
+    }
   },
   "versions": {
     "title": "編集履歴",

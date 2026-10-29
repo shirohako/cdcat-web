@@ -2330,12 +2330,32 @@
     "rating_title": "評分",
     "no_ratings": "還沒有人評分",
     "rating_count": "{count} 人評分",
-    "rating_few": "{count} 人評分，滿 {min} 人顯示平均分",
     "page_ratings": "本頁評分",
     "page_rated": "本頁已評分",
     "mine_empty": "還沒有寫過評價",
     "mine_empty_hint": "在專輯頁寫下你的感受，也可以順便評分",
-    "discover_albums": "去找專輯"
+    "discover_albums": "去找專輯",
+    "score": {
+      "tbd": "TBD",
+      "based_on": "基於 {count} 人評分",
+      "out_of": "滿分 5",
+      "verdict": {
+        "acclaim": "廣受好評",
+        "favorable": "普遍好評",
+        "mixed": "褒貶不一",
+        "unfavorable": "普遍差評",
+        "dislike": "極度差評"
+      },
+      "group": {
+        "positive": "滿足",
+        "mixed": "一般",
+        "negative": "遺憾"
+      },
+      "ratings": "{count} 評價",
+      "few": "{count} 人已評分",
+      "few_hint": "滿 {min} 人後顯示平均分",
+      "first": "來寫下第一則評價吧"
+    }
   },
   "versions": {
     "title": "版本歷史",

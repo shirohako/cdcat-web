@@ -1,7 +1,7 @@
 <template>
   <section class="card overflow-hidden">
     <!-- A 20px line instead of the title's usual 24px, so the gaps above and below it are what the padding says. -->
-    <UiSectionTitle :title="$t('album.section.stats')" :icon="BarChart3" size="sm" class="px-5 pb-3 pt-4 [&_h2]:leading-5" />
+    <UiSectionTitle :title="$t('album.section.stats')" :icon="BarChart3" size="sm" class="px-5 pb-5 pt-4 [&_h2]:leading-5" />
 
     <div class="space-y-4 px-5 pb-5">
       <div class="grid grid-cols-2 gap-2">
