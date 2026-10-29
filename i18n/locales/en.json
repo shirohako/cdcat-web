@@ -57,13 +57,58 @@
       "unmarked": "Not marked yet"
     },
     "tracklist": {
-      "credits_toggle": "Credits",
-      "lyric": "Lyrics",
-      "translation": "Translation",
       "translation_with_count": "Translations {count}",
-      "language": "Tracklist language",
       "original": "Original titles",
-      "original_songs": "Original: "
+      "density": {
+        "label": "Detail",
+        "compact": "Compact",
+        "comfy": "Comfortable",
+        "full": "Full"
+      },
+      "styles": {
+        "list": "List",
+        "list_hint": "Like a music app",
+        "booklet": "Booklet",
+        "booklet_hint": "Like a CD booklet",
+        "table": "Table",
+        "table_hint": "Aligned columns"
+      },
+      "settings": {
+        "title": "Tracklist settings",
+        "description": "Saved in this browser only",
+        "style": "Style",
+        "cards": "Hover cards",
+        "track_card": "Track card",
+        "track_card_hint": "Shown when the pointer rests on a title",
+        "artist_card": "Artist card",
+        "artist_card_hint": "Shown when the pointer rests on a name",
+        "done": "Done"
+      },
+      "language_title": "Title language",
+      "language_button": "Title language: {name}",
+      "language_description": "Which language track titles are shown in",
+      "language_note": "Tracks without a title in that language keep the original, in a lighter colour.",
+      "lyrics_count": "Lyrics {count}",
+      "lyrics_none": "No lyrics yet; open to add them",
+      "disc": {
+        "tracks": "{count} track | {count} tracks",
+        "folded": "{count} track folded | {count} tracks folded",
+        "fold": "Fold this disc",
+        "unfold": "Unfold this disc"
+      },
+      "total": "{discs} discs · {tracks} tracks",
+      "total_tracks": "{count} track | {count} tracks",
+      "original_song": "Original",
+      "original_title": "Original title",
+      "open_track": "Open track page",
+      "columns": {
+        "title": "Title",
+        "duration": "Length",
+        "lyrics": "Lyrics",
+        "favorites": "Favorites",
+        "others": "Other credits"
+      },
+      "language_none": "No other languages for these titles yet"
     },
     "actions": {},
     "empty": {
@@ -3096,5 +3141,12 @@
       "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data.",
       "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators."
     }
+  },
+  "artist_card": {
+    "on_album": "On this album",
+    "albums": "{count} album | {count} albums",
+    "favorites": "{count} favorite | {count} favorites",
+    "open": "View artist",
+    "load_failed": "More details failed to load"
   }
 }

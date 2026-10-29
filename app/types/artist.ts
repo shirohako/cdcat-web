@@ -58,3 +58,19 @@ export interface ArtistCreditedAlbum {
   roles: Array<{ role: string, credited_as: string | null, detail: string | null }>
   tracks: ArtistCreditedTrack[]
 }
+
+/** GET /artists/{id}/card: what a hover card shows. The same for every visitor. */
+export interface ArtistCard {
+  id: number
+  name: string
+  type: ArtistType | null
+  image_url: string | null
+  is_active: boolean
+  is_pending: boolean
+  /** Up to four other names. */
+  titles: CatalogTitle[]
+  /** The bio's first 160 characters on one line, or null. */
+  bio: string | null
+  albums_count: number
+  followers_count: number
+}

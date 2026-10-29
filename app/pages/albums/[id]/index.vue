@@ -5,13 +5,14 @@
       <CatalogPendingBanner :pending="album.is_pending" :revision="album.pending_revision" />
 
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div class="space-y-8 lg:col-span-2">
+        <!-- The side column a little narrower than a third, so the tracklist and the other main cards get the room -->
+        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] xl:grid-cols-[minmax(0,1fr)_19.5rem] 2xl:grid-cols-[minmax(0,1fr)_21rem]">
+          <div class="min-w-0 space-y-8">
             <AlbumDescriptions :album="album" />
 
             <AlbumCredits :credits="album.credits" :discs="album.discs" />
 
-            <AlbumTracklist :album-id="album.id" :discs="album.discs" :bonuses="album.bonuses" :languages="album.tracklist_languages" :locked="album.is_pending" />
+            <AlbumTracklist :discs="album.discs" :bonuses="album.bonuses" :languages="album.tracklist_languages" :credits="album.credits" :locked="album.is_pending" @favorited="setTrackFavorite" />
 
             <AlbumProducts :products="album.products" :bonuses="album.bonuses" :discs="album.discs" :images="album.images" />
 
@@ -19,7 +20,7 @@
             <AlbumReviews v-if="!album.is_pending" ref="reviews" :album-id="album.id" @changed="refresh" />
           </div>
 
-          <div class="space-y-6 lg:col-span-1">
+          <div class="min-w-0 space-y-6">
             <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
@@ -86,6 +87,17 @@ if (mergedInto.value) {
 watch(mergedInto, (id) => {
   if (id) navigateTo({ path: `/albums/${id}`, query: route.query }, { replace: true })
 })
+
+/** A track favourited from the tracklist: its heart and count change in the page data, so a revisit shows them. */
+const setTrackFavorite = (trackId: number, favorited: boolean) => mutate(current => ({
+  ...current,
+  discs: current.discs.map(disc => ({
+    ...disc,
+    tracks: disc.tracks.map(track => (track.id === trackId && track.is_favorited !== favorited
+      ? { ...track, is_favorited: favorited, favorites_count: Math.max(0, track.favorites_count + (favorited ? 1 : -1)) }
+      : track)),
+  })),
+}))
 
 // The visitor's own pick moves the counts as the server's will: one off the status they leave, one onto the new one.
 const setTracking = (tracking: TrackingStatus | null, previous: TrackingStatus | null) => mutate((current) => {

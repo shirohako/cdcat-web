@@ -54,6 +54,10 @@ const badgeVariants = ['soft', 'solid', 'outline'] as const
 
 const pill = ref<'all' | 'cd' | 'vinyl' | 'digital'>('all')
 const view = ref<'albums' | 'tracks'>('albums')
+const density = ref<'compact' | 'comfy' | 'full'>('comfy')
+const collapseOpen = ref(false)
+const hoverRegion = ref<HTMLElement | null>(null)
+const demoCard = useHoverCard(hoverRegion, '[data-demo-card]')
 const page = ref(4)
 const name = ref('')
 const email = ref('bad@')
@@ -276,6 +280,22 @@ const markdownEnv: MarkdownEnv = {
         variant="segmented"
         :items="[{ value: 'albums', label: '专辑', icon: 'lucide:disc-3' }, { value: 'tracks', label: '曲目', icon: 'lucide:list-music' }]"
       />
+      <div class="flex flex-wrap items-center gap-3">
+        <UiSegmented
+          v-model="density"
+          collapse
+          size="sm"
+          label="信息密度"
+          :items="[{ value: 'compact', label: '简洁', icon: 'lucide:align-justify' }, { value: 'comfy', label: '舒适', icon: 'lucide:list' }, { value: 'full', label: '完整', icon: 'lucide:list-tree' }]"
+        />
+        <span class="text-xs text-meta">collapse：只有选中的显示名字，名字随滑块展开；其余悬停显示提示</span>
+      </div>
+      <div>
+        <UiButton size="sm" @click="collapseOpen = !collapseOpen">{{ collapseOpen ? '收起' : '展开' }}</UiButton>
+        <UiCollapse :open="collapseOpen" lazy>
+          <p class="pt-2 text-sm text-body">UiCollapse：按高度展开收起，内容淡入上移；收起时先淡出再收。lazy 时第一次展开才挂载。</p>
+        </UiCollapse>
+      </div>
       <div class="flex flex-wrap items-center gap-2">
         <UiTag to="/albums">东方Project</UiTag>
         <UiTag to="/albums">同人音乐</UiTag>
@@ -521,6 +541,11 @@ const markdownEnv: MarkdownEnv = {
             </div>
           </template>
         </UiPopover>
+        <span ref="hoverRegion" class="text-sm text-body">悬停卡片（useHoverCard + UiHoverCard）：<span data-demo-card="梶浦由記" class="underline decoration-faint underline-offset-4">梶浦由記</span>、<span data-demo-card="ClariS" class="underline decoration-faint underline-offset-4">ClariS</span></span>
+        <UiHoverCard :anchor="demoCard.anchor.value" class="w-64" @enter="demoCard.enter" @leave="demoCard.leave" @close="demoCard.close">
+          <p class="font-semibold text-title">{{ demoCard.current.value?.dataset.demoCard }}</p>
+          <p class="mt-1 text-xs leading-5">停 350 ms 后出现；移到下一个名字时很快切换；指针移进卡片不会消失。</p>
+        </UiHoverCard>
         <UiPopover placement="right-start" class="w-64">
           <template #trigger="{ toggle, attrs }">
             <UiButton icon="lucide:info" label="弹出卡片（右侧）" v-bind="attrs" @click="toggle" />

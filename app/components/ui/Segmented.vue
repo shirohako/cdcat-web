@@ -22,6 +22,9 @@ export interface UiSegmentedItem<V> {
  * The thumb is placed from measured offsets, so until the component has mounted the chosen option paints its own
  * background instead: the server-rendered page already shows the choice, and nothing moves when the thumb takes over.
  * Link options move the thumb on the click, while the next page is still on its way.
+ *
+ * With `collapse`, options show only their icon (their label as a tooltip) and the chosen one opens its label as the
+ * thumb glides over; the label width and the thumb move on the same curve, so they land together. Not with `block`.
  */
 const props = withDefaults(defineProps<{
   items: UiSegmentedItem<T>[]
@@ -30,7 +33,9 @@ const props = withDefaults(defineProps<{
   block?: boolean
   label?: string
   semantics?: 'radio' | 'tab'
-}>(), { size: 'md', block: false, label: undefined, semantics: 'radio' })
+  /** Icon-only options; only the chosen one shows its label. */
+  collapse?: boolean
+}>(), { size: 'md', block: false, label: undefined, semantics: 'radio', collapse: false })
 
 const model = defineModel<T>()
 
@@ -41,7 +46,9 @@ const shown = computed(() => pending.value ?? model.value)
 watch(model, () => { pending.value = null })
 
 const asLinks = computed(() => props.items.some(item => item.to))
-const options = () => [...(track.value?.querySelectorAll<HTMLElement>(':scope > [data-option]') ?? [])]
+// Descendants, not children: in collapse mode each option sits inside its tooltip's trigger wrapper.
+const options = () => [...(track.value?.querySelectorAll<HTMLElement>('[data-option]') ?? [])]
+const tooltipGroup = `segmented-${useId()}`
 
 // Measured place of the thumb; `measured` turns the thumb on.
 const thumb = reactive({ left: 0, width: 0 })
@@ -50,10 +57,28 @@ const interacted = ref(false)
 
 function measure() {
   const index = props.items.findIndex(item => item.value === shown.value)
-  const option = options()[index]
+  const all = options()
+  const option = all[index]
   if (!option) return
-  thumb.left = option.offsetLeft
-  thumb.width = option.offsetWidth
+  if (!props.collapse) {
+    thumb.left = option.offsetLeft
+    thumb.width = option.offsetWidth
+    measured.value = true
+    return
+  }
+  // Labels are still opening or closing: place the thumb where the chosen option will end up, from each option's
+  // width without its label plus the chosen label's full width. Offsets, not rects, so a scaling popover can't skew it.
+  let left = Number.parseFloat(SIZES[props.size].pad)
+  all.forEach((element, at) => {
+    const wrap = element.querySelector<HTMLElement>('[data-label]')
+    const base = element.offsetWidth - (wrap?.offsetWidth ?? 0)
+    const width = base + (at === index ? (wrap?.firstElementChild as HTMLElement | null)?.scrollWidth ?? 0 : 0)
+    if (at === index) {
+      thumb.left = left
+      thumb.width = width
+    }
+    left += width
+  })
   measured.value = true
 }
 
@@ -104,9 +129,9 @@ function onKeydown(event: KeyboardEvent) {
 
 // `pad` is the track's padding, which the thumb keeps above and below it.
 const SIZES = {
-  sm: { pad: '3px', option: 'h-7 gap-1.5 px-3 text-xs', icon: 'size-3.5' },
-  md: { pad: '3px', option: 'h-8 gap-2 px-3.5 text-sm', icon: 'size-4' },
-  lg: { pad: '4px', option: 'h-10 gap-2 px-4 text-sm', icon: 'size-4' },
+  sm: { pad: '3px', option: 'h-7 gap-1.5 px-3 text-xs', collapsed: 'h-[1.625rem] px-[0.4375rem] text-xs', icon: 'size-3.5' },
+  md: { pad: '3px', option: 'h-8 gap-2 px-3.5 text-sm', collapsed: 'h-8 px-2.5 text-sm', icon: 'size-4' },
+  lg: { pad: '4px', option: 'h-10 gap-2 px-4 text-sm', collapsed: 'h-10 px-3 text-sm', icon: 'size-4' },
 }
 
 const optionRole = computed(() => (asLinks.value ? undefined : props.semantics))
@@ -118,7 +143,7 @@ const isOn = (item: UiSegmentedItem<T>) => item.value === shown.value
     :is="asLinks ? 'nav' : 'div'"
     ref="track"
     class="segmented relative isolate rounded-lg"
-    :class="block ? 'grid w-full' : 'inline-flex max-w-full'"
+    :class="[block ? 'grid w-full' : 'inline-flex max-w-full', collapse && 'is-collapse']"
     :style="{ '--pad': SIZES[size].pad, 'padding': SIZES[size].pad, 'gridTemplateColumns': block ? `repeat(${items.length}, minmax(0, 1fr))` : undefined }"
     :role="asLinks ? undefined : semantics === 'tab' ? 'tablist' : 'radiogroup'"
     :aria-label="label"
@@ -131,31 +156,35 @@ const isOn = (item: UiSegmentedItem<T>) => item.value === shown.value
       :style="{ translate: `${thumb.left}px 0`, width: `${thumb.width}px` }"
       aria-hidden="true"
     />
-    <component
-      :is="item.to && !item.disabled ? NuxtLink : 'button'"
-      v-for="item in items"
-      :key="item.value"
-      data-option
-      :to="item.to && !item.disabled ? item.to : undefined"
-      :type="item.to && !item.disabled ? undefined : 'button'"
-      :role="optionRole"
-      :aria-checked="optionRole === 'radio' ? isOn(item) : undefined"
-      :aria-selected="optionRole === 'tab' ? isOn(item) : undefined"
-      :aria-current="item.to && item.value === model ? 'page' : undefined"
-      :tabindex="asLinks ? undefined : isOn(item) ? 0 : -1"
-      :disabled="item.to && !item.disabled ? undefined : item.disabled"
-      class="option relative flex min-w-0 items-center justify-center rounded-md font-medium whitespace-nowrap"
-      :class="[SIZES[size].option, {
-        'is-on': isOn(item),
-        'is-painted': isOn(item) && !measured,
-        'is-popping': isOn(item) && interacted,
-      }]"
-      @click="choose(item)"
-    >
-      <UiIcon v-if="item.icon" :icon="item.icon" class="icon shrink-0" :class="SIZES[size].icon" />
-      <span class="truncate">{{ item.label }}</span>
-      <span v-if="item.count !== undefined" class="count tabular-nums">{{ item.count }}</span>
-    </component>
+    <UiTooltip v-for="item in items" :key="item.value" :text="item.label" :group="tooltipGroup" :disabled="!collapse || isOn(item)">
+      <component
+        :is="item.to && !item.disabled ? NuxtLink : 'button'"
+        data-option
+        :aria-label="collapse ? item.label : undefined"
+        :to="item.to && !item.disabled ? item.to : undefined"
+        :type="item.to && !item.disabled ? undefined : 'button'"
+        :role="optionRole"
+        :aria-checked="optionRole === 'radio' ? isOn(item) : undefined"
+        :aria-selected="optionRole === 'tab' ? isOn(item) : undefined"
+        :aria-current="item.to && item.value === model ? 'page' : undefined"
+        :tabindex="asLinks ? undefined : isOn(item) ? 0 : -1"
+        :disabled="item.to && !item.disabled ? undefined : item.disabled"
+        class="option relative flex min-w-0 items-center justify-center rounded-md font-medium whitespace-nowrap"
+        :class="[collapse ? SIZES[size].collapsed : SIZES[size].option, {
+          'is-on': isOn(item),
+          'is-painted': isOn(item) && !measured,
+          'is-popping': isOn(item) && interacted,
+        }]"
+        @click="choose(item)"
+      >
+        <UiIcon v-if="item.icon" :icon="item.icon" class="icon shrink-0" :class="SIZES[size].icon" />
+        <span v-if="collapse" data-label class="label-wrap grid" :class="isOn(item) ? 'grid-cols-[1fr]' : 'grid-cols-[0fr]'" aria-hidden="true">
+          <span class="min-w-0 overflow-hidden"><span class="block whitespace-nowrap pl-1.5">{{ item.label }}</span></span>
+        </span>
+        <span v-else class="truncate">{{ item.label }}</span>
+        <span v-if="item.count !== undefined" class="count tabular-nums">{{ item.count }}</span>
+      </component>
+    </UiTooltip>
   </component>
 </template>
 
@@ -215,6 +244,19 @@ const isOn = (item: UiSegmentedItem<T>) => item.value === shown.value
   opacity: 0.65;
 }
 
+.label-wrap {
+  transition: grid-template-columns 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A hover fill well clear of the page colour (the album page's rule), only in this newer mode. */
+.is-collapse .option:hover:not(:disabled, .is-on) {
+  background-color: oklch(0 0 0 / 0.06);
+}
+
+[data-theme="dark"] .is-collapse .option:hover:not(:disabled, .is-on) {
+  background-color: oklch(1 0 0 / 0.07);
+}
+
 @keyframes land {
   45% { scale: 1.05 0.9; }
 }
@@ -227,7 +269,8 @@ const isOn = (item: UiSegmentedItem<T>) => item.value === shown.value
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .thumb {
+  .thumb,
+  .label-wrap {
     transition: none;
   }
 

@@ -108,10 +108,14 @@ import type { Revision } from '~/types/revision'
 import { Columns2, FileText, Pencil, Plus, Trash2 } from '@lucide/vue'
 import { lyricLines } from '~/utils/lyricText'
 
-const props = defineProps<{ trackId: number }>()
+const props = defineProps<{
+  trackId: number
+  /** What to show first: the original (default) or a translation, one in the UI language when there is */
+  prefer?: 'original' | 'translation'
+}>()
 
 const { $api } = useNuxtApp()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { isAuthenticated, hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
@@ -127,8 +131,13 @@ const canSubmit = computed(() => isAuthenticated.value && hasPermission('content
 const selectedId = ref<number | null>(null)
 const compareId = ref<number | null>(null)
 const editing = ref<'new' | 'edit' | null>(null)
+const firstPick = (list: LyricSummary[]) => {
+  if (props.prefer !== 'translation') return list[0]
+  const translations = list.filter(lyric => lyric.kind === 'translation')
+  return translations.find(lyric => lyric.language === locale.value) ?? translations[0] ?? list[0]
+}
 watch(lyrics, (list) => {
-  if (!list.some(lyric => lyric.id === selectedId.value)) selectedId.value = list[0]?.id ?? null
+  if (!list.some(lyric => lyric.id === selectedId.value)) selectedId.value = firstPick(list)?.id ?? null
 }, { immediate: true })
 
 const selected = computed(() => lyrics.value.find(lyric => lyric.id === selectedId.value) ?? null)

@@ -57,13 +57,58 @@
       "unmarked": "我還未標記"
     },
     "tracklist": {
-      "credits_toggle": "人員資訊",
-      "lyric": "歌詞",
-      "translation": "翻譯",
       "translation_with_count": "翻譯 {count}",
-      "language": "曲目表語言",
       "original": "原文",
-      "original_songs": "原曲："
+      "density": {
+        "label": "資訊密度",
+        "compact": "簡潔",
+        "comfy": "舒適",
+        "full": "完整"
+      },
+      "styles": {
+        "list": "清單",
+        "list_hint": "像音樂 App",
+        "booklet": "內頁",
+        "booklet_hint": "CD 內頁排版",
+        "table": "表格",
+        "table_hint": "對齊的欄"
+      },
+      "settings": {
+        "title": "曲目表設定",
+        "description": "只儲存在這個瀏覽器裡",
+        "style": "樣式",
+        "cards": "懸停卡片",
+        "track_card": "曲目資訊卡",
+        "track_card_hint": "滑鼠停在曲名上時顯示",
+        "artist_card": "藝術家資訊卡",
+        "artist_card_hint": "滑鼠停在人名上時顯示",
+        "done": "完成"
+      },
+      "language_title": "標題語言",
+      "language_button": "標題語言：{name}",
+      "language_description": "曲目標題用哪種語言顯示",
+      "language_note": "沒有這種語言標題的曲目仍顯示原文，字色變淺。",
+      "lyrics_count": "歌詞 {count}",
+      "lyrics_none": "還沒有歌詞，點開可以新增",
+      "disc": {
+        "tracks": "{count} 首",
+        "folded": "已收起 {count} 首",
+        "fold": "收起這張碟",
+        "unfold": "展開這張碟"
+      },
+      "total": "共 {discs} 張碟 · {tracks} 首",
+      "total_tracks": "共 {count} 首",
+      "original_song": "原曲",
+      "original_title": "原名",
+      "open_track": "打開曲目頁",
+      "columns": {
+        "title": "標題",
+        "duration": "時長",
+        "lyrics": "歌詞",
+        "favorites": "收藏",
+        "others": "其他人員"
+      },
+      "language_none": "曲目標題還沒有其他語言"
     },
     "actions": {},
     "empty": {
@@ -3096,5 +3141,12 @@
       "guide_editor": "CDCat 編輯器使用說明：怎樣新增專輯，填寫曲目、參與創作的人、版本和特典，提交審核，以及修正已有的資料。",
       "join": "CDCat 人員募集：翻譯、校對、編輯、美術、設計、開發、資料整理和社群管理等職位，歡迎喜歡音樂的你一起參與。"
     }
+  },
+  "artist_card": {
+    "on_album": "在本專輯",
+    "albums": "專輯 {count}",
+    "favorites": "收藏 {count}",
+    "open": "查看藝術家",
+    "load_failed": "更多資訊沒能載入"
   }
 }

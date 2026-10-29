@@ -13,7 +13,7 @@
         {{ $t('lyrics_ui.open_track') }}
       </UiButton>
     </template>
-    <LyricsPanel v-if="trackId" :key="trackId" :track-id="trackId" />
+    <LyricsPanel v-if="trackId" :key="trackId" :track-id="trackId" :prefer="prefer" />
   </EditorModal>
 </template>
 
@@ -21,6 +21,11 @@
 import { ArrowUpRight, FileText } from '@lucide/vue'
 
 /** The lyrics of one track over the album page; the panel is the same as on the track page. */
-defineProps<{ trackId: number | null, title?: string }>()
+defineProps<{
+  trackId: number | null
+  title?: string
+  /** Open on a translation (one in the UI language when there is) rather than the original */
+  prefer?: 'original' | 'translation'
+}>()
 const open = defineModel<boolean>({ required: true })
 </script>

@@ -57,13 +57,58 @@
       "unmarked": "まだマークしていません"
     },
     "tracklist": {
-      "credits_toggle": "クレジット",
-      "lyric": "歌詞",
-      "translation": "翻訳",
       "translation_with_count": "翻訳 {count}",
-      "language": "トラックリストの言語",
       "original": "原題",
-      "original_songs": "原曲："
+      "density": {
+        "label": "表示の詳しさ",
+        "compact": "シンプル",
+        "comfy": "標準",
+        "full": "詳細"
+      },
+      "styles": {
+        "list": "リスト",
+        "list_hint": "音楽アプリ風",
+        "booklet": "ブックレット",
+        "booklet_hint": "CD ブックレット風",
+        "table": "表",
+        "table_hint": "列をそろえて"
+      },
+      "settings": {
+        "title": "トラックリストの設定",
+        "description": "このブラウザにだけ保存されます",
+        "style": "スタイル",
+        "cards": "ホバーカード",
+        "track_card": "曲のカード",
+        "track_card_hint": "曲名にポインターを置くと表示",
+        "artist_card": "アーティストのカード",
+        "artist_card_hint": "名前にポインターを置くと表示",
+        "done": "完了"
+      },
+      "language_title": "タイトルの言語",
+      "language_button": "タイトルの言語：{name}",
+      "language_description": "曲名をどの言語で表示するか",
+      "language_note": "その言語のタイトルがない曲は原題のまま、薄い色で表示します。",
+      "lyrics_count": "歌詞 {count}",
+      "lyrics_none": "歌詞はまだありません。開くと追加できます",
+      "disc": {
+        "tracks": "{count} 曲",
+        "folded": "{count} 曲を折りたたみ中",
+        "fold": "このディスクを折りたたむ",
+        "unfold": "このディスクを開く"
+      },
+      "total": "全 {discs} 枚 · {tracks} 曲",
+      "total_tracks": "全 {count} 曲",
+      "original_song": "原曲",
+      "original_title": "原題",
+      "open_track": "曲のページへ",
+      "columns": {
+        "title": "タイトル",
+        "duration": "時間",
+        "lyrics": "歌詞",
+        "favorites": "お気に入り",
+        "others": "その他のクレジット"
+      },
+      "language_none": "ほかの言語のタイトルはまだありません"
     },
     "actions": {},
     "empty": {
@@ -3096,5 +3141,12 @@
       "guide_editor": "CDCat エディターの使い方：アルバムの追加、曲目・クレジット・エディション・特典の入力、審査への提出、既存データの修正。",
       "join": "CDCat スタッフ募集：翻訳、校正、編集、イラスト、デザイン、開発、データ整理、コミュニティ管理など、音楽が好きな方の参加をお待ちしています。"
     }
+  },
+  "artist_card": {
+    "on_album": "このアルバムで",
+    "albums": "アルバム {count}",
+    "favorites": "お気に入り {count}",
+    "open": "アーティストを見る",
+    "load_failed": "詳しい情報を読み込めませんでした"
   }
 }
