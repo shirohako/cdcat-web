@@ -1,7 +1,7 @@
 <template>
   <section class="card overflow-hidden">
     <!-- Header -->
-    <UiSectionTitle :title="$t('album.section.articles')" :icon="FileText" class="px-5 pb-2 pt-4">
+    <UiSectionTitle :title="$t('album.section.articles')" :icon="FileText" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
       <template v-if="articles.length > 0" #actions>
         <span class="text-xs text-meta">{{ $t('content_display.article_count', { count: articles.length }) }}</span>
       </template>
@@ -24,7 +24,7 @@
             class="w-full h-full object-cover"
           >
           <div v-else class="w-full h-full flex items-center justify-center">
-            <FileText :size="18" class="text-faint" />
+            <FileText :size="18" class="text-meta" />
           </div>
         </div>
 
@@ -40,16 +40,7 @@
       </NuxtLink>
     </div>
 
-    <!-- Empty state -->
-    <div v-else class="flex items-center justify-center gap-3 py-5 px-5">
-      <div class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center shrink-0">
-        <FileText :size="15" class="text-faint" />
-      </div>
-      <div class="text-left">
-        <p class="text-sm font-semibold text-meta">{{ $t('album.empty.articles_title') }}</p>
-        <p class="text-xs text-meta mt-0.5">{{ $t('album.empty.articles_desc') }}</p>
-      </div>
-    </div>
+    <CatalogEmptyLine v-else :icon="FileText" :text="$t('album.empty.articles_title')" size="sm" />
   </section>
 </template>
 

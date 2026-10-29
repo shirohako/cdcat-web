@@ -1,6 +1,7 @@
 <template>
   <section class="card overflow-hidden">
-    <UiSectionTitle :title="title" :icon="icon" :description="description" class="px-5 pb-2 pt-4">
+    <!-- sm: the album page's card title, 16px on a 20px line -->
+    <UiSectionTitle :title="title" :icon="icon" :description="description" :size="size" class="px-5 pb-2 pt-4" :class="size === 'sm' && '[&_h2]:leading-5'">
       <template v-if="$slots.actions" #actions>
         <div class="flex flex-wrap items-center justify-end gap-2 text-xs text-meta">
           <slot name="actions" />
@@ -19,7 +20,9 @@ withDefaults(defineProps<{
   icon: Component
   /** What the section is for, under the title. */
   description?: string
+  size?: 'sm' | 'md'
 }>(), {
   description: undefined,
+  size: 'md',
 })
 </script>

@@ -19,7 +19,7 @@
               :alt="album.title"
               class="h-44 w-44 rounded-md object-cover sm:h-56 sm:w-56 md:h-60 md:w-60 lg:h-72 lg:w-72 xl:h-80 xl:w-80 2xl:h-96 2xl:w-96"
             >
-            <div v-else class="flex h-44 w-44 items-center justify-center rounded-md bg-sunken text-faint sm:h-56 sm:w-56 md:h-60 md:w-60 lg:h-72 lg:w-72">
+            <div v-else class="flex h-44 w-44 items-center justify-center rounded-md bg-sunken text-meta sm:h-56 sm:w-56 md:h-60 md:w-60 lg:h-72 lg:w-72">
               <Disc3 :size="64" />
             </div>
           </button>

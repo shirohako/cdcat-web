@@ -1,41 +1,31 @@
 <template>
-  <CatalogSection :title="$t('reviews.title')" :icon="MessageSquare">
+  <!-- The album page calls its reviews 留言: same data, ratings given in the review editor. Styled like the page's other
+       cards: the site's switch for the sort, xs buttons, rating tags in the rating card's colours, a one-line empty state. -->
+  <CatalogSection :title="$t('album.comments.title')" :icon="MessageSquare" size="sm">
     <template #actions>
       <span>{{ $t('reviews.count', { count: total }) }}</span>
-      <div v-if="total > 1" class="flex items-center gap-1">
-        <button
-          v-for="option in SORTS"
-          :key="option"
-          type="button"
-          class="chip chip-sm"
-          :class="{ 'chip-selected': sort === option }"
-          @click="sort = option"
-        >{{ $t(`reviews.sort.${option}`) }}</button>
-      </div>
+      <UiSegmented v-if="total > 1" v-model="sort" :items="sortItems" size="sm" />
     </template>
 
-    <div class="border-b border-line px-5 py-4">
-      <template v-if="isAuthenticated">
-        <div v-if="mine" class="rounded-lg bg-primary/10 px-3 py-2.5">
-          <p class="mb-1 flex flex-wrap items-center gap-2 text-[11px] font-semibold text-primary">
-            {{ $t('reviews.mine') }}
-            <span v-if="mine.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1" :class="reviewRatingTone(mine.rating)">{{ $t(reviewRatingKey(mine.rating)) }}</span>
-            <span v-if="mine.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-[10px] font-medium text-btn-content">{{ $t('reviews.hidden') }}</span>
-          </p>
-          <RichContent :content="mine.content" format="markdown" class="text-sm" />
-          <div class="mt-1.5 flex gap-1.5">
-            <UiButton size="xs" @click="openEditor()">{{ $t('common.edit') }}</UiButton>
-            <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
-          </div>
+    <!-- The viewer's own comment; else, with comments below, the button to write one (the rating hint lives in the
+         editor). With none at all, only that button, centred. -->
+    <div v-if="isAuthenticated && mine" class="border-b border-line px-5 py-4">
+      <div class="rounded-md bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
+        <p class="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-title">
+          {{ $t('album.comments.mine') }}
+          <span v-if="mine.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[mine.rating].solid">{{ $t(reviewRatingKey(mine.rating)) }}</span>
+          <span v-if="mine.is_hidden" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-[11px] leading-4 text-meta dark:bg-white/[0.08]">{{ $t('reviews.hidden') }}</span>
+        </p>
+        <RichContent :content="mine.content" format="markdown" class="text-sm" />
+        <div class="mt-1.5 flex gap-1.5">
+          <UiButton size="xs" @click="openEditor()">{{ $t('common.edit') }}</UiButton>
+          <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
         </div>
-        <div v-else class="flex flex-wrap items-center gap-3">
-          <UiButton variant="primary" size="sm" :icon="PenLine" @click="openEditor()">{{ $t('reviews.write') }}</UiButton>
-          <span class="text-xs text-meta">{{ $t('reviews.rating_hint') }}</span>
-        </div>
-      </template>
-      <p v-else class="text-sm text-meta">
-        <UiButton :to="loginPath" size="sm">{{ $t('reviews.login') }}</UiButton>
-      </p>
+      </div>
+    </div>
+    <div v-else-if="reviews.length" class="border-b border-line px-5 py-3">
+      <UiButton v-if="isAuthenticated" variant="primary" size="xs" :icon="PenLine" @click="openEditor()">{{ $t('album.comments.write') }}</UiButton>
+      <UiButton v-else :to="loginPath" size="xs">{{ $t('album.comments.login') }}</UiButton>
     </div>
 
     <ul v-if="reviews.length" class="divide-y divide-line">
@@ -46,8 +36,8 @@
         <div class="min-w-0 flex-1">
           <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
             <NuxtLink :to="`/profile/${review.user?.username}`" class="font-semibold text-body transition-colors hover:text-primary">{{ review.user?.nickname || review.user?.username }}</NuxtLink>
-            <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1" :class="reviewRatingTone(review.rating)">{{ $t(reviewRatingKey(review.rating)) }}</span>
-            <span v-if="review.tracking_status" class="rounded bg-btn px-1.5 py-0.5 text-[10px] text-btn-content">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
+            <span v-if="review.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[review.rating].solid">{{ $t(reviewRatingKey(review.rating)) }}</span>
+            <span v-if="review.tracking_status" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-[11px] leading-4 text-meta dark:bg-white/[0.08]">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
             <time class="text-meta" :datetime="review.created_at" :title="exact(review.created_at)">{{ ago(review.created_at) }}</time>
             <UiButton
               v-if="isAuthenticated && review.user_id !== user?.id"
@@ -95,7 +85,10 @@
         </div>
       </div>
     </SkeletonStatus>
-    <p v-else class="px-5 py-6 text-center text-sm text-meta">{{ $t('reviews.empty') }}</p>
+    <div v-else class="flex justify-center px-5 py-4">
+      <UiButton v-if="isAuthenticated" variant="primary" size="xs" :icon="PenLine" @click="openEditor()">{{ $t('album.comments.write') }}</UiButton>
+      <UiButton v-else :to="loginPath" size="xs">{{ $t('album.comments.login') }}</UiButton>
+    </div>
 
     <div v-if="page < lastPage" class="border-t border-line px-5 py-2 text-center">
       <UiButton size="xs" :disabled="pending" @click="load(page + 1)">{{ $t('reviews.more') }}</UiButton>
@@ -134,6 +127,7 @@ const props = defineProps<{ albumId: number }>()
 const emit = defineEmits<{ changed: [] }>()
 
 const SORTS: ReviewSort[] = ['latest', 'useful']
+const sortItems = computed(() => SORTS.map(value => ({ value, label: t(`reviews.sort.${value}`) })))
 const REACTIONS = [
   { type: 'useful', icon: ThumbsUp, active: 'bg-blue-50 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300' },
   { type: 'dislike', icon: ThumbsDown, active: 'bg-red-50 text-red-500 dark:bg-red-400/15 dark:text-red-300' },

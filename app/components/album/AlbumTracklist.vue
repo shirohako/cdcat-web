@@ -1,5 +1,5 @@
 <template>
-  <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic">
+  <CatalogSection :title="$t('album.section.tracklist')" :icon="ListMusic" size="sm">
     <template #actions>
       <UiSelect
         v-if="languages.length"
@@ -9,12 +9,6 @@
         class="h-8 max-w-44 text-xs text-body"
         :aria-label="$t('album.tracklist.language')"
       />
-      <NuxtLink
-        v-if="albumId"
-        :to="{ path: `/contribute/album/${albumId}`, query: { mode: 'translate', locale } }"
-        class="hidden items-center gap-1 transition-colors hover:text-primary sm:flex"
-        :title="$t('editor.mode_translate')"
-      ><Languages :size="12" />{{ $t('album.tracklist.translate') }}</NuxtLink>
       <span class="hidden items-center gap-1 sm:flex"><Users :size="12" />{{ $t('album.tracklist.credits_toggle') }}</span>
       <input v-model="showCredits" type="checkbox" class="toggle scale-75" :aria-label="$t('album.tracklist.credits_toggle')">
     </template>
@@ -118,13 +112,7 @@
       </template>
     </div>
 
-    <div v-else class="flex items-center justify-center gap-3 px-6 py-5">
-      <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sunken"><ListMusic :size="15" class="text-faint" /></div>
-      <div class="text-left">
-        <p class="text-sm font-semibold text-body">{{ $t('album.empty.tracklist_title') }}</p>
-        <p class="mt-0.5 text-xs text-meta">{{ $t('album.empty.tracklist_desc') }}</p>
-      </div>
-    </div>
+    <CatalogEmptyLine v-else :icon="ListMusic" :text="$t('album.empty.tracklist_title')" />
   </CatalogSection>
 
   <LyricsModal v-model="showLyrics" :track-id="lyricsTarget.trackId" :title="lyricsTarget.title" />
@@ -133,7 +121,7 @@
 <script setup lang="ts">
 import type { AlbumBonus, AlbumDisc, AlbumTrack, TracklistLanguage } from '~/types/album'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { Disc3, FileText, Heart, Languages, ListMusic, Music2, UserRound, Users } from '@lucide/vue'
+import { Disc3, FileText, Heart, ListMusic, Music2, UserRound, Users } from '@lucide/vue'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
 
 const props = defineProps<{

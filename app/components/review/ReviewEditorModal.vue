@@ -27,7 +27,7 @@
             </label>
             <!-- After Metacritic's "my score": five parts, pale in their own level's colour; pointing at one fills the
                  bar up to it in that level's colour, a press picks it (again: takes it back). The square and name show
-                 the level pointed at, else the picked one. -->
+                 the level pointed at, else the picked one; nothing picked, a dash on a faint square and 未评分. -->
             <div class="flex items-center gap-4">
               <div class="-my-1.5 flex min-w-0 flex-1" @pointerleave="pointed = null">
                 <button
@@ -56,16 +56,16 @@
               <div class="flex w-32 shrink-0 items-center gap-2.5">
                 <span
                   class="grid size-10 shrink-0 place-items-center rounded-md text-base font-black tabular-nums transition-colors duration-150"
-                  :class="shownRating ? REVIEW_LEVEL_COLORS[shownRating].solid : 'ring-2 ring-inset ring-faint'"
-                >{{ shownRating ?? '' }}</span>
-                <span v-if="shownRating" class="truncate text-sm font-semibold text-title">{{ $t(reviewRatingKey(shownRating)) }}</span>
+                  :class="shownRating ? REVIEW_LEVEL_COLORS[shownRating].solid : 'bg-black/[0.05] text-faint dark:bg-white/[0.08]'"
+                >{{ shownRating ?? '–' }}</span>
+                <span class="truncate text-sm font-semibold" :class="shownRating ? 'text-title' : 'text-meta'">{{ shownRating ? $t(reviewRatingKey(shownRating)) : $t('reviews.unrated') }}</span>
               </div>
             </div>
           </div>
 
           <div>
             <label class="mb-2 block text-sm font-semibold text-body">
-              <span class="flex items-center gap-1.5"><Globe :size="13" />{{ $t('reviews.language') }}</span>
+              <span class="flex items-center gap-1.5"><Globe :size="13" />{{ $t('reviews.language') }} <span class="text-danger">*</span></span>
             </label>
             <UiSelect v-model="form.language" :options="languageOptions" size="sm" class="w-full max-w-xs" />
           </div>
@@ -137,7 +137,8 @@ const targetAlbumId = computed(() => props.albumId ?? props.review?.album_id ?? 
 
 const submitting = ref(false)
 const errorMessage = ref('')
-const canSubmit = computed(() => !!targetAlbumId.value && form.content.trim().length > 0 && form.content.length <= REVIEW_MAX_LENGTH)
+// The language is required here (the API still takes none, for older clients).
+const canSubmit = computed(() => !!targetAlbumId.value && !!form.language && form.content.trim().length > 0 && form.content.length <= REVIEW_MAX_LENGTH)
 
 const submit = async () => {
   if (!canSubmit.value || submitting.value) return

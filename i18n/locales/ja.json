@@ -32,6 +32,7 @@
     "section": {
       "description": "概要",
       "products": "商品",
+      "products_bonuses": "商品・特典",
       "bonuses": "特典",
       "credits": "クレジット",
       "tracklist": "トラックリスト",
@@ -62,43 +63,71 @@
       "translation_with_count": "翻訳 {count}",
       "language": "トラックリストの言語",
       "original": "原題",
-      "translate": "翻訳",
       "original_songs": "原曲："
     },
     "actions": {},
     "empty": {
-      "products_title": "商品情報がありません",
-      "products_desc": "このアルバムには商品がまだ紐づいていません",
+      "products_title": "情報はありません",
       "bonuses_title": "特典情報がありません",
       "bonuses_desc": "このアルバムには特典情報がまだ追加されていません",
       "bonus_detail": "詳細説明はありません",
       "credits": "クレジット情報がありません。",
       "tracklist_title": "曲目情報がありません",
-      "tracklist_desc": "このアルバムには曲目がまだ追加されていません",
       "links_title": "外部リンクがありません",
-      "links_desc": "このアルバムにはリンクがまだ追加されていません",
       "articles_title": "関連記事はありません",
-      "articles_desc": "このアルバムには記事がまだ紐づいていません",
       "contributors_title": "貢献者はいません",
       "contributors_desc": "最初の貢献者になりましょう",
       "lyrics_title": "歌詞がありません",
       "lyrics_desc": "右上の「歌詞・翻訳を投稿」から貢献できます",
-      "content": "内容がありません"
+      "content": "内容がありません",
+      "description": "紹介文はありません",
+      "gallery": "画像はありません"
     },
     "gallery": {
-      "count": "{count} 枚",
-      "original": "元画像 {width}×{height}"
+      "original": "元画像 {width}×{height}",
+      "view": "画像の表示",
+      "grid": "グリッド",
+      "list": "リスト",
+      "show_all": "すべて表示（{count}枚）",
+      "collapse": "閉じる"
     },
     "info": {
       "release_event": "頒布イベント",
-      "attributes": "その他の情報",
       "people": "発売"
     },
     "products": {
-      "contains_discs": "Disc {discs} 収録"
+      "columns": {
+        "edition": "形態",
+        "catalog": "品番",
+        "format": "仕様",
+        "discs": "収録",
+        "region": "地域",
+        "date": "発売日",
+        "price": "価格"
+      }
     },
     "bonuses": {
-      "all_editions": "全形態"
+      "all_editions": "全形態",
+      "columns": {
+        "bonus": "名称",
+        "type": "種類",
+        "channel": "入手先",
+        "editions": "対象形態"
+      }
+    },
+    "links": {
+      "show_all": "すべて表示（{count}件）",
+      "collapse": "閉じる"
+    },
+    "overview": {
+      "expand": "すべて表示",
+      "collapse": "閉じる"
+    },
+    "comments": {
+      "title": "コメント",
+      "mine": "あなたのコメント",
+      "write": "コメントを書く",
+      "login": "ログインしてコメント"
     }
   },
   "albums": {
@@ -2226,7 +2255,7 @@
     "related": {
       "title": "関連ディスカッション",
       "start": "ディスカッションを始める",
-      "empty": "まだディスカッションはありません。",
+      "empty": "関連ディスカッションはありません",
       "more": "{count} 件をすべて見る"
     },
     "profile": {
@@ -2285,7 +2314,6 @@
     }
   },
   "reviews": {
-    "title": "レビュー",
     "count": "{count} 件",
     "sort": {
       "latest": "新着",
@@ -2293,7 +2321,6 @@
       "liked_most": "好きな順",
       "liked_least": "好きではない順"
     },
-    "mine": "あなたのレビュー",
     "hidden": "非表示",
     "hidden_hint": "管理者により非表示になりました。あなたにだけ表示されています",
     "write": "レビューを書く",
@@ -2301,8 +2328,6 @@
     "update": "変更を保存",
     "submit": "投稿する",
     "submit_failed": "投稿できませんでした。しばらくしてからお試しください",
-    "login": "ログインしてレビューを書く",
-    "empty": "まだレビューはありません。最初のレビューを書いてみましょう",
     "more": "もっと見る",
     "delete_confirm": "レビューを削除しますか？評価も一緒に削除されます。",
     "report": "通報",
@@ -2337,14 +2362,12 @@
     "discover_albums": "アルバムを探す",
     "score": {
       "tbd": "TBD",
-      "based_on": "{count} 件の評価に基づく",
-      "out_of": "5 点満点",
       "verdict": {
-        "acclaim": "絶賛",
-        "favorable": "好評",
-        "mixed": "賛否両論",
-        "unfavorable": "不評",
-        "dislike": "酷評"
+        "acclaim": "広く愛されている",
+        "favorable": "おおむね満足",
+        "mixed": "好みが分かれる",
+        "unfavorable": "あまり合わない",
+        "dislike": "残念の声が多い"
       },
       "group": {
         "positive": "満足",
@@ -2354,8 +2377,11 @@
       "ratings": "{count} 件の評価",
       "few": "{count} 人が評価済み",
       "few_hint": "{min} 人に達するとスコアを表示",
-      "first": "最初のレビューを書いてみましょう"
-    }
+      "rank_hint": "高評価ランキングでの順位（毎日更新）",
+      "rank_pending": "ランキング待ち",
+      "rank_pending_hint": "順位は毎日更新。評価された作品は次の更新で順位が付きます"
+    },
+    "unrated": "未評価"
   },
   "versions": {
     "title": "編集履歴",

@@ -1,79 +1,50 @@
 <template>
   <section class="card overflow-hidden">
     <!-- Header -->
-    <UiSectionTitle :title="$t('album.section.links')" :icon="Link2" class="px-5 pb-2 pt-4">
-      <template v-if="links && links.length > 0" #actions>
+    <UiSectionTitle :title="$t('album.section.links')" :icon="Link2" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
+      <template v-if="links.length" #actions>
         <span class="text-xs text-meta">{{ $t('content_display.links', { count: links.length }) }}</span>
       </template>
     </UiSectionTitle>
 
-    <!-- Links grouped by category -->
-    <div v-if="links && links.length > 0">
-      <template v-for="(group, category) in groupedLinks" :key="category">
-        <!-- Category label -->
-        <div class="px-5 pt-3 pb-1 flex items-center gap-2">
-          <span class="text-[10px] font-bold tracking-widest uppercase" :class="categoryStyle(category).label">
-            {{ categoryLabel(category) }}
-          </span>
-          <div class="flex-1 h-px bg-line"/>
-        </div>
-
-        <!-- Links in this category: two columns in the page's wide column -->
-        <div class="grid px-2 sm:grid-cols-2">
-          <a
-            v-for="link in group"
-            :key="link.id"
-            :href="link.url"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group flex min-w-0 items-center gap-3 px-3 py-2.5"
-          >
-            <!-- Icon -->
-            <div
-              class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
-              :class="categoryStyle(category).bg"
+    <!-- Links grouped by category, each group a small label over a row of grey tags (the category's icon and the
+         site's name; the address in the tooltip, which glides along the tags). Past COLLAPSED_COUNT links only the
+         first ones show until expanded. -->
+    <div v-if="links && links.length > 0" class="space-y-3 px-5 pb-4 pt-1.5">
+      <div v-for="(group, category) in shownGroups" :key="category">
+        <p class="text-[11px] font-semibold text-meta">{{ categoryLabel(category) }}</p>
+        <div class="mt-1.5 flex flex-wrap gap-1.5">
+          <UiTooltip v-for="link in group" :key="link.id" group="album-links" :text="getDomain(link.url)">
+            <a
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="group inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] pl-1 pr-2.5 text-[12.5px] font-semibold text-title transition-colors duration-150 hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.14]"
             >
-              <Globe :size="13" :class="categoryStyle(category).icon" />
-            </div>
-
-            <!-- Name + domain -->
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-title leading-snug transition-colors group-hover:text-primary">
-                {{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}
-              </p>
-              <p class="text-[11px] text-meta truncate leading-none mt-0.5">
-                {{ getDomain(link.url) }}
-              </p>
-            </div>
-
-            <!-- Arrow -->
-            <ExternalLink
-              :size="13"
-              class="shrink-0 text-faint transition-[color,translate] duration-150 ease-out group-hover:-translate-y-px group-hover:translate-x-0.5 group-hover:text-primary"
-            />
-          </a>
+              <span class="flex size-5 shrink-0 items-center justify-center rounded-sm" :class="categoryStyle(category).bg">
+                <component :is="categoryStyle(category).iconComponent" :size="12" :class="categoryStyle(category).icon" />
+              </span>
+              <span class="truncate">{{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}</span>
+              <ExternalLink :size="11" class="shrink-0 text-faint transition-colors duration-150 group-hover:text-title" />
+            </a>
+          </UiTooltip>
         </div>
-
-        <div class="h-1"/>
-      </template>
-    </div>
-
-    <!-- Empty state -->
-    <div v-else class="flex items-center justify-center gap-3 py-5 px-5">
-      <div class="w-8 h-8 rounded-lg bg-sunken flex items-center justify-center shrink-0">
-        <Link2 :size="15" class="text-faint" />
       </div>
-      <div class="text-left">
-        <p class="text-sm font-semibold text-meta">{{ $t('album.empty.links_title') }}</p>
-        <p class="text-xs text-meta mt-0.5">{{ $t('album.empty.links_desc') }}</p>
+      <div v-if="collapsible" class="flex justify-center pt-1">
+        <UiButton size="xs" :icon-right="expanded ? ChevronUp : ChevronDown" @click="expanded = !expanded">
+          {{ expanded ? $t('album.links.collapse') : $t('album.links.show_all', { count: links.length }) }}
+        </UiButton>
       </div>
     </div>
+
+    <CatalogEmptyLine v-else :icon="Link2" :text="$t('album.empty.links_title')" size="sm" />
   </section>
 </template>
 
 <script setup lang="ts">
+import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
-import { Link2, Globe, ExternalLink } from '@lucide/vue'
+import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, ShoppingBag } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   links?: CatalogLink[]
@@ -100,6 +71,23 @@ const groupedLinks = computed(() => {
   return result;
 });
 
+/** Up to this many links show at first (tags are small); one more would not be worth a button, so it collapses past it. */
+const COLLAPSED_COUNT = 8
+const collapsible = computed(() => props.links.length > COLLAPSED_COUNT + 1)
+const expanded = ref(false)
+/** The groups as shown: collapsed, the first COLLAPSED_COUNT links in group order, groups left empty dropped. */
+const shownGroups = computed(() => {
+  if (!collapsible.value || expanded.value) return groupedLinks.value
+  const result: Record<string, CatalogLink[]> = {}
+  let left = COLLAPSED_COUNT
+  for (const [category, group] of Object.entries(groupedLinks.value)) {
+    if (left <= 0) break
+    result[category] = group.slice(0, left)
+    left -= result[category].length
+  }
+  return result
+})
+
 const categoryLabel = (category: string) => {
   const map: Record<string, string> = {
     official: 'Official',
@@ -113,14 +101,14 @@ const categoryLabel = (category: string) => {
 };
 
 const categoryStyle = (category: string) => {
-  const map: Record<string, { bg: string; icon: string; label: string }> = {
+  const map: Record<string, { bg: string; icon: string; iconComponent: Component }> = {
     // Each category keeps its own colour, with a partner for the dark theme; "other" uses the theme's neutrals.
-    official:  { bg: 'bg-blue-50 dark:bg-blue-400/15',     icon: 'text-blue-500 dark:text-blue-400',     label: 'text-blue-400 dark:text-blue-300' },
-    streaming: { bg: 'bg-green-50 dark:bg-green-400/15',   icon: 'text-green-500 dark:text-green-400',   label: 'text-green-500 dark:text-green-400' },
-    shop:      { bg: 'bg-orange-50 dark:bg-orange-400/15', icon: 'text-orange-500 dark:text-orange-400', label: 'text-orange-400 dark:text-orange-300' },
-    social:    { bg: 'bg-violet-50 dark:bg-violet-400/15', icon: 'text-violet-500 dark:text-violet-400', label: 'text-violet-400 dark:text-violet-300' },
-    database:  { bg: 'bg-amber-50 dark:bg-amber-400/15',   icon: 'text-amber-500 dark:text-amber-400',   label: 'text-amber-500 dark:text-amber-400' },
-    other:     { bg: 'bg-sunken',                          icon: 'text-meta',                            label: 'text-meta' },
+    official:  { bg: 'bg-blue-100 dark:bg-blue-400/20',     icon: 'text-blue-600 dark:text-blue-300',     iconComponent: House },
+    streaming: { bg: 'bg-emerald-100 dark:bg-emerald-400/20', icon: 'text-emerald-600 dark:text-emerald-300', iconComponent: Headphones },
+    shop:      { bg: 'bg-orange-100 dark:bg-orange-400/20', icon: 'text-orange-600 dark:text-orange-300', iconComponent: ShoppingBag },
+    social:    { bg: 'bg-violet-100 dark:bg-violet-400/20', icon: 'text-violet-600 dark:text-violet-300', iconComponent: AtSign },
+    database:  { bg: 'bg-amber-100 dark:bg-amber-400/20',   icon: 'text-amber-600 dark:text-amber-300',   iconComponent: Database },
+    other:     { bg: 'bg-black/[0.06] dark:bg-white/[0.1]', icon: 'text-meta',                            iconComponent: Globe },
   };
   return map[category] ?? map['other']!;
 };

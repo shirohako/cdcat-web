@@ -32,6 +32,7 @@
     "section": {
       "description": "簡介",
       "products": "產品",
+      "products_bonuses": "產品與特典",
       "bonuses": "特典",
       "credits": "製作人員",
       "tracklist": "曲目表",
@@ -62,43 +63,71 @@
       "translation_with_count": "翻譯 {count}",
       "language": "曲目表語言",
       "original": "原文",
-      "translate": "翻譯",
       "original_songs": "原曲："
     },
     "actions": {},
     "empty": {
-      "products_title": "暫無商品資訊",
-      "products_desc": "該專輯尚未關聯任何商品",
+      "products_title": "暫無資訊",
       "bonuses_title": "暫無特典資訊",
       "bonuses_desc": "該專輯尚未新增任何特典情報",
       "bonus_detail": "暫無詳細說明",
       "credits": "暫無製作人員資訊。",
       "tracklist_title": "暫無曲目資訊",
-      "tracklist_desc": "該專輯尚未新增任何曲目",
       "links_title": "暫無外部連結",
-      "links_desc": "該專輯尚未新增任何連結",
       "articles_title": "暫無相關文章",
-      "articles_desc": "該專輯尚未關聯任何文章",
       "contributors_title": "暫無貢獻者",
       "contributors_desc": "成為第一個貢獻資料的人",
       "lyrics_title": "暫無歌詞",
       "lyrics_desc": "點擊右上角「提交歌詞或翻譯」來貢獻內容",
-      "content": "暫無內容"
+      "content": "暫無內容",
+      "description": "暫無簡介",
+      "gallery": "暫無圖片"
     },
     "gallery": {
-      "count": "{count} 張",
-      "original": "原圖 {width}×{height}"
+      "original": "原圖 {width}×{height}",
+      "view": "圖片檢視",
+      "grid": "網格",
+      "list": "列表",
+      "show_all": "展開全部 {count} 張",
+      "collapse": "收起"
     },
     "info": {
       "release_event": "發行活動",
-      "attributes": "其他資訊",
       "people": "發行"
     },
     "products": {
-      "contains_discs": "含 Disc {discs}"
+      "columns": {
+        "edition": "版本",
+        "catalog": "編號",
+        "format": "規格",
+        "discs": "收錄",
+        "region": "地區",
+        "date": "發售日",
+        "price": "價格"
+      }
     },
     "bonuses": {
-      "all_editions": "所有版本"
+      "all_editions": "所有版本",
+      "columns": {
+        "bonus": "名稱",
+        "type": "類型",
+        "channel": "通路",
+        "editions": "適用版本"
+      }
+    },
+    "links": {
+      "show_all": "展開全部 {count} 個連結",
+      "collapse": "收起"
+    },
+    "overview": {
+      "expand": "展開全部",
+      "collapse": "收起"
+    },
+    "comments": {
+      "title": "留言",
+      "mine": "我的留言",
+      "write": "寫留言",
+      "login": "登入後寫留言"
     }
   },
   "albums": {
@@ -2226,7 +2255,7 @@
     "related": {
       "title": "相關討論",
       "start": "發起討論",
-      "empty": "還沒有相關討論。",
+      "empty": "暫無相關討論",
       "more": "查看全部 {count} 個討論"
     },
     "profile": {
@@ -2285,7 +2314,6 @@
     }
   },
   "reviews": {
-    "title": "評價",
     "count": "{count} 則",
     "sort": {
       "latest": "最新",
@@ -2293,7 +2321,6 @@
       "liked_most": "最喜歡的在前",
       "liked_least": "最不喜歡的在前"
     },
-    "mine": "我的評價",
     "hidden": "已隱藏",
     "hidden_hint": "已被管理員隱藏，只有你自己能看到",
     "write": "寫評價",
@@ -2301,8 +2328,6 @@
     "update": "儲存修改",
     "submit": "發布評價",
     "submit_failed": "發布失敗，請稍後再試",
-    "login": "登入後寫評價",
-    "empty": "還沒有評價，來寫第一則吧",
     "more": "更多",
     "delete_confirm": "刪除你的評價？評分也會一起刪除。",
     "report": "檢舉",
@@ -2337,14 +2362,12 @@
     "discover_albums": "去找專輯",
     "score": {
       "tbd": "TBD",
-      "based_on": "基於 {count} 人評分",
-      "out_of": "滿分 5",
       "verdict": {
-        "acclaim": "廣受好評",
-        "favorable": "普遍好評",
-        "mixed": "褒貶不一",
-        "unfavorable": "普遍差評",
-        "dislike": "極度差評"
+        "acclaim": "廣受喜愛",
+        "favorable": "多數滿足",
+        "mixed": "見仁見智",
+        "unfavorable": "不太合拍",
+        "dislike": "多感遺憾"
       },
       "group": {
         "positive": "滿足",
@@ -2354,8 +2377,11 @@
       "ratings": "{count} 評價",
       "few": "{count} 人已評分",
       "few_hint": "滿 {min} 人後顯示平均分",
-      "first": "來寫下第一則評價吧"
-    }
+      "rank_hint": "在高評分排行中的名次，每天更新",
+      "rank_pending": "等待排名",
+      "rank_pending_hint": "排名每天更新，有人評分後會在下次更新時排上"
+    },
+    "unrated": "未評分"
   },
   "versions": {
     "title": "版本歷史",

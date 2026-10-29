@@ -7,26 +7,19 @@
       <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div class="space-y-8 lg:col-span-2">
-            <AlbumDescriptions v-if="album.description" :description="album.description" />
+            <AlbumDescriptions :album="album" />
 
             <AlbumCredits :credits="album.credits" :discs="album.discs" />
 
             <AlbumTracklist :album-id="album.id" :discs="album.discs" :bonuses="album.bonuses" :languages="album.tracklist_languages" :locked="album.is_pending" />
 
-            <AlbumProducts :products="album.products" :discs="album.discs" :images="album.images" />
-
-            <AlbumBonuses :bonuses="album.bonuses" :products="album.products" :discs="album.discs" :images="album.images" />
-
-            <AlbumLinks :links="album.links" />
-
-            <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
+            <AlbumProducts :products="album.products" :bonuses="album.bonuses" :discs="album.discs" :images="album.images" />
 
             <!-- Albums awaiting review can only be viewed: reviews and tracking open after approval. -->
             <AlbumReviews v-if="!album.is_pending" ref="reviews" :album-id="album.id" @changed="refresh" />
           </div>
 
           <div class="space-y-6 lg:col-span-1">
-            <AlbumInfo :album="album" />
             <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
@@ -44,11 +37,14 @@
               :rating="album.rating"
               :rating-count="album.rating_count"
               :distribution="album.rating_distribution"
+              :ranking="album.ranking"
               :reviewed="!!reviews?.mine"
               @write-review="reviews?.openEditor()"
             />
+            <AlbumLinks :links="album.links" />
+            <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
             <AlbumArticles :articles="album.articles ?? []" />
-            <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" />
+            <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact />
           </div>
         </div>
       </div>

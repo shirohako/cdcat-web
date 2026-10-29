@@ -3,8 +3,11 @@ import { MessageCircle, MessageSquare, PenSquare } from '@lucide/vue'
 import type { ContentLinkType } from '~/types/article'
 import type { DiscussionTopicList } from '~/types/discussion'
 
-/** The latest topics linking a piece of content, with a button to start one. */
-const props = defineProps<{ type: ContentLinkType, id: number }>()
+/**
+ * The latest topics linking a piece of content, with a button to start one unless `startable` is false. `compact`
+ * (the album page's side column) draws the title smaller and the empty state tighter.
+ */
+const props = withDefaults(defineProps<{ type: ContentLinkType, id: number, startable?: boolean, compact?: boolean }>(), { startable: true, compact: false })
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
@@ -19,8 +22,8 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
 
 <template>
   <section class="card overflow-hidden">
-    <UiSectionTitle :title="t('discussions.related.title')" :icon="MessageCircle" :count="total || undefined" class="px-5 pb-2 pt-4">
-      <template #actions>
+    <UiSectionTitle :title="t('discussions.related.title')" :icon="MessageCircle" :count="total || undefined" :size="compact ? 'sm' : 'md'" class="px-5 pb-2 pt-4" :class="compact && '[&_h2]:leading-5'">
+      <template v-if="startable" #actions>
         <UiButton :to="start" size="xs" :icon="PenSquare">{{ t('discussions.related.start') }}</UiButton>
       </template>
     </UiSectionTitle>
@@ -42,6 +45,6 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
         <div class="skeleton h-2.5 w-1/3 rounded-full" />
       </div>
     </SkeletonStatus>
-    <p v-else class="px-5 py-4 text-sm text-meta">{{ t('discussions.related.empty') }}</p>
+    <CatalogEmptyLine v-else :icon="MessageCircle" :text="t('discussions.related.empty')" :size="compact ? 'sm' : 'md'" />
   </section>
 </template>

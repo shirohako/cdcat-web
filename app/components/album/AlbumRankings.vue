@@ -4,30 +4,40 @@
     <UiSectionTitle :title="$t('reviews.rating_title')" :icon="Heart" size="sm" class="px-5 pb-5 pt-4 [&_h2]:leading-5" />
 
     <div class="px-5 pb-5">
-      <!-- After Metacritic: the score in a square coloured by how good it is, the verdict beside it; too few
-           ratings, and the square reads "TBD" (in every language) in the theme colour. -->
-      <!-- Square and text as one group, centred in the card like the columns under the bar. -->
+      <!-- After Metacritic: the score in a square coloured by how good it is; too few ratings, and the square reads
+           "TBD" (in every language) in the theme colour, its tooltip saying when the score shows. Square and text are
+           one group, centred in the card like the columns under the bar. -->
       <div class="flex items-center justify-center gap-3">
-        <div
-          class="grid size-12 shrink-0 place-items-center rounded-md tabular-nums"
-          :class="score ? REVIEW_BAND_COLORS[score.band].solid : 'bg-primary text-on-primary'"
-        >
-          <span v-if="score" class="text-xl font-black leading-none">{{ score.value }}</span>
-          <span v-else class="text-xs font-black">{{ $t('reviews.score.tbd') }}</span>
-        </div>
-        <!-- Title and line never say the same: the verdict and its count; how many rated and when the score shows;
-             nobody yet, and an invitation to be first. -->
+        <UiTooltip :text="$t('reviews.score.few_hint', { min: MIN_RATINGS })" :disabled="!!score">
+          <div
+            class="grid size-12 shrink-0 place-items-center rounded-md tabular-nums"
+            :class="score ? REVIEW_BAND_COLORS[score.band].solid : 'bg-primary text-on-primary'"
+          >
+            <span v-if="score" class="text-xl font-black leading-none">{{ score.value }}</span>
+            <span v-else class="text-xs font-black">{{ $t('reviews.score.tbd') }}</span>
+          </div>
+        </UiTooltip>
         <div class="min-w-0">
+          <!-- The verdict; under five ratings, how many rated; nobody yet, that. -->
           <p class="truncate text-[15px] font-bold leading-5 text-title">
             <template v-if="score">{{ $t(`reviews.score.verdict.${score.verdict}`) }}</template>
             <template v-else-if="ratingCount === 0">{{ $t('reviews.no_ratings') }}</template>
             <template v-else>{{ $t('reviews.score.few', { count: number.format(ratingCount) }, ratingCount) }}</template>
           </p>
-          <p class="mt-0.5 truncate text-xs leading-5 text-meta">
-            <template v-if="score">{{ $t('reviews.score.based_on', { count: number.format(ratingCount) }, ratingCount) }} · {{ $t('reviews.score.out_of') }}</template>
-            <template v-else-if="ratingCount === 0">{{ $t('reviews.score.first') }}</template>
-            <template v-else>{{ $t('reviews.score.few_hint', { min: MIN_RATINGS }) }}</template>
-          </p>
+          <!-- Under it the 高评分 rank, with the list tab's award icon, opening that list: always "Rank N", whatever
+               the UI language; no rank yet (unrated, or rated since the last daily update), a grey "awaiting rank". -->
+          <UiTooltip :text="$t(ranking ? 'reviews.score.rank_hint' : 'reviews.score.rank_pending_hint')">
+            <NuxtLink
+              :to="{ path: '/albums', query: { sort: 'top_rated' } }"
+              class="mt-1 inline-flex h-6 items-center gap-1 rounded-md px-2 text-xs font-semibold tabular-nums transition-colors duration-150"
+              :class="ranking
+                ? 'bg-[oklch(0.86_0.1_85)]/35 text-[oklch(0.4_0.08_70)] hover:bg-[oklch(0.86_0.1_85)]/60 dark:bg-[oklch(0.86_0.1_85)]/15 dark:text-[oklch(0.86_0.1_85)] dark:hover:bg-[oklch(0.86_0.1_85)]/25'
+                : 'bg-black/[0.05] text-meta hover:bg-black/[0.09] dark:bg-white/[0.08] dark:hover:bg-white/[0.12]'"
+            >
+              <Award :size="13" class="shrink-0" />
+              {{ ranking ? `Rank ${ranking.toLocaleString('en-US')}` : $t('reviews.score.rank_pending') }}
+            </NuxtLink>
+          </UiTooltip>
         </div>
       </div>
 
@@ -56,7 +66,7 @@
 
       <!-- A small button centred under the columns, not a full-width bar. -->
       <div class="mt-4 flex justify-center">
-        <UiButton variant="primary" size="sm" :icon="PenLine" @click="emit('writeReview')">
+        <UiButton variant="primary" size="xs" :icon="PenLine" @click="emit('writeReview')">
           {{ $t(reviewed ? 'reviews.edit' : 'reviews.write') }}
         </UiButton>
       </div>
@@ -67,13 +77,15 @@
 <script setup lang="ts">
 import type { ReviewRating } from '~/types/reviews'
 import type { ReviewBand } from '~/utils/reviewRating'
-import { Heart, PenLine } from '@lucide/vue'
+import { Award, Heart, PenLine } from '@lucide/vue'
 
 /** The album's rating: average and per-level counts of the visible reviews. Ratings are given in the review editor. */
 const props = defineProps<{
   rating: number | null
   ratingCount: number
   distribution: number[] | null
+  /** Place in the 高评分 list (1 = best), recomputed daily; null when unrated or not ranked yet */
+  ranking?: number | null
   /** Whether the visitor has reviewed the album, rated or not */
   reviewed?: boolean
 }>()

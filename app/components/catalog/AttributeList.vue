@@ -1,5 +1,23 @@
 <template>
-  <dl v-if="groups.length" class="space-y-2 text-sm">
+  <!-- rows: each attribute as a CatalogInfoRow, for inside a CatalogInfoTable -->
+  <template v-if="rows">
+    <CatalogInfoRow v-for="group in groups" :key="group.key">
+      <template #label>
+        <UiTooltip :text="hint(group.key)" placement="right">
+          <span>{{ attributeName(group.key) }}</span>
+        </UiTooltip>
+      </template>
+      <span class="flex flex-wrap gap-x-2 gap-y-1">
+        <template v-for="attribute in group.values" :key="attribute.id">
+          <NuxtLink v-if="attributeLink(attribute)" :to="attributeLink(attribute)!" class="text-title transition-colors hover:text-primary">
+            {{ attributeText(attribute) }}
+          </NuxtLink>
+          <span v-else>{{ attributeText(attribute) }}</span>
+        </template>
+      </span>
+    </CatalogInfoRow>
+  </template>
+  <dl v-else-if="groups.length" class="space-y-2 text-sm">
     <div v-for="group in groups" :key="group.key" class="flex gap-3">
       <dt class="w-24 shrink-0 text-xs leading-5 text-meta">
         <UiTooltip :text="hint(group.key)" placement="right">
@@ -21,7 +39,7 @@
 <script setup lang="ts">
 import type { CatalogAttribute } from '~/types/catalog'
 
-const props = defineProps<{ attributes: CatalogAttribute[] }>()
+const props = defineProps<{ attributes: CatalogAttribute[], rows?: boolean }>()
 
 const { attributeName, attributeDefinition } = useCatalogSchema()
 const { attributeText, attributeLink } = useCatalogDisplay()

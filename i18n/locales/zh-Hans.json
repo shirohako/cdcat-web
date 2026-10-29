@@ -32,6 +32,7 @@
     "section": {
       "description": "简介",
       "products": "产品",
+      "products_bonuses": "产品与特典",
       "bonuses": "特典",
       "credits": "制作人员",
       "tracklist": "曲目表",
@@ -62,43 +63,71 @@
       "translation_with_count": "翻译 {count}",
       "language": "曲目表语言",
       "original": "原文",
-      "translate": "翻译",
       "original_songs": "原曲："
     },
     "actions": {},
     "empty": {
-      "products_title": "暂无商品信息",
-      "products_desc": "该专辑尚未关联任何商品",
+      "products_title": "暂无信息",
       "bonuses_title": "暂无特典信息",
       "bonuses_desc": "该专辑尚未添加任何特典情报",
       "bonus_detail": "暂无详细说明",
       "credits": "暂无制作人员信息。",
       "tracklist_title": "暂无曲目信息",
-      "tracklist_desc": "该专辑尚未添加任何曲目",
       "links_title": "暂无外部链接",
-      "links_desc": "该专辑尚未添加任何链接",
       "articles_title": "暂无相关文章",
-      "articles_desc": "该专辑尚未关联任何文章",
       "contributors_title": "暂无贡献者",
       "contributors_desc": "成为第一个贡献数据的人",
       "lyrics_title": "暂无歌词",
       "lyrics_desc": "点击右上角「提交歌词或翻译」来贡献内容",
-      "content": "暂无内容"
+      "content": "暂无内容",
+      "description": "暂无简介",
+      "gallery": "暂无图片"
     },
     "gallery": {
-      "count": "{count} 张",
-      "original": "原图 {width}×{height}"
+      "original": "原图 {width}×{height}",
+      "view": "图片视图",
+      "grid": "网格",
+      "list": "列表",
+      "show_all": "展开全部 {count} 张",
+      "collapse": "收起"
     },
     "info": {
       "release_event": "发行活动",
-      "attributes": "其他信息",
       "people": "发行"
     },
     "products": {
-      "contains_discs": "含 Disc {discs}"
+      "columns": {
+        "edition": "版本",
+        "catalog": "编号",
+        "format": "规格",
+        "discs": "收录",
+        "region": "地区",
+        "date": "发售日",
+        "price": "价格"
+      }
     },
     "bonuses": {
-      "all_editions": "所有版本"
+      "all_editions": "所有版本",
+      "columns": {
+        "bonus": "名称",
+        "type": "类型",
+        "channel": "渠道",
+        "editions": "适用版本"
+      }
+    },
+    "links": {
+      "show_all": "展开全部 {count} 个链接",
+      "collapse": "收起"
+    },
+    "overview": {
+      "expand": "展开全部",
+      "collapse": "收起"
+    },
+    "comments": {
+      "title": "留言",
+      "mine": "我的留言",
+      "write": "写留言",
+      "login": "登录后写留言"
     }
   },
   "albums": {
@@ -2226,7 +2255,7 @@
     "related": {
       "title": "相关讨论",
       "start": "发起讨论",
-      "empty": "还没有相关讨论。",
+      "empty": "暂无相关讨论",
       "more": "查看全部 {count} 个讨论"
     },
     "profile": {
@@ -2285,7 +2314,6 @@
     }
   },
   "reviews": {
-    "title": "评价",
     "count": "{count} 条",
     "sort": {
       "latest": "最新",
@@ -2293,7 +2321,6 @@
       "liked_most": "最喜欢的在前",
       "liked_least": "最不喜欢的在前"
     },
-    "mine": "我的评价",
     "hidden": "已隐藏",
     "hidden_hint": "已被管理员隐藏，只有你自己能看到",
     "write": "写评价",
@@ -2301,8 +2328,6 @@
     "update": "保存修改",
     "submit": "发布评价",
     "submit_failed": "发布失败，请稍后再试",
-    "login": "登录后写评价",
-    "empty": "还没有评价，来写第一条吧",
     "more": "更多",
     "delete_confirm": "删除你的评价？评分也会一起删除。",
     "report": "举报",
@@ -2337,14 +2362,12 @@
     "discover_albums": "去找专辑",
     "score": {
       "tbd": "TBD",
-      "based_on": "基于 {count} 人评分",
-      "out_of": "满分 5",
       "verdict": {
-        "acclaim": "广受好评",
-        "favorable": "普遍好评",
-        "mixed": "褒贬不一",
-        "unfavorable": "普遍差评",
-        "dislike": "极度差评"
+        "acclaim": "广受喜爱",
+        "favorable": "多数满足",
+        "mixed": "见仁见智",
+        "unfavorable": "不太合拍",
+        "dislike": "多感遗憾"
       },
       "group": {
         "positive": "满足",
@@ -2354,8 +2377,11 @@
       "ratings": "{count} 评价",
       "few": "{count} 人已评分",
       "few_hint": "满 {min} 人后显示平均分",
-      "first": "来写下第一条评价吧"
-    }
+      "rank_hint": "在高评分排行中的名次，每天更新",
+      "rank_pending": "等待排名",
+      "rank_pending_hint": "排名每天更新，有人评分后会在下次更新时排上"
+    },
+    "unrated": "未评分"
   },
   "versions": {
     "title": "版本历史",
