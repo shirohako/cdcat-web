@@ -685,9 +685,10 @@ md.use(container, 'quote', {
 })
 
 // External links open in a new tab and carry no endorsement; links within the
-// site stay in the tab. markdown-it's built-in validateLink rejects javascript:,
-// vbscript:, file: and unsafe data: URLs before this runs.
-const isSiteLink = (href: string) => href.startsWith('/') && !href.startsWith('//')
+// site, and #anchors on the same page, stay in the tab. markdown-it's built-in
+// validateLink rejects javascript:, vbscript:, file: and unsafe data: URLs
+// before this runs.
+const isSiteLink = (href: string) => (href.startsWith('/') && !href.startsWith('//')) || href.startsWith('#')
 const defaultLinkOpen = md.renderer.rules.link_open
   ?? ((tokens, idx, options, _env, self) => self.renderToken(tokens, idx, options))
 md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
@@ -724,6 +725,13 @@ md.renderer.rules.image = (tokens, idx, options, env, self) => {
 /** Renders site Markdown; `env` supplies what mentions, quotes and database tokens point to. */
 export const renderMarkdown = (src: string, env?: MarkdownEnv | null) =>
   md.render(src ?? '', { cdcatReferences: env?.references ?? null } satisfies RenderContext)
+
+/**
+ * One line of site Markdown without a paragraph around it (code, emphasis, links), for short texts placed inside
+ * other markup, such as the field descriptions of the API reference. Same rules and escaping as renderMarkdown.
+ */
+export const renderMarkdownInline = (src: string) =>
+  md.renderInline(src ?? '', { cdcatReferences: null } satisfies RenderContext)
 
 /**
  * The headings `renderMarkdown` gives ids to. Build a contents list from this

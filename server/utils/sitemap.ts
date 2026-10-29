@@ -31,6 +31,7 @@ export const SITEMAP_PATHS: Record<string, (item: SitemapItem) => string> = {
 export const SITEMAP_PAGES = [
   '/', '/albums', '/vinyls', '/artists', '/labels', '/entries', '/franchises', '/events',
   '/articles', '/discussions', '/contribute', '/about', '/terms', '/privacy', '/help/markdown', '/help/design', '/help/editor', '/join',
+  '/docs/api',
 ]
 
 /** A GET on the API's sitemap endpoints; a failure answers 503 so that nothing empty is cached. */

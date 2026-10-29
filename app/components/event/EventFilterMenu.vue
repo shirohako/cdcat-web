@@ -42,7 +42,7 @@ const loadEditions = async (id: number) => {
     const all: Edition[] = []
     for (let page = 1; ; page++) {
       const data = await $api<{ events: Edition[], pagination: { last_page: number } }>('/v1/events', {
-        query: { series_id: id, per_page: 100, page, sort_by: 'start_date', sort_order: 'desc' },
+        query: { series_id: id, per_page: 100, page, sort: 'start_date', direction: 'desc' },
       })
       all.push(...data.events)
       if (page >= data.pagination.last_page) break
@@ -57,7 +57,7 @@ const loadSeries = async () => {
   if (series.value) return
   seriesFailed.value = false
   try {
-    const list = await $api<Series[]>('/v1/event-series')
+    const { event_series: list } = await $api<{ event_series: Series[] }>('/v1/event-series')
     series.value = [...list].sort((a, b) => (b.latest_start_date ?? '').localeCompare(a.latest_start_date ?? ''))
   } catch {
     seriesFailed.value = true

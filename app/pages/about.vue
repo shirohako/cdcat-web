@@ -256,15 +256,17 @@
               </span>
             </NuxtLink>
           </li>
-          <li class="flex items-center gap-4 px-3.5 py-3">
-            <span class="accent grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)" style="--shift: 100">
-              <Icon name="lucide:plug" class="size-4.5" />
-            </span>
-            <div class="min-w-0 flex-1">
-              <p class="text-sm font-medium text-title">{{ t('about_page.api_docs') }}</p>
-              <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.api_docs_desc') }}</p>
-            </div>
-            <span class="shrink-0 rounded-md bg-sunken px-2 py-1 text-xs text-meta">{{ t('common.coming_soon') }}</span>
+          <li>
+            <NuxtLink to="/docs/api" class="link-row accent flex items-center gap-4 rounded-md px-3.5 py-3" style="--shift: 100">
+              <span class="tile grid size-9 shrink-0 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
+                <Icon name="lucide:plug" class="spin size-4.5" />
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-medium text-title">{{ t('about_page.api_docs') }}</p>
+                <p class="mt-0.5 text-xs leading-5 text-meta">{{ t('about_page.api_docs_desc') }}</p>
+              </div>
+              <Icon name="lucide:chevron-right" class="trail size-4 shrink-0 text-meta" />
+            </NuxtLink>
           </li>
         </ul>
       </div>
@@ -343,8 +345,6 @@ import {
   AboutArtSubmit,
   AboutArtTimeline,
 } from '#components'
-
-const SOURCE_URL = 'https://github.com/shirohako/cdcat'
 
 const { t } = useI18n()
 useRevealOnScroll(useTemplateRef('page'))

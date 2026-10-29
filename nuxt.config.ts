@@ -34,6 +34,8 @@ export default defineNuxtConfig({
     '/articles/create': { redirect: { to: '/articles/new', statusCode: 301 } },
     // Password reset moved beside login and register, under the record stage.
     '/forgot-password': { redirect: { to: '/auth/forgot-password', statusCode: 301 } },
+    // /docs has one document so far; a temporary redirect, so it can become an index later.
+    '/docs': { redirect: { to: '/docs/api', statusCode: 302 } },
   },
 
   // The component showcase (app/dev/UiShowcase.vue) lives outside app/pages and is routed only under `nuxt dev`,

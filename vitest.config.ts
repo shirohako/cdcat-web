@@ -8,10 +8,12 @@ export default defineConfig({
   resolve: {
     alias: {
       '#app': fileURLToPath(new URL('./tests/markdown/stubs/nuxt-app.ts', import.meta.url)),
+      // The API reference's content files import each other the way the app does.
+      '~': fileURLToPath(new URL('./app', import.meta.url)),
     },
   },
   test: {
     environment: 'node',
-    include: ['tests/markdown/**/*.test.ts', 'tests/catalog/**/*.test.ts', 'tests/page/**/*.test.ts', 'tests/event/**/*.test.ts', 'tests/seo/**/*.test.ts', 'tests/harvest/**/*.test.ts', 'tests/auth/**/*.test.ts'],
+    include: ['tests/markdown/**/*.test.ts', 'tests/catalog/**/*.test.ts', 'tests/page/**/*.test.ts', 'tests/event/**/*.test.ts', 'tests/seo/**/*.test.ts', 'tests/harvest/**/*.test.ts', 'tests/auth/**/*.test.ts', 'tests/api-docs/**/*.test.ts'],
   },
 })

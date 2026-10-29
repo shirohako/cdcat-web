@@ -47,9 +47,9 @@ const { data: series, status, error, revealClass } = await usePageAPI<EventSerie
 const PER_PAGE = 24
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
 const SORTS = {
-  newest: { sort_by: 'start_date', sort_order: 'desc' },
-  oldest: { sort_by: 'start_date', sort_order: 'asc' },
-  albums: { sort_by: 'released_albums_count', sort_order: 'desc' },
+  newest: { sort: 'start_date', direction: 'desc' },
+  oldest: { sort: 'start_date', direction: 'asc' },
+  albums: { sort: 'released_albums_count', direction: 'desc' },
 } as const
 type SortKey = keyof typeof SORTS
 const sortKeys = Object.keys(SORTS) as SortKey[]

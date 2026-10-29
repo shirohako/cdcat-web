@@ -18,8 +18,8 @@ const { t } = useI18n()
 const { formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
-const { data, status, error, revealClass } = usePageAPI<EventSeriesSummary[]>('/v1/event-series')
-const seriesList = computed(() => (Array.isArray(data.value) ? data.value : []).map(series => ({
+const { data, status, error, revealClass } = usePageAPI<{ event_series: EventSeriesSummary[] }>('/v1/event-series')
+const seriesList = computed(() => (data.value?.event_series ?? []).map(series => ({
   ...series,
   banner_url: eventSeriesBanner(series),
 })))

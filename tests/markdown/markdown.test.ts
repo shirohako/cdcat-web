@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { markdownContainers, markdownHeadings, renderMarkdown } from '../../app/utils/markdown'
+import { markdownContainers, markdownHeadings, renderMarkdown, renderMarkdownInline } from '../../app/utils/markdown'
 
 describe('Heading anchors', () => {
   it('slugs headings in every script and numbers repeats', () => {
@@ -75,6 +75,17 @@ describe('Markdown renderer', () => {
     const html = renderMarkdown('[unsafe](javascript:alert(1))')
     expect(html).not.toContain('href=')
     expect(html).not.toContain('<a')
+  })
+
+  it('opens other sites in a new tab and keeps the site and its anchors in this one', () => {
+    expect(renderMarkdown('[out](https://example.org)')).toContain('target="_blank"')
+    expect(renderMarkdown('[page](/albums/1)')).toBe('<p><a href="/albums/1">page</a></p>\n')
+    expect(renderMarkdown('[section](#vinyl)')).toBe('<p><a href="#vinyl">section</a></p>\n')
+  })
+
+  it('renders one line inline, with the same escaping', () => {
+    expect(renderMarkdownInline('Use `per_page`, **not** <b>size</b>')).toBe('Use <code>per_page</code>, <strong>not</strong> &lt;b&gt;size&lt;/b&gt;')
+    expect(renderMarkdownInline('[see](#object-album-simple)')).toBe('<a href="#object-album-simple">see</a>')
   })
 
   it('renders highlighting, allow-listed colors and text sizes', () => {

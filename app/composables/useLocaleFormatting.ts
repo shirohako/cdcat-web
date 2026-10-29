@@ -7,6 +7,9 @@ const INTL_LOCALES: Record<string, string> = {
   ja: 'ja-JP',
 }
 
+/** A calendar day as the API sends it (YYYY-MM-DD), with no time of its own. */
+const DAY = /^\d{4}-\d{2}-\d{2}$/
+
 const CONTENT_LOCALE_KEYS: Record<string, string[]> = {
   'zh-Hans': ['zh-Hans', 'zh-CN'],
   'zh-Hant': ['zh-Hant', 'zh-TW'],
@@ -26,7 +29,10 @@ export const useLocaleFormatting = (localeOverride?: string) => {
     if (value === null || value === undefined || value === '') return ''
     const date = value instanceof Date ? value : new Date(value)
     if (Number.isNaN(date.getTime())) return String(value)
-    return new Intl.DateTimeFormat(intlLocale.value, options).format(date)
+    // A bare day parses as UTC midnight: formatted in the reader's zone it would be the day before west of UTC, and
+    // differ between the server's render and the browser's.
+    const day = typeof value === 'string' && DAY.test(value)
+    return new Intl.DateTimeFormat(intlLocale.value, day ? { ...options, timeZone: 'UTC' } : options).format(date)
   }
 
   const displayName = (code: string, type: 'language' | 'region' | 'currency') => {

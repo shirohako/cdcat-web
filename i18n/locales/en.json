@@ -1021,7 +1021,7 @@
       "creator_title": "Made with creators in mind",
       "creator_desc": "Document standard, limited, made-to-order, hi-res, and download editions alongside store bonuses and official sales links, so listeners can understand and support each release.",
       "developer_title": "Open to developers",
-      "developer_desc": "CDCat will provide a public API and documentation. Build lyric tools, cover matching, or your own applications on top of community-maintained data.",
+      "developer_desc": "CDCat has a public API and documentation. Build lyric tools, cover matching, or your own applications on top of community-maintained data.",
       "relations_title": "Rich relationships",
       "relations_desc": "Connect music to games, anime, films, television, entries, and series so it can be explored from multiple perspectives.",
       "community_title": "A broader music community",
@@ -3144,6 +3144,7 @@
       "discussion_tag": "Topics tagged #{tag} in the CDCat forum.",
       "guide_design": "How CDCat is designed: what albums, artists, events, entries, series, vinyl, discussions and articles are for, and how they connect.",
       "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data.",
+      "api_docs": "The CDCat public API: read albums, tracks, artists, events, entries and series over HTTP, with no key needed. The data is shared under CC BY-SA 4.0.",
       "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators."
     }
   },
