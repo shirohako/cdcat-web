@@ -61,6 +61,12 @@ const ERROR_CODE_KEYS: Record<string, string> = {
   MAIL_NOT_CONFIGURED: 'errors.codes.mail_not_configured',
   INVALID_CREDENTIALS: 'errors.codes.invalid_credentials',
   USER_INACTIVE: 'errors.codes.user_inactive',
+  MAIL_SEND_FAILED: 'errors.codes.mail_send_failed',
+  EMAIL_ALREADY_REGISTERED: 'errors.codes.email_already_registered',
+  EMAIL_SAME_AS_CURRENT: 'errors.codes.email_same_as_current',
+  VERIFICATION_CODE_COOLDOWN: 'errors.codes.verification_code_cooldown',
+  VERIFICATION_CODE_INVALID: 'errors.codes.verification_code_invalid',
+  VERIFICATION_CODE_EXPIRED: 'errors.codes.verification_code_expired',
 }
 
 export const useLocalizedApiError = (translate?: (key: string, params?: Record<string, unknown>) => string) => {

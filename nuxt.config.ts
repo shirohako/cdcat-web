@@ -32,6 +32,8 @@ export default defineNuxtConfig({
   routeRules: {
     // The writing page moved when articles gained review; keep old links working.
     '/articles/create': { redirect: { to: '/articles/new', statusCode: 301 } },
+    // Password reset moved beside login and register, under the record stage.
+    '/forgot-password': { redirect: { to: '/auth/forgot-password', statusCode: 301 } },
   },
 
   // The component showcase (app/dev/UiShowcase.vue) lives outside app/pages and is routed only under `nuxt dev`,

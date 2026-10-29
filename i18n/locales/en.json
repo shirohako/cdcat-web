@@ -262,24 +262,20 @@
       "step2_subtitle": "Enter the verification code and your new password",
       "change_email": "Change",
       "verification_code": "Verification Code",
-      "code_placeholder": "Enter 6-digit code",
       "new_password": "New Password",
-      "password_placeholder": "At least 8 characters",
-      "confirm_password": "Confirm Password",
-      "confirm_placeholder": "Re-enter your password",
       "reset": "Reset Password",
       "resetting": "Resetting...",
       "reset_failed": "Failed to reset password, please try again",
       "success_title": "Password Reset",
-      "success_message": "Your password has been reset successfully. Redirecting to login...",
+      "success_message": "You can now sign in with your new password.",
       "back_to_login": "Back to Login",
-      "password_mismatch": "Passwords do not match",
-      "password_strength": "Password strength",
-      "strength_weak": "Weak",
-      "strength_fair": "Fair",
-      "strength_medium": "Medium",
-      "strength_strong": "Strong",
-      "strength_very_strong": "Very Strong"
+      "steps": {
+        "email": "Email",
+        "reset": "New password",
+        "done": "Done"
+      },
+      "sent": "If {email} has an account, we've sent it a code. Can't find it? Check your spam folder.",
+      "email_placeholder": "example{'@'}email.com"
     },
     "login": {
       "title": "Welcome Back",
@@ -310,33 +306,9 @@
       }
     },
     "register": {
-      "title": "Create Account",
-      "subtitle": "Join CDCat and start your music journey",
-      "nickname": "Nickname",
-      "nickname_placeholder": "Choose a nickname",
-      "email": "Email Address",
-      "email_placeholder": "example{'@'}email.com",
-      "verification_code": "Email Verification Code",
-      "verification_code_placeholder": "Enter verification code",
-      "send_code": "Send Code",
       "send_code_failed": "Failed to send verification code, please try again",
-      "password": "Password",
-      "password_placeholder": "At least 8 characters",
-      "password_strength": "Password strength",
-      "confirm_password": "Confirm Password",
-      "confirm_password_placeholder": "Re-enter your password",
-      "password_mismatch": "Passwords do not match",
-      "birthday": "Birthday",
-      "birthday_hint": "Used to confirm you're at least {age}. Never shown publicly.",
-      "agree_prefix": "I agree to CDCat's",
-      "terms_of_service": "Terms of Service",
-      "and": "and",
-      "privacy_policy": "Privacy Policy",
-      "agree_suffix": "",
       "create_account": "Create Account",
       "creating_account": "Creating account...",
-      "or_use": "Or continue with",
-      "github_register": "Sign up with GitHub",
       "have_account": "Already have an account?",
       "login_now": "Sign in now",
       "register_failed": "Sign up failed, please try again",
@@ -354,7 +326,129 @@
         "birthday": "Birthday"
       },
       "closed_title": "Registration paused",
-      "closed_message": "New sign-ups are currently paused. Please come back later. Existing accounts can still sign in."
+      "closed_message": "New sign-ups are currently paused. Please come back later. Existing accounts can still sign in.",
+      "steps": {
+        "notice": "First things first",
+        "terms": "Terms",
+        "profile": "Profile",
+        "password": "Password",
+        "email": "Email"
+      },
+      "prev": "Back",
+      "next": "Next",
+      "notice": {
+        "title": "First things first: no music downloads here",
+        "lead": "CDCat is a music catalogue. Together we keep track of albums, tracks, artists and events, write reviews, build collections and talk about music.",
+        "no_audio_title": "No audio files",
+        "no_audio": "We don't host music, and there is nothing to download or stream.",
+        "no_piracy_title": "No links to pirated copies",
+        "no_piracy": "Sharing links to pirated downloads or streams breaks the terms, and they will be removed.",
+        "support_title": "Support the artists",
+        "support": "Buy the CD or the digital release, or use a licensed streaming service.",
+        "confirm": "Got it"
+      },
+      "terms": {
+        "title": "Terms of Service and Privacy Policy",
+        "lead": "Please read both before you sign up. They open in a new tab, so nothing you have filled in is lost.",
+        "updated": "Updated {date}",
+        "read": "Read",
+        "agree": "I have read and agree to the {terms} and the {privacy}",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy"
+      },
+      "profile": {
+        "title": "Tell us about yourself",
+        "lead": "Your nickname shows on your profile and next to what you post. You can change it any time.",
+        "nickname": "Nickname",
+        "nickname_placeholder": "Choose a nickname",
+        "nickname_required": "Please enter a nickname.",
+        "birthday": "Birthday",
+        "birthday_hint": "Used to confirm you're at least {age}. Never shown publicly.",
+        "birthday_required": "Please enter your birthday.",
+        "under_age": "You need to be at least {age} to sign up."
+      },
+      "password": {
+        "title": "Set a password",
+        "lead": "At least 8 characters. Longer is harder to guess: 12 or more, or a few words strung together."
+      },
+      "email": {
+        "title": "Verify your email",
+        "lead": "We'll send a 6-character code to this address to make sure it's yours.",
+        "label": "Email address",
+        "placeholder": "example{'@'}email.com"
+      },
+      "done": {
+        "title": "Welcome to CDCat",
+        "lead": "Your account is ready, and you're signed in.",
+        "home": "Go to the home page",
+        "profile": "Finish your profile",
+        "tip": "You can change your nickname, avatar and email preferences in Settings at any time."
+      }
+    },
+    "stage": {
+      "register_title": "Join CDCat"
+    },
+    "steps": {
+      "label": "Steps",
+      "step_of": "Step {n} of {total}",
+      "short": "Step {n} of {total} · {name}",
+      "go": "Back to step {n}: {name}",
+      "playing": "Now playing",
+      "finished": "Played through"
+    },
+    "code": {
+      "label": "Verification code",
+      "send": "Send code",
+      "sending": "Sending…",
+      "resend": "Send again",
+      "resend_in": "Send again in {seconds}s",
+      "sent": "We sent a code to {email}. It works for {minutes} minutes. Can't find it? Check your spam folder.",
+      "sent_plain": "We sent a code to {email}. Can't find it? Check your spam folder.",
+      "registered_title": "This email already has an account",
+      "registered": "Sign in, or reset your password.",
+      "go_login": "Sign in",
+      "forgot": "Forgot password",
+      "failed_title": "We couldn't send the code",
+      "failed": "Our mail service is having trouble. Please try again later. If it keeps failing, write to {email}."
+    },
+    "password": {
+      "label": "Password",
+      "new_label": "New password",
+      "placeholder": "At least {n} characters",
+      "confirm": "Confirm password",
+      "confirm_placeholder": "Type it again",
+      "show": "Show password",
+      "hide": "Hide password",
+      "strength": "Strength: ",
+      "levels": {
+        "0": "Very weak",
+        "1": "Weak",
+        "2": "Fair",
+        "3": "Strong",
+        "4": "Very strong"
+      },
+      "length": "{n} characters",
+      "min_length": "At least {n} characters",
+      "not_common": "Not a common password",
+      "not_personal": "Doesn't contain your nickname or birthday",
+      "warnings": {
+        "common": "This is a common password and easy to guess",
+        "sequence": "Contains a run of letters or digits, like 1234 or qwer",
+        "repeat": "Contains repeated characters",
+        "nickname": "Contains your nickname",
+        "birthday": "Contains your birthday",
+        "year": "Contains a year; pick something harder to guess",
+        "site": "Contains the site's name"
+      },
+      "generate": "Generate",
+      "regenerate": "Another one",
+      "copy": "Copy",
+      "copied": "Password copied",
+      "copy_failed": "Couldn't copy; select the password and copy it yourself",
+      "generate_hint": "Makes a random 16-character password and fills in both fields",
+      "generated": "Both fields are filled in. Save it in your password manager.",
+      "mismatch": "The passwords don't match",
+      "match": "Passwords match"
     }
   },
   "common": {
@@ -469,7 +563,13 @@
       "mail_campaign_not_editable": "This group mail can't do that in its current state.",
       "mail_audience_changed": "The number of recipients has changed. Check the new count and confirm again.",
       "mail_audience_empty": "Nobody would receive this email.",
-      "mail_not_configured": "Group mail isn't set up on this server."
+      "mail_not_configured": "Group mail isn't set up on this server.",
+      "mail_send_failed": "We couldn't send the code email. Please try again later.",
+      "email_already_registered": "This email already has an account.",
+      "email_same_as_current": "That's the email you're using now.",
+      "verification_code_cooldown": "That was too soon. Please wait a minute and try again.",
+      "verification_code_invalid": "That code isn't right. Check it and try again.",
+      "verification_code_expired": "That code has expired. Please get a new one."
     }
   },
   "article_ui": {

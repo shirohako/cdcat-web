@@ -262,24 +262,20 @@
       "step2_subtitle": "輸入驗證碼和新密碼",
       "change_email": "修改",
       "verification_code": "驗證碼",
-      "code_placeholder": "輸入 6 位驗證碼",
       "new_password": "新密碼",
-      "password_placeholder": "至少 8 個字元",
-      "confirm_password": "確認密碼",
-      "confirm_placeholder": "再次輸入密碼",
       "reset": "重設密碼",
       "resetting": "重設中...",
       "reset_failed": "重設密碼失敗，請重試",
       "success_title": "密碼已重設",
-      "success_message": "你的密碼已成功重設，即將跳轉到登入頁...",
+      "success_message": "現在可以用新密碼登入了。",
       "back_to_login": "返回登入",
-      "password_mismatch": "密碼不一致",
-      "password_strength": "密碼強度",
-      "strength_weak": "弱",
-      "strength_fair": "較弱",
-      "strength_medium": "中等",
-      "strength_strong": "強",
-      "strength_very_strong": "很強"
+      "steps": {
+        "email": "填寫信箱",
+        "reset": "設定新密碼",
+        "done": "完成"
+      },
+      "sent": "如果 {email} 註冊過帳號，驗證碼已經寄過去了。沒收到的話，看看垃圾郵件。",
+      "email_placeholder": "example{'@'}email.com"
     },
     "login": {
       "title": "歡迎回來",
@@ -310,33 +306,9 @@
       }
     },
     "register": {
-      "title": "建立帳號",
-      "subtitle": "加入 CDCat，開啟你的音樂探索之旅",
-      "nickname": "暱稱",
-      "nickname_placeholder": "取一個暱稱吧",
-      "email": "信箱地址",
-      "email_placeholder": "example{'@'}email.com",
-      "verification_code": "信箱驗證碼",
-      "verification_code_placeholder": "輸入驗證碼",
-      "send_code": "發送驗證碼",
       "send_code_failed": "發送驗證碼失敗，請重試",
-      "password": "密碼",
-      "password_placeholder": "至少 8 個字元",
-      "password_strength": "密碼強度",
-      "confirm_password": "確認密碼",
-      "confirm_password_placeholder": "再次輸入密碼",
-      "password_mismatch": "密碼不一致",
-      "birthday": "生日",
-      "birthday_hint": "用於確認你已年滿 {age} 歲，不會公開顯示",
-      "agree_prefix": "我同意 CDCat 的",
-      "terms_of_service": "服務條款",
-      "and": "和",
-      "privacy_policy": "隱私政策",
-      "agree_suffix": "",
       "create_account": "建立帳號",
       "creating_account": "註冊中...",
-      "or_use": "或者使用",
-      "github_register": "使用 GitHub 註冊",
       "have_account": "已經有帳號了？",
       "login_now": "立即登入",
       "register_failed": "註冊失敗，請重試",
@@ -354,7 +326,129 @@
         "birthday": "生日"
       },
       "closed_title": "暫停註冊",
-      "closed_message": "網站目前暫停新用戶註冊，請稍後再來。已有帳號可以正常登入。"
+      "closed_message": "網站目前暫停新用戶註冊，請稍後再來。已有帳號可以正常登入。",
+      "steps": {
+        "notice": "先說清楚",
+        "terms": "服務條款",
+        "profile": "個人資料",
+        "password": "設定密碼",
+        "email": "驗證信箱"
+      },
+      "prev": "上一步",
+      "next": "下一步",
+      "notice": {
+        "title": "先說清楚：這裡不能下載音樂",
+        "lead": "CDCat 是一個音樂資料庫。大家一起整理專輯、曲目、藝人和活動的資訊，寫評價、做收藏、聊音樂。",
+        "no_audio_title": "沒有音訊檔案",
+        "no_audio": "這裡不存放音樂，也不提供下載或線上播放。",
+        "no_piracy_title": "不能發盜版連結",
+        "no_piracy": "分享盜版下載或播放連結違反服務條款，會被刪除。",
+        "support_title": "想聽就支持正版",
+        "support": "購買 CD、數位版，或者使用正規的串流平台。",
+        "confirm": "我明白了"
+      },
+      "terms": {
+        "title": "服務條款和隱私政策",
+        "lead": "註冊前請讀一讀這兩份文件。連結會在新分頁開啟，已經填的內容不會遺失。",
+        "updated": "{date} 更新",
+        "read": "閱讀",
+        "agree": "我已閱讀並同意{terms}和{privacy}",
+        "terms": "服務條款",
+        "privacy": "隱私政策"
+      },
+      "profile": {
+        "title": "介紹一下你自己",
+        "lead": "暱稱會顯示在你的個人頁面和發言旁邊，之後隨時可以修改。",
+        "nickname": "暱稱",
+        "nickname_placeholder": "取一個暱稱吧",
+        "nickname_required": "請填寫暱稱。",
+        "birthday": "生日",
+        "birthday_hint": "用來確認你已年滿 {age} 歲，不會公開顯示。",
+        "birthday_required": "請填寫生日。",
+        "under_age": "需要年滿 {age} 歲才能註冊。"
+      },
+      "password": {
+        "title": "設定密碼",
+        "lead": "至少 8 個字元。越長越難猜：建議 12 位以上，或者用幾個詞拼成一句話。"
+      },
+      "email": {
+        "title": "驗證信箱",
+        "lead": "我們會往這個信箱寄一個 6 位驗證碼，確認信箱是你的。",
+        "label": "電子信箱",
+        "placeholder": "example{'@'}email.com"
+      },
+      "done": {
+        "title": "歡迎加入 CDCat",
+        "lead": "帳號已經建好，也已經登入了。",
+        "home": "去首頁",
+        "profile": "完善個人資料",
+        "tip": "暱稱、頭像和郵件偏好，之後都可以在設定裡修改。"
+      }
+    },
+    "stage": {
+      "register_title": "加入 CDCat"
+    },
+    "steps": {
+      "label": "步驟",
+      "step_of": "第 {n} 步，共 {total} 步",
+      "short": "第 {n} / {total} 步 · {name}",
+      "go": "回到第 {n} 步：{name}",
+      "playing": "正在播放",
+      "finished": "播放完畢"
+    },
+    "code": {
+      "label": "驗證碼",
+      "send": "傳送驗證碼",
+      "sending": "傳送中…",
+      "resend": "重新傳送",
+      "resend_in": "{seconds} 秒後可重新傳送",
+      "sent": "驗證碼已寄到 {email}，{minutes} 分鐘內有效。沒收到的話，看看垃圾郵件。",
+      "sent_plain": "驗證碼已寄到 {email}。沒收到的話，看看垃圾郵件。",
+      "registered_title": "這個信箱已經註冊過了",
+      "registered": "可以直接登入，或者找回密碼。",
+      "go_login": "去登入",
+      "forgot": "忘記密碼",
+      "failed_title": "驗證碼沒能寄出去",
+      "failed": "郵件服務暫時出了問題。請稍後再試；一直不行的話，請寫信給 {email}。"
+    },
+    "password": {
+      "label": "密碼",
+      "new_label": "新密碼",
+      "placeholder": "至少 {n} 個字元",
+      "confirm": "確認密碼",
+      "confirm_placeholder": "再輸入一次密碼",
+      "show": "顯示密碼",
+      "hide": "隱藏密碼",
+      "strength": "強度：",
+      "levels": {
+        "0": "很弱",
+        "1": "弱",
+        "2": "中等",
+        "3": "強",
+        "4": "很強"
+      },
+      "length": "{n} 個字元",
+      "min_length": "至少 {n} 個字元",
+      "not_common": "不是常見密碼",
+      "not_personal": "不包含暱稱或生日",
+      "warnings": {
+        "common": "這是很常見的密碼，很容易被猜到",
+        "sequence": "含有連續的字母或數字，例如 1234、qwer",
+        "repeat": "含有重複的字元",
+        "nickname": "包含你的暱稱",
+        "birthday": "包含你的生日",
+        "year": "包含年份，換一個更難猜的組合",
+        "site": "包含網站的名字"
+      },
+      "generate": "隨機產生",
+      "regenerate": "換一個",
+      "copy": "複製",
+      "copied": "密碼已複製",
+      "copy_failed": "沒能複製，請手動選取密碼複製",
+      "generate_hint": "產生 16 位隨機密碼，自動填入兩欄",
+      "generated": "已填入兩欄，記得存進密碼管理器",
+      "mismatch": "兩次輸入的密碼不一樣",
+      "match": "兩次輸入一致"
     }
   },
   "common": {
@@ -469,7 +563,13 @@
       "mail_campaign_not_editable": "這封群發目前的狀態不允許這樣操作。",
       "mail_audience_changed": "收件人數已經變動，請確認新的人數後重新送出。",
       "mail_audience_empty": "沒有人會收到這封郵件。",
-      "mail_not_configured": "這台伺服器還沒有設定群發郵件。"
+      "mail_not_configured": "這台伺服器還沒有設定群發郵件。",
+      "mail_send_failed": "驗證碼郵件沒能寄出去，請稍後再試。",
+      "email_already_registered": "這個信箱已經註冊過了。",
+      "email_same_as_current": "這就是你現在使用的信箱。",
+      "verification_code_cooldown": "傳送得太頻繁了，請稍等一分鐘再試。",
+      "verification_code_invalid": "驗證碼不對，請檢查後重新輸入。",
+      "verification_code_expired": "驗證碼已過期，請重新取得。"
     }
   },
   "article_ui": {

@@ -262,24 +262,20 @@
       "step2_subtitle": "認証コードと新しいパスワードを入力してください",
       "change_email": "変更",
       "verification_code": "認証コード",
-      "code_placeholder": "6桁のコードを入力",
       "new_password": "新しいパスワード",
-      "password_placeholder": "8文字以上",
-      "confirm_password": "パスワード確認",
-      "confirm_placeholder": "パスワードを再入力",
       "reset": "パスワードをリセット",
       "resetting": "リセット中...",
       "reset_failed": "パスワードのリセットに失敗しました。もう一度お試しください",
       "success_title": "パスワードがリセットされました",
-      "success_message": "パスワードが正常にリセットされました。ログインページにリダイレクトします...",
+      "success_message": "新しいパスワードでログインできます。",
       "back_to_login": "ログインに戻る",
-      "password_mismatch": "パスワードが一致しません",
-      "password_strength": "パスワード強度",
-      "strength_weak": "弱い",
-      "strength_fair": "やや弱い",
-      "strength_medium": "普通",
-      "strength_strong": "強い",
-      "strength_very_strong": "非常に強い"
+      "steps": {
+        "email": "メールアドレス",
+        "reset": "新しいパスワード",
+        "done": "完了"
+      },
+      "sent": "{email} が登録済みであれば、認証コードを送りました。届かない場合は迷惑メールフォルダもご確認ください。",
+      "email_placeholder": "example{'@'}email.com"
     },
     "login": {
       "title": "おかえりなさい",
@@ -310,33 +306,9 @@
       }
     },
     "register": {
-      "title": "アカウント作成",
-      "subtitle": "CDCatに参加して音楽探索を始めよう",
-      "nickname": "ニックネーム",
-      "nickname_placeholder": "ニックネームを入力",
-      "email": "メールアドレス",
-      "email_placeholder": "example{'@'}email.com",
-      "verification_code": "メール認証コード",
-      "verification_code_placeholder": "認証コードを入力",
-      "send_code": "認証コードを送信",
       "send_code_failed": "認証コードの送信に失敗しました。もう一度お試しください",
-      "password": "パスワード",
-      "password_placeholder": "8文字以上",
-      "password_strength": "パスワード強度",
-      "confirm_password": "パスワード確認",
-      "confirm_password_placeholder": "パスワードを再入力",
-      "password_mismatch": "パスワードが一致しません",
-      "birthday": "生年月日",
-      "birthday_hint": "{age}歳以上であることの確認に使います。公開されません",
-      "agree_prefix": "CDCatの",
-      "terms_of_service": "利用規約",
-      "and": "と",
-      "privacy_policy": "プライバシーポリシー",
-      "agree_suffix": "に同意します",
       "create_account": "アカウント作成",
       "creating_account": "登録中...",
-      "or_use": "または",
-      "github_register": "GitHubで登録",
       "have_account": "すでにアカウントをお持ちですか？",
       "login_now": "ログイン",
       "register_failed": "登録に失敗しました。もう一度お試しください",
@@ -354,7 +326,129 @@
         "birthday": "生年月日"
       },
       "closed_title": "新規登録を停止中",
-      "closed_message": "現在、新規登録を停止しています。しばらくしてから再度お越しください。既存のアカウントはログインできます。"
+      "closed_message": "現在、新規登録を停止しています。しばらくしてから再度お越しください。既存のアカウントはログインできます。",
+      "steps": {
+        "notice": "はじめに",
+        "terms": "利用規約",
+        "profile": "プロフィール",
+        "password": "パスワード",
+        "email": "メール認証"
+      },
+      "prev": "戻る",
+      "next": "次へ",
+      "notice": {
+        "title": "はじめに：ここでは音楽をダウンロードできません",
+        "lead": "CDCat は音楽のデータベースです。アルバム、トラック、アーティスト、イベントの情報をみんなで整理し、レビューを書いたり、コレクションを作ったり、音楽の話をしたりする場所です。",
+        "no_audio_title": "音声ファイルはありません",
+        "no_audio": "音楽そのものは置いておらず、ダウンロードやストリーミング再生もできません。",
+        "no_piracy_title": "海賊版へのリンクは禁止",
+        "no_piracy": "海賊版のダウンロードや再生へのリンクを共有することは利用規約違反で、削除されます。",
+        "support_title": "聴くなら正規の方法で",
+        "support": "CD やデジタル版を購入するか、正規のストリーミングサービスを使ってください。",
+        "confirm": "わかりました"
+      },
+      "terms": {
+        "title": "利用規約とプライバシーポリシー",
+        "lead": "登録の前に、この 2 つの文書をお読みください。リンクは新しいタブで開くので、入力した内容は消えません。",
+        "updated": "{date} 更新",
+        "read": "読む",
+        "agree": "{terms}と{privacy}を読み、同意します",
+        "terms": "利用規約",
+        "privacy": "プライバシーポリシー"
+      },
+      "profile": {
+        "title": "あなたについて",
+        "lead": "ニックネームはプロフィールや投稿の横に表示されます。あとからいつでも変更できます。",
+        "nickname": "ニックネーム",
+        "nickname_placeholder": "ニックネームを入力",
+        "nickname_required": "ニックネームを入力してください。",
+        "birthday": "誕生日",
+        "birthday_hint": "{age}歳以上であることの確認に使います。公開されません。",
+        "birthday_required": "誕生日を入力してください。",
+        "under_age": "登録できるのは {age} 歳以上の方です。"
+      },
+      "password": {
+        "title": "パスワードを設定",
+        "lead": "8 文字以上。長いほど推測されにくくなります。12 文字以上か、いくつかの単語をつなげたフレーズがおすすめです。"
+      },
+      "email": {
+        "title": "メールアドレスの確認",
+        "lead": "このアドレスに 6 桁の認証コードを送って、あなたのものか確認します。",
+        "label": "メールアドレス",
+        "placeholder": "example{'@'}email.com"
+      },
+      "done": {
+        "title": "CDCat へようこそ",
+        "lead": "アカウントを作成し、ログインしました。",
+        "home": "ホームへ",
+        "profile": "プロフィールを整える",
+        "tip": "ニックネーム、アバター、メールの設定は、あとから設定画面で変更できます。"
+      }
+    },
+    "stage": {
+      "register_title": "CDCat に参加"
+    },
+    "steps": {
+      "label": "ステップ",
+      "step_of": "ステップ {n} / {total}",
+      "short": "ステップ {n} / {total} · {name}",
+      "go": "ステップ {n}「{name}」に戻る",
+      "playing": "再生中",
+      "finished": "再生完了"
+    },
+    "code": {
+      "label": "認証コード",
+      "send": "コードを送信",
+      "sending": "送信中…",
+      "resend": "再送信",
+      "resend_in": "{seconds} 秒後に再送信できます",
+      "sent": "{email} に認証コードを送りました。有効期限は {minutes} 分です。届かない場合は迷惑メールフォルダもご確認ください。",
+      "sent_plain": "{email} に認証コードを送りました。届かない場合は迷惑メールフォルダもご確認ください。",
+      "registered_title": "このメールアドレスは登録済みです",
+      "registered": "そのままログインするか、パスワードを再設定してください。",
+      "go_login": "ログインへ",
+      "forgot": "パスワードを忘れた",
+      "failed_title": "認証コードを送れませんでした",
+      "failed": "メールの送信で一時的な問題が起きています。しばらくしてからもう一度お試しください。解決しない場合は {email} までご連絡ください。"
+    },
+    "password": {
+      "label": "パスワード",
+      "new_label": "新しいパスワード",
+      "placeholder": "{n} 文字以上",
+      "confirm": "パスワード（確認）",
+      "confirm_placeholder": "もう一度入力してください",
+      "show": "パスワードを表示",
+      "hide": "パスワードを隠す",
+      "strength": "強度：",
+      "levels": {
+        "0": "とても弱い",
+        "1": "弱い",
+        "2": "普通",
+        "3": "強い",
+        "4": "とても強い"
+      },
+      "length": "{n} 文字",
+      "min_length": "{n} 文字以上",
+      "not_common": "よくあるパスワードではない",
+      "not_personal": "ニックネームや誕生日を含まない",
+      "warnings": {
+        "common": "よく使われるパスワードで、簡単に推測されます",
+        "sequence": "1234 や qwer のような連続した文字が含まれています",
+        "repeat": "同じ文字の繰り返しが含まれています",
+        "nickname": "ニックネームが含まれています",
+        "birthday": "誕生日が含まれています",
+        "year": "年号が含まれています。推測されにくい組み合わせにしましょう",
+        "site": "サイト名が含まれています"
+      },
+      "generate": "ランダムに生成",
+      "regenerate": "別のものにする",
+      "copy": "コピー",
+      "copied": "パスワードをコピーしました",
+      "copy_failed": "コピーできませんでした。パスワードを選択してコピーしてください",
+      "generate_hint": "16 文字のランダムなパスワードを作り、両方の欄に入力します",
+      "generated": "両方の欄に入力しました。パスワードマネージャーに保存しておきましょう",
+      "mismatch": "パスワードが一致しません",
+      "match": "一致しています"
     }
   },
   "common": {
@@ -469,7 +563,13 @@
       "mail_campaign_not_editable": "この一斉送信は、現在の状態ではこの操作ができません。",
       "mail_audience_changed": "受信者数が変わりました。新しい人数を確認してから、もう一度確定してください。",
       "mail_audience_empty": "このメールを受け取る人がいません。",
-      "mail_not_configured": "このサーバーでは一斉送信が設定されていません。"
+      "mail_not_configured": "このサーバーでは一斉送信が設定されていません。",
+      "mail_send_failed": "認証コードのメールを送れませんでした。しばらくしてからお試しください。",
+      "email_already_registered": "このメールアドレスは登録済みです。",
+      "email_same_as_current": "現在お使いのメールアドレスです。",
+      "verification_code_cooldown": "送信が多すぎます。1 分ほど待ってからお試しください。",
+      "verification_code_invalid": "認証コードが正しくありません。確認してもう一度入力してください。",
+      "verification_code_expired": "認証コードの有効期限が切れました。もう一度取得してください。"
     }
   },
   "article_ui": {

@@ -85,6 +85,8 @@ export const useAuth = () => {
       return {
         success: false,
         error: localizeError(error, 'auth.register.register_failed'),
+        // The API's error name (UNDER_MINIMUM_AGE, VERIFICATION_CODE_INVALID …), so the form can point at the field
+        code: (error as { name?: string })?.name,
         details: (error as { details?: { details?: Record<string, unknown> } })?.details?.details
       }
     }

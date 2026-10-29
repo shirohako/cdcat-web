@@ -262,24 +262,20 @@
       "step2_subtitle": "输入验证码和新密码",
       "change_email": "修改",
       "verification_code": "验证码",
-      "code_placeholder": "输入 6 位验证码",
       "new_password": "新密码",
-      "password_placeholder": "至少 8 个字符",
-      "confirm_password": "确认密码",
-      "confirm_placeholder": "再次输入密码",
       "reset": "重置密码",
       "resetting": "重置中...",
       "reset_failed": "重置密码失败，请重试",
       "success_title": "密码已重置",
-      "success_message": "你的密码已成功重置，即将跳转到登录页...",
+      "success_message": "现在可以用新密码登录了。",
       "back_to_login": "返回登录",
-      "password_mismatch": "密码不匹配",
-      "password_strength": "密码强度",
-      "strength_weak": "弱",
-      "strength_fair": "较弱",
-      "strength_medium": "中等",
-      "strength_strong": "强",
-      "strength_very_strong": "很强"
+      "steps": {
+        "email": "填写邮箱",
+        "reset": "设置新密码",
+        "done": "完成"
+      },
+      "sent": "如果 {email} 注册过账号，验证码已经发过去了。没收到的话，看看垃圾邮件。",
+      "email_placeholder": "example{'@'}email.com"
     },
     "login": {
       "title": "欢迎回来",
@@ -310,33 +306,9 @@
       }
     },
     "register": {
-      "title": "创建账号",
-      "subtitle": "加入 CDCat，开启你的音乐探索之旅",
-      "nickname": "昵称",
-      "nickname_placeholder": "取一个昵称吧",
-      "email": "邮箱地址",
-      "email_placeholder": "example{'@'}email.com",
-      "verification_code": "邮箱验证码",
-      "verification_code_placeholder": "输入验证码",
-      "send_code": "发送验证码",
       "send_code_failed": "发送验证码失败，请重试",
-      "password": "密码",
-      "password_placeholder": "至少 8 个字符",
-      "password_strength": "密码强度",
-      "confirm_password": "确认密码",
-      "confirm_password_placeholder": "再次输入密码",
-      "password_mismatch": "密码不匹配",
-      "birthday": "生日",
-      "birthday_hint": "用于确认你已年满 {age} 岁，不会公开显示",
-      "agree_prefix": "我同意 CDCat 的",
-      "terms_of_service": "用户协议",
-      "and": "和",
-      "privacy_policy": "隐私政策",
-      "agree_suffix": "",
       "create_account": "创建账号",
       "creating_account": "注册中...",
-      "or_use": "或者使用",
-      "github_register": "使用 GitHub 注册",
       "have_account": "已经有账号了？",
       "login_now": "立即登录",
       "register_failed": "注册失败，请重试",
@@ -354,7 +326,129 @@
         "birthday": "生日"
       },
       "closed_title": "暂停注册",
-      "closed_message": "网站当前暂停新用户注册，请稍后再来。已有账号可以正常登录。"
+      "closed_message": "网站当前暂停新用户注册，请稍后再来。已有账号可以正常登录。",
+      "steps": {
+        "notice": "先说清楚",
+        "terms": "用户协议",
+        "profile": "个人资料",
+        "password": "设置密码",
+        "email": "验证邮箱"
+      },
+      "prev": "上一步",
+      "next": "下一步",
+      "notice": {
+        "title": "先说清楚：这里不能下载音乐",
+        "lead": "CDCat 是一个音乐资料库。大家一起整理专辑、曲目、艺术家和活动的信息，写评价、做收藏、聊音乐。",
+        "no_audio_title": "没有音频文件",
+        "no_audio": "这里不存放音乐，也不提供下载或在线播放。",
+        "no_piracy_title": "不能发盗版链接",
+        "no_piracy": "分享盗版下载或播放链接违反用户协议，会被删除。",
+        "support_title": "想听就支持正版",
+        "support": "购买 CD、数字版，或者使用正规的流媒体平台。",
+        "confirm": "我明白了"
+      },
+      "terms": {
+        "title": "用户协议和隐私政策",
+        "lead": "注册前请读一读这两份文件。链接会在新标签页打开，已经填的内容不会丢。",
+        "updated": "{date} 更新",
+        "read": "阅读",
+        "agree": "我已阅读并同意{terms}和{privacy}",
+        "terms": "用户协议",
+        "privacy": "隐私政策"
+      },
+      "profile": {
+        "title": "介绍一下你自己",
+        "lead": "昵称会显示在你的主页和发言旁边，之后随时可以改。",
+        "nickname": "昵称",
+        "nickname_placeholder": "取一个昵称吧",
+        "nickname_required": "请填写昵称。",
+        "birthday": "生日",
+        "birthday_hint": "用来确认你已年满 {age} 岁，不会公开显示。",
+        "birthday_required": "请填写生日。",
+        "under_age": "需要年满 {age} 岁才能注册。"
+      },
+      "password": {
+        "title": "设置密码",
+        "lead": "至少 8 个字符。越长越难猜：建议 12 位以上，或者用几个词拼成一句话。"
+      },
+      "email": {
+        "title": "验证邮箱",
+        "lead": "我们会往这个邮箱发一个 6 位验证码，确认邮箱是你的。",
+        "label": "邮箱地址",
+        "placeholder": "example{'@'}email.com"
+      },
+      "done": {
+        "title": "欢迎加入 CDCat",
+        "lead": "账号已经建好，也已经登录了。",
+        "home": "去首页",
+        "profile": "完善个人资料",
+        "tip": "昵称、头像和邮件偏好，之后都可以在设置里改。"
+      }
+    },
+    "stage": {
+      "register_title": "加入 CDCat"
+    },
+    "steps": {
+      "label": "步骤",
+      "step_of": "第 {n} 步，共 {total} 步",
+      "short": "第 {n} / {total} 步 · {name}",
+      "go": "回到第 {n} 步：{name}",
+      "playing": "正在播放",
+      "finished": "播放完毕"
+    },
+    "code": {
+      "label": "验证码",
+      "send": "发送验证码",
+      "sending": "发送中…",
+      "resend": "重新发送",
+      "resend_in": "{seconds} 秒后可重发",
+      "sent": "验证码已发到 {email}，{minutes} 分钟内有效。没收到的话，看看垃圾邮件。",
+      "sent_plain": "验证码已发到 {email}。没收到的话，看看垃圾邮件。",
+      "registered_title": "这个邮箱已经注册过了",
+      "registered": "可以直接登录，或者找回密码。",
+      "go_login": "去登录",
+      "forgot": "忘记密码",
+      "failed_title": "验证码没能发出去",
+      "failed": "邮件服务暂时出了问题。请稍后再试；一直不行的话，请写信给 {email}。"
+    },
+    "password": {
+      "label": "密码",
+      "new_label": "新密码",
+      "placeholder": "至少 {n} 个字符",
+      "confirm": "确认密码",
+      "confirm_placeholder": "再输入一次密码",
+      "show": "显示密码",
+      "hide": "隐藏密码",
+      "strength": "强度：",
+      "levels": {
+        "0": "很弱",
+        "1": "弱",
+        "2": "中等",
+        "3": "强",
+        "4": "很强"
+      },
+      "length": "{n} 个字符",
+      "min_length": "至少 {n} 个字符",
+      "not_common": "不是常见密码",
+      "not_personal": "不包含昵称或生日",
+      "warnings": {
+        "common": "这是很常见的密码，很容易被猜到",
+        "sequence": "含有连续的字母或数字，比如 1234、qwer",
+        "repeat": "含有重复的字符",
+        "nickname": "包含你的昵称",
+        "birthday": "包含你的生日",
+        "year": "包含年份，换一个更难猜的组合",
+        "site": "包含网站的名字"
+      },
+      "generate": "随机生成",
+      "regenerate": "换一个",
+      "copy": "复制",
+      "copied": "密码已复制",
+      "copy_failed": "没能复制，请手动选中密码复制",
+      "generate_hint": "生成 16 位随机密码，自动填入两栏",
+      "generated": "已填入两栏，记得存进密码管理器",
+      "mismatch": "两次输入的密码不一样",
+      "match": "两次输入一致"
     }
   },
   "common": {
@@ -469,7 +563,13 @@
       "mail_campaign_not_editable": "这封群发当前的状态不允许这样操作。",
       "mail_audience_changed": "收件人数已经变化，请确认新的人数后重新提交。",
       "mail_audience_empty": "没有人会收到这封邮件。",
-      "mail_not_configured": "这台服务器还没有配置群发邮件。"
+      "mail_not_configured": "这台服务器还没有配置群发邮件。",
+      "mail_send_failed": "验证码邮件没能发出去，请稍后再试。",
+      "email_already_registered": "这个邮箱已经注册过了。",
+      "email_same_as_current": "这就是你现在用的邮箱。",
+      "verification_code_cooldown": "发送得太频繁了，请稍等一分钟再试。",
+      "verification_code_invalid": "验证码不对，请检查后重新输入。",
+      "verification_code_expired": "验证码已过期，请重新获取。"
     }
   },
   "article_ui": {
