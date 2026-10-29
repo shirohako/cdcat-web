@@ -1,63 +1,44 @@
-# CDCAT Web
+# CDCat
 
-Frontend for CDCAT — a music database covering doujin releases, game soundtracks, Vocaloid, covers, Touhou, and anime-related music.
+**[dev.cdcat.net](https://dev.cdcat.net)**
 
-## Tech Stack
+CDCat is a non-profit music database made by music lovers. It focuses on music that is easy to lose track of: doujin releases, game and anime soundtracks, Vocaloid, Touhou arrangements, covers and other Japanese music.
 
-- Nuxt 4 + Vue 3
-- Tailwind CSS + daisyUI
-- `@nuxtjs/i18n` for localization
+This repository is the CDCat website.
 
-## Requirements
+CDCat only holds information about music. It has no audio files, so there is nothing to download or stream. If you like what you find, please buy the CD or the digital release, or listen on a licensed streaming service.
 
-- Node.js (LTS recommended)
-- pnpm (recommended; this repo is configured for pnpm)
+## What you can do on CDCat
 
-## Environment Variables
+- **Browse albums and tracks.** Albums come with tracklists, credits, editions (limited, regular, digital, hi-res …), store bonuses, scans of the cover, booklet and discs, and links to official shops and streaming services.
+- **Look up artists.** Find the people, groups, doujin circles, labels and virtual singers behind the music, with their releases and every track they are credited on.
+- **Follow events.** See doujin events such as M3 and Comic Market, edition by edition, with the albums first released there, venue maps and booth lists.
+- **Explore by source work.** Albums are connected to the anime, games, films and other works they come from, and works are grouped into series.
+- **Read lyrics.** Original lyrics, translations and romanizations, where contributors have added them.
+- **Keep track of your listening.** Favorite albums, tracks and artists, mark what you plan to listen to, have heard, want or own, and rate and review albums.
+- **Join the community.** Talk about music in the discussions and write or read articles.
 
-This project uses Nuxt runtime config mapped from environment variables.
+The site is available in English, Japanese, Simplified Chinese and Traditional Chinese.
 
-Copy the example env file:
+## Contribute
 
-```bash
-cp .env.example .env
-```
+Anyone with an account can add albums, artists, entries and series, or correct them. Every change is reviewed by other contributors and kept in the edit history.
 
-Edit `.env` as needed:
+- New to editing? Start with the guides linked from the [About page](https://dev.cdcat.net/about).
+- We are also looking for translators, proofreaders, artists, designers, developers and moderators: see [Join the team](https://dev.cdcat.net/join).
+- Found a bug in the website or have an idea? [Open an issue](https://github.com/shirohako/cdcat/issues), or send a pull request.
 
-- `NUXT_PUBLIC_BASE_URL` (your site URL, used by SEO/i18n)
-- `NUXT_PUBLIC_API_BASE_URL` (backend API base URL; development: `https://api.dev.cdcat.net`)
-- `NUXT_PUBLIC_INDEXABLE` (`true` lets search engines index the site; leave it unset outside production)
-- `PORT` (server port for production preview/server)
+## Public API
 
-## Development
+Other sites and apps can read CDCat's data over HTTP, for lyric tools, cover matching and more. No sign-up or API key is needed.
 
-```bash
-pnpm install
-pnpm dev
-```
+Read the documentation: **[dev.cdcat.net/docs/api](https://dev.cdcat.net/docs/api)**
 
-Then open `http://localhost:3210`.
+## Data license
 
-## Page data and loading states
+The catalog data is shared under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Lyrics, cover art and other images belong to their rights holders and are not covered by that license. See the [Terms of Service](https://dev.cdcat.net/terms) for details.
 
-Pages render as soon as they are navigated to; their data arrives afterwards. The server still waits for the data, so server-rendered HTML is complete.
+## Contact
 
-- Fetch a page's main data with `usePageAPI(url, { query })` or `usePageData(key, fetcher)` (`app/composables/usePageData.ts`). Keep the `await`: it only waits on the server, so code after it can still read the data there. The key must contain every request parameter.
-- Public pages keep the data of a visit for ten minutes (`app/utils/pageCache.ts`): coming back shows it at once and refreshes it in the background. Pass `cache: false` for data about the viewer (notifications, drafts, revisions…).
-- Templates go in this order: content when there is data, the error when `status === 'error'`, otherwise the skeleton. Keep one static root element per page; page transitions attach to it.
-- Skeletons are built from `.skeleton` blocks inside `SkeletonStatus` (`app/components/skeleton/`), or `CollectionLoadingSkeleton` for lists. The skeleton that stands in for a page's main data passes `page`, so the scroll restoration in `app/router.options.ts` waits for it.
-- Content that replaces a skeleton gets `revealClass`. A list also gets `:key="revealKey"` and is dimmed and `inert` while `refetching`; a failed refetch keeps the old results under `CommonLoadError`.
-- After the reader changes something the page data holds (a favourite, a tracking status), update it with `mutate` so the cached copy stays right.
-- `v-img-fade` fades in an image that loads after the page is on screen.
-
-## SEO
-
-The design is `docs/seo/README.md` in the API repo. Each page has one address in every language; visitors without a language preference (search engines) get Japanese.
-
-- `?l=` (Steam's names: `schinese`, `tchinese`, `english`, `japanese`) or `?lang=` (a language tag such as `zh-Hans`, `zh-TW`, `ja`) switches the interface language on any page and is remembered like a choice in the language menu (`app/middleware/language-query.global.ts`).
-
-- An indexable page calls `usePageSeo({ title, description, image, jsonLd, breadcrumbs, error })` (`app/composables/usePageSeo.ts`) after its main `await`. It writes the description, share card, canonical URL and JSON-LD, and answers 404 when `error` is a 404.
-- Build titles and descriptions with `useSeoText()` (`withOriginal`, `sentence`, `count`) and the `seo.*` messages; JSON-LD with the builders in `app/utils/structuredData.ts`.
-- Pages that should stay out of search results (personal, editing, search, history) set `useSeoMeta({ robots: 'noindex' })` instead.
-- `robots.txt` and the sitemap (`/sitemap.xml`, `/sitemaps/*.xml`) are Nitro routes under `server/routes/`. Every page is `noindex` and `robots.txt` blocks everything unless `NUXT_PUBLIC_INDEXABLE=true`.
+- Email: support@cdcat.net
+- Issues: [github.com/shirohako/cdcat/issues](https://github.com/shirohako/cdcat/issues)
