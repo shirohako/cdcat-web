@@ -2,7 +2,7 @@ import type { JoinContent } from './types'
 
 const content: JoinContent = {
   eyebrow: '加入 CDCat',
-  title: { before: '一起把', em: '音乐资料馆', after: '建起来' },
+  title: [{ em: '你', shift: 40 }, '可以让 CDCat 变得', { em: '更好', shift: 200 }],
   lead: 'CDCat 是由音乐爱好者维护的非营利音乐数据库。下面这些岗位正在募集，懂外语、会画画，或者收了一柜子 CD，都有能出力的地方。',
   stats: { roles: '{count} 个岗位募集中', groups: '{count} 个领域', spare: '业余时间参与' },
   badge: { role: 'CDCAT · STAFF', name: '就差你了' },
@@ -15,7 +15,7 @@ const content: JoinContent = {
       roles: [
         { name: '情报高手', icon: 'lucide:search-check', desc: '审核用户新建的专辑，补充尚未收录的专辑资料，核实并更正用户反馈的错误。' },
         { name: '歌词', icon: 'lucide:file-music', desc: '把歌词本或流媒体上的歌词录入站内，和曲目一一对应。' },
-        { name: '富婆', sub: '实体收藏家', icon: 'lucide:disc-3', desc: '自购 CD、有扫描设备，扫描歌词本等实体资料并上传。' },
+        { name: '收藏家', icon: 'lucide:disc-3', desc: '手边有不少 CD，也有扫描设备，愿意把歌词本等实体资料扫描上传。' },
       ],
     },
     {
@@ -43,12 +43,11 @@ const content: JoinContent = {
     {
       id: 'product',
       name: '产品',
-      desc: '设计与开发',
+      desc: '设计、产品与测试',
       shift: 150,
       roles: [
         { name: '设计', icon: 'lucide:layout-template', desc: '为网站的视觉风格、排版、图标、过渡动画和交互逻辑提供指导和建议。' },
         { name: '产品', icon: 'lucide:lightbulb', desc: '收集用户的意见和反馈，把大家需要的新功能整理成提案。' },
-        { name: '开发', icon: 'lucide:code-xml', desc: '熟悉 Vue / Nuxt 或 PHP / Laravel，参与网站功能的开发和维护。' },
         { name: '测试', icon: 'lucide:bug', desc: '抢先试用新功能，发现问题并整理成能复现的反馈。' },
       ],
     },
@@ -68,8 +67,7 @@ const content: JoinContent = {
     eyebrow: 'ADMINISTRATOR · CDCAT STAFF',
     name: '管理员',
     tag: '长期',
-    requirements: ['胜任上面任意一项工作', '愿意长期参与 CDCat 的建设'],
-    roles: '上面 {count} 个岗位，任一即可',
+    requirements: ['胜任上面任意一项工作', '能长期投入，和大家一起把 CDCat 做好', '乐于交流，有事愿意和大家商量'],
   },
   join: {
     title: '怎样加入',
@@ -77,7 +75,7 @@ const content: JoinContent = {
     steps: [
       { title: '挑一个岗位', desc: '看看哪件事是你擅长或想试试的，多选也可以。' },
       { title: '加入交流群', desc: '在 Telegram 群或 QQ 群里找管理员。' },
-      { title: '介绍一下自己', desc: '说说你会什么，每周大概能投入多少时间。' },
+      { title: '介绍一下自己', desc: '说说你会什么，平时喜欢听什么音乐。' },
       { title: '从一件小事开始', desc: '先接一个小任务，熟悉之后再慢慢多做。' },
     ],
   },

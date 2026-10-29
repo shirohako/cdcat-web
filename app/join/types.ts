@@ -12,15 +12,15 @@ export interface JoinRole {
 
 export interface JoinContent {
   eyebrow: string
-  /** The title, around its highlighted phrase */
-  title: { before: string, em: string, after: string }
+  /** The title: plain text and highlighted phrases, each highlight in its own colour (`shift`, as for the groups) */
+  title: (string | { em: string, shift: number })[]
   lead: string
   /** The chips under the lead; {count} is filled in from the groups. */
   stats: { roles: string, groups: string, spare: string }
   /** The staff pass beside the hero */
   badge: { role: string, name: string }
   groups: { id: string, name: string, desc: string, shift: number, roles: JoinRole[] }[]
-  /** 管理员, an all-access pass: `pass` runs down its foil strip; {count} in `roles` is the number of roles above. */
-  admin: { pass: string, eyebrow: string, name: string, tag: string, requirements: string[], roles: string }
+  /** 管理员, an all-access pass: `pass` runs down its foil strip. */
+  admin: { pass: string, eyebrow: string, name: string, tag: string, requirements: string[] }
   join: { title: string, desc: string, steps: { title: string, desc: string }[] }
 }

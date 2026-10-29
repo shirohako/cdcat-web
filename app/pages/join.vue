@@ -7,7 +7,10 @@
           {{ content.eyebrow }}
         </p>
         <h1 class="mt-5 text-balance text-3xl font-black leading-tight tracking-tight text-title md:text-[2.875rem] md:leading-[1.2]">
-          {{ content.title.before }}<em class="accent highlight not-italic">{{ content.title.em }}</em>{{ content.title.after }}
+          <template v-for="(part, index) in content.title" :key="index">
+            <template v-if="typeof part === 'string'">{{ part }}</template>
+            <em v-else class="accent highlight not-italic" :style="{ '--shift': part.shift }">{{ part.em }}</em>
+          </template>
         </h1>
         <p class="mt-5 text-base leading-8 text-body md:text-lg md:leading-9">{{ content.lead }}</p>
         <ul class="mt-6 flex flex-wrap gap-2.5 text-sm text-title">
@@ -98,7 +101,6 @@
             </li>
           </template>
         </ul>
-        <p class="text-xs opacity-60">{{ adminRoles }}</p>
       </div>
     </section>
 
@@ -160,7 +162,6 @@ const GRID_COLUMNS: Record<number, string> = {
 }
 
 const roleCount = content.groups.reduce((sum, group) => sum + group.roles.length, 0)
-const adminRoles = content.admin.roles.replace('{count}', String(roleCount))
 
 // The roles count 管理员 too.
 const stats = computed(() => [
@@ -194,9 +195,16 @@ usePageSeo({
 
 <style scoped>
 /* A highlighter stroke behind the title's phrase, in a colour turned from the theme hue. */
+/* The marked words: a band under their lower part that rises to fill the whole word on hover. */
 .highlight {
-  --shift: 40;
-  background: linear-gradient(transparent 62%, color-mix(in oklab, var(--accent) 38%, transparent) 0);
+  padding-inline: 0.08em;
+  background: linear-gradient(color-mix(in oklab, var(--accent) 38%, transparent), color-mix(in oklab, var(--accent) 38%, transparent)) bottom / 100% 30% no-repeat;
+  box-decoration-break: clone;
+  transition: background-size 300ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.highlight:hover {
+  background-size: 100% 100%;
 }
 
 .photo {
@@ -260,6 +268,7 @@ section:hover > .pass .pass-back {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .highlight,
   .pass-front,
   .pass-back {
     transition: none;
