@@ -63,7 +63,7 @@
     </Transition>
 
     <p v-if="step !== 3" class="text-center text-[13px] text-meta">
-      <NuxtLink to="/auth/login" class="link font-semibold">{{ t('auth.forgot_password.back_to_login') }}</NuxtLink>
+      <NuxtLink to="/auth/login" class="link -mx-2 -my-1 px-2 py-1 font-semibold">{{ t('auth.forgot_password.back_to_login') }}</NuxtLink>
     </p>
   </div>
 </template>

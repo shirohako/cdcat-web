@@ -197,10 +197,10 @@
 
         <!-- Login/Register Buttons (Not Authenticated); on phones, where the two don't fit, one icon with both in a menu -->
         <div v-else class="ml-1 hidden items-center gap-2 sm:flex">
-          <UiButton to="/auth/login">
+          <UiButton to="/auth/login" size="sm">
             {{ $t('user.login') }}
           </UiButton>
-          <UiButton to="/auth/register" variant="primary">
+          <UiButton to="/auth/register" variant="primary" size="sm">
             {{ $t('user.register') }}
           </UiButton>
         </div>

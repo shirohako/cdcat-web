@@ -415,7 +415,7 @@
       "closed_title": "Registration paused",
       "closed_message": "New sign-ups are currently paused. Please come back later. Existing accounts can still sign in.",
       "steps": {
-        "notice": "First things first",
+        "notice": "Welcome",
         "terms": "Terms",
         "profile": "Profile",
         "password": "Password",
@@ -424,22 +424,18 @@
       "prev": "Back",
       "next": "Next",
       "notice": {
-        "title": "First things first: no music downloads here",
-        "lead": "CDCat is a music catalogue. Together we keep track of albums, tracks, artists and events, write reviews, build collections and talk about music.",
-        "no_audio_title": "No audio files",
-        "no_audio": "We don't host music, and there is nothing to download or stream.",
-        "no_piracy_title": "No links to pirated copies",
-        "no_piracy": "Sharing links to pirated downloads or streams breaks the terms, and they will be removed.",
-        "support_title": "Support the artists",
-        "support": "Buy the CD or the digital release, or use a licensed streaming service.",
-        "confirm": "Got it"
+        "title": "Welcome to CDCat",
+        "lead": "CDCat is a music catalogue we build together. Here we keep track of albums, tracks, artists and events, write reviews, build collections and talk about music.",
+        "no_audio_title": "Information, not music",
+        "no_audio": "We don't host any audio, so there's nothing to download or stream here.",
+        "support_title": "If you like it, support the artists",
+        "support": "Buying the CD or the digital release, or listening on a licensed streaming service, means a lot to the people who made it.",
+        "confirm": "Sounds good"
       },
       "terms": {
         "title": "Terms of Service and Privacy Policy",
         "lead": "Please read both before you sign up. They open in a new tab, so nothing you have filled in is lost.",
-        "updated": "Updated {date}",
-        "read": "Read",
-        "agree": "I have read and agree to the {terms} and the {privacy}",
+        "agree": "I have read and agree to the {doc}",
         "terms": "Terms of Service",
         "privacy": "Privacy Policy"
       },

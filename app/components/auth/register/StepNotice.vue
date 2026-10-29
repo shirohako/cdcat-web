@@ -3,9 +3,8 @@
 defineEmits<{ next: [] }>()
 
 const POINTS = [
-  { key: 'no_audio', icon: 'lucide:ban' },
-  { key: 'no_piracy', icon: 'lucide:unlink' },
-  { key: 'support', icon: 'lucide:disc-3' },
+  { key: 'no_audio', icon: 'lucide:library' },
+  { key: 'support', icon: 'lucide:heart' },
 ] as const
 </script>
 
@@ -13,7 +12,7 @@ const POINTS = [
   <div class="flex flex-col gap-5">
     <ul class="flex flex-col gap-2.5">
       <li v-for="point in POINTS" :key="point.key" class="flex items-start gap-3 rounded-lg bg-sunken p-3">
-        <span class="grid size-9 shrink-0 place-items-center rounded-md bg-card text-(--auth-tint)">
+        <span class="grid size-9 shrink-0 place-items-center rounded-md border border-line bg-card text-(--auth-tint)">
           <UiIcon :icon="point.icon" class="size-[18px]" />
         </span>
         <div class="min-w-0">

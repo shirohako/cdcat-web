@@ -49,7 +49,7 @@
 
       <p v-if="step !== 'done'" class="text-center text-[13px] text-meta">
         {{ t('auth.register.have_account') }}
-        <NuxtLink to="/auth/login" class="link ml-1 font-semibold">{{ t('auth.register.login_now') }}</NuxtLink>
+        <NuxtLink to="/auth/login" class="link -my-1 -mr-2 ml-0.5 px-2 py-1 font-semibold">{{ t('auth.register.login_now') }}</NuxtLink>
       </p>
     </template>
   </div>
