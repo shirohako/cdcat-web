@@ -38,7 +38,7 @@
       "links": "Links",
       "articles": "Related Articles",
       "contributors": "Contributors",
-      "stats": "Stats",
+      "stats": "Stats & Tracking",
       "gallery": "Images",
       "information": "Information"
     },
@@ -51,7 +51,9 @@
       "owned": "Owned",
       "dropped": "Dropped",
       "tracking": "Tracking",
-      "tracking_total": "{count} person | {count} people"
+      "tracking_total": "{count} person | {count} people",
+      "mine": "Marked as",
+      "unmarked": "Not marked yet"
     },
     "tracklist": {
       "credits_toggle": "Credits",
@@ -200,7 +202,6 @@
     "removed": "Tracking removed",
     "widget": {
       "title": "Tracking Status",
-      "remove": "Remove Tracking",
       "manage": "Manage My Tracking"
     }
   },

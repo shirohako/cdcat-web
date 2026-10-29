@@ -146,7 +146,6 @@
               </UiButton>
               <UiButton
                 :to="isAuthenticated ? `/contribute/album/${album.id}` : `/auth/login?redirect=/contribute/album/${album.id}`"
-                variant="outline"
                 size="sm"
                 :icon="Edit"
                 class="flex-1 lg:flex-none"

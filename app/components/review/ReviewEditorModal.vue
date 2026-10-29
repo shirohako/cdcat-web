@@ -9,7 +9,7 @@
             <UiIconTile :icon="MessageSquare" />
             <h2 class="text-base font-bold text-title">{{ $t(review ? 'reviews.edit' : 'reviews.write') }}</h2>
           </div>
-          <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full text-meta transition-colors hover:bg-ghost-hover hover:text-primary" @click="emit('close')">
+          <button type="button" class="flex h-8 w-8 items-center justify-center rounded-full text-meta transition-colors hover:bg-black/[0.08] hover:text-primary dark:hover:bg-white/[0.1]" @click="emit('close')">
             <X :size="18" />
           </button>
         </div>
@@ -31,7 +31,7 @@
                 :key="value"
                 type="button"
                 class="rounded-full px-3 py-1.5 text-sm font-medium transition-colors"
-                :class="form.rating === value ? ['ring-2', reviewRatingTone(value)] : 'text-meta ring-1 ring-line hover:bg-ghost-hover hover:text-primary'"
+                :class="form.rating === value ? ['ring-2', reviewRatingTone(value)] : 'text-meta ring-1 ring-line hover:text-primary hover:ring-faint'"
                 :aria-pressed="form.rating === value"
                 @click="form.rating = form.rating === value ? null : value"
               >{{ $t(reviewRatingKey(value)) }}</button>

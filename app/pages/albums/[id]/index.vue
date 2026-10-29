@@ -27,8 +27,15 @@
             <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
               {{ $t('pending.locked') }}
             </div>
-            <AlbumTracking v-else :album-id="String(album.id)" :initial-tracking="album.user_tracking" @tracked="setTracking" />
-            <AlbumStats :views-count="album.views_count" :favorites-count="album.favorites_count" :tracking-stats="album.tracking_stats" />
+            <AlbumStats
+              :album-id="album.id"
+              :views-count="album.views_count"
+              :favorites-count="album.favorites_count"
+              :tracking-stats="album.tracking_stats"
+              :initial-tracking="album.user_tracking"
+              :locked="album.is_pending"
+              @tracked="setTracking"
+            />
             <AlbumRankings v-if="!album.is_pending" :rating="album.rating" :rating-count="album.rating_count" :distribution="album.rating_distribution" @write-review="reviews?.openEditor()" />
             <AlbumInfo :album="album" />
             <AlbumLinks :links="album.links" />
@@ -75,9 +82,13 @@ watch(mergedInto, (id) => {
   if (id) navigateTo({ path: `/albums/${id}`, query: route.query }, { replace: true })
 })
 
-const setTracking = (tracking: TrackingStatus | null) => mutate((current) => {
+// The visitor's own pick moves the counts as the server's will: one off the status they leave, one onto the new one.
+const setTracking = (tracking: TrackingStatus | null, previous: TrackingStatus | null) => mutate((current) => {
   const now = new Date().toISOString()
-  return { ...current, user_tracking: tracking ? { created_at: current.user_tracking?.created_at ?? now, updated_at: now, status: tracking } : null }
+  const stats = { ...current.tracking_stats }
+  if (previous) stats[previous] = Math.max(0, stats[previous] - 1)
+  if (tracking) stats[tracking] += 1
+  return { ...current, tracking_stats: stats, user_tracking: tracking ? { created_at: current.user_tracking?.created_at ?? now, updated_at: now, status: tracking } : null }
 })
 
 const gallery = ref<{ openCover: () => void } | null>(null)

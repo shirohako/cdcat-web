@@ -38,7 +38,7 @@
       "links": "相关链接",
       "articles": "相关文章",
       "contributors": "贡献者",
-      "stats": "统计",
+      "stats": "统计和追踪",
       "gallery": "图片",
       "information": "信息"
     },
@@ -51,7 +51,9 @@
       "owned": "已入手",
       "dropped": "不感兴趣",
       "tracking": "追踪",
-      "tracking_total": "{count} 人"
+      "tracking_total": "{count} 人",
+      "mine": "我已标记",
+      "unmarked": "我还未标记"
     },
     "tracklist": {
       "credits_toggle": "人员信息",
@@ -200,7 +202,6 @@
     "removed": "已移除追踪",
     "widget": {
       "title": "追踪状态",
-      "remove": "取消追踪",
       "manage": "管理我的追踪"
     }
   },

@@ -12,7 +12,7 @@
       <div
         v-for="product in products"
         :key="product.id"
-        class="group flex items-center gap-4 border-b border-line px-5 py-4 transition-colors duration-150 ease-out last:border-b-0 hover:bg-card-hover"
+        class="group flex items-center gap-4 border-b border-line px-5 py-4 last:border-b-0"
       >
         <!-- Thumbnail: the edition's own cover when there is one -->
         <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg">

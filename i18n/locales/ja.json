@@ -38,7 +38,7 @@
       "links": "リンク",
       "articles": "関連記事",
       "contributors": "貢献者",
-      "stats": "統計",
+      "stats": "統計とトラッキング",
       "gallery": "画像",
       "information": "情報"
     },
@@ -51,7 +51,9 @@
       "owned": "所持",
       "dropped": "興味なし",
       "tracking": "トラッキング",
-      "tracking_total": "{count} 人"
+      "tracking_total": "{count} 人",
+      "mine": "マーク済み",
+      "unmarked": "まだマークしていません"
     },
     "tracklist": {
       "credits_toggle": "クレジット",
@@ -200,7 +202,6 @@
     "removed": "トラッキングを削除しました",
     "widget": {
       "title": "トラッキング",
-      "remove": "トラッキングを削除",
       "manage": "トラッキング管理"
     }
   },

@@ -13,7 +13,7 @@
         v-for="article in articles"
         :key="article.id"
         :to="`/articles/${article.id}`"
-        class="group flex items-center gap-3 px-4 py-3 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
+        class="group flex items-center gap-3 px-4 py-3"
       >
         <!-- Cover -->
         <div class="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-sunken">

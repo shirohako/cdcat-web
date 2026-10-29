@@ -36,7 +36,7 @@
           v-for="track in disc.tracks"
           :id="`track-${track.id}`"
           :key="track.id"
-          class="group flex scroll-mt-20 items-center gap-2 border-b border-line px-4 py-3 transition-colors duration-150 ease-out last:border-b-0 hover:bg-card-hover sm:gap-3 sm:px-5"
+          class="group flex scroll-mt-20 items-center gap-2 border-b border-line px-4 py-3 last:border-b-0 sm:gap-3 sm:px-5"
         >
           <span class="w-7 shrink-0 select-none text-right font-mono text-xs font-bold text-meta transition-colors group-hover:text-primary">{{ track.number }}</span>
 
@@ -44,7 +44,7 @@
             v-if="!locked"
             type="button"
             :disabled="!!toggling[track.id]"
-            class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-ghost-hover disabled:cursor-not-allowed disabled:opacity-40"
+            class="shrink-0 cursor-pointer rounded-full p-1 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-red-400/15"
             :class="favorited[track.id] ? '' : 'sm:opacity-0 sm:group-hover:opacity-100'"
             :title="$t(favorited[track.id] ? 'content_display.unfavorite' : 'content_display.favorite')"
             @click="toggleFavorite(track.id)"

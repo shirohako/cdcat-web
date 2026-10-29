@@ -25,7 +25,7 @@
           :href="link.url"
           target="_blank"
           rel="noopener noreferrer"
-          class="group flex items-center gap-3 px-5 py-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
+          class="group flex items-center gap-3 px-5 py-2.5"
         >
           <!-- Icon -->
           <div
@@ -48,7 +48,7 @@
           <!-- Arrow -->
           <ExternalLink
             :size="13"
-            class="shrink-0 text-faint group-hover:text-primary transition-colors"
+            class="shrink-0 text-faint transition-[color,translate] duration-150 ease-out group-hover:-translate-y-px group-hover:translate-x-0.5 group-hover:text-primary"
           />
         </a>
 
