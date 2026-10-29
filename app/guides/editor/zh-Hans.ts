@@ -106,7 +106,7 @@ const guide: GuideContent = {
         | 广播剧 | 以剧情和对白为主的 CD |
         | 广播节目 | 广播、网络电台节目 |
 
-        八种类别各自包括什么，见[了解 CDCat 的设计](/help/design#album)。
+        八种类别各自包括什么，见[了解 CDCat 的设计](/docs/design#album)。
 
         ### 下面还有两块
 

@@ -11,8 +11,8 @@ const props = defineProps<{ doc: GuideDoc, kind: GuideKind }>()
 const { t, locale } = useI18n()
 
 const GUIDES = {
-  design: { to: '/help/design', icon: 'lucide:blocks', title: 'about_page.guide_basics_title', tag: 'about_page.guide_basics_tag' },
-  editor: { to: '/help/editor', icon: 'lucide:square-pen', title: 'about_page.guide_submit_title', tag: 'about_page.guide_submit_tag' },
+  design: { to: '/docs/design', icon: 'lucide:blocks', title: 'about_page.guide_basics_title', tag: 'about_page.guide_basics_tag' },
+  editor: { to: '/docs/editor', icon: 'lucide:square-pen', title: 'about_page.guide_submit_title', tag: 'about_page.guide_submit_tag' },
 } as const
 
 const title = computed(() => t(GUIDES[props.kind].title))

@@ -1,6 +1,6 @@
 import type { DocSectionLink } from '~/documents/sections'
 
-/** The guides the about page's 使用说明 links to: /help/design and /help/editor. */
+/** The guides the about page's 使用说明 links to: /docs/design and /docs/editor. */
 export type GuideKind = 'design' | 'editor'
 /** The languages a guide is written in so far; readers of the others get the first. */
 export type GuideLocale = 'zh-Hans'

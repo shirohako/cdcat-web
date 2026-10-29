@@ -18,12 +18,12 @@ const { data: doc } = await useAsyncData(() => `guide:editor:${locale.value}`, (
 usePageSeo({
   title: () => t('about_page.guide_submit_title'),
   description: () => t('seo.pages.guide_editor'),
-  breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_submit_title'), path: '/help/editor' }],
+  breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_submit_title'), path: '/docs/editor' }],
   jsonLd: () => doc.value && compactLd({
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     'name': t('about_page.guide_submit_title'),
-    'url': absolute('/help/editor'),
+    'url': absolute('/docs/editor'),
     'inLanguage': doc.value.locale,
     'dateModified': doc.value.updated,
   }),

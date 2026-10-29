@@ -91,7 +91,7 @@
         <p class="mt-3 text-base font-medium leading-[1.9] text-title">{{ t('landing.community.body') }}</p>
         <div class="mt-6 flex flex-wrap gap-2.5">
           <UiButton to="/contribute" variant="primary" size="lg">{{ t('landing.community.contribute') }}</UiButton>
-          <UiButton to="/help/editor" size="lg">{{ t('landing.community.guide') }}</UiButton>
+          <UiButton to="/docs/editor" size="lg">{{ t('landing.community.guide') }}</UiButton>
         </div>
       </div>
     </section>

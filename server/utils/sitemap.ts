@@ -30,7 +30,7 @@ export const SITEMAP_PATHS: Record<string, (item: SitemapItem) => string> = {
 /** Pages that are always there: the home page and each section's list. */
 export const SITEMAP_PAGES = [
   '/', '/albums', '/vinyls', '/artists', '/labels', '/entries', '/franchises', '/events',
-  '/articles', '/discussions', '/contribute', '/about', '/terms', '/privacy', '/help/markdown', '/help/design', '/help/editor', '/join',
+  '/articles', '/discussions', '/contribute', '/about', '/terms', '/privacy', '/docs/markdown', '/docs/design', '/docs/editor', '/join',
   '/docs/api',
 ]
 

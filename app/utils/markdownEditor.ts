@@ -2,7 +2,7 @@ import type { MarkdownContainerName, MarkdownTextColor, MarkdownTextSize, Markdo
 import { mdT } from './markdownI18n'
 
 /** The syntax guide the editor's help banner links to. */
-export const MARKDOWN_GUIDE_URL = '/help/markdown'
+export const MARKDOWN_GUIDE_URL = '/docs/markdown'
 
 /** One completion offered after `@` or `[[`; `apply` is the text that replaces the typed query. */
 export interface MarkdownCompletionItem {

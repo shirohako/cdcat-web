@@ -18,12 +18,12 @@ const { data: doc } = await useAsyncData(() => `guide:design:${locale.value}`, (
 usePageSeo({
   title: () => t('about_page.guide_basics_title'),
   description: () => t('seo.pages.guide_design'),
-  breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_basics_title'), path: '/help/design' }],
+  breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_basics_title'), path: '/docs/design' }],
   jsonLd: () => doc.value && compactLd({
     '@context': 'https://schema.org',
     '@type': 'TechArticle',
     'name': t('about_page.guide_basics_title'),
-    'url': absolute('/help/design'),
+    'url': absolute('/docs/design'),
     'inLanguage': doc.value.locale,
     'dateModified': doc.value.updated,
   }),
