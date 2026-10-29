@@ -8,6 +8,8 @@ import { autoUpdate, computePosition, flip, hide as hideMiddleware, offset as of
 let closeShown: (() => void) | null = null
 let closedAt = 0
 const SKIP_DELAY = 300
+/** Where the bubble of a grouped tooltip was when it closed, for the next tooltip of its group to glide on from. */
+let lastBubble: { group: string, x: number, y: number, width: number, height: number, drop: () => void } | null = null
 const LONG_PRESS = 500
 /** Triggers whose tap does something of their own; on touch screens their tooltip waits for a long press instead. */
 const ACTIONABLE = 'a[href], button, input, select, textarea, label, summary, [contenteditable="true"], '
@@ -28,6 +30,9 @@ const ACTIONABLE = 'a[href], button, input, select, textarea, label, summary, [c
  * The default slot is the trigger and gets no box of its own: its first element anchors the bubble and is described by
  * it (aria-describedby) while it shows, unless its aria-label already says the same. Attributes (class …) go to the
  * bubble, e.g. a width for the `content` slot.
+ *
+ * Tooltips with the same `group` (the parts of a bar, a row of icons …) pass one bubble along: when one opens right
+ * after another of its group closed, it starts where that bubble was and glides over to its own trigger.
  */
 defineOptions({ inheritAttrs: false })
 
@@ -39,7 +44,9 @@ const props = withDefaults(defineProps<{
   /** How long the pointer rests on the trigger before the tooltip shows, in milliseconds */
   delay?: number
   disabled?: boolean
-}>(), { text: undefined, placement: 'top', offset: 8, delay: 400 })
+  /** Tooltips of one group glide from one to the next instead of closing and opening again */
+  group?: string
+}>(), { text: undefined, placement: 'top', offset: 8, delay: 400, group: undefined })
 
 const slots = useSlots()
 const id = useId()
@@ -51,6 +58,10 @@ const rendered = ref(false)
 const layer = ref<HTMLElement | 'body'>('body')
 const theme = ref<Theme>('light')
 const position = reactive({ x: 0, y: 0, placement: props.placement as Placement, placed: false, hidden: false })
+// Set while the bubble took over from another of its group: no pop-in. `moving` then turns on the transition that
+// carries it to its place, once it stands where the last bubble was.
+const gliding = ref(false)
+const moving = ref(false)
 
 const rich = computed(() => Boolean(slots.content))
 const anchor = () => triggerIn(root.value)
@@ -97,6 +108,11 @@ const show = async () => {
   if (open.value || props.disabled || !reference || !(props.text || rich.value)) return
   closeShown?.()
   closeShown = hide
+  const from = props.group && lastBubble?.group === props.group && Date.now() - closedAt < SKIP_DELAY ? lastBubble : null
+  lastBubble = null
+  // The bubble it takes over from goes at once rather than fading out under this one.
+  from?.drop()
+  gliding.value = Boolean(from)
   layer.value = floatingLayer(reference)
   theme.value = invertedTheme(reference)
   position.placed = false
@@ -106,14 +122,32 @@ const show = async () => {
   document.addEventListener('keydown', onKeydown)
   document.addEventListener('pointerdown', onOutsidePointerDown, true)
   await nextTick()
-  if (open.value && bubble.value) stopAutoUpdate = autoUpdate(reference, bubble.value, place)
+  if (!open.value || !bubble.value) return
+  if (from) {
+    // Start centred on where the last bubble was, without the transition: with it, the bubble would glide in from
+    // wherever it stood before (the corner of the screen, the first time). That style has to be in before the move.
+    const { width, height } = bubble.value.getBoundingClientRect()
+    Object.assign(position, { x: Math.round(from.x + (from.width - width) / 2), y: Math.round(from.y + (from.height - height) / 2), placed: true, hidden: false })
+    await nextTick()
+    if (!open.value || !bubble.value) return
+    bubble.value.getBoundingClientRect()
+    moving.value = true
+  }
+  stopAutoUpdate = autoUpdate(reference, bubble.value, place)
 }
 
 function hide() {
   clearTimeout(showTimer)
   clearTimeout(pressTimer)
   if (!open.value) return
+  const leaving = bubble.value
+  if (props.group && leaving && position.placed) {
+    const { width, height } = leaving.getBoundingClientRect()
+    lastBubble = { group: props.group, x: position.x, y: position.y, width, height, drop: () => { leaving.style.display = 'none' } }
+  }
   open.value = false
+  gliding.value = false
+  moving.value = false
   closedAt = Date.now()
   if (closeShown === hide) closeShown = null
   stopAutoUpdate?.()
@@ -249,8 +283,8 @@ onBeforeUnmount(hide)
   <Teleport v-if="rendered" :to="layer">
     <Transition
       appear
-      enter-active-class="transition-[opacity,scale] duration-150 ease-out motion-reduce:transition-none"
-      enter-from-class="scale-95 opacity-0"
+      :enter-active-class="gliding ? '' : 'transition-[opacity,scale] duration-150 ease-out motion-reduce:transition-none'"
+      :enter-from-class="gliding ? '' : 'scale-95 opacity-0'"
       leave-active-class="transition-opacity duration-100 ease-in motion-reduce:transition-none"
       leave-to-class="opacity-0"
       @after-leave="rendered = false"
@@ -263,14 +297,16 @@ onBeforeUnmount(hide)
         :data-theme="theme"
         v-bind="$attrs"
         class="pointer-events-none fixed left-0 top-0 z-[90] bg-popover shadow-lg"
-        :class="rich
+        :class="[rich
           ? 'max-w-[min(22rem,calc(100vw-1rem))] rounded-[10px] p-3 text-sm text-body'
-          : 'max-w-60 rounded-md px-2.5 py-1.5 text-xs font-medium leading-4 text-title'"
+          : 'max-w-60 rounded-md px-2.5 py-1.5 text-xs font-medium leading-4 text-title',
+        moving && 'transition-[translate] duration-200 ease-out motion-reduce:transition-none']"
         :style="{
           translate: `${position.x}px ${position.y}px`,
           visibility: position.placed && !position.hidden ? 'visible' : 'hidden',
           transformOrigin: placementOrigin(position.placement),
         }"
+        @transitionend.self="event => event.propertyName === 'translate' && (moving = false)"
       >
         <slot name="content">{{ text }}</slot>
       </div>

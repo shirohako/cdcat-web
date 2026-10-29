@@ -49,7 +49,9 @@
       "completed": "Completed",
       "wishlist": "Wishlist",
       "owned": "Owned",
-      "dropped": "Dropped"
+      "dropped": "Dropped",
+      "tracking": "Tracking",
+      "tracking_total": "{count} person | {count} people"
     },
     "tracklist": {
       "credits_toggle": "Credits",

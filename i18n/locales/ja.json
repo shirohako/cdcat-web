@@ -49,7 +49,9 @@
       "completed": "聴いた",
       "wishlist": "ウィッシュリスト",
       "owned": "所持",
-      "dropped": "興味なし"
+      "dropped": "興味なし",
+      "tracking": "トラッキング",
+      "tracking_total": "{count} 人"
     },
     "tracklist": {
       "credits_toggle": "クレジット",

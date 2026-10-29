@@ -49,7 +49,9 @@
       "completed": "聽過",
       "wishlist": "想要",
       "owned": "已入手",
-      "dropped": "不感興趣"
+      "dropped": "不感興趣",
+      "tracking": "追蹤",
+      "tracking_total": "{count} 人"
     },
     "tracklist": {
       "credits_toggle": "人員資訊",
