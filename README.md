@@ -24,7 +24,7 @@ Anyone with an account can add albums, artists, entries and series, or correct t
 
 - New to editing? Start with the guides linked from the site's About page.
 - We are also looking for translators, proofreaders, artists, designers, testers and moderators: see the Join the team page on the site.
-- Found a bug in the website or have an idea? [Open an issue](https://github.com/shirohako/cdcat/issues), or send a pull request.
+- Found a bug in the website or have an idea? [Open an issue](https://github.com/shirohako/cdcat-web/issues), or send a pull request.
 
 ## Public API
 
@@ -37,4 +37,4 @@ The catalog data is shared under [CC BY-SA 4.0](https://creativecommons.org/lice
 ## Contact
 
 - Email: support@cdcat.net
-- Issues: [github.com/shirohako/cdcat/issues](https://github.com/shirohako/cdcat/issues)
+- Issues: [github.com/shirohako/cdcat-web/issues](https://github.com/shirohako/cdcat-web/issues)
