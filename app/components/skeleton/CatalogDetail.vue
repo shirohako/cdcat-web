@@ -1,11 +1,43 @@
 <template>
   <SkeletonStatus page>
     <!-- Full-width heroes (albums, tracks, entries, franchises) come with their own body container. -->
-    <div v-if="hero === 'album' || hero === 'track'" class="bg-card">
+    <!-- AlbumHero: a banner, then a card riding over its lower edge with the cover sticking out of its top, the like
+         button under the cover, the title and the big figures beside it. -->
+    <div v-if="hero === 'album'">
+      <div class="skeleton h-40 sm:h-48 md:h-52 lg:h-60 2xl:h-64" />
+      <div class="container mx-auto max-w-6xl px-4 md:px-8 2xl:max-w-7xl">
+        <div class="card relative -mt-12 flex flex-col items-center gap-x-8 px-4 pb-6 sm:px-6 md:-mt-16 md:flex-row md:items-start lg:gap-x-10 lg:px-8 lg:pb-7 2xl:-mt-18">
+          <div class="flex shrink-0 flex-col gap-3">
+            <div class="skeleton -mt-22 size-40 rounded-md ring-4 ring-card sm:-mt-24 sm:size-44 md:size-48 lg:-mt-26 lg:size-52 xl:-mt-28 xl:size-56 2xl:-mt-30 2xl:size-60" />
+            <div class="skeleton h-8 rounded-md" />
+          </div>
+          <div class="flex w-full flex-1 flex-col items-center gap-3 pt-5 md:items-start md:pt-6">
+            <div class="flex gap-1.5">
+              <div class="skeleton h-6 w-12 rounded" />
+              <div class="skeleton h-6 w-10 rounded" />
+            </div>
+            <div class="skeleton h-8 w-3/5 rounded-md" />
+            <div class="flex items-center gap-2.5 py-1.5">
+              <div class="skeleton size-7 rounded-md" />
+              <div class="skeleton h-4 w-32 rounded-full" />
+            </div>
+            <div class="mt-1 flex gap-5">
+              <div v-for="figure in 3" :key="figure" class="skeleton h-10 w-14 rounded-md" />
+            </div>
+            <div class="flex gap-1.5">
+              <div class="skeleton h-7 w-24 rounded-md" />
+              <div class="skeleton h-7 w-28 rounded-md" />
+              <div class="skeleton h-7 w-32 rounded-md" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else-if="hero === 'track'" class="bg-card">
       <div class="container mx-auto max-w-6xl px-4 pb-7 pt-5 md:px-12 md:py-10 lg:px-20 xl:px-8 2xl:max-w-7xl">
         <div class="mx-auto flex max-w-5xl flex-col items-center gap-6 md:flex-row md:items-stretch md:gap-10">
-          <div v-if="hero === 'track'" class="skeleton size-36 shrink-0 rounded-md sm:size-44 md:size-48 lg:size-56" />
-          <div v-else class="skeleton size-44 shrink-0 rounded-md sm:size-56 md:size-60 lg:size-72 xl:size-80 2xl:size-96" />
+          <div class="skeleton size-36 shrink-0 rounded-md sm:size-44 md:size-48 lg:size-56" />
           <div class="flex w-full flex-1 flex-col items-center gap-3 rounded-lg bg-sunken p-3 sm:p-4 md:items-start md:p-6">
             <div class="skeleton h-7 w-3/5 rounded-md" />
             <div class="skeleton h-4 w-2/5 rounded-full" />
@@ -95,9 +127,10 @@
 <script setup lang="ts">
 /**
  * The placeholder for a catalog detail page while its data loads. `hero` mirrors the page's header:
- * `album`, `track` (the album's banner with a smaller cover), `poster` (entries) and `gradient`
- * (franchises) span the full width and bring the body's container; `tile` (labels) and `series` go
- * inside the page's container; `none` is for a page that renders its own header (artists).
+ * `album` (a banner with a card over its edge), `track` (a banner with the cover beside a
+ * panel), `poster` (entries) and `gradient` (franchises) span the full width and bring the body's
+ * container; `tile` (labels) and `series` go inside the page's container; `none` is for a page that
+ * renders its own header (artists).
  */
 const props = withDefaults(defineProps<{
   hero: 'album' | 'poster' | 'gradient' | 'tile' | 'track' | 'series' | 'none'

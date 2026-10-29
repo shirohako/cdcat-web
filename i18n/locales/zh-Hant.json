@@ -41,7 +41,8 @@
       "contributors": "貢獻者",
       "stats": "統計和追蹤",
       "gallery": "圖片",
-      "information": "資訊"
+      "information": "資訊",
+      "editing": "編輯這張專輯"
     },
     "stats": {
       "viewed": "瀏覽",
@@ -173,6 +174,15 @@
       "mine": "我的留言",
       "write": "寫留言",
       "login": "登入後寫留言"
+    },
+    "hero": {
+      "discs": "片光碟",
+      "tracks": "首曲目",
+      "duration": "總時長"
+    },
+    "editing": {
+      "version": "目前版本",
+      "edited_at": "{date}更新"
     }
   },
   "albums": {
@@ -1308,7 +1318,6 @@
     },
     "bonuses": "{count} 項特典",
     "details": "詳細資訊",
-    "streaming": "串流平台",
     "contributors": "{count} 位",
     "links": "{count} 個",
     "physical": "實體版",

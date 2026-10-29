@@ -45,7 +45,7 @@
              it back. -->
         <ul class="mt-3 grid grid-cols-2 gap-2 text-xs">
           <!-- Five statuses in two columns: the last one takes the whole row rather than leave a hole. -->
-          <li v-for="option in options" :key="option.status" class="last:odd:col-span-2">
+          <li v-for="option in tiles" :key="option.status" class="last:odd:col-span-2">
             <button
               type="button"
               class="group flex w-full min-w-0 items-center gap-2 rounded-sm px-2.5 py-1.5 text-left transition-colors duration-150 disabled:cursor-default"
@@ -191,6 +191,10 @@ const options = computed(() => STATUSES.map(option => ({
   label: t(`album.stats.${option.status}`),
   count: props.trackingStats[option.status] ?? 0,
 })))
+// The picker's own layout, two to a row: wanting to listen beside not interested, wishlist beside owned, then completed
+// across the last row. The bar keeps the order above.
+const TILE_ORDER: TrackingStatus[] = ['plan_to_listen', 'dropped', 'wishlist', 'owned', 'completed']
+const tiles = computed(() => TILE_ORDER.flatMap(status => options.value.filter(option => option.status === status)))
 const total = computed(() => options.value.reduce((sum, option) => sum + option.count, 0))
 /** Percent of the people tracking, as shown: under one but not none reads "<1". */
 const shareOf = (count: number) => {

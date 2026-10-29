@@ -41,7 +41,8 @@
       "contributors": "貢献者",
       "stats": "統計とトラッキング",
       "gallery": "画像",
-      "information": "情報"
+      "information": "情報",
+      "editing": "このアルバムを編集"
     },
     "stats": {
       "viewed": "閲覧",
@@ -173,6 +174,15 @@
       "mine": "あなたのコメント",
       "write": "コメントを書く",
       "login": "ログインしてコメント"
+    },
+    "hero": {
+      "discs": "ディスク",
+      "tracks": "曲",
+      "duration": "収録時間"
+    },
+    "editing": {
+      "version": "現在のバージョン",
+      "edited_at": "{date}更新"
     }
   },
   "albums": {
@@ -1308,7 +1318,6 @@
     },
     "bonuses": "特典{count}件",
     "details": "詳細",
-    "streaming": "ストリーミング",
     "contributors": "{count}人",
     "links": "{count}件",
     "physical": "フィジカル",

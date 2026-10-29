@@ -41,7 +41,8 @@
       "contributors": "Contributors",
       "stats": "Stats & Tracking",
       "gallery": "Images",
-      "information": "Information"
+      "information": "Information",
+      "editing": "Edit this album"
     },
     "stats": {
       "viewed": "Viewed",
@@ -173,6 +174,15 @@
       "mine": "Your comment",
       "write": "Write a comment",
       "login": "Log in to comment"
+    },
+    "hero": {
+      "discs": "disc | discs",
+      "tracks": "track | tracks",
+      "duration": "total length"
+    },
+    "editing": {
+      "version": "Current version",
+      "edited_at": "Updated {date}"
     }
   },
   "albums": {
@@ -1308,7 +1318,6 @@
     },
     "bonuses": "{count} bonuses",
     "details": "Details",
-    "streaming": "Streaming",
     "contributors": "{count} contributors",
     "links": "{count} links",
     "physical": "Physical",

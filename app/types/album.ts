@@ -17,6 +17,38 @@ export type AlbumCategory = typeof ALBUM_CATEGORIES[number]
 export const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other'] as const
 export type DiscFormat = typeof DISC_FORMATS[number]
 
+export const ALBUM_TYPE_ICONS: Record<AlbumType, string> = {
+  album: 'lucide:disc-3',
+  ep: 'lucide:disc-2',
+  single: 'lucide:disc',
+  compilation: 'lucide:library-big',
+  drama: 'lucide:drama',
+  radio: 'lucide:radio',
+}
+
+/** Shared with ENTRY_TYPE_ICONS where they mean the same (game, anime). */
+export const ALBUM_CATEGORY_ICONS: Record<AlbumCategory, string> = {
+  game: 'lucide:gamepad-2',
+  animation: 'lucide:sparkles',
+  publication: 'lucide:book-open',
+  audio_drama: 'lucide:audio-lines',
+  tokusatsu: 'lucide:zap',
+  live_action: 'lucide:clapperboard',
+  doujin: 'lucide:palette',
+  event: 'lucide:party-popper',
+}
+
+export const DISC_FORMAT_ICONS: Record<DiscFormat, string> = {
+  cd: 'lucide:disc-3',
+  sacd: 'lucide:disc-2',
+  dvd: 'lucide:disc-2',
+  bd: 'lucide:disc-2',
+  vinyl: 'lucide:disc',
+  cassette: 'lucide:cassette-tape',
+  digital: 'lucide:cloud-download',
+  other: 'lucide:package',
+}
+
 export const IMAGE_KINDS = [
   'cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'other',
 ] as const
@@ -246,6 +278,8 @@ export interface Album extends PendingFields {
   is_favorited: boolean
   user_tracking: { status: TrackingStatus, created_at: string, updated_at: string } | null
   version: number
+  /** When the current version was made; null without a version record. updated_at also moves with views. */
+  edited_at: string | null
   created_at: string
   updated_at: string
 }
