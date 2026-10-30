@@ -3,7 +3,7 @@
     <div
       ref="stage"
       :class="['td-stage', { 'is-live': live }]"
-      :style="{ aspectRatio: `${viewBox[2]} / ${viewBox[3]}`, '--td-unit': unit }"
+      :style="{ aspectRatio: `${viewBox[2]} / ${viewBox[3]}`, '--td-unit': unit ?? `tan(atan2(${viewBox[2]}px, 100cqw))` }"
       role="img"
       :aria-label="title"
     >
@@ -68,11 +68,11 @@
         <svg :class="['td-sheet', 'td-leaders', `td-${marks}`, { 'is-on': labelsOn }]" :viewBox="viewBox.join(' ')" aria-hidden="true">
           <g v-for="(label, i) in placed" :key="label.anchor">
             <line :x1="label.from[0]" :y1="label.from[1]" :x2="label.at[0]" :y2="label.at[1]" />
-            <circle :cx="label.from[0]" :cy="label.from[1]" :r="marks === 'balloons' ? 2.2 * unit : 1.4" />
+            <circle :cx="label.from[0]" :cy="label.from[1]" :r="marks === 'balloons' ? 2.2 * (unit ?? 0.5) : 1.4" />
             <!-- A drawing's item balloon: the part's number in the parts list. -->
             <template v-if="marks === 'balloons'">
-              <circle :class="['td-balloon', { 'is-hot': label.hot }]" :cx="label.at[0]" :cy="label.at[1]" :r="11 * unit" />
-              <text :x="label.at[0]" :y="label.at[1]" :font-size="11.5 * unit" dy="0.35em">{{ label.n ?? i + 1 }}</text>
+              <circle :class="['td-balloon', { 'is-hot': label.hot }]" :cx="label.at[0]" :cy="label.at[1]" :r="11 * (unit ?? 0.5)" />
+              <text :x="label.at[0]" :y="label.at[1]" :font-size="11.5 * (unit ?? 0.5)" dy="0.35em">{{ label.n ?? i + 1 }}</text>
             </template>
           </g>
         </svg>
@@ -85,7 +85,8 @@
         :style="{ left: `${label.left}%`, top: `${label.top}%`, '--td-turn': `${TURNS[i % TURNS.length]}deg`, transitionDelay: labelsOn ? `${i * 70}ms` : '0ms' }"
         aria-hidden="true"
       >{{ label.text }}</span>
-      <slot name="overlay" :on="labelsOn" :at="at" />
+      <!-- Only with the drawing, so nothing waits on an empty stage. -->
+      <slot v-if="data" name="overlay" :on="labelsOn" :at="at" />
     </div>
 
     <!-- Phones: the same stickers in a row under the drawing, which is too small to label in place. -->
@@ -124,13 +125,18 @@ const props = withDefaults(defineProps<{
   marks?: 'stickers' | 'balloons'
   /** The accessible name of the picture. */
   title: string
-}>(), { labels: () => [], marks: 'stickers' })
+  /**
+   * Loaded with the page rather than in the browser, so the server's HTML already shows it (assembled) and there is
+   * no empty stage at first: for the drawing at the top of a page. Its data then travels in the page's payload.
+   */
+  ssr?: boolean
+}>(), { labels: () => [], marks: 'stickers', ssr: false })
 
 defineSlots<{
   /**
    * HTML over the drawing, such as the mascot or a speech bubble. `on` while the stickers show; `at(part, point)`
    * places an element at a point of the apart drawing belonging to a part, wherever that part is now (left and top
-   * in %, plus a transform, so it moves without layout). Anything that moves or animates belongs here rather than
+   * in %, plus a transform in the stage's cqw, so it moves without layout and is right before the stage is measured). Anything that moves or animates belongs here rather than
    * in the SVG, where it would make the drawing repaint.
    */
   overlay?: (props: { on: boolean, at: (part: string, point: [number, number]) => { left: string, top: string, transform: string } }) => unknown
@@ -147,13 +153,18 @@ const LOOP = APART + OPEN + TOGETHER + CLOSED
 const uid = `td-${props.device}-${useId().replace(/[^\w-]/g, '')}`
 const root = ref<HTMLElement>()
 const stage = ref<HTMLElement>()
-const data = shallowRef<TeardownData | null>(null)
+const loaded = shallowRef<TeardownData | null>(null)
+const prefetched = props.ssr ? useAsyncData(`teardown:${props.device}`, () => loadTeardown(props.device)).data : undefined
+const data = computed(() => prefetched?.value ?? loaded.value)
 const t = ref(0)
 const labelsOn = ref(false)
 /** Playing on screen: the layers are promoted only then. */
 const live = ref(false)
-/** Drawing units per CSS pixel, for stroke widths in pixels at any size. */
-const unit = ref(0.5)
+/**
+ * Drawing units per CSS pixel, for stroke widths in pixels at any size. Until the stage is measured, CSS works it out
+ * from the stage's width (tan(atan2()) divides two lengths), which also covers the server's HTML.
+ */
+const unit = ref<number | null>(null)
 
 const progress = computed(() => (data.value ? partProgress(data.value, t.value) : new Map<string, number>()))
 const layers = computed(() => (data.value ? layersAt(data.value, progress.value) : []))
@@ -200,7 +211,7 @@ const at = (part: string, [x, y]: [number, number]) => {
   return {
     left: `${((x - x0) / w) * 100}%`,
     top: `${((y - y0) / h) * 100}%`,
-    transform: `translate(${((dx - sx) / unit.value).toFixed(1)}px, ${((dy - sy) / unit.value).toFixed(1)}px)`
+    transform: `translate(${(((dx - sx) / w) * 100).toFixed(3)}cqw, ${(((dy - sy) / w) * 100).toFixed(3)}cqw)`
   }
 }
 
@@ -268,10 +279,12 @@ onMounted(async () => {
     if (entry?.contentRect.width) unit.value = props.viewBox[2] / entry.contentRect.width
   })
   if (stage.value) sizer.observe(stage.value)
-  try {
-    data.value = await loadTeardown(props.device)
-  } catch {
-    return
+  if (!data.value) {
+    try {
+      loaded.value = await loadTeardown(props.device)
+    } catch {
+      return
+    }
   }
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     t.value = 1
@@ -331,7 +344,11 @@ onBeforeUnmount(() => {
   --td-leader: #c9cfe6;
 }
 
-.td-stage { position: relative; }
+/* A size container, for the cqw in --td-unit and in `at`. */
+.td-stage {
+  position: relative;
+  container-type: inline-size;
+}
 
 .td-drawing {
   position: absolute;

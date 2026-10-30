@@ -133,11 +133,20 @@ export function layersAt(data: TeardownData, progress: Map<string, number>): Tea
 
 const cache = new Map<string, Promise<TeardownData>>()
 
-/** One fetch per device per visit; the files are static. */
+/**
+ * On the server the files are read from the bundle: a fetch of a public file from the server doesn't reach it under
+ * `nuxt dev`. The branch is dropped from the browser's bundle.
+ */
+const bundled = import.meta.server
+  ? import.meta.glob<TeardownData>('../../public/landing/teardown/*.json', { import: 'default' })
+  : {}
+
+/** One fetch per device per visit (on the server, one read for all requests); the files are static. */
 export function loadTeardown(device: string): Promise<TeardownData> {
   let request = cache.get(device)
   if (!request) {
-    request = $fetch<TeardownData>(`/landing/teardown/${device}.json`)
+    const read = bundled[`../../public/landing/teardown/${device}.json`]
+    request = read ? read() : $fetch<TeardownData>(`/landing/teardown/${device}.json`)
     request.catch(() => cache.delete(device))
     cache.set(device, request)
   }

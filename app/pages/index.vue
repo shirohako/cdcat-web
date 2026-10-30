@@ -2,7 +2,7 @@
   <div class="landing mx-auto grid max-w-6xl gap-6 px-4 pb-20 pt-6 md:gap-8 md:px-8 md:pt-8 2xl:max-w-7xl">
     <!-- The CD player, which comes apart by itself once the page is open; the mascot rides on its lid. -->
     <section class="grid items-center gap-2 xl:grid-cols-[minmax(0,27rem)_minmax(0,1fr)] xl:gap-4">
-      <div class="max-w-xl px-1 pt-2 sm:px-3 xl:pb-8">
+      <div class="landing-intro max-w-xl px-1 pt-2 sm:px-3 xl:pb-8">
         <p class="landing-kicker">
           <span class="landing-dots" aria-hidden="true"><i /><i /><i /></span>
           {{ t('landing.hero.kicker') }}
@@ -24,6 +24,7 @@
       </div>
       <LandingTeardownFigure
         device="discman"
+        ssr
         :view-box="HERO_BOX"
         :tones="TONES.discman"
         :labels="LABELS.discman"
@@ -160,14 +161,17 @@ useHead({
   titleTemplate: '%s',
   meta: [{ name: 'keywords', content: computed(() => t('home.seo_keywords')) }],
 })
-// The first drawing and the title face are wanted at once; the other drawings load when their figures mount. Only
-// the server-rendered page asks for them: coming back to the home page within the site, both are already loaded
-// (the font face, and the drawing cached by loadTeardown), and a fresh preload would go unused.
+// The first drawing comes with the page (`ssr`). The title face is wanted at once; the collage's drawings are fetched
+// at low priority while the scripts load, so they are ready, or nearly, when their figures mount. Only the
+// server-rendered page asks for them: coming back to the home page within the site, all are already loaded (the font
+// face, and the drawings cached by loadTeardown), and a fresh preload would go unused.
 if (import.meta.server) {
   useHead({
     link: [
-      { rel: 'preload', href: '/landing/teardown/discman.json', as: 'fetch', crossorigin: 'anonymous' },
-      { rel: 'preload', href: '/landing/fonts/display.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }
+      { rel: 'preload', href: '/landing/fonts/display.woff2', as: 'font', type: 'font/woff2', crossorigin: 'anonymous' },
+      ...(['jewelcase', 'headphones', 'turntable'] as const).map(device => (
+        { rel: 'preload', href: `/landing/teardown/${device}.json`, as: 'fetch', crossorigin: 'anonymous', fetchpriority: 'low' } as const
+      ))
     ]
   })
 }
@@ -227,6 +231,37 @@ html[data-theme="dark"] .landing {
   z-index: 1;
   overflow: visible;
   will-change: transform;
+  /* Hops on once the drawing has faded in; `scale` and `translate` add to the inline transform that places it. */
+  animation: landing-ghost-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+/* The intro settles in line by line as the page opens. */
+.landing-intro > * {
+  animation: landing-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.landing-intro > :nth-child(2) { animation-delay: 60ms; }
+.landing-intro > :nth-child(3) { animation-delay: 120ms; }
+.landing-intro > :nth-child(4) { animation-delay: 180ms; }
+
+@keyframes landing-ghost-in {
+  from {
+    opacity: 0;
+    translate: 0 -40%;
+    scale: 0.6;
+  }
+}
+
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-ghost,
+  .landing-intro > * { animation: none; }
 }
 
 .landing-note {
