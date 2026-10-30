@@ -7,6 +7,7 @@ describe('languageFromQuery', () => {
     expect(languageFromQuery('tchinese')).toBe('zh-Hant')
     expect(languageFromQuery('english')).toBe('en')
     expect(languageFromQuery('Japanese')).toBe('ja')
+    expect(languageFromQuery('koreana')).toBe('ko')
   })
 
   it('reads language tags in any case, with a script or region', () => {
@@ -18,12 +19,13 @@ describe('languageFromQuery', () => {
     expect(languageFromQuery('zh-HK')).toBe('zh-Hant')
     expect(languageFromQuery('zh-Hant-TW')).toBe('zh-Hant')
     expect(languageFromQuery('ja-JP')).toBe('ja')
+    expect(languageFromQuery('ko-KR')).toBe('ko')
     expect(languageFromQuery(' en-GB ')).toBe('en')
   })
 
   it('refuses languages the site does not offer', () => {
-    expect(languageFromQuery('koreana')).toBeNull()
-    expect(languageFromQuery('ko')).toBeNull()
+    expect(languageFromQuery('french')).toBeNull()
+    expect(languageFromQuery('fr')).toBeNull()
     expect(languageFromQuery('')).toBeNull()
   })
 })

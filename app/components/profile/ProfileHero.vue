@@ -135,6 +135,7 @@ const formatterLocale = computed(() => {
     "zh-Hant": "zh-TW",
     en: "en-US",
     ja: "ja-JP",
+    ko: "ko-KR",
   };
   return map[locale.value] || "en-US";
 });

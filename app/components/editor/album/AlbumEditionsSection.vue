@@ -5,7 +5,7 @@
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
       <p v-if="unticked.length" class="rounded-lg border border-warning/25 bg-warning/10 px-3 py-2 text-xs text-warning">
-        {{ $t('editor.editions.unticked', { discs: unticked.map(disc => $t('editor.album.disc_n', { n: disc.position })).join('、') }) }}
+        {{ $t('editor.editions.unticked', { discs: unticked.map(disc => $t('editor.album.disc_n', { n: disc.position })).join(separator) }) }}
       </p>
 
       <div v-if="!products.length" class="rounded-xl border border-dashed border-line px-4 py-5 text-center text-sm text-meta">
@@ -147,6 +147,7 @@ import { moveRow, sameId } from '~/utils/documentRows'
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel, formatDate } = useCatalogDisplay()
+const { separator } = useListPunctuation()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})

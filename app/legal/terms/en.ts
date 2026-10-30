@@ -20,7 +20,7 @@ export default {
 
         By creating an account or using the service, you agree to these terms and to our [Privacy Policy](/privacy), which explains how we handle personal information. If you don't agree, please don't use the service.
 
-        These terms are available in English, Simplified Chinese, Traditional Chinese and Japanese. If the versions differ, the English version prevails.
+        These terms are available in English, Simplified Chinese, Traditional Chinese, Japanese and Korean. If the versions differ, the English version prevails.
       `,
     },
     {

@@ -75,7 +75,8 @@ const formatterLocale = computed(() => {
     'zh-Hans': 'zh-CN',
     'zh-Hant': 'zh-TW',
     en: 'en-US',
-    ja: 'ja-JP'
+    ja: 'ja-JP',
+    ko: 'ko-KR'
   }
   return map[locale.value] || 'zh-CN'
 })

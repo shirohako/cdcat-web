@@ -11,12 +11,14 @@ const LOADERS: Record<LegalKind, Record<LegalLocale, Loader>> = {
     'ja': () => import('./terms/ja'),
     'zh-Hans': () => import('./terms/zh-Hans'),
     'zh-Hant': () => import('./terms/zh-Hant'),
+    'ko': () => import('./terms/ko'),
   },
   privacy: {
     'en': () => import('./privacy/en'),
     'ja': () => import('./privacy/ja'),
     'zh-Hans': () => import('./privacy/zh-Hans'),
     'zh-Hant': () => import('./privacy/zh-Hant'),
+    'ko': () => import('./privacy/ko'),
   },
 }
 

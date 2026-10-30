@@ -5,6 +5,7 @@ const INTL_LOCALES: Record<string, string> = {
   'zh-Hant': 'zh-TW',
   en: 'en-US',
   ja: 'ja-JP',
+  ko: 'ko-KR',
 }
 
 /** A calendar day as the API sends it (YYYY-MM-DD), with no time of its own. */
@@ -15,6 +16,7 @@ const CONTENT_LOCALE_KEYS: Record<string, string[]> = {
   'zh-Hant': ['zh-Hant', 'zh-TW'],
   en: ['en'],
   ja: ['ja'],
+  ko: ['ko'],
 }
 
 export const useLocaleFormatting = (localeOverride?: string) => {

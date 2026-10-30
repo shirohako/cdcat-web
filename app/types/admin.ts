@@ -542,7 +542,7 @@ export interface AdminImageDetail extends AdminImage {
 
 // ── Mail (docs/mail/README.md) ──
 
-export type AdminMailLocale = 'en' | 'ja' | 'zh-Hans' | 'zh-Hant'
+export type AdminMailLocale = 'en' | 'ja' | 'zh-Hans' | 'zh-Hant' | 'ko'
 
 /** Subject and Markdown body per language; English is required before anything is sent. */
 export type AdminMailContents = Partial<Record<AdminMailLocale, { subject: string, body: string }>>

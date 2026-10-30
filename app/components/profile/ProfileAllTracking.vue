@@ -155,7 +155,7 @@ const hasCover = (album: ProfileTrackingAlbum) => {
 
 // --- Date formatting ---
 const formatterLocale = computed(() => {
-  const map: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP' }
+  const map: Record<string, string> = { 'zh-Hans': 'zh-CN', 'zh-Hant': 'zh-TW', en: 'en-US', ja: 'ja-JP', ko: 'ko-KR' }
   return map[locale.value] || 'zh-CN'
 })
 

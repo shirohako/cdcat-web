@@ -3,7 +3,7 @@ import type { AdminArticleType } from '~/types/admin'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
+const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant', 'ko'] as const
 
 const { $api } = useNuxtApp()
 // The writer's picker and article labels read GET /article-types; refresh it after a change.
@@ -12,7 +12,7 @@ const { refresh: refreshPublic } = useArticleTypes()
 const { data, pending, error, refresh } = await useAsyncData('admin-article-types', () => $api<AdminArticleType[]>('/v1/admin/article-types'))
 const types = computed(() => data.value ?? [])
 
-const empty = () => ({ key: '', names: { 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '' } as Record<string, string>, sort_order: 0, is_active: true, reason: '' })
+const empty = () => ({ key: '', names: { 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '', ko: '' } as Record<string, string>, sort_order: 0, is_active: true, reason: '' })
 const form = reactive(empty())
 const editing = ref<string | null>(null)
 const formOpen = ref(false)

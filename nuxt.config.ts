@@ -116,7 +116,13 @@ export default defineNuxtConfig({
         language: 'ja',
         name: '日本語',
         files: ['ja.json', 'markdown/ja.json'],
-      }
+      },
+      {
+        code: 'ko',
+        language: 'ko',
+        name: '한국어',
+        files: ['ko.json', 'markdown/ko.json'],
+      },
     ],
     defaultLocale: 'en',
   },
@@ -138,10 +144,12 @@ export default defineNuxtConfig({
     },
   },
   // The body faces (font stacks in main.css). Only @font-face rules: a slice downloads when a page uses its characters.
+  // Korean uses Pretendard, the usual face of Korean sites, rather than Noto Sans KR.
   css: [
     '@fontsource-variable/noto-sans-sc/wght.css',
     '@fontsource-variable/noto-sans-tc/wght.css',
     '@fontsource-variable/noto-sans-jp/wght.css',
+    'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css',
     '~/assets/css/main.css',
     '~/assets/css/markdown.css',
   ],

@@ -5,7 +5,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 // 署名与发行 (release) holds only the reserved roles, so new roles can't pick it.
 const CATEGORIES = ['composition', 'lyrics', 'arrangement', 'vocals', 'performance', 'production', 'engineering', 'artwork', 'other'] as const
-const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
+const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant', 'ko'] as const
 const LEVELS = ['is_album_role', 'is_track_role'] as const
 
 const { $api } = useNuxtApp()
@@ -29,7 +29,7 @@ const category = ref('')
 const shown = computed(() => roles.value.filter(role => !category.value || role.category === category.value))
 
 const empty = () => ({
-  key: '', category: 'composition', names: { 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '' } as Record<string, string>, aliases: '',
+  key: '', category: 'composition', names: { 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '', ko: '' } as Record<string, string>, aliases: '',
   is_album_role: true, is_track_role: true, sort_order: 0, is_active: true, reason: '',
 })
 const form = reactive(empty())

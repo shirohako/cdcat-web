@@ -328,22 +328,30 @@
       "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial;
 
     /* 中日文正文统一用思源黑体网页字体（@fontsource-variable/noto-sans-*，nuxt.config 引入）：可变字重，按字符切片按需下载，
-       各平台一致；系统字体只在字体下载完之前顶上。 */
+       各平台一致；系统字体只在字体下载完之前顶上。
+       每个栈的第二位是 Pretendard：SC/TC 切片的 unicode-range 声明了部分韩文音节，文件里却没有这些字形，
+       浏览器只好交给后面的系统字体，有的系统字体会把韩文叠在一起画（中文界面的语言菜单里「한국어」）。
+       放在思源黑体后面，拉丁字母和汉字仍用思源黑体，韩文一律用 Pretendard。 */
 
     /* 简体中文 - 思源黑体 SC；之前 macOS: PingFang SC, HarmonyOS, Windows: YaHei UI > YaHei, Android/Linux: Noto */
-    --font-sans-zh-hans: "Noto Sans SC Variable", "PingFang SC", "HarmonyOS Sans SC",
+    --font-sans-zh-hans: "Noto Sans SC Variable", "Pretendard Variable", "PingFang SC", "HarmonyOS Sans SC",
       "Microsoft YaHei UI", "Microsoft YaHei",
       "Noto Sans CJK SC", "Noto Sans SC", "Source Han Sans SC", "WenQuanYi Micro Hei";
 
     /* 繁体中文 - 思源黑体 TC；之前 macOS: PingFang TC, Windows: JhengHei UI > JhengHei, Android/Linux: Noto */
-    --font-sans-zh-hant: "Noto Sans TC Variable", "PingFang TC", "HarmonyOS Sans TC",
+    --font-sans-zh-hant: "Noto Sans TC Variable", "Pretendard Variable", "PingFang TC", "HarmonyOS Sans TC",
       "Microsoft JhengHei UI", "Microsoft JhengHei",
       "Noto Sans CJK TC", "Noto Sans TC", "Source Han Sans TC";
 
     /* 日文 - 思源黑体 JP；之前 macOS: Hiragino, Windows: Yu Gothic UI > Meiryo UI, Android/Linux: Noto */
-    --font-sans-ja: "Noto Sans JP Variable", "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+    --font-sans-ja: "Noto Sans JP Variable", "Pretendard Variable", "Hiragino Kaku Gothic ProN", "Hiragino Sans",
       "Yu Gothic UI", "Yu Gothic", "Meiryo UI", "Meiryo",
       "Noto Sans CJK JP", "Noto Sans JP", "Source Han Sans JP";
+
+    /* 韩文 - Pretendard（pretendard 包，nuxt.config 引入，韩国网站最常用的正文字体）；之前 macOS: Apple SD Gothic Neo,
+       Windows: 맑은 고딕, Android/Linux: Noto。Pretendard 没有假名，日文曲名落到后面的思源黑体 JP */
+    --font-sans-ko: "Pretendard Variable", "Apple SD Gothic Neo", "Malgun Gothic",
+      "Noto Sans CJK KR", "Noto Sans KR", "Source Han Sans K";
 
     /* 等宽字体 */
     --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
@@ -363,6 +371,10 @@
 
   html[lang="ja"] {
     --font-sans-cjk: var(--font-sans-ja);
+  }
+
+  html[lang="ko"] {
+    --font-sans-cjk: var(--font-sans-ko), var(--font-sans-ja);
   }
 
   /* In-page jumps (anchors, back to top, a post scrolled into view) glide; page switches and restored positions
@@ -403,9 +415,18 @@
     font-family: var(--font-sans-ja), var(--font-sans-en), sans-serif;
   }
 
+  /* 韩文：Pretendard 优先（它的拉丁字母也用它的），日文字形用思源黑体 JP。
+     韩文按词（空格）换行，不在词中间断开；没有空格的长串（日文标题、网址）放不下时照样能断 */
+  html[lang="ko"] body {
+    font-family: var(--font-sans-ko), var(--font-sans-ja), var(--font-sans-en), sans-serif;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
   /* CJK 禁止字体合成：防止浏览器对 CJK 字体伪造粗体/斜体导致字形变形 */
   html[lang^="zh"] body,
-  html[lang="ja"] body {
+  html[lang="ja"] body,
+  html[lang="ko"] body {
     font-synthesis: none;
   }
 

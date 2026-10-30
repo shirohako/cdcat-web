@@ -1,20 +1,20 @@
 import type { LocationQuery } from 'vue-router'
 
 /** The interface languages, as i18n locale codes. */
-export type SiteLocale = 'zh-Hans' | 'zh-Hant' | 'en' | 'ja'
+export type SiteLocale = 'zh-Hans' | 'zh-Hant' | 'en' | 'ja' | 'ko'
 
 /** Query parameters that pick the interface language: `lang`, then Steam's `l`. */
 export const LANGUAGE_QUERY = ['lang', 'l'] as const
 
 /** Steam's language names (store.steampowered.com/?l=schinese) for the languages we offer. */
-const STEAM_NAMES: Record<string, SiteLocale> = { schinese: 'zh-Hans', tchinese: 'zh-Hant', english: 'en', japanese: 'ja' }
+const STEAM_NAMES: Record<string, SiteLocale> = { schinese: 'zh-Hans', tchinese: 'zh-Hant', english: 'en', japanese: 'ja', koreana: 'ko' }
 
 /** Script and region subtags that mean Traditional Chinese. */
 const TRADITIONAL = ['hant', 'tw', 'hk', 'mo']
 
 /**
  * The interface language a `?l=` or `?lang=` value names: a Steam name or a language tag in any case,
- * with `-` or `_` (schinese, zh-hans, zh-CN, zh_TW, ja-JP, en-GB …). Null for a language we don't offer.
+ * with `-` or `_` (schinese, zh-hans, zh-CN, zh_TW, ja-JP, ko-KR, en-GB …). Null for a language we don't offer.
  */
 export function languageFromQuery(value: string): SiteLocale | null {
   const tag = value.trim().toLowerCase().replaceAll('_', '-')
@@ -22,6 +22,7 @@ export function languageFromQuery(value: string): SiteLocale | null {
   const [language, ...subtags] = tag.split('-')
   if (language === 'en') return 'en'
   if (language === 'ja') return 'ja'
+  if (language === 'ko') return 'ko'
   if (language === 'zh') return subtags.some(subtag => TRADITIONAL.includes(subtag)) ? 'zh-Hant' : 'zh-Hans'
   return null
 }

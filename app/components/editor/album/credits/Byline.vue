@@ -11,6 +11,7 @@ import { bylineCredits } from '~/utils/creditLines'
  * publishers, else the 署名艺术家, several of them reading Various Artists on cards.
  */
 const { t } = useI18n()
+const { aside } = useListPunctuation()
 const editor = useAlbumEditor()
 const people = useCreditPeople()
 const album = computed(() => editor.album.value)
@@ -28,7 +29,7 @@ const preview = computed(() => {
   for (const role of ['publisher', 'artist']) {
     const names = [...new Set(bylineCredits(album.value, role).map(row => row.credited_as || people.artistName(row.artist_id)).filter(Boolean))]
     if (!names.length) continue
-    return role === 'artist' && names.length > 1 ? `${names.join(', ')}（${t('editor.album.byline_various', { name: VARIOUS_ARTISTS })}）` : names.join(', ')
+    return role === 'artist' && names.length > 1 ? names.join(', ') + aside(t('editor.album.byline_various', { name: VARIOUS_ARTISTS })) : names.join(', ')
   }
   return ''
 })

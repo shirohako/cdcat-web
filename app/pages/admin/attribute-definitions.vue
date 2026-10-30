@@ -6,7 +6,7 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const VALUE_TYPES = ['text', 'integer', 'decimal', 'date', 'url', 'boolean', 'choice', 'reference'] as const
 const SUBJECTS = ['album', 'track', 'album_image', 'artist'] as const
 const REFERENCE_TYPES = ['album', 'artist', 'entry', 'franchise'] as const
-const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant'] as const
+const LANGUAGES = ['zh-Hans', 'en', 'ja', 'zh-Hant', 'ko'] as const
 
 const { $api } = useNuxtApp()
 const attributeDefinitionSubjectLabels: Record<string, string> = { album: '专辑', track: '曲目', album_image: '专辑图片', artist: '艺术家' }
@@ -24,7 +24,7 @@ const attributeDefinitionValueTypeLabels: Record<string, string> = {
 const { data, pending, error, refresh } = await useAsyncData('admin-attribute-definitions', () => $api<AdminAttributeDefinition[]>('/v1/admin/attribute-definitions'))
 const definitions = computed(() => data.value ?? [])
 
-const texts = () => ({ 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '' }) as Record<string, string>
+const texts = () => ({ 'zh-Hans': '', en: '', ja: '', 'zh-Hant': '', ko: '' }) as Record<string, string>
 const empty = () => ({
   key: '', names: texts(), description: texts(), group: 'general', value_type: 'text', choices: [] as Array<{ value: string, names: Record<string, string> }>,
   reference_types: [] as string[], applies_to: ['album'] as string[], is_multiple: false, sort_order: 0, is_active: true, reason: '',

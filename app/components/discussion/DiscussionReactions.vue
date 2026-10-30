@@ -10,6 +10,7 @@ import type { UserSummary } from '~/types/catalog'
 const props = defineProps<{ postId: number, reactions: DiscussionReactionCount[], canReact: boolean, compact?: boolean }>()
 const emit = defineEmits<{ 'update:reactions': [value: DiscussionReactionCount[]] }>()
 const { t } = useI18n()
+const { separator } = useListPunctuation()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
 const notice = useDiscussionNotice()
@@ -41,8 +42,9 @@ async function loadWho(reaction: DiscussionReactionKey, count: number) {
   who.value[reaction] = ''
   try {
     const response = await $api<{ users: UserSummary[] }>(`/v1/discussions/posts/${props.postId}/reactions`, { query: { reaction } })
-    const names = response.users.slice(0, 8).map(user => user.nickname || user.username)
-    who.value[reaction] = count > names.length ? t('discussions.reactions.and_more', { names: names.join('、'), count }) : names.join('、')
+    const users = response.users.slice(0, 8)
+    const names = users.map(user => user.nickname || user.username).join(separator.value)
+    who.value[reaction] = count > users.length ? t('discussions.reactions.and_more', { names, count }) : names
   }
   catch {
     who.value = { ...who.value, [reaction]: undefined }

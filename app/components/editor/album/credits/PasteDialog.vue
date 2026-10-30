@@ -37,6 +37,7 @@ interface Row {
 const PLACEHOLDER = 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nIllustration：mochi\n\n01. 星屑のアトラス\n編曲：ミナト'
 
 const { t } = useI18n()
+const { separator } = useListPunctuation()
 const { $api } = useNuxtApp()
 const editor = useAlbumEditor()
 const people = useCreditPeople()
@@ -169,10 +170,10 @@ const apply = () => {
           <tbody>
             <tr v-for="row in rows" :key="row.key" :class="ready(row) ? '' : 'bg-warning/10'">
               <td class="border-t border-line px-3 py-1.5 align-middle">
-                <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join('、') }}</span>
+                <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join(separator) }}</span>
                 <EditorAlbumCreditsRoles v-else :model-value="row.roles" :invalid="!row.roles.length" @update:model-value="setRoles(row, $event)" />
                 <span class="block text-[10px] text-faint">{{ row.roleText }}</span>
-                <span v-if="row.unknown.length" class="block text-[10px] text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join('、') }) }}</span>
+                <span v-if="row.unknown.length" class="block text-[10px] text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>
               </td>
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="flex flex-wrap items-center gap-2">

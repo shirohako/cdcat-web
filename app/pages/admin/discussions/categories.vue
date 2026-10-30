@@ -18,7 +18,7 @@ const parents = computed(() => ordered.value.filter(item => item.parent_id === n
 const dirtyOrder = ref(false)
 
 const empty = () => ({
-  id: 0, parent_id: null as number | null, name: '', slug: '', description: '', name_en: '', name_ja: '', name_zh_hant: '',
+  id: 0, parent_id: null as number | null, name: '', slug: '', description: '', name_en: '', name_ja: '', name_zh_hant: '', name_ko: '',
   color: 'slate', icon: '', kind: 'discussion' as 'discussion' | 'question', topic_permission: 'everyone' as 'everyone' | 'moderators',
   visibility: 'public' as 'public' | 'moderators', is_archived: false, topic_template: '', show_in_latest: true, show_in_list: true,
 })
@@ -31,7 +31,7 @@ const notice = ref('')
 function edit(category: AdminDiscussionCategory) {
   Object.assign(form, {
     id: category.id, parent_id: category.parent_id, name: category.name, slug: category.slug, description: category.description ?? '',
-    name_en: category.translations?.en?.name ?? '', name_ja: category.translations?.ja?.name ?? '', name_zh_hant: category.translations?.['zh-Hant']?.name ?? '',
+    name_en: category.translations?.en?.name ?? '', name_ja: category.translations?.ja?.name ?? '', name_zh_hant: category.translations?.['zh-Hant']?.name ?? '', name_ko: category.translations?.ko?.name ?? '',
     color: category.color ?? 'slate', icon: category.icon ?? '', kind: category.kind, topic_permission: category.topic_permission,
     visibility: category.visibility, is_archived: category.is_archived, topic_template: category.topic_template ?? '', show_in_latest: category.show_in_latest,
     show_in_list: category.show_in_list,
@@ -53,7 +53,7 @@ async function run(action: () => Promise<unknown>, done: string) {
 }
 
 const save = () => run(async () => {
-  const translations = Object.fromEntries(([['en', form.name_en], ['ja', form.name_ja], ['zh-Hant', form.name_zh_hant]] as const)
+  const translations = Object.fromEntries(([['en', form.name_en], ['ja', form.name_ja], ['zh-Hant', form.name_zh_hant], ['ko', form.name_ko]] as const)
     .filter(([, name]) => name.trim()).map(([code, name]) => [code, { name: name.trim() }]))
   const body = {
     parent_id: form.parent_id, name: form.name.trim(), slug: form.slug.trim(), description: form.description.trim() || null, translations,
@@ -154,10 +154,11 @@ useHead({ title: '讨论版块' })
           </select>
         </label>
         <label class="block">说明<textarea v-model="form.description" maxlength="1000" rows="2" :class="field" /></label>
-        <div class="grid grid-cols-3 gap-2">
+        <div class="grid grid-cols-4 gap-2">
           <label class="block text-xs">繁體<input v-model="form.name_zh_hant" maxlength="50" :class="field"></label>
           <label class="block text-xs">English<input v-model="form.name_en" maxlength="50" :class="field"></label>
           <label class="block text-xs">日本語<input v-model="form.name_ja" maxlength="50" :class="field"></label>
+          <label class="block text-xs">한국어<input v-model="form.name_ko" maxlength="50" :class="field"></label>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <label class="block">颜色

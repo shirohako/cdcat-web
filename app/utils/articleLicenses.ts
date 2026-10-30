@@ -33,6 +33,6 @@ export const articleLicense = (key: ArticleLicense | null | undefined): LicenseI
 /** The deed in the site language, where Creative Commons has one. */
 export const licenseDeedUrl = (info: LicenseInfo, locale: string): string | null => {
   if (!info.url) return null
-  const deed = ({ 'zh-Hans': 'zh-hans', 'zh-Hant': 'zh-hant', 'ja': 'ja', 'en': 'en' } as Record<string, string>)[locale]
+  const deed = ({ 'zh-Hans': 'zh-hans', 'zh-Hant': 'zh-hant', 'ja': 'ja', 'en': 'en', 'ko': 'ko' } as Record<string, string>)[locale]
   return deed ? `${info.url}deed.${deed}` : info.url
 }

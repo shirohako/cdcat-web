@@ -69,7 +69,7 @@ export interface CatalogAttribute {
   sort_order: number
 }
 
-export type LocalizedText = Partial<Record<'en' | 'ja' | 'zh-Hans' | 'zh-Hant', string>>
+export type LocalizedText = Partial<Record<'en' | 'ja' | 'zh-Hans' | 'zh-Hant' | 'ko', string>>
 
 export interface CreditRoleDefinition {
   key: string

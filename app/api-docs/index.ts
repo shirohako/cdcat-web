@@ -12,6 +12,7 @@ const LOADERS: Partial<Record<ApiDocsLocale, Loader>> = {
   'en': () => import('./locales/en'),
   'zh-Hant': () => import('./locales/zh-Hant'),
   'ja': () => import('./locales/ja'),
+  'ko': () => import('./locales/ko'),
 }
 
 /** The language the reference is written in first, which readers get until their own is written. */

@@ -13,6 +13,7 @@ const model = defineModel<string[]>({ required: true })
 defineProps<{ invalid?: boolean }>()
 
 const { t } = useI18n()
+const { separator } = useListPunctuation()
 const { schema, roleName, roleNameEn } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 
@@ -27,7 +28,7 @@ const groups = computed(() => {
   for (const role of roles.value.filter(matches)) byCategory.set(role.category, [...(byCategory.get(role.category) ?? []), role])
   return [...byCategory].map(([category, list]) => ({ category, label: enumLabel('credit_role_category', category), roles: list }))
 })
-const label = computed(() => model.value.map(roleName).join('、'))
+const label = computed(() => model.value.map(roleName).join(separator.value))
 
 const has = (key: string) => model.value.includes(key)
 const toggle = (key: string) => {

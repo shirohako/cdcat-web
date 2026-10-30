@@ -119,6 +119,7 @@ const props = withDefaults(defineProps<{
   images: () => [],
 })
 const { t } = useI18n()
+const { separator } = useListPunctuation()
 const { intlLocale, regionName } = useLocaleFormatting()
 const { formatDate, enumLabel } = useCatalogDisplay()
 
@@ -142,7 +143,7 @@ const editionNames = (ids: number[]) => ids
   .map(id => props.products.find(product => product.id === id))
   .filter(Boolean)
   .map(product => product!.name || t(product!.edition_type === 'limited' ? 'content_display.limited' : 'content_display.regular'))
-  .join('、')
+  .join(separator.value)
 const bonusImage = (bonusId: number) => props.images.find(image => image.bonus_id === bonusId && image.image)?.image?.thumbnail_url ?? null
 
 const discNumbers = computed(() => new Map(props.discs.map(disc => [disc.id, disc.position])))

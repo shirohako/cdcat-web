@@ -13,7 +13,7 @@ const { t, locale } = useI18n()
 const config = useRuntimeConfig()
 const absolute = useSiteUrl()
 
-const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW' }
+const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', 'ko': 'ko_KR' }
 
 useHead({
   titleTemplate: (titleChunk) => titleChunk ? `${titleChunk} | ${SITE_NAME}` : SITE_NAME,

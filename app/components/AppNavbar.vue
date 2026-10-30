@@ -75,7 +75,7 @@
               ]"
               @click="switchLanguage(option.code)"
             >
-              <span>{{ option.name }}</span>
+              <span :lang="option.language">{{ option.name }}</span>
               <Icon
                 v-if="currentLocale === option.code"
                 name="lucide:check"

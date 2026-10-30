@@ -12,7 +12,7 @@ export interface RegisterRequest {
   password: string
   verification_code: string
   birthday: string
-  /** The interface language at sign-up, which becomes the mail language (en, ja, zh-Hans, zh-Hant). */
+  /** The interface language at sign-up, which becomes the mail language (en, ja, zh-Hans, zh-Hant, ko). */
   locale?: string
 }
 

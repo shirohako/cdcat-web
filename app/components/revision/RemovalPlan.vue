@@ -25,7 +25,7 @@
             <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" class="min-w-0 truncate transition-colors hover:text-primary">{{ entry.label }}</NuxtLink>
             <span class="shrink-0 text-xs text-meta">{{ entry.action === 'move' ? $t('revision_page.plan.move', { id: entry.move_to }) : $t('revision_page.plan.release') }}</span>
           </p>
-          <p class="ml-1 text-xs text-faint">{{ $t('revision_page.plan.because', { names: entry.reasons.map(reason => reason.label).join('、') }) }}</p>
+          <p class="ml-1 text-xs text-faint">{{ $t('revision_page.plan.because', { names: entry.reasons.map(reason => reason.label).join(separator) }) }}</p>
         </li>
       </ul>
     </div>
@@ -41,5 +41,6 @@ import { entityPath } from '~/utils/revisionLinks'
 defineProps<{ plan: RemovalPlan }>()
 
 const { enumLabel } = useCatalogDisplay()
-const counts = (entry: RemovalPlan['delete'][number]) => entry.counts.filter(count => count.count > 0).map(count => `${count.label} ${count.count}`).join('、')
+const { separator } = useListPunctuation()
+const counts = (entry: RemovalPlan['delete'][number]) => entry.counts.filter(count => count.count > 0).map(count => `${count.label} ${count.count}`).join(separator.value)
 </script>

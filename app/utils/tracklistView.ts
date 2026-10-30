@@ -36,7 +36,7 @@ export interface TracklistLanguageChoice {
 
 export const tracklistLanguageKey = (language: TracklistLanguageChoice) => `${language.locale}|${language.kind}`
 
-const UI_LOCALES: Record<string, string[]> = { 'zh-Hans': ['zh-Hans', 'zh-CN'], 'zh-Hant': ['zh-Hant', 'zh-TW'], 'en': ['en'], 'ja': ['ja'] }
+const UI_LOCALES: Record<string, string[]> = { 'zh-Hans': ['zh-Hans', 'zh-CN'], 'zh-Hant': ['zh-Hant', 'zh-TW'], 'en': ['en'], 'ja': ['ja'], 'ko': ['ko'] }
 
 /** Starts in the UI language when the tracklist has an official name or a translation in it, else in the original (''). */
 export const defaultLanguageKey = (languages: TracklistLanguage[], uiLocale: string) => {

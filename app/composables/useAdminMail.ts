@@ -1,7 +1,7 @@
 import type { AdminMailContents, AdminMailLocale } from '~/types/admin'
 
 /** The mail languages, English first: every mail needs it, and it stands in for missing ones. */
-export const ADMIN_MAIL_LOCALES: readonly AdminMailLocale[] = ['en', 'ja', 'zh-Hans', 'zh-Hant']
+export const ADMIN_MAIL_LOCALES: readonly AdminMailLocale[] = ['en', 'ja', 'zh-Hans', 'zh-Hant', 'ko']
 
 /** What group mail and group mail templates may use (CampaignService::variables()). */
 export const ADMIN_MAIL_CAMPAIGN_VARIABLES = ['site_name', 'site_url', 'nickname', 'username']

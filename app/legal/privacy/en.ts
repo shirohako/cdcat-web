@@ -199,7 +199,7 @@ export default {
       body: md`
         For questions about this policy or your personal information, or to make a request, email **${CONTACT_EMAIL}**.
 
-        This policy is available in English, Simplified Chinese, Traditional Chinese and Japanese. If the versions differ, the English version prevails.
+        This policy is available in English, Simplified Chinese, Traditional Chinese, Japanese and Korean. If the versions differ, the English version prevails.
       `,
     },
   ],

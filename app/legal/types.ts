@@ -2,7 +2,7 @@ import type { DocSectionLink } from '~/documents/sections'
 
 /** The two legal documents, and the languages each is written in (the English text prevails). */
 export type LegalKind = 'terms' | 'privacy'
-export type LegalLocale = 'en' | 'ja' | 'zh-Hans' | 'zh-Hant'
+export type LegalLocale = 'en' | 'ja' | 'zh-Hans' | 'zh-Hant' | 'ko'
 
 /** One of the "at a glance" cards under the hero; `to` is the id of the section it sums up. */
 export interface LegalHighlight {

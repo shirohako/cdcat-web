@@ -1,0 +1,244 @@
+{
+  "markdown": {
+    "editor": {
+      "placeholder": "Markdown으로 작성해 보세요…",
+      "ariaLabel": "Markdown 편집기",
+      "edit": "편집",
+      "preview": "미리보기",
+      "split": "분할 보기",
+      "mode": "보기 방식",
+      "previewEmpty": "여기에 미리보기가 표시돼요.",
+      "help": "문법 가이드",
+      "helpHint": "처음이신가요? Markdown으로 글을 더 편하게 꾸밀 수 있어요. 사용법과 문법은 가이드에서 확인해 보세요.",
+      "helpClose": "안내 닫기",
+      "helpOpen": "문법 가이드(새 창 열림)",
+      "toolbar": {
+        "heading": "제목",
+        "bold": "굵게",
+        "italic": "기울임",
+        "strike": "취소선",
+        "mark": "형광펜",
+        "inlineSpoiler": "인라인 스포일러",
+        "quote": "인용",
+        "link": "링크",
+        "image": "이미지",
+        "list": "목록",
+        "tasks": "체크리스트",
+        "code": "코드",
+        "size": "글자 크기",
+        "color": "글자 색",
+        "underline": "색 밑줄",
+        "advanced": "고급 블록"
+      },
+      "sizes": {
+        "small": "작게",
+        "large": "크게",
+        "xlarge": "아주 크게"
+      },
+      "colors": {
+        "slate": "회색",
+        "red": "빨간색",
+        "orange": "주황색",
+        "yellow": "노란색",
+        "green": "초록색",
+        "blue": "파란색",
+        "purple": "보라색",
+        "pink": "분홍색"
+      },
+      "placeholders": {
+        "text": "텍스트",
+        "linkText": "링크 텍스트",
+        "imageAlt": "이미지 설명",
+        "code": "코드",
+        "title": "제목(선택)",
+        "content": "내용",
+        "firstStep": "첫 번째 단계",
+        "secondStep": "두 번째 단계",
+        "completedTask": "완료한 항목",
+        "pendingTask": "남은 항목"
+      },
+      "count": "{count} / {max}",
+      "uploading": "업로드 중…"
+    },
+    "inlineSpoiler": {
+      "reveal": "스포일러 보기"
+    },
+    "blocks": {
+      "details": {
+        "title": "접은 글",
+        "description": "보충 내용을 접어 두고 제목을 누르면 펼쳐져요.",
+        "defaultTitle": "자세히 보기"
+      },
+      "info": {
+        "title": "참고",
+        "description": "도움이 되는 배경 정보를 눈에 띄게 보여 줘요.",
+        "defaultTitle": "참고"
+      },
+      "tip": {
+        "title": "팁",
+        "description": "유용한 조언이나 추천을 강조해요.",
+        "defaultTitle": "팁"
+      },
+      "warning": {
+        "title": "주의",
+        "description": "놓치면 안 되는 중요한 내용을 알려요.",
+        "defaultTitle": "주의"
+      },
+      "danger": {
+        "title": "위험",
+        "description": "큰 위험이나 되돌릴 수 없는 작업을 경고해요.",
+        "defaultTitle": "위험"
+      },
+      "checklist": {
+        "title": "제목 있는 체크리스트",
+        "description": "할 일을 제목과 진행 상황이 보이는 카드로 묶어요.",
+        "defaultTitle": "체크리스트",
+        "progress": "{total}개 중 {completed}개 완료"
+      },
+      "steps": {
+        "title": "단계별 안내",
+        "description": "번호를 매겨 따라 하기 쉽게 정리해요.",
+        "defaultTitle": "단계"
+      },
+      "spoiler": {
+        "title": "스포일러 블록",
+        "description": "여러 문단이나 목록으로 된 스포일러를 접어서 가려요.",
+        "defaultTitle": "스포일러 보기"
+      }
+    },
+    "help": {
+      "title": "Markdown 작성 가이드",
+      "lead": "익숙한 Markdown 문법에 접은 글·강조 상자·단계별 안내·스포일러 블록을 더해 읽기 쉬운 아티클과 커뮤니티 글을 써 보세요. 커뮤니티에서는 사용자 멘션, 게시물 인용, 데이터베이스 항목 삽입도 할 수 있어요.",
+      "source": "입력",
+      "result": "결과",
+      "copied": "복사했어요",
+      "copy": "복사",
+      "basic": {
+        "title": "Markdown 기본 문법",
+        "description": "아티클, 커뮤니티 글, 리뷰에서 모두 쓸 수 있는 기본 문법이에요.",
+        "headingTocHint": "아티클에서는 H1–H4 제목으로 목차를 자동으로 만들어 줘요. 내용 구조에 맞게 제목 수준을 고르고, 글자를 키우려고 제목을 쓰지는 마세요.",
+        "heading": "제목(H1–H4)",
+        "emphasis": "강조",
+        "link": "링크",
+        "image": "이미지",
+        "list": "목록",
+        "task": "체크리스트",
+        "quote": "인용",
+        "code": "코드"
+      },
+      "images": {
+        "title": "이미지",
+        "description": "긴 글도 읽기 편하도록 이미지는 항상 별도 블록으로 표시돼요. 이미지 바로 뒤에 Pandoc 속성을 붙이면 크기를 정할 수 있어요. 너비나 높이 하나만 쓰면 원래 비율이 유지되고, 둘 다 쓰면 그 크기 그대로 표시돼요. 값은 픽셀 단위이고 1부터 4096까지 쓸 수 있어요.",
+        "width": "너비 지정",
+        "height": "높이 지정",
+        "both": "너비와 높이 지정"
+      },
+      "formatting": {
+        "title": "글자 꾸미기",
+        "description": "편집기에서 글자를 선택한 뒤 형광펜, 색 밑줄, 정해진 글자 색, 글자 크기를 적용할 수 있어요.",
+        "mark": "형광펜",
+        "underline": "색 밑줄",
+        "color": "글자 색",
+        "size": "글자 크기",
+        "sample": "중요한 부분",
+        "attributesTitle": "속성 조합과 중첩",
+        "attributesDescription": "Pandoc 방식에서는 같은 범위에 적용할 속성을 속성 블록 하나에 모아 써요. 범위가 다를 때만 중첩하세요. 속성은 어떤 순서로 써도 결과가 같아요.",
+        "recommended": "권장",
+        "supported": "중첩에 적합",
+        "notRecommended": "권장하지 않음",
+        "outerSample": "문장 전체에서 ",
+        "innerSample": "여기만 빨간색이에요",
+        "combined": {
+          "title": "같은 범위는 한 블록으로",
+          "description": "색, 크기, 밑줄을 같은 글자에 적용할 때는 속성을 한곳에 모아 쓰세요."
+        },
+        "nested": {
+          "title": "다른 범위는 중첩으로",
+          "description": "바깥쪽 크기는 전체에, 안쪽 색은 일부에만 적용돼요."
+        },
+        "avoid": {
+          "title": "같은 범위를 여러 번 중첩",
+          "description": "문법상 문제는 없지만 코드가 길어져요. 속성 블록 하나로 합쳐 쓰세요."
+        }
+      },
+      "advanced": {
+        "title": "고급 블록",
+        "description": "블록은 ::: 기호로 시작하고, ::: 만 있는 줄로 끝내요.",
+        "examples": {
+          "detailsTitle": "전체 수록곡",
+          "detailsBody": "1. Opening\n2. 새벽의 노래\n3. **Bonus Track**",
+          "infoTitle": "구매 전에 알아 두세요",
+          "infoBody": "이 앨범은 **M3-2026 봄**에서 처음 선보였고, 통판은 조금 뒤에 시작해요.",
+          "tipTitle": "처음 듣는다면",
+          "tipBody": "3번과 7번 트랙부터 들어 보세요. 앨범의 색깔이 가장 잘 드러나요.",
+          "warningTitle": "에디션마다 구성이 달라요",
+          "warningBody": "재발매판에는 특전 CD가 빠져 있어요. 중고로 살 때는 에디션을 꼭 확인하세요.",
+          "dangerTitle": "불법 음원에 주의하세요",
+          "dangerBody": "이 앨범은 공식 디지털 음원이 없어요. 인터넷에 도는 ‘무손실’ 음원은 모두 무단으로 배포된 거예요.",
+          "checklistTitle": "행사 구매 목록",
+          "checklistDone": "새 앨범",
+          "checklistPending": "행사장 한정 특전",
+          "checklistOptional": "재입고된 구작",
+          "stepsFirst": "앨범 페이지를 열고 ‘가사’로 이동하세요",
+          "stepsSecond": "곡을 고르고 가사를 붙여넣으세요",
+          "stepsThird": "제출한 뒤 검토를 기다리세요",
+          "spoilerTitle": "히든 트랙",
+          "spoilerBody": "마지막 곡이 끝나고 2분간 정적이 흐른 뒤 **히든 트랙**이 시작돼요."
+        }
+      },
+      "formattingSampleAfter": "만 눈에 띄어요.",
+      "nesting": {
+        "title": "블록 중첩",
+        "description": "서로 다른 고급 블록은 중첩할 수 있어요. 구조가 한눈에 보이도록 여는 기호와 닫는 기호는 각각 한 줄에 따로 쓰세요."
+      },
+      "spoilers": {
+        "title": "글 전체·블록·인라인 스포일러",
+        "description": "독자가 스포일러를 피할 수 있을 만큼만, 가능한 한 좁게 가려 주세요.",
+        "whole": "글 전체가 스포일러라면 제목에 미리 알리고 본문을 ::: spoiler 블록에 넣어 주세요.",
+        "block": "여러 문단이나 목록을 가릴 때는 ::: spoiler 블록을 쓰세요.",
+        "inline": "문장 속 짧은 구절만 가릴 때는 아래 인라인 문법을 쓰세요. 가려진 글자는 누르면 보여요.",
+        "inlineBefore": "이 앨범의 마지막 곡은 ",
+        "inlineSample": "히든 트랙 ‘새벽’",
+        "inlineAfter": "인데, 초회판에만 들어 있어요."
+      },
+      "security": {
+        "title": "안전한 콘텐츠를 위해",
+        "description": "HTML을 직접 넣거나 스크립트를 실행하는 URL을 쓸 수는 없어요. 대신 Markdown 링크와 지원하는 블록을 이용해 주세요."
+      },
+      "commonMark": "CommonMark 문법 요약",
+      "discussion": {
+        "title": "커뮤니티 전용 문법",
+        "description": "커뮤니티에서 쓸 수 있는 문법이에요. 이름, 프로필 사진, 댓글 번호는 사이트에서 자동으로 채워 줘요.",
+        "mention": "사용자 멘션",
+        "mentionHint": "{'@'} 기호를 입력하면 사용자 목록이 열려요. 멘션한 사용자에게는 알림이 가고, 없는 이름은 일반 텍스트로 남아요.",
+        "quote": "게시물 인용",
+        "quoteHint": "게시물 아래 ‘인용’ 버튼을 누르면 이 형식이 자동으로 들어가요. 일부를 먼저 선택하면 그 부분만 인용돼요.",
+        "ref": "데이터베이스 항목",
+        "refHint": "[[ 기호를 입력하면 바로 검색할 수 있어요. 한 줄에 따로 쓰면 카드로, 문장 안에 쓰면 링크로 표시돼요. 이 사이트의 앨범, 아티스트 등 페이지 주소를 붙여넣어도 이 형식으로 바뀌어요.",
+        "refTypes": "쓸 수 있는 종류: album(앨범), artist(아티스트), entry(작품), franchise(시리즈), event(행사), track(곡), topic(게시글), article(아티클).",
+        "sampleAlbum": "동방홍마향 OST",
+        "sampleUser": "예시 사용자"
+      }
+    },
+    "refs": {
+      "types": {
+        "album": "앨범",
+        "artist": "아티스트",
+        "entry": "작품",
+        "franchise": "시리즈",
+        "event": "행사",
+        "track": "곡",
+        "topic": "게시글",
+        "article": "아티클"
+      },
+      "unavailable": "{type} #{id}(삭제됐거나 볼 수 없음)",
+      "replies": "댓글 {count}"
+    },
+    "quote": {
+      "unavailable": "인용한 게시물을 볼 수 없어요",
+      "deleted": "원글이 삭제됐어요",
+      "someone": "알 수 없는 사용자",
+      "reply": "#{floor}에 달린 답글"
+    }
+  }
+}

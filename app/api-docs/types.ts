@@ -8,7 +8,7 @@ import type { JsonExample } from '~/utils/jsonExample'
  */
 
 /** The languages the reference is written in; index.ts loads one chunk per language. */
-export type ApiDocsLocale = 'zh-Hans' | 'en' | 'zh-Hant' | 'ja'
+export type ApiDocsLocale = 'zh-Hans' | 'en' | 'zh-Hant' | 'ja' | 'ko'
 
 export type HttpMethod = 'GET'
 

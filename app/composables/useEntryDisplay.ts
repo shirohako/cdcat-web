@@ -5,6 +5,7 @@ const UI_TO_TITLE_LOCALES: Record<string, string[]> = {
   'zh-Hant': ['zh-Hant', 'zh-TW', 'zh-HK'],
   en: ['en'],
   ja: ['ja'],
+  ko: ['ko'],
 }
 
 /** Display helpers shared by entry and series pages and forms. */
