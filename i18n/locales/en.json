@@ -1108,60 +1108,30 @@
   },
   "landing": {
     "hero": {
-      "kicker": "Japanese music database",
-      "title": "Serious listeners deserve\nserious liner notes.",
+      "kicker": "CDCat Music Database",
+      "title": "May you find the melody\nyou've long dreamed of",
       "body": "CDCat catalogs albums, tracks and credits from doujin, anime, game and VOCALOID music, sorted and checked bit by bit by its community.",
       "browse": "Browse albums",
-      "contribute": "Start editing",
-      "figure": "Exploded view of a portable CD player: top lid, disc, optical pickup, chassis, main board and bottom shell",
-      "bubble": "Let's take it apart!"
+      "about": "About us",
+      "figure": "Exploded view of a portable CD player: top lid, disc, optical pickup, chassis, main board and bottom shell"
     },
     "album": {
-      "kicker": "Albums",
-      "title": "Down to every disc\nand every track.",
-      "body": "Track lists and lengths, who composed, arranged and wrote each song, catalog numbers and prices, first-press and shop bonuses, and the event where it came out. Whatever is worth noting about an album has a place here.",
-      "figure": "Exploded view of a Japanese CD release: front cover, booklet, disc, tray, inlay, obi strip and case",
-      "tags": {
-        "tracks": "Tracks",
-        "credits": "Credits",
-        "lyrics": "Lyrics",
-        "catalog": "Catalog no.",
-        "editions": "Editions",
-        "bonuses": "Bonuses"
-      }
+      "title": "May it reach the heart\nof everyone who dreams",
+      "figure": "Exploded view of a Japanese CD release: front cover, booklet, disc, tray, inlay, obi strip and case"
     },
     "listen": {
-      "kicker": "Your listening",
-      "title": "What you've heard,\nwhat you want.",
-      "body": "Mark albums as plan to listen, wishlist, completed or owned, give them a score and a few words, and keep the ones you love as favorites.",
-      "figure": "Exploded view of over-ear headphones: ear cushion, driver, Bluetooth board, battery and touch cover",
-      "tags": {
-        "plan": "Plan to Listen",
-        "wish": "Wishlist",
-        "done": "Completed",
-        "owned": "Owned",
-        "review": "Reviews",
-        "favorite": "Favorites"
-      }
+      "title": "People pass on,\nbut their stories live on in song",
+      "figure": "Exploded view of over-ear headphones: ear cushion, driver, Bluetooth board, battery and touch cover"
     },
     "discover": {
-      "kicker": "Discover",
-      "title": "Follow one name\nto find more.",
-      "body": "From a composer's name to every song credited to it, from an M3 to the albums that came out there, from an anime to its whole soundtrack.",
-      "figure": "Exploded view of a turntable: record, slipmat, platter, belt, tonearm and plinth",
-      "tags": {
-        "artists": "Artists",
-        "circles": "Circles",
-        "events": "Events",
-        "entries": "Entries",
-        "series": "Series"
-      }
+      "title": "Those who follow starlight down lonely roads\nwill find their place among the stars",
+      "figure": "Exploded view of a turntable: record, slipmat, platter, belt, tonearm and plinth"
     },
     "community": {
-      "title": "Filled in by everyone.",
-      "body": "Once signed in, anyone can add new albums and fix mistakes, and every change is kept in the history. The data is shared under CC BY-SA 4.0 and is free to use.",
-      "contribute": "Start editing",
-      "guide": "Read the editing guide"
+      "title": "Your Japanese music database",
+      "body": "Once signed in, anyone can add new albums and fix mistakes. The data is shared under CC BY-SA 4.0 and is free to use.",
+      "api_docs": "View the API docs",
+      "design": "About CDCat's design"
     }
   },
   "revision_entry": {
