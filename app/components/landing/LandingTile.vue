@@ -1,5 +1,5 @@
 <template>
-  <section :class="['grid gap-6 rounded-2xl px-5 py-7 sm:p-8 xl:p-10', large ? 'grid-rows-[auto_1fr] md:row-span-2' : 'content-between', TONES[tone]]">
+  <section :class="['grid grid-rows-[auto_1fr] gap-6 rounded-2xl px-5 py-7 sm:p-8 xl:p-10', { 'md:row-span-2': large }, TONES[tone]]">
     <h2
       :class="[
         'landing-display whitespace-pre-line text-title',
@@ -8,7 +8,7 @@
     >
       {{ title }}
     </h2>
-    <div :class="large ? 'self-center' : 'w-[64%] justify-self-end'">
+    <div :class="['self-center', { 'w-[64%] justify-self-center': !large }]">
       <slot />
     </div>
   </section>
@@ -17,8 +17,8 @@
 <script setup lang="ts">
 /**
  * A tile of the home page's collage: a display title over one of the exploded drawings (the default slot). The large
- * tile spans two rows beside the others and centres its drawing in the height it gets; the small ones keep their
- * drawing smaller, in the bottom corner.
+ * tile spans two rows beside the others; the small ones keep their drawing smaller. Either way the drawing is centred
+ * in the space under the title.
  */
 withDefaults(defineProps<{
   title: string

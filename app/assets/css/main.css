@@ -2,6 +2,17 @@
 @import "./theme.css";
 @import "./ui.css";
 
+/* The display face for the titles of the home page and the error page: Resource Han Rounded Heavy (SIL OFL), one
+   font for Chinese, Japanese, Korean and Latin, so changing language never changes or fetches a font. Cut down to
+   the characters those titles use in every locale (tools/landing-fonts.mjs); the page's lang picks the regional
+   glyph forms. Declared here so both pages can use it; it is only fetched where it is used. */
+@font-face {
+  font-family: "CDCat Display";
+  src: url("/landing/fonts/display.woff2") format("woff2");
+  font-weight: 900;
+  font-display: swap;
+}
+
 /* Page switches (nuxt.config `app.pageTransition`): the old page fades out, then the new one fades in and settles. */
 .page-leave-active {
   transition: opacity 120ms ease-in;

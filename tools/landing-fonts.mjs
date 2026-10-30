@@ -1,6 +1,7 @@
-// Cuts the home page's display face down to the characters its titles use in every locale (all of
-// i18n/locales/*.json, so a new language is picked up by itself) and writes public/landing/fonts/display.woff2.
-// Run it after changing a landing.*.title text:  node tools/landing-fonts.mjs
+// Cuts the display face of the home page and the error page down to the characters their titles use in every
+// locale (all of i18n/locales/*.json, so a new language is picked up by itself) and writes
+// public/landing/fonts/display.woff2. Run it after changing a landing.*.title or error_page.*.title text:
+// node tools/landing-fonts.mjs
 //
 // The face is Resource Han Rounded Heavy (github.com/CyanoHao/Resource-Han-Rounded, SIL OFL), a rounded Source Han
 // Sans: one font for Chinese, Japanese, Korean and Latin, so switching languages never changes or fetches a font.
@@ -20,6 +21,7 @@ const RELEASE = 'https://github.com/CyanoHao/Resource-Han-Rounded/releases/downl
 const LICENSE = 'https://raw.githubusercontent.com/CyanoHao/Resource-Han-Rounded/master/OFL-License.txt'
 const FONT = 'ResourceHanRoundedSC-Heavy.ttf'
 const TITLES = ['hero', 'album', 'listen', 'discover', 'community']
+const ERROR_TITLES = ['not_found', 'server', 'request']
 const ALWAYS = ' ,.!?\'’-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz，。、！？：'
 
 const exists = path => access(path).then(() => true, () => false)
@@ -49,8 +51,9 @@ async function sourceFont() {
 let text = ALWAYS
 const locales = (await readdir(join(ROOT, 'i18n/locales'))).filter(name => name.endsWith('.json'))
 for (const name of locales) {
-  const { landing } = JSON.parse(await readFile(join(ROOT, 'i18n/locales', name), 'utf8'))
+  const { landing, error_page: errorPage } = JSON.parse(await readFile(join(ROOT, 'i18n/locales', name), 'utf8'))
   for (const key of TITLES) text += landing?.[key]?.title ?? ''
+  for (const key of ERROR_TITLES) text += errorPage?.[key]?.title ?? ''
 }
 const characters = [...new Set(text.replace(/\s/g, ''))].join('') + ' '
 

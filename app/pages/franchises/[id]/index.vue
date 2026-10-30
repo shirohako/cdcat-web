@@ -8,7 +8,7 @@ const route = useRoute()
 const { t, locale } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 
-const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`)
+const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`, { notFound: true })
 
 const { withOriginal, sentence, count } = useSeoText()
 const absolute = useSiteUrl()
@@ -154,7 +154,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
     </div>
 
     <div v-else-if="status === 'error'" class="flex min-h-[60vh] items-center justify-center">
-      <UiEmpty :title="$t('catalog.not_found')" :icon="Boxes" />
+      <UiEmpty :title="$t('common.load_failed')" :icon="Boxes" />
     </div>
 
     <SkeletonCatalogDetail v-else hero="gradient" />

@@ -10,7 +10,7 @@ export type TeardownLines = Partial<Record<TeardownRole, string>>
 export interface TeardownPart {
   id: string
   name: string
-  /** See-through, such as a window: drawn as lines only. */
+  /** See-through, such as a clear cover: drawn with a frosted fill that dims what lies behind it. */
   glass: boolean
   shift: [number, number]
   /** 0 starts moving first, 1 last. */
@@ -20,7 +20,8 @@ export interface TeardownPart {
   exp: number[]
   fill: string | null
   lines: TeardownLines
-  overlays: { kind: 'arcs' | 'label', paths: string[] }[]
+  /** Drawn over the part: a disc's rainbow arcs, a label, or a record's art mapped onto it by `matrix`. */
+  overlays: ({ kind: 'arcs' | 'label', paths: string[] } | { kind: 'vinyl', matrix: number[] })[]
   /** Where its layer sits when assembled, [x, y, width, height] in the drawing's units, strokes included. */
   extent: [number, number, number, number]
 }
@@ -40,15 +41,18 @@ export interface TeardownData {
   /** In painting order once the device is apart. */
   parts: TeardownPart[]
   skirts: TeardownSkirt[]
-  /** The exact assembled drawing, for devices whose layers can't show it (an obi wrapped round its case). */
-  assembled: { fills: { part: string, d: string }[], lines: { part: string, lines: TeardownLines }[] } | null
+  /**
+   * The exact assembled drawing, for devices whose layers can't show it (an obi wrapped round its case): each part's
+   * visible fill and lines, in painting order.
+   */
+  assembled: { part: string, fill: string | null, lines: TeardownLines }[] | null
   trails: { a: [number, number], b: [number, number], from?: string, to?: string }[]
   anchors: Record<string, { part: string, at: [number, number] }>
 }
 
 export type TeardownTone = 'pink' | 'butter' | 'mint' | 'sky' | 'lilac' | 'coral' | 'silver' | 'white' | 'night'
 
-/** A sticker naming a part, with a dotted leader to it. */
+/** A sticker naming a part, with a dotted leader to it, or a numbered balloon (TeardownFigure's `marks`). */
 export interface TeardownLabel {
   /** An anchor of the drawing, at the part it names. */
   anchor: string
@@ -58,6 +62,9 @@ export interface TeardownLabel {
   at: [number, number]
   align: 'start' | 'center' | 'end'
   tone: TeardownTone
+  /** As a balloon: its number (the label's place in the list by default), and whether it marks the faulty part. */
+  n?: number
+  hot?: boolean
 }
 
 export type TeardownLayer =

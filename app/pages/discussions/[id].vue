@@ -34,7 +34,7 @@ const query = computed(() => ({
 }))
 // Always fetched fresh (no revisit cache): replies, read positions and polling all start from it.
 const { data, status, error, refresh, pending } = await usePageData(() => `discussion-topic-${topicId.value}`,
-  ({ signal }) => $api<DiscussionTopicPage>(`/v1/discussions/topics/${topicId.value}`, { query: query.value, signal }), { cache: false, watch: [query] })
+  ({ signal }) => $api<DiscussionTopicPage>(`/v1/discussions/topics/${topicId.value}`, { query: query.value, signal }), { cache: false, watch: [query], notFound: true })
 
 // An article's comment topic lives on the article page; go there while the article is on the site.
 const articlePath = (value: DiscussionTopicPage | null | undefined) => {

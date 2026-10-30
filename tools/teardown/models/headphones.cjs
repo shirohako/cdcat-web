@@ -2,7 +2,7 @@
 exports.build = G => {
   const K = require('./kit.cjs')(G);
   const {rr, disc, turnX, frontTube} = K;
-  const camera = {azimuth: -62, elevation: 14, roll: 0};
+  const camera = {azimuth: -70, elevation: 15, roll: 0};
   const parts = [];
   const add = (id, name, explosion = [0, 0, 0]) => {
     const p = G.part(id, name);
@@ -22,63 +22,63 @@ exports.build = G => {
     return p;
   };
 
-  // One ear cup's pieces, built on the +x side.
+  // One ear cup's pieces, built on the +x side, inside out. Each has its span along x and its radius, to explode by.
   const cup = {
-    cushion(p) {
+    cushion: [47, 66, R, p => {
       G.lathe(p, rr(19, 21, 8, [56.5, 36.5]), {creaseAngle: 40});
       G.ring(p, 56.5, 47.02, {role: 'texture'});
-    },
-    mesh(p) {
-      turnX(p, 0, 0, [[65.4, 0], [65.4, 40], [66.2, 40], [66.2, 0]]);
-      for (const r of [8, 16, 24, 32]) G.circle(p, [65.38, 0, 0], r, [-1, 0, 0], {role: 'texture'});
-    },
-    baffle(p) {
+    }],
+    // The baffle plate with its vents, and the driver mounted behind it.
+    driver: [66.4, 82.6, 44, p => {
       const vents = [0, 1, 2, 3, 4, 5].map(k => disc(31 * Math.cos(k * Math.PI / 3 + .5), 31 * Math.sin(k * Math.PI / 3 + .5), 3, 36));
       G.merge(p, G.transform(G.extrude(G.piece(), disc(0, 0, 44, 144), {depth: 2.2, holes: [disc(0, 0, 21, 96), ...vents]}), yz([66.4, 0, 0])));
-    },
-    driver(p) {
-      turnX(p, 0, 0, [[68.6, 0], [68.7, 5], [69.1, 10], [69.9, 15], [70.6, 19.2], [71.6, 21.6], [73.2, 21.6], [73.8, 18], [75.6, 12.6], [76, 12.6], [76, 11.4], [82.6, 11.4], [82.6, 0]], {creaseAngle: 18});
+      turnX(p, 0, 0, [[68.6, 21.6], [70.6, 21.6], [71.6, 21.6], [73.2, 21.6], [73.8, 18], [75.6, 12.6], [76, 12.6], [76, 11.4], [82.6, 11.4], [82.6, 0], [68.6, 0]], {creaseAngle: 18});
       for (let k = 0; k < 4; k++) {
         const a = k * Math.PI / 2 + Math.PI / 4;
         G.line(p, [73.85, 17.6 * Math.cos(a), 17.6 * Math.sin(a)], [75.5, 13 * Math.cos(a), 13 * Math.sin(a)], 'detail');
       }
       G.ring(p, 79.4, 11.42, {role: 'texture'});
-    },
-    shell(p) {
+    }],
+    shell: [66, 98.6, R, p => {
       turnX(p, 0, 0, [[66, 43.4], [66, R], [89, R], [93.6, 45.2], [96.8, 43.4], [98.6, 41.2], [98.6, 38], [95.6, 38], [95.6, 43.4]], {creaseAngle: 30});
-    },
-    board(p) {
-      G.merge(p, G.transform(G.extrude(G.piece(), disc(0, 0, 34, 120), {depth: 1.4, holes: [disc(0, 0, 6, 36), disc(24, -12, 1.6, 24), disc(-24, -12, 1.6, 24)]}), yz([86, 0, 0])));
+    }],
+    // The Bluetooth board, chips on its outer face and the battery on the lower half.
+    board: [86, 94.8, 34, p => {
+      G.merge(p, G.transform(G.extrude(G.piece(), disc(0, 0, 34, 120), {depth: 1.4, holes: [disc(24, 14, 1.6, 24), disc(-24, 14, 1.6, 24)]}), yz([86, 0, 0])));
       const chip = (y0, z0, y1, z1, h) => {
         G.merge(p, G.transform(G.extrude(G.piece(), K.rect(y0, z0, y1, z1), {depth: h + .1}), yz([87.3, 0, 0])));
         G.polyline(p, K.rect(y0 - .05, z0 - .05, y1 + .05, z1 + .05).map(([y, z]) => [87.45, y, z]), {closed: true});
       };
-      chip(-10, 8, 6, 22, 1.2);
-      chip(10, 6, 20, 16, 1);
-      chip(-22, -4, -12, 4, 1.4);
-      chip(-6, -24, 14, -16, 2.4);
-      for (let i = 0; i < 7; i++) G.line(p, [87.45, -9 + i * 2.2, 22.05], [87.45, -9 + i * 2.2, 23.5], 'detail');
-    },
-    battery(p) {
-      G.merge(p, G.transform(G.extrude(G.piece(), rr(46, 34, 3), {depth: 6}), yz([89.4, 0, -2])));
-      G.polyline(p, rr(40, 10, 2, [0, 6]).map(([y, z]) => [95.45, y, z - 2]), {closed: true, role: 'detail'});
-      G.line(p, [95.45, -23, 12], [95.45, -23, 4], 'detail');
-    },
-    cap(p) {
-      turnX(p, 0, 0, [[98.5, 0], [98.5, 41.1], [100.4, 41.1], [101.5, 40], [102.1, 37], [102.3, 30], [102.3, 0]], {creaseAngle: 22});
-      G.circle(p, [98.62, 0, 0], 41.15, [1, 0, 0], {segments: 144});
+      chip(-14, 4, 2, 18, 1.2);
+      chip(7, 5, 17, 13, 1);
+      chip(-27, -4, -19, 2, 1.4);
+      for (let i = 0; i < 6; i++) G.line(p, [87.45, 6 + i * 2.2, 19], [87.45, 6 + i * 2.2, 22], 'detail');
+      G.merge(p, G.transform(G.extrude(G.piece(), rr(36, 18, 3, [0, -17]), {depth: 7.4}), yz([87.4, 0, 0])));
+      G.polyline(p, rr(28, 6, 2, [0, -15]).map(([y, z]) => [94.82, y, z]), {closed: true, role: 'detail'});
+    }],
+    cap: [98.5, 102.3, 41.1, p => {
+      turnX(p, 0, 0, [[98.5, 0], [98.5, 41.1], [99.6, 41.1], [100.8, 40.6], [101.7, 38.6], [102.2, 35], [102.3, 30], [102.3, 0]], {creaseAngle: 50});
       G.circle(p, [102.32, 0, 0], 22, [1, 0, 0], {role: 'detail'});
-    }
+    }]
   };
 
   // Left cup, assembled, as one part.
   const left = add('left-cup', 'Left ear cup');
-  for (const make of Object.values(cup)) make(left);
+  for (const [, , , make] of Object.values(cup)) make(left);
   mirrorX(left);
 
-  // Right cup, exploded outward along its axis.
-  const order = [['cushion', 'Ear cushion', 0], ['mesh', 'Acoustic mesh', 16], ['baffle', 'Baffle', 30], ['driver', '40 mm driver', 50], ['shell', 'Cup shell', 76], ['board', 'Bluetooth board', 100], ['battery', 'Battery', 118], ['cap', 'Touch cover', 140]];
-  for (const [id, name, dx] of order) cup[id](add(id, name, [dx, 0, 0]));
+  // Right cup: each piece slides out along the cup's axis until, on paper, it clears the one before by GAP.
+  {
+    const a = camera.azimuth * Math.PI / 180, e = camera.elevation * Math.PI / 180;
+    const squash = Math.abs(Math.cos(a) * Math.cos(e)), along = Math.sqrt(1 - squash ** 2), GAP = 7;
+    const names = {cushion: 'Ear cushion', driver: '40 mm driver', shell: 'Cup shell', board: 'Bluetooth board', cap: 'Touch cover'};
+    let reach = -Infinity;
+    for (const [id, [x0, x1, r, make]] of Object.entries(cup)) {
+      const dx = Math.max(0, (reach + GAP - (x0 * along - r * squash)) / along);
+      make(add(id, names[id], [+dx.toFixed(1), 0, 0]));
+      reach = x1 * along + r * squash + dx * along;
+    }
+  }
 
   // Headband with sliders and yokes.
   const band = add('headband', 'Headband');
@@ -91,15 +91,15 @@ exports.build = G => {
   for (const s of [1, -1]) {
     const yoke = [];
     for (let i = 0; i <= 40; i++) {
-      const a = -0.08 + (Math.PI + 0.16) * i / 40;
-      yoke.push([s * CX, 51 * Math.cos(a), 51 * Math.sin(a)]);
+      const t = -0.08 + (Math.PI + 0.16) * i / 40;
+      yoke.push([s * CX, 51 * Math.cos(t), 51 * Math.sin(t)]);
     }
     G.sweep(band, yoke, rr(8, 7, 2.5));
     G.sweep(band, [[s * CX, 0, 50.5], [s * CX, 0, 58]], rr(12, 5, 2));
     for (const y of [-51, 51]) G.lathe(band, [[-3, 0], [-3, 2.2], [3, 2.2], [3, 0]], {axis: 'y', at: [s * CX, y - Math.sign(y) * 4, 0]});
   }
 
-  const pad = add('pad', 'Headband cushion', [0, 0, -16]);
+  const pad = add('pad', 'Headband cushion', [0, 0, -20]);
   const inner = [];
   for (let i = 0; i <= 40; i++) {
     const t = Math.PI * (0.22 + 0.56 * i / 40);
@@ -107,16 +107,15 @@ exports.build = G => {
   }
   G.sweep(pad, inner, rr(24, 6, 2.6, [0, 6.6]));
 
-  const trails = [{a: [55, 0, 0], b: [102.3, 0, 0], from: 'cushion', to: 'cap'}];
+  const trails = [{a: [66, 0, 0], b: [98.5, 0, 0], from: 'cushion', to: 'cap'}];
   return {
     parts, trails, camera,
     skirts: [{of: 'shell', piece: frontTube(66, 98.6, 43.4, R, camera)}],
     anchors: {
       headband: ['headband', [0, -15, 139.5]], pad: ['pad', [0, -12, 118]], cushion: ['cushion', [57, -30, -30]],
-      mesh: ['mesh', [66.2, -20, -20]], baffle: ['baffle', [68.6, -30, -26]], driver: ['driver', [82.6, -7, -7]],
-      shell: ['shell', [98.6, -28, -28]], board: ['board', [87.4, 12, 14]], battery: ['battery', [95.4, 0, 6]], cap: ['cap', [102.3, 0, -28]]
+      driver: ['driver', [68.6, -30, -26]], shell: ['shell', [98.6, -28, -28]], board: ['board', [87.4, 12, 14]], cap: ['cap', [102.3, 0, -28]]
     },
     overlays: [],
-    sequence: ['cap', 'battery', 'board', 'shell', 'driver', 'baffle', 'mesh', 'pad']
+    sequence: ['cap', 'board', 'shell', 'driver', 'pad']
   };
 };

@@ -976,7 +976,6 @@
       "no_series": "暂无活动系列",
       "latest": "最近一届 {date}",
       "back": "全部活动系列",
-      "not_found": "没有找到这个活动系列",
       "sort_label": "排序",
       "sorts": {
         "newest": "最新在前",
@@ -1626,7 +1625,6 @@
     "no_albums": "暂无关联专辑",
     "no_series": "暂无系列",
     "episode_n": "第 {n} 话",
-    "not_found": "找不到该内容",
     "form": {
       "tab_basic": "基础信息",
       "tab_relations": "关联",
@@ -2300,7 +2298,6 @@
     }
   },
   "tracks": {
-    "not_found": "曲目不存在。",
     "originals_section": "原曲",
     "originals": "这首曲目的原曲",
     "derived_tracks": "以它为原曲的曲目（{count}）",
@@ -2931,7 +2928,6 @@
     }
   },
   "event_page": {
-    "not_found": "没有找到这个活动",
     "hero": {
       "date": "日期",
       "venue": "会场",
@@ -3124,5 +3120,46 @@
     "favorites": "收藏 {count}",
     "open": "查看艺术家",
     "load_failed": "更多信息没能加载"
+  },
+  "error_page": {
+    "not_found": {
+      "kicker": "404 · 找不到页面",
+      "title": "找不到这一页",
+      "body": "钢琴只有 88 个键，第 404 号键我们翻遍了零件箱也没找到。链接可能写错了，或者这一页已经被移走。",
+      "name": "找不到页面"
+    },
+    "server": {
+      "kicker": "{code} · 服务器出错",
+      "title": "八音盒卡住了",
+      "body": "服务器出了点问题，这次请求没能完成。我们正在修，请稍后刷新再试。",
+      "name": "服务器出错"
+    },
+    "request": {
+      "kicker": "{code} · 请求出错",
+      "title": "这一页打不开",
+      "body": "这次请求没能完成。请检查一下链接，或者回到首页重新找。",
+      "name": "请求出错"
+    },
+    "home": "回到首页",
+    "search": "去搜索",
+    "reload": "刷新页面",
+    "piano": "拆开的三角钢琴，零件表里第 404 号键缺件",
+    "musicbox": "拆开的八音盒，零件表里的发条盒卡住了",
+    "parts": {
+      "no": "编号",
+      "part": "零件",
+      "qty": "数量",
+      "status": "状态",
+      "missing": "缺件",
+      "jammed": "卡住"
+    },
+    "block": {
+      "name": "名称",
+      "number": "图号",
+      "scale": "比例",
+      "state": "状态",
+      "sheet": "张次",
+      "repair": "待修"
+    }
   }
 }

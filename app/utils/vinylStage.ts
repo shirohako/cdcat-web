@@ -67,13 +67,16 @@ export const VINYL_TRACKS = (() => {
   })
 })()
 
-export type VinylRecord = 'login' | 'register'
+/** The two sign-in stage records, and the home page turntable's black one. */
+export type VinylRecord = 'login' | 'register' | 'black'
 
 interface Colourway {
   seed: number
   base: string
   inks: string[]
   groove: string
+  /** Swirls of the inks through the base, as pressed coloured vinyl; off, the record is plain base colour. */
+  marble?: boolean
   /** the record's own colour, for the glow behind it, the stylus light and the reflection in the chrome */
   glow: string
   label: { paper: string, paper2: string, ink: string, accent: string, side: string, no: string, etch: string }
@@ -98,6 +101,16 @@ const COLOURWAYS: Record<VinylRecord, Colourway> = {
     glow: '#25d0c2',
     label: { paper: '#f3fcfa', paper2: '#d9efea', ink: '#0d2e44', accent: '#13b3a4', side: '#0f9a8d', no: 'CDCAT-0002', etch: 'CDCAT-0002-A1  ✳  WELCOME ABOARD  ✳' },
   },
+  // 黑胶: plain black, the home page turntable's record (TeardownFigure), too small there for a marble
+  black: {
+    seed: 7,
+    base: '#16171f',
+    inks: [],
+    groove: '#050609',
+    marble: false,
+    glow: '#f4a9bc',
+    label: { paper: '#fdf4f8', paper2: '#f4dbe5', ink: '#3b1648', accent: '#f4a9bc', side: '#e2368c', no: 'CDCAT-0000', etch: 'CDCAT-0000-A1  ✳  TAKE IT APART  ✳' },
+  },
 }
 
 export const vinylGlow = (record: VinylRecord) => COLOURWAYS[record].glow
@@ -118,7 +131,7 @@ function ghost(ink: string) {
  * etched matrix number, and the paper label. `title` and `tracks` are printed on the label in the reader's language;
  * `id` keeps the SVG's internal references apart when several records are on a page.
  */
-export function vinylSvg(record: VinylRecord, o: { id: string, title: string, tracks: string[] }): string {
+export function vinylSvg(record: VinylRecord, o: { id: string, title: string, tracks: string[], sheen?: boolean }): string {
   const cw = COLOURWAYS[record]
   const L = cw.label
   const id = o.id
@@ -127,25 +140,29 @@ export function vinylSvg(record: VinylRecord, o: { id: string, title: string, tr
   const defs = [`<clipPath id="${id}-disc"><circle cx="500" cy="500" r="${VINYL.R}"/></clipPath>`]
   const out: string[] = []
 
-  // Marble: soften the colour edges first, then swirl them, so the colours blend like pressed vinyl
-  defs.push(`<filter id="${id}-mb" filterUnits="userSpaceOnUse" x="-220" y="-220" width="1440" height="1440" color-interpolation-filters="sRGB">`
-    + '<feGaussianBlur in="SourceGraphic" stdDeviation="9" result="soft"/>'
-    + `<feTurbulence type="fractalNoise" baseFrequency="0.0028 0.0036" numOctaves="2" seed="${cw.seed}" result="n"/>`
-    + '<feDisplacementMap in="soft" in2="n" scale="280" xChannelSelector="R" yChannelSelector="G"/>'
-    + '<feGaussianBlur stdDeviation="1.6"/></filter>')
-  let paint = `<rect x="-220" y="-220" width="1440" height="1440" fill="${cw.base}"/>`
-  for (let i = 0; i < 5; i++) {
-    const p = polar(120 + rnd() * 300, rnd() * 360, 500, 500)
-    paint += `<circle cx="${r2(p.x)}" cy="${r2(p.y)}" r="${r2(90 + rnd() * 150)}" fill="${pick()}" opacity="${r2(0.45 + rnd() * 0.4)}"/>`
+  if (cw.marble === false) {
+    out.push(`<circle cx="500" cy="500" r="${VINYL.R}" fill="${cw.base}"/>`)
+  } else {
+    // Marble: soften the colour edges first, then swirl them, so the colours blend like pressed vinyl
+    defs.push(`<filter id="${id}-mb" filterUnits="userSpaceOnUse" x="-220" y="-220" width="1440" height="1440" color-interpolation-filters="sRGB">`
+      + '<feGaussianBlur in="SourceGraphic" stdDeviation="9" result="soft"/>'
+      + `<feTurbulence type="fractalNoise" baseFrequency="0.0028 0.0036" numOctaves="2" seed="${cw.seed}" result="n"/>`
+      + '<feDisplacementMap in="soft" in2="n" scale="280" xChannelSelector="R" yChannelSelector="G"/>'
+      + '<feGaussianBlur stdDeviation="1.6"/></filter>')
+    let paint = `<rect x="-220" y="-220" width="1440" height="1440" fill="${cw.base}"/>`
+    for (let i = 0; i < 5; i++) {
+      const p = polar(120 + rnd() * 300, rnd() * 360, 500, 500)
+      paint += `<circle cx="${r2(p.x)}" cy="${r2(p.y)}" r="${r2(90 + rnd() * 150)}" fill="${pick()}" opacity="${r2(0.45 + rnd() * 0.4)}"/>`
+    }
+    for (let i = 0; i < 64; i++) {
+      const r = 30 + rnd() * 560
+      const a0 = rnd() * 360
+      const span = 40 + rnd() * 240
+      const w = (rnd() < 0.2 ? 44 : 5) + rnd() * 34
+      paint += `<path d="${arc(500, 500, r, a0, a0 + span)}" fill="none" stroke="${pick()}" stroke-width="${r2(w)}" stroke-linecap="round" opacity="${r2(0.6 + rnd() * 0.4)}"/>`
+    }
+    out.push(`<g clip-path="url(#${id}-disc)"><g filter="url(#${id}-mb)">${paint}</g></g>`)
   }
-  for (let i = 0; i < 64; i++) {
-    const r = 30 + rnd() * 560
-    const a0 = rnd() * 360
-    const span = 40 + rnd() * 240
-    const w = (rnd() < 0.2 ? 44 : 5) + rnd() * 34
-    paint += `<path d="${arc(500, 500, r, a0, a0 + span)}" fill="none" stroke="${pick()}" stroke-width="${r2(w)}" stroke-linecap="round" opacity="${r2(0.6 + rnd() * 0.4)}"/>`
-  }
-  out.push(`<g clip-path="url(#${id}-disc)"><g filter="url(#${id}-mb)">${paint}</g></g>`)
 
   // Grooves, louder passages a little brighter; nothing in the four gaps between tracks
   const inGap = (r: number) => VINYL_TRACKS.slice(0, 4).some(t => Math.abs(r - t.to) < GAP / 2 + 0.7)
@@ -169,6 +186,14 @@ export function vinylSvg(record: VinylRecord, o: { id: string, title: string, tr
   out.push(`<text font-family="${MONO}" font-size="7" letter-spacing="1.3" fill="rgba(255,255,255,.55)"><textPath href="#${id}-etch">${esc(L.etch)}</textPath></text>`)
   out.push(`<circle cx="500" cy="500" r="${VINYL.bead}" fill="none" stroke="#ffffff" stroke-opacity=".3" stroke-width="2.6"/>`)
   out.push(`<circle cx="500" cy="500" r="${VINYL.R - 0.9}" fill="none" stroke="#000" stroke-opacity=".55" stroke-width="1.8"/>`)
+  // A still record's light: two pale arcs across the grooves on opposite sides.
+  if (o.sheen) {
+    for (const [a0, a1] of [[200, 250], [20, 70]] as const) {
+      for (const [i, r] of [300, 340, 380, 420].entries()) {
+        out.push(`<path d="${arc(500, 500, r, a0 - i * 2, a1 + i * 2)}" fill="none" stroke="#ffffff" stroke-opacity="${r2(0.42 - i * 0.05)}" stroke-width="7" stroke-linecap="round"/>`)
+      }
+    }
+  }
 
   // The paper label
   defs.push(`<radialGradient id="${id}-paper" cx="42%" cy="36%" r="78%"><stop offset="0" stop-color="${L.paper}"/><stop offset="1" stop-color="${L.paper2}"/></radialGradient>`)

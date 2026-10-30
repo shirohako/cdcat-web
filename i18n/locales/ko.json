@@ -976,7 +976,6 @@
       "no_series": "아직 행사 시리즈가 없어요",
       "latest": "최근 회차 {date}",
       "back": "전체 행사 시리즈",
-      "not_found": "행사 시리즈를 찾을 수 없어요",
       "sort_label": "정렬",
       "sorts": {
         "newest": "최신순",
@@ -1626,7 +1625,6 @@
     "no_albums": "아직 관련 앨범이 없어요",
     "no_series": "아직 시리즈가 없어요",
     "episode_n": "{n}화",
-    "not_found": "찾을 수 없어요",
     "form": {
       "tab_basic": "기본 정보",
       "tab_relations": "관계",
@@ -2300,7 +2298,6 @@
     }
   },
   "tracks": {
-    "not_found": "곡을 찾을 수 없어요.",
     "originals_section": "원곡",
     "originals": "이 곡의 원곡",
     "derived_tracks": "이 곡을 원곡으로 하는 곡 ({count})",
@@ -2931,7 +2928,6 @@
     }
   },
   "event_page": {
-    "not_found": "행사를 찾을 수 없어요",
     "hero": {
       "date": "일정",
       "venue": "장소",
@@ -3124,5 +3120,46 @@
     "favorites": "팔로워 {count}명",
     "open": "아티스트 보기",
     "load_failed": "자세한 정보를 불러오지 못했어요"
+  },
+  "error_page": {
+    "not_found": {
+      "kicker": "404 · 페이지를 찾을 수 없음",
+      "title": "이 페이지를 찾을 수 없어요",
+      "body": "피아노 건반은 88개뿐이라, 404번 건반은 부품 상자를 다 뒤져도 없었어요. 링크가 잘못됐거나 페이지가 옮겨졌을 수 있어요.",
+      "name": "페이지를 찾을 수 없음"
+    },
+    "server": {
+      "kicker": "{code} · 서버 오류",
+      "title": "오르골이 멈췄어요",
+      "body": "서버에 문제가 생겨 이번 요청을 마치지 못했어요. 고치는 중이니 잠시 뒤 새로고침해 주세요.",
+      "name": "서버 오류"
+    },
+    "request": {
+      "kicker": "{code} · 요청 오류",
+      "title": "이 페이지를 열 수 없어요",
+      "body": "이번 요청을 마치지 못했어요. 링크를 확인하거나 홈에서 다시 찾아 주세요.",
+      "name": "요청 오류"
+    },
+    "home": "홈으로",
+    "search": "검색하기",
+    "reload": "새로고침",
+    "piano": "분해한 그랜드 피아노. 부품표에서 404번 건반이 결품",
+    "musicbox": "분해한 오르골. 부품표에서 태엽 통이 멈춤",
+    "parts": {
+      "no": "번호",
+      "part": "부품",
+      "qty": "수량",
+      "status": "상태",
+      "missing": "결품",
+      "jammed": "멈춤"
+    },
+    "block": {
+      "name": "명칭",
+      "number": "도면 번호",
+      "scale": "축척",
+      "state": "상태",
+      "sheet": "매수",
+      "repair": "수리 중"
+    }
   }
 }

@@ -976,7 +976,6 @@
       "no_series": "目前沒有活動系列",
       "latest": "最近一屆 {date}",
       "back": "全部活動系列",
-      "not_found": "找不到這個活動系列",
       "sort_label": "排序",
       "sorts": {
         "newest": "最新在前",
@@ -1626,7 +1625,6 @@
     "no_albums": "暫無關聯專輯",
     "no_series": "暫無系列",
     "episode_n": "第 {n} 話",
-    "not_found": "找不到該內容",
     "form": {
       "tab_basic": "基礎資訊",
       "tab_relations": "關聯",
@@ -2300,7 +2298,6 @@
     }
   },
   "tracks": {
-    "not_found": "曲目不存在。",
     "originals_section": "原曲",
     "originals": "這首曲目的原曲",
     "derived_tracks": "以它為原曲的曲目（{count}）",
@@ -2931,7 +2928,6 @@
     }
   },
   "event_page": {
-    "not_found": "找不到這個活動",
     "hero": {
       "date": "日期",
       "venue": "會場",
@@ -3124,5 +3120,46 @@
     "favorites": "收藏 {count}",
     "open": "查看藝術家",
     "load_failed": "更多資訊沒能載入"
+  },
+  "error_page": {
+    "not_found": {
+      "kicker": "404 · 找不到頁面",
+      "title": "找不到這一頁",
+      "body": "鋼琴只有 88 個鍵，第 404 號鍵我們翻遍了零件箱也沒找到。連結可能寫錯了，或者這一頁已經被移走。",
+      "name": "找不到頁面"
+    },
+    "server": {
+      "kicker": "{code} · 伺服器出錯",
+      "title": "音樂盒卡住了",
+      "body": "伺服器出了點問題，這次請求沒能完成。我們正在修，請稍後重新整理再試。",
+      "name": "伺服器出錯"
+    },
+    "request": {
+      "kicker": "{code} · 請求出錯",
+      "title": "這一頁打不開",
+      "body": "這次請求沒能完成。請檢查一下連結，或者回到首頁重新找。",
+      "name": "請求出錯"
+    },
+    "home": "回到首頁",
+    "search": "去搜尋",
+    "reload": "重新整理",
+    "piano": "拆開的三角鋼琴，零件表裡第 404 號鍵缺件",
+    "musicbox": "拆開的音樂盒，零件表裡的發條盒卡住了",
+    "parts": {
+      "no": "編號",
+      "part": "零件",
+      "qty": "數量",
+      "status": "狀態",
+      "missing": "缺件",
+      "jammed": "卡住"
+    },
+    "block": {
+      "name": "名稱",
+      "number": "圖號",
+      "scale": "比例",
+      "state": "狀態",
+      "sheet": "張次",
+      "repair": "待修"
+    }
   }
 }

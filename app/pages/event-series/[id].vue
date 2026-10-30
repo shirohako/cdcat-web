@@ -41,7 +41,7 @@ const { t } = useI18n()
 const { localizedContent, formatDate } = useLocaleFormatting()
 const { localizeError } = useLocalizedApiError()
 
-const { data: series, status, error, revealClass } = await usePageAPI<EventSeriesDetail>(`/v1/event-series/${seriesId}`)
+const { data: series, status, error, revealClass } = await usePageAPI<EventSeriesDetail>(`/v1/event-series/${seriesId}`, { notFound: true })
 
 // 24 fills whole rows in every grid (2/3/4 portrait columns, 1/2/3 landscape).
 const PER_PAGE = 24
@@ -243,7 +243,7 @@ usePageSeo({
 
       <div v-else-if="status === 'error'" class="flex min-h-60 items-center justify-center">
         <div class="alert alert-error max-w-md">
-          <span>{{ error?.statusCode === 404 ? t('collection_pages.events.not_found') : localizeError(error) }}</span>
+          <span>{{ localizeError(error) }}</span>
         </div>
       </div>
 

@@ -47,6 +47,26 @@ module.exports = G => {
 
   const flat = (points, z) => points.map(([x, y]) => [x, y, z]);
 
+  // A flat ring at height z as one sheet with no thickness. Its free edges are its outline, so a thin part such as a
+  // disc draws one rim rather than two lines that run together at the landing's size.
+  const sheetRing = (p, x, y, z, r0, r1, n = 144) => {
+    const ring = r => Array.from({length: n}, (_, i) => [x + r * Math.cos(i * TAU / n), y + r * Math.sin(i * TAU / n), z]);
+    return G.loft(p, [ring(r1), ring(r0)], {caps: false, lines: 'none'});
+  };
+
+  // A folded sheet with no thickness, such as a paper strip wrapped round a spine: the polyline profile [[x, z], ...]
+  // runs along y from y0 to y1. Its free edges are its outline; the folds are drawn as edges.
+  const fold = (p, profile, y0, y1, {role = 'edge'} = {}) => {
+    const base = p.vertices.length, m = profile.length;
+    for (const [x, z] of profile) p.vertices.push([x, y0, z], [x, y1, z]);
+    for (let i = 0; i < m - 1; i++) {
+      const a = base + 2 * i;
+      p.triangles.push([a, a + 2, a + 3], [a, a + 3, a + 1]);
+    }
+    for (let i = 1; i < m - 1; i++) G.line(p, [profile[i][0], y0, profile[i][1]], [profile[i][0], y1, profile[i][1]], role);
+    return p;
+  };
+
   // The walls of an upright container that face the camera, as one solid between z0 and z1. The landing draws it
   // over the parts that are still inside the container, which the walls would hide.
   const frontWalls = (outer, inner, z0, z1, camera) => {
@@ -74,5 +94,5 @@ module.exports = G => {
     return G.lathe(G.piece(), [[x0, r0], [x0, r1], [x1, r1], [x1, r0]], {start: phi - Math.PI / 2 - .05, end: phi + Math.PI / 2 + .05});
   };
 
-  return {TAU, rr, disc, grow, ccw, slab, block, rect, turnZ, turnX, turnY, post, flat, frontWalls, frontTube};
+  return {TAU, rr, disc, grow, ccw, slab, block, rect, turnZ, turnX, turnY, post, flat, sheetRing, fold, frontWalls, frontTube};
 };

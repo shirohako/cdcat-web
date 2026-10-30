@@ -976,7 +976,6 @@
       "no_series": "No event series yet",
       "latest": "Latest {date}",
       "back": "All event series",
-      "not_found": "Event series not found",
       "sort_label": "Sort",
       "sorts": {
         "newest": "Newest first",
@@ -1626,7 +1625,6 @@
     "no_albums": "No related music yet",
     "no_series": "No series yet",
     "episode_n": "Episode {n}",
-    "not_found": "Not found",
     "form": {
       "tab_basic": "Basics",
       "tab_relations": "Relations",
@@ -2300,7 +2298,6 @@
     }
   },
   "tracks": {
-    "not_found": "This track does not exist.",
     "originals_section": "Originals",
     "originals": "Based on",
     "derived_tracks": "Tracks based on it ({count})",
@@ -2931,7 +2928,6 @@
     }
   },
   "event_page": {
-    "not_found": "Event not found",
     "hero": {
       "date": "Date",
       "venue": "Venue",
@@ -3124,5 +3120,46 @@
     "favorites": "{count} favorite | {count} favorites",
     "open": "View artist",
     "load_failed": "More details failed to load"
+  },
+  "error_page": {
+    "not_found": {
+      "kicker": "404 · Page not found",
+      "title": "This page isn't here",
+      "body": "A piano has 88 keys. We turned the parts box upside down, and key 404 isn't in it. The link may be mistyped, or the page has moved.",
+      "name": "Page not found"
+    },
+    "server": {
+      "kicker": "{code} · Server error",
+      "title": "The music box is stuck",
+      "body": "Something went wrong on our server, so this request couldn't finish. We're fixing it; please reload in a little while.",
+      "name": "Server error"
+    },
+    "request": {
+      "kicker": "{code} · Request error",
+      "title": "This page can't be opened",
+      "body": "This request couldn't be completed. Check the link, or start again from the home page.",
+      "name": "Request error"
+    },
+    "home": "Back to home",
+    "search": "Search",
+    "reload": "Reload page",
+    "piano": "A grand piano taken apart; its parts list is missing key 404",
+    "musicbox": "A music box taken apart; its spring barrel is jammed",
+    "parts": {
+      "no": "No.",
+      "part": "Part",
+      "qty": "Qty",
+      "status": "Status",
+      "missing": "Missing",
+      "jammed": "Jammed"
+    },
+    "block": {
+      "name": "Title",
+      "number": "Dwg. no.",
+      "scale": "Scale",
+      "state": "Status",
+      "sheet": "Sheet",
+      "repair": "Under repair"
+    }
   }
 }

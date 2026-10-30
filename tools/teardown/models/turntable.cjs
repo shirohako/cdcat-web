@@ -1,8 +1,10 @@
-// Belt-drive turntable, illustrative concept (~440 x 350 mm plinth).
+// Belt-drive turntable, illustrative concept (~440 x 350 mm plinth). The plinth with its feet stays put; the record,
+// platter, drive and the tonearm with its headshell, cartridge and counterweight come off it. The arm is parked on
+// its rest, so the record lifts straight off past it.
 exports.build = G => {
   const K = require('./kit.cjs')(G);
-  const {rr, disc, slab, block, turnZ, flat, post} = K;
-  const camera = {azimuth: -112, elevation: 19, roll: 0};
+  const {rr, disc, slab, block, turnZ, post, sheetRing} = K;
+  const camera = {azimuth: -62, elevation: 20, roll: 0};
   const parts = [];
   const add = (id, name, explosion = [0, 0, 0]) => {
     const p = G.part(id, name);
@@ -10,112 +12,128 @@ exports.build = G => {
     parts.push(p);
     return p;
   };
-  const PX = -42, PY = 0;       // platter centre
-  const AX = 162, AY = 96;      // tonearm pivot
+  const PX = -46, PY = 0;       // platter centre
+  const AX = 160, AY = 96;      // tonearm pivot
   const TOP = 60;               // plinth top
+  const ZA = TOP + 54;          // arm tube axis
+  const LIFT = 70;              // the arm's travel off its pillar
 
-  // Plinth with control details on the top plate.
+  // The parked arm points to the front, turned a hair outwards; the headshell is offset in, towards the platter.
+  const turn = (v, deg) => {
+    const a = deg * Math.PI / 180;
+    return [v[0] * Math.cos(a) - v[1] * Math.sin(a), v[0] * Math.sin(a) + v[1] * Math.cos(a), 0];
+  };
+  const D = turn([0, -1, 0], 2), H = turn(D, -22);
+  const at = (k, z = ZA) => [AX + D[0] * k, AY + D[1] * k, z];
+  // A frame whose x runs along v (horizontal) and z up, at origin.
+  const along = (v, origin) => ({origin, xAxis: v, yAxis: [-v[1], v[0], 0], zAxis: [0, 0, 1]});
+
+  // Plinth on four feet, with the speed buttons, the motor pulley, the bearing boss, the arm's base and pillar, the rest.
   const plinth = add('plinth', 'Plinth');
-  slab(plinth, rr(440, 350, 10), 14, TOP - 14);
-  G.polyline(plinth, flat(rr(428, 338, 6), TOP + .02), {closed: true, role: 'detail'});
-  turnZ(plinth, PX, PY, [[TOP - .1, 0], [TOP - .1, 26], [TOP + 2, 26], [TOP + 2, 0]]);
-  post(plinth, -176, -136, TOP, 13, 4);
-  G.circle(plinth, [-176, -136, TOP + 4.02], 8, [0, 0, 1], {role: 'detail', segments: 72});
-  for (const [x, y] of [[-140, -140], [-112, -140]]) block(plinth, rr(20, 9, 2.5, [x, y]), TOP, 2.6);
-  G.polyline(plinth, flat(rr(10, 120, 5, [190, -60]), TOP + .02), {closed: true});
-  block(plinth, rr(18, 10, 2, [190, -50]), TOP, 4.5);
-  for (let i = 0; i < 9; i++) G.line(plinth, [200, -116 + i * 14, TOP + .03], [206, -116 + i * 14, TOP + .03], 'texture');
-  // motor pulley (fixed in the plinth)
-  turnZ(plinth, -170, 120, [[TOP - .1, 0], [TOP - .1, 14], [TOP + 3, 14], [TOP + 3, 0]]);
-  turnZ(plinth, -170, 120, [[TOP + 3, 0], [TOP + 3, 6], [TOP + 12, 6], [TOP + 12, 0]]);
-  // arm rest
-  turnZ(plinth, 150, -20, [[TOP - .1, 0], [TOP - .1, 4], [TOP + 44, 4], [TOP + 44, 0]]);
-  block(plinth, [[142, -24], [158, -24], [158, -16], [142, -16]], TOP + 44, 3);
-
-  const feet = add('feet', 'Isolation feet', [0, 0, -40]);
-  for (const [x, y] of [[-190, -145], [190, -145], [-190, 145], [190, 145]]) {
-    turnZ(feet, x, y, [[0, 0], [0, 21], [6, 22], [14.1, 22], [14.1, 0]], {creaseAngle: 30});
+  slab(plinth, rr(440, 350, 12), 14, TOP - 14);
+  for (const [x, y] of [[-188, -143], [188, -143], [-188, 143], [188, 143]]) {
+    turnZ(plinth, x, y, [[0, 0], [0, 19], [4, 21], [14.2, 21], [14.2, 0]], {creaseAngle: 30});
+  }
+  turnZ(plinth, PX, PY, [[TOP - .1, 0], [TOP - .1, 28], [TOP + 2, 28], [TOP + 2, 0]]);
+  post(plinth, -186, -140, TOP, 11, 5);
+  G.circle(plinth, [-186, -140, TOP + 5.02], 6.5, [0, 0, 1], {role: 'detail', segments: 72});
+  for (const x of [-158, -132]) block(plinth, rr(20, 9, 3, [x, -142]), TOP, 2.6);
+  turnZ(plinth, -176, 116, [[TOP - .1, 0], [TOP - .1, 15], [TOP + 3, 15], [TOP + 3, 0]]);
+  turnZ(plinth, -176, 116, [[TOP + 3, 0], [TOP + 3, 6.4], [TOP + 15, 6.4], [TOP + 15, 0]]);
+  turnZ(plinth, AX, AY, [[TOP - .1, 0], [TOP - .1, 30], [TOP + 5, 30], [TOP + 7, 28], [TOP + 7, 0]], {creaseAngle: 30});
+  turnZ(plinth, AX, AY, [[TOP + 7, 0], [TOP + 7, 9], [ZA - 10, 9], [ZA - 10, 0]]);
+  {
+    const [rx, ry] = at(118);
+    turnZ(plinth, rx, ry, [[TOP - .1, 0], [TOP - .1, 6], [TOP + 2, 6], [TOP + 2, 3.4], [ZA - 7, 3.4], [ZA - 7, 0]]);
+    const cradle = G.piece();
+    G.extrude(cradle, [[-6, 0], [6, 0], [6, 5.5], [2.5, 5.5], [2.5, 2], [-2.5, 2], [-2.5, 5.5], [-6, 5.5]], {depth: 5});
+    G.transform(cradle, {origin: [rx - D[0] * 2.5, ry - D[1] * 2.5, ZA - 7.5], xAxis: [-D[1], D[0], 0], yAxis: [0, 0, 1], zAxis: [D[0], D[1], 0]});
+    G.merge(plinth, cradle);
   }
 
-  // Sub-platter, spindle and drive belt.
-  const sub = add('sub', 'Sub-platter & belt', [0, 0, 44]);
-  turnZ(sub, PX, PY, [[TOP + 2, 0], [TOP + 2, 72], [TOP + 18, 72], [TOP + 18, 0]]);
-  turnZ(sub, PX, PY, [[TOP + 18, 0], [TOP + 18, 3.6], [TOP + 50, 3.6], [TOP + 51.5, 2.6], [TOP + 51.5, 0]], {creaseAngle: 30});
+  // Drive belt, round the sub-platter's rim and the motor pulley.
+  const belt = add('belt', 'Drive belt', [0, 0, 18]);
   {
-    const belt = [], r1 = 72.6, r2 = 8.6, c1 = [PX, PY], c2 = [-170, 120];
+    const path = [], r1 = 72.6, r2 = 7, c1 = [PX, PY], c2 = [-176, 116];
     const d = Math.hypot(c2[0] - c1[0], c2[1] - c1[1]), base = Math.atan2(c2[1] - c1[1], c2[0] - c1[0]);
     const phi = Math.acos((r1 - r2) / d);
     for (let i = 0; i <= 48; i++) {
       const t = base + phi + (2 * Math.PI - 2 * phi) * i / 48;
-      belt.push([c1[0] + r1 * Math.cos(t), c1[1] + r1 * Math.sin(t), TOP + 9]);
+      path.push([c1[0] + r1 * Math.cos(t), c1[1] + r1 * Math.sin(t), TOP + 9]);
     }
     for (let i = 0; i <= 16; i++) {
       const t = base - phi + 2 * phi * i / 16;
-      belt.push([c2[0] + r2 * Math.cos(t), c2[1] + r2 * Math.sin(t), TOP + 9]);
+      path.push([c2[0] + r2 * Math.cos(t), c2[1] + r2 * Math.sin(t), TOP + 9]);
     }
-    const pts = belt.filter((p, i) => i === 0 || Math.hypot(p[0] - belt[i - 1][0], p[1] - belt[i - 1][1]) > 1e-6);
-    G.sweep(sub, pts, [[-.6, -2.5], [.6, -2.5], [.6, 2.5], [-.6, 2.5]], {closed: true});
+    const pts = path.filter((p, i) => i === 0 || Math.hypot(p[0] - path[i - 1][0], p[1] - path[i - 1][1]) > 1e-6);
+    G.sweep(belt, pts, [[-.7, -2.6], [.7, -2.6], [.7, 2.6], [-.7, 2.6]], {closed: true});
   }
 
-  // Platter with strobe rim.
-  const platter = add('platter', 'Platter', [0, 0, 104]);
+  // Sub-platter with the spindle, on the main bearing.
+  const sub = add('sub', 'Sub-platter', [0, 0, 62]);
+  turnZ(sub, PX, PY, [[TOP + 2, 0], [TOP + 2, 72], [TOP + 18, 72], [TOP + 18, 0]]);
+  turnZ(sub, PX, PY, [[TOP + 18, 0], [TOP + 18, 3.6], [TOP + 50, 3.6], [TOP + 51.5, 2.6], [TOP + 51.5, 0]], {creaseAngle: 30});
+
+  // Platter, with the record's resting ring on top.
+  const platter = add('platter', 'Platter', [0, 0, 140]);
   turnZ(platter, PX, PY, [[TOP + 19, 3.8], [TOP + 19, 145], [TOP + 21, 150], [TOP + 34, 150], [TOP + 35, 149], [TOP + 35, 3.8]], {creaseAngle: 30});
-  for (let k = 0; k < 90; k++) {
-    const t = k * Math.PI * 2 / 90, c = Math.cos(t), s = Math.sin(t);
-    G.line(platter, [PX + 150.03 * c, PY + 150.03 * s, TOP + 24], [PX + 150.03 * c, PY + 150.03 * s, TOP + 30], 'texture');
-  }
+  G.circle(platter, [PX, PY, TOP + 35.02], 138, [0, 0, 1], {role: 'texture', segments: 192});
 
-  const mat = add('mat', 'Slipmat', [0, 0, 150]);
-  turnZ(mat, PX, PY, [[TOP + 35, 3.8], [TOP + 35, 147], [TOP + 38, 147], [TOP + 38, 3.8]]);
+  // The record, one sheet: its grooves and label are the sign-in page's record art laid on it (the `vinyl` overlay).
+  const lp = add('record', 'Vinyl record', [0, 0, 262]);
+  sheetRing(lp, PX, PY, TOP + 36.8, 3.7, 151, 192);
 
-  // The record: grooves, run-out, label.
-  const lp = add('record', 'Vinyl record', [0, 0, 204]);
-  turnZ(lp, PX, PY, [[TOP + 38, 3.7], [TOP + 38, 151], [TOP + 39.8, 151], [TOP + 39.8, 3.7]]);
-  for (let r = 62; r <= 146; r += 5) G.circle(lp, [PX, PY, TOP + 39.82], r, [0, 0, 1], {role: 'texture'});
-  G.circle(lp, [PX, PY, TOP + 39.82], 50, [0, 0, 1], {role: 'detail'});
-  G.circle(lp, [PX, PY, TOP + 39.82], 57, [0, 0, 1], {role: 'detail'});
+  // Tonearm: bearing housing, tube and the counterweight stub; it lifts off the pillar.
+  const arm = add('arm', 'Tonearm', [0, 0, LIFT]);
+  turnZ(arm, AX, AY, [[ZA - 10, 0], [ZA - 10, 11], [ZA + 8, 11], [ZA + 9, 10], [ZA + 9, 0]], {creaseAngle: 30});
+  G.merge(arm, G.transform(G.lathe(G.piece(), [[-64, 0], [-64, 2.8], [-8, 2.8], [-8, 3.6], [190, 3.6], [190, 4.8], [198, 4.8], [198, 0]]), along(D, [AX, AY, ZA])));
 
-  // Tonearm: base, pillar, arm tube, headshell with cartridge, counterweight.
-  const arm = add('arm', 'Tonearm', [40, -30, 96]);
-  turnZ(arm, AX, AY, [[TOP - .1, 0], [TOP - .1, 30], [TOP + 6, 30], [TOP + 8, 27], [TOP + 8, 0]], {creaseAngle: 30});
-  turnZ(arm, AX, AY, [[TOP + 8, 0], [TOP + 8, 9], [TOP + 44, 9], [TOP + 44, 0]]);
-  block(arm, rr(22, 22, 4, [AX, AY]), TOP + 44, 10);
-  const tip = [PX + 120 * Math.cos(-.55), PY + 120 * Math.sin(-.55)];
-  const path = [];
-  for (let i = 0; i <= 20; i++) {
-    const t = i / 20, x = AX + (tip[0] - AX) * t, y = AY + (tip[1] - AY) * t, bend = Math.sin(t * Math.PI) * 18;
-    const nx = -(tip[1] - AY), ny = tip[0] - AX, nl = Math.hypot(nx, ny);
-    path.push([x + nx / nl * bend * (t > .6 ? 1 : .6), y + ny / nl * bend * (t > .6 ? 1 : .6), TOP + 50]);
-  }
-  G.sweep(arm, [[AX - 40 * (tip[0] - AX) / 200, AY - 40 * (tip[1] - AY) / 200, TOP + 50], ...path], disc(0, 0, 3.6, 24));
+  // Headshell, offset towards the platter, with its finger lift; it slides off the tube's end.
+  const headshell = add('headshell', 'Headshell', [D[0] * 44, D[1] * 44, LIFT]);
   {
-    const dir = G.unit([tip[0] - path[18][0], tip[1] - path[18][1], 0]);
-    const head = G.piece();
-    G.extrude(head, [[0, -9], [26, -11], [30, -8], [30, 8], [26, 11], [0, 9]], {depth: 3.4});
-    G.transform(head, {origin: [tip[0] - dir[0] * 4, tip[1] - dir[1] * 4, TOP + 48.4], xAxis: dir, yAxis: [-dir[1], dir[0], 0], zAxis: [0, 0, 1]});
-    G.merge(arm, head);
-    const cart = G.piece();
-    G.extrude(cart, [[10, -7], [24, -7], [24, 7], [10, 7]], {depth: 8.1});
-    G.transform(cart, {origin: [tip[0] - dir[0] * 4, tip[1] - dir[1] * 4, TOP + 40.4], xAxis: dir, yAxis: [-dir[1], dir[0], 0], zAxis: [0, 0, 1]});
-    G.merge(arm, cart);
-    const back = G.unit([AX - tip[0], AY - tip[1], 0]);
-    const cw = G.piece();
-    G.lathe(cw, [[0, 0], [0, 15], [22, 15], [24, 13], [24, 0]], {creaseAngle: 30});
-    G.transform(cw, {origin: [AX + back[0] * 22, AY + back[1] * 22, TOP + 50], xAxis: back, yAxis: [-back[1], back[0], 0], zAxis: [0, 0, 1]});
-    G.merge(arm, cw);
+    const shell = G.piece();
+    G.extrude(shell, [[0, -6], [36, -9], [44, -7], [44, 7], [36, 9], [0, 6]], {depth: 2.6});
+    G.transform(shell, along(H, [...at(196).slice(0, 2), ZA - 1.3]));
+    G.merge(headshell, shell);
+    G.merge(headshell, G.transform(G.lathe(G.piece(), [[0, 0], [0, 3.4], [10, 3.4], [10, 0]]), along(D, at(194))));
+    const lift = G.piece(), s = [H[1], -H[0]];
+    const o = at(196), from = [o[0] + H[0] * 30 + s[0] * 8, o[1] + H[1] * 30 + s[1] * 8], to = [from[0] + s[0] * 12, from[1] + s[1] * 12];
+    G.sweep(lift, [[...from, ZA], [...to, ZA + 5]], disc(0, 0, 1.4, 16));
+    G.merge(headshell, lift);
   }
 
-  const trails = [{a: [PX, PY, TOP + 39.8], b: [PX, PY, TOP + 18], from: 'record', to: 'sub'}];
+  // Cartridge with its stylus, screwed under the headshell.
+  const cart = add('cartridge', 'Cartridge', [D[0] * 44, D[1] * 44, LIFT - 30]);
+  {
+    const body = G.piece();
+    G.extrude(body, [[14, -7.5], [33, -7.5], [36, -5], [36, 5], [33, 7.5], [14, 7.5]], {depth: 15});
+    G.transform(body, along(H, [...at(196).slice(0, 2), ZA - 16.4]));
+    G.merge(cart, body);
+    const o = at(196), tip = k => [o[0] + H[0] * k, o[1] + H[1] * k];
+    G.sweep(cart, [[...tip(33), ZA - 14], [...tip(39), ZA - 18.5]], disc(0, 0, .7, 12));
+  }
+
+  // Counterweight on the stub behind the pivot.
+  const cw = add('counterweight', 'Counterweight', [-D[0] * 50, -D[1] * 50, LIFT]);
+  G.merge(cw, G.transform(G.lathe(G.piece(), [[0, 2.8], [0, 13], [2, 15], [26, 15], [28, 13], [28, 2.8]], {creaseAngle: 30}), along([-D[0], -D[1], 0], at(-26))));
+  G.merge(cw, G.transform(G.lathe(G.piece(), [[0, 0], [0, 15.05], [.01, 15.05]], {role: 'detail'}), along([-D[0], -D[1], 0], at(-40))));
+
+  const trails = [
+    {a: [PX, PY, TOP + 36.8], b: [PX, PY, TOP + 2], from: 'record', to: 'plinth'},
+    {a: at(196), b: at(196), from: 'headshell', to: 'arm'},
+    {a: at(-26), b: at(-26), from: 'counterweight', to: 'arm'},
+    {a: [AX, AY, ZA - 10], b: [AX, AY, ZA - 10], from: 'arm', to: 'plinth'}
+  ];
   return {
     parts, trails, camera,
     skirts: [],
     anchors: {
-      // The record's right-hand rim, the mat's and platter's left-hand ones, the belt round the motor pulley.
-      record: ['record', [PX + 140, PY - 56.6, TOP + 39.8]], mat: ['mat', [PX - 136.3, PY + 55.1, TOP + 38]],
-      platter: ['platter', [PX - 139.1, PY + 56.2, TOP + 27]], sub: ['sub', [-178.6, 120, TOP + 9]],
-      arm: ['arm', [tip[0], tip[1], TOP + 50]], plinth: ['plinth', [-176, -136, TOP + 4]], feet: ['feet', [-190, -167, 7]]
+      record: ['record', [PX + 140, PY - 56.6, TOP + 36.8]], platter: ['platter', [PX - 139, PY + 56, TOP + 27]],
+      sub: ['sub', [PX - 72, PY, TOP + 10]], belt: ['belt', [-182.6, 116, TOP + 9]], arm: ['arm', at(100)],
+      headshell: ['headshell', at(230)], cartridge: ['cartridge', at(222, ZA - 16)], counterweight: ['counterweight', at(-52)],
+      plinth: ['plinth', [-186, -140, TOP + 5]]
     },
-    overlays: [{part: 'record', kind: 'label', centre: [PX, PY, TOP + 39.84], radius: 50, hole: 3.7}],
-    sequence: ['record', 'mat', 'arm', 'platter', 'sub', 'feet']
+    overlays: [{part: 'record', kind: 'vinyl', centre: [PX, PY, TOP + 36.8], radius: 151}],
+    sequence: ['record', 'counterweight', 'headshell', 'cartridge', 'arm', 'platter', 'sub', 'belt']
   };
 };

@@ -62,7 +62,7 @@ const onSelectTrackingStatus = (status: TrackingStatus) => {
   activeView.value = 'tracking'
 }
 
-const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`/v1/profiles/${username}`)
+const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`/v1/profiles/${username}`, { notFound: true })
 
 // --------------- SEO ---------------
 

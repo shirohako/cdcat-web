@@ -31,14 +31,14 @@
       >
         <template #overlay="{ at }">
           <!-- The mascot rides the lid, on a layer of its own so its floating never repaints the drawing. -->
-          <svg class="landing-ghost" viewBox="-1 -1 18 19.3" :style="{ ...at('lid', [139.7, 46.2]), width: `${(23.4 / HERO_BOX[2]) * 100}%` }" aria-hidden="true">
+          <svg class="landing-ghost" viewBox="-1 -1 18 19.3" :style="{ ...at('lid', [146.7, 29.4]), width: `${(23.4 / HERO_BOX[2]) * 100}%` }" aria-hidden="true">
             <BrandGhost />
           </svg>
         </template>
       </LandingTeardownFigure>
     </section>
 
-    <!-- The three verses as one collage: the jewel case large with its stickers, the other two smaller without. -->
+    <!-- The three verses as one collage: the jewel case large, the other two smaller, each with its stickers. -->
     <div class="grid gap-6 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] md:gap-8">
       <LandingTile large :title="t('landing.album.title')">
         <LandingTeardownFigure
@@ -52,16 +52,18 @@
       <LandingTile tone="sky" :title="t('landing.listen.title')">
         <LandingTeardownFigure
           device="headphones"
-          :view-box="[20, 30, 395, 266]"
+          :view-box="[22, 45, 376, 207]"
           :tones="TONES.headphones"
+          :labels="LABELS.headphones"
           :title="t('landing.listen.figure')"
         />
       </LandingTile>
       <LandingTile tone="mint" :title="t('landing.discover.title')">
         <LandingTeardownFigure
           device="turntable"
-          :view-box="[56, 20, 314, 262]"
+          :view-box="[66, 22, 288, 253]"
           :tones="TONES.turntable"
+          :labels="LABELS.turntable"
           :title="t('landing.discover.figure')"
         />
       </LandingTile>
@@ -101,25 +103,25 @@ type Device = 'discman' | 'jewelcase' | 'headphones' | 'turntable'
 
 /** Each part's colour. */
 const TONES: Record<Device, Record<string, TeardownTone>> = {
-  discman: { shell: 'butter', pcb: 'mint', chassis: 'lilac', sled: 'sky', hub: 'white', screws: 'white', disc: 'silver', lid: 'pink', buttons: 'coral' },
-  jewelcase: { base: 'white', inlay: 'mint', tray: 'lilac', disc: 'silver', booklet: 'pink', obi: 'butter' },
-  headphones: { 'left-cup': 'lilac', 'cushion': 'pink', 'mesh': 'silver', 'baffle': 'sky', 'driver': 'butter', 'shell': 'lilac', 'board': 'mint', 'battery': 'coral', 'cap': 'white', 'headband': 'lilac', 'pad': 'pink' },
-  turntable: { plinth: 'white', feet: 'lilac', sub: 'butter', platter: 'sky', mat: 'pink', record: 'night', arm: 'silver' }
+  discman: { shell: 'butter', pcb: 'mint', chassis: 'lilac', sled: 'sky', hub: 'white', disc: 'silver', lid: 'pink', buttons: 'coral' },
+  jewelcase: { base: 'white', inlay: 'mint', tray: 'lilac', disc: 'silver', booklet: 'pink', obi: 'butter', lid: 'silver' },
+  headphones: { 'left-cup': 'lilac', 'cushion': 'pink', 'driver': 'butter', 'shell': 'lilac', 'board': 'mint', 'cap': 'white', 'headband': 'lilac', 'pad': 'pink' },
+  turntable: { plinth: 'white', belt: 'coral', sub: 'butter', platter: 'sky', record: 'night', arm: 'silver', headshell: 'lilac', cartridge: 'coral', counterweight: 'butter' }
 }
 
 /**
- * The parts' English names (the user's rule: never translated), placed in each drawing's units. Only the drawings shown
- * large have them; in the collage's small tiles they would crowd the drawing.
+ * The parts' English names (the user's rule: never translated), placed in each drawing's units. In the collage's small
+ * tiles the drawing is narrower than the tile, so stickers may reach past its edges into the space beside it.
  */
 const LABELS: Partial<Record<Device, TeardownLabel[]>> = {
   discman: [
-    { anchor: 'buttons', text: 'Buttons', at: [306, 54], align: 'start', tone: 'coral' },
-    { anchor: 'lid', text: 'Top lid', at: [120, 60], align: 'end', tone: 'pink' },
-    { anchor: 'disc', text: 'Compact disc', at: [128, 122], align: 'end', tone: 'sky' },
-    { anchor: 'sled', text: 'Optical pickup', at: [120, 178], align: 'end', tone: 'lilac' },
-    { anchor: 'chassis', text: 'Chassis', at: [306, 178], align: 'start', tone: 'butter' },
-    { anchor: 'pcb', text: 'Main board', at: [306, 222], align: 'start', tone: 'mint' },
-    { anchor: 'shell', text: 'Bottom shell', at: [120, 256], align: 'end', tone: 'butter' }
+    { anchor: 'buttons', text: 'Buttons', at: [300, 62], align: 'start', tone: 'coral' },
+    { anchor: 'lid', text: 'Top lid', at: [124, 76], align: 'end', tone: 'pink' },
+    { anchor: 'disc', text: 'Compact disc', at: [132, 120], align: 'end', tone: 'sky' },
+    { anchor: 'sled', text: 'Optical pickup', at: [124, 164], align: 'end', tone: 'lilac' },
+    { anchor: 'chassis', text: 'Chassis', at: [300, 170], align: 'start', tone: 'butter' },
+    { anchor: 'pcb', text: 'Main board', at: [300, 214], align: 'start', tone: 'mint' },
+    { anchor: 'shell', text: 'Bottom shell', at: [124, 252], align: 'end', tone: 'butter' }
   ],
   jewelcase: [
     { anchor: 'lid', text: 'Front cover', at: [300, 18], align: 'start', tone: 'silver' },
@@ -129,6 +131,21 @@ const LABELS: Partial<Record<Device, TeardownLabel[]>> = {
     { anchor: 'inlay', text: 'Inlay', at: [350, 212], align: 'start', tone: 'mint' },
     { anchor: 'obi', text: 'Obi strip', at: [118, 282], align: 'center', tone: 'butter' },
     { anchor: 'base', text: 'Case', at: [350, 262], align: 'start', tone: 'coral' }
+  ],
+  headphones: [
+    { anchor: 'headband', text: 'Headband', at: [40, 52], align: 'end', tone: 'lilac' },
+    { anchor: 'cushion', text: 'Ear cushion', at: [118, 268], align: 'center', tone: 'pink' },
+    { anchor: 'driver', text: 'Driver', at: [228, 268], align: 'center', tone: 'butter' },
+    { anchor: 'board', text: 'Bluetooth board', at: [330, 92], align: 'center', tone: 'mint' },
+    { anchor: 'cap', text: 'Touch cover', at: [400, 268], align: 'end', tone: 'silver' }
+  ],
+  turntable: [
+    { anchor: 'record', text: 'Vinyl record', at: [332, 40], align: 'start', tone: 'pink' },
+    { anchor: 'arm', text: 'Tonearm', at: [352, 150], align: 'start', tone: 'silver' },
+    { anchor: 'cartridge', text: 'Cartridge', at: [330, 238], align: 'start', tone: 'coral' },
+    { anchor: 'platter', text: 'Platter', at: [78, 96], align: 'end', tone: 'sky' },
+    { anchor: 'belt', text: 'Belt', at: [78, 160], align: 'end', tone: 'coral' },
+    { anchor: 'plinth', text: 'Plinth', at: [70, 236], align: 'end', tone: 'lilac' }
   ]
 }
 
@@ -157,16 +174,6 @@ if (import.meta.server) {
 </script>
 
 <style>
-/* The display face for the home page's titles: Resource Han Rounded Heavy (SIL OFL), one font for Chinese,
-   Japanese, Korean and Latin, so changing language never changes or fetches a font. Cut down to the characters
-   the titles use in every locale (tools/landing-fonts.mjs); the page's lang picks the regional glyph forms. */
-@font-face {
-  font-family: "CDCat Display";
-  src: url("/landing/fonts/display.woff2") format("woff2");
-  font-weight: 900;
-  font-display: swap;
-}
-
 .landing {
   --landing-lilac: #d8cff6;
   --landing-ink: #1d2444;

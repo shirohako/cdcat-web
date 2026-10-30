@@ -169,7 +169,7 @@ const { localName, localeName, enumLabel } = useCatalogDisplay()
 const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)
-const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`)
+const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`, { notFound: true })
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')

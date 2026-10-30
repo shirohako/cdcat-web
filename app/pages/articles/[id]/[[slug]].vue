@@ -81,7 +81,7 @@ const { tagName } = useTags()
 const { typeName } = useArticleTypes()
 const articleId = String(route.params.id)
 
-const { data: article, status, error, revealClass, mutate } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`)
+const { data: article, status, error, revealClass, mutate } = await usePageAPI<ArticleDetail>(`/v1/articles/${articleId}`, { notFound: true })
 const license = computed(() => article.value && !article.value.is_repost ? articleLicense(article.value.license) : null)
 const licenseUrl = computed(() => license.value ? licenseDeedUrl(license.value, locale.value) : null)
 

@@ -24,25 +24,30 @@
           :style="layerStyle(layer)"
           aria-hidden="true"
         >
-          <g v-if="layer.kind === 'part'" :class="['td-part', `td-${layer.part.id}`, { 'td-glass': layer.part.glass }]">
-            <path v-if="layer.part.fill" class="td-fill" :d="layer.part.fill" :style="{ fill: toneOf(layer.part.id) }" />
+          <g v-if="layer.kind === 'part'" :class="['td-part', { 'td-glass': layer.part.glass }]" :style="paintOf(layer.part.id)">
+            <path v-if="layer.part.fill" class="td-fill" :d="layer.part.fill" />
             <template v-for="(overlay, i) in layer.part.overlays" :key="i">
-              <path
-                v-for="(d, j) in overlay.paths"
-                :key="j"
-                :class="overlay.kind === 'arcs' ? ['td-arc', `td-arc-${j % 4}`] : j ? 'td-hole' : 'td-label'"
-                :d="d"
-              />
+              <!-- A record's face: the sign-in page's record art (utils/vinylStage), laid onto it. -->
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <g v-if="overlay.kind === 'vinyl'" :transform="`matrix(${overlay.matrix.join(' ')})`" v-html="recordArt" />
+              <template v-else>
+                <path
+                  v-for="(d, j) in overlay.paths"
+                  :key="j"
+                  :class="overlay.kind === 'arcs' ? ['td-arc', `td-arc-${j % 4}`] : j ? 'td-hole' : 'td-label'"
+                  :d="d"
+                />
+              </template>
             </template>
             <g :id="`${uid}-${layer.part.id}-lines`">
               <path v-for="(d, role) in layer.part.lines" :key="role" :class="['td-line', `td-${role}`]" :d="d" />
             </g>
           </g>
-          <g v-else :class="`td-${layer.skirt.of}`">
+          <g v-else :style="paintOf(layer.skirt.of)">
             <clipPath :id="`${uid}-${layer.skirt.of}-front`">
               <path :d="layer.skirt.fill" />
             </clipPath>
-            <path class="td-fill" :d="layer.skirt.fill" :style="{ fill: toneOf(layer.skirt.of) }" />
+            <path class="td-fill" :d="layer.skirt.fill" />
             <use :href="`#${uid}-${layer.skirt.of}-lines`" :clip-path="`url(#${uid}-${layer.skirt.of}-front)`" />
           </g>
         </svg>
@@ -54,22 +59,27 @@
           :style="{ opacity: assembledOpacity }"
           aria-hidden="true"
         >
-          <path v-for="(f, i) in data.assembled.fills" :key="i" class="td-fill" :d="f.d" :style="{ fill: toneOf(f.part) }" />
-          <g v-for="item in data.assembled.lines" :key="item.part" :class="[`td-${item.part}`, { 'td-glass': parts.get(item.part)?.glass }]">
+          <g v-for="item in data.assembled" :key="item.part" :class="{ 'td-glass': parts.get(item.part)?.glass }" :style="paintOf(item.part)">
+            <path v-if="item.fill" class="td-fill" :d="item.fill" />
             <path v-for="(d, role) in item.lines" :key="role" :class="['td-line', `td-${role}`]" :d="d" />
           </g>
         </svg>
 
-        <svg :class="['td-sheet', 'td-leaders', { 'is-on': labelsOn }]" :viewBox="viewBox.join(' ')" aria-hidden="true">
-          <g v-for="label in placed" :key="label.anchor">
+        <svg :class="['td-sheet', 'td-leaders', `td-${marks}`, { 'is-on': labelsOn }]" :viewBox="viewBox.join(' ')" aria-hidden="true">
+          <g v-for="(label, i) in placed" :key="label.anchor">
             <line :x1="label.from[0]" :y1="label.from[1]" :x2="label.at[0]" :y2="label.at[1]" />
-            <circle :cx="label.from[0]" :cy="label.from[1]" r="1.4" />
+            <circle :cx="label.from[0]" :cy="label.from[1]" :r="marks === 'balloons' ? 2.2 * unit : 1.4" />
+            <!-- A drawing's item balloon: the part's number in the parts list. -->
+            <template v-if="marks === 'balloons'">
+              <circle :class="['td-balloon', { 'is-hot': label.hot }]" :cx="label.at[0]" :cy="label.at[1]" :r="11 * unit" />
+              <text :x="label.at[0]" :y="label.at[1]" :font-size="11.5 * unit" dy="0.35em">{{ label.n ?? i + 1 }}</text>
+            </template>
           </g>
         </svg>
       </div>
 
       <span
-        v-for="(label, i) in placed"
+        v-for="(label, i) in stickers"
         :key="label.anchor"
         :class="['td-sticker', 'td-placed', `td-tone-${label.tone}`, `td-${label.align}`, { 'is-on': labelsOn }]"
         :style="{ left: `${label.left}%`, top: `${label.top}%`, '--td-turn': `${TURNS[i % TURNS.length]}deg`, transitionDelay: labelsOn ? `${i * 70}ms` : '0ms' }"
@@ -79,9 +89,9 @@
     </div>
 
     <!-- Phones: the same stickers in a row under the drawing, which is too small to label in place. -->
-    <ul v-if="placed.length" class="td-legend" aria-hidden="true">
+    <ul v-if="stickers.length" class="td-legend" aria-hidden="true">
       <li
-        v-for="(label, i) in placed"
+        v-for="(label, i) in stickers"
         :key="label.anchor"
         :class="['td-sticker', `td-tone-${label.tone}`, { 'is-on': labelsOn }]"
         :style="{ '--td-turn': `${(TURNS[i % TURNS.length] ?? 0) / 2}deg`, transitionDelay: labelsOn ? `${i * 50}ms` : '0ms' }"
@@ -94,6 +104,7 @@
 
 <script setup lang="ts">
 import type { TeardownData, TeardownLabel, TeardownLayer, TeardownTone } from '~/utils/teardown'
+import { vinylSvg } from '~/utils/vinylStage'
 
 /**
  * One of the home page's exploded drawings (utils/teardown.ts). It loads in the browser and, while on screen, plays
@@ -106,9 +117,14 @@ const props = withDefaults(defineProps<{
   viewBox: [number, number, number, number]
   tones: Record<string, TeardownTone>
   labels?: TeardownLabel[]
+  /**
+   * How the labels show: the English part names on stickers, or numbered balloons, as on an assembly drawing whose
+   * parts list sits beside it (the error page).
+   */
+  marks?: 'stickers' | 'balloons'
   /** The accessible name of the picture. */
   title: string
-}>(), { labels: () => [] })
+}>(), { labels: () => [], marks: 'stickers' })
 
 defineSlots<{
   /**
@@ -144,7 +160,15 @@ const layers = computed(() => (data.value ? layersAt(data.value, progress.value)
 const parts = computed(() => new Map((data.value?.parts ?? []).map(p => [p.id, p])))
 const assembledOpacity = computed(() => (data.value?.assembled ? 1 - Math.min(1, t.value / 0.05) : 0))
 
-const toneOf = (id: string) => `var(--td-${props.tones[id] ?? 'white'})`
+/** The black record's art, built the first time a drawing has a record. Sized for the box its matrix maps from. */
+const recordArt = computed(() => vinylSvg('black', { id: `${uid}-vinyl`, title: '', tracks: [], sheen: true })
+  .replace('<svg viewBox=', '<svg width="1000" height="1000" viewBox='))
+
+/** A part's fill and its line colour, a deeper shade of the same pastel. */
+const paintOf = (id: string) => {
+  const tone = props.tones[id] ?? 'white'
+  return { '--td-fill': `var(--td-${tone})`, '--td-line': `var(--td-${tone}-ink)` }
+}
 const offsetOf = (id: string): [number, number] => {
   const part = parts.value.get(id)
   return part ? moved([0, 0], part.shift, progress.value.get(id) ?? 0) : [0, 0]
@@ -194,6 +218,7 @@ const placed = computed(() => {
     }]
   })
 })
+const stickers = computed(() => (props.marks === 'stickers' ? placed.value : []))
 
 // The loop's clock starts just before its end, so a device first rests assembled for a moment, then comes apart.
 let clock = LOOP - 500
@@ -266,29 +291,42 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Fixed colours: the pastel parts and navy ink look the same in both themes (the user's 夜色贴纸 for dark); only what
-   is drawn straight on the page (see-through parts, trails, leaders) turns light in dark. */
+/* Fixed colours: the pastel parts and their lines look the same in both themes (the user's 夜色贴纸 for dark); only
+   what is drawn straight on the page (see-through parts, trails, leaders) turns light in dark. A part's lines are a
+   deeper shade of its own pastel (--td-<tone>-ink); the stickers keep the navy ink. */
 .teardown {
   --td-ink: #1d2444;
-  --td-glass: #1d2444;
-  --td-trail: #1d2444;
+  --td-glass: #66718e;
+  --td-glass-fill: #f4f8ff;
+  --td-glass-opacity: 0.62;
+  --td-trail: #8d96b0;
   --td-leader: #1d2444;
-  --td-record-ink: #c9cfe6;
   --td-pink: #f7c3d0;
+  --td-pink-ink: #a8456a;
   --td-butter: #fde7a4;
+  --td-butter-ink: #94661a;
   --td-mint: #bfe7d2;
+  --td-mint-ink: #2c7553;
   --td-sky: #bcd8f6;
+  --td-sky-ink: #2b64a0;
   --td-lilac: #d8cff6;
+  --td-lilac-ink: #5e4aa8;
   --td-coral: #ffb7a5;
+  --td-coral-ink: #ad4a34;
   --td-silver: #e8ecf2;
+  --td-silver-ink: #556079;
   --td-white: #ffffff;
+  --td-white-ink: #556079;
   --td-night: #2a3150;
+  --td-night-ink: #c9cfe6;
   margin: 0;
   width: 100%;
 }
 
 [data-theme="dark"] .teardown {
   --td-glass: #e8ebf7;
+  --td-glass-fill: #e8ebf7;
+  --td-glass-opacity: 0.1;
   --td-trail: #8c94b6;
   --td-leader: #c9cfe6;
 }
@@ -316,18 +354,25 @@ onBeforeUnmount(() => {
 
 .is-live .td-layer { will-change: transform; }
 
+.td-fill { fill: var(--td-fill); }
+
+.td-glass .td-fill {
+  fill: var(--td-glass-fill);
+  fill-opacity: var(--td-glass-opacity);
+}
+
 .td-line {
   fill: none;
-  stroke: var(--td-ink);
+  stroke: var(--td-line, var(--td-ink));
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 /* Widths in CSS pixels: --td-unit is drawing units per pixel at the figure's current size. */
-.td-outline { stroke-width: calc(1.6 * var(--td-unit)); }
-.td-edge { stroke-width: calc(1 * var(--td-unit)); }
-.td-detail { stroke-width: calc(0.75 * var(--td-unit)); }
-.td-texture { stroke-width: calc(0.55 * var(--td-unit)); }
+.td-outline { stroke-width: calc(1.45 * var(--td-unit)); }
+.td-edge { stroke-width: calc(0.9 * var(--td-unit)); }
+.td-detail { stroke-width: calc(0.68 * var(--td-unit)); }
+.td-texture { stroke-width: calc(0.5 * var(--td-unit)); }
 .td-axis {
   stroke-width: calc(0.7 * var(--td-unit));
   stroke-dasharray: calc(9 * var(--td-unit)) calc(2.5 * var(--td-unit)) calc(2 * var(--td-unit)) calc(2.5 * var(--td-unit));
@@ -335,15 +380,14 @@ onBeforeUnmount(() => {
 }
 .td-trail { stroke: var(--td-trail); }
 .td-glass .td-line { stroke: var(--td-glass); }
-.td-record .td-line { stroke: var(--td-record-ink); }
 
 .td-arc { fill: none; stroke-width: 1.1; stroke-linecap: round; }
 .td-arc-0 { stroke: #f4a9bc; }
 .td-arc-1 { stroke: #f6d27a; }
 .td-arc-2 { stroke: #9ad7b8; }
 .td-arc-3 { stroke: #9cc3ef; }
-.td-label { fill: var(--td-pink); stroke: var(--td-ink); stroke-width: 0.45; }
-.td-hole { fill: var(--td-white); stroke: var(--td-ink); stroke-width: 0.3; }
+.td-label { fill: var(--td-pink); stroke: var(--td-pink-ink); stroke-width: 0.45; }
+.td-hole { fill: var(--td-white); stroke: var(--td-pink-ink); stroke-width: 0.3; }
 
 .td-leaders line {
   stroke: var(--td-leader);
@@ -356,6 +400,18 @@ onBeforeUnmount(() => {
   fill: #ffffff;
   stroke: var(--td-ink);
   stroke-width: var(--td-unit);
+}
+
+.td-balloons line { stroke-width: calc(0.8 * var(--td-unit)); stroke-dasharray: none; }
+.td-balloons circle { fill: var(--td-leader); stroke: none; }
+.td-balloons .td-balloon { fill: #ffffff; stroke: var(--td-ink); stroke-width: var(--td-unit); }
+.td-balloons .td-balloon.is-hot { fill: var(--td-coral); }
+
+.td-balloons text {
+  fill: var(--td-ink);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-anchor: middle;
 }
 
 .td-leaders { opacity: 0; transition: opacity 0.3s ease-out; }
@@ -418,12 +474,12 @@ onBeforeUnmount(() => {
 
 @media (max-width: 639px) {
   .td-placed,
-  .td-leaders { display: none; }
+  .td-leaders.td-stickers { display: none; }
   .td-legend { display: flex; }
-  .td-outline { stroke-width: calc(1.25 * var(--td-unit)); }
-  .td-edge { stroke-width: calc(0.8 * var(--td-unit)); }
-  .td-detail { stroke-width: calc(0.6 * var(--td-unit)); }
-  .td-texture { stroke-width: calc(0.45 * var(--td-unit)); }
+  .td-outline { stroke-width: calc(1.15 * var(--td-unit)); }
+  .td-edge { stroke-width: calc(0.75 * var(--td-unit)); }
+  .td-detail { stroke-width: calc(0.55 * var(--td-unit)); }
+  .td-texture { stroke-width: calc(0.42 * var(--td-unit)); }
 }
 
 @keyframes td-appear {

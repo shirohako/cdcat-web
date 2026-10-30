@@ -14,7 +14,7 @@ const { t, locale } = useI18n()
 const { localizeError } = useLocalizedApiError()
 const { formatDate, localizedContent } = useLocaleFormatting()
 
-const { data: event, status, error, revealClass } = await usePageAPI<EventDetail>(`/v1/events/${eventId}`)
+const { data: event, status, error, revealClass } = await usePageAPI<EventDetail>(`/v1/events/${eventId}`, { notFound: true })
 
 // The map and the circle list are large and only useful in the browser: load them there.
 const { data: map, status: mapStatus } = usePageAPI<VenueMapData>(`/v1/events/${eventId}/map`, { server: false })
@@ -392,7 +392,7 @@ usePageSeo({
 
     <div v-else-if="status === 'error'" class="flex min-h-[60vh] items-center justify-center px-4">
       <div class="alert alert-error max-w-md">
-        <span>{{ error?.statusCode === 404 ? t('event_page.not_found') : localizeError(error) }}</span>
+        <span>{{ localizeError(error) }}</span>
       </div>
     </div>
 

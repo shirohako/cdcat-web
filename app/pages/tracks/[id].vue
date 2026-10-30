@@ -29,7 +29,7 @@
     </div>
 
     <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center">
-      <div class="alert alert-error max-w-md"><span>{{ $t('tracks.not_found') }}</span></div>
+      <div class="alert alert-error max-w-md"><span>{{ $t('common.load_failed') }}</span></div>
     </div>
 
     <!-- Also while moving on to the track this one was mapped to. -->
@@ -48,7 +48,7 @@ const { localName, formatDuration } = useCatalogDisplay()
 const { withOriginal, sentence, list } = useSeoText()
 const absolute = useSiteUrl()
 
-const { data: track, status, error, mutate, revealClass } = await usePageAPI<TrackDetail>(`/v1/tracks/${route.params.id}`)
+const { data: track, status, error, mutate, revealClass } = await usePageAPI<TrackDetail>(`/v1/tracks/${route.params.id}`, { notFound: true })
 
 // Tracks of a merged album answer with the track they were mapped to: a 301 on the server (and with
 // cached data), a replace once the data arrives after client-side navigation.

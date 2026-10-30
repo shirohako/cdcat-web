@@ -1,4 +1,5 @@
-// Renders the home page's device drawings (models/*.cjs) into the layered data TeardownFigure animates.
+// Renders the device drawings of the home page and the error page (models/*.cjs) into the layered data TeardownFigure
+// animates.
 // Every part is drawn on its own in its assembled place, hidden lines removed within the part, together with the
 // paper offset it travels when the device comes apart, and the extent of its own layer. Parts are listed in painting order. A container's front walls
 // ("skirts") are drawn again over the parts still inside it, and the exact assembled drawing covers the first moments.
@@ -10,7 +11,7 @@ const G = require('./vendor/geometry.cjs');
 const P = require('./vendor/projection.cjs');
 
 const OUT = path.resolve(__dirname, '../../public/landing/teardown');
-const DEVICES = ['discman', 'jewelcase', 'headphones', 'turntable'];
+const DEVICES = ['discman', 'jewelcase', 'headphones', 'turntable', 'piano', 'musicbox'];
 const ARCS = [[29, -95, -35], [34, -100, -30], [39, -105, -25], [44, -110, -20], [29, 85, 145], [34, 80, 150], [39, 75, 155], [44, 70, 160]];
 
 const num = n => {
@@ -98,14 +99,21 @@ function build(name) {
     return round([q[0] * frame.scale, q[1] * frame.scale]);
   };
 
-  // Painting order: who covers whom once the device is apart, nearer parts last.
-  const exploded = parse(P.render(parts, {explosion: 1, camera, fill: true, frame}).markup);
+  // Clear parts are drawn with a frosted fill (TeardownFigure), so they hide their own back edges and take their place
+  // in the painting order like any other part.
+  const solid = parts.map(p => (p.transparent ? {...p, transparent: false} : p));
+
+  // Painting order: who covers whom once the device is apart and while it is together, nearer parts last.
+  const exploded = parse(P.render(solid, {explosion: 1, camera, fill: true, frame}).markup);
+  const together = solid.some((p, i) => p !== parts[i]) ? parse(P.render(solid, {explosion: 0, camera, fill: true, frame}).markup) : parse(base.markup);
   const depth = part => {
     const b = boxOf(part), c = [0, 1, 2].map(i => (b[i] + b[i + 3]) / 2 + part.explosion[i]);
     return G.dot(c, cam.direction);
   };
   const before = new Map(parts.map(p => [p.id, new Set()]));
-  for (const f of exploded.fills) for (const behind of f.covers) if (behind !== f.part) before.get(f.part).add(behind);
+  for (const {fills} of [exploded, together]) {
+    for (const f of fills) for (const behind of f.covers) if (behind !== f.part) before.get(f.part).add(behind);
+  }
   const order = [], placed = new Set();
   const pending = [...parts].sort((a, b) => depth(a) - depth(b));
   while (pending.length) {
@@ -115,8 +123,12 @@ function build(name) {
     placed.add(next.id);
   }
 
-  const sequence = model.sequence ?? [];
-  const delayOf = id => (sequence.includes(id) ? sequence.indexOf(id) / Math.max(1, sequence.length - 1) : 0);
+  // The order parts start moving in; parts listed together, such as a lid and its buttons, move as one.
+  const sequence = (model.sequence ?? []).map(step => [step].flat());
+  const delayOf = id => {
+    const i = sequence.findIndex(step => step.includes(id));
+    return i < 0 ? 0 : i / Math.max(1, sequence.length - 1);
+  };
 
   const overlaysOf = id => (model.overlays ?? []).filter(o => o.part === id).map(o => {
     const ring = (r, a0, a1, steps) => Array.from({length: steps + 1}, (_, i) => {
@@ -125,11 +137,21 @@ function build(name) {
     });
     const line = pts => 'M' + pts.map(p => p.map(num).join(' ')).join('L');
     if (o.kind === 'arcs') return {kind: 'arcs', paths: ARCS.map(([r, a0, a1]) => line(ring(r, a0, a1, 36)))};
+    if (o.kind === 'vinyl') {
+      // Maps the record art's 1000 x 1000 box (centre 500,500, edge at radius 490) onto the record's face: a circle
+      // seen in parallel projection is an affine image of itself. The box's y runs towards -y, so it isn't mirrored.
+      const k = o.radius / 490, c = paper(o.centre);
+      const ex = paper([o.centre[0] + k, o.centre[1], o.centre[2]]).map((n, i) => n - c[i]);
+      const ey = paper([o.centre[0], o.centre[1] - k, o.centre[2]]).map((n, i) => n - c[i]);
+      const m = [ex[0], ex[1], ey[0], ey[1], c[0] - 500 * (ex[0] + ey[0]), c[1] - 500 * (ex[1] + ey[1])];
+      return {kind: 'vinyl', matrix: m.map(n => +n.toFixed(5))};
+    }
     return {kind: 'label', paths: [line(ring(o.radius, 0, 360, 96)) + 'Z', line(ring(o.hole, 0, 360, 36)) + 'Z']};
   });
 
+  const alone = new Map(order.map(part => [part.id, parse(P.render(solid, {explosion: 0, isolated: part.id, camera, fill: true, frame}).markup)]));
   const layers = order.map(part => {
-    const own = parse(P.render(parts, {explosion: 0, isolated: part.id, camera, fill: true, frame}).markup);
+    const own = alone.get(part.id);
     return {
       id: part.id,
       name: part.name,
@@ -165,11 +187,13 @@ function build(name) {
     bounds: round([frame.bounds.x, frame.bounds.y, frame.bounds.width, frame.bounds.height]),
     parts: layers,
     skirts,
-    // Only where layering cannot show the assembled device, such as an obi wrapped round its case.
-    assembled: model.assembledFrame ? {
-      fills: assembled.fills.map(f => ({part: f.part, d: roundPath(f.d)})),
-      lines: order.map(p => ({part: p.id, lines: roundRoles(assembled.lines.get(p.id) ?? {})}))
-    } : null,
+    // Only where layering cannot show the assembled device, such as an obi wrapped round its case: each part's visible
+    // fill and lines in painting order, a clear part as drawn alone so its frosted fill dims what lies under it.
+    assembled: model.assembledFrame ? order.map((p) => {
+      const from = p.transparent ? alone.get(p.id) : assembled;
+      const fills = from.fills.filter(f => f.part === p.id).map(f => f.d);
+      return {part: p.id, fill: fills.length ? roundPath(fills.join(' ')) : null, lines: roundRoles(from.lines.get(p.id) ?? {})};
+    }) : null,
     trails: trails.map(t => ({a: round(paper(t.a)), b: round(paper(t.b)), from: t.from, to: t.to})),
     anchors
   };

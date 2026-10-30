@@ -123,7 +123,7 @@ const { localizeError } = useLocalizedApiError()
 
 // Fetched fresh and only in the browser; server and browser both start out with the skeleton.
 const { data: revision, status, error, refresh, revealClass } = await usePageData(`revision:${route.params.id}`,
-  ({ signal }) => $api<Revision>(`/v1/revisions/${route.params.id}`, { signal }), { cache: false, server: false })
+  ({ signal }) => $api<Revision>(`/v1/revisions/${route.params.id}`, { signal }), { cache: false, server: false, notFound: true })
 
 const mine = computed(() => !!revision.value && revision.value.submitter?.id === user.value?.id)
 const editor = computed(() => revision.value ? editorPath(revision.value) : null)

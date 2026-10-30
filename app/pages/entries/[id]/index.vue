@@ -9,7 +9,7 @@ const { t, locale } = useI18n()
 const { languageName } = useLocaleFormatting()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
 
-const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`)
+const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`, { notFound: true })
 
 const name = computed(() => displayName(entry.value))
 const subtitle = computed(() => originalName(entry.value))
@@ -253,7 +253,7 @@ const providerLabel = (name?: string) => (name || '').split('_').map(word => wor
     </div>
 
     <div v-else-if="status === 'error'" class="flex min-h-[60vh] items-center justify-center">
-      <UiEmpty :title="$t('catalog.not_found')" :icon="Film" />
+      <UiEmpty :title="$t('common.load_failed')" :icon="Film" />
     </div>
 
     <SkeletonCatalogDetail v-else hero="poster" />

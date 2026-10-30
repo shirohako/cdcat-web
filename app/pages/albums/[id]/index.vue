@@ -77,7 +77,7 @@ const { localName, formatDate, enumLabel } = useCatalogDisplay()
 const { withOriginal, sentence, count } = useSeoText()
 const absolute = useSiteUrl()
 
-const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${route.params.id}`)
+const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${route.params.id}`, { notFound: true })
 
 // A merged album answers with the kept one; show its address instead of the old id. The check after the
 // await covers the server (a 301) and cached data; the watch covers data that arrives after client-side navigation.
