@@ -44,7 +44,7 @@ export const ROLE_SHORTHANDS: Record<string, string[]> = {
   vo: ['vocals'], vox: ['vocals'], 唄: ['vocals'], 歌唱: ['vocals'], cho: ['chorus'],
   gt: ['guitar'], gtr: ['guitar'], ba: ['bass'], dr: ['drums'], ds: ['drums'], key: ['keyboards'], kb: ['keyboards'],
   pf: ['piano'], vn: ['violin'], vln: ['violin'], str: ['strings'], prog: ['programming'],
-  comp: ['composer'], arr: ['arranger'], arrange: ['arranger'], lyric: ['lyricist'], rec: ['recording_engineer'],
+  comp: ['composer'], arr: ['arranger'], arrange: ['arranger'], lyric: ['lyricist'], rec: ['recording'],
   作編曲: ['composer', 'arranger'], 作詞作曲: ['lyricist', 'composer'], 詞曲: ['lyricist', 'composer'],
 }
 

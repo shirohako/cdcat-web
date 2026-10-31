@@ -27,7 +27,7 @@ export const isBylineCredit = (row: AlbumCreditRow) => row.track_id === null && 
 export const ALBUM_ONLY_ROLES: readonly string[] = RELEASE_ROLES.filter(role => role !== 'artist')
 
 /** The roles a line can be started with in one click; the rest are under 更多角色. */
-export const COMMON_ROLES = ['composer', 'lyricist', 'arranger', 'vocals', 'performer', 'illustrator', 'mixing_engineer', 'mastering_engineer']
+export const COMMON_ROLES = ['composer', 'lyricist', 'arranger', 'vocals', 'performer', 'illustrator', 'mixing', 'mastering']
 
 /** The byline block's credits of one role, in order. */
 export const bylineCredits = (doc: AlbumDocument, role: string) => byOrder(doc.credits).filter(row => isBylineCredit(row) && row.role === role)

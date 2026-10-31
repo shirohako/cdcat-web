@@ -9,7 +9,7 @@ const { t } = useI18n()
 
 const role = (key: string) => props.text[key] ?? key
 const ALBUM: Array<{ role: string, people: Array<{ name: string, created?: boolean, printed?: boolean }> }> = [
-  { role: 'mastering_engineer', people: [{ name: 'Hoshi Studio', created: true }] },
+  { role: 'mastering', people: [{ name: 'Hoshi Studio', created: true }] },
   { role: 'illustrator', people: [{ name: 'mochi', printed: true }] },
 ]
 const TRACKS = [

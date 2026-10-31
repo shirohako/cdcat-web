@@ -21,7 +21,7 @@ const LINES: Line[] = [
   { roles: ['composer', 'arranger'], people: [{ name: 'Yuki', untyped: true }], tracks: [4] },
   { roles: ['lyricist'], people: [{ name: 'ミナト' }], tracks: [1, 2] },
   { roles: ['vocals'], people: [{ name: '星野あかり' }], tracks: [1, 2] },
-  { roles: ['mastering_engineer'], people: [{ name: 'Hoshi Studio', created: true }], tracks: [] },
+  { roles: ['mastering'], people: [{ name: 'Hoshi Studio', created: true }], tracks: [] },
   { roles: ['illustrator'], people: [{ name: 'mochi', printed: true }], tracks: [] },
 ]
 const QUICK = ['composer', 'arranger', 'vocals', 'illustrator']

@@ -1166,7 +1166,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
               success: true,
               data: {
                 enums: { album_type: ['album', 'ep', 'single', 'compilation', 'drama', 'radio'], $more: 19 },
-                credit_roles: [{ key: 'composer', category: 'composition', names: { 'en': 'Composer', 'ja': '作曲', 'zh-Hans': '作曲', 'zh-Hant': '作曲' }, aliases: ['Composer', 'Music', '作曲'], is_album_role: true, is_track_role: true }, { $more: 44 }],
+                credit_roles: [{ key: 'composer', category: 'composition', names: { 'en': 'Composer', 'ja': '作曲', 'zh-Hans': '作曲', 'zh-Hant': '作曲' }, aliases: ['Composer', 'Music', '作曲'], is_album_role: true, is_track_role: true }, { $more: 48 }],
                 attribute_definitions: [{ key: 'bpm', names: { 'en': 'BPM', 'ja': 'BPM', 'zh-Hans': 'BPM', 'zh-Hant': 'BPM' }, description: null, group: null, value_type: 'integer', choices: null, reference_types: null, applies_to: ['track'], is_multiple: false }, { $more: 3 }],
                 link_providers: [{ $more: 'LinkProvider' }],
                 aggregates: { $more: true },

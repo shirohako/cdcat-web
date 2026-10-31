@@ -17,7 +17,7 @@ const ROWS = [
   { roles: ['composer', 'arranger'], source: '作曲・編曲', name: 'ミナト', match: 'existing', tracks: 'Disc 1 Track 1–3' },
   { roles: ['composer', 'arranger'], source: '作曲・編曲', name: 'Yuki', match: 'new', tracks: 'Disc 1 Track 4' },
   { roles: ['illustrator'], source: 'Illustration', name: 'mochi', match: 'namesakes', tracks: '' },
-  { roles: ['mastering_engineer'], source: 'Mastering', name: 'Hoshi Studio', match: 'new', tracks: '' },
+  { roles: ['mastering'], source: 'Mastering', name: 'Hoshi Studio', match: 'new', tracks: '' },
 ]
 /** What the 添加 button counts: a credit per role of every settled row. */
 const count = ROWS.filter(row => row.match !== 'namesakes').reduce((sum, row) => sum + row.roles.length, 0)

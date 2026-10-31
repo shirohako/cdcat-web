@@ -2,7 +2,7 @@ import { md } from '~/documents/sections'
 import type { GuideContent } from '../types'
 
 /** The role names the credits figures show; the real ones are in the catalog schema, which the guide doesn't load. */
-const CREDIT_ROLES = { publisher: '发行', artist: '署名艺术家', composer: '作曲', lyricist: '作词', arranger: '编曲', vocals: '演唱', illustrator: '插画', mastering_engineer: '母带' }
+const CREDIT_ROLES = { publisher: '发行', artist: '署名艺术家', composer: '作曲', lyricist: '作词', arranger: '编曲', vocals: '演唱', illustrator: '插画', mastering: '母带' }
 
 const guide: GuideContent = {
   intro: '这份说明以新建一张专辑为例，按编辑器左侧的顺序，讲清楚每一部分、每个选项该怎么填，再讲提交之后会发生什么，以及怎样更正已有的资料。不用一次填完：必填的只有 5 项，其余的知道多少填多少。',
