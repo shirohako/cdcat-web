@@ -169,6 +169,7 @@
 <script setup lang="ts">
 import { ALBUM_CATEGORY_ICONS, ALBUM_TYPE_ICONS, DISC_FORMAT_ICONS, type Album } from '~/types/album'
 import { getStreamingProvider } from '~/utils/streamingProviders'
+import { providerLabel } from '~/utils/linkProviders'
 import { NuxtLink } from '#components'
 import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound } from '@lucide/vue'
 
@@ -243,7 +244,7 @@ const figures = computed(() => {
   ].filter(figure => figure.shown)
 })
 
-const providerName = (name: string) => name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+const providerName = providerLabel
 
 const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.album.is_favorited)

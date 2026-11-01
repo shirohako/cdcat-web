@@ -47,13 +47,14 @@ import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder } from '~/utils/documentRows'
+import { providerLabel } from '~/utils/linkProviders'
 
 /** External links of an album, artist, label, entry or series, added and edited in a dialog. */
 const rows = defineModel<LinkRow[]>({ required: true })
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const providers = computed(() => schema.value?.link_providers ?? [])
-const providerName = (name: string) => name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+const providerName = providerLabel
 const providerOptions = computed<UiSelectOption<number | null>[]>(() => providers.value.map(provider => ({ value: provider.id, label: providerName(provider.name) })))
 const providerOf = (id: number | null) => {
   const provider = providers.value.find(item => item.id === id)

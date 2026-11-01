@@ -7,12 +7,12 @@
       </template>
     </UiSectionTitle>
 
-    <!-- Links grouped by category, each group a small label over a row of grey tags (the category's icon and the
-         site's name; the address in the tooltip, which glides along the tags). Past COLLAPSED_COUNT links only the
-         first ones show until expanded. -->
+    <!-- Links grouped by category, each group a small label over a row of grey tags (the category's icon on a tile in
+         the site's own hue, and the site's name; the address in the tooltip, which glides along the tags). Past
+         COLLAPSED_COUNT links only the first ones show until expanded. -->
     <div v-if="links && links.length > 0" class="space-y-3 px-5 pb-4 pt-1.5">
       <div v-for="(group, category) in shownGroups" :key="category">
-        <p class="text-[11px] font-semibold text-meta">{{ categoryLabel(category) }}</p>
+        <p class="text-[11px] font-semibold text-meta">{{ $t(`catalog.link_category.${categoryKey(category)}`) }}</p>
         <div class="mt-1.5 flex flex-wrap gap-1.5">
           <UiTooltip v-for="link in group" :key="link.id" group="album-links" :text="getDomain(link.url)">
             <a
@@ -21,10 +21,14 @@
               rel="noopener noreferrer"
               class="group inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] pl-1 pr-2.5 text-[12.5px] font-semibold text-title transition-colors duration-150 hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.14]"
             >
-              <span class="flex size-5 shrink-0 items-center justify-center rounded-sm" :class="categoryStyle(category).bg">
-                <component :is="categoryStyle(category).iconComponent" :size="12" :class="categoryStyle(category).icon" />
+              <span
+                class="flex size-5 shrink-0 items-center justify-center rounded-[5px]"
+                :class="tileHue(link) === null ? 'bg-black/[0.06] text-meta dark:bg-white/[0.1]' : 'bg-[oklch(0.94_0.035_var(--hue-link))] text-[oklch(0.56_0.14_var(--hue-link))] dark:bg-[oklch(0.36_0.06_var(--hue-link))] dark:text-[oklch(0.82_0.1_var(--hue-link))]'"
+                :style="tileHue(link) === null ? undefined : { '--hue-link': tileHue(link) }"
+              >
+                <component :is="categoryIcons[categoryKey(category)]" :size="12" />
               </span>
-              <span class="truncate">{{ formatProviderName(link.provider?.name ?? getDomain(link.url)) }}</span>
+              <span class="truncate">{{ providerLabel(link.provider?.name) || getDomain(link.url) }}</span>
               <ExternalLink :size="11" class="shrink-0 text-faint transition-colors duration-150 group-hover:text-title" />
             </a>
           </UiTooltip>
@@ -44,6 +48,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
+import { providerHue, providerLabel } from '~/utils/linkProviders'
 import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, ShoppingBag } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
@@ -88,37 +93,13 @@ const shownGroups = computed(() => {
   return result
 })
 
-const categoryLabel = (category: string) => {
-  const map: Record<string, string> = {
-    official: 'Official',
-    streaming: 'Streaming',
-    shop: 'Shop',
-    social: 'Social',
-    database: 'Database',
-    other: 'Other',
-  };
-  return map[category] ?? category;
-};
+const categoryIcons: Record<string, Component> = {
+  official: House, streaming: Headphones, shop: ShoppingBag, social: AtSign, database: Database, other: Globe,
+}
+const categoryKey = (category: string) => category in categoryIcons ? category : 'other'
 
-const categoryStyle = (category: string) => {
-  const map: Record<string, { bg: string; icon: string; iconComponent: Component }> = {
-    // Each category keeps its own colour, with a partner for the dark theme; "other" uses the theme's neutrals.
-    official:  { bg: 'bg-blue-100 dark:bg-blue-400/20',     icon: 'text-blue-600 dark:text-blue-300',     iconComponent: House },
-    streaming: { bg: 'bg-emerald-100 dark:bg-emerald-400/20', icon: 'text-emerald-600 dark:text-emerald-300', iconComponent: Headphones },
-    shop:      { bg: 'bg-orange-100 dark:bg-orange-400/20', icon: 'text-orange-600 dark:text-orange-300', iconComponent: ShoppingBag },
-    social:    { bg: 'bg-violet-100 dark:bg-violet-400/20', icon: 'text-violet-600 dark:text-violet-300', iconComponent: AtSign },
-    database:  { bg: 'bg-amber-100 dark:bg-amber-400/20',   icon: 'text-amber-600 dark:text-amber-300',   iconComponent: Database },
-    other:     { bg: 'bg-black/[0.06] dark:bg-white/[0.1]', icon: 'text-meta',                            iconComponent: Globe },
-  };
-  return map[category] ?? map['other']!;
-};
-
-const formatProviderName = (name: string) => {
-  return name
-    .split('_')
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-};
+/** The tile's hue: the site's own, so links of one category differ; links without a known site stay grey. */
+const tileHue = (link: CatalogLink) => !link.provider || link.provider.category === 'other' ? null : providerHue(link.provider.name)
 
 const getDomain = (url: string) => {
   try {

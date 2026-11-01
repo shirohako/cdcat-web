@@ -2,6 +2,7 @@
 import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
 import type { FranchiseDetail } from '~/types/entry'
 import { namedLd } from '~/utils/structuredData'
+import { providerLabel } from '~/utils/linkProviders'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
@@ -47,7 +48,6 @@ const tabs = computed(() => [
 ])
 const currentTab = ref('entries')
 
-const providerLabel = (name?: string) => (name || '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 </script>
 
 <template>

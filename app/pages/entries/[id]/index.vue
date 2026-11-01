@@ -2,6 +2,7 @@
 import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } from '@lucide/vue'
 import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
 import { entryLdType, ldDate, namedLd } from '~/utils/structuredData'
+import { providerLabel } from '~/utils/linkProviders'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
@@ -54,7 +55,6 @@ const groupBy = <T extends { relation_type: string }>(items: T[], order: readonl
 const albumGroups = computed(() => groupBy<EntryAlbum>(entry.value?.albums || [], ENTRY_ALBUM_RELATIONS))
 const relationGroups = computed(() => groupBy<RelatedEntry>(entry.value?.related_entries || [], ENTRY_RELATIONS))
 
-const providerLabel = (name?: string) => (name || '').split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 </script>
 
 <template>

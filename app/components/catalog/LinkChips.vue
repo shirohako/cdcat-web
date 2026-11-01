@@ -20,6 +20,7 @@
 <script setup lang="ts">
 import type { CatalogLink } from '~/types/catalog'
 import { ExternalLink, Globe } from '@lucide/vue'
+import { providerLabel } from '~/utils/linkProviders'
 
 /** External links as one compact row, for page headers. The full grouped list is AlbumLinks. */
 const props = defineProps<{ links: CatalogLink[] }>()
@@ -32,7 +33,7 @@ const rank = (link: CatalogLink) => {
 const sorted = computed(() => [...props.links].sort((a, b) => rank(a) - rank(b)))
 
 const label = (link: CatalogLink) => {
-  if (link.provider?.name) return link.provider.name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+  if (link.provider?.name) return providerLabel(link.provider.name)
   try {
     return new URL(link.url).hostname.replace(/^www\./, '')
   } catch {
