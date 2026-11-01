@@ -25,7 +25,7 @@ interface EditorHandle {
 const { $api } = useNuxtApp()
 const harvestCircleByLabels: Record<string, string> = {
   identity: '审核时记住的对应', handle: 'X 账号', url: '链接', name: '社团名', artist: '署名的人是参展社团',
-  circle: '参展社团（同名）', contains: '参展社团（名字包含）', manual: '手动指定',
+  circle: '参展社团（同名）', contains: '参展社团（名字包含）', booth_handle: '参展社团（X 账号）', manual: '手动指定',
 }
 const harvestViaLabels: Record<string, string> = { fixed: '任务固定在这届', name: '活动名对上', date: '发售日期在活动内' }
 const harvestError = useHarvestError()

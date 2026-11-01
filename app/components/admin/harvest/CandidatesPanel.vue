@@ -6,7 +6,7 @@ import { HARVEST_FILTER_KEYS, harvestFilters, type HarvestFilterKey } from '~/ut
 const props = defineProps<{ sources: HarvestOverview['sources'] }>()
 const { $api } = useNuxtApp()
 const harvestCandidateAdultLabels: Record<string, string> = { label: '成人', '1': '只看成人', '0': '不含成人' }
-const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', matched: '已关联社团', unmatched: '未关联社团' }
+const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', matched: '已关联社团', unmatched: '未关联社团', booth: '对上摊位', no_booth: '没对上摊位' }
 const harvestCandidateCompleteLabels: Record<string, string> = { label: '完整度', complete: '资料齐全', incomplete: '资料不全', no_cover: '缺封面', no_tracks: '缺曲目' }
 const harvestCandidateDuplicatesLabels: Record<string, string> = { label: '站内重复', strong: '站内已有（强匹配）', any: '可能重复', none: '站内没有' }
 const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间' }
@@ -103,6 +103,8 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
             <option value="">所有来源</option>
             <option v-for="item in sources" :key="item.source" :value="item.source">{{ item.label }}</option>
           </select>
+          <!-- Set from the coverage page: one booth's candidates. -->
+          <UiButton v-if="filters.booth_id" size="xs" icon-right="lucide:x" @click="setFilter('booth_id', '')">只看一个摊位的候选</UiButton>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <span class="w-8 shrink-0 text-xs text-slate-500">条件</span>
@@ -117,7 +119,7 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
             <option v-for="value in ['', 'strong', 'any', 'none']" :key="value" :value="value">{{ harvestCandidateDuplicatesLabels[value || 'label'] }}</option>
           </select>
           <select v-model="circle" aria-label="社团" :class="select">
-            <option v-for="value in ['', 'matched', 'unmatched']" :key="value" :value="value">{{ harvestCandidateCircleLabels[value || 'label'] }}</option>
+            <option v-for="value in ['', 'matched', 'unmatched', 'booth', 'no_booth']" :key="value" :value="value">{{ harvestCandidateCircleLabels[value || 'label'] }}</option>
           </select>
           <select v-model="adult" aria-label="成人" :class="select">
             <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>

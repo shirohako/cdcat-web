@@ -39,7 +39,7 @@ const roleKey = ref('')
 
 const start = (identity: HarvestIdentity, mode: 'link' | 'create' | 'role') => {
   open.value = { id: identity.id, mode }
-  createForm.name = identity.label
+  createForm.name = identity.suggested_name || identity.label
   createForm.type = identity.type_hint && (artistTypes as readonly string[]).includes(identity.type_hint) ? identity.type_hint : identity.kind === 'credit_name' ? 'person' : 'circle'
   roleKey.value = identity.credit_role ?? ''
   message.value = ''

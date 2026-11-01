@@ -140,6 +140,21 @@ export interface HarvestCoverageBooth {
   links: Array<{ type: string, url: string }>
   embeds: Array<{ type: string, id: string }>
   candidates: number
+  /** The name reads like several circles (a shared booth) */
+  shared: boolean
+}
+
+/** How an event's booths and its candidates met (GET /admin/harvest/coverage). */
+export interface HarvestCoverageSummary {
+  booths: number
+  /** Booths with candidates */
+  covered: number
+  covered_with_artist: number
+  /** Booths with candidates and no artist whose name reads like several circles */
+  covered_shared: number
+  /** Pending candidates linked to the event */
+  candidates: number
+  candidates_with_booth: number
 }
 
 export type HarvestIdentityKind = 'circle_name' | 'credit_name' | 'shop_account' | 'db_artist' | 'role'
@@ -149,6 +164,8 @@ export interface HarvestIdentity {
   kind: HarvestIdentityKind
   key: string
   label: string
+  /** The name a new artist starts with: shop names without their shop words. */
+  suggested_name: string
   status: 'auto' | 'linked' | 'created' | 'ignored' | 'unresolved'
   type_hint: string | null
   credit_role: string | null
