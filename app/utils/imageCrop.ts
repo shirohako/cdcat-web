@@ -1,6 +1,9 @@
-/** Whether an image counts as square: width and height differ by at most `tolerance` (1 %). */
-export const isSquare = (width: number, height: number, tolerance = 0.01) =>
+/** Whether an image counts as square: width and height differ by at most `tolerance` (2 %, as config/catalog.php). */
+export const isSquare = (width: number, height: number, tolerance = 0.02) =>
   width > 0 && height > 0 && Math.abs(width - height) / Math.max(width, height) <= tolerance
+
+/** Covers this close to square are cropped to the centred square without asking; further off, the crop dialog opens. */
+export const autoCropTolerance = 0.05
 
 /** The largest centred square inside the image, optionally moved by an offset (-1 … 1 of the free space). */
 export const squareCrop = (width: number, height: number, offset = 0) => {

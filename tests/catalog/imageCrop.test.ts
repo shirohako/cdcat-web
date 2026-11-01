@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { isSquare, outputSize, squareCrop } from '../../app/utils/imageCrop'
+import { autoCropTolerance, isSquare, outputSize, squareCrop } from '../../app/utils/imageCrop'
 
 describe('image crop', () => {
-  it('accepts images within one percent of square', () => {
+  it('accepts images within two percent of square', () => {
     expect(isSquare(1000, 1000)).toBe(true)
-    expect(isSquare(1500, 1488)).toBe(true)
-    expect(isSquare(1668, 1647)).toBe(false)
+    expect(isSquare(1500, 1523)).toBe(true)
+    expect(isSquare(1500, 1540)).toBe(false)
+    expect(isSquare(1500, 1540, autoCropTolerance)).toBe(true)
     expect(isSquare(0, 0)).toBe(false)
   })
 

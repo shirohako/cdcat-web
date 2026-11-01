@@ -2691,6 +2691,7 @@
       "too_small": "The image must be at least {size} px on its short side.",
       "not_square": "The cover must be square.",
       "url_not_square": "This image is not square. Download it and upload the file to crop it.",
+      "auto_cropped": "Cropped to the centred square ({from} → {to}).",
       "too_large": "The file is larger than 25 MB.",
       "unreadable": "This file could not be read as an image.",
       "gallery": "Gallery",

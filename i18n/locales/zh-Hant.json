@@ -2691,6 +2691,7 @@
       "too_small": "圖片短邊至少要 {size} 像素。",
       "not_square": "封面必須是正方形。",
       "url_not_square": "這張圖不是正方形。請下載後上傳檔案，再進行裁切。",
+      "auto_cropped": "已從中間裁成正方形（{from} → {to}）。",
       "too_large": "檔案超過 25 MB。",
       "unreadable": "無法把這個檔案讀作圖片。",
       "gallery": "圖庫",

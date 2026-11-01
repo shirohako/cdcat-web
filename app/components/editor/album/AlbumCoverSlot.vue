@@ -21,6 +21,7 @@
       <UiButton :icon="Link2" :label="$t('editor.image.from_url')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="openUrl" />
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
+    <p v-else-if="note" class="text-xs text-meta">{{ note }}</p>
     <p class="text-[11px] leading-snug text-meta">{{ $t('editor.image.cover_rules', { size: limits.coverMinSize }) }} {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</p>
     <EditorImageImportDialog v-model="showUrl" :busy="busy" :error="message" :description="$t('editor.image.cover_rules', { size: limits.coverMinSize })" @import="fromUrl" />
     <EditorImageCropDialog :file="cropFile" @cropped="uploadCropped" @cancel="cropFile = null" />
@@ -31,6 +32,7 @@
 import type { CatalogImage } from '~/types/catalog'
 import { ClipboardPaste, ImagePlus, Link2, Upload } from '@lucide/vue'
 import { coverOf, setCover } from '~/utils/albumDocument'
+import { autoCropTolerance, cropToSquare, isSquare } from '~/utils/imageCrop'
 
 /** The album's cover: upload, paste from the clipboard (the button, or Ctrl+V / ⌘V on the page), crop to a square, or import from a link. */
 const editor = useAlbumEditor()
@@ -44,6 +46,7 @@ const error = computed(() => editor.errorAt('images'))
 
 const busy = ref(false)
 const message = ref('')
+const note = ref('')
 const showUrl = ref(false)
 const cropFile = ref<File | null>(null)
 
@@ -71,26 +74,41 @@ const pick = (event: Event) => {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  message.value = ''
   if (file) void take(file)
 }
 
-/** A chosen or pasted file: too large or too small is refused, a square one is uploaded, any other shape goes to the crop dialog. */
+/**
+ * A chosen or pasted file: too large or too small is refused, a square one is uploaded, a nearly square one is cropped
+ * to the centred square and uploaded, any other shape goes to the crop dialog.
+ */
 const take = async (file: File) => {
   message.value = ''
+  note.value = ''
   if (file.size > limits.value.maxBytes) {
     message.value = t('editor.image.too_large')
     return
   }
+  let image: HTMLImageElement
   try {
-    const image = await loadImageFile(file)
-    URL.revokeObjectURL(image.src)
+    image = await loadImageFile(file)
+  } catch {
+    message.value = t('editor.image.unreadable')
+    return
+  }
+  try {
     const problem = coverProblem(image.naturalWidth, image.naturalHeight)
-    if (problem === 'not_square') cropFile.value = file
+    if (problem === 'not_square' && isSquare(image.naturalWidth, image.naturalHeight, autoCropTolerance)) {
+      const size = Math.min(image.naturalWidth, image.naturalHeight)
+      await uploadCropped(await cropToSquare(image))
+      // The upload's own error, if any, shows instead.
+      if (!message.value) note.value = t('editor.image.auto_cropped', { from: `${image.naturalWidth}×${image.naturalHeight}`, to: `${size}×${size}` })
+    } else if (problem === 'not_square') cropFile.value = file
     else if (problem) message.value = problemText(problem)
     else await send(file, file.name)
   } catch {
     message.value = t('editor.image.unreadable')
+  } finally {
+    URL.revokeObjectURL(image.src)
   }
 }
 
@@ -134,6 +152,7 @@ const uploadCropped = async (blob: Blob) => {
 
 const openUrl = () => {
   message.value = ''
+  note.value = ''
   showUrl.value = true
 }
 

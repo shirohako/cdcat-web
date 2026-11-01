@@ -7,6 +7,7 @@ import type { Revision } from '~/types/revision'
 import { buildHarvestDraft } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
 import { peopleWarnings } from '~/utils/harvestPeople'
+import { isSquare } from '~/utils/imageCrop'
 import { errorName } from '~/utils/revisionErrors'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import { draftKey, localDrafts } from '~/utils/localDrafts'
@@ -204,7 +205,7 @@ const useCover = async (url: string) => {
   }
 }
 const sizeNote = (preview: { width: number, height: number }) => [
-  Math.abs(preview.width - preview.height) > Math.max(preview.width, preview.height) * 0.01 ? '不是正方形' : null,
+  !isSquare(preview.width, preview.height) ? '不是正方形' : null,
   Math.min(preview.width, preview.height) < 500 ? '小于 500px' : null,
 ].filter(Boolean).join('，')
 

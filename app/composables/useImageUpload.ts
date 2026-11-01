@@ -20,7 +20,7 @@ export const useImageUpload = () => {
 
   const limits = computed(() => ({
     coverMinSize: schema.value?.limits?.cover_min_size ?? 500,
-    tolerance: schema.value?.limits?.cover_square_tolerance ?? 0.01,
+    tolerance: schema.value?.limits?.cover_square_tolerance ?? 0.02,
     maxBytes: schema.value?.limits?.image_max_bytes ?? 25 * 1024 * 1024,
   }))
 
