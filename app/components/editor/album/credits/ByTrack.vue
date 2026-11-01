@@ -2,13 +2,14 @@
 import type { RowId } from '~/types/document'
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
-import { addCredit, orderedTracks, patchCredits, removeCredits } from '~/utils/albumDocument'
+import { addCredit, orderedTracks, patchCredits, removeCredits, setCreditParent } from '~/utils/albumDocument'
 import { copyTrackCredits, creditsOn, sameTrackCredits } from '~/utils/creditLines'
 
 /**
  * 按曲目: the whole album's credits (outside the byline block) first, then a card per track with its credits by
  * role, the way a booklet that lists each track's staff reads. A track can take over the one before's credits in a
- * click. Rows being started (the role picked first) are kept here, per track, until their first person.
+ * click. Rows being started (the role picked first) are kept here, per track, until their first person. On a track,
+ * each person also picks the credit it belongs to (a 客串's 艺术家, utils/artistLine).
  */
 const { t } = useI18n()
 const editor = useAlbumEditor()
@@ -19,6 +20,8 @@ const album = computed(() => editor.album.value)
 const tracks = computed(() => orderedTracks(album.value))
 const albumCredits = computed(() => creditsOn(album.value, null, roleOrder))
 const trackCredits = (id: RowId) => creditsOn(album.value, id, roleOrder)
+const trackRows = (id: RowId) => album.value.credits.filter(row => String(row.track_id) === String(id))
+const setParent = (row: AlbumCreditRow, parent: AlbumCreditRow | null) => setCreditParent(album.value, row, parent)
 
 /** Rows being started, by track ('album' for the whole album). */
 const started = reactive<Record<string, string[] | undefined>>({})
@@ -83,9 +86,11 @@ const copyPrevious = async (index: number) => {
           :key="item.role"
           :role="item.role"
           :rows="item.rows"
+          :track-rows="trackRows(track.id)"
           @add="add(track.id, item.role, $event)"
           @update="update"
           @remove="remove"
+          @parent="setParent"
         />
         <EditorAlbumCreditsRoleRow
           v-if="started[keyOf(track.id)]"

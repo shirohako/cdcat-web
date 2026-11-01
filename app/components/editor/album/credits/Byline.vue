@@ -8,7 +8,7 @@ import { bylineCredits } from '~/utils/creditLines'
 /**
  * 署名与发行, above both views: who the album is by and who puts it out, then (behind 更多, open when used) label,
  * distributor, manufacturer and planning. Under them, the line album lists will show (App\Support\AlbumByline): the
- * publishers, else the 署名艺术家, several of them reading Various Artists on cards.
+ * publishers, else the 艺术家, several of them reading Various Artists on cards.
  */
 const { t } = useI18n()
 const { aside } = useListPunctuation()

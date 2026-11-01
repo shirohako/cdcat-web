@@ -3,6 +3,8 @@
 //
 //   作曲・編曲：ミナト（M1–M3）、Yuki（M4）     roles before the colon, names after it, tracks in brackets
 //   Vocal：ルナ（CV：星野あかり）              brackets that are no track list become the detail
+//   Vocal：Gardens feat. moon jelly（M2）      who comes after feat. / ft. (or in "(feat. …)") is a 客串
+//   Artist：しゅーりん × MoAE:.（M10）         two people; × & vs. only part names
 //   01. 星屑のアトラス                         a track's own block: the lines under it, up to a blank line, are that track's
 //   Disc 2                                     numbers after it are on disc 2
 //
@@ -20,6 +22,12 @@ export interface ParsedCreditName {
   detail: string | null
   /** The tracks given, 'all' for 全曲, or null for none: then the whole album, or the track whose block it is in. */
   tracks: TrackRef[] | 'all' | null
+  /** Written after "feat." / "ft.": a 客串, credited as such rather than in the line's roles. */
+  featuring?: boolean
+  /** On a 客串: the index in the line's names of who it belongs to, the name right before the feat. */
+  host?: number
+  /** On the first of several people split from one written name ("A & B"): that name and how many it became */
+  unit?: { name: string, size: number }
 }
 
 export interface ParsedCreditLine {
@@ -58,6 +66,15 @@ const TRACK_ITEM = /^(?:m|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~〜～
 const DISC_TRACK_ITEM = /^(\d)-(\d{2})$/
 const ALL_TRACKS = /^(?:全曲|全て|すべて|全部|all(?:\s*tracks)?)$/i
 const BRACKETS: Record<string, string> = { '（': '）', '(': ')', '［': '］', '[': ']', '【': '】' }
+/** The word before a 客串: "A feat. B", "A ft. B", "A featuring B", also "A feat.B" as booklets sometimes print it. */
+const FEATURING_WORD = /\s+(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)/gi
+/** A bracket that holds the 客串 instead of a detail: "A (feat. B)". */
+const FEATURING_BRACKET = /^(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)(.+)$/i
+/**
+ * Between two people of one written name: "A & B", "A × B", "A x B", "A vs. B" with spaces, or "A×B". "A&B" stays one
+ * name, as names like that are common (M&M).
+ */
+const COLLAB_WORD = /\s+(?:[&＆×xX]|vs\.?|VS\.?)\s+|×/g
 
 /** "M1, M3–M5" as track numbers on the disc; null when it is no track list. */
 function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
@@ -100,21 +117,80 @@ function splitNames(text: string): string[] {
   return parts.map(part => part.trim()).filter(Boolean)
 }
 
-/** A name with its brackets taken off the end: track lists become tracks, anything else the detail. */
-function parseName(text: string, disc: number): ParsedCreditName {
+/**
+ * A name with its brackets taken off the end: track lists become tracks, "(feat. B)" the 客串 in `featured`,
+ * anything else the detail.
+ */
+function parseName(text: string, disc: number): ParsedCreditName & { featured: string[] } {
   let name = text
   const details: string[] = []
+  const featured: string[] = []
   let tracks: ParsedCreditName['tracks'] = null
   for (;;) {
     const match = name.match(/[（(［[【]([^（(［[【）)］\]】]*)[）)］\]】]\s*$/)
     if (!match || match.index === undefined || match.index === 0) break
     const inside = match[1]!.trim()
     const asTracks = parseTracks(inside, disc)
+    const asFeaturing = inside.match(FEATURING_BRACKET)
     if (asTracks && tracks === null) tracks = asTracks
+    else if (asFeaturing) featured.unshift(asFeaturing[1]!.trim())
     else if (inside) details.unshift(inside)
     name = name.slice(0, match.index).trim()
   }
-  return { name, detail: details.join(' ') || null, tracks }
+  return { name, detail: details.join(' ') || null, tracks, featured }
+}
+
+/** Splits at the matches outside brackets. */
+function splitAt(text: string, pattern: RegExp): string[] {
+  const pieces: string[] = []
+  let start = 0
+  for (const match of text.matchAll(pattern)) {
+    let depth = 0
+    for (const char of text.slice(0, match.index)) {
+      if (BRACKETS[char]) depth++
+      else if (depth && Object.values(BRACKETS).includes(char)) depth--
+    }
+    if (depth) continue
+    pieces.push(text.slice(start, match.index).trim())
+    start = match.index + match[0].length
+  }
+  pieces.push(text.slice(start).trim())
+  return pieces.filter(Boolean)
+}
+
+/**
+ * One written name, the people in it and the 客串 it brings: "A × B feat. C（M2）" is A and B, then C as B's 客串.
+ * A 客串 belongs to the name right before its feat.; "A feat. X & B feat. Y" is A with X, B with Y (a name just before
+ * a later feat. leads again), "A (feat. X)" is A with X. `host` counts from `offset`, the names of the line before
+ * this one. The tracks are written at the end, so a name without its own takes the last ones given; each detail
+ * stays with the name it follows.
+ */
+function parseNames(text: string, disc: number, offset = 0): ParsedCreditName[] {
+  const names: ParsedCreditName[] = []
+  const parts = splitAt(text, FEATURING_WORD)
+  let host: number | undefined
+  parts.forEach((part, partIndex) => {
+    const { featured, ...parsed } = parseName(part, disc)
+    const people = splitAt(parsed.name, COLLAB_WORD)
+    const guests = featured.flatMap(other => splitAt(other, COLLAB_WORD))
+    people.forEach((person, index) => {
+      const last = index === people.length - 1
+      const leads = partIndex === 0 || (last && partIndex < parts.length - 1)
+      names.push({
+        name: person,
+        detail: last ? parsed.detail : null,
+        tracks: parsed.tracks,
+        ...(leads ? {} : { featuring: true, host }),
+        ...(index === 0 && people.length > 1 ? { unit: { name: parsed.name, size: people.length } } : {}),
+      })
+      if (leads) host = offset + names.length - 1
+    })
+    // "(feat. X)" belongs to the name the bracket follows, else to who leads
+    const before = names.at(-1)?.featuring ? host : offset + names.length - 1
+    guests.forEach(guest => names.push({ name: guest, detail: null, tracks: null, featuring: true, host: before }))
+  })
+  const tracks = names.findLast(name => name.tracks !== null)?.tracks ?? null
+  return names.map(name => ({ ...name, tracks: name.tracks ?? tracks }))
 }
 
 /** The colon that ends the role words: the first one outside brackets. */
@@ -175,8 +251,8 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
       skipped.push(index + 1)
       return
     }
-    const names = splitNames(line.slice(colon + 1)).map(part => parseName(part, disc))
-      .filter(name => name.name)
+    // Every name parseNames gives has text, so the hosts' indexes hold across the line
+    const names = splitNames(line.slice(colon + 1)).reduce<ParsedCreditName[]>((all, part) => [...all, ...parseNames(part, disc, all.length)], [])
       .map(name => ({ ...name, tracks: name.tracks ?? (track === null ? null : [{ disc, number: track }]) }))
     if (!names.length) {
       skipped.push(index + 1)

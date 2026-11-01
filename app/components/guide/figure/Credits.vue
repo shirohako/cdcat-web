@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 参与创作的人: the section as the editor draws it, filled in with the guide's booklet. The byline block (署名艺术家
+ * 参与创作的人: the section as the editor draws it, filled in with the guide's booklet. The byline block (艺术家
  * and 发行 with the list preview), the view switch on 按角色, the booklet's six lines and the buttons that start one.
  * Markers 1–4 match the steps under the figure: roles, people, tracks, and a person's tag (here a new artist still
  * without a type). Role names come from the guide's text: the real ones are in the catalog schema, which this page

@@ -21,8 +21,8 @@ defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<{
   placement?: Placement
-  /** Gap between the trigger and the card, in pixels */
-  offset?: number
+  /** Gap between the trigger and the card, in pixels; with `crossAxis`, also a shift along the trigger's edge */
+  offset?: number | { mainAxis?: number, crossAxis?: number }
   /** An element to anchor on instead of the trigger slot */
   reference?: Element | null
   /** Names the card for screen readers */

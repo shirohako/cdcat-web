@@ -52,7 +52,7 @@ type OldAlbumArtist = { artist_id: AggregateRef | null, roles?: string[], credit
 
 /**
  * Brings a document kept in a draft up to date: tracks lose `work_id`, `track_originals` exists, the old
- * 艺术家与发行 rows become album-wide credits, one per role (署名艺术家, 发行 …), and the old label rows, which
+ * 艺术家与发行 rows become album-wide credits, one per role (艺术家, 发行 …), and the old label rows, which
  * point at labels that are gone, are dropped.
  */
 export function upgradeAlbumDocument(doc: AlbumDocument) {
@@ -346,15 +346,48 @@ export function creditGroups(doc: AlbumDocument): CreditGroup[] {
   return [...groups.values()]
 }
 
-/** Drops exact duplicates, e.g. after two groups were edited into the same one. */
+/**
+ * Drops exact duplicates, e.g. after two groups were edited into the same one; what belonged to a dropped one (its
+ * 客串, parent_id) belongs to the one kept.
+ */
 const dedupeCredits = (doc: AlbumDocument) => {
-  const seen = new Set<string>()
+  const seen = new Map<string, AlbumCreditRow>()
+  const dropped = new Map<string, AlbumCreditRow>()
   doc.credits = doc.credits.filter((row) => {
     const key = JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.detail || null])
-    if (seen.has(key)) return false
-    seen.add(key)
+    const kept = seen.get(key)
+    if (kept) {
+      dropped.set(String(row.id), kept)
+      kept.parent_id ??= row.parent_id ?? null
+      return false
+    }
+    seen.set(key, row)
     return true
   })
+  for (const row of doc.credits) {
+    const kept = row.parent_id != null ? dropped.get(String(row.parent_id)) : undefined
+    if (kept) row.parent_id = kept.id
+  }
+  tidyParents(doc)
+}
+
+/**
+ * A credit belongs to another of the same track or album (parent_id, utils/artistLine): one removed, itself or on
+ * another track is no parent. A 客串 left without one gets the default again (parentOf), as the backend gives it.
+ */
+const tidyParents = (doc: AlbumDocument) => {
+  const ids = new Map(doc.credits.map(row => [String(row.id), row]))
+  for (const row of doc.credits) {
+    if (row.parent_id == null) continue
+    const parent = ids.get(String(row.parent_id))
+    if (!parent || parent === row || String(parent.track_id ?? '') !== String(row.track_id ?? '')) row.parent_id = null
+  }
+}
+
+/** Sets the credit `row` belongs to, null for none (a 客串 then belongs to the default one, parentOf). */
+export function setCreditParent(doc: AlbumDocument, row: AlbumCreditRow, parent: AlbumCreditRow | null) {
+  row.parent_id = parent?.id ?? null
+  tidyParents(doc)
 }
 
 export function updateCreditGroup(doc: AlbumDocument, group: CreditGroup, patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>>) {
@@ -389,18 +422,26 @@ export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
   return trackRangeParts(doc, trackIds).map(part => `Disc ${part.disc} Track ${part.ranges.join(', ')}`).join(' · ')
 }
 
-/** Credits `fields` on the whole album (trackIds null) or on each of the tracks. */
-export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>, trackIds: RowId[] | null) {
+/**
+ * Credits `fields` on the whole album (trackIds null) or on each of the tracks. Returns the credit now on each of
+ * them, the new row or the one it turned out to repeat.
+ */
+export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>, trackIds: RowId[] | null): AlbumCreditRow[] {
   let order = nextOrder(doc.credits)
-  for (const trackId of trackIds ?? [null]) {
-    doc.credits.push({ id: newKey('c'), track_id: trackId, ...fields, sort_order: order++ })
-  }
+  const added = (trackIds ?? [null]).map((trackId) => {
+    const row: AlbumCreditRow = { id: newKey('c'), track_id: trackId, ...fields, sort_order: order++ }
+    doc.credits.push(row)
+    return row
+  })
   dedupeCredits(doc)
+  const key = (row: AlbumCreditRow) => JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.detail || null])
+  return added.map(row => doc.credits.find(other => key(other) === key(row))!)
 }
 
 export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
   const ids = new Set(rows.map(row => String(row.id)))
   doc.credits = doc.credits.filter(row => !ids.has(String(row.id)))
+  tidyParents(doc)
 }
 
 /** Changes these credit rows in place (their ids stay), dropping any that become duplicates of others. */

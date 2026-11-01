@@ -45,10 +45,6 @@ const { t } = useI18n()
     <div class="[@media(hover:none)]:hidden">
       <p class="mb-1 mt-5 text-xs font-semibold text-meta">{{ t('album.tracklist.settings.cards') }}</p>
       <div class="divide-y divide-line">
-        <UiSwitch :model-value="prefs.trackCard" class="w-full flex-row-reverse justify-between py-2.5" @update:model-value="value => emit('update', { trackCard: Boolean(value) })">
-          <span class="block text-[13.5px] font-semibold leading-5 text-title">{{ t('album.tracklist.settings.track_card') }}</span>
-          <span class="block text-xs leading-[1.125rem] text-meta">{{ t('album.tracklist.settings.track_card_hint') }}</span>
-        </UiSwitch>
         <UiSwitch :model-value="prefs.artistCard" class="w-full flex-row-reverse justify-between py-2.5" @update:model-value="value => emit('update', { artistCard: Boolean(value) })">
           <span class="block text-[13.5px] font-semibold leading-5 text-title">{{ t('album.tracklist.settings.artist_card') }}</span>
           <span class="block text-xs leading-[1.125rem] text-meta">{{ t('album.tracklist.settings.artist_card_hint') }}</span>

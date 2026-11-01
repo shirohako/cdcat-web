@@ -7,6 +7,7 @@
 import type { AggregateRef, AlbumDocument, RowId } from '~/types/document'
 import { RELEASE_ROLES } from '../types/album'
 import { addCredit, orderedTracks, patchCredits, removeCredits, type AlbumCreditRow } from './albumDocument'
+import { parentOf } from './artistLine'
 import { byOrder, sameId } from './documentRows'
 
 /** Who a credit names: an artist (an id, or "@ref" of one new in this revision) or only a printed name, and the detail. */
@@ -159,14 +160,26 @@ export function creditsOn(doc: AlbumDocument, trackId: RowId | null, roleOrder: 
 
 const creditOnTrackKey = (row: AlbumCreditRow) => JSON.stringify([row.role, personKey(personOf(row))])
 
-/** Whether two tracks credit the same people in the same roles. */
+/** A credit with the one it belongs to, so that "eili, Xeno's 客串" differs from "eili, Xeudo Code's". */
+const creditWithParentKey = (row: AlbumCreditRow, rows: AlbumCreditRow[]) => {
+  const parent = parentOf(row, rows)
+  return JSON.stringify([creditOnTrackKey(row), parent ? creditOnTrackKey(parent) : null])
+}
+
+/** Whether two tracks credit the same people in the same roles, each 客串 with the same credit. */
 export function sameTrackCredits(doc: AlbumDocument, a: RowId, b: RowId) {
-  const keys = (id: RowId) => new Set(doc.credits.filter(row => sameId(row.track_id, id)).map(creditOnTrackKey))
+  const keys = (id: RowId) => {
+    const rows = doc.credits.filter(row => sameId(row.track_id, id))
+    return new Set(rows.map(row => creditWithParentKey(row, rows)))
+  }
   const [left, right] = [keys(a), keys(b)]
   return left.size === right.size && [...left].every(key => right.has(key))
 }
 
-/** Makes a track's credits the same as another's: what the other has is added, what it lacks is removed. */
+/**
+ * Makes a track's credits the same as another's: what the other has is added, what it lacks is removed, and each
+ * belongs to the same credit as there.
+ */
 export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId) {
   const source = byOrder(doc.credits).filter(row => sameId(row.track_id, fromId))
   const target = doc.credits.filter(row => sameId(row.track_id, toId))
@@ -175,5 +188,11 @@ export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId)
   const have = new Set(target.map(creditOnTrackKey))
   for (const row of source) {
     if (!have.has(creditOnTrackKey(row))) addCredit(doc, { ...personOf(row), role: row.role }, [toId])
+  }
+  const copies = new Map(doc.credits.filter(row => sameId(row.track_id, toId)).map(row => [creditOnTrackKey(row), row]))
+  for (const row of source) {
+    const parent = parentOf(row, source)
+    const copy = copies.get(creditOnTrackKey(row))
+    if (copy) copy.parent_id = parent ? copies.get(creditOnTrackKey(parent))?.id ?? null : null
   }
 }

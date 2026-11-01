@@ -51,7 +51,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     setTitleIn(doc, 'titles', null, title.locale, title.kind, title.title)
   }
   const circle = detail.circle_match ? people.circle() : candidate.artist_id
-  // The circle publishes the album; reviewers add the 署名艺术家 the sources name.
+  // The circle publishes the album; reviewers add the 艺术家 the sources name.
   if (circle) setCirclePublisher(doc, circle)
 
   const digital = merged.media.length > 0 && merged.media.every(medium => medium === 'digital')

@@ -2,8 +2,10 @@
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import type { RowId } from '~/types/document'
 import type { CreditPerson } from '~/utils/creditLines'
-import type { ParsedCredits, TrackRef } from '~/utils/creditParser'
-import { addCredit, orderedTracks, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
+import type { ParsedCreditName, ParsedCredits, TrackRef } from '~/utils/creditParser'
+import type { AlbumCreditRow } from '~/utils/albumDocument'
+import { addCredit, orderedTracks, setCreditParent, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
+import { FEATURING_ROLE } from '~/utils/artistLine'
 import { ALBUM_ONLY_ROLES } from '~/utils/creditLines'
 import { foldRoleWord, parseCredits } from '~/utils/creditParser'
 
@@ -12,7 +14,8 @@ import { foldRoleWord, parseCredits } from '~/utils/creditParser'
  * tracks, its names looked up among the artists (GET /artists/lookup), and shown as a table to check before it is
  * added in one go. Each name becomes the one artist of that name, a new artist (its type picked later), or a
  * printed name only; namesakes and unknown role words stay yellow until settled, and are left out until then.
- * Roles only the whole album has go on the whole album wherever they were written.
+ * Roles only the whole album has go on the whole album wherever they were written. "A & B" is two people unless
+ * the whole of it is an artist's name; who comes after feat. is a 客串 of the name right before it (utils/artistLine).
  */
 const open = defineModel<boolean>({ required: true })
 
@@ -25,6 +28,8 @@ interface Row {
   unknown: string[]
   name: string
   detail: string | null
+  /** A 客串's: the key of the row it belongs to */
+  hostKey: string | null
   /** null for the whole album */
   trackIds: RowId[] | null
   /** Track numbers the album has no track for */
@@ -58,13 +63,16 @@ const roleWords = computed(() => {
   return words
 })
 const parsed = computed<ParsedCredits>(() => parseCredits(text.value, word => roleWords.value.get(word) ?? []))
+// Who came after "feat." is a 客串 rather than in the line's roles, while the dictionary has that role.
+const featuringRoles = computed(() => schema.value?.credit_roles.some(role => role.key === FEATURING_ROLE) ? [FEATURING_ROLE] : null)
 
 // ---- looking the names up ----
 
 const matches = reactive<Record<string, Match[]>>({})
 const looking = ref(false)
 let timer: ReturnType<typeof setTimeout> | undefined
-const unknownNames = computed(() => [...new Set(parsed.value.lines.flatMap(line => line.names.map(name => name.name)))].filter(name => !(name in matches)))
+const unknownNames = computed(() => [...new Set(parsed.value.lines.flatMap(line => line.names.flatMap(name => [name.name, ...(name.unit ? [name.unit.name] : [])])))]
+  .filter(name => !(name in matches)))
 watch(unknownNames, (names) => {
   clearTimeout(timer)
   if (!names.length) return
@@ -113,14 +121,46 @@ const trackIdsOf = (tracks: TrackRef[] | 'all' | null) => {
 
 const defaultChoice = (candidates: Match[]) => candidates.length === 1 ? `a:${candidates[0]!.id}` : candidates.length ? '' : 'new'
 
-const rows = computed<Row[]>(() => parsed.value.lines.flatMap(line => line.names.map((name, index) => {
-  const key = `${line.line}:${index}:${name.name}`
-  const candidates = matches[name.name] ?? []
-  const roles = picks.value[key]?.roles ?? line.roles
-  const albumOnly = roles.length > 0 && roles.every(role => ALBUM_ONLY_ROLES.includes(role))
-  const { ids, missing } = albumOnly ? { ids: null, missing: [] } : trackIdsOf(name.tracks)
-  return { key, roleText: line.roleText, roles, unknown: line.unknown, name: name.name, detail: name.detail, trackIds: ids, missing, choice: picks.value[key]?.choice ?? defaultChoice(candidates), candidates }
-})))
+/**
+ * The names of a line, the people split from one written name joined again when that whole name is an artist's;
+ * `at` maps each parsed name to the entry it ended up in, for a 客串's host.
+ */
+const namesOf = (names: ParsedCreditName[]) => {
+  const result: Array<ParsedCreditName & { index: number }> = []
+  const at: number[] = []
+  for (let index = 0; index < names.length; index++) {
+    const name = names[index]!
+    const unit = name.unit
+    if (unit && matches[unit.name]?.length) {
+      const last = names[index + unit.size - 1]!
+      for (let member = 0; member < unit.size; member++) at[index + member] = result.length
+      result.push({ ...name, name: unit.name, detail: last.detail, index })
+      index += unit.size - 1
+    }
+    else {
+      at[index] = result.length
+      result.push({ ...name, index })
+    }
+  }
+  return { names: result, at }
+}
+
+const rows = computed<Row[]>(() => parsed.value.lines.flatMap((line) => {
+  const { names, at } = namesOf(line.names)
+  const keyOf = (name: { index: number, name: string }) => `${line.line}:${name.index}:${name.name}`
+  return names.map((name) => {
+    const key = keyOf(name)
+    const host = name.featuring && name.host !== undefined ? names[at[name.host]!] : undefined
+    const candidates = matches[name.name] ?? []
+    const roles = picks.value[key]?.roles ?? (name.featuring && featuringRoles.value ? featuringRoles.value : line.roles)
+    const albumOnly = roles.length > 0 && roles.every(role => ALBUM_ONLY_ROLES.includes(role))
+    const { ids, missing } = albumOnly ? { ids: null, missing: [] } : trackIdsOf(name.tracks)
+    return {
+      key, roleText: line.roleText, roles, unknown: line.unknown, name: name.name, detail: name.detail, hostKey: host && host !== name ? keyOf(host) : null,
+      trackIds: ids, missing, choice: picks.value[key]?.choice ?? defaultChoice(candidates), candidates,
+    }
+  })
+}))
 const ready = (row: Row) => row.roles.length > 0 && row.choice !== ''
 const count = computed(() => rows.value.filter(ready).reduce((sum, row) => sum + row.roles.length, 0))
 
@@ -131,6 +171,7 @@ const choiceOptions = (row: Row): UiSelectOption<string>[] => [
 ]
 const setChoice = (row: Row, choice: string) => { picks.value[row.key] = { ...picks.value[row.key], choice } }
 const setRoles = (row: Row, roles: string[]) => { picks.value[row.key] = { ...picks.value[row.key], roles } }
+const hostName = (row: Row) => (row.hostKey ? rows.value.find(item => item.key === row.hostKey)?.name ?? '' : '')
 const tracksText = (row: Row) => row.trackIds === null ? t('editor.credits.whole_album') : trackRanges(album.value, row.trackIds)
 
 const personOf = (row: Row): CreditPerson => {
@@ -142,10 +183,19 @@ const personOf = (row: Row): CreditPerson => {
   return { ...person, credited_as: match.name === row.name ? null : row.name, detail: row.detail }
 }
 
+/** Adds the ready rows; then each 客串 belongs to its host's credit on the same track, when the host was added too. */
 const apply = () => {
+  const added = new Map<string, AlbumCreditRow[]>()
   for (const row of rows.value.filter(ready)) {
     const person = personOf(row)
-    for (const role of row.roles) addCredit(album.value, { ...person, role }, row.trackIds)
+    added.set(row.key, row.roles.flatMap(role => addCredit(album.value, { ...person, role }, row.trackIds)))
+  }
+  for (const row of rows.value.filter(item => item.hostKey && added.has(item.key))) {
+    const hosts = added.get(row.hostKey!) ?? []
+    for (const credit of added.get(row.key)!) {
+      const host = hosts.find(item => String(item.track_id ?? '') === String(credit.track_id ?? ''))
+      if (host) setCreditParent(album.value, credit, host)
+    }
   }
   editor.notify(t('editor.paste_credits.added', { count: count.value }))
   open.value = false
@@ -178,7 +228,7 @@ const apply = () => {
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="flex flex-wrap items-center gap-2">
                   <span class="min-w-0">
-                    <span class="block truncate font-medium text-title">{{ row.name }}</span>
+                    <span class="block truncate font-medium text-title">{{ row.name }}<span v-if="hostName(row)" class="ml-1 font-normal text-meta">↳ {{ hostName(row) }}</span></span>
                     <span v-if="row.detail" class="block truncate text-[10px] text-meta">{{ row.detail }}</span>
                   </span>
                   <UiSelect

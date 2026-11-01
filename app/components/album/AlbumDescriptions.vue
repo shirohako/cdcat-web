@@ -76,7 +76,7 @@ const props = defineProps<{ album: Album }>()
 const { roleName } = useCatalogSchema()
 const { albumRelationLabel } = useEntryDisplay()
 
-/** The album-wide 署名与发行 credits but 署名艺术家 (the hero shows those), grouped by name, roles in their fixed order. */
+/** The album-wide 署名与发行 credits but 艺术家 (the hero shows those), grouped by name, roles in their fixed order. */
 const releasers = computed(() => {
   const rows = new Map<string, { key: string, id: number | null, name: string, roles: string[] }>()
   for (const credit of props.album.credits) {

@@ -29,6 +29,11 @@
     "console": "Admin Console"
   },
   "album": {
+    "track_people": {
+      "title": "Track credits",
+      "count": "{count} person | {count} people",
+      "all": "All tracks"
+    },
     "section": {
       "description": "Description",
       "products": "Products",
@@ -79,8 +84,6 @@
         "description": "Saved in this browser only",
         "style": "Style",
         "cards": "Hover cards",
-        "track_card": "Track card",
-        "track_card_hint": "Shown when the pointer rests on a title",
         "artist_card": "Artist card",
         "artist_card_hint": "Shown when the pointer rests on a name",
         "done": "Done"
@@ -2612,6 +2615,9 @@
       "link_artist": "Link an artist",
       "unlink_artist": "Unlink the artist and keep the name",
       "printed_as": "printed as “{name}”",
+      "parent": "Belongs to",
+      "parent_none": "Nobody",
+      "parent_hint": "Which credit of this track it belongs to: a featured artist always has one, by default the one before it; other roles may leave it empty.",
       "pick_type": "Pick a type",
       "remove_person": "Remove {name}",
       "printed_hint": "Only when it differs from the artist’s name",

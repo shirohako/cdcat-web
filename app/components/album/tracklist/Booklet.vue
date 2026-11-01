@@ -72,7 +72,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
           <UiCollapse v-if="hasComfy(row)" class="col-[2/-1]" :open="density === 'comfy'">
             <div class="flex items-start gap-3 pt-1">
               <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3.5 gap-y-1 text-[12.5px] leading-[1.125rem] text-title">
-                <span v-for="group in keyGroups(row)" :key="group.role" class="inline-flex min-w-0 items-center gap-1.5">
+                <span v-for="group in keyGroups(row)" :key="group.role" class="inline-flex min-w-0 items-start gap-1.5">
                   <CatalogRoleTag :label="group.label" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" />
                 </span>
@@ -94,7 +94,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
                 <div v-for="group in row.groups" :key="group.role" class="liner-line">
                   <CatalogRoleTag :label="group.label" :category="group.category" />
                   <span class="leader" aria-hidden="true" />
-                  <AlbumTracklistPeople :people="group.people" stack class="value text-title" />
+                  <AlbumTracklistPeople :people="group.people" stack end class="value mt-0.5" />
                 </div>
               </div>
               <!-- Notes; the 歌词 line comes along whenever there is a liner at all -->

@@ -1,9 +1,9 @@
 <template>
-  <CatalogSection v-if="groups.length" :title="$t('album.section.credits')" :icon="Users" size="sm">
+  <CatalogSection v-if="groups.length || people.length" :title="$t('album.section.credits')" :icon="Users" size="sm">
     <!-- One row per role, the role as its coloured tag; a hairline list, as a single role looks lost in the 简介 card's
          booklet layout. -->
     <div class="px-5 pb-5 pt-2">
-      <CatalogInfoTable variant="lines">
+      <CatalogInfoTable v-if="groups.length" variant="lines">
         <CatalogInfoRow v-for="group in groups" :key="group.role">
           <template #label>
             <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ roleName(group.role) }}</span>
@@ -24,6 +24,44 @@
           </span>
         </CatalogInfoRow>
       </CatalogInfoTable>
+
+      <!-- 曲目参与人员: the tracks' credits by person, folded under the album's own; open from the start when the album
+           has none of its own -->
+      <div v-if="people.length" :class="groups.length && 'mt-3 border-t border-line pt-2'">
+        <button
+          type="button"
+          class="-mx-2 flex w-[calc(100%+1rem)] items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-[13px] font-semibold text-title transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          :aria-expanded="peopleOpen"
+          @click="peopleOpen = !peopleOpen"
+        >
+          <ChevronRight :size="15" class="shrink-0 text-meta transition-transform duration-200" :class="peopleOpen && 'rotate-90'" />
+          {{ $t('album.track_people.title') }}
+          <span class="font-normal text-meta">{{ $t('album.track_people.count', { count: people.length }) }}</span>
+        </button>
+        <UiCollapse :open="peopleOpen" lazy>
+          <CatalogInfoTable variant="lines" class="pt-1">
+            <CatalogInfoRow v-for="person in people" :key="person.key">
+              <template #label>
+                <component
+                  :is="person.artistId ? NuxtLink : 'span'"
+                  :to="person.artistId ? `/artists/${person.artistId}` : undefined"
+                  class="inline-flex max-w-full items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 text-title transition-colors duration-150 dark:bg-white/[0.08]"
+                  :class="person.artistId && 'hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]'"
+                ><span class="truncate">{{ person.name }}</span></component>
+              </template>
+              <!-- Each role as its tag, the tracks after it -->
+              <span class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
+                <span v-for="role in person.roles" :key="`${role.role}:${role.detail}`" class="inline-flex min-w-0 items-center gap-1.5">
+                  <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge">{{ roleName(role.role) }}</span>
+                  <span class="min-w-0 text-xs tabular-nums text-meta">
+                    <span v-if="role.detail" class="text-body">{{ role.detail }} · </span>{{ role.tracks ?? $t('album.track_people.all') }}
+                  </span>
+                </span>
+              </span>
+            </CatalogInfoRow>
+          </CatalogInfoTable>
+        </UiCollapse>
+      </div>
     </div>
   </CatalogSection>
 </template>
@@ -31,24 +69,23 @@
 <script setup lang="ts">
 import type { AlbumDisc } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
-import { Users } from '@lucide/vue'
+import { ChevronRight, Users } from '@lucide/vue'
 import { NuxtLink } from '#components'
 import { RELEASE_ROLES } from '~/types/album'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
+import { trackPeople } from '~/utils/trackPeople'
 
 const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
 
 const { roleName, roleCategory, roleOrder } = useCatalogSchema()
 
 /**
- * One row per role; a person credited under another name shows that name. An album with no credits
- * of its own sums up its tracks' credits instead, each person once per role. The 署名与发行 roles are left
- * to the hero, 专辑信息 and the tracklist.
+ * The album's own credits, one row per role; a person credited under another name shows that name. The 署名与发行
+ * roles are left to the hero, 专辑信息 and the tracklist. The tracks' credits go to 曲目参与人员, by person.
  */
 const groups = computed(() => {
   const isWork = (credit: CatalogCredit) => !(RELEASE_ROLES as readonly string[]).includes(credit.role)
-  const own = props.credits.filter(isWork)
-  const credits = own.length ? own : (props.discs ?? []).flatMap(disc => disc.tracks.flatMap(track => track.credits)).filter(isWork)
+  const credits = props.credits.filter(isWork)
   const map = new Map<string, { role: string, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }>()
   const seen = new Set<string>()
   for (const credit of credits) {
@@ -62,4 +99,7 @@ const groups = computed(() => {
   }
   return [...map.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
 })
+
+const people = computed(() => trackPeople(props.discs ?? [], roleOrder))
+const peopleOpen = ref(!groups.value.length)
 </script>

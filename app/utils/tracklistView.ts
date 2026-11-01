@@ -1,5 +1,6 @@
 import type { AlbumBonus, AlbumDisc, AlbumTrack, TrackOriginal, TracklistLanguage } from '~/types/album'
 import type { CatalogAttribute, CatalogCredit, CatalogTitle } from '~/types/catalog'
+import { attachGuests, FEATURING_ROLE } from './artistLine'
 
 /**
  * The album page's tracklist, worked out once for every style: shown titles, numbers, durations, credits grouped by
@@ -13,10 +14,9 @@ export const TRACKLIST_DENSITIES: readonly TracklistDensity[] = ['compact', 'com
 export interface TracklistPrefs {
   style: string
   density: TracklistDensity
-  trackCard: boolean
   artistCard: boolean
 }
-export const DEFAULT_TRACKLIST_PREFS: TracklistPrefs = { style: 'list', density: 'comfy', trackCard: true, artistCard: true }
+export const DEFAULT_TRACKLIST_PREFS: TracklistPrefs = { style: 'list', density: 'comfy', artistCard: true }
 
 /** The saved preferences, with anything unknown (a removed style, a hand-edited cookie) back at its default. */
 export const normalizeTracklistPrefs = (raw: unknown, styleKeys: readonly string[]): TracklistPrefs => {
@@ -24,7 +24,6 @@ export const normalizeTracklistPrefs = (raw: unknown, styleKeys: readonly string
   return {
     style: typeof value.style === 'string' && styleKeys.includes(value.style) ? value.style : DEFAULT_TRACKLIST_PREFS.style,
     density: TRACKLIST_DENSITIES.includes(value.density as TracklistDensity) ? value.density as TracklistDensity : DEFAULT_TRACKLIST_PREFS.density,
-    trackCard: typeof value.trackCard === 'boolean' ? value.trackCard : DEFAULT_TRACKLIST_PREFS.trackCard,
     artistCard: typeof value.artistCard === 'boolean' ? value.artistCard : DEFAULT_TRACKLIST_PREFS.artistCard,
   }
 }
@@ -51,9 +50,15 @@ export const parseLanguageKey = (key: string): TracklistLanguageChoice | null =>
 }
 
 export interface TracklistPerson {
+  creditId: number
+  /** As credited: credited_as, else the artist's name */
   name: string
   artistId: number | null
+  /** The artist's own name, for linking only that part of a credited name ("void (Mournfinale)": void) */
+  artistName: string | null
   detail: string | null
+  /** The 客串 that belong to this credit (parent_id, utils/artistLine), shown with it: "Xeno feat. eili" */
+  guests: TracklistPerson[]
 }
 
 export interface TracklistRoleGroup {
@@ -83,10 +88,10 @@ export interface TracklistRow {
   /** The original and its readings */
   lyrics: number
   translations: number
-  /** 舒适: who performs (署名艺术家, else the first vocal role) and who made it (arrangement, else composition) */
+  /** 舒适: who performs (艺术家, else the first vocal role, with the 客串 after them) and who made it (arrangement, else composition) */
   lead: TracklistRoleGroup | null
   maker: TracklistRoleGroup | null
-  /** 完整: every credit by role, in the dictionary's order */
+  /** 完整: every credit by role, in the dictionary's order; the 客串 inside the lead rather than a group of their own */
   groups: TracklistRoleGroup[]
   originals: TrackOriginal[]
   attributes: Array<{ key: string, label: string, value: string }>
@@ -150,15 +155,37 @@ const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): Trac
       category: credit.category ?? helpers.roleCategory(credit.role),
       people: [],
     }
-    group.people.push({ name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail })
+    group.people.push({
+      creditId: credit.id,
+      name: credit.credited_as || credit.artist?.name || '',
+      artistId: credit.artist?.id ?? null,
+      artistName: credit.artist?.name ?? null,
+      detail: credit.detail,
+      guests: [],
+    })
     groups.set(credit.role, group)
   }
   return [...groups.values()].sort((a, b) => helpers.roleOrder(a.role) - helpers.roleOrder(b.role))
 }
 
+/**
+ * Each 客串 goes into the tag of the credit it belongs to, wherever that one is listed ("Xeno feat. eili"), so the
+ * 客串 role only keeps those whose credit is not on the track; with none left it is no group of its own.
+ */
+const attachFeaturing = (groups: TracklistRoleGroup[], credits: CatalogCredit[]): TracklistRoleGroup[] => {
+  const featuring = groups.find(group => group.role === FEATURING_ROLE)
+  if (!featuring) return groups
+  const people = groups.filter(group => group !== featuring).flatMap(group => group.people)
+  const parents = new Map(credits.map(credit => [credit.id, credit.parent_id ?? null]))
+  const { lines, left } = attachGuests(people, featuring.people, person => person.creditId, guest => parents.get(guest.creditId))
+  for (const line of lines) line.item.guests = line.guests
+  featuring.people = left
+  return left.length ? groups : groups.filter(group => group !== featuring)
+}
+
 const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
-  const groups = groupCredits(track.credits, helpers)
+  const groups = attachFeaturing(groupCredits(track.credits, helpers), track.credits)
   const byCategory = (category: string) => groups.find(group => group.category === category) ?? null
   return {
     id: track.id,
@@ -178,6 +205,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
     favorited: track.is_favorited,
     lyrics: Math.max(0, track.lyrics_count - track.translations_count),
     translations: track.translations_count,
+    // The 艺术家, else the first role of the vocals; the 客串 when no credit of the track takes them
     lead: groups.find(group => group.role === 'artist') ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
     groups,

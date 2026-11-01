@@ -323,7 +323,7 @@ const texts: ApiDocsTexts = {
       },
       notes: md`
         - 每次請求會記一次瀏覽（同一來源每天只記一次），\`views_count\` 每 5 分鐘更新。
-        - 署名與發行（發行、廠牌、署名藝術家等）也在 \`credits\` 裡，\`category\` 為 \`release\`。
+        - 署名與發行（發行、廠牌、藝術家等）也在 \`credits\` 裡，\`category\` 為 \`release\`。
       `,
     },
     'get-tracks-id': {
@@ -376,7 +376,7 @@ const texts: ApiDocsTexts = {
     },
     'get-artists-id-albums': {
       title: '藝術家發行的專輯',
-      summary: '這位藝術家在整張專輯上擔任「署名與發行」角色（署名藝術家、發行、廠牌、經銷、製造、企劃）的專輯，依發行日期從新到舊。包括審核中的專輯。',
+      summary: '這位藝術家在整張專輯上擔任「署名與發行」角色（藝術家、發行、廠牌、經銷、製造、企劃）的專輯，依發行日期從新到舊。包括審核中的專輯。',
       params: {
         id: '藝術家 ID。',
       },
@@ -644,7 +644,7 @@ const texts: ApiDocsTexts = {
         favorites_count: '收藏數。',
         reviews_count: '評價數。',
         views_count: '瀏覽數，每 5 分鐘更新一次。',
-        byline: '標題下面那一行署名：有發行方時是全部發行方，否則是署名藝術家；都沒有時為 `null`。',
+        byline: '標題下面那一行署名：有發行方時是全部發行方，否則是藝術家；都沒有時為 `null`。',
       },
     },
     Album: {
@@ -783,6 +783,7 @@ const texts: ApiDocsTexts = {
         'credits.role': '角色的 key，名稱見 `/catalog/schema` 的 `credit_roles`。',
         'credits.detail': '補充說明，例如具體的樂器或角色名稱。',
         'credits.credited_as': '署名，和藝術家名稱不同時才有。',
+        'credits.parent_id': '這條 credit 所屬的、同一曲目上那條 credit 的 ID，例如客串所屬的藝術家；沒有時為 `null`。',
         'credits.artist': '藝術家；只知道署名、還沒有對應的藝術家時為 `null`。',
         'credits.artist.id': '藝術家 ID。',
         'credits.artist.name': '藝術家名稱（原名）。',
@@ -802,6 +803,7 @@ const texts: ApiDocsTexts = {
         'artist.image_url': '大頭貼。',
         'artist.type': '藝術家類型。',
         'credited_as': '署名，也就是專輯上印的名字；和藝術家名稱不同時才有。',
+        'parent_id': '這條 credit 所屬的那條 credit 的 ID，在同一曲目上（或者都在整張專輯上）。曲目上的客串（`featuring`）一定有，指向它跟著的那位（「Xeudo Code & Xeno feat. eili」裡是 Xeno）；其他角色也可以有。有所屬的 credit 不會再被別的 credit 所屬。沒有時為 `null`。',
         'detail': '補充說明，例如具體的樂器或配音的角色。',
       },
     },
@@ -1173,7 +1175,7 @@ const texts: ApiDocsTexts = {
       title: '署名',
       description: '標題下面那一行署名，儲存專輯時計算好。',
       fields: {
-        'role': '`publisher` 時是整張專輯的全部發行方，`artist` 時是全部署名藝術家。',
+        'role': '`publisher` 時是整張專輯的全部發行方，`artist` 時是全部藝術家。',
         'artists': '署名的藝術家，依製作人員的順序。',
         'artists.id': '藝術家 ID；只有署名、沒有對應的藝術家時為 `null`。',
         'artists.name': '署名；沒有另外的署名時是藝術家名稱。',
@@ -1304,7 +1306,7 @@ const texts: ApiDocsTexts = {
       title: '角色分類',
       description: '製作人員角色的分組。具體的角色見 `/catalog/schema` 的 `credit_roles`。',
       values: {
-        release: '署名與發行：署名藝術家、發行、廠牌等，見 [release_role](#enum-release-role)。',
+        release: '署名與發行：藝術家、發行、廠牌等，見 [release_role](#enum-release-role)。',
         composition: '作曲。',
         lyrics: '作詞。',
         arrangement: '編曲、混音改編。',
@@ -1320,7 +1322,7 @@ const texts: ApiDocsTexts = {
       title: '署名與發行',
       description: '「署名與發行」組的 6 個角色，是 `credits[].role` 的一部分。專輯的署名（Byline）由這裡計算而來。',
       values: {
-        artist: '署名藝術家：封面或曲目上署名的藝術家。',
+        artist: '藝術家：封面或曲目上署名的藝術家。',
         publisher: '發行（発売元），只用於整張專輯。',
         label: '廠牌（レーベル），只用於整張專輯。',
         distributor: '經銷（販売元），只用於整張專輯。',

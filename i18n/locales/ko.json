@@ -29,6 +29,11 @@
     "console": "관리자 페이지"
   },
   "album": {
+    "track_people": {
+      "title": "곡별 참여자",
+      "count": "{count}명",
+      "all": "전곡"
+    },
     "section": {
       "description": "소개",
       "products": "에디션",
@@ -79,8 +84,6 @@
         "description": "이 브라우저에만 저장돼요",
         "style": "스타일",
         "cards": "미리보기 카드",
-        "track_card": "곡 정보 카드",
-        "track_card_hint": "곡 제목에 마우스를 올리면 나타나요",
         "artist_card": "아티스트 정보 카드",
         "artist_card_hint": "이름에 마우스를 올리면 나타나요",
         "done": "완료"
@@ -2612,6 +2615,9 @@
       "link_artist": "아티스트 연결",
       "unlink_artist": "아티스트 연결 해제 (이름은 유지)",
       "printed_as": "표기: ‘{name}’",
+      "parent": "소속",
+      "parent_none": "없음",
+      "parent_hint": "이 곡의 어느 크레디트에 속하는지: 피처링은 반드시 있어야 하며 기본값은 바로 앞의 사람입니다. 다른 역할은 비워 둘 수 있습니다.",
       "pick_type": "유형 선택",
       "remove_person": "{name} 삭제",
       "printed_hint": "아티스트 이름과 다를 때만 입력",

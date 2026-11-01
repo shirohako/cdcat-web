@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ArtistType } from '~/types/artist'
-import { ArrowRight } from '@lucide/vue'
+import { ArrowRight, Disc3, Heart } from '@lucide/vue'
 
 export interface ArtistAlbumRole {
   role: string
@@ -11,9 +11,13 @@ export interface ArtistAlbumRole {
 }
 
 /**
- * The artist hover card. What the page already has (picture, name, type, the roles on this album) shows at once; the
- * other names, the start of the bio and the counts come from GET /artists/{id}/card, with placeholder lines meanwhile.
- * Without a picture it shows the type's icon, never initials.
+ * The artist hover card. What the page already has (picture, name, type) shows at once; the other names, the start of
+ * the bio and the counts come from GET /artists/{id}/card, with placeholder lines meanwhile. The roles on this album
+ * are on the page too, but wait for the card, so they don't show ahead of the placeholders and then move down under
+ * the bio. Without a picture it shows the type's icon, never initials.
+ *
+ * Its sections run edge to edge, so it brings its own padding: open it with `p-0!` and `:text-inset="16"` (UiHoverCard),
+ * and its text lines up with the name it is about.
  */
 const props = defineProps<{
   artist: { id: number, name: string, image_url?: string | null, type?: string | null }
@@ -33,42 +37,45 @@ const TYPE_ICONS: Record<ArtistType, string> = {
   character: 'lucide:venetian-mask',
 }
 const type = computed(() => (card.value?.type ?? props.artist.type ?? null) as ArtistType | null)
+const typeIcon = computed(() => (type.value ? TYPE_ICONS[type.value] : 'lucide:user-round'))
 const otherNames = computed(() => (card.value?.titles ?? []).map(title => title.title).filter(name => name !== props.artist.name).slice(0, 2))
-const subtitle = computed(() => [type.value ? enumLabel('artist_type', type.value) : '', ...otherNames.value].filter(Boolean).join(' · '))
+const showRoles = computed(() => Boolean(props.roles?.length && (card.value || failed.value)))
 </script>
 
 <template>
-  <div>
-    <div class="flex items-center gap-3">
-      <UiCover :src="card?.image_url ?? artist.image_url" :alt="artist.name" :icon="type ? TYPE_ICONS[type] : 'lucide:user-round'" rounded="lg" eager class="size-11 shrink-0 ring-1 ring-line" />
-      <div class="min-w-0">
-        <NuxtLink :to="`/artists/${artist.id}`" class="block truncate text-[15px] font-bold leading-snug text-title hover:underline">{{ artist.name }}</NuxtLink>
-        <p v-if="subtitle" class="truncate text-xs text-meta">{{ subtitle }}</p>
+  <div class="text-[13px]">
+    <div class="flex items-center gap-3 px-4 pt-4">
+      <UiCover :src="card?.image_url ?? artist.image_url" :alt="artist.name" :icon="typeIcon" rounded="lg" eager class="size-12 shrink-0 ring-1 ring-line" />
+      <div class="min-w-0 flex-1">
+        <NuxtLink :to="`/artists/${artist.id}`" class="block truncate text-[15px] font-bold leading-5 text-title transition-colors hover:text-primary">{{ artist.name }}</NuxtLink>
+        <p class="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-meta">
+          <span v-if="type" class="inline-flex shrink-0 items-center gap-1"><Icon :name="typeIcon" class="size-3.5" />{{ enumLabel('artist_type', type) }}</span>
+          <span v-for="name in otherNames" :key="name" class="truncate"><span v-if="type" class="mr-1.5 text-faint">·</span>{{ name }}</span>
+        </p>
       </div>
     </div>
 
-    <template v-if="card">
-      <p v-if="card.bio" class="mt-2.5 line-clamp-2 text-[12.5px] leading-relaxed text-body">{{ card.bio }}</p>
-    </template>
-    <p v-else-if="failed" class="mt-2.5 text-xs text-meta">{{ t('artist_card.load_failed') }}</p>
-    <div v-else class="mt-3 space-y-2" aria-hidden="true">
+    <p v-if="card?.bio" class="mt-3 line-clamp-2 px-4 text-[12.5px] leading-relaxed text-body">{{ card.bio }}</p>
+    <p v-else-if="failed" class="mt-3 px-4 text-xs text-meta">{{ t('artist_card.load_failed') }}</p>
+    <div v-else-if="!card" class="mt-3.5 space-y-2 px-4" aria-hidden="true">
       <div class="h-2.5 w-11/12 rounded skeleton" />
       <div class="h-2.5 w-2/3 rounded skeleton" />
     </div>
 
-    <div v-if="roles?.length" class="mt-2.5 flex flex-wrap items-center gap-1.5">
+    <div v-if="showRoles" class="mt-3 flex flex-wrap items-center gap-1.5 px-4">
       <span class="mr-0.5 text-[11px] font-semibold text-meta">{{ t('artist_card.on_album') }}</span>
       <CatalogRoleTag v-for="role in roles" :key="role.role" :label="role.count > 1 ? `${role.label} ×${role.count}` : role.label" :category="role.category" />
     </div>
 
-    <p v-if="card" class="mt-2.5 text-xs tabular-nums text-meta">
-      {{ t('artist_card.albums', { count: card.albums_count }) }}<span class="mx-1.5 text-faint">·</span>{{ t('artist_card.favorites', { count: card.followers_count }) }}
-    </p>
-    <div v-else-if="!failed" class="mt-3 h-2.5 w-2/5 rounded skeleton" aria-hidden="true" />
-
-    <div class="mt-3 flex border-t border-line pt-2.5">
-      <NuxtLink :to="`/artists/${artist.id}`" class="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-title hover:underline">
-        {{ t('artist_card.open') }}<ArrowRight :size="13" />
+    <!-- The counts and the way to the artist's page share the foot -->
+    <div class="mt-4 flex items-center gap-3 border-t border-line px-4 py-2.5 text-xs text-meta">
+      <template v-if="card">
+        <span class="inline-flex items-center gap-1 tabular-nums"><Disc3 :size="13" class="text-faint" />{{ t('artist_card.albums', { count: card.albums_count }) }}</span>
+        <span class="inline-flex items-center gap-1 tabular-nums"><Heart :size="13" class="text-faint" />{{ t('artist_card.favorites', { count: card.followers_count }) }}</span>
+      </template>
+      <div v-else-if="!failed" class="h-2.5 w-28 rounded skeleton" aria-hidden="true" />
+      <NuxtLink :to="`/artists/${artist.id}`" class="group/open ml-auto inline-flex shrink-0 items-center gap-1 font-semibold text-title transition-colors hover:text-primary">
+        {{ t('artist_card.open') }}<ArrowRight :size="13" class="transition-transform group-hover/open:translate-x-0.5" />
       </NuxtLink>
     </div>
   </div>

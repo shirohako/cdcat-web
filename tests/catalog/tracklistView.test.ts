@@ -1,11 +1,11 @@
 import type { AlbumDisc, AlbumTrack } from '../../app/types/album'
 import type { CatalogCredit } from '../../app/types/catalog'
-import type { TracklistHelpers } from '../../app/utils/tracklistView'
+import type { TracklistHelpers, TracklistRoleGroup } from '../../app/utils/tracklistView'
 import { describe, expect, it } from 'vitest'
 import { buildTracklist, defaultLanguageKey, normalizeTracklistPrefs } from '../../app/utils/tracklistView'
 
-const ORDER = ['artist', 'composer', 'lyricist', 'arranger', 'vocals', 'voice_actor']
-const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'composition', lyricist: 'lyrics', arranger: 'arrangement', vocals: 'vocals', voice_actor: 'vocals' }
+const ORDER = ['artist', 'composer', 'lyricist', 'arranger', 'vocals', 'voice_actor', 'featuring']
+const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'composition', lyricist: 'lyrics', arranger: 'arrangement', vocals: 'vocals', voice_actor: 'vocals', featuring: 'vocals' }
 
 const helpers: TracklistHelpers = {
   titleIn: (titles, wanted) => (wanted ? titles.find(title => title.locale === wanted.locale && title.kind === wanted.kind)?.title ?? null : null),
@@ -56,16 +56,38 @@ describe('buildTracklist', () => {
     const credits = [credit('vocals', 'Vivienne', 3), credit('arranger', 'NAGI', 1), credit('arranger', 'Eris', null, 'remix'), credit('composer', 'NAGI', 1)]
     const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
     expect(row.groups.map(group => group.role)).toEqual(['composer', 'arranger', 'vocals'])
-    expect(row.groups[1]!.people).toEqual([{ name: 'NAGI', artistId: 1, detail: null }, { name: 'Eris', artistId: null, detail: 'remix' }])
+    expect(row.groups[1]!.people).toEqual([
+      { creditId: credits[1]!.id, name: 'NAGI', artistId: 1, artistName: 'NAGI', detail: null, guests: [] },
+      { creditId: credits[2]!.id, name: 'Eris', artistId: null, artistName: null, detail: 'remix', guests: [] },
+    ])
     expect(row.lead?.role).toBe('vocals')
     expect(row.maker?.role).toBe('arranger')
   })
 
-  it('leads with the 署名艺术家, falls back to composers and reads roles by category', () => {
+  it('leads with the 艺术家, falls back to composers and reads roles by category', () => {
     const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
     expect(row([credit('vocals', 'A', 1), credit('artist', 'B', 2)]).lead?.role).toBe('artist')
     expect(row([credit('voice_actor', 'C', 3), credit('composer', 'D', 4)])).toMatchObject({ lead: { role: 'voice_actor' }, maker: { role: 'composer' } })
     expect(row([])).toMatchObject({ lead: null, maker: null })
+  })
+
+  it('puts each 客串 with the credit it belongs to, in 完整 too, and keeps the role only for those it can\'t place', () => {
+    const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    const xeudo = credit('artist', 'Xeudo Code', 1)
+    const xeno = credit('artist', 'Xeno', 2)
+    const both = row([xeudo, xeno, { ...credit('featuring', 'eili', 3), parent_id: xeno.id }, credit('composer', 'Xeno', 2)])
+    const text = (group: TracklistRoleGroup | null) => group?.people.map(person => [person.name, ...person.guests.map(guest => guest.name)].join(' feat. '))
+    expect(text(both.lead)).toEqual(['Xeudo Code', 'Xeno feat. eili'])
+    expect(both.lead!.people[1]!.guests).toMatchObject([{ name: 'eili', artistId: 3 }])
+    expect(both.groups.map(group => group.role)).toEqual(['artist', 'composer'])
+    // Belonging to a singer
+    const vocals = credit('vocals', 'A', 4)
+    const sung = row([vocals, { ...credit('featuring', 'B', 5), parent_id: vocals.id }])
+    expect(text(sung.lead)).toEqual(['A feat. B'])
+    expect(sung.groups.map(group => group.role)).toEqual(['vocals'])
+    const alone = row([credit('featuring', 'B', 5)])
+    expect(alone.lead).toMatchObject({ role: 'featuring', people: [{ name: 'B' }] })
+    expect(alone.groups).toEqual([alone.lead])
   })
 
   it('lists the roles credited on each disc for the table', () => {
@@ -105,9 +127,9 @@ describe('buildTracklist', () => {
 
 describe('normalizeTracklistPrefs', () => {
   it('fills in defaults and drops unknown values', () => {
-    expect(normalizeTracklistPrefs(undefined, ['list', 'table'])).toEqual({ style: 'list', density: 'comfy', trackCard: true, artistCard: true })
+    expect(normalizeTracklistPrefs(undefined, ['list', 'table'])).toEqual({ style: 'list', density: 'comfy', artistCard: true })
     expect(normalizeTracklistPrefs({ style: 'table', density: 'full', trackCard: false, artistCard: 'no' }, ['list', 'table']))
-      .toEqual({ style: 'table', density: 'full', trackCard: false, artistCard: true })
+      .toEqual({ style: 'table', density: 'full', artistCard: true })
     expect(normalizeTracklistPrefs({ style: 'gone', density: 'huge' }, ['list'])).toMatchObject({ style: 'list', density: 'comfy' })
   })
 })

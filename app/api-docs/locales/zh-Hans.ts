@@ -323,7 +323,7 @@ const texts: ApiDocsTexts = {
       },
       notes: md`
         - 每次请求会记一次浏览（同一来源每天只记一次），\`views_count\` 每 5 分钟更新。
-        - 署名与发行（发行、厂牌、署名艺术家等）也在 \`credits\` 里，\`category\` 为 \`release\`。
+        - 署名与发行（发行、厂牌、艺术家等）也在 \`credits\` 里，\`category\` 为 \`release\`。
       `,
     },
     'get-tracks-id': {
@@ -376,7 +376,7 @@ const texts: ApiDocsTexts = {
     },
     'get-artists-id-albums': {
       title: '艺术家发行的专辑',
-      summary: '这位艺术家在整张专辑上担任「署名与发行」角色（署名艺术家、发行、厂牌、经销、制造、企划）的专辑，按发行日期从新到旧。包括审核中的专辑。',
+      summary: '这位艺术家在整张专辑上担任「署名与发行」角色（艺术家、发行、厂牌、经销、制造、企划）的专辑，按发行日期从新到旧。包括审核中的专辑。',
       params: {
         id: '艺术家 ID。',
       },
@@ -644,7 +644,7 @@ const texts: ApiDocsTexts = {
         favorites_count: '收藏数。',
         reviews_count: '评价数。',
         views_count: '浏览数，每 5 分钟更新一次。',
-        byline: '标题下面那一行署名：有发行方时是全部发行方，否则是署名艺术家；都没有时为 `null`。',
+        byline: '标题下面那一行署名：有发行方时是全部发行方，否则是艺术家；都没有时为 `null`。',
       },
     },
     Album: {
@@ -783,6 +783,7 @@ const texts: ApiDocsTexts = {
         'credits.role': '角色的 key，名称见 `/catalog/schema` 的 `credit_roles`。',
         'credits.detail': '补充说明，例如具体的乐器或角色名。',
         'credits.credited_as': '署名，和艺术家名不同时才有。',
+        'credits.parent_id': '这条 credit 所属的、同一曲目上那条 credit 的 ID，例如客串所属的艺术家；没有时为 `null`。',
         'credits.artist': '艺术家；只知道署名、还没有对应的艺术家时为 `null`。',
         'credits.artist.id': '艺术家 ID。',
         'credits.artist.name': '艺术家名称（原名）。',
@@ -802,6 +803,7 @@ const texts: ApiDocsTexts = {
         'artist.image_url': '头像。',
         'artist.type': '艺术家类型。',
         'credited_as': '署名，即专辑上印的名字；和艺术家名不同时才有。',
+        'parent_id': '这条 credit 所属的那条 credit 的 ID，在同一曲目上（或者都在整张专辑上）。曲目上的客串（`featuring`）一定有，指向它跟着的那位（「Xeudo Code & Xeno feat. eili」里是 Xeno）；其他角色也可以有。有所属的 credit 不会再被别的 credit 所属。没有时为 `null`。',
         'detail': '补充说明，例如具体的乐器或配音的角色。',
       },
     },
@@ -1173,7 +1175,7 @@ const texts: ApiDocsTexts = {
       title: '署名',
       description: '标题下面那一行署名，保存专辑时算好。',
       fields: {
-        'role': '`publisher` 时是整张专辑的全部发行方，`artist` 时是全部署名艺术家。',
+        'role': '`publisher` 时是整张专辑的全部发行方，`artist` 时是全部艺术家。',
         'artists': '署名的艺术家，按制作人员的顺序。',
         'artists.id': '艺术家 ID；只有署名、没有对应的艺术家时为 `null`。',
         'artists.name': '署名；没有单独的署名时是艺术家名。',
@@ -1304,7 +1306,7 @@ const texts: ApiDocsTexts = {
       title: '角色分类',
       description: '制作人员角色的分组。具体的角色见 `/catalog/schema` 的 `credit_roles`。',
       values: {
-        release: '署名与发行：署名艺术家、发行、厂牌等，见 [release_role](#enum-release-role)。',
+        release: '署名与发行：艺术家、发行、厂牌等，见 [release_role](#enum-release-role)。',
         composition: '作曲。',
         lyrics: '作词。',
         arrangement: '编曲、混音改编。',
@@ -1320,7 +1322,7 @@ const texts: ApiDocsTexts = {
       title: '署名与发行',
       description: '「署名与发行」组的 6 个角色，是 `credits[].role` 的一部分。专辑的署名（Byline）从这里算出。',
       values: {
-        artist: '署名艺术家：封面或曲目上署名的艺术家。',
+        artist: '艺术家：封面或曲目上署名的艺术家。',
         publisher: '发行（発売元），只用于整张专辑。',
         label: '厂牌（レーベル），只用于整张专辑。',
         distributor: '经销（販売元），只用于整张专辑。',

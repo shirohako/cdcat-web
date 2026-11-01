@@ -43,7 +43,8 @@ export interface AlbumDocument {
   track_originals: Array<{ id: RowId, track_id: RowId, original_track_id: number | null, original_title: string | null, sort_order?: number }>
   track_titles: Array<TitleRow & { track_id: RowId }>
   disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], source: string }>
-  credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, role: string, detail: string | null, sort_order?: number }>
+  /** parent_id: the credit of the same track (or album) this one belongs to, a 客串's 艺术家 (utils/artistLine) */
+  credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, parent_id?: RowId | null, role: string, detail: string | null, sort_order?: number }>
   images: Array<{
     id: RowId, image_id: number, kind: string, label: string | null, caption: string | null,
     product_id: RowId | null, bonus_id: RowId | null, disc_id: RowId | null, sort_order?: number

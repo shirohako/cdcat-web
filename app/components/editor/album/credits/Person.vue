@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
+import type { UiSelectOption } from '~/components/ui/Select.vue'
 import type { CreditPerson } from '~/utils/creditLines'
 
 /**
  * One person of a credit, as a tag: the name with what to look at beside it (新建, 选类型 for a new artist without
  * a type, 仅署名 for a printed name only, the harvest page's notes), and a remove button. A click opens the rest:
  * the printed name and the detail (applied when the card closes, since they decide which line the person is in), a
- * new artist's type, and linking the person to an artist or keeping only the printed name.
+ * new artist's type, and linking the person to an artist or keeping only the printed name. Given `parent` (on a track
+ * card), also which credit of the track it belongs to (parent_id, utils/artistLine): the 客串's 艺术家, shown on the
+ * tag as "↳ Xeno" when there was a choice.
  */
-const props = defineProps<{ person: CreditPerson, invalid?: boolean }>()
-const emit = defineEmits<{ update: [patch: Partial<CreditPerson>], remove: [] }>()
+const props = defineProps<{
+  person: CreditPerson
+  invalid?: boolean
+  parent?: { value: string, options: UiSelectOption<string>[], label: string | null }
+}>()
+const emit = defineEmits<{ update: [patch: Partial<CreditPerson>], remove: [], parent: [value: string] }>()
 
 const { t } = useI18n()
 const people = useCreditPeople()
@@ -77,6 +84,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
           <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
           <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-[10px] font-bold text-success">{{ t('editor.new') }}</span>
           <span v-else-if="person.artist_id === null" class="shrink-0 text-[10px] text-meta">{{ t('editor.dialog.name_only') }}</span>
+          <span v-if="parent?.label" class="truncate text-[11px] text-meta">↳ {{ parent.label }}</span>
           <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning" :title="note">⚠</span>
         </button>
         <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">
@@ -100,6 +108,11 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}</span>
         <input v-model="form.detail" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
       </label>
+      <div v-if="parent">
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}</span>
+        <UiSelect :model-value="parent.value" :options="parent.options" size="sm" class="w-full" @update:model-value="emit('parent', $event as string)" />
+        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.parent_hint') }}</span>
+      </div>
       <div v-if="person.artist_id === null">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}</span>
         <EditorEntityPicker kind="artist" :placeholder="t('editor.credits.pick_artist')" @select="link" />

@@ -82,7 +82,7 @@
               </h1>
               <p v-if="originalTitle" class="mt-1 text-sm text-body">{{ originalTitle }}</p>
 
-              <!-- The byline: the publishers, else the 署名艺术家, every one of them; under publishers, the 署名艺术家
+              <!-- The byline: the publishers, else the 艺术家, every one of them; under publishers, the 艺术家
                    follow. Who labels, sells or makes the album is in 专辑信息. Unlike the grey fact tags further down,
                    each name is the artist's picture (or its icon on a grey tile: a building for publishers, a person
                    otherwise) and the name, with no fill until hovered; then the whole block, picture and padding
@@ -197,7 +197,7 @@ const titleSize = computed(() => {
   if (width <= 40) return 'text-xl lg:text-[23px]'
   return 'text-lg lg:text-xl'
 })
-/** The album-wide 署名艺术家 when the byline names the publishers instead, each once. */
+/** The album-wide 艺术家 when the byline names the publishers instead, each once. */
 const bylineArtists = computed(() => {
   if (props.album.byline?.role !== 'publisher') return []
   const seen = new Map<string, { key: string, id: number | null, name: string }>()
@@ -210,7 +210,7 @@ const bylineArtists = computed(() => {
   return [...seen.values()]
 })
 /**
- * The byline's tags: the publishers, or with none the 署名艺术家; then the 署名艺术家 under publishers. Pictures come
+ * The byline's tags: the publishers, or with none the 艺术家; then the 艺术家 under publishers. Pictures come
  * from the credits, which carry the artists' images.
  */
 const bylineTags = computed(() => {

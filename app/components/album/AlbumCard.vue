@@ -42,7 +42,7 @@
       <div class="flex h-4 min-w-0 items-center gap-1.5 text-[11px] text-meta">
         <template v-if="bylineNames.length">
           <UserRound :size="11" class="shrink-0" />
-          <!-- Several 署名艺术家 don't fit: Various Artists, with all of them in the tooltip -->
+          <!-- Several 艺术家 don't fit: Various Artists, with all of them in the tooltip -->
           <UiTooltip v-if="various" :text="allArtists">
             <span class="truncate">{{ VARIOUS_ARTISTS }}</span>
           </UiTooltip>
@@ -81,7 +81,7 @@ const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-[3px] te
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
 /**
  * The byline (App\Support\AlbumByline): the publishers, cut off when they don't fit and shown in full in a tooltip;
- * else the 署名艺术家, one by name and several as Various Artists.
+ * else the 艺术家, one by name and several as Various Artists.
  */
 const bylineNames = computed(() => (props.album.byline?.artists ?? []).map(artist => artist.name))
 const various = computed(() => props.album.byline?.role === 'artist' && bylineNames.value.length > 1)

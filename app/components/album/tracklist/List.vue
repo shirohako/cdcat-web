@@ -50,14 +50,15 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
 
         <UiCollapse v-if="hasComfy(row)" class="col-[3/-1]" :open="density === 'comfy'">
           <div class="flex min-h-[1.375rem] items-center gap-3 pt-px">
-            <!-- Roles as tags (原曲 as a grey one), names after them; one line, cut with … when it runs long -->
+            <!-- Roles as tags (原曲 as a grey one), the names after them as grey tags; one line, cut with … when it runs
+                 long -->
             <p class="min-w-0 flex-1 truncate text-xs leading-5 text-body">
               <template v-for="(group, index) in keyGroups(row)" :key="group.role">
-                <CatalogRoleTag :label="group.label" :category="group.category" size="xs" class="mr-1 align-[1px]" :class="index > 0 && 'ml-3'" />
-                <AlbumTracklistPeople :people="group.people" />
+                <CatalogRoleTag :label="group.label" :category="group.category" class="mr-1 align-middle" :class="index > 0 && 'ml-3'" />
+                <AlbumTracklistPeople :people="group.people" inline />
               </template>
               <template v-if="row.originals.length">
-                <AlbumTracklistLabel size="xs" class="mr-1 align-[1px]" :class="keyGroups(row).length > 0 && 'ml-3'">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
+                <AlbumTracklistLabel class="mr-1 align-middle" :class="keyGroups(row).length > 0 && 'ml-3'">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
                 <AlbumTracklistOriginals :originals="row.originals" />
               </template>
             </p>

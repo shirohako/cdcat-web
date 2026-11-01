@@ -34,10 +34,7 @@
     <CatalogEmptyLine v-else :icon="ListMusic" :text="$t('album.empty.tracklist_title')" />
   </CatalogSection>
 
-  <UiHoverCard :anchor="trackCard.anchor.value" :label="hoverRow?.title" class="w-80" @enter="trackCard.enter" @leave="trackCard.leave" @close="trackCard.close">
-    <AlbumTracklistTrackCard v-if="hoverRow" :row="hoverRow" />
-  </UiHoverCard>
-  <UiHoverCard :anchor="artistCard.anchor.value" :label="hoverArtist?.name" class="w-76" @enter="artistCard.enter" @leave="artistCard.leave" @close="artistCard.close">
+  <UiHoverCard :anchor="artistCard.anchor.value" :label="hoverArtist?.name" :text-inset="16" class="w-76 p-0!" @enter="artistCard.enter" @leave="artistCard.leave" @close="artistCard.close">
     <ArtistHoverCard v-if="hoverArtist" :artist="hoverArtist" :roles="view.artistRoles.get(hoverArtist.id)" />
   </UiHoverCard>
 
@@ -196,10 +193,8 @@ const openLyrics = (row: TracklistRow, prefer: 'original' | 'translation') => {
 
 provideTracklist({ prefs, locked: computed(() => Boolean(props.locked)), folded, toggleDisc, favoriting, toggleFavorite, openLyrics })
 
-// ── Hover cards: one for titles and one for names, for the whole list.
-const trackCard = useHoverCard(list, '[data-track-card]', { enabled: () => prefs.value.trackCard })
+// ── The artist hover card, one for the whole list; titles have none (2026-11-02).
 const artistCard = useHoverCard(list, '[data-artist-card]', { enabled: () => prefs.value.artistCard })
-const hoverRow = computed(() => rowsById.value.get(Number(trackCard.current.value?.dataset.trackCard)) ?? null)
 const hoverArtist = computed(() => view.value.artists.get(Number(artistCard.current.value?.dataset.artistCard)) ?? null)
 
 // The old 显示制作人员 switch, replaced by the densities.

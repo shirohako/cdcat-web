@@ -35,14 +35,29 @@
 
               <h1 class="mb-1 wrap-break-word text-center text-lg font-bold leading-snug text-title md:text-left md:text-xl lg:text-2xl">{{ shownTitle }}</h1>
               <p v-if="originalTitle" class="mb-2 text-center text-sm text-body md:text-left">{{ originalTitle }}</p>
-              <!-- The track's own 署名艺术家, else the album's byline -->
-              <p v-if="artists.length" class="flex flex-wrap items-center justify-center gap-x-1 text-sm text-body md:justify-start">
+              <!-- The track's own 艺术家 (else the album's byline), each with the 客串 that belong to it
+                   (utils/artistLine): "Xeudo Code, Xeno feat. eili"; each name opens its artist's card -->
+              <p v-if="line.lines.length || line.left.length" ref="artistLine" class="flex flex-wrap items-center justify-center gap-x-1 text-sm text-body md:justify-start">
                 <UserRound :size="13" class="text-meta" />
-                <template v-for="(artist, index) in artists" :key="`${artist.id}:${artist.name}`">
-                  <NuxtLink v-if="artist.id" :to="`/artists/${artist.id}`" class="link link-muted">{{ artist.name }}</NuxtLink>
-                  <span v-else>{{ artist.name }}</span>
-                  <span v-if="index < artists.length - 1" class="text-meta">,</span>
-                </template>
+                <span>
+                  <template v-for="(item, index) in line.lines" :key="index">
+                    <CatalogArtistName :name="item.item.name" :artist-id="item.item.id" :artist-name="item.item.artistName" card />
+                    <template v-if="item.guests.length">
+                      <span class="text-meta"> feat. </span>
+                      <template v-for="(guest, guestIndex) in item.guests" :key="guestIndex">
+                        <CatalogArtistName :name="guest.name" :artist-id="guest.id" :artist-name="guest.artistName" card /><span v-if="guestIndex < item.guests.length - 1" class="text-meta">, </span>
+                      </template>
+                    </template>
+                    <span v-if="index < line.lines.length - 1" class="text-meta">, </span>
+                  </template>
+                  <!-- 客串 that belong to none of these names (the byline stands in, or a credit of another role) -->
+                  <template v-if="line.left.length">
+                    <span v-if="line.lines.length" class="text-meta">{{ line.lines.at(-1)!.guests.length ? ', ' : ' feat. ' }}</span>
+                    <template v-for="(guest, guestIndex) in line.left" :key="guestIndex">
+                      <CatalogArtistName :name="guest.name" :artist-id="guest.id" :artist-name="guest.artistName" card /><span v-if="guestIndex < line.left.length - 1" class="text-meta">, </span>
+                    </template>
+                  </template>
+                </span>
               </p>
 
               <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-sm text-body md:justify-start">
@@ -107,11 +122,18 @@
         </div>
       </div>
     </div>
+
+    <UiHoverCard :anchor="artistCard.anchor.value" :label="hoverArtist?.name" :text-inset="16" class="w-76 p-0!" @enter="artistCard.enter" @leave="artistCard.leave" @close="artistCard.close">
+      <ArtistHoverCard v-if="hoverArtist" :artist="hoverArtist" :roles="hoverRoles" />
+    </UiHoverCard>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { TrackDetail } from '~/types/album'
+import type { CatalogCredit } from '~/types/catalog'
+import type { TracklistArtist, TracklistArtistRole } from '~/utils/tracklistView'
+import { attachGuests, FEATURING_ROLE } from '~/utils/artistLine'
 import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music, UserRound } from '@lucide/vue'
 
 /** The top of a track page: the album's cover and banner, the title, favorite, edit and moving to the next track. */
@@ -128,15 +150,42 @@ const { isAuthenticated } = useAuth()
 const { setFavoriteTrack } = useFavorites()
 const route = useRoute()
 const { localName, formatDuration } = useCatalogDisplay()
+const { roleName, roleCategory } = useCatalogSchema()
 
 const shownTitle = computed(() => localName(props.track.title, props.track.titles))
 const originalTitle = computed(() => shownTitle.value !== props.track.title ? props.track.title : '')
 const albumTitle = computed(() => props.track.album?.title ?? '')
-const artists = computed(() => {
-  const own = (props.track.credits ?? []).filter(credit => credit.role === 'artist')
-    .map(credit => ({ id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '' }))
-  return own.length ? own : (props.track.album?.byline?.artists ?? [])
+const credits = computed(() => props.track.credits ?? [])
+type LineName = { creditId: number | null, parentId: number | null, id: number | null, name: string, artistName: string | null }
+const named = (credit: CatalogCredit): LineName => ({
+  creditId: credit.id, parentId: credit.parent_id ?? null, id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '', artistName: credit.artist?.name ?? null,
 })
+/** The artist line (utils/artistLine): the track's own 艺术家, else the album's byline, each with its 客串. */
+const line = computed(() => {
+  const own = credits.value.filter(credit => credit.role === 'artist').map(named)
+  const lead = own.length
+    ? own
+    : (props.track.album?.byline?.artists ?? []).map(artist => ({ creditId: null, parentId: null, id: artist.id, name: artist.name, artistName: null }))
+  const featuring = credits.value.filter(credit => credit.role === FEATURING_ROLE).map(named)
+  return attachGuests(lead, featuring, item => item.creditId, guest => guest.parentId)
+})
+
+// The artist hover card of the line, as in the tracklist, with the artist's roles on this track.
+const artistLine = ref<HTMLElement | null>(null)
+const artistCard = useHoverCard(artistLine, '[data-artist-card]')
+const cardArtists = computed(() => {
+  const known = new Map<number, TracklistArtist>()
+  for (const artist of props.track.album?.byline?.artists ?? []) {
+    if (artist.id) known.set(artist.id, { id: artist.id, name: artist.name })
+  }
+  for (const credit of credits.value) {
+    if (credit.artist) known.set(credit.artist.id, credit.artist)
+  }
+  return known
+})
+const hoverArtist = computed(() => cardArtists.value.get(Number(artistCard.current.value?.dataset.artistCard)) ?? null)
+const hoverRoles = computed<TracklistArtistRole[]>(() => [...new Set(credits.value.filter(credit => credit.artist && credit.artist.id === hoverArtist.value?.id).map(credit => credit.role))]
+  .map(role => ({ role, label: roleName(role), category: roleCategory(role), count: 1 })))
 const cover = computed(() => props.track.album?.image_url ?? null)
 const number = computed(() => props.track.number_label || String(props.track.track_number).padStart(2, '0'))
 const position = computed(() => props.multiDisc ? `Disc ${props.track.disc_number} · ${number.value}` : number.value)

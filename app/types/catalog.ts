@@ -110,6 +110,8 @@ export interface CatalogCredit {
   category?: string | null
   artist: { id: number, name: string, image_url?: string | null, type?: string | null } | null
   credited_as: string | null
+  /** The credit this one belongs to, on the same track: a 客串's 艺术家 (utils/artistLine) */
+  parent_id?: number | null
   detail: string | null
 }
 

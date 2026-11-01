@@ -56,14 +56,14 @@ export type ImageKind = typeof IMAGE_KINDS[number]
 
 /**
  * The credit roles of the 署名与发行 group (credit category `release`), in order: who the album is by
- * (署名艺术家, also on tracks) and who publishes, labels, sells, makes and plans it. Backend: App\Enums\ReleaseRole.
+ * (艺术家, also on tracks) and who publishes, labels, sells, makes and plans it. Backend: App\Enums\ReleaseRole.
  */
 export const RELEASE_ROLES = ['artist', 'publisher', 'label', 'distributor', 'manufacturer', 'planning'] as const
 export type ReleaseRole = typeof RELEASE_ROLES[number]
 
 /**
- * The line under an album's title: its publishers (`role` publisher); with none, its 署名艺术家 (`role` artist).
- * `id` is null for a name-only credit. Cards show several 署名艺术家 as Various Artists. Backend: App\Support\AlbumByline.
+ * The line under an album's title: its publishers (`role` publisher); with none, its 艺术家 (`role` artist).
+ * `id` is null for a name-only credit. Cards show several 艺术家 as Various Artists. Backend: App\Support\AlbumByline.
  */
 export interface AlbumByline {
   role: 'publisher' | 'artist'
@@ -95,7 +95,7 @@ export interface AlbumSimple {
   is_favorited: boolean
   /** Awaiting review; see PendingFields. */
   is_pending?: boolean
-  /** Null when the album has neither a publisher nor a 署名艺术家. */
+  /** Null when the album has neither a publisher nor a 艺术家. */
   byline?: AlbumByline | null
 }
 

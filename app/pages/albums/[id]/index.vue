@@ -113,7 +113,7 @@ const gallery = ref<{ openCover: () => void } | null>(null)
 const reviews = ref<{ openEditor: () => void, mine: AlbumReview | null } | null>(null)
 
 const shownTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : '')
-/** The byline for the page title: the publishers, else up to three 署名艺术家, else Various Artists. */
+/** The byline for the page title: the publishers, else up to three 艺术家, else Various Artists. */
 const artistLine = computed(() => bylineText(album.value?.byline))
 /** Album-wide credits in these roles, each artist once, for structured data. */
 const creditedAs = (roles: string[]) => {

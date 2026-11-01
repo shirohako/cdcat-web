@@ -29,6 +29,11 @@
     "console": "管理後台"
   },
   "album": {
+    "track_people": {
+      "title": "曲目參與人員",
+      "count": "{count} 位",
+      "all": "全曲"
+    },
     "section": {
       "description": "簡介",
       "products": "產品",
@@ -79,8 +84,6 @@
         "description": "只儲存在這個瀏覽器裡",
         "style": "樣式",
         "cards": "懸停卡片",
-        "track_card": "曲目資訊卡",
-        "track_card_hint": "滑鼠停在曲名上時顯示",
         "artist_card": "藝術家資訊卡",
         "artist_card_hint": "滑鼠停在人名上時顯示",
         "done": "完成"
@@ -2497,7 +2500,7 @@
       "artist_types": "新藝術家的類型（{count} 位）"
     },
     "suggested_item": {
-      "byline": "署名藝術家或發行",
+      "byline": "藝術家或發行",
       "catalog_number": "品番",
       "categories": "類別",
       "links": "連結",
@@ -2561,7 +2564,7 @@
       "revision_mismatch": "這筆修訂不是編輯這張專輯的。",
       "categories_suggested": "根據關聯條目，建議：",
       "byline_preview": "列表顯示",
-      "byline_none": "沒有發行，也沒有整張專輯的署名藝術家：列表裡不顯示這一行",
+      "byline_none": "沒有發行，也沒有整張專輯的藝術家：列表裡不顯示這一行",
       "byline_various": "卡片上顯示為 {name}"
     },
     "paste": {
@@ -2612,6 +2615,9 @@
       "link_artist": "關聯藝術家",
       "unlink_artist": "取消關聯，保留署名",
       "printed_as": "印作「{name}」",
+      "parent": "所屬",
+      "parent_none": "不屬於誰",
+      "parent_hint": "這條 credit 附屬於這首曲目的哪一條：客串必須有，預設是它前面的那位；其他角色可以不填。",
       "pick_type": "選類型",
       "remove_person": "移除 {name}",
       "printed_hint": "和藝術家名字不同時才填",

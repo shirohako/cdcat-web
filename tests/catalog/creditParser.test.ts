@@ -6,6 +6,7 @@ const WORDS: Record<string, string[]> = {
   lyricist: ['作詞', 'Lyrics'],
   arranger: ['編曲', 'Arranger'],
   vocals: ['Vocal', 'ボーカル'],
+  artist: ['Artist'],
   illustrator: ['Illustration'],
   publisher: ['発売元'],
 }
@@ -18,6 +19,30 @@ describe('pasted credit lists', () => {
     const [line] = parse('作曲・編曲：ミナト（M1–M3）、Yuki（M4）').lines
     expect(line!.roles).toEqual(['composer', 'arranger'])
     expect(line!.names.map(name => [name.name, tracks(name.tracks)])).toEqual([['ミナト', ['1-1', '1-2', '1-3']], ['Yuki', ['1-4']]])
+  })
+
+  it('makes who comes after feat. a 客串, with the tracks of the whole name', () => {
+    const { lines } = parse('Vocal：Gardens feat. moon jelly（M2）\nVocal：ルナ（CV：星野あかり） ft. Aoi & Mio\nVocal：Yuki (feat. Rin)、Sora')
+    const names = lines.map(line => line.names.map(name => [name.name, name.detail, tracks(name.tracks), name.featuring ?? false]))
+    expect(names).toEqual([
+      [['Gardens', null, ['1-2'], false], ['moon jelly', null, ['1-2'], true]],
+      [['ルナ', 'CV：星野あかり', null, false], ['Aoi', null, null, true], ['Mio', null, null, true]],
+      [['Yuki', null, null, false], ['Rin', null, null, true], ['Sora', null, null, false]],
+    ])
+  })
+
+  it('splits the people of one written name, each 客串 with the name right before its feat.', () => {
+    const { lines } = parse('Artist：しゅーりん × MoAE:. feat.nayuta（M10）\nArtist：Xeudo Code & Xeno feat. eili、A×B、M&M\nArtist：Yuki (feat. Rin & Sora)\nArtist：A feat. X & B feat. Y')
+    const names = lines.map(line => line.names.map(name => [name.name, name.featuring ? line.names[name.host!]!.name : null]))
+    expect(names).toEqual([
+      [['しゅーりん', null], ['MoAE:.', null], ['nayuta', 'MoAE:.']],
+      [['Xeudo Code', null], ['Xeno', null], ['eili', 'Xeno'], ['A', null], ['B', null], ['M&M', null]],
+      [['Yuki', null], ['Rin', 'Yuki'], ['Sora', 'Yuki']],
+      [['A', null], ['X', 'A'], ['B', null], ['Y', 'B']],
+    ])
+    expect(lines[0]!.names.map(name => tracks(name.tracks))).toEqual([['1-10'], ['1-10'], ['1-10']])
+    // The whole written name goes with its first person, for the dialog to keep it whole when it is an artist's name
+    expect(lines[1]!.names.map(name => name.unit ?? null)).toEqual([{ name: 'Xeudo Code & Xeno', size: 2 }, null, null, { name: 'A×B', size: 2 }, null, null])
   })
 
   it('keeps brackets that are no track list as the detail, and reads shorthands and 全曲', () => {
