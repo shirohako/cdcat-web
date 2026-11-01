@@ -466,8 +466,8 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   <template v-if="detail.candidate.merged.title.alternatives.length">
                     <dt class="pt-0.5 text-xs text-slate-500">标题</dt>
                     <dd class="space-y-1">
-                      <div v-for="alt in [{ value: detail.candidate.merged.title.value, source: detail.candidate.merged.title.source }, ...detail.candidate.merged.title.alternatives]" :key="`${alt.source}-${alt.value}`" class="flex items-baseline gap-2">
-                        <span class="w-16 shrink-0 truncate text-xs text-slate-500">{{ alt.source ? sourceName(alt.source) : '' }}</span>
+                      <!-- One row per distinct title, without sources: identical titles of several sources are one row. -->
+                      <div v-for="alt in [{ value: detail.candidate.merged.title.value }, ...detail.candidate.merged.title.alternatives]" :key="alt.value ?? ''" class="flex items-baseline gap-2">
                         <span class="min-w-0 flex-1 break-words">{{ alt.value }}</span>
                         <UiButton v-if="open && alt.value" size="xs" class="shrink-0" @click="useTitle(alt.value)">采用</UiButton>
                       </div>
