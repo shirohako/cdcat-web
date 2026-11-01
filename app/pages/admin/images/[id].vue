@@ -32,6 +32,7 @@ const imageKindLabels: Record<string, string> = {
   sticker: '贴纸',
   bonus_item: '特典',
   illustration: '插图',
+  oshinagaki: '品书',
   other: '其他',
 }
 const imageUseTypeLabels: Record<string, string> = {

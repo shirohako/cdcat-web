@@ -50,9 +50,16 @@ export const DISC_FORMAT_ICONS: Record<DiscFormat, string> = {
 }
 
 export const IMAGE_KINDS = [
-  'cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'other',
+  'cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'oshinagaki', 'other',
 ] as const
 export type ImageKind = typeof IMAGE_KINDS[number]
+
+/** The image kind picker's groups, in order: the case and what wraps it, what is inside, the rest. */
+export const IMAGE_KIND_GROUPS: ReadonlyArray<{ key: string, kinds: readonly ImageKind[] }> = [
+  { key: 'packaging', kinds: ['cover', 'front', 'back', 'box', 'obi_front', 'obi_back', 'sticker'] },
+  { key: 'inside', kinds: ['booklet', 'tray', 'disc', 'disc_back'] },
+  { key: 'other', kinds: ['bonus_item', 'illustration', 'oshinagaki', 'other'] },
+]
 
 /**
  * The credit roles of the 署名与发行 group (credit category `release`), in order: who the album is by

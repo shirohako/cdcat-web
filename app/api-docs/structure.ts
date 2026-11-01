@@ -1210,7 +1210,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         { kind: 'enum', name: 'limited_rule', values: ['first_press', 'count', 'period', 'shop', 'event', 'region'] },
         { kind: 'enum', name: 'product_medium', values: ['physical', 'digital'] },
         { kind: 'enum', name: 'bonus_type', values: ['bonus_track', 'bonus_disc', 'booklet', 'photo_item', 'goods', 'digital_content', 'serial_code', 'event_entry', 'signed_item', 'other'] },
-        { kind: 'enum', name: 'image_kind', values: ['cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'other'] },
+        { kind: 'enum', name: 'image_kind', values: ['cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'oshinagaki', 'other'] },
         { kind: 'enum', name: 'lyric_kind', values: ['original', 'translation', 'transliteration'] },
         { kind: 'enum', name: 'lyric_format', values: ['plain', 'lrc', 'srt'] },
         { kind: 'enum', name: 'entry_type', values: ['anime', 'game', 'movie', 'tv', 'book', 'manga', 'stage', 'other'] },

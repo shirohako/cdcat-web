@@ -1391,6 +1391,7 @@ const texts: ApiDocsTexts = {
         sticker: '貼紙。',
         bonus_item: '特典物品。',
         illustration: '插圖。',
+        oshinagaki: '品書（お品書き）：社團在展會前公布的新刊與價目一覽。',
         other: '其他。',
       },
     },

@@ -1779,6 +1779,7 @@
       "sticker": "스티커",
       "bonus_item": "특전",
       "illustration": "일러스트",
+      "oshinagaki": "오시나가키",
       "other": "기타"
     },
     "artist_relation": {
@@ -2692,6 +2693,8 @@
       "url_not_square": "정사각형이 아닌 이미지예요. 다운로드한 뒤 파일로 업로드하면 잘라서 쓸 수 있어요.",
       "too_large": "파일이 25MB를 넘어요.",
       "unreadable": "이미지로 읽을 수 없는 파일이에요.",
+      "gallery": "갤러리",
+      "drop_hint": "여기에 이미지를 끌어다 놓으세요",
       "gallery_hint": "앞면, 뒷면, 부클릿, 디스크, 띠지 등 여러 장을 한 번에 업로드할 수 있어요. 종류는 파일 이름을 보고 자동으로 정해요.",
       "upload_many": "이미지 업로드",
       "uploading": "{count}장 업로드 중…",
@@ -2703,7 +2706,12 @@
       "already_added": "이미 갤러리에 있는 이미지예요.",
       "upload_file": "업로드",
       "remove": "삭제",
-      "missing": "삭제된 이미지예요. 다시 업로드해 주세요."
+      "missing": "삭제된 이미지예요. 다시 업로드해 주세요.",
+      "kind_group": {
+        "packaging": "패키지",
+        "inside": "내용물",
+        "other": "기타"
+      }
     },
     "crop": {
       "title": "정사각형으로 자르기",

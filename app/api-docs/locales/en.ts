@@ -1391,6 +1391,7 @@ const texts: ApiDocsTexts = {
         sticker: 'Sticker.',
         bonus_item: 'Bonus item.',
         illustration: 'Illustration.',
+        oshinagaki: 'Oshinagaki: the list of releases and prices a circle posts before an event.',
         other: 'Other.',
       },
     },

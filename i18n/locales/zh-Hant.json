@@ -1779,6 +1779,7 @@
       "sticker": "貼紙",
       "bonus_item": "特典",
       "illustration": "插圖",
+      "oshinagaki": "品書",
       "other": "其他"
     },
     "artist_relation": {
@@ -2692,6 +2693,8 @@
       "url_not_square": "這張圖不是正方形。請下載後上傳檔案，再進行裁切。",
       "too_large": "檔案超過 25 MB。",
       "unreadable": "無法把這個檔案讀作圖片。",
+      "gallery": "圖庫",
+      "drop_hint": "把圖片拖到這裡",
       "gallery_hint": "正面、背面、歌詞本、碟面、側標……可以一次上傳多張，類別依檔名猜測。",
       "upload_many": "上傳圖片",
       "uploading": "正在上傳 {count} 張…",
@@ -2703,7 +2706,12 @@
       "already_added": "這張圖片已經在圖庫裡了。",
       "upload_file": "上傳",
       "remove": "移除",
-      "missing": "圖片已被清理，請重新上傳"
+      "missing": "圖片已被清理，請重新上傳",
+      "kind_group": {
+        "packaging": "包裝",
+        "inside": "盒內",
+        "other": "其他"
+      }
     },
     "crop": {
       "title": "裁切成正方形",

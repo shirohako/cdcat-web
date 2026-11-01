@@ -24,3 +24,13 @@ export const moveRow = <T extends Ordered>(rows: T[], row: T, delta: number) => 
   ordered.splice(to, 0, ...ordered.splice(from, 1))
   ordered.forEach((item, index) => { item.sort_order = index })
 }
+
+/** Moves a row to just before `before` (to the end when null) in display order and renumbers sort_order 0..n-1. */
+export const placeRow = <T extends Ordered>(rows: T[], row: T, before: T | null) => {
+  if (row === before) return
+  const ordered = byOrder(rows).filter(item => item !== row)
+  const at = before ? ordered.indexOf(before) : ordered.length
+  if (at < 0) return
+  ordered.splice(at, 0, row)
+  ordered.forEach((item, index) => { item.sort_order = index })
+}

@@ -1,18 +1,29 @@
 <template>
-  <li v-if="image" class="flex gap-3 rounded-xl border p-3" :class="errors.length ? 'border-danger/25 bg-danger/10' : 'border-line'">
-    <a :href="file?.url" target="_blank" rel="noopener" class="block h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-sunken">
-      <img v-if="file" :src="file.thumbnail_url" alt="" class="h-full w-full object-cover" loading="lazy">
-      <span v-else class="flex h-full items-center justify-center p-2 text-center text-[11px] text-danger">{{ $t('editor.image.missing') }}</span>
-    </a>
-    <div class="min-w-0 flex-1 space-y-2">
-      <div class="flex flex-wrap items-center gap-2">
-        <UiSelect v-model="image.kind" :options="kindOptions" size="sm" class="w-36" :aria-label="$t('catalog.field.kind')" />
-        <input v-model="image.label" class="input input-sm w-28" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')">
-        <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-44" :aria-label="$t('editor.image.scope')" @change="setScope" />
-        <span class="ml-auto flex gap-0.5">
-          <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="emit('move', -1)" />
-          <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="emit('move', 1)" />
-          <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="removeImage(album, imageId)" />
+  <li v-if="image" class="relative flex gap-3 rounded-xl border p-3 transition-opacity sm:gap-4" :class="[errors.length ? 'border-danger/25 bg-danger/10' : 'border-line', dragging && 'opacity-40']">
+    <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
+    <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-[5px]' : '-bottom-[5px]'" />
+    <!-- Dragging starts from the handle only, so text in the fields can still be selected; the buttons move rows by keyboard and touch. -->
+    <span class="-ml-1 flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing" aria-hidden="true" @pointerdown="emit('grab')">
+      <GripVertical :size="16" />
+    </span>
+    <!-- The whole image at its own shape (scans are often far from square), its size underneath. -->
+    <figure class="w-28 shrink-0 sm:w-36">
+      <a :href="file?.url" target="_blank" rel="noopener" class="block" draggable="false">
+        <img v-if="file" :src="file.thumbnail_url" alt="" class="mx-auto max-h-52 max-w-full rounded-lg bg-sunken object-contain ring-1 ring-line" loading="lazy">
+        <span v-else class="flex aspect-square w-full items-center justify-center rounded-lg bg-sunken p-2 text-center text-[11px] text-danger">{{ $t('editor.image.missing') }}</span>
+      </a>
+      <figcaption v-if="file" class="mt-1.5 text-center text-[11px] tabular-nums text-meta">{{ file.width }} × {{ file.height }}</figcaption>
+    </figure>
+    <div class="@container min-w-0 flex-1 space-y-2">
+      <!-- Kind, label and scope share one line when the form is wide enough, the row's buttons at its end; narrower, two lines. -->
+      <div class="grid gap-2 @sm:grid-cols-2 @2xl:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto]">
+        <UiSelect v-model="image.kind" :options="kindOptions" size="sm" class="w-full" :aria-label="$t('catalog.field.kind')" />
+        <input v-model="image.label" class="input input-sm w-full" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')" :aria-label="$t('catalog.field.label')">
+        <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-full" :aria-label="$t('editor.image.scope')" @change="setScope" />
+        <span class="flex justify-end gap-1">
+          <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="emit('move', -1)" />
+          <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="emit('move', 1)" />
+          <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="removeImage(album, imageId)" />
         </span>
       </div>
       <input v-model="image.caption" class="input input-sm w-full" maxlength="500" :placeholder="$t('editor.image.caption_placeholder')">
@@ -20,7 +31,6 @@
         <summary class="cursor-pointer text-[11px] font-medium text-meta transition-colors hover:text-primary">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
         <EditorAttributeRows v-model="album.image_attributes" compact subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
       </details>
-      <p v-if="file" class="text-[10px] text-meta">{{ file.width }} × {{ file.height }}</p>
       <p v-for="error in errors" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
     </div>
   </li>
@@ -30,33 +40,30 @@
 import type { CatalogImage } from '~/types/catalog'
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { ArrowDown, ArrowUp, Trash2 } from '@lucide/vue'
-import { coverOf, removeImage, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
+import { ArrowDown, ArrowUp, GripVertical, Trash2 } from '@lucide/vue'
+import { removeImage, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
 import { byOrder, sameId } from '~/utils/documentRows'
 
-const props = defineProps<{ imageId: RowId, first: boolean, last: boolean }>()
-const emit = defineEmits<{ move: [delta: number] }>()
+/**
+ * One row of the album editor's image list. The section orders the rows: `grab` when the handle is pressed (the
+ * row then becomes draggable), `dragging` while this row is dragged, `dropEdge` where a dragged row would land.
+ */
+const props = defineProps<{ imageId: RowId, first: boolean, last: boolean, dragging?: boolean, dropEdge?: 'before' | 'after' | null }>()
+const emit = defineEmits<{ move: [delta: number], grab: [] }>()
 
 const editor = useAlbumEditor()
-const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 const { t } = useI18n()
+const imageKindOptions = useImageKindOptions()
 
 const album = computed(() => editor.album.value)
 const image = computed(() => album.value.images.find(row => sameId(row.id, props.imageId)) ?? null)
-const kinds = computed(() => schema.value?.enums?.image_kind ?? [])
 const products = computed(() => sortedProducts(album.value))
 const bonuses = computed(() => byOrder(album.value.bonuses))
 const discs = computed(() => sortedDiscs(album.value))
 const file = computed(() => image.value ? editor.references.images?.[String(image.value.image_id)] as CatalogImage | undefined : undefined)
 const errors = computed(() => editor.errorsIn(`images.${props.imageId}`))
-const hasCover = computed(() => !!coverOf(album.value))
-const isCover = computed(() => image.value?.kind === 'cover')
-const kindOptions = computed<UiSelectOption<string>[]>(() => kinds.value.map(value => ({
-  value,
-  label: enumLabel('image_kind', value),
-  disabled: value === 'cover' && !isCover.value && hasCover.value,
-})))
+const kindOptions = computed(() => imageKindOptions(image.value?.kind))
 const scopeOptions = computed<UiSelectOption<string>[]>(() => [
   { value: 'album', label: t('editor.image.scope_album') },
   ...products.value.map(product => ({ value: `p:${product.id}`, label: product.name || product.catalog_number || enumLabel('edition_type', product.edition_type), group: t('catalog.collection.products') })),

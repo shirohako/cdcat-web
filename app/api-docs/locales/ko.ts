@@ -1390,6 +1390,7 @@ const texts: ApiDocsTexts = {
         sticker: '스티커',
         bonus_item: '특전 상품',
         illustration: '일러스트',
+        oshinagaki: '오시나가키: 서클이 행사 전에 공개하는 신간과 가격 목록',
         other: '기타',
       },
     },
