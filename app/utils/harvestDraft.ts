@@ -10,8 +10,8 @@ import { RELEASE_ROLES } from '~/types/album'
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }
 
-/** Links that say nothing about the album itself (a post on X). */
-const SKIPPED_PROVIDERS = new Set(['twitter'])
+/** An X account page rather than a post (a circle's 新譜告知 or お品書き): it belongs to the circle, not the album. */
+const isAccountPage = (link: { provider: string | null, url: string }) => link.provider === 'twitter' && !/\/status(?:es)?\/\d+/.test(link.url)
 
 /** "2026-04" (month precision) → "2026-04-01"; the editor stores full dates with a precision. */
 const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.length === 7 ? `${date}-01` : date
@@ -94,7 +94,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
 
   const seen = new Set<string>()
   for (const link of merged.links) {
-    if (!link.provider_id || SKIPPED_PROVIDERS.has(link.provider ?? '') || seen.has(link.url)) continue
+    if (!link.provider_id || isAccountPage(link) || seen.has(link.url)) continue
     seen.add(link.url)
     doc.links.push({ id: newKey('l'), link_provider_id: link.provider_id, url: link.url })
   }
