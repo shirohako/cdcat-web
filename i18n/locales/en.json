@@ -2523,6 +2523,11 @@
       "edit_title": "Edit album",
       "untitled": "Untitled album",
       "view": "View album",
+      "preview": {
+        "button": "Preview",
+        "title": "Publish preview",
+        "note": "How the album will look once published. It isn't published yet, so the buttons and links on the page do nothing."
+      },
       "cover": "Cover",
       "title_placeholder": "The title as printed on the release",
       "type_placeholder": "Choose a type",

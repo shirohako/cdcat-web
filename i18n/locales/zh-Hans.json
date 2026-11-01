@@ -2523,6 +2523,11 @@
       "edit_title": "编辑专辑",
       "untitled": "未命名专辑",
       "view": "查看专辑",
+      "preview": {
+        "button": "预览",
+        "title": "发布预览",
+        "note": "发布后的样子。还没有发布，页面里的按钮和链接不起作用。"
+      },
       "cover": "封面",
       "title_placeholder": "按实物上印的标题填写",
       "type_placeholder": "请选择类型",

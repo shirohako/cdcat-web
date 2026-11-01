@@ -165,7 +165,9 @@ const toggleDisc = (disc: TracklistDisc, header: HTMLElement | null) => {
 }
 
 const favoriting = ref(new Set<number>())
+const previewing = useContentPreview()
 const toggleFavorite = async (row: TracklistRow) => {
+  if (previewing) return
   if (!isAuthenticated.value) {
     await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
     return
@@ -187,6 +189,7 @@ const toggleFavorite = async (row: TracklistRow) => {
 const showLyrics = ref(false)
 const lyricsTarget = ref<{ trackId: number | null, title: string, prefer: 'original' | 'translation' }>({ trackId: null, title: '', prefer: 'original' })
 const openLyrics = (row: TracklistRow, prefer: 'original' | 'translation') => {
+  if (previewing) return
   lyricsTarget.value = { trackId: row.id, title: row.title, prefer }
   showLyrics.value = true
 }

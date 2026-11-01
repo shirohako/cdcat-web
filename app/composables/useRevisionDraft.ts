@@ -325,6 +325,6 @@ export function useRevisionDraft(options: {
 
   return {
     scope, revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, persisted, restoredAt, lastError, busy,
-    start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved,
+    start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved, payload,
   }
 }

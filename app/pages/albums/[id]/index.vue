@@ -1,56 +1,14 @@
 <template>
   <div class="min-h-screen">
-    <div v-if="album && !mergedInto" :class="revealClass">
-      <AlbumHero :album="album" @open-cover="gallery?.openCover()" @favorited="value => mutate(current => ({ ...current, is_favorited: value }))" />
-      <CatalogPendingBanner :pending="album.is_pending" :revision="album.pending_revision" />
-
-      <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
-        <!-- The side column a little narrower than a third, so the tracklist and the other main cards get the room -->
-        <div class="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_18rem] xl:grid-cols-[minmax(0,1fr)_19.5rem] 2xl:grid-cols-[minmax(0,1fr)_21rem]">
-          <div class="min-w-0 space-y-8">
-            <AlbumDescriptions :album="album" />
-
-            <AlbumCredits :credits="album.credits" :discs="album.discs" />
-
-            <AlbumTracklist :discs="album.discs" :bonuses="album.bonuses" :languages="album.tracklist_languages" :credits="album.credits" :locked="album.is_pending" @favorited="setTrackFavorite" />
-
-            <AlbumProducts :products="album.products" :bonuses="album.bonuses" :discs="album.discs" :images="album.images" />
-
-            <!-- Albums awaiting review can only be viewed: reviews and tracking open after approval. -->
-            <AlbumReviews v-if="!album.is_pending" ref="reviews" :album-id="album.id" @changed="refresh" />
-          </div>
-
-          <div class="min-w-0 space-y-6">
-            <div v-if="album.is_pending" class="rounded-xl border border-dashed border-warning/30 bg-warning/10 p-4 text-sm text-body">
-              {{ $t('pending.locked') }}
-            </div>
-            <AlbumStats
-              :album-id="album.id"
-              :views-count="album.views_count"
-              :favorites-count="album.favorites_count"
-              :tracking-stats="album.tracking_stats"
-              :initial-tracking="album.user_tracking"
-              :locked="album.is_pending"
-              @tracked="setTracking"
-            />
-            <AlbumRankings
-              v-if="!album.is_pending"
-              :rating="album.rating"
-              :rating-count="album.rating_count"
-              :distribution="album.rating_distribution"
-              :ranking="album.ranking"
-              :reviewed="!!reviews?.mine"
-              @write-review="reviews?.openEditor()"
-            />
-            <AlbumLinks :links="album.links" />
-            <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
-            <AlbumArticles :articles="album.articles ?? []" />
-            <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact />
-            <AlbumEditing :album-id="album.id" :version="album.version" :edited-at="album.edited_at" />
-          </div>
-        </div>
-      </div>
-    </div>
+    <AlbumDetail
+      v-if="album && !mergedInto"
+      :class="revealClass"
+      :album="album"
+      @favorited="value => mutate(current => ({ ...current, is_favorited: value }))"
+      @track-favorited="setTrackFavorite"
+      @tracked="setTracking"
+      @changed="refresh"
+    />
 
     <div v-else-if="status === 'error'" class="flex min-h-screen items-center justify-center">
       <div class="alert alert-error max-w-md">
@@ -66,7 +24,6 @@
 <script setup lang="ts">
 import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
-import type { AlbumReview } from '~/types/reviews'
 import { ldDate, musicAlbumLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 import { bylineText } from '~/utils/albumByline'
@@ -108,9 +65,6 @@ const setTracking = (tracking: TrackingStatus | null, previous: TrackingStatus |
   if (tracking) stats[tracking] += 1
   return { ...current, tracking_stats: stats, user_tracking: tracking ? { created_at: current.user_tracking?.created_at ?? now, updated_at: now, status: tracking } : null }
 })
-
-const gallery = ref<{ openCover: () => void } | null>(null)
-const reviews = ref<{ openEditor: () => void, mine: AlbumReview | null } | null>(null)
 
 const shownTitle = computed(() => album.value ? localName(album.value.title, album.value.titles) : '')
 /** The byline for the page title: the publishers, else up to three 艺术家, else Various Artists. */

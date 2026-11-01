@@ -2523,6 +2523,11 @@
       "edit_title": "앨범 편집",
       "untitled": "제목 없는 앨범",
       "view": "앨범 보기",
+      "preview": {
+        "button": "미리보기",
+        "title": "게시 미리보기",
+        "note": "게시된 후의 모습입니다. 아직 게시되지 않았으므로 페이지의 버튼과 링크는 작동하지 않습니다."
+      },
       "cover": "커버",
       "title_placeholder": "실물에 적힌 제목을 그대로 입력해 주세요",
       "type_placeholder": "유형 선택",

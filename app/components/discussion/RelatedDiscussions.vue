@@ -13,8 +13,11 @@ const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
 const { ago } = useRelativeTime()
 const link = computed(() => `${props.type}:${props.id}`)
-const { data, loading } = await usePageData(`related-discussions-${link.value}`,
-  ({ signal, background }) => $api<DiscussionTopicList>('/v1/discussions/topics', { query: { link: link.value, per_page: 5 }, signal, progress: !background }))
+// Content in a preview isn't published, so nothing links it yet.
+const { data, loading } = useContentPreview()
+  ? { data: ref<DiscussionTopicList | null>(null), loading: computed(() => false) }
+  : await usePageData(`related-discussions-${link.value}`,
+    ({ signal, background }) => $api<DiscussionTopicList>('/v1/discussions/topics', { query: { link: link.value, per_page: 5 }, signal, progress: !background }))
 const topics = computed(() => data.value?.topics ?? [])
 const total = computed(() => data.value?.pagination.total ?? 0)
 const start = computed(() => isAuthenticated.value ? { path: '/discussions/new', query: { link: link.value } } : { path: '/auth/login', query: { redirect: `/discussions/new?link=${link.value}` } })

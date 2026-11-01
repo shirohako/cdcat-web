@@ -44,7 +44,7 @@
   <Teleport to="body">
     <!-- Above the navbar (z-50) and sidebar, which would otherwise cover the top bar with its close button; below
          popovers and tooltips. A click on the dark area around the picture closes it too. -->
-    <div v-if="current" ref="viewer" class="fixed inset-0 z-[70] flex flex-col bg-black/90" tabindex="-1" @keydown.esc="close" @keydown.left="step(-1)" @keydown.right="step(1)">
+    <div v-if="current" ref="viewer" class="fixed inset-0 z-[70] flex flex-col bg-black/90" tabindex="-1" @keydown.esc.stop="close" @keydown.left="step(-1)" @keydown.right="step(1)">
       <div class="flex items-center gap-3 px-4 py-3 text-sm text-white/80">
         <span class="font-semibold text-white">{{ enumLabel('image_kind', current.kind) }}</span>
         <span v-if="current.label">{{ current.label }}</span>

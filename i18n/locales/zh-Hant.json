@@ -2523,6 +2523,11 @@
       "edit_title": "編輯專輯",
       "untitled": "未命名專輯",
       "view": "檢視專輯",
+      "preview": {
+        "button": "預覽",
+        "title": "發布預覽",
+        "note": "發布後的樣子。尚未發布，頁面中的按鈕和連結不會作用。"
+      },
       "cover": "封面",
       "title_placeholder": "依實物上印的標題填寫",
       "type_placeholder": "請選擇類型",

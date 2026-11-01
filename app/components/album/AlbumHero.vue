@@ -250,8 +250,10 @@ const isFavorited = ref(props.album.is_favorited)
 // The page may swap in a fresher copy of the album after this has rendered (revisit cache).
 watch(() => props.album.is_favorited, (value) => { isFavorited.value = value })
 const isToggling = ref(false)
+const previewing = useContentPreview()
 
 const toggleLike = async () => {
+  if (previewing) return
   if (!isAuthenticated.value) {
     await navigateTo(`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
     return

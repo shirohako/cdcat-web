@@ -217,8 +217,9 @@ watch(() => props.initialTracking?.status ?? null, (status) => {
   if (!saving.value) mine.value = status
 })
 
+const previewing = useContentPreview()
 const fetchMine = async () => {
-  if (!isAuthenticated.value || mine.value !== null) return
+  if (previewing || !isAuthenticated.value || mine.value !== null) return
   try {
     mine.value = (await getAlbumTracking(props.albumId)).status
   } catch (error) {
@@ -228,7 +229,7 @@ const fetchMine = async () => {
 
 /** Picks a status, or takes back the one already picked. The counts move at once, and back if saving fails. */
 const choose = async (status: TrackingStatus) => {
-  if (props.locked || saving.value) return
+  if (props.locked || previewing || saving.value) return
   if (!isAuthenticated.value) {
     router.push({ path: '/auth/login', query: { redirect: route.fullPath } })
     return

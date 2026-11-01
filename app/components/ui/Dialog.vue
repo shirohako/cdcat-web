@@ -52,9 +52,7 @@
 <script lang="ts">
 import type { Component } from 'vue'
 import type { UiTone } from './IconTile.vue'
-
-/** Open dialogs, innermost last: Escape closes only the top one, and the page scrolls again once all are closed. */
-const stack: symbol[] = []
+import { dialogStack as stack } from '~/utils/dialogStack'
 </script>
 
 <script setup lang="ts">

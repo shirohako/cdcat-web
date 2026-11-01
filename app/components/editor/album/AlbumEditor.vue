@@ -16,7 +16,24 @@
             <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-2xl font-bold'">{{ album.title || $t('editor.album.untitled') }}</component>
             <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" />
           </div>
-          <nav v-if="!embedded" class="flex flex-wrap items-center gap-2">
+          <UiButton
+            v-if="embedded"
+            :icon="Eye"
+            icon-class="size-3.5"
+            size="sm"
+            :loading="previewing"
+            class="gap-1.5 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
+            @click="openPreview"
+          >{{ $t('editor.album.preview.button') }}</UiButton>
+          <nav v-else class="flex flex-wrap items-center gap-2">
+            <UiButton
+              :icon="Eye"
+              icon-class="size-3.5"
+              size="sm"
+              :loading="previewing"
+              class="gap-1.5 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
+              @click="openPreview"
+            >{{ $t('editor.album.preview.button') }}</UiButton>
             <UiButton
               v-for="link in headerLinks"
               :key="link.to"
@@ -123,6 +140,8 @@
             <EditorAlbumNewItems v-if="active === 'submit'" />
           </main>
         </div>
+
+        <EditorAlbumPreview v-model="previewOpen" :album="previewAlbum" />
       </template>
     </div>
   </div>
@@ -131,6 +150,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '~/composables/useAlbumEditor'
+import type { Album } from '~/types/album'
 import type { DraftItem, RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
@@ -141,6 +161,7 @@ import { CATALOG_RESOURCES } from '~/types/catalog'
 import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument, upgradeAlbumDocument } from '~/utils/albumDocument'
 import { newRef } from '~/utils/documentKeys'
 import { newDraftScope } from '~/utils/localDrafts'
+import { revisionFieldErrors } from '~/utils/revisionErrors'
 
 /**
  * The album editor (docs/catalog/editing.md): the album document and any artists
@@ -341,6 +362,32 @@ const headerLinks = computed(() => [
 ])
 
 const nameNotes = computed(() => props.nameNotes ?? {})
+
+// ---- preview ----
+
+const previewOpen = ref(false)
+const previewAlbum = ref<Album | null>(null)
+const previewing = ref(false)
+/**
+ * Opens the album page as the draft would publish it, from the edits as they are now (POST /albums/preview).
+ * A draft the server can't write stays shut, with its errors marked in the sections as after a submit.
+ */
+const openPreview = async () => {
+  if (previewing.value) return
+  previewing.value = true
+  previewAlbum.value = null
+  previewOpen.value = true
+  try {
+    previewAlbum.value = await $api<Album>('/v1/albums/preview', { method: 'POST', body: { ...draft.payload(), ref: mainRef.value } })
+  } catch (error) {
+    previewOpen.value = false
+    const fields = revisionFieldErrors(error)
+    if (fields.length) setErrors(fields)
+    else showToast(localizeError(error), 'error')
+  } finally {
+    previewing.value = false
+  }
+}
 
 const context: AlbumEditorContext = {
   albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,

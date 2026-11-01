@@ -150,10 +150,13 @@ const total = ref(0)
 const page = ref(1)
 const lastPage = ref(1)
 const sort = ref<ReviewSort>('latest')
+// A preview's album has no reviews yet: nothing to load, nor to write.
+const previewing = useContentPreview()
 // True until the first page is in, so the empty note doesn't flash first.
-const pending = ref(true)
+const pending = ref(!previewing)
 
 const load = async (at = 1) => {
+  if (previewing) return
   pending.value = true
   try {
     const result = await $api<ReviewPage>(`/v1/albums/${props.albumId}/reviews`, { params: { page: at, sort: sort.value } })
@@ -182,6 +185,7 @@ const toggleExpanded = (id: number) => {
 const editorOpen = ref(false)
 /** Opens the editor on the viewer's review, or sends a guest to log in. */
 const openEditor = () => {
+  if (previewing) return
   if (!isAuthenticated.value) {
     navigateTo(loginPath.value)
     return
