@@ -22,14 +22,20 @@ export const useImageUpload = () => {
     coverMinSize: schema.value?.limits?.cover_min_size ?? 500,
     tolerance: schema.value?.limits?.cover_square_tolerance ?? 0.02,
     avatarMinSize: schema.value?.limits?.avatar_min_size ?? 200,
-    bannerMinWidth: schema.value?.limits?.banner_min_width ?? 1200,
-    bannerMinRatio: schema.value?.limits?.banner_min_ratio ?? 1.5,
+    bannerMinWidth: schema.value?.limits?.banner_min_width ?? 1000,
+    bannerMinHeight: schema.value?.limits?.banner_min_height ?? 300,
+    // Only advice, not checked: 4:1 sits between the album page's strip (about 7.5:1 on a wide screen) and the artist
+    // page's (about 4.7:1), so it is stretched and cropped least on both (CommonBannerImage).
+    bannerRecommendedWidth: 2400,
+    bannerRecommendedHeight: 600,
     maxBytes: schema.value?.limits?.image_max_bytes ?? 25 * 1024 * 1024,
   }))
 
-  const upload = (file: Blob, name = 'image.jpg') => {
+  /** `purpose: 'profile'` is for the account's own avatar and banner, which needs no content.submit. */
+  const upload = (file: Blob, name = 'image.jpg', purpose?: 'profile') => {
     const body = new FormData()
     body.append('file', file, name)
+    if (purpose) body.append('purpose', purpose)
     return $api<CatalogImage>('/v1/images', { method: 'POST', body })
   }
 
@@ -53,8 +59,8 @@ export const useImageUpload = () => {
     return null
   }
 
-  /** Whether an image may be an artist's banner: wide enough, and at least banner_min_ratio times as wide as tall. */
-  const bannerFits = (width: number, height: number) => width >= limits.value.bannerMinWidth && width >= height * limits.value.bannerMinRatio
+  /** Whether an image may be a main banner: at least banner_min_width wide and banner_min_height tall, of any shape. */
+  const bannerFits = (width: number, height: number) => width >= limits.value.bannerMinWidth && height >= limits.value.bannerMinHeight
 
   return { limits, upload, importUrl, coverProblem, avatarProblem, bannerFits }
 }

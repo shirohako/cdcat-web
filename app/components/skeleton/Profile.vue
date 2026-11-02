@@ -1,20 +1,22 @@
 <!-- The placeholder for a public profile: the banner card, then the two-column body. -->
 <template>
   <SkeletonStatus page>
-    <div class="container mx-auto max-w-6xl px-4 pb-2 pt-8 md:px-6 2xl:max-w-7xl">
+    <div class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <div class="card overflow-hidden">
-        <div class="skeleton h-38 sm:h-44 md:h-52" />
-        <div class="relative border-t border-line px-4 pb-4 sm:px-6 sm:pb-6">
-          <div class="skeleton absolute -top-12 left-4 size-20 rounded-full border-3 border-white sm:-top-16 sm:left-6 sm:size-26 sm:border-4" />
-          <div class="space-y-2.5 pt-12 sm:pl-44 sm:pt-4">
-            <div class="skeleton h-6 w-40 rounded-md" />
-            <div class="skeleton h-3.5 w-24 rounded-full" />
-            <div class="skeleton h-3 w-2/3 rounded-full" />
+        <div class="page-hero-banner skeleton" />
+        <div class="relative h-11 md:h-13">
+          <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 rounded-full border-4 border-card bg-card md:left-6">
+            <div class="skeleton size-full rounded-full" />
           </div>
+        </div>
+        <div class="space-y-2.5 p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
+          <div class="skeleton h-6 w-40 rounded-md" />
+          <div class="skeleton h-3.5 w-24 rounded-full" />
+          <div class="skeleton h-3 w-2/3 rounded-full" />
         </div>
       </div>
     </div>
-    <div class="container mx-auto max-w-6xl px-4 py-8 md:px-6 2xl:max-w-7xl">
+    <div class="container mx-auto max-w-6xl px-4 py-8 md:px-8 2xl:max-w-7xl">
       <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
           <div v-for="card in 2" :key="card" class="card p-5">

@@ -2,15 +2,7 @@
   <div>
     <!-- The banner: the album's main banner, else its cover blurred into a wash. -->
     <div class="relative h-40 overflow-hidden bg-card-active sm:h-48 md:h-52 lg:h-60 2xl:h-64">
-      <img
-        v-if="banner"
-        v-img-fade
-        :src="banner.medium_url"
-        :srcset="`${banner.medium_url} 1200w, ${banner.url} ${banner.width}w`"
-        sizes="100vw"
-        alt=""
-        class="absolute inset-0 size-full object-cover"
-      >
+      <CommonBannerImage v-if="banner" :image="banner" />
       <img
         v-else-if="album.banner_url"
         v-img-fade

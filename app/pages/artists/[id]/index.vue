@@ -1,23 +1,15 @@
 <template>
-  <div class="min-h-screen" :style="pageCssVariables">
+  <div class="min-h-screen">
     <CatalogPendingBanner :pending="artist?.is_pending" :revision="artist?.pending_revision" />
     <section class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <div class="card overflow-hidden">
-        <!-- The artist's banner, cropped to the middle; the site's default one when there is none. -->
-        <div class="artist-banner bg-sunken">
-          <img
-            v-if="banner"
-            v-img-fade
-            :src="banner.medium_url"
-            :srcset="`${banner.medium_url} 1200w, ${banner.url} ${banner.width}w`"
-            sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw"
-            alt=""
-            class="h-full w-full object-cover"
-          >
-          <img v-else :src="artistPageConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
+        <!-- The artist's banner, fitted to the strip; the site's default one when there is none. -->
+        <div class="page-hero-banner relative bg-sunken">
+          <CommonBannerImage v-if="banner" :image="banner" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
+          <img v-else :src="pageHeroConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
         </div>
         <div class="relative h-11 md:h-13">
-          <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
+          <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
             <img v-if="artist?.image_url" v-img-fade :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
             <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users class="h-7 w-7 md:h-9 md:w-9" /></div>
           </div>
@@ -168,7 +160,7 @@ import type { ArtistCreditedAlbum, ArtistDetail, ArtistImage } from '~/types/art
 import type { AlbumSimple } from '~/types/album'
 import type { CatalogImage } from '~/types/catalog'
 import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
-import { artistPageConfig } from '~/config/artistPage'
+import { pageHeroConfig } from '~/config/pageHero'
 import { artistLdType, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
@@ -192,13 +184,6 @@ const galleryItems = computed(() => images.value.filter(item => !item.is_primary
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
 // One full-width column: up to six albums a row; a page of 30 ends on a full row at 2, 3, 5 and 6 columns.
 const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6'
-
-const pageCssVariables = {
-  '--artist-banner-mobile-height': `${artistPageConfig.banner.mobileHeight}px`,
-  '--artist-banner-desktop-height': `${artistPageConfig.banner.desktopHeight}px`,
-  '--artist-avatar-mobile-size': `${artistPageConfig.avatar.mobileSize}px`,
-  '--artist-avatar-desktop-size': `${artistPageConfig.avatar.desktopSize}px`,
-}
 
 // 发行的专辑: every album the artist is behind (an album-wide 署名与发行 credit), unfiltered; 参与的专辑: the albums
 // of their other credits, grouped with the credited tracks, filtered by credit role.
@@ -298,25 +283,3 @@ usePageSeo({
   }),
 })
 </script>
-
-<style scoped>
-.artist-banner {
-  height: var(--artist-banner-mobile-height);
-}
-
-.artist-avatar {
-  width: var(--artist-avatar-mobile-size);
-  height: var(--artist-avatar-mobile-size);
-}
-
-@media (min-width: 768px) {
-  .artist-banner {
-    height: var(--artist-banner-desktop-height);
-  }
-
-  .artist-avatar {
-    width: var(--artist-avatar-desktop-size);
-    height: var(--artist-avatar-desktop-size);
-  }
-}
-</style>

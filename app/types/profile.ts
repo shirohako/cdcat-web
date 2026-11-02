@@ -1,3 +1,4 @@
+import type { CatalogImage } from './catalog'
 import type { TrackingStatus } from './tracking'
 
 export interface PublicProfile {
@@ -6,6 +7,8 @@ export interface PublicProfile {
   nickname?: string
   avatar_url?: string | null
   banner_url?: string | null
+  /** The upload behind banner_url, for CommonBannerImage; null for an address from before uploads. */
+  banner_image?: CatalogImage | null
   bio?: string | null
   joined_at: string
   favorites: ProfileFavorites

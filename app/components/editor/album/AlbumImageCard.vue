@@ -80,7 +80,7 @@ const kindOptions = computed(() => imageKindOptions())
 const mainKind = computed(() => image.value?.kind === 'cover' || image.value?.kind === 'banner' ? image.value.kind : null)
 const mainProblem = computed(() => {
   if (!mainKind.value || !file.value) return mainKind.value ? t('editor.image.missing') : ''
-  if (mainKind.value === 'banner') return bannerFits(file.value.width, file.value.height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, ratio: limits.value.bannerMinRatio })
+  if (mainKind.value === 'banner') return bannerFits(file.value.width, file.value.height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, height: limits.value.bannerMinHeight })
   return coverProblem(file.value.width, file.value.height) ? t('editor.image.cover_rules', { size: limits.value.coverMinSize }) : ''
 })
 const scopeOptions = computed<UiSelectOption<string>[]>(() => [

@@ -1,30 +1,22 @@
 <template>
-  <div class="container mx-auto max-w-6xl 2xl:max-w-7xl px-4 pb-2 pt-8 md:px-6">
-    <header class="card relative overflow-hidden">
-      <div class="relative h-38 sm:h-44 md:h-52">
+  <!-- The same frame as the artist page's header: banner strip, avatar riding on its lower edge, then the text. -->
+  <section class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
+    <header class="card overflow-hidden">
+      <div class="page-hero-banner relative bg-sunken">
+        <!-- An uploaded banner is fitted like an artist's; an address from before uploads is cropped to the middle. -->
+        <CommonBannerImage v-if="profile.banner_image" :image="profile.banner_image" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
         <img
-          v-if="displayBanner"
+          v-else-if="displayBanner"
           v-img-fade
           :src="displayBanner"
           :alt="displayBanner === ownBanner ? `${profile.username} banner` : ''"
           class="h-full w-full object-cover"
           @error="onBannerError"
         >
-        <div
-          v-else
-          class="h-full w-full bg-linear-to-br from-primary/35 via-sunken to-card"
-        />
-        <div
-          class="pointer-events-none absolute inset-0 bg-linear-to-b from-transparent to-card/30"
-        />
+        <div v-else class="h-full w-full bg-linear-to-br from-primary/35 via-sunken to-card" />
       </div>
-
-      <div
-        class="relative border-t border-line px-4 pb-4 sm:px-6 sm:pb-6"
-      >
-        <div
-          class="absolute -top-12 left-4 size-20 overflow-hidden rounded-full border-3 border-white bg-sunken sm:-top-16 sm:left-6 sm:size-26 sm:border-4"
-        >
+      <div class="relative h-11 md:h-13">
+        <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
           <img
             v-if="displayAvatar"
             v-img-fade
@@ -33,57 +25,46 @@
             class="h-full w-full object-cover"
             @error="onAvatarError"
           >
-          <span
-            v-else
-            class="grid h-full w-full place-items-center text-body"
-          >
-            <User :size="26" class="text-faint sm:h-8 sm:w-8" />
-          </span>
-        </div>
-
-        <UiButton :icon="MoreVertical" :label="moreActionsLabel" size="sm" round class="absolute right-3 top-3" />
-
-        <h1
-          class="mt-12 truncate text-[1.14rem] font-semibold leading-[1.15] tracking-[-0.01em] text-title sm:mt-14 sm:text-[1.28rem] md:text-[1.42rem]"
-        >
-          {{ profileDisplayName }}
-        </h1>
-
-        <p
-          class="mt-2 flex flex-wrap items-center gap-2 text-[0.9rem] text-body sm:text-[1rem]"
-        >
-          <span>@{{ profile.username }}</span>
-          <span class="text-faint" aria-hidden="true">•</span>
-          <span class="inline-flex items-center gap-1.5">
-            <Calendar :size="14" />
-            {{ $t("profile.joined") }} {{ memberSince }}
-          </span>
-        </p>
-
-        <div class="mt-3 max-w-4xl">
-          <p
-            ref="bioTextRef"
-            :class="[
-              'wrap-break-word text-[0.88rem] leading-[1.55] text-body transition-all sm:text-[0.96rem] sm:leading-[1.6]',
-              bioCollapsible && !bioExpanded
-                ? 'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]'
-                : '',
-            ]"
-          >
-            {{ profileBio }}
-          </p>
-          <UiButton v-if="bioCollapsible" size="xs" class="mt-1" @click="bioExpanded = !bioExpanded">
-            {{ bioExpanded ? bioCollapseLabel : bioExpandLabel }}
-          </UiButton>
+          <div v-else class="flex h-full w-full items-center justify-center text-faint"><User class="h-7 w-7 md:h-9 md:w-9" /></div>
         </div>
       </div>
+      <div class="flex items-start gap-4 p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
+        <div class="min-w-0 flex-1">
+          <h1 class="truncate text-lg font-bold tracking-tight text-title md:text-xl">{{ profileDisplayName }}</h1>
+          <p class="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-meta">
+            <span>@{{ profile.username }}</span>
+            <span class="text-faint" aria-hidden="true">•</span>
+            <span class="inline-flex items-center gap-1.5">
+              <Calendar :size="14" />
+              {{ $t("profile.joined") }} {{ memberSince }}
+            </span>
+          </p>
+          <div class="mt-1.5 max-w-3xl">
+            <p
+              ref="bioTextRef"
+              :class="[
+                'wrap-break-word text-sm leading-6 text-body',
+                bioCollapsible && !bioExpanded
+                  ? 'overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]'
+                  : '',
+              ]"
+            >
+              {{ profileBio }}
+            </p>
+            <UiButton v-if="bioCollapsible" size="xs" class="mt-1" @click="bioExpanded = !bioExpanded">
+              {{ bioExpanded ? bioCollapseLabel : bioExpandLabel }}
+            </UiButton>
+          </div>
+        </div>
+        <UiButton :icon="MoreVertical" :label="moreActionsLabel" size="sm" round class="shrink-0" />
+      </div>
     </header>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { Calendar, MoreVertical, User } from "@lucide/vue";
-import { artistPageConfig } from "~/config/artistPage";
+import { pageHeroConfig } from "~/config/pageHero";
 
 const props = defineProps({
   profile: {
@@ -153,10 +134,10 @@ const ownBanner = computed(() => {
   return (props.profile.banner_url || "").trim();
 });
 
-// The user's banner, else (or when it fails to load) the same default as artist pages; the gradient only if that fails too.
+// The user's banner, else (or when it fails to load) the same default as the artist page; the gradient only if that fails too.
 const displayBanner = computed(() => {
   if (ownBanner.value && !bannerLoadFailed.value) return ownBanner.value;
-  return defaultBannerFailed.value ? "" : artistPageConfig.defaultBannerUrl;
+  return defaultBannerFailed.value ? "" : pageHeroConfig.defaultBannerUrl;
 });
 
 watch(ownBanner, () => {

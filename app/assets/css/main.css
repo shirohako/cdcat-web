@@ -132,6 +132,29 @@
   }
 }
 
+/* The banner strip and the round avatar at the top of the artist and profile pages (config/pageHero.ts). */
+@layer components {
+  .page-hero-banner {
+    height: 192px;
+  }
+
+  .page-hero-avatar {
+    width: 84px;
+    height: 84px;
+  }
+
+  @media (width >= 48rem) {
+    .page-hero-banner {
+      height: 260px;
+    }
+
+    .page-hero-avatar {
+      width: 104px;
+      height: 104px;
+    }
+  }
+}
+
 /* Toasts (components/ui/Toaster.vue), after Nuxt UI's toaster theme. Each toast is positioned from the bottom of
    the viewport by --transform; collapsed, the ones behind the front toast shrink to its height, scale down by
    --scale-factor and peek out by --gap. UiToast sets data-state, data-swipe and the swipe offsets; the keyframes are

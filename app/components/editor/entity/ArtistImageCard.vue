@@ -73,7 +73,7 @@ const mainKind = computed(() => image.value?.kind === 'avatar' || image.value?.k
 const mainProblem = computed(() => {
   if (!mainKind.value || !file.value) return mainKind.value ? t('editor.image.missing') : ''
   const { width, height } = file.value
-  if (mainKind.value === 'banner') return bannerFits(width, height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, ratio: limits.value.bannerMinRatio })
+  if (mainKind.value === 'banner') return bannerFits(width, height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, height: limits.value.bannerMinHeight })
   return Math.min(width, height) >= limits.value.avatarMinSize && isSquare(width, height, limits.value.tolerance) ? '' : t('editor.artist_image.avatar_rules', { size: limits.value.avatarMinSize })
 })
 </script>

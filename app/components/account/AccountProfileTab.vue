@@ -7,89 +7,36 @@
       </div>
 
       <div class="p-6 space-y-8">
-        <!-- Avatar -->
-        <div class="flex items-center gap-6">
-          <div class="relative group shrink-0">
-            <div class="w-20 h-20 rounded-full bg-sunken flex items-center justify-center ring-1 ring-line overflow-hidden">
-              <NuxtImg
-                v-if="avatarPreview"
-                :src="avatarPreview"
-                :alt="t('account_pages.profile.avatar_alt')"
-                class="w-full h-full object-cover"
-                @error="avatarPreview = ''"
-              />
-              <UserIcon v-else :size="32" class="text-faint" />
-            </div>
-            <button
-              type="button"
-              class="absolute inset-0 rounded-full bg-scrim flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer"
-              @click="showAvatarInput = !showAvatarInput"
-            >
-              <Camera :size="18" class="text-on-media" />
-            </button>
+        <!-- Avatar and banner: uploads, as in the artist editor, saved as soon as one is picked. The old picture, if
+             nothing else uses it, is removed by images:prune after the site's cleanup days. -->
+        <div class="grid max-w-2xl gap-6 sm:grid-cols-[10rem_minmax(0,1fr)]">
+          <div class="space-y-1.5">
+            <p class="text-sm font-medium text-body">{{ t('account_pages.profile.avatar') }}</p>
+            <EditorImageSlot
+              variant="avatar"
+              purpose="profile"
+              :file="images?.avatar_image"
+              :preview-url="images?.avatar_image ? null : (images?.avatar_url ?? user?.avatar_url)"
+              :error="avatarStatus?.error"
+              @use="saveAvatar"
+            />
+            <p v-if="avatarStatus?.done" class="text-xs font-medium text-success">{{ avatarStatus.done }}</p>
           </div>
-          <div class="space-y-2 flex-1 max-w-sm">
-            <p class="text-sm font-medium text-title">{{ t('account_pages.profile.avatar') }}</p>
-            <div v-if="showAvatarInput" class="flex gap-2">
-              <input
-                v-model="form.avatar_url"
-                type="url"
-                class="input input-sm flex-1 text-sm"
-                placeholder="https://example.com/avatar.jpg"
-                @input="onAvatarUrlInput"
-              >
-              <UiButton
-                variant="primary"
-                size="sm"
-                class="shrink-0"
-                :loading="isUpdatingAvatar"
-                :disabled="!isAvatarChanged || !form.avatar_url.trim()"
-                @click="updateAvatar"
-              >
-                {{ t('common.save') }}
-              </UiButton>
-            </div>
-            <p v-if="avatarStatus" :class="avatarStatus.class">{{ avatarStatus.message }}</p>
-            <p v-else class="text-xs text-meta">{{ t('account_pages.profile.avatar_hint') }}</p>
+          <div class="space-y-1.5">
+            <p class="text-sm font-medium text-body">{{ t('account_pages.profile.banner') }}</p>
+            <EditorImageSlot
+              variant="banner"
+              purpose="profile"
+              :file="images?.banner_image"
+              :preview-url="images?.banner_image ? null : images?.banner_url"
+              :error="bannerStatus?.error"
+              removable
+              @use="saveBanner"
+              @remove="saveBanner(null)"
+            />
+            <p v-if="bannerStatus?.done" class="text-xs font-medium text-success">{{ bannerStatus.done }}</p>
+            <p v-else class="text-xs text-meta">{{ t('account_pages.profile.banner_hint') }}</p>
           </div>
-        </div>
-
-        <!-- Banner -->
-        <div class="grid gap-1.5 max-w-sm">
-          <label for="banner" class="text-sm font-medium text-body">{{ t('account_pages.profile.banner') }}</label>
-          <div class="flex gap-2">
-            <input
-              id="banner"
-              v-model="form.banner_url"
-              type="url"
-              class="input flex-1"
-              placeholder="https://example.com/banner.jpg"
-            >
-            <UiButton
-              v-if="form.banner?.trim() && form.banner.trim() === originalBanner"
-              size="sm"
-              class="shrink-0"
-              :disabled="isUpdatingBanner"
-              @click="clearBanner"
-            >
-              {{ t('account_pages.profile.clear') }}
-            </UiButton>
-            <UiButton
-              v-else
-              variant="primary"
-              size="sm"
-              class="shrink-0"
-              :loading="isUpdatingBanner"
-              :disabled="!isBannerChanged"
-              @click="updateBanner"
-            >
-              {{ t('common.save') }}
-            </UiButton>
-          </div>
-          <p class="text-xs text-meta">{{ t('account_pages.profile.banner_hint') }}</p>
-          <p v-if="bannerStatus" :class="bannerStatus.class">
-            {{ bannerStatus.message }}
-          </p>
         </div>
 
         <!-- Username -->
@@ -194,7 +141,7 @@
 </template>
 
 <script setup>
-import { Camera, Save, User as UserIcon } from '@lucide/vue'
+import { Save } from '@lucide/vue'
 
 const props = defineProps({
   user: { type: Object, default: null }
@@ -208,9 +155,7 @@ const { localizeError } = useLocalizedApiError()
 const form = reactive({
   username: props.user?.username || '',
   nickname: props.user?.nickname || '',
-  bio: '',
-  avatar_url: props.user?.avatar_url || '',
-  banner_url: props.user?.banner_url || ''
+  bio: ''
 })
 
 const originalBio = ref('')
@@ -222,114 +167,40 @@ const isUpdatingNickname = ref(false)
 const bioStatus = ref(null)
 const isUpdatingBio = ref(false)
 
-// Banner
-const bannerStatus = ref(null)
-const isUpdatingBanner = ref(false)
-const originalBanner = ref(props.user?.banner || '')
-
-const isBannerChanged = computed(() => {
-  return (form.banner?.trim() || '') !== originalBanner.value
-})
-
-const updateBanner = async () => {
-  isUpdatingBanner.value = true
-  bannerStatus.value = null
-  const url = form.banner_url?.trim() || null
-
-  try {
-    await $api('/v1/me/banner', {
-      method: 'PUT',
-      body: { banner_url: url }
-    })
-
-    bannerStatus.value = {
-      class: 'text-xs text-success font-medium',
-      message: t('account_pages.profile.banner_updated')
-    }
-
-    originalBanner.value = url || ''
-    await fetchUser()
-  } catch (error) {
-    bannerStatus.value = {
-      class: 'text-xs text-danger font-medium',
-      message: localizeError(error, 'account_pages.profile.update_failed')
-    }
-  } finally {
-    isUpdatingBanner.value = false
-  }
-}
-
-const clearBanner = async () => {
-  isUpdatingBanner.value = true
-  bannerStatus.value = null
-
-  try {
-    await $api('/v1/me/banner', {
-      method: 'PUT',
-      body: { banner_url: null }
-    })
-
-    bannerStatus.value = {
-      class: 'text-xs text-success font-medium',
-      message: t('account_pages.profile.banner_cleared')
-    }
-
-    form.banner_url = ''
-    originalBanner.value = ''
-    await fetchUser()
-  } catch (error) {
-    bannerStatus.value = {
-      class: 'text-xs text-danger font-medium',
-      message: localizeError(error, 'account_pages.profile.clear_failed')
-    }
-  } finally {
-    isUpdatingBanner.value = false
-  }
-}
-
-// Avatar
-const showAvatarInput = ref(false)
-const avatarPreview = ref(props.user?.avatar_url || '')
+// Avatar and banner (GET /v1/me/profile-images: /me has no images, it is kept whole in a cookie)
+const images = ref(null)
 const avatarStatus = ref(null)
-const isUpdatingAvatar = ref(false)
-const originalAvatar = ref(props.user?.avatar_url || '')
+const bannerStatus = ref(null)
 
-const isAvatarChanged = computed(() => {
-  return form.avatar_url.trim() !== originalAvatar.value
-})
-
-const onAvatarUrlInput = () => {
-  avatarStatus.value = null
-  const url = form.avatar_url.trim()
-  avatarPreview.value = url || originalAvatar.value
+const loadImages = async () => {
+  try {
+    images.value = await $api('/v1/me/profile-images')
+  } catch {
+    // The slots show the avatar from /me and no banner.
+  }
 }
 
-const updateAvatar = async () => {
-  const url = form.avatar_url.trim()
-  isUpdatingAvatar.value = true
+const saveAvatar = async (image) => {
   avatarStatus.value = null
-
   try {
-    await $api('/v1/me/avatar', {
-      method: 'PUT',
-      body: { avatar_url: url }
-    })
-
-    avatarStatus.value = {
-      class: 'text-xs text-success font-medium',
-      message: t('account_pages.profile.avatar_updated')
-    }
-
-    originalAvatar.value = url
-    avatarPreview.value = url
+    const saved = await $api('/v1/me/avatar', { method: 'PUT', body: { image_id: image.id } })
+    images.value = { ...images.value, avatar_url: saved.avatar_url, avatar_image: saved.avatar_image }
+    avatarStatus.value = { done: t('account_pages.profile.avatar_updated') }
     await fetchUser()
   } catch (error) {
-    avatarStatus.value = {
-      class: 'text-xs text-danger font-medium',
-      message: localizeError(error, 'account_pages.profile.update_failed')
-    }
-  } finally {
-    isUpdatingAvatar.value = false
+    avatarStatus.value = { error: localizeError(error, 'account_pages.profile.update_failed') }
+  }
+}
+
+/** A new banner, or none (null). */
+const saveBanner = async (image) => {
+  bannerStatus.value = null
+  try {
+    const saved = await $api('/v1/me/banner', { method: 'PUT', body: { image_id: image?.id ?? null } })
+    images.value = { ...images.value, banner_url: saved.banner_url, banner_image: saved.banner_image }
+    bannerStatus.value = { done: t(image ? 'account_pages.profile.banner_updated' : 'account_pages.profile.banner_cleared') }
+  } catch (error) {
+    bannerStatus.value = { error: localizeError(error, 'account_pages.profile.update_failed') }
   }
 }
 
@@ -349,6 +220,7 @@ const loadBio = async () => {
 
 onMounted(() => {
   loadBio()
+  loadImages()
 })
 
 const isUsernameChanged = computed(() => {
