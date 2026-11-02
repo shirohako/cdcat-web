@@ -9,17 +9,22 @@ const harvestCandidateAdultLabels: Record<string, string> = { label: '成人', '
 const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', matched: '已关联社团', unmatched: '未关联社团', booth: '对上摊位', no_booth: '没对上摊位' }
 const harvestCandidateCompleteLabels: Record<string, string> = { label: '完整度', complete: '资料齐全', incomplete: '资料不全', no_cover: '缺封面', no_tracks: '缺曲目' }
 const harvestCandidateDuplicatesLabels: Record<string, string> = { label: '站内重复', strong: '站内已有（强匹配）', any: '可能重复', none: '站内没有' }
-const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间' }
+const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间', sources_changed: '按来源更新时间' }
+const harvestCandidateSourcesChangedLabels: Record<string, string> = { label: '来源更新', '1': '来源有更新', '0': '来源没有更新' }
 const route = useRoute()
 const router = useRouter()
 
 const statuses = ['pending', 'excluded', 'approved', 'linked', 'rejected', 'all'] as const
 const filters = computed(() => harvestFilters(route.query))
 const page = computed(() => Math.max(1, Number.parseInt(String(route.query.page || '1')) || 1))
-/** Changes one filter (back to the first page); the event match only means something with an event. */
+/**
+ * Changes one filter (back to the first page); the event match only means something with an event.
+ * Only decided candidates have changed sources, so asking for them on the default tab (pending) shows every status.
+ */
 const setFilter = (key: HarvestFilterKey, value: string) => {
   const next: Record<string, string | undefined> = { ...route.query as Record<string, string>, [key]: value || undefined, page: undefined }
   if (key === 'event_id' && (!value || value === 'none')) next.event_match = undefined
+  if (key === 'sources_changed' && value === '1' && !next.status) next.status = 'all'
   void router.push({ query: next })
 }
 const filter = (key: HarvestFilterKey) => computed({ get: () => filters.value[key] ?? '', set: value => setFilter(key, value) })
@@ -32,8 +37,9 @@ const complete = filter('complete')
 const duplicates = filter('duplicates')
 const circle = filter('circle')
 const adult = filter('adult')
+const sourcesChanged = filter('sources_changed')
 /** Each order and the way it goes first, as CandidateQuery::SORTS; a second click on a column flips it. */
-const sortDirections: Record<string, 'asc' | 'desc'> = { circle: 'asc', id: 'desc', title: 'asc', release: 'desc', sources: 'desc', updated: 'desc' }
+const sortDirections: Record<string, 'asc' | 'desc'> = { circle: 'asc', id: 'desc', title: 'asc', release: 'desc', sources: 'desc', updated: 'desc', sources_changed: 'desc' }
 const sortKey = computed(() => filters.value.sort ?? 'circle')
 const sortDir = computed(() => filters.value.dir ?? sortDirections[sortKey.value])
 const setSort = (key: string, dir?: 'asc' | 'desc') => router.push({ query: { ...route.query, sort: key && key !== 'circle' ? key : undefined, dir, page: undefined } })
@@ -124,11 +130,14 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
           <select v-model="adult" aria-label="成人" :class="select">
             <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>
           </select>
+          <select v-model="sourcesChanged" aria-label="来源更新" :class="select">
+            <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateSourcesChangedLabels[value || 'label'] }}</option>
+          </select>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <span class="w-8 shrink-0 text-xs text-slate-500">排序</span>
           <select v-model="sort" aria-label="排序" :class="select">
-            <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
+            <option v-for="value in ['', 'id', 'title', 'release', 'sources', 'updated', 'sources_changed']" :key="value" :value="value">{{ harvestCandidateSortLabels[value || 'circle'] }}</option>
           </select>
           <span class="text-xs text-slate-400">也可以点表格的表头排序</span>
           <UiButton v-if="filtered" size="xs" icon="lucide:x" class="ml-auto" @click="clear">清除筛选</UiButton>

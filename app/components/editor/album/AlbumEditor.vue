@@ -402,7 +402,7 @@ const context: AlbumEditorContext = {
   remember, errors, errorAt, errorsIn, go, notify: showToast, nameNotes, nameInfo,
 }
 provide(albumEditorKey, context)
-defineExpose({ album, draft, references, remember, go, createItem, removeItem })
+defineExpose({ album, ready, draft, references, pending, remember, go, createItem, removeItem })
 
 // ---- loading ----
 

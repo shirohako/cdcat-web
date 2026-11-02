@@ -358,6 +358,8 @@ export interface HarvestCandidateDetail {
     label: string
     fetched_at: string | null
     kind_reason: string | null
+    /** What this source says changed since the candidate was decided. */
+    changed_at: string | null
     events: Array<{ event_id: number, via: HarvestVia }>
     listings: HarvestListing[]
   }>
@@ -366,6 +368,8 @@ export interface HarvestCandidateDetail {
   people: HarvestPerson[]
   circle_match: HarvestCircleMatch
   references: import('~/types/catalog').CatalogReferences
+  /** The sources' images this site has stored already, catalog image id by sha256. */
+  catalog_images: Record<string, number>
   /** Within the list's filters, which the review page passes on. */
   neighbors: { previous: number | null, next: number | null, position: number | null, total: number }
 }

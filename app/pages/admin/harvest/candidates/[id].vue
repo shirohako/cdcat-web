@@ -3,6 +3,7 @@ import type { RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
 import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage } from '~/types/harvest'
+import type { AlbumEditorHandle } from '~/utils/harvestAlbumCompare'
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
@@ -28,6 +29,7 @@ const harvestCircleByLabels: Record<string, string> = {
   circle: '参展社团（同名）', contains: '参展社团（名字包含）', booth_handle: '参展社团（X 账号）', manual: '手动指定',
 }
 const harvestViaLabels: Record<string, string> = { fixed: '任务固定在这届', name: '活动名对上', date: '发售日期在活动内' }
+const sourcesChangedText: Record<string, string> = { approved: '建档之后来源有更新。', linked: '关联到站内专辑之后来源有更新。', rejected: '标为不收录之后来源有更新。' }
 const harvestError = useHarvestError()
 const { user } = useAuth()
 const route = useRoute()
@@ -68,6 +70,33 @@ const prepareDraft = async (fresh = false) => {
   }
   editorKey.value++
   draftReady.value = true
+}
+/**
+ * A decided candidate with an album (已建档, 站内已有): the album opens in the editor with the sources compared to it
+ * (AdminHarvestAlbumCompare), open at once when the sources changed since. Submitting it is an edit of the album.
+ */
+const albumId = computed(() => detail.value && ['approved', 'linked'].includes(detail.value.candidate.status) ? detail.value.candidate.album?.id ?? null : null)
+const albumEditor = ref<AlbumEditorHandle | null>(null)
+const albumEditorKey = ref(0)
+const albumOpen = ref(false)
+watch(() => [detail.value?.candidate.id, !!detail.value?.candidate.sources_changed_at] as const, ([, changed]) => { albumOpen.value = changed }, { immediate: true })
+const sourcesSeen = async () => {
+  if (busy.value || !detail.value) return
+  busy.value = true
+  message.value = ''
+  try {
+    await $api(`/v1/admin/harvest/candidates/${id.value}/sources-seen`, { method: 'POST' })
+    await refresh()
+  } catch (error) {
+    message.value = harvestError(error)
+  } finally {
+    busy.value = false
+  }
+}
+const albumEdited = async () => {
+  albumEditorKey.value++
+  if (detail.value?.candidate.sources_changed_at) await sourcesSeen()
+  else await refresh()
 }
 // The draft lives in this browser's IndexedDB, so it is prepared after mounting.
 onMounted(() => {
@@ -244,6 +273,10 @@ const copyDescription = async (recordId: number, value: string) => {
 onBeforeUnmount(() => clearTimeout(copiedTimer))
 /** The site name of a source, as the records label it. */
 const sourceName = (source: string) => detail.value?.records.find(record => record.source === source)?.label ?? source
+/** The sources, those whose data changed after the candidate was decided first (they are marked). */
+const sortedRecords = computed(() => [...detail.value?.records ?? []].sort((a, b) => Number(!a.changed_at) - Number(!b.changed_at)))
+/** The sources whose data changed after the candidate was decided (marked in the sources card). */
+const changedSources = computed(() => (detail.value?.records ?? []).filter(record => record.changed_at).map(record => record.label))
 /** The album's official sites, as the sources mark their links; opened from the sources card. */
 const officialLinks = computed(() => [...new Map((detail.value?.candidate.merged.links ?? [])
   .filter(link => link.kind === 'official').map(link => [link.url, link])).values()])
@@ -306,11 +339,11 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
 
         <div v-if="!open" class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
           <p>这条候选已经处理过（{{ harvestStatusLabels[detail.candidate.status] }}）。
-            <template v-if="detail.candidate.album">已建档：<NuxtLink :to="`/albums/${detail.candidate.album.id}`" class="text-sky-700 hover:underline">{{ detail.candidate.album.title }}</NuxtLink></template>
+            <template v-if="detail.candidate.album">{{ detail.candidate.status === 'approved' ? '已建档' : '对应专辑' }}：<NuxtLink :to="`/albums/${detail.candidate.album.id}`" class="text-sky-700 hover:underline">{{ detail.candidate.album.title }}</NuxtLink></template>
           </p>
           <p v-if="detail.candidate.reviewer" class="text-xs text-slate-500">由 {{ detail.candidate.reviewer.nickname || detail.candidate.reviewer.username }} 于 {{ time(detail.candidate.reviewed_at) }} 处理</p>
           <p v-if="detail.candidate.reject_reason" class="text-xs text-slate-600">{{ detail.candidate.reject_reason }}</p>
-          <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">建档之后来源有更新。</p>
+          <p v-if="detail.candidate.sources_changed_at" class="text-xs text-sky-800">{{ sourcesChangedText[detail.candidate.status] ?? '处理之后来源有更新。' }}{{ changedSources.length ? `有更新的来源：${changedSources.join('、')}（下面来源卡片里标了时间）。` : '' }}</p>
         </div>
         <p v-else-if="!detail.event" class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">没有记录关联到活动：请核对发行日期，需要时在编辑器里选上首发活动。</p>
 
@@ -348,13 +381,14 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   </span>
                 </h3>
                 <ul class="divide-y divide-slate-100">
-                  <li v-for="record in detail.records" :key="`${record.record_id}-${record.part}`" class="px-4 py-3">
+                  <li v-for="record in sortedRecords" :key="`${record.record_id}-${record.part}`" class="px-4 py-3">
                     <div class="flex items-start gap-2">
                       <span class="mt-px shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">{{ record.label }}</span>
                       <div class="min-w-0 flex-1">
                         <a :href="record.url" target="_blank" rel="noopener noreferrer" class="break-words font-medium text-sky-700 hover:underline">{{ record.title }}<Icon name="lucide:external-link" class="ml-1 inline size-3 align-[-1px] text-sky-600/70" /></a>
                         <p class="mt-0.5 flex flex-wrap gap-x-2 text-xs text-slate-500">
                           <span>抓取于 {{ time(record.fetched_at) }}</span>
+                          <span v-if="record.changed_at" class="text-sky-800">{{ time(record.changed_at) }} 有更新</span>
                           <span v-if="record.gone" class="text-red-700">已消失</span>
                           <span v-if="record.delisted" class="text-amber-700">已下架</span>
                         </p>
@@ -602,6 +636,20 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
           <div class="bg-slate-50">
             <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" :name-info="nameInfo" @submitted="approved" @discarded="prepareDraft(true)" />
             <p v-else class="px-4 py-8 text-center text-xs text-slate-400">正在准备草稿…</p>
+          </div>
+        </section>
+        <section v-else-if="albumId" :class="card">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-100 bg-slate-50/70 px-4 py-3">
+            <h2 class="flex items-center gap-2 font-semibold">
+              <Icon name="lucide:disc-3" class="size-4 text-slate-400" />按来源编辑这张专辑
+            </h2>
+            <p class="min-w-0 flex-1 text-xs text-slate-500">对比来源和专辑现在的内容，「采用」写进编辑器，在「提交」一节提交后才改专辑。</p>
+            <UiButton v-if="detail.candidate.sources_changed_at" size="xs" :disabled="busy" @click="sourcesSeen">看过了，不用改</UiButton>
+            <UiButton size="xs" :icon="albumOpen ? 'lucide:chevron-up' : 'lucide:chevron-down'" @click="albumOpen = !albumOpen">{{ albumOpen ? '收起' : '和专辑对比' }}</UiButton>
+          </div>
+          <div v-if="albumOpen" class="space-y-4 bg-slate-50 pt-4">
+            <AdminHarvestAlbumCompare v-if="albumEditor?.ready" :key="albumEditorKey" :detail="detail" :editor="albumEditor" class="mx-4 md:mx-5" />
+            <LazyEditorAlbumEditor :key="albumEditorKey" ref="albumEditor" :album-id="albumId" embedded @submitted="albumEdited" @discarded="albumEditorKey++" />
           </div>
         </section>
       </template>
