@@ -717,12 +717,31 @@ const texts: ApiDocsTexts = {
       title: '碟片',
       description: '专辑里的一张碟：CD、BD、黑胶或配信等。',
       fields: {
-        id: '碟片 ID。',
+        id: '碟片在本站的 ID；抓轨软件用的 Disc ID 在 `tocs` 里。',
         position: '第几张，从 1 开始。',
         title: '碟名，例如「DISC 2 Instrumental」；没有时为 `null`。',
         format: '介质。',
         bonus_id: '特典附带的碟片才有，指向那个特典。',
+        tocs: 'CD 的 TOC，每个压片一份，按 `id` 排列；其他碟为空数组。',
         tracks: '这张碟上的曲目，按曲号排列。',
+      },
+    },
+    DiscToc: {
+      title: 'CD 的 TOC',
+      description: '抓轨软件读出的一份 CD 目录，以及由它算出的 Disc ID。扇区数都含 150 扇区的引导区，和 MusicBrainz 的写法相同。',
+      fields: {
+        id: 'TOC ID。',
+        first_track: '首轨号。',
+        last_track: '末轨号。',
+        data_track: '数据轨的轨号：增强 CD 是最后一轨，混合模式 CD 是第一轨；全是音频轨时为 `null`。',
+        leadout_offset: '整张碟的 lead-out 扇区。',
+        offsets: '每一轨（含数据轨）的起始扇区，从首轨到末轨。',
+        source: '来源：`eac`、`xld`、`cueripper`、`manual` 或 `import`。',
+        cdcat_id: 'CDCat Disc ID，如 `CDCAT1-ZX8Q-8MGS-W6KN-TFK3`：只看音频轨的长度，同一母带的压片相同。',
+        freedb_id: 'freedb（CDDB）ID，8 位小写十六进制，数据轨也算在内。',
+        mb_discid: 'MusicBrainz Disc ID，只算第一个 session。',
+        accuraterip_id: 'AccurateRip ID，写成 `nnn-id1-id2-freedb`；CUETools 的日志里只印后三段。',
+        ctdb_id: 'CUETools 数据库（CTDB）的 TOC ID。',
       },
     },
     AlbumTrack: {
@@ -1517,6 +1536,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_tocs: '专辑详情的碟片新增 `tocs`：CD 的 TOC，以及 CDCat Disc ID 和 freedb、MusicBrainz、AccurateRip、CTDB 的 ID。',
     launch: '首次公开，测试版。',
   },
 }

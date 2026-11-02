@@ -44,6 +44,8 @@
 
 <script setup lang="ts">
 import type { CatalogReferences, CatalogType, ChangeOp } from '~/types/catalog'
+import type { RowSummaryContext } from '~/utils/rowSummaries'
+import { ROW_SUMMARIES } from '~/utils/rowSummaries'
 
 const props = withDefaults(defineProps<{
   type: CatalogType
@@ -57,6 +59,18 @@ const props = withDefaults(defineProps<{
 })
 
 const { fields, collections, fieldLabel, collectionLabel, valueLabel } = useDocumentSchema(() => props.type)
+const { t, te } = useI18n()
+
+/** A row of the documents by collection and id, for collections that describe their rows themselves (utils/rowSummaries). */
+const findRow = (collectionName: string, id: unknown) => {
+  for (const document of props.documents) {
+    const rows = document?.[collectionName]
+    const row = Array.isArray(rows) ? rows.find((item: Record<string, unknown>) => String(item.id) === String(id)) as Record<string, unknown> | undefined : undefined
+    if (row) return row
+  }
+  return undefined
+}
+const summaryContext: RowSummaryContext = { t, te, find: findRow }
 
 const fieldChanges = computed(() => props.changes
   .filter(change => change.path.length === 1)
@@ -89,7 +103,8 @@ const collectionChanges = computed(() => {
         const element = valueLabel({ name: fieldName, type: 'sibling' }, change.path[3], props.references)
         row.fields.push({ name: fieldName, from: change.op === 'remove' ? element : '', to: change.op === 'add' ? element : '' })
       } else {
-        row.fields.push({ name: fieldName, from: valueLabel(field, change.from, props.references), to: valueLabel(field, change.to, props.references) })
+        const label = (value: unknown) => ROW_SUMMARIES[name]?.value?.(fieldName, value, summaryContext) ?? valueLabel(field, value, props.references)
+        row.fields.push({ name: fieldName, from: label(change.from), to: label(change.to) })
       }
       group.rows.set(id, row)
     }
@@ -101,6 +116,8 @@ const collectionChanges = computed(() => {
 /** A short description of a whole row: its meaningful values, references by name. */
 const rowSummary = (collectionName: string, row: Record<string, unknown> | undefined) => {
   if (!row) return ''
+  const custom = ROW_SUMMARIES[collectionName]
+  if (custom) return custom.summary(row, summaryContext)
   const collection = collections.value.get(collectionName)
   return (collection?.fields ?? [])
     .filter(field => !['sort_order'].includes(field.name) && row[field.name] !== null && row[field.name] !== undefined && row[field.name] !== '' && row[field.name] !== false)
@@ -110,9 +127,11 @@ const rowSummary = (collectionName: string, row: Record<string, unknown> | undef
 
 /** Describes a changed row from the documents, e.g. a track by its title. */
 const rowLabel = (collectionName: string, id: string) => {
+  const custom = ROW_SUMMARIES[collectionName]
   for (const document of props.documents) {
     const rows = document?.[collectionName]
     const row = Array.isArray(rows) ? rows.find((item: Record<string, unknown>) => String(item.id) === id) as Record<string, unknown> | undefined : undefined
+    if (row && custom) return custom.label(row, summaryContext)
     const name = row?.title ?? row?.name ?? row?.url
     if (name) return String(name)
   }

@@ -19,7 +19,7 @@ const LOADERS: Partial<Record<ApiDocsLocale, Loader>> = {
 export const SOURCE_LOCALE: ApiDocsLocale = 'zh-Hans'
 
 /** When the reference last changed (YYYY-MM-DD); bump it with every edit that changes what it says. */
-export const API_DOCS_UPDATED = '2026-10-30'
+export const API_DOCS_UPDATED = '2026-11-02'
 
 /** The reference's words in the reader's language, or in the language it was written in first. */
 export async function loadApiDocs(locale: string): Promise<ApiDocsDoc> {

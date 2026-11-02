@@ -717,12 +717,31 @@ const texts: ApiDocsTexts = {
       title: 'Disc',
       description: 'One disc in an album: CD, BD, vinyl, digital and so on.',
       fields: {
-        id: 'Disc ID.',
+        id: 'The disc\'s ID on this site; the disc IDs rippers use are in `tocs`.',
         position: 'Disc number, starting at 1.',
         title: 'Disc title, for example "DISC 2 Instrumental"; `null` when there is none.',
         format: 'Format.',
         bonus_id: 'Only for discs that come with a bonus; points to that bonus.',
+        tocs: 'CD tables of contents, one per pressing, by `id`; an empty array for other discs.',
         tracks: 'The tracks on this disc, by track number.',
+      },
+    },
+    DiscToc: {
+      title: 'CD TOC',
+      description: 'A CD table of contents as ripping software read it, and the disc IDs computed from it. Sector numbers include the 150-sector lead-in, as MusicBrainz writes them.',
+      fields: {
+        id: 'TOC ID.',
+        first_track: 'First track number.',
+        last_track: 'Last track number.',
+        data_track: 'The data track\'s number: the last track of an Enhanced CD, the first of a mixed-mode CD; `null` when every track is audio.',
+        leadout_offset: 'The disc\'s lead-out sector.',
+        offsets: 'Start sector of every track from the first to the last, a data track included.',
+        source: 'Where it came from: `eac`, `xld`, `cueripper`, `manual` or `import`.',
+        cdcat_id: 'CDCat Disc ID, such as `CDCAT1-ZX8Q-8MGS-W6KN-TFK3`: it only looks at the audio tracks\' lengths, so every pressing of one master shares it.',
+        freedb_id: 'freedb (CDDB) ID, 8 lowercase hex digits, counting the data track too.',
+        mb_discid: 'MusicBrainz Disc ID, of the first session only.',
+        accuraterip_id: 'AccurateRip ID as `nnn-id1-id2-freedb`; CUETools logs print only the last three parts.',
+        ctdb_id: 'The CUETools database\'s (CTDB) TOC ID.',
       },
     },
     AlbumTrack: {
@@ -1517,6 +1536,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_tocs: 'Album details: discs get `tocs`, the CD\'s tables of contents with the CDCat Disc ID and the freedb, MusicBrainz, AccurateRip and CTDB IDs.',
     launch: 'First public release, in beta.',
   },
 }

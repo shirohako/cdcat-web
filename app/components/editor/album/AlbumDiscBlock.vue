@@ -7,13 +7,15 @@
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
-        <UiButton size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" class="text-primary">·{{ tocCount }}</span></UiButton>
+        <UiButton v-if="isCd || tocCount" size="xs" class="ring-1 ring-inset shadow-xs active:translate-y-px" :class="tocErrors.length || !isCd ? 'text-danger ring-danger/40' : 'ring-line'" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" :class="tocErrors.length || !isCd ? 'text-danger' : 'text-primary'">·{{ tocCount }}</span></UiButton>
         <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="moveDisc(album, disc.id, -1)" />
         <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="moveDisc(album, disc.id, 1)" />
         <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.album.remove_disc')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
       </span>
     </div>
     <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ error.message }}</p>
+    <p v-if="tocCount && !isCd" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ $t('editor.toc.not_cd_disc') }}</p>
+    <p v-else-if="tocErrors.length" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ $t('editor.toc.has_errors') }}</p>
 
     <div ref="list">
       <EditorAlbumTrackRow
@@ -58,7 +60,11 @@ const discs = computed(() => sortedDiscs(album.value))
 const first = computed(() => sameId(discs.value[0]?.id, props.discId))
 const last = computed(() => sameId(discs.value.at(-1)?.id, props.discId))
 const bonus = computed(() => album.value.bonuses.find(item => sameId(item.id, disc.value?.bonus_id)) ?? null)
-const tocCount = computed(() => album.value.disc_tocs.filter(toc => sameId(toc.disc_id, props.discId)).length)
+const tocs = computed(() => album.value.disc_tocs.filter(toc => sameId(toc.disc_id, props.discId)))
+const tocCount = computed(() => tocs.value.length)
+const tocErrors = computed(() => tocs.value.flatMap(toc => editor.errorsIn(`disc_tocs.${toc.id}`)))
+// Only CDs have a TOC; another disc still shows the button while it has one, so it can be removed.
+const isCd = computed(() => disc.value?.format === 'cd' || disc.value?.format === 'sacd')
 const duration = computed(() => tracks.value.reduce((sum, track) => sum + (track.duration ?? 0), 0))
 const errors = computed(() => editor.errorsIn(`discs.${props.discId}`))
 

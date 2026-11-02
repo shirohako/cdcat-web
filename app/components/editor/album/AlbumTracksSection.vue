@@ -46,8 +46,8 @@ const discs = computed(() => sortedDiscs(album.value))
 const pasteOpen = ref(false)
 const tocDisc = ref<RowId | null>(null)
 
-/** Errors about the tracklist as a whole, e.g. "An album needs at least one track". */
-const levelErrors = computed(() => [...editor.errorsIn('discs'), ...editor.errorsIn('tracks')].filter(error => error.path.split('.').length === 3))
+/** Errors about the tracklist as a whole, e.g. "An album needs at least one track", or about all TOCs. */
+const levelErrors = computed(() => [...editor.errorsIn('discs'), ...editor.errorsIn('tracks'), ...editor.errorsIn('disc_tocs')].filter(error => error.path.split('.').length === 3))
 
 const applied = ({ added, updated }: { added: number, updated: number }) => {
   editor.notify(t('editor.paste.applied', { added, updated }))

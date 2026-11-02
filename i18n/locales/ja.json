@@ -189,6 +189,20 @@
     "editing": {
       "version": "現在のバージョン",
       "edited_at": "{date}更新"
+    },
+    "toc": {
+      "button": "Disc ID",
+      "title": "TOC と Disc ID",
+      "description": "リッピングソフトや音楽データベースは、これらの ID でこの CD を照合します。CDCat Disc ID はオーディオトラックの長さだけから求めるので、同じマスターのプレスはすべて同じ ID です。",
+      "disc_picker": "ディスクを選択",
+      "pressings": "このディスクには TOC が {n} 件あります。プレスによって TOC が異なることがあります。",
+      "toc_n": "TOC {n}",
+      "copy": "コピー",
+      "copied": "コピーしました",
+      "copy_failed": "コピーできませんでした",
+      "open_musicbrainz": "MusicBrainz で見る",
+      "source": "出典：{source}",
+      "missing": "TOC はまだありません · リッピングログがあれば追加できます"
     }
   },
   "albums": {
@@ -1928,6 +1942,7 @@
       "last_track": "最後のトラック",
       "leadout_offset": "リードアウト",
       "offsets": "オフセット",
+      "data_track": "データトラック",
       "album_id": "アルバム",
       "album_image_id": "画像",
       "original_track_id": "原曲のトラック",
@@ -1977,6 +1992,26 @@
       "plain": "テキスト",
       "lrc": "LRC（タイムタグ付き）",
       "srt": "SRT（字幕）"
+    },
+    "toc": {
+      "disc_n": "Disc {n}",
+      "track": "トラック",
+      "start": "開始",
+      "length": "長さ",
+      "start_sector": "開始セクター",
+      "end_sector": "終了セクター",
+      "data": "データ",
+      "source": {
+        "eac": "EAC のログ",
+        "xld": "XLD のログ",
+        "cueripper": "CUERipper のログ",
+        "manual": "手入力",
+        "import": "インポート"
+      },
+      "tracks": "トラック {first}–{last}",
+      "data_track_n": "データトラック {n}",
+      "disc_toc": "Disc {n} の TOC",
+      "offsets_short": "{n} 個（{first} … {last}）"
     }
   },
   "notifications": {
@@ -2625,14 +2660,39 @@
       "notes_points": "「M1.曲名」「M-01.」の行から 1 曲が始まり、その下のインデントされた行は空行をはさんでもその曲のもの\n行ごとに空行が入ったテキストでは、もっと長い空きで曲が終わります\n役割と名前の間のコロンの後はスペースなしでも構いません（「Vocal:nayuta」）\n英語の役割名とよくある書き方：Vocal、Music、Lyric、Illust、Vocal Recording Engineer、Vo.、Gt.\n「Music&Lyric」「Guitar&Bass」は 2 つの役割に、「つぐ&るる」のような日本語名の間の & は 2 人に分けます\n最後の独立したブロック（「Illust」など）はアルバム全体のもの"
     },
     "toc": {
-      "button": "ディスク TOC（リッピングソフト用）",
+      "button": "ディスク TOC（リッピングログの目次）",
       "title": "Disc {n} の TOC",
-      "hint": "EAC や XLD のログにある「TOC of the extracted CD」の表を貼り付けてください。Disc ID はサーバーで計算され、今後リッピングソフトがディスクの照合に使います。",
+      "hint": "EAC・XLD・CUERipper のログにある「TOC of the extracted CD」の表を貼り付けてください。保存されるのは表の数値だけで、ログのほかの内容（ユーザー名、パス、ドライブ）は送信されません。",
+      "ids_hint": "Disc ID はサーバーで計算されます。「プレビュー」か保存のあと、アルバムページの「このアルバムを編集」→「Disc ID」で確認できます。",
       "none": "TOC はまだありません。",
-      "tracks": "トラック {first}–{last}",
-      "leadout": "lead-out {offset}",
-      "count_mismatch": "ディスクのトラックは {count} 曲です",
-      "unreadable": "このテキストに TOC の表が見つかりません。",
+      "paste_label": "リッピングログを貼り付け",
+      "pasted": "貼り付けた TOC",
+      "toc_n": "TOC {n}",
+      "facts": "オーディオ {tracks} トラック · 計 {length}",
+      "with_data": "データトラックあり",
+      "matches": "ディスクの {count} 曲と一致しています",
+      "count_mismatch": "TOC のオーディオトラックは {tracks}、ディスクのトラックは {count} 曲です",
+      "not_cd": "TOC があるのは CD と SACD だけです。先にディスクの形式を CD にしてください。",
+      "not_cd_disc": "このディスクは CD ではないため、保存時に TOC が拒否されます。TOC を削除するか、形式を CD にしてください。",
+      "has_errors": "このディスクの TOC に問題があります。「TOC」から確認してください。",
+      "duplicate": "この TOC はすでに追加されています。",
+      "data_track": "データトラック",
+      "data_none": "なし",
+      "data_last": "最後のトラック（エンハンスド CD）",
+      "data_first": "最初のトラック（ミックスモード CD）",
+      "data_detected": "最後のトラックの前にちょうど 11400 セクターの間隔があるので、エンハンスド CD のデータトラックです。",
+      "show_table": "TOC の表を見る",
+      "hide_table": "TOC の表を閉じる",
+      "fill_durations": "TOC から長さを入力",
+      "fill_hint": "長さが空のトラックだけに、秒単位に四捨五入して入力します",
+      "fill_mismatch": "TOC のオーディオトラック数がディスクのトラック数と違います",
+      "nothing_to_fill": "すべてのトラックに長さがあります",
+      "filled": "{n} 曲の長さを入力しました",
+      "unreadable": {
+        "none": "このテキストに TOC の表が見つかりません。",
+        "several": "TOC が複数あります。ログは 1 枚ずつ貼り付けてください。",
+        "gaps": "TOC のトラック番号が飛んでいます。表全体を貼り付けてください。"
+      },
       "add": "TOC を追加"
     },
     "credits": {

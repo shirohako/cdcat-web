@@ -143,6 +143,27 @@ export interface AlbumTrack {
   attributes: CatalogAttribute[]
 }
 
+/**
+ * A CD's table of contents as ripping software read one pressing, with its disc ids (docs/catalog/disc-id.md).
+ * Offsets are start sectors including the 150-sector lead-in, a data track's too; leadout_offset is the disc's end.
+ */
+export interface AlbumDiscToc {
+  id: number
+  first_track: number
+  last_track: number
+  /** An Enhanced CD's last track or a mixed-mode CD's first; null when every track is audio. */
+  data_track: number | null
+  leadout_offset: number
+  offsets: number[]
+  source: string
+  /** CDCat's own id: the audio tracks' lengths, the same for every pressing of one master. */
+  cdcat_id: string
+  freedb_id: string
+  mb_discid: string
+  accuraterip_id: string
+  ctdb_id: string
+}
+
 export interface AlbumDisc {
   id: number
   position: number
@@ -151,6 +172,8 @@ export interface AlbumDisc {
   format: DiscFormat
   /** The bonus this disc comes with; null for the album's own discs. */
   bonus_id: number | null
+  /** CDs only, one per pressing. */
+  tocs: AlbumDiscToc[]
   tracks: AlbumTrack[]
 }
 

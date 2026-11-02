@@ -41,7 +41,11 @@ export interface AlbumDocument {
   /** 原曲 of a track: a saved track elsewhere in the catalog, or only a name. Exactly one of the two is set. */
   track_originals: Array<{ id: RowId, track_id: RowId, original_track_id: number | null, original_title: string | null, sort_order?: number }>
   track_titles: Array<TitleRow & { track_id: RowId }>
-  disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], source: string }>
+  /**
+   * A CD's table of contents, one per pressing: start sectors of every track (lead-in included, a data track too) and
+   * the disc's lead-out; data_track marks an Enhanced CD's last track or a mixed-mode CD's first. The server computes the ids.
+   */
+  disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], data_track: number | null, source: string }>
   /** parent_id: the credit of the same track (or album) this one belongs to, a 客串's 艺术家 (utils/artistLine) */
   credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, parent_id?: RowId | null, role: string, detail: string | null, sort_order?: number }>
   /** is_primary marks the main cover and banner (albums.image_url and banner_url are derived from them). */

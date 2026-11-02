@@ -189,6 +189,20 @@
     "editing": {
       "version": "Current version",
       "edited_at": "Updated {date}"
+    },
+    "toc": {
+      "button": "Disc ID",
+      "title": "TOC and disc IDs",
+      "description": "Rippers and music databases recognise this CD by these IDs. The CDCat Disc ID only looks at how long the audio tracks are, so every pressing of one master shares it.",
+      "disc_picker": "Disc",
+      "pressings": "This disc has {n} TOCs: pressings can differ.",
+      "toc_n": "TOC {n}",
+      "copy": "Copy",
+      "copied": "Copied",
+      "copy_failed": "Couldn't copy",
+      "open_musicbrainz": "View on MusicBrainz",
+      "source": "Source: {source}",
+      "missing": "No TOC yet · add one from a rip log"
     }
   },
   "albums": {
@@ -1928,6 +1942,7 @@
       "last_track": "Last track",
       "leadout_offset": "Lead-out",
       "offsets": "Offsets",
+      "data_track": "Data track",
       "album_id": "Album",
       "album_image_id": "Image",
       "original_track_id": "Original track",
@@ -1977,6 +1992,26 @@
       "plain": "Plain text",
       "lrc": "LRC (timed)",
       "srt": "SRT (subtitles)"
+    },
+    "toc": {
+      "disc_n": "Disc {n}",
+      "track": "Track",
+      "start": "Start",
+      "length": "Length",
+      "start_sector": "Start sector",
+      "end_sector": "End sector",
+      "data": "Data",
+      "source": {
+        "eac": "EAC log",
+        "xld": "XLD log",
+        "cueripper": "CUERipper log",
+        "manual": "Entered by hand",
+        "import": "Imported"
+      },
+      "tracks": "Tracks {first}–{last}",
+      "data_track_n": "Data track {n}",
+      "disc_toc": "Disc {n} TOC",
+      "offsets_short": "{n} starts ({first} … {last})"
     }
   },
   "notifications": {
@@ -2625,14 +2660,39 @@
       "notes_points": "A line “M1.Title” or “M-01.” starts a track; the indented lines under it are that track’s, blank lines or not\nIn text with a blank line after every line, only a longer gap ends the track\nNo space needed after the colon, as in “Vocal:nayuta”\nEnglish role names and common spellings: Vocal, Music, Lyric, Illust, Vocal Recording Engineer, Vo., Gt.\n“Music&Lyric” and “Guitar&Bass” become two roles; & between Japanese names, as in “つぐ&るる”, is two people\nA last block on its own (like “Illust”) is the whole album’s"
     },
     "toc": {
-      "button": "Disc TOC, for CD rippers",
+      "button": "Disc TOC, from a rip log",
       "title": "TOC of disc {n}",
-      "hint": "Paste the “TOC of the extracted CD” table of an EAC or XLD log. The server computes the Disc ID, which rippers will use to look the disc up.",
+      "hint": "Paste the “TOC of the extracted CD” table of an EAC, XLD or CUERipper log. Only the table's numbers are kept; the rest of the log (user name, paths, drive) is not uploaded.",
+      "ids_hint": "The server computes the disc IDs: after Preview or saving, see them under “Edit this album” → “Disc ID” on the album page.",
       "none": "No TOC yet.",
-      "tracks": "Tracks {first}–{last}",
-      "leadout": "lead-out {offset}",
-      "count_mismatch": "but the disc has {count} tracks",
-      "unreadable": "No TOC table found in this text.",
+      "paste_label": "Paste a rip log",
+      "pasted": "Pasted TOC",
+      "toc_n": "TOC {n}",
+      "facts": "{tracks} audio tracks · {length} in all",
+      "with_data": "plus a data track",
+      "matches": "Matches the disc's {count} tracks",
+      "count_mismatch": "The TOC has {tracks} audio tracks; the disc has {count} tracks",
+      "not_cd": "Only CDs and SACDs have a TOC: set this disc's format to CD first.",
+      "not_cd_disc": "This disc isn't a CD, so its TOC will be refused on saving: delete the TOC or set the format to CD.",
+      "has_errors": "This disc's TOC has problems; open “TOC” to see them.",
+      "duplicate": "This TOC has already been added.",
+      "data_track": "Data track",
+      "data_none": "None",
+      "data_last": "Last track (Enhanced CD)",
+      "data_first": "First track (mixed-mode CD)",
+      "data_detected": "The last track starts exactly 11400 sectors after the audio: an Enhanced CD's data track.",
+      "show_table": "Show the TOC",
+      "hide_table": "Hide the TOC",
+      "fill_durations": "Fill durations from the TOC",
+      "fill_hint": "Only tracks without a duration, rounded to the second",
+      "fill_mismatch": "The TOC's audio tracks don't match the disc's tracks",
+      "nothing_to_fill": "Every track has a duration",
+      "filled": "Filled in {n} durations",
+      "unreadable": {
+        "none": "No TOC table found in this text.",
+        "several": "This text has several TOCs: paste one disc's log at a time.",
+        "gaps": "The TOC skips track numbers: paste the whole table."
+      },
       "add": "Add TOC"
     },
     "credits": {

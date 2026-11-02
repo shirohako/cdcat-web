@@ -13,7 +13,7 @@ const track = (number: number, credits: CatalogCredit[], extra: Partial<AlbumTra
   is_instrumental: false, isrc: null, favorites_count: 0, is_favorited: false, has_lyrics: false, lyrics_count: 0, translations_count: 0,
   originals: [], credits, attributes: [], ...extra,
 })
-const disc = (position: number, tracks: AlbumTrack[]): AlbumDisc => ({ id: position, position, title: null, titles: [], format: 'cd', bonus_id: null, tracks })
+const disc = (position: number, tracks: AlbumTrack[]): AlbumDisc => ({ id: position, position, title: null, titles: [], format: 'cd', bonus_id: null, tocs: [], tracks })
 
 describe('track people', () => {
   it('groups track credits by artist in tracklist order, roles in order with their tracks as ranges', () => {

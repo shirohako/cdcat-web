@@ -28,7 +28,7 @@ const track = (number: number, extra: Partial<AlbumTrack> = {}): AlbumTrack => (
   translations_count: 0, originals: [], credits: [], attributes: [], ...extra,
 })
 const disc = (position: number, tracks: AlbumTrack[], extra: Partial<AlbumDisc> = {}): AlbumDisc => ({
-  id: position, position, title: null, titles: [], format: 'cd', bonus_id: null, tracks, ...extra,
+  id: position, position, title: null, titles: [], format: 'cd', bonus_id: null, tocs: [], tracks, ...extra,
 })
 
 describe('buildTracklist', () => {

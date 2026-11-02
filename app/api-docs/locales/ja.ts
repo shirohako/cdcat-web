@@ -717,12 +717,31 @@ const texts: ApiDocsTexts = {
       title: 'ディスク',
       description: 'アルバムに含まれる 1 枚のディスク：CD、BD、アナログ、配信など。',
       fields: {
-        id: 'ディスク ID。',
+        id: 'このサイトでのディスク ID。リッピングソフトが使う Disc ID は `tocs` にあります。',
         position: '何枚目か。1 から始まります。',
         title: 'ディスク名。例：「DISC 2 Instrumental」。ない場合は `null`。',
         format: 'メディア。',
         bonus_id: '特典に付くディスクにだけあり、その特典を指します。',
+        tocs: 'CD の TOC。プレスごとに 1 件、`id` 順です。CD 以外は空の配列です。',
         tracks: 'このディスクのトラック。トラック番号順です。',
+      },
+    },
+    DiscToc: {
+      title: 'CD の TOC',
+      description: 'リッピングソフトが読み取った CD の目次と、そこから求めた Disc ID。セクター数はどれも 150 セクターのリードインを含みます（MusicBrainz と同じ書き方）。',
+      fields: {
+        id: 'TOC ID。',
+        first_track: '最初のトラック番号。',
+        last_track: '最後のトラック番号。',
+        data_track: 'データトラックの番号。エンハンスド CD では最後、ミックスモード CD では最初のトラックです。すべてオーディオなら `null`。',
+        leadout_offset: 'ディスク全体のリードアウトのセクター。',
+        offsets: '最初から最後までの各トラック（データトラックを含む）の開始セクター。',
+        source: '出典：`eac`、`xld`、`cueripper`、`manual`、`import` のいずれか。',
+        cdcat_id: 'CDCat Disc ID（例：`CDCAT1-ZX8Q-8MGS-W6KN-TFK3`）。オーディオトラックの長さだけから求めるので、同じマスターのプレスは同じ ID です。',
+        freedb_id: 'freedb（CDDB）ID。小文字の 16 進数 8 桁で、データトラックも含めて計算します。',
+        mb_discid: 'MusicBrainz Disc ID。最初のセッションだけで計算します。',
+        accuraterip_id: 'AccurateRip ID。`nnn-id1-id2-freedb` の形式で、CUETools のログには後ろの 3 つだけが出ます。',
+        ctdb_id: 'CUETools データベース（CTDB）の TOC ID。',
       },
     },
     AlbumTrack: {
@@ -1517,6 +1536,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_tocs: 'アルバム詳細のディスクに `tocs` を追加：CD の TOC と、CDCat Disc ID、freedb・MusicBrainz・AccurateRip・CTDB の ID。',
     launch: '初公開（ベータ版）。',
   },
 }

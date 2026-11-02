@@ -54,7 +54,7 @@ type OldAlbumArtist = { artist_id: AggregateRef | null, roles?: string[], credit
  * Brings a document kept in a draft up to date: tracks lose `work_id`, `track_originals` exists, the old
  * 艺术家与发行 rows become album-wide credits, one per role (艺术家, 发行 …), the old label rows, which
  * point at labels that are gone, are dropped, and so is the banner address, now a banner image. The cover gets marked
- * as the main one, so reordering the gallery can't make another the main cover.
+ * as the main one, so reordering the gallery can't make another the main cover. TOCs from before 2026-11-02 get no data track.
  */
 export function upgradeAlbumDocument(doc: AlbumDocument) {
   delete (doc as AlbumDocument & { banner_url?: unknown }).banner_url
@@ -62,6 +62,7 @@ export function upgradeAlbumDocument(doc: AlbumDocument) {
   if (cover) cover.is_primary = true
   for (const track of doc.tracks as Array<AlbumDocument['tracks'][number] & { work_id?: unknown }>) delete track.work_id
   doc.track_originals ??= []
+  for (const toc of doc.disc_tocs) toc.data_track ??= null
   const old = doc as AlbumDocument & { artists?: OldAlbumArtist[], labels?: unknown }
   for (const row of old.artists ?? []) {
     for (const role of row.roles?.length ? row.roles : ['artist']) {

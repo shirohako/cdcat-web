@@ -189,6 +189,20 @@
     "editing": {
       "version": "현재 버전",
       "edited_at": "{date} 업데이트"
+    },
+    "toc": {
+      "button": "Disc ID",
+      "title": "TOC와 Disc ID",
+      "description": "리핑 프로그램과 음악 데이터베이스는 이 ID로 CD를 알아봐요. CDCat Disc ID는 오디오 트랙 길이만 보기 때문에 같은 마스터로 찍은 디스크는 모두 같은 ID예요.",
+      "disc_picker": "디스크 선택",
+      "pressings": "이 디스크에는 TOC가 {n}개 있어요. 프레스마다 TOC가 다를 수 있어요.",
+      "toc_n": "TOC {n}",
+      "copy": "복사",
+      "copied": "복사됨",
+      "copy_failed": "복사하지 못했어요",
+      "open_musicbrainz": "MusicBrainz에서 보기",
+      "source": "출처: {source}",
+      "missing": "아직 TOC가 없어요 · 리핑 로그가 있으면 추가할 수 있어요"
     }
   },
   "albums": {
@@ -1928,6 +1942,7 @@
       "last_track": "마지막 트랙",
       "leadout_offset": "리드아웃",
       "offsets": "오프셋",
+      "data_track": "데이터 트랙",
       "album_id": "앨범",
       "album_image_id": "이미지",
       "original_track_id": "원곡 트랙",
@@ -1977,6 +1992,26 @@
       "plain": "일반 텍스트",
       "lrc": "LRC (싱크 가사)",
       "srt": "SRT (자막)"
+    },
+    "toc": {
+      "disc_n": "디스크 {n}",
+      "track": "트랙",
+      "start": "시작",
+      "length": "길이",
+      "start_sector": "시작 섹터",
+      "end_sector": "끝 섹터",
+      "data": "데이터",
+      "source": {
+        "eac": "EAC 로그",
+        "xld": "XLD 로그",
+        "cueripper": "CUERipper 로그",
+        "manual": "직접 입력",
+        "import": "가져옴"
+      },
+      "tracks": "트랙 {first}–{last}",
+      "data_track_n": "데이터 트랙 {n}",
+      "disc_toc": "디스크 {n} TOC",
+      "offsets_short": "시작 위치 {n}개 ({first} … {last})"
     }
   },
   "notifications": {
@@ -2625,14 +2660,39 @@
       "notes_points": "「M1.제목」 「M-01.」 줄에서 트랙 하나가 시작되고, 그 아래 들여쓴 줄은 빈 줄이 있어도 그 트랙의 것\n줄마다 빈 줄이 들어간 텍스트에서는 더 긴 공백이 있어야 트랙이 끝납니다\n역할과 이름 사이 콜론 뒤에 공백이 없어도 됩니다(「Vocal:nayuta」)\n영어 역할 이름과 흔한 표기: Vocal, Music, Lyric, Illust, Vocal Recording Engineer, Vo., Gt.\n「Music&Lyric」 「Guitar&Bass」는 두 역할로, 「つぐ&るる」처럼 일본어 이름 사이의 &는 두 사람으로 나눕니다\n마지막의 따로 떨어진 블록(「Illust」 등)은 앨범 전체의 것"
     },
     "toc": {
-      "button": "디스크 TOC (CD 리핑 프로그램용)",
+      "button": "디스크 TOC (리핑 로그의 목차)",
       "title": "디스크 {n} TOC",
-      "hint": "EAC나 XLD 로그에서 ‘TOC of the extracted CD’ 표를 붙여넣어 주세요. 서버가 Disc ID를 계산하고, 리핑 프로그램은 나중에 이 ID로 디스크를 찾아요.",
+      "hint": "EAC, XLD, CUERipper 로그에서 ‘TOC of the extracted CD’ 표를 붙여넣어 주세요. 표의 숫자만 저장되고, 로그의 다른 내용(사용자 이름, 경로, 드라이브)은 올라가지 않아요.",
+      "ids_hint": "Disc ID는 서버가 계산해요. ‘미리보기’나 저장 후 앨범 페이지의 ‘앨범 편집’ → ‘Disc ID’에서 볼 수 있어요.",
       "none": "아직 TOC가 없어요.",
-      "tracks": "트랙 {first}–{last}",
-      "leadout": "리드아웃 {offset}",
-      "count_mismatch": "디스크 트랙 수({count}곡)와 맞지 않아요",
-      "unreadable": "이 텍스트에서 TOC 표를 찾지 못했어요.",
+      "paste_label": "리핑 로그 붙여넣기",
+      "pasted": "붙여넣은 TOC",
+      "toc_n": "TOC {n}",
+      "facts": "오디오 트랙 {tracks}개 · 총 {length}",
+      "with_data": "데이터 트랙 있음",
+      "matches": "디스크의 {count}곡과 맞아요",
+      "count_mismatch": "TOC의 오디오 트랙은 {tracks}개, 디스크의 트랙은 {count}곡이에요",
+      "not_cd": "TOC는 CD와 SACD에만 있어요. 먼저 디스크 형식을 CD로 바꿔 주세요.",
+      "not_cd_disc": "이 디스크는 CD가 아니라서 저장할 때 TOC가 거부돼요. TOC를 지우거나 형식을 CD로 바꿔 주세요.",
+      "has_errors": "이 디스크의 TOC에 문제가 있어요. ‘TOC’를 눌러 확인해 주세요.",
+      "duplicate": "이미 추가한 TOC예요.",
+      "data_track": "데이터 트랙",
+      "data_none": "없음",
+      "data_last": "마지막 트랙 (인핸스드 CD)",
+      "data_first": "첫 트랙 (혼합 모드 CD)",
+      "data_detected": "마지막 트랙 앞에 정확히 11400섹터의 간격이 있어서 인핸스드 CD의 데이터 트랙이에요.",
+      "show_table": "TOC 표 보기",
+      "hide_table": "TOC 표 접기",
+      "fill_durations": "TOC로 재생 시간 채우기",
+      "fill_hint": "재생 시간이 없는 트랙만 초 단위로 반올림해서 채워요",
+      "fill_mismatch": "TOC의 오디오 트랙 수가 디스크의 트랙 수와 달라요",
+      "nothing_to_fill": "모든 트랙에 재생 시간이 있어요",
+      "filled": "{n}곡의 재생 시간을 채웠어요",
+      "unreadable": {
+        "none": "이 텍스트에서 TOC 표를 찾지 못했어요.",
+        "several": "TOC가 여러 개 있어요. 로그는 한 장씩 붙여넣어 주세요.",
+        "gaps": "TOC의 트랙 번호가 건너뛰었어요. 표 전체를 붙여넣어 주세요."
+      },
       "add": "TOC 추가"
     },
     "credits": {

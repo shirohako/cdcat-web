@@ -45,7 +45,7 @@
           <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
           <AlbumArticles :articles="album.articles ?? []" />
           <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact />
-          <AlbumEditing :album-id="album.id" :version="album.version" :edited-at="album.edited_at" />
+          <AlbumEditing :album-id="album.id" :version="album.version" :edited-at="album.edited_at" :discs="album.discs" />
         </div>
       </div>
     </div>

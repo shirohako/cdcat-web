@@ -189,6 +189,20 @@
     "editing": {
       "version": "目前版本",
       "edited_at": "{date}更新"
+    },
+    "toc": {
+      "button": "Disc ID",
+      "title": "TOC 與 Disc ID",
+      "description": "抓軌軟體和音樂資料庫用這些 ID 認出這張 CD。CDCat Disc ID 只看音訊軌的長度，同一母帶的不同壓片都相同。",
+      "disc_picker": "選擇碟片",
+      "pressings": "這張碟有 {n} 份 TOC：不同壓片的 TOC 可能不同。",
+      "toc_n": "TOC {n}",
+      "copy": "複製",
+      "copied": "已複製",
+      "copy_failed": "複製失敗",
+      "open_musicbrainz": "在 MusicBrainz 檢視",
+      "source": "來源：{source}",
+      "missing": "還沒有 TOC · 有抓軌日誌可以補充"
     }
   },
   "albums": {
@@ -1928,6 +1942,7 @@
       "last_track": "末曲",
       "leadout_offset": "導出區",
       "offsets": "偏移",
+      "data_track": "資料軌",
       "album_id": "專輯",
       "album_image_id": "圖片",
       "original_track_id": "原曲曲目",
@@ -1977,6 +1992,26 @@
       "plain": "純文字",
       "lrc": "LRC（附時間軸）",
       "srt": "SRT（字幕）"
+    },
+    "toc": {
+      "disc_n": "Disc {n}",
+      "track": "軌",
+      "start": "開始",
+      "length": "長度",
+      "start_sector": "起始磁區",
+      "end_sector": "結束磁區",
+      "data": "資料軌",
+      "source": {
+        "eac": "EAC 日誌",
+        "xld": "XLD 日誌",
+        "cueripper": "CUERipper 日誌",
+        "manual": "手動填寫",
+        "import": "匯入"
+      },
+      "tracks": "第 {first}–{last} 軌",
+      "data_track_n": "資料軌 {n}",
+      "disc_toc": "Disc {n} 的 TOC",
+      "offsets_short": "{n} 個起點（{first} … {last}）"
     }
   },
   "notifications": {
@@ -2625,14 +2660,39 @@
       "notes_points": "「M1.曲名」「M-01.」一行開始一首曲目；下面縮排的行都算這首的，中間空幾行也不要緊\n每行之間都隔一個空行的文字，要空得更多才算這首結束\n角色和名字之間的冒號可以不帶空格，如「Vocal:nayuta」\n英文角色名和常見寫法：Vocal、Music、Lyric、Illust、Vocal Recording Engineer、Vo.、Gt.\n「Music&Lyric」「Guitar&Bass」拆成兩個角色；「つぐ&るる」這樣日文名之間的 & 是兩個人\n最後單獨一段（如「Illust」）算整張專輯的"
     },
     "toc": {
-      "button": "碟片 TOC（供抓軌軟體使用）",
+      "button": "碟片 TOC（抓軌日誌裡的目錄）",
       "title": "Disc {n} 的 TOC",
-      "hint": "貼上 EAC 或 XLD 日誌裡的「TOC of the extracted CD」表格。Disc ID 由伺服器計算，之後抓軌軟體會用它查詢碟片。",
+      "hint": "貼上 EAC、XLD 或 CUERipper 日誌裡「TOC of the extracted CD」那張表。只儲存表裡的數字，日誌的其他內容（使用者名稱、路徑、光碟機）不會上傳。",
+      "ids_hint": "Disc ID 由伺服器計算：點「預覽」或儲存後，在專輯頁「編輯這張專輯」→「Disc ID」裡檢視。",
       "none": "還沒有 TOC。",
-      "tracks": "第 {first}–{last} 軌",
-      "leadout": "lead-out {offset}",
-      "count_mismatch": "但這張碟有 {count} 首曲目",
-      "unreadable": "這段文字裡沒有 TOC 表格。",
+      "paste_label": "貼上抓軌日誌",
+      "pasted": "貼上的 TOC",
+      "toc_n": "TOC {n}",
+      "facts": "{tracks} 個音訊軌 · 共 {length}",
+      "with_data": "另有資料軌",
+      "matches": "和這張碟的 {count} 首曲目對得上",
+      "count_mismatch": "TOC 有 {tracks} 個音訊軌，這張碟有 {count} 首曲目",
+      "not_cd": "只有 CD 和 SACD 有 TOC，請先把這張碟的格式改成 CD。",
+      "not_cd_disc": "這張碟不是 CD，它的 TOC 儲存時會被拒絕：刪除 TOC，或把格式改成 CD。",
+      "has_errors": "這張碟的 TOC 有問題，點「TOC」檢視。",
+      "duplicate": "這份 TOC 已經新增過了。",
+      "data_track": "資料軌",
+      "data_none": "沒有",
+      "data_last": "最後一軌（增強型 CD）",
+      "data_first": "第一軌（混合模式 CD）",
+      "data_detected": "最後一軌前面正好空了 11400 個磁區，是增強型 CD 的資料軌。",
+      "show_table": "檢視 TOC 表",
+      "hide_table": "收起 TOC 表",
+      "fill_durations": "用 TOC 填寫時長",
+      "fill_hint": "只填還沒有時長的曲目，四捨五入到秒",
+      "fill_mismatch": "TOC 的音訊軌數和這張碟的曲目數不一樣",
+      "nothing_to_fill": "曲目都已經有時長了",
+      "filled": "填好了 {n} 首曲目的時長",
+      "unreadable": {
+        "none": "這段文字裡沒有 TOC 表格。",
+        "several": "這段文字裡有好幾份 TOC：一次只貼一張碟的日誌。",
+        "gaps": "TOC 的軌號不連續：請把整張表貼進來。"
+      },
       "add": "新增 TOC"
     },
     "credits": {

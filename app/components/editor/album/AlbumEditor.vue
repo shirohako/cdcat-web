@@ -177,6 +177,8 @@ const props = defineProps<{
   draftScope?: string | null
   mode?: 'edit' | 'translate'
   locale?: string
+  /** The section to open first, e.g. `tracks` from the album page's TOC prompt; unknown names open the basics. */
+  openSection?: string
   embedded?: boolean
   submitTo?: (payload: RevisionDraftPayload) => Promise<Revision>
   /** Printed names that still need a person to look at them, with why */
@@ -323,7 +325,7 @@ const SECTIONS: Array<{ key: AlbumSection, icon: Component }> = [
   { key: 'translate', icon: Languages },
   { key: 'submit', icon: Send },
 ]
-const active = ref<AlbumSection>(props.mode === 'translate' ? 'translate' : 'basic')
+const active = ref<AlbumSection>(props.mode === 'translate' ? 'translate' : SECTIONS.find(section => section.key === props.openSection)?.key ?? 'basic')
 const SECTION_LABELS: Partial<Record<AlbumSection, string>> = { translate: 'editor.mode_translate', submit: 'editor.section_submit' }
 const sections = computed(() => SECTIONS.map(section => ({ ...section, label: t(SECTION_LABELS[section.key] ?? `editor.album.section.${section.key}`) })))
 

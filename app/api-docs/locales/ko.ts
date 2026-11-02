@@ -716,12 +716,31 @@ const texts: ApiDocsTexts = {
       title: '디스크',
       description: '앨범에 든 디스크 한 장입니다. CD, BD, LP, 디지털 등이 있습니다.',
       fields: {
-        id: '디스크 ID',
+        id: '이 사이트의 디스크 ID. 리핑 프로그램이 쓰는 Disc ID는 `tocs`에 있습니다.',
         position: '디스크 번호. 1부터 시작합니다.',
         title: '디스크 제목(예: ‘DISC 2 Instrumental’). 없으면 `null`입니다.',
         format: '포맷',
         bonus_id: '특전으로 딸린 디스크에만 있으며, 해당 특전을 가리킵니다.',
+        tocs: 'CD의 TOC. 프레스마다 하나씩, `id` 순입니다. CD가 아니면 빈 배열입니다.',
         tracks: '이 디스크의 수록곡. 트랙 번호순입니다.',
+      },
+    },
+    DiscToc: {
+      title: 'CD TOC',
+      description: '리핑 프로그램이 읽은 CD 목차와 그것으로 계산한 Disc ID입니다. 섹터 번호에는 모두 150섹터의 리드인이 포함됩니다(MusicBrainz와 같은 방식).',
+      fields: {
+        id: 'TOC ID',
+        first_track: '첫 트랙 번호',
+        last_track: '마지막 트랙 번호',
+        data_track: '데이터 트랙의 번호. 인핸스드 CD는 마지막 트랙, 혼합 모드 CD는 첫 트랙입니다. 모두 오디오 트랙이면 `null`입니다.',
+        leadout_offset: '디스크 전체의 리드아웃 섹터',
+        offsets: '첫 트랙부터 마지막 트랙까지 각 트랙(데이터 트랙 포함)의 시작 섹터',
+        source: '출처: `eac`, `xld`, `cueripper`, `manual`, `import` 중 하나',
+        cdcat_id: 'CDCat Disc ID(예: `CDCAT1-ZX8Q-8MGS-W6KN-TFK3`). 오디오 트랙 길이만 보므로 같은 마스터로 찍은 디스크는 모두 같은 ID입니다.',
+        freedb_id: 'freedb(CDDB) ID. 소문자 16진수 8자리이며 데이터 트랙도 포함해 계산합니다.',
+        mb_discid: 'MusicBrainz Disc ID. 첫 세션만으로 계산합니다.',
+        accuraterip_id: 'AccurateRip ID. `nnn-id1-id2-freedb` 형식이며 CUETools 로그에는 뒤의 세 부분만 나옵니다.',
+        ctdb_id: 'CUETools 데이터베이스(CTDB)의 TOC ID',
       },
     },
     AlbumTrack: {
@@ -1516,6 +1535,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_tocs: '앨범 상세의 디스크에 `tocs` 추가: CD의 TOC와 CDCat Disc ID, freedb·MusicBrainz·AccurateRip·CTDB ID',
     launch: '첫 공개(베타)',
   },
 }

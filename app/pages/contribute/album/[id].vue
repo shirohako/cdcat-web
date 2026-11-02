@@ -8,6 +8,7 @@
         :revision-id="revisionId"
         :mode="route.query.mode === 'translate' ? 'translate' : 'edit'"
         :locale="typeof route.query.locale === 'string' ? route.query.locale : undefined"
+        :open-section="typeof route.query.section === 'string' ? route.query.section : undefined"
       />
       <template #fallback>
         <!-- The editor's own loading state, so nothing moves when it takes over. -->
@@ -24,7 +25,8 @@
 <script setup lang="ts">
 // The editor loads in the browser only (it keeps its drafts there): the server renders its spinner,
 // so the navbar and the rest of the page become usable without waiting for the editor's code.
-// Edits an album: ?revision=<id> continues a revision sent back for changes, ?mode=translate&locale=en opens the tracklist translator.
+// Edits an album: ?revision=<id> continues a revision sent back for changes, ?mode=translate&locale=en opens the tracklist translator,
+// ?section=tracks opens a section first.
 definePageMeta({ middleware: 'auth' })
 
 const route = useRoute()
