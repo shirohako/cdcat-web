@@ -1526,6 +1526,7 @@ const texts: ApiDocsTexts = {
       description: 'Link provider categories; streaming links are listed separately on albums.',
       values: {
         official: 'Official sites.',
+        promotion: 'Promotion, such as XFDs and お品書き.',
         social: 'Social networks.',
         streaming: 'Streaming.',
         shop: 'Shops.',

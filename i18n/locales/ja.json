@@ -1742,6 +1742,7 @@
     },
     "link_category": {
       "official": "公式",
+      "promotion": "告知",
       "database": "データベース",
       "shop": "ショップ",
       "streaming": "ストリーミング",

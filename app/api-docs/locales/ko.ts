@@ -1525,6 +1525,7 @@ const texts: ApiDocsTexts = {
       description: '링크 제공처의 분류입니다. 앨범에서는 스트리밍 링크를 따로 제공합니다.',
       values: {
         official: '공식 사이트',
+        promotion: '홍보(XFD, お品書き 등)',
         social: 'SNS',
         streaming: '스트리밍',
         shop: '쇼핑몰',

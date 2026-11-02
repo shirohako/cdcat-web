@@ -1,6 +1,8 @@
 /** Display names of link providers (link_providers.name keys) whose spelling title case gets wrong. */
 const PROVIDER_LABELS: Record<string, string> = {
   official_website: 'Official Website',
+  xfd: 'XFD',
+  oshinagaki: 'お品書き',
   twitter: 'X (Twitter)',
   youtube: 'YouTube',
   youtube_music: 'YouTube Music',
@@ -35,6 +37,8 @@ export const providerLabel = (name?: string | null) => name
  */
 const PROVIDER_HUES: Record<string, number> = {
   official_website: 285,
+  // promotion
+  xfd: 300, oshinagaki: 30,
   // streaming
   spotify: 150, apple_music: 10, youtube_music: 28, soundcloud: 55, bandcamp: 205, netease_music: 340,
   // shop

@@ -25,7 +25,7 @@ import { providerLabel } from '~/utils/linkProviders'
 /** External links as one compact row, for page headers. The full grouped list is AlbumLinks. */
 const props = defineProps<{ links: CatalogLink[] }>()
 
-const categoryOrder = ['official', 'streaming', 'shop', 'social', 'database', 'other']
+const categoryOrder = ['official', 'promotion', 'streaming', 'shop', 'social', 'database', 'other']
 const rank = (link: CatalogLink) => {
   const index = categoryOrder.indexOf(link.provider?.category ?? 'other')
   return index === -1 ? categoryOrder.length : index

@@ -1742,6 +1742,7 @@
     },
     "link_category": {
       "official": "공식",
+      "promotion": "홍보",
       "database": "데이터베이스",
       "shop": "구매처",
       "streaming": "스트리밍",

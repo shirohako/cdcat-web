@@ -1742,6 +1742,7 @@
     },
     "link_category": {
       "official": "Official",
+      "promotion": "Promotion",
       "database": "Databases",
       "shop": "Shops",
       "streaming": "Streaming",

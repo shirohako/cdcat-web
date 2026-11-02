@@ -1526,6 +1526,7 @@ const texts: ApiDocsTexts = {
       description: '連結提供者的分類，串流連結在專輯裡另外列出。',
       values: {
         official: '官網。',
+        promotion: '宣傳，例如 XFD、お品書き。',
         social: '社群網站。',
         streaming: '串流。',
         shop: '商店。',

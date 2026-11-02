@@ -1269,7 +1269,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         { kind: 'enum', name: 'entry_relation', values: ['sequel', 'prequel', 'side_story', 'main_story', 'spin_off', 'spin_off_of', 'adaptation', 'source', 'remake', 'remake_of', 'alternative', 'shared_world', 'related'] },
         { kind: 'enum', name: 'entry_album_relation', values: ['opening', 'ending', 'insert_song', 'theme_song', 'character_song', 'image_song', 'ost', 'drama', 'other'] },
         { kind: 'enum', name: 'attribute_value_type', values: ['text', 'integer', 'decimal', 'date', 'url', 'boolean', 'choice', 'reference'] },
-        { kind: 'enum', name: 'link_category', values: ['official', 'social', 'streaming', 'shop', 'database', 'other'] },
+        { kind: 'enum', name: 'link_category', values: ['official', 'promotion', 'social', 'streaming', 'shop', 'database', 'other'] },
       ],
     },
     {

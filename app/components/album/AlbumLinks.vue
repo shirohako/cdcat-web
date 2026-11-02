@@ -49,7 +49,7 @@
 import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
 import { providerHue, providerLabel } from '~/utils/linkProviders'
-import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, ShoppingBag } from '@lucide/vue'
+import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, Megaphone, ShoppingBag } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   links?: CatalogLink[]
@@ -57,7 +57,7 @@ const props = withDefaults(defineProps<{
   links: () => [],
 })
 
-const categoryOrder = ['official', 'streaming', 'shop', 'social', 'database', 'other'];
+const categoryOrder = ['official', 'promotion', 'streaming', 'shop', 'social', 'database', 'other'];
 
 const groupedLinks = computed(() => {
   const groups: Record<string, CatalogLink[]> = {};
@@ -94,7 +94,7 @@ const shownGroups = computed(() => {
 })
 
 const categoryIcons: Record<string, Component> = {
-  official: House, streaming: Headphones, shop: ShoppingBag, social: AtSign, database: Database, other: Globe,
+  official: House, promotion: Megaphone, streaming: Headphones, shop: ShoppingBag, social: AtSign, database: Database, other: Globe,
 }
 const categoryKey = (category: string) => category in categoryIcons ? category : 'other'
 

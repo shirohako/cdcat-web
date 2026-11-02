@@ -1526,6 +1526,7 @@ const texts: ApiDocsTexts = {
       description: '链接提供方的分类，流媒体链接在专辑里单独列出。',
       values: {
         official: '官网。',
+        promotion: '宣传，例如 XFD、お品書き。',
         social: '社交网站。',
         streaming: '流媒体。',
         shop: '商店。',
