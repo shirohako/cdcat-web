@@ -101,7 +101,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
 
   return {
     items: [{ ref: ALBUM_REF, resource_type: 'album', action: 'create', document: doc as unknown as Record<string, unknown> }, ...artists],
-    summary: event ? `采集：${event.name}「${doc.title}」` : `采集：「${doc.title}」`,
+    summary: event ? `Candidate #${candidate.id}: ${event.name} “${doc.title}”` : `Candidate #${candidate.id}: “${doc.title}”`,
     sources: [...new Set(merged.sources.map(source => source.url))].slice(0, 20),
   }
 }

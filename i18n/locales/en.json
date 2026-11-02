@@ -2586,7 +2586,7 @@
     "paste_credits": {
       "button": "Paste credits",
       "title": "Paste credits",
-      "hint": "Paste a whole credit list from the booklet or a shop page, one role per line, like “Composer & Arranger: Minato (M1–M3), Yuki (M4)”. Track numbers in brackets are the tracks someone worked on; without them it is the whole album. The lines under “01. Title” are that track’s, up to a blank line, and numbers after “Disc 2” are on disc 2.",
+      "hint": "Paste a whole credit list from the booklet, a shop page or a VGMdb note, one role per line. Hover over an example below to see what it reads by itself.",
       "existing": "Existing artists",
       "new": "New artist",
       "namesakes": "{count} artists of this name",
@@ -2600,7 +2600,17 @@
       "col_role": "Role",
       "col_who": "Who",
       "col_tracks": "Tracks",
-      "unknown_roles": "Not recognised: {words}"
+      "unknown_roles": "Not recognised: {words}",
+      "placeholder": "Paste the credit list here",
+      "examples": "Examples",
+      "example": "Example {n}",
+      "handles": "Read automatically:",
+      "roles_title": "Role: name (tracks)",
+      "roles_points": "A colon between the role and the names, one role per line\nSeveral roles at once: “作詞・作曲”, “Music&Lyric”, “Guitar / Bass”\nPeople separated by “、” or “,”; “A × B” and “A & B” are two people\nTrack numbers in brackets are the tracks someone worked on: “M1, M2”, “M1–M3”, “2-03” (disc 2, track 3), “全曲”; without them, the whole album\nOther brackets become the detail, like “(CV: 星野あかり)”\nWho comes after feat. is a guest of the name before",
+      "blocks_title": "Blocks per track",
+      "blocks_points": "The lines under “01. Title”, “M1” or “Track 1” are that track’s\nA blank line ends the block; lines after it are the whole album’s\nNumbers after a line “Disc 2” are on disc 2",
+      "notes_title": "Track numbers with English roles",
+      "notes_points": "A line “M1.Title” or “M-01.” starts a track; the indented lines under it are that track’s, blank lines or not\nIn text with a blank line after every line, only a longer gap ends the track\nNo space needed after the colon, as in “Vocal:nayuta”\nEnglish role names and common spellings: Vocal, Music, Lyric, Illust, Vocal Recording Engineer, Vo., Gt.\n“Music&Lyric” and “Guitar&Bass” become two roles; & between Japanese names, as in “つぐ&るる”, is two people\nA last block on its own (like “Illust”) is the whole album’s"
     },
     "toc": {
       "button": "Disc TOC, for CD rippers",
@@ -2746,7 +2756,7 @@
       "remove_confirm": "The album still uses this. Remove it anyway?",
       "used_credits": "credited {count}×",
       "used_elsewhere": "used elsewhere",
-      "unused": "not used yet",
+      "unused": "Not used; it won’t be created",
       "edited": "Edits {type}",
       "edited_hint": "also edited in this revision"
     },

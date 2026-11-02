@@ -2586,7 +2586,7 @@
     "paste_credits": {
       "button": "貼上人員表",
       "title": "貼上人員表",
-      "hint": "把歌詞本或商店頁面上的人員表整段貼進來，每行一個角色，如「作曲・編曲：ミナト（M1–M3）、Yuki（M4）」。括號裡的曲號是參與的曲目，沒有就是整張專輯；「01. 曲名」下面幾行算這首曲目的，空一行結束；「Disc 2」之後的曲號在第 2 張碟上。",
+      "hint": "把歌詞本、商店頁面或 VGMdb 備註裡的人員表整段貼進來，每行一個角色。滑鼠移到下面的範例上，可以看到能自動辨識的寫法。",
       "existing": "已有的藝術家",
       "new": "新增藝術家",
       "namesakes": "同名的有 {count} 位",
@@ -2600,7 +2600,17 @@
       "col_role": "角色",
       "col_who": "誰",
       "col_tracks": "曲目",
-      "unknown_roles": "沒認出：{words}"
+      "unknown_roles": "沒認出：{words}",
+      "placeholder": "在這裡貼上人員表",
+      "examples": "範例",
+      "example": "範例 {n}",
+      "handles": "能自動處理：",
+      "roles_title": "角色：名字（曲號）",
+      "roles_points": "角色和名字用「：」或「:」隔開，一行一個角色\n幾個角色可以連寫：「作詞・作曲」「Music&Lyric」「Guitar / Bass」\n幾個人用「、」或「,」隔開；「A × B」「A & B」是兩個人\n括號裡的曲號是參與的曲目：「M1, M2」「M1–M3」「2-03」（第 2 張碟第 3 首）「全曲」；沒寫就是整張專輯\n其他括號記成細節，如「（CV：星野あかり）」\nfeat. 後面的人記成前一個人的客串",
+      "blocks_title": "按曲目分塊",
+      "blocks_points": "「01. 曲名」「M1」「Track 1」下面幾行算這首曲目的\n空一行結束，之後的行算整張專輯的\n單獨一行「Disc 2」之後的曲號在第 2 張碟上",
+      "notes_title": "曲號加英文角色",
+      "notes_points": "「M1.曲名」「M-01.」一行開始一首曲目；下面縮排的行都算這首的，中間空幾行也不要緊\n每行之間都隔一個空行的文字，要空得更多才算這首結束\n角色和名字之間的冒號可以不帶空格，如「Vocal:nayuta」\n英文角色名和常見寫法：Vocal、Music、Lyric、Illust、Vocal Recording Engineer、Vo.、Gt.\n「Music&Lyric」「Guitar&Bass」拆成兩個角色；「つぐ&るる」這樣日文名之間的 & 是兩個人\n最後單獨一段（如「Illust」）算整張專輯的"
     },
     "toc": {
       "button": "碟片 TOC（供抓軌軟體使用）",
@@ -2746,7 +2756,7 @@
       "remove_confirm": "專輯裡還在用它。仍然移除嗎？",
       "used_credits": "署名 {count} 處",
       "used_elsewhere": "在其他地方使用",
-      "unused": "還沒有用到",
+      "unused": "沒有用到，提交時不會建立",
       "edited": "修改{type}",
       "edited_hint": "這筆修訂同時修改它"
     },

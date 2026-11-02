@@ -11,7 +11,7 @@
           <span class="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">{{ enumLabel('catalog_type', item.resource_type) }}</span>
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
           <UiSelect v-if="item.resource_type === 'artist'" v-model="docOf(item).type" :options="artistTypeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-36" :invalid="!docOf(item).type" :aria-label="$t('catalog.field.type')" />
-          <span class="text-[11px] text-meta">{{ usage(item.ref) }}</span>
+          <span class="text-[11px]" :class="usage(item.ref) === null ? 'text-warning' : 'text-meta'">{{ usage(item.ref) ?? $t('editor.new_items.unused') }}</span>
           <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.new_items.remove')" icon-class="size-3" size="xs" class="ml-auto ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(item.ref)" />
         </div>
 
@@ -53,13 +53,14 @@ interface NewItemDocument {
 const docOf = (item: DraftItem) => item.document as NewItemDocument
 const errorsOf = (ref: string) => editor.errors.value.filter(error => error.path.startsWith(`items.${ref}.`) || error.path === `items.${ref}`)
 
-/** Where the album uses the new item, e.g. "2 credits". */
+/** Where the album uses the new item, e.g. "2 credits"; null when nothing does, so it won't be created (draft.prepared). */
 const usage = (ref: string) => {
   const album = editor.album.value
   const target = `@${ref}`
   const credits = album.credits.filter(credit => credit.artist_id === target).length
   if (credits) return t('editor.new_items.used_credits', { count: credits })
-  return editor.referenced(target) ? t('editor.new_items.used_elsewhere') : t('editor.new_items.unused')
+  if (!editor.draft.prepared.value.some(item => item.ref === ref)) return null
+  return t('editor.new_items.used_elsewhere')
 }
 
 const remove = async (ref: string) => {

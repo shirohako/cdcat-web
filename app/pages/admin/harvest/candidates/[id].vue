@@ -227,6 +227,21 @@ const sizeNote = (preview: { width: number, height: number }) => [
 
 const useTitle = (value: string) => { if (editor.value) editor.value.album.title = value }
 const useDescription = (value: string) => { if (editor.value) editor.value.album.description = value.trim() || null }
+/** The source description just copied (by record), so its button says so for a moment. */
+const copiedDescription = ref<number | null>(null)
+let copiedTimer: ReturnType<typeof setTimeout> | undefined
+const copyDescription = async (recordId: number, value: string) => {
+  try {
+    await navigator.clipboard.writeText(value)
+  }
+  catch {
+    return
+  }
+  copiedDescription.value = recordId
+  clearTimeout(copiedTimer)
+  copiedTimer = setTimeout(() => { copiedDescription.value = null }, 1500)
+}
+onBeforeUnmount(() => clearTimeout(copiedTimer))
 /** The site name of a source, as the records label it. */
 const sourceName = (source: string) => detail.value?.records.find(record => record.source === source)?.label ?? source
 /** The album's official sites, as the sources mark their links; opened from the sources card. */
@@ -542,23 +557,6 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                 </div>
               </section>
 
-              <details v-if="detail.candidate.merged.descriptions.length" class="group/desc" :class="card">
-                <summary class="flex cursor-pointer list-none items-center gap-2 bg-slate-50/70 px-4 py-2.5 font-semibold group-open/desc:border-b group-open/desc:border-slate-100">
-                  <Icon name="lucide:file-text" class="size-4 text-slate-400" />来源描述
-                  <Icon name="lucide:chevron-down" class="ml-auto size-4 text-slate-400 transition-transform group-open/desc:rotate-180" />
-                </summary>
-                <div class="space-y-3 px-4 py-3">
-                  <p v-if="open && detail.candidate.merged.descriptions.length > 1" class="text-xs text-slate-500">草稿默认填第一条，点「采用」换成别的来源。</p>
-                  <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id">
-                    <p class="mb-1 flex items-center gap-2 text-xs text-slate-500">
-                      {{ sourceName(text.source) }}
-                      <UiButton v-if="open" size="xs" class="ml-auto" :disabled="!editor" @click="useDescription(text.text)">采用</UiButton>
-                    </p>
-                    <p class="max-h-48 overflow-y-auto whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-5">{{ text.text }}</p>
-                  </div>
-                </div>
-              </details>
-
               <section v-if="detail.candidate.merged.notes.length" :class="card">
                 <h3 :class="cardHead">
                   <Icon name="lucide:sticky-note" class="size-4 text-slate-400" />备注
@@ -570,6 +568,26 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
             </div>
           </div>
         </details>
+
+        <section v-if="detail.candidate.merged.descriptions.length" :class="card">
+          <h3 :class="cardHead">
+            <Icon name="lucide:file-text" class="size-4 text-slate-400" />来源描述
+            <span v-if="open && detail.candidate.merged.descriptions.length > 1" class="text-xs font-normal text-slate-500">草稿默认填第一条，点「采用」换成别的来源。</span>
+          </h3>
+          <div class="grid gap-4 px-4 py-3 text-sm" :class="detail.candidate.merged.descriptions.length > 1 ? 'lg:grid-cols-2' : ''">
+            <div v-for="text in detail.candidate.merged.descriptions" :key="text.record_id" class="min-w-0">
+              <p class="mb-1 flex items-center gap-2 text-xs text-slate-500">
+                {{ sourceName(text.source) }}
+                <UiButton size="xs" class="ml-auto" @click="copyDescription(text.record_id, text.text)">
+                  <Icon :name="copiedDescription === text.record_id ? 'lucide:check' : 'lucide:copy'" class="size-3.5" />{{ copiedDescription === text.record_id ? '已复制' : '复制' }}
+                </UiButton>
+                <UiButton v-if="open" size="xs" :disabled="!editor" @click="useDescription(text.text)">采用</UiButton>
+              </p>
+              <!-- The thumb always shows here (not only while scrolling, as elsewhere): a long description should look longer than the box. -->
+              <p class="max-h-72 overflow-y-auto whitespace-pre-line rounded-lg bg-slate-50 p-3 text-xs leading-5 [&::-webkit-scrollbar-thumb]:bg-primary/35 [&::-webkit-scrollbar-thumb:hover]:bg-primary/50">{{ text.text }}</p>
+            </div>
+          </div>
+        </section>
 
         <AdminHarvestPeopleCheck v-if="open && draftReady" :people="people" :circle="circleMatch" :credits="detail.candidate.merged.credits" :artists="artistRefs" :editor="editor" />
 

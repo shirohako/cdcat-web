@@ -175,8 +175,26 @@ export function useRevisionDraft(options: {
     return revision
   }
 
-  /** The items as they are sent. */
-  const prepared = computed(() => items.value.map(item => options.prepare ? options.prepare(item) : item))
+  /**
+   * The items as they are sent. A new entity nothing uses any more (its last credit was removed, say) is left out, so
+   * it isn't created: an item is used when the main item, an edited entity or another used item names it ("@ref").
+   */
+  const prepared = computed(() => {
+    const all = items.value.map(item => options.prepare ? options.prepare(item) : item)
+    const main = mainItem(all)
+    const used = new Set(all.filter(item => item === main || item.action !== 'create').map(item => item.ref))
+    for (let grew = true; grew;) {
+      grew = false
+      const texts = all.filter(item => used.has(item.ref)).map(item => JSON.stringify(item.document ?? {}))
+      for (const item of all) {
+        if (!used.has(item.ref) && texts.some(text => text.includes(`"@${item.ref}"`))) {
+          used.add(item.ref)
+          grew = true
+        }
+      }
+    }
+    return all.filter(item => used.has(item.ref))
+  })
 
   const payload = (): RevisionDraftPayload => ({
     summary: summary.value || null,
@@ -260,7 +278,8 @@ export function useRevisionDraft(options: {
       clearTimeout(timer)
       let revision: Revision
       if (revisionId.value) {
-        const current = new Set(items.value.map(item => item.ref))
+        // A new item no longer used is removed from the revision too.
+        const current = new Set(prepared.value.map(item => item.ref))
         const saved = await $api<Revision>(`/v1/revisions/${revisionId.value}`, {
           method: 'PUT',
           body: { ...payload(), removed_refs: [...serverRefs].filter(ref => !current.has(ref)), lock_version: lockVersion.value },

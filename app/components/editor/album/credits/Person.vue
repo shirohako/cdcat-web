@@ -98,7 +98,9 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
     <div class="space-y-3">
       <div v-if="person.artist_id !== null" class="flex items-center gap-2">
         <Icon name="lucide:user" class="size-4 shrink-0 text-meta" />
-        <span class="min-w-0 flex-1 truncate text-sm font-semibold text-title">{{ name }}</span>
+        <span class="min-w-0 flex-1 truncate text-sm font-semibold text-title">
+          {{ name }}<span v-if="typeof person.artist_id === 'number'" class="ml-1.5 text-xs font-normal tabular-nums text-meta">#{{ person.artist_id }}</span>
+        </span>
         <EditorViewLink v-if="typeof person.artist_id === 'number'" :id="person.artist_id" type="artist" />
       </div>
       <EditorArtistTypePicker v-if="isNew" v-model="type" :invalid="!type" />

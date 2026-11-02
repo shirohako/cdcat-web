@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import { foldRoleWord, parseCredits } from '../../app/utils/creditParser'
+import { foldRoleWord, newArtistName, parseCredits } from '../../app/utils/creditParser'
 
 const WORDS: Record<string, string[]> = {
   composer: ['作曲', 'Composer', 'Music'],
-  lyricist: ['作詞', 'Lyrics'],
+  lyricist: ['作詞', 'Lyrics', 'Lyric'],
   arranger: ['編曲', 'Arranger'],
   vocals: ['Vocal', 'ボーカル'],
   artist: ['Artist'],
-  illustrator: ['Illustration'],
+  illustrator: ['Illustration', 'Illust'],
+  guitar: ['Guitar'],
+  bass: ['Bass'],
   publisher: ['発売元'],
 }
 const lookup = new Map(Object.entries(WORDS).flatMap(([role, words]) => words.map(word => [foldRoleWord(word), [role]])))
@@ -60,6 +62,19 @@ describe('pasted credit lists', () => {
       ['Composer & Arranger', [['2-3'], ['2-3']]],
       ['Illustration', [null]],
     ])
+  })
+
+  it('reads M-01. and M1.Title blocks, indented or double-spaced, and & between Japanese names', () => {
+    const credits = (text: string) => parse(text).lines.map(line => [line.roles.join('+'), line.names.map(name => `${name.name}@${tracks(name.tracks) ?? 'album'}`).join(' / ')])
+    expect(credits('M-01.\nVocal: nayuta\nMusic&Lyric: Minato Suzuya\n\nM-02.\nGuitar&Bass: Maki Hanagata\n\nIllust: K-ko')).toEqual([
+      ['vocals', 'nayuta@1-1'], ['composer+lyricist', 'Minato Suzuya@1-1'], ['guitar+bass', 'Maki Hanagata@1-2'], ['illustrator', 'K-ko@album'],
+    ])
+    const indented = 'M1.プリズムにさよならを\n\n   Vocal:nayuta\n\n   Music&Lyric:鈴谷皆人\n\n\n\nM3.破滅しゅぎ的恋愛\n\n   Vocal:つぐ&るる'
+    const expected = [['vocals', 'nayuta@1-1'], ['composer+lyricist', '鈴谷皆人@1-1'], ['vocals', 'つぐ@1-3 / るる@1-3']]
+    expect(credits(indented)).toEqual(expected)
+    expect(credits(`${indented.replace(/^ {3}/gm, '')}\n\n\n\nIllust:K子`)).toEqual([...expected, ['illustrator', 'K子@album']])
+    expect(credits('Artist: Tom&Jerry')).toEqual([['artist', 'Tom&Jerry@album']])
+    expect([newArtistName('上杉 悟'), newArtistName('ナツメ\u3000ユウキ'), newArtistName('Aki Ra')]).toEqual(['上杉悟', 'ナツメユウキ', 'Aki Ra'])
   })
 
   it('marks role words it doesn\'t know and skips lines that are no credits', () => {

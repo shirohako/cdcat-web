@@ -7,12 +7,12 @@ import type { AlbumCreditRow } from '~/utils/albumDocument'
 import { addCredit, orderedTracks, setCreditParent, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
 import { FEATURING_ROLE } from '~/utils/artistLine'
 import { ALBUM_ONLY_ROLES } from '~/utils/creditLines'
-import { foldRoleWord, parseCredits } from '~/utils/creditParser'
+import { foldRoleWord, newArtistName, parseCredits } from '~/utils/creditParser'
 
 /**
- * 粘贴人员表: a credit list pasted from a booklet or a shop page, read by utils/creditParser into roles, names and
- * tracks, its names looked up among the artists (GET /artists/lookup), and shown as a table to check before it is
- * added in one go. Each name becomes the one artist of that name, a new artist (its type picked later), or a
+ * 粘贴人员表: a credit list pasted from a booklet, a shop page or a VGMdb note (examples of each on hover), read by
+ * utils/creditParser into roles, names and tracks, its names looked up among the artists (GET /artists/lookup), and
+ * shown as a table to check before it is added in one go. Each name becomes the one artist of that name, a new artist (its type picked later), or a
  * printed name only; namesakes and unknown role words stay yellow until settled, and are left out until then.
  * Roles only the whole album has go on the whole album wherever they were written. "A & B" is two people unless
  * the whole of it is an artist's name; who comes after feat. is a 客串 of the name right before it (utils/artistLine).
@@ -39,7 +39,12 @@ interface Row {
   candidates: Match[]
 }
 
-const PLACEHOLDER = 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nIllustration：mochi\n\n01. 星屑のアトラス\n編曲：ミナト'
+/** The formats it reads, each shown on hover with what it handles (editor.paste_credits.<key>_title, <key>_points). */
+const EXAMPLES = [
+  { key: 'roles', text: 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nGuitar：Ken（全曲）\nVocal：ルナ（CV：星野あかり）\nArtist：Gardens feat. moon jelly（M2）\nIllustration：mochi' },
+  { key: 'blocks', text: '01. 星屑のアトラス\n作詞・作曲：ミナト\n編曲：Yuki\n\n02. 夜明けのプリズム\nVocal：星野あかり\n\nDisc 2\n01. 星屑のアトラス (Instrumental)\n編曲：Yuki\n\nIllustration：mochi' },
+  { key: 'notes', text: 'M1.プリズムにさよならを\n   Vocal:nayuta\n   Music&Lyric:鈴谷皆人\n   Guitar&Bass:花形真喜\n\nM-02.\nVocal: つぐ&るる\nVocal Recording Engineer: Yuhi Sumino\n\nIllust: K-ko' },
+] as const
 
 const { t } = useI18n()
 const { separator } = useListPunctuation()
@@ -176,7 +181,8 @@ const tracksText = (row: Row) => row.trackIds === null ? t('editor.credits.whole
 
 const personOf = (row: Row): CreditPerson => {
   if (row.choice === 'name') return { ...people.printed(row.name), detail: row.detail }
-  if (row.choice === 'new') return { ...people.created(row.name), detail: row.detail }
+  // A Japanese name is created without the spaces between its characters (上杉 悟 → 上杉悟).
+  if (row.choice === 'new') return { ...people.created(newArtistName(row.name)), detail: row.detail }
   const match = row.candidates.find(item => `a:${item.id}` === row.choice)!
   const person = people.picked({ id: match.id, label: match.name, subtitle: '', image_url: match.image_url })
   // Matched by another of its names: keep the one printed.
@@ -206,7 +212,24 @@ const apply = () => {
   <EditorModal v-model="open" :title="t('editor.paste_credits.title')" wide as="div">
     <div class="space-y-3">
       <p class="text-sm text-body">{{ t('editor.paste_credits.hint') }}</p>
-      <textarea v-model="text" rows="7" class="textarea w-full font-mono text-xs" :placeholder="PLACEHOLDER" :aria-label="t('editor.paste_credits.title')" />
+      <div class="flex flex-wrap items-center gap-2 text-xs">
+        <span class="text-meta">{{ t('editor.paste_credits.examples') }}</span>
+        <UiTooltip v-for="(example, index) in EXAMPLES" :key="example.key" placement="bottom-start" :delay="150" group="paste-examples" class="w-[26rem] max-w-[calc(100vw-2rem)]">
+          <span tabindex="0" class="inline-flex h-6 cursor-help items-center gap-1 rounded-md bg-btn px-2 font-medium text-body hover:bg-btn-hover">
+            <Icon name="lucide:file-text" class="size-3.5 text-meta" />{{ t('editor.paste_credits.example', { n: index + 1 }) }}
+            <span class="font-normal text-meta">· {{ t(`editor.paste_credits.${example.key}_title`) }}</span>
+          </span>
+          <template #content>
+            <p class="text-xs font-semibold text-title">{{ t(`editor.paste_credits.${example.key}_title`) }}</p>
+            <pre class="mt-1.5 whitespace-pre-wrap rounded-md bg-sunken px-2.5 py-2 font-mono text-[11px] leading-4 text-title">{{ example.text }}</pre>
+            <p class="mt-2 text-[11px] font-semibold text-title">{{ t('editor.paste_credits.handles') }}</p>
+            <ul class="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-body">
+              <li v-for="point in t(`editor.paste_credits.${example.key}_points`).split('\n')" :key="point">{{ point }}</li>
+            </ul>
+          </template>
+        </UiTooltip>
+      </div>
+      <textarea v-model="text" rows="7" class="textarea w-full font-mono text-xs" :placeholder="t('editor.paste_credits.placeholder')" :aria-label="t('editor.paste_credits.title')" />
 
       <div v-if="rows.length" class="max-h-80 overflow-auto rounded-lg border border-line">
         <table class="w-full min-w-[34rem] border-separate border-spacing-0 text-xs">

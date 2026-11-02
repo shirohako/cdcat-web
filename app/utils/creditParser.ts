@@ -6,6 +6,10 @@
 //   Vocal：Gardens feat. moon jelly（M2）      who comes after feat. / ft. (or in "(feat. …)") is a 客串
 //   Artist：しゅーりん × MoAE:.（M10）         two people; × & vs. only part names
 //   01. 星屑のアトラス                         a track's own block: the lines under it, up to a blank line, are that track's
+//   M-01.                                      the same in a VGMdb note (Music&Lyric: …, Guitar&Bass: … under it)
+//   M1.プリズムにさよならを                    lines indented under a heading stay that track's across blank lines; text with
+//      Vocal:つぐ&るる                         a blank line after every line ends a block only at a longer gap. "つぐ&るる":
+//                                              & between Japanese names parts two people
 //   Disc 2                                     numbers after it are on disc 2
 //
 // Role words are looked up by the caller (the role dictionary's names and other spellings); matching the
@@ -56,12 +60,19 @@ export const ROLE_SHORTHANDS: Record<string, string[]> = {
   作編曲: ['composer', 'arranger'], 作詞作曲: ['lyricist', 'composer'], 詞曲: ['lyricist', 'composer'],
 }
 
+/**
+ * The name a new artist takes: a Japanese or Chinese name without the spaces between its characters (上杉 悟 →
+ * 上杉悟), as the server's lookup and the harvest review take them for one person.
+ */
+export const newArtistName = (name: string) => name.trim().replace(/(?<=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー々〆])[\s\u3000]+(?=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー々〆])/gu, '')
+
 /** A role word as the lookup compares it: full-width forms, case, spaces and dots don't count. */
 export const foldRoleWord = (word: string) => word.normalize('NFKC').toLowerCase().replace(/[\s.。・]/g, '')
 
 const DISC_LINE = /^(?:disc|disk|cd|dvd|bd)\s*[-#.]?\s*(\d{1,2})\b/i
-const TRACK_LINE = /^(?:m|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:[.．:：)）、\]\s-]|$)/i
-const TRACK_ITEM = /^(?:m|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~〜～]\s*(?:m|tr\.?|track|#|no\.?)?\s*(\d{1,3}))?$/i
+/** "M-01." as VGMdb notes write a track's block: M with a hyphen or dot before the number too. */
+const TRACK_LINE = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:[.．:：)）、\]\s-]|$)/i
+const TRACK_ITEM = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~〜～]\s*(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3}))?$/i
 /** "2-03": a disc and a zero-padded track number, as VGMdb writes them, rather than a range. */
 const DISC_TRACK_ITEM = /^(\d)-(\d{2})$/
 const ALL_TRACKS = /^(?:全曲|全て|すべて|全部|all(?:\s*tracks)?)$/i
@@ -71,10 +82,10 @@ const FEATURING_WORD = /\s+(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)/gi
 /** A bracket that holds the 客串 instead of a detail: "A (feat. B)". */
 const FEATURING_BRACKET = /^(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)(.+)$/i
 /**
- * Between two people of one written name: "A & B", "A × B", "A x B", "A vs. B" with spaces, or "A×B". "A&B" stays one
- * name, as names like that are common (M&M).
+ * Between two people of one written name: "A & B", "A × B", "A x B", "A vs. B" with spaces, "A×B", or "つぐ&るる" between
+ * Japanese names. "A&B" in Latin letters stays one name, as names like that are common (M&M).
  */
-const COLLAB_WORD = /\s+(?:[&＆×xX]|vs\.?|VS\.?)\s+|×/g
+const COLLAB_WORD = /\s+(?:[&＆×xX]|vs\.?|VS\.?)\s+|×|(?<=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー])[&＆](?=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}])/gu
 
 /** "M1, M3–M5" as track numbers on the disc; null when it is no track list. */
 function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
@@ -219,14 +230,33 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
   const skipped: number[] = []
   let disc = 1
   let track: number | null = null
+  const rows = text.split(/\r?\n/)
+  // Text copied with a blank line after every line (no two lines next to each other) ends a block only at a longer
+  // gap than that.
+  const gaps: number[] = []
+  let run = -1
+  for (const raw of rows) {
+    if (raw.trim()) {
+      if (run >= 0) gaps.push(run)
+      run = 0
+    }
+    else if (run >= 0) run++
+  }
+  const spacing = gaps.length && gaps.every(gap => gap > 0) ? Math.min(...gaps) : 0
+  let blanks = 0
+  // How far the open track's heading is indented; lines indented further stay in its block.
+  let headingIndent = 0
+  const indentOf = (raw: string) => raw.match(/^[ \t\u3000]*/)![0].replace(/\t/g, '    ').length
 
-  text.split(/\r?\n/).forEach((raw, index) => {
+  rows.forEach((raw, index) => {
     const line = raw.trim().replace(/^[-*•·]\s*/, '')
-    // A blank line ends a track's block: the whole album's staff usually follows the tracks.
     if (!line) {
-      track = null
+      blanks++
       return
     }
+    // A blank line ends a track's block: the whole album's staff usually follows the tracks.
+    if (blanks > spacing && indentOf(raw) <= headingIndent) track = null
+    blanks = 0
     const discHeading = line.match(DISC_LINE)
     const colon = roleColon(line)
     const left = colon > 0 ? line.slice(0, colon).trim() : ''
@@ -239,11 +269,13 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
       if (discHeading && (colon < 0 || !unknown.length)) {
         disc = Number(discHeading[1])
         track = null
+        headingIndent = 0
         return
       }
       const heading = line.match(TRACK_LINE)
       if (heading && (colon < 0 || unknown.length)) {
         track = Number(heading[1])
+        headingIndent = indentOf(raw)
         return
       }
     }

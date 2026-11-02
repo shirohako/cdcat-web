@@ -9,7 +9,7 @@
       <textarea :value="sources.join('\n')" rows="2" class="textarea font-mono text-xs" :placeholder="$t('editor.sources_placeholder')" @input="setSources(($event.target as HTMLTextAreaElement).value)" />
     </label>
 
-    <details class="rounded-lg border border-line" @toggle="previewOpen = ($event.target as HTMLDetailsElement).open">
+    <details class="rounded-lg border border-line" open @toggle="previewOpen = ($event.target as HTMLDetailsElement).open">
       <summary class="cursor-pointer px-4 py-2 text-sm font-medium text-body transition-colors hover:text-primary">{{ $t('editor.preview_changes', { count: totalChanges }) }}</summary>
       <div v-if="previewOpen" class="space-y-4 border-t border-line px-4 py-3">
         <div v-for="preview in previews" :key="preview.ref">
@@ -104,13 +104,14 @@ const { localizeError } = useLocalizedApiError()
 
 const canAutoApprove = computed(() => hasPermission('revisions.auto-approve'))
 /** New content goes live at submission, marked as awaiting review (docs/catalog/editing.md#待审内容). */
-const creates = computed(() => props.draft.items.value.some(item => item.action === 'create'))
+const creates = computed(() => props.draft.prepared.value.some(item => item.action === 'create'))
 // The draft's own refs; edits go straight into the revision being saved.
 const { summary, sources } = props.draft
 const setSources = (text: string) => { sources.value = text.split('\n') }
 const references = computed(() => props.draft.references)
 const mainType = computed(() => (props.draft.items.value[0]?.resource_type ?? 'album') as CatalogType)
-const previewOpen = ref(false)
+// Open from the start: the changes are what to look at before submitting.
+const previewOpen = ref(true)
 
 const collectionsOf = (type: string) => ((schema.value?.aggregates?.[type] as { collections?: DiffCollection[] } | undefined)?.collections ?? [])
 

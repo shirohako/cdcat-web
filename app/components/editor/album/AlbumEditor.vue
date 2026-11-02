@@ -338,8 +338,11 @@ const go = (section: AlbumSection) => {
 
 const missing = computed(() => missingRequired(album.value))
 const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const
-/** Artists made in the credits whose type nobody has picked yet: required too, but listed only while there are some. */
-const untypedArtists = computed(() => items.value.filter(item => item.action === 'create' && item.resource_type === 'artist' && !item.document?.type).length)
+/**
+ * Artists made in the credits whose type nobody has picked yet: required too, but listed only while there are some.
+ * One nothing uses any more isn't created (draft.prepared), so it needs no type.
+ */
+const untypedArtists = computed(() => draft.prepared.value.filter(item => item.action === 'create' && item.resource_type === 'artist' && !item.document?.type).length)
 const requiredChecks = computed(() => [
   ...(['title', 'type', 'release_date', 'cover', 'tracks'] as const).map(key => ({
     key: key as string, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
