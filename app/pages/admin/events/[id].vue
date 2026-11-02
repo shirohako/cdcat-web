@@ -1,39 +1,15 @@
 <script setup lang="ts">
 import type { EventBooth, EventDetail, VenueMapData } from '~/types/event'
+import type { EventImportRun } from '~/types/eventImport'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface ImportSummary {
-  circles: { total: number, on_site: number, catalog_only: number, new: number, updated: number, removed: number, with_cut: number }
-  map: null | { halls: { name: string, spaces: number }[], spaces: number, circles_without_space: string[], circles_without_space_count: number, empty_spaces: string[], empty_spaces_count: number, warnings: string[] }
-  // How booths came out of the artist matching (docs/api/events.md); imports before 2026-10-28 counted other things.
-  artists: Partial<Record<'handle' | 'url' | 'name' | 'previous' | 'manual' | 'confirmed' | 'suggested' | 'none' | 'suspect', number>>
-  event: Record<string, [string | null, string | null]>
-  notes: string[]
-}
-interface EventImportRun {
-  id: number
-  source: string
-  // What the bundle says about itself (docs/events/README.md#导入包).
-  // auto_apply: sent by a harvester with its token, applied by itself when the preview is clean (#一键上传).
-  params: { file?: { name: string, bytes: number }, edition?: { key: string, name: string }, created_at?: string, auto_apply?: boolean }
-  status: 'collecting' | 'queued' | 'running' | 'ready' | 'applying' | 'applied' | 'failed'
-  summary: ImportSummary | null
-  // A bundle in several volumes: the ones still to come (docs/events/README.md#分卷).
-  missing_volumes: number[]
-  error: string | null
-  creator: { username: string, nickname: string | null } | null
-  applier: { username: string, nickname: string | null } | null
-  applied_at: string | null
-  created_at: string
-}
 interface AdminHall { id: number, building: string, floor: string | null, name: string, sort_order: number, spaces_count: number }
 
 const route = useRoute()
 const router = useRouter()
 const eventId = Number(route.params.id)
 const { $api } = useNuxtApp()
-const eventVenueStatusLabels: Record<string, string> = { collecting: '等其余分卷', queued: '排队中', running: '检查中', ready: '待确认', applying: '应用中', applied: '已应用', failed: '失败' }
 const eventVenueTabLabels: Record<string, string> = { import: '导入', booths: '摊位', venue: '会场' }
 
 const { data: event, error: eventError } = await useAsyncData(`admin-event-${eventId}`, () => $api<EventDetail>(`/v1/events/${eventId}`))
@@ -52,8 +28,11 @@ const bundleError = useHarvestError()
 const bundleInput = useTemplateRef<HTMLInputElement>('bundleInput')
 const { data: imports, refresh: refreshImports } = await useAsyncData(`admin-event-imports-${eventId}`,
   () => $api<{ imports: EventImportRun[] }>(`/v1/admin/events/${eventId}/imports`))
-const latest = computed(() => imports.value?.imports[0] ?? null)
-const working = computed(() => latest.value && ['queued', 'running', 'applying'].includes(latest.value.status))
+// The latest floor plan and the latest booths have a card each; the rest (and imports from before the split) are listed under them.
+const latestMap = computed(() => imports.value?.imports.find(run => run.kind === 'map') ?? null)
+const latestBooths = computed(() => imports.value?.imports.find(run => run.kind === 'booths') ?? null)
+const earlier = computed(() => (imports.value?.imports ?? []).filter(run => run !== latestMap.value && run !== latestBooths.value))
+const working = computed(() => (imports.value?.imports ?? []).some(run => ['queued', 'running', 'applying'].includes(run.status)))
 const busy = ref(false)
 
 let poll: ReturnType<typeof setInterval> | null = null
@@ -65,8 +44,8 @@ watch(working, (value) => {
   stopPolling()
   if (value && import.meta.client) poll = setInterval(() => refreshImports(), 2000)
 }, { immediate: true })
-watch(() => latest.value?.status, (status, before) => {
-  if (status === 'applied' && before === 'applying') {
+watch(() => [latestMap.value?.status, latestBooths.value?.status], (statuses, before) => {
+  if (statuses.some((status, n) => status === 'applied' && before?.[n] === 'applying')) {
     notice.value = '导入已应用。'
     boothPanel.value?.refresh()
     refreshHalls()
@@ -97,11 +76,6 @@ const uploadBundle = async () => {
     if (bundleInput.value) bundleInput.value.value = ''
   }
 }
-const bundleLine = (run: EventImportRun) => {
-  const { file, edition, created_at: createdAt, auto_apply: fromHarvester } = run.params
-  if (!file) return ''
-  return `导入包：${edition?.name ?? '—'} · ${file.name}（${`${(file.bytes / 1024 / 1024).toFixed(1)} MB`}）· ${createdAt ? new Date(createdAt).toLocaleString() : '—'} 生成${fromHarvester ? ' · 采集器上传，无问题时自动应用' : ''}`
-}
 const applyImport = async (run: EventImportRun) => {
   busy.value = true
   message.value = ''
@@ -114,14 +88,8 @@ const applyImport = async (run: EventImportRun) => {
     busy.value = false
   }
 }
-const statusClass = (status: EventImportRun['status']) => ({
-  collecting: 'bg-slate-100 text-slate-600', queued: 'bg-slate-100 text-slate-600', running: 'bg-sky-100 text-sky-700', ready: 'bg-amber-100 text-amber-800',
-  applying: 'bg-sky-100 text-sky-700', applied: 'bg-emerald-100 text-emerald-700', failed: 'bg-red-100 text-red-700',
-})[status]
-
 // ===== Booths =====
 const boothPanel = useTemplateRef<{ refresh: () => Promise<void> }>('boothPanel')
-const linkedBooths = (artists: ImportSummary['artists']) => (artists.handle ?? 0) + (artists.url ?? 0) + (artists.name ?? 0) + (artists.previous ?? 0)
 
 // ===== Venue =====
 const { data: halls, refresh: refreshHalls } = await useAsyncData(`admin-event-halls-${eventId}`, () => $api<AdminHall[]>(`/v1/admin/events/${eventId}/halls`))
@@ -193,80 +161,24 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
     <template v-if="tab === 'import'">
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">导入</h2>
-        <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。采集器也能用令牌直接上传，预览无问题时自动应用。超过 50 MB 的包分成几卷（…-1of3.zip），一起选上传，收齐后才预览。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
+        <p class="mt-1 text-sm text-slate-600">平面图和摊位分开导入，先后不限：上传采集器为这一届生成的平面图包或摊位包（.zip），先生成预览，确认后再应用；采集器也能用令牌直接上传，预览无问题时自动应用。导入平面图会按摊位号把已有的摊位放到桌子上；没有平面图时摊位照样导入，以后补上平面图再放。超过 50 MB 的摊位包分成几卷（…-1of3.zip），一起选上传，收齐后才预览。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入」。</p>
         <UiButton variant="primary" icon="lucide:upload" class="mt-4" :disabled="busy || Boolean(working)" @click="bundleInput?.click()">{{ busy ? '正在上传…' : '上传导入包' }}</UiButton>
         <input ref="bundleInput" type="file" accept=".zip,application/zip" multiple class="hidden" :disabled="busy || Boolean(working)" @change="uploadBundle">
       </section>
 
-      <section v-if="latest" class="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div class="flex items-center gap-3">
-            <h2 class="font-semibold">导入 #{{ latest.id }}</h2>
-            <span class="rounded-full px-2.5 py-0.5 text-xs font-medium" :class="statusClass(latest.status)">{{ eventVenueStatusLabels[latest.status] }}</span>
-            <span class="text-xs text-slate-500">{{ new Date(latest.created_at).toLocaleString() }} · {{ latest.creator?.nickname || latest.creator?.username }}</span>
-          </div>
-          <UiButton v-if="latest.status === 'ready'" variant="primary" :disabled="busy" @click="applyImport(latest)">应用导入</UiButton>
-        </div>
-        <p v-if="bundleLine(latest)" class="text-xs text-slate-500">{{ bundleLine(latest) }}</p>
-        <p v-if="latest.status === 'collecting'" class="text-sm text-slate-600">还缺第 {{ latest.missing_volumes.join('、') }} 卷：上传它们后开始预览。</p>
-        <p v-if="working" class="text-sm text-slate-500">正在处理，页面会自动刷新…</p>
-        <p v-if="latest.error" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ latest.error }}</p>
+      <AdminEventImportCard kind="booths" :run="latestBooths" :busy="busy" @apply="applyImport" />
+      <AdminEventImportCard kind="map" :run="latestMap" :busy="busy" @apply="applyImport" />
 
-        <template v-if="latest.summary">
-          <div class="grid gap-3 sm:grid-cols-3">
-            <div class="rounded-lg bg-slate-50 p-4">
-              <p class="text-xs font-medium text-slate-500">摊位</p>
-              <p class="mt-1 text-2xl font-bold tabular-nums">{{ latest.summary.circles.total }}</p>
-              <p class="mt-1 text-xs text-slate-600">新增 {{ latest.summary.circles.new }} · 更新 {{ latest.summary.circles.updated }} · 移除 {{ latest.summary.circles.removed }} · 仅目录参加 {{ latest.summary.circles.catalog_only }} · 有 cut {{ latest.summary.circles.with_cut }}</p>
-            </div>
-            <div class="rounded-lg bg-slate-50 p-4">
-              <p class="text-xs font-medium text-slate-500">会场桌子</p>
-              <template v-if="latest.summary.map">
-                <p class="mt-1 text-2xl font-bold tabular-nums">{{ latest.summary.map.spaces }}</p>
-                <p class="mt-1 text-xs text-slate-600">{{ latest.summary.map.halls.map(h => `${h.name} ${h.spaces}`).join(' · ') }}</p>
-              </template>
-              <p v-else class="mt-1 text-sm text-slate-500">本次没有平面图</p>
-            </div>
-            <div class="rounded-lg bg-slate-50 p-4">
-              <p class="text-xs font-medium text-slate-500">自动关联艺术家</p>
-              <p class="mt-1 text-2xl font-bold tabular-nums">{{ linkedBooths(latest.summary.artists) }}</p>
-              <p class="mt-1 text-xs text-slate-600">X 账号 {{ latest.summary.artists.handle ?? 0 }} · 链接 {{ latest.summary.artists.url ?? 0 }} · 同名 {{ latest.summary.artists.name ?? 0 }} · 沿用别的届次 {{ latest.summary.artists.previous ?? 0 }}</p>
-              <p class="mt-1 text-xs text-slate-600">保留手动 {{ latest.summary.artists.manual ?? 0 }} · 已核对 {{ latest.summary.artists.confirmed ?? 0 }} · 只有建议 {{ latest.summary.artists.suggested ?? 0 }} · 没找到 {{ latest.summary.artists.none ?? 0 }} · 名字可疑 {{ latest.summary.artists.suspect ?? 0 }}</p>
-            </div>
-          </div>
-          <div v-if="latest.summary.map && (latest.summary.map.circles_without_space_count || latest.summary.map.empty_spaces_count || latest.summary.map.warnings.length)" class="space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-            <p v-if="latest.summary.map.circles_without_space_count">{{ latest.summary.map.circles_without_space_count }} 个摊位在平面图上找不到桌子： <span class="font-mono text-xs">{{ latest.summary.map.circles_without_space.join(', ') }}</span></p>
-            <p v-if="latest.summary.map.empty_spaces_count">{{ latest.summary.map.empty_spaces_count }} 张桌子没有摊位： <span class="font-mono text-xs">{{ latest.summary.map.empty_spaces.join(', ') }}</span></p>
-            <p v-for="warning in latest.summary.map.warnings" :key="warning">{{ warning }}</p>
-          </div>
-          <p v-else-if="latest.summary.map" class="text-sm text-emerald-700">所有现场摊位都对上了桌子。</p>
-          <div v-if="Object.keys(latest.summary.event).length">
-            <p class="text-xs font-medium text-slate-500">活动信息变更</p>
-            <table class="mt-1 text-sm">
-              <tbody>
-                <tr v-for="(change, field) in latest.summary.event" :key="field">
-                  <td class="pr-4 text-slate-500">{{ field }}</td>
-                  <td class="pr-2 text-slate-400 line-through">{{ change[0] ?? '—' }}</td>
-                  <td class="break-all">{{ change[1] }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <ul v-if="latest.summary.notes.length" class="list-disc pl-5 text-sm text-slate-600">
-            <li v-for="note in latest.summary.notes" :key="note">{{ note }}</li>
-          </ul>
-        </template>
-      </section>
-
-      <section v-if="(imports?.imports.length ?? 0) > 1" class="rounded-xl border border-slate-200 bg-white">
+      <section v-if="earlier.length" class="rounded-xl border border-slate-200 bg-white">
         <h2 class="border-b border-slate-100 px-5 py-3 font-semibold">更早的导入</h2>
         <ul class="divide-y divide-slate-100 text-sm">
-          <li v-for="run in imports!.imports.slice(1)" :key="run.id" class="flex flex-wrap items-center gap-3 px-5 py-2.5">
+          <li v-for="run in earlier" :key="run.id" class="flex flex-wrap items-center gap-3 px-5 py-2.5">
             <span class="font-mono text-xs text-slate-500">#{{ run.id }}</span>
-            <span class="rounded-full px-2 py-0.5 text-xs" :class="statusClass(run.status)">{{ eventVenueStatusLabels[run.status] }}</span>
+            <span class="text-slate-600">{{ eventImportKindLabels[run.kind] }}</span>
+            <span class="rounded-full px-2 py-0.5 text-xs" :class="eventImportStatusClass(run.status)">{{ eventImportStatusLabels[run.status] }}</span>
             <span class="text-slate-600">{{ new Date(run.created_at).toLocaleString() }}</span>
             <span v-if="run.params.edition" class="text-slate-500">{{ run.params.edition.name }}</span>
-            <span v-if="run.summary" class="text-slate-500">{{ run.summary.circles.total }} / {{ run.summary.map?.spaces ?? 0 }}</span>
+            <span v-if="run.summary" class="text-slate-500">{{ [run.summary.circles && `${run.summary.circles.total} 个摊位`, run.summary.map && `${run.summary.map.spaces} 张桌子`].filter(Boolean).join(' / ') }}</span>
           </li>
         </ul>
       </section>
