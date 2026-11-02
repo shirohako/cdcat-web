@@ -6,7 +6,7 @@ import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
-import { peopleWarnings } from '~/utils/harvestPeople'
+import { peopleWarnings, sameName } from '~/utils/harvestPeople'
 import { isSquare } from '~/utils/imageCrop'
 import { errorName } from '~/utils/revisionErrors'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
@@ -91,6 +91,22 @@ const artistRefs = computed(() => ({ ...detail.value?.references.artist, ...peop
 const nameNotes = computed(() => Object.fromEntries((editor.value ? peopleWarnings(editor.value.album, people.value, circleMatch.value) : [])
   .filter(warning => warning.open && warning.kind === 'person')
   .flatMap(warning => warning.names.map(name => [name, harvestPeopleWarningLabels[warning.state] ?? warning.state]))))
+/**
+ * Artists whose name the draft took as the same name the sources spell otherwise (上杉 悟 → 上杉悟: spacing, width,
+ * case), said on their credit tags in the editor.
+ */
+const nameInfo = computed(() => {
+  const info: Record<string, string> = {}
+  for (const person of people.value) {
+    const isNew = person.state === 'new' && person.create
+    const name = isNew ? person.create!.name : person.artist_id ? artistRefs.value[String(person.artist_id)]?.name : undefined
+    const others = name ? person.names.filter(spelling => spelling !== name && sameName(spelling, name)) : []
+    if (!name || !others.length) continue
+    const spellings = others.map(spelling => `「${spelling}」`).join('、')
+    info[name] = isNew ? `来源里写作${spellings}，按同一个名字处理，新建为「${name}」` : `来源里写作${spellings}，按同一个名字处理，关联到站内的「${name}」`
+  }
+  return info
+})
 
 const { confirm } = useConfirm()
 /** Submits the draft; names still left to the reviewer are confirmed first, and stay printed names. */
@@ -491,6 +507,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                     <dt class="pt-0.5 text-xs text-slate-500">曲目表</dt>
                     <dd class="space-y-0.5 text-xs">
                       <p v-for="alt in detail.candidate.merged.tracklist.alternatives" :key="`${alt.record_id}-${alt.part}`">{{ sourceName(alt.source) }}：{{ alt.tracks }} 轨<span class="text-slate-500">（草稿用的是 {{ detail.candidate.merged.tracklist.source ? sourceName(detail.candidate.merged.tracklist.source) : '—' }}）</span></p>
+                      <p v-if="detail.candidate.merged.tracklist.duration_sources?.length" class="text-slate-500">缺的时长取自 {{ detail.candidate.merged.tracklist.duration_sources.map(sourceName).join('、') }}</p>
                     </dd>
                   </template>
                 </dl>
@@ -565,7 +582,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
             <UiButton size="xs" @click="prepareDraft(true)">按来源重新生成草稿</UiButton>
           </div>
           <div class="bg-slate-50">
-            <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" @submitted="approved" @discarded="prepareDraft(true)" />
+            <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" :name-info="nameInfo" @submitted="approved" @discarded="prepareDraft(true)" />
             <p v-else class="px-4 py-8 text-center text-xs text-slate-400">正在准备草稿…</p>
           </div>
         </section>

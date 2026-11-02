@@ -245,6 +245,8 @@ export interface HarvestMerged {
     part: number | null
     discs: Array<{ position: number, title: string | null }>
     tracks: HarvestMergedTrack[]
+    /** Sources the durations the chosen tracklist lacked were taken from. */
+    duration_sources?: string[]
     alternatives: Array<{ source: string, record_id: number, part: number, tracks: number }>
   }
   credits: HarvestMergedCredit[]

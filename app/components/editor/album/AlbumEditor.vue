@@ -181,6 +181,8 @@ const props = defineProps<{
   submitTo?: (payload: RevisionDraftPayload) => Promise<Revision>
   /** Printed names that still need a person to look at them, with why */
   nameNotes?: Record<string, string>
+  /** Artists, by name, whose name was tidied from what the sources print, with how */
+  nameInfo?: Record<string, string>
 }>()
 const emit = defineEmits<{ submitted: [revision: Revision], discarded: [] }>()
 
@@ -362,6 +364,7 @@ const headerLinks = computed(() => [
 ])
 
 const nameNotes = computed(() => props.nameNotes ?? {})
+const nameInfo = computed(() => props.nameInfo ?? {})
 
 // ---- preview ----
 
@@ -391,7 +394,7 @@ const openPreview = async () => {
 
 const context: AlbumEditorContext = {
   albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,
-  remember, errors, errorAt, errorsIn, go, notify: showToast, nameNotes,
+  remember, errors, errorAt, errorsIn, go, notify: showToast, nameNotes, nameInfo,
 }
 provide(albumEditorKey, context)
 defineExpose({ album, draft, references, remember, go, createItem, removeItem })

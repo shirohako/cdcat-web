@@ -16,7 +16,13 @@ const SETTLED = new Set(['linked', 'ignored', 'link', 'circle', 'name', 'new'])
 const LINKING = new Set(['linked', 'link', 'circle', 'name'])
 const CIRCLE_SETTLED = new Set(['linked', 'name', 'new', 'unknown', 'unnamed'])
 
-const normalize = (value: string) => value.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()
+const CJK = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u
+
+/** As IdentityResolver::nameKey compares names: a name in CJK without its spaces and middle dots (上杉 悟, ナツメ・ユウキ). */
+const normalize = (value: string) => {
+  const text = value.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()
+  return CJK.test(text) ? text.replace(/[\s・·]+/g, '') : text
+}
 
 /** The same name, width, case and spacing aside. */
 export const sameName = (a: string, b: string) => normalize(a) === normalize(b)

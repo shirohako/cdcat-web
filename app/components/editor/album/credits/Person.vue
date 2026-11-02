@@ -5,11 +5,11 @@ import type { CreditPerson } from '~/utils/creditLines'
 
 /**
  * One person of a credit, as a tag: the name with what to look at beside it (新建, 选类型 for a new artist without
- * a type, 仅署名 for a printed name only, the harvest page's notes), and a remove button. A click opens the rest:
- * the printed name and the detail (applied when the card closes, since they decide which line the person is in), a
- * new artist's type, and linking the person to an artist or keeping only the printed name. Given `parent` (on a track
- * card), also which credit of the track it belongs to (parent_id, utils/artistLine): the 客串's 艺术家, shown on the
- * tag as "↳ Xeno" when there was a choice.
+ * a type, 仅署名 for a printed name only, the harvest page's notes, ⓘ where it tidied a name), and a remove button.
+ * A click opens the rest: the printed name and the detail (applied when the card closes, since they decide which
+ * line the person is in), a new artist's type, and linking the person to an artist or keeping only the printed name.
+ * Given `parent` (on a track card), also which credit of the track it belongs to (parent_id, utils/artistLine): the
+ * 客串's 艺术家, shown on the tag as "↳ Xeno" when there was a choice.
  */
 const props = defineProps<{
   person: CreditPerson
@@ -30,6 +30,7 @@ const type = computed({
   set: value => people.setNewType(props.person, value),
 })
 const note = computed(() => people.noteOf(props.person))
+const info = computed(() => people.infoOf(props.person))
 
 /** What the card's fields change. A printed name is all a name-only credit has, so it can't be emptied here. */
 const formPatch = (): Partial<CreditPerson> => {
@@ -86,6 +87,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
           <span v-else-if="person.artist_id === null" class="shrink-0 text-[10px] text-meta">{{ t('editor.dialog.name_only') }}</span>
           <span v-if="parent?.label" class="truncate text-[11px] text-meta">↳ {{ parent.label }}</span>
           <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning" :title="note">⚠</span>
+          <span v-else-if="info" class="grid shrink-0 place-items-center text-info" :title="info"><Icon name="lucide:info" class="size-3.5" /></span>
         </button>
         <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">
           <Icon name="lucide:x" class="size-3" />
@@ -118,6 +120,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         <EditorEntityPicker kind="artist" :placeholder="t('editor.credits.pick_artist')" @select="link" />
       </div>
       <p v-if="note" class="rounded-md bg-warning/10 px-2.5 py-1.5 text-xs text-warning">⚠ {{ note }}</p>
+      <p v-else-if="info" class="flex gap-1.5 rounded-md bg-info/10 px-2.5 py-1.5 text-xs text-info"><Icon name="lucide:info" class="mt-px size-3.5 shrink-0" />{{ info }}</p>
       <div class="flex flex-wrap justify-between gap-2 border-t border-line pt-3">
         <UiButton v-if="person.artist_id !== null" size="xs" class="ring-1 ring-inset ring-line" @click="unlink">{{ t('editor.credits.unlink_artist') }}</UiButton>
         <UiButton variant="danger-soft" size="xs" class="ml-auto ring-1 ring-inset ring-danger/20" @click="emit('remove')">{{ t('common.delete') }}</UiButton>

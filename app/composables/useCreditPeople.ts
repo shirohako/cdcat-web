@@ -31,6 +31,8 @@ export const useCreditPeople = () => {
   }
   /** Why the harvest review page wants a person to look at a printed name, if it does. */
   const noteOf = (person: CreditPerson) => person.artist_id === null && person.credited_as ? editor.nameNotes.value[person.credited_as] ?? null : null
+  /** How the harvest review page tidied the name of a person's artist from what the sources print, if it did. */
+  const infoOf = (person: CreditPerson) => person.artist_id !== null ? editor.nameInfo.value[nameOf(person)] ?? null : null
 
   /** An artist picked from the search, remembered for its label. */
   const picked = (item: PickedEntity): CreditPerson => {
@@ -46,5 +48,5 @@ export const useCreditPeople = () => {
   const created = (name: string): CreditPerson => ({ artist_id: newArtistRef(name), credited_as: null, detail: null })
   const printed = (name: string): CreditPerson => ({ artist_id: null, credited_as: name.trim(), detail: null })
 
-  return { nameOf, artistName, isNew, newType, setNewType, noteOf, picked, created, printed, newArtistRef }
+  return { nameOf, artistName, isNew, newType, setNewType, noteOf, infoOf, picked, created, printed, newArtistRef }
 }

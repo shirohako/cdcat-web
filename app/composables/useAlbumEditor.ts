@@ -34,6 +34,8 @@ export interface AlbumEditorContext {
   notify: (message: string, type?: 'success' | 'error' | 'info') => void
   /** Printed names in the credits that need a person to look at them, with why (the harvest review page) */
   nameNotes: ComputedRef<Record<string, string>>
+  /** Artists (by the name the credits show) whose name was tidied from what the sources print, with how (the harvest review page) */
+  nameInfo: ComputedRef<Record<string, string>>
 }
 
 export const ALBUM_REF = 'album'
