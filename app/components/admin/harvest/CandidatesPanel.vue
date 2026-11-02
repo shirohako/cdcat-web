@@ -5,9 +5,9 @@ import { HARVEST_FILTER_KEYS, harvestFilters, type HarvestFilterKey } from '~/ut
 /** The review queue: every candidate, whatever its events, with the filters in the page's query. */
 const props = defineProps<{ sources: HarvestOverview['sources'] }>()
 const { $api } = useNuxtApp()
-const harvestCandidateAdultLabels: Record<string, string> = { label: '成人', '1': '只看成人', '0': '不含成人' }
 const harvestCandidateCircleLabels: Record<string, string> = { label: '社团', matched: '已关联社团', unmatched: '未关联社团', booth: '对上摊位', no_booth: '没对上摊位' }
 const harvestCandidateCompleteLabels: Record<string, string> = { label: '完整度', complete: '资料齐全', incomplete: '资料不全', no_cover: '缺封面', no_tracks: '缺曲目' }
+const harvestCandidateOfficialSiteLabels: Record<string, string> = { label: '官网', '1': '有官网', '0': '没有官网' }
 const harvestCandidateDuplicatesLabels: Record<string, string> = { label: '站内重复', strong: '站内已有（强匹配）', any: '可能重复', none: '站内没有' }
 const harvestCandidateSortLabels: Record<string, string> = { circle: '按社团', id: '按 ID', title: '按标题', release: '按发售日期', sources: '按来源数', updated: '按更新时间', sources_changed: '按来源更新时间' }
 const harvestCandidateSourcesChangedLabels: Record<string, string> = { label: '来源更新', '1': '来源有更新', '0': '来源没有更新' }
@@ -36,7 +36,7 @@ const source = filter('source')
 const complete = filter('complete')
 const duplicates = filter('duplicates')
 const circle = filter('circle')
-const adult = filter('adult')
+const officialSite = filter('official_site')
 const sourcesChanged = filter('sources_changed')
 /** Each order and the way it goes first, as CandidateQuery::SORTS; a second click on a column flips it. */
 const sortDirections: Record<string, 'asc' | 'desc'> = { circle: 'asc', id: 'desc', title: 'asc', release: 'desc', sources: 'desc', updated: 'desc', sources_changed: 'desc' }
@@ -127,8 +127,8 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
           <select v-model="circle" aria-label="社团" :class="select">
             <option v-for="value in ['', 'matched', 'unmatched', 'booth', 'no_booth']" :key="value" :value="value">{{ harvestCandidateCircleLabels[value || 'label'] }}</option>
           </select>
-          <select v-model="adult" aria-label="成人" :class="select">
-            <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateAdultLabels[value || 'label'] }}</option>
+          <select v-model="officialSite" aria-label="官网" :class="select">
+            <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateOfficialSiteLabels[value || 'label'] }}</option>
           </select>
           <select v-model="sourcesChanged" aria-label="来源更新" :class="select">
             <option v-for="value in ['', '1', '0']" :key="value" :value="value">{{ harvestCandidateSourcesChangedLabels[value || 'label'] }}</option>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AlbumDocument } from '../../app/types/document'
-import { addCredit, addProduct, addTrack, emptyAlbumDocument } from '../../app/utils/albumDocument'
+import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument } from '../../app/utils/albumDocument'
 import { compareWithAlbum, type CompareContext } from '../../app/utils/harvestAlbumCompare'
 
 /** A one-disc album with these tracks (title, seconds). */
@@ -64,5 +64,23 @@ describe('compareWithAlbum', () => {
     expect(album.credits.find(credit => credit.role === 'arranger')).toMatchObject({ artist_id: '@ar1', track_id: album.tracks[0]!.id })
     expect(album.images.map(image => [image.image_id, image.kind])).toEqual([[5, 'cover'], [99, 'back']])
     expect(compareWithAlbum({ ...ctx, catalogImages: { ['a'.repeat(64)]: 5, ['b'.repeat(64)]: 99 } })).toEqual([])
+  })
+
+  it('compared with the draft, removes the tracks and discs the source lacks, so its tracklist takes over', () => {
+    const album = albumWith('Stillwater', [['Opening', 60], ['Tide', 200], ['Bonus', 30]])
+    const second = addDisc(album, { position: 2 })
+    addTrack(album, second.id, { title: 'Live', duration: 300 })
+    addCredit(album, { artist_id: 7, credited_as: null, role: 'composer', detail: null }, [album.tracks[2]!.id])
+    const source = albumWith('Stillwater', [['Opening', 60], ['Tide', 210]])
+
+    expect(compareWithAlbum(context(album, source)).map(row => row.key)).toEqual(['track:1:2'])
+    const ctx = context(album, source, { removeExtra: true })
+    const rows = compareWithAlbum(ctx)
+    expect(rows.map(row => row.key)).toEqual(['track:1:2', `track-extra:${album.tracks[2]!.id}`, `track-extra:${album.tracks[3]!.id}`])
+    for (const row of rows) void row.apply()
+    expect(album.tracks.map(track => [track.title, track.duration])).toEqual([['Opening', 60], ['Tide', 210]])
+    expect(album.discs).toHaveLength(1)
+    expect(album.credits).toEqual([])
+    expect(compareWithAlbum(ctx)).toEqual([])
   })
 })

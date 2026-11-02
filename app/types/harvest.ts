@@ -373,3 +373,12 @@ export interface HarvestCandidateDetail {
   /** Within the list's filters, which the review page passes on. */
   neighbors: { previous: number | null, next: number | null, position: number | null, total: number }
 }
+
+/**
+ * The candidate merged again without saving it (GET …/candidates/{id}/merged): with one source ahead of the others
+ * (prefer), or from that source alone (only); the circle stays the candidate's. withMerge() puts it in the detail.
+ */
+export type HarvestRemerge = Pick<HarvestCandidateDetail, 'people' | 'circle_match' | 'catalog_images'> & {
+  merged: HarvestMerged
+  references: { artist?: Record<string, Record<string, unknown>> }
+}

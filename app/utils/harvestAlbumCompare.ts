@@ -2,15 +2,15 @@ import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AggregateRef, AlbumDocument, RowId } from '~/types/document'
 import type { HarvestMergedImage } from '~/types/harvest'
-import { addCredit, addDisc, addImage, addTrack, coverOf, firstProduct, setCover, setTitleIn } from '~/utils/albumDocument'
+import { addCredit, addDisc, addImage, addTrack, coverOf, firstProduct, removeDisc, removeTrack, setCover, setTitleIn } from '~/utils/albumDocument'
 import { sameName } from '~/utils/harvestPeople'
 import { newKey } from '~/utils/documentKeys'
 
 /**
- * What the sources of a decided candidate say against the album as it is now (the harvest review page,
- * docs/harvest/README.md#审核): the source draft (buildHarvestDraft) compared field by field, track by
- * track and role by role. Each row's `apply` writes the source's value into the album document the
- * editor holds, which makes the row go; credits, links and images are only the ones the album lacks.
+ * What the sources of a candidate say against the album as it is now, or against the review draft (the harvest
+ * review page, docs/harvest/README.md#审核): the source draft (buildHarvestDraft, of all sources or of one) compared
+ * field by field, track by track and role by role. Each row's `apply` writes the source's value into the album
+ * document the editor holds, which makes the row go; credits, links and images are only the ones the album lacks.
  */
 export type CompareGroup = 'basic' | 'tracks' | 'credits' | 'links' | 'images'
 
@@ -62,6 +62,8 @@ export interface CompareContext {
   providerName: (id: number | null) => string
   formatDate: (date: string | null, precision: AlbumDocument['release_date_precision']) => string
   formatDuration: (seconds: number | null) => string
+  /** Tracks the source lacks are rows too, which remove them (comparing with the draft: the source's tracklist in place of its own). */
+  removeExtra?: boolean
 }
 
 const TITLE_KINDS: Record<string, string> = { official: '正式名', translation: '译名', transliteration: '读音', alias: '别名', abbreviation: '简称' }
@@ -187,6 +189,22 @@ function trackRows(ctx: CompareContext): CompareRow[] {
       apply: () => {
         if (title) current.title = track.title
         if (duration) current.duration = track.duration
+      },
+    })
+  }
+  if (!ctx.removeExtra || !source.tracks.length) return rows
+  const extra = album.tracks.filter(track => !source.tracks.some(row => positionOf(source, row.disc_id) === positionOf(album, track.disc_id) && row.track_number === track.track_number))
+  for (const track of extra) {
+    const position = positionOf(album, track.disc_id)
+    rows.push({
+      key: `track-extra:${track.id}`, group: 'tracks', label: `曲目 ${several ? `${position}-${track.track_number}` : track.track_number}`,
+      album: [track.title, ctx.formatDuration(track.duration)].filter(Boolean).join(' · '), source: '来源没有这首（采用就删掉）', from: ctx.picked.tracks,
+      apply: () => {
+        removeTrack(album, track.id)
+        // A disc left empty that the source does not have goes too.
+        if (!album.tracks.some(row => String(row.disc_id) === String(track.disc_id)) && album.discs.length > 1 && !source.discs.some(disc => disc.position === position)) {
+          removeDisc(album, track.disc_id)
+        }
       },
     })
   }

@@ -2,10 +2,10 @@
 import type { RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
-import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage } from '~/types/harvest'
+import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage, HarvestRemerge } from '~/types/harvest'
 import type { AlbumEditorHandle } from '~/utils/harvestAlbumCompare'
 import type { Revision } from '~/types/revision'
-import { buildHarvestDraft } from '~/utils/harvestDraft'
+import { buildHarvestDraft, withMerge } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
 import { peopleWarnings, sameName } from '~/utils/harvestPeople'
 import { isSquare } from '~/utils/imageCrop'
@@ -16,10 +16,7 @@ import { setCover } from '~/utils/albumDocument'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
 
-interface EditorHandle {
-  album: AlbumDocument
-  remember: (type: string, id: number, row: object) => void
-  createItem: (type: 'artist', document: Record<string, unknown>, prefix?: string) => string
+interface EditorHandle extends AlbumEditorHandle {
   removeItem: (ref: string) => void
 }
 
@@ -52,15 +49,28 @@ const draftReady = ref(false)
 const message = ref('')
 const busy = ref(false)
 
-/** The reviewer's edits stay in this browser; a candidate opened for the first time starts from its sources. */
-const prepareDraft = async (fresh = false) => {
+/**
+ * The reviewer's edits stay in this browser; a candidate opened for the first time starts from its sources. A fresh
+ * draft may put one source ahead of the others (`prefer`: its values first, the others fill what it lacks).
+ */
+const prepareDraft = async (fresh = false, prefer?: string) => {
   draftReady.value = false
   const userId = user.value?.id
   if (!detail.value || !userId || !open.value) return
+  let from = detail.value
+  if (prefer) {
+    try {
+      from = withMerge(detail.value, await $api<HarvestRemerge>(`/v1/admin/harvest/candidates/${id.value}/merged`, { query: { prefer } }))
+    } catch (error) {
+      message.value = harvestError(error)
+      draftReady.value = true
+      return
+    }
+  }
   if (fresh) await localDrafts.remove(userId, scope.value).catch(() => undefined)
   const existing = fresh ? undefined : await localDrafts.get(userId, scope.value).catch(() => undefined)
   if (!existing) {
-    const built = buildHarvestDraft(detail.value)
+    const built = buildHarvestDraft(from)
     const now = new Date().toISOString()
     await localDrafts.put({
       key: draftKey(userId, scope.value), userId, scope: scope.value, mainRef: ALBUM_REF, type: 'album', action: 'create', entityId: null, revisionId: null,
@@ -70,6 +80,18 @@ const prepareDraft = async (fresh = false) => {
   }
   editorKey.value++
   draftReady.value = true
+}
+/** The sources-against-draft comparison (AdminHarvestAlbumCompare) is opened from the draft's header. */
+const draftCompareOpen = ref(false)
+/** The sources once each, in priority order, for 「重新生成草稿」 and the comparison. */
+const draftSources = computed(() => [...new Map((detail.value?.records ?? []).map(record => [record.source, record.label])).entries()])
+const regenerate = async (prefer?: string) => {
+  if (!await confirm({
+    title: prefer ? `以${sourceName(prefer)}为主重新生成草稿？` : '按来源重新生成草稿？',
+    description: '草稿里现在的修改会丢掉。',
+    confirmText: '重新生成',
+  })) return
+  await prepareDraft(true, prefer)
 }
 /**
  * A decided candidate with an album (已建档, 站内已有): the album opens in the editor with the sources compared to it
@@ -631,9 +653,19 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
               <Icon name="lucide:disc-3" class="size-4 text-slate-400" />新建专辑
             </h2>
             <p class="min-w-0 flex-1 text-xs text-slate-500">资料核对完后，在「提交」一节提交，就会以你的名义建成专辑。</p>
-            <UiButton size="xs" @click="prepareDraft(true)">按来源重新生成草稿</UiButton>
+            <UiButton v-if="draftSources.length > 1" size="xs" :icon="draftCompareOpen ? 'lucide:chevron-up' : 'lucide:git-compare'" @click="draftCompareOpen = !draftCompareOpen">{{ draftCompareOpen ? '收起对照' : '和来源对照' }}</UiButton>
+            <UiMenu v-if="draftSources.length > 1" align="end" width="w-56" label="重新生成草稿">
+              <template #trigger="{ toggle, attrs }">
+                <UiButton size="xs" icon="lucide:chevron-down" v-bind="attrs" @click="toggle">按来源重新生成草稿</UiButton>
+              </template>
+              <UiMenuItem icon="lucide:list-ordered" @click="regenerate()">按默认优先级</UiMenuItem>
+              <UiMenuDivider />
+              <UiMenuItem v-for="[key, label] in draftSources" :key="key" icon="lucide:arrow-up-to-line" @click="regenerate(key)">以{{ label }}为主</UiMenuItem>
+            </UiMenu>
+            <UiButton v-else size="xs" @click="regenerate()">按来源重新生成草稿</UiButton>
           </div>
           <div class="bg-slate-50">
+            <AdminHarvestAlbumCompare v-if="draftCompareOpen && draftReady && editor && draftSources.length > 1" :key="`compare-${editorKey}`" :detail="detail" :editor="editor" target="draft" class="mx-4 mt-4 md:mx-5" />
             <LazyEditorAlbumEditor v-if="draftReady" :key="editorKey" ref="editor" :draft-scope="scope" embedded :submit-to="approve" :name-notes="nameNotes" :name-info="nameInfo" @submitted="approved" @discarded="prepareDraft(true)" />
             <p v-else class="px-4 py-8 text-center text-xs text-slate-400">正在准备草稿…</p>
           </div>

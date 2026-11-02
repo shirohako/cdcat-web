@@ -1,11 +1,21 @@
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { AlbumDocument, RowId } from '~/types/document'
-import type { HarvestCandidateDetail } from '~/types/harvest'
+import type { HarvestCandidateDetail, HarvestRemerge } from '~/types/harvest'
 import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument, setTitleIn } from '~/utils/albumDocument'
 import { newKey, newRef } from '~/utils/documentKeys'
 import { DRAFT_REF, draftPeople, setCirclePublisher } from '~/utils/harvestPeople'
 import { RELEASE_ROLES } from '~/types/album'
+
+/** The detail with another merge of its sources in place of the saved one (buildHarvestDraft from one source first, or one alone). */
+export const withMerge = (detail: HarvestCandidateDetail, remerge: HarvestRemerge): HarvestCandidateDetail => ({
+  ...detail,
+  candidate: { ...detail.candidate, merged: remerge.merged },
+  people: remerge.people,
+  circle_match: remerge.circle_match,
+  references: { ...detail.references, artist: { ...detail.references.artist, ...remerge.references.artist } },
+  catalog_images: { ...detail.catalog_images, ...remerge.catalog_images },
+})
 
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }

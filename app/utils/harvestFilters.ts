@@ -4,7 +4,7 @@ import type { LocationQuery } from 'vue-router'
  * The review queue's filters (docs/harvest/README.md#后台). They live in the page's query, and the
  * review page passes them on to the API, so previous / next stay within the same list.
  */
-export const HARVEST_FILTER_KEYS = ['status', 'event_id', 'event_match', 'task_id', 'source', 'circle', 'booth_id', 'complete', 'duplicates', 'adult', 'sources_changed', 'q', 'sort', 'dir'] as const
+export const HARVEST_FILTER_KEYS = ['status', 'event_id', 'event_match', 'task_id', 'source', 'circle', 'booth_id', 'complete', 'duplicates', 'official_site', 'sources_changed', 'q', 'sort', 'dir'] as const
 
 export type HarvestFilterKey = typeof HARVEST_FILTER_KEYS[number]
 
