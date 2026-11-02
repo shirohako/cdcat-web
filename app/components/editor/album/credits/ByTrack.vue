@@ -2,13 +2,14 @@
 import type { RowId } from '~/types/document'
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
-import { addCredit, orderedTracks, patchCredits, removeCredits, setCreditParent } from '~/utils/albumDocument'
+import { addCredit, changeCreditRole, orderedTracks, patchCredits, removeCredits, setCreditParent } from '~/utils/albumDocument'
 import { copyTrackCredits, creditsOn, sameTrackCredits } from '~/utils/creditLines'
 
 /**
  * 按曲目: the whole album's credits (outside the byline block) first, then a card per track with its credits by
  * role, the way a booklet that lists each track's staff reads. A track can take over the one before's credits in a
- * click. Rows being started (the role picked first) are kept here, per track, until their first person. On a track,
+ * click. A role's name changes the role of the whole row; on the whole album not to 艺术家, which is the byline
+ * block's. Rows being started (the role picked first) are kept here, per track, until their first person. On a track,
  * each person also picks the credit it belongs to (a 客串's 艺术家, utils/artistLine).
  */
 const { t } = useI18n()
@@ -34,6 +35,8 @@ const firstPerson = (trackId: RowId | null, person: CreditPerson) => {
 const add = (trackId: RowId | null, role: string, person: CreditPerson) => addCredit(album.value, { ...person, role }, trackId === null ? null : [trackId])
 const update = (row: AlbumCreditRow, patch: Partial<CreditPerson>) => patchCredits(album.value, [row], patch)
 const remove = (row: AlbumCreditRow) => removeCredits(album.value, [row])
+const changeRole = (rows: AlbumCreditRow[], role: string) => changeCreditRole(album.value, rows, role)
+const ALBUM_EXCLUDED_ROLES = ['artist']
 
 const canCopy = (index: number) => {
   const previous = tracks.value[index - 1]
@@ -64,7 +67,10 @@ const copyPrevious = async (index: number) => {
           :key="item.role"
           :role="item.role"
           :rows="item.rows"
+          changeable
+          :exclude="ALBUM_EXCLUDED_ROLES"
           @add="add(null, item.role, $event)"
+          @role="changeRole(item.rows, $event)"
           @update="update"
           @remove="remove"
         />
@@ -87,7 +93,9 @@ const copyPrevious = async (index: number) => {
           :role="item.role"
           :rows="item.rows"
           :track-rows="trackRows(track.id)"
+          changeable
           @add="add(track.id, item.role, $event)"
+          @role="changeRole(item.rows, $event)"
           @update="update"
           @remove="remove"
           @parent="setParent"

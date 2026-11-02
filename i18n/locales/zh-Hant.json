@@ -2711,6 +2711,7 @@
       "name_only_option": "只填署名「{name}」",
       "roles_label": "角色",
       "pick_role": "選擇角色",
+      "change_role": "更改角色",
       "role_search": "搜尋角色，中英日都可以",
       "no_tracks_on": "清空",
       "remove_line": "刪除這一行",

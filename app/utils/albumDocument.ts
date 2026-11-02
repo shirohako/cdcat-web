@@ -5,6 +5,7 @@
 
 import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/document'
 import type { ParsedDisc } from './tracklistParser'
+import { FEATURING_ROLE } from './artistLine'
 import { newKey } from './documentKeys'
 import { byOrder, nextOrder, sameId } from './documentRows'
 import { mainImageOf, makeMainImage } from './mainImages'
@@ -479,6 +480,17 @@ export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
 export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>>) {
   for (const row of rows) Object.assign(row, patch)
   dedupeCredits(doc)
+}
+
+/** Gives the rows another role. A 客串 is no credit to belong to, so what belonged to one of them belongs to none. */
+export function changeCreditRole(doc: AlbumDocument, rows: AlbumCreditRow[], role: string) {
+  if (role === FEATURING_ROLE) {
+    const ids = new Set(rows.map(row => String(row.id)))
+    for (const row of doc.credits) {
+      if (row.parent_id != null && ids.has(String(row.parent_id))) row.parent_id = null
+    }
+  }
+  patchCredits(doc, rows, { role })
 }
 
 // ---- names in other languages -----------------------------------------------------------------

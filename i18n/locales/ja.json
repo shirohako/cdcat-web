@@ -2711,6 +2711,7 @@
       "name_only_option": "表記「{name}」だけ入力",
       "roles_label": "役割",
       "pick_role": "役割を選ぶ",
+      "change_role": "役割を変更",
       "role_search": "役割を検索（日中英どれでも）",
       "no_tracks_on": "クリア",
       "remove_line": "この行を削除",

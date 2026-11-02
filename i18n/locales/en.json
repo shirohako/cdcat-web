@@ -2711,6 +2711,7 @@
       "name_only_option": "Use the name “{name}” only",
       "roles_label": "Roles",
       "pick_role": "Pick a role",
+      "change_role": "Change role",
       "role_search": "Search roles in any language",
       "no_tracks_on": "Clear",
       "remove_line": "Remove this line",

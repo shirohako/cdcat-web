@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  addBonus, addCredit, addDisc, addImage, addMainImage, addProduct, addTrack, bannerOf, coverOf, creditGroups, emptyAlbumDocument, importTracklist,
+  addBonus, addCredit, addDisc, addImage, addMainImage, addProduct, addTrack, bannerOf, changeCreditRole, coverOf, creditGroups, emptyAlbumDocument,
+  importTracklist,
   missingRequired, moveDisc, moveTrack, moveTrackToDisc, orderedTracks, pruneAlbumDocument, removeBonus, removeDisc,
   removeProduct, removeTrack, setCover, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
   tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument, useAsMain,
@@ -172,6 +173,24 @@ describe('credits', () => {
     // Edited into the same group as another, the rows that become duplicates go.
     updateCreditGroup(doc, groups[1]!, { role: 'composer' })
     expect(creditGroups(doc).map(group => [group.role, group.trackIds.length])).toEqual([['composer', 3]])
+  })
+
+  it('changes the role of a row, joining the row of that role', () => {
+    const { doc } = album()
+    const [a] = orderedTracks(doc)
+    const [xeno] = addCredit(doc, { artist_id: 1, credited_as: null, role: 'vocals', detail: null }, [a!.id])
+    const [eili] = addCredit(doc, { artist_id: 2, credited_as: null, role: 'featuring', detail: null }, [a!.id])
+    eili!.parent_id = xeno!.id
+    addCredit(doc, { artist_id: 3, credited_as: null, role: 'composer', detail: null }, [a!.id])
+    addCredit(doc, { artist_id: 3, credited_as: null, role: 'arranger', detail: null }, [a!.id])
+    addCredit(doc, { artist_id: 4, credited_as: null, role: 'arranger', detail: null }, [a!.id])
+
+    changeCreditRole(doc, doc.credits.filter(row => row.role === 'arranger'), 'composer')
+    expect(doc.credits.filter(row => row.role === 'composer').map(row => row.artist_id)).toEqual([3, 4])
+
+    // A 客串 is no credit to belong to.
+    changeCreditRole(doc, [xeno!], 'featuring')
+    expect(eili!.parent_id).toBeNull()
   })
 })
 

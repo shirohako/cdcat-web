@@ -2711,6 +2711,7 @@
       "name_only_option": "‘{name}’ 이름으로만 표기",
       "roles_label": "역할",
       "pick_role": "역할 선택",
+      "change_role": "역할 변경",
       "role_search": "역할 검색 (영어·일본어 등도 가능)",
       "no_tracks_on": "선택 해제",
       "remove_line": "이 줄 삭제",
