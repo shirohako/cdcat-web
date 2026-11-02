@@ -38,4 +38,16 @@ describe('track people', () => {
     ], role => ORDER.indexOf(role))
     expect(people[0]!.roles[0]!.tracks).toBe('Disc 1: A1 · Disc 2: 1')
   })
+
+  it('lists each person\'s tracks per disc with their roles on each, null for every track', () => {
+    const people = trackPeople([
+      disc(1, [track(1, [credit('arranger', 'A', 1), credit('composer', 'A', 1), credit('artist', 'B', 2)], { number_label: 'A1' }), track(2, [credit('artist', 'B', 2)])]),
+      disc(2, [track(3, [credit('performer', 'A', 1, 'Guitar'), credit('artist', 'B', 2)], { disc_number: 2 })]),
+    ], role => ORDER.indexOf(role))
+    expect(people[0]!.tracks).toEqual([
+      { disc: 1, tracks: [{ id: 1010, label: 'A1', title: 'T1', roles: [{ role: 'composer', detail: null }, { role: 'arranger', detail: null }] }] },
+      { disc: 2, tracks: [{ id: 2030, label: '3', title: 'T3', roles: [{ role: 'performer', detail: 'Guitar' }] }] },
+    ])
+    expect(people[1]!.tracks).toBeNull()
+  })
 })

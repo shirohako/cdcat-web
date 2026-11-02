@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line px-5 py-4">
+    <div v-if="editor.albumId" class="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line px-5 py-4">
       <h3 class="text-sm font-semibold text-body">{{ $t('editor.album.other_names') }}</h3>
       <p class="text-xs text-meta">{{ $t('editor.album.other_names_moved') }}</p>
       <UiButton size="xs" icon="lucide:languages" class="ml-auto ring-1 ring-inset ring-line" @click="editor.go('translate')">{{ $t('editor.translate.title') }}</UiButton>

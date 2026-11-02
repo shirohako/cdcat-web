@@ -84,8 +84,8 @@
 
               <!-- The byline: the publishers, else the 艺术家, every one of them; under publishers, the 艺术家
                    follow. Who labels, sells or makes the album is in 专辑信息. Unlike the grey fact tags further down,
-                   each name is the artist's picture (or its icon on a grey tile: a building for publishers, a person
-                   otherwise) and the name, with no fill until hovered; then the whole block, picture and padding
+                   each name is the artist's picture (or its icon on a grey tile: a building for companies, people for
+                   circles and groups, a person otherwise; a name-only publisher gets the building) and the name, with no fill until hovered; then the whole block, picture and padding
                    included, turns grey. The row moves left by that padding, so the pictures line up with the title.
                    A name-only credit has no link. -->
               <div v-if="bylineTags.length" class="mt-2 flex flex-wrap items-center justify-center gap-1 md:-ml-1.5 md:justify-start">
@@ -171,7 +171,7 @@ import { ALBUM_CATEGORY_ICONS, ALBUM_TYPE_ICONS, DISC_FORMAT_ICONS, type Album }
 import { getStreamingProvider } from '~/utils/streamingProviders'
 import { providerLabel } from '~/utils/linkProviders'
 import { NuxtLink } from '#components'
-import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound } from '@lucide/vue'
+import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
 const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-[12.5px] font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
@@ -218,10 +218,15 @@ const bylineTags = computed(() => {
   const byline = props.album.byline
   if (!byline) return []
   const images = new Map(props.album.credits.flatMap(credit => credit.artist?.image_url ? [[credit.artist.id, credit.artist.image_url] as const] : []))
-  const icon = byline.role === 'publisher' ? Building2 : UserRound
+  const types = new Map(props.album.credits.flatMap(credit => credit.artist?.type ? [[credit.artist.id, credit.artist.type] as const] : []))
+  const icon = (id: number | null, role: string) => {
+    const type = id ? types.get(id) : undefined
+    if (type) return type === 'company' ? Building2 : type === 'circle' || type === 'group' ? UsersRound : UserRound
+    return role === 'publisher' ? Building2 : UserRound
+  }
   return [
-    ...byline.artists.map(artist => ({ key: `${byline.role}:${artist.id}:${artist.name}`, id: artist.id, name: artist.name, icon })),
-    ...bylineArtists.value.map(artist => ({ key: `artist:${artist.key}`, id: artist.id, name: artist.name, icon: UserRound })),
+    ...byline.artists.map(artist => ({ key: `${byline.role}:${artist.id}:${artist.name}`, id: artist.id, name: artist.name, icon: icon(artist.id, byline.role) })),
+    ...bylineArtists.value.map(artist => ({ key: `artist:${artist.key}`, id: artist.id, name: artist.name, icon: icon(artist.id, 'artist') })),
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)

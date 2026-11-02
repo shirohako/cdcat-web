@@ -32,7 +32,10 @@
     "track_people": {
       "title": "Track credits",
       "count": "{count} person | {count} people",
-      "all": "All tracks"
+      "all": "All tracks",
+      "view_label": "View",
+      "view_roles": "By role",
+      "view_tracks": "By track"
     },
     "section": {
       "description": "Description",
@@ -2625,7 +2628,7 @@
       "add": "Add TOC"
     },
     "credits": {
-      "hint": "Start with the byline and publisher, then everyone else: line by line by role, or track by track.",
+      "hint": "Start with the byline and publisher, then everyone else: track by track, or line by line by role.",
       "whole_album": "Whole album",
       "none": "No other credits yet. Start a line with a role below, or paste a whole credit list.",
       "pick_artist": "Pick or create an artist…",

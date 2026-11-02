@@ -39,14 +39,14 @@ const levelErrors = computed(() => editor.errorsIn('credits').filter(error => er
 const VIEW_KEY = 'cdcat:album-editor:credits-view'
 const readView = () => {
   try {
-    return localStorage.getItem(VIEW_KEY) === 'track' ? 'track' : 'role'
+    return localStorage.getItem(VIEW_KEY) === 'role' ? 'role' : 'track'
   }
   catch {
-    return 'role'
+    return 'track'
   }
 }
 // The editor is drawn in the browser only, so the stored choice is there from the start.
-const view = ref<'role' | 'track'>(import.meta.client ? readView() : 'role')
+const view = ref<'role' | 'track'>(import.meta.client ? readView() : 'track')
 watch(view, (value) => {
   try {
     localStorage.setItem(VIEW_KEY, value)
@@ -54,8 +54,8 @@ watch(view, (value) => {
   catch { /* the choice is a convenience */ }
 })
 const views = computed(() => [
-  { value: 'role' as const, label: t('editor.credits.view_by_role'), icon: 'lucide:rows-3' },
   { value: 'track' as const, label: t('editor.credits.view_by_track'), icon: 'lucide:list-music' },
+  { value: 'role' as const, label: t('editor.credits.view_by_role'), icon: 'lucide:rows-3' },
 ])
 
 const pasteOpen = ref(false)
