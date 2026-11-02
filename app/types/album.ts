@@ -50,7 +50,7 @@ export const DISC_FORMAT_ICONS: Record<DiscFormat, string> = {
 }
 
 export const IMAGE_KINDS = [
-  'cover', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'oshinagaki', 'other',
+  'cover', 'banner', 'front', 'back', 'booklet', 'disc', 'disc_back', 'obi_front', 'obi_back', 'tray', 'box', 'sticker', 'bonus_item', 'illustration', 'oshinagaki', 'other',
 ] as const
 export type ImageKind = typeof IMAGE_KINDS[number]
 
@@ -58,7 +58,7 @@ export type ImageKind = typeof IMAGE_KINDS[number]
 export const IMAGE_KIND_GROUPS: ReadonlyArray<{ key: string, kinds: readonly ImageKind[] }> = [
   { key: 'packaging', kinds: ['cover', 'front', 'back', 'box', 'obi_front', 'obi_back', 'sticker'] },
   { key: 'inside', kinds: ['booklet', 'tray', 'disc', 'disc_back'] },
-  { key: 'other', kinds: ['bonus_item', 'illustration', 'oshinagaki', 'other'] },
+  { key: 'other', kinds: ['banner', 'bonus_item', 'illustration', 'oshinagaki', 'other'] },
 ]
 
 /**
@@ -209,6 +209,8 @@ export interface AlbumImage {
   product_id: number | null
   bonus_id: number | null
   disc_id: number | null
+  /** The main cover or the main banner */
+  is_primary: boolean
   sort_order: number
   image: CatalogImage | null
   attributes: CatalogAttribute[]

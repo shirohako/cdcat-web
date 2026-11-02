@@ -21,10 +21,6 @@
           <input :value="doc.catalog_prefixes.join(', ')" class="input input-sm w-full font-mono" placeholder="KICA, KICS" @change="setPrefixes(($event.target as HTMLInputElement).value)">
           <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.entity.prefixes_hint') }}</span>
         </label>
-        <div class="sm:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.image_url') }}</span>
-          <EditorImageUrlInput v-model="doc.image_url" />
-        </div>
         <label class="block sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.bio') }}</span>
           <textarea v-model="doc.bio" rows="5" class="textarea w-full text-sm" />
@@ -32,6 +28,8 @@
         <EditorEntitySlugField v-model="doc.slug" class="sm:col-span-2" />
       </div>
     </CatalogSection>
+
+    <EditorEntityArtistImages />
 
     <CatalogSection :title="$t('editor.album.other_names')" :icon="Languages">
       <div class="p-5"><EditorTitleRows v-model="doc.titles" /></div>

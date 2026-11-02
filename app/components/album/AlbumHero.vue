@@ -1,9 +1,18 @@
 <template>
   <div>
-    <!-- The banner: the album's own banner image, else its cover blurred into a wash. -->
+    <!-- The banner: the album's main banner, else its cover blurred into a wash. -->
     <div class="relative h-40 overflow-hidden bg-card-active sm:h-48 md:h-52 lg:h-60 2xl:h-64">
       <img
-        v-if="album.banner_url"
+        v-if="banner"
+        v-img-fade
+        :src="banner.medium_url"
+        :srcset="`${banner.medium_url} 1200w, ${banner.url} ${banner.width}w`"
+        sizes="100vw"
+        alt=""
+        class="absolute inset-0 size-full object-cover"
+      >
+      <img
+        v-else-if="album.banner_url"
         v-img-fade
         :src="album.banner_url"
         alt=""
@@ -230,6 +239,7 @@ const bylineTags = computed(() => {
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
+const banner = computed(() => props.album.images.find(item => item.kind === 'banner' && item.is_primary)?.image ?? null)
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
 const typeIcon = computed(() => ALBUM_TYPE_ICONS[props.album.type] ?? 'lucide:disc-3')
 /** The formats worth a word (anything but a plain CD: vinyl, cassette, SACD …), then the categories. */

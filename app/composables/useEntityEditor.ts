@@ -30,7 +30,7 @@ export const useEntityEditor = () => {
 export const emptyDocument = (type: EntityType): Record<string, unknown> => {
   switch (type) {
     case 'artist':
-      return { name: '', slug: null, type: null, is_active: true, bio: null, image_url: null, catalog_prefixes: [], titles: [], links: [], attributes: [], relations: [] }
+      return { name: '', slug: null, type: null, is_active: true, bio: null, catalog_prefixes: [], titles: [], links: [], attributes: [], relations: [], images: [] }
     case 'entry':
       return {
         name: '', slug: null, type: 'anime', format: null, platforms: [], release_date: null, release_date_precision: 'day',

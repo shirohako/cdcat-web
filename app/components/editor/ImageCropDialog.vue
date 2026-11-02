@@ -1,7 +1,7 @@
 <template>
   <EditorModal :model-value="!!file" :title="$t('editor.crop.title')" wide @update:model-value="value => !value && emit('cancel')">
     <div v-if="image" class="space-y-4">
-      <p class="text-sm text-body">{{ $t('editor.crop.hint') }}</p>
+      <p class="text-sm text-body">{{ hint ?? $t('editor.crop.hint') }}</p>
       <div class="relative mx-auto w-fit max-w-full select-none overflow-hidden rounded-lg bg-hero">
         <img :src="image.src" alt="" class="block max-h-[55vh] max-w-full">
         <div class="pointer-events-none absolute border-2 border-white shadow-[0_0_0_9999px_var(--scrim)]" :style="box" />
@@ -23,8 +23,8 @@
 <script setup lang="ts">
 import { cropToSquare, outputSize, squareCrop } from '~/utils/imageCrop'
 
-/** Crops a picked file to the largest square; the slider moves the square along the long side. */
-const props = defineProps<{ file: File | null }>()
+/** Crops a picked file to the largest square; the slider moves the square along the long side. `hint` says why (an album cover by default). */
+const props = defineProps<{ file: File | null, hint?: string }>()
 const emit = defineEmits<{ cropped: [Blob], cancel: [] }>()
 
 const image = shallowRef<HTMLImageElement | null>(null)

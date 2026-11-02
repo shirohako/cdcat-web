@@ -263,7 +263,8 @@
       "no_credits": "参加作品はまだありません",
       "albums_label": "アルバム",
       "album_roles": "アルバム全体",
-      "catalog_prefixes": "品番プレフィックス"
+      "catalog_prefixes": "品番プレフィックス",
+      "gallery": "画像"
     }
   },
   "tracking": {
@@ -1768,8 +1769,16 @@
       "digital": "配信",
       "other": "その他"
     },
+    "artist_image_kind": {
+      "avatar": "アイコン",
+      "banner": "バナー",
+      "photo": "写真",
+      "illustration": "立ち絵・イラスト",
+      "other": "その他"
+    },
     "image_kind": {
       "cover": "ジャケット",
+      "banner": "バナー",
       "front": "表",
       "back": "裏",
       "booklet": "ブックレット",
@@ -2542,7 +2551,6 @@
       "categories_hint": "音楽の出どころ。アーティスト自身のアルバムなら空欄のままで構いません。",
       "description_placeholder": "このアルバムの背景や補足…",
       "other_names": "ほかの名前",
-      "other_names_moved": "公式名、翻訳、ローマ字、別名はすべて「トラックリストを翻訳」で入力します。",
       "is_adult": "成人向け（R-18）",
       "section": {
         "basic": "基本情報",
@@ -2695,6 +2703,14 @@
       "cover_needed": "正方形のジャケットが必要です",
       "cover_rules": "正方形（縦横の差 1% 以内）、{size} px 以上。ほかの比率は切り抜けます。",
       "upload": "ジャケットをアップロード",
+      "banner": "バナー",
+      "banner_empty": "バナーはまだありません",
+      "upload_banner": "バナーをアップロード",
+      "banner_rules": "横長で幅 {width} px 以上、幅が高さの {ratio} 倍以上。ページ上部に中央を切り抜いて表示します。",
+      "banner_too_narrow": "バナーは幅 {width} px 以上、幅が高さの {ratio} 倍以上にしてください。",
+      "use_as_cover": "ジャケットに使う",
+      "use_as_banner": "バナーに使う",
+      "main_hint": "種類をジャケットやバナーにしても、今のジャケットとバナーは置き換わりません。「ジャケットに使う」「バナーに使う」で切り替えます。",
       "replace": "差し替え",
       "from_url": "リンクから取り込む",
       "from_clipboard": "クリップボードから貼り付け",
@@ -2728,6 +2744,19 @@
         "other": "その他"
       }
     },
+    "artist_image": {
+      "avatar": "アイコン",
+      "banner": "バナー",
+      "avatar_empty": "アイコンはまだありません",
+      "upload_avatar": "アイコンをアップロード",
+      "avatar_rules": "正方形、{size} px 以上。ほかの比率は切り抜けます。",
+      "avatar_not_square": "アイコンは正方形にしてください。",
+      "gallery_hint": "写真、立ち絵、イラストなど。まとめてアップロードできます。",
+      "label_placeholder": "例：2024、C105",
+      "crop_hint": "アーティストのアイコンは正方形です。枠を動かして残す部分を選んでください。",
+      "use_as_avatar": "アイコンに使う",
+      "main_hint": "種類をアイコンやバナーにしても、今のアイコンとバナーは置き換わりません。「アイコンに使う」「バナーに使う」で切り替えます。"
+    },
     "crop": {
       "title": "正方形に切り抜く",
       "hint": "アルバムのジャケットは正方形です。枠を動かして残す部分を選んでください。",
@@ -2738,7 +2767,7 @@
     "relations": {
       "entries_hint": "このアルバムが属するゲームやアニメなどの作品。",
       "links_hint": "ショップ、配信サービス、公式ページ、VGMdb、MusicBrainz など",
-      "attributes_hint": "意味があらかじめ決められた補足情報（ジャケットのキャラクターなど）。わかるものだけ入力してください。"
+      "attributes_hint": "意味があらかじめ決められた補足情報"
     },
     "translate": {
       "title": "トラックリストを翻訳",

@@ -7,6 +7,7 @@ import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/docum
 import type { ParsedDisc } from './tracklistParser'
 import { newKey } from './documentKeys'
 import { byOrder, nextOrder, sameId } from './documentRows'
+import { mainImageOf, makeMainImage } from './mainImages'
 
 export type AlbumDiscRow = AlbumDocument['discs'][number]
 export type AlbumTrackRow = AlbumDocument['tracks'][number]
@@ -28,7 +29,6 @@ export const emptyAlbumDocument = (): AlbumDocument => ({
   release_event_id: null,
   description: null,
   is_adult: false,
-  banner_url: null,
   titles: [],
   products: [],
   bonuses: [],
@@ -52,10 +52,14 @@ type OldAlbumArtist = { artist_id: AggregateRef | null, roles?: string[], credit
 
 /**
  * Brings a document kept in a draft up to date: tracks lose `work_id`, `track_originals` exists, the old
- * 艺术家与发行 rows become album-wide credits, one per role (艺术家, 发行 …), and the old label rows, which
- * point at labels that are gone, are dropped.
+ * 艺术家与发行 rows become album-wide credits, one per role (艺术家, 发行 …), the old label rows, which
+ * point at labels that are gone, are dropped, and so is the banner address, now a banner image. The cover gets marked
+ * as the main one, so reordering the gallery can't make another the main cover.
  */
 export function upgradeAlbumDocument(doc: AlbumDocument) {
+  delete (doc as AlbumDocument & { banner_url?: unknown }).banner_url
+  const cover = coverOf(doc)
+  if (cover) cover.is_primary = true
   for (const track of doc.tracks as Array<AlbumDocument['tracks'][number] & { work_id?: unknown }>) delete track.work_id
   doc.track_originals ??= []
   const old = doc as AlbumDocument & { artists?: OldAlbumArtist[], labels?: unknown }
@@ -286,24 +290,50 @@ export function removeBonus(doc: AlbumDocument, bonusId: RowId) {
 // ---- images -----------------------------------------------------------------------------------
 
 export const isUnscoped = (image: AlbumImageRow) => image.product_id === null && image.bonus_id === null && image.disc_id === null
-export const coverOf = (doc: AlbumDocument) => doc.images.find(image => image.kind === 'cover' && isUnscoped(image)) ?? null
 
-/** Uses an uploaded image as the album cover, replacing the current one. */
+/**
+ * The main cover. Documents from before main images (old drafts, harvested ones) mark none: their first album-wide
+ * cover is it, as the server takes it (AlbumSchema::prepare).
+ */
+export const coverOf = (doc: AlbumDocument) => mainImageOf(doc.images, 'cover')
+  ?? byOrder(doc.images).find(image => image.kind === 'cover' && isUnscoped(image)) ?? null
+export const bannerOf = (doc: AlbumDocument) => mainImageOf(doc.images, 'banner')
+
+/** Makes a gallery image the main cover or banner; the main one is album-wide, so it stops belonging to an edition, bonus or disc. */
+export function useAsMain(doc: AlbumDocument, image: AlbumImageRow) {
+  const current = image.kind === 'cover' ? coverOf(doc) : null
+  if (current && current !== image) current.is_primary = false
+  image.product_id = image.bonus_id = image.disc_id = null
+  makeMainImage(doc.images, image)
+}
+
+/** An upload in the cover or banner slot becomes the main one; the old main one stays in the gallery. */
+export function addMainImage(doc: AlbumDocument, kind: 'cover' | 'banner', imageId: number) {
+  const image = doc.images.find(row => row.image_id === imageId && row.kind === kind && isUnscoped(row)) ?? addImage(doc, imageId, { kind })
+  useAsMain(doc, image)
+  return image
+}
+
+/**
+ * Puts an image in the main cover's place, the old one leaving the album: the harvest review picks the right cover of
+ * a release among its sources this way.
+ */
 export function setCover(doc: AlbumDocument, imageId: number) {
   const cover = coverOf(doc)
   if (cover) {
     cover.image_id = imageId
+    cover.is_primary = true
     return cover
   }
   for (const image of doc.images) image.sort_order = (image.sort_order ?? 0) + 1
-  doc.images.push({ id: newKey('i'), image_id: imageId, kind: 'cover', label: null, caption: null, product_id: null, bonus_id: null, disc_id: null, sort_order: 0 })
+  doc.images.push({ id: newKey('i'), image_id: imageId, kind: 'cover', label: null, caption: null, product_id: null, bonus_id: null, disc_id: null, is_primary: true, sort_order: 0 })
   return doc.images[doc.images.length - 1]!
 }
 
 export function addImage(doc: AlbumDocument, imageId: number, fields: Partial<AlbumImageRow> = {}): AlbumImageRow {
   doc.images.push({
     id: newKey('i'), image_id: imageId, kind: 'other', label: null, caption: null, product_id: null, bonus_id: null, disc_id: null,
-    sort_order: nextOrder(doc.images), ...fields,
+    is_primary: false, sort_order: nextOrder(doc.images), ...fields,
   })
   return doc.images[doc.images.length - 1]!
 }

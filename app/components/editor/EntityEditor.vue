@@ -95,7 +95,11 @@ const prepare = (item: DraftItem): DraftItem => {
   if (Array.isArray(document.links)) document.links = document.links.filter(row => !blank(row.url))
   if (Array.isArray(document.attributes)) document.attributes = document.attributes.filter(row => !blank(row.value))
   // Drafts saved before these fields were dropped still carry them: the episode count, and the
-  // character name and episode of album links.
+  // character name and episode of album links; an artist's picture, now its avatar row.
+  if (item.resource_type === 'artist') {
+    delete document.image_url
+    if (!Array.isArray(document.images)) document.images = []
+  }
   if (item.resource_type === 'entry') {
     delete document.episodes
     for (const row of (Array.isArray(document.albums) ? document.albums : []) as Array<Record<string, unknown>>) {

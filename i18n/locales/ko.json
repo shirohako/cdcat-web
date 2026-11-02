@@ -263,7 +263,8 @@
       "no_credits": "아직 참여한 앨범이 없어요",
       "albums_label": "앨범",
       "album_roles": "앨범 전체",
-      "catalog_prefixes": "품번 접두어"
+      "catalog_prefixes": "품번 접두어",
+      "gallery": "이미지"
     }
   },
   "tracking": {
@@ -1768,8 +1769,16 @@
       "digital": "디지털",
       "other": "기타"
     },
+    "artist_image_kind": {
+      "avatar": "프로필 이미지",
+      "banner": "배너",
+      "photo": "사진",
+      "illustration": "스탠딩 · 일러스트",
+      "other": "기타"
+    },
     "image_kind": {
       "cover": "커버",
+      "banner": "배너",
       "front": "앞면",
       "back": "뒷면",
       "booklet": "부클릿",
@@ -2542,7 +2551,6 @@
       "categories_hint": "어디에서 나온 음악인지 골라 주세요. 아티스트의 오리지널 앨범이라면 비워 두세요.",
       "description_placeholder": "발매 배경이나 참고할 내용…",
       "other_names": "다른 이름",
-      "other_names_moved": "공식 이름, 번역, 로마자, 별칭은 모두 「트랙 리스트 번역」에서 입력합니다.",
       "is_adult": "성인용 콘텐츠 (R-18)",
       "section": {
         "basic": "기본 정보",
@@ -2695,6 +2703,14 @@
       "cover_needed": "정사각형 커버가 필요해요",
       "cover_rules": "정사각형(가로세로 차이 1% 이내)이고 {size}px 이상이어야 해요. 다른 비율은 잘라서 쓸 수 있어요.",
       "upload": "커버 업로드",
+      "banner": "배너",
+      "banner_empty": "아직 배너가 없어요",
+      "upload_banner": "배너 업로드",
+      "banner_rules": "가로가 {width}px 이상이고 세로의 {ratio}배 이상인 가로형 이미지여야 해요. 페이지 위쪽에 가운데를 잘라서 보여 줘요.",
+      "banner_too_narrow": "배너는 가로가 {width}px 이상이고 세로의 {ratio}배 이상이어야 해요.",
+      "use_as_cover": "커버로 쓰기",
+      "use_as_banner": "배너로 쓰기",
+      "main_hint": "종류를 커버나 배너로 골라도 지금 커버와 배너는 바뀌지 않아요. ‘커버로 쓰기’, ‘배너로 쓰기’를 눌러야 바뀌어요.",
       "replace": "변경",
       "from_url": "링크로 가져오기",
       "from_clipboard": "클립보드에서 붙여넣기",
@@ -2728,6 +2744,19 @@
         "other": "기타"
       }
     },
+    "artist_image": {
+      "avatar": "프로필 이미지",
+      "banner": "배너",
+      "avatar_empty": "아직 프로필 이미지가 없어요",
+      "upload_avatar": "프로필 이미지 업로드",
+      "avatar_rules": "정사각형이고 {size}px 이상이어야 해요. 다른 비율은 잘라서 쓸 수 있어요.",
+      "avatar_not_square": "프로필 이미지는 정사각형이어야 해요.",
+      "gallery_hint": "사진, 스탠딩, 일러스트 등 여러 장을 한 번에 업로드할 수 있어요.",
+      "label_placeholder": "예: 2024, C105",
+      "crop_hint": "아티스트 프로필 이미지는 정사각형이에요. 틀을 옮겨 남길 부분을 골라 주세요.",
+      "use_as_avatar": "프로필 이미지로 쓰기",
+      "main_hint": "종류를 프로필 이미지나 배너로 골라도 지금 프로필 이미지와 배너는 바뀌지 않아요. ‘프로필 이미지로 쓰기’, ‘배너로 쓰기’를 눌러야 바뀌어요."
+    },
     "crop": {
       "title": "정사각형으로 자르기",
       "hint": "앨범 커버는 정사각형이에요. 틀을 옮겨 남길 부분을 골라 주세요.",
@@ -2738,7 +2767,7 @@
     "relations": {
       "entries_hint": "이 앨범이 속한 게임, 애니메이션 등의 작품이에요.",
       "links_hint": "판매처, 스트리밍 서비스, 공식 페이지, VGMdb, MusicBrainz…",
-      "attributes_hint": "커버에 그려진 캐릭터처럼 의미가 정해져 있는 추가 정보예요. 아는 것만 입력해 주세요."
+      "attributes_hint": "의미가 정해져 있는 추가 정보예요."
     },
     "translate": {
       "title": "트랙 리스트 번역",

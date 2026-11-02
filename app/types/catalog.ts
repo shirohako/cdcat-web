@@ -100,7 +100,10 @@ export interface CatalogSchema {
   credit_roles: CreditRoleDefinition[]
   attribute_definitions: AttributeDefinition[]
   link_providers: Array<CatalogLinkProvider & { url_pattern: string | null }>
-  limits: { cover_min_size: number, cover_square_tolerance: number, image_max_bytes: number }
+  limits: {
+    cover_min_size: number, cover_square_tolerance: number, image_max_bytes: number
+    avatar_min_size: number, banner_min_width: number, banner_min_ratio: number
+  }
 }
 
 /** A credit on an album or a track. `artist` is null when only a printed name is known. */

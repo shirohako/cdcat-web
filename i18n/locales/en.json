@@ -263,7 +263,8 @@
       "no_credits": "No credited albums yet",
       "albums_label": "Albums",
       "album_roles": "Whole album",
-      "catalog_prefixes": "Catalog prefixes"
+      "catalog_prefixes": "Catalog prefixes",
+      "gallery": "Images"
     }
   },
   "tracking": {
@@ -1768,8 +1769,16 @@
       "digital": "Digital",
       "other": "Other"
     },
+    "artist_image_kind": {
+      "avatar": "Avatar",
+      "banner": "Banner",
+      "photo": "Photo",
+      "illustration": "Illustration",
+      "other": "Other"
+    },
     "image_kind": {
       "cover": "Cover",
+      "banner": "Banner",
       "front": "Front",
       "back": "Back",
       "booklet": "Booklet",
@@ -2542,7 +2551,6 @@
       "categories_hint": "What the music comes from. Leave empty for an artist's own album.",
       "description_placeholder": "Background and notes about this release…",
       "other_names": "Other names",
-      "other_names_moved": "Official names, translations, romaji and aliases are all filled in under “Translate tracklist”.",
       "is_adult": "Adult content (R-18)",
       "section": {
         "basic": "Basics",
@@ -2695,6 +2703,14 @@
       "cover_needed": "A square cover is required",
       "cover_rules": "Square (within 1%) and at least {size} px. Other shapes can be cropped.",
       "upload": "Upload cover",
+      "banner": "Banner",
+      "banner_empty": "No banner yet",
+      "upload_banner": "Upload banner",
+      "banner_rules": "Landscape, at least {width} px wide and {ratio} times as wide as it is tall. Shown across the top of the page, cropped to the middle.",
+      "banner_too_narrow": "The banner must be at least {width} px wide and {ratio} times as wide as it is tall.",
+      "use_as_cover": "Use as cover",
+      "use_as_banner": "Use as banner",
+      "main_hint": "Giving an image the kind Cover or Banner doesn’t replace the current one; “Use as cover” and “Use as banner” do.",
       "replace": "Replace",
       "from_url": "Import from a link",
       "from_clipboard": "Paste from clipboard",
@@ -2728,6 +2744,19 @@
         "other": "Other"
       }
     },
+    "artist_image": {
+      "avatar": "Avatar",
+      "banner": "Banner",
+      "avatar_empty": "No avatar yet",
+      "upload_avatar": "Upload avatar",
+      "avatar_rules": "Square and at least {size} px. Other shapes can be cropped.",
+      "avatar_not_square": "The avatar must be square.",
+      "gallery_hint": "Photos, character art, illustrations… Upload several at once.",
+      "label_placeholder": "e.g. 2024, C105",
+      "crop_hint": "Artist avatars are square. Move the frame to choose the part to keep.",
+      "use_as_avatar": "Use as avatar",
+      "main_hint": "Giving an image the kind Avatar or Banner doesn’t replace the current one; “Use as avatar” and “Use as banner” do."
+    },
     "crop": {
       "title": "Crop to a square",
       "hint": "Album covers are square. Move the frame to choose the part to keep.",
@@ -2738,7 +2767,7 @@
     "relations": {
       "entries_hint": "The games, anime and other works this album belongs to.",
       "links_hint": "Shops, streaming services, official pages, VGMdb, MusicBrainz…",
-      "attributes_hint": "Extra facts with an agreed meaning, such as a character on the cover. Only fill in what you know."
+      "attributes_hint": "Extra facts with an agreed meaning."
     },
     "translate": {
       "title": "Translate tracklist",

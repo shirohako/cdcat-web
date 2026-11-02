@@ -507,6 +507,7 @@ export interface AdminImage {
   source_url: string | null
   uploader: AdminUserName | null
   album_images_count: number
+  artist_images_count: number
   unused_since: string | null
   /** Waiting for WebP conversion, or given up on; null once converted. */
   conversion: 'pending' | 'failed' | null
@@ -534,7 +535,8 @@ export interface AdminImageDetail extends AdminImage {
   variants: { size: number, url: string }[]
   in_use: boolean
   usage: {
-    albums: { id: number, album_id: number, title: string, kind: string, label: string | null, product_id: number | null, bonus_id: number | null, disc_id: number | null }[]
+    albums: { id: number, album_id: number, title: string, kind: string, label: string | null, product_id: number | null, bonus_id: number | null, disc_id: number | null, is_primary: boolean }[]
+    artists: { id: number, artist_id: number, name: string, kind: string, label: string | null, is_primary: boolean }[]
     addresses: { type: AdminImageUseType, id: number, name: string | null, field: string, album_id?: number, topic_id?: number, floor_number?: number | null }[]
     revisions: { id: number, status: string, title: string | null, submitter: AdminUserName | null, submitted_at: string | null }[]
   }

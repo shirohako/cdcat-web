@@ -1,42 +1,61 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.images')" :icon="Images">
     <div class="space-y-5 p-3 sm:p-5">
-      <!-- The cover on the left; on the right the gallery's drop area, as tall as the cover's square. -->
+      <ul v-if="cover && collectionErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
+        <li v-for="error in collectionErrors" :key="error.path">{{ error.message }}</li>
+      </ul>
+
+      <!-- The main cover and the main banner, each in its slot; the gallery below has every other image, other covers
+           and banners too, and makes one of them the main one only with 用作封面 / 用作横幅. -->
       <div class="grid gap-5 sm:grid-cols-[14rem_minmax(0,1fr)]">
         <div>
           <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span></p>
           <EditorAlbumCoverSlot />
         </div>
         <div class="min-w-0">
-          <p class="mb-1.5 flex items-baseline gap-1.5 text-sm font-medium text-body">
-            {{ $t('editor.image.gallery') }}<span v-if="gallery.length" class="text-xs tabular-nums text-meta">{{ gallery.length }}</span>
-          </p>
-          <div
-            class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors sm:h-56"
-            :class="dropping ? 'border-primary bg-primary/5' : 'border-line bg-sunken'"
-            @dragenter="filesOver"
-            @dragover="filesOver"
-            @dragleave="filesLeave"
-            @drop="dropFiles"
-          >
-            <ImageUp :size="28" class="text-meta" />
-            <div class="space-y-1">
-              <p class="text-sm font-medium text-title">{{ $t('editor.image.drop_hint') }}</p>
-              <p class="text-xs text-meta">{{ $t('editor.image.gallery_hint') }}</p>
-            </div>
-            <div class="flex flex-wrap justify-center gap-2">
-              <label class="btn btn-add btn-sm cursor-pointer gap-1.5" :class="{ 'btn-disabled': uploading > 0 }">
-                <Upload :size="14" />{{ $t('editor.image.upload_many') }}
-                <input type="file" multiple :accept="ACCEPTED.join(',')" class="hidden" @change="pick">
-              </label>
-              <UiButton variant="add" :icon="Link2" icon-class="size-3.5" size="sm" class="gap-1.5" @click="openUrl">{{ $t('editor.image.from_url') }}</UiButton>
-            </div>
-            <p v-if="uploading" class="flex items-center gap-1.5 text-xs text-meta"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</p>
-          </div>
-          <ul v-if="failures.length" class="mt-2 space-y-0.5 text-xs text-danger">
-            <li v-for="failure in failures" :key="failure">{{ failure }}</li>
-          </ul>
+          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.image.banner') }}</p>
+          <EditorImageSlot
+            variant="banner"
+            :file="bannerFile"
+            :missing="!!banner && !bannerFile"
+            :error="banner ? editor.errorAt('images', banner.id, 'image_id') : null"
+            removable
+            @use="useBanner"
+            @remove="banner && removeImage(album, banner.id)"
+          />
         </div>
+      </div>
+
+      <div>
+        <p class="mb-1.5 flex items-baseline gap-1.5 text-sm font-medium text-body">
+          {{ $t('editor.image.gallery') }}<span v-if="gallery.length" class="text-xs tabular-nums text-meta">{{ gallery.length }}</span>
+        </p>
+        <div
+          class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-4 py-6 text-center transition-colors"
+          :class="dropping ? 'border-primary bg-primary/5' : 'border-line bg-sunken'"
+          @dragenter="filesOver"
+          @dragover="filesOver"
+          @dragleave="filesLeave"
+          @drop="dropFiles"
+        >
+          <ImageUp :size="28" class="text-meta" />
+          <div class="space-y-1">
+            <p class="text-sm font-medium text-title">{{ $t('editor.image.drop_hint') }}</p>
+            <p class="text-xs text-meta">{{ $t('editor.image.gallery_hint') }}</p>
+            <p class="text-xs text-meta">{{ $t('editor.image.main_hint') }}</p>
+          </div>
+          <div class="flex flex-wrap justify-center gap-2">
+            <label class="btn btn-add btn-sm cursor-pointer gap-1.5" :class="{ 'btn-disabled': uploading > 0 }">
+              <Upload :size="14" />{{ $t('editor.image.upload_many') }}
+              <input type="file" multiple :accept="ACCEPTED.join(',')" class="hidden" @change="pick">
+            </label>
+            <UiButton variant="add" :icon="Link2" icon-class="size-3.5" size="sm" class="gap-1.5" @click="openUrl">{{ $t('editor.image.from_url') }}</UiButton>
+          </div>
+          <p v-if="uploading" class="flex items-center gap-1.5 text-xs text-meta"><span class="loading loading-spinner loading-xs" />{{ $t('editor.image.uploading', { count: uploading }) }}</p>
+        </div>
+        <ul v-if="failures.length" class="mt-2 space-y-0.5 text-xs text-danger">
+          <li v-for="failure in failures" :key="failure">{{ failure }}</li>
+        </ul>
       </div>
 
       <ul v-if="gallery.length" class="space-y-2">
@@ -49,7 +68,7 @@
           :draggable="grabbed !== null && sameId(grabbed, image.id)"
           :dragging="dragged !== null && sameId(dragged, image.id)"
           :drop-edge="dropEdge(image)"
-          @grab="grabbed = image.id"
+          @grab="grab(image)"
           @move="move(image, $event)"
           @dragstart="startDrag(image, $event)"
           @dragover="overRow(image, $event)"
@@ -77,8 +96,8 @@
 import type { CatalogImage } from '~/types/catalog'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ImageUp, Images, Link2, Upload } from '@lucide/vue'
-import { addImage, coverOf } from '~/utils/albumDocument'
-import type { AlbumDocument, RowId } from '~/types/document'
+import { addImage, addMainImage, bannerOf, coverOf, removeImage } from '~/utils/albumDocument'
+import type { AlbumDocument } from '~/types/document'
 import { byOrder, placeRow, sameId } from '~/utils/documentRows'
 
 /** Common labels by kind, as VGMdb writes them. */
@@ -96,59 +115,26 @@ const { localizeError } = useLocalizedApiError()
 const { limits, upload, importUrl } = useImageUpload()
 
 const album = computed(() => editor.album.value)
-/** Every image but the album cover, which has its own slot. */
-const gallery = computed(() => byOrder(album.value.images).filter(image => !sameId(image.id, coverOf(album.value)?.id)))
+const cover = computed(() => coverOf(album.value))
+const banner = computed(() => bannerOf(album.value))
+const bannerFile = computed(() => banner.value ? editor.references.images?.[String(banner.value.image_id)] as CatalogImage | undefined : undefined)
+/** Every image but the main cover and banner, which have their slots. */
+const gallery = computed(() => byOrder(album.value.images).filter(image => image !== cover.value && image !== banner.value))
+// "At most one main banner" and the like; without a cover, its slot shows "needs exactly one main cover".
+const collectionErrors = computed(() => editor.errorsIn('images').filter(error => error.path.split('.').length === 3))
+
+const useBanner = (image: CatalogImage) => {
+  editor.remember('images', image.id, image)
+  addMainImage(album.value, 'banner', image.id)
+}
 
 type ImageRow = AlbumDocument['images'][number]
 
 // ---- order: drag a row by its handle, or move it one step; the cover's place among the rows doesn't count ----
 
-/** The row whose handle is held down: only that row can be dragged, so its fields stay selectable. */
-const grabbed = ref<RowId | null>(null)
-const dragged = ref<RowId | null>(null)
-/** Where the dragged row would land: before or after this row. */
-const target = ref<{ id: RowId, after: boolean } | null>(null)
-
 /** Puts the row before the gallery row at `index` (last when there is none). */
 const placeAt = (image: ImageRow, index: number) => placeRow(album.value.images, image, gallery.value[index] ?? null)
-const move = (image: ImageRow, delta: number) => {
-  const index = gallery.value.indexOf(image)
-  if (index < 0 || index + delta < 0) return
-  placeAt(image, delta < 0 ? index - 1 : index + 2)
-}
-
-const startDrag = (image: ImageRow, event: DragEvent) => {
-  dragged.value = image.id
-  if (!event.dataTransfer) return
-  event.dataTransfer.effectAllowed = 'move'
-  // Firefox starts a drag only with some data.
-  event.dataTransfer.setData('text/plain', String(image.id))
-}
-const overRow = (image: ImageRow, event: DragEvent) => {
-  if (dragged.value === null) return
-  event.preventDefault()
-  const box = (event.currentTarget as HTMLElement).getBoundingClientRect()
-  target.value = { id: image.id, after: event.clientY > box.top + box.height / 2 }
-}
-const dropOn = (image: ImageRow) => {
-  const moving = gallery.value.find(row => sameId(row.id, dragged.value))
-  if (moving && target.value && sameId(target.value.id, image.id)) placeAt(moving, gallery.value.indexOf(image) + (target.value.after ? 1 : 0))
-  endDrag()
-}
-const endDrag = () => {
-  grabbed.value = null
-  dragged.value = null
-  target.value = null
-}
-/** The edge of this row the drop line shows on; none over the dragged row itself. */
-const dropEdge = (image: ImageRow) => target.value && dragged.value !== null && !sameId(dragged.value, image.id) && sameId(target.value.id, image.id)
-  ? (target.value.after ? 'after' : 'before')
-  : null
-
-// A handle pressed and let go without dragging lets go of the row.
-const release = () => { if (dragged.value === null) grabbed.value = null }
-onMounted(() => document.addEventListener('pointerup', release))
-onBeforeUnmount(() => document.removeEventListener('pointerup', release))
+const { grabbed, dragged, grab, move, startDrag, overRow, dropOn, endDrag, dropEdge } = useRowDrag(() => gallery.value, placeAt)
 
 const uploading = ref(0)
 const importing = ref(false)

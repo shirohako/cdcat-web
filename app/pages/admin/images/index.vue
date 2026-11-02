@@ -109,7 +109,7 @@ useHead({ title: '图片' })
               <p class="mt-1 text-slate-500">{{ image.width }} × {{ image.height }} · {{ formatBytes(image.size) }}</p>
               <p v-if="image.conversion" :class="image.conversion === 'failed' ? 'text-red-700' : 'text-slate-500'">{{ imageConversionLabels[image.conversion] }}</p>
               <p v-if="image.cleanup_at" class="text-amber-700">{{ date(image.cleanup_at) }} 后清理</p>
-              <p v-else-if="image.album_images_count" class="text-slate-500">{{ image.album_images_count }} 处专辑图片</p>
+              <p v-else-if="image.album_images_count || image.artist_images_count" class="text-slate-500">{{ [image.album_images_count && `${image.album_images_count} 处专辑图片`, image.artist_images_count && `${image.artist_images_count} 处艺术家图片`].filter(Boolean).join(' · ') }}</p>
               <p class="truncate text-slate-400">{{ image.uploader ? (image.uploader.nickname || image.uploader.username) : '—' }} · {{ date(image.created_at) }}</p>
             </NuxtLink>
           </li>

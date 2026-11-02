@@ -263,7 +263,8 @@
       "no_credits": "暂无参与的专辑",
       "albums_label": "专辑",
       "album_roles": "整张专辑",
-      "catalog_prefixes": "品番前缀"
+      "catalog_prefixes": "品番前缀",
+      "gallery": "图片"
     }
   },
   "tracking": {
@@ -1768,8 +1769,16 @@
       "digital": "数字",
       "other": "其他"
     },
+    "artist_image_kind": {
+      "avatar": "头像",
+      "banner": "横幅",
+      "photo": "照片",
+      "illustration": "立绘 / 插画",
+      "other": "其他"
+    },
     "image_kind": {
       "cover": "封面",
+      "banner": "横幅",
       "front": "正面",
       "back": "背面",
       "booklet": "歌词本",
@@ -2542,7 +2551,6 @@
       "categories_hint": "音乐的出处。艺术家自己的专辑留空即可。",
       "description_placeholder": "这张专辑的背景和说明……",
       "other_names": "其他名称",
-      "other_names_moved": "官方名称、翻译、罗马字和别名都在「翻译曲目表」里填。",
       "is_adult": "成人内容（R-18）",
       "section": {
         "basic": "基本信息",
@@ -2695,6 +2703,14 @@
       "cover_needed": "必须有正方形封面",
       "cover_rules": "正方形（宽高差不超过 1%），至少 {size} 像素。其他比例可以裁切。",
       "upload": "上传封面",
+      "banner": "横幅",
+      "banner_empty": "还没有横幅",
+      "upload_banner": "上传横幅",
+      "banner_rules": "横图，宽至少 {width} 像素，并且至少是高的 {ratio} 倍。在页面顶部居中裁着显示。",
+      "banner_too_narrow": "横幅宽至少要 {width} 像素，并且至少是高的 {ratio} 倍。",
+      "use_as_cover": "用作封面",
+      "use_as_banner": "用作横幅",
+      "main_hint": "类别选封面、横幅的图片不会替换现在的封面和横幅；点它的「用作封面」「用作横幅」才会换。",
       "replace": "更换",
       "from_url": "从链接导入",
       "from_clipboard": "从剪贴板粘贴",
@@ -2728,6 +2744,19 @@
         "other": "其他"
       }
     },
+    "artist_image": {
+      "avatar": "头像",
+      "banner": "横幅",
+      "avatar_empty": "还没有头像",
+      "upload_avatar": "上传头像",
+      "avatar_rules": "正方形，至少 {size} 像素。其他比例可以裁切。",
+      "avatar_not_square": "头像必须是正方形。",
+      "gallery_hint": "照片、立绘、插画……可以一次上传多张。",
+      "label_placeholder": "如 2024、C105",
+      "crop_hint": "艺术家头像是正方形的。移动方框选择要保留的部分。",
+      "use_as_avatar": "用作头像",
+      "main_hint": "类别选头像、横幅的图片不会替换现在的头像和横幅；点它的「用作头像」「用作横幅」才会换。"
+    },
     "crop": {
       "title": "裁切成正方形",
       "hint": "专辑封面是正方形的。移动方框选择要保留的部分。",
@@ -2738,7 +2767,7 @@
     "relations": {
       "entries_hint": "这张专辑所属的游戏、动画等作品。",
       "links_hint": "商店、流媒体、官方页面、VGMdb、MusicBrainz……",
-      "attributes_hint": "含义事先约定好的补充信息，比如封面上的角色。知道才填。"
+      "attributes_hint": "含义事先约定好的补充信息"
     },
     "translate": {
       "title": "翻译曲目表",

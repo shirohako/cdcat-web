@@ -3,8 +3,18 @@
     <CatalogPendingBanner :pending="artist?.is_pending" :revision="artist?.pending_revision" />
     <section class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <div class="card overflow-hidden">
+        <!-- The artist's banner, cropped to the middle; the site's default one when there is none. -->
         <div class="artist-banner bg-sunken">
-          <img :src="artistPageConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
+          <img
+            v-if="banner"
+            v-img-fade
+            :src="banner.medium_url"
+            :srcset="`${banner.medium_url} 1200w, ${banner.url} ${banner.width}w`"
+            sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw"
+            alt=""
+            class="h-full w-full object-cover"
+          >
+          <img v-else :src="artistPageConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
         </div>
         <div class="relative h-11 md:h-13">
           <div class="artist-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
@@ -139,6 +149,8 @@
         </div>
       </section>
 
+      <ArtistGallery v-if="galleryItems.length" :items="galleryItems" />
+
       <!-- Artists awaiting review can only be viewed: following, shouts and links open after approval. -->
       <template v-if="!artist.is_pending">
         <ShoutBox :id="artist.id" resource="artists" />
@@ -152,8 +164,9 @@
 </template>
 
 <script setup lang="ts">
-import type { ArtistCreditedAlbum, ArtistDetail } from '~/types/artist'
+import type { ArtistCreditedAlbum, ArtistDetail, ArtistImage } from '~/types/artist'
 import type { AlbumSimple } from '~/types/album'
+import type { CatalogImage } from '~/types/catalog'
 import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { artistPageConfig } from '~/config/artistPage'
 import { artistLdType, namedLd } from '~/utils/structuredData'
@@ -172,6 +185,10 @@ const artistId = Number(route.params.id)
 const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`, { notFound: true })
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
+// The main banner up top, the main avatar in its circle; the 图片 card has the rest, other avatars and banners too.
+const images = computed(() => (artist.value?.images ?? []).filter((item): item is ArtistImage & { image: CatalogImage } => item.image !== null))
+const banner = computed(() => images.value.find(item => item.kind === 'banner' && item.is_primary)?.image ?? null)
+const galleryItems = computed(() => images.value.filter(item => !item.is_primary))
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
 // One full-width column: up to six albums a row; a page of 30 ends on a full row at 2, 3, 5 and 6 columns.
 const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6'

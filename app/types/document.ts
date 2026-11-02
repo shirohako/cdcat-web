@@ -22,7 +22,6 @@ export interface AlbumDocument {
   release_event_id: number | null
   description: string | null
   is_adult: boolean
-  banner_url: string | null
   titles: TitleRow[]
   products: Array<{
     id: RowId, name: string | null, edition_type: string, medium: string, limited_rule: string | null, limited_name: string | null,
@@ -45,9 +44,10 @@ export interface AlbumDocument {
   disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], source: string }>
   /** parent_id: the credit of the same track (or album) this one belongs to, a 客串's 艺术家 (utils/artistLine) */
   credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, parent_id?: RowId | null, role: string, detail: string | null, sort_order?: number }>
+  /** is_primary marks the main cover and banner (albums.image_url and banner_url are derived from them). */
   images: Array<{
     id: RowId, image_id: number, kind: string, label: string | null, caption: string | null,
-    product_id: RowId | null, bonus_id: RowId | null, disc_id: RowId | null, sort_order?: number
+    product_id: RowId | null, bonus_id: RowId | null, disc_id: RowId | null, is_primary?: boolean, sort_order?: number
   }>
   attributes: AttributeRow[]
   track_attributes: Array<AttributeRow & { track_id: RowId }>
@@ -56,6 +56,9 @@ export interface AlbumDocument {
   entries: Array<{ id: RowId, entry_id: AggregateRef | null, relation_type: string, note: string | null }>
 }
 
+/** An artist image: an avatar, a banner, a photo …; is_primary marks the main avatar and banner. */
+export interface ArtistImageRow { id: RowId, image_id: number, kind: string, label: string | null, caption: string | null, is_primary?: boolean, sort_order?: number }
+
 export interface ArtistDocument {
   name: string
   slug: string | null
@@ -63,13 +66,14 @@ export interface ArtistDocument {
   type: string | null
   is_active: boolean
   bio: string | null
-  image_url: string | null
   /** Companies and circles that act as labels, e.g. ["LACA", "LACM"]. */
   catalog_prefixes: string[]
   titles: TitleRow[]
   links: LinkRow[]
   attributes: AttributeRow[]
   relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, note: string | null }>
+  /** The artist's picture (image_url) is derived from the main avatar. */
+  images: ArtistImageRow[]
 }
 
 export interface EntryDocument {

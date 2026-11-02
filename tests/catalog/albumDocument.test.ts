@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
-  addBonus, addCredit, addDisc, addProduct, addTrack, coverOf, creditGroups, emptyAlbumDocument, importTracklist,
+  addBonus, addCredit, addDisc, addImage, addMainImage, addProduct, addTrack, bannerOf, coverOf, creditGroups, emptyAlbumDocument, importTracklist,
   missingRequired, moveDisc, moveTrack, moveTrackToDisc, orderedTracks, pruneAlbumDocument, removeBonus, removeDisc,
   removeProduct, removeTrack, setCover, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
-  tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument,
+  tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument, useAsMain,
 } from '../../app/utils/albumDocument'
 import { parseTracklist } from '../../app/utils/tracklistParser'
 
@@ -123,6 +123,39 @@ describe('editions and bonuses', () => {
     setCover(doc, 8)
     expect(coverOf(doc)?.image_id).toBe(8)
     expect(doc.images.map(image => [image.kind, image.sort_order])).toEqual([['back', 1], ['cover', 0]])
+  })
+
+  it('keeps the old main cover and banner when another becomes the main one', () => {
+    const { doc } = album()
+    addMainImage(doc, 'cover', 1)
+    addMainImage(doc, 'cover', 2)
+    expect(coverOf(doc)?.image_id).toBe(2)
+    expect(doc.images.map(image => [image.image_id, image.kind, image.is_primary])).toEqual([[1, 'cover', false], [2, 'cover', true]])
+    // Another banner of the gallery, of one disc, becomes the main one only when told, and then album-wide.
+    addMainImage(doc, 'banner', 3)
+    const other = addImage(doc, 4, { kind: 'banner', disc_id: doc.discs[0]!.id })
+    expect(bannerOf(doc)?.image_id).toBe(3)
+    useAsMain(doc, other)
+    expect(bannerOf(doc)?.image_id).toBe(4)
+    expect(other.disc_id).toBeNull()
+    expect(doc.images.filter(image => image.kind === 'banner').map(image => image.is_primary)).toEqual([false, true])
+    // Uploading the old cover again makes its row the main one instead of adding another.
+    addMainImage(doc, 'cover', 1)
+    expect(doc.images.filter(image => image.kind === 'cover').map(image => [image.image_id, image.is_primary])).toEqual([[1, true], [2, false]])
+  })
+
+  it('takes the first album-wide cover of a document from before main images', () => {
+    const { doc } = album()
+    doc.images.push(
+      { id: 'e', image_id: 5, kind: 'cover', label: null, caption: null, product_id: null, bonus_id: null, disc_id: doc.discs[0]!.id, sort_order: 0 },
+      { id: 'a', image_id: 6, kind: 'cover', label: null, caption: null, product_id: null, bonus_id: null, disc_id: null, sort_order: 1 },
+    )
+    const legacy = doc as typeof doc & { banner_url?: string }
+    legacy.banner_url = 'https://example.com/banner.png'
+    expect(coverOf(doc)?.image_id).toBe(6)
+    upgradeAlbumDocument(doc)
+    expect(doc.images.map(image => image.is_primary)).toEqual([undefined, true])
+    expect('banner_url' in doc).toBe(false)
   })
 })
 

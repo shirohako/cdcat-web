@@ -24,7 +24,7 @@
 import { ImagePlus, Link2, Trash2, Upload } from '@lucide/vue'
 
 /**
- * An image URL column (artists, labels, entries, series). The image always comes through this
+ * An image URL column (entries, series). The image always comes through this
  * site: uploaded, or imported from a link by the server; there is no field to type a URL into.
  */
 defineProps<{ wide?: boolean }>()

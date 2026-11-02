@@ -290,7 +290,7 @@ const setErrors = (list: FieldError[]) => {
 }
 
 const SECTION_FIELDS: Partial<Record<AlbumSection, string[]>> = {
-  basic: ['title', 'slug', 'type', 'categories', 'release_date', 'release_date_precision', 'release_event_id', 'description', 'is_adult', 'banner_url', 'titles'],
+  basic: ['title', 'slug', 'type', 'categories', 'release_date', 'release_date_precision', 'release_event_id', 'description', 'is_adult', 'titles'],
   tracks: ['discs', 'tracks', 'disc_titles', 'track_titles', 'track_originals', 'disc_tocs', 'track_attributes'],
   credits: ['credits'],
   editions: ['products'],

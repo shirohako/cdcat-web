@@ -18,8 +18,10 @@ const imageFieldLabels: Record<string, string> = {
   content: '正文',
   raw: '正文',
 }
+const artistImageKindLabels: Record<string, string> = { avatar: '头像', banner: '横幅', photo: '照片', illustration: '立绘 / 插画', other: '其他' }
 const imageKindLabels: Record<string, string> = {
   cover: '封面',
+  banner: '横幅',
   front: '正面',
   back: '背面',
   booklet: '歌词本',
@@ -75,7 +77,7 @@ const scope = (use: AdminImageDetail['usage']['albums'][number]) => {
   if (use.disc_id) return `碟 #${use.disc_id}`
   return ''
 }
-const hasUses = computed(() => Boolean(image.value && (image.value.usage.albums.length || image.value.usage.addresses.length || image.value.usage.revisions.length)))
+const hasUses = computed(() => Boolean(image.value && (image.value.usage.albums.length || image.value.usage.artists.length || image.value.usage.addresses.length || image.value.usage.revisions.length)))
 
 const deleteOpen = ref(false)
 const busy = ref(false)
@@ -123,7 +125,7 @@ useHead({ title: computed(() => `图片 #${id.value}`) })
 
           <div class="rounded-xl border border-slate-200 bg-white p-5 text-sm">
             <h2 class="text-lg font-semibold">用在哪里</h2>
-            <p class="mt-1 text-xs text-slate-500">实时查询专辑图片、各处图片地址和正文、未结束的修订。历史版本和已结束的修订不算。</p>
+            <p class="mt-1 text-xs text-slate-500">实时查询专辑图片、艺术家图片、各处图片地址和正文、未结束的修订。历史版本和已结束的修订不算。</p>
             <p v-if="!hasUses" class="mt-4 text-slate-600">当前没有内容在用。</p>
 
             <template v-if="image.usage.albums.length">
@@ -132,9 +134,22 @@ useHead({ title: computed(() => `图片 #${id.value}`) })
                 <li v-for="use in image.usage.albums" :key="use.id" class="flex flex-wrap items-center justify-between gap-2 py-2">
                   <span>
                     <NuxtLink :to="`/albums/${use.album_id}`" target="_blank" class="underline">#{{ use.album_id }} {{ use.title }}</NuxtLink>
-                    <span class="ml-2 text-slate-500">{{ imageKindLabels[use.kind] }}<template v-if="use.label"> · {{ use.label }}</template><template v-if="scope(use)"> · {{ scope(use) }}</template></span>
+                    <span class="ml-2 text-slate-500">{{ imageKindLabels[use.kind] }}<template v-if="use.is_primary">（主图）</template><template v-if="use.label"> · {{ use.label }}</template><template v-if="scope(use)"> · {{ scope(use) }}</template></span>
                   </span>
                   <UiButton :to="`/contribute/album/${use.album_id}`" size="xs">编辑专辑</UiButton>
+                </li>
+              </ul>
+            </template>
+
+            <template v-if="image.usage.artists.length">
+              <h3 class="mt-4 font-medium">艺术家图片</h3>
+              <ul class="mt-2 divide-y divide-slate-100">
+                <li v-for="use in image.usage.artists" :key="use.id" class="flex flex-wrap items-center justify-between gap-2 py-2">
+                  <span>
+                    <NuxtLink :to="`/artists/${use.artist_id}`" target="_blank" class="underline">#{{ use.artist_id }} {{ use.name }}</NuxtLink>
+                    <span class="ml-2 text-slate-500">{{ artistImageKindLabels[use.kind] ?? use.kind }}<template v-if="use.is_primary">（主图）</template><template v-if="use.label"> · {{ use.label }}</template></span>
+                  </span>
+                  <UiButton :to="`/contribute/artist/${use.artist_id}`" size="xs">编辑艺术家</UiButton>
                 </li>
               </ul>
             </template>

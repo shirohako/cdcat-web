@@ -21,6 +21,9 @@ export const useImageUpload = () => {
   const limits = computed(() => ({
     coverMinSize: schema.value?.limits?.cover_min_size ?? 500,
     tolerance: schema.value?.limits?.cover_square_tolerance ?? 0.02,
+    avatarMinSize: schema.value?.limits?.avatar_min_size ?? 200,
+    bannerMinWidth: schema.value?.limits?.banner_min_width ?? 1200,
+    bannerMinRatio: schema.value?.limits?.banner_min_ratio ?? 1.5,
     maxBytes: schema.value?.limits?.image_max_bytes ?? 25 * 1024 * 1024,
   }))
 
@@ -43,5 +46,15 @@ export const useImageUpload = () => {
     return null
   }
 
-  return { limits, upload, importUrl, coverProblem }
+  /** Whether an image may be an artist's avatar: square within the tolerance and large enough. */
+  const avatarProblem = (width: number, height: number): 'too_small' | 'not_square' | null => {
+    if (Math.min(width, height) < limits.value.avatarMinSize) return 'too_small'
+    if (!isSquare(width, height, limits.value.tolerance)) return 'not_square'
+    return null
+  }
+
+  /** Whether an image may be an artist's banner: wide enough, and at least banner_min_ratio times as wide as tall. */
+  const bannerFits = (width: number, height: number) => width >= limits.value.bannerMinWidth && width >= height * limits.value.bannerMinRatio
+
+  return { limits, upload, importUrl, coverProblem, avatarProblem, bannerFits }
 }

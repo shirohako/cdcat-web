@@ -81,12 +81,6 @@
       </div>
     </div>
 
-    <div v-if="editor.albumId" class="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-line px-5 py-4">
-      <h3 class="text-sm font-semibold text-body">{{ $t('editor.album.other_names') }}</h3>
-      <p class="text-xs text-meta">{{ $t('editor.album.other_names_moved') }}</p>
-      <UiButton size="xs" icon="lucide:languages" class="ml-auto ring-1 ring-inset ring-line" @click="editor.go('translate')">{{ $t('editor.translate.title') }}</UiButton>
-    </div>
-
     <div class="border-t border-line px-5 py-4">
       <h3 class="mb-3 text-sm font-semibold text-body">{{ $t('editor.advanced') }}</h3>
       <div class="grid gap-4 sm:grid-cols-2">
@@ -95,11 +89,8 @@
           <input v-model="album.slug" class="input input-sm w-full font-mono" :class="{ 'input-error': errorAt('slug') }" placeholder="my-album-2024">
           <span v-if="errorAt('slug')" class="mt-1 block text-xs text-danger">{{ errorAt('slug') }}</span>
         </label>
-        <label class="block">
-          <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.banner_url') }}</span>
-          <input v-model="album.banner_url" type="url" class="input input-sm w-full" placeholder="https://">
-        </label>
-        <label class="flex items-center gap-2 text-sm text-body">
+        <!-- Level with the slug's input: as tall, below a label's height (an error under the input doesn't move it). -->
+        <label class="flex h-8 items-center gap-2 self-start text-sm text-body sm:mt-5">
           <input v-model="album.is_adult" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.album.is_adult') }}
         </label>
       </div>

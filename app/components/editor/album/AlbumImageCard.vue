@@ -21,6 +21,17 @@
         <input v-model="image.label" class="input input-sm w-full" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')" :aria-label="$t('catalog.field.label')">
         <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-full" :aria-label="$t('editor.image.scope')" @change="setScope" />
         <span class="flex justify-end gap-1">
+          <!-- Another cover or banner becomes the main one only from here; one that doesn't fit says why. -->
+          <UiButton
+            v-if="mainKind"
+            :icon="Star"
+            icon-class="size-3.5"
+            size="sm"
+            class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
+            :disabled="!!mainProblem"
+            :title="mainProblem || undefined"
+            @click="useAsMain(album, image)"
+          >{{ $t(`editor.image.use_as_${mainKind}`) }}</UiButton>
           <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="emit('move', -1)" />
           <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="emit('move', 1)" />
           <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="removeImage(album, imageId)" />
@@ -40,8 +51,8 @@
 import type { CatalogImage } from '~/types/catalog'
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { ArrowDown, ArrowUp, GripVertical, Trash2 } from '@lucide/vue'
-import { removeImage, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
+import { ArrowDown, ArrowUp, GripVertical, Star, Trash2 } from '@lucide/vue'
+import { removeImage, sortedDiscs, sortedProducts, useAsMain } from '~/utils/albumDocument'
 import { byOrder, sameId } from '~/utils/documentRows'
 
 /**
@@ -55,6 +66,7 @@ const editor = useAlbumEditor()
 const { enumLabel } = useCatalogDisplay()
 const { t } = useI18n()
 const imageKindOptions = useImageKindOptions()
+const { limits, coverProblem, bannerFits } = useImageUpload()
 
 const album = computed(() => editor.album.value)
 const image = computed(() => album.value.images.find(row => sameId(row.id, props.imageId)) ?? null)
@@ -63,7 +75,14 @@ const bonuses = computed(() => byOrder(album.value.bonuses))
 const discs = computed(() => sortedDiscs(album.value))
 const file = computed(() => image.value ? editor.references.images?.[String(image.value.image_id)] as CatalogImage | undefined : undefined)
 const errors = computed(() => editor.errorsIn(`images.${props.imageId}`))
-const kindOptions = computed(() => imageKindOptions(image.value?.kind))
+const kindOptions = computed(() => imageKindOptions())
+/** A cover or banner of the gallery can become the main one, when it is the right shape and size. */
+const mainKind = computed(() => image.value?.kind === 'cover' || image.value?.kind === 'banner' ? image.value.kind : null)
+const mainProblem = computed(() => {
+  if (!mainKind.value || !file.value) return mainKind.value ? t('editor.image.missing') : ''
+  if (mainKind.value === 'banner') return bannerFits(file.value.width, file.value.height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, ratio: limits.value.bannerMinRatio })
+  return coverProblem(file.value.width, file.value.height) ? t('editor.image.cover_rules', { size: limits.value.coverMinSize }) : ''
+})
 const scopeOptions = computed<UiSelectOption<string>[]>(() => [
   { value: 'album', label: t('editor.image.scope_album') },
   ...products.value.map(product => ({ value: `p:${product.id}`, label: product.name || product.catalog_number || enumLabel('edition_type', product.edition_type), group: t('catalog.collection.products') })),
