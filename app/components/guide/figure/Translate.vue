@@ -1,7 +1,8 @@
 <script setup lang="ts">
 /**
- * 翻译曲目表: the translator set to official English names, its progress in the corner, and the made-up album's rows,
- * each original above its box: three filled in, two left for later.
+ * 翻译曲目表: the album's translations as tabs (official English open, a Chinese one beside it) with 新建翻译 and the
+ * language and kind it asks for, the progress in the corner, and the made-up album's rows, each original above its
+ * box: three filled in, two left for later.
  */
 defineProps<{ text: Record<string, string> }>()
 const { t } = useI18n()
@@ -21,13 +22,25 @@ const ROWS = computed(() => [
     <template #actions>
       <span class="text-[11px] text-meta">{{ t('editor.translate.progress', { done: 3, total: 5 }) }}</span>
     </template>
-    <div class="flex flex-wrap items-end gap-2">
-      <GuideMockField :n="1" :label="t('editor.translate.language')" :value="localeName('en')" select class="w-32" />
-      <GuideMockField :n="2" :label="t('catalog.field.kind')" :value="t('catalog.title_kind.official')" select class="w-32" />
+    <div class="flex flex-wrap items-center gap-1.5 text-[11px]">
+      <span class="inline-flex h-6 items-center gap-1.5 rounded-md bg-primary/12 px-2 font-semibold text-primary ring-1 ring-inset ring-primary/30">
+        {{ localeName('en') }}<span class="font-normal opacity-75">· {{ t('catalog.title_kind.official') }} 3/5</span>
+      </span>
+      <span class="inline-flex h-6 items-center gap-1.5 rounded-md bg-btn px-2 text-body">
+        {{ localeName('zh-Hans') }}<span class="opacity-75">· {{ t('catalog.title_kind.translation') }} 5/5</span>
+      </span>
+      <span class="relative inline-flex h-6 items-center gap-1 rounded-md border border-dashed border-primary/40 px-2 font-semibold text-primary">
+        <GuideMockMarker :n="1" class="absolute -left-1.5 -top-1.5" />
+        <Icon name="lucide:plus" class="size-3" />{{ t('editor.translate.new') }}
+      </span>
+    </div>
+    <div class="mt-2 flex flex-wrap items-end gap-2 rounded-md bg-sunken/60 p-2">
+      <GuideMockField :n="2" :label="t('editor.names.question')" :value="t('editor.names.official')" select class="w-36" />
+      <GuideMockField :n="3" :label="t('editor.translate.language')" :value="localeName('en')" select class="w-32" />
       <p class="min-w-40 flex-1 pb-1.5 text-[10px] leading-3.5 text-meta">{{ t('editor.translate.kind_hint.official') }}</p>
     </div>
     <div class="relative mt-3 divide-y divide-line rounded-md ring-1 ring-line">
-      <GuideMockMarker :n="3" class="absolute -left-1.5 -top-1.5 z-10" />
+      <GuideMockMarker :n="4" class="absolute -left-1.5 -top-1.5 z-10" />
       <div v-for="(row, index) in ROWS" :key="index">
         <p v-if="row.heading" class="bg-sunken px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-meta">{{ row.heading }}</p>
         <div class="px-2.5 py-1.5">

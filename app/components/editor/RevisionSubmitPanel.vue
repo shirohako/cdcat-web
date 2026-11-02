@@ -20,6 +20,9 @@
       </div>
     </details>
 
+    <!-- What the editor adds before the buttons, which stay last (the album editor's new items). -->
+    <slot />
+
     <div v-if="errors.length" class="alert alert-error block text-sm">
       <p class="mb-1 font-semibold">{{ $t('editor.fix_errors') }}</p>
       <ul class="list-inside list-disc space-y-0.5">
@@ -40,8 +43,8 @@
       <UiButton variant="primary" class="shadow-xs active:translate-y-px" :disabled="!totalChanges" :loading="draft.busy.value" @click="submit">
         {{ $t(canAutoApprove ? 'editor.submit_publish' : 'editor.submit_review') }}
       </UiButton>
-      <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</UiButton>
-      <UiButton v-if="draft.persisted.value" variant="danger-soft" size="sm" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
+      <UiButton class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</UiButton>
+      <UiButton v-if="draft.persisted.value" variant="danger-soft" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
       <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
 

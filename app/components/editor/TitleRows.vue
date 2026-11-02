@@ -1,16 +1,16 @@
 <template>
   <div class="space-y-2">
-    <p class="text-xs text-meta">{{ $t('editor.names_hint') }}</p>
-    <ul v-if="rows.length" class="space-y-1.5">
-      <EditorListRow v-for="row in rows" :key="row.id" :invalid="!row.title.trim()" @edit="edit(row)" @remove="remove(row)">
+    <p class="text-xs text-meta">{{ hint }}</p>
+    <ul v-if="shown.length" class="space-y-1.5">
+      <EditorListRow v-for="row in shown" :key="row.id" :invalid="!row.title.trim()" @edit="edit(row)" @remove="remove(row)">
         <span class="min-w-0 truncate text-sm font-medium text-title">{{ row.title || '—' }}</span>
-        <span class="shrink-0 rounded-md px-1.5 py-0.5 text-[11px]" :class="GROUPS[groupOf(row.kind)].chip">{{ enumLabel('title_kind', row.kind) }}</span>
+        <span class="shrink-0 rounded-md px-1.5 py-0.5 text-[11px]" :class="TITLE_GROUPS[titleGroupOf(row.kind)].chip">{{ enumLabel('title_kind', row.kind) }}</span>
         <span v-if="row.locale" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content" :title="row.locale">{{ localeName(row.locale) }}</span>
       </EditorListRow>
     </ul>
     <EditorAddButton @click="edit(null)">{{ $t('editor.add_name') }}</EditorAddButton>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.name_edit' : 'editor.add_name')" :description="$t('editor.names_hint')" :icon="Type" @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.name_edit' : 'editor.add_name')" :description="hint" :icon="Type" @submit="save">
       <div class="space-y-5">
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.title') }}</span>
@@ -18,11 +18,11 @@
           <span v-if="tried && !form.title.trim()" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.name_required') }}</span>
         </label>
 
-        <fieldset>
+        <fieldset v-if="groups.length > 1">
           <legend class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.names.question') }}</legend>
-          <div class="grid gap-2 sm:grid-cols-3">
+          <div class="grid gap-2" :class="groups.length > 2 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'">
             <button
-              v-for="(group, key) in GROUPS"
+              v-for="(group, key) in offered"
               :key="key"
               type="button"
               class="flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-colors"
@@ -79,7 +79,7 @@
             <ChevronDown :size="13" class="ml-auto shrink-0 transition-transform group-open:rotate-180" />
           </summary>
           <ul class="mt-2 list-disc space-y-1 pl-4 leading-5">
-            <li v-for="line in TIPS" :key="line">{{ $t(`editor.names.tip_${line}`) }}</li>
+            <li v-for="line in TITLE_TIPS" :key="line">{{ $t(`editor.names.tip_${line}`) }}</li>
           </ul>
         </details>
       </div>
@@ -92,34 +92,31 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
 import type { CatalogTitleKind } from '~/types/catalog'
 import type { TitleRow } from '~/types/document'
-import { BadgeCheck, ChevronDown, Languages, Lightbulb, Tags, Type } from '@lucide/vue'
+import type { TitleGroup } from '~/utils/titleGroups'
+import { ChevronDown, Lightbulb, Type } from '@lucide/vue'
 import { COMMON_LANGUAGES, isReading, READINGS } from '~/utils/contentLanguages'
 import { newKey } from '~/utils/documentKeys'
 import { nextOrder } from '~/utils/documentRows'
+import { TITLE_GROUPS, TITLE_TIPS, titleGroupOf } from '~/utils/titleGroups'
 
 /**
  * Other names of an aggregate, added and edited in a dialog. Instead of picking one of the five
- * title kinds, the editor says what sort of name it is and in which language, and the kind follows:
- * official → official; translation → translation, or transliteration for a reading such as ja-Latn;
- * other → alias, or abbreviation when ticked.
+ * title kinds, the editor says what sort of name it is and in which language, and the kind follows
+ * (utils/titleGroups). `groups` keeps it to some of the sorts: the album's translator lists only its
+ * aliases here, its translations being whole tracklists.
  */
 const rows = defineModel<TitleRow[]>({ required: true })
+const props = withDefaults(defineProps<{ groups?: TitleGroup[] }>(), { groups: () => ['official', 'translation', 'alias'] })
 const { t } = useI18n()
 const { enumLabel, localeName } = useCatalogDisplay()
 
-type Group = 'official' | 'translation' | 'alias'
-
-const GROUPS: Record<Group, { icon: Component, active: string, text: string, chip: string }> = {
-  official: { icon: BadgeCheck, active: 'border-blue-400 bg-blue-50/70 ring-1 ring-blue-200 dark:bg-blue-400/15 dark:ring-blue-400/25', text: 'text-blue-700 dark:text-blue-300', chip: 'bg-blue-50 text-blue-700 dark:bg-blue-400/15 dark:text-blue-300' },
-  translation: { icon: Languages, active: 'border-emerald-400 bg-emerald-50/70 ring-1 ring-emerald-200 dark:bg-emerald-400/15 dark:ring-emerald-400/25', text: 'text-emerald-700 dark:text-emerald-300', chip: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300' },
-  alias: { icon: Tags, active: 'border-meta bg-sunken ring-1 ring-line', text: 'text-title', chip: 'bg-btn text-btn-content' },
-}
-const TIPS = ['shown', 'count', 'search', 'unsure'] as const
-const groupOf = (kind: CatalogTitleKind): Group =>
-  kind === 'official' ? 'official' : kind === 'translation' || kind === 'transliteration' ? 'translation' : 'alias'
+type Group = TitleGroup
+const groupOf = titleGroupOf
+const offered = computed(() => Object.fromEntries(props.groups.map(key => [key, TITLE_GROUPS[key]])) as Partial<typeof TITLE_GROUPS>)
+const shown = computed(() => rows.value.filter(row => props.groups.includes(groupOf(row.kind as CatalogTitleKind))))
+const hint = computed(() => props.groups.length === 1 && props.groups[0] === 'alias' ? t('editor.names.alias_hint') : t('editor.names_hint'))
 
 const remove = (row: TitleRow) => {
   const index = rows.value.indexOf(row)
@@ -159,7 +156,7 @@ const localeProblem = computed(() => {
 const edit = (row: TitleRow | null) => {
   editing.value = row
   form.title = row?.title ?? ''
-  form.group = row ? groupOf(row.kind) : 'translation'
+  form.group = row ? groupOf(row.kind) : props.groups.includes('translation') ? 'translation' : props.groups[0]!
   form.locale = row?.locale ?? ''
   form.abbreviation = row?.kind === 'abbreviation'
   tried.value = false

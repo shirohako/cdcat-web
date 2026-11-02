@@ -133,11 +133,11 @@
                   :draft="draft" :originals="originals" :labels="itemLabels"
                   :required="requiredChecks.filter(check => !check.done)" :suggested="suggested"
                   @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" @go="go($event as AlbumSection)"
-                />
+                >
+                  <EditorAlbumNewItems />
+                </EditorRevisionSubmitPanel>
               </div>
             </CatalogSection>
-
-            <EditorAlbumNewItems v-if="active === 'submit'" />
           </main>
         </div>
 
