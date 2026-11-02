@@ -15,7 +15,8 @@ interface EventImportRun {
   id: number
   source: string
   // What the bundle says about itself (docs/events/README.md#导入包).
-  params: { file?: { name: string, bytes: number }, edition?: { key: string, name: string }, created_at?: string }
+  // auto_apply: sent by a harvester with its token, applied by itself when the preview is clean (#一键上传).
+  params: { file?: { name: string, bytes: number }, edition?: { key: string, name: string }, created_at?: string, auto_apply?: boolean }
   status: 'queued' | 'running' | 'ready' | 'applying' | 'applied' | 'failed'
   summary: ImportSummary | null
   error: string | null
@@ -91,9 +92,9 @@ const uploadBundle = async () => {
   }
 }
 const bundleLine = (run: EventImportRun) => {
-  const { file, edition, created_at: createdAt } = run.params
+  const { file, edition, created_at: createdAt, auto_apply: fromHarvester } = run.params
   if (!file) return ''
-  return `导入包：${edition?.name ?? '—'} · ${file.name}（${`${(file.bytes / 1024 / 1024).toFixed(1)} MB`}）· ${createdAt ? new Date(createdAt).toLocaleString() : '—'} 生成`
+  return `导入包：${edition?.name ?? '—'} · ${file.name}（${`${(file.bytes / 1024 / 1024).toFixed(1)} MB`}）· ${createdAt ? new Date(createdAt).toLocaleString() : '—'} 生成${fromHarvester ? ' · 采集器上传，无问题时自动应用' : ''}`
 }
 const applyImport = async (run: EventImportRun) => {
   busy.value = true
@@ -186,7 +187,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
     <template v-if="tab === 'import'">
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">导入</h2>
-        <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
+        <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。采集器也能用令牌直接上传，预览无问题时自动应用。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
         <UiButton variant="primary" icon="lucide:upload" class="mt-4" :disabled="busy || Boolean(working)" @click="bundleInput?.click()">{{ busy ? '正在上传…' : '上传导入包' }}</UiButton>
         <input ref="bundleInput" type="file" accept=".zip,application/zip" class="hidden" :disabled="busy || Boolean(working)" @change="uploadBundle">
       </section>
