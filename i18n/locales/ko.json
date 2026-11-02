@@ -1247,6 +1247,7 @@
     "entry_desc": "애니메이션, 영화, 드라마, 게임 등 다양한 작품을 둘러보세요",
     "entries_count": "작품 {count}개",
     "albums_count": "앨범 {count}장",
+    "booths_count": "부스 {count}개",
     "no_series": "아직 시리즈가 없어요",
     "linked_entries": "관련 작품",
     "albums_by_time": "앨범 (발매순)",

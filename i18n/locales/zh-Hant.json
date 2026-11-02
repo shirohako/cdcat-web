@@ -1247,6 +1247,7 @@
     "entry_desc": "瀏覽動畫、電影、影集、遊戲等條目",
     "entries_count": "{count} 個條目",
     "albums_count": "{count} 張專輯",
+    "booths_count": "{count} 個攤位",
     "no_series": "目前沒有系列",
     "linked_entries": "已連結條目",
     "albums_by_time": "專輯（依時間）",

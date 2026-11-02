@@ -1247,6 +1247,7 @@
     "entry_desc": "Explore anime, films, series, games, and more",
     "entries_count": "{count} entries",
     "albums_count": "{count} releases",
+    "booths_count": "{count} booths",
     "no_series": "No series yet",
     "linked_entries": "Linked entries",
     "albums_by_time": "Releases by date",

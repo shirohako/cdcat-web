@@ -799,6 +799,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                   albums_count: 0,
                   artists_count: 0,
                   released_albums_count: 214,
+                  booths_count: 1520,
                   created_at: '2026-10-10T00:00:00Z',
                   updated_at: '2026-10-26T03:00:00Z',
                 }],

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Calendar, CalendarDays, Disc3, ExternalLink, MapPin } from '@lucide/vue'
+import { ArrowLeft, Calendar, CalendarDays, Disc3, ExternalLink, MapPin, Store } from '@lucide/vue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { namedLd } from '~/utils/structuredData'
 import { plainText } from '~/utils/seoText'
@@ -14,6 +14,7 @@ interface SeriesEvent {
   location: string | null
   main_visual_url: string | null
   released_albums_count: number
+  booths_count: number
 }
 
 interface SeriesEventPage {
@@ -224,6 +225,10 @@ usePageSeo({
                     {{ t('content_display.albums_count', { count: event.released_albums_count }) }}
                   </NuxtLink>
                   <span v-else class="truncate">{{ t('content_display.albums_count', { count: 0 }) }}</span>
+                </p>
+                <p class="flex gap-1.5">
+                  <span class="shrink-0"><Store class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>
+                  <span class="truncate">{{ t('content_display.booths_count', { count: event.booths_count.toLocaleString() }) }}</span>
                 </p>
                 <p v-if="event.venue || event.location" class="flex gap-1.5">
                   <span class="shrink-0"><MapPin class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>

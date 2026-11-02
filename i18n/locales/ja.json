@@ -1247,6 +1247,7 @@
     "entry_desc": "アニメ、映画、ドラマ、ゲームなどの作品を探す",
     "entries_count": "{count}作品",
     "albums_count": "{count}リリース",
+    "booths_count": "{count}サークル",
     "no_series": "シリーズはまだありません",
     "linked_entries": "関連作品",
     "albums_by_time": "リリース（時系列）",
