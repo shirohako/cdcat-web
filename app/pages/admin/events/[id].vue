@@ -17,8 +17,10 @@ interface EventImportRun {
   // What the bundle says about itself (docs/events/README.md#导入包).
   // auto_apply: sent by a harvester with its token, applied by itself when the preview is clean (#一键上传).
   params: { file?: { name: string, bytes: number }, edition?: { key: string, name: string }, created_at?: string, auto_apply?: boolean }
-  status: 'queued' | 'running' | 'ready' | 'applying' | 'applied' | 'failed'
+  status: 'collecting' | 'queued' | 'running' | 'ready' | 'applying' | 'applied' | 'failed'
   summary: ImportSummary | null
+  // A bundle in several volumes: the ones still to come (docs/events/README.md#分卷).
+  missing_volumes: number[]
   error: string | null
   creator: { username: string, nickname: string | null } | null
   applier: { username: string, nickname: string | null } | null
@@ -31,7 +33,7 @@ const route = useRoute()
 const router = useRouter()
 const eventId = Number(route.params.id)
 const { $api } = useNuxtApp()
-const eventVenueStatusLabels: Record<string, string> = { queued: '排队中', running: '检查中', ready: '待确认', applying: '应用中', applied: '已应用', failed: '失败' }
+const eventVenueStatusLabels: Record<string, string> = { collecting: '等其余分卷', queued: '排队中', running: '检查中', ready: '待确认', applying: '应用中', applied: '已应用', failed: '失败' }
 const eventVenueTabLabels: Record<string, string> = { import: '导入', booths: '摊位', venue: '会场' }
 
 const { data: event, error: eventError } = await useAsyncData(`admin-event-${eventId}`, () => $api<EventDetail>(`/v1/events/${eventId}`))
@@ -72,20 +74,24 @@ watch(() => latest.value?.status, (status, before) => {
 })
 onBeforeUnmount(stopPolling)
 
-// A bundle the harvester made for this event: checked, kept and previewed by the site.
+// A bundle the harvester made for this event: checked, kept and previewed by the site. A bundle in several
+// volumes can be picked at once (or a few at a time); the site previews it once every volume is in.
 const uploadBundle = async () => {
-  const file = bundleInput.value?.files?.[0]
-  if (!file || busy.value) return
+  const files = [...(bundleInput.value?.files ?? [])]
+  if (!files.length || busy.value) return
   busy.value = true
   message.value = ''
   notice.value = ''
   try {
-    const form = new FormData()
-    form.append('bundle', file)
-    await $api(`/v1/admin/events/${eventId}/imports`, { method: 'POST', body: form })
+    for (const file of files) {
+      const form = new FormData()
+      form.append('bundle', file)
+      await $api(`/v1/admin/events/${eventId}/imports`, { method: 'POST', body: form })
+    }
     await refreshImports()
   } catch (e) {
     message.value = (e as { statusCode?: number }).statusCode === 413 ? '导入包太大，超过了服务器的上传上限。' : bundleError(e)
+    await refreshImports()
   } finally {
     busy.value = false
     if (bundleInput.value) bundleInput.value.value = ''
@@ -109,7 +115,7 @@ const applyImport = async (run: EventImportRun) => {
   }
 }
 const statusClass = (status: EventImportRun['status']) => ({
-  queued: 'bg-slate-100 text-slate-600', running: 'bg-sky-100 text-sky-700', ready: 'bg-amber-100 text-amber-800',
+  collecting: 'bg-slate-100 text-slate-600', queued: 'bg-slate-100 text-slate-600', running: 'bg-sky-100 text-sky-700', ready: 'bg-amber-100 text-amber-800',
   applying: 'bg-sky-100 text-sky-700', applied: 'bg-emerald-100 text-emerald-700', failed: 'bg-red-100 text-red-700',
 })[status]
 
@@ -187,9 +193,9 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
     <template v-if="tab === 'import'">
       <section class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">导入</h2>
-        <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。采集器也能用令牌直接上传，预览无问题时自动应用。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
+        <p class="mt-1 text-sm text-slate-600">上传采集器为这一届生成的活动导入包（.zip），先生成预览，确认后再应用。采集器也能用令牌直接上传，预览无问题时自动应用。超过 50 MB 的包分成几卷（…-1of3.zip），一起选上传，收齐后才预览。导入只把有把握的摊位关联到已有的艺术家，不会新建艺术家；其余的在「摊位」页核对。再次导入会更新现有摊位，核对过的和手动设置的关联会保留。导入包的生成方法见采集器说明里的「活动导入包」。</p>
         <UiButton variant="primary" icon="lucide:upload" class="mt-4" :disabled="busy || Boolean(working)" @click="bundleInput?.click()">{{ busy ? '正在上传…' : '上传导入包' }}</UiButton>
-        <input ref="bundleInput" type="file" accept=".zip,application/zip" class="hidden" :disabled="busy || Boolean(working)" @change="uploadBundle">
+        <input ref="bundleInput" type="file" accept=".zip,application/zip" multiple class="hidden" :disabled="busy || Boolean(working)" @change="uploadBundle">
       </section>
 
       <section v-if="latest" class="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
@@ -202,6 +208,7 @@ useHead({ title: computed(() => event.value ? `${event.value.name} · 会场与�
           <UiButton v-if="latest.status === 'ready'" variant="primary" :disabled="busy" @click="applyImport(latest)">应用导入</UiButton>
         </div>
         <p v-if="bundleLine(latest)" class="text-xs text-slate-500">{{ bundleLine(latest) }}</p>
+        <p v-if="latest.status === 'collecting'" class="text-sm text-slate-600">还缺第 {{ latest.missing_volumes.join('、') }} 卷：上传它们后开始预览。</p>
         <p v-if="working" class="text-sm text-slate-500">正在处理，页面会自动刷新…</p>
         <p v-if="latest.error" role="alert" class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ latest.error }}</p>
 
