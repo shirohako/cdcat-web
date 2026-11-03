@@ -2646,7 +2646,7 @@
     "paste_credits": {
       "button": "Paste credits",
       "title": "Paste credits",
-      "hint": "Paste a whole credit list from the booklet, a shop page or a VGMdb note, one role per line. Hover over an example below to see what it reads by itself.",
+      "hint": "Paste a whole credit list from the booklet, a shop page or a note on a music database.\nHover over an example below to see the formats it reads by itself.\nIf a format is not supported or something is read wrong, let the admin team know at any time.",
       "existing": "Existing artists",
       "new": "New artist",
       "namesakes": "{count} artists of this name",

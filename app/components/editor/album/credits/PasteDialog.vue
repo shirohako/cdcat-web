@@ -212,7 +212,7 @@ const apply = () => {
 <template>
   <EditorModal v-model="open" :title="t('editor.paste_credits.title')" wide as="div">
     <div class="space-y-3">
-      <p class="text-sm text-body">{{ t('editor.paste_credits.hint') }}</p>
+      <p class="whitespace-pre-line text-sm text-body">{{ t('editor.paste_credits.hint') }}</p>
       <div class="flex flex-wrap items-center gap-2 text-xs">
         <span class="text-meta">{{ t('editor.paste_credits.examples') }}</span>
         <UiTooltip v-for="(example, index) in EXAMPLES" :key="example.key" placement="bottom-start" :delay="150" group="paste-examples" class="w-[26rem] max-w-[calc(100vw-2rem)]">
