@@ -44,6 +44,7 @@ const EXAMPLES = [
   { key: 'roles', text: 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nGuitar：Ken（全曲）\nVocal：ルナ（CV：星野あかり）\nArtist：Gardens feat. moon jelly（M2）\nIllustration：mochi' },
   { key: 'blocks', text: '01. 星屑のアトラス\n作詞・作曲：ミナト\n編曲：Yuki\n\n02. 夜明けのプリズム\nVocal：星野あかり\n\nDisc 2\n01. 星屑のアトラス (Instrumental)\n編曲：Yuki\n\nIllustration：mochi' },
   { key: 'notes', text: 'M1.プリズムにさよならを\n   Vocal:nayuta\n   Music&Lyric:鈴谷皆人\n   Guitar&Bass:花形真喜\n\nM-02.\nVocal: つぐ&るる\nVocal Recording Engineer: Yuhi Sumino\n\nIllust: K-ko' },
+  { key: 'lists', text: 'Composer: Kaito Mizuno (01, 10, 14)\nArranger: Kaito Mizuno (01, 10, 14)\n\nComposer: Starlit Sound, LLC. (02-09, 11-13)\nArranger: Starlit Sound, LLC. (02-09, 11-13)\nLyricist: Yuki (03, 05)' },
 ] as const
 
 const { t } = useI18n()

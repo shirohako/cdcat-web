@@ -2669,7 +2669,9 @@
       "blocks_title": "按曲目分塊",
       "blocks_points": "「01. 曲名」「M1」「Track 1」下面幾行算這首曲目的\n空一行結束，之後的行算整張專輯的\n單獨一行「Disc 2」之後的曲號在第 2 張碟上",
       "notes_title": "曲號加英文角色",
-      "notes_points": "「M1.曲名」「M-01.」一行開始一首曲目；下面縮排的行都算這首的，中間空幾行也不要緊\n每行之間都隔一個空行的文字，要空得更多才算這首結束\n角色和名字之間的冒號可以不帶空格，如「Vocal:nayuta」\n英文角色名和常見寫法：Vocal、Music、Lyric、Illust、Vocal Recording Engineer、Vo.、Gt.\n「Music&Lyric」「Guitar&Bass」拆成兩個角色；「つぐ&るる」這樣日文名之間的 & 是兩個人\n最後單獨一段（如「Illust」）算整張專輯的"
+      "notes_points": "「M1.曲名」「M-01.」一行開始一首曲目；下面縮排的行都算這首的，中間空幾行也不要緊\n每行之間都隔一個空行的文字，要空得更多才算這首結束\n角色和名字之間的冒號可以不帶空格，如「Vocal:nayuta」\n英文角色名和常見寫法：Vocal、Music、Lyric、Illust、Vocal Recording Engineer、Vo.、Gt.\n「Music&Lyric」「Guitar&Bass」拆成兩個角色；「つぐ&るる」這樣日文名之間的 & 是兩個人\n最後單獨一段（如「Illust」）算整張專輯的",
+      "lists_title": "英文角色加曲號列表",
+      "lists_points": "英文角色名後面跟名字，參與的曲號寫在後面的括號裡，如「(01, 10, 14)」\n兩位數的「02-09」是第 2 到第 9 首；一位數加兩位數的「2-03」才是第 2 張碟第 3 首\n公司名裡的逗號不拆開：「Starlit Sound, LLC.」「Co., Ltd.」「Inc.」算一個名字；用《》「」『』括起來的名字也不拆，括號會去掉\n每行算各自括號裡的曲目，中間空行不要緊"
     },
     "toc": {
       "button": "碟片 TOC（抓軌日誌裡的目錄）",

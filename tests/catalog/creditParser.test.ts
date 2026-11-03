@@ -77,6 +77,20 @@ describe('pasted credit lists', () => {
     expect([newArtistName('上杉 悟'), newArtistName('ナツメ\u3000ユウキ'), newArtistName('Aki Ra')]).toEqual(['上杉悟', 'ナツメユウキ', 'Aki Ra'])
   })
 
+  it('keeps a company suffix after a comma with the name, and reads ranges of zero-padded numbers', () => {
+    const { lines } = parse('Composer: dDedalus (01, 10, 14)\nArranger: ESTIMATE, LLC. (02-04, 11-12)\nArtist: Foo Co., Ltd.、Bar Inc. (M3)、Baz')
+    expect(lines.map(line => line.names.map(name => [name.name, tracks(name.tracks)]))).toEqual([
+      [['dDedalus', ['1-1', '1-10', '1-14']]],
+      [['ESTIMATE, LLC.', ['1-2', '1-3', '1-4', '1-11', '1-12']]],
+      [['Foo Co., Ltd.', null], ['Bar Inc.', ['1-3']], ['Baz', null]],
+    ])
+    const quoted = parse('Composer: 《ESTIMATE, LLC.》 (02-03, 15)\nArtist: 「A, B & C」、『D』 feat. 〈E, F〉（M1）').lines
+    expect(quoted.map(line => line.names.map(name => [name.name, tracks(name.tracks)]))).toEqual([
+      [['ESTIMATE, LLC.', ['1-2', '1-3', '1-15']]],
+      [['A, B & C', null], ['D', ['1-1']], ['E, F', ['1-1']]],
+    ])
+  })
+
   it('marks role words it doesn\'t know and skips lines that are no credits', () => {
     const { lines, skipped } = parse('Recording：Studio Moon\nThanks to everyone\n作曲 ミナト')
     expect(lines).toHaveLength(1)

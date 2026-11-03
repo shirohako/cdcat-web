@@ -11,6 +11,8 @@
 //      Vocal:つぐ&るる                         a blank line after every line ends a block only at a longer gap. "つぐ&るる":
 //                                              & between Japanese names parts two people
 //   Disc 2                                     numbers after it are on disc 2
+//   Composer: ESTIMATE, LLC. (02-09, 11-13)    a company suffix after a comma (LLC., Inc., Co., Ltd.) stays with the name
+//   Composer: 《ESTIMATE, LLC.》 (02-09)        so does what 《》「」『』〈〉“” wrap, the quotes taken off
 //
 // Role words are looked up by the caller (the role dictionary's names and other spellings); matching the
 // names to artists is the dialog's business.
@@ -77,6 +79,18 @@ const TRACK_ITEM = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~�
 const DISC_TRACK_ITEM = /^(\d)-(\d{2})$/
 const ALL_TRACKS = /^(?:全曲|全て|すべて|全部|all(?:\s*tracks)?)$/i
 const BRACKETS: Record<string, string> = { '（': '）', '(': ')', '［': '］', '[': ']', '【': '】' }
+/** Quotes around one name, "《ESTIMATE, LLC.》": nothing inside is split, and they are taken off the name. */
+const QUOTES: Record<string, string> = { '《': '》', '「': '」', '『': '』', '〈': '〉', '“': '”' }
+/** Brackets and quotes: no name is split inside either. */
+const GROUPS: Record<string, string> = { ...BRACKETS, ...QUOTES }
+
+/** "《A》" → "A", when the quotes wrap the whole name. */
+function unquote(name: string): string {
+  const close = QUOTES[name[0] ?? '']
+  if (!close || !name.endsWith(close) || name.length < 3) return name
+  const inner = name.slice(1, -1)
+  return inner.includes(name[0]!) || inner.includes(close) ? name : inner.trim()
+}
 /** The word before a 客串: "A feat. B", "A ft. B", "A featuring B", also "A feat.B" as booklets sometimes print it. */
 const FEATURING_WORD = /\s+(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)/gi
 /** A bracket that holds the 客串 instead of a detail: "A (feat. B)". */
@@ -110,13 +124,16 @@ function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
   return refs
 }
 
-/** Splits at the separators outside brackets: "A（M1、M2）、B" is two names. */
+/** What follows a comma in a company's name rather than another name: "ESTIMATE, LLC.", "Foo Co., Ltd." */
+const COMPANY_SUFFIX = /^(?:LLC|L\.L\.C|LLP|Inc|Ltd|Limited|Co|Corp|Corporation|PLC|GmbH|AG|S\.?A|S\.?L|B\.?V|Pty|K\.?K)\.?(?=$|[\s（(［[【])/i
+
+/** Splits at the separators outside brackets: "A（M1、M2）、B" is two names, "ESTIMATE, LLC." one. */
 function splitNames(text: string): string[] {
   const parts: string[] = []
   const closing: string[] = []
   let current = ''
   for (const char of text) {
-    if (BRACKETS[char]) closing.push(BRACKETS[char]!)
+    if (GROUPS[char]) closing.push(GROUPS[char]!)
     else if (char === closing[closing.length - 1]) closing.pop()
     if (!closing.length && /[、，,／/;；]/.test(char)) {
       parts.push(current)
@@ -125,7 +142,11 @@ function splitNames(text: string): string[] {
     else current += char
   }
   parts.push(current)
-  return parts.map(part => part.trim()).filter(Boolean)
+  return parts.map(part => part.trim()).filter(Boolean).reduce<string[]>((names, part) => {
+    if (names.length && COMPANY_SUFFIX.test(part)) names[names.length - 1] += `, ${part}`
+    else names.push(part)
+    return names
+  }, [])
 }
 
 /**
@@ -158,8 +179,8 @@ function splitAt(text: string, pattern: RegExp): string[] {
   for (const match of text.matchAll(pattern)) {
     let depth = 0
     for (const char of text.slice(0, match.index)) {
-      if (BRACKETS[char]) depth++
-      else if (depth && Object.values(BRACKETS).includes(char)) depth--
+      if (GROUPS[char]) depth++
+      else if (depth && Object.values(GROUPS).includes(char)) depth--
     }
     if (depth) continue
     pieces.push(text.slice(start, match.index).trim())
@@ -182,8 +203,8 @@ function parseNames(text: string, disc: number, offset = 0): ParsedCreditName[] 
   let host: number | undefined
   parts.forEach((part, partIndex) => {
     const { featured, ...parsed } = parseName(part, disc)
-    const people = splitAt(parsed.name, COLLAB_WORD)
-    const guests = featured.flatMap(other => splitAt(other, COLLAB_WORD))
+    const people = splitAt(parsed.name, COLLAB_WORD).map(unquote)
+    const guests = featured.flatMap(other => splitAt(other, COLLAB_WORD)).map(unquote)
     people.forEach((person, index) => {
       const last = index === people.length - 1
       const leads = partIndex === 0 || (last && partIndex < parts.length - 1)
@@ -192,7 +213,7 @@ function parseNames(text: string, disc: number, offset = 0): ParsedCreditName[] 
         detail: last ? parsed.detail : null,
         tracks: parsed.tracks,
         ...(leads ? {} : { featuring: true, host }),
-        ...(index === 0 && people.length > 1 ? { unit: { name: parsed.name, size: people.length } } : {}),
+        ...(index === 0 && people.length > 1 ? { unit: { name: unquote(parsed.name), size: people.length } } : {}),
       })
       if (leads) host = offset + names.length - 1
     })
