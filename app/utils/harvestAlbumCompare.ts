@@ -1,10 +1,20 @@
 import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
-import type { AggregateRef, AlbumDocument, RowId } from '~/types/document'
+import type { AggregateRef, AlbumDocument, ProductPrice, RowId } from '~/types/document'
 import type { HarvestMergedImage } from '~/types/harvest'
 import { addCredit, addDisc, addImage, addTrack, coverOf, firstProduct, removeDisc, removeTrack, setCover, setTitleIn } from '~/utils/albumDocument'
 import { sameName } from '~/utils/harvestPeople'
 import { newKey } from '~/utils/documentKeys'
+
+const PRICE_KINDS: Record<string, string> = { list: '定价', event: '会场价', shop: '通贩价', other: '其他价格' }
+/** The same price: kind, amount and currency (notes and tax may differ). */
+const samePrice = (a: ProductPrice, b: ProductPrice) => a.kind === b.kind && a.currency === b.currency && Number(a.amount) === Number(b.amount)
+/** 会场价 · C107 4000 JPY 含税, for the admin pages. */
+export const priceText = (price: ProductPrice) => [
+  [PRICE_KINDS[price.kind] ?? price.kind, price.note].filter(Boolean).join(' · '),
+  `${Number(price.amount)} ${price.currency}`,
+  price.tax_included === true ? '含税' : price.tax_included === false ? '不含税' : '',
+].filter(Boolean).join(' ')
 
 /**
  * What the sources of a candidate say against the album as it is now, or against the review draft (the harvest
@@ -128,14 +138,14 @@ function basicRows(ctx: CompareContext): CompareRow[] {
       apply: () => { firstProduct(album, true)!.barcode = product.barcode },
     })
   }
-  if (product?.price && !album.products.some(row => row.price !== null && Number(row.price) === Number(product.price) && row.currency === product.currency)) {
-    const price = (row: { price: string | null, currency: string | null } | null | undefined) => row?.price ? `${row.price} ${row.currency ?? ''}`.trim() : ''
+  const missingPrices = (product?.prices ?? []).filter(price => !album.products.some(row => row.prices.some(other => samePrice(other, price))))
+  if (product && missingPrices.length) {
+    const prices = (list: ProductPrice[] | undefined) => (list ?? []).map(priceText).join(' / ')
     rows.push({
-      key: 'price', group: 'basic', label: '价格', album: price(current), source: price(product), from: picked.price,
+      key: 'price', group: 'basic', label: '价格', album: prices(current?.prices), source: prices(product.prices), from: picked.price,
       apply: () => {
         const target = firstProduct(album, true)!
-        target.price = product.price
-        target.currency = product.currency
+        target.prices.push(...missingPrices.filter(price => !target.prices.some(other => samePrice(other, price))).map(price => ({ ...price })))
         target.region ??= product.region
       },
     })

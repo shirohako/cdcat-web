@@ -1902,6 +1902,7 @@
       "catalog_number": "品番",
       "barcode": "條碼",
       "price": "價格",
+      "prices": "價格",
       "currency": "貨幣",
       "is_hires": "高解析",
       "is_available": "在售",
@@ -1985,6 +1986,17 @@
     "product_medium": {
       "physical": "實體",
       "digital": "數位"
+    },
+    "price_kind": {
+      "list": "定價",
+      "event": "會場價",
+      "shop": "通販價",
+      "other": "其他價格"
+    },
+    "price_tax": {
+      "included": "含稅",
+      "excluded": "未稅",
+      "unknown": "未註明"
     },
     "lyric_format": {
       "plain": "純文字",
@@ -2739,7 +2751,13 @@
       "discs": "包含",
       "format_hint": "形態，由包含的碟推出",
       "unticked": "還沒有放進任何版本：{discs}",
-      "limited_name_placeholder": "如 Animate 限定"
+      "limited_name_placeholder": "如 Animate 限定",
+      "add_price": "新增價格",
+      "no_prices": "還沒有價格",
+      "price_note_placeholder": "備註，如 C107、メロンブックス",
+      "price_amount": "金額",
+      "price_tax": "稅",
+      "remove_price": "刪除這個價格"
     },
     "bonuses": {
       "hint": "店鋪和活動特典：周邊、特典 CD、下載碼。",

@@ -1,4 +1,5 @@
 import type { CatalogReferences, CatalogType } from '~/types/catalog'
+import type { ProductPrice } from '~/types/document'
 
 /** A field of an aggregate or collection row, as GET /catalog/schema exports it. */
 export interface SchemaField {
@@ -34,6 +35,7 @@ interface AggregateSchemaExport {
 export const useDocumentSchema = (type: MaybeRefOrGetter<CatalogType>) => {
   const { schema, roleName, attributeName } = useCatalogSchema()
   const { enumLabel } = useCatalogDisplay()
+  const { line: priceLine } = usePriceDisplay()
   const { t, te } = useI18n()
 
   const aggregate = computed(() => (schema.value?.aggregates?.[toValue(type)] ?? null) as AggregateSchemaExport | null)
@@ -46,6 +48,7 @@ export const useDocumentSchema = (type: MaybeRefOrGetter<CatalogType>) => {
   /** A readable label for a value of `field`, using the references that came with the document. */
   const valueLabel = (field: SchemaField | undefined, value: unknown, references: CatalogReferences = {}): string => {
     if (value === null || value === undefined || value === '') return '—'
+    if (field?.type === 'price_list' && Array.isArray(value)) return (value as ProductPrice[]).map(priceLine).join(' / ') || '—'
     if (Array.isArray(value)) return value.map(item => valueLabel(field, item, references)).join(', ') || '—'
     if (field?.type === 'aggregate' && field.target) return referenceLabel(field.target, value, references)
     if (field?.type === 'table' && field.target === 'link_providers') {

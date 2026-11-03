@@ -2,6 +2,7 @@
 
 import type { ApiResponse } from './api'
 import type { CatalogAttribute, CatalogCredit, CatalogImage, CatalogLink, CatalogTitle, CatalogTitleKind, PendingFields, UserSummary } from './catalog'
+import type { ProductPrice } from './document'
 import type { DatePrecision, EntryAlbumRelation, EntryType } from './entry'
 import type { TrackingStatus } from './tracking'
 
@@ -197,8 +198,7 @@ export interface AlbumProduct {
   release_date: string | null
   release_date_precision: DatePrecision | null
   region: string | null
-  price: string | null
-  currency: string | null
+  prices: ProductPrice[]
   is_hires: boolean
   is_available: boolean
   sort_order: number

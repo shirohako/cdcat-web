@@ -4,6 +4,7 @@ import type { CatalogImage } from '~/types/catalog'
 import type { AlbumDocument } from '~/types/document'
 import type { HarvestArtistReference, HarvestCandidateDetail, HarvestMergedImage, HarvestRemerge } from '~/types/harvest'
 import type { AlbumEditorHandle } from '~/utils/harvestAlbumCompare'
+import { priceText } from '~/utils/harvestAlbumCompare'
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft, withMerge } from '~/utils/harvestDraft'
 import { harvestFilters } from '~/utils/harvestFilters'
@@ -312,7 +313,7 @@ const host = (url: string) => {
 /** Whether the field comparison has anything to show: what the sources disagree on, and the numbers and price. */
 const comparesFields = computed(() => {
   const merged = detail.value?.candidate.merged
-  return Boolean(merged && (merged.title.alternatives.length || merged.catalog_numbers.value?.length || merged.price.value || merged.tracklist.alternatives.length))
+  return Boolean(merged && (merged.title.alternatives.length || merged.catalog_numbers.value?.length || merged.prices?.length || merged.tracklist.alternatives.length))
 })
 // Each group of the source comparison is a white card on the grey page, its title inside.
 const card = 'overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs'
@@ -567,11 +568,13 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                       <p v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="text-xs text-slate-500">{{ sourceName(alt.source) }}：<span class="font-mono">{{ alt.value.join(' / ') }}</span></p>
                     </dd>
                   </template>
-                  <template v-if="detail.candidate.merged.price.value">
+                  <template v-if="detail.candidate.merged.prices?.length">
                     <dt class="pt-0.5 text-xs text-slate-500">价格</dt>
                     <dd class="space-y-0.5 text-xs">
-                      <p class="tabular-nums">{{ detail.candidate.merged.price.value.amount }} {{ detail.candidate.merged.price.value.currency }}</p>
-                      <p v-for="alt in detail.candidate.merged.price.alternatives" :key="alt.source" class="tabular-nums text-slate-500">{{ sourceName(alt.source) }}：{{ alt.value.amount }}</p>
+                      <p v-for="(price, i) in detail.candidate.merged.prices" :key="i" class="tabular-nums">
+                        {{ priceText(price) }}
+                        <span class="text-slate-500">（{{ sourceName(price.source) }}）</span>
+                      </p>
                     </dd>
                   </template>
                   <template v-if="detail.candidate.merged.tracklist.alternatives.length">

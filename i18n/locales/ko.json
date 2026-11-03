@@ -1902,6 +1902,7 @@
       "catalog_number": "품번",
       "barcode": "바코드",
       "price": "가격",
+      "prices": "가격",
       "currency": "통화",
       "is_hires": "하이레조",
       "is_available": "판매 중",
@@ -1985,6 +1986,17 @@
     "product_medium": {
       "physical": "실물",
       "digital": "디지털"
+    },
+    "price_kind": {
+      "list": "정가",
+      "event": "행사가",
+      "shop": "통판가",
+      "other": "기타 가격"
+    },
+    "price_tax": {
+      "included": "세금 포함",
+      "excluded": "세금 별도",
+      "unknown": "표기 없음"
     },
     "lyric_format": {
       "plain": "일반 텍스트",
@@ -2739,7 +2751,13 @@
       "discs": "포함된 디스크",
       "format_hint": "포함된 디스크에 따라 정해지는 형태예요",
       "unticked": "아직 어느 에디션에도 포함되지 않은 디스크: {discs}",
-      "limited_name_placeholder": "예: Animate 한정"
+      "limited_name_placeholder": "예: Animate 한정",
+      "add_price": "가격 추가",
+      "no_prices": "아직 가격이 없습니다",
+      "price_note_placeholder": "메모 (예: C107, 멜론북스)",
+      "price_amount": "금액",
+      "price_tax": "세금",
+      "remove_price": "이 가격 삭제"
     },
     "bonuses": {
       "hint": "굿즈, 특전 CD, 다운로드 코드 같은 매장·행사 특전을 입력해요.",

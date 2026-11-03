@@ -30,7 +30,7 @@ const fullDate = (date: string) => date.length === 4 ? `${date}-01-01` : date.le
  * The album draft a harvest candidate starts as in the review page (docs/harvest/README.md#审核):
  * title and names, release date and event (the suggested first release and the sources' earliest
  * date), the description of the highest-priority source that has one, the circle as the
- * album's publisher (an album-wide 发行 credit), the tracklist, the edition's catalog number and price, credits and links. The circle
+ * album's publisher (an album-wide 发行 credit), the tracklist, the edition's catalog number and prices, credits and links. The circle
  * and the credited names are linked or created as the server suggests (utils/harvestPeople); the
  * names left to the reviewer stay printed names. The cover is picked by the reviewer, because only
  * a picked image is stored.
@@ -81,14 +81,13 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
   }
 
   const numbers = merged.catalog_numbers.value ?? []
-  const price = merged.price.value
-  if (numbers.length || merged.barcode.value || price) {
+  const prices = (merged.prices ?? []).map(({ kind, note, amount, currency, tax_included }) => ({ kind, note, amount, currency, tax_included }))
+  if (numbers.length || merged.barcode.value || prices.length) {
     addProduct(doc, {
       catalog_number: numbers.join(' / ') || null,
       barcode: merged.barcode.value,
-      price: price ? String(price.amount) : null,
-      currency: price?.currency ?? null,
-      region: price?.currency === 'JPY' ? 'JP' : null,
+      prices,
+      region: prices.some(price => price.currency === 'JPY') ? 'JP' : null,
     })
   }
 

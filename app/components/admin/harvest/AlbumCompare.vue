@@ -92,7 +92,7 @@ const rows = computed(() => {
     sourceItems: built.value.items.slice(1),
     picked: {
       title: merged.title.source, catalog: merged.catalog_numbers.source, barcode: merged.barcode.source,
-      price: merged.price.source, tracks: merged.tracklist.source, description: merged.descriptions[0]?.source ?? null,
+      price: merged.prices?.[0]?.source ?? null, tracks: merged.tracklist.source, description: merged.descriptions[0]?.source ?? null,
     },
     images: merged.images,
     catalogImages: { ...view.value.catalog_images, ...stored },

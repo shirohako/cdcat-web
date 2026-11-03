@@ -56,6 +56,7 @@ type OldAlbumArtist = { artist_id: AggregateRef | null, roles?: string[], credit
  * 艺术家与发行 rows become album-wide credits, one per role (艺术家, 发行 …), the old label rows, which
  * point at labels that are gone, are dropped, and so is the banner address, now a banner image. The cover gets marked
  * as the main one, so reordering the gallery can't make another the main cover. TOCs from before 2026-11-02 get no data track.
+ * An edition's one price (before 2026-11-03) becomes its list of prices, a 定价 whose tax is not stated.
  */
 export function upgradeAlbumDocument(doc: AlbumDocument) {
   delete (doc as AlbumDocument & { banner_url?: unknown }).banner_url
@@ -64,6 +65,12 @@ export function upgradeAlbumDocument(doc: AlbumDocument) {
   for (const track of doc.tracks as Array<AlbumDocument['tracks'][number] & { work_id?: unknown }>) delete track.work_id
   doc.track_originals ??= []
   for (const toc of doc.disc_tocs) toc.data_track ??= null
+  for (const product of doc.products as Array<AlbumProductRow & { price?: string | null, currency?: string | null }>) {
+    if (product.prices) continue
+    product.prices = product.price && product.currency ? [{ kind: 'list', note: null, amount: product.price, currency: product.currency, tax_included: null }] : []
+    delete product.price
+    delete product.currency
+  }
   const old = doc as AlbumDocument & { artists?: OldAlbumArtist[], labels?: unknown }
   for (const row of old.artists ?? []) {
     for (const role of row.roles?.length ? row.roles : ['artist']) {
@@ -231,7 +238,7 @@ export function blankProduct(doc: AlbumDocument, fields: Partial<AlbumProductRow
     id: newKey('p'), name: null, edition_type: 'regular',
     medium: discs.length && discs.every(disc => disc.format === 'digital') ? 'digital' : 'physical',
     limited_rule: null, limited_name: null, catalog_number: null, barcode: null, release_date: null, release_date_precision: 'day',
-    region: null, price: null, currency: null, is_hires: false, is_available: true, sort_order: nextOrder(doc.products),
+    region: null, prices: [], is_hires: false, is_available: true, sort_order: nextOrder(doc.products),
     disc_ids: discs.map(disc => disc.id), ...fields,
   }
 }

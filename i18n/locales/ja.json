@@ -1902,6 +1902,7 @@
       "catalog_number": "品番",
       "barcode": "バーコード",
       "price": "価格",
+      "prices": "価格",
       "currency": "通貨",
       "is_hires": "ハイレゾ",
       "is_available": "発売中",
@@ -1985,6 +1986,17 @@
     "product_medium": {
       "physical": "パッケージ",
       "digital": "配信"
+    },
+    "price_kind": {
+      "list": "定価",
+      "event": "会場価格",
+      "shop": "通販価格",
+      "other": "その他の価格"
+    },
+    "price_tax": {
+      "included": "税込",
+      "excluded": "税抜",
+      "unknown": "記載なし"
     },
     "lyric_format": {
       "plain": "テキスト",
@@ -2739,7 +2751,13 @@
       "discs": "収録ディスク",
       "format_hint": "収録ディスクから決まる形態",
       "unticked": "どのエディションにも含まれていません：{discs}",
-      "limited_name_placeholder": "例：アニメイト限定"
+      "limited_name_placeholder": "例：アニメイト限定",
+      "add_price": "価格を追加",
+      "no_prices": "価格はまだありません",
+      "price_note_placeholder": "メモ（例：C107、メロンブックス）",
+      "price_amount": "金額",
+      "price_tax": "税",
+      "remove_price": "この価格を削除"
     },
     "bonuses": {
       "hint": "店舗特典やイベント特典：グッズ、特典 CD、ダウンロードコード。",

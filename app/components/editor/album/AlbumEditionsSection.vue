@@ -32,7 +32,7 @@
               <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
               <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
               <span v-if="product.region">{{ product.region }}</span>
-              <span v-if="product.price">{{ product.price }} {{ product.currency ?? '' }}</span>
+              <span v-for="(price, i) in product.prices" :key="i">{{ priceLine(price) }}</span>
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
               <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
             </p>
@@ -96,20 +96,26 @@
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}</span>
             <CommonRegionSelect :model-value="form.region ?? ''" class="select-sm w-full" @update:model-value="form.region = $event || null" />
           </label>
-          <div class="flex gap-2">
-            <label class="block min-w-0 flex-1">
-              <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.price') }}</span>
-              <input v-model="form.price" class="input input-sm w-full" inputmode="decimal" placeholder="3300">
-            </label>
-            <label class="block w-24">
-              <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.currency') }}</span>
-              <input v-model="form.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies">
-            </label>
-          </div>
           <div class="flex items-end gap-5 pb-1.5 text-sm text-body">
             <label class="flex items-center gap-1.5"><input v-model="form.is_hires" type="checkbox" class="checkbox checkbox-sm">Hi-Res</label>
             <label class="flex items-center gap-1.5"><input v-model="form.is_available" type="checkbox" class="checkbox checkbox-sm">{{ $t('catalog.field.is_available') }}</label>
           </div>
+        </div>
+
+        <div>
+          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('catalog.field.prices') }}</p>
+          <p v-if="!form.prices.length" class="mb-2 text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>
+          <ul v-else class="mb-2 space-y-2">
+            <li v-for="(price, i) in form.prices" :key="i" class="grid grid-cols-2 gap-2 sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_auto] sm:items-center">
+              <UiSelect v-model="price.kind" :options="priceKindOptions" size="sm" class="w-full" />
+              <input v-model="price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')">
+              <input v-model="price.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies" :aria-label="$t('catalog.field.currency')">
+              <UiSelect v-model="price.tax_included" :options="taxOptions" size="sm" class="w-full" />
+              <input v-model="price.note" class="input input-sm col-span-2 w-full sm:col-span-1" maxlength="100" :placeholder="$t('editor.editions.price_note_placeholder')">
+              <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.editions.remove_price')" icon-class="size-3" size="xs" class="justify-self-end ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="form.prices.splice(i, 1)" />
+            </li>
+          </ul>
+          <EditorAddButton small @click="addPrice">{{ $t('editor.editions.add_price') }}</EditorAddButton>
         </div>
 
         <div>
@@ -138,7 +144,7 @@
 
 <script setup lang="ts">
 import type { AlbumProductRow } from '~/utils/albumDocument'
-import type { RowId } from '~/types/document'
+import type { PriceKind, RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
 import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
@@ -148,6 +154,7 @@ const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel, formatDate } = useCatalogDisplay()
 const { separator } = useListPunctuation()
+const { line: priceLine, kindLabel, taxLabel } = usePriceDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
@@ -157,6 +164,8 @@ const limitedRuleOptions = computed<UiSelectOption<string | null>[]>(() => [
   { value: null, label: '—' },
   ...(enums.value.limited_rule ?? []).map(value => ({ value, label: enumLabel('limited_rule', value) })),
 ])
+const priceKindOptions = computed<UiSelectOption<PriceKind>[]>(() => ((enums.value.price_kind ?? ['list', 'event', 'shop', 'other']) as PriceKind[]).map(value => ({ value, label: kindLabel(value) })))
+const taxOptions = computed<UiSelectOption<boolean | null>[]>(() => [true, false, null].map(value => ({ value, label: taxLabel(value) })))
 const products = computed(() => sortedProducts(album.value))
 const mainDiscs = computed(() => mainDiscsOf(album.value))
 const unticked = computed(() => untickedDiscs(album.value))
@@ -188,9 +197,19 @@ const edit = (product: AlbumProductRow | null) => {
   dialog.value = true
 }
 
+/** A new price in the currency of the one before it. */
+const addPrice = () => {
+  const prices = form.value?.prices
+  if (!prices) return
+  prices.push({ kind: 'list', note: null, amount: '', currency: prices.at(-1)?.currency ?? 'JPY', tax_included: null })
+}
+
 const save = () => {
   if (!form.value) return
-  const values = { ...form.value, name: form.value.name?.trim() || null, currency: form.value.currency?.trim().toUpperCase() || null }
+  const prices = form.value.prices
+    .map(price => ({ ...price, amount: String(price.amount ?? '').trim(), currency: price.currency.trim().toUpperCase(), note: price.note?.trim() || null }))
+    .filter(price => price.amount !== '')
+  const values = { ...form.value, name: form.value.name?.trim() || null, prices }
   if (values.edition_type !== 'limited') Object.assign(values, { limited_rule: null, limited_name: null })
   if (editing.value) Object.assign(editing.value, { ...values, id: editing.value.id, sort_order: editing.value.sort_order })
   else album.value.products.push(values)

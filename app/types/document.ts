@@ -8,6 +8,10 @@ import type { DatePrecision } from './entry'
 export type RowId = number | string
 export type AggregateRef = number | string
 
+/** One price of an edition (products.prices): kind list 定价 · event 会场价 · shop 通贩价 · other; tax_included null = not stated. */
+export type PriceKind = 'list' | 'event' | 'shop' | 'other'
+export interface ProductPrice { kind: PriceKind, note: string | null, amount: string, currency: string, tax_included: boolean | null }
+
 export interface TitleRow { id: RowId, title: string, locale: string | null, kind: CatalogTitleKind, sort_order?: number }
 export interface LinkRow { id: RowId, link_provider_id: number | null, url: string, sort_order?: number }
 export interface AttributeRow { id: RowId, key: string, value: unknown, sort_order?: number }
@@ -26,7 +30,7 @@ export interface AlbumDocument {
   products: Array<{
     id: RowId, name: string | null, edition_type: string, medium: string, limited_rule: string | null, limited_name: string | null,
     catalog_number: string | null, barcode: string | null, release_date: string | null, release_date_precision: DatePrecision,
-    region: string | null, price: string | null, currency: string | null, is_hires: boolean, is_available: boolean, sort_order?: number, disc_ids: RowId[]
+    region: string | null, prices: ProductPrice[], is_hires: boolean, is_available: boolean, sort_order?: number, disc_ids: RowId[]
   }>
   bonuses: Array<{
     id: RowId, name: string, type: string, description: string | null, is_digital: boolean, shop: string | null,

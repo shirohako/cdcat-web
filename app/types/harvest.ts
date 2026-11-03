@@ -3,6 +3,8 @@
  * harvester itself (settings, tasks, runs) is a separate program with its own page.
  */
 
+import type { ProductPrice } from './document'
+
 export interface HarvestEventSummary {
   id: number
   name: string
@@ -236,7 +238,8 @@ export interface HarvestMerged {
   }
   catalog_numbers: HarvestPicked<string[]>
   barcode: HarvestPicked<string>
-  price: HarvestPicked<{ amount: number, currency: string, note: string | null }>
+  /** Every source's prices, each once; missing on candidates merged before 2026-11-03 until they are merged again. */
+  prices?: HarvestPrice[]
   media: string[]
   kind_hint: string | null
   tracklist: {
@@ -382,3 +385,6 @@ export type HarvestRemerge = Pick<HarvestCandidateDetail, 'people' | 'circle_mat
   merged: HarvestMerged
   references: { artist?: Record<string, Record<string, unknown>> }
 }
+
+/** A price a source gave (merged.prices): products.prices plus where it came from. */
+export interface HarvestPrice extends ProductPrice { source: string, record_id: number }

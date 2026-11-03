@@ -1902,6 +1902,7 @@
       "catalog_number": "Catalog number",
       "barcode": "Barcode",
       "price": "Price",
+      "prices": "Prices",
       "currency": "Currency",
       "is_hires": "Hi-Res",
       "is_available": "Available",
@@ -1985,6 +1986,17 @@
     "product_medium": {
       "physical": "Physical",
       "digital": "Digital"
+    },
+    "price_kind": {
+      "list": "List price",
+      "event": "Event price",
+      "shop": "Shop price",
+      "other": "Other price"
+    },
+    "price_tax": {
+      "included": "Tax incl.",
+      "excluded": "Tax excl.",
+      "unknown": "Tax not stated"
     },
     "lyric_format": {
       "plain": "Plain text",
@@ -2739,7 +2751,13 @@
       "discs": "Contains",
       "format_hint": "The format, from the discs it contains",
       "unticked": "Not in any edition yet: {discs}",
-      "limited_name_placeholder": "e.g. Animate exclusive"
+      "limited_name_placeholder": "e.g. Animate exclusive",
+      "add_price": "Add a price",
+      "no_prices": "No prices yet",
+      "price_note_placeholder": "Note, e.g. C107 or Melonbooks",
+      "price_amount": "Amount",
+      "price_tax": "Tax",
+      "remove_price": "Remove this price"
     },
     "bonuses": {
       "hint": "Shop and event bonuses: items, bonus CDs, download codes.",

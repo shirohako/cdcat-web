@@ -42,6 +42,24 @@ describe('compareWithAlbum', () => {
     expect(album.tracks.map(track => [track.title, track.duration])).toEqual([['Opening', 60], ['Tide', 200], ['Ending', 90]])
   })
 
+  it('adds the prices the album lacks to its first edition', () => {
+    const album = albumWith('Stillwater', [['Opening', 60]])
+    const source = albumWith('Stillwater', [['Opening', 60]])
+    const event = { kind: 'event' as const, note: 'M3', amount: '1000.00', currency: 'JPY', tax_included: true }
+    const shop = { kind: 'shop' as const, note: null, amount: '1320.00', currency: 'JPY', tax_included: true }
+    addProduct(album, { prices: [{ ...event, amount: '1000', note: null }] })
+    addProduct(source, { prices: [event, shop] })
+
+    const ctx = context(album, source)
+    const rows = compareWithAlbum(ctx)
+    expect(rows.map(row => row.key)).toEqual(['price'])
+    expect(rows[0]).toMatchObject({ album: '会场价 1000 JPY 含税', source: '会场价 · M3 1000 JPY 含税 / 通贩价 1320 JPY 含税' })
+
+    void rows[0]!.apply()
+    expect(album.products[0]!.prices.map(price => [price.kind, price.amount])).toEqual([['event', '1000'], ['shop', '1320.00']])
+    expect(compareWithAlbum(ctx)).toEqual([])
+  })
+
   it('adds the credits, links and images the album lacks, creating the new artists once', async () => {
     const album = albumWith('Stillwater', [['Opening', 60]])
     const source = albumWith('Stillwater', [['Opening', 60]])

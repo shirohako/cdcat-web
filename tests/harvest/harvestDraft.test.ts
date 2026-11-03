@@ -11,7 +11,7 @@ const detail = (links: Array<{ url: string, kind: string, provider_id: number | 
     merged: {
       title: { value: 'Meltianote。', alternatives: [] }, kind_hint: 'album', release: { date: '2026-04', precision: 'month' },
       descriptions: [], titles: [], media: ['cd'], tracklist: { discs: [], tracks: [], alternatives: [] },
-      catalog_numbers: { value: null }, price: { value: null }, barcode: { value: null }, credits: [], sources: [],
+      catalog_numbers: { value: null }, prices: [], barcode: { value: null }, credits: [], sources: [],
       links: links.map(link => ({ ...link, source: 'dojinmusic' })),
     },
   },

@@ -46,7 +46,14 @@
               <td v-if="columns.discs" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).map(n => `Disc ${n}`).join(', ') || '—' }}</td>
               <td v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.region ? regionName(product.region) : '—' }}</td>
               <td v-if="columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle tabular-nums text-body">{{ product.release_date ? formatDate(product.release_date, product.release_date_precision) : '—' }}</td>
-              <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-right font-semibold tabular-nums text-title">{{ formattedPrice(product) || '—' }}</td>
+              <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-right">
+                <p v-for="(price, i) in product.prices" :key="i" class="leading-5">
+                  <span v-if="labelled(product, price)" class="mr-1.5 text-[11px] text-meta">{{ priceLabel(price) }}</span>
+                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(price) }}</span>
+                  <span v-if="price.tax_included !== null" class="ml-1 text-[11px] text-meta">{{ taxLabel(price.tax_included) }}</span>
+                </p>
+                <span v-if="!product.prices.length" class="text-body">—</span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -105,6 +112,7 @@
 
 <script setup lang="ts">
 import type { AlbumBonus, AlbumDisc, AlbumImage, AlbumProduct, MediumType, EditionType } from '~/types/album'
+import type { ProductPrice } from '~/types/document'
 import { Disc3, Gift, Package } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
@@ -120,7 +128,8 @@ const props = withDefaults(defineProps<{
 })
 const { t } = useI18n()
 const { separator } = useListPunctuation()
-const { intlLocale, regionName } = useLocaleFormatting()
+const { regionName } = useLocaleFormatting()
+const { label: priceLabel, amount: priceAmount, taxLabel } = usePriceDisplay()
 const { formatDate, enumLabel } = useCatalogDisplay()
 
 /** "2 个版本 · 3 项特典" on the title row, each part only when there are several. */
@@ -135,7 +144,7 @@ const columns = computed(() => ({
   discs: discNumbers.value.size > 1,
   region: props.products.some(product => product.region),
   date: props.products.some(product => product.release_date),
-  price: props.products.some(product => formattedPrice(product)),
+  price: props.products.some(product => product.prices.length),
 }))
 
 const sortedBonuses = computed(() => [...props.bonuses].sort((a, b) => a.sort_order - b.sort_order))
@@ -176,18 +185,6 @@ const limitedRuleLabel = (rule: string | null) => {
   return rule ? (map[rule] || '') : '';
 };
 
-const formattedPrice = (product: AlbumProduct) => {
-  if (!product.price || !product.currency) return null;
-  const numericPrice = parseFloat(product.price);
-  if (isNaN(numericPrice)) return `${product.currency} ${product.price}`;
-  try {
-    return new Intl.NumberFormat(intlLocale.value, {
-      style: 'currency',
-      currency: product.currency,
-      minimumFractionDigits: 0,
-    }).format(numericPrice);
-  } catch {
-    return `${product.currency} ${product.price}`;
-  }
-};
+/** A lone list price without a note shows only its amount. */
+const labelled = (product: AlbumProduct, price: ProductPrice) => product.prices.length > 1 || price.kind !== 'list' || !!price.note;
 </script>
