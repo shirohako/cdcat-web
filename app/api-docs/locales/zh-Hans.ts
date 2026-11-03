@@ -1279,6 +1279,7 @@ const texts: ApiDocsTexts = {
         live_action: '电影、电视剧、舞台剧。',
         doujin: '同人社团或个人自主创作的音乐，原创和二次创作都算。',
         event: '为活动制作的音乐，例如展会、演出和比赛的主题曲。',
+        soundtrack: '原声集：作品里实际使用的配乐和歌曲（OST），通常和游戏、动画等类别一起出现。',
       },
     },
     disc_format: {
@@ -1521,6 +1522,7 @@ const texts: ApiDocsTexts = {
         ost: '原声带。',
         drama: '广播剧。',
         other: '其他。',
+        fan_work: '同人作品：这部作品的二次创作专辑，条目页排在官方专辑后面。',
       },
     },
     attribute_value_type: {

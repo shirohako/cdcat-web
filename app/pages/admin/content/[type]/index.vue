@@ -21,6 +21,7 @@ const contentCategoryLabels: Record<string, string> = {
   live_action: '影视舞台',
   doujin: '同人创作',
   event: '活动',
+  soundtrack: '原声集',
 }
 const contentDescriptionLabels: Record<string, string> = {
   album: '检索和维护专辑，包括碟片、曲目、制作人员、版本、特典、图片和外部链接。编辑在编辑器里进行，有自动通过权限时立即生效。',
@@ -61,7 +62,7 @@ const sorts: Record<AdminContentType, string[]> = {
   track: ['id', 'title', 'created_at'],
   lyric: ['id', 'language', 'created_at', 'updated_at'],
 }
-const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event']
+const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack']
 const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other']
 const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'track_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)

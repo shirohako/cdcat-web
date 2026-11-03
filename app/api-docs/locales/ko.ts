@@ -1278,6 +1278,7 @@ const texts: ApiDocsTexts = {
         live_action: '영화, 드라마, 무대',
         doujin: '동인 서클이나 개인이 자체 제작한 음악. 오리지널과 2차 창작 모두 포함합니다.',
         event: '행사를 위해 만든 음악(예: 컨벤션, 공연, 대회의 주제가)',
+        soundtrack: '사운드트랙: 작품에서 실제로 쓰인 배경음악과 노래(OST). 보통 게임, 애니메이션 등과 함께 붙습니다',
       },
     },
     disc_format: {
@@ -1520,6 +1521,7 @@ const texts: ApiDocsTexts = {
         ost: 'OST',
         drama: '드라마',
         other: '기타',
+        fan_work: '동인 작품: 이 작품의 2차 창작 앨범. 작품 페이지에서는 공식 앨범 뒤에 표시됩니다',
       },
     },
     attribute_value_type: {

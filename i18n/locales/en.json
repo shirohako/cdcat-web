@@ -1605,7 +1605,8 @@
       "image_song": "Image song",
       "ost": "Soundtrack",
       "drama": "Drama",
-      "other": "Other"
+      "other": "Other",
+      "fan_work": "Fan work"
     },
     "title_kind": {
       "official": "Official",
@@ -1773,7 +1774,8 @@
       "tokusatsu": "Tokusatsu",
       "live_action": "Film, TV & stage",
       "doujin": "Doujin",
-      "event": "Event"
+      "event": "Event",
+      "soundtrack": "Soundtrack"
     },
     "disc_format": {
       "cd": "CD",

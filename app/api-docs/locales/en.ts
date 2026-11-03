@@ -1279,6 +1279,7 @@ const texts: ApiDocsTexts = {
         live_action: 'Films, TV dramas and stage plays.',
         doujin: 'Music made independently by doujin circles or individuals, original or derivative.',
         event: 'Music made for an event, such as the theme song of a convention, show or competition.',
+        soundtrack: 'A soundtrack: the score and songs a work actually uses (an OST), usually together with game, animation and the like.',
       },
     },
     disc_format: {
@@ -1521,6 +1522,7 @@ const texts: ApiDocsTexts = {
         ost: 'Soundtrack.',
         drama: 'Drama.',
         other: 'Other.',
+        fan_work: 'A fan work: a derivative album made by fans; entry pages list these after the official albums.',
       },
     },
     attribute_value_type: {

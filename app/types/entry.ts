@@ -36,7 +36,7 @@ export const ENTRY_RELATIONS = [
 export type EntryRelation = typeof ENTRY_RELATIONS[number]
 
 export const ENTRY_ALBUM_RELATIONS = [
-  'opening', 'ending', 'insert_song', 'theme_song', 'character_song', 'image_song', 'ost', 'drama', 'other',
+  'opening', 'ending', 'insert_song', 'theme_song', 'character_song', 'image_song', 'ost', 'drama', 'other', 'fan_work',
 ] as const
 export type EntryAlbumRelation = typeof ENTRY_ALBUM_RELATIONS[number]
 

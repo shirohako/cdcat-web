@@ -11,7 +11,7 @@ export type AlbumType = typeof ALBUM_TYPES[number]
 
 /** VGMdb-style categories; an empty list means a composer's discography album. */
 export const ALBUM_CATEGORIES = [
-  'game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event',
+  'game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack',
 ] as const
 export type AlbumCategory = typeof ALBUM_CATEGORIES[number]
 
@@ -37,6 +37,7 @@ export const ALBUM_CATEGORY_ICONS: Record<AlbumCategory, string> = {
   live_action: 'lucide:clapperboard',
   doujin: 'lucide:palette',
   event: 'lucide:party-popper',
+  soundtrack: 'lucide:list-music',
 }
 
 export const DISC_FORMAT_ICONS: Record<DiscFormat, string> = {

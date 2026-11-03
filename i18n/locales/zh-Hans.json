@@ -1605,7 +1605,8 @@
       "image_song": "印象曲",
       "ost": "原声带",
       "drama": "广播剧",
-      "other": "其他"
+      "other": "其他",
+      "fan_work": "同人作品"
     },
     "title_kind": {
       "official": "正式名称",
@@ -1773,7 +1774,8 @@
       "tokusatsu": "特摄",
       "live_action": "影视舞台",
       "doujin": "同人创作",
-      "event": "活动"
+      "event": "活动",
+      "soundtrack": "原声集"
     },
     "disc_format": {
       "cd": "CD",

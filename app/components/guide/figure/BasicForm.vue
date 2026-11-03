@@ -6,7 +6,7 @@
 const props = defineProps<{ text: Record<string, string> }>()
 const { t } = useI18n()
 
-const CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event']
+const CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack']
 const description = computed(() => props.text.description ?? '')
 </script>
 

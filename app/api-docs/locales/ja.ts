@@ -1279,6 +1279,7 @@ const texts: ApiDocsTexts = {
         live_action: '映画、テレビドラマ、舞台。',
         doujin: '同人サークルや個人が自主制作した音楽。オリジナルも二次創作も含みます。',
         event: 'イベントのために作られた音楽。例：展示会、公演、大会のテーマ曲。',
+        soundtrack: 'サウンドトラック：作品で実際に使われた劇伴や楽曲（OST）。ふつうはゲームやアニメなどと一緒に付きます。',
       },
     },
     disc_format: {
@@ -1521,6 +1522,7 @@ const texts: ApiDocsTexts = {
         ost: 'サウンドトラック。',
         drama: 'ドラマ CD。',
         other: 'その他。',
+        fan_work: '同人作品：この作品の二次創作アルバム。作品ページでは公式のアルバムの後に並びます。',
       },
     },
     attribute_value_type: {
