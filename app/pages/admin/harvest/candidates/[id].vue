@@ -211,6 +211,16 @@ const act = async (path: string, body: Record<string, unknown> = {}, after: 'nex
   }
 }
 
+/** Takes one source out into a candidate of its own, after asking: both candidates' sources are pinned then, and merging never joins them again. */
+const split = async (record: { record_id: number, part: number, label: string, title: string }) => {
+  if (!await confirm({
+    title: `把${record.label}的「${record.title}」拆成单独的候选？`,
+    description: '拆出后两个候选的来源都会固定，自动合并和重新分组不会再把它们合到一起；拆错了只能在新候选里用「合并」并回来。',
+    confirmText: '拆出',
+  })) return
+  await act('split', { record_id: record.record_id, part: record.part }, 'refresh')
+}
+
 const rejectPresets = ['不是音乐', '周边或书籍', '重复的条目', '不是这届活动的作品']
 const rejectOpen = ref(false)
 const rejectReason = ref('')
@@ -416,7 +426,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                           <span v-if="record.delisted" class="text-amber-700">已下架</span>
                         </p>
                       </div>
-                      <UiButton v-if="open && detail.records.length > 1" size="xs" class="shrink-0" :disabled="busy" @click="act('split', { record_id: record.record_id, part: record.part }, 'refresh')">拆成单独的候选</UiButton>
+                      <UiButton v-if="open && detail.records.length > 1" size="xs" class="shrink-0" :disabled="busy" @click="split(record)">拆成单独的候选</UiButton>
                     </div>
                     <dl v-if="record.listings.length || record.events.length" class="mt-2.5 grid grid-cols-[3rem_1fr] gap-x-2 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-2 text-xs leading-5">
                       <template v-for="listing in record.listings" :key="listing.task.id">
