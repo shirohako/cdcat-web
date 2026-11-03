@@ -100,3 +100,23 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
     tracks: perTrack(byTrack),
   }))
 }
+
+export interface TrackRoleGroup {
+  role: string
+  category: string | null
+  /** Everyone with this role, in the order they first appear in the tracklist, a role detail (an instrument) apart */
+  people: Array<{ key: string, name: string, artistId: number | null, detail: string | null, tracks: string | null }>
+}
+
+/** The same credits turned around for the by-role view: one group per role in the dictionary's order, its people under it. */
+export function trackRoleGroups(people: TrackPerson[], roleOrder: (role: string) => number): TrackRoleGroup[] {
+  const groups = new Map<string, TrackRoleGroup>()
+  for (const person of people) {
+    for (const role of person.roles) {
+      const group = groups.get(role.role) ?? { role: role.role, category: role.category, people: [] }
+      groups.set(role.role, group)
+      group.people.push({ key: `${person.key}:${role.detail ?? ''}`, name: person.name, artistId: person.artistId, detail: role.detail, tracks: role.tracks })
+    }
+  }
+  return [...groups.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
+}

@@ -1,7 +1,7 @@
 import type { AlbumDisc, AlbumTrack } from '../../app/types/album'
 import type { CatalogCredit } from '../../app/types/catalog'
 import { describe, expect, it } from 'vitest'
-import { trackPeople } from '../../app/utils/trackPeople'
+import { trackPeople, trackRoleGroups } from '../../app/utils/trackPeople'
 
 const ORDER = ['artist', 'composer', 'arranger', 'performer']
 let nextId = 1
@@ -49,5 +49,18 @@ describe('track people', () => {
       { disc: 2, tracks: [{ id: 2030, label: '3', title: 'T3', roles: [{ role: 'performer', detail: 'Guitar' }] }] },
     ])
     expect(people[1]!.tracks).toBeNull()
+  })
+
+  it('turns the people around into one group per role, people in tracklist order', () => {
+    const order = (role: string) => ORDER.indexOf(role)
+    const groups = trackRoleGroups(trackPeople([disc(1, [
+      track(1, [credit('performer', 'Eris', null, 'Guitar'), credit('composer', 'NAGI', 1)]),
+      track(2, [credit('composer', 'Mio', 3), credit('performer', 'Eris', null, 'Bass'), credit('artist', 'Vivienne', 2)]),
+    ])], order), order)
+    expect(groups.map(group => [group.role, group.people.map(person => [person.name, person.detail, person.tracks])])).toEqual([
+      ['artist', [['Vivienne', null, '2']]],
+      ['composer', [['NAGI', null, '1'], ['Mio', null, '2']]],
+      ['performer', [['Eris', 'Guitar', '1'], ['Eris', 'Bass', '2']]],
+    ])
   })
 })

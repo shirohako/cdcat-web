@@ -34,8 +34,10 @@
       "count": "{count} 人",
       "all": "全曲",
       "view_label": "表示",
-      "view_roles": "役割ごと",
-      "view_tracks": "曲ごと"
+      "view_roles": "人ごと",
+      "view_tracks": "曲ごと",
+      "view_role_groups": "役割ごと",
+      "collapse": "閉じる"
     },
     "section": {
       "description": "概要",

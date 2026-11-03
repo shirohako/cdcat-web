@@ -34,8 +34,10 @@
       "count": "{count} person | {count} people",
       "all": "All tracks",
       "view_label": "View",
-      "view_roles": "By role",
-      "view_tracks": "By track"
+      "view_roles": "By person",
+      "view_tracks": "By track",
+      "view_role_groups": "By role",
+      "collapse": "Show less"
     },
     "section": {
       "description": "Description",

@@ -34,8 +34,10 @@
       "count": "{count} 位",
       "all": "全曲",
       "view_label": "顯示方式",
-      "view_roles": "按角色",
-      "view_tracks": "按曲目"
+      "view_roles": "按人員",
+      "view_tracks": "按曲目",
+      "view_role_groups": "按角色",
+      "collapse": "收起"
     },
     "section": {
       "description": "簡介",

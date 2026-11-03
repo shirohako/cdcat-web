@@ -34,8 +34,10 @@
       "count": "{count}명",
       "all": "전곡",
       "view_label": "보기",
-      "view_roles": "역할별",
-      "view_tracks": "곡별"
+      "view_roles": "사람별",
+      "view_tracks": "곡별",
+      "view_role_groups": "역할별",
+      "collapse": "접기"
     },
     "section": {
       "description": "소개",
