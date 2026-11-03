@@ -39,7 +39,7 @@ const description = computed(() => props.text.description ?? '')
           </span>
         </div>
         <div class="grid grid-cols-2 gap-3">
-          <GuideMockField :n="6" :label="`${t('catalog.field.catalog_number')} · ${t('editor.recommended')}`" value="STNT-0012~3" mono />
+          <GuideMockField :n="6" :label="t('catalog.field.catalog_number')" value="STNT-0012~3" mono />
           <GuideMockField :label="t('catalog.field.barcode')" value="4580000000017" mono />
         </div>
         <div>

@@ -1401,10 +1401,10 @@ const texts: ApiDocsTexts = {
     },
     product_medium: {
       title: '版本的形态',
-      description: '实体还是数字版。',
+      description: '实体还是数字内容。',
       values: {
         physical: '实体。',
-        digital: '数字版（配信）。',
+        digital: '数字内容（配信、下载）。',
       },
     },
     bonus_type: {

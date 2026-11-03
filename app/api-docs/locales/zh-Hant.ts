@@ -1401,10 +1401,10 @@ const texts: ApiDocsTexts = {
     },
     product_medium: {
       title: '版本的形態',
-      description: '實體還是數位版。',
+      description: '實體還是數位內容。',
       values: {
         physical: '實體。',
-        digital: '數位版（配信）。',
+        digital: '數位內容（配信、下載）。',
       },
     },
     bonus_type: {
