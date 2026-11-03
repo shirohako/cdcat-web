@@ -133,7 +133,6 @@ export default defineNuxtConfig({
     ],
     optimizeDeps: {
       include: [
-        'countries-list',
         '@lucide/vue',
         'lucide',
         'markdown-it',
