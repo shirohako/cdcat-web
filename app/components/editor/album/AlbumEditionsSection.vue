@@ -31,7 +31,7 @@
               <span v-if="product.catalog_number" class="font-mono text-body">{{ product.catalog_number }}</span>
               <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
               <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
-              <span v-if="product.region">{{ product.region }}</span>
+              <span v-if="product.region">{{ regionName(product.region) }}</span>
               <span v-for="(price, i) in product.prices" :key="i">{{ priceLine(price) }}</span>
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
               <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
@@ -156,6 +156,7 @@ const { schema } = useCatalogSchema()
 const { enumLabel, formatDate } = useCatalogDisplay()
 const { separator } = useListPunctuation()
 const { line: priceLine, kindLabel, taxLabel } = usePriceDisplay()
+const { regionName } = useLocaleFormatting()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})

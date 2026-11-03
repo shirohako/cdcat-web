@@ -9,7 +9,7 @@
 </template>
 
 <script setup>
-import { getEmojiFlag, getCountryData } from 'countries-list'
+import { getEmojiFlag } from 'countries-list'
 
 defineOptions({ inheritAttrs: false })
 
@@ -52,20 +52,17 @@ const mainCountryCodes = [
 
 const { regionName } = useLocaleFormatting()
 
-const countries = computed(() => mainCountryCodes.map((code) => {
-  const data = getCountryData(code)
-  return {
-    code,
-    name: regionName(code),
-    value: data.name,
-    flag: getEmojiFlag(code),
-  }
-}).sort((a, b) => a.name.localeCompare(b.name)))
+// The value is the ISO code itself ("JP"); the label is the name in the reader's language.
+const countries = computed(() => mainCountryCodes.map(code => ({
+  code,
+  name: regionName(code),
+  flag: getEmojiFlag(code),
+})).sort((a, b) => a.name.localeCompare(b.name)))
 
 const { t } = useI18n()
 
 const options = computed(() => [
   { value: '', label: t('account_pages.preferences.select_region') },
-  ...countries.value.map(c => ({ value: c.value, label: `${c.flag} ${c.name}` })),
+  ...countries.value.map(c => ({ value: c.code, label: `${c.flag} ${c.name}` })),
 ])
 </script>
