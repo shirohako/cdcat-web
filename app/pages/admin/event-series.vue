@@ -16,6 +16,7 @@ const notice = ref('')
 const emptySeries = () => ({ id: 0, name: '', slug: '', location: '', website: '', banner_url: '', visual_orientation: 'portrait' as AdminEventSeries['visual_orientation'] })
 const seriesForm = reactive(emptySeries())
 const seriesOpen = ref(false)
+const bannerUploading = ref(false)
 const editSeries = (item?: AdminEventSeries) => {
   Object.assign(seriesForm, emptySeries(), item ? { ...item, website: item.website ?? '', banner_url: item.banner_url ?? '' } : {})
   message.value = ''
@@ -84,12 +85,14 @@ useHead({ title: '活动系列' })
         <label class="block">地点<input v-model="seriesForm.location" required maxlength="255" :class="input"></label>
         <label class="block">官网<input v-model="seriesForm.website" type="url" maxlength="2048" :class="input"></label>
         <label class="block">每届配图方向<select v-model="seriesForm.visual_orientation" :class="input"><option v-for="value in ['portrait', 'landscape']" :key="value" :value="value">{{ seriesOrientationLabels[value] }}</option></select><span class="mt-1 block text-xs text-slate-500">决定前台系列页里每届活动配图的版式，同一系列统一比例。</span></label>
-        <label class="block sm:col-span-2">横幅图 URL<input v-model="seriesForm.banner_url" type="url" maxlength="2048" placeholder="https://" :class="input"><span class="mt-1 block text-xs text-slate-500">建议 16:9 横图；Logo 会完整显示，不裁切。</span></label>
-        <img v-if="seriesForm.banner_url" :src="seriesForm.banner_url" alt="" class="aspect-video w-full max-w-sm rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2">
+        <div class="sm:col-span-2">
+          <span class="mb-1 block">横幅图</span>
+          <AdminImageField v-model:url="seriesForm.banner_url" v-model:busy="bannerUploading" hint="建议 16:9 横图；Logo 会完整显示，不裁切。" :disabled="busy" preview-class="aspect-video w-full max-w-sm" />
+        </div>
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
           <UiButton :disabled="busy" @click="seriesOpen = false">取消</UiButton>
-          <UiButton type="submit" variant="primary" :disabled="busy">{{ busy ? '保存中…' : '保存' }}</UiButton>
+          <UiButton type="submit" variant="primary" :disabled="busy || bannerUploading">{{ busy ? '保存中…' : '保存' }}</UiButton>
         </div>
       </form>
     </section>

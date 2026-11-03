@@ -39,7 +39,6 @@ const editEvent = (event?: AdminEvent) => {
     main_visual_width: event.main_visual_width ?? null, main_visual_height: event.main_visual_height ?? null,
   } : {})
   message.value = ''
-  visualError.value = ''
   eventOpen.value = true
 }
 const saveEvent = async () => {
@@ -63,47 +62,12 @@ const saveEvent = async () => {
   }
 }
 
-// The visual's pixel size is read from the preview, so editors never pick an orientation by hand.
-const readVisualSize = (e: Event) => {
-  const image = e.target as HTMLImageElement
-  eventForm.main_visual_width = image.naturalWidth || null
-  eventForm.main_visual_height = image.naturalHeight || null
-}
-const clearVisualSize = () => {
-  eventForm.main_visual_width = null
-  eventForm.main_visual_height = null
-}
-// An uploaded visual is stored on this site (POST /v1/images); its size comes with it.
-const { limits: imageLimits, upload: uploadImage } = useImageUpload()
+// The visual's pixel size comes with an upload and is read again whenever the preview loads, so editors never pick an
+// orientation by hand.
 const visualUploading = ref(false)
-const visualInput = useTemplateRef<HTMLInputElement>('visualInput')
-const visualError = ref('')
-const uploadVisual = async (e: Event) => {
-  const picker = e.target as HTMLInputElement
-  const file = picker.files?.[0]
-  picker.value = ''
-  visualError.value = ''
-  if (!file) return
-  if (file.size > imageLimits.value.maxBytes) {
-    visualError.value = `图片太大，最多 ${Math.floor(imageLimits.value.maxBytes / 1024 / 1024)} MB。`
-    return
-  }
-  visualUploading.value = true
-  try {
-    const image = await uploadImage(file, file.name)
-    eventForm.main_visual_url = image.url
-    eventForm.main_visual_width = image.width
-    eventForm.main_visual_height = image.height
-  } catch (err) {
-    visualError.value = adminError(err)
-  } finally {
-    visualUploading.value = false
-  }
-}
-const removeVisual = () => {
-  eventForm.main_visual_url = ''
-  visualError.value = ''
-  clearVisualSize()
+const setVisualSize = (width: number | null, height: number | null) => {
+  eventForm.main_visual_width = width
+  eventForm.main_visual_height = height
 }
 // Layout follows the series orientation, so flag a visual that would be letterboxed in its series.
 const seriesOrientation = computed(() => series.value?.find(item => String(item.id) === eventForm.event_series_id)?.visual_orientation)
@@ -112,7 +76,7 @@ const visualMismatch = computed(() => {
   return Boolean(eventForm.main_visual_url && seriesOrientation.value && (orientation === 'portrait' || orientation === 'landscape') && orientation !== seriesOrientation.value)
 })
 const visualSizeText = computed(() => {
-  if (!eventForm.main_visual_url) return '这一届的场刊封面或主视觉：上传图片，或者填图片地址。会自动识别图片尺寸和横竖方向。'
+  if (!eventForm.main_visual_url) return '这一届的场刊封面或主视觉。会自动识别图片尺寸和横竖方向。'
   const orientation = imageOrientation(eventForm.main_visual_width, eventForm.main_visual_height)
   return orientation
     ? `${eventForm.main_visual_width} × ${eventForm.main_visual_height} · ${eventOrientationLabels[orientation]}`
@@ -174,18 +138,10 @@ useHead({ title: '活动' })
         <label class="block">地点<input v-model="eventForm.location" maxlength="255" :class="input"></label>
         <label class="block sm:col-span-2">本届官网<input v-model="eventForm.website_url" type="url" maxlength="2048" placeholder="https://" :class="input"></label>
         <div class="sm:col-span-2">
-          <label for="event-visual-url">主视觉 / 场刊封面</label>
-          <div class="mt-1 flex flex-wrap gap-2">
-            <input id="event-visual-url" v-model="eventForm.main_visual_url" type="url" maxlength="2048" placeholder="https://" class="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2" :disabled="visualUploading" @input="clearVisualSize">
-            <UiButton icon="lucide:upload" class="shrink-0" :disabled="visualUploading || busy" @click="visualInput?.click()">{{ visualUploading ? '正在上传…' : '上传图片' }}</UiButton>
-            <input ref="visualInput" type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="visualUploading || busy" @change="uploadVisual">
-            <UiButton v-if="eventForm.main_visual_url" variant="danger-soft" class="shrink-0" :disabled="visualUploading" @click="removeVisual">清除</UiButton>
-          </div>
-          <span class="mt-1 block text-xs text-slate-500">{{ visualSizeText }}</span>
-          <span v-if="visualError" role="alert" class="mt-1 block text-xs text-red-700">{{ visualError }}</span>
+          <span class="mb-1 block">主视觉 / 场刊封面</span>
+          <AdminImageField v-model:url="eventForm.main_visual_url" v-model:busy="visualUploading" :hint="visualSizeText" :disabled="busy" preview-class="max-w-md" @size="setVisualSize" />
           <span v-if="visualMismatch" class="mt-1 block text-xs text-amber-700">图片方向和系列设定的「{{ seriesOrientationLabels[seriesOrientation ?? ''] }}」不一致，前台会按系列比例留白显示。</span>
         </div>
-        <img v-if="eventForm.main_visual_url" :src="eventForm.main_visual_url" alt="" class="max-h-56 w-auto max-w-full justify-self-start rounded-lg border border-slate-200 bg-slate-50 object-contain sm:col-span-2" @load="readVisualSize" @error="clearVisualSize">
         <div class="flex items-end justify-end gap-2 sm:col-span-2">
           <p v-if="message" role="alert" class="mr-auto text-red-700">{{ message }}</p>
           <UiButton :disabled="busy" @click="eventOpen = false">取消</UiButton>
