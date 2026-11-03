@@ -31,7 +31,9 @@ const notice = ref('')
 const emptyEvent = () => ({ id: 0, event_series_id: '', name: '', slug: '', start_date: '', end_date: '', start_time: '', end_time: '', venue: '', location: '', website_url: '', main_visual_url: '', main_visual_width: null as number | null, main_visual_height: null as number | null })
 const eventForm = reactive(emptyEvent())
 const eventOpen = ref(false)
-const editEvent = (event?: AdminEvent) => {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
+const editEvent = async (event?: AdminEvent) => {
   Object.assign(eventForm, emptyEvent(), event ? {
     ...event, event_series_id: event.event_series_id ? String(event.event_series_id) : '', end_date: event.end_date ?? '', venue: event.venue ?? '',
     location: event.location ?? '', main_visual_url: event.main_visual_url ?? '',
@@ -40,6 +42,9 @@ const editEvent = (event?: AdminEvent) => {
   } : {})
   message.value = ''
   eventOpen.value = true
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus({ preventScroll: true })
 }
 const saveEvent = async () => {
   busy.value = true
@@ -124,7 +129,7 @@ useHead({ title: '活动' })
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !eventOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <section v-if="eventOpen" class="rounded-xl border border-slate-200 bg-white p-5">
+    <section v-if="eventOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-5">
       <h2 class="font-semibold">{{ eventForm.id ? '编辑活动' : '新建活动' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="saveEvent">
         <label class="block">活动系列<select v-model="eventForm.event_series_id" :class="input"><option value="">无系列</option><option v-for="item in series" :key="item.id" :value="String(item.id)">{{ item.name }}</option></select></label>

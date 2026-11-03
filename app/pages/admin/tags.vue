@@ -16,9 +16,14 @@ const message = ref('')
 const notice = ref('')
 const editing = computed(() => form.id > 0)
 
-function edit(tag: AdminTag) {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Fills the form beside the list and brings it into view: on a long list, 编辑 is clicked far below it. */
+async function edit(tag: AdminTag) {
   Object.assign(form, { id: tag.id, name: tag.name, slug: tag.slug, description: tag.description ?? '', is_staff_only: tag.is_staff_only,
     name_en: tag.translations?.en?.name ?? '', name_ja: tag.translations?.ja?.name ?? '' })
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus({ preventScroll: true })
 }
 const reset = () => Object.assign(form, empty())
 
@@ -94,7 +99,7 @@ useHead({ title: '标签库' })
           </table>
         </AdminListState>
       </section>
-      <form class="h-fit space-y-3 rounded-xl border border-slate-200 bg-white p-4 text-sm" @submit.prevent="save">
+      <form ref="formSection" class="h-fit scroll-mt-20 space-y-3 rounded-xl border border-slate-200 bg-white p-4 text-sm" @submit.prevent="save">
         <h2 class="font-semibold">{{ editing ? '编辑标签' : '新建标签' }}</h2>
         <label class="block">名称<input v-model="form.name" required maxlength="50" :class="field"></label>
         <label class="block">Slug<input v-model="form.slug" required maxlength="60" pattern="[a-z0-9]+(-[a-z0-9]+)*" :class="[field, 'font-mono']"><span class="mt-1 block text-xs text-slate-500">小写字母、数字和连字符，用在筛选地址里。</span></label>

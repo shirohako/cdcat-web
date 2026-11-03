@@ -41,7 +41,9 @@ const busy = ref(false)
 const message = ref('')
 const notice = ref('')
 
-const open = (role?: AdminCreditRole) => {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
+const open = async (role?: AdminCreditRole) => {
   message.value = ''
   Object.assign(form, empty())
   editing.value = role?.key ?? null
@@ -54,6 +56,9 @@ const open = (role?: AdminCreditRole) => {
     form.sort_order = Math.max(0, ...roles.value.map(item => item.sort_order)) + 10
   }
   formOpen.value = true
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus({ preventScroll: true })
 }
 
 const save = async () => {
@@ -123,7 +128,7 @@ useHead({ title: '角色字典' })
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !formOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <section v-if="formOpen" class="rounded-xl border border-slate-300 bg-white p-5">
+    <section v-if="formOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-300 bg-white p-5">
       <h2 class="font-semibold">{{ editing ? `编辑角色 ${editing}` : '新建角色' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="save">
         <label class="block">Key

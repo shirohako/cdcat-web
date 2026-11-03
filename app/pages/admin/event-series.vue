@@ -17,10 +17,15 @@ const emptySeries = () => ({ id: 0, name: '', slug: '', location: '', website: '
 const seriesForm = reactive(emptySeries())
 const seriesOpen = ref(false)
 const bannerUploading = ref(false)
-const editSeries = (item?: AdminEventSeries) => {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
+const editSeries = async (item?: AdminEventSeries) => {
   Object.assign(seriesForm, emptySeries(), item ? { ...item, website: item.website ?? '', banner_url: item.banner_url ?? '' } : {})
   message.value = ''
   seriesOpen.value = true
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus({ preventScroll: true })
 }
 const saveSeries = async () => {
   busy.value = true
@@ -77,7 +82,7 @@ useHead({ title: '活动系列' })
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !seriesOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <section v-if="seriesOpen" class="rounded-xl border border-slate-200 bg-white p-5">
+    <section v-if="seriesOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-5">
       <h2 class="font-semibold">{{ seriesForm.id ? '编辑活动系列' : '新建活动系列' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="saveSeries">
         <label class="block">名称<input v-model="seriesForm.name" required maxlength="255" :class="input"></label>

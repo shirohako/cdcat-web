@@ -20,7 +20,9 @@ const message = ref('')
 const notice = ref('')
 const errors = ref<Record<string, string[]>>({})
 
-const open = (category?: AdminMailCategory) => {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
+const open = async (category?: AdminMailCategory) => {
   message.value = ''
   errors.value = {}
   Object.assign(form, empty())
@@ -34,6 +36,9 @@ const open = (category?: AdminMailCategory) => {
     form.sort_order = Math.max(0, ...categories.value.map(item => item.sort_order)) + 10
   }
   formOpen.value = true
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector<HTMLElement>('input:not([disabled]), select, textarea')?.focus({ preventScroll: true })
 }
 const texts = (values: Record<string, string>) => Object.fromEntries(Object.entries(values).filter(([, value]) => value.trim()).map(([locale, value]) => [locale, value.trim()]))
 const save = async () => {
@@ -95,7 +100,7 @@ useHead({ title: '邮件类型' })
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !formOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <section v-if="formOpen" class="rounded-xl border border-slate-300 bg-white p-5">
+    <section v-if="formOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-300 bg-white p-5">
       <h2 class="font-semibold">{{ editing ? `编辑类型 ${editing.key}` : '新建类型' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="save">
         <label class="block sm:col-span-2">键
