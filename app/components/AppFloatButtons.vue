@@ -6,7 +6,7 @@
     :inert="!shown"
   >
     <!-- How far down the page is read; hovered, the number gives way to an arrow up, and a click goes back to the top. -->
-    <UiFloatButton :label="t('site.back_to_top')" :tooltip="`${t('site.read_percent', { percent })} · ${t('site.back_to_top')}`" class="group/top relative overflow-hidden" @click="toTop">
+    <UiFloatButton :label="topLabel" :tooltip="`${readLabel} · ${topLabel}`" class="group/top relative overflow-hidden" @click="toTop">
       <span class="text-xs font-bold leading-none tabular-nums transition-[translate,opacity] duration-200 ease-out group-hover/top:-translate-y-2 group-hover/top:opacity-0">{{ percent }}<span class="text-[9px]">%</span></span>
       <ArrowUp :size="20" class="absolute translate-y-2 opacity-0 transition-[translate,opacity] duration-200 ease-out group-hover/top:translate-y-0 group-hover/top:opacity-100" aria-hidden="true" />
     </UiFloatButton>
@@ -16,7 +16,11 @@
 <script setup lang="ts">
 import { ArrowUp } from '@lucide/vue'
 
-/** The page's floating button, bottom right: how far down the page is read, and back to the top on a click. */
+/**
+ * The page's floating button, bottom right: how far down the page is read, and back to the top on a click. `zh` keeps
+ * its text in Chinese whatever the locale, for the admin pages, which are Chinese only.
+ */
+const props = defineProps<{ zh?: boolean }>()
 const { t } = useI18n()
 
 /** Scrolled this far (px), the buttons come in. */
@@ -24,6 +28,8 @@ const SHOW_AFTER = 120
 
 const percent = ref(0)
 const shown = ref(false)
+const topLabel = computed(() => props.zh ? '回到顶部' : t('site.back_to_top'))
+const readLabel = computed(() => props.zh ? `已读 ${percent.value}%` : t('site.read_percent', { percent: percent.value }))
 
 let frame = 0
 const measure = () => {

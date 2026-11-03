@@ -141,6 +141,9 @@ useHead({
       </header>
       <main><slot /></main>
     </div>
+
+    <!-- Reading progress, and back to the top on a click; bottom right, as on the site -->
+    <AppFloatButtons zh />
   </div>
 </template>
 
