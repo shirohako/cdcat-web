@@ -603,6 +603,7 @@
     "coming_soon_desc": "아무리 긴 밤이라도 결국 새벽은 와요.",
     "loading_animation": "로딩 애니메이션",
     "search_language": "언어 검색",
+    "search_region": "국가·지역 검색",
     "retry": "다시 시도",
     "clear": "지우기",
     "type_to_confirm": "계속하려면 다음을 입력해 주세요: {phrase}",
