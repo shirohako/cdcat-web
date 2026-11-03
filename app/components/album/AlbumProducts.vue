@@ -1,8 +1,8 @@
 <template>
-  <section class="card overflow-hidden">
-    <!-- Header -->
+  <section :class="bare ? 'overflow-hidden' : 'card overflow-hidden'">
+    <!-- Header; left out when `bare` (the edition editor's preview shows just the table). -->
     <!-- Editions and, under them, the bonuses (特典): one card, each part under its own small heading when both are there. -->
-    <UiSectionTitle :title="$t(bonuses.length ? 'album.section.products_bonuses' : 'album.section.products')" :icon="Package" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
+    <UiSectionTitle v-if="!bare" :title="$t(bonuses.length ? 'album.section.products_bonuses' : 'album.section.products')" :icon="Package" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
       <template v-if="counts" #actions>
         <span class="text-xs text-meta">{{ counts }}</span>
       </template>
@@ -12,7 +12,7 @@
          on hover. Columns nobody fills are left out; on a narrow screen a table scrolls sideways. -->
     <template v-if="products.length">
       <h3 v-if="bonuses.length" class="px-5 pt-2 text-xs font-semibold text-meta">{{ $t('album.section.products') }}</h3>
-      <div class="overflow-x-auto px-5 pb-4 pt-1">
+      <div class="overflow-x-auto px-5 pt-1" :class="bare ? 'pb-1' : 'pb-4'">
         <table class="w-full border-collapse text-[13px]">
           <thead>
             <tr>
@@ -44,7 +44,16 @@
               <td v-if="columns.catalog" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle font-mono text-xs text-body">{{ product.catalog_number || '—' }}</td>
               <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ [product.format_label, mediumLabel(product.medium)].filter(Boolean).join(' · ') }}</td>
               <td v-if="columns.discs" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).map(n => `Disc ${n}`).join(', ') || '—' }}</td>
-              <td v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.region ? regionName(product.region) : '—' }}</td>
+              <!-- Flag + English name; long names ("United Arab Emirates") are cut at the column's width and shown whole on hover. -->
+              <td v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">
+                <template v-if="product.region">
+                  <UiTooltip v-if="regionEnglishName(product.region).length > LONG_REGION" :text="regionEnglishName(product.region)">
+                    <span class="flex max-w-36 items-center gap-1.5"><CommonFlag :code="product.region" /><span class="min-w-0 truncate">{{ regionEnglishName(product.region) }}</span></span>
+                  </UiTooltip>
+                  <span v-else class="flex items-center gap-1.5"><CommonFlag :code="product.region" />{{ regionEnglishName(product.region) }}</span>
+                </template>
+                <template v-else>—</template>
+              </td>
               <td v-if="columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle tabular-nums text-body">{{ product.release_date ? formatDate(product.release_date, product.release_date_precision) : '—' }}</td>
               <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-right">
                 <p v-for="(price, i) in product.prices" :key="i" class="leading-5">
@@ -115,11 +124,16 @@ import type { AlbumBonus, AlbumDisc, AlbumImage, AlbumProduct, MediumType, Editi
 import type { ProductPrice } from '~/types/document'
 import { Disc3, Gift, Package } from '@lucide/vue'
 
+/** Region names longer than this get cut with a tooltip, so one long name does not widen the table. */
+const LONG_REGION = 16
+
 const props = withDefaults(defineProps<{
   products?: AlbumProduct[]
   bonuses?: AlbumBonus[]
   discs?: AlbumDisc[]
   images?: AlbumImage[]
+  /** Just the tables, without the card and its title (the edition editor's live preview). */
+  bare?: boolean
 }>(), {
   products: () => [],
   bonuses: () => [],
@@ -128,7 +142,6 @@ const props = withDefaults(defineProps<{
 })
 const { t } = useI18n()
 const { separator } = useListPunctuation()
-const { regionName } = useLocaleFormatting()
 const { label: priceLabel, amount: priceAmount, taxLabel } = usePriceDisplay()
 const { formatDate, enumLabel } = useCatalogDisplay()
 

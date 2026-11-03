@@ -2762,7 +2762,12 @@
       "price_note_placeholder": "メモ（例：C107、メロンブックス）",
       "price_amount": "金額",
       "price_tax": "税",
-      "remove_price": "この価格を削除"
+      "remove_price": "この価格を削除",
+      "price_kind": "種類",
+      "price_note": "メモ",
+      "preview": "アルバムページでの表示",
+      "preview_live": "リアルタイムプレビュー",
+      "preview_hint": "アルバムページと同じく、誰も入力していない列は表示されず、この版の空欄は「—」になります。"
     },
     "bonuses": {
       "hint": "店舗特典やイベント特典：グッズ、特典 CD、ダウンロードコード。",

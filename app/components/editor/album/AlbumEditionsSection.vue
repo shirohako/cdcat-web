@@ -31,7 +31,7 @@
               <span v-if="product.catalog_number" class="font-mono text-body">{{ product.catalog_number }}</span>
               <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
               <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
-              <span v-if="product.region">{{ regionName(product.region) }}</span>
+              <span v-if="product.region">{{ regionEnglishName(product.region) }}</span>
               <span v-for="(price, i) in product.prices" :key="i">{{ priceLine(price) }}</span>
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
               <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
@@ -50,85 +50,103 @@
       <EditorAddButton @click="edit(null)">{{ $t('editor.editions.add') }}</EditorAddButton>
     </div>
 
-    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.edition_edit' : 'editor.editions.add')" :description="$t('editor.editions.hint')" :icon="Package" wide @submit="save">
+    <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.edition_edit' : 'editor.editions.add')" :icon="Package" size="xl" @submit="save">
       <div v-if="form" class="space-y-5">
-        <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_9rem_9rem]">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.edition_name') }}</span>
-            <input v-model="form.name" data-autofocus class="input input-sm w-full" :placeholder="$t('editor.editions.name_placeholder')">
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}</span>
-            <UiSelect v-model="form.edition_type" :options="editionTypeOptions" size="sm" class="w-full" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}</span>
-            <UiSelect v-model="form.medium" :options="mediumOptions" size="sm" class="w-full" />
-          </label>
-        </div>
-
-        <div v-if="form.edition_type === 'limited'" class="grid gap-4 sm:grid-cols-2">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}</span>
-            <UiSelect v-model="form.limited_rule" :options="limitedRuleOptions" size="sm" class="w-full" />
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}</span>
-            <input v-model="form.limited_name" class="input input-sm w-full" :placeholder="$t('editor.editions.limited_name_placeholder')">
-          </label>
-        </div>
-
-        <div class="grid gap-4 sm:grid-cols-2">
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}</span>
-            <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5" @blur="form.catalog_number = formatCatalogNumber(form.catalog_number)">
-          </label>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
-            <input v-model="form.barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
-          </label>
-          <div>
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
-            <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" />
-            <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
+        <!-- Left: what the edition is and how it is identified; right, on grey: what it holds and its switches. -->
+        <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_15rem]">
+          <div class="space-y-4">
+            <label class="block">
+              <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.edition_name') }}</span>
+              <input v-model="form.name" data-autofocus class="input input-sm w-full" :placeholder="$t('editor.editions.name_placeholder')">
+            </label>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}</span>
+                <UiSelect v-model="form.edition_type" :options="editionTypeOptions" size="sm" class="w-full" />
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}</span>
+                <UiSelect v-model="form.medium" :options="mediumOptions" size="sm" class="w-full" />
+              </label>
+              <template v-if="form.edition_type === 'limited'">
+                <label class="block">
+                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}</span>
+                  <UiSelect v-model="form.limited_rule" :options="limitedRuleOptions" size="sm" class="w-full" />
+                </label>
+                <label class="block">
+                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}</span>
+                  <input v-model="form.limited_name" class="input input-sm w-full" :placeholder="$t('editor.editions.limited_name_placeholder')">
+                </label>
+              </template>
+            </div>
+            <div class="grid items-start gap-4 sm:grid-cols-2">
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}</span>
+                <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5" @blur="form.catalog_number = formatCatalogNumber(form.catalog_number)">
+              </label>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
+                <input v-model="form.barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
+              </label>
+              <div>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
+                <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" />
+                <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
+              </div>
+              <label class="block">
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}</span>
+                <CommonRegionSelect :model-value="form.region ?? ''" class="select-sm w-full" @update:model-value="form.region = $event || null" />
+              </label>
+            </div>
           </div>
-          <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}</span>
-            <CommonRegionSelect :model-value="form.region ?? ''" class="select-sm w-full" @update:model-value="form.region = $event || null" />
-          </label>
-          <div class="flex items-end gap-5 pb-1.5 text-sm text-body">
-            <label class="flex items-center gap-1.5"><input v-model="form.is_hires" type="checkbox" class="checkbox checkbox-sm">Hi-Res</label>
-            <label class="flex items-center gap-1.5"><input v-model="form.is_available" type="checkbox" class="checkbox checkbox-sm">{{ $t('catalog.field.is_available') }}</label>
-          </div>
+
+          <aside class="space-y-4 self-start rounded-xl bg-sunken p-4">
+            <div>
+              <p class="text-sm font-medium text-body">{{ $t('editor.editions.discs') }}</p>
+              <p class="mt-0.5 font-mono text-xl font-medium text-title" :title="$t('editor.editions.format_hint')">{{ formLabel || '—' }}</p>
+            </div>
+            <div class="space-y-1.5">
+              <label v-for="disc in mainDiscs" :key="disc.id" class="flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="ticked(form.disc_ids, disc.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line bg-card text-meta hover:bg-card-hover'">
+                <input type="checkbox" class="checkbox checkbox-xs" :checked="ticked(form.disc_ids, disc.id)" @change="setProductDisc(form, disc.id, ($event.target as HTMLInputElement).checked)">
+                <span class="min-w-0 truncate">{{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="text-faint"> · {{ disc.title }}</span></span>
+              </label>
+            </div>
+            <div class="flex flex-col gap-2.5 border-t border-line pt-3">
+              <UiSwitch v-model="form.is_hires">Hi-Res</UiSwitch>
+              <UiSwitch v-model="form.is_available">{{ $t('catalog.field.is_available') }}</UiSwitch>
+            </div>
+          </aside>
         </div>
 
-        <div>
-          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('catalog.field.prices') }}</p>
-          <p v-if="!form.prices.length" class="mb-2 text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>
-          <ul v-else class="mb-2 space-y-2">
-            <li v-for="(price, i) in form.prices" :key="i" class="grid grid-cols-2 gap-2 sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_auto] sm:items-center">
-              <UiSelect v-model="price.kind" :options="priceKindOptions" size="sm" class="w-full" />
-              <input v-model="price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')">
-              <input v-model="price.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies" :aria-label="$t('catalog.field.currency')">
-              <UiSelect v-model="price.tax_included" :options="taxOptions" size="sm" class="w-full" />
-              <input v-model="price.note" class="input input-sm col-span-2 w-full sm:col-span-1" maxlength="100" :placeholder="$t('editor.editions.price_note_placeholder')">
-              <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.editions.remove_price')" icon-class="size-3" size="xs" class="justify-self-end ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="form.prices.splice(i, 1)" />
-            </li>
-          </ul>
+        <div class="space-y-2 border-t border-line pt-4">
+          <p class="text-sm font-medium text-body">{{ $t('catalog.field.prices') }}</p>
+          <p v-if="!form.prices.length" class="text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>
+          <template v-else>
+            <!-- One small header over the price fields, so each box says what it is; hidden where the row wraps. -->
+            <div class="hidden gap-2 text-[11px] text-meta sm:grid sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_1.75rem]">
+              <span>{{ $t('editor.editions.price_kind') }}</span><span>{{ $t('editor.editions.price_amount') }}</span><span>{{ $t('catalog.field.currency') }}</span><span>{{ $t('editor.editions.price_tax') }}</span><span>{{ $t('editor.editions.price_note') }}</span>
+            </div>
+            <ul class="space-y-2">
+              <li v-for="(price, i) in form.prices" :key="i" class="grid grid-cols-2 gap-2 sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_1.75rem] sm:items-center">
+                <UiSelect v-model="price.kind" :options="priceKindOptions" size="sm" class="w-full" />
+                <input v-model="price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')">
+                <input v-model="price.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies" :aria-label="$t('catalog.field.currency')">
+                <UiSelect v-model="price.tax_included" :options="taxOptions" size="sm" class="w-full" />
+                <input v-model="price.note" class="input input-sm col-span-2 w-full sm:col-span-1" maxlength="100" :placeholder="$t('editor.editions.price_note_placeholder')">
+                <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.editions.remove_price')" icon-class="size-3" size="xs" class="justify-self-end ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="form.prices.splice(i, 1)" />
+              </li>
+            </ul>
+          </template>
           <EditorAddButton small @click="addPrice">{{ $t('editor.editions.add_price') }}</EditorAddButton>
         </div>
 
-        <div>
-          <p class="mb-1.5 flex items-center gap-2 text-sm font-medium text-body">
-            {{ $t('editor.editions.discs') }}
-            <span class="rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] font-normal text-btn-content">{{ formatOf(form.disc_ids) || '—' }}</span>
-          </p>
-          <div class="flex flex-wrap gap-2">
-            <label v-for="disc in mainDiscs" :key="disc.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="ticked(form.disc_ids, disc.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line text-meta hover:bg-card-hover'">
-              <input type="checkbox" class="checkbox checkbox-xs" :checked="ticked(form.disc_ids, disc.id)" @change="setProductDisc(form, disc.id, ($event.target as HTMLInputElement).checked)">
-              {{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-32 truncate text-faint"> · {{ disc.title }}</span>
-            </label>
+        <!-- The row this edition gets in the album page's editions table, drawn by that table itself. -->
+        <div class="space-y-2 border-t border-line pt-4">
+          <p class="text-sm font-medium text-body">{{ $t('editor.editions.preview') }} <span class="font-normal text-meta">· {{ $t('editor.editions.preview_live') }}</span></p>
+          <div class="rounded-xl border border-line">
+            <AlbumProducts :products="previewProducts" :discs="previewDiscs" bare />
           </div>
+          <p class="text-[11px] text-meta">{{ $t('editor.editions.preview_hint') }}</p>
         </div>
       </div>
       <datalist id="editor-currencies">
@@ -143,6 +161,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AlbumDisc, AlbumProduct } from '~/types/album'
 import type { AlbumProductRow } from '~/utils/albumDocument'
 import type { PriceKind, RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
@@ -156,7 +175,6 @@ const { schema } = useCatalogSchema()
 const { enumLabel, formatDate } = useCatalogDisplay()
 const { separator } = useListPunctuation()
 const { line: priceLine, kindLabel, taxLabel } = usePriceDisplay()
-const { regionName } = useLocaleFormatting()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
@@ -192,6 +210,30 @@ const formatOf = (discIds: RowId[]) => {
 const dialog = ref(false)
 const editing = ref<AlbumProductRow | null>(null)
 const form = ref<AlbumProductRow | null>(null)
+
+/** The format the album page shows, as the API derives it: "DL" for digital editions, else the ticked discs ("2CD+BD"). */
+const formLabel = computed(() => form.value ? (form.value.medium === 'digital' ? 'DL' : formatOf(form.value.disc_ids)) : '')
+
+/** The album's discs and the edition being edited, shaped as the album page gets them, for the live preview row. */
+const previewDiscs = computed(() => mainDiscs.value.map((disc, index) => ({ id: index + 1, position: disc.position, format: disc.format }) as AlbumDisc))
+const previewProducts = computed<AlbumProduct[]>(() => {
+  if (!form.value) return []
+  const values = form.value
+  const discIds = mainDiscs.value.flatMap((disc, index) => ticked(values.disc_ids, disc.id) ? [index + 1] : [])
+  const limited = values.edition_type === 'limited'
+  return [{
+    ...values,
+    id: 0,
+    sort_order: 0,
+    name: values.name?.trim() || null,
+    limited_rule: limited ? values.limited_rule : null,
+    limited_name: limited ? values.limited_name : null,
+    catalog_number: values.catalog_number ? formatCatalogNumber(values.catalog_number) : null,
+    prices: values.prices.filter(price => String(price.amount ?? '').trim() !== '').map(price => ({ ...price, currency: price.currency.trim().toUpperCase() })),
+    disc_ids: discIds,
+    format_label: formLabel.value || null,
+  } as AlbumProduct]
+})
 
 const edit = (product: AlbumProductRow | null) => {
   editing.value = product

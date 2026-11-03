@@ -2762,7 +2762,12 @@
       "price_note_placeholder": "Note, e.g. C107 or Melonbooks",
       "price_amount": "Amount",
       "price_tax": "Tax",
-      "remove_price": "Remove this price"
+      "remove_price": "Remove this price",
+      "price_kind": "Kind",
+      "price_note": "Note",
+      "preview": "On the album page",
+      "preview_live": "live preview",
+      "preview_hint": "As on the album page: columns nobody fills are left out, and a blank cell of this edition shows “—”."
     },
     "bonuses": {
       "hint": "Shop and event bonuses: items, bonus CDs, download codes.",

@@ -2762,7 +2762,12 @@
       "price_note_placeholder": "備註，如 C107、メロンブックス",
       "price_amount": "金額",
       "price_tax": "稅",
-      "remove_price": "刪除這個價格"
+      "remove_price": "刪除這個價格",
+      "price_kind": "類型",
+      "price_note": "備註",
+      "preview": "在專輯頁上",
+      "preview_live": "即時預覽",
+      "preview_hint": "和專輯頁一樣：沒人填的欄位不顯示，這個版本沒填的格子顯示「—」。"
     },
     "bonuses": {
       "hint": "店鋪和活動特典：周邊、特典 CD、下載碼。",

@@ -5,7 +5,7 @@
     :description="description"
     :icon="icon"
     :tone="TONES[tone]"
-    :size="wide ? 'lg' : 'md'"
+    :size="size ?? (wide ? 'lg' : 'md')"
     :as="as"
     @submit="emit('submit')"
   >
@@ -30,7 +30,7 @@ type Tone = 'blue' | 'sky' | 'indigo' | 'emerald' | 'amber' | 'rose' | 'purple' 
  * `type="submit"` button in the footer (or Enter in a text field) emits `submit`; `as="div"` is for dialogs that hold
  * forms of their own. The `actions` slot sits left of the close button.
  */
-withDefaults(defineProps<{ title: string, description?: string, icon?: Component, tone?: Tone, wide?: boolean, as?: 'form' | 'div' }>(), { description: undefined, icon: undefined, tone: 'blue', as: 'form' })
+withDefaults(defineProps<{ title: string, description?: string, icon?: Component, tone?: Tone, wide?: boolean, size?: 'md' | 'lg' | 'xl', as?: 'form' | 'div' }>(), { description: undefined, icon: undefined, tone: 'blue', size: undefined, as: 'form' })
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
 

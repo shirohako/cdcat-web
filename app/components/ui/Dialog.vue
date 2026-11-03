@@ -67,14 +67,14 @@ withDefaults(defineProps<{
   description?: string
   icon?: string | Component
   tone?: UiTone
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   as?: 'form' | 'div'
 }>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div' })
 
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
 
-const SIZES = { sm: 'sm:max-w-sm', md: 'sm:max-w-lg', lg: 'sm:max-w-3xl' }
+const SIZES = { sm: 'sm:max-w-sm', md: 'sm:max-w-lg', lg: 'sm:max-w-3xl', xl: 'sm:max-w-5xl' }
 
 const titleId = useId()
 const panel = ref<HTMLElement | null>(null)
