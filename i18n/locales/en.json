@@ -2831,14 +2831,18 @@
       "avatar_not_square": "The avatar must be square.",
       "gallery_hint": "Photos, character art, illustrations… Upload several at once.",
       "label_placeholder": "e.g. 2024, C105",
-      "crop_hint": "Avatars are square. Move the frame to choose the part to keep.",
+      "crop_hint": "Avatars are square and shown as a circle. Drag the frame to choose the part to keep; zoom with the wheel, a pinch or the slider below.",
       "use_as_avatar": "Use as avatar",
       "main_hint": "Giving an image the kind Avatar or Banner doesn’t replace the current one; “Use as avatar” and “Use as banner” do."
     },
     "crop": {
       "title": "Crop to a square",
-      "hint": "Album covers are square. Move the frame to choose the part to keep.",
-      "position": "Position",
+      "hint": "Album covers are square. Drag the frame to choose the part to keep; zoom with the wheel, a pinch or the slider below.",
+      "zoom": "Zoom",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Zoom out",
+      "reset": "Reset",
+      "frame": "Crop frame (arrow keys move it, + / − zoom)",
       "result": "Result: {size} × {size} px",
       "apply": "Crop and upload"
     },

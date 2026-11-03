@@ -16,13 +16,34 @@ export const squareCrop = (width: number, height: number, offset = 0) => {
 /** The output size of a square crop: no larger than `max`, no upscaling. */
 export const outputSize = (size: number, max = 3000) => Math.min(size, max)
 
+/** A square crop in image pixels: the top-left corner and the side. */
+export interface SquareCrop { x: number, y: number, size: number }
+
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value))
+
 /**
- * Crops a loaded image to a square in the browser. Resolves to a WebP blob at the server's own quality, which the
- * server stores as uploaded, so the cover is compressed once; browsers that can't write WebP get a JPEG.
+ * Keeps a square crop inside the image: the side between `minSize` (or the short side, when that is smaller) and the
+ * short side, the corner so the square does not leave the image. Not rounded, so small drags add up.
  */
-export const cropToSquare = async (image: HTMLImageElement, offset = 0, max = 3000, quality = 0.95): Promise<Blob> => {
-  const { x, y, size } = squareCrop(image.naturalWidth, image.naturalHeight, offset)
-  const output = outputSize(size, max)
+export const clampCrop = (width: number, height: number, crop: SquareCrop, minSize = 1): SquareCrop => {
+  const short = Math.min(width, height)
+  const size = clamp(crop.size, Math.min(minSize, short), short)
+  return { x: clamp(crop.x, 0, width - size), y: clamp(crop.y, 0, height - size), size }
+}
+
+/** The crop resized to `size` around its own centre, then kept inside the image. */
+export const resizeCrop = (width: number, height: number, crop: SquareCrop, size: number, minSize = 1): SquareCrop => {
+  const centreX = crop.x + crop.size / 2
+  const centreY = crop.y + crop.size / 2
+  return clampCrop(width, height, { x: centreX - size / 2, y: centreY - size / 2, size }, minSize)
+}
+
+/**
+ * Draws part of a loaded image to a square in the browser. Resolves to a WebP blob at the server's own quality, which
+ * the server stores as uploaded, so the image is compressed once; browsers that can't write WebP get a JPEG.
+ */
+export const cropToBlob = async (image: HTMLImageElement, { x, y, size }: SquareCrop, max = 3000, quality = 0.95): Promise<Blob> => {
+  const output = outputSize(Math.round(size), max)
   const canvas = document.createElement('canvas')
   canvas.width = output
   canvas.height = output
@@ -33,3 +54,7 @@ export const cropToSquare = async (image: HTMLImageElement, offset = 0, max = 30
   // A browser without a WebP encoder (Safari) returns a PNG instead.
   return webp.type === 'image/webp' ? webp : encode('image/jpeg')
 }
+
+/** Crops a loaded image to its largest square, centred or moved by `offset` (see squareCrop). */
+export const cropToSquare = (image: HTMLImageElement, offset = 0, max = 3000, quality = 0.95): Promise<Blob> =>
+  cropToBlob(image, squareCrop(image.naturalWidth, image.naturalHeight, offset), max, quality)

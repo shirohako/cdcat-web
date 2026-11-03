@@ -31,7 +31,7 @@
     <p v-else-if="note" class="text-xs text-meta">{{ note }}</p>
     <p class="text-[11px] leading-snug text-meta">{{ texts.rules }}<template v-if="pasteOnPage"> {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</template></p>
     <EditorImageImportDialog v-if="purpose !== 'profile'" v-model="showUrl" :busy="busy" :error="message" :description="texts.rules" @import="fromUrl" />
-    <EditorImageCropDialog v-if="variant !== 'banner'" :file="cropFile" :hint="texts.cropHint" @cropped="uploadCropped" @cancel="cropFile = null" />
+    <EditorImageCropDialog v-if="variant !== 'banner'" :file="cropFile" :hint="texts.cropHint" :round="variant === 'avatar'" :min-size="minSize" :tolerance="limits.tolerance" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>
 </template>
 
@@ -43,8 +43,9 @@ import { autoCropTolerance, cropToSquare, isSquare } from '~/utils/imageCrop'
 /**
  * The slot of a main image: an album's cover or banner, an artist's avatar or banner. Upload, paste from the clipboard
  * (the button, or Ctrl+V / ⌘V on the page with `paste-on-page`) or import from a link; what fits is handed on with
- * `use`, whoever owns the slot decides what becomes of the old one. A cover or avatar is square: a nearly square one is
- * cropped to the centre, any other shape goes to the crop dialog. A banner is taken as it is, when it is big enough.
+ * `use`, whoever owns the slot decides what becomes of the old one. A cover or avatar is square: an avatar always goes
+ * to the crop dialog (to pick the part to keep, even of a square one); a nearly square cover is cropped to the centre,
+ * any other shape goes to the crop dialog. A banner is taken as it is, when it is big enough.
  * The account settings use it too, for the user's own avatar and banner (`purpose="profile"`: upload or paste, no link).
  */
 const props = defineProps<{
@@ -121,8 +122,9 @@ const pick = (event: Event) => {
 }
 
 /**
- * A chosen or pasted file: too large, too small or (a banner) too narrow is refused; a square one is uploaded, a nearly
- * square one is cropped to the centred square and uploaded, any other shape goes to the crop dialog.
+ * A chosen or pasted file: too large, too small or (a banner) too narrow is refused; an avatar goes to the crop dialog;
+ * a square cover is uploaded, a nearly square one is cropped to the centred square and uploaded, any other shape goes
+ * to the crop dialog.
  */
 const take = async (picked: File) => {
   message.value = ''
@@ -140,8 +142,8 @@ const take = async (picked: File) => {
   }
   try {
     const { naturalWidth: width, naturalHeight: height } = image
-    if (square.value && Math.min(width, height) >= minSize.value && !isSquare(width, height, limits.value.tolerance)) {
-      if (!isSquare(width, height, autoCropTolerance)) {
+    if (square.value && Math.min(width, height) >= minSize.value && (props.variant === 'avatar' || !isSquare(width, height, limits.value.tolerance))) {
+      if (props.variant === 'avatar' || !isSquare(width, height, autoCropTolerance)) {
         cropFile.value = picked
         return
       }
@@ -195,7 +197,8 @@ onBeforeUnmount(() => document.removeEventListener('paste', onPaste))
 
 const uploadCropped = async (blob: Blob) => {
   cropFile.value = null
-  await send(blob, `${props.variant}.${blob.type === 'image/webp' ? 'webp' : 'jpg'}`)
+  // The dialog hands back the picked file itself when it was left whole and square enough.
+  await send(blob, blob instanceof File ? blob.name : `${props.variant}.${blob.type === 'image/webp' ? 'webp' : 'jpg'}`)
 }
 
 const openUrl = () => {
