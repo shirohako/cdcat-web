@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { HarvestCandidateRow, HarvestOverview, HarvestPagination, HarvestTaskRow } from '~/types/harvest'
 import { HARVEST_FILTER_KEYS, harvestFilters, type HarvestFilterKey } from '~/utils/harvestFilters'
+import { formatCatalogNumber } from '~/utils/catalogNumber'
 
 /** The review queue: every candidate, whatever its events, with the filters in the page's query. */
 const props = defineProps<{ sources: HarvestOverview['sources'] }>()
@@ -165,7 +166,7 @@ const select = 'rounded-lg border border-slate-300 bg-white px-2 py-1.5 focus:bo
               <td class="whitespace-nowrap px-4 py-3 font-mono text-xs leading-5 tabular-nums text-slate-500">#{{ candidate.id }}</td>
               <td class="min-w-64 space-y-1 px-4 py-3">
                 <NuxtLink :to="reviewLink(candidate.id)" class="block font-medium leading-snug hover:underline">{{ candidate.title }}</NuxtLink>
-                <p v-if="candidate.catalog_numbers.length" class="font-mono text-xs text-slate-500">{{ candidate.catalog_numbers.join(' / ') }}</p>
+                <p v-if="candidate.catalog_numbers.length" class="font-mono text-xs text-slate-500">{{ formatCatalogNumber(candidate.catalog_numbers) }}</p>
                 <p v-if="candidate.reject_reason" class="text-xs leading-5 text-slate-500">{{ candidate.reject_reason }}</p>
                 <p v-if="candidate.error" class="text-xs leading-5 text-red-700">{{ candidate.error }}</p>
               </td>

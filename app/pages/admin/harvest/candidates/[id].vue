@@ -7,6 +7,7 @@ import type { AlbumEditorHandle } from '~/utils/harvestAlbumCompare'
 import { priceText } from '~/utils/harvestAlbumCompare'
 import type { Revision } from '~/types/revision'
 import { buildHarvestDraft, withMerge } from '~/utils/harvestDraft'
+import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { harvestFilters } from '~/utils/harvestFilters'
 import { peopleWarnings, sameName } from '~/utils/harvestPeople'
 import { isSquare } from '~/utils/imageCrop'
@@ -564,8 +565,8 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   <template v-if="detail.candidate.merged.catalog_numbers.value?.length">
                     <dt class="pt-0.5 text-xs text-slate-500">编号</dt>
                     <dd class="space-y-0.5">
-                      <p class="font-mono text-xs">{{ detail.candidate.merged.catalog_numbers.value.join(' / ') }}</p>
-                      <p v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="text-xs text-slate-500">{{ sourceName(alt.source) }}：<span class="font-mono">{{ alt.value.join(' / ') }}</span></p>
+                      <p class="font-mono text-xs">{{ formatCatalogNumber(detail.candidate.merged.catalog_numbers.value) }}</p>
+                      <p v-for="alt in detail.candidate.merged.catalog_numbers.alternatives" :key="alt.source" class="text-xs text-slate-500">{{ sourceName(alt.source) }}：<span class="font-mono">{{ formatCatalogNumber(alt.value) }}</span></p>
                     </dd>
                   </template>
                   <template v-if="detail.candidate.merged.prices?.length">

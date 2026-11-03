@@ -36,7 +36,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }} <span class="text-[11px] font-normal text-meta">· {{ $t('editor.recommended') }}</span></span>
-            <input v-model="catalogNumber" class="input input-sm w-full font-mono" placeholder="KICA-1234">
+            <input v-model="catalogNumber" class="input input-sm w-full font-mono" placeholder="KICA-1234" @blur="catalogNumber = formatCatalogNumber(catalogNumber) ?? ''">
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
@@ -103,6 +103,7 @@ import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { CalendarDays, ChevronRight, Info } from '@lucide/vue'
 import { firstProduct } from '~/utils/albumDocument'
+import { formatCatalogNumber } from '~/utils/catalogNumber'
 
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
