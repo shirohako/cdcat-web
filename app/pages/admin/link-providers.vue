@@ -13,10 +13,16 @@ const formOpen = ref(false)
 const busy = ref(false)
 const message = ref('')
 const notice = ref('')
-const edit = (provider?: AdminLinkProvider) => {
+const formSection = useTemplateRef<HTMLElement>('formSection')
+/** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
+const edit = async (provider?: AdminLinkProvider) => {
   Object.assign(form, provider ? { ...provider, icon_url: provider.icon_url ?? '', url_pattern: provider.url_pattern ?? '' } : empty())
   message.value = ''
+  notice.value = ''
   formOpen.value = true
+  await nextTick()
+  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  formSection.value?.querySelector('input')?.focus({ preventScroll: true })
 }
 const save = async () => {
   if (busy.value) return
@@ -77,7 +83,7 @@ useHead({ title: '链接提供方' })
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message && !formOpen" role="alert" class="text-sm text-red-700">{{ message }}</p>
 
-    <section v-if="formOpen" class="rounded-xl border border-slate-200 bg-white p-5">
+    <section v-if="formOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-5">
       <h2 class="font-semibold">{{ form.id ? '编辑提供方' : '新建提供方' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="save">
         <label class="block">名称<input v-model="form.name" required maxlength="255" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
