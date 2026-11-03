@@ -4,7 +4,7 @@
       v-if="album && !mergedInto"
       :class="revealClass"
       :album="album"
-      @favorited="value => mutate(current => ({ ...current, is_favorited: value }))"
+      @favorited="setAlbumFavorite"
       @track-favorited="setTrackFavorite"
       @tracked="setTracking"
       @changed="refresh"
@@ -45,6 +45,11 @@ if (mergedInto.value) {
 watch(mergedInto, (id) => {
   if (id) navigateTo({ path: `/albums/${id}`, query: route.query }, { replace: true })
 })
+
+/** The album liked or unliked: its state and, when that changed, the 喜欢 count in the stats card. */
+const setAlbumFavorite = (favorited: boolean) => mutate(current => current.is_favorited === favorited
+  ? current
+  : { ...current, is_favorited: favorited, favorites_count: Math.max(0, (current.favorites_count ?? 0) + (favorited ? 1 : -1)) })
 
 /** A track favourited from the tracklist: its heart and count change in the page data, so a revisit shows them. */
 const setTrackFavorite = (trackId: number, favorited: boolean) => mutate(current => ({
