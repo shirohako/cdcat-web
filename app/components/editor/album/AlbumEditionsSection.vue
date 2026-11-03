@@ -81,7 +81,7 @@
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}</span>
-            <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5">
+            <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5" @blur="form.catalog_number = formatCatalogNumber(form.catalog_number)">
           </label>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
@@ -148,6 +148,7 @@ import type { PriceKind, RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
 import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
+import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { moveRow, sameId } from '~/utils/documentRows'
 
 const editor = useAlbumEditor()

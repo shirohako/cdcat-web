@@ -4,6 +4,7 @@ import type { AlbumDocument, RowId } from '~/types/document'
 import type { HarvestCandidateDetail, HarvestRemerge } from '~/types/harvest'
 import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument, setTitleIn } from '~/utils/albumDocument'
 import { newKey, newRef } from '~/utils/documentKeys'
+import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { DRAFT_REF, draftPeople, setCirclePublisher } from '~/utils/harvestPeople'
 import { RELEASE_ROLES } from '~/types/album'
 
@@ -84,7 +85,7 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
   const prices = (merged.prices ?? []).map(({ kind, note, amount, currency, tax_included }) => ({ kind, note, amount, currency, tax_included }))
   if (numbers.length || merged.barcode.value || prices.length) {
     addProduct(doc, {
-      catalog_number: numbers.join(' / ') || null,
+      catalog_number: formatCatalogNumber(numbers),
       barcode: merged.barcode.value,
       prices,
       region: prices.some(price => price.currency === 'JPY') ? 'JP' : null,
