@@ -13,6 +13,7 @@ import { isSquare } from '~/utils/imageCrop'
 import { errorName } from '~/utils/revisionErrors'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import { draftKey, localDrafts } from '~/utils/localDrafts'
+import { serverDrafts } from '~/utils/serverDrafts'
 import { setCover } from '~/utils/albumDocument'
 
 definePageMeta({ layout: 'admin', middleware: 'admin' })
@@ -51,8 +52,9 @@ const message = ref('')
 const busy = ref(false)
 
 /**
- * The reviewer's edits stay in this browser; a candidate opened for the first time starts from its sources. A fresh
- * draft may put one source ahead of the others (`prefer`: its values first, the others fill what it lacks).
+ * The draft is shared on the server (utils/serverDrafts), kept in this browser too; a candidate opened for the first
+ * time starts from its sources, and the editor sends that to the server. A fresh draft may put one source ahead of the
+ * others (`prefer`: its values first, the others fill what it lacks); it replaces the server's.
  */
 const prepareDraft = async (fresh = false, prefer?: string) => {
   draftReady.value = false
@@ -70,13 +72,17 @@ const prepareDraft = async (fresh = false, prefer?: string) => {
   }
   if (fresh) await localDrafts.remove(userId, scope.value).catch(() => undefined)
   const existing = fresh ? undefined : await localDrafts.get(userId, scope.value).catch(() => undefined)
-  if (!existing) {
+  // Unreachable server: the browser's copy (or a new one) is used and goes up later.
+  const server = await serverDrafts.meta(id.value).then(result => result.draft).catch(() => null)
+  if (!existing && (fresh || !server)) {
     const built = buildHarvestDraft(from)
     const now = new Date().toISOString()
     await localDrafts.put({
       key: draftKey(userId, scope.value), userId, scope: scope.value, mainRef: ALBUM_REF, type: 'album', action: 'create', entityId: null, revisionId: null,
       label: detail.value.candidate.title, items: built.items, summary: built.summary, sources: built.sources, references: detail.value.references,
       createdAt: now, updatedAt: now,
+      // Made from the version it replaces, so the editor's first save takes the server's place.
+      serverVersion: server?.version ?? null, unsynced: true,
     })
   }
   editorKey.value++
@@ -121,7 +127,7 @@ const albumEdited = async () => {
   if (detail.value?.candidate.sources_changed_at) await sourcesSeen()
   else await refresh()
 }
-// The draft lives in this browser's IndexedDB, so it is prepared after mounting.
+// The draft is kept in this browser's IndexedDB (and on the server), so it is prepared after mounting.
 onMounted(() => {
   void prepareDraft()
   watch(detail, () => { void prepareDraft() })

@@ -47,6 +47,9 @@
           <EditorDraftStatus v-if="!embedded" :draft="draft" class="w-full border-t border-line pt-3" @discard="restart" />
         </header>
 
+        <!-- A harvest candidate's draft is shared on the server; the model's MCP edits come in from there. -->
+        <AdminHarvestDraftSync v-if="draft.serverId.value !== null" :draft="draft" class="mb-4" @reloaded="contentKey++" />
+
         <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <History :size="16" class="shrink-0 text-warning" />
           <span class="min-w-0 flex-1">{{ $t('editor.open_revision', { id: openRevisions[0]!.id, at: ago(openRevisions[0]!.updated_at) }) }}</span>
@@ -58,7 +61,7 @@
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
 
-        <div class="grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'gap-5' : 'gap-6'">
+        <div :key="contentKey" class="grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'gap-5' : 'gap-6'">
           <aside class="space-y-4 lg:sticky lg:self-start" :class="embedded ? 'lg:top-24' : 'lg:top-20'">
             <nav class="card flex gap-1 overflow-x-auto p-1.5 lg:flex-col lg:overflow-visible">
               <button
@@ -209,6 +212,8 @@ const items = draft.items
 const references = draft.references as CatalogReferences
 
 const loading = ref(true)
+/** Bumped when the draft was replaced by the server's version, so the sections start from it. */
+const contentKey = ref(0)
 const loadError = ref('')
 const loaded = ref(false)
 const ready = computed(() => loaded.value && !!schema.value)

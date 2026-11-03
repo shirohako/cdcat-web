@@ -34,6 +34,10 @@ export interface LocalDraft {
   references: CatalogReferences
   createdAt: string
   updatedAt: string
+  /** A draft also kept on the server (utils/serverDrafts): the server version this copy was loaded or last saved as. */
+  serverVersion?: number | null
+  /** Changed here since the server last took it. */
+  unsynced?: boolean
 }
 
 const DB_NAME = 'cdcat'
