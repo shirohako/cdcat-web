@@ -1601,7 +1601,7 @@
       "theme_song": "主題曲",
       "character_song": "角色歌",
       "image_song": "印象曲",
-      "ost": "原聲",
+      "ost": "原聲帶",
       "drama": "廣播劇",
       "other": "其他"
     },
@@ -1680,7 +1680,7 @@
       "parent_hint": "系列最多兩層：子系列不能再有子系列。",
       "no_parent": "無（頂層系列）",
       "related_albums": "關聯專輯",
-      "related_albums_hint": "主題曲、原聲等與本條目相關的專輯。",
+      "related_albums_hint": "主題曲、原聲帶等與本條目相關的專輯。",
       "related_entries": "相關條目",
       "related_entries_hint": "從本條目的角度選擇關係，例如「續作」。對方條目會自動顯示反向關係。",
       "series_entries_hint": "把條目放在最具體的那一層系列；上級系列會自動包含子系列的條目。",

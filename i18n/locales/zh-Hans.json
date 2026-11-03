@@ -1126,7 +1126,7 @@
   "home": {
     "seo_title": "CDCat — 日系音乐数据库｜同人、VOCALOID、动画与游戏",
     "seo_description": "在 CDCat 探索日系音乐、同人作品、VOCALOID、动画游戏配乐、活动档案和详细曲目信息。",
-    "seo_keywords": "日系音乐,同人音乐,VOCALOID,东方Project,动画原声,游戏音乐,音乐数据库,曲目信息"
+    "seo_keywords": "日系音乐,同人音乐,VOCALOID,东方Project,动画原声带,游戏音乐,音乐数据库,曲目信息"
   },
   "landing": {
     "hero": {
@@ -1601,7 +1601,7 @@
       "theme_song": "主题曲",
       "character_song": "角色歌",
       "image_song": "印象曲",
-      "ost": "原声",
+      "ost": "原声带",
       "drama": "广播剧",
       "other": "其他"
     },
@@ -1680,7 +1680,7 @@
       "parent_hint": "系列最多两层：子系列不能再有子系列。",
       "no_parent": "无（顶层系列）",
       "related_albums": "关联专辑",
-      "related_albums_hint": "主题曲、原声等与本条目相关的专辑。",
+      "related_albums_hint": "主题曲、原声带等与本条目相关的专辑。",
       "related_entries": "相关条目",
       "related_entries_hint": "从本条目的角度选择关系，例如“续作”。对方条目会自动显示反向关系。",
       "series_entries_hint": "把条目放在最具体的那一层系列；上级系列会自动包含子系列的条目。",
