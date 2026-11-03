@@ -597,7 +597,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 catalog_prefixes: ['STNT'],
                 shouts_count: 2,
                 titles: [{ title: 'Stella Note', locale: 'en', kind: 'official' }],
-                links: [{ id: 610, url: 'https://x.com/stellanote', external_id: null, is_verified: true, provider: { id: 7, name: 'x', icon_url: null, category: 'social' } }],
+                links: [{ id: 610, url: 'https://x.com/stellanote', label: null, external_id: null, is_verified: true, provider: { id: 7, name: 'x', icon_url: null, category: 'social' } }],
                 attributes: [],
                 images: [{ $more: 'ArtistImage' }],
                 relations: [{ artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, relation_type: 'has_member', note: null }],
@@ -1290,6 +1290,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
           fields: [
             f('id', 'integer'),
             f('url', 'url'),
+            f('label', 'string | null'),
             f('external_id', 'string | null'),
             f('is_verified', 'boolean'),
             f('provider', 'object | null', { fields: [f('id', 'integer'), f('name', 'string'), f('icon_url', 'url | null'), f('category', 'string', { enum: 'link_category' })] }),

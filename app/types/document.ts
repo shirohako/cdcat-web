@@ -13,7 +13,7 @@ export type PriceKind = 'list' | 'event' | 'shop' | 'other'
 export interface ProductPrice { kind: PriceKind, note: string | null, amount: string, currency: string, tax_included: boolean | null }
 
 export interface TitleRow { id: RowId, title: string, locale: string | null, kind: CatalogTitleKind, sort_order?: number }
-export interface LinkRow { id: RowId, link_provider_id: number | null, url: string, sort_order?: number }
+export interface LinkRow { id: RowId, link_provider_id: number | null, url: string, label?: string | null, sort_order?: number }
 export interface AttributeRow { id: RowId, key: string, value: unknown, sort_order?: number }
 
 export interface AlbumDocument {

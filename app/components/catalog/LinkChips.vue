@@ -11,7 +11,7 @@
     >
       <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" alt="" class="h-3.5 w-3.5 rounded-sm object-contain">
       <Globe v-else :size="13" class="opacity-60" />
-      {{ label(link) }}
+      <span>{{ label(link) }}<span v-if="link.label" class="opacity-70"> · {{ link.label }}</span></span>
       <ExternalLink :size="11" class="opacity-40" />
     </a>
   </div>
@@ -20,17 +20,13 @@
 <script setup lang="ts">
 import type { CatalogLink } from '~/types/catalog'
 import { ExternalLink, Globe } from '@lucide/vue'
-import { providerLabel } from '~/utils/linkProviders'
+import { linkCategoryRank, providerLabel } from '~/utils/linkProviders'
 
 /** External links as one compact row, for page headers. The full grouped list is AlbumLinks. */
 const props = defineProps<{ links: CatalogLink[] }>()
 
-const categoryOrder = ['official', 'promotion', 'streaming', 'shop', 'social', 'database', 'other']
-const rank = (link: CatalogLink) => {
-  const index = categoryOrder.indexOf(link.provider?.category ?? 'other')
-  return index === -1 ? categoryOrder.length : index
-}
-const sorted = computed(() => [...props.links].sort((a, b) => rank(a) - rank(b)))
+/** By category, each category's links in their own order (the sort is stable). */
+const sorted = computed(() => [...props.links].sort((a, b) => linkCategoryRank(a.provider?.category) - linkCategoryRank(b.provider?.category)))
 
 const label = (link: CatalogLink) => {
   if (link.provider?.name) return providerLabel(link.provider.name)

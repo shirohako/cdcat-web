@@ -1187,6 +1187,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'リンク ID。',
         'url': 'URL。',
+        'label': 'リンク独自の表示名。同じサイトのリンクが複数あるときの「公式 MV」など。未入力なら `null`。',
         'external_id': 'そのサイトでの ID。例：Bangumi の `subject/12345`。特定できない場合は `null`。',
         'is_verified': '確認済みかどうか。',
         'provider': 'リンクの提供元。提供元が削除された場合は `null`。',

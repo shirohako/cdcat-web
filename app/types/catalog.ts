@@ -41,6 +41,8 @@ export interface CatalogLinkProvider {
 export interface CatalogLink {
   id: number
   url: string
+  /** A name of its own, shown after the site's name ("YouTube · 官方 MV"). */
+  label: string | null
   external_id: string | null
   is_verified: boolean
   provider: CatalogLinkProvider | null

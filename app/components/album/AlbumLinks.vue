@@ -7,8 +7,8 @@
       </template>
     </UiSectionTitle>
 
-    <!-- Links grouped by category, each group a small label over a row of grey tags (the category's icon on a tile in
-         the site's own hue, and the site's name; the address in the tooltip, which glides along the tags). Past
+    <!-- Links grouped by category in their own order, each group a small label over a row of grey tags (the category's
+         icon on a tile in the site's own hue, the site's name and the link's own name; the address in the tooltip, which glides along the tags). Past
          COLLAPSED_COUNT links only the first ones show until expanded. -->
     <div v-if="links && links.length > 0" class="space-y-3 px-5 pb-4 pt-1.5">
       <div v-for="(group, category) in shownGroups" :key="category">
@@ -28,7 +28,7 @@
               >
                 <component :is="categoryIcons[categoryKey(category)]" :size="12" />
               </span>
-              <span class="truncate">{{ providerLabel(link.provider?.name) || getDomain(link.url) }}</span>
+              <span class="truncate">{{ providerLabel(link.provider?.name) || getDomain(link.url) }}<span v-if="link.label" class="font-medium text-meta"> · {{ link.label }}</span></span>
               <ExternalLink :size="11" class="shrink-0 text-faint transition-colors duration-150 group-hover:text-title" />
             </a>
           </UiTooltip>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
-import { providerHue, providerLabel } from '~/utils/linkProviders'
+import { LINK_CATEGORIES, providerHue, providerLabel } from '~/utils/linkProviders'
 import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, Megaphone, ShoppingBag } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
@@ -56,8 +56,6 @@ const props = withDefaults(defineProps<{
 }>(), {
   links: () => [],
 })
-
-const categoryOrder = ['official', 'promotion', 'streaming', 'shop', 'social', 'database', 'other'];
 
 const groupedLinks = computed(() => {
   const groups: Record<string, CatalogLink[]> = {};
@@ -67,7 +65,7 @@ const groupedLinks = computed(() => {
     groups[cat].push(link);
   }
   const result: Record<string, CatalogLink[]> = {};
-  for (const cat of categoryOrder) {
+  for (const cat of LINK_CATEGORIES) {
     if (groups[cat]?.length) result[cat] = groups[cat];
   }
   for (const cat of Object.keys(groups)) {

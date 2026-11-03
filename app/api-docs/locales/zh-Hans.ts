@@ -1187,6 +1187,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': '链接 ID。',
         'url': '地址。',
+        'label': '链接自己的名称，例如同一网站有几条链接时的「官方 MV」；没填时为 `null`。',
         'external_id': '在那个网站上的 ID，例如 Bangumi 的 `subject/12345`；对不上时为 `null`。',
         'is_verified': '是否已经核实。',
         'provider': '链接提供方；提供方被删除时为 `null`。',

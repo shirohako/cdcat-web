@@ -1186,6 +1186,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': '링크 ID',
         'url': '주소',
+        'label': '링크에 붙인 이름(예: 같은 사이트 링크가 여러 개일 때의 「공식 MV」). 입력하지 않았으면 `null`입니다.',
         'external_id': '해당 사이트에서의 ID(예: Bangumi의 `subject/12345`). 알아낼 수 없으면 `null`입니다.',
         'is_verified': '확인 완료 여부',
         'provider': '링크 제공처. 제공처가 삭제되었으면 `null`입니다.',

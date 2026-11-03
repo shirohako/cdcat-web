@@ -1187,6 +1187,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'Link ID.',
         'url': 'Address.',
+        'label': 'The link\'s own name, such as "Official MV" when there are several links to one site; `null` when none was given.',
         'external_id': 'The ID on that site, for example `subject/12345` on Bangumi; `null` when it can\'t be matched.',
         'is_verified': 'Whether it has been verified.',
         'provider': 'Link provider; `null` when the provider has been deleted.',

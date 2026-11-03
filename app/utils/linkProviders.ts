@@ -58,3 +58,12 @@ export const providerHue = (name?: string | null) => {
   for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360
   return hash
 }
+
+/** The order link categories show in, on pages and in the editor; links keep their own order inside a category. */
+export const LINK_CATEGORIES = ['official', 'promotion', 'streaming', 'shop', 'social', 'database', 'other']
+
+/** A category's place in LINK_CATEGORIES; unknown categories come last. */
+export const linkCategoryRank = (category?: string | null) => {
+  const index = LINK_CATEGORIES.indexOf(category ?? 'other')
+  return index === -1 ? LINK_CATEGORIES.length : index
+}

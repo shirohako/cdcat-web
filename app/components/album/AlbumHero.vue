@@ -158,7 +158,7 @@
                   ? { color: getStreamingProvider(link.provider?.name ?? '').color, filter: 'none' }
                   : { filter: 'grayscale(1)' }"
               />
-              {{ providerName(link.provider?.name ?? '') }}
+              <span>{{ providerName(link.provider?.name ?? '') }}<span v-if="link.label" class="font-normal opacity-70"> · {{ link.label }}</span></span>
             </UiButton>
           </div>
         </div>
