@@ -273,6 +273,7 @@
       "no_releases_desc": "該藝術家尚未有關聯的專輯。",
       "inactive": "已停止活動",
       "relations": "相關藝術家",
+      "ended_relations": "過往關係",
       "credited_as": "署名為 {name}",
       "tab_releases": "發行的專輯",
       "tab_credits": "參與的專輯",
@@ -1820,6 +1821,14 @@
       "has_subunit": "小組合",
       "related": "相關"
     },
+    "artist_relation_ended": {
+      "member_of": "曾所屬",
+      "has_member": "前成員",
+      "voice_of": "曾配音",
+      "voiced_by": "前任聲優",
+      "subunit_of": "曾所屬組合",
+      "has_subunit": "前小組合"
+    },
     "artist_type": {
       "person": "個人",
       "group": "團體",
@@ -1909,6 +1918,7 @@
       "currency": "貨幣",
       "is_hires": "高解析",
       "is_available": "在售",
+      "ended": "已結束",
       "disc_ids": "碟片",
       "product_ids": "版本",
       "shop": "店鋪",
@@ -2904,7 +2914,7 @@
       },
       "artist_name_placeholder": "最常見的署名",
       "entry_name_placeholder": "原名",
-      "artist_relations_hint": "成員、聲優、馬甲和小分隊。從這個藝術家的角度選擇關係，對方會自動顯示反向關係。",
+      "artist_relations_hint": "成員、聲優、馬甲和小分隊。從這個藝術家的角度選擇關係，對方會自動顯示反向關係。成員、聲優和小組合的關係結束了（退團、解散、換人），勾選「已結束」。",
       "prefixes_hint": "品番前綴，用逗號分隔。公司和兼做廠牌的社團可以填。",
       "name_only_credit": "只填署名",
       "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。",

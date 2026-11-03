@@ -961,6 +961,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': '大頭貼。',
         'relations.artist.type': '藝術家類型。',
         'relations.relation_type': '關係，例如 `has_member` 表示對方是這個團體的成員。',
+        'relations.ended': '關係是否已結束：前成員、解散的小分隊、之前的聲優。只有成員、聲優和小分隊的關係會是 true。',
         'relations.note': '補充說明。',
       },
     },

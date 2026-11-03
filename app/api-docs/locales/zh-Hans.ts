@@ -961,6 +961,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': '头像。',
         'relations.artist.type': '艺术家类型。',
         'relations.relation_type': '关系，例如 `has_member` 表示对方是这个团体的成员。',
+        'relations.ended': '关系是否已结束：前成员、解散的小分队、之前的声优。只有成员、声优和小分队的关系会是 true。',
         'relations.note': '补充说明。',
       },
     },

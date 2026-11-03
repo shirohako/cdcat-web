@@ -79,7 +79,7 @@ export interface ArtistDocument {
   titles: TitleRow[]
   links: LinkRow[]
   attributes: AttributeRow[]
-  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, note: string | null }>
+  relations: Array<{ id: RowId, related_artist_id: AggregateRef | null, relation_type: string, ended?: boolean, note: string | null }>
   /** The artist's picture (image_url) is derived from the main avatar. */
   images: ArtistImageRow[]
 }

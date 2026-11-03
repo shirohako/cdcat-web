@@ -10,6 +10,9 @@ export type ArtistType = typeof ARTIST_TYPES[number]
 export const ARTIST_RELATIONS = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'persona_of', 'has_persona', 'subunit_of', 'has_subunit', 'related'] as const
 export type ArtistRelation = typeof ARTIST_RELATIONS[number]
 
+/** Relations that can be over ("ended"): memberships, voices and sub-units; an alias or "related" cannot (App\Enums\ArtistRelation::canEnd). */
+export const ENDING_RELATIONS: readonly string[] = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'subunit_of', 'has_subunit']
+
 /** An artist image (GET /artists/{id}): an avatar, a banner, a photo …; `image` is null once the upload is gone. */
 export interface ArtistImage {
   id: number
@@ -49,6 +52,8 @@ export interface ArtistDetail extends PendingFields {
   relations?: Array<{
     artist: { id: number, name: string, image_url: string | null, type: ArtistType | null }
     relation_type: ArtistRelation
+    /** A former member, a disbanded sub-unit, an earlier voice. */
+    ended: boolean
     note: string | null
   }>
   version: number

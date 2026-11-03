@@ -273,6 +273,7 @@
       "no_releases_desc": "This artist has no linked music releases yet.",
       "inactive": "Inactive",
       "relations": "Related artists",
+      "ended_relations": "Past",
       "credited_as": "as {name}",
       "tab_releases": "Releases",
       "tab_credits": "Credits",
@@ -1820,6 +1821,14 @@
       "has_subunit": "Sub-unit",
       "related": "Related"
     },
+    "artist_relation_ended": {
+      "member_of": "Former member of",
+      "has_member": "Former member",
+      "voice_of": "Formerly voiced",
+      "voiced_by": "Formerly voiced by",
+      "subunit_of": "Former sub-unit of",
+      "has_subunit": "Former sub-unit"
+    },
     "artist_type": {
       "person": "Person",
       "group": "Group",
@@ -1909,6 +1918,7 @@
       "currency": "Currency",
       "is_hires": "Hi-Res",
       "is_available": "Available",
+      "ended": "Ended",
       "disc_ids": "Discs",
       "product_ids": "Editions",
       "shop": "Shop",
@@ -2904,7 +2914,7 @@
       },
       "artist_name_placeholder": "The name as usually credited",
       "entry_name_placeholder": "The original title",
-      "artist_relations_hint": "Members, voice actors, aliases and sub-units. Pick the relation as seen from this artist; the other artist shows the reverse.",
+      "artist_relations_hint": "Members, voice actors, aliases and sub-units. Pick the relation as seen from this artist; the other artist shows the reverse. Tick “Ended” when a membership, sub-unit or voice role is over (left, disbanded, recast).",
       "prefixes_hint": "Catalog number prefixes, comma-separated. For companies and circles that act as labels.",
       "name_only_credit": "Name only",
       "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",

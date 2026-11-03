@@ -961,6 +961,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': 'Avatar.',
         'relations.artist.type': 'Artist type.',
         'relations.relation_type': 'The relation, for example `has_member` means the other artist is a member of this group.',
+        'relations.ended': 'Whether the relation is over: a former member, a disbanded sub-unit, an earlier voice. Only member, voice and sub-unit relations can be true.',
         'relations.note': 'A note.',
       },
     },

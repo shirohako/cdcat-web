@@ -273,6 +273,7 @@
       "no_releases_desc": "このアーティストに関連付けられたアルバムはまだありません。",
       "inactive": "活動終了",
       "relations": "関連アーティスト",
+      "ended_relations": "過去の関係",
       "credited_as": "{name} 名義",
       "tab_releases": "リリース",
       "tab_credits": "参加作品",
@@ -1820,6 +1821,14 @@
       "has_subunit": "派生ユニット",
       "related": "関連"
     },
+    "artist_relation_ended": {
+      "member_of": "元所属",
+      "has_member": "元メンバー",
+      "voice_of": "以前の担当キャラクター",
+      "voiced_by": "以前の声優",
+      "subunit_of": "以前の派生ユニット元",
+      "has_subunit": "元派生ユニット"
+    },
     "artist_type": {
       "person": "個人",
       "group": "グループ",
@@ -1909,6 +1918,7 @@
       "currency": "通貨",
       "is_hires": "ハイレゾ",
       "is_available": "発売中",
+      "ended": "終了",
       "disc_ids": "ディスク",
       "product_ids": "形態",
       "shop": "店舗",
@@ -2904,7 +2914,7 @@
       },
       "artist_name_placeholder": "よく使われるクレジット名",
       "entry_name_placeholder": "原題",
-      "artist_relations_hint": "メンバー、声優、別名義、ユニット。このアーティストから見た関係を選ぶと、相手には逆の関係が表示されます。",
+      "artist_relations_hint": "メンバー、声優、別名義、ユニット。このアーティストから見た関係を選ぶと、相手には逆の関係が表示されます。メンバー、声優、ユニットの関係が終わったとき（脱退、解散、交代）は「終了」にチェックを入れてください。",
       "prefixes_hint": "品番の接頭辞をカンマ区切りで。会社やレーベルを兼ねるサークル向けです。",
       "name_only_credit": "表記名だけ",
       "open_revision": "あなたの修正が差し戻されています（#{id}、{at}）。",

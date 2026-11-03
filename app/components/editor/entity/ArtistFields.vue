@@ -45,6 +45,7 @@
           :references="editor.references"
           :relations="{ group: 'artist_relation', values: enums.artist_relation ?? [], default: 'member_of' }"
           :extras="[
+            { name: 'ended', label: $t('catalog.field.ended'), type: 'checkbox', onlyFor: ENDING_RELATIONS },
             { name: 'note', label: $t('catalog.field.note'), wide: true },
           ]"
           :exclude="[editor.id]"
@@ -62,6 +63,7 @@
 import type { ArtistDocument } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Languages, Network, UserRound } from '@lucide/vue'
+import { ENDING_RELATIONS } from '~/types/artist'
 
 const editor = useEntityEditor()
 const { schema } = useCatalogSchema()

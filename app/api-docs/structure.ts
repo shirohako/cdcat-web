@@ -600,7 +600,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 links: [{ id: 610, url: 'https://x.com/stellanote', label: null, external_id: null, is_verified: true, provider: { id: 7, name: 'x', icon_url: null, category: 'social' } }],
                 attributes: [],
                 images: [{ $more: 'ArtistImage' }],
-                relations: [{ artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, relation_type: 'has_member', note: null }],
+                relations: [{ artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, relation_type: 'has_member', ended: false, note: null }],
                 share_card_url: null,
                 version: 3,
                 is_pending: false,
@@ -713,7 +713,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
             f('images', 'ArtistImage[]', { optional: true }),
             f('relations', 'object[]', {
               optional: true,
-              fields: [f('artist', 'object', { fields: [f('id', 'integer'), f('name', 'string'), f('image_url', 'url | null'), f('type', 'string', { enum: 'artist_type' })] }), f('relation_type', 'string', { enum: 'artist_relation' }), f('note', 'string | null')],
+              fields: [f('artist', 'object', { fields: [f('id', 'integer'), f('name', 'string'), f('image_url', 'url | null'), f('type', 'string', { enum: 'artist_type' })] }), f('relation_type', 'string', { enum: 'artist_relation' }), f('ended', 'boolean'), f('note', 'string | null')],
             }),
             shared('share_card_url', 'url | null', { optional: true }),
             shared('is_favorited', 'boolean', { optional: true }),

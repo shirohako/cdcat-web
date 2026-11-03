@@ -273,6 +273,7 @@
       "no_releases_desc": "该艺术家还没有关联的专辑。",
       "inactive": "已停止活动",
       "relations": "相关艺术家",
+      "ended_relations": "过往关系",
       "credited_as": "署名为 {name}",
       "tab_releases": "发行的专辑",
       "tab_credits": "参与的专辑",
@@ -1820,6 +1821,14 @@
       "has_subunit": "小组合",
       "related": "相关"
     },
+    "artist_relation_ended": {
+      "member_of": "曾所属",
+      "has_member": "前成员",
+      "voice_of": "曾配音",
+      "voiced_by": "前任声优",
+      "subunit_of": "曾所属组合",
+      "has_subunit": "前小组合"
+    },
     "artist_type": {
       "person": "个人",
       "group": "团体",
@@ -1909,6 +1918,7 @@
       "currency": "货币",
       "is_hires": "高解析",
       "is_available": "在售",
+      "ended": "已结束",
       "disc_ids": "碟片",
       "product_ids": "版本",
       "shop": "店铺",
@@ -2904,7 +2914,7 @@
       },
       "artist_name_placeholder": "最常见的署名",
       "entry_name_placeholder": "原名",
-      "artist_relations_hint": "成员、声优、马甲和小分队。从这个艺术家的角度选择关系，对方会自动显示反向关系。",
+      "artist_relations_hint": "成员、声优、马甲和小分队。从这个艺术家的角度选择关系，对方会自动显示反向关系。成员、声优和小组合的关系结束了（退团、解散、换人），勾上「已结束」。",
       "prefixes_hint": "品番前缀，用逗号分隔。公司和兼做厂牌的社团可以填。",
       "name_only_credit": "只填署名",
       "open_revision": "它有一条你的修订被退回修改（#{id}，{at}）。",

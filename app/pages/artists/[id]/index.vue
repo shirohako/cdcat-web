@@ -44,16 +44,21 @@
                   <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('artists.detail.catalog_prefixes') }}</span>
                   <span class="min-w-0 font-mono text-body">{{ artist.catalog_prefixes.join(', ') }}</span>
                 </div>
-                <div v-if="artist.relations?.length" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t('artists.detail.relations') }}</span>
+                <!-- Current relations, then the ended ones (former members, disbanded sub-units, earlier voices) on a row of their own, lighter. -->
+                <div v-for="part in relationParts" :key="part.key" class="flex gap-3">
+                  <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t(part.key === 'ended' ? 'artists.detail.ended_relations' : 'artists.detail.relations') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-1.5">
-                    <li v-for="relation in artist.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
-                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="inline-flex h-6 items-center gap-1.5 rounded-full bg-btn pl-0.5 pr-2.5 text-xs text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover">
-                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken">
+                    <li v-for="relation in part.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
+                      <NuxtLink
+                        :to="`/artists/${relation.artist.id}`"
+                        class="inline-flex h-6 items-center gap-1.5 rounded-full pl-0.5 pr-2.5 text-xs transition-colors duration-150 ease-out"
+                        :class="relation.ended ? 'bg-sunken text-meta hover:bg-btn hover:text-btn-content' : 'bg-btn text-btn-content hover:bg-btn-hover'"
+                      >
+                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken" :class="relation.ended && 'opacity-70'">
                           <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
                         </span>
                         {{ relation.artist.name }}
-                        <span class="text-[11px] text-meta">{{ enumLabel('artist_relation', relation.relation_type) }}</span>
+                        <span class="text-[11px] text-meta">{{ enumLabel(relation.ended ? 'artist_relation_ended' : 'artist_relation', relation.relation_type) }}</span>
                       </NuxtLink>
                     </li>
                   </ul>
@@ -175,6 +180,15 @@ const { roleName, roleOrder } = useCatalogSchema()
 
 const artistId = Number(route.params.id)
 const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`, { notFound: true })
+
+/** The relations row, then the ended ones ("过往关系") when there are any; each keeps the order the API gives. */
+const relationParts = computed(() => {
+  const relations = artist.value?.relations ?? []
+  return [
+    { key: 'current', relations: relations.filter(relation => !relation.ended) },
+    { key: 'ended', relations: relations.filter(relation => relation.ended) },
+  ].filter(part => part.relations.length)
+})
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 // The main banner up top, the main avatar in its circle; the 图片 card has the rest, other avatars and banners too.

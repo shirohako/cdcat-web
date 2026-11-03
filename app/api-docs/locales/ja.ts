@@ -961,6 +961,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': 'アイコン画像。',
         'relations.artist.type': 'アーティストの種類。',
         'relations.relation_type': '関係。例：`has_member` は相手がこのグループのメンバーであることを表します。',
+        'relations.ended': '関係が終わっているかどうか：元メンバー、解散したユニット、以前の声優。true になるのはメンバー、声優、ユニットの関係だけです。',
         'relations.note': '補足。',
       },
     },

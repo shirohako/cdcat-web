@@ -960,6 +960,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': '프로필 사진',
         'relations.artist.type': '아티스트 유형',
         'relations.relation_type': '관계. 예를 들어 `has_member`는 상대 아티스트가 이 그룹의 멤버라는 뜻입니다.',
+        'relations.ended': '관계가 끝났는지 여부: 이전 멤버, 해체한 유닛, 이전 성우. 멤버, 성우, 서브 유닛 관계만 true가 될 수 있습니다.',
         'relations.note': '메모',
       },
     },

@@ -273,6 +273,7 @@
       "no_releases_desc": "이 아티스트와 연결된 앨범이 아직 없어요.",
       "inactive": "활동 종료",
       "relations": "관련 아티스트",
+      "ended_relations": "이전 관계",
       "credited_as": "{name} 명의",
       "tab_releases": "발매 앨범",
       "tab_credits": "참여 앨범",
@@ -1820,6 +1821,14 @@
       "has_subunit": "서브 유닛",
       "related": "관련 아티스트"
     },
+    "artist_relation_ended": {
+      "member_of": "이전 소속",
+      "has_member": "이전 멤버",
+      "voice_of": "이전 담당 캐릭터",
+      "voiced_by": "이전 담당 성우",
+      "subunit_of": "이전 상위 그룹",
+      "has_subunit": "이전 서브 유닛"
+    },
     "artist_type": {
       "person": "개인",
       "group": "그룹",
@@ -1909,6 +1918,7 @@
       "currency": "통화",
       "is_hires": "하이레조",
       "is_available": "판매 중",
+      "ended": "종료",
       "disc_ids": "디스크",
       "product_ids": "에디션",
       "shop": "구매처",
@@ -2904,7 +2914,7 @@
       },
       "artist_name_placeholder": "크레딧에 주로 쓰는 이름",
       "entry_name_placeholder": "원제",
-      "artist_relations_hint": "멤버, 성우, 다른 활동명, 서브 유닛 같은 관계를 입력해요. 이 아티스트 입장에서 관계를 고르면 상대 아티스트에는 반대 관계가 표시돼요.",
+      "artist_relations_hint": "멤버, 성우, 다른 활동명, 서브 유닛 같은 관계를 입력해요. 이 아티스트 입장에서 관계를 고르면 상대 아티스트에는 반대 관계가 표시돼요. 멤버, 성우, 서브 유닛 관계가 끝났다면(탈퇴, 해체, 교체) 「종료」에 체크해 주세요.",
       "prefixes_hint": "품번 접두어를 쉼표로 구분해 입력해요. 회사나 레이블을 겸하는 서클에 쓰는 항목이에요.",
       "name_only_credit": "이름만 표기",
       "open_revision": "이 항목에 대한 내 편집에 수정 요청이 있어요 (#{id}, {at}).",
