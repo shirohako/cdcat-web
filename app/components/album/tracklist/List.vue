@@ -35,8 +35,9 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
       >
         <!-- Right-aligned against the heart, both centred on the 24px first line -->
         <span class="flex h-6 items-center justify-end text-xs tabular-nums text-meta">{{ row.number }}</span>
-        <!-- The heart has its own column after the number, the same place in every density -->
-        <AlbumTracklistFavorite :row="row" class="mt-0.5" />
+        <!-- The heart has its own column after the number, the same place in every density. The cell stays when the
+             heart doesn't (albums awaiting review), so the title keeps the third column. -->
+        <span class="mt-0.5 flex"><AlbumTracklistFavorite :row="row" /></span>
         <span class="flex h-6 min-w-0 items-center gap-1.5">
           <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-sm font-medium leading-6" />
           <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
