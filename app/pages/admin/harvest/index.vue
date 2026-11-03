@@ -77,7 +77,7 @@ useHead({ title: '采集概况' })
         <p class="text-xs text-slate-500">可以一次给多个文件，例如一次导出的全部分卷。加 --process 导入后立即合并，不加就等调度器每分钟合并。导入成功的文件会删掉（加 --keep 保留），所以文件要放在 www-data 能写的目录里，例如 /tmp。不要用 root 运行：新建的图片目录会归 root 所有，网站读不了。</p>
       </section>
       <AdminHarvestTokensPanel v-if="hasPermission('harvest.submit')" />
-      <AdminHarvestMcpTokensPanel v-if="hasPermission('harvest.manage')" />
+      <AdminHarvestMcpTokensPanel v-if="hasPermission('harvest.admin')" />
     </div>
 
     <section class="space-y-3">

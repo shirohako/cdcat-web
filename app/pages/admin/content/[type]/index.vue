@@ -11,6 +11,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
+const { hasPermission } = useAuth()
 const contentCategoryLabels: Record<string, string> = {
   game: '游戏',
   animation: '动画',
@@ -79,7 +80,8 @@ const pagination = computed(() => data.value?.pagination ?? { total: 0, per_page
 const label = (item: AdminContentItem) => String(item.title ?? item.name ?? (type.value === 'lyric' ? (item.track as { title?: string } | null)?.title : null) ?? `#${item.id}`)
 const editable = computed(() => type.value !== 'track')
 const creatable = computed(() => !!adminEditorPath(type.value))
-const recountable = computed(() => ['album', 'artist'].includes(type.value))
+// content.browse only lists; recounting is content.manage's.
+const recountable = computed(() => ['album', 'artist'].includes(type.value) && hasPermission('content.manage'))
 const frontLink = (item: AdminContentItem) => type.value === 'track' ? `/tracks/${item.id}`
   : type.value === 'lyric' ? `/tracks/${item.track_id}` : `/${adminContentRoutes[type.value]?.front}/${item.id}`
 const detail = (item: AdminContentItem) => [

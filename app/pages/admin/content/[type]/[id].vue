@@ -31,8 +31,10 @@ const type = computed(() => adminContentTypeOf(route.params.type)!)
 const id = computed(() => String(route.params.id))
 const paths = computed(() => adminContentRoutes[type.value])
 const editor = computed(() => adminEditorPath(type.value, id.value))
+// 维护操作 (recount, merge, delete) is content.manage's; content.browse sees the history and revisions.
+const tabs = computed(() => hasPermission('content.manage') ? ['history', 'revisions', 'actions'] : ['history', 'revisions'])
 const tab = computed({
-  get: () => ['history', 'revisions', 'actions'].includes(String(route.query.tab)) ? String(route.query.tab) : 'history',
+  get: () => tabs.value.includes(String(route.query.tab)) ? String(route.query.tab) : 'history',
   set: value => { router.replace({ query: { ...route.query, tab: value === 'history' ? undefined : value } }) },
 })
 
@@ -207,7 +209,7 @@ useHead({ title: computed(() => name.value) })
     </AdminListState>
 
     <nav class="flex gap-2 border-b border-slate-200 text-sm">
-      <button v-for="item in ['history', 'revisions', 'actions']" :key="item" type="button" :aria-pressed="tab === item" class="-mb-px border-b-2 px-3 py-2" :class="tab === item ? 'border-slate-900 font-semibold' : 'border-transparent text-slate-500'" @click="tab = item">{{ detailTabLabels[item] }}</button>
+      <button v-for="item in tabs" :key="item" type="button" :aria-pressed="tab === item" class="-mb-px border-b-2 px-3 py-2" :class="tab === item ? 'border-slate-900 font-semibold' : 'border-transparent text-slate-500'" @click="tab = item">{{ detailTabLabels[item] }}</button>
     </nav>
     <p v-if="notice" role="status" class="text-sm text-emerald-700">{{ notice }}</p>
     <p v-if="message" role="alert" class="text-sm text-red-700">{{ message }}</p>
