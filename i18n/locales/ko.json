@@ -261,6 +261,8 @@
     "page_indicator": "({current}/{last}페이지)",
     "no_results": "표시할 아티스트가 없어요",
     "no_search_results": "‘{query}’에 해당하는 아티스트가 없어요",
+    "show_pending_results": "검토 중인 결과 보기 ({count}개)",
+    "add_searched": "‘{name}’ 추가",
     "search_placeholder": "이름, 별칭, 읽는 법으로 검색",
     "search_too_short": "2자 이상 입력해 주세요. 한자나 가나는 1자부터 검색할 수 있어요",
     "detail": {

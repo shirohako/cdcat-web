@@ -85,6 +85,10 @@
               <Users :size="64" class="mx-auto" />
             </div>
             <p class="text-meta">{{ searchQuery ? $t('artists.no_search_results', { query: searchQuery }) : $t('artists.no_results') }}</p>
+            <div v-if="searchQuery" class="mt-4 flex flex-wrap justify-center gap-2">
+              <UiButton v-if="pendingMatches" @click="setIncludePending(true)">{{ $t('artists.show_pending_results', { count: pendingMatches }) }}</UiButton>
+              <UiButton :variant="pendingMatches ? 'default' : 'primary'" :icon="Plus" :to="{ path: '/contribute/artist', query: { name: searchQuery } }">{{ $t('artists.add_searched', { name: searchQuery }) }}</UiButton>
+            </div>
           </div>
         </CommonPagedList>
       </div>
@@ -94,7 +98,7 @@
 </template>
 
 <script setup>
-import { Users } from "@lucide/vue";
+import { Plus, Users } from "@lucide/vue";
 import { ARTIST_TYPES } from "~/types/artist";
 
 const route = useRoute();
@@ -160,6 +164,9 @@ const artistsData = computed(() => {
   return artistsResponse.value.artists || [];
 });
 
+/** Artists waiting for review that a search with no results would have found. */
+const pendingMatches = computed(() => artistsResponse.value?.pending_matches ?? 0);
+
 // 分页信息
 const pagination = computed(() => {
   if (!artistsResponse.value?.pagination) {
@@ -199,7 +206,10 @@ const selectType = (type) => {
   });
 };
 
-/** Enter or the search button; a query too short to search leaves the list as it is and says why. */
+/**
+ * Enter or the search button; a query too short to search leaves the list as it is and says why. The same query again
+ * asks the server again: what was missing a moment ago may have been added since.
+ */
 const applySearch = () => {
   const value = searchInput.value.trim();
   if (value && !searchable(value)) {
@@ -207,7 +217,10 @@ const applySearch = () => {
     toast.add({ id: 'artists-search-too-short', title: t('artists.search_too_short'), color: 'warning' });
     return;
   }
-  if (value === String(route.query.q || '')) return;
+  if (value === String(route.query.q || '')) {
+    void refresh({ dedupe: 'defer' });
+    return;
+  }
   router.push({ query: { ...route.query, q: value || undefined, page: undefined } });
 };
 </script>

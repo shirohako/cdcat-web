@@ -365,6 +365,7 @@ const texts: ApiDocsTexts = {
       },
       fields: {
         artists: '이 페이지의 아티스트입니다. 상세에만 있는 필드는 빠집니다.',
+        pending_matches: '검색 결과가 없을 때 일치하는 검토 중 아티스트 수입니다. 그 외에는 `0`입니다.',
       },
     },
     'get-artists-id': {

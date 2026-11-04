@@ -261,6 +261,8 @@
     "page_indicator": "（第 {current} / {last} 页）",
     "no_results": "没有找到艺术家",
     "no_search_results": "没有找到与「{query}」相关的艺术家",
+    "show_pending_results": "查看 {count} 个审核中的结果",
+    "add_searched": "添加「{name}」",
     "search_placeholder": "搜索名称、别名或读音",
     "search_too_short": "至少输入 2 个字符，汉字或假名 1 个即可",
     "detail": {

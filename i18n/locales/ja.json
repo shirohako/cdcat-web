@@ -261,6 +261,8 @@
     "page_indicator": "（{current}/{last} ページ）",
     "no_results": "アーティストが見つかりません",
     "no_search_results": "「{query}」に一致するアーティストはありません",
+    "show_pending_results": "承認待ちの結果を表示（{count} 件）",
+    "add_searched": "「{name}」を追加",
     "search_placeholder": "名前・別名・読みで検索",
     "search_too_short": "2 文字以上入力してください（漢字・かなは 1 文字から）",
     "detail": {

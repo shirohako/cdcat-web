@@ -365,6 +365,7 @@ const texts: ApiDocsTexts = {
       },
       fields: {
         artists: '這一頁的藝術家，不含詳情才有的欄位。',
+        pending_matches: '搜尋沒有結果時，符合的審核中藝術家數量；其他情況為 `0`。',
       },
     },
     'get-artists-id': {

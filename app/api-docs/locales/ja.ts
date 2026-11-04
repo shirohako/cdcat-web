@@ -365,6 +365,7 @@ const texts: ApiDocsTexts = {
       },
       fields: {
         artists: 'このページのアーティスト。詳細にしかないフィールドは含みません。',
+        pending_matches: '検索結果がないときの、一致する承認待ちアーティストの数。それ以外は `0`。',
       },
     },
     'get-artists-id': {

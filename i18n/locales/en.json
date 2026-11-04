@@ -261,6 +261,8 @@
     "page_indicator": "(Page {current} of {last})",
     "no_results": "No artists found",
     "no_search_results": "No artists match “{query}”",
+    "show_pending_results": "View pending results ({count})",
+    "add_searched": "Add “{name}”",
     "search_placeholder": "Search names, aliases or readings",
     "search_too_short": "Type at least 2 characters, or 1 kanji or kana",
     "detail": {

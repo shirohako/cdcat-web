@@ -562,7 +562,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
       items: [
         get('/artists', {
           query: [page, perPage(15), p('type', 'string', { enum: 'artist_type' }), p('search', 'string', { range: '≤ 100' }), p('has_albums', 'boolean', { default: 'false' }), includePending],
-          response: { fields: [f('artists', 'Artist[]'), pagination] },
+          response: { fields: [f('artists', 'Artist[]'), pagination, f('pending_matches', 'integer')] },
           statuses: [invalid],
           example: {
             request: '/artists?type=circle&has_albums=true&per_page=1',
@@ -571,6 +571,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
               data: {
                 artists: [{ id: 352, name: 'ステラノート', slug: null, type: 'circle', is_active: true, bio: '2019年から活動している同人音楽サークル。', image_url: null, followers_count: 41, albums_count: 7, catalog_prefixes: ['STNT'], shouts_count: 2, version: 3, is_pending: false, pending_revision: null, created_at: '2026-10-18T06:00:00Z', updated_at: '2026-10-29T10:40:21Z' }],
                 pagination: { total: 1830, per_page: 1, current_page: 1, last_page: 1830 },
+                pending_matches: 0,
               },
             },
           },

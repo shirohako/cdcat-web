@@ -239,7 +239,11 @@ const applySearch = () => {
     toast.add({ id: 'albums-search-too-short', title: t('albums.search_too_short'), color: 'warning' })
     return
   }
-  if (value === String(route.query.q || '')) return
+  // The same query again asks the server again: what was missing a moment ago may have been added since.
+  if (value === String(route.query.q || '')) {
+    void refresh({ dedupe: 'defer' })
+    return
+  }
   router.push({ query: { ...route.query, q: value || undefined, page: undefined } })
 };
 

@@ -365,6 +365,7 @@ const texts: ApiDocsTexts = {
       },
       fields: {
         artists: '这一页的艺术家，不含详情才有的字段。',
+        pending_matches: '搜索没有结果时，匹配的审核中艺术家数量；其他情况为 `0`。',
       },
     },
     'get-artists-id': {

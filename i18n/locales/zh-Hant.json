@@ -261,6 +261,8 @@
     "page_indicator": "（第 {current} / {last} 頁）",
     "no_results": "沒有找到藝術家",
     "no_search_results": "沒有找到與「{query}」相關的藝術家",
+    "show_pending_results": "查看 {count} 個審核中的結果",
+    "add_searched": "新增「{name}」",
     "search_placeholder": "搜尋名稱、別名或讀音",
     "search_too_short": "至少輸入 2 個字元，漢字或假名 1 個即可",
     "detail": {

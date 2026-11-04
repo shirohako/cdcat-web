@@ -365,6 +365,7 @@ const texts: ApiDocsTexts = {
       },
       fields: {
         artists: 'The artists on this page, without the detail-only fields.',
+        pending_matches: 'With a search that finds nothing, how many pending artists match it; otherwise `0`.',
       },
     },
     'get-artists-id': {
