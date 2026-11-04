@@ -30,13 +30,28 @@
                 <span class="inline-flex items-center gap-2"><Users :size="16" class="text-meta" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
               </div>
               <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
-              <div v-if="artist.titles?.length || artist.catalog_prefixes?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
-                <div v-if="artist.titles?.length" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('catalog.other_names') }}</span>
-                  <ul class="flex min-w-0 flex-wrap gap-x-4 gap-y-1">
-                    <li v-for="(title, index) in artist.titles" :key="index" class="text-body">
-                      {{ title.title }}
-                      <span class="text-[11px] text-meta">{{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}</span>
+              <div v-if="otherTitles.length || artist.catalog_prefixes?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+                <div v-if="otherTitles.length" class="space-y-1.5">
+                  <p class="text-xs text-meta">{{ $t('catalog.other_names') }}</p>
+                  <ul class="flex flex-wrap gap-1.5">
+                    <li v-for="(title, index) in otherTitles" :key="index" class="max-w-full">
+                      <UiTooltip group="artist-names" class="px-2.5! py-2! text-xs!">
+                        <template #content>
+                          <p class="flex items-center gap-1.5 font-semibold text-title">
+                            <Languages :size="13" class="shrink-0" aria-hidden="true" />
+                            {{ enumLabel('title_kind', title.kind) }}
+                          </p>
+                          <p v-if="title.locale" class="mt-0.5 flex items-center gap-1.5 text-meta">
+                            <Globe :size="13" class="shrink-0" aria-hidden="true" />
+                            {{ localeName(title.locale) }}
+                          </p>
+                        </template>
+                        <div class="flex h-full items-center gap-1.5 rounded-md bg-page px-2 py-1">
+                          <Languages :size="13" class="shrink-0 text-meta" aria-hidden="true" />
+                          <span class="min-w-0 break-words text-[13px] leading-5 text-title">{{ title.title }}</span>
+                          <span class="sr-only">{{ titleDetail(title) }}</span>
+                        </div>
+                      </UiTooltip>
                     </li>
                   </ul>
                 </div>
@@ -163,8 +178,8 @@
 <script setup lang="ts">
 import type { ArtistCreditedAlbum, ArtistDetail, ArtistImage } from '~/types/artist'
 import type { AlbumSimple } from '~/types/album'
-import type { CatalogImage } from '~/types/catalog'
-import { Disc3, Edit, History, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
+import type { CatalogImage, CatalogTitle } from '~/types/catalog'
+import { Disc3, Edit, Globe, History, Languages, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { pageHeroConfig } from '~/config/pageHero'
 import { artistLdType, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
@@ -196,6 +211,9 @@ const images = computed(() => (artist.value?.images ?? []).filter((item): item i
 const banner = computed(() => images.value.find(item => item.kind === 'banner' && item.is_primary)?.image ?? null)
 const galleryItems = computed(() => images.value.filter(item => !item.is_primary))
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
+/** The names the header does not show already. */
+const otherTitles = computed(() => (artist.value?.titles ?? []).filter(title => title.title !== shownName.value && title.title !== artist.value?.name))
+const titleDetail = (title: CatalogTitle) => [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' ')
 // One full-width column: up to six albums a row; a page of 30 ends on a full row at 2, 3, 5 and 6 columns.
 const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6'
 
