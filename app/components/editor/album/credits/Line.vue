@@ -29,7 +29,7 @@ const labelable = computed(() => props.roles.length === 1 && canHaveRoleLabel(pr
 <template>
   <li class="rounded-lg px-2.5 py-2" :class="errors.length ? 'bg-danger/8 ring-1 ring-inset ring-danger/25' : 'bg-sunken'">
     <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <EditorAlbumCreditsRoles :model-value="roles" class="shrink-0" @update:model-value="emit('roles', $event)" />
+      <EditorAlbumCreditsRoles :model-value="roles" :required="people.length > 0" :starting="!people.length" class="shrink-0" @update:model-value="emit('roles', $event)" />
       <div class="flex min-w-0 flex-1 basis-48 flex-wrap items-center gap-1.5">
         <EditorAlbumCreditsPerson
           v-for="entry in people"

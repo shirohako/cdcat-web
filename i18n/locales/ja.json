@@ -2785,6 +2785,7 @@
       "name_only_option": "表記「{name}」だけ入力",
       "roles_label": "役割",
       "pick_role": "役割を選ぶ",
+      "role_keep_one": "この行には人物がいるため、役割を1つ以上残す必要があります。変更するには、新しい役割にチェックを入れてから元の役割を外してください。",
       "change_role": "役割を変更",
       "role_search": "役割を検索（日中英どれでも）",
       "no_tracks_on": "クリア",

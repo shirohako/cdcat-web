@@ -8,7 +8,7 @@ import { personOf } from '~/utils/creditLines'
 /**
  * One role on a track (or on the whole album) in the by-track view and the byline block: its name, a tag per
  * person, and a search to add another. `roles` makes it a row being started, with the role still to pick; then the
- * search opens as soon as there is one. Otherwise, when `changeable`, a click on the role's name changes it for the
+ * search opens as soon as there is one, and it can be dropped (`cancel`). Otherwise, when `changeable`, a click on the role's name changes it for the
  * whole row (not to the roles in `exclude`), which joins the row of that role if the track has one. Each tag is one
  * credit row. Given the track's credits (`trackRows`), each tag also picks the credit it belongs to (utils/artistLine):
  * a 客串 always one of them, the default the one before it; another role one or none. A credit others belong to
@@ -21,6 +21,7 @@ const emit = defineEmits<{
   'update': [row: AlbumCreditRow, patch: Partial<CreditPerson>]
   'remove': [row: AlbumCreditRow]
   'update:roles': [roles: string[]]
+  'cancel': []
   'parent': [row: AlbumCreditRow, parent: AlbumCreditRow | null]
 }>()
 
@@ -52,7 +53,7 @@ const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(
 
 <template>
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-    <EditorAlbumCreditsRoles v-if="starting" :model-value="roles!" class="shrink-0" @update:model-value="emit('update:roles', $event)" />
+    <EditorAlbumCreditsRoles v-if="starting" :model-value="roles!" starting class="shrink-0" @update:model-value="emit('update:roles', $event)" />
     <EditorAlbumCreditsRoles v-else-if="changeable" single :model-value="[role!]" :exclude="exclude" @update:model-value="emit('role', $event[0]!)">
       <template #trigger="{ toggle, attrs }">
         <button
@@ -88,6 +89,7 @@ const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(
       />
       <EditorAlbumCreditsAddPerson v-if="!starting || roles!.length" :start-open="starting" @add="emit('add', $event)" />
     </span>
+    <UiButton v-if="starting" variant="danger-soft" icon="lucide:trash-2" :label="t('editor.credits.remove_line')" size="xs" class="shrink-0 ring-1 ring-inset ring-danger/20" @click="emit('cancel')" />
     <p v-for="error in errors" :key="error.path" class="w-full text-[11px] text-danger">{{ error.message }}</p>
   </div>
 </template>

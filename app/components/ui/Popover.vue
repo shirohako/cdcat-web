@@ -10,7 +10,7 @@ import { autoUpdate, computePosition, flip, offset as offsetMiddleware, shift, s
  *
  * Opening it from the trigger moves focus into the card; Tab past its end goes on to whatever follows the trigger and
  * Shift+Tab before its start goes back to the trigger, as if the card sat right after it. Escape returns focus to the
- * trigger too.
+ * trigger too. `toggle` is also exposed, to open the card from code as the trigger would.
  *
  * Without a trigger, pass `reference` (the element to anchor on) and drive `v-model:open` yourself, as the venue map
  * does on hover; focus then stays where it is. Attributes (class, listeners …) go to the card, e.g. a width. The card
@@ -78,6 +78,7 @@ const toggle = () => {
   focusOnOpen = true
   open.value = true
 }
+defineExpose({ toggle })
 
 const close = (returnFocus = true) => {
   if (!open.value) return

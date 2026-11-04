@@ -74,7 +74,7 @@ const copyPrevious = async (index: number) => {
           @update="update"
           @remove="remove"
         />
-        <EditorAlbumCreditsRoleRow v-if="started.album" v-model:roles="started.album" @add="firstPerson(null, $event)" />
+        <EditorAlbumCreditsRoleRow v-if="started.album" v-model:roles="started.album" @add="firstPerson(null, $event)" @cancel="started.album = undefined" />
         <EditorAlbumCreditsStartRow v-else @start="started.album = []" />
       </div>
     </section>
@@ -105,6 +105,7 @@ const copyPrevious = async (index: number) => {
           :roles="started[keyOf(track.id)]"
           @update:roles="started[keyOf(track.id)] = $event"
           @add="firstPerson(track.id, $event)"
+          @cancel="started[keyOf(track.id)] = undefined"
         />
         <EditorAlbumCreditsStartRow v-else @start="started[keyOf(track.id)] = []" />
       </div>

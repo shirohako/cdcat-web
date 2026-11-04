@@ -2785,6 +2785,7 @@
       "name_only_option": "‘{name}’ 이름으로만 표기",
       "roles_label": "역할",
       "pick_role": "역할 선택",
+      "role_keep_one": "이 줄에는 인물이 있어 역할을 하나 이상 남겨야 합니다. 바꾸려면 새 역할을 먼저 선택한 뒤 기존 역할을 해제하세요.",
       "change_role": "역할 변경",
       "role_search": "역할 검색 (영어·일본어 등도 가능)",
       "no_tracks_on": "선택 해제",

@@ -2785,6 +2785,7 @@
       "name_only_option": "Use the name “{name}” only",
       "roles_label": "Roles",
       "pick_role": "Pick a role",
+      "role_keep_one": "This line has people, so it needs at least one role. To change it, tick the new role first, then untick the old one.",
       "change_role": "Change role",
       "role_search": "Search roles in any language",
       "no_tracks_on": "Clear",

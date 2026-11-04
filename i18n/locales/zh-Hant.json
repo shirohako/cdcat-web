@@ -2785,6 +2785,7 @@
       "name_only_option": "只填署名「{name}」",
       "roles_label": "角色",
       "pick_role": "選擇角色",
+      "role_keep_one": "這一行已有人員，至少保留一個角色。要換角色，先勾選新的，再取消原來的。",
       "change_role": "更改角色",
       "role_search": "搜尋角色，中英日都可以",
       "no_tracks_on": "清空",
