@@ -193,7 +193,7 @@ const levelErrors = computed(() => editor.errorsIn('products').filter(error => e
 const errorsOf = (id: RowId) => editor.errorsIn(`products.${id}`)
 const ticked = (ids: RowId[], discId: RowId) => ids.some(id => sameId(id, discId))
 
-const SHORT: Record<string, string> = { cd: 'CD', sacd: 'SACD', dvd: 'DVD', bd: 'BD', vinyl: 'LP', cassette: 'CT', digital: 'DL', other: '?' }
+const SHORT: Record<string, string> = { cd: 'CD', sacd: 'SACD', dvd: 'DVD', bd: 'BD', vinyl: 'LP', cassette: 'CT', minidisc: 'MiniDisc', usb: 'USB', digital: 'DL', other: '?' }
 
 /** The edition's format as shops print it, e.g. 2CD+BD. */
 const formatOf = (discIds: RowId[]) => {

@@ -15,7 +15,7 @@ export const ALBUM_CATEGORIES = [
 ] as const
 export type AlbumCategory = typeof ALBUM_CATEGORIES[number]
 
-export const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other'] as const
+export const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'minidisc', 'usb', 'digital', 'other'] as const
 export type DiscFormat = typeof DISC_FORMATS[number]
 
 export const ALBUM_TYPE_ICONS: Record<AlbumType, string> = {
@@ -47,6 +47,8 @@ export const DISC_FORMAT_ICONS: Record<DiscFormat, string> = {
   bd: 'lucide:disc-2',
   vinyl: 'lucide:disc',
   cassette: 'lucide:cassette-tape',
+  minidisc: 'lucide:disc-2',
+  usb: 'lucide:usb',
   digital: 'lucide:cloud-download',
   other: 'lucide:package',
 }

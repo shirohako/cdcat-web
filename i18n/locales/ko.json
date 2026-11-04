@@ -1789,6 +1789,8 @@
       "bd": "블루레이",
       "vinyl": "LP",
       "cassette": "카세트테이프",
+      "minidisc": "미니디스크",
+      "usb": "USB",
       "digital": "디지털",
       "other": "기타"
     },

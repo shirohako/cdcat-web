@@ -63,7 +63,7 @@ const sorts: Record<AdminContentType, string[]> = {
   lyric: ['id', 'language', 'created_at', 'updated_at'],
 }
 const ALBUM_CATEGORIES = ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack']
-const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other']
+const DISC_FORMATS = ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'minidisc', 'usb', 'digital', 'other']
 const filterKeys = ['search', 'type', 'category', 'format', 'is_active', 'has_lyrics', 'album_id', 'track_id', 'language', 'kind', 'sort_by', 'sort_order'] as const
 const filters = reactive(Object.fromEntries(filterKeys.map(key => [key, String(route.query[key] ?? '')])) as Record<typeof filterKeys[number], string>)
 watch(() => route.query, (query) => { for (const key of filterKeys) filters[key] = String(query[key] ?? '') })

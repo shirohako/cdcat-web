@@ -77,7 +77,7 @@ export interface CompareContext {
 }
 
 const TITLE_KINDS: Record<string, string> = { official: '正式名', translation: '译名', transliteration: '读音', alias: '别名', abbreviation: '简称' }
-const FORMATS: Record<string, string> = { cd: 'CD', sacd: 'SACD', dvd: 'DVD', bd: 'BD', vinyl: '黑胶', cassette: '磁带', digital: '数字', other: '其他' }
+const FORMATS: Record<string, string> = { cd: 'CD', sacd: 'SACD', dvd: 'DVD', bd: 'BD', vinyl: '黑胶', cassette: '磁带', minidisc: 'MiniDisc', usb: 'USB', digital: '数字', other: '其他' }
 const IMAGE_KINDS: Record<string, string> = { cover: '封面', back: '背面', other: '其他图片' }
 
 const text = (value: string | null | undefined) => (value ?? '').normalize('NFKC').replace(/\s+/g, ' ').trim()

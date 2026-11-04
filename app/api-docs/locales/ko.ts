@@ -1297,6 +1297,8 @@ const texts: ApiDocsTexts = {
         bd: '블루레이',
         vinyl: 'LP',
         cassette: '카세트테이프',
+        minidisc: 'MiniDisc(미니디스크)',
+        usb: 'USB 메모리',
         digital: '디지털(다운로드 또는 스트리밍)',
         other: '기타',
       },
@@ -1557,6 +1559,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_formats: '`disc_format`에 `minidisc`와 `usb` 추가, 버전 형식에서는 `MiniDisc`, `USB`로 표시',
     artist_relations: '아티스트 `relation_type` 정리: `subunit_of`, `has_subunit`를 `member_of`, `has_member`에 통합하고 `persona_of`, `has_persona`를 방향이 없는 `alias`로 통합',
     disc_tocs: '앨범 상세의 디스크에 `tocs` 추가: CD의 TOC와 CDCat Disc ID, freedb·MusicBrainz·AccurateRip·CTDB ID',
     launch: '첫 공개(베타)',

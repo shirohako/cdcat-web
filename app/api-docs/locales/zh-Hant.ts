@@ -1298,6 +1298,8 @@ const texts: ApiDocsTexts = {
         bd: '藍光。',
         vinyl: '黑膠。',
         cassette: '卡帶。',
+        minidisc: 'MiniDisc（迷你光碟）。',
+        usb: 'USB 隨身碟。',
         digital: '配信（數位版）。',
         other: '其他。',
       },
@@ -1558,6 +1560,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_formats: '`disc_format` 新增 `minidisc` 和 `usb`，版本規格裡寫作 `MiniDisc` 和 `USB`。',
     artist_relations: '藝術家的 `relation_type` 簡化：`subunit_of`、`has_subunit` 併入 `member_of`、`has_member`；`persona_of`、`has_persona` 合併為沒有方向的 `alias`。',
     disc_tocs: '專輯詳情的碟片新增 `tocs`：CD 的 TOC，以及 CDCat Disc ID 和 freedb、MusicBrainz、AccurateRip、CTDB 的 ID。',
     launch: '首次公開，測試版。',

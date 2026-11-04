@@ -1298,6 +1298,8 @@ const texts: ApiDocsTexts = {
         bd: 'Blu-ray。',
         vinyl: 'アナログレコード。',
         cassette: 'カセットテープ。',
+        minidisc: 'MiniDisc（ミニディスク）。',
+        usb: 'USB メモリ。',
         digital: '配信（デジタル）。',
         other: 'その他。',
       },
@@ -1558,6 +1560,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_formats: '`disc_format` に `minidisc` と `usb` を追加。エディションの形態では `MiniDisc`、`USB` と表記します。',
     artist_relations: 'アーティストの `relation_type` を整理：`subunit_of`・`has_subunit` を `member_of`・`has_member` に統合し、`persona_of`・`has_persona` を方向のない `alias` に統合。',
     disc_tocs: 'アルバム詳細のディスクに `tocs` を追加：CD の TOC と、CDCat Disc ID、freedb・MusicBrainz・AccurateRip・CTDB の ID。',
     launch: '初公開（ベータ版）。',

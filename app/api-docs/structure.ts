@@ -70,6 +70,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
     issues: `${SOURCE_URL}/issues`,
   },
   changes: [
+    { id: 'disc_formats', date: '2026-11-05' },
     { id: 'artist_relations', date: '2026-11-05' },
     { id: 'disc_tocs', date: '2026-11-02' },
     { id: 'launch', date: '2026-10-30' },
@@ -1260,7 +1261,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         },
         { kind: 'enum', name: 'album_type', values: ['album', 'ep', 'single', 'compilation', 'drama', 'radio'] },
         { kind: 'enum', name: 'album_category', values: ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack'] },
-        { kind: 'enum', name: 'disc_format', values: ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'digital', 'other'] },
+        { kind: 'enum', name: 'disc_format', values: ['cd', 'sacd', 'dvd', 'bd', 'vinyl', 'cassette', 'minidisc', 'usb', 'digital', 'other'] },
         { kind: 'enum', name: 'date_precision', values: ['day', 'month', 'year'] },
         { kind: 'enum', name: 'title_kind', values: ['official', 'translation', 'transliteration', 'alias', 'abbreviation'] },
         { kind: 'enum', name: 'artist_type', values: ['person', 'group', 'circle', 'company', 'virtual', 'character'] },

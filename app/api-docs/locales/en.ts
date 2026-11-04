@@ -1298,6 +1298,8 @@ const texts: ApiDocsTexts = {
         bd: 'Blu-ray.',
         vinyl: 'Vinyl.',
         cassette: 'Cassette.',
+        minidisc: 'MiniDisc.',
+        usb: 'USB drive.',
         digital: 'Digital (download or streaming).',
         other: 'Other.',
       },
@@ -1558,6 +1560,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    disc_formats: '`disc_format` gains `minidisc` and `usb`, written `MiniDisc` and `USB` in edition formats.',
     artist_relations: 'Artist `relation_type` simplified: `subunit_of` and `has_subunit` merged into `member_of` and `has_member`; `persona_of` and `has_persona` merged into `alias`, which has no direction.',
     disc_tocs: 'Album details: discs get `tocs`, the CD\'s tables of contents with the CDCat Disc ID and the freedb, MusicBrainz, AccurateRip and CTDB IDs.',
     launch: 'First public release, in beta.',

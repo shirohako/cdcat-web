@@ -1789,6 +1789,8 @@
       "bd": "Blu-ray",
       "vinyl": "アナログ",
       "cassette": "カセット",
+      "minidisc": "ミニディスク",
+      "usb": "USB",
       "digital": "配信",
       "other": "その他"
     },

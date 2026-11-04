@@ -1789,6 +1789,8 @@
       "bd": "蓝光",
       "vinyl": "黑胶",
       "cassette": "磁带",
+      "minidisc": "MiniDisc",
+      "usb": "USB",
       "digital": "数字",
       "other": "其他"
     },
