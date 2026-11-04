@@ -30,7 +30,7 @@
         <!-- One bar split by status. Each part's hover area takes in the gap before it and reaches past the bar's
              edges, so moving along the bar never leaves the tooltips and theirs glides from part to part. -->
         <div class="-my-1.5 flex">
-          <UiTooltip v-for="(segment, index) in segments" :key="segment.status" group="album-tracking" :offset="2" :text="`${segment.label} ${number.format(segment.count)} · ${segment.share}%`">
+          <UiTooltip v-for="(segment, index) in segments" :key="segment.status" group="album-tracking" :text="`${segment.label} ${number.format(segment.count)} · ${segment.share}%`">
             <div
               class="box-content py-1.5 transition-[flex-grow] duration-300 ease-out"
               :class="[index > 0 && 'pl-0.5', segment.count > 0 ? 'min-w-2' : 'min-w-1']"

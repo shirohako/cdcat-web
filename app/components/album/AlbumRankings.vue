@@ -45,7 +45,7 @@
            sliver of its colour (min-w-1), narrower than any group somebody is in (min-w-2). Each part's hover area
            takes in the gap before it and reaches past the bar, so its tooltip glides from part to part. -->
       <div class="-mb-1.5 mt-2.5 flex">
-        <UiTooltip v-for="(group, index) in groups" :key="group.band" group="album-rating" :offset="2" :text="group.tip">
+        <UiTooltip v-for="(group, index) in groups" :key="group.band" group="album-rating" :text="group.tip">
           <div
             class="box-content py-1.5 transition-[flex-grow] duration-300 ease-out"
             :class="[index > 0 && 'pl-0.5', group.count > 0 ? 'min-w-2' : 'min-w-1']"
