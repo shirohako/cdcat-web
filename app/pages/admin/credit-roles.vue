@@ -177,7 +177,8 @@ useHead({ title: '角色字典' })
           <table class="w-full min-w-200 text-left text-sm">
             <thead class="border-b border-slate-100 bg-slate-50 text-xs text-slate-500">
               <tr>
-                <th class="px-4 py-3">Key</th>
+                <th class="px-4 py-3">排序</th>
+                <th class="px-3 py-3">Key</th>
                 <th class="px-3 py-3">名称</th>
                 <th class="px-3 py-3">分类</th>
                 <th class="px-3 py-3">可用层级</th>
@@ -187,7 +188,8 @@ useHead({ title: '角色字典' })
             </thead>
             <tbody class="divide-y divide-slate-100">
               <tr v-for="role in shown" :key="role.key" :class="{ 'opacity-50': !role.is_active }">
-                <td class="px-4 py-3 font-mono text-xs">{{ role.key }}<span v-if="role.is_reserved" class="ml-1 font-sans text-slate-500">（系统保留）</span><span v-if="!role.is_active" class="ml-1 font-sans text-slate-500">（已停用）</span></td>
+                <td class="px-4 py-3 text-xs tabular-nums">{{ role.sort_order }}</td>
+                <td class="px-3 py-3 font-mono text-xs">{{ role.key }}<span v-if="role.is_reserved" class="ml-1 font-sans text-slate-500">（系统保留）</span><span v-if="!role.is_active" class="ml-1 font-sans text-slate-500">（已停用）</span></td>
                 <td class="px-3 py-3">{{ role.names['zh-Hans'] || role.names.en }} <span class="text-xs text-slate-500">{{ role.names.en }}</span></td>
                 <td class="px-3 py-3 text-xs">{{ creditRoleCategoryLabels[role.category] }}</td>
                 <td class="px-3 py-3 text-xs">{{ LEVELS.filter(level => role[level]).map(level => levelLabels[level]).join(' · ') }}</td>
