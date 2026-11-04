@@ -2,6 +2,7 @@
   <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" :description="$t('editor.album.tracks_hint')">
     <template #actions>
       <UiButton :icon="ClipboardPaste" icon-class="size-3" size="xs" class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="pasteOpen = true">{{ $t('editor.paste.button') }}</UiButton>
+      <UiButton :icon="FileMusic" icon-class="size-3" size="xs" class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="cueOpen = true">{{ $t('editor.cue.button') }}</UiButton>
     </template>
 
     <div class="space-y-4 p-3 sm:p-5">
@@ -29,13 +30,14 @@
     </div>
 
     <EditorAlbumTracklistPasteDialog v-model="pasteOpen" @applied="applied" />
+    <EditorAlbumCueImportDialog v-model="cueOpen" @applied="applied" />
     <EditorAlbumDiscTocDialog :model-value="tocDisc !== null" :disc-id="tocDisc" @update:model-value="value => { if (!value) tocDisc = null }" />
   </CatalogSection>
 </template>
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
-import { ClipboardPaste, ListMusic } from '@lucide/vue'
+import { ClipboardPaste, FileMusic, ListMusic } from '@lucide/vue'
 import { addDisc, sortedDiscs } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()
@@ -44,6 +46,7 @@ const { t } = useI18n()
 const album = computed(() => editor.album.value)
 const discs = computed(() => sortedDiscs(album.value))
 const pasteOpen = ref(false)
+const cueOpen = ref(false)
 const tocDisc = ref<RowId | null>(null)
 
 /** Errors about the tracklist as a whole, e.g. "An album needs at least one track", or about all TOCs. */

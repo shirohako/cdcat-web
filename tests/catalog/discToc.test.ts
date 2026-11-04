@@ -26,11 +26,11 @@ describe('tocRows', () => {
 })
 
 describe('frames', () => {
-  it('writes m:ss.ff and rounds to whole seconds', () => {
+  it('writes m:ss.ff and cuts off to whole seconds', () => {
     expect(formatFrames(20773)).toBe('4:36.73')
     expect(formatFrames(0)).toBe('0:00.00')
-    expect(toSeconds(15213)).toBe(203)
-    expect(toSeconds(14973)).toBe(200)
+    expect(toSeconds(15213)).toBe(202)
+    expect(toSeconds(14973)).toBe(199)
   })
 
   it('compares TOCs by their sectors, not the data track', () => {

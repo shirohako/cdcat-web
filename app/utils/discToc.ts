@@ -48,8 +48,11 @@ export const audioRows = (toc: DiscTocLike) => tocRows(toc).filter(row => !row.d
 /** How long the audio plays, in frames. */
 export const audioLength = (toc: DiscTocLike) => audioRows(toc).reduce((sum, row) => sum + row.length, 0)
 
-/** A duration in whole seconds, as the tracklist stores it. */
-export const toSeconds = (frames: number) => Math.round(frames / FRAMES_PER_SECOND)
+/**
+ * A duration in whole seconds, as the tracklist stores it: a part of a second is cut off, never rounded, which is what
+ * Spotify and Apple Music show (checked on 2026-11-05, Spotify's player page and Apple Music's own formatter).
+ */
+export const toSeconds = (frames: number) => Math.floor(frames / FRAMES_PER_SECOND)
 
 /** m:ss.ff, frames after the dot, like EAC's Start and Length columns. */
 export function formatFrames(frames: number): string {

@@ -11,6 +11,7 @@ export interface ParsedTrack {
   number_label: string | null
   title: string
   duration: number | null
+  isrc?: string | null
 }
 
 const DISC_LINE = /^(?:disc|disk|cd|dvd|bd|blu-?ray|side)\s*(\d+)\s*(?:[:：\-–—.]\s*(.*))?$/i

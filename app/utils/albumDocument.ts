@@ -213,15 +213,16 @@ export function importTracklist(doc: AlbumDocument, parsed: ParsedDisc[], mode: 
       const trackNumber = parsedTrack.track_number + offset
       const existing = mode === 'update' ? tracksOn(doc, disc.id).find(track => track.track_number === trackNumber) : undefined
       if (!existing) {
-        addTrack(doc, disc.id, { track_number: trackNumber, title: parsedTrack.title, duration: parsedTrack.duration, number_label: parsedTrack.number_label })
+        addTrack(doc, disc.id, { track_number: trackNumber, title: parsedTrack.title, duration: parsedTrack.duration, number_label: parsedTrack.number_label, isrc: parsedTrack.isrc ?? null })
         added++
         continue
       }
-      const before = JSON.stringify([existing.title, existing.duration, existing.number_label])
-      existing.title = parsedTrack.title
+      const before = JSON.stringify([existing.title, existing.duration, existing.number_label, existing.isrc])
+      if (parsedTrack.title) existing.title = parsedTrack.title
       if (parsedTrack.duration !== null) existing.duration = parsedTrack.duration
       if (parsedTrack.number_label) existing.number_label = parsedTrack.number_label
-      if (JSON.stringify([existing.title, existing.duration, existing.number_label]) !== before) updated++
+      if (parsedTrack.isrc) existing.isrc = parsedTrack.isrc
+      if (JSON.stringify([existing.title, existing.duration, existing.number_label, existing.isrc]) !== before) updated++
     }
   }
   return { added, updated }

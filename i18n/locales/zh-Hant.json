@@ -2660,7 +2660,7 @@
         "images": "圖片",
         "relations": "連結與關聯"
       },
-      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定原曲、資訊和連結。",
+      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定原曲、資訊和連結。\n時長只記到秒，不足一秒的部分向下取整（直接捨去），例如 3:58.90 記作 3:58。",
       "empty_tracklist": "還沒有曲目",
       "empty_tracklist_hint": "可以從歌詞本、商店頁面或 VGMdb 貼上曲目表，也可以一首一首新增。",
       "disc_n": "Disc {n}",
@@ -2683,6 +2683,21 @@
       "byline_preview": "列表顯示",
       "byline_none": "沒有發行，也沒有整張專輯的藝術家：列表裡不顯示這一行",
       "byline_various": "卡片上顯示為 {name}"
+    },
+    "cue": {
+      "button": "從 CUE 匯入",
+      "title": "從 CUE 匯入",
+      "hint": "選擇 CUE 檔案，或把內容貼到下面。會匯入標題、時長和 ISRC。",
+      "choose": "選擇 CUE 檔案",
+      "encoding": "檔案編碼",
+      "paste_label": "CUE 內容",
+      "target": "匯入到",
+      "new_disc": "新碟片 Disc {n}",
+      "last_track": "CUE 只記錄每首的開始時間，算不出最後一首的時長，這首會留空，請手動填寫或用 TOC 補上。",
+      "no_durations": "這份 CUE 算不出這些曲目的時長（通常是一首一個音訊檔），它們會留空，請手動填寫或用 TOC 補上。",
+      "performers": "PERFORMER 只在這裡顯示，不會匯入；藝人請在「參與創作的人」裡填寫。",
+      "unreadable": "沒有讀到曲目，請確認這是 CUE 檔案。",
+      "too_big": "檔案太大，這不像 CUE 檔案。"
     },
     "paste": {
       "button": "貼上曲目表",

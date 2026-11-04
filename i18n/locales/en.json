@@ -2660,7 +2660,7 @@
         "images": "Images",
         "relations": "Links & relations"
       },
-      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.",
+      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.\nLengths stop at whole seconds, rounded down: 3:58.90 is entered as 3:58.",
       "empty_tracklist": "No tracks yet",
       "empty_tracklist_hint": "Paste a tracklist from the booklet, a shop page or VGMdb, or add tracks one by one.",
       "disc_n": "Disc {n}",
@@ -2683,6 +2683,21 @@
       "byline_preview": "Shown in lists",
       "byline_none": "No publisher and no album-wide artist: lists show no line here",
       "byline_various": "cards show {name}"
+    },
+    "cue": {
+      "button": "Import CUE",
+      "title": "Import from CUE",
+      "hint": "Choose a CUE file or paste its text below. Titles, lengths and ISRCs are imported.",
+      "choose": "Choose CUE file",
+      "encoding": "File encoding",
+      "paste_label": "CUE text",
+      "target": "Import to",
+      "new_disc": "New disc, Disc {n}",
+      "last_track": "A CUE sheet only records where each track starts, so the last track has no length. It stays empty: fill it in by hand or from a TOC.",
+      "no_durations": "This CUE sheet gives no length for these tracks, usually because each has its own audio file. They stay empty: fill them in by hand or from a TOC.",
+      "performers": "PERFORMER is only shown here and is not imported. Add artists under the people section.",
+      "unreadable": "No tracks found. Is this a CUE file?",
+      "too_big": "This file is too big to be a CUE file."
     },
     "paste": {
       "button": "Paste tracklist",

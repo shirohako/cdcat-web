@@ -26,7 +26,7 @@ const SIZES = { sm: 'text-base leading-6', md: 'text-lg leading-7', lg: 'text-xl
         <span class="min-w-0 truncate">{{ title }}</span>
         <UiCount v-if="count !== undefined" :value="count" size="sm" />
       </component>
-      <p v-if="description" class="mt-1 text-xs leading-5 text-meta">{{ description }}</p>
+      <p v-if="description" class="mt-1 whitespace-pre-line text-xs leading-5 text-meta">{{ description }}</p>
     </div>
     <div v-if="$slots.actions" class="flex shrink-0 flex-wrap items-center justify-end gap-2 text-sm">
       <slot name="actions" />
