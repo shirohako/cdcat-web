@@ -32,7 +32,7 @@
               <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
               <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
               <span v-if="product.region">{{ regionEnglishName(product.region) }}</span>
-              <span v-for="(price, i) in product.prices" :key="i">{{ priceLine(price) }}</span>
+              <span v-for="(price, i) in sortedPrices(product.prices)" :key="i">{{ priceLine(price) }}</span>
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
               <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
             </p>
@@ -118,27 +118,7 @@
           </aside>
         </div>
 
-        <div class="space-y-2 border-t border-line pt-4">
-          <p class="text-sm font-medium text-body">{{ $t('catalog.field.prices') }}</p>
-          <p v-if="!form.prices.length" class="text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>
-          <template v-else>
-            <!-- One small header over the price fields, so each box says what it is; hidden where the row wraps. -->
-            <div class="hidden gap-2 text-[11px] text-meta sm:grid sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_1.75rem]">
-              <span>{{ $t('editor.editions.price_kind') }}</span><span>{{ $t('editor.editions.price_amount') }}</span><span>{{ $t('catalog.field.currency') }}</span><span>{{ $t('editor.editions.price_tax') }}</span><span>{{ $t('editor.editions.price_note') }}</span>
-            </div>
-            <ul class="space-y-2">
-              <li v-for="(price, i) in form.prices" :key="i" class="grid grid-cols-2 gap-2 sm:grid-cols-[8rem_minmax(0,7rem)_4.5rem_8rem_minmax(0,1fr)_1.75rem] sm:items-center">
-                <UiSelect v-model="price.kind" :options="priceKindOptions" size="sm" class="w-full" />
-                <input v-model="price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')">
-                <input v-model="price.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies" :aria-label="$t('catalog.field.currency')">
-                <UiSelect v-model="price.tax_included" :options="taxOptions" size="sm" class="w-full" />
-                <input v-model="price.note" class="input input-sm col-span-2 w-full sm:col-span-1" maxlength="100" :placeholder="$t('editor.editions.price_note_placeholder')">
-                <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.editions.remove_price')" icon-class="size-3" size="xs" class="justify-self-end ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="form.prices.splice(i, 1)" />
-              </li>
-            </ul>
-          </template>
-          <EditorAddButton small @click="addPrice">{{ $t('editor.editions.add_price') }}</EditorAddButton>
-        </div>
+        <EditorAlbumPriceRows v-model="form.prices" class="border-t border-line pt-4" />
 
         <!-- The row this edition gets in the album page's editions table, drawn by that table itself. -->
         <div class="space-y-2 border-t border-line pt-4">
@@ -149,9 +129,6 @@
           <p class="text-[11px] text-meta">{{ $t('editor.editions.preview_hint') }}</p>
         </div>
       </div>
-      <datalist id="editor-currencies">
-        <option v-for="code in ['JPY', 'CNY', 'USD', 'EUR', 'TWD', 'HKD', 'KRW', 'GBP']" :key="code" :value="code" />
-      </datalist>
       <template #footer>
         <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</UiButton>
         <UiButton type="submit" variant="primary" size="sm" class="shadow-xs active:translate-y-px">{{ $t(editing ? 'common.save' : 'common.add') }}</UiButton>
@@ -163,7 +140,7 @@
 <script setup lang="ts">
 import type { AlbumDisc, AlbumProduct } from '~/types/album'
 import type { AlbumProductRow } from '~/utils/albumDocument'
-import type { PriceKind, RowId } from '~/types/document'
+import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
 import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
@@ -174,7 +151,7 @@ const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel, formatDate } = useCatalogDisplay()
 const { separator } = useListPunctuation()
-const { line: priceLine, kindLabel, taxLabel } = usePriceDisplay()
+const { line: priceLine, sorted: sortedPrices } = usePriceDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
@@ -184,8 +161,6 @@ const limitedRuleOptions = computed<UiSelectOption<string | null>[]>(() => [
   { value: null, label: '—' },
   ...(enums.value.limited_rule ?? []).map(value => ({ value, label: enumLabel('limited_rule', value) })),
 ])
-const priceKindOptions = computed<UiSelectOption<PriceKind>[]>(() => ((enums.value.price_kind ?? ['list', 'event', 'shop', 'other']) as PriceKind[]).map(value => ({ value, label: kindLabel(value) })))
-const taxOptions = computed<UiSelectOption<boolean | null>[]>(() => [true, false, null].map(value => ({ value, label: taxLabel(value) })))
 const products = computed(() => sortedProducts(album.value))
 const mainDiscs = computed(() => mainDiscsOf(album.value))
 const unticked = computed(() => untickedDiscs(album.value))
@@ -239,13 +214,6 @@ const edit = (product: AlbumProductRow | null) => {
   editing.value = product
   form.value = product ? JSON.parse(JSON.stringify(product)) : blankProduct(album.value)
   dialog.value = true
-}
-
-/** A new price in the currency of the one before it. */
-const addPrice = () => {
-  const prices = form.value?.prices
-  if (!prices) return
-  prices.push({ kind: 'list', note: null, amount: '', currency: prices.at(-1)?.currency ?? 'JPY', tax_included: null })
 }
 
 const save = () => {

@@ -158,7 +158,9 @@
         "region": "지역",
         "date": "발매일",
         "price": "가격"
-      }
+      },
+      "all_prices": "전체 가격",
+      "all_prices_count": "전체 {count}"
     },
     "bonuses": {
       "all_editions": "모든 에디션",
@@ -2819,6 +2821,7 @@
       "remove_price": "이 가격 삭제",
       "price_kind": "종류",
       "price_note": "메모",
+      "price_order_hint": "앨범 페이지에서는 종류별로 자동 정렬돼요: {order}. 같은 종류 안의 순서는 드래그하거나 화살표로 바꿀 수 있고, 맨 앞의 가격이 판 표에 표시돼요.",
       "preview": "앨범 페이지에서",
       "preview_live": "실시간 미리보기",
       "preview_hint": "앨범 페이지와 같이, 아무도 입력하지 않은 열은 표시되지 않고 이 판의 빈칸은 「—」로 표시돼요."

@@ -158,7 +158,9 @@
         "region": "地域",
         "date": "発売日",
         "price": "価格"
-      }
+      },
+      "all_prices": "すべての価格",
+      "all_prices_count": "すべて {count}"
     },
     "bonuses": {
       "all_editions": "全形態",
@@ -2819,6 +2821,7 @@
       "remove_price": "この価格を削除",
       "price_kind": "種類",
       "price_note": "メモ",
+      "price_order_hint": "アルバムページでは種類ごとに自動で並びます：{order}。同じ種類の中の順序はドラッグか矢印で変更でき、先頭の価格が版の表に表示されます。",
       "preview": "アルバムページでの表示",
       "preview_live": "リアルタイムプレビュー",
       "preview_hint": "アルバムページと同じく、誰も入力していない列は表示されず、この版の空欄は「—」になります。"

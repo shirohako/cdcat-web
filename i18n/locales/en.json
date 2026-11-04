@@ -158,7 +158,9 @@
         "region": "Region",
         "date": "Release",
         "price": "Price"
-      }
+      },
+      "all_prices": "All prices",
+      "all_prices_count": "All {count}"
     },
     "bonuses": {
       "all_editions": "All editions",
@@ -2819,6 +2821,7 @@
       "remove_price": "Remove this price",
       "price_kind": "Kind",
       "price_note": "Note",
+      "price_order_hint": "The album page sorts prices by kind automatically: {order}. Within a kind, drag or use the arrows to set the order; the first price shows in the editions table.",
       "preview": "On the album page",
       "preview_live": "live preview",
       "preview_hint": "As on the album page: columns nobody fills are left out, and a blank cell of this edition shows “—”."

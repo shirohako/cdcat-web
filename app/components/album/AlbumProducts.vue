@@ -26,7 +26,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="product in products" :key="product.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
+            <tr v-for="product in sortedProducts" :key="product.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
               <td class="border-b border-line px-2.5 py-2 align-middle">
                 <div class="flex min-w-48 items-center gap-2.5">
                   <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="product.name || formatEditionType(product.edition_type)" class="size-8 shrink-0 rounded-md object-cover">
@@ -42,7 +42,7 @@
                 </div>
               </td>
               <td v-if="columns.catalog" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle font-mono text-xs text-body">{{ product.catalog_number || '—' }}</td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ [product.format_label, mediumLabel(product.medium)].filter(Boolean).join(' · ') }}</td>
+              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ formatLabel(product) }}</td>
               <td v-if="columns.discs" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).map(n => `Disc ${n}`).join(', ') || '—' }}</td>
               <!-- Flag + English name; long names ("United Arab Emirates") are cut at the column's width and shown whole on hover. -->
               <td v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">
@@ -56,12 +56,30 @@
               </td>
               <td v-if="columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle tabular-nums text-body">{{ product.release_date ? formatDate(product.release_date, product.release_date_precision) : '—' }}</td>
               <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-right">
-                <p v-for="(price, i) in product.prices" :key="i" class="leading-5">
-                  <span v-if="labelled(product, price)" class="mr-1.5 text-[11px] text-meta">{{ priceLabel(price) }}</span>
-                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(price) }}</span>
-                  <span v-if="price.tax_included !== null" class="ml-1 text-[11px] text-meta">{{ taxLabel(price.tax_included) }}</span>
+                <!-- Several prices keep the row one line: the first in display order, and all of them behind a button. -->
+                <div v-if="product.prices.length > 1" class="flex items-center justify-end gap-2">
+                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]!) }}</span>
+                  <UiPopover placement="bottom-end" :label="$t('album.products.all_prices')" class="w-max p-3!">
+                    <template #trigger="{ toggle, attrs }">
+                      <UiButton size="xs" v-bind="attrs" @click="toggle">{{ $t('album.products.all_prices_count', { count: product.prices.length }) }}</UiButton>
+                    </template>
+                    <table class="text-[13px]">
+                      <tbody>
+                        <tr v-for="(price, i) in product.prices" :key="i">
+                          <td class="max-w-48 py-0.5 pr-4 text-xs text-meta">{{ priceLabel(price) }}</td>
+                          <td class="whitespace-nowrap py-0.5 text-right font-semibold tabular-nums text-title">{{ priceAmount(price) }}</td>
+                          <td v-if="product.prices.some(item => item.tax_included !== null)" class="whitespace-nowrap py-0.5 pl-2 text-[11px] text-meta">{{ price.tax_included === null ? '' : taxLabel(price.tax_included) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </UiPopover>
+                </div>
+                <p v-else-if="product.prices[0]" class="leading-5">
+                  <span v-if="labelled(product.prices[0])" class="mr-1.5 text-[11px] text-meta">{{ priceLabel(product.prices[0]) }}</span>
+                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]) }}</span>
+                  <span v-if="product.prices[0].tax_included !== null" class="ml-1 text-[11px] text-meta">{{ taxLabel(product.prices[0].tax_included) }}</span>
                 </p>
-                <span v-if="!product.prices.length" class="text-body">—</span>
+                <span v-else class="text-body">—</span>
               </td>
             </tr>
           </tbody>
@@ -142,7 +160,7 @@ const props = withDefaults(defineProps<{
 })
 const { t } = useI18n()
 const { separator } = useListPunctuation()
-const { label: priceLabel, amount: priceAmount, taxLabel } = usePriceDisplay()
+const { label: priceLabel, amount: priceAmount, taxLabel, sorted: sortedPrices } = usePriceDisplay()
 const { formatDate, enumLabel } = useCatalogDisplay()
 
 /** "2 个版本 · 3 项特典" on the title row, each part only when there are several. */
@@ -160,6 +178,7 @@ const columns = computed(() => ({
   price: props.products.some(product => product.prices.length),
 }))
 
+const sortedProducts = computed(() => props.products.map(product => ({ ...product, prices: sortedPrices(product.prices) })))
 const sortedBonuses = computed(() => [...props.bonuses].sort((a, b) => a.sort_order - b.sort_order))
 const editionNames = (ids: number[]) => ids
   .map(id => props.products.find(product => product.id === id))
@@ -181,6 +200,9 @@ const mediumLabel = (medium: MediumType) => {
 };
 
 
+/** "2CD+BD · 实体版"; a digital edition's "DL" would only repeat 数字版. */
+const formatLabel = (product: AlbumProduct) => [product.medium !== 'digital' && product.format_label, mediumLabel(product.medium)].filter(Boolean).join(' · ');
+
 const formatEditionType = (type: EditionType) => {
   if (type === 'limited') return t('content_display.limited');
   return t('content_display.regular');
@@ -199,5 +221,5 @@ const limitedRuleLabel = (rule: string | null) => {
 };
 
 /** A lone list price without a note shows only its amount. */
-const labelled = (product: AlbumProduct, price: ProductPrice) => product.prices.length > 1 || price.kind !== 'list' || !!price.note;
+const labelled = (price: ProductPrice) => price.kind !== 'list' || !!price.note;
 </script>

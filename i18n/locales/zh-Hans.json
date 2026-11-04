@@ -158,7 +158,9 @@
         "region": "地区",
         "date": "发售日",
         "price": "价格"
-      }
+      },
+      "all_prices": "全部价格",
+      "all_prices_count": "全部 {count}"
     },
     "bonuses": {
       "all_editions": "所有版本",
@@ -2819,6 +2821,7 @@
       "remove_price": "删除这个价格",
       "price_kind": "类型",
       "price_note": "备注",
+      "price_order_hint": "专辑页按类型自动排序：{order}。同类型内的先后可拖动或用箭头调整，排在最前的价格显示在版本表格里。",
       "preview": "在专辑页上",
       "preview_live": "实时预览",
       "preview_hint": "和专辑页一样：没人填的列不显示，这个版本没填的格子显示「—」。"
