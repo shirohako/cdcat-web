@@ -230,7 +230,8 @@
     },
     "sort": {
       "label": "排序",
-      "new": "新发布",
+      "new": "最近发售",
+      "added": "新添加",
       "trending": "近期热门",
       "top_rated": "高评分",
       "relevance": "最相关"

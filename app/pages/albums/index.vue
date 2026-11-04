@@ -128,9 +128,9 @@ const year = computed(() => {
   return value >= 1900 && value <= 2100 ? value : null
 })
 const { includePending, setIncludePending } = usePendingToggle()
-type AlbumSort = 'new' | 'trending' | 'top_rated'
-const SORTS: AlbumSort[] = ['new', 'trending', 'top_rated']
-/** The order picked in the URL; none means 新发布, or the closest matches first while searching. */
+type AlbumSort = 'new' | 'added' | 'trending' | 'top_rated'
+const SORTS: AlbumSort[] = ['added', 'new', 'trending', 'top_rated']
+/** The order picked in the URL; none means 新添加, or the closest matches first while searching. */
 const sort = computed(() => SORTS.find(value => value === route.query.sort) ?? null)
 // The list endpoint needs two characters, or one kanji or kana, to search.
 const searchQuery = computed(() => {
@@ -161,7 +161,7 @@ const { data: albumsResponse, status, error, refresh, loading, refetching, revea
     category: category.value ?? undefined,
     year: year.value ?? undefined,
     search: searchQuery.value ?? undefined,
-    sort: sort.value ?? undefined,
+    sort: sort.value ?? (searchQuery.value ? undefined : 'added'),
     include_pending: includePending.value ? 1 : undefined,
   })),
 });
@@ -219,16 +219,16 @@ const clearFilters = () => {
 
 /** Enter or the search button; a query too short to search leaves the list as it is and says why. */
 // 最相关 only shows while searching, where it is what no choice means.
-const shownSort = computed(() => sort.value ?? (searchQuery.value ? 'relevance' : 'new'))
+const shownSort = computed(() => sort.value ?? (searchQuery.value ? 'relevance' : 'added'))
 const SORT_ICONS: Record<string, string> = {
-  relevance: 'lucide:crosshair', new: 'lucide:calendar-clock', trending: 'lucide:trending-up', top_rated: 'lucide:award',
+  relevance: 'lucide:crosshair', new: 'lucide:calendar-clock', added: 'lucide:circle-plus', trending: 'lucide:trending-up', top_rated: 'lucide:award',
 }
 const sortItems = computed(() => [
   ...(searchQuery.value ? ['relevance'] : []),
   ...SORTS,
 ].map(value => ({ value, label: t(`albums.sort.${value}`), icon: SORT_ICONS[value]! })))
 const selectSort = (value: string | undefined) => {
-  const chosen = value === 'relevance' || (value === 'new' && !searchQuery.value) ? undefined : value
+  const chosen = value === 'relevance' || (value === 'added' && !searchQuery.value) ? undefined : value
   router.push({ query: { ...route.query, sort: chosen, page: undefined } })
 }
 

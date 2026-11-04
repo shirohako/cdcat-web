@@ -230,7 +230,8 @@
     },
     "sort": {
       "label": "排序",
-      "new": "新發佈",
+      "new": "最近發售",
+      "added": "新添加",
       "trending": "近期熱門",
       "top_rated": "高評分",
       "relevance": "最相關"

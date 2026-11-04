@@ -303,7 +303,7 @@ const texts: ApiDocsTexts = {
         'release_event_id': '只列出在這一屆活動首發的專輯。',
         'year': '發行年份。',
         'attributes[key]': '依屬性篩選，最多 5 個，例如 `attributes[cover_character]=射命丸文`。指向條目等內容的屬性寫成 `entry:12`。只能篩選文字、網址、選項和參照類型的屬性。',
-        'sort': '`new` 依發行日期從新到舊，`trending` 依最近 30 天的熱度，`top_rated` 依評分排名（每天更新一次）。',
+        'sort': '`new` 依發行日期從新到舊，`added` 依加入資料庫的時間從新到舊，`trending` 依最近 30 天的熱度，`top_rated` 依評分排名（每天更新一次）。',
         'search': '搜尋標題、其他名稱、品番、條碼和署名。去掉空格後至少 2 個字元，含漢字或假名時 1 個就夠，最多 3 個詞。沒傳 `sort` 時依相關度排序。',
       },
       fields: {

@@ -303,7 +303,7 @@ const texts: ApiDocsTexts = {
         'release_event_id': '只列出在这一届活动首发的专辑。',
         'year': '发行年份。',
         'attributes[key]': '按属性筛选，最多 5 个，例如 `attributes[cover_character]=射命丸文`。指向条目等内容的属性写成 `entry:12`。只能筛选文字、网址、选项和引用类型的属性。',
-        'sort': '`new` 按发行日期从新到旧，`trending` 按最近 30 天的热度，`top_rated` 按评分排名（每天更新一次）。',
+        'sort': '`new` 按发行日期从新到旧，`added` 按加入数据库的时间从新到旧，`trending` 按最近 30 天的热度，`top_rated` 按评分排名（每天更新一次）。',
         'search': '搜索标题、其他名称、品番、条码和署名。去掉空格后至少 2 个字符，含汉字或假名时 1 个就够，最多 3 个词。没传 `sort` 时按相关度排序。',
       },
       fields: {

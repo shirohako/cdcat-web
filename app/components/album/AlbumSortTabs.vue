@@ -3,7 +3,8 @@ interface SortItem { value: string, label: string, icon: string }
 
 /**
  * The album list's sort, in the header's #tabs, so it is the first thing under the title. On phones it is a
- * full-width UiSegmented (its thumb glides and squashes). On wider screens it is a row of tabs on the header's
+ * UiSegmented of icons with the chosen one's label open, as the labels don't fit side by side (its thumb glides and
+ * squashes). On wider screens it is a row of tabs on the header's
  * line: each label carries its icon in a small tile, filled with the theme colour on the chosen tab, and one
  * underline glides to whichever tab is chosen. Pointing at a tab darkens its label, tips its icon and draws a faint
  * underline out from the middle.
@@ -50,7 +51,7 @@ watch(() => [props.modelValue, props.items.length], () => nextTick(measure))
     <UiSegmented
       :model-value="modelValue"
       :items="items"
-      block
+      collapse
       :label="label"
       @update:model-value="value => value && emit('update:modelValue', String(value))"
     />

@@ -109,7 +109,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
             p('year', 'integer', { range: '1900–2100' }),
             p('attributes[key]', 'string'),
             includePending,
-            p('sort', 'string', { values: ['new', 'trending', 'top_rated'], default: 'new' }),
+            p('sort', 'string', { values: ['new', 'added', 'trending', 'top_rated'], default: 'new' }),
             p('search', 'string', { range: '≤ 100' }),
           ],
           response: { fields: [f('albums', 'AlbumSimple[]'), pagination] },

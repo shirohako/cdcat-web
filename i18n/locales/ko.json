@@ -230,7 +230,8 @@
     },
     "sort": {
       "label": "정렬",
-      "new": "최신순",
+      "new": "최근 발매순",
+      "added": "최근 추가순",
       "trending": "최근 인기순",
       "top_rated": "평점순",
       "relevance": "정확도순"

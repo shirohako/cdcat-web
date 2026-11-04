@@ -230,7 +230,8 @@
     },
     "sort": {
       "label": "Sort",
-      "new": "New releases",
+      "new": "Recently released",
+      "added": "Recently added",
       "trending": "Trending",
       "top_rated": "Top rated",
       "relevance": "Best match"

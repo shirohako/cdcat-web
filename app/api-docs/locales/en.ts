@@ -303,7 +303,7 @@ const texts: ApiDocsTexts = {
         'release_event_id': 'Only list albums first released at this event.',
         'year': 'Release year.',
         'attributes[key]': 'Filter by attribute, up to 5, for example `attributes[cover_character]=射命丸文`. Write attributes that point to an entry or other content as `entry:12`. Only text, URL, choice and reference attributes can be filtered.',
-        'sort': '`new` by release date, newest first; `trending` by popularity over the last 30 days; `top_rated` by rating ranking (updated once a day).',
+        'sort': '`new` by release date, newest first; `added` by when the album entered the database, newest first; `trending` by popularity over the last 30 days; `top_rated` by rating ranking (updated once a day).',
         'search': 'Search titles, other names, catalog numbers, barcodes and credited names. At least 2 characters without spaces, or 1 if it has kanji or kana; at most 3 words. Without `sort`, results are sorted by relevance.',
       },
       fields: {

@@ -230,7 +230,8 @@
     },
     "sort": {
       "label": "並び替え",
-      "new": "新着",
+      "new": "最近の発売",
+      "added": "新着",
       "trending": "最近の人気",
       "top_rated": "高評価",
       "relevance": "関連度"
