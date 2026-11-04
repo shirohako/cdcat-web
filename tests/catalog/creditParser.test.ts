@@ -6,7 +6,7 @@ const WORDS: Record<string, string[]> = {
   lyricist: ['作詞', 'Lyrics', 'Lyric'],
   arranger: ['編曲', 'Arranger'],
   vocals: ['Vocal', 'ボーカル'],
-  artist: ['Artist'],
+  artist: ['Artist', '艺术家'],
   illustrator: ['Illustration', 'Illust'],
   guitar: ['Guitar'],
   bass: ['Bass'],
@@ -89,6 +89,63 @@ describe('pasted credit lists', () => {
       [['ESTIMATE, LLC.', ['1-2', '1-3', '1-15']]],
       [['A, B & C', null], ['D', ['1-1']], ['E, F', ['1-1']]],
     ])
+  })
+
+  it('reads disc.track numbers, feat. against a Japanese name, and a name list that wraps', () => {
+    const { lines, skipped } = parse([
+      '艺术家:Animalost(1.1)、雨部冷キザミfeat.宮舞モ力',
+      '(1.5)、Tatsh(1.6)、夜未アガリfeat.重音テトSV(1.10)、',
+      'WHITEFISTS feat.Sennzai(2.1)、ak+q(2.4)、LV.4(2.8)、wa.(2.9)、Junk feat.《夢/結唱R0sE》(2.11)、',
+      'ex.Zekk(3.4)、Mei Naganowa feat.L4hee(3.11)、天門',
+      '(4.7)、黒魔feat.カゼヒキV(4.10)、aon(4.11)',
+    ].join('\n'))
+    expect(skipped).toEqual([])
+    expect(lines).toHaveLength(1)
+    expect(lines[0]!.roles).toEqual(['artist'])
+    expect(lines[0]!.names.map(name => [name.name, tracks(name.tracks), name.featuring ? lines[0]!.names[name.host!]!.name : null])).toEqual([
+      ['Animalost', ['1-1'], null],
+      ['雨部冷キザミ', ['1-5'], null],
+      ['宮舞モ力', ['1-5'], '雨部冷キザミ'],
+      ['Tatsh', ['1-6'], null],
+      ['夜未アガリ', ['1-10'], null],
+      ['重音テトSV', ['1-10'], '夜未アガリ'],
+      ['WHITEFISTS', ['2-1'], null],
+      ['Sennzai', ['2-1'], 'WHITEFISTS'],
+      ['ak+q', ['2-4'], null],
+      ['LV.4', ['2-8'], null],
+      ['wa.', ['2-9'], null],
+      ['Junk', ['2-11'], null],
+      ['夢/結唱R0sE', ['2-11'], 'Junk'],
+      ['ex.Zekk', ['3-4'], null],
+      ['Mei Naganowa', ['3-11'], null],
+      ['L4hee', ['3-11'], 'Mei Naganowa'],
+      ['天門', ['4-7'], null],
+      ['黒魔', ['4-10'], null],
+      ['カゼヒキV', ['4-10'], '黒魔'],
+      ['aon', ['4-11'], null],
+    ])
+  })
+
+  it('reads disc.track ranges, and keeps a version number as the detail', () => {
+    const { lines } = parse('Vocal: A (1.2-1.4, 2.1)\nVocal: B (1.8-10)\nVocal: C (1.8-2.3)\nVocal: D (2.0)')
+    expect(lines.map(line => tracks(line.names[0]!.tracks))).toEqual([['1-2', '1-3', '1-4', '2-1'], ['1-8', '1-9', '1-10'], null, null])
+    expect(lines.slice(2).map(line => line.names[0]!.detail)).toEqual(['1.8-2.3', '2.0'])
+  })
+
+  it('leaves a name glued to feat in Latin letters, and doesn\'t wrap past the end of a list', () => {
+    const { lines, skipped } = parse('Vocal: Swift.Kid、Mofeat.Rin\n作曲：A、\n編曲：B\nVocal: C、\nDisc 2\n作曲：D\n这是一行说明\n(M2) 这行也不是\n\n作曲：E、\n\nF')
+    expect(lines.map(line => [line.line, line.names.map(name => name.name)])).toEqual([
+      [1, ['Swift.Kid', 'Mofeat.Rin']], [2, ['A']], [3, ['B']], [4, ['C']], [6, ['D']], [10, ['E']],
+    ])
+    expect(tracks(lines[4]!.names[0]!.tracks)).toBe(null)
+    expect(skipped).toEqual([7, 8, 12])
+  })
+
+  it('numbers lines after a wrapped list as they stand in the text', () => {
+    const { lines, skipped } = parse('作曲：A、\nB\n说明\n編曲：C')
+    expect(lines.map(line => line.line)).toEqual([1, 4])
+    expect(lines[0]!.names.map(name => name.name)).toEqual(['A', 'B'])
+    expect(skipped).toEqual([3])
   })
 
   it('marks role words it doesn\'t know and skips lines that are no credits', () => {

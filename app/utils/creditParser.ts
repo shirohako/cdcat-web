@@ -13,6 +13,9 @@
 //   Disc 2                                     numbers after it are on disc 2
 //   Composer: ESTIMATE, LLC. (02-09, 11-13)    a company suffix after a comma (LLC., Inc., Co., Ltd.) stays with the name
 //   Composer: 《ESTIMATE, LLC.》 (02-09)        so does what 《》「」『』〈〉“” wrap, the quotes taken off
+//   艺术家:A(1.1)、黒魔feat.B(1.2)、             1.2 is disc 1, track 2; feat. may touch a Japanese name; a list that wraps
+//   C(2.1)、D                                   goes on under a line ending in a separator, or under one starting with
+//   (2.2)、E(2.3)                               the brackets or separator of the name before
 //
 // Role words are looked up by the caller (the role dictionary's names and other spellings); matching the
 // names to artists is the dialog's business.
@@ -77,6 +80,8 @@ const TRACK_LINE = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:[.．:：)）
 const TRACK_ITEM = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~〜～]\s*(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3}))?$/i
 /** "2-03": a disc and a zero-padded track number, as VGMdb writes them, rather than a range. */
 const DISC_TRACK_ITEM = /^(\d)-(\d{2})$/
+/** "1.5" and "1.5-1.8": a disc and a track number. */
+const DISC_DOT_ITEM = /^(\d{1,2})\.(\d{1,3})(?:[-–—~〜～](?:\1\.)?(\d{1,3}))?$/
 const ALL_TRACKS = /^(?:全曲|全て|すべて|全部|all(?:\s*tracks)?)$/i
 const BRACKETS: Record<string, string> = { '（': '）', '(': ')', '［': '］', '[': ']', '【': '】' }
 /** Quotes around one name, "《ESTIMATE, LLC.》": nothing inside is split, and they are taken off the name. */
@@ -91,8 +96,11 @@ function unquote(name: string): string {
   const inner = name.slice(1, -1)
   return inner.includes(name[0]!) || inner.includes(close) ? name : inner.trim()
 }
-/** The word before a 客串: "A feat. B", "A ft. B", "A featuring B", also "A feat.B" as booklets sometimes print it. */
-const FEATURING_WORD = /\s+(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)/gi
+/**
+ * The word before a 客串: "A feat. B", "A ft. B", "A featuring B", also "A feat.B" as booklets sometimes print it, and
+ * "黒魔feat.B" with no space after a Japanese name or a closing bracket. Latin letters need the space: "Swift.B".
+ */
+const FEATURING_WORD = /(?:\s+|(?<=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー々〆）)］\]】》」』〉”]))(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)/giu
 /** A bracket that holds the 客串 instead of a detail: "A (feat. B)". */
 const FEATURING_BRACKET = /^(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)(.+)$/i
 /**
@@ -112,6 +120,14 @@ function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
     const discTrack = item.match(DISC_TRACK_ITEM)
     if (discTrack) {
       refs.push({ disc: Number(discTrack[1]), number: Number(discTrack[2]) })
+      continue
+    }
+    const dotted = item.match(DISC_DOT_ITEM)
+    if (dotted) {
+      const first = Number(dotted[2])
+      const last = dotted[3] ? Number(dotted[3]) : first
+      if (!first || last < first || last - first > 200) return null
+      for (let number = first; number <= last; number++) refs.push({ disc: Number(dotted[1]), number })
       continue
     }
     const match = item.match(TRACK_ITEM)
@@ -237,6 +253,16 @@ function roleColon(line: string): number {
   return -1
 }
 
+/** A line without its indent and list bullet. */
+const bare = (raw: string) => raw.trim().replace(/^[-*•·]\s*/, '')
+
+/** How a wrapped name list carries on from the line before: at a separator, a track bracket or a feat. */
+function startsAsTail(line: string): boolean {
+  if (/^[、，,／/;；]/.test(line) || /^(?:feat|ft)\./i.test(line)) return true
+  const bracket = line.match(/^[（(［[【]([^）)］\]】]*)[）)］\]】]/)
+  return !!bracket && parseTracks(bracket[1]!, 1) !== null
+}
+
 /**
  * Reads a pasted credit list. `rolesOf` gives the role keys a folded role word stands for (none when it is not
  * one); ROLE_SHORTHANDS are tried after it.
@@ -247,16 +273,32 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
     const found = rolesOf(folded)
     return found.length ? found : ROLE_SHORTHANDS[folded] ?? []
   }
+  const rolesIn = (line: string) => {
+    const colon = roleColon(line)
+    const left = colon > 0 ? line.slice(0, colon).trim() : ''
+    const words = left ? left.split(/\s*[・/／&＆,，、+＋]\s*|\s+(?:and|&)\s+/i).map(word => word.trim()).filter(Boolean) : []
+    return { colon, left, roles: [...new Set(words.flatMap(lookup))], unknown: words.filter(word => !lookup(word).length) }
+  }
   const lines: ParsedCreditLine[] = []
   const skipped: number[] = []
   let disc = 1
   let track: number | null = null
-  const rows = text.split(/\r?\n/)
+  // A list that wrapped is put back on one line, numbered as its first
+  const rows: { raw: string, number: number }[] = []
+  text.split(/\r?\n/).forEach((raw, index) => {
+    const before = rows.at(-1)
+    const previous = before ? bare(before.raw) : ''
+    const line = bare(raw)
+    const wraps = line && roleColon(previous) > 0 && !DISC_LINE.test(line) && !rolesIn(line).roles.length
+      && (/(?:[、，,／/;；]|\b(?:feat|ft)\.)$/i.test(previous) || startsAsTail(line))
+    if (wraps) before!.raw = before!.raw.trimEnd() + raw.trim()
+    else rows.push({ raw, number: index + 1 })
+  })
   // Text copied with a blank line after every line (no two lines next to each other) ends a block only at a longer
   // gap than that.
   const gaps: number[] = []
   let run = -1
-  for (const raw of rows) {
+  for (const { raw } of rows) {
     if (raw.trim()) {
       if (run >= 0) gaps.push(run)
       run = 0
@@ -269,8 +311,8 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
   let headingIndent = 0
   const indentOf = (raw: string) => raw.match(/^[ \t\u3000]*/)![0].replace(/\t/g, '    ').length
 
-  rows.forEach((raw, index) => {
-    const line = raw.trim().replace(/^[-*•·]\s*/, '')
+  rows.forEach(({ raw, number }) => {
+    const line = bare(raw)
     if (!line) {
       blanks++
       return
@@ -279,11 +321,7 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
     if (blanks > spacing && indentOf(raw) <= headingIndent) track = null
     blanks = 0
     const discHeading = line.match(DISC_LINE)
-    const colon = roleColon(line)
-    const left = colon > 0 ? line.slice(0, colon).trim() : ''
-    const words = left ? left.split(/\s*[・/／&＆,，、+＋]\s*|\s+(?:and|&)\s+/i).map(word => word.trim()).filter(Boolean) : []
-    const roles = [...new Set(words.flatMap(lookup))]
-    const unknown = words.filter(word => !lookup(word).length)
+    const { colon, left, roles, unknown } = rolesIn(line)
 
     // A line naming no known role may be a disc or a track heading: "Disc 2", "01. Title", "M1 Title: Subtitle".
     if (!roles.length) {
@@ -301,17 +339,17 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
       }
     }
     if (colon <= 0 || left.length > 40) {
-      skipped.push(index + 1)
+      skipped.push(number)
       return
     }
     // Every name parseNames gives has text, so the hosts' indexes hold across the line
     const names = splitNames(line.slice(colon + 1)).reduce<ParsedCreditName[]>((all, part) => [...all, ...parseNames(part, disc, all.length)], [])
       .map(name => ({ ...name, tracks: name.tracks ?? (track === null ? null : [{ disc, number: track }]) }))
     if (!names.length) {
-      skipped.push(index + 1)
+      skipped.push(number)
       return
     }
-    lines.push({ line: index + 1, roleText: left, roles, unknown, names })
+    lines.push({ line: number, roleText: left, roles, unknown, names })
   })
   return { lines, skipped }
 }
