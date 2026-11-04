@@ -1,7 +1,8 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.basic')" :icon="Info">
     <div class="grid gap-6 p-5 md:grid-cols-[13rem_1fr]">
-      <div>
+      <!-- As wide as beside the fields, not the whole screen: the fields would start a full square further down. -->
+      <div class="mx-auto w-full max-w-52 md:max-w-none">
         <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span></p>
         <EditorAlbumCoverSlot />
       </div>
@@ -21,7 +22,7 @@
           </div>
           <label class="block">
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
-            <UiSelect v-model="album.type" :options="typeOptions" :placeholder="$t('editor.album.type_placeholder')" size="sm" class="w-full" :invalid="!!errorAt('type')" />
+            <UiDialogSelect v-model="album.type" :options="typeOptions" :title="$t('editor.album.type_title')" :description="$t('editor.album.type_intro')" :placeholder="$t('editor.album.type_placeholder')" size="sm" class="w-full" :invalid="!!errorAt('type')" />
             <span v-if="errorAt('type')" class="mt-1 block text-xs text-danger">{{ errorAt('type') }}</span>
           </label>
         </div>
@@ -100,11 +101,12 @@
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
-import type { UiSelectOption } from '~/components/ui/Select.vue'
+import type { UiDialogSelectOption } from '~/components/ui/DialogSelect.vue'
 import { CalendarDays, ChevronRight, Info } from '@lucide/vue'
 import { firstProduct } from '~/utils/albumDocument'
 import { formatCatalogNumber } from '~/utils/catalogNumber'
 
+const { t } = useI18n()
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
@@ -114,7 +116,30 @@ const album = computed(() => editor.album.value)
 const references = editor.references
 const errorAt = (field: string) => editor.errorAt(field)
 const enums = computed(() => schema.value?.enums ?? {})
-const typeOptions = computed<UiSelectOption<string | null>[]>(() => (enums.value.album_type ?? []).map(value => ({ value, label: enumLabel('album_type', value) })))
+
+/** Each type's block in the picker: columns out of six and colour. */
+const TYPE_BLOCKS: Record<string, Pick<UiDialogSelectOption, 'span' | 'tone'>> = {
+  album: { span: 6, tone: 'blue' },
+  ep: { span: 2, tone: 'violet' },
+  single: { span: 2, tone: 'pink' },
+  compilation: { span: 2, tone: 'amber' },
+  drama: { span: 3, tone: 'purple' },
+  radio: { span: 3, tone: 'teal' },
+}
+
+const typeOptions = computed<UiDialogSelectOption<string | null>[]>(() => (enums.value.album_type ?? []).map((value) => {
+  const label = enumLabel('album_type', value)
+  const english = labelEn('album_type', value)
+  return {
+    value,
+    label,
+    hint: english === label ? undefined : english,
+    summary: t(`editor.album.type_options.${value}.summary`),
+    description: t(`editor.album.type_options.${value}.description`),
+    content: t(`editor.album.type_options.${value}.content`).split('\n'),
+    ...TYPE_BLOCKS[value],
+  }
+}))
 
 /** Categories that follow from the linked entries: a game's album is a game album, and so on. */
 const ENTRY_CATEGORIES: Record<string, string> = { game: 'game', anime: 'animation', book: 'publication', manga: 'publication', movie: 'live_action', tv: 'live_action', stage: 'live_action' }

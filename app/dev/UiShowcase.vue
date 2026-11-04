@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { UiDialogSelectOption } from '~/components/ui/DialogSelect.vue'
 import type { MarkdownEnv } from '~/utils/markdown'
 
 /**
@@ -63,6 +64,12 @@ const name = ref('')
 const email = ref('bad@')
 const format = ref<string | number | null>('cd')
 const language = ref('ja')
+const albumType = ref<string>()
+const albumTypeOptions: UiDialogSelectOption<string>[] = [
+  { value: 'wide', label: '整行', hint: 'span 6', summary: '一行六列，这块占满', description: '每块写明含义。占满一行时，描述和内容左右并排。', content: ['内容列表的一项', '再一项'], span: 6, tone: 'blue' },
+  { value: 'half', label: '半行', hint: 'span 3', summary: '两块一行', description: '颜色由 tone 决定。', span: 3, tone: 'amber' },
+  { value: 'off', label: '不可选', hint: 'span 3', summary: '带 disabled', description: '变淡，不能选。', span: 3, tone: 'teal', disabled: true },
+]
 const bio = ref('')
 const agree = ref(true)
 const kinds = ref<(string | number)[]>(['cd'])
@@ -408,6 +415,11 @@ const markdownEnv: MarkdownEnv = {
         <UiField label="语言（可搜索）">
           <template #default="{ id }">
             <UiLanguageSelect :id="id" v-model="language" readings />
+          </template>
+        </UiField>
+        <UiField label="UiDialogSelect" hint="选项需要解释时用：点开是对话框，每项写明含义。">
+          <template #default="{ id }">
+            <UiDialogSelect :id="id" v-model="albumType" :options="albumTypeOptions" title="选择专辑类型" description="每一块是一个选项，选中后对话框关闭。" placeholder="请选择" class="w-full" />
           </template>
         </UiField>
         <UiField label="小号输入框">

@@ -1,6 +1,7 @@
 <template>
   <div v-if="track" class="border-b border-line last:border-b-0" :class="{ 'bg-danger/10': errors.length }">
-    <div class="flex items-center gap-1.5 px-2 py-1.5 sm:gap-2 sm:px-3">
+    <!-- On phones two lines: the number and a full-width title, then the rest. -->
+    <div class="flex flex-wrap items-center gap-1.5 px-2 py-1.5 sm:flex-nowrap sm:gap-2 sm:px-3">
       <input
         v-model.number="track.track_number"
         type="number"
@@ -14,20 +15,20 @@
       <input
         v-model="track.title"
         data-track-title
-        class="input input-sm min-w-0 flex-1"
+        class="input input-sm min-w-0 flex-1 basis-[calc(100%-4rem)] sm:basis-0"
         :class="{ 'input-error': errorAt('title') }"
         :placeholder="$t('editor.album.track_title')"
         maxlength="500"
         @keydown.enter.prevent="emit('next')"
       >
-      <EditorDurationInput v-model="track.duration" class="hidden shrink-0 sm:block" />
+      <EditorDurationInput v-model="track.duration" class="shrink-0" />
       <label class="flex shrink-0 cursor-pointer items-center gap-1 px-1 text-xs" :class="track.is_instrumental ? 'text-primary' : 'text-meta'" :title="$t('catalog.field.is_instrumental')">
         <input v-model="track.is_instrumental" type="checkbox" class="checkbox checkbox-xs">
         <Music2 :size="13" aria-hidden="true" />
-        <span class="hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
+        <span class="sm:hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
       </label>
-      <button v-if="badge" type="button" class="hidden shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium sm:inline" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
-      <UiButton :label="$t('editor.album.track_details')" size="sm" class="shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :aria-expanded="open" @click="open = !open">
+      <button v-if="badge" type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
+      <UiButton :label="$t('editor.album.track_details')" size="sm" class="ml-auto shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px sm:ml-0" :aria-expanded="open" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </UiButton>
       <UiButton variant="danger-soft" :icon="X" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
@@ -36,10 +37,6 @@
 
     <div v-if="open" class="space-y-4 border-t border-dashed border-line bg-sunken px-4 py-3">
       <div class="flex flex-wrap items-end gap-3">
-        <label class="block sm:hidden">
-          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.duration') }}</span>
-          <EditorDurationInput v-model="track.duration" />
-        </label>
         <label class="block">
           <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.number_label') }}</span>
           <input v-model="track.number_label" class="input input-sm w-20 font-mono" placeholder="A1" maxlength="10">

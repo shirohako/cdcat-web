@@ -95,7 +95,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
           <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning" :title="note">⚠</span>
           <span v-else-if="info" class="grid shrink-0 place-items-center text-info" :title="info"><Icon name="lucide:info" class="size-3.5" /></span>
         </button>
-        <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">
+        <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger [@media(hover:none)]:size-6" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">
           <Icon name="lucide:x" class="size-3" />
         </button>
       </span>

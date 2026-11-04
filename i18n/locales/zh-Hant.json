@@ -614,7 +614,9 @@
     "select_language": "選擇語言",
     "languages_common": "常用",
     "languages_all": "所有語言",
-    "no_matches": "沒有符合項目"
+    "no_matches": "沒有符合項目",
+    "option_description": "描述",
+    "option_content": "內容"
   },
   "errors": {
     "request_failed": "要求失敗，請再試一次。",
@@ -2608,6 +2610,40 @@
       "cover": "封面",
       "title_placeholder": "依實物上印的標題填寫",
       "type_placeholder": "請選擇類型",
+      "type_title": "選擇專輯類型",
+      "type_intro": "選擇作品的發行類型。不同類型決定了作品的結構與歸類方式。",
+      "type_options": {
+        "album": {
+          "summary": "完整音樂專輯",
+          "description": "Album 是音樂發行中最標準、最常見的作品形式。\n通常包含藝術家在某一時期創作的一組完整歌曲，\n可能圍繞特定主題或概念進行製作。\n大多數正式音樂專輯都屬於此類型。",
+          "content": "同一藝術家或團體的完整作品集合"
+        },
+        "ep": {
+          "summary": "迷你專輯",
+          "description": "EP（Extended Play）是一種長度介於 Single 和 Album 之間的發行形式。\n通常包含多首新歌曲，但規模不足以成為完整專輯。\n常用於發布小型作品或專輯前的過渡發行。",
+          "content": "多首歌曲\n小型音樂作品集合"
+        },
+        "single": {
+          "summary": "以一首主打歌為核心的發行",
+          "description": "Single 的發行目的通常是推廣一首主打歌曲。\n除主打曲外，可能包含 B-side 或 instrumental 等附加曲目。",
+          "content": "主打歌曲"
+        },
+        "compilation": {
+          "summary": "精選集",
+          "description": "Compilation 是將來自不同作品或不同藝術家的歌曲整理成一個專輯的發行形式。\n常見於精選集、合集、主題合集或廠牌合集。\n全新曲目的同人合輯不算在內。",
+          "content": "已發布歌曲\n可能來自多個專輯或多個藝術家"
+        },
+        "drama": {
+          "summary": "聲優劇情 CD",
+          "description": "Drama CD 是以劇情表演為核心的音訊作品。\n透過聲優對白、背景音樂和音效來演繹故事，\n類似沒有畫面的動畫或廣播劇。\n常見於動畫、遊戲、輕小說等作品的衍生內容。",
+          "content": "角色對白\n劇情故事\nBGM\n場景音效"
+        },
+        "radio": {
+          "summary": "廣播節目 CD",
+          "description": "Radio CD 是將廣播節目或網路電台節目整理並發行的音訊作品。\n內容通常是聲優聊天、訪談或互動環節。",
+          "content": "聲優聊天\n嘉賓訪談\n聽眾投稿\n互動環節"
+        }
+      },
       "release_event": "首發活動",
       "release_event_placeholder": "搜尋活動，如 Comic Market",
       "release_event_hint": "在 Comic Market、M3 等活動首發的作品填寫。",

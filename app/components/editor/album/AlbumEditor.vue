@@ -1,6 +1,6 @@
 <template>
   <div ref="root" :class="embedded ? 'embedded-editor scroll-mt-24' : 'cards-raised min-h-screen'">
-    <div :class="embedded ? 'p-4 md:p-5' : 'container mx-auto max-w-7xl px-3 py-6 md:px-6'">
+    <div :class="embedded ? 'p-4 md:p-5' : 'container mx-auto max-w-7xl px-3 py-4 md:px-6 md:py-6'">
       <SkeletonForm v-if="loading && embedded" :fields="5" class="min-h-96" />
       <SkeletonAlbumEditor v-else-if="loading" />
 
@@ -10,10 +10,10 @@
       </div>
 
       <template v-else-if="ready">
-        <header class="card mb-4 flex flex-wrap gap-3" :class="embedded ? 'items-center px-4 py-3' : 'items-end px-5 py-4'">
+        <header class="card mb-4 flex flex-wrap gap-3" :class="embedded ? 'items-center px-4 py-3' : 'items-end px-4 py-3 sm:px-5 sm:py-4'">
           <div class="min-w-0 flex-1">
             <p v-if="!embedded" class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
-            <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-2xl font-bold'">{{ album.title || $t('editor.album.untitled') }}</component>
+            <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-xl font-bold sm:text-2xl'">{{ album.title || $t('editor.album.untitled') }}</component>
             <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" />
           </div>
           <UiButton
@@ -61,15 +61,17 @@
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
 
-        <div :key="contentKey" class="grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'gap-5' : 'gap-6'">
-          <aside class="space-y-4 lg:sticky lg:self-start" :class="embedded ? 'lg:top-24' : 'lg:top-20'">
-            <nav class="card flex gap-1 overflow-x-auto p-1.5 lg:flex-col lg:overflow-visible">
+        <!-- Below lg this is no grid, so the sections' bar can stick for the whole page, edge to edge under the navbar. -->
+        <div :key="contentKey" class="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)]" :class="embedded ? 'lg:gap-5' : 'lg:gap-6'">
+          <aside class="space-y-4" :class="embedded ? 'mb-5 lg:sticky lg:top-24 lg:mb-0 lg:self-start' : 'sticky top-14 z-30 -mx-3 mb-4 md:-mx-6 lg:top-20 lg:z-auto lg:mx-0 lg:mb-0 lg:self-start'">
+            <nav ref="sectionNav" class="card flex gap-1 overflow-x-auto p-1.5 lg:flex-col lg:overflow-visible" :class="{ 'max-lg:rounded-none': !embedded }">
               <button
                 v-for="section in sections"
                 :key="section.key"
                 type="button"
                 class="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-left text-sm transition-colors"
                 :class="active === section.key ? 'bg-primary/10 font-semibold text-primary' : 'text-body hover:bg-sunken hover:text-primary'"
+                :aria-current="active === section.key ? 'true' : undefined"
                 @click="go(section.key)"
               >
                 <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
@@ -123,7 +125,7 @@
             <EditorAlbumRelationsSection v-else-if="active === 'relations'" />
             <EditorAlbumTranslateSection v-else-if="active === 'translate'" :initial-locale="locale" />
             <CatalogSection v-else :title="$t('editor.section_submit')" :icon="Send">
-              <div class="space-y-4 p-5">
+              <div class="space-y-4 p-3 sm:p-5">
                 <div v-if="requiredChecks.some(check => !check.done)" class="rounded-lg border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
                   <p class="font-semibold text-warning">{{ $t('editor.required_missing') }}</p>
                   <ul class="mt-2 flex flex-wrap gap-1.5">
@@ -342,6 +344,18 @@ const go = (section: AlbumSection) => {
   if (!props.embedded) window.scrollTo({ top: 0, behavior: 'smooth' })
   else if (root.value && root.value.getBoundingClientRect().top < 0) root.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+const sectionNav = ref<HTMLElement | null>(null)
+/** Below lg the sections scroll sideways: this keeps the open one in view, wherever it was opened from. */
+watch([active, sectionNav], async () => {
+  await nextTick()
+  const nav = sectionNav.value
+  const tab = nav?.querySelector('[aria-current]')
+  if (!nav || !tab) return
+  const bar = nav.getBoundingClientRect()
+  const box = tab.getBoundingClientRect()
+  nav.scrollTo({ left: nav.scrollLeft + box.left - bar.left - (bar.width - box.width) / 2, behavior: 'smooth' })
+})
 
 const missing = computed(() => missingRequired(album.value))
 const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const

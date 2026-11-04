@@ -7,20 +7,20 @@
       leave-to-class="opacity-0"
       @after-leave="restoreFocus"
     >
-      <div v-if="open" class="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4" @mousedown.self="close">
+      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
         <div class="pointer-events-none absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
         <Transition
           appear
           enter-active-class="transition duration-200 ease-out"
-          enter-from-class="translate-y-6 opacity-0 sm:translate-y-2 sm:scale-[0.97]"
+          enter-from-class="translate-y-2 scale-[0.97] opacity-0"
           leave-active-class="transition duration-150 ease-in"
-          leave-to-class="translate-y-6 opacity-0 sm:translate-y-2 sm:scale-[0.97]"
+          leave-to-class="translate-y-2 scale-[0.97] opacity-0"
         >
           <component
             :is="as"
             v-if="open"
             ref="panel"
-            class="relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-2xl bg-card text-body shadow-overlay ring-1 ring-line sm:max-h-[88vh] sm:rounded-2xl"
+            class="relative flex max-h-[80dvh] w-full flex-col overflow-hidden rounded-2xl bg-card text-body shadow-overlay ring-1 ring-line sm:max-h-[88dvh]"
             :class="SIZES[size]"
             role="dialog"
             aria-modal="true"
@@ -28,8 +28,7 @@
             :novalidate="as === 'form' || undefined"
             @submit.prevent="emit('submit')"
           >
-            <div class="mx-auto mt-2 h-1 w-10 shrink-0 rounded-full bg-line sm:hidden" aria-hidden="true" />
-            <header class="flex shrink-0 items-start gap-3 px-5 pb-3 pt-3 sm:pt-5">
+            <header class="flex shrink-0 items-start gap-3 px-5 pb-3 pt-5">
               <UiIconTile v-if="icon" :icon="icon" :tone="tone" />
               <div class="min-w-0 flex-1 pt-0.5">
                 <h2 :id="titleId" class="truncate text-base font-bold leading-6 text-title">{{ title }}</h2>
@@ -39,7 +38,7 @@
               <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 -mt-0.5" @click="close" />
             </header>
             <div class="min-h-0 overflow-y-auto px-5 pb-5 pt-1"><slot /></div>
-            <footer v-if="$slots.footer" class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            <footer v-if="$slots.footer" class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken px-5 py-3">
               <slot name="footer" />
             </footer>
           </component>
@@ -57,10 +56,10 @@ import { dialogStack as stack } from '~/utils/dialogStack'
 
 <script setup lang="ts">
 /**
- * A dialog: centred on wide screens, a sheet from the bottom on phones. With `as="form"` the body is a form, so a
- * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field marked
- * `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of the
- * close button.
+ * A dialog, centred at every width with the page showing around it. With `as="form"` the body is a form, so a
+ * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field or button
+ * marked `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of
+ * the close button.
  */
 withDefaults(defineProps<{
   title: string
@@ -96,7 +95,7 @@ const focusFirst = () => {
   const field = 'input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
   // The mark may sit on a component's wrapper, such as a picker's, rather than on the field itself.
   const marked = root.querySelector<HTMLElement>('[data-autofocus]')
-  const target = (marked?.matches(field) ? marked : marked?.querySelector<HTMLElement>(field))
+  const target = (marked?.matches(`${field}, button`) ? marked : marked?.querySelector<HTMLElement>(field))
     ?? root.querySelector<HTMLElement>(`.overflow-y-auto :is(${field})`)
   target?.focus({ preventScroll: true })
 }

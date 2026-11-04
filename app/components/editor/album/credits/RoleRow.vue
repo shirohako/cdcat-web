@@ -64,7 +64,7 @@ const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(
         >
           <span class="flex max-w-full items-center gap-1 font-medium text-primary">
             <span class="truncate group-hover:underline">{{ roleName(role!) }}</span>
-            <Icon name="lucide:chevron-down" class="size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100" />
+            <Icon name="lucide:chevron-down" class="size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100" />
           </span>
           <span v-if="roleNameEn(role!)" class="truncate text-[10px] text-meta">{{ roleNameEn(role!) }}</span>
         </button>

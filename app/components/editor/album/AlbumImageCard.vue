@@ -1,26 +1,26 @@
 <template>
-  <li v-if="image" class="relative flex gap-3 rounded-xl border p-3 transition-opacity sm:gap-4" :class="[errors.length ? 'border-danger/25 bg-danger/10' : 'border-line', dragging && 'opacity-40']">
+  <li v-if="image" class="relative flex flex-wrap gap-3 rounded-xl border p-3 transition-opacity sm:flex-nowrap sm:gap-4" :class="[errors.length ? 'border-danger/25 bg-danger/10' : 'border-line', dragging && 'opacity-40']">
     <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
     <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-[5px]' : '-bottom-[5px]'" />
-    <!-- Dragging starts from the handle only, so text in the fields can still be selected; the buttons move rows by keyboard and touch. -->
-    <span class="-ml-1 flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing" aria-hidden="true" @pointerdown="emit('grab')">
+    <!-- Dragging starts from the handle only, so text in the fields can still be selected; the buttons move rows by keyboard and touch, so touch has no handle. -->
+    <span class="-ml-1 flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing [@media(hover:none)]:hidden" aria-hidden="true" @pointerdown="emit('grab')">
       <GripVertical :size="16" />
     </span>
     <!-- The whole image at its own shape (scans are often far from square), its size underneath. -->
-    <figure class="w-28 shrink-0 sm:w-36">
+    <figure class="mx-auto w-28 shrink-0 sm:mx-0 sm:w-36">
       <a :href="file?.url" target="_blank" rel="noopener" class="block" draggable="false">
         <img v-if="file" :src="file.thumbnail_url" alt="" class="mx-auto max-h-52 max-w-full rounded-lg bg-sunken object-contain ring-1 ring-line" loading="lazy">
         <span v-else class="flex aspect-square w-full items-center justify-center rounded-lg bg-sunken p-2 text-center text-[11px] text-danger">{{ $t('editor.image.missing') }}</span>
       </a>
       <figcaption v-if="file" class="mt-1.5 text-center text-[11px] tabular-nums text-meta">{{ file.width }} × {{ file.height }}</figcaption>
     </figure>
-    <div class="@container min-w-0 flex-1 space-y-2">
+    <div class="@container min-w-0 flex-1 basis-full space-y-2 sm:basis-0">
       <!-- Kind, label and scope share one line when the form is wide enough, the row's buttons at its end; narrower, two lines. -->
       <div class="grid gap-2 @sm:grid-cols-2 @2xl:grid-cols-[minmax(0,1fr)_7rem_minmax(0,1fr)_auto]">
         <UiSelect v-model="image.kind" :options="kindOptions" size="sm" class="w-full" :aria-label="$t('catalog.field.kind')" />
         <input v-model="image.label" class="input input-sm w-full" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')" :aria-label="$t('catalog.field.label')">
         <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-full" :aria-label="$t('editor.image.scope')" @change="setScope" />
-        <span class="flex justify-end gap-1">
+        <span class="flex flex-wrap justify-end gap-1">
           <!-- Another cover or banner becomes the main one only from here; one that doesn't fit says why. -->
           <UiButton
             v-if="mainKind"

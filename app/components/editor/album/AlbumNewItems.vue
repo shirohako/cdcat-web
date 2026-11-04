@@ -1,12 +1,12 @@
 <template>
   <section v-if="created.length || edited.length" class="rounded-xl border border-success/25 bg-success/10">
-    <div class="flex items-center gap-2 border-b border-success/25 px-5 py-3">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-success/25 px-3 py-3 sm:px-5">
       <Sparkles :size="15" class="text-success" />
       <h2 class="text-sm font-bold text-success">{{ $t('editor.new_items.title') }}</h2>
       <span class="text-xs text-meta">{{ $t('editor.new_items.hint') }}</span>
     </div>
     <ul class="divide-y divide-success/25">
-      <li v-for="item in created" :key="item.ref" class="space-y-2 px-5 py-3">
+      <li v-for="item in created" :key="item.ref" class="space-y-2 px-3 py-3 sm:px-5">
         <div class="flex flex-wrap items-center gap-2">
           <span class="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">{{ enumLabel('catalog_type', item.resource_type) }}</span>
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
@@ -17,7 +17,7 @@
 
         <p v-for="error in errorsOf(item.ref)" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
       </li>
-      <li v-for="item in edited" :key="item.ref" class="flex flex-wrap items-center gap-2 px-5 py-2.5 text-sm">
+      <li v-for="item in edited" :key="item.ref" class="flex flex-wrap items-center gap-2 px-3 py-2.5 text-sm sm:px-5">
         <span class="rounded-full bg-info/15 px-2 py-0.5 text-[10px] font-bold text-info">{{ $t('editor.new_items.edited', { type: enumLabel('catalog_type', item.resource_type) }) }}</span>
         <EditorRefLabel :id="item.resource_id ?? null" :type="item.resource_type" :references="editor.references" />
         <span class="text-[11px] text-meta">{{ $t('editor.new_items.edited_hint') }}</span>

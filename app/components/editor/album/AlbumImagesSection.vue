@@ -8,7 +8,7 @@
       <!-- The main cover and the main banner, each in its slot; the gallery below has every other image, other covers
            and banners too, and makes one of them the main one only with 用作封面 / 用作横幅. -->
       <div class="grid gap-5 sm:grid-cols-[14rem_minmax(0,1fr)]">
-        <div>
+        <div class="mx-auto w-full max-w-52 sm:mx-0 sm:max-w-none">
           <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span></p>
           <EditorAlbumCoverSlot />
         </div>

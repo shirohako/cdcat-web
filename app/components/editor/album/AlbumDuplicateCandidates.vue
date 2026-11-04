@@ -10,10 +10,10 @@
     </p>
     <p class="mt-1 text-xs" :class="strong.length ? 'text-body' : 'text-meta'">{{ $t(strong.length ? 'duplicates.strong_hint' : 'duplicates.weak_hint') }}</p>
     <ul class="mt-3 space-y-2">
-      <li v-for="candidate in candidates" :key="candidate.album_id" class="flex items-center gap-3 rounded-lg p-2" :class="strong.length ? 'bg-card' : 'bg-sunken'">
+      <li v-for="candidate in candidates" :key="candidate.album_id" class="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg p-2 sm:flex-nowrap" :class="strong.length ? 'bg-card' : 'bg-sunken'">
         <img v-if="candidate.album.image_url" :src="candidate.album.image_url" alt="" class="h-11 w-11 shrink-0 rounded object-cover">
         <span v-else class="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-btn text-faint"><Disc3 :size="18" /></span>
-        <div class="min-w-0 flex-1">
+        <div class="min-w-0 flex-1 basis-[calc(100%-3.5rem)] sm:basis-0">
           <a :href="`/albums/${candidate.album.id}`" target="_blank" rel="noopener" class="flex min-w-0 items-center gap-1.5 text-sm font-medium text-title transition-colors hover:text-primary">
             <span class="truncate">{{ candidate.album.title }}</span>
             <CatalogPendingBadge v-if="candidate.album.is_pending" />
@@ -25,7 +25,7 @@
             {{ candidate.reasons.map(reason => $t(`duplicates.reasons.${reason.kind}`, { value: reason.value })).join(clauseSeparator) }}
           </p>
         </div>
-        <label v-if="candidate.strength === 'strong'" class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-body">
+        <label v-if="candidate.strength === 'strong'" class="ml-auto flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-body">
           <input type="checkbox" class="checkbox checkbox-xs" :checked="acknowledged.includes(candidate.album_id)" @change="acknowledge(candidate.album_id, ($event.target as HTMLInputElement).checked)">
           {{ $t('duplicates.not_same') }}
         </label>

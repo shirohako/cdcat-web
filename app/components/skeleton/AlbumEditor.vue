@@ -1,7 +1,7 @@
 <template>
   <SkeletonStatus page>
     <!-- The header: what is being edited, the album's title, its links and the save state. -->
-    <div class="card mb-4 flex flex-wrap items-end gap-3 px-5 py-4">
+    <div class="card mb-4 flex flex-wrap items-end gap-3 px-4 py-3 sm:px-5 sm:py-4">
       <div class="min-w-0 flex-1">
         <div class="skeleton h-3 w-20 rounded-full" />
         <div class="skeleton mt-2 h-7 w-72 max-w-full rounded-md" />
@@ -14,9 +14,9 @@
       </div>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-[14rem_minmax(0,1fr)]">
-      <aside class="space-y-4">
-        <div class="card flex gap-1 overflow-hidden p-1.5 lg:flex-col">
+    <div class="lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-6">
+      <aside class="-mx-3 mb-4 space-y-4 md:-mx-6 lg:mx-0 lg:mb-0">
+        <div class="card flex gap-1 overflow-hidden p-1.5 max-lg:rounded-none lg:flex-col">
           <div v-for="(width, index) in NAV_WIDTHS" :key="index" class="flex shrink-0 items-center gap-2 px-3 py-2">
             <div class="skeleton size-[15px] shrink-0 rounded" />
             <div class="skeleton h-3 rounded-full" :class="width" />
@@ -39,7 +39,7 @@
             <div class="skeleton h-4 w-20 rounded-full" />
           </div>
           <div class="grid gap-6 p-5 md:grid-cols-[13rem_1fr]">
-            <div class="space-y-1.5">
+            <div class="mx-auto w-full max-w-52 space-y-1.5 md:max-w-none">
               <div class="skeleton h-3 w-10 rounded-full" />
               <div class="skeleton aspect-square w-full rounded-xl" />
             </div>

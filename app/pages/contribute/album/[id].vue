@@ -13,7 +13,7 @@
       <template #fallback>
         <!-- The editor's own loading state, so nothing moves when it takes over. -->
         <div class="cards-raised min-h-screen">
-          <div class="container mx-auto max-w-7xl px-3 py-6 md:px-6">
+          <div class="container mx-auto max-w-7xl px-3 py-4 md:px-6 md:py-6">
             <SkeletonAlbumEditor />
           </div>
         </div>

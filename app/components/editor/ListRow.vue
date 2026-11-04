@@ -1,16 +1,22 @@
 <template>
   <li
     class="group relative flex items-center gap-2 rounded-lg py-1.5 pr-1 transition-[background-color,opacity]"
-    :class="[invalid ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover', sortable ? 'pl-1' : 'pl-3', dragging && 'opacity-40']"
+    :class="[
+      invalid ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover',
+      sortable ? 'pl-1 [@media(hover:none)]:pl-3' : 'pl-3',
+      $slots.actions && 'flex-wrap justify-end sm:flex-nowrap',
+      dragging && 'opacity-40',
+    ]"
   >
     <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
     <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-[4px]' : '-bottom-[4px]'" />
-    <!-- Dragging starts from the handle only; the move buttons are the keyboard and touch way. -->
-    <span v-if="sortable" class="flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing" aria-hidden="true" @pointerdown="emit('grab')">
+    <!-- Dragging starts from the handle only; the move buttons are the keyboard and touch way, so touch has no handle. -->
+    <span v-if="sortable" class="flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing [@media(hover:none)]:hidden" aria-hidden="true" @pointerdown="emit('grab')">
       <GripVertical :size="14" />
     </span>
-    <!-- The pencil is the keyboard way in; the summary itself is a larger mouse target. -->
-    <div class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 py-0.5" @click="emit('edit')">
+    <!-- The pencil is the keyboard way in; the summary itself is a larger mouse target. With extra actions, a row on a
+         phone has too many buttons to share a line with the summary, so they go under it. -->
+    <div class="flex min-w-0 flex-1 cursor-pointer items-center gap-2 py-0.5" :class="$slots.actions && 'basis-[calc(100%-1.5rem)] sm:basis-0'" @click="emit('edit')">
       <slot />
     </div>
     <slot name="actions" />

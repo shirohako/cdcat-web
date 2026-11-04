@@ -1,11 +1,11 @@
 <template>
-  <div class="space-y-4 text-sm">
+  <div class="space-y-4 text-sm [overflow-wrap:anywhere]">
     <p v-if="!changes.length" class="py-6 text-center text-faint">{{ $t('versions.no_changes') }}</p>
 
     <table v-if="fieldChanges.length" class="w-full">
       <tbody>
         <tr v-for="change in fieldChanges" :key="change.name">
-          <th class="w-32 py-1 pr-3 text-left align-top text-xs font-medium text-meta">{{ fieldLabel(change.name) }}</th>
+          <th class="w-20 py-1 pr-3 text-left align-top text-xs font-medium text-meta sm:w-32">{{ fieldLabel(change.name) }}</th>
           <td class="py-1 align-top"><span class="rounded bg-danger/10 px-1 text-danger line-through decoration-danger/40">{{ valueLabel(fields.get(change.name), change.from, references) }}</span></td>
           <td class="w-4 px-1 py-1 align-top text-faint">→</td>
           <td class="py-1 align-top"><span class="rounded bg-success/10 px-1 text-success">{{ valueLabel(fields.get(change.name), change.to, references) }}</span></td>

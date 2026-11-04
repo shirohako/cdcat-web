@@ -243,6 +243,15 @@
     font-size: 0.8125rem;
   }
 
+  /* iOS Safari zooms the page in when a field under 16px takes focus and stays zoomed. Important, because forms set
+     smaller text on fields with utilities. */
+  @media (pointer: coarse) and (max-width: 639px) {
+    .input,
+    .textarea {
+      font-size: 1rem !important;
+    }
+  }
+
   .input-error,
   .select-error,
   .textarea-error {

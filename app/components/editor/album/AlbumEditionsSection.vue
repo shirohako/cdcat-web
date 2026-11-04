@@ -16,11 +16,11 @@
         <li
           v-for="(product, index) in products"
           :key="product.id"
-          class="group flex items-start gap-3 rounded-xl p-3 transition-colors"
+          class="group flex flex-wrap items-start gap-x-3 gap-y-2 rounded-xl p-3 transition-colors sm:flex-nowrap"
           :class="errorsOf(product.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
         >
           <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{{ index + 1 }}</span>
-          <div class="min-w-0 flex-1 cursor-pointer" @click="edit(product)">
+          <div class="min-w-0 flex-1 basis-[calc(100%-2.25rem)] cursor-pointer sm:basis-0" @click="edit(product)">
             <p class="flex flex-wrap items-center gap-1.5">
               <span class="truncate text-sm font-semibold text-title">{{ product.name || enumLabel('edition_type', product.edition_type) }}</span>
               <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('edition_type', product.edition_type) }}</span>
@@ -38,7 +38,7 @@
             </p>
             <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
-          <span class="flex shrink-0 gap-0.5">
+          <span class="ml-auto flex shrink-0 gap-0.5">
             <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.products, product, -1)" />
             <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === products.length - 1" @click="moveRow(album.products, product, 1)" />
             <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(product)" />

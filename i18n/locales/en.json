@@ -614,7 +614,9 @@
     "select_language": "Select a language",
     "languages_common": "Common",
     "languages_all": "All languages",
-    "no_matches": "No matches"
+    "no_matches": "No matches",
+    "option_description": "Description",
+    "option_content": "Contents"
   },
   "errors": {
     "request_failed": "The request failed. Please try again.",
@@ -2608,6 +2610,40 @@
       "cover": "Cover",
       "title_placeholder": "The title as printed on the release",
       "type_placeholder": "Choose a type",
+      "type_title": "Choose an album type",
+      "type_intro": "Choose how this release was issued. The type decides how it is structured and categorized.",
+      "type_options": {
+        "album": {
+          "summary": "A complete music album",
+          "description": "The album is the most standard and common form of music release.\nIt usually holds a complete set of songs an artist wrote in a given period,\nand may be built around a theme or concept.\nMost official music albums are this type.",
+          "content": "A complete body of work by one artist or group"
+        },
+        "ep": {
+          "summary": "A mini album",
+          "description": "An EP (Extended Play) sits between a single and an album in length.\nIt usually has several new songs, but not enough to make a full album.\nIt is often used for smaller works or as a bridge before an album.",
+          "content": "Several songs\nA small collection of music"
+        },
+        "single": {
+          "summary": "A release built around one lead song",
+          "description": "A single usually exists to promote one lead song.\nBesides the lead track, it may include B-sides, instrumentals and other extras.",
+          "content": "Lead song"
+        },
+        "compilation": {
+          "summary": "A best-of collection",
+          "description": "A compilation gathers songs from different works or artists into one album.\nCommon examples are best-ofs, collections, themed collections and label collections.\nDoujin compilations of all-new tracks don't count.",
+          "content": "Previously released songs\nMay come from several albums or artists"
+        },
+        "drama": {
+          "summary": "A story CD performed by voice actors",
+          "description": "A drama CD is an audio work centred on a performed story.\nVoice actors, background music and sound effects tell the story,\nmuch like an anime without pictures or a radio play.\nMost are spin-offs of anime, games or light novels.",
+          "content": "Character dialogue\nStory\nBGM\nSound effects"
+        },
+        "radio": {
+          "summary": "A radio show CD",
+          "description": "A radio CD collects a radio or web radio show and releases it as an audio work.\nIt is usually voice actors chatting, interviews or interactive segments.",
+          "content": "Voice actor talk\nGuest interviews\nListener submissions\nInteractive segments"
+        }
+      },
       "release_event": "Release event",
       "release_event_placeholder": "Search events, e.g. Comic Market",
       "release_event_hint": "For releases first sold at an event such as Comic Market or M3.",

@@ -7,11 +7,11 @@
         <li
           v-for="(bonus, index) in bonuses"
           :key="bonus.id"
-          class="flex items-start gap-3 rounded-xl p-3 transition-colors"
+          class="flex flex-wrap items-start gap-x-3 gap-y-2 rounded-xl p-3 transition-colors sm:flex-nowrap"
           :class="errorsOf(bonus.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
         >
           <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-50 text-pink-500 dark:bg-pink-400/15 dark:text-pink-400"><Gift :size="13" /></span>
-          <div class="min-w-0 flex-1 cursor-pointer" @click="edit(bonus)">
+          <div class="min-w-0 flex-1 basis-[calc(100%-2.25rem)] cursor-pointer sm:basis-0" @click="edit(bonus)">
             <p class="flex flex-wrap items-center gap-1.5">
               <span class="truncate text-sm font-semibold text-title">{{ bonus.name || '—' }}</span>
               <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('bonus_type', bonus.type) }}</span>
@@ -26,7 +26,7 @@
             </p>
             <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
-          <span class="flex shrink-0 gap-0.5">
+          <span class="ml-auto flex shrink-0 gap-0.5">
             <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.bonuses, bonus, -1)" />
             <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === bonuses.length - 1" @click="moveRow(album.bonuses, bonus, 1)" />
             <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(bonus)" />
