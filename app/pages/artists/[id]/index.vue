@@ -64,17 +64,19 @@
                   <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t(part.key === 'ended' ? 'artists.detail.ended_relations' : 'artists.detail.relations') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-1.5">
                     <li v-for="relation in part.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
-                      <NuxtLink
-                        :to="`/artists/${relation.artist.id}`"
-                        class="inline-flex h-6 items-center gap-1.5 rounded-full pl-0.5 pr-2.5 text-xs transition-colors duration-150 ease-out"
-                        :class="relation.ended ? 'bg-sunken text-meta hover:bg-btn hover:text-btn-content' : 'bg-btn text-btn-content hover:bg-btn-hover'"
-                      >
-                        <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken" :class="relation.ended && 'opacity-70'">
-                          <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
-                        </span>
-                        {{ relation.artist.name }}
-                        <span class="text-[11px] text-meta">{{ enumLabel(relation.ended ? 'artist_relation_ended' : 'artist_relation', relation.relation_type) }}</span>
-                      </NuxtLink>
+                      <UiTooltip :text="relation.note ?? undefined">
+                        <NuxtLink
+                          :to="`/artists/${relation.artist.id}`"
+                          class="inline-flex h-6 items-center gap-1.5 rounded-full pl-0.5 pr-2.5 text-xs transition-colors duration-150 ease-out"
+                          :class="relation.ended ? 'bg-sunken text-meta hover:bg-btn hover:text-btn-content' : 'bg-btn text-btn-content hover:bg-btn-hover'"
+                        >
+                          <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken" :class="relation.ended && 'opacity-70'">
+                            <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
+                          </span>
+                          {{ relation.artist.name }}
+                          <span class="text-[11px] text-meta">{{ enumLabel(relation.ended ? 'artist_relation_ended' : 'artist_relation', relation.relation_type) }}</span>
+                        </NuxtLink>
+                      </UiTooltip>
                     </li>
                   </ul>
                 </div>
