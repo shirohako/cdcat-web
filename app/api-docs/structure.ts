@@ -162,8 +162,8 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 }],
                 tracklist_languages: [{ locale: 'en', kind: 'official', count: 12, total: 12 }],
                 credits: [
-                  { id: 9001, role: 'publisher', category: 'release', artist: { id: 352, name: 'ステラノート', image_url: null, type: 'circle' }, credited_as: null, parent_id: null, detail: null },
-                  { id: 9002, role: 'composer', category: 'composition', artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, credited_as: null, parent_id: null, detail: null },
+                  { id: 9001, role: 'publisher', role_label: null, category: 'release', artist: { id: 352, name: 'ステラノート', image_url: null, type: 'circle' }, credited_as: null, parent_id: null, detail: null },
+                  { id: 9002, role: 'composer', role_label: null, category: 'composition', artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, credited_as: null, parent_id: null, detail: null },
                   { $more: 4 },
                 ],
                 products: [{ id: 3101, name: '通常盤', edition_type: 'regular', limited_rule: null, limited_name: null, medium: 'physical', catalog_number: 'STNT-0012', barcode: null, release_date: null, release_date_precision: 'day', region: 'JP', prices: [{ kind: 'event', note: null, amount: '1500.00', currency: 'JPY', tax_included: true }], is_hires: false, is_available: true, sort_order: 0, disc_ids: [2210], format_label: 'CD' }],
@@ -222,7 +222,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 derived_tracks: [],
                 album: { $more: 'AlbumSimple' },
                 album_tracks: [{ id: 5120, disc_number: 1, track_number: 1, number_label: null, title: 'プロローグ', titles: [], duration: 94, has_lyrics: false }, { $more: 11 }],
-                credits: [{ id: 9010, role: 'vocals', detail: null, credited_as: null, parent_id: null, artist: { id: 1405, name: '朝凪ひより' } }, { $more: 2 }],
+                credits: [{ id: 9010, role: 'vocals', role_label: null, detail: null, credited_as: null, parent_id: null, artist: { id: 1405, name: '朝凪ひより' } }, { $more: 2 }],
                 attributes: [],
                 created_at: '2026-10-20T11:03:12Z',
                 updated_at: '2026-10-28T09:12:44Z',
@@ -382,7 +382,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
               fields: [f('id', 'integer'), f('disc_number', 'integer'), f('track_number', 'integer'), f('number_label', 'string | null'), f('title', 'string'), shared('titles', 'Title[]'), f('duration', 'integer | null'), f('has_lyrics', 'boolean')],
             }),
             f('credits', 'object[]', {
-              fields: [f('id', 'integer'), f('role', 'string'), f('detail', 'string | null'), f('credited_as', 'string | null'), f('parent_id', 'integer | null'), f('artist', 'object | null', { fields: [f('id', 'integer'), f('name', 'string')] })],
+              fields: [f('id', 'integer'), f('role', 'string'), f('role_label', 'string | null'), f('detail', 'string | null'), f('credited_as', 'string | null'), f('parent_id', 'integer | null'), f('artist', 'object | null', { fields: [f('id', 'integer'), f('name', 'string')] })],
             }),
             f('attributes', 'Attribute[]'),
             shared('created_at', 'datetime'),
@@ -395,6 +395,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
           fields: [
             f('id', 'integer'),
             f('role', 'string'),
+            f('role_label', 'string | null'),
             f('category', 'string | null', { enum: 'credit_role_category' }),
             f('artist', 'object | null', { fields: [f('id', 'integer'), f('name', 'string'), f('image_url', 'url | null'), f('type', 'string', { enum: 'artist_type' })] }),
             f('credited_as', 'string | null'),
@@ -629,7 +630,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
               f('albums', 'object[]', {
                 fields: [
                   f('album', 'AlbumSimple'),
-                  f('roles', 'object[]', { fields: [f('role', 'string'), f('credited_as', 'string | null'), f('detail', 'string | null')] }),
+                  f('roles', 'object[]', { fields: [f('role', 'string'), f('role_label', 'string | null'), f('credited_as', 'string | null'), f('detail', 'string | null')] }),
                   f('tracks', 'object[]', {
                     fields: [f('id', 'integer'), f('title', 'string'), f('disc_position', 'integer'), f('track_number', 'integer'), f('number_label', 'string | null'), f('roles', 'object[]')],
                   }),
@@ -649,7 +650,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 albums: [{
                   album: { $more: 'AlbumSimple' },
                   roles: [],
-                  tracks: [{ id: 5121, title: '星屑の地図', disc_position: 1, track_number: 2, number_label: null, roles: [{ role: 'composer', credited_as: null, detail: null }, { role: 'arranger', credited_as: null, detail: null }] }, { $more: 3 }],
+                  tracks: [{ id: 5121, title: '星屑の地図', disc_position: 1, track_number: 2, number_label: null, roles: [{ role: 'composer', role_label: null, credited_as: null, detail: null }, { role: 'arranger', role_label: null, credited_as: null, detail: null }] }, { $more: 3 }],
                 }],
                 pagination: { total: 4, per_page: 1, current_page: 1, last_page: 4 },
                 roles: { composer: 4, arranger: 3, lyricist: 1 },

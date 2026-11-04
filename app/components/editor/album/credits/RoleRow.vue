@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
+import { canHaveRoleLabel } from '~/utils/albumDocument'
 import { FEATURING_ROLE, parentCandidates, parentOf } from '~/utils/artistLine'
 import { personOf } from '~/utils/creditLines'
 
@@ -79,6 +80,7 @@ const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(
         :key="String(row.id)"
         :person="personOf(row)"
         :invalid="invalid(row)"
+        :labelable="canHaveRoleLabel(row.role)"
         :parent="parentOfRow(row)"
         @update="emit('update', row, $event)"
         @remove="emit('remove', row)"

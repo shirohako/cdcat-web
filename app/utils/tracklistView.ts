@@ -62,8 +62,13 @@ export interface TracklistPerson {
 }
 
 export interface TracklistRoleGroup {
+  /** One group per role and printed job title, in the order they first appear */
+  key: string
   role: string
+  /** The printed job title, else the role's name */
   label: string
+  /** The role's own name */
+  roleName: string
   category: string
   people: TracklistPerson[]
 }
@@ -149,9 +154,12 @@ export interface TracklistInput {
 const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): TracklistRoleGroup[] => {
   const groups = new Map<string, TracklistRoleGroup>()
   for (const credit of credits) {
-    const group = groups.get(credit.role) ?? {
+    const key = credit.role_label ? JSON.stringify([credit.role, credit.role_label]) : credit.role
+    const group = groups.get(key) ?? {
+      key,
       role: credit.role,
-      label: helpers.roleName(credit.role),
+      label: credit.role_label || helpers.roleName(credit.role),
+      roleName: helpers.roleName(credit.role),
       category: credit.category ?? helpers.roleCategory(credit.role),
       people: [],
     }
@@ -163,7 +171,7 @@ const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): Trac
       detail: credit.detail,
       guests: [],
     })
-    groups.set(credit.role, group)
+    groups.set(key, group)
   }
   return [...groups.values()].sort((a, b) => helpers.roleOrder(a.role) - helpers.roleOrder(b.role))
 }
@@ -186,7 +194,13 @@ const attachFeaturing = (groups: TracklistRoleGroup[], credits: CatalogCredit[])
 const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
   const groups = attachFeaturing(groupCredits(track.credits, helpers), track.credits)
-  const byCategory = (category: string) => groups.find(group => group.category === category) ?? null
+  // A role split by job titles counts as one for the key people: they are all of the role, under its own name.
+  const whole = (group: TracklistRoleGroup | undefined) => {
+    if (!group) return null
+    const same = groups.filter(other => other.role === group.role)
+    return same.length > 1 ? { ...group, key: group.role, label: group.roleName, people: same.flatMap(other => other.people) } : group
+  }
+  const byCategory = (category: string) => whole(groups.find(group => group.category === category))
   return {
     id: track.id,
     discPosition,
@@ -206,7 +220,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
     lyrics: Math.max(0, track.lyrics_count - track.translations_count),
     translations: track.translations_count,
     // The 艺术家, else the first role of the vocals; the 客串 when no credit of the track takes them
-    lead: groups.find(group => group.role === 'artist') ?? byCategory('vocals'),
+    lead: whole(groups.find(group => group.role === 'artist')) ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
     groups,
     originals: track.originals,
@@ -239,7 +253,7 @@ export const buildTracklist = (input: TracklistInput, helpers: TracklistHelpers)
     }
     const rows = tracks.map(track => buildRow(track, disc.position, input, helpers))
     const roles = new Map<string, { role: string, label: string, category: string }>()
-    for (const row of rows) for (const group of row.groups) roles.set(group.role, { role: group.role, label: group.label, category: group.category })
+    for (const row of rows) for (const group of row.groups) roles.set(group.role, { role: group.role, label: group.roleName, category: group.category })
     const known = tracks.every(track => track.duration !== null)
     const bonus = input.bonuses.find(item => item.id === disc.bonus_id)
     const title = helpers.titleIn(disc.titles, input.language) ?? disc.title ?? ''

@@ -6,14 +6,17 @@ import type { CreditPerson } from '~/utils/creditLines'
 /**
  * One person of a credit, as a tag: the name with what to look at beside it (新建, 选类型 for a new artist without
  * a type, 仅署名 for a printed name only, the harvest page's notes, ⓘ where it tidied a name), and a remove button.
- * A click opens the rest: the printed name and the detail (applied when the card closes, since they decide which
- * line the person is in), a new artist's type, and linking the person to an artist or keeping only the printed name.
+ * A click opens the rest: the printed name, the detail and, when `labelable`, the printed job title (applied when the
+ * card closes, since they decide which line the person is in), a new artist's type, and linking the person to an
+ * artist or keeping only the printed name.
  * Given `parent` (on a track card), also which credit of the track it belongs to (parent_id, utils/artistLine): the
  * 客串's 艺术家, shown on the tag as "↳ Xeno" when there was a choice.
  */
 const props = defineProps<{
   person: CreditPerson
   invalid?: boolean
+  /** The credit has one role that can take a job title (canHaveRoleLabel) */
+  labelable?: boolean
   parent?: { value: string, options: UiSelectOption<string>[], label: string | null }
 }>()
 const emit = defineEmits<{ update: [patch: Partial<CreditPerson>], remove: [], parent: [value: string] }>()
@@ -22,7 +25,7 @@ const { t } = useI18n()
 const people = useCreditPeople()
 
 const open = ref(false)
-const form = reactive({ credited_as: '', detail: '' })
+const form = reactive({ credited_as: '', role_label: '', detail: '' })
 const name = computed(() => people.nameOf(props.person))
 const isNew = computed(() => people.isNew(props.person))
 const type = computed({
@@ -38,6 +41,7 @@ const formPatch = (): Partial<CreditPerson> => {
   const printed = form.credited_as.trim() || (props.person.artist_id === null ? props.person.credited_as : null)
   if (printed !== props.person.credited_as) patch.credited_as = printed
   if ((form.detail.trim() || null) !== props.person.detail) patch.detail = form.detail.trim() || null
+  if (props.labelable && (form.role_label.trim() || null) !== (props.person.role_label ?? null)) patch.role_label = form.role_label.trim() || null
   return patch
 }
 
@@ -46,6 +50,7 @@ let applied = false
 watch(open, (opened) => {
   if (opened) {
     form.credited_as = props.person.credited_as ?? ''
+    form.role_label = props.person.role_label ?? ''
     form.detail = props.person.detail ?? ''
     applied = false
     return
@@ -81,6 +86,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         <button type="button" class="flex h-full min-w-0 items-center gap-1.5 rounded-l-md pl-2 pr-1 text-left hover:bg-btn-hover/60" v-bind="attrs" @click="toggle">
           <span class="truncate font-medium text-title">{{ name || '—' }}</span>
           <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-[11px] text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
+          <span v-if="person.role_label" class="truncate text-[11px] text-primary">· {{ person.role_label }}</span>
           <span v-if="person.detail" class="truncate text-[11px] text-meta">· {{ person.detail }}</span>
           <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
           <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-[10px] font-bold text-success">{{ t('editor.new') }}</span>
@@ -111,6 +117,11 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}</span>
         <input v-model="form.detail" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
+      </label>
+      <label v-if="labelable" class="block">
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}</span>
+        <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">
+        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.role_label_note') }}</span>
       </label>
       <div v-if="parent">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}</span>

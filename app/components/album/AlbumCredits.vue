@@ -4,9 +4,11 @@
          booklet layout. -->
     <div class="px-5 pb-5 pt-2">
       <CatalogInfoTable v-if="groups.length" variant="lines">
-        <CatalogInfoRow v-for="group in groups" :key="group.role">
+        <CatalogInfoRow v-for="group in groups" :key="group.key">
           <template #label>
-            <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ roleName(group.role) }}</span>
+            <UiTooltip :text="roleName(group.role)" :disabled="!group.role_label">
+              <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
+            </UiTooltip>
           </template>
           <!-- Each person a grey tag (a link darkens and takes the theme colour on hover), the note inside it -->
           <span class="flex flex-wrap gap-1.5">
@@ -53,9 +55,11 @@
         <UiCollapse :open="peopleOpen" lazy>
           <!-- By role: one row per role as in the album's own credits, each person a tag with their tracks after it -->
           <CatalogInfoTable v-if="peopleView === 'role_groups'" variant="lines" class="pt-1">
-            <CatalogInfoRow v-for="group in roleGroups" :key="group.role">
+            <CatalogInfoRow v-for="group in roleGroups" :key="group.key">
               <template #label>
-                <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category ?? roleCategory(group.role)).badge">{{ roleName(group.role) }}</span>
+                <UiTooltip :text="roleName(group.role)" :disabled="!group.role_label">
+                  <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category ?? roleCategory(group.role)).badge">{{ group.role_label || roleName(group.role) }}</span>
+                </UiTooltip>
               </template>
               <span class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
                 <span v-for="person in group.people" :key="person.key" class="inline-flex min-w-0 items-center gap-1.5">
@@ -93,15 +97,17 @@
                     <span tabindex="0" class="inline-flex min-w-6 cursor-default justify-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 tabular-nums text-title dark:bg-white/[0.08]">{{ track.label }}</span>
                     <template #content>
                       <p class="font-semibold">{{ track.label }}. {{ track.title }}</p>
-                      <p class="mt-0.5 text-meta">{{ track.roles.map(role => role.detail ? `${roleName(role.role)} · ${role.detail}` : roleName(role.role)).join(' / ') }}</p>
+                      <p class="mt-0.5 text-meta">{{ track.roles.map(role => role.detail ? `${role.role_label || roleName(role.role)} · ${role.detail}` : role.role_label || roleName(role.role)).join(' / ') }}</p>
                     </template>
                   </UiTooltip>
                 </span>
               </span>
               <!-- By role: each role as its tag, the tracks after it -->
               <span v-else class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
-                <span v-for="role in person.roles" :key="`${role.role}:${role.detail}`" class="inline-flex min-w-0 items-center gap-1.5">
-                  <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge">{{ roleName(role.role) }}</span>
+                <span v-for="role in person.roles" :key="`${role.role}:${role.role_label}:${role.detail}`" class="inline-flex min-w-0 items-center gap-1.5">
+                  <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
+                    <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge">{{ role.role_label || roleName(role.role) }}</span>
+                  </UiTooltip>
                   <span class="min-w-0 text-xs tabular-nums text-meta">
                     <span v-if="role.detail" class="text-body">{{ role.detail }} · </span>{{ role.tracks ?? $t('album.track_people.all') }}
                   </span>
@@ -146,22 +152,24 @@ const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
 const { roleName, roleCategory, roleOrder } = useCatalogSchema()
 
 /**
- * The album's own credits, one row per role; a person credited under another name shows that name. The 署名与发行
+ * The album's own credits, one row per role and printed job title (shown instead of the role's name); a person credited under another name shows that name. The 署名与发行
  * roles are left to the hero, 专辑信息 and the tracklist. The tracks' credits go to 曲目参与人员, by person.
  */
 const groups = computed(() => {
   const isWork = (credit: CatalogCredit) => !(RELEASE_ROLES as readonly string[]).includes(credit.role)
   const credits = props.credits.filter(isWork)
-  const map = new Map<string, { role: string, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }>()
+  const map = new Map<string, { key: string, role: string, role_label: string | null, category: string, people: Array<{ name: string, artistId: number | null, detail: string | null }> }>()
   const seen = new Set<string>()
   for (const credit of credits) {
     const person = { name: credit.credited_as || credit.artist?.name || '', artistId: credit.artist?.id ?? null, detail: credit.detail }
-    const key = JSON.stringify([credit.role, person.artistId ?? person.name, person.detail])
+    const roleLabel = credit.role_label || null
+    const groupKey = JSON.stringify([credit.role, roleLabel])
+    const key = JSON.stringify([groupKey, person.artistId ?? person.name, person.detail])
     if (seen.has(key)) continue
     seen.add(key)
-    const group = map.get(credit.role) ?? { role: credit.role, category: credit.category ?? roleCategory(credit.role), people: [] }
+    const group = map.get(groupKey) ?? { key: groupKey, role: credit.role, role_label: roleLabel, category: credit.category ?? roleCategory(credit.role), people: [] }
     group.people.push(person)
-    map.set(credit.role, group)
+    map.set(groupKey, group)
   }
   return [...map.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
 })

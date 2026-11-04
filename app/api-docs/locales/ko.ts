@@ -396,6 +396,7 @@ const texts: ApiDocsTexts = {
         'albums.album': '앨범',
         'albums.roles': '앨범 전체에 대해 맡은 역할',
         'albums.roles.role': '역할 키',
+        'albums.roles.role_label': '인쇄된 구체적인 직무로, 역할 이름 대신 표시합니다. 없으면 `null`입니다.',
         'albums.roles.credited_as': '크레딧 표기 이름입니다. 아티스트 이름과 다를 때만 있습니다.',
         'albums.roles.detail': '구체적인 악기 등 추가 설명',
         'albums.tracks': '참여한 곡입니다. 디스크 번호와 트랙 번호순으로 정렬합니다.',
@@ -799,6 +800,7 @@ const texts: ApiDocsTexts = {
         'credits': '이 곡의 크레딧',
         'credits.id': 'ID',
         'credits.role': '역할 키. 역할 이름은 `/catalog/schema`의 `credit_roles`에 있습니다.',
+        'credits.role_label': '인쇄된 구체적인 직무로, 역할 이름 대신 표시합니다. 없으면 `null`입니다.',
         'credits.detail': '보충 설명(예: 구체적인 악기, 캐릭터 이름)',
         'credits.credited_as': '표기명. 아티스트 이름과 다를 때만 있습니다.',
         'credits.parent_id': '이 크레디트가 속한, 같은 곡의 크레디트 ID(예: 피처링한 상대 아티스트). 없으면 `null`입니다.',
@@ -814,6 +816,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'ID',
         'role': '역할 키(예: `composer`). 역할 이름은 `/catalog/schema`의 `credit_roles`에 있습니다. ‘아티스트 표기와 발매’ 그룹의 역할 6개는 [release_role](#enum-release-role)을 참고하세요.',
+        'role_label': '인쇄된 구체적인 직무(예: `Graphic Designer`)로, 역할 이름 대신 표시합니다. 번역되지 않습니다. 없으면 `null`입니다.',
         'category': '역할 분류',
         'artist': '아티스트. 표기명만 알고 아직 연결된 아티스트가 없으면 `null`입니다.',
         'artist.id': '아티스트 ID',

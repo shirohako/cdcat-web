@@ -3,25 +3,29 @@ import type { AlbumDisc } from '~/types/album'
 /**
  * The album page's 曲目参与人员: everyone credited on the tracks, grouped by artist (a name-only credit by its name),
  * in the order they first appear in the tracklist. Each person lists their roles in the dictionary's order, a role
- * with its detail (an instrument) apart, with the tracks as ranges: "1–3, 5", per disc when there are several
+ * with another job title or detail (an instrument) apart, with the tracks as ranges: "1–3, 5", per disc when there are several
  * ("Disc 1: 1–3 · Disc 2: 2"), or `all` when it is every track of the album. For the by-track view each person also
  * lists their tracks one by one, per disc, with what they did on each.
  */
 
 export interface TrackPersonRole {
   role: string
+  /** The printed job title, shown instead of the role's name */
+  role_label: string | null
   category: string | null
   detail: string | null
   /** The tracks as ranges, or null for every track */
   tracks: string | null
 }
 
+type TrackCreditRole = { role: string, role_label: string | null, detail: string | null }
+
 export interface TrackPersonTrack {
   id: number
   /** The printed number, else the track number */
   label: string
   title: string
-  roles: Array<{ role: string, detail: string | null }>
+  roles: TrackCreditRole[]
 }
 
 export interface TrackPerson {
@@ -39,7 +43,7 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
   const total = ordered.reduce((sum, item) => sum + item.tracks.length, 0)
   const people = new Map<string, Omit<TrackPerson, 'tracks'> & {
     byRole: Map<string, { role: TrackPersonRole, ids: Set<number> }>
-    byTrack: Map<number, Array<{ role: string, detail: string | null }>>
+    byTrack: Map<number, TrackCreditRole[]>
   }>()
 
   for (const { tracks } of ordered) {
@@ -50,13 +54,15 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
         const key = credit.artist ? `a:${credit.artist.id}` : `n:${name}`
         const person = people.get(key) ?? { key, name, artistId: credit.artist?.id ?? null, roles: [], byRole: new Map(), byTrack: new Map() }
         people.set(key, person)
-        const roleKey = JSON.stringify([credit.role, credit.detail || null])
-        const entry = person.byRole.get(roleKey) ?? { role: { role: credit.role, category: credit.category ?? null, detail: credit.detail || null, tracks: null }, ids: new Set<number>() }
+        const roleLabel = credit.role_label || null
+        const detail = credit.detail || null
+        const roleKey = JSON.stringify([credit.role, roleLabel, detail])
+        const entry = person.byRole.get(roleKey) ?? { role: { role: credit.role, role_label: roleLabel, category: credit.category ?? null, detail, tracks: null }, ids: new Set<number>() }
         person.byRole.set(roleKey, entry)
         entry.ids.add(track.id)
         const onTrack = person.byTrack.get(track.id) ?? []
         person.byTrack.set(track.id, onTrack)
-        if (!onTrack.some(role => role.role === credit.role && role.detail === (credit.detail || null))) onTrack.push({ role: credit.role, detail: credit.detail || null })
+        if (!onTrack.some(role => role.role === credit.role && role.role_label === roleLabel && role.detail === detail)) onTrack.push({ role: credit.role, role_label: roleLabel, detail })
       }
     }
   }
@@ -80,7 +86,7 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
     return ordered.length > 1 ? parts.map(part => `Disc ${part.disc}: ${part.runs.join(', ')}`).join(' · ') : parts.map(part => part.runs.join(', ')).join('')
   }
 
-  const perTrack = (byTrack: Map<number, Array<{ role: string, detail: string | null }>>) => {
+  const perTrack = (byTrack: Map<number, TrackCreditRole[]>) => {
     if (byTrack.size === total) return null
     return ordered.map(({ disc, tracks }) => ({
       disc: ordered.length > 1 ? disc.position : null,
@@ -102,19 +108,23 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
 }
 
 export interface TrackRoleGroup {
+  /** One group per role and printed job title */
+  key: string
   role: string
+  role_label: string | null
   category: string | null
   /** Everyone with this role, in the order they first appear in the tracklist, a role detail (an instrument) apart */
   people: Array<{ key: string, name: string, artistId: number | null, detail: string | null, tracks: string | null }>
 }
 
-/** The same credits turned around for the by-role view: one group per role in the dictionary's order, its people under it. */
+/** The same credits turned around for the by-role view: one group per role and job title in the dictionary's order, its people under it. */
 export function trackRoleGroups(people: TrackPerson[], roleOrder: (role: string) => number): TrackRoleGroup[] {
   const groups = new Map<string, TrackRoleGroup>()
   for (const person of people) {
     for (const role of person.roles) {
-      const group = groups.get(role.role) ?? { role: role.role, category: role.category, people: [] }
-      groups.set(role.role, group)
+      const key = JSON.stringify([role.role, role.role_label])
+      const group = groups.get(key) ?? { key, role: role.role, role_label: role.role_label, category: role.category, people: [] }
+      groups.set(key, group)
       group.people.push({ key: `${person.key}:${role.detail ?? ''}`, name: person.name, artistId: person.artistId, detail: role.detail, tracks: role.tracks })
     }
   }

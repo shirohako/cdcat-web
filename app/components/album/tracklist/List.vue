@@ -54,8 +54,8 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
             <!-- Roles as tags (原曲 as a grey one), the names after them as grey tags; one line, cut with … when it runs
                  long -->
             <p class="min-w-0 flex-1 truncate text-xs leading-5 text-body">
-              <template v-for="(group, index) in keyGroups(row)" :key="group.role">
-                <CatalogRoleTag :label="group.label" :category="group.category" class="mr-1 align-middle" :class="index > 0 && 'ml-3'" />
+              <template v-for="(group, index) in keyGroups(row)" :key="group.key">
+                <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" class="mr-1 align-middle" :class="index > 0 && 'ml-3'" />
                 <AlbumTracklistPeople :people="group.people" inline />
               </template>
               <template v-if="row.originals.length">
@@ -76,8 +76,8 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
                 <AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>
               </p>
               <div v-if="row.groups.length" class="grid gap-x-5 gap-y-1.5 @xl:grid-cols-2">
-                <div v-for="group in row.groups" :key="group.role" class="flex min-w-0 items-start gap-2 text-[12.5px] leading-[1.125rem] text-title">
-                  <CatalogRoleTag :label="group.label" :category="group.category" />
+                <div v-for="group in row.groups" :key="group.key" class="flex min-w-0 items-start gap-2 text-[12.5px] leading-[1.125rem] text-title">
+                  <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" class="min-w-0" />
                 </div>
               </div>

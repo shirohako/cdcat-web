@@ -5,6 +5,7 @@
 
 import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/document'
 import type { ParsedDisc } from './tracklistParser'
+import { RELEASE_ROLES } from '../types/album'
 import { FEATURING_ROLE } from './artistLine'
 import { newKey } from './documentKeys'
 import { byOrder, nextOrder, sameId } from './documentRows'
@@ -354,7 +355,10 @@ export function removeImage(doc: AlbumDocument, rowId: RowId) {
 
 // ---- credits ----------------------------------------------------------------------------------
 
-/** Credits with the same person, role and detail, edited as one row with a set of tracks. */
+/** A printed job title stands in for the role's name, which the 署名与发行 roles and 客串 don't show (AlbumSchema::roleLabels). */
+export const canHaveRoleLabel = (role: string) => role !== FEATURING_ROLE && !(RELEASE_ROLES as readonly string[]).includes(role)
+
+/** Credits with the same person, role, job title and detail, edited as one row with a set of tracks. */
 export interface CreditGroup {
   /** Id of the first row: stable while the group's fields are edited */
   key: string
@@ -363,12 +367,13 @@ export interface CreditGroup {
   artist_id: AggregateRef | null
   credited_as: string | null
   role: string
+  role_label: string | null
   detail: string | null
   rows: AlbumCreditRow[]
   trackIds: RowId[]
 }
 
-const creditKey = (row: AlbumCreditRow) => JSON.stringify([row.track_id === null, row.artist_id, row.credited_as || null, row.role, row.detail || null])
+const creditKey = (row: AlbumCreditRow) => JSON.stringify([row.track_id === null, row.artist_id, row.credited_as || null, row.role, row.role_label || null, row.detail || null])
 
 export function creditGroups(doc: AlbumDocument): CreditGroup[] {
   const groups = new Map<string, CreditGroup>()
@@ -376,7 +381,7 @@ export function creditGroups(doc: AlbumDocument): CreditGroup[] {
     const key = creditKey(row)
     let group = groups.get(key)
     if (!group) {
-      group = { key: String(row.id), album: row.track_id === null, artist_id: row.artist_id, credited_as: row.credited_as, role: row.role, detail: row.detail, rows: [], trackIds: [] }
+      group = { key: String(row.id), album: row.track_id === null, artist_id: row.artist_id, credited_as: row.credited_as, role: row.role, role_label: row.role_label || null, detail: row.detail, rows: [], trackIds: [] }
       groups.set(key, group)
     }
     group.rows.push(row)
@@ -393,7 +398,7 @@ const dedupeCredits = (doc: AlbumDocument) => {
   const seen = new Map<string, AlbumCreditRow>()
   const dropped = new Map<string, AlbumCreditRow>()
   doc.credits = doc.credits.filter((row) => {
-    const key = JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.detail || null])
+    const key = JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.role_label || null, row.detail || null])
     const kept = seen.get(key)
     if (kept) {
       dropped.set(String(row.id), kept)
@@ -429,7 +434,7 @@ export function setCreditParent(doc: AlbumDocument, row: AlbumCreditRow, parent:
   tidyParents(doc)
 }
 
-export function updateCreditGroup(doc: AlbumDocument, group: CreditGroup, patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>>) {
+export function updateCreditGroup(doc: AlbumDocument, group: CreditGroup, patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'role_label' | 'detail'>>) {
   for (const row of group.rows) Object.assign(row, patch)
   Object.assign(group, patch)
   dedupeCredits(doc)
@@ -465,7 +470,7 @@ export function trackRanges(doc: AlbumDocument, trackIds: RowId[]): string {
  * Credits `fields` on the whole album (trackIds null) or on each of the tracks. Returns the credit now on each of
  * them, the new row or the one it turned out to repeat.
  */
-export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>, trackIds: RowId[] | null): AlbumCreditRow[] {
+export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'role_label' | 'detail'>, trackIds: RowId[] | null): AlbumCreditRow[] {
   let order = nextOrder(doc.credits)
   const added = (trackIds ?? [null]).map((trackId) => {
     const row: AlbumCreditRow = { id: newKey('c'), track_id: trackId, ...fields, sort_order: order++ }
@@ -473,7 +478,7 @@ export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'arti
     return row
   })
   dedupeCredits(doc)
-  const key = (row: AlbumCreditRow) => JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.detail || null])
+  const key = (row: AlbumCreditRow) => JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.role_label || null, row.detail || null])
   return added.map(row => doc.credits.find(other => key(other) === key(row))!)
 }
 
@@ -484,12 +489,15 @@ export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
 }
 
 /** Changes these credit rows in place (their ids stay), dropping any that become duplicates of others. */
-export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'detail'>>) {
+export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'role_label' | 'detail'>>) {
   for (const row of rows) Object.assign(row, patch)
   dedupeCredits(doc)
 }
 
-/** Gives the rows another role. A 客串 is no credit to belong to, so what belonged to one of them belongs to none. */
+/**
+ * Gives the rows another role, the job title with it where the new role can have one. A 客串 is no credit to belong
+ * to, so what belonged to one of them belongs to none.
+ */
 export function changeCreditRole(doc: AlbumDocument, rows: AlbumCreditRow[], role: string) {
   if (role === FEATURING_ROLE) {
     const ids = new Set(rows.map(row => String(row.id)))
@@ -497,7 +505,7 @@ export function changeCreditRole(doc: AlbumDocument, rows: AlbumCreditRow[], rol
       if (row.parent_id != null && ids.has(String(row.parent_id))) row.parent_id = null
     }
   }
-  patchCredits(doc, rows, { role })
+  patchCredits(doc, rows, canHaveRoleLabel(role) ? { role } : { role, role_label: null })
 }
 
 // ---- names in other languages -----------------------------------------------------------------

@@ -396,6 +396,7 @@ const texts: ApiDocsTexts = {
         'albums.album': 'アルバム。',
         'albums.roles': 'アルバム全体で担っている役割。',
         'albums.roles.role': '役割の key。',
+        'albums.roles.role_label': '印刷された具体的な役職で、役割名の代わりに表示します。ない場合は `null` です。',
         'albums.roles.credited_as': 'クレジット名義。アーティスト名と異なる場合だけ含まれます。',
         'albums.roles.detail': '補足。例：担当した楽器。',
         'albums.tracks': '参加しているトラック。ディスクとトラック番号の順に並びます。',
@@ -800,6 +801,7 @@ const texts: ApiDocsTexts = {
         'credits': 'このトラックのクレジット。',
         'credits.id': 'ID。',
         'credits.role': '役割の key。名前は `/catalog/schema` の `credit_roles` を参照してください。',
+        'credits.role_label': '印刷された具体的な役職で、役割名の代わりに表示します。ない場合は `null` です。',
         'credits.detail': '補足。例：担当した楽器や役名。',
         'credits.credited_as': 'クレジット名義。アーティスト名と異なる場合だけ含まれます。',
         'credits.parent_id': 'このクレジットが属する、同じ曲のクレジットの ID（例：フィーチャリングされた相手のアーティスト）。ない場合は `null`。',
@@ -815,6 +817,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'ID。',
         'role': '役割の key。例：`composer`。名前は `/catalog/schema` の `credit_roles` を参照してください。「アーティスト・発売」グループの 6 つの役割は [release_role](#enum-release-role) を参照してください。',
+        'role_label': '印刷された具体的な役職（`Graphic Designer` など）で、役割名の代わりに表示します。翻訳はありません。ない場合は `null` です。',
         'category': '役割の分類。',
         'artist': 'アーティスト。名義だけが分かっていて、対応するアーティストがまだない場合は `null`。',
         'artist.id': 'アーティスト ID。',

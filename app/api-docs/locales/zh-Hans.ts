@@ -396,6 +396,7 @@ const texts: ApiDocsTexts = {
         'albums.album': '专辑。',
         'albums.roles': '在整张专辑上担任的角色。',
         'albums.roles.role': '角色的 key。',
+        'albums.roles.role_label': '印刷的具体职务，显示时替代角色名；没有时为 `null`。',
         'albums.roles.credited_as': '署名，和艺术家名不同时才有。',
         'albums.roles.detail': '补充说明，例如具体的乐器。',
         'albums.tracks': '参与的曲目，按碟片和曲号排序。',
@@ -800,6 +801,7 @@ const texts: ApiDocsTexts = {
         'credits': '这个曲目的制作人员。',
         'credits.id': 'ID。',
         'credits.role': '角色的 key，名称见 `/catalog/schema` 的 `credit_roles`。',
+        'credits.role_label': '印刷的具体职务，显示时替代角色名；没有时为 `null`。',
         'credits.detail': '补充说明，例如具体的乐器或角色名。',
         'credits.credited_as': '署名，和艺术家名不同时才有。',
         'credits.parent_id': '这条 credit 所属的、同一曲目上那条 credit 的 ID，例如客串所属的艺术家；没有时为 `null`。',
@@ -815,6 +817,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'ID。',
         'role': '角色的 key，例如 `composer`；名称见 `/catalog/schema` 的 `credit_roles`。「署名与发行」组的 6 个角色见 [release_role](#enum-release-role)。',
+        'role_label': '印刷的具体职务，例如 `Graphic Designer`，显示时替代角色名。不翻译；没有时为 `null`。',
         'category': '角色的分类。',
         'artist': '艺术家；只知道署名、还没有对应的艺术家时为 `null`。',
         'artist.id': '艺术家 ID。',

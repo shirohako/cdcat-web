@@ -396,6 +396,7 @@ const texts: ApiDocsTexts = {
         'albums.album': 'The album.',
         'albums.roles': 'Roles on the whole album.',
         'albums.roles.role': 'Role key.',
+        'albums.roles.role_label': 'The job title as printed, shown instead of the role\'s name; `null` when there is none.',
         'albums.roles.credited_as': 'The credited name; only present when it differs from the artist\'s name.',
         'albums.roles.detail': 'Extra detail, such as the exact instrument.',
         'albums.tracks': 'The tracks worked on, by disc and track number.',
@@ -800,6 +801,7 @@ const texts: ApiDocsTexts = {
         'credits': 'This track\'s credits.',
         'credits.id': 'ID.',
         'credits.role': 'Role key; names are in `credit_roles` of `/catalog/schema`.',
+        'credits.role_label': 'The job title as printed, shown instead of the role\'s name; `null` when there is none.',
         'credits.detail': 'Extra detail, such as the exact instrument or character name.',
         'credits.credited_as': 'The credited name; only present when it differs from the artist\'s name.',
         'credits.parent_id': 'ID of the credit of this track that this one belongs to, e.g. the artist a featured artist is with; `null` for none.',
@@ -815,6 +817,7 @@ const texts: ApiDocsTexts = {
       fields: {
         'id': 'ID.',
         'role': 'Role key, for example `composer`; names are in `credit_roles` of `/catalog/schema`. The 6 roles of the "Artists & release" group are in [release_role](#enum-release-role).',
+        'role_label': 'The job title as printed, such as `Graphic Designer`, shown instead of the role\'s name. It is not translated; `null` when there is none.',
         'category': 'Role category.',
         'artist': 'The artist; `null` when only the credited name is known and no artist is matched yet.',
         'artist.id': 'Artist ID.',

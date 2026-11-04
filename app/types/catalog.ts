@@ -112,6 +112,8 @@ export interface CatalogSchema {
 export interface CatalogCredit {
   id: number
   role: string
+  /** The job title as printed ("Graphic Designer"), shown instead of the role's name */
+  role_label?: string | null
   category?: string | null
   artist: { id: number, name: string, image_url?: string | null, type?: string | null } | null
   credited_as: string | null

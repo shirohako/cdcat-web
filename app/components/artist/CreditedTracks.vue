@@ -21,7 +21,7 @@
       <p v-if="group.roles.length" class="mt-2 flex flex-wrap items-baseline gap-1.5 border-t border-line pt-2 text-sm">
         <span class="text-xs text-meta">{{ $t('artists.detail.album_roles') }}</span>
         <span v-for="(credit, index) in group.roles" :key="index" class="inline-flex items-baseline gap-1">
-          <span class="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" :class="getAlbumRolePalette(roleCategory(credit.role)).badge">{{ roleName(credit.role) }}</span>
+          <UiTooltip :text="roleName(credit.role)" :disabled="!credit.role_label"><span class="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" :class="getAlbumRolePalette(roleCategory(credit.role)).badge">{{ credit.role_label || roleName(credit.role) }}</span></UiTooltip>
           <span v-if="credit.detail" class="text-xs text-meta">({{ credit.detail }})</span>
           <span v-if="credit.credited_as && credit.credited_as !== artistName" class="text-xs text-meta">{{ $t('artists.detail.credited_as', { name: credit.credited_as }) }}</span>
         </span>
@@ -32,7 +32,7 @@
           <NuxtLink :to="`/tracks/${track.id}`" class="min-w-0 flex-1 truncate text-body transition-colors hover:text-primary">{{ track.title }}</NuxtLink>
           <span class="flex flex-wrap items-baseline gap-1.5 pl-13 sm:pl-0">
             <span v-for="(credit, index) in track.roles" :key="index" class="inline-flex items-baseline gap-1">
-              <span class="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" :class="getAlbumRolePalette(roleCategory(credit.role)).badge">{{ roleName(credit.role) }}</span>
+              <UiTooltip :text="roleName(credit.role)" :disabled="!credit.role_label"><span class="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" :class="getAlbumRolePalette(roleCategory(credit.role)).badge">{{ credit.role_label || roleName(credit.role) }}</span></UiTooltip>
               <span v-if="credit.detail" class="text-xs text-meta">({{ credit.detail }})</span>
               <span v-if="credit.credited_as && credit.credited_as !== artistName" class="text-xs text-meta">{{ $t('artists.detail.credited_as', { name: credit.credited_as }) }}</span>
             </span>

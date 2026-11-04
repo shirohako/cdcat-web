@@ -68,13 +68,13 @@ export interface ArtistCreditedTrack {
   disc_position: number
   track_number: number
   number_label: string | null
-  roles: Array<{ role: string, credited_as: string | null, detail: string | null }>
+  roles: Array<{ role: string, role_label?: string | null, credited_as: string | null, detail: string | null }>
 }
 
 /** GET /artists/{id}/tracks (参与的专辑): the artist's album-wide roles and credited tracks, grouped by album. */
 export interface ArtistCreditedAlbum {
   album: AlbumSimple
-  roles: Array<{ role: string, credited_as: string | null, detail: string | null }>
+  roles: Array<{ role: string, role_label?: string | null, credited_as: string | null, detail: string | null }>
   tracks: ArtistCreditedTrack[]
 }
 

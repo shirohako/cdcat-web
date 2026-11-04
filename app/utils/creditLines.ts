@@ -6,19 +6,20 @@
 
 import type { AggregateRef, AlbumDocument, RowId } from '~/types/document'
 import { RELEASE_ROLES } from '../types/album'
-import { addCredit, orderedTracks, patchCredits, removeCredits, type AlbumCreditRow } from './albumDocument'
+import { addCredit, canHaveRoleLabel, orderedTracks, patchCredits, removeCredits, type AlbumCreditRow } from './albumDocument'
 import { parentOf } from './artistLine'
 import { byOrder, sameId } from './documentRows'
 
-/** Who a credit names: an artist (an id, or "@ref" of one new in this revision) or only a printed name, and the detail. */
+/** Who a credit names: an artist (an id, or "@ref" of one new in this revision) or only a printed name, the printed job title and the detail. */
 export interface CreditPerson {
   artist_id: AggregateRef | null
   credited_as: string | null
+  role_label?: string | null
   detail: string | null
 }
 
-export const personOf = (row: AlbumCreditRow): CreditPerson => ({ artist_id: row.artist_id, credited_as: row.credited_as || null, detail: row.detail || null })
-export const personKey = (person: CreditPerson) => JSON.stringify([person.artist_id, person.credited_as || null, person.detail || null])
+export const personOf = (row: AlbumCreditRow): CreditPerson => ({ artist_id: row.artist_id, credited_as: row.credited_as || null, role_label: row.role_label || null, detail: row.detail || null })
+export const personKey = (person: CreditPerson) => JSON.stringify([person.artist_id, person.credited_as || null, person.role_label || null, person.detail || null])
 const isPerson = (person: CreditPerson) => (row: AlbumCreditRow) => personKey(personOf(row)) === personKey(person)
 
 /** The whole album's 署名与发行 credits, which the byline block edits; everything else is in the lines or the track lists. */
@@ -53,8 +54,9 @@ export interface CreditLine {
 
 /**
  * The credits outside the byline block as lines: first each person's tracks for each role, then a person's roles
- * on the same tracks together ("作曲・編曲"), then the people with the same roles on the same tracks. In the
- * dictionary's role order, then by first track.
+ * on the same tracks together ("作曲・編曲"), then the people with the same roles on the same tracks. A job title
+ * belongs to one role, so a credit with one takes no other role into its line. In the dictionary's role order, then by
+ * first track.
  */
 export function creditLines(doc: AlbumDocument, roleOrder: (role: string) => number): CreditLine[] {
   const position = new Map(orderedTracks(doc).map((track, index) => [String(track.id), index]))
@@ -74,7 +76,7 @@ export function creditLines(doc: AlbumDocument, roleOrder: (role: string) => num
   const byTracks = new Map<string, { person: CreditPerson, trackIds: RowId[], roles: string[], rows: AlbumCreditRow[] }>()
   for (const entry of byRole.values()) {
     const trackIds = [...entry.trackIds].sort((a, b) => at(a) - at(b))
-    const key = JSON.stringify([personKey(entry.person), trackIds.map(String)])
+    const key = JSON.stringify([personKey(entry.person), trackIds.map(String), entry.person.role_label ? entry.role : null])
     const item = byTracks.get(key) ?? { person: entry.person, trackIds, roles: [], rows: [] }
     byTracks.set(key, item)
     item.roles.push(entry.role)
@@ -105,9 +107,11 @@ export function addCreditLine(doc: AlbumDocument, roles: string[], people: Credi
   }
 }
 
+/** A job title goes along when a line's one role is swapped for another; a role added beside it starts without one. */
 export function setLineRoles(doc: AlbumDocument, line: CreditLine, roles: string[]) {
+  const swapped = line.roles.length === 1 && roles.length === 1 && canHaveRoleLabel(roles[0]!)
   removeCredits(doc, line.rows.filter(row => !roles.includes(row.role)))
-  addCreditLine(doc, roles.filter(role => !line.roles.includes(role)), line.people.map(entry => entry.person), line.trackIds)
+  addCreditLine(doc, roles.filter(role => !line.roles.includes(role)), line.people.map(entry => ({ ...entry.person, role_label: swapped ? entry.person.role_label : null })), line.trackIds)
 }
 
 /** Moves the line onto these tracks, or onto the whole album when there are none. */
@@ -132,7 +136,7 @@ export function removeLinePerson(doc: AlbumDocument, line: CreditLine, person: C
   removeCredits(doc, line.rows.filter(isPerson(person)))
 }
 
-/** Changes how a person of the line is credited: the printed name, the detail, or the artist it points at. */
+/** Changes how a person of the line is credited: the printed name, the job title, the detail, or the artist it points at. */
 export function updateLinePerson(doc: AlbumDocument, line: CreditLine, person: CreditPerson, patch: Partial<CreditPerson>) {
   patchCredits(doc, line.rows.filter(isPerson(person)), patch)
 }

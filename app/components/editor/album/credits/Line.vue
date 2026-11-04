@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { CreditLinePerson, CreditPerson } from '~/utils/creditLines'
+import { canHaveRoleLabel } from '~/utils/albumDocument'
 import { personKey } from '~/utils/creditLines'
 
 /**
@@ -21,6 +22,8 @@ const { t } = useI18n()
 const editor = useAlbumEditor()
 const errorsOf = (entry: CreditLinePerson) => entry.rows.flatMap(row => editor.errorsIn(`credits.${row.id}`))
 const errors = computed(() => [...new Map(props.people.flatMap(errorsOf).map(error => [error.message, error])).values()])
+/** A job title belongs to one role: a line of several has none. */
+const labelable = computed(() => props.roles.length === 1 && canHaveRoleLabel(props.roles[0]!))
 </script>
 
 <template>
@@ -33,6 +36,7 @@ const errors = computed(() => [...new Map(props.people.flatMap(errorsOf).map(err
           :key="personKey(entry.person)"
           :person="entry.person"
           :invalid="errorsOf(entry).length > 0"
+          :labelable="labelable"
           @update="emit('update-person', entry.person, $event)"
           @remove="emit('remove-person', entry.person)"
         />

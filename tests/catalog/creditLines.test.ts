@@ -18,6 +18,57 @@ const person = (artist_id: number | string | null, credited_as: string | null = 
 const summary = (doc: ReturnType<typeof emptyAlbumDocument>) => creditLines(doc, roleOrder)
   .map(line => `${line.roles.join('+')} ${line.people.map(entry => entry.person.artist_id ?? entry.person.credited_as).join(',')} @${line.trackIds.length ? line.trackIds.length : 'album'}`)
 
+describe('job titles', () => {
+  const labelled = (artist_id: number, role_label: string) => ({ ...person(artist_id), role_label })
+
+  it('keeps people of one role in one line, each with their own job title', () => {
+    const { doc, tracks } = album()
+    addCreditLine(doc, ['illustrator'], [labelled(1, 'Graphic Designer'), labelled(2, 'Package Designer'), person(3)], tracks)
+    expect(summary(doc)).toEqual(['illustrator 1,2,3 @4'])
+    expect(creditLines(doc, roleOrder)[0]!.people.map(entry => entry.person.role_label)).toEqual(['Graphic Designer', 'Package Designer', null])
+  })
+
+  it('keeps one person under two job titles of one role', () => {
+    const { doc } = album()
+    addCreditLine(doc, ['illustrator'], [labelled(1, 'Graphic Designer'), labelled(1, 'Package Designer')], [])
+    expect(doc.credits.map(row => row.role_label)).toEqual(['Graphic Designer', 'Package Designer'])
+  })
+
+  it('keeps a credit with a job title out of a line of several roles', () => {
+    const { doc, tracks } = album()
+    addCreditLine(doc, ['composer', 'arranger'], [person(1)], tracks)
+    addCreditLine(doc, ['composer'], [labelled(2, 'Sound Creator')], tracks)
+    addCreditLine(doc, ['arranger'], [person(2)], tracks)
+    expect(summary(doc)).toEqual(['composer+arranger 1 @4', 'composer 2 @4', 'arranger 2 @4'])
+  })
+
+  it('splits the line when a role is added, the new role without the job title', () => {
+    const { doc, tracks } = album()
+    addCreditLine(doc, ['composer'], [labelled(1, 'Sound Creator')], tracks)
+    setLineRoles(doc, creditLines(doc, roleOrder)[0]!, ['composer', 'arranger'])
+    expect(summary(doc)).toEqual(['composer 1 @4', 'arranger 1 @4'])
+    expect(doc.credits.filter(row => row.track_id === tracks[0]).map(row => [row.role, row.role_label])).toEqual([['composer', 'Sound Creator'], ['arranger', null]])
+  })
+
+  it('keeps the job title when the line\'s one role is swapped, unless the new role can\'t have one', () => {
+    const { doc } = album()
+    addCreditLine(doc, ['composer'], [labelled(1, 'Sound Creator')], [])
+    setLineRoles(doc, creditLines(doc, roleOrder)[0]!, ['arranger'])
+    expect(doc.credits.map(row => [row.role, row.role_label])).toEqual([['arranger', 'Sound Creator']])
+    setLineRoles(doc, creditLines(doc, roleOrder)[0]!, ['featuring'])
+    expect(doc.credits.map(row => [row.role, row.role_label])).toEqual([['featuring', null]])
+  })
+
+  it('copies the job title with a track\'s credits and tells tracks with different ones apart', () => {
+    const { doc, tracks } = album()
+    addCreditLine(doc, ['illustrator'], [labelled(1, 'Graphic Designer')], [tracks[0]!])
+    addCreditLine(doc, ['illustrator'], [person(1)], [tracks[1]!])
+    expect(sameTrackCredits(doc, tracks[0]!, tracks[1]!)).toBe(false)
+    copyTrackCredits(doc, tracks[0]!, tracks[1]!)
+    expect(sameTrackCredits(doc, tracks[0]!, tracks[1]!)).toBe(true)
+  })
+})
+
 describe('lines by role', () => {
   it('reads a booklet line back as one line: two roles, one person, the same tracks', () => {
     const { doc, tracks } = album()

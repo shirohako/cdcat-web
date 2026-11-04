@@ -16,6 +16,20 @@ const track = (number: number, credits: CatalogCredit[], extra: Partial<AlbumTra
 const disc = (position: number, tracks: AlbumTrack[]): AlbumDisc => ({ id: position, position, title: null, titles: [], format: 'cd', bonus_id: null, tocs: [], tracks })
 
 describe('track people', () => {
+  it('keeps each job title of a role apart and spells it in the groups', () => {
+    const designer = (name: string, artistId: number, role_label: string | null) => ({ ...credit('performer', name, artistId), role_label })
+    const people = trackPeople([disc(1, [
+      track(1, [designer('NAGI', 1, 'Graphic Designer'), designer('Eris', 2, null)]),
+      track(2, [designer('NAGI', 1, 'Package Designer'), designer('Eris', 2, 'Graphic Designer')]),
+      track(3, []),
+    ])], role => ORDER.indexOf(role))
+    expect(people[0]!.roles.map(role => [role.role_label, role.tracks])).toEqual([['Graphic Designer', '1'], ['Package Designer', '2']])
+    expect(people[0]!.tracks?.[0]?.tracks[1]?.roles).toEqual([{ role: 'performer', role_label: 'Package Designer', detail: null }])
+    expect(trackRoleGroups(people, role => ORDER.indexOf(role)).map(group => [group.role_label, group.people.map(person => person.name)])).toEqual([
+      ['Graphic Designer', ['NAGI', 'Eris']], ['Package Designer', ['NAGI']], [null, ['Eris']],
+    ])
+  })
+
   it('groups track credits by artist in tracklist order, roles in order with their tracks as ranges', () => {
     const people = trackPeople([disc(1, [
       track(1, [credit('composer', 'NAGI', 1), credit('artist', 'Vivienne', 2)]),
@@ -45,8 +59,8 @@ describe('track people', () => {
       disc(2, [track(3, [credit('performer', 'A', 1, 'Guitar'), credit('artist', 'B', 2)], { disc_number: 2 })]),
     ], role => ORDER.indexOf(role))
     expect(people[0]!.tracks).toEqual([
-      { disc: 1, tracks: [{ id: 1010, label: 'A1', title: 'T1', roles: [{ role: 'composer', detail: null }, { role: 'arranger', detail: null }] }] },
-      { disc: 2, tracks: [{ id: 2030, label: '3', title: 'T3', roles: [{ role: 'performer', detail: 'Guitar' }] }] },
+      { disc: 1, tracks: [{ id: 1010, label: 'A1', title: 'T1', roles: [{ role: 'composer', role_label: null, detail: null }, { role: 'arranger', role_label: null, detail: null }] }] },
+      { disc: 2, tracks: [{ id: 2030, label: '3', title: 'T3', roles: [{ role: 'performer', role_label: null, detail: 'Guitar' }] }] },
     ])
     expect(people[1]!.tracks).toBeNull()
   })

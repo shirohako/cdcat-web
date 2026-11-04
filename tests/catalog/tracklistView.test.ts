@@ -64,6 +64,16 @@ describe('buildTracklist', () => {
     expect(row.maker?.role).toBe('arranger')
   })
 
+  it('gives each job title of a role its own group, and the key people all of the role under its name', () => {
+    const titled = (name: string, id: number, role_label: string) => ({ ...credit('arranger', name, id), role_label })
+    const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!
+    const split = row([titled('A', 1, 'Strings Arrangement'), titled('B', 2, 'Brass Arrangement'), credit('arranger', 'C', 3)])
+    expect(split.rows[0]!.groups.map(group => [group.label, group.people.map(person => person.name)])).toEqual([['Strings Arrangement', ['A']], ['Brass Arrangement', ['B']], [helpers.roleName('arranger'), ['C']]])
+    expect(split.rows[0]!.maker).toMatchObject({ label: helpers.roleName('arranger'), people: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] })
+    expect(split.roles).toEqual([{ role: 'arranger', label: helpers.roleName('arranger'), category: 'arrangement' }])
+    expect(row([titled('A', 1, 'Strings Arrangement')]).rows[0]!.maker).toMatchObject({ label: 'Strings Arrangement', roleName: helpers.roleName('arranger') })
+  })
+
   it('leads with the 艺术家, falls back to composers and reads roles by category', () => {
     const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
     expect(row([credit('vocals', 'A', 1), credit('artist', 'B', 2)]).lead?.role).toBe('artist')
