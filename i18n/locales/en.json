@@ -1822,19 +1822,14 @@
       "has_member": "Member",
       "voice_of": "Voices",
       "voiced_by": "Voiced by",
-      "persona_of": "Alias of",
-      "has_persona": "Also known as",
-      "subunit_of": "Sub-unit of",
-      "has_subunit": "Sub-unit",
+      "alias": "Alias",
       "related": "Related"
     },
     "artist_relation_ended": {
       "member_of": "Former member of",
       "has_member": "Former member",
       "voice_of": "Formerly voiced",
-      "voiced_by": "Formerly voiced by",
-      "subunit_of": "Former sub-unit of",
-      "has_subunit": "Former sub-unit"
+      "voiced_by": "Formerly voiced by"
     },
     "artist_type": {
       "person": "Person",
@@ -2961,7 +2956,43 @@
       },
       "artist_name_placeholder": "The name as usually credited",
       "entry_name_placeholder": "The original title",
-      "artist_relations_hint": "Members, voice actors, aliases and sub-units. Pick the relation as seen from this artist; the other artist shows the reverse. Tick “Ended” when a membership, sub-unit or voice role is over (left, disbanded, recast).",
+      "artist_relations_hint": "This artist's links to other artists. Enter each one once and the other artist's page shows it too. Tick “Ended” when a membership or voice role is over (left, disbanded, recast).",
+      "relation_title": "Choose a relation",
+      "relation_intro": "“The other artist” is the one this row links to. Enter a relation once and the other artist's page shows it too.",
+      "relation_placeholder": "Choose a relation",
+      "relation_this_artist": "This artist",
+      "relation_options": {
+        "member_of": {
+          "summary": "{name} belongs to the other artist",
+          "description": "The other artist is the group, circle or company this artist is part of.",
+          "content": "Bands and groups\nDoujin circles\nAgencies and record labels\nThe group a sub-unit belongs to"
+        },
+        "has_member": {
+          "summary": "The other artist belongs to {name}",
+          "description": "The other artist is part of this group, circle or company. People and sub-units both count.",
+          "content": "Band and group members\nCircle members\nSub-units of a group\nArtists signed to a company"
+        },
+        "voice_of": {
+          "summary": "{name} voices the other artist",
+          "description": "The other artist is a character this artist voices, or a virtual singer this artist gives a voice to.",
+          "content": "Anime and game characters\nVirtual singers"
+        },
+        "voiced_by": {
+          "summary": "The other artist voices {name}",
+          "description": "The other artist voices this character, or gives this virtual singer its voice.",
+          "content": "A character's voice actor\nA virtual singer's voice provider"
+        },
+        "alias": {
+          "summary": "{name} and the other artist are the same artist",
+          "description": "One person or group active under different names, listed on CDCat as two artists. If only the spelling differs (romanization, reading), add it under “Other names” instead.",
+          "content": "Pen names\nStage names\nA former name"
+        },
+        "related": {
+          "summary": "None of the above",
+          "description": "The two artists are connected, but not in any of these ways. Say how in the note.",
+          "content": "Long-term collaborators\nFamily, teacher and student\nA predecessor group"
+        }
+      },
       "prefixes_hint": "Catalog number prefixes, comma-separated. For companies and circles that act as labels.",
       "name_only_credit": "Name only",
       "open_revision": "One of your revisions of it was sent back for changes (#{id}, {at}).",

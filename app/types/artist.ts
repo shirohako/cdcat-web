@@ -6,12 +6,28 @@ import type { CatalogAttribute, CatalogImage, CatalogLink, CatalogTitle, Pending
 export const ARTIST_TYPES = ['person', 'group', 'company', 'virtual', 'circle', 'character'] as const
 export type ArtistType = typeof ARTIST_TYPES[number]
 
-/** Relations as seen from the artist on the page. */
-export const ARTIST_RELATIONS = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'persona_of', 'has_persona', 'subunit_of', 'has_subunit', 'related'] as const
+/** Relations as seen from the artist on the page. A sub-unit is a member of its group. */
+export const ARTIST_RELATIONS = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'alias', 'related'] as const
 export type ArtistRelation = typeof ARTIST_RELATIONS[number]
 
-/** Relations that can be over ("ended"): memberships, voices and sub-units; an alias or "related" cannot (App\Enums\ArtistRelation::canEnd). */
-export const ENDING_RELATIONS: readonly string[] = ['member_of', 'has_member', 'voice_of', 'voiced_by', 'subunit_of', 'has_subunit']
+/** Relations that can be over ("ended"): memberships and voices; an alias or "related" cannot (App\Enums\ArtistRelation::canEnd). */
+export const ENDING_RELATIONS: readonly string[] = ['member_of', 'has_member', 'voice_of', 'voiced_by']
+
+/**
+ * What the editor offers an artist of each type, the usual one first. Each type gets the side of a pair that fits it, so
+ * nobody has to think about direction; the other side of any relation can still be entered from the other artist.
+ */
+export const RELATIONS_BY_TYPE: Record<ArtistType, readonly ArtistRelation[]> = {
+  person: ['member_of', 'voice_of', 'alias', 'related'],
+  group: ['has_member', 'member_of', 'alias', 'related'],
+  circle: ['has_member', 'member_of', 'alias', 'related'],
+  company: ['has_member', 'member_of', 'alias', 'related'],
+  virtual: ['voiced_by', 'member_of', 'alias', 'related'],
+  character: ['voiced_by', 'member_of', 'alias', 'related'],
+}
+
+/** The relations offered to an artist: all of them until it has a type. */
+export const relationsFor = (type?: string | null): readonly ArtistRelation[] => RELATIONS_BY_TYPE[type as ArtistType] ?? ARTIST_RELATIONS
 
 /** An artist image (GET /artists/{id}): an avatar, a banner, a photo …; `image` is null once the upload is gone. */
 export interface ArtistImage {

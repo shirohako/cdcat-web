@@ -117,14 +117,14 @@ const references = editor.references
 const errorAt = (field: string) => editor.errorAt(field)
 const enums = computed(() => schema.value?.enums ?? {})
 
-/** Each type's block in the picker: columns out of six and colour. */
-const TYPE_BLOCKS: Record<string, Pick<UiDialogSelectOption, 'span' | 'tone'>> = {
-  album: { span: 6, tone: 'blue' },
-  ep: { span: 2, tone: 'violet' },
-  single: { span: 2, tone: 'pink' },
-  compilation: { span: 2, tone: 'amber' },
-  drama: { span: 3, tone: 'purple' },
-  radio: { span: 3, tone: 'teal' },
+/** Each type's colour in the picker. */
+const TYPE_TONES: Record<string, UiDialogSelectOption['tone']> = {
+  album: 'blue',
+  ep: 'violet',
+  single: 'pink',
+  compilation: 'amber',
+  drama: 'purple',
+  radio: 'teal',
 }
 
 const typeOptions = computed<UiDialogSelectOption<string | null>[]>(() => (enums.value.album_type ?? []).map((value) => {
@@ -137,7 +137,8 @@ const typeOptions = computed<UiDialogSelectOption<string | null>[]>(() => (enums
     summary: t(`editor.album.type_options.${value}.summary`),
     description: t(`editor.album.type_options.${value}.description`),
     content: t(`editor.album.type_options.${value}.content`).split('\n'),
-    ...TYPE_BLOCKS[value],
+    span: 3,
+    tone: TYPE_TONES[value],
   }
 }))
 

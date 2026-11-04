@@ -1822,19 +1822,14 @@
       "has_member": "멤버",
       "voice_of": "담당 캐릭터",
       "voiced_by": "담당 성우",
-      "persona_of": "원래 명의",
-      "has_persona": "다른 명의",
-      "subunit_of": "상위 그룹",
-      "has_subunit": "서브 유닛",
+      "alias": "다른 명의",
       "related": "관련 아티스트"
     },
     "artist_relation_ended": {
       "member_of": "이전 소속",
       "has_member": "이전 멤버",
       "voice_of": "이전 담당 캐릭터",
-      "voiced_by": "이전 담당 성우",
-      "subunit_of": "이전 상위 그룹",
-      "has_subunit": "이전 서브 유닛"
+      "voiced_by": "이전 담당 성우"
     },
     "artist_type": {
       "person": "개인",
@@ -2961,7 +2956,43 @@
       },
       "artist_name_placeholder": "크레딧에 주로 쓰는 이름",
       "entry_name_placeholder": "원제",
-      "artist_relations_hint": "멤버, 성우, 다른 활동명, 서브 유닛 같은 관계를 입력해요. 이 아티스트 입장에서 관계를 고르면 상대 아티스트에는 반대 관계가 표시돼요. 멤버, 성우, 서브 유닛 관계가 끝났다면(탈퇴, 해체, 교체) 「종료」에 체크해 주세요.",
+      "artist_relations_hint": "다른 아티스트와의 관계를 입력해요. 한 번만 입력하면 상대 페이지에도 자동으로 표시돼요. 멤버나 성우 관계가 끝났다면(탈퇴, 해체, 교체) 「종료」에 체크해 주세요.",
+      "relation_title": "아티스트 관계 선택",
+      "relation_intro": "「상대」는 이 줄에서 연결할 아티스트예요. 관계는 한 번만 입력하면 상대 페이지에도 자동으로 표시돼요.",
+      "relation_placeholder": "관계 선택",
+      "relation_this_artist": "이 아티스트",
+      "relation_options": {
+        "member_of": {
+          "summary": "{name}은(는) 상대의 멤버예요",
+          "description": "상대는 이 아티스트가 속한 그룹, 서클, 회사예요.",
+          "content": "밴드, 그룹\n동인 서클\n소속사, 음반사\n서브 유닛의 상위 그룹"
+        },
+        "has_member": {
+          "summary": "상대는 {name}의 멤버예요",
+          "description": "상대가 이 그룹, 서클, 회사에 속해 있어요. 개인과 서브 유닛 모두 해당돼요.",
+          "content": "밴드, 그룹 멤버\n서클 멤버\n그룹의 서브 유닛\n회사 소속 아티스트"
+        },
+        "voice_of": {
+          "summary": "{name}이(가) 상대의 목소리를 맡았어요",
+          "description": "상대는 이 아티스트가 목소리를 맡은 캐릭터이거나, 목소리를 제공한 버추얼 싱어예요.",
+          "content": "애니메이션, 게임 캐릭터\n버추얼 싱어"
+        },
+        "voiced_by": {
+          "summary": "상대가 {name}의 목소리를 맡았어요",
+          "description": "상대가 이 캐릭터의 목소리를 맡았거나, 이 버추얼 싱어에게 목소리를 제공했어요.",
+          "content": "캐릭터의 성우\n버추얼 싱어의 음성 제공자"
+        },
+        "alias": {
+          "summary": "{name}와(과) 상대는 같은 아티스트예요",
+          "description": "같은 사람이나 그룹이 다른 이름으로 활동해서 CDCat에 아티스트가 둘로 나뉘어 있는 경우예요. 표기만 다르다면(로마자, 읽는 법) 「다른 이름」에 입력해 주세요.",
+          "content": "다른 필명\n다른 활동명\n개명 전 이름"
+        },
+        "related": {
+          "summary": "위의 어디에도 해당하지 않아요",
+          "description": "관계는 있지만 위의 어디에도 해당하지 않는 경우예요. 어떤 관계인지 메모에 적어 주세요.",
+          "content": "오랜 협업\n가족, 사제\n전신 그룹"
+        }
+      },
       "prefixes_hint": "품번 접두어를 쉼표로 구분해 입력해요. 회사나 레이블을 겸하는 서클에 쓰는 항목이에요.",
       "name_only_credit": "이름만 표기",
       "open_revision": "이 항목에 대한 내 편집에 수정 요청이 있어요 (#{id}, {at}).",

@@ -59,7 +59,7 @@
                   <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('artists.detail.catalog_prefixes') }}</span>
                   <span class="min-w-0 font-mono text-body">{{ artist.catalog_prefixes.join(', ') }}</span>
                 </div>
-                <!-- Current relations, then the ended ones (former members, disbanded sub-units, earlier voices) on a row of their own, lighter. -->
+                <!-- Current relations, then the ended ones (former members, earlier voices) on a row of their own, lighter. -->
                 <div v-for="part in relationParts" :key="part.key" class="flex gap-3">
                   <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t(part.key === 'ended' ? 'artists.detail.ended_relations' : 'artists.detail.relations') }}</span>
                   <ul class="flex min-w-0 flex-wrap gap-1.5">

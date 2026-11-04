@@ -965,7 +965,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': 'アイコン画像。',
         'relations.artist.type': 'アーティストの種類。',
         'relations.relation_type': '関係。例：`has_member` は相手がこのグループのメンバーであることを表します。',
-        'relations.ended': '関係が終わっているかどうか：元メンバー、解散したユニット、以前の声優。true になるのはメンバー、声優、ユニットの関係だけです。',
+        'relations.ended': '関係が終わっているかどうか：元メンバー、以前の声優。true になるのはメンバーと声優の関係だけです。',
         'relations.note': '補足。',
       },
     },
@@ -1338,14 +1338,11 @@ const texts: ApiDocsTexts = {
       title: 'アーティストの関係',
       description: '現在のアーティストから見た関係で、双方にそれぞれ 1 つずつ表示されます。',
       values: {
-        member_of: '現在のアーティストが相手のメンバー。',
+        member_of: '現在のアーティストが相手のメンバー。派生ユニットも含みます。',
         has_member: '相手が現在のグループのメンバー。',
         voice_of: '現在のアーティストが相手（キャラクター）の声を担当。',
         voiced_by: '相手が現在のキャラクターの声を担当。',
-        persona_of: '現在のアーティストが相手の別名義。',
-        has_persona: '相手が現在のアーティストの別名義。',
-        subunit_of: '現在のアーティストが相手の派生ユニット。',
-        has_subunit: '相手が現在のグループの派生ユニット。',
+        alias: '現在のアーティストと相手は同じ人物やグループの別名義。双方ともこの値になります。',
         related: 'その他の関連。',
       },
     },
@@ -1561,6 +1558,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    artist_relations: 'アーティストの `relation_type` を整理：`subunit_of`・`has_subunit` を `member_of`・`has_member` に統合し、`persona_of`・`has_persona` を方向のない `alias` に統合。',
     disc_tocs: 'アルバム詳細のディスクに `tocs` を追加：CD の TOC と、CDCat Disc ID、freedb・MusicBrainz・AccurateRip・CTDB の ID。',
     launch: '初公開（ベータ版）。',
   },

@@ -19,7 +19,7 @@ const KINDS = [
 const RELATIONS = [
   { from: { name: 'ミナト', icon: 'lucide:user-round' }, to: { name: 'ステラノート', icon: 'lucide:tent' }, stored: 'member_of', reverse: 'has_member' },
   { from: { name: '星野あかり', icon: 'lucide:user-round' }, to: { name: 'ルナ', icon: 'lucide:drama' }, stored: 'voice_of', reverse: 'voiced_by' },
-  { from: { name: 'minato', icon: 'lucide:user-round' }, to: { name: 'ミナト', icon: 'lucide:user-round' }, stored: 'persona_of', reverse: 'has_persona' },
+  { from: { name: 'minato', icon: 'lucide:user-round' }, to: { name: 'ミナト', icon: 'lucide:user-round' }, stored: 'alias', reverse: 'alias' },
 ] as const
 </script>
 

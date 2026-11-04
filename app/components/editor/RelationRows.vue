@@ -6,7 +6,9 @@
           <UiButton :icon="ChevronUp" :label="$t('catalog.form.move_up')" size="xs" :disabled="index === 0" @click="moveRow(rows, row, -1)" />
           <UiButton :icon="ChevronDown" :label="$t('catalog.form.move_down')" size="xs" :disabled="index === shown.length - 1" @click="moveRow(rows, row, 1)" />
         </div>
-        <UiSelect v-if="relations" :model-value="get(row, 'relation_type') as string" :options="relationOptions" size="sm" class="w-40" @change="value => setRelation(row, value)" />
+        <slot name="relation" :value="get(row, 'relation_type') as string" :set="(value: string) => setRelation(row, value)">
+          <UiSelect v-if="relations" :model-value="get(row, 'relation_type') as string" :options="relationOptions" size="sm" class="w-40" @change="value => setRelation(row, value)" />
+        </slot>
         <EditorRefLabel :id="refId(row)" :type="kind" :references="references" class="min-w-32 flex-1 text-sm font-medium" />
         <template v-for="extra in extras" :key="extra.name">
           <label v-if="extra.type === 'checkbox'" v-show="applies(row, extra)" class="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-body">
@@ -36,7 +38,9 @@
       </li>
     </ul>
     <div class="flex flex-wrap items-center gap-2">
-      <UiSelect v-if="relations" v-model="nextRelation" :options="relationOptions" size="sm" class="w-40" :aria-label="$t('catalog.field.relation_type')" />
+      <slot name="relation" :value="nextRelation" :set="setNext">
+        <UiSelect v-if="relations" v-model="nextRelation" :options="relationOptions" size="sm" class="w-40" :aria-label="$t('catalog.field.relation_type')" />
+      </slot>
       <EditorEntityPicker :kind="kind" class="min-w-56 max-w-md flex-1" :placeholder="placeholder" :exclude="[...(exclude ?? []), ...shown.map(row => get(row, field) as number)]" @select="add" />
     </div>
   </div>
@@ -58,7 +62,8 @@ interface Extra { name: string, label: string, type?: 'text' | 'number' | 'date'
 
 /**
  * Rows that point at other entities: an artist's relations, a series' entries, an entry's albums …
- * `field` holds the other entity's id; `relations` offers relation types; `extras` are more fields.
+ * `field` holds the other entity's id; `relations` offers relation types; `extras` are more fields. The `relation` slot
+ * replaces the relation select, on every row and next to the search.
  */
 const props = defineProps<{
   kind: PickerKind
@@ -78,6 +83,8 @@ const { enumLabel } = useCatalogDisplay()
 const shown = computed(() => props.ordered ? byOrder(rows.value) : rows.value)
 const relationOptions = computed<UiSelectOption<string>[]>(() => props.relations ? props.relations.values.map(value => ({ value, label: enumLabel(props.relations!.group, value) })) : [])
 const nextRelation = ref(props.relations?.default ?? props.relations?.values[0] ?? '')
+const setNext = (value: string) => { nextRelation.value = value }
+watch(() => props.relations?.default, (value) => { if (value) setNext(value) })
 const errorsOf = (id: RowId) => props.errors?.(id) ?? []
 
 // Rows of several collections share this list, so their fields are read by name.

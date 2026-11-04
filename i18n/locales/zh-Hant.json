@@ -1820,21 +1820,16 @@
     "artist_relation": {
       "member_of": "所屬",
       "has_member": "成員",
-      "voice_of": "配音",
+      "voice_of": "配音角色",
       "voiced_by": "聲優",
-      "persona_of": "另一名義",
-      "has_persona": "其他名義",
-      "subunit_of": "所屬組合",
-      "has_subunit": "小組合",
+      "alias": "另一名義",
       "related": "相關"
     },
     "artist_relation_ended": {
       "member_of": "曾所屬",
       "has_member": "前成員",
       "voice_of": "曾配音",
-      "voiced_by": "前任聲優",
-      "subunit_of": "曾所屬組合",
-      "has_subunit": "前小組合"
+      "voiced_by": "前任聲優"
     },
     "artist_type": {
       "person": "個人",
@@ -2961,7 +2956,43 @@
       },
       "artist_name_placeholder": "最常見的署名",
       "entry_name_placeholder": "原名",
-      "artist_relations_hint": "成員、聲優、馬甲和小分隊。從這個藝術家的角度選擇關係，對方會自動顯示反向關係。成員、聲優和小組合的關係結束了（退團、解散、換人），勾選「已結束」。",
+      "artist_relations_hint": "這位藝術家和其他藝術家的關係。只填一次，對方的頁面會自動顯示。成員或聲優的關係結束了（退團、解散、換人），勾選「已結束」。",
+      "relation_title": "選擇藝術家關係",
+      "relation_intro": "「對方」是這一行要關聯的藝術家。關係只需填一次，對方的頁面會自動顯示。",
+      "relation_placeholder": "請選擇關係",
+      "relation_this_artist": "這位藝術家",
+      "relation_options": {
+        "member_of": {
+          "summary": "{name} 是對方的一員",
+          "description": "對方是這位藝術家所在的團體、社團或公司。",
+          "content": "樂隊、組合\n同人社團\n事務所、唱片公司\n小分隊所在的團體"
+        },
+        "has_member": {
+          "summary": "對方是 {name} 的一員",
+          "description": "對方屬於這個團體、社團或公司，個人和小分隊都算。",
+          "content": "樂隊、組合的成員\n社團成員\n團體裡的小分隊\n公司旗下的藝人"
+        },
+        "voice_of": {
+          "summary": "{name} 為對方配音",
+          "description": "對方是這位藝術家配音的角色，或由這位藝術家提供聲音的虛擬歌手。",
+          "content": "動畫、遊戲角色\n虛擬歌手"
+        },
+        "voiced_by": {
+          "summary": "對方為 {name} 配音",
+          "description": "對方為這個角色配音，或為這位虛擬歌手提供聲音。",
+          "content": "角色的聲優\n虛擬歌手的聲源"
+        },
+        "alias": {
+          "summary": "{name} 和對方是同一位藝術家",
+          "description": "同一個人或團體用不同的名字活動，在 CDCat 上是兩位藝術家。只是寫法不同（羅馬字、讀音）的，填在「其他名稱」裡。",
+          "content": "馬甲\n另一個藝名\n改名前的名字"
+        },
+        "related": {
+          "summary": "以上都不是",
+          "description": "兩位藝術家有關係，但不屬於上面幾種。請在備註裡寫明是什麼關係。",
+          "content": "長期合作\n家人、師徒\n前身團體"
+        }
+      },
       "prefixes_hint": "品番前綴，用逗號分隔。公司和兼做廠牌的社團可以填。",
       "name_only_credit": "只填署名",
       "open_revision": "它有一條你的修訂被退回修改（#{id}，{at}）。",

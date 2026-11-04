@@ -965,7 +965,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': '头像。',
         'relations.artist.type': '艺术家类型。',
         'relations.relation_type': '关系，例如 `has_member` 表示对方是这个团体的成员。',
-        'relations.ended': '关系是否已结束：前成员、解散的小分队、之前的声优。只有成员、声优和小分队的关系会是 true。',
+        'relations.ended': '关系是否已结束：前成员、之前的声优。只有成员和声优的关系会是 true。',
         'relations.note': '补充说明。',
       },
     },
@@ -1338,14 +1338,11 @@ const texts: ApiDocsTexts = {
       title: '艺术家关系',
       description: '从当前这位艺术家的角度描述，两边各看到一种。',
       values: {
-        member_of: '当前艺术家是对方的成员。',
+        member_of: '当前艺术家是对方的成员，小分队也算。',
         has_member: '对方是当前团体的成员。',
         voice_of: '当前艺术家为对方（角色）配音。',
         voiced_by: '对方为当前角色配音。',
-        persona_of: '当前是对方的另一个名义。',
-        has_persona: '对方是当前艺术家的另一个名义。',
-        subunit_of: '当前是对方的小分队。',
-        has_subunit: '对方是当前团体的小分队。',
+        alias: '当前艺术家和对方是同一个人或团体的不同名义，两边都是这个值。',
         related: '其他相关。',
       },
     },
@@ -1561,6 +1558,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    artist_relations: '艺术家的 `relation_type` 简化：`subunit_of`、`has_subunit` 并入 `member_of`、`has_member`；`persona_of`、`has_persona` 合并为没有方向的 `alias`。',
     disc_tocs: '专辑详情的碟片新增 `tocs`：CD 的 TOC，以及 CDCat Disc ID 和 freedb、MusicBrainz、AccurateRip、CTDB 的 ID。',
     launch: '首次公开，测试版。',
   },

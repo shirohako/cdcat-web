@@ -965,7 +965,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': 'Avatar.',
         'relations.artist.type': 'Artist type.',
         'relations.relation_type': 'The relation, for example `has_member` means the other artist is a member of this group.',
-        'relations.ended': 'Whether the relation is over: a former member, a disbanded sub-unit, an earlier voice. Only member, voice and sub-unit relations can be true.',
+        'relations.ended': 'Whether the relation is over: a former member, an earlier voice. Only member and voice relations can be true.',
         'relations.note': 'A note.',
       },
     },
@@ -1338,14 +1338,11 @@ const texts: ApiDocsTexts = {
       title: 'Artist relation',
       description: 'Described from the current artist\'s side; each side sees one of the pair.',
       values: {
-        member_of: 'The current artist is a member of the other.',
+        member_of: 'The current artist is a member of the other; sub-units count.',
         has_member: 'The other artist is a member of the current group.',
         voice_of: 'The current artist voices the other (a character).',
         voiced_by: 'The other artist voices the current character.',
-        persona_of: 'The current artist is another name of the other.',
-        has_persona: 'The other artist is another name of the current artist.',
-        subunit_of: 'The current artist is a sub-unit of the other.',
-        has_subunit: 'The other artist is a sub-unit of the current group.',
+        alias: 'The current artist and the other are one person or group under different names; both sides have this value.',
         related: 'Otherwise related.',
       },
     },
@@ -1561,6 +1558,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    artist_relations: 'Artist `relation_type` simplified: `subunit_of` and `has_subunit` merged into `member_of` and `has_member`; `persona_of` and `has_persona` merged into `alias`, which has no direction.',
     disc_tocs: 'Album details: discs get `tocs`, the CD\'s tables of contents with the CDCat Disc ID and the freedb, MusicBrainz, AccurateRip and CTDB IDs.',
     launch: 'First public release, in beta.',
   },

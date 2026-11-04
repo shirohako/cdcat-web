@@ -964,7 +964,7 @@ const texts: ApiDocsTexts = {
         'relations.artist.image_url': '프로필 사진',
         'relations.artist.type': '아티스트 유형',
         'relations.relation_type': '관계. 예를 들어 `has_member`는 상대 아티스트가 이 그룹의 멤버라는 뜻입니다.',
-        'relations.ended': '관계가 끝났는지 여부: 이전 멤버, 해체한 유닛, 이전 성우. 멤버, 성우, 서브 유닛 관계만 true가 될 수 있습니다.',
+        'relations.ended': '관계가 끝났는지 여부: 이전 멤버, 이전 성우. 멤버와 성우 관계만 true가 될 수 있습니다.',
         'relations.note': '메모',
       },
     },
@@ -1337,14 +1337,11 @@ const texts: ApiDocsTexts = {
       title: '아티스트 관계',
       description: '현재 아티스트를 기준으로 나타내며, 양쪽에서 각각 짝이 되는 값 하나씩을 보게 됩니다.',
       values: {
-        member_of: '현재 아티스트가 상대 아티스트의 멤버입니다.',
+        member_of: '현재 아티스트가 상대 아티스트의 멤버입니다. 서브 유닛도 포함합니다.',
         has_member: '상대 아티스트가 현재 그룹의 멤버입니다.',
         voice_of: '현재 아티스트가 상대(캐릭터)의 목소리를 맡았습니다.',
         voiced_by: '상대 아티스트가 현재 캐릭터의 목소리를 맡았습니다.',
-        persona_of: '현재 아티스트가 상대 아티스트의 다른 명의입니다.',
-        has_persona: '상대 아티스트가 현재 아티스트의 다른 명의입니다.',
-        subunit_of: '현재 아티스트가 상대 그룹의 서브 유닛입니다.',
-        has_subunit: '상대 아티스트가 현재 그룹의 서브 유닛입니다.',
+        alias: '현재 아티스트와 상대 아티스트는 같은 사람이나 그룹의 다른 명의입니다. 양쪽 모두 이 값을 가집니다.',
         related: '그 밖의 관계',
       },
     },
@@ -1560,6 +1557,7 @@ const texts: ApiDocsTexts = {
   },
 
   changes: {
+    artist_relations: '아티스트 `relation_type` 정리: `subunit_of`, `has_subunit`를 `member_of`, `has_member`에 통합하고 `persona_of`, `has_persona`를 방향이 없는 `alias`로 통합',
     disc_tocs: '앨범 상세의 디스크에 `tocs` 추가: CD의 TOC와 CDCat Disc ID, freedb·MusicBrainz·AccurateRip·CTDB ID',
     launch: '첫 공개(베타)',
   },

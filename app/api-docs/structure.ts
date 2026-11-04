@@ -70,6 +70,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
     issues: `${SOURCE_URL}/issues`,
   },
   changes: [
+    { id: 'artist_relations', date: '2026-11-05' },
     { id: 'disc_tocs', date: '2026-11-02' },
     { id: 'launch', date: '2026-10-30' },
   ],
@@ -1263,7 +1264,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         { kind: 'enum', name: 'date_precision', values: ['day', 'month', 'year'] },
         { kind: 'enum', name: 'title_kind', values: ['official', 'translation', 'transliteration', 'alias', 'abbreviation'] },
         { kind: 'enum', name: 'artist_type', values: ['person', 'group', 'circle', 'company', 'virtual', 'character'] },
-        { kind: 'enum', name: 'artist_relation', values: ['member_of', 'has_member', 'voice_of', 'voiced_by', 'persona_of', 'has_persona', 'subunit_of', 'has_subunit', 'related'] },
+        { kind: 'enum', name: 'artist_relation', values: ['member_of', 'has_member', 'voice_of', 'voiced_by', 'alias', 'related'] },
         { kind: 'enum', name: 'artist_image_kind', values: ['avatar', 'banner', 'photo', 'illustration', 'other'] },
         { kind: 'enum', name: 'credit_role_category', values: ['release', 'composition', 'lyrics', 'arrangement', 'vocals', 'performance', 'production', 'engineering', 'artwork', 'other'] },
         { kind: 'enum', name: 'release_role', values: ['artist', 'publisher', 'label', 'distributor', 'manufacturer', 'planning'] },
