@@ -28,7 +28,7 @@
               >
                 <component :is="categoryIcons[categoryKey(category)]" :size="12" />
               </span>
-              <span class="truncate">{{ providerLabel(link.provider?.name) || getDomain(link.url) }}<span v-if="link.label" class="font-medium text-meta"> · {{ link.label }}</span></span>
+              <span class="truncate">{{ link.provider?.name || getDomain(link.url) }}<span v-if="link.label" class="font-medium text-meta"> · {{ link.label }}</span></span>
               <ExternalLink :size="11" class="shrink-0 text-faint transition-colors duration-150 group-hover:text-title" />
             </a>
           </UiTooltip>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
-import { LINK_CATEGORIES, providerHue, providerLabel } from '~/utils/linkProviders'
+import { LINK_CATEGORIES, providerHue } from '~/utils/linkProviders'
 import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, Megaphone, ShoppingBag } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
@@ -97,7 +97,7 @@ const categoryIcons: Record<string, Component> = {
 const categoryKey = (category: string) => category in categoryIcons ? category : 'other'
 
 /** The tile's hue: the site's own, so links of one category differ; links without a known site stay grey. */
-const tileHue = (link: CatalogLink) => !link.provider || link.provider.category === 'other' ? null : providerHue(link.provider.name)
+const tileHue = (link: CatalogLink) => !link.provider || link.provider.category === 'other' ? null : providerHue(link.provider.key)
 
 const getDomain = (url: string) => {
   try {

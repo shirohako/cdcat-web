@@ -7,9 +7,14 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 const { $api } = useNuxtApp()
 const { data, pending, error, refresh } = await useAsyncData('admin-link-providers', () => $api<AdminLinkProvider[]>('/v1/admin/link-providers'))
 
-const empty = () => ({ id: 0, name: '', category: 'other', icon_url: '', url_pattern: '', sort_order: 0 })
+const empty = () => ({ id: 0, key: '', name: '', category: 'other', icon_url: '', url_pattern: '', sort_order: 0 })
 const form = reactive(empty())
 const formOpen = ref(false)
+/** A new provider's key follows its name until the key is typed by hand. */
+const keyTyped = ref(false)
+watch(() => form.name, (name) => {
+  if (!form.id && !keyTyped.value) form.key = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 50)
+})
 const busy = ref(false)
 const message = ref('')
 const notice = ref('')
@@ -17,6 +22,7 @@ const formSection = useTemplateRef<HTMLElement>('formSection')
 /** Opens the form above the list and brings it into view: 编辑 is usually clicked far down the list. */
 const edit = async (provider?: AdminLinkProvider) => {
   Object.assign(form, provider ? { ...provider, icon_url: provider.icon_url ?? '', url_pattern: provider.url_pattern ?? '' } : empty())
+  keyTyped.value = false
   message.value = ''
   notice.value = ''
   formOpen.value = true
@@ -29,13 +35,16 @@ const save = async () => {
   busy.value = true
   message.value = ''
   try {
-    const body = { name: form.name, category: form.category, icon_url: form.icon_url || null, url_pattern: form.url_pattern || null, sort_order: Number(form.sort_order) || 0 }
+    const body = { ...(form.id ? {} : { key: form.key }), name: form.name, category: form.category, icon_url: form.icon_url || null, url_pattern: form.url_pattern || null, sort_order: Number(form.sort_order) || 0 }
     await $api(form.id ? `/v1/admin/link-providers/${form.id}` : '/v1/admin/link-providers', { method: form.id ? 'PUT' : 'POST', body })
     formOpen.value = false
     notice.value = '已保存'
     await refresh()
   } catch (e) {
-    message.value = adminError(e)
+    const fields = (e as { details?: { details?: { key?: string[], name?: string[] } } }).details?.details
+    if (fields?.key) message.value = '这个键已被使用。请换一个，或编辑原有的提供方。'
+    else if (fields?.name) message.value = '已有同名的提供方（不区分大小写）。请换一个名称，或编辑原有的提供方。'
+    else message.value = adminError(e)
   } finally {
     busy.value = false
   }
@@ -76,7 +85,7 @@ useHead({ title: '链接提供方' })
     <header class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <h1 class="text-3xl font-bold">链接提供方</h1>
-        <p class="mt-2 text-sm text-slate-600">维护外部链接的名称、图标、类别、URL 规则和显示顺序。仍被引用的提供方不能删除。</p>
+        <p class="mt-2 text-sm text-slate-600">维护外部链接显示的名称、图标、类别、URL 规则和显示顺序。键由系统使用，创建后不能修改。仍被引用的提供方不能删除。</p>
       </div>
       <UiButton variant="primary" @click="edit()">新建提供方</UiButton>
     </header>
@@ -86,7 +95,8 @@ useHead({ title: '链接提供方' })
     <section v-if="formOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-200 bg-white p-5">
       <h2 class="font-semibold">{{ form.id ? '编辑提供方' : '新建提供方' }}</h2>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="save">
-        <label class="block">名称<input v-model="form.name" required maxlength="255" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
+        <label class="block">名称<input v-model="form.name" required maxlength="255" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"><span class="mt-1 block text-xs text-slate-500">页面上显示的名字，例如 VGMdb。</span></label>
+        <label class="block">键<input v-model="form.key" required :disabled="Boolean(form.id)" maxlength="50" pattern="[a-z0-9_]+" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono disabled:bg-slate-50 disabled:text-slate-500" @input="keyTyped = true"><span class="mt-1 block text-xs text-slate-500">小写字母、数字或下划线，例如 vgmdb。创建后不能修改。</span></label>
         <label class="block">类别<input v-model="form.category" required maxlength="50" pattern="[a-z0-9_\-]+" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"><span class="mt-1 block text-xs text-slate-500">小写字母、数字、下划线或连字符，例如 streaming、shop、social。</span></label>
         <label class="block">图标<input v-model="form.icon_url" maxlength="2048" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
         <label class="block">URL 规则<input v-model="form.url_pattern" maxlength="2048" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"></label>
@@ -109,7 +119,7 @@ useHead({ title: '链接提供方' })
             <tbody class="divide-y divide-slate-100">
               <tr v-for="provider in data" :key="provider.id">
                 <td class="px-4 py-3 tabular-nums">{{ provider.sort_order }}</td>
-                <td class="px-4 py-3 font-medium">{{ provider.name }}<p v-if="provider.icon_url" class="truncate text-xs font-normal text-slate-500">{{ provider.icon_url }}</p></td>
+                <td class="px-4 py-3 font-medium">{{ provider.name }}<p class="font-mono text-xs font-normal text-slate-500">{{ provider.key }}</p><p v-if="provider.icon_url" class="truncate text-xs font-normal text-slate-500">{{ provider.icon_url }}</p></td>
                 <td class="px-4 py-3">{{ provider.category }}</td>
                 <td class="max-w-60 truncate px-4 py-3 font-mono text-xs">{{ provider.url_pattern || '—' }}</td>
                 <td class="px-4 py-3 tabular-nums">{{ provider.links_count }}</td>

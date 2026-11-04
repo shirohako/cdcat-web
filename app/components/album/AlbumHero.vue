@@ -145,20 +145,20 @@
               rel="noopener noreferrer"
               size="sm"
               class="group gap-1.5"
-              :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.name ?? '').color + '22' } : {}"
+              :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.key ?? '').color + '22' } : {}"
               @mouseenter="hoveredLinkId = link.id"
               @mouseleave="hoveredLinkId = null"
             >
               <Icon
-                :name="getStreamingProvider(link.provider?.name ?? '').icon"
+                :name="getStreamingProvider(link.provider?.key ?? '').icon"
                 size="16"
                 class="shrink-0 transition-all duration-200"
                 :class="hoveredLinkId === link.id ? '' : 'opacity-70'"
                 :style="hoveredLinkId === link.id
-                  ? { color: getStreamingProvider(link.provider?.name ?? '').color, filter: 'none' }
+                  ? { color: getStreamingProvider(link.provider?.key ?? '').color, filter: 'none' }
                   : { filter: 'grayscale(1)' }"
               />
-              <span>{{ providerName(link.provider?.name ?? '') }}<span v-if="link.label" class="font-normal opacity-70"> · {{ link.label }}</span></span>
+              <span>{{ link.provider?.name }}<span v-if="link.label" class="font-normal opacity-70"> · {{ link.label }}</span></span>
             </UiButton>
           </div>
         </div>
@@ -170,7 +170,6 @@
 <script setup lang="ts">
 import { ALBUM_CATEGORY_ICONS, ALBUM_TYPE_ICONS, DISC_FORMAT_ICONS, type Album } from '~/types/album'
 import { getStreamingProvider } from '~/utils/streamingProviders'
-import { providerLabel } from '~/utils/linkProviders'
 import { NuxtLink } from '#components'
 import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
@@ -250,8 +249,6 @@ const figures = computed(() => {
     { key: 'duration', shown: duration > 0, value: formatDuration(duration), label: t('album.hero.duration') },
   ].filter(figure => figure.shown)
 })
-
-const providerName = providerLabel
 
 const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.album.is_favorited)

@@ -2,7 +2,6 @@
 import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
 import type { FranchiseDetail } from '~/types/entry'
 import { namedLd } from '~/utils/structuredData'
-import { providerLabel } from '~/utils/linkProviders'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
@@ -97,7 +96,7 @@ const currentTab = ref('entries')
               class="group flex items-center gap-3 rounded-lg p-2 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
             >
               <ExternalLink :size="16" class="text-meta transition-colors group-hover:text-primary" />
-              <span class="truncate text-body transition-colors group-hover:text-primary">{{ providerLabel(link.provider?.name) || link.url }}</span>
+              <span class="truncate text-body transition-colors group-hover:text-primary">{{ link.provider?.name || link.url }}</span>
             </a>
           </section>
         </div>

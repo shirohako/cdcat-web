@@ -5,7 +5,6 @@ import type { HarvestCandidateDetail, HarvestRemerge } from '~/types/harvest'
 import { buildHarvestDraft, withMerge } from '~/utils/harvestDraft'
 import { compareWithAlbum, type AlbumEditorHandle, type CompareGroup, type CompareRow } from '~/utils/harvestAlbumCompare'
 import { sameName } from '~/utils/harvestPeople'
-import { providerLabel } from '~/utils/linkProviders'
 
 /**
  * The sources of a candidate against what the editor below holds (utils/harvestAlbumCompare): the album of a decided
@@ -101,7 +100,7 @@ const rows = computed(() => {
     storeImage,
     roleName,
     localeName,
-    providerName: id => providerLabel(schema.value?.link_providers.find(provider => provider.id === id)?.name) || '链接',
+    providerName: id => schema.value?.link_providers.find(provider => provider.id === id)?.name || '链接',
     formatDate: (date, precision) => formatDate(date, precision),
     formatDuration: seconds => formatDuration(seconds),
     removeExtra: props.target === 'draft' && !!picked.value,

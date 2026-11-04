@@ -80,7 +80,7 @@ import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ChevronDown, ChevronUp, ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
-import { LINK_CATEGORIES, linkCategoryRank, providerLabel } from '~/utils/linkProviders'
+import { LINK_CATEGORIES, linkCategoryRank } from '~/utils/linkProviders'
 
 /**
  * External links of an album, artist, label, entry or series, added and edited in a dialog, each with an optional name of
@@ -90,11 +90,10 @@ const rows = defineModel<LinkRow[]>({ required: true })
 const { t } = useI18n()
 const { schema } = useCatalogSchema()
 const providers = computed(() => schema.value?.link_providers ?? [])
-const providerName = providerLabel
-const providerOptions = computed<UiSelectOption<number | null>[]>(() => providers.value.map(provider => ({ value: provider.id, label: providerName(provider.name) })))
+const providerOptions = computed<UiSelectOption<number | null>[]>(() => providers.value.map(provider => ({ value: provider.id, label: provider.name })))
 const providerOf = (id: number | null) => {
   const provider = providers.value.find(item => item.id === id)
-  return provider ? providerName(provider.name) : '—'
+  return provider ? provider.name : '—'
 }
 const bare = (url: string) => url.replace(/^https?:\/\/(www\.)?/i, '').replace(/\/$/, '')
 
@@ -152,7 +151,7 @@ const detect = (url: string) => {
     const pattern = new RegExp(`^${provider.url_pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}`, 'i')
     return pattern.test(url) || pattern.test(url.replace(/^http:/, 'https:'))
   })
-  return match?.id ?? providers.value.find(provider => provider.name === 'other')?.id ?? null
+  return match?.id ?? providers.value.find(provider => provider.key === 'other')?.id ?? null
 }
 
 // ---- the dialog ----

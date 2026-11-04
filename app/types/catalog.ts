@@ -33,6 +33,7 @@ export interface CatalogTitle {
 
 export interface CatalogLinkProvider {
   id: number
+  key: string
   name: string
   icon_url: string | null
   category: string

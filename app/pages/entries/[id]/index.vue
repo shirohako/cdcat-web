@@ -2,7 +2,6 @@
 import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } from '@lucide/vue'
 import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
 import { entryLdType, ldDate, namedLd } from '~/utils/structuredData'
-import { providerLabel } from '~/utils/linkProviders'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
 
 const route = useRoute()
@@ -238,7 +237,7 @@ const relationGroups = computed(() => groupBy<RelatedEntry>(entry.value?.related
                   class="group flex items-center gap-3 rounded-lg p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
                 >
                   <ExternalLink :size="16" class="text-meta transition-colors group-hover:text-primary" />
-                  <span class="flex-1 truncate text-body transition-colors group-hover:text-primary">{{ providerLabel(link.provider?.name) || link.url }}</span>
+                  <span class="flex-1 truncate text-body transition-colors group-hover:text-primary">{{ link.provider?.name || link.url }}</span>
                 </a>
               </div>
             </section>

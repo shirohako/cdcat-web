@@ -11,7 +11,6 @@ const streamingProviderMap: Record<string, StreamingProvider> = {
   // 更多平台待补充
 }
 
-export function getStreamingProvider(providerName: string): StreamingProvider {
-  const key = providerName?.toLowerCase().replace(/[^a-z0-9]/g, '_') ?? ''
-  return streamingProviderMap[key] ?? streamingProviderMap.default!
+export function getStreamingProvider(providerKey: string): StreamingProvider {
+  return streamingProviderMap[providerKey] ?? streamingProviderMap.default!
 }

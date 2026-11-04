@@ -211,6 +211,7 @@ export interface AdminShout {
 
 export interface AdminLinkProvider {
   id: number
+  key: string
   name: string
   icon_url: string | null
   url_pattern: string | null

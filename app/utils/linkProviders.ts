@@ -1,73 +1,6 @@
-/** Display names of link providers (link_providers.name keys) whose spelling title case gets wrong. */
-const PROVIDER_LABELS: Record<string, string> = {
-  official_website: 'Official Website',
-  xfd: 'XFD',
-  oshinagaki: 'お品書き',
-  twitter: 'X (Twitter)',
-  youtube: 'YouTube',
-  youtube_music: 'YouTube Music',
-  tiktok: 'TikTok',
-  soundcloud: 'SoundCloud',
-  netease_music: 'NetEase Music',
-  itunes: 'iTunes',
-  cdjapan: 'CDJapan',
-  booth: 'BOOTH',
-  dlsite: 'DLsite',
-  musicbrainz: 'MusicBrainz',
-  vgmdb: 'VGMdb',
-  vocadb: 'VocaDB',
-  touhoudb: 'TouhouDB',
-  utaitedb: 'UtaiteDB',
-  thbwiki: 'THBWiki',
-  dojin_music: '同人音楽info',
-  allmusic: 'AllMusic',
-  vndb: 'VNDB',
-  anidb: 'AniDB',
-  myanimelist: 'MyAnimeList',
-  imdb: 'IMDb',
-  amazon_music: 'Amazon Music',
-  tidal: 'TIDAL',
-  kkbox: 'KKBOX',
-  line_music: 'LINE MUSIC',
-  qq_music: 'QQ Music',
-  linkcore: 'LinkCore',
-  recochoku: 'RecoChoku',
-  mora: 'mora',
-  ototoy: 'OTOTOY',
-  seven_digital: '7digital',
-  tower_records: 'TOWER RECORDS',
-  hmv: 'HMV',
-  animate: 'animate',
-  gamers: 'GAMERS',
-  sevennet: '7net Shopping',
-  yodobashi: 'yodobashi.com',
-  mandarake: 'MANDARAKE',
-  diskunion: 'diskunion',
-  yesasia: 'YesAsia',
-  play_asia: 'Play-Asia',
-  alice_books: 'ALICE BOOKS',
-  diverse_direct: 'DIVERSE DIRECT',
-  dizzylab: 'dizzylab',
-  fanza: 'FANZA',
-  aniplex_plus: 'ANIPLEX+',
-  square_enix_store: 'SQUARE ENIX STORE',
-  cystore: 'CyStore',
-  ebten: 'ebten',
-  tanoc_store: 'TANO*C STORE',
-  gog: 'GOG',
-  itch_io: 'itch.io',
-  mega: 'MEGA',
-  mediafire: 'MediaFire',
-}
-
-/** A provider key as people write the site's name: "vgmdb" → "VGMdb", unknown keys in title case ("sony_music_shop" → "Sony Music Shop"). */
-export const providerLabel = (name?: string | null) => name
-  ? PROVIDER_LABELS[name] ?? name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
-  : ''
-
 /**
  * Each provider's own hue (OKLCH), loosely after its brand, picked so that providers of one category differ; the
- * album page tints each link's icon with it. Unknown providers get a hue from their name.
+ * album page tints each link's icon with it. Unknown providers get a hue from their key.
  */
 const PROVIDER_HUES: Record<string, number> = {
   official_website: 285,
@@ -92,12 +25,12 @@ const PROVIDER_HUES: Record<string, number> = {
   utaitedb: 295, thbwiki: 110, wikipedia: 220, allmusic: 175, vndb: 270, anidb: 230, myanimelist: 255, imdb: 90,
 }
 
-export const providerHue = (name?: string | null) => {
-  if (!name) return null
-  const known = PROVIDER_HUES[name]
+export const providerHue = (key?: string | null) => {
+  if (!key) return null
+  const known = PROVIDER_HUES[key]
   if (known !== undefined) return known
   let hash = 0
-  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) % 360
+  for (const char of key) hash = (hash * 31 + char.charCodeAt(0)) % 360
   return hash
 }
 

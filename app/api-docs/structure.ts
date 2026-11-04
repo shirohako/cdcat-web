@@ -598,7 +598,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 catalog_prefixes: ['STNT'],
                 shouts_count: 2,
                 titles: [{ title: 'Stella Note', locale: 'en', kind: 'official' }],
-                links: [{ id: 610, url: 'https://x.com/stellanote', label: null, external_id: null, is_verified: true, provider: { id: 7, name: 'x', icon_url: null, category: 'social' } }],
+                links: [{ id: 610, url: 'https://x.com/stellanote', label: null, external_id: null, is_verified: true, provider: { id: 7, key: 'twitter', name: 'X (Twitter)', icon_url: null, category: 'social' } }],
                 attributes: [],
                 images: [{ $more: 'ArtistImage' }],
                 relations: [{ artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, relation_type: 'has_member', ended: false, note: null }],
@@ -1243,8 +1243,8 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
               success: true,
               data: {
                 link_providers: [
-                  { id: 4, name: 'official_website', icon_url: null, url_pattern: null, category: 'official' },
-                  { id: 7, name: 'x', icon_url: null, url_pattern: 'https://x.com/*', category: 'social' },
+                  { id: 4, key: 'official_website', name: 'Official Website', icon_url: null, url_pattern: null, category: 'official' },
+                  { id: 7, key: 'twitter', name: 'X (Twitter)', icon_url: null, url_pattern: 'https://x.com/*', category: 'social' },
                   { $more: 34 },
                 ],
               },
@@ -1254,7 +1254,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         {
           kind: 'model',
           name: 'LinkProvider',
-          fields: [f('id', 'integer'), f('name', 'string'), f('icon_url', 'url | null'), f('url_pattern', 'string | null'), f('category', 'string', { enum: 'link_category' })],
+          fields: [f('id', 'integer'), f('key', 'string'), f('name', 'string'), f('icon_url', 'url | null'), f('url_pattern', 'string | null'), f('category', 'string', { enum: 'link_category' })],
         },
         { kind: 'enum', name: 'album_type', values: ['album', 'ep', 'single', 'compilation', 'drama', 'radio'] },
         { kind: 'enum', name: 'album_category', values: ['game', 'animation', 'publication', 'audio_drama', 'tokusatsu', 'live_action', 'doujin', 'event', 'soundtrack'] },
@@ -1294,7 +1294,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
             f('label', 'string | null'),
             f('external_id', 'string | null'),
             f('is_verified', 'boolean'),
-            f('provider', 'object | null', { fields: [f('id', 'integer'), f('name', 'string'), f('icon_url', 'url | null'), f('category', 'string', { enum: 'link_category' })] }),
+            f('provider', 'object | null', { fields: [f('id', 'integer'), f('key', 'string'), f('name', 'string'), f('icon_url', 'url | null'), f('category', 'string', { enum: 'link_category' })] }),
           ],
         },
         {
