@@ -43,7 +43,7 @@
       <CommonLoadError v-if="status === 'error' && albumsResponse" class="mb-4" @retry="refresh()" />
 
       <!-- 加载状态 -->
-      <CollectionLoadingSkeleton v-if="loading" variant="covers" />
+      <CollectionLoadingSkeleton v-if="loading" variant="covers" grid-class="grid-cols-2 gap-5 sm:grid-cols-4 md:gap-6 xl:grid-cols-5" />
 
       <!-- 错误状态 -->
       <div v-else-if="status === 'error' && !albumsResponse" class="flex items-center justify-center min-h-100">
@@ -67,7 +67,7 @@
           @update:page="goToPage"
         >
           <!-- 专辑网格 -->
-          <div class="grid grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5">
+          <div class="grid grid-cols-2 gap-5 sm:grid-cols-4 md:gap-6 xl:grid-cols-5">
             <AlbumCard
               v-for="album in albumsData"
               :key="album.id"
@@ -152,10 +152,14 @@ const currentPage = computed(() => {
   return page > 0 ? page : 1;
 });
 
+// 2、4、5 列都能排满整页
+const PER_PAGE = 40;
+
 // 从 API 获取专辑列表
 const { data: albumsResponse, status, error, refresh, loading, refetching, revealKey, revealClass } = usePageAPI<{ albums: AlbumSimple[], pagination: { total: number, per_page: number, current_page: number, last_page: number } }>("/v1/albums", {
   query: computed(() => ({
     page: currentPage.value,
+    per_page: PER_PAGE,
     type: selectedType.value === 'all' ? undefined : selectedType.value,
     release_event_id: eventId.value ?? undefined,
     category: category.value ?? undefined,
@@ -182,7 +186,7 @@ const pagination = computed(() => {
   if (!albumsResponse.value?.pagination) {
     return {
       total: 0,
-      per_page: 15,
+      per_page: PER_PAGE,
       current_page: 1,
       last_page: 1,
     };

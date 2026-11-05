@@ -102,7 +102,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
         get('/albums', {
           query: [
             page,
-            perPage(18),
+            perPage(40),
             p('type', 'string', { enum: 'album_type' }),
             p('category', 'string', { enum: 'album_category' }),
             p('format', 'string', { enum: 'disc_format' }),

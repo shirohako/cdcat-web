@@ -11,7 +11,7 @@
         </template>
 
         <CommonLoadError v-if="status === 'error'" class="mb-4" @retry="refresh()" />
-        <CollectionLoadingSkeleton v-if="loading" variant="covers" />
+        <CollectionLoadingSkeleton v-if="loading" variant="covers" grid-class="grid-cols-2 gap-5 sm:grid-cols-4 md:gap-6 xl:grid-cols-5" />
         <CommonPagedList
           v-else-if="data"
           :page="page"
@@ -24,7 +24,7 @@
         >
           <div
             :key="revealKey"
-            class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-3 md:grid-cols-4 md:gap-6 xl:grid-cols-5"
+            class="grid grid-cols-2 gap-5 transition-opacity sm:grid-cols-4 md:gap-6 xl:grid-cols-5"
             :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]"
             :inert="refetching"
           >
