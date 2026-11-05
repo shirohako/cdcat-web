@@ -4,9 +4,9 @@ import { sameId } from '~/utils/documentRows'
 /**
  * Reordering a list of rows: drag a row by its handle, or move it one step with its buttons. Only the row whose handle
  * is held down can be dragged, so the text in its fields stays selectable. `rows` gives the list in display order,
- * `place` puts a row before the one at an index (last when there is none).
+ * `place` puts a row before the one at an index (last when there is none); after a drop it also gets the row dropped on.
  */
-export function useRowDrag<T extends { id: RowId }>(rows: () => T[], place: (row: T, index: number) => void) {
+export function useRowDrag<T extends { id: RowId }>(rows: () => T[], place: (row: T, index: number, over?: T) => void) {
   /** The row whose handle is held down. */
   const grabbed = ref<RowId | null>(null)
   const dragged = ref<RowId | null>(null)
@@ -40,7 +40,7 @@ export function useRowDrag<T extends { id: RowId }>(rows: () => T[], place: (row
   }
   const dropOn = (row: T) => {
     const moving = rows().find(item => sameId(item.id, dragged.value))
-    if (moving && target.value && sameId(target.value.id, row.id)) place(moving, rows().indexOf(row) + (target.value.after ? 1 : 0))
+    if (moving && target.value && sameId(target.value.id, row.id)) place(moving, rows().indexOf(row) + (target.value.after ? 1 : 0), row)
     endDrag()
   }
   /** The edge of this row the drop line shows on; none over the dragged row itself. */

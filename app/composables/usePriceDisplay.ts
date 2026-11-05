@@ -1,8 +1,8 @@
-import type { ProductPrice } from '~/types/document'
+import type { PriceKind, ProductPrice } from '~/types/document'
 
 /** Which price a reader looks for first; the album page shows prices in this order. */
-const KIND_ORDER = ['list', 'shop', 'event', 'other']
-const kindRank = (kind: string) => {
+const KIND_ORDER: PriceKind[] = ['list', 'shop', 'event', 'other']
+const kindRank = (kind: PriceKind) => {
   const rank = KIND_ORDER.indexOf(kind)
   return rank === -1 ? KIND_ORDER.length : rank
 }
