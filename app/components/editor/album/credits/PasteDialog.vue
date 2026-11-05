@@ -7,7 +7,7 @@ import type { AlbumCreditRow } from '~/utils/albumDocument'
 import { addCredit, orderedTracks, setCreditParent, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
 import { FEATURING_ROLE } from '~/utils/artistLine'
 import { ALBUM_ONLY_ROLES } from '~/utils/creditLines'
-import { foldRoleWord, newArtistName, parseCredits } from '~/utils/creditParser'
+import { foldRoleWord, newArtistName, parseCredits, voiceCredit } from '~/utils/creditParser'
 
 /**
  * 粘贴人员表: a credit list pasted from a booklet, a shop page or a VGMdb note (examples of each on hover), read by
@@ -16,6 +16,7 @@ import { foldRoleWord, newArtistName, parseCredits } from '~/utils/creditParser'
  * printed name only; namesakes and unknown role words stay yellow until settled, and are left out until then.
  * Roles only the whole album has go on the whole album wherever they were written. "A & B" is two people unless
  * the whole of it is an artist's name; who comes after feat. is a 客串 of the name right before it (utils/artistLine).
+ * In "紅葉谷希美(CV.遠藤ゆりか)" the person is the voice actor, printed as 紅葉谷希美(CV:遠藤ゆりか).
  */
 const open = defineModel<boolean>({ required: true })
 
@@ -28,6 +29,8 @@ interface Row {
   unknown: string[]
   name: string
   detail: string | null
+  /** The character a voice actor voices */
+  character: string | null
   /** A 客串's: the key of the row it belongs to */
   hostKey: string | null
   /** null for the whole album */
@@ -41,7 +44,8 @@ interface Row {
 
 /** The formats it reads, each shown on hover with what it handles (editor.paste_credits.<key>_title, <key>_points). */
 const EXAMPLES = [
-  { key: 'roles', text: 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nGuitar：Ken（全曲）\nVocal：ルナ（CV：星野あかり）\nArtist：Gardens feat. moon jelly（M2）\nIllustration：mochi' },
+  { key: 'roles', text: 'Vocal：星野あかり（M1, M2）\n作詞・作曲：ミナト（M1–M3）、Yuki（M4）\nGuitar：Ken（全曲）\nBass：Ken（5弦）\nArtist：Gardens feat. moon jelly（M2）\nIllustration：mochi' },
+  { key: 'voices', text: 'Vocal：ルナ(CV.星野あかり)(1-6, 9)、ソラ(CV：蒼井みお)(7, 8)\n作詞：ミナト(1-9)\n作曲：ミナト(1, 7)、Yuki(2-6, 8, 9)' },
   { key: 'blocks', text: '01. 星屑のアトラス\n作詞・作曲：ミナト\n編曲：Yuki\n\n02. 夜明けのプリズム\nVocal：星野あかり\n\nDisc 2\n01. 星屑のアトラス (Instrumental)\n編曲：Yuki\n\nIllustration：mochi' },
   { key: 'notes', text: 'M1.プリズムにさよならを\n   Vocal:nayuta\n   Music&Lyric:鈴谷皆人\n   Guitar&Bass:花形真喜\n\nM-02.\nVocal: つぐ&るる\nVocal Recording Engineer: Yuhi Sumino\n\nIllust: K-ko' },
   { key: 'lists', text: 'Composer: Kaito Mizuno (01, 10, 14)\nArranger: Kaito Mizuno (01, 10, 14)\n\nComposer: Starlit Sound, LLC. (02-09, 11-13)\nArranger: Starlit Sound, LLC. (02-09, 11-13)\nLyricist: Yuki (03, 05)' },
@@ -163,7 +167,7 @@ const rows = computed<Row[]>(() => parsed.value.lines.flatMap((line) => {
     const albumOnly = roles.length > 0 && roles.every(role => ALBUM_ONLY_ROLES.includes(role))
     const { ids, missing } = albumOnly ? { ids: null, missing: [] } : trackIdsOf(name.tracks)
     return {
-      key, roleText: line.roleText, roles, unknown: line.unknown, name: name.name, detail: name.detail, hostKey: host && host !== name ? keyOf(host) : null,
+      key, roleText: line.roleText, roles, unknown: line.unknown, name: name.name, detail: name.detail, character: name.character ?? null, hostKey: host && host !== name ? keyOf(host) : null,
       trackIds: ids, missing, choice: picks.value[key]?.choice ?? defaultChoice(candidates), candidates,
     }
   })
@@ -181,14 +185,19 @@ const setRoles = (row: Row, roles: string[]) => { picks.value[row.key] = { ...pi
 const hostName = (row: Row) => (row.hostKey ? rows.value.find(item => item.key === row.hostKey)?.name ?? '' : '')
 const tracksText = (row: Row) => row.trackIds === null ? t('editor.credits.whole_album') : trackRanges(album.value, row.trackIds)
 
+const printedOf = (row: Row, name = row.name) => row.character ? voiceCredit(row.character, name) : name
+
 const personOf = (row: Row): CreditPerson => {
-  if (row.choice === 'name') return { ...people.printed(row.name), detail: row.detail }
+  if (row.choice === 'name') return { ...people.printed(printedOf(row)), detail: row.detail }
   // A Japanese name is created without the spaces between its characters (上杉 悟 → 上杉悟).
-  if (row.choice === 'new') return { ...people.created(newArtistName(row.name)), detail: row.detail }
+  if (row.choice === 'new') {
+    const name = newArtistName(row.name)
+    return { ...people.created(name), credited_as: row.character ? voiceCredit(row.character, name) : null, detail: row.detail }
+  }
   const match = row.candidates.find(item => `a:${item.id}` === row.choice)!
   const person = people.picked({ id: match.id, label: match.name, subtitle: '', image_url: match.image_url })
   // Matched by another of its names: keep the one printed.
-  return { ...person, credited_as: match.name === row.name ? null : row.name, detail: row.detail }
+  return { ...person, credited_as: match.name === row.name && !row.character ? null : printedOf(row), detail: row.detail }
 }
 
 /** Adds the ready rows; then each 客串 belongs to its host's credit on the same track, when the host was added too. */
@@ -254,6 +263,7 @@ const apply = () => {
                 <span class="flex flex-wrap items-center gap-2">
                   <span class="min-w-0">
                     <span class="block truncate font-medium text-title">{{ row.name }}<span v-if="hostName(row)" class="ml-1 font-normal text-meta">↳ {{ hostName(row) }}</span></span>
+                    <span v-if="row.character" class="block truncate text-[10px] text-meta">{{ printedOf(row) }}</span>
                     <span v-if="row.detail" class="block truncate text-[10px] text-meta">{{ row.detail }}</span>
                   </span>
                   <UiSelect

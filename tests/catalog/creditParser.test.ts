@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { foldRoleWord, newArtistName, parseCredits } from '../../app/utils/creditParser'
+import { foldRoleWord, newArtistName, parseCredits, voiceCredit } from '../../app/utils/creditParser'
 
 const WORDS: Record<string, string[]> = {
   composer: ['作曲', 'Composer', 'Music'],
@@ -28,7 +28,7 @@ describe('pasted credit lists', () => {
     const names = lines.map(line => line.names.map(name => [name.name, name.detail, tracks(name.tracks), name.featuring ?? false]))
     expect(names).toEqual([
       [['Gardens', null, ['1-2'], false], ['moon jelly', null, ['1-2'], true]],
-      [['ルナ', 'CV：星野あかり', null, false], ['Aoi', null, null, true], ['Mio', null, null, true]],
+      [['星野あかり', null, null, false], ['Aoi', null, null, true], ['Mio', null, null, true]],
       [['Yuki', null, null, false], ['Rin', null, null, true], ['Sora', null, null, false]],
     ])
   })
@@ -47,10 +47,59 @@ describe('pasted credit lists', () => {
     expect(lines[1]!.names.map(name => name.unit ?? null)).toEqual([{ name: 'Xeudo Code & Xeno', size: 2 }, null, null, { name: 'A×B', size: 2 }, null, null])
   })
 
+  it('takes a voice actor for the person and the character for the printed name, in any spelling', () => {
+    const { lines } = parse([
+      '艺术家：紅葉谷希美(CV.遠藤ゆりか)(1-6,9)、《ボーカルソフト音声》(CV.小倉唯)(7,8,11)',
+      'Vocal：ルナ（CV：星野あかり）、Mio (CV: Rin)、Yuki（CV 蒼井）、Aoi（CV蒼井）、Sora（C.V. 蒼井）、A & B（cv.蒼井）',
+    ].join('\n'))
+    expect(lines[0]!.names.map(name => [name.name, name.character, tracks(name.tracks)])).toEqual([
+      ['遠藤ゆりか', '紅葉谷希美', ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-9']],
+      ['小倉唯', 'ボーカルソフト音声', ['1-7', '1-8', '1-11']],
+    ])
+    expect(lines[1]!.names.map(name => [name.name, name.character, name.detail])).toEqual([
+      ['星野あかり', 'ルナ', null], ['Rin', 'Mio', null], ['蒼井', 'Yuki', null], ['蒼井', 'Aoi', null], ['蒼井', 'Sora', null], ['蒼井', 'A & B', null],
+    ])
+    expect(voiceCredit('紅葉谷希美', '遠藤ゆりか')).toBe('紅葉谷希美(CV:遠藤ゆりか)')
+  })
+
+  it('reads the dialog\'s voice actor example', () => {
+    const { lines, skipped } = parse('Vocal：ルナ(CV.星野あかり)(1-6, 9)、ソラ(CV：蒼井みお)(7, 8)\n作詞：ミナト(1-9)\n作曲：ミナト(1, 7)、Yuki(2-6, 8, 9)')
+    expect(skipped).toEqual([])
+    expect(lines[0]!.names.map(name => [name.name, name.character, tracks(name.tracks)])).toEqual([
+      ['星野あかり', 'ルナ', ['1-1', '1-2', '1-3', '1-4', '1-5', '1-6', '1-9']],
+      ['蒼井みお', 'ソラ', ['1-7', '1-8']],
+    ])
+    expect(tracks(lines[2]!.names[1]!.tracks)).toEqual(['1-2', '1-3', '1-4', '1-5', '1-6', '1-8', '1-9'])
+  })
+
+  it('tells a range from a disc and track only by the padding', () => {
+    const { lines } = parse('Vocal：A(8-10)、B(4,8-10)、C(2-03)、D(2-03, 2-12)、E(1-12)')
+    expect(lines[0]!.names.map(name => tracks(name.tracks))).toEqual([
+      ['1-8', '1-9', '1-10'], ['1-4', '1-8', '1-9', '1-10'], ['2-3'], ['2-3', '2-12'],
+      Array.from({ length: 12 }, (_, index) => `1-${index + 1}`),
+    ])
+  })
+
+  it('leaves what only looks like a voice actor as the detail', () => {
+    const { lines } = parse('Vocal：Yuki（CVS）、Aoi（CV.星野、蒼井）')
+    expect(lines[0]!.names.map(name => [name.name, name.detail, name.character])).toEqual([['Yuki', 'CVS', undefined], ['Aoi', 'CV.星野、蒼井', undefined]])
+  })
+
+  it('reads a whole staff list with voice actors, ranges and instruments', () => {
+    const { lines, skipped } = parse([
+      '艺术家：紅葉谷希美(CV.遠藤ゆりか)(1-6,9)、相ヶ江柚葉(CV.井口裕香)(10)',
+      '作曲：高田暁(1,7)、廣澤優也(4,8-10)、Meis Clauson(5,11)',
+      'Bass：HIROTOMO(2)、萩龍一(3)',
+    ].join('\n'))
+    expect(skipped).toEqual([])
+    expect(lines.map(line => line.names.map(name => name.name))).toEqual([['遠藤ゆりか', '井口裕香'], ['高田暁', '廣澤優也', 'Meis Clauson'], ['HIROTOMO', '萩龍一']])
+    expect(tracks(lines[1]!.names[1]!.tracks)).toEqual(['1-4', '1-8', '1-9', '1-10'])
+  })
+
   it('keeps brackets that are no track list as the detail, and reads shorthands and 全曲', () => {
-    const { lines } = parse('Vocal：ルナ（CV：星野あかり）\nVo.: 星野あかり (Tr.2, 5)\nMusic: ZUN (全曲)\n作編曲：Yuki')
-    expect(lines.map(line => line.roles)).toEqual([['vocals'], ['vocals'], ['composer'], ['composer', 'arranger']])
-    expect(lines[0]!.names[0]).toMatchObject({ name: 'ルナ', detail: 'CV：星野あかり', tracks: null })
+    const { lines } = parse('Bass：ルナ（5弦）\nVo.: 星野あかり (Tr.2, 5)\nMusic: ZUN (全曲)\n作編曲：Yuki')
+    expect(lines.map(line => line.roles)).toEqual([['bass'], ['vocals'], ['composer'], ['composer', 'arranger']])
+    expect(lines[0]!.names[0]).toMatchObject({ name: 'ルナ', detail: '5弦', tracks: null })
     expect(tracks(lines[1]!.names[0]!.tracks)).toEqual(['1-2', '1-5'])
     expect(lines[2]!.names[0]!.tracks).toBe('all')
   })

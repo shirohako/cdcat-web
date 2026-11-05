@@ -2,7 +2,8 @@
 // names and tracks:
 //
 //   作曲・編曲：ミナト（M1–M3）、Yuki（M4）     roles before the colon, names after it, tracks in brackets
-//   Vocal：ルナ（CV：星野あかり）              brackets that are no track list become the detail
+//   Vocal：ルナ（CV：星野あかり）              a voice actor is the person, the character goes in the printed name
+//   Bass：Yuki（5弦）                         other brackets that are no track list become the detail
 //   Vocal：Gardens feat. moon jelly（M2）      who comes after feat. / ft. (or in "(feat. …)") is a 客串
 //   Artist：しゅーりん × MoAE:.（M10）         two people; × & vs. only part names
 //   01. 星屑のアトラス                         a track's own block: the lines under it, up to a blank line, are that track's
@@ -27,8 +28,10 @@ export interface TrackRef {
 
 export interface ParsedCreditName {
   name: string
-  /** What the brackets after the name held when it was no track list, e.g. "CV：星野あかり" */
+  /** What the brackets after the name held when it was no track list, e.g. "5弦" */
   detail: string | null
+  /** With a voice actor as `name`: the character they voice, "ルナ" in "ルナ（CV：星野あかり）" */
+  character?: string
   /** The tracks given, 'all' for 全曲, or null for none: then the whole album, or the track whose block it is in. */
   tracks: TrackRef[] | 'all' | null
   /** Written after "feat." / "ft.": a 客串, credited as such rather than in the line's roles. */
@@ -78,8 +81,12 @@ const DISC_LINE = /^(?:disc|disk|cd|dvd|bd)\s*[-#.]?\s*(\d{1,2})\b/i
 /** "M-01." as VGMdb notes write a track's block: M with a hyphen or dot before the number too. */
 const TRACK_LINE = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:[.．:：)）、\]\s-]|$)/i
 const TRACK_ITEM = /^(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3})(?:\s*[-–—~〜～]\s*(?:m[-.]?|tr\.?|track|#|no\.?)?\s*(\d{1,3}))?$/i
-/** "2-03": a disc and a zero-padded track number, as VGMdb writes them, rather than a range. */
+/**
+ * "2-03": a disc and a zero-padded track number, as VGMdb writes them, rather than a range. Past track 9 only the
+ * padding of the others in the list tells them apart: "2-03, 2-12" is disc 2, "4, 8-10" a range.
+ */
 const DISC_TRACK_ITEM = /^(\d)-(\d{2})$/
+const PADDED_DISC_TRACK_ITEM = /^\d-0\d$/
 /** "1.5" and "1.5-1.8": a disc and a track number. */
 const DISC_DOT_ITEM = /^(\d{1,2})\.(\d{1,3})(?:[-–—~〜～](?:\1\.)?(\d{1,3}))?$/
 const ALL_TRACKS = /^(?:全曲|全て|すべて|全部|all(?:\s*tracks)?)$/i
@@ -109,6 +116,15 @@ const FEATURING_BRACKET = /^(?:(?:feat|ft)\.\s*|(?:feat|featuring)\s+)(.+)$/i
  */
 const COLLAB_WORD = /\s+(?:[&＆×xX]|vs\.?|VS\.?)\s+|×|(?<=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}ー])[&＆](?=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}])/gu
 
+/**
+ * A bracket that holds a voice actor: "CV.A", "CV:A", "CV A", "C.V. A", or "CV遠藤" with nothing between before a
+ * Japanese name. Several people (with a separator) stay a detail.
+ */
+const VOICE_BRACKET = /^(?:CV|ＣＶ|C\.V|Ｃ．Ｖ)(?:[.．:：]\s*|\s+|(?=[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}]))([^、，,／/;；]+)$/iu
+
+/** How a voice actor's credit is printed: 紅葉谷希美(CV:遠藤ゆりか). */
+export const voiceCredit = (character: string, actor: string) => `${character}(CV:${actor})`
+
 /** "M1, M3–M5" as track numbers on the disc; null when it is no track list. */
 function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
   const value = text.trim()
@@ -116,8 +132,9 @@ function parseTracks(text: string, disc: number): TrackRef[] | 'all' | null {
   const items = value.split(/\s*[,，、;；/／]\s*|\s+/).filter(Boolean)
   if (!items.length) return null
   const refs: TrackRef[] = []
+  const padded = items.some(item => PADDED_DISC_TRACK_ITEM.test(item))
   for (const item of items) {
-    const discTrack = item.match(DISC_TRACK_ITEM)
+    const discTrack = padded ? item.match(DISC_TRACK_ITEM) : null
     if (discTrack) {
       refs.push({ disc: Number(discTrack[1]), number: Number(discTrack[2]) })
       continue
@@ -167,12 +184,13 @@ function splitNames(text: string): string[] {
 
 /**
  * A name with its brackets taken off the end: track lists become tracks, "(feat. B)" the 客串 in `featured`,
- * anything else the detail.
+ * "(CV.B)" the voice actor in `voice`, anything else the detail.
  */
-function parseName(text: string, disc: number): ParsedCreditName & { featured: string[] } {
+function parseName(text: string, disc: number): ParsedCreditName & { featured: string[], voice?: string } {
   let name = text
   const details: string[] = []
   const featured: string[] = []
+  let voice: string | undefined
   let tracks: ParsedCreditName['tracks'] = null
   for (;;) {
     const match = name.match(/[（(［[【]([^（(［[【）)］\]】]*)[）)］\]】]\s*$/)
@@ -180,12 +198,14 @@ function parseName(text: string, disc: number): ParsedCreditName & { featured: s
     const inside = match[1]!.trim()
     const asTracks = parseTracks(inside, disc)
     const asFeaturing = inside.match(FEATURING_BRACKET)
+    const asVoice = inside.match(VOICE_BRACKET)
     if (asTracks && tracks === null) tracks = asTracks
     else if (asFeaturing) featured.unshift(asFeaturing[1]!.trim())
+    else if (asVoice && !voice) voice = unquote(asVoice[1]!.trim())
     else if (inside) details.unshift(inside)
     name = name.slice(0, match.index).trim()
   }
-  return { name, detail: details.join(' ') || null, tracks, featured }
+  return { name, detail: details.join(' ') || null, tracks, featured, voice }
 }
 
 /** Splits at the matches outside brackets. */
@@ -218,8 +238,9 @@ function parseNames(text: string, disc: number, offset = 0): ParsedCreditName[] 
   const parts = splitAt(text, FEATURING_WORD)
   let host: number | undefined
   parts.forEach((part, partIndex) => {
-    const { featured, ...parsed } = parseName(part, disc)
-    const people = splitAt(parsed.name, COLLAB_WORD).map(unquote)
+    const { featured, voice, ...parsed } = parseName(part, disc)
+    // With a voice actor the person is the actor, and all that was written before the bracket is the character.
+    const people = voice ? [voice] : splitAt(parsed.name, COLLAB_WORD).map(unquote)
     const guests = featured.flatMap(other => splitAt(other, COLLAB_WORD)).map(unquote)
     people.forEach((person, index) => {
       const last = index === people.length - 1
@@ -228,6 +249,7 @@ function parseNames(text: string, disc: number, offset = 0): ParsedCreditName[] 
         name: person,
         detail: last ? parsed.detail : null,
         tracks: parsed.tracks,
+        ...(voice ? { character: unquote(parsed.name) } : {}),
         ...(leads ? {} : { featuring: true, host }),
         ...(index === 0 && people.length > 1 ? { unit: { name: unquote(parsed.name), size: people.length } } : {}),
       })
