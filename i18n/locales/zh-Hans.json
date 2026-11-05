@@ -256,7 +256,7 @@
     "review_filter": "审核",
     "pending_tag": "含审核中",
     "remove_filter": "去掉筛选：{name}",
-    "vinyl_subtitle": "以黑胶发行的专辑",
+    "vinyl_subtitle": "以黑胶(vinyl)发行的专辑",
     "search_placeholder": "在专辑里搜索",
     "filters": "筛选",
     "clear_filters": "清除筛选"

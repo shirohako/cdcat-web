@@ -256,7 +256,7 @@
     "review_filter": "審査",
     "pending_tag": "審査中を含む",
     "remove_filter": "絞り込みを解除：{name}",
-    "vinyl_subtitle": "アナログレコードで発売された作品",
+    "vinyl_subtitle": "アナログレコード(vinyl)で発売された作品",
     "search_placeholder": "アルバムを検索",
     "filters": "絞り込み",
     "clear_filters": "絞り込みを解除"

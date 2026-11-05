@@ -256,7 +256,7 @@
     "review_filter": "검토 상태",
     "pending_tag": "검토 중 포함",
     "remove_filter": "필터 해제: {name}",
-    "vinyl_subtitle": "LP로 발매된 앨범",
+    "vinyl_subtitle": "LP(vinyl)로 발매된 앨범",
     "search_placeholder": "앨범 검색",
     "filters": "필터",
     "clear_filters": "필터 초기화"
