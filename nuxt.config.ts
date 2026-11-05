@@ -127,6 +127,13 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
   },
 
+  // `/_nuxt/` is cached as immutable, so a file's name must change whenever its bytes do. The entry import map breaks
+  // that: chunks keep their names while their preload lists name a new entry CSS, and returning browsers load the old
+  // Tailwind on top of the new one. Remove once https://github.com/nuxt/nuxt/issues/36136 is fixed.
+  experimental: {
+    entryImportMap: false,
+  },
+
   vite: {
     plugins: [
       tailwindcss(),
