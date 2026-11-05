@@ -2797,7 +2797,7 @@
       "printed_as": "印作「{name}」",
       "parent": "所屬",
       "parent_none": "不屬於誰",
-      "parent_hint": "這條 credit 附屬於這首曲目的哪一條：客串必須有，預設是它前面的那位；其他角色可以不填。",
+      "parent_hint": "只有客串需要選，其他角色不用選。\n「A feat. B」裡，B 是 A 的客串。\n同一首有幾位藝術家時，在這裡選 B 跟著誰，預設是它前面的那位。",
       "pick_type": "選類型",
       "remove_person": "移除 {name}",
       "printed_hint": "和藝術家名字不同時才填",

@@ -126,7 +126,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       <div v-if="parent">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}</span>
         <UiSelect :model-value="parent.value" :options="parent.options" size="sm" class="w-full" @update:model-value="emit('parent', $event as string)" />
-        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.parent_hint') }}</span>
+        <span class="mt-1 block whitespace-pre-line text-[11px] text-meta">{{ t('editor.credits.parent_hint') }}</span>
       </div>
       <div v-if="person.artist_id === null">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}</span>
