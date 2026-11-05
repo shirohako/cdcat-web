@@ -232,7 +232,8 @@ onBeforeRouteLeave(async () => {
 
 const submitted = (revision: Revision) => {
   errors.value = []
-  const main = revision.items?.find(item => item.ref === mainRef.value)
+  // An edit of the user's own pending content comes back as the revision that put it live, whose refs are its own.
+  const main = revision.items?.find(item => item.ref === mainRef.value || (id !== null && item.resource_id === id))
   if (revision.status === 'approved') {
     showToast(t('editor.published'))
     router.push(`/${resource}/${main?.resource_id ?? id}`)

@@ -3136,6 +3136,7 @@
       "checked": "Checked by a moderator",
       "rebased": "Conflicts resolved",
       "applied": "Went live at submission",
+      "amended": "Submitter edited the content",
       "discarded": "Removed the live content"
     },
     "resubmit": "Submit again",

@@ -3136,6 +3136,7 @@
       "checked": "운영진 확인",
       "rebased": "충돌 해결",
       "applied": "제출 즉시 공개",
+      "amended": "제출자가 내용을 수정",
       "discarded": "공개된 콘텐츠 삭제"
     },
     "resubmit": "다시 제출",

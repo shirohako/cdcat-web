@@ -21,6 +21,6 @@ const { ago, exact } = useRelativeTime()
 const DOTS: Record<string, string> = {
   submitted: 'bg-info', approved: 'bg-success', auto_approved: 'bg-success', rejected: 'bg-danger',
   changes_requested: 'bg-orange-500', withdrawn: 'bg-faint', flagged: 'bg-warning', checked: 'bg-success/70', rebased: 'bg-primary',
-  applied: 'bg-warning/70', discarded: 'bg-danger/70',
+  applied: 'bg-warning/70', amended: 'bg-warning/70', discarded: 'bg-danger/70',
 }
 </script>

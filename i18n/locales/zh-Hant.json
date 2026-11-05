@@ -3136,6 +3136,7 @@
       "checked": "管理員已巡查",
       "rebased": "處理了衝突",
       "applied": "提交時已上線",
+      "amended": "提交人修改了內容",
       "discarded": "刪除了已上線的內容"
     },
     "resubmit": "再次提交",

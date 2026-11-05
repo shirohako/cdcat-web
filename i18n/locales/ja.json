@@ -3136,6 +3136,7 @@
       "checked": "モデレーターが確認",
       "rebased": "競合を解決",
       "applied": "投稿時に公開",
+      "amended": "投稿者が内容を修正",
       "discarded": "公開済みのコンテンツを削除"
     },
     "resubmit": "再提出",
