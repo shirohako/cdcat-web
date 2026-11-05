@@ -11,6 +11,9 @@ const WORDS: Record<string, string[]> = {
   guitar: ['Guitar'],
   bass: ['Bass'],
   publisher: ['発売元'],
+  designer: ['设计'],
+  mixing: ['Mixing'],
+  producer: ['Co-Producer'],
 }
 const lookup = new Map(Object.entries(WORDS).flatMap(([role, words]) => words.map(word => [foldRoleWord(word), [role]])))
 const parse = (text: string) => parseCredits(text, word => lookup.get(word) ?? [])
@@ -195,6 +198,36 @@ describe('pasted credit lists', () => {
     expect(lines.map(line => line.line)).toEqual([1, 4])
     expect(lines[0]!.names.map(name => name.name)).toEqual(['A', 'B'])
     expect(skipped).toEqual([3])
+  })
+
+  it('keeps a printed job title after a role, and files custom- ones under other', () => {
+    const { lines, skipped } = parse([
+      'Mixing: 柑田夏芽 (Tr.1, Tr.3), 葉山結 (Tr.2)',
+      'custom-ReMastering: 葉山結',
+      '设计-CD Design: 丹下風',
+      '',
+      'Custom - Promotion & Teaser Movie: 山口駿, Mise',
+      'custom-Re-Mastering：5byte',
+    ].join('\n'))
+    expect(skipped).toEqual([])
+    expect(lines.map(({ roles, roleLabel, unknown }) => ({ roles, roleLabel, unknown }))).toEqual([
+      { roles: ['mixing'], roleLabel: null, unknown: [] },
+      { roles: ['other'], roleLabel: 'ReMastering', unknown: [] },
+      { roles: ['designer'], roleLabel: 'CD Design', unknown: [] },
+      { roles: ['other'], roleLabel: 'Promotion & Teaser Movie', unknown: [] },
+      { roles: ['other'], roleLabel: 'Re-Mastering', unknown: [] },
+    ])
+    expect(lines[0]!.names.map(name => tracks(name.tracks))).toEqual([['1-1', '1-3'], ['1-2']])
+    expect(lines[3]!.names.map(name => name.name)).toEqual(['山口駿', 'Mise'])
+    expect(lines[4]!.names.map(name => name.name)).toEqual(['5byte'])
+  })
+
+  it('takes a hyphen for a job title only after one known role', () => {
+    const { lines } = parse('Co-Producer: A\nNot-Role: B\n作曲・编曲-Foo: C\ncustom-: D')
+    expect(lines[0]).toMatchObject({ roles: ['producer'], roleLabel: null, unknown: [] })
+    expect(lines[1]).toMatchObject({ roles: [], roleLabel: null, unknown: ['Not-Role'] })
+    expect(lines[2]).toMatchObject({ roleLabel: null })
+    expect(lines[3]).toMatchObject({ roles: [], roleLabel: null, unknown: ['custom-'] })
   })
 
   it('marks role words it doesn\'t know and skips lines that are no credits', () => {

@@ -4,7 +4,7 @@ import type { RowId } from '~/types/document'
 import type { CreditPerson } from '~/utils/creditLines'
 import type { ParsedCreditName, ParsedCredits, TrackRef } from '~/utils/creditParser'
 import type { AlbumCreditRow } from '~/utils/albumDocument'
-import { addCredit, orderedTracks, setCreditParent, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
+import { addCredit, canHaveRoleLabel, orderedTracks, setCreditParent, sortedDiscs, trackRanges, tracksOn } from '~/utils/albumDocument'
 import { FEATURING_ROLE } from '~/utils/artistLine'
 import { ALBUM_ONLY_ROLES } from '~/utils/creditLines'
 import { foldRoleWord, newArtistName, parseCredits, voiceCredit } from '~/utils/creditParser'
@@ -17,6 +17,7 @@ import { foldRoleWord, newArtistName, parseCredits, voiceCredit } from '~/utils/
  * Roles only the whole album has go on the whole album wherever they were written. "A & B" is two people unless
  * the whole of it is an artist's name; who comes after feat. is a 客串 of the name right before it (utils/artistLine).
  * In "紅葉谷希美(CV.遠藤ゆりか)" the person is the voice actor, printed as 紅葉谷希美(CV:遠藤ゆりか).
+ * "设计-CD Design" keeps the printed job title as role_label; "custom-Comic" does so under 其他.
  */
 const open = defineModel<boolean>({ required: true })
 
@@ -27,6 +28,8 @@ interface Row {
   roles: string[]
   /** Role words no role goes by; the row shows its role picker while there are any */
   unknown: string[]
+  /** The printed job title, while the row has the one role that can take it */
+  roleLabel: string | null
   name: string
   detail: string | null
   /** The character a voice actor voices */
@@ -50,6 +53,7 @@ const EXAMPLES = [
   { key: 'notes', text: 'M1.プリズムにさよならを\n   Vocal:nayuta\n   Music&Lyric:鈴谷皆人\n   Guitar&Bass:花形真喜\n\nM-02.\nVocal: つぐ&るる\nVocal Recording Engineer: Yuhi Sumino\n\nIllust: K-ko' },
   { key: 'lists', text: 'Composer: Kaito Mizuno (01, 10, 14)\nArranger: Kaito Mizuno (01, 10, 14)\n\nComposer: Starlit Sound, LLC. (02-09, 11-13)\nArranger: Starlit Sound, LLC. (02-09, 11-13)\nLyricist: Yuki (03, 05)' },
   { key: 'wrapped', text: '艺术家:Minato(1.1)、Yuki(1.2)、黒魔feat.ルナ\n(1.3)、Gardens feat.moon jelly(1.4)、\nKen(2.1)、mochi(2.2)' },
+  { key: 'titles', text: 'Mixing: ミナト (Tr.1, Tr.3), Yuki (Tr.2)\ncustom-ReMastering: Yuki\n设计-CD Design: mochi\n\ncustom-Comic: 星野あかり\ncustom-Promotion Movie: Ken, mochi' },
 ] as const
 
 const { t } = useI18n()
@@ -167,7 +171,7 @@ const rows = computed<Row[]>(() => parsed.value.lines.flatMap((line) => {
     const albumOnly = roles.length > 0 && roles.every(role => ALBUM_ONLY_ROLES.includes(role))
     const { ids, missing } = albumOnly ? { ids: null, missing: [] } : trackIdsOf(name.tracks)
     return {
-      key, roleText: line.roleText, roles, unknown: line.unknown, name: name.name, detail: name.detail, character: name.character ?? null, hostKey: host && host !== name ? keyOf(host) : null,
+      key, roleText: line.roleText, roles, unknown: line.unknown, roleLabel: roles.length === 1 && canHaveRoleLabel(roles[0]!) ? line.roleLabel : null, name: name.name, detail: name.detail, character: name.character ?? null, hostKey: host && host !== name ? keyOf(host) : null,
       trackIds: ids, missing, choice: picks.value[key]?.choice ?? defaultChoice(candidates), candidates,
     }
   })
@@ -205,7 +209,7 @@ const apply = () => {
   const added = new Map<string, AlbumCreditRow[]>()
   for (const row of rows.value.filter(ready)) {
     const person = personOf(row)
-    added.set(row.key, row.roles.flatMap(role => addCredit(album.value, { ...person, role }, row.trackIds)))
+    added.set(row.key, row.roles.flatMap(role => addCredit(album.value, { ...person, role, role_label: row.roleLabel }, row.trackIds)))
   }
   for (const row of rows.value.filter(item => item.hostKey && added.has(item.key))) {
     const hosts = added.get(row.hostKey!) ?? []
@@ -254,7 +258,7 @@ const apply = () => {
           <tbody>
             <tr v-for="row in rows" :key="row.key" :class="ready(row) ? '' : 'bg-warning/10'">
               <td class="border-t border-line px-3 py-1.5 align-middle">
-                <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join(separator) }}</span>
+                <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join(separator) }}<span v-if="row.roleLabel" class="ml-1 font-normal text-primary">· {{ row.roleLabel }}</span></span>
                 <EditorAlbumCreditsRoles v-else :model-value="row.roles" :invalid="!row.roles.length" @update:model-value="setRoles(row, $event)" />
                 <span class="block text-[10px] text-faint">{{ row.roleText }}</span>
                 <span v-if="row.unknown.length" class="block text-[10px] text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>

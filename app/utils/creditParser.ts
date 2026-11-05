@@ -17,6 +17,8 @@
 //   艺术家:A(1.1)、黒魔feat.B(1.2)、             1.2 is disc 1, track 2; feat. may touch a Japanese name; a list that wraps
 //   C(2.1)、D                                   goes on under a line ending in a separator, or under one starting with
 //   (2.2)、E(2.3)                               the brackets or separator of the name before
+//   设计-CD Design: A                           a role, then the job title as printed (credits.role_label)
+//   custom-Comic: B                             the same under the role 其他, for titles no role stands for
 //
 // Role words are looked up by the caller (the role dictionary's names and other spellings); matching the
 // names to artists is the dialog's business.
@@ -50,6 +52,8 @@ export interface ParsedCreditLine {
   roles: string[]
   /** Role words no role goes by */
   unknown: string[]
+  /** The job title as printed, after "设计-" or "custom-" */
+  roleLabel: string | null
   names: ParsedCreditName[]
 }
 
@@ -76,6 +80,12 @@ export const newArtistName = (name: string) => name.trim().replace(/(?<=[\p{sc=H
 
 /** A role word as the lookup compares it: full-width forms, case, spaces and dots don't count. */
 export const foldRoleWord = (word: string) => word.normalize('NFKC').toLowerCase().replace(/[\s.。・]/g, '')
+
+/** The role "custom-…" files a job title under. */
+export const CUSTOM_ROLE = 'other'
+const CUSTOM_WORD = 'custom'
+/** "设计-CD Design", split at the first hyphen, so the title may hold more of them ("custom-Re-Mastering"). */
+const ROLE_AND_LABEL = /^(.+?)\s*[-－]\s*(.+)$/
 
 const DISC_LINE = /^(?:disc|disk|cd|dvd|bd)\s*[-#.]?\s*(\d{1,2})\b/i
 /** "M-01." as VGMdb notes write a track's block: M with a hyphen or dot before the number too. */
@@ -295,11 +305,20 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
     const found = rolesOf(folded)
     return found.length ? found : ROLE_SHORTHANDS[folded] ?? []
   }
+  /** One role and a job title for it. A role whose own name has a hyphen (Co-Producer) stays that role. */
+  const labelled = (left: string) => {
+    const [, word, roleLabel] = lookup(left).length ? [] : left.match(ROLE_AND_LABEL) ?? []
+    if (!word || !roleLabel) return null
+    const roles = foldRoleWord(word) === CUSTOM_WORD ? [CUSTOM_ROLE] : lookup(word)
+    return roles.length === 1 ? { roles, roleLabel } : null
+  }
   const rolesIn = (line: string) => {
     const colon = roleColon(line)
     const left = colon > 0 ? line.slice(0, colon).trim() : ''
+    const label = labelled(left)
+    if (label) return { colon, left, ...label, unknown: [] as string[] }
     const words = left ? left.split(/\s*[・/／&＆,，、+＋]\s*|\s+(?:and|&)\s+/i).map(word => word.trim()).filter(Boolean) : []
-    return { colon, left, roles: [...new Set(words.flatMap(lookup))], unknown: words.filter(word => !lookup(word).length) }
+    return { colon, left, roles: [...new Set(words.flatMap(lookup))], roleLabel: null, unknown: words.filter(word => !lookup(word).length) }
   }
   const lines: ParsedCreditLine[] = []
   const skipped: number[] = []
@@ -343,7 +362,7 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
     if (blanks > spacing && indentOf(raw) <= headingIndent) track = null
     blanks = 0
     const discHeading = line.match(DISC_LINE)
-    const { colon, left, roles, unknown } = rolesIn(line)
+    const { colon, left, roles, roleLabel, unknown } = rolesIn(line)
 
     // A line naming no known role may be a disc or a track heading: "Disc 2", "01. Title", "M1 Title: Subtitle".
     if (!roles.length) {
@@ -371,7 +390,7 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
       skipped.push(number)
       return
     }
-    lines.push({ line: number, roleText: left, roles, unknown, names })
+    lines.push({ line: number, roleText: left, roles, roleLabel, unknown, names })
   })
   return { lines, skipped }
 }
