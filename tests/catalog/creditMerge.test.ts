@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import type { CreditGroup, CreditPerson } from '~/utils/creditMerge'
+import type { CreditRowRole, CreditRowPerson } from '~/utils/creditMerge'
 import { mergeCreditRoles } from '~/utils/creditMerge'
 
-const kino: CreditPerson = { name: 'キノ', artistId: 1, detail: null }
-const konomi: CreditPerson = { name: '姫宮このみ', artistId: 2, detail: null }
-const group = (role: string, ...people: CreditPerson[]): CreditGroup => ({ key: role, role, role_label: null, category: 'other', people })
-const shape = (groups: CreditGroup[]) => mergeCreditRoles(groups).map(row => [row.roles.map(item => item.role), row.people.map(person => person.name)])
+const kino: CreditRowPerson = { name: 'キノ', artistId: 1, detail: null }
+const konomi: CreditRowPerson = { name: '姫宮このみ', artistId: 2, detail: null }
+const group = (role: string, ...people: CreditRowPerson[]): CreditRowRole => ({ key: role, role, role_label: null, category: 'other', people })
+const shape = (groups: CreditRowRole[]) => mergeCreditRoles(groups).map(row => [row.roles.map(item => item.role), row.people.map(person => person.name)])
 
 describe('mergeCreditRoles', () => {
   it('puts roles held by the same people on one row, at the first role', () => {
@@ -25,7 +25,7 @@ describe('mergeCreditRoles', () => {
   })
 
   it('tells people without an artist apart by name', () => {
-    const name = (text: string): CreditPerson => ({ name: text, artistId: null, detail: null })
+    const name = (text: string): CreditRowPerson => ({ name: text, artistId: null, detail: null })
     expect(shape([group('a', name('もろこし')), group('b', name('さゆ')), group('c', name('もろこし'))])).toEqual([
       [['a', 'c'], ['もろこし']],
       [['b'], ['さゆ']],

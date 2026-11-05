@@ -1,21 +1,21 @@
-export interface CreditPerson {
+export interface CreditRowPerson {
   name: string
   artistId: number | null
   detail: string | null
 }
 
-export interface CreditGroup {
+export interface CreditRowRole {
   key: string
   role: string
   role_label: string | null
   category: string
-  people: CreditPerson[]
+  people: CreditRowPerson[]
 }
 
 export interface CreditRow {
   key: string
-  roles: CreditGroup[]
-  people: CreditPerson[]
+  roles: CreditRowRole[]
+  people: CreditRowPerson[]
 }
 
 /**
@@ -23,7 +23,7 @@ export interface CreditRow {
  * A row stands where its first role stood; the order of the names doesn't matter, but a different credited name or
  * detail does, as the row could only show one of them.
  */
-export function mergeCreditRoles(groups: CreditGroup[]): CreditRow[] {
+export function mergeCreditRoles(groups: CreditRowRole[]): CreditRow[] {
   const rows = new Map<string, CreditRow>()
   for (const group of groups) {
     const key = group.people.map(person => JSON.stringify([person.artistId, person.name, person.detail])).sort().join('|')
