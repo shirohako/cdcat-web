@@ -29,6 +29,11 @@
     "console": "Admin Console"
   },
   "album": {
+    "credits_merge": {
+      "label": "Roles with the same people",
+      "merged": "Merge roles",
+      "split": "Separate roles"
+    },
     "track_people": {
       "title": "Track credits",
       "count": "{count} person | {count} people",

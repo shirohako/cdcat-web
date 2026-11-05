@@ -29,6 +29,11 @@
     "console": "管理后台"
   },
   "album": {
+    "credits_merge": {
+      "label": "相同人员的职位",
+      "merged": "合并职位",
+      "split": "分开显示"
+    },
     "track_people": {
       "title": "曲目参与人员",
       "count": "{count} 位",

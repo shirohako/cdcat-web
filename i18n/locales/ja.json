@@ -29,6 +29,11 @@
     "console": "管理画面"
   },
   "album": {
+    "credits_merge": {
+      "label": "同じ担当者の役職",
+      "merged": "役職をまとめる",
+      "split": "分けて表示"
+    },
     "track_people": {
       "title": "曲ごとのクレジット",
       "count": "{count} 人",

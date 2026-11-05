@@ -1,20 +1,25 @@
 <template>
   <CatalogSection v-if="groups.length || people.length" :title="$t('album.section.credits')" :icon="Users" size="sm" clip>
-    <!-- One row per role, the role as its coloured tag; a hairline list, as a single role looks lost in the 简介 card's
-         booklet layout. -->
+    <template v-if="canMerge" #actions>
+      <UiSegmented v-model="creditsMerge" :items="creditsMerges" size="sm" collapse :label="$t('album.credits_merge.label')" />
+    </template>
+    <!-- One row per role, or per set of people, the roles as coloured tags; a hairline list, as a single role looks lost
+         in the 简介 card's booklet layout. -->
     <div class="px-5 pb-5 pt-2">
-      <CatalogInfoTable v-if="groups.length" variant="lines">
-        <CatalogInfoRow v-for="group in groups" :key="group.key">
+      <CatalogInfoTable v-if="rows.length" variant="lines">
+        <CatalogInfoRow v-for="row in rows" :key="row.key">
           <template #label>
-            <UiTooltip :text="roleName(group.role)" :disabled="!group.role_label">
-              <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
-            </UiTooltip>
+            <span class="flex flex-wrap gap-1">
+              <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleName(group.role)" :disabled="!group.role_label">
+                <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
+              </UiTooltip>
+            </span>
           </template>
           <!-- Each person a grey tag (a link darkens and takes the theme colour on hover), the note inside it -->
           <span class="flex flex-wrap gap-1.5">
             <component
               :is="person.artistId ? NuxtLink : 'span'"
-              v-for="(person, index) in group.people"
+              v-for="(person, index) in row.people"
               :key="index"
               :to="person.artistId ? `/artists/${person.artistId}` : undefined"
               class="inline-flex items-center gap-1 rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 text-title transition-colors duration-150 dark:bg-white/[0.08]"
@@ -141,10 +146,11 @@
 <script setup lang="ts">
 import type { AlbumDisc } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
-import { ChevronRight, ChevronUp, Users } from '@lucide/vue'
+import { ChevronRight, ChevronUp, Combine, Rows3, Users } from '@lucide/vue'
 import { NuxtLink } from '#components'
 import { RELEASE_ROLES } from '~/types/album'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
+import { mergeCreditRoles } from '~/utils/creditMerge'
 import { trackPeople, trackRoleGroups } from '~/utils/trackPeople'
 
 const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
@@ -173,6 +179,19 @@ const groups = computed(() => {
   }
   return [...map.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))
 })
+
+const { t } = useI18n()
+/** Roles held by the same people on one row, or each on its own. In a cookie, so the server already renders the reader's choice. */
+const creditsMerge = useCookie<'merged' | 'split'>('album_credits_merge', { default: () => 'merged', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' })
+if (creditsMerge.value !== 'merged' && creditsMerge.value !== 'split') creditsMerge.value = 'merged'
+const creditsMerges = computed(() => [
+  { value: 'merged' as const, label: t('album.credits_merge.merged'), icon: Combine },
+  { value: 'split' as const, label: t('album.credits_merge.split'), icon: Rows3 },
+])
+const mergedRows = computed(() => mergeCreditRoles(groups.value))
+/** With nothing to merge the switch would change nothing, so it stays away. */
+const canMerge = computed(() => mergedRows.value.length < groups.value.length)
+const rows = computed(() => creditsMerge.value === 'merged' ? mergedRows.value : groups.value.map(group => ({ key: group.key, roles: [group], people: group.people })))
 
 const people = computed(() => trackPeople(props.discs ?? [], roleOrder))
 const roleGroups = computed(() => trackRoleGroups(people.value, roleOrder))
@@ -205,7 +224,6 @@ onMounted(() => {
 onBeforeUnmount(() => stuckObserver?.disconnect())
 
 const VIEW_KEY = 'cdcat:album:track-people-view'
-const { t } = useI18n()
 // The page is rendered on the server too, so the stored choice is read once mounted.
 type PeopleView = 'roles' | 'tracks' | 'role_groups'
 const peopleView = ref<PeopleView>('roles')

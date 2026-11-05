@@ -29,6 +29,11 @@
     "console": "관리자 페이지"
   },
   "album": {
+    "credits_merge": {
+      "label": "담당자가 같은 역할",
+      "merged": "역할 합치기",
+      "split": "나눠서 보기"
+    },
     "track_people": {
       "title": "곡별 참여자",
       "count": "{count}명",
