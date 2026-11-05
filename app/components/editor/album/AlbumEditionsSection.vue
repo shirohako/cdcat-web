@@ -146,6 +146,7 @@ import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
 import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
 import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { moveRow, sameId } from '~/utils/documentRows'
+import { plainAmount } from '~/utils/priceAmount'
 
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
@@ -204,7 +205,7 @@ const previewProducts = computed<AlbumProduct[]>(() => {
     limited_rule: limited ? values.limited_rule : null,
     limited_name: limited ? values.limited_name : null,
     catalog_number: values.catalog_number ? formatCatalogNumber(values.catalog_number) : null,
-    prices: values.prices.filter(price => String(price.amount ?? '').trim() !== '').map(price => ({ ...price, currency: price.currency.trim().toUpperCase() })),
+    prices: values.prices.filter(price => String(price.amount ?? '').trim() !== '').map(price => ({ ...price, amount: plainAmount(price.amount), currency: price.currency.trim().toUpperCase() })),
     disc_ids: discIds,
     format_label: formLabel.value || null,
   } as AlbumProduct]
@@ -219,7 +220,7 @@ const edit = (product: AlbumProductRow | null) => {
 const save = () => {
   if (!form.value) return
   const prices = form.value.prices
-    .map(price => ({ ...price, amount: String(price.amount ?? '').trim(), currency: price.currency.trim().toUpperCase(), note: price.note?.trim() || null }))
+    .map(price => ({ ...price, amount: plainAmount(price.amount), currency: price.currency.trim().toUpperCase(), note: price.note?.trim() || null }))
     .filter(price => price.amount !== '')
   const values = { ...form.value, name: form.value.name?.trim() || null, prices }
   if (values.edition_type !== 'limited') Object.assign(values, { limited_rule: null, limited_name: null })

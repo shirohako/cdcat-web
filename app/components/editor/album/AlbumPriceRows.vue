@@ -30,7 +30,7 @@
           <span class="hidden w-4 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing md:flex [@media(hover:none)]:invisible" :class="rows.length < 2 && 'invisible'" aria-hidden="true" @pointerdown="grab(row)">
             <GripVertical :size="14" />
           </span>
-          <input v-model="row.price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')">
+          <input v-model="row.price.amount" class="input input-sm w-full tabular-nums" inputmode="decimal" placeholder="3300" :aria-label="$t('editor.editions.price_amount')" @change="row.price.amount = plainAmount(row.price.amount)">
           <input v-model="row.price.currency" class="input input-sm w-full font-mono uppercase" maxlength="3" placeholder="JPY" list="editor-currencies" :aria-label="$t('catalog.field.currency')">
           <UiSelect v-model="row.price.tax_included" :options="taxOptions" size="sm" class="w-full" :aria-label="$t('editor.editions.price_tax')" />
           <input v-model="row.price.note" class="input input-sm w-full" maxlength="100" :placeholder="$t('editor.editions.price_note_placeholder')" :aria-label="$t('editor.editions.price_note')">
@@ -67,6 +67,7 @@ import type { PriceKind, ProductPrice } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowLeftRight, ArrowUp, GripVertical, Trash2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
+import { plainAmount } from '~/utils/priceAmount'
 import { sameId } from '~/utils/documentRows'
 
 /**
