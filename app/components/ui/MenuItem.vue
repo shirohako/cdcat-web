@@ -7,7 +7,8 @@ import { MENU_CLOSE } from './Menu.vue'
 /**
  * A row in a UiMenu: a link with `to`, else a button. Choosing it closes the menu. The icon stays muted and takes the
  * theme colour on hover, so the labels lead. With `glide`, the menu draws one highlight that glides between rows
- * (useGlideHighlight), so the row draws no hover background of its own.
+ * (useGlideHighlight), so the row draws no hover background of its own. `hint` is a smaller line under the label, for
+ * rows whose label alone doesn't say what they do.
  */
 withDefaults(defineProps<{
   to?: RouteLocationRaw
@@ -16,7 +17,8 @@ withDefaults(defineProps<{
   active?: boolean
   disabled?: boolean
   glide?: boolean
-}>(), { to: undefined, icon: undefined })
+  hint?: string
+}>(), { to: undefined, icon: undefined, hint: undefined })
 
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
 const close = inject(MENU_CLOSE, () => {})
@@ -48,6 +50,7 @@ const choose = (event: MouseEvent) => {
     />
     <span class="min-w-0 flex-1 truncate">
       <slot />
+      <span v-if="hint" class="block whitespace-normal text-xs font-normal leading-4 text-meta">{{ hint }}</span>
     </span>
     <slot name="trailing" />
   </component>

@@ -151,7 +151,7 @@ export interface TracklistInput {
   language: TracklistLanguageChoice | null
 }
 
-const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): TracklistRoleGroup[] => {
+export const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): TracklistRoleGroup[] => {
   const groups = new Map<string, TracklistRoleGroup>()
   for (const credit of credits) {
     const key = credit.role_label ? JSON.stringify([credit.role, credit.role_label]) : credit.role

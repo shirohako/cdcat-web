@@ -25,7 +25,7 @@
           <p class="min-w-0 flex-1 truncate text-sm text-meta">{{ $t('editor.album.preview.note') }}</p>
           <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 shrink-0" @click="open = false" />
         </header>
-        <AlbumDetail v-if="album" :album="album" />
+        <AlbumDetail v-if="album" :album="album" preview />
         <SkeletonCatalogDetail v-else hero="album" />
       </div>
     </Transition>

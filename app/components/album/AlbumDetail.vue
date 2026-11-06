@@ -45,7 +45,7 @@
           <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
           <AlbumArticles :articles="album.articles ?? []" />
           <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact />
-          <AlbumEditing :album-id="album.id" :version="album.version" :edited-at="album.edited_at" :discs="album.discs" />
+          <AlbumEditing :album="album" :preview="preview" />
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@ import type { TrackingStatus } from '~/types/tracking'
 import type { AlbumReview } from '~/types/reviews'
 
 /** The album page below the navbar: the album's page and the album editor's preview (EditorAlbumPreview) both show it. */
-defineProps<{ album: Album }>()
+defineProps<{ album: Album, preview?: boolean }>()
 const emit = defineEmits<{
   favorited: [value: boolean]
   trackFavorited: [trackId: number, value: boolean]

@@ -199,6 +199,48 @@
       "version": "Current version",
       "edited_at": "Updated {date}"
     },
+    "export": {
+      "button": "Export",
+      "csv": "Spreadsheet (CSV)",
+      "csv_hint": "Opens in Excel, Sheets or Numbers, one row per track",
+      "markdown": "Document (Markdown)",
+      "markdown_hint": "Opens in any text editor, or paste into Notion, Obsidian or a blog",
+      "json": "Data (JSON)",
+      "json_hint": "Everything, for programs and scripts",
+      "failed": "Couldn't export. Please try again.",
+      "csv_columns": {
+        "album": "Album",
+        "catalog_number": "Catalog number",
+        "release_date": "Release date",
+        "disc": "Disc",
+        "track": "Track",
+        "title": "Title",
+        "translation": "Translation",
+        "duration": "Length",
+        "seconds": "Length (seconds)",
+        "originals": "Original",
+        "isrc": "ISRC",
+        "bonus": "Bonus",
+        "source": "Source",
+        "license": "License"
+      },
+      "md": {
+        "other_names": "Other names",
+        "catalog_number": "Catalog number",
+        "release_date": "Release date",
+        "type": "Type",
+        "disc_count": "Discs",
+        "track_count": "Tracks",
+        "duration": "Total length",
+        "description": "Description",
+        "credits": "Credits",
+        "tracklist": "Tracklist",
+        "products": "Editions",
+        "bonuses": "Bonuses",
+        "links": "Links",
+        "footer": "Source: {source}, shared under {license}"
+      }
+    },
     "toc": {
       "button": "Disc ID",
       "title": "TOC and disc IDs",

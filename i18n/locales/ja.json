@@ -199,6 +199,48 @@
       "version": "現在のバージョン",
       "edited_at": "{date}更新"
     },
+    "export": {
+      "button": "エクスポート",
+      "csv": "表（CSV）",
+      "csv_hint": "Excel や Numbers で開けます。1 曲 1 行",
+      "markdown": "文書（Markdown）",
+      "markdown_hint": "メモ帳で開くか、Notion、Obsidian、ブログに貼り付け",
+      "json": "データ（JSON）",
+      "json_hint": "すべての情報。プログラムやスクリプト向け",
+      "failed": "エクスポートできませんでした。もう一度お試しください。",
+      "csv_columns": {
+        "album": "アルバム",
+        "catalog_number": "品番",
+        "release_date": "発売日",
+        "disc": "ディスク",
+        "track": "曲番号",
+        "title": "タイトル",
+        "translation": "訳題",
+        "duration": "長さ",
+        "seconds": "長さ（秒）",
+        "originals": "原曲",
+        "isrc": "ISRC",
+        "bonus": "特典",
+        "source": "出典",
+        "license": "ライセンス"
+      },
+      "md": {
+        "other_names": "別名",
+        "catalog_number": "品番",
+        "release_date": "発売日",
+        "type": "種類",
+        "disc_count": "ディスク数",
+        "track_count": "曲数",
+        "duration": "総時間",
+        "description": "紹介",
+        "credits": "クレジット",
+        "tracklist": "トラックリスト",
+        "products": "エディション",
+        "bonuses": "特典",
+        "links": "関連リンク",
+        "footer": "出典：{source}（{license} で共有）"
+      }
+    },
     "toc": {
       "button": "Disc ID",
       "title": "TOC と Disc ID",

@@ -199,6 +199,48 @@
       "version": "当前版本",
       "edited_at": "{date}更新"
     },
+    "export": {
+      "button": "导出",
+      "csv": "表格（CSV）",
+      "csv_hint": "用 Excel、WPS、Numbers 打开，每首歌一行",
+      "markdown": "文档（Markdown）",
+      "markdown_hint": "用记事本打开，或贴到 Notion、Obsidian、博客",
+      "json": "数据（JSON）",
+      "json_hint": "完整资料，给程序或脚本用",
+      "failed": "导出失败，请再试一次。",
+      "csv_columns": {
+        "album": "专辑",
+        "catalog_number": "品番",
+        "release_date": "发售日",
+        "disc": "碟",
+        "track": "曲号",
+        "title": "标题",
+        "translation": "译名",
+        "duration": "时长",
+        "seconds": "时长（秒）",
+        "originals": "原曲",
+        "isrc": "ISRC",
+        "bonus": "特典",
+        "source": "来源",
+        "license": "协议"
+      },
+      "md": {
+        "other_names": "其他名称",
+        "catalog_number": "品番",
+        "release_date": "发售日",
+        "type": "类型",
+        "disc_count": "碟数",
+        "track_count": "曲数",
+        "duration": "总时长",
+        "description": "简介",
+        "credits": "制作人员",
+        "tracklist": "曲目表",
+        "products": "发行版本",
+        "bonuses": "特典",
+        "links": "相关链接",
+        "footer": "资料来源：{source}，以 {license} 共享"
+      }
+    },
     "toc": {
       "button": "Disc ID",
       "title": "TOC 与 Disc ID",
