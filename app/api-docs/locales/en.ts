@@ -850,6 +850,7 @@ const texts: ApiDocsTexts = {
         'prices.amount': 'Amount, as a string, for example `"3300.00"`.',
         'prices.currency': 'Currency, an ISO 4217 code, for example `JPY`.',
         'prices.tax_included': '`true` tax included, `false` tax excluded, `null` not stated.',
+        note: 'Note on this edition, such as a repress or how it differs from the first press. May span several lines.',
         is_hires: 'Whether it is hi-res audio.',
         is_available: 'Whether it is still on sale.',
         sort_order: 'Display order.',

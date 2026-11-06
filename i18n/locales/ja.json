@@ -2837,6 +2837,7 @@
       "format_hint": "収録ディスクから決まる形態",
       "unticked": "どのエディションにも含まれていません：{discs}",
       "limited_name_placeholder": "例：アニメイト限定",
+      "note_placeholder": "例：2024年再プレス。ジャケットは初版と異なる",
       "add_price": "価格を追加",
       "add_other_kind": "他の種類を追加",
       "no_prices": "価格はまだありません",

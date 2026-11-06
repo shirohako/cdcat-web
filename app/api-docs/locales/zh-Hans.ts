@@ -850,6 +850,7 @@ const texts: ApiDocsTexts = {
         'prices.amount': '金额，写成字符串，例如 `"3300.00"`。',
         'prices.currency': '货币，ISO 4217 代码，例如 `JPY`。',
         'prices.tax_included': '`true` 含税，`false` 不含税，`null` 未注明。',
+        note: '这个版本的备注，例如再版说明或和初版的差异，可能有多行。',
         is_hires: '是否是高解析度音源。',
         is_available: '是否仍在销售。',
         sort_order: '显示顺序。',

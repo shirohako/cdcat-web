@@ -849,6 +849,7 @@ const texts: ApiDocsTexts = {
         'prices.amount': '금액. 문자열입니다(예: `"3300.00"`).',
         'prices.currency': '통화. ISO 4217 코드입니다(예: `JPY`).',
         'prices.tax_included': '`true`는 세금 포함, `false`는 세금 별도, `null`은 표기 없음.',
+        note: '이 버전의 메모(예: 재발매 설명, 초판과의 차이). 여러 줄일 수 있습니다.',
         is_hires: '하이레조 음원 여부',
         is_available: '판매 중 여부',
         sort_order: '표시 순서',

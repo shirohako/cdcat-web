@@ -240,7 +240,7 @@ export function blankProduct(doc: AlbumDocument, fields: Partial<AlbumProductRow
     id: newKey('p'), name: null, edition_type: 'regular',
     medium: discs.length && discs.every(disc => disc.format === 'digital') ? 'digital' : 'physical',
     limited_rule: null, limited_name: null, catalog_number: null, barcode: null, release_date: null, release_date_precision: 'day',
-    region: null, prices: [], is_hires: false, is_available: true, sort_order: nextOrder(doc.products),
+    region: null, prices: [], note: null, is_hires: false, is_available: true, sort_order: nextOrder(doc.products),
     disc_ids: discs.map(disc => disc.id), ...fields,
   }
 }

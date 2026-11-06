@@ -2837,6 +2837,7 @@
       "format_hint": "The format, from the discs it contains",
       "unticked": "Not in any edition yet: {discs}",
       "limited_name_placeholder": "e.g. Animate exclusive",
+      "note_placeholder": "e.g. 2024 repress with a different cover",
       "add_price": "Add a price",
       "add_other_kind": "Add another kind",
       "no_prices": "No prices yet",

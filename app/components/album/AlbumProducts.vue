@@ -38,6 +38,7 @@
                       <span v-if="!product.is_available" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-black/[0.05] text-meta dark:bg-white/[0.08]">{{ $t('content_display.out_of_print') }}</span>
                     </p>
                     <p v-if="product.edition_type === 'limited' && product.limited_name" class="mt-0.5 text-[11px] text-meta">{{ product.limited_name }}</p>
+                    <p v-if="product.note" class="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-body">{{ product.note }}</p>
                   </div>
                 </div>
               </td>

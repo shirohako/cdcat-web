@@ -202,6 +202,7 @@ export interface AlbumProduct {
   release_date_precision: DatePrecision | null
   region: string | null
   prices: ProductPrice[]
+  note: string | null
   is_hires: boolean
   is_available: boolean
   sort_order: number

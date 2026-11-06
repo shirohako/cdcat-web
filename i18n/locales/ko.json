@@ -2837,6 +2837,7 @@
       "format_hint": "포함된 디스크에 따라 정해지는 형태예요",
       "unticked": "아직 어느 에디션에도 포함되지 않은 디스크: {discs}",
       "limited_name_placeholder": "예: Animate 한정",
+      "note_placeholder": "예: 2024년 재발매, 초판과 재킷이 다름",
       "add_price": "가격 추가",
       "add_other_kind": "다른 종류 추가",
       "no_prices": "아직 가격이 없습니다",

@@ -850,6 +850,7 @@ const texts: ApiDocsTexts = {
         'prices.amount': '金額。文字列です。例：`"3300.00"`。',
         'prices.currency': '通貨。ISO 4217 のコード。例：`JPY`。',
         'prices.tax_included': '`true` は税込、`false` は税抜、`null` は記載なし。',
+        note: 'このエディションのメモ。再プレスの説明や初版との違いなど。複数行の場合があります。',
         is_hires: 'ハイレゾ音源かどうか。',
         is_available: '現在も販売中かどうか。',
         sort_order: '表示順。',

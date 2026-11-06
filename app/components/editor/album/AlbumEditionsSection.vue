@@ -36,6 +36,7 @@
               <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
               <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
             </p>
+            <p v-if="product.note" class="mt-1 truncate text-xs text-meta">{{ product.note }}</p>
             <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
           </div>
           <span class="ml-auto flex shrink-0 gap-0.5">
@@ -120,6 +121,11 @@
 
         <EditorAlbumPriceRows v-model="form.prices" class="border-t border-line pt-4" />
 
+        <label class="block border-t border-line pt-4">
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}</span>
+          <textarea v-model="form.note" rows="2" class="textarea textarea-sm w-full text-sm" maxlength="1000" :placeholder="$t('editor.editions.note_placeholder')" />
+        </label>
+
         <!-- The row this edition gets in the album page's editions table, drawn by that table itself. -->
         <div class="space-y-2 border-t border-line pt-4">
           <p class="text-sm font-medium text-body">{{ $t('editor.editions.preview') }} <span class="font-normal text-meta">· {{ $t('editor.editions.preview_live') }}</span></p>
@@ -202,6 +208,7 @@ const previewProducts = computed<AlbumProduct[]>(() => {
     id: 0,
     sort_order: 0,
     name: values.name?.trim() || null,
+    note: values.note?.trim() || null,
     limited_rule: limited ? values.limited_rule : null,
     limited_name: limited ? values.limited_name : null,
     catalog_number: values.catalog_number ? formatCatalogNumber(values.catalog_number) : null,
@@ -222,7 +229,7 @@ const save = () => {
   const prices = form.value.prices
     .map(price => ({ ...price, amount: plainAmount(price.amount), currency: price.currency.trim().toUpperCase(), note: price.note?.trim() || null }))
     .filter(price => price.amount !== '')
-  const values = { ...form.value, name: form.value.name?.trim() || null, prices }
+  const values = { ...form.value, name: form.value.name?.trim() || null, note: form.value.note?.trim() || null, prices }
   if (values.edition_type !== 'limited') Object.assign(values, { limited_rule: null, limited_name: null })
   if (editing.value) Object.assign(editing.value, { ...values, id: editing.value.id, sort_order: editing.value.sort_order })
   else album.value.products.push(values)

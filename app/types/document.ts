@@ -30,7 +30,7 @@ export interface AlbumDocument {
   products: Array<{
     id: RowId, name: string | null, edition_type: string, medium: string, limited_rule: string | null, limited_name: string | null,
     catalog_number: string | null, barcode: string | null, release_date: string | null, release_date_precision: DatePrecision,
-    region: string | null, prices: ProductPrice[], is_hires: boolean, is_available: boolean, sort_order?: number, disc_ids: RowId[]
+    region: string | null, prices: ProductPrice[], note: string | null, is_hires: boolean, is_available: boolean, sort_order?: number, disc_ids: RowId[]
   }>
   bonuses: Array<{
     id: RowId, name: string, type: string, description: string | null, is_digital: boolean, shop: string | null,
