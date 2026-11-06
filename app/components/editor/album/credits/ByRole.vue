@@ -1,24 +1,26 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { CreditLine, CreditPerson } from '~/utils/creditLines'
+import { orderedTracks } from '~/utils/albumDocument'
 import { COMMON_ROLES, addCreditLine, addLinePerson, creditLines, removeCreditLine, removeLinePerson, setLineRoles, setLineTracks, updateLinePerson } from '~/utils/creditLines'
 import { newKey } from '~/utils/documentKeys'
 
 /**
- * 按角色: the credits outside the byline block as lines, each a line of the booklet (roles × people × tracks).
- * A line started from the buttons below has no one yet, so it lives here until its first person is added; then it
- * is credits like the others.
+ * 按角色: the tracks' credits as lines, each a line of the booklet (roles × people × tracks). A line left with no track
+ * is the whole album's, so it moves up to 参与创作 (专辑); a line starts with every track for that reason. It has no
+ * one yet, so it lives here until its first person is added; then it is credits like the others.
  */
 const { t } = useI18n()
 const editor = useAlbumEditor()
 const { roleName, roleOrder } = useCatalogSchema()
 const album = computed(() => editor.album.value)
 
-const lines = computed(() => creditLines(album.value, roleOrder))
+const tracks = computed(() => orderedTracks(album.value))
+const lines = computed(() => creditLines(album.value, roleOrder).filter(line => line.trackIds.length))
 
 interface StartedLine { key: string, roles: string[], trackIds: RowId[] }
 const started = ref<StartedLine[]>([])
-const start = (roles: string[]) => started.value.push({ key: newKey('line'), roles, trackIds: [] })
+const start = (roles: string[]) => started.value.push({ key: newKey('line'), roles, trackIds: tracks.value.map(track => track.id) })
 const drop = (line: StartedLine) => { started.value = started.value.filter(item => item !== line) }
 const firstPerson = (line: StartedLine, person: CreditPerson) => {
   addCreditLine(album.value, line.roles, [person], line.trackIds)
@@ -36,7 +38,8 @@ const edit = {
 </script>
 
 <template>
-  <div class="space-y-3">
+  <p v-if="!tracks.length" class="rounded-lg border border-dashed border-line px-4 py-4 text-center text-xs text-meta">{{ t('editor.credits.no_tracks_hint') }}</p>
+  <div v-else class="space-y-3">
     <ul v-if="lines.length || started.length" class="space-y-1.5">
       <EditorAlbumCreditsLine
         v-for="line in lines"

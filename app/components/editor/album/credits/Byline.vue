@@ -36,12 +36,12 @@ const preview = computed(() => {
 </script>
 
 <template>
-  <section class="rounded-lg border border-line">
-    <p class="flex flex-wrap items-baseline gap-x-2 border-b border-line bg-sunken px-3 py-1.5">
-      <span class="text-xs font-semibold text-title">{{ t('editor.credits.byline_title') }}<EditorHelp id="credits.byline" /></span>
-      <span class="text-[11px] text-meta">{{ t('editor.credits.byline_hint') }}</span>
-    </p>
-    <div class="space-y-2 px-3 py-2.5">
+  <EditorAlbumCreditsBlock name="byline" :title="t('editor.credits.byline_title')" scope="album">
+    <template #hint>
+      <p>{{ t('editor.credits.byline_hint') }}</p>
+      <EditorAlbumCreditsBylineGuide class="mt-2" />
+    </template>
+    <div class="space-y-2">
       <EditorAlbumCreditsRoleRow
         v-for="role in roles"
         :key="role"
@@ -58,5 +58,5 @@ const preview = computed(() => {
         <span v-else class="text-meta">{{ t('editor.album.byline_none') }}</span>
       </p>
     </div>
-  </section>
+  </EditorAlbumCreditsBlock>
 </template>

@@ -123,40 +123,28 @@ const help: Record<string, EditorHelpEntry> = {
   },
 
   // ── 参与创作的人
-  'credits.byline': {
-    text: '标题下面那一行来自这里：有发行时显示所有发行方，没有时显示艺术家，有好几位时卡片上显示 Various Artists。',
-    rows: [
-      ['同人专辑', '社团同时填进艺术家和发行'],
-      ['商业专辑', '艺术家填封面上的歌手或乐队，发行填唱片公司'],
-      ['厂牌等', '点下面的按钮展开，显示在「简介」卡片的表格里'],
-    ],
-    where: '专辑页标题下面、列表和卡片，下方「列表显示」是实时预览。',
-    mock: { page: 'hero', mark: 'byline' },
-  },
-  'credits.contributors': {
-    text: '两种填法改的是同一份资料，可以随时切换。',
-    rows: [
-      ['按角色', '歌词本上的一行就是这里的一行。一行可以有好几个角色和好几个人，点曲号选他们参与的曲目，不选就是整张专辑'],
-      ['按曲目', '每首曲目一张卡片，适合歌词本逐首列出人员的情况'],
-    ],
-    where: '专辑页「参与创作的人」卡片和曲目表。',
-    mock: { page: 'track', mark: 'credit' },
-  },
   'person.credited_as': {
     text: '实物上印的名字和艺术家的名字不同时才填，相同就留空。',
-    rows: [['Yuki Kajiura', '库里叫 梶浦由記：选 梶浦由記，这里填 Yuki Kajiura']],
+    rows: [
+      ['Yuki Kajiura', '库里叫 梶浦由記：选 梶浦由記，这里填 Yuki Kajiura'],
+      ['リコ(CV:富田美憂)', '选声优 富田美憂，这里照印的写'],
+    ],
     where: '页面上显示这个名字，链接仍然指向艺术家。',
     mock: { page: 'track', mark: 'credit' },
   },
   'person.detail': {
-    text: '补充这个人具体做了什么：演奏的乐器，或者声优所配的角色。',
-    examples: ['Piano', 'Violin', '星野あかり'],
+    text: '补充这个人具体负责的部分，比如声部。',
+    examples: ['1st Violin', '2nd Violin'],
     where: '人名标签里，名字后面的小字。',
     mock: { page: 'track', mark: 'detail' },
   },
   'person.role_label': {
     text: '实物上印的职务比角色字典细时填。角色选最接近的一个，这里照印刷的写。',
-    rows: [['Graphic Designer', '角色选「设计」，这里填 Graphic Designer']],
+    rows: [
+      ['Logo Design', '角色选「设计」'],
+      ['Flute', '乐器没有专属角色时，角色选「演奏」'],
+      ['Crossfade Video', '字典里没有合适的角色时，角色选「其他」'],
+    ],
     where: '页面上用这段文字代替角色名，所有语言都显示原文。',
     mock: { page: 'track', mark: 'role_label' },
   },

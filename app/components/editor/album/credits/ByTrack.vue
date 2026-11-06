@@ -6,11 +6,10 @@ import { addCredit, changeCreditRole, orderedTracks, patchCredits, removeCredits
 import { copyTrackCredits, creditsOn, sameTrackCredits } from '~/utils/creditLines'
 
 /**
- * 按曲目: the whole album's credits (outside the byline block) first, then a card per track with its credits by
- * role, the way a booklet that lists each track's staff reads. A track can take over the one before's credits in a
- * click. A role's name changes the role of the whole row; on the whole album not to 艺术家, which is the byline
- * block's. Rows being started (the role picked first) are kept here, per track, until their first person. On a track,
- * each person also picks the credit it belongs to (a 客串's 艺术家, utils/artistLine).
+ * 按曲目: a card per track with its credits by role, the way a booklet that lists each track's staff reads. A track
+ * can take over the one before's credits in a click. A role's name changes the role of the whole row. Rows being
+ * started (the role picked first) are kept here, per track, until their first person. Each person also picks the
+ * credit it belongs to (a 客串's 艺术家, utils/artistLine).
  */
 const { t } = useI18n()
 const editor = useAlbumEditor()
@@ -19,24 +18,22 @@ const { roleOrder } = useCatalogSchema()
 const album = computed(() => editor.album.value)
 
 const tracks = computed(() => orderedTracks(album.value))
-const albumCredits = computed(() => creditsOn(album.value, null, roleOrder))
 const trackCredits = (id: RowId) => creditsOn(album.value, id, roleOrder)
 const trackRows = (id: RowId) => album.value.credits.filter(row => String(row.track_id) === String(id))
 const setParent = (row: AlbumCreditRow, parent: AlbumCreditRow | null) => setCreditParent(album.value, row, parent)
 
-/** Rows being started, by track ('album' for the whole album). */
+/** Rows being started, by track. */
 const started = reactive<Record<string, string[] | undefined>>({})
-const keyOf = (trackId: RowId | null) => trackId === null ? 'album' : String(trackId)
-const firstPerson = (trackId: RowId | null, person: CreditPerson) => {
-  for (const role of started[keyOf(trackId)] ?? []) addCredit(album.value, { ...person, role }, trackId === null ? null : [trackId])
+const keyOf = (trackId: RowId) => String(trackId)
+const firstPerson = (trackId: RowId, person: CreditPerson) => {
+  for (const role of started[keyOf(trackId)] ?? []) addCredit(album.value, { ...person, role }, [trackId])
   started[keyOf(trackId)] = undefined
 }
 
-const add = (trackId: RowId | null, role: string, person: CreditPerson) => addCredit(album.value, { ...person, role }, trackId === null ? null : [trackId])
+const add = (trackId: RowId, role: string, person: CreditPerson) => addCredit(album.value, { ...person, role }, [trackId])
 const update = (row: AlbumCreditRow, patch: Partial<CreditPerson>) => patchCredits(album.value, [row], patch)
 const remove = (row: AlbumCreditRow) => removeCredits(album.value, [row])
 const changeRole = (rows: AlbumCreditRow[], role: string) => changeCreditRole(album.value, rows, role)
-const ALBUM_EXCLUDED_ROLES = ['artist']
 
 const canCopy = (index: number) => {
   const previous = tracks.value[index - 1]
@@ -57,28 +54,6 @@ const copyPrevious = async (index: number) => {
 
 <template>
   <div class="space-y-3">
-    <section class="rounded-lg border border-line">
-      <p class="flex items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-xs font-semibold text-title">
-        <Icon name="lucide:disc-3" class="size-3.5 text-meta" />{{ t('editor.credits.whole_album') }}
-      </p>
-      <div class="space-y-2 px-3 py-2">
-        <EditorAlbumCreditsRoleRow
-          v-for="item in albumCredits"
-          :key="item.role"
-          :role="item.role"
-          :rows="item.rows"
-          changeable
-          :exclude="ALBUM_EXCLUDED_ROLES"
-          @add="add(null, item.role, $event)"
-          @role="changeRole(item.rows, $event)"
-          @update="update"
-          @remove="remove"
-        />
-        <EditorAlbumCreditsRoleRow v-if="started.album" v-model:roles="started.album" @add="firstPerson(null, $event)" @cancel="started.album = undefined" />
-        <EditorAlbumCreditsStartRow v-else @start="started.album = []" />
-      </div>
-    </section>
-
     <p v-if="!tracks.length" class="rounded-lg border border-dashed border-line px-4 py-4 text-center text-xs text-meta">{{ t('editor.credits.no_tracks_hint') }}</p>
     <section v-for="(track, index) in tracks" :key="String(track.id)" class="rounded-lg border border-line">
       <p class="flex items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-xs">

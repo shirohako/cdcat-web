@@ -1,25 +1,7 @@
 <template>
   <div aria-hidden="true" class="rounded-md bg-card p-2 text-[10.5px] leading-4 text-body ring-1 ring-line">
-    <!-- 专辑页的标题区 -->
-    <div v-if="mock.page === 'hero'" class="flex gap-2.5">
-      <span class="size-14 shrink-0 rounded-sm bg-linear-to-br from-indigo-300 to-pink-300" :class="on('cover')" />
-      <div class="min-w-0 space-y-0.5">
-        <p class="flex gap-1">
-          <span class="rounded-sm bg-primary px-1 font-semibold text-on-primary">专辑</span>
-          <span class="rounded-sm px-1 ring-1 ring-inset ring-line" :class="on('tags')">同人创作</span>
-        </p>
-        <p><span class="text-[13px] font-bold leading-5 text-title" :class="on('title')">星屑のアトラス</span></p>
-        <p><span class="font-semibold text-title" :class="on('byline')">ステラノート</span></p>
-        <p class="flex flex-wrap gap-1">
-          <span class="rounded-sm bg-black/[0.05] px-1 font-mono dark:bg-white/[0.08]" :class="on('catalog')">STLN-0012</span>
-          <span class="rounded-sm bg-black/[0.05] px-1 dark:bg-white/[0.08]" :class="on('date')">2026-10-25</span>
-          <span class="rounded-sm bg-black/[0.05] px-1 dark:bg-white/[0.08]" :class="on('event')">M3-2026 Autumn</span>
-        </p>
-      </div>
-    </div>
-
     <!-- 发行卡片里的一行 -->
-    <div v-else-if="mock.page === 'edition'" class="flex justify-between gap-3">
+    <div v-if="mock.page === 'edition'" class="flex justify-between gap-3">
       <div class="min-w-0 space-y-0.5">
         <p class="flex flex-wrap items-center gap-1">
           <span class="font-semibold text-title" :class="on('name')">初回限定盤</span>
@@ -59,7 +41,7 @@
       <p class="flex flex-wrap items-center gap-1 pl-5">
         <span class="rounded-sm bg-blue-100 px-1 font-semibold text-blue-700 dark:bg-blue-400/20 dark:text-blue-200" :class="on('role_label')">{{ mock.mark === 'role_label' ? 'Graphic Designer' : '作曲' }}</span>
         <span class="rounded-sm bg-black/[0.05] px-1 text-title dark:bg-white/[0.08]" :class="on('credit')">ミナト</span>
-        <span class="rounded-sm bg-black/[0.05] px-1 text-title dark:bg-white/[0.08]" :class="on('detail')">Piano</span>
+        <span class="rounded-sm bg-black/[0.05] px-1 text-title dark:bg-white/[0.08]" :class="on('detail')">1st Violin</span>
         <span class="ml-1 text-meta" :class="on('original')">原曲 星の記憶</span>
       </p>
     </div>

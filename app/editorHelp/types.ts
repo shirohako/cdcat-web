@@ -1,6 +1,5 @@
 /** A small drawing of a part of the album page, with the piece the field fills marked. */
 export type EditorHelpMock =
-  | { page: 'hero', mark: 'cover' | 'tags' | 'title' | 'byline' | 'catalog' | 'date' | 'event' }
   | { page: 'edition', mark: 'name' | 'limited' | 'hires' | 'sold_out' | 'catalog' | 'note' | 'format' | 'discs' | 'region' | 'date' | 'price' }
   | { page: 'track', mark: 'disc_title' | 'disc_format' | 'number' | 'title' | 'duration' | 'instrumental' | 'credit' | 'detail' | 'role_label' | 'original' }
 
