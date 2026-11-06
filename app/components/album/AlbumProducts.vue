@@ -8,28 +8,19 @@
       </template>
     </UiSectionTitle>
 
-    <!-- Editions, then bonuses, each a table with a head so editions line up and compare; the rows take a neutral grey
-         on hover. Columns nobody fills are left out; on a narrow screen a table scrolls sideways. -->
+    <!-- Editions, then bonuses, each a table without a head, so editions still line up and compare; the rows take a
+         neutral grey on hover. An edition has too many facts for a column each, so they pair up on two lines: the catalog number under
+         the name, the discs under the format, the date under the region, the price's kind under the amount. Columns nobody
+         fills are left out; on a phone a table scrolls sideways. -->
     <template v-if="products.length">
       <h3 v-if="bonuses.length" class="px-5 pt-2 text-xs font-semibold text-meta">{{ $t('album.section.products') }}</h3>
       <div class="overflow-x-auto px-5 pt-1" :class="bare ? 'pb-1' : 'pb-4'">
         <table class="w-full border-collapse text-[13px]">
-          <thead>
-            <tr>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.edition') }}</th>
-              <th v-if="columns.catalog" class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.catalog') }}</th>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.format') }}</th>
-              <th v-if="columns.discs" class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.discs') }}</th>
-              <th v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.region') }}</th>
-              <th v-if="columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.products.columns.date') }}</th>
-              <th v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta text-right">{{ $t('album.products.columns.price') }}</th>
-            </tr>
-          </thead>
           <tbody>
             <tr v-for="product in sortedProducts" :key="product.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
-              <td class="border-b border-line px-2.5 py-2 align-middle">
-                <div class="flex min-w-48 items-center gap-2.5">
-                  <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="product.name || formatEditionType(product.edition_type)" class="size-8 shrink-0 rounded-md object-cover">
+              <td class="border-b border-line px-2.5 py-2.5 align-top">
+                <div class="flex min-w-44 items-start gap-2.5">
+                  <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="product.name || formatEditionType(product.edition_type)" class="size-10 shrink-0 rounded-md object-cover">
                   <div class="min-w-0">
                     <p class="flex flex-wrap items-center gap-1.5">
                       <span class="font-semibold text-title">{{ product.name || formatEditionType(product.edition_type) }}</span>
@@ -37,27 +28,28 @@
                       <span v-if="product.is_hires" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-violet-100 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200">Hi-Res</span>
                       <span v-if="!product.is_available" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-black/[0.05] text-meta dark:bg-white/[0.08]">{{ $t('content_display.out_of_print') }}</span>
                     </p>
+                    <p v-if="product.catalog_number" class="mt-0.5 font-mono text-xs text-meta">{{ product.catalog_number }}</p>
                     <p v-if="product.edition_type === 'limited' && product.limited_name" class="mt-0.5 text-[11px] text-meta">{{ product.limited_name }}</p>
                     <p v-if="product.note" class="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-body">{{ product.note }}</p>
                   </div>
                 </div>
               </td>
-              <td v-if="columns.catalog" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle font-mono text-xs text-body">{{ product.catalog_number || '—' }}</td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ formatLabel(product) }}</td>
-              <td v-if="columns.discs" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ product.disc_ids.map(id => discNumbers.get(id)).filter(Boolean).map(n => `Disc ${n}`).join(', ') || '—' }}</td>
-              <!-- Flag + English name; long names ("United Arab Emirates") are cut at the column's width and shown whole on hover. -->
-              <td v-if="columns.region" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">
+              <td class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-body">
+                {{ formatLabel(product) }}
+                <p v-if="columns.discs && discsLabel(product.disc_ids)" class="mt-0.5 text-xs text-meta">{{ discsLabel(product.disc_ids) }}</p>
+              </td>
+              <td v-if="columns.region || columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-body">
+                <!-- Flag + English name; long names ("United Arab Emirates") are cut at the column's width and shown whole on hover. -->
                 <template v-if="product.region">
                   <UiTooltip v-if="regionEnglishName(product.region).length > LONG_REGION" :text="regionEnglishName(product.region)">
                     <span class="flex max-w-36 items-center gap-1.5"><CommonFlag :code="product.region" /><span class="min-w-0 truncate">{{ regionEnglishName(product.region) }}</span></span>
                   </UiTooltip>
                   <span v-else class="flex items-center gap-1.5"><CommonFlag :code="product.region" />{{ regionEnglishName(product.region) }}</span>
                 </template>
-                <template v-else>—</template>
+                <p v-if="product.release_date" class="text-xs tabular-nums text-meta" :class="product.region && 'mt-0.5'">{{ formatDate(product.release_date, product.release_date_precision) }}</p>
               </td>
-              <td v-if="columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle tabular-nums text-body">{{ product.release_date ? formatDate(product.release_date, product.release_date_precision) : '—' }}</td>
-              <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-right">
-                <!-- Several prices keep the row one line: the first in display order, and all of them behind a button. -->
+              <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-right">
+                <!-- Several prices keep the cell one line: the first in display order, and all of them behind a button. -->
                 <div v-if="product.prices.length > 1" class="flex items-center justify-end gap-2">
                   <span class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]!) }}</span>
                   <UiPopover placement="bottom-end" :label="$t('album.products.all_prices')" class="w-max p-3!">
@@ -75,12 +67,10 @@
                     </table>
                   </UiPopover>
                 </div>
-                <p v-else-if="product.prices[0]" class="leading-5">
-                  <span v-if="labelled(product.prices[0])" class="mr-1.5 text-[11px] text-meta">{{ priceLabel(product.prices[0]) }}</span>
-                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]) }}</span>
-                  <span v-if="product.prices[0].tax_included !== null" class="ml-1 text-[11px] text-meta">{{ taxLabel(product.prices[0].tax_included) }}</span>
-                </p>
-                <span v-else class="text-body">—</span>
+                <template v-else-if="product.prices[0]">
+                  <p class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]) }}</p>
+                  <p v-if="priceNote(product.prices[0])" class="ml-auto mt-0.5 max-w-40 whitespace-normal text-[11px] text-meta">{{ priceNote(product.prices[0]) }}</p>
+                </template>
               </td>
             </tr>
           </tbody>
@@ -92,14 +82,6 @@
       <h3 class="px-5 pt-3 text-xs font-semibold text-meta" :class="products.length > 0 && 'border-t border-line'">{{ $t('album.section.bonuses') }}</h3>
       <div class="overflow-x-auto px-5 pb-4 pt-1">
         <table class="w-full border-collapse text-[13px]">
-          <thead>
-            <tr>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.bonuses.columns.bonus') }}</th>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.bonuses.columns.type') }}</th>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.bonuses.columns.channel') }}</th>
-              <th class="whitespace-nowrap border-b border-line px-2.5 py-1.5 text-left text-[11px] font-semibold text-meta">{{ $t('album.bonuses.columns.editions') }}</th>
-            </tr>
-          </thead>
           <tbody>
             <tr v-for="bonus in sortedBonuses" :key="bonus.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
               <td class="border-b border-line px-2.5 py-2 align-middle">
@@ -124,7 +106,7 @@
               <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle"><span class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-pink-100 text-pink-700 dark:bg-pink-400/20 dark:text-pink-200">{{ enumLabel('bonus_type', bonus.type) }}</span></td>
               <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">
                 <NuxtLink v-if="bonus.event" :to="`/albums?event=${bonus.event.id}`" class="transition-colors hover:text-primary">{{ bonus.event.name }}</NuxtLink>
-                <template v-else>{{ [bonus.shop, bonus.availability && enumLabel('limited_rule', bonus.availability)].filter(Boolean).join(' · ') || '—' }}</template>
+                <template v-else>{{ [bonus.shop, bonus.availability && enumLabel('limited_rule', bonus.availability)].filter(Boolean).join(' · ') }}</template>
               </td>
               <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ bonus.product_ids.length ? editionNames(bonus.product_ids) : $t('album.bonuses.all_editions') }}</td>
             </tr>
@@ -170,9 +152,8 @@ const counts = computed(() => [
   props.bonuses.length > 1 && t('content_display.bonuses', { count: props.bonuses.length }),
 ].filter(Boolean).join(' · '))
 
-/** Columns shown only when some edition fills them (the discs one only when the album has several discs). */
+/** Columns shown only when some edition fills them; `discs` is a line, only when the album has several discs. */
 const columns = computed(() => ({
-  catalog: props.products.some(product => product.catalog_number),
   discs: discNumbers.value.size > 1,
   region: props.products.some(product => product.region),
   date: props.products.some(product => product.release_date),
@@ -189,6 +170,17 @@ const editionNames = (ids: number[]) => ids
 const bonusImage = (bonusId: number) => props.images.find(image => image.bonus_id === bonusId && image.image)?.image?.thumbnail_url ?? null
 
 const discNumbers = computed(() => new Map(props.discs.map(disc => [disc.id, disc.position])))
+/** "Disc 1–3" or "Disc 1, 3": an edition's discs, neighbours joined. */
+const discsLabel = (discIds: number[]) => {
+  const numbers = [...new Set(discIds.map(id => discNumbers.value.get(id)).filter(number => number !== undefined))].sort((a, b) => a - b)
+  const runs: Array<[number, number]> = []
+  for (const number of numbers) {
+    const last = runs.at(-1)
+    if (last && last[1] === number - 1) last[1] = number
+    else runs.push([number, number])
+  }
+  return runs.length ? `Disc ${runs.map(([from, to]) => from === to ? from : `${from}–${to}`).join(', ')}` : ''
+}
 /** Covers that belong to one edition, e.g. the regular edition's own jacket. */
 const editionCovers = computed(() => Object.fromEntries(props.images
   .filter(image => image.kind === 'cover' && image.product_id && image.image)
@@ -201,8 +193,8 @@ const mediumLabel = (medium: MediumType) => {
 };
 
 
-/** "2CD+BD · 实体版"; a digital edition's "DL" would only repeat 数字版. */
-const formatLabel = (product: AlbumProduct) => [product.medium !== 'digital' && product.format_label, mediumLabel(product.medium)].filter(Boolean).join(' · ');
+/** "2CD+BD" says it is physical by itself; 实体版 is left for an edition without a format, 数字版 for every digital one (its "DL" would only repeat it). */
+const formatLabel = (product: AlbumProduct) => (product.medium !== 'digital' && product.format_label) || mediumLabel(product.medium);
 
 const formatEditionType = (type: EditionType) => {
   if (type === 'limited') return t('content_display.limited');
@@ -221,6 +213,9 @@ const limitedRuleLabel = (rule: string | null) => {
   return rule ? (map[rule] || '') : '';
 };
 
-/** A lone list price without a note shows only its amount. */
-const labelled = (price: ProductPrice) => price.kind !== 'list' || !!price.note;
+/** What goes under a lone price: its kind (a list price without a note needs none) and the tax. */
+const priceNote = (price: ProductPrice) => [
+  (price.kind !== 'list' || price.note) && priceLabel(price),
+  price.tax_included !== null && taxLabel(price.tax_included),
+].filter(Boolean).join(' · ')
 </script>

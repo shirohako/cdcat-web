@@ -14,13 +14,13 @@
           <RichContent v-if="album.description" :content="album.description" format="markdown" class="text-body" />
 
           <!-- The album's facts (once the side column's 信息 card) as a table under the text: a faint label column,
-               the attributes as rows of it too. -->
+               the attributes as rows of it too. Whatever the hero already shows stays out of it. -->
           <CatalogInfoTable v-if="hasInfo" :class="album.description && 'mt-4'">
-            <CatalogInfoRow v-if="album.titles.length" :label="$t('catalog.other_names')">
-              <CatalogTitleList :titles="album.titles" />
+            <CatalogInfoRow v-if="otherTitles.length" :label="$t('catalog.other_names')">
+              <CatalogTitleList :titles="otherTitles" />
             </CatalogInfoRow>
 
-            <!-- Who publishes, labels, sells, makes and plans the album, each name once with all its roles -->
+            <!-- Who labels, sells, makes and plans the album, each name once with all its roles -->
             <CatalogInfoRow v-if="releasers.length" :label="$t('album.info.people')">
               <ul class="space-y-1">
                 <li v-for="releaser in releasers" :key="releaser.key" class="flex items-baseline gap-2">
@@ -29,10 +29,6 @@
                   <span class="shrink-0 text-[11px] text-meta">{{ releaser.roles.map(roleName).join(', ') }}</span>
                 </li>
               </ul>
-            </CatalogInfoRow>
-
-            <CatalogInfoRow v-if="album.release_event" :label="$t('album.info.release_event')">
-              <NuxtLink :to="`/albums?event=${album.release_event.id}`" class="text-title transition-colors hover:text-primary">{{ album.release_event.name }}</NuxtLink>
             </CatalogInfoRow>
 
             <CatalogAttributeList v-if="album.attributes.length" :attributes="album.attributes" rows />
@@ -70,17 +66,24 @@ import type { Album } from '~/types/album'
 import { ChevronDown, ChevronUp, FileText } from '@lucide/vue'
 import { RELEASE_ROLES } from '~/types/album'
 
-/** The album's 简介 and, under it, its facts: other names, who releases it, the event, attributes, entries, series. */
+/** The album's 简介 and, under it, the facts the hero leaves out: other names, labels and the like, attributes, entries, series. */
 const props = defineProps<{ album: Album }>()
 
 const { roleName } = useCatalogSchema()
+const { localName } = useCatalogDisplay()
 const { albumRelationLabel } = useEntryDisplay()
 
-/** The album-wide 署名与发行 credits but 艺术家 (the hero shows those), grouped by name, roles in their fixed order. */
+/** The names but the two the hero shows: the original title and the one for this language. */
+const otherTitles = computed(() => {
+  const shown = [props.album.title, localName(props.album.title, props.album.titles)]
+  return props.album.titles.filter(title => !shown.includes(title.title))
+})
+
+/** The album-wide 署名与发行 credits but 艺术家 and 发行 (the hero shows those), grouped by name, roles in their fixed order. */
 const releasers = computed(() => {
   const rows = new Map<string, { key: string, id: number | null, name: string, roles: string[] }>()
   for (const credit of props.album.credits) {
-    if (credit.role === 'artist' || !(RELEASE_ROLES as readonly string[]).includes(credit.role)) continue
+    if (credit.role === 'artist' || credit.role === 'publisher' || !(RELEASE_ROLES as readonly string[]).includes(credit.role)) continue
     const name = credit.credited_as || credit.artist?.name || ''
     const key = credit.artist ? `id:${credit.artist.id}:${name}` : `name:${name}`
     const row = rows.get(key) ?? { key, id: credit.artist?.id ?? null, name, roles: [] }
@@ -120,6 +123,6 @@ const toggle = () => {
   }
 }
 
-const hasInfo = computed(() => Boolean(props.album.titles.length || releasers.value.length || props.album.release_event
+const hasInfo = computed(() => Boolean(otherTitles.value.length || releasers.value.length
   || props.album.attributes.length || props.album.entries.length || props.album.franchises.length))
 </script>

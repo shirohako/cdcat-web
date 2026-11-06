@@ -88,7 +88,6 @@ export interface TracklistRow {
   duration: string
   instrumental: boolean
   isrc: string | null
-  favorites: number
   favorited: boolean
   /** The original and its readings */
   lyrics: number
@@ -215,7 +214,6 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
     duration: helpers.formatDuration(track.duration),
     instrumental: track.is_instrumental,
     isrc: track.isrc,
-    favorites: track.favorites_count,
     favorited: track.is_favorited,
     lyrics: Math.max(0, track.lyrics_count - track.translations_count),
     translations: track.translations_count,

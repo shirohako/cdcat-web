@@ -3,34 +3,41 @@
     <template v-if="canMerge" #actions>
       <UiSegmented v-model="creditsMerge" :items="creditsMerges" size="sm" collapse :label="$t('album.credits_merge.label')" />
     </template>
-    <!-- One row per role, or per set of people, the roles as coloured tags; a hairline list, as a single role looks lost
-         in the 简介 card's booklet layout. -->
+    <!-- 专辑参与人员: the album's own credits, open from the start. One row per role, or per set of people, the roles as
+         coloured tags; a hairline list, as a single role looks lost in the 简介 card's booklet layout. -->
     <div class="px-5 pb-5 pt-2">
-      <CatalogInfoTable v-if="rows.length" variant="lines">
-        <CatalogInfoRow v-for="row in rows" :key="row.key">
-          <template #label>
-            <span class="flex flex-wrap gap-1">
-              <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleName(group.role)" :disabled="!group.role_label">
-                <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
-              </UiTooltip>
-            </span>
-          </template>
-          <!-- Each person a grey tag (a link darkens and takes the theme colour on hover), the note inside it -->
-          <span class="flex flex-wrap gap-1.5">
-            <component
-              :is="person.artistId ? NuxtLink : 'span'"
-              v-for="(person, index) in row.people"
-              :key="index"
-              :to="person.artistId ? `/artists/${person.artistId}` : undefined"
-              class="inline-flex items-center gap-1 rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 text-title transition-colors duration-150 dark:bg-white/[0.08]"
-              :class="person.artistId && 'hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]'"
-            >
-              {{ person.name }}
-              <span v-if="person.detail" class="text-[11px] text-meta">{{ person.detail }}</span>
-            </component>
-          </span>
-        </CatalogInfoRow>
-      </CatalogInfoTable>
+      <div v-if="rows.length">
+        <div class="-mx-5 flex px-3">
+          <AlbumCreditsFold :open="albumOpen" :title="$t('album.album_people.title')" :count="albumPeopleCount" @click="albumOpen = !albumOpen" />
+        </div>
+        <UiCollapse :open="albumOpen">
+          <CatalogInfoTable variant="lines" class="pt-1">
+            <CatalogInfoRow v-for="row in rows" :key="row.key">
+              <template #label>
+                <span class="flex flex-wrap gap-1">
+                  <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleName(group.role)" :disabled="!group.role_label">
+                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
+                  </UiTooltip>
+                </span>
+              </template>
+              <!-- Each person a grey tag (a link darkens and takes the theme colour on hover), the note inside it -->
+              <span class="flex flex-wrap gap-1.5">
+                <component
+                  :is="person.artistId ? NuxtLink : 'span'"
+                  v-for="(person, index) in row.people"
+                  :key="index"
+                  :to="person.artistId ? `/artists/${person.artistId}` : undefined"
+                  class="inline-flex items-center gap-1 rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 text-title transition-colors duration-150 dark:bg-white/[0.08]"
+                  :class="person.artistId && 'hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]'"
+                >
+                  {{ person.name }}
+                  <span v-if="person.detail" class="text-[11px] text-meta">{{ person.detail }}</span>
+                </component>
+              </span>
+            </CatalogInfoRow>
+          </CatalogInfoTable>
+        </UiCollapse>
+      </div>
 
       <!-- 曲目参与人员: the tracks' credits, folded under the album's own; open from the start when the album has none of
            its own. By person, each shows their roles (with the tracks of each) or their tracks (with the roles on each in
@@ -45,16 +52,7 @@
           class="-mx-5 flex items-center gap-2 px-3 transition-shadow duration-150"
           :class="peopleOpen && ['sticky top-14 z-10 bg-card', peopleStuck && 'shadow-[0_1px_0_0_var(--color-line)]']"
         >
-          <button
-            type="button"
-            class="flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-[13px] font-semibold text-title transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
-            :aria-expanded="peopleOpen"
-            @click="togglePeople"
-          >
-            <ChevronRight :size="15" class="shrink-0 text-meta transition-transform duration-200" :class="peopleOpen && 'rotate-90'" />
-            {{ $t('album.track_people.title') }}
-            <span class="font-normal text-meta">{{ $t('album.track_people.count', { count: people.length }) }}</span>
-          </button>
+          <AlbumCreditsFold :open="peopleOpen" :title="$t('album.track_people.title')" :count="people.length" @click="togglePeople" />
           <UiSegmented v-if="peopleOpen" v-model="peopleView" :items="peopleViews" :label="$t('album.track_people.view_label')" size="sm" class="mr-2 shrink-0" />
         </div>
         <UiCollapse :open="peopleOpen" lazy>
@@ -120,23 +118,7 @@
               </span>
             </CatalogInfoRow>
           </CatalogInfoTable>
-          <!-- Floats at the bottom of the screen while the list is in view and settles at its end; only the pill takes clicks.
-               In the inverted theme like the tooltips, so it reads as a control above the page; a light shadow; on hover a slightly lighter fill and the arrow below. -->
-          <div v-if="peopleLong" class="pointer-events-none sticky bottom-5 z-10 flex justify-center pt-4">
-            <UiButton
-              :data-theme="pillTheme"
-              class="group/fold pointer-events-auto h-7 min-h-7 gap-1 rounded-md border-0 bg-popover pl-2 pr-2.5 text-[11.5px] font-semibold text-title shadow-[0_2px_8px_-2px_oklch(0_0_0/0.25)] ring-1 ring-line transition-colors duration-150 hover:bg-card-hover"
-              @click="togglePeople"
-            >
-              <!-- On hover the arrow slides up out of its slot and a second one rises in from below, once, like the list
-                   folding upwards; reduced motion keeps the arrow still. -->
-              <span class="relative size-[13px] shrink-0 overflow-hidden" aria-hidden="true">
-                <ChevronUp :size="13" class="absolute inset-0 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/fold:-translate-y-full motion-reduce:transition-none motion-reduce:group-hover/fold:translate-y-0" />
-                <ChevronUp :size="13" class="absolute inset-0 translate-y-full transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/fold:translate-y-0 motion-reduce:hidden" />
-              </span>
-              {{ $t('album.track_people.collapse') }}
-            </UiButton>
-          </div>
+          <AlbumFoldPill v-if="peopleLong" :label="$t('album.track_people.collapse')" @click="togglePeople" />
         </UiCollapse>
       </div>
     </div>
@@ -146,7 +128,7 @@
 <script setup lang="ts">
 import type { AlbumDisc } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
-import { ChevronRight, ChevronUp, Combine, Rows3, Users } from '@lucide/vue'
+import { Combine, Rows3, Users } from '@lucide/vue'
 import { NuxtLink } from '#components'
 import { RELEASE_ROLES } from '~/types/album'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
@@ -193,6 +175,10 @@ const mergedRows = computed(() => mergeCreditRoles(groups.value))
 const canMerge = computed(() => mergedRows.value.length < groups.value.length)
 const rows = computed(() => creditsMerge.value === 'merged' ? mergedRows.value : groups.value.map(group => ({ key: group.key, roles: [group], people: group.people })))
 
+/** The album's own list starts open; it is folded by hand, per visit. */
+const albumOpen = ref(true)
+const albumPeopleCount = computed(() => new Set(groups.value.flatMap(group => group.people.map(person => person.artistId ?? person.name))).size)
+
 const people = computed(() => trackPeople(props.discs ?? [], roleOrder))
 const roleGroups = computed(() => trackRoleGroups(people.value, roleOrder))
 const peopleOpen = ref(!groups.value.length)
@@ -206,22 +192,10 @@ const togglePeople = () => {
   hold(520, peopleHeader.value)
   peopleOpen.value = !peopleOpen.value
 }
-/** Past this many rows the list also has the floating 收起 button, in the theme opposite the page's. */
-const { theme } = useAppearance()
-const pillTheme = computed(() => theme.value === 'dark' ? 'light' : 'dark')
+/** Past this many rows the list also has the floating 收起 button. */
 const LONG_LIST = 8
 const peopleLong = computed(() => (peopleView.value === 'role_groups' ? roleGroups.value.length : people.value.length) > LONG_LIST)
-/** Whether the header is stuck under the navbar: the empty line above it has scrolled up behind the navbar. */
-const peopleStuck = ref(false)
-let stuckObserver: IntersectionObserver | null = null
-onMounted(() => {
-  if (!peopleSentinel.value) return
-  stuckObserver = new IntersectionObserver(([entry]) => {
-    peopleStuck.value = !!entry && !entry.isIntersecting && entry.boundingClientRect.top < 57
-  }, { rootMargin: '-57px 0px 0px 0px' })
-  stuckObserver.observe(peopleSentinel.value)
-})
-onBeforeUnmount(() => stuckObserver?.disconnect())
+const peopleStuck = useStuckHeader(peopleSentinel)
 
 const VIEW_KEY = 'cdcat:album:track-people-view'
 // The page is rendered on the server too, so the stored choice is read once mounted.

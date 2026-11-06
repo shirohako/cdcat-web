@@ -34,6 +34,9 @@
       "merged": "역할 합치기",
       "split": "나눠서 보기"
     },
+    "album_people": {
+      "title": "앨범 참여자"
+    },
     "track_people": {
       "title": "곡별 참여자",
       "count": "{count}명",
@@ -46,8 +49,8 @@
     },
     "section": {
       "description": "소개",
-      "products": "에디션",
-      "products_bonuses": "에디션·특전",
+      "products": "발매",
+      "products_bonuses": "발매·특전",
       "bonuses": "특전",
       "credits": "크레딧",
       "tracklist": "수록곡",
@@ -119,7 +122,6 @@
         "title": "제목",
         "duration": "재생 시간",
         "lyrics": "가사",
-        "favorites": "좋아요",
         "others": "기타 크레딧"
       },
       "language_none": "아직 다른 언어로 된 곡 제목이 없어요"
@@ -151,30 +153,14 @@
       "collapse": "접기"
     },
     "info": {
-      "release_event": "발매 행사",
       "people": "발매·유통"
     },
     "products": {
-      "columns": {
-        "edition": "에디션",
-        "catalog": "품번",
-        "format": "포맷",
-        "discs": "수록 디스크",
-        "region": "지역",
-        "date": "발매일",
-        "price": "가격"
-      },
       "all_prices": "전체 가격",
       "all_prices_count": "전체 {count}"
     },
     "bonuses": {
-      "all_editions": "모든 에디션",
-      "columns": {
-        "bonus": "이름",
-        "type": "종류",
-        "channel": "구매처",
-        "editions": "대상 에디션"
-      }
+      "all_editions": "모든 에디션"
     },
     "links": {
       "show_all": "링크 {count}개 모두 보기",

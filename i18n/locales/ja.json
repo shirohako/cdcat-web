@@ -34,6 +34,9 @@
       "merged": "役職をまとめる",
       "split": "分けて表示"
     },
+    "album_people": {
+      "title": "アルバムのクレジット"
+    },
     "track_people": {
       "title": "曲ごとのクレジット",
       "count": "{count} 人",
@@ -46,8 +49,8 @@
     },
     "section": {
       "description": "概要",
-      "products": "商品",
-      "products_bonuses": "商品・特典",
+      "products": "リリース",
+      "products_bonuses": "リリース・特典",
       "bonuses": "特典",
       "credits": "クレジット",
       "tracklist": "トラックリスト",
@@ -119,7 +122,6 @@
         "title": "タイトル",
         "duration": "時間",
         "lyrics": "歌詞",
-        "favorites": "お気に入り",
         "others": "その他のクレジット"
       },
       "language_none": "ほかの言語のタイトルはまだありません"
@@ -151,30 +153,14 @@
       "collapse": "閉じる"
     },
     "info": {
-      "release_event": "頒布イベント",
       "people": "発売"
     },
     "products": {
-      "columns": {
-        "edition": "形態",
-        "catalog": "品番",
-        "format": "仕様",
-        "discs": "収録",
-        "region": "地域",
-        "date": "発売日",
-        "price": "価格"
-      },
       "all_prices": "すべての価格",
       "all_prices_count": "すべて {count}"
     },
     "bonuses": {
-      "all_editions": "全形態",
-      "columns": {
-        "bonus": "名称",
-        "type": "種類",
-        "channel": "入手先",
-        "editions": "対象形態"
-      }
+      "all_editions": "全形態"
     },
     "links": {
       "show_all": "すべて表示（{count}件）",

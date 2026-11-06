@@ -18,7 +18,7 @@ const CORE_CATEGORIES = ['composition', 'lyrics', 'arrangement', 'vocals']
 
 type Head = { label: string, category: string, role: string }
 type Column =
-  | { kind: 'number' | 'title' | 'others' | 'lyrics' | 'heart' | 'favorites' | 'duration' }
+  | { kind: 'number' | 'title' | 'others' | 'lyrics' | 'heart' | 'duration' }
   | { kind: 'key', which: 'lead' | 'maker', head: Head }
   | { kind: 'category', head: Head }
 
@@ -47,7 +47,7 @@ const columnsOf = (disc: TracklistDisc): Column[] => {
     if (disc.roles.some(role => !CORE_CATEGORIES.includes(role.category))) columns.push({ kind: 'others' })
   }
   if (props.density !== 'compact' && sung) columns.push({ kind: 'lyrics' })
-  columns.push({ kind: props.density === 'full' ? 'favorites' : 'heart' }, { kind: 'duration' })
+  columns.push({ kind: 'heart' }, { kind: 'duration' })
   return columns
 }
 const columns = computed(() => new Map(props.discs.map(disc => [disc.id, columnsOf(disc)])))
@@ -64,7 +64,6 @@ const CELL_CLASSES: Record<string, string> = {
   title: 'c-title',
   lyrics: 'c-lyrics w-px whitespace-nowrap',
   heart: 'c-heart w-px !px-0.5',
-  favorites: 'c-heart w-px whitespace-nowrap',
   duration: 'c-duration w-px whitespace-nowrap text-right text-xs/5 tabular-nums',
   key: 'c-people text-[12.5px] text-title',
   category: 'c-people text-[12.5px] text-title',
@@ -85,7 +84,6 @@ const CELL_CLASSES: Record<string, string> = {
                   <template v-else-if="column.kind === 'number'">#</template>
                   <template v-else-if="column.kind === 'title'">{{ t('album.tracklist.columns.title') }}</template>
                   <template v-else-if="column.kind === 'lyrics'">{{ t('album.tracklist.columns.lyrics') }}</template>
-                  <template v-else-if="column.kind === 'favorites'">{{ t('album.tracklist.columns.favorites') }}</template>
                   <template v-else-if="column.kind === 'others'">{{ t('album.tracklist.columns.others') }}</template>
                   <template v-else-if="column.kind === 'duration'">{{ t('album.tracklist.columns.duration') }}</template>
                 </th>
@@ -128,7 +126,6 @@ const CELL_CLASSES: Record<string, string> = {
                   </template>
                   <AlbumTracklistLyrics v-else-if="column.kind === 'lyrics'" :row="row" merged />
                   <AlbumTracklistFavorite v-else-if="column.kind === 'heart'" :row="row" />
-                  <AlbumTracklistFavorite v-else-if="column.kind === 'favorites'" :row="row" count />
                   <span v-else-if="column.kind === 'duration'" :class="row.duration ? 'text-meta' : 'text-faint'">{{ row.duration || '—' }}</span>
                 </td>
               </tr>

@@ -34,6 +34,9 @@
       "merged": "合并职位",
       "split": "分开显示"
     },
+    "album_people": {
+      "title": "专辑参与人员"
+    },
     "track_people": {
       "title": "曲目参与人员",
       "count": "{count} 位",
@@ -46,10 +49,10 @@
     },
     "section": {
       "description": "简介",
-      "products": "产品",
-      "products_bonuses": "产品与特典",
+      "products": "发行",
+      "products_bonuses": "发行与特典",
       "bonuses": "特典",
-      "credits": "制作人员",
+      "credits": "参与创作的人",
       "tracklist": "曲目表",
       "links": "相关链接",
       "articles": "相关文章",
@@ -119,7 +122,6 @@
         "title": "标题",
         "duration": "时长",
         "lyrics": "歌词",
-        "favorites": "收藏",
         "others": "其他人员"
       },
       "language_none": "曲目标题还没有其他语言"
@@ -151,30 +153,14 @@
       "collapse": "收起"
     },
     "info": {
-      "release_event": "发行活动",
       "people": "发行"
     },
     "products": {
-      "columns": {
-        "edition": "版本",
-        "catalog": "编号",
-        "format": "规格",
-        "discs": "收录",
-        "region": "地区",
-        "date": "发售日",
-        "price": "价格"
-      },
       "all_prices": "全部价格",
       "all_prices_count": "全部 {count}"
     },
     "bonuses": {
-      "all_editions": "所有版本",
-      "columns": {
-        "bonus": "名称",
-        "type": "类型",
-        "channel": "渠道",
-        "editions": "适用版本"
-      }
+      "all_editions": "所有版本"
     },
     "links": {
       "show_all": "展开全部 {count} 个链接",

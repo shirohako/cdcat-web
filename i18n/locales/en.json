@@ -34,6 +34,9 @@
       "merged": "Merge roles",
       "split": "Separate roles"
     },
+    "album_people": {
+      "title": "Album credits"
+    },
     "track_people": {
       "title": "Track credits",
       "count": "{count} person | {count} people",
@@ -46,8 +49,8 @@
     },
     "section": {
       "description": "Description",
-      "products": "Products",
-      "products_bonuses": "Products & bonuses",
+      "products": "Release",
+      "products_bonuses": "Release & bonuses",
       "bonuses": "Bonuses",
       "credits": "Credits",
       "tracklist": "Tracklist",
@@ -119,7 +122,6 @@
         "title": "Title",
         "duration": "Length",
         "lyrics": "Lyrics",
-        "favorites": "Favorites",
         "others": "Other credits"
       },
       "language_none": "No other languages for these titles yet"
@@ -151,30 +153,14 @@
       "collapse": "Show less"
     },
     "info": {
-      "release_event": "Released at",
       "people": "Release"
     },
     "products": {
-      "columns": {
-        "edition": "Edition",
-        "catalog": "Catalog no.",
-        "format": "Format",
-        "discs": "Discs",
-        "region": "Region",
-        "date": "Release",
-        "price": "Price"
-      },
       "all_prices": "All prices",
       "all_prices_count": "All {count}"
     },
     "bonuses": {
-      "all_editions": "All editions",
-      "columns": {
-        "bonus": "Name",
-        "type": "Type",
-        "channel": "Where",
-        "editions": "Editions"
-      }
+      "all_editions": "All editions"
     },
     "links": {
       "show_all": "Show all {count} links",

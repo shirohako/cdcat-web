@@ -16,7 +16,7 @@ const keyGroups = (row: TracklistRow) => [row.lead, row.maker].filter(group => g
 // What the 舒适 line and the 完整 block have besides the lyrics buttons. With nothing else, the buttons move to the
 // end of the first line instead, so a track without credits doesn't get a line holding only them.
 const hasComfy = (row: TracklistRow) => Boolean(row.lead || row.maker || row.originals.length)
-const hasNotes = (row: TracklistRow) => Boolean(row.originals.length || row.attributes.length || row.isrc || row.favorites)
+const hasNotes = (row: TracklistRow) => Boolean(row.originals.length || row.attributes.length || row.isrc)
 const hasFull = (row: TracklistRow) => Boolean(row.groups.length || row.subtitle || hasNotes(row))
 const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.instrumental
   && ((density === 'comfy' && !hasComfy(row)) || (density === 'full' && !hasFull(row)))
@@ -81,12 +81,11 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
                   <AlbumTracklistPeople :people="group.people" class="min-w-0" />
                 </div>
               </div>
-              <!-- The notes, each behind a grey label tag like the roles above: 原曲, attributes (BPM …), ISRC, 收藏 -->
+              <!-- The notes, each behind a grey label tag like the roles above: 原曲, attributes (BPM …), ISRC -->
               <div v-if="hasNotes(row)" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12.5px] leading-[1.375rem] text-title" :class="row.groups.length > 0 && 'mt-2'">
                 <span v-if="row.originals.length" class="inline-flex min-w-0 items-center gap-2"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                 <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-2"><AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
                 <span v-if="row.isrc" class="inline-flex items-center gap-2"><AlbumTracklistLabel>ISRC</AlbumTracklistLabel><span class="font-mono text-xs">{{ row.isrc }}</span></span>
-                <span v-if="row.favorites" class="inline-flex items-center gap-2"><AlbumTracklistLabel>{{ t('album.tracklist.columns.favorites') }}</AlbumTracklistLabel><span class="tabular-nums">{{ row.favorites }}</span></span>
               </div>
             </div>
             <AlbumTracklistLyrics :row="row" class="-mt-px" />

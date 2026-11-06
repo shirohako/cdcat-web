@@ -34,6 +34,9 @@
       "merged": "合併職位",
       "split": "分開顯示"
     },
+    "album_people": {
+      "title": "專輯參與人員"
+    },
     "track_people": {
       "title": "曲目參與人員",
       "count": "{count} 位",
@@ -46,10 +49,10 @@
     },
     "section": {
       "description": "簡介",
-      "products": "產品",
-      "products_bonuses": "產品與特典",
+      "products": "發行",
+      "products_bonuses": "發行與特典",
       "bonuses": "特典",
-      "credits": "製作人員",
+      "credits": "參與創作的人",
       "tracklist": "曲目表",
       "links": "相關連結",
       "articles": "相關文章",
@@ -119,7 +122,6 @@
         "title": "標題",
         "duration": "時長",
         "lyrics": "歌詞",
-        "favorites": "收藏",
         "others": "其他人員"
       },
       "language_none": "曲目標題還沒有其他語言"
@@ -151,30 +153,14 @@
       "collapse": "收起"
     },
     "info": {
-      "release_event": "發行活動",
       "people": "發行"
     },
     "products": {
-      "columns": {
-        "edition": "版本",
-        "catalog": "編號",
-        "format": "規格",
-        "discs": "收錄",
-        "region": "地區",
-        "date": "發售日",
-        "price": "價格"
-      },
       "all_prices": "全部價格",
       "all_prices_count": "全部 {count}"
     },
     "bonuses": {
-      "all_editions": "所有版本",
-      "columns": {
-        "bonus": "名稱",
-        "type": "類型",
-        "channel": "通路",
-        "editions": "適用版本"
-      }
+      "all_editions": "所有版本"
     },
     "links": {
       "show_all": "展開全部 {count} 個連結",
