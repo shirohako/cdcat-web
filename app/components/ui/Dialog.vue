@@ -39,8 +39,13 @@
               <slot name="actions" />
               <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 -mt-0.5" @click="close" />
             </header>
-            <div class="min-h-0 overflow-y-auto px-5 pb-5 pt-1"><slot /></div>
-            <footer v-if="$slots.footer" class="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-sunken px-5 py-3">
+            <div class="min-h-0 overflow-y-auto px-5 pt-1" :class="plainFooter ? 'pb-3' : 'pb-5'"><slot /></div>
+            <footer
+              v-if="$slots.footer"
+              class="flex shrink-0 flex-wrap items-center justify-end gap-2 px-5"
+              :class="plainFooter ? 'relative pb-3 pt-1.5' : 'border-t border-line bg-sunken py-3'"
+            >
+              <div v-if="plainFooter" class="pointer-events-none absolute inset-x-0 bottom-full h-3 bg-linear-to-t from-card to-transparent" />
               <slot name="footer" />
             </footer>
           </component>
@@ -71,7 +76,9 @@ withDefaults(defineProps<{
   size?: 'sm' | 'md' | 'ml' | 'lg' | 'xl'
   as?: 'form' | 'div'
   dark?: boolean
-}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div', dark: false })
+  /** The footer without its band: the body fades out just above it. */
+  plainFooter?: boolean
+}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div', dark: false, plainFooter: false })
 
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
