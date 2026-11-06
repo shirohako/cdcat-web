@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-3">
     <div class="flex flex-wrap items-baseline justify-between gap-x-3">
-      <p class="text-sm font-medium text-body">{{ $t('catalog.field.prices') }}</p>
+      <p class="text-sm font-medium text-body">{{ $t('catalog.field.prices') }}<EditorHelp id="edition.prices" /></p>
       <p v-if="rows.length > 1" class="text-[11px] text-meta">{{ $t('editor.editions.price_order_hint') }}</p>
     </div>
     <p v-if="!rows.length" class="text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>

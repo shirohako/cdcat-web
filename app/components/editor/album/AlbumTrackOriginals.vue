@@ -1,6 +1,6 @@
 <template>
   <div v-if="track">
-    <p class="text-xs font-semibold text-body">{{ $t('editor.originals.title') }}</p>
+    <p class="text-xs font-semibold text-body">{{ $t('editor.originals.title') }}<EditorHelp id="track.originals" /></p>
     <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.originals.hint') }}</p>
     <ul v-if="rows.length" class="mb-2 space-y-1.5">
       <li v-for="row in rows" :key="row.id" class="flex flex-wrap items-center gap-2 text-sm">

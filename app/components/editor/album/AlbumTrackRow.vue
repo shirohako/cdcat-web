@@ -38,15 +38,15 @@
     <div v-if="open" class="space-y-4 border-t border-dashed border-line bg-sunken px-4 py-3">
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
-          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.number_label') }}</span>
+          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.number_label') }}<EditorHelp id="track.number_label" /></span>
           <input v-model="track.number_label" class="input input-sm w-20 font-mono" placeholder="A1" maxlength="10">
         </label>
         <label class="block">
-          <span class="mb-1 block text-[11px] text-meta">ISRC</span>
+          <span class="mb-1 block text-[11px] text-meta">ISRC<EditorHelp id="track.isrc" /></span>
           <input v-model="track.isrc" class="input input-sm w-36 font-mono uppercase" placeholder="JPXX01234567" maxlength="12">
         </label>
         <label v-if="discs.length > 1" class="block">
-          <span class="mb-1 block text-[11px] text-meta">{{ $t('editor.album.move_to_disc') }}</span>
+          <span class="mb-1 block text-[11px] text-meta">{{ $t('editor.album.move_to_disc') }}<EditorHelp id="track.move" /></span>
           <UiSelect :model-value="String(track.disc_id)" :options="discOptions" size="sm" class="w-32" @change="moveTo" />
         </label>
         <div class="flex gap-1">
@@ -58,7 +58,7 @@
       <EditorAlbumTrackOriginals :track-id="track.id" />
 
       <div>
-        <p class="mb-1 text-xs font-semibold text-body">{{ $t('catalog.collection.track_attributes') }}</p>
+        <p class="mb-1 text-xs font-semibold text-body">{{ $t('catalog.collection.track_attributes') }}<EditorHelp id="track.attributes" /></p>
         <EditorAttributeRows v-model="album.track_attributes" compact subject="track" :owner="{ field: 'track_id', id: track.id }" :references="editor.references" />
       </div>
     </div>

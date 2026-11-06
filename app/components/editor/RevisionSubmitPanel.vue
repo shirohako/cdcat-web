@@ -1,11 +1,11 @@
 <template>
   <div class="space-y-4">
     <label class="form-control">
-      <span class="label-text mb-1 text-sm font-medium">{{ $t('editor.summary') }}</span>
+      <span class="label-text mb-1 text-sm font-medium">{{ $t('editor.summary') }}<EditorHelp id="submit.summary" /></span>
       <textarea v-model="summary" rows="2" class="textarea text-sm" :placeholder="$t('editor.summary_placeholder')" />
     </label>
     <label class="form-control">
-      <span class="label-text mb-1 text-sm font-medium">{{ $t('editor.sources') }}</span>
+      <span class="label-text mb-1 text-sm font-medium">{{ $t('editor.sources') }}<EditorHelp id="submit.sources" /></span>
       <textarea :value="sources.join('\n')" rows="2" class="textarea font-mono text-xs" :placeholder="$t('editor.sources_placeholder')" @input="setSources(($event.target as HTMLTextAreaElement).value)" />
     </label>
 

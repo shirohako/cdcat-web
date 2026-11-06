@@ -42,36 +42,36 @@
       <div v-if="form" class="space-y-5">
         <div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_11rem]">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}<EditorHelp id="bonus.name" /></span>
             <input v-model="form.name" data-autofocus class="input input-sm w-full" :class="{ 'input-error': tried && !form.name.trim() }" :placeholder="$t('editor.bonuses.name_placeholder')">
             <span v-if="tried && !form.name.trim()" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.name_required') }}</span>
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}<EditorHelp id="bonus.type" /></span>
             <UiSelect v-model="form.type" :options="typeOptions" size="sm" class="w-full" />
           </label>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-3">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.shop') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.shop') }}<EditorHelp id="bonus.shop" /></span>
             <input v-model="form.shop" class="input input-sm w-full" maxlength="100" :placeholder="$t('editor.bonuses.shop_placeholder')">
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.availability') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.availability') }}<EditorHelp id="bonus.availability" /></span>
             <UiSelect v-model="form.availability" :options="availabilityOptions" size="sm" class="w-full" />
           </label>
           <div>
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.event_id') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.event_id') }}<EditorHelp id="bonus.event" /></span>
             <EditorPickedRef v-if="form.event_id" :id="form.event_id" type="events" :references="editor.references" :icon="CalendarDays" @remove="form.event_id = null" />
             <EditorEntityPicker v-else kind="event" @select="pickEvent" />
           </div>
         </div>
 
-        <label class="flex items-center gap-1.5 text-sm text-body"><input v-model="form.is_digital" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.bonuses.is_digital') }}</label>
+        <label class="flex items-center gap-1.5 text-sm text-body"><input v-model="form.is_digital" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.bonuses.is_digital') }}<EditorHelp id="bonus.is_digital" /></label>
 
         <div v-if="products.length > 1">
-          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.editions') }}</p>
+          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.editions') }}<EditorHelp id="bonus.editions" /></p>
           <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.editions_hint') }}</p>
           <div class="flex flex-wrap gap-2">
             <label v-for="product in products" :key="product.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="has(form.product_ids, product.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line text-meta hover:bg-card-hover'">
@@ -82,7 +82,7 @@
         </div>
 
         <div>
-          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.discs') }}</p>
+          <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.discs') }}<EditorHelp id="bonus.discs" /></p>
           <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.discs_hint') }}</p>
           <div class="flex flex-wrap items-center gap-2">
             <span v-for="disc in linkedDiscs" :key="disc.id" class="inline-flex items-center gap-1 rounded-lg bg-pink-50 px-2 py-1 text-xs text-pink-800 dark:bg-pink-400/15 dark:text-pink-300">
@@ -101,11 +101,11 @@
 
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.description') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.description') }}<EditorHelp id="bonus.description" /></span>
             <textarea v-model="form.description" rows="3" class="textarea textarea-sm w-full text-sm" />
           </label>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}</span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}<EditorHelp id="bonus.note" /></span>
             <textarea v-model="form.note" rows="3" class="textarea textarea-sm w-full text-sm" maxlength="500" />
           </label>
         </div>

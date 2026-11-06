@@ -57,45 +57,45 @@
         <div class="grid gap-5 md:grid-cols-[minmax(0,1fr)_15rem]">
           <div class="space-y-4">
             <label class="block">
-              <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.edition_name') }}</span>
+              <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.edition_name') }}<EditorHelp id="edition.name" /></span>
               <input v-model="form.name" data-autofocus class="input input-sm w-full" :placeholder="$t('editor.editions.name_placeholder')">
             </label>
             <div class="grid gap-4 sm:grid-cols-2">
               <label class="block">
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.edition_type') }}<EditorHelp id="edition.type" /></span>
                 <UiSelect v-model="form.edition_type" :options="editionTypeOptions" size="sm" class="w-full" />
               </label>
               <label class="block">
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.medium') }}<EditorHelp id="edition.medium" /></span>
                 <UiSelect v-model="form.medium" :options="mediumOptions" size="sm" class="w-full" />
               </label>
               <template v-if="form.edition_type === 'limited'">
                 <label class="block">
-                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}</span>
+                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_rule') }}<EditorHelp id="edition.limited_rule" /></span>
                   <UiSelect v-model="form.limited_rule" :options="limitedRuleOptions" size="sm" class="w-full" />
                 </label>
                 <label class="block">
-                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}</span>
+                  <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.limited_name') }}<EditorHelp id="edition.limited_name" /></span>
                   <input v-model="form.limited_name" class="input input-sm w-full" :placeholder="$t('editor.editions.limited_name_placeholder')">
                 </label>
               </template>
             </div>
             <div class="grid items-start gap-4 sm:grid-cols-2">
               <label class="block">
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_number') }}<EditorHelp id="edition.catalog_number" /></span>
                 <input v-model="form.catalog_number" class="input input-sm w-full font-mono" placeholder="KICA-1234~5" @blur="form.catalog_number = formatCatalogNumber(form.catalog_number)">
               </label>
               <label class="block">
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}<EditorHelp id="edition.barcode" /></span>
                 <input v-model="form.barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
               </label>
               <div>
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}<EditorHelp id="edition.release_date" /></span>
                 <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" />
                 <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
               </div>
               <label class="block">
-                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}</span>
+                <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}<EditorHelp id="edition.region" /></span>
                 <CommonRegionSelect :model-value="form.region ?? ''" class="select-sm w-full" @update:model-value="form.region = $event || null" />
               </label>
             </div>
@@ -103,7 +103,7 @@
 
           <aside class="space-y-4 self-start rounded-xl bg-sunken p-4">
             <div>
-              <p class="text-sm font-medium text-body">{{ $t('editor.editions.discs') }}</p>
+              <p class="text-sm font-medium text-body">{{ $t('editor.editions.discs') }}<EditorHelp id="edition.discs" /></p>
               <p class="mt-0.5 font-mono text-xl font-medium text-title" :title="$t('editor.editions.format_hint')">{{ formLabel || '—' }}</p>
             </div>
             <div class="space-y-1.5">
@@ -113,8 +113,8 @@
               </label>
             </div>
             <div class="flex flex-col gap-2.5 border-t border-line pt-3">
-              <UiSwitch v-model="form.is_hires">Hi-Res</UiSwitch>
-              <UiSwitch v-model="form.is_available">{{ $t('catalog.field.is_available') }}</UiSwitch>
+              <span class="flex items-center"><UiSwitch v-model="form.is_hires">Hi-Res</UiSwitch><EditorHelp id="edition.hires" /></span>
+              <span class="flex items-center"><UiSwitch v-model="form.is_available">{{ $t('catalog.field.is_available') }}</UiSwitch><EditorHelp id="edition.available" /></span>
             </div>
           </aside>
         </div>
@@ -122,7 +122,7 @@
         <EditorAlbumPriceRows v-model="form.prices" class="border-t border-line pt-4" />
 
         <label class="block border-t border-line pt-4">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}<EditorHelp id="edition.note" /></span>
           <textarea v-model="form.note" rows="2" class="textarea textarea-sm w-full text-sm" maxlength="1000" :placeholder="$t('editor.editions.note_placeholder')" />
         </label>
 

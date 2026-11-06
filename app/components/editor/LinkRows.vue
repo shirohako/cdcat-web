@@ -42,7 +42,7 @@
     <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.link_edit' : 'editor.add_link')" :description="$t('editor.dialog.link_hint')" :icon="Link2" @submit="save">
       <div class="space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">URL</span>
+          <span class="mb-1 block text-sm font-medium text-body">URL<EditorHelp id="link.url" /></span>
           <input
             v-model.trim="form.url"
             data-autofocus
@@ -56,12 +56,12 @@
           <span v-if="problem" class="mt-1 block text-xs text-danger">{{ problem }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.link_provider_id') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.link_provider_id') }}<EditorHelp id="link.provider" /></span>
           <UiSelect v-model="form.provider" :options="providerOptions" placeholder="—" size="sm" class="w-full" @change="pickedByHand = true" />
           <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_provider_hint') }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.link_label') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.link_label') }}<EditorHelp id="link.label" /></span>
           <input v-model="form.label" class="input w-full" maxlength="100" :placeholder="$t('editor.dialog.link_label_placeholder')">
           <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_label_hint') }}</span>
         </label>

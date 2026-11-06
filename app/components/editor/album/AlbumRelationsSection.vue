@@ -39,13 +39,13 @@
     <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.entry_edit' : 'editor.dialog.entry_add')" :description="$t('editor.relations.entries_hint')" :icon="Clapperboard" @submit="save">
       <div class="space-y-4">
         <div>
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.entry') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.entry') }}<EditorHelp id="entry.entry" /></span>
           <EditorPickedRef v-if="form.entry_id !== null" :id="form.entry_id" type="entry" :references="editor.references" :icon="Clapperboard" @remove="form.entry_id = null" />
           <EditorEntityPicker v-else kind="entry" data-autofocus :placeholder="$t('catalog.form.search_entry')" :exclude="taken" @select="pick" />
           <span v-if="tried && form.entry_id === null" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.entry_required') }}</span>
         </div>
         <div>
-          <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.relation_type') }}</span>
+          <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.relation_type') }}<EditorHelp id="entry.relation" /></span>
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="value in enums.entry_album_relation ?? []"
@@ -59,7 +59,7 @@
           </div>
         </div>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.form.note') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.form.note') }}<EditorHelp id="entry.note" /></span>
           <input v-model="form.note" class="input input-sm w-full" maxlength="500">
         </label>
       </div>

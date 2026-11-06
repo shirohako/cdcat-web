@@ -111,25 +111,25 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       </div>
       <EditorArtistTypePicker v-if="isNew" v-model="type" :invalid="!type" />
       <label class="block">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.dialog.credited_as') }}</span>
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.dialog.credited_as') }}<EditorHelp id="person.credited_as" /></span>
         <input v-model="form.credited_as" class="input input-sm w-full" maxlength="200" :placeholder="person.artist_id === null ? '' : t('editor.credits.printed_hint')" @keydown.enter.prevent="open = false">
       </label>
       <label class="block">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}</span>
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}<EditorHelp id="person.detail" /></span>
         <input v-model="form.detail" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
       </label>
       <label v-if="labelable" class="block">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}</span>
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}<EditorHelp id="person.role_label" /></span>
         <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">
         <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.role_label_note') }}</span>
       </label>
       <div v-if="parent">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}</span>
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}<EditorHelp id="person.parent" /></span>
         <UiSelect :model-value="parent.value" :options="parent.options" size="sm" class="w-full" @update:model-value="emit('parent', $event as string)" />
         <span class="mt-1 block whitespace-pre-line text-[11px] text-meta">{{ t('editor.credits.parent_hint') }}</span>
       </div>
       <div v-if="person.artist_id === null">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}</span>
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}<EditorHelp id="person.link_artist" /></span>
         <EditorEntityPicker kind="artist" :placeholder="t('editor.credits.pick_artist')" @select="link" />
       </div>
       <p v-if="note" class="rounded-md bg-warning/10 px-2.5 py-1.5 text-xs text-warning">⚠ {{ note }}</p>

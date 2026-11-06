@@ -27,29 +27,7 @@
 
       <div>
         <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.locale') }}</span>
-        <div class="flex flex-wrap items-center gap-1.5">
-          <button
-            v-for="code in languages"
-            :key="code"
-            type="button"
-            class="chip chip-sm"
-            :class="{ 'chip-selected': locale === code }"
-            :aria-pressed="locale === code"
-            :title="code"
-            @click="locale = locale === code ? '' : code"
-          >{{ localeName(code) }}</button>
-          <span class="flex items-center gap-0.5">
-            <UiLanguageSelect
-              v-model="otherLocale"
-              :readings="group !== 'official'"
-              :placeholder="$t('editor.dialog.locale_other')"
-              :aria-label="$t('catalog.field.locale')"
-              size="sm"
-              class="w-40"
-            />
-            <UiButton v-if="otherLocale" icon="lucide:x" :label="$t('common.clear')" size="xs" @click="locale = ''" />
-          </span>
-        </div>
+        <UiLanguageSelect v-model="locale" :readings="group !== 'official'" :aria-label="$t('catalog.field.locale')" size="sm" class="w-60" />
         <span v-if="problem" class="mt-1 block text-xs text-danger">{{ problem }}</span>
         <span v-else-if="kind === 'transliteration'" class="mt-1 block text-[11px] text-meta">{{ $t('editor.names.reading_note') }}</span>
       </div>
@@ -74,7 +52,7 @@
 <script setup lang="ts">
 import type { TitleGroup } from '~/utils/titleGroups'
 import { ChevronDown, Languages, Lightbulb, Plus } from '@lucide/vue'
-import { COMMON_LANGUAGES, isReading, READINGS } from '~/utils/contentLanguages'
+import { isReading } from '~/utils/contentLanguages'
 import { TITLE_GROUPS, TITLE_TIPS } from '~/utils/titleGroups'
 
 /**
@@ -93,20 +71,12 @@ const emit = defineEmits<{ add: [set: { locale: string, kind: 'official' | 'tran
 const GROUPS = ['official', 'translation'] as const satisfies TitleGroup[]
 
 const { t, locale: uiLocale } = useI18n()
-const { localeName } = useCatalogDisplay()
 
 const dialog = ref(false)
 const group = ref<typeof GROUPS[number]>('translation')
 const locale = ref('')
 const tried = ref(false)
 
-/** An official name is never a reading, so readings are offered for translations only. */
-const languages = computed(() => group.value === 'official' ? COMMON_LANGUAGES : [...COMMON_LANGUAGES, ...READINGS])
-/** The chips have the usual languages and the select next to them the rest; it shows a language only when no chip has it. */
-const otherLocale = computed({
-  get: () => languages.value.includes(locale.value) ? '' : locale.value,
-  set: (code: string) => { locale.value = code },
-})
 const kind = computed(() => group.value === 'official' ? 'official' : isReading(locale.value) ? 'transliteration' : 'translation')
 
 const problem = computed(() => {

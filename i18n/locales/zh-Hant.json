@@ -2528,6 +2528,9 @@
     "fields_changed": "{count} 個欄位"
   },
   "editor": {
+    "help": {
+      "examples": "範例"
+    },
     "search_placeholder": "搜尋…",
     "create_new": "新建「{name}」",
     "new": "新建",
@@ -2621,7 +2624,7 @@
     "preview": "預覽",
     "date_placeholder": "年-月-日",
     "date_invalid": "請寫成 2024、2024-05 或 2024-05-12",
-    "mode_translate": "翻譯曲目表",
+    "mode_translate": "專輯標題和曲目翻譯",
     "my_revisions": "我的修訂",
     "continue_draft": "繼續編輯",
     "ignore": "忽略",
@@ -2640,7 +2643,6 @@
         "note": "發布後的樣子。尚未發布，頁面中的按鈕和連結不會作用。"
       },
       "cover": "封面",
-      "title_placeholder": "依實物上印的標題填寫",
       "type_placeholder": "請選擇類型",
       "type_title": "選擇專輯類型",
       "type_intro": "選擇作品的發行類型。不同類型決定了作品的結構與歸類方式。",
@@ -2680,7 +2682,6 @@
       "release_event_placeholder": "搜尋活動，如 Comic Market",
       "release_event_hint": "在 Comic Market、M3 等活動首發的作品填寫。",
       "first_edition_hint": "這兩項屬於第一個版本。其他版本見",
-      "categories_hint": "音樂的出處。藝術家自己的專輯留空即可。",
       "description_placeholder": "這張專輯的背景和說明……",
       "other_names": "其他名稱",
       "is_adult": "成人內容（R-18）",
@@ -2693,7 +2694,9 @@
         "images": "圖片",
         "relations": "連結與關聯"
       },
-      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定原曲、資訊和連結。\n時長只記到秒，不足一秒的部分向下取整（直接捨去），例如 3:58.90 記作 3:58。",
+      "quick_import": "快速填寫 (自動識別)",
+      "tracks_hint": "曲目號依碟分別計數。在標題裡按 Enter 跳到下一首；展開曲目可以設定原曲、資訊和連結。",
+      "duration_tip": "時長只記到秒，不足一秒的部分向下取整（直接捨去），例如 3:58.90 記作 3:58。",
       "empty_tracklist": "還沒有曲目",
       "empty_tracklist_hint": "可以從歌詞本、商店頁面或 VGMdb 貼上曲目表，也可以一首一首新增。",
       "disc_n": "Disc {n}",
@@ -2973,7 +2976,7 @@
       "attributes_hint": "含義事先約定好的補充資訊"
     },
     "translate": {
-      "title": "翻譯曲目表",
+      "title": "專輯標題和曲目翻譯",
       "hint": "專輯、碟片和曲目的名稱按語言填寫，一份翻譯是一種語言。可以建好幾份，一起提交；不需要的行留空即可。",
       "language": "語言",
       "new": "新增翻譯",
@@ -2983,7 +2986,7 @@
       "remove_confirm": "刪除「{name}」的 {count} 個名稱嗎？",
       "empty_title": "還沒有翻譯",
       "empty_hint": "新增一份翻譯，按一種語言填寫專輯、碟片和曲目的名稱。",
-      "aliases": "別名和簡稱",
+      "aliases": "專輯的別名和簡稱",
       "album_title": "專輯標題",
       "tracks": "曲目",
       "progress": "已完成 {done}/{total}",
@@ -3076,7 +3079,6 @@
       "link_label_hint": "可以不填。同一網站有幾條連結時用來區分，顯示在網站名稱後面。",
       "name_edit": "編輯名稱",
       "name_required": "請填寫名稱。",
-      "locale_other": "其他語言…",
       "attribute_edit": "編輯資訊",
       "attribute_key": "項目",
       "attribute_value": "內容",

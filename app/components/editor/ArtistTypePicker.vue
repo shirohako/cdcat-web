@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('editor.dialog.new_artist_type') }} <span class="text-danger">*</span></span>
+    <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('editor.dialog.new_artist_type') }} <span class="text-danger">*</span><EditorHelp id="artist.type" /></span>
     <div class="flex flex-wrap gap-1.5" role="radiogroup" :aria-label="$t('editor.dialog.new_artist_type')">
       <button
         v-for="value in enums.artist_type ?? []"

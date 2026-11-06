@@ -42,29 +42,11 @@
           <span class="mb-1.5 block text-sm font-medium text-body">
             {{ $t('catalog.field.locale') }}<span v-if="form.group === 'alias'" class="font-normal text-meta"> · {{ $t('editor.names.optional') }}</span>
           </span>
-          <div class="flex flex-wrap items-center gap-1.5">
-            <button
-              v-for="code in languages"
-              :key="code"
-              type="button"
-              class="chip chip-sm"
-              :class="{ 'chip-selected': form.locale === code }"
-              :aria-pressed="form.locale === code"
-              :title="code"
-              @click="form.locale = form.locale === code ? '' : code"
-            >{{ localeName(code) }}</button>
-            <span class="flex items-center gap-0.5">
-              <UiLanguageSelect
-                v-model="otherLocale"
-                :readings="form.group !== 'official'"
-                :placeholder="$t('editor.dialog.locale_other')"
-                :aria-label="$t('catalog.field.locale')"
-                size="sm"
-                class="w-40"
-              />
-              <UiButton v-if="otherLocale" icon="lucide:x" :label="$t('common.clear')" size="xs" @click="form.locale = ''" />
-            </span>
-          </div>
+          <span class="flex items-center gap-0.5">
+            <UiLanguageSelect v-model="form.locale" :readings="form.group !== 'official'" :aria-label="$t('catalog.field.locale')" size="sm" class="w-60" />
+            <!-- Only an alias can go without a language. -->
+            <UiButton v-if="form.group === 'alias' && form.locale" icon="lucide:x" :label="$t('common.clear')" size="xs" @click="form.locale = ''" />
+          </span>
           <span v-if="localeProblem" class="mt-1 block text-xs text-danger">{{ localeProblem }}</span>
           <span v-else-if="kind === 'transliteration'" class="mt-1 block text-[11px] text-meta">{{ $t('editor.names.reading_note') }}</span>
         </div>
@@ -96,7 +78,7 @@ import type { CatalogTitleKind } from '~/types/catalog'
 import type { TitleRow } from '~/types/document'
 import type { TitleGroup } from '~/utils/titleGroups'
 import { ChevronDown, Lightbulb, Type } from '@lucide/vue'
-import { COMMON_LANGUAGES, isReading, READINGS } from '~/utils/contentLanguages'
+import { isReading } from '~/utils/contentLanguages'
 import { newKey } from '~/utils/documentKeys'
 import { nextOrder } from '~/utils/documentRows'
 import { TITLE_GROUPS, TITLE_TIPS, titleGroupOf } from '~/utils/titleGroups'
@@ -129,14 +111,6 @@ const dialog = ref(false)
 const editing = ref<TitleRow | null>(null)
 const form = reactive({ title: '', group: 'translation' as Group, locale: '', abbreviation: false })
 const tried = ref(false)
-
-/** An official name is never a reading, so readings are offered for translations and other names only. */
-const languages = computed(() => form.group === 'official' ? COMMON_LANGUAGES : [...COMMON_LANGUAGES, ...READINGS])
-/** The chips have the usual languages and the select next to them the rest; it shows a language only when no chip has it. */
-const otherLocale = computed({
-  get: () => languages.value.includes(form.locale) ? '' : form.locale,
-  set: (code: string) => { form.locale = code },
-})
 
 const kind = computed<CatalogTitleKind>(() => {
   if (form.group === 'official') return 'official'

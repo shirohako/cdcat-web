@@ -1,11 +1,20 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.tracks')" :icon="ListMusic" :description="$t('editor.album.tracks_hint')">
-    <template #actions>
-      <UiButton :icon="ClipboardPaste" icon-class="size-3" size="xs" class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="pasteOpen = true">{{ $t('editor.paste.button') }}</UiButton>
-      <UiButton :icon="FileMusic" icon-class="size-3" size="xs" class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="cueOpen = true">{{ $t('editor.cue.button') }}</UiButton>
-    </template>
+    <div class="space-y-4 p-3 pt-1 sm:p-5 sm:pt-1">
+      <!-- The ways to bring in a whole tracklist at once, right under the title. -->
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-primary/10 bg-primary/5 px-2.5 py-1.5">
+        <span class="flex items-center gap-1.5 text-[13px] font-semibold text-title">
+          <Zap :size="14" class="shrink-0 text-primary" />{{ $t('editor.album.quick_import') }}
+        </span>
+        <span class="flex flex-wrap gap-1.5">
+          <UiButton :icon="ClipboardPaste" icon-class="size-3" size="xs" class="gap-1 shadow-xs active:translate-y-px [--ui-btn-bg:var(--card)] [--ui-btn-border:color-mix(in_oklab,var(--primary)_18%,transparent)] [--ui-btn-hover:var(--card-hover)]" @click="pasteOpen = true">{{ $t('editor.paste.button') }}</UiButton>
+          <UiButton :icon="FileMusic" icon-class="size-3" size="xs" class="gap-1 shadow-xs active:translate-y-px [--ui-btn-bg:var(--card)] [--ui-btn-border:color-mix(in_oklab,var(--primary)_18%,transparent)] [--ui-btn-hover:var(--card-hover)]" @click="cueOpen = true">{{ $t('editor.cue.button') }}</UiButton>
+        </span>
+      </div>
+      <p class="flex items-start gap-1.5 rounded-md border border-info/15 bg-info/10 px-2.5 py-1 text-xs leading-5 text-body">
+        <Lightbulb :size="13" class="mt-1 shrink-0 text-info" />{{ $t('editor.album.duration_tip') }}
+      </p>
 
-    <div class="space-y-4 p-3 sm:p-5">
       <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
       </ul>
@@ -37,7 +46,7 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
-import { ClipboardPaste, FileMusic, ListMusic } from '@lucide/vue'
+import { ClipboardPaste, FileMusic, Lightbulb, ListMusic, Zap } from '@lucide/vue'
 import { addDisc, sortedDiscs } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * 翻译曲目表: the album's translations as tabs (official English open, a Chinese one beside it) with 新建翻译 and the
+ * 专辑标题和曲目翻译: the album's translations as tabs (official English open, a Chinese one beside it) with 新建翻译 and the
  * language and kind it asks for, the progress in the corner, and the made-up album's rows, each original above its
  * box: three filled in, two left for later.
  */

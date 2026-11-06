@@ -11,12 +11,12 @@
     <EditorModal v-model="dialog" :title="$t(editing ? 'editor.dialog.attribute_edit' : 'editor.add_attribute')" :icon="ListChecks" @submit="save">
       <div class="space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_key') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_key') }}<EditorHelp id="attribute.key" /></span>
           <UiSelect v-model="form.key" :options="keyOptions" data-autofocus size="sm" class="w-full" @change="form.value = null" />
           <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-meta">{{ hint(form.key) }}</span>
         </label>
         <div>
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_value') }}</span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_value') }}<EditorHelp id="attribute.value" /></span>
           <EditorAttributeValueInput :key="form.key" v-model="form.value" :definition="attributeDefinition(form.key)" :references="known" @picked="remember" />
           <span v-if="tried && empty(form.value)" class="mt-1 block text-xs text-danger">{{ $t('editor.dialog.attribute_required') }}</span>
         </div>

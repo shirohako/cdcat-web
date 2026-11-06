@@ -26,8 +26,8 @@ const ACTIONABLE = 'a[href], button, input, select, textarea, label, summary, [c
  * arrow on its edge points at the trigger's middle, also when the bubble is pushed aside at the edge of the screen.
  *
  * It shows after `delay` when the pointer rests on the trigger, at once on keyboard focus, and on touch screens on a
- * tap, or on a long press when the trigger is a button or link (its tap keeps doing what it does); a tap elsewhere
- * closes it then. It never takes the pointer or focus, so anything to click belongs in a UiPopover instead. A click on
+ * tap, or on a long press when the trigger is a button or link (its tap keeps doing what it does; `data-tooltip-tap`
+ * on a trigger inside a <label> or the like makes it the plain tap again); a tap elsewhere closes it then. It never takes the pointer or focus, so anything to click belongs in a UiPopover instead. A click on
  * the trigger or Escape closes it.
  *
  * The default slot is the trigger and gets no box of its own: its first element anchors the bubble and is described by
@@ -209,7 +209,8 @@ const onPointerDown = (event: PointerEvent) => {
     touchPress = null
     return
   }
-  const actionable = Boolean((event.target as Element).closest?.(ACTIONABLE))
+  const target = event.target as Element
+  const actionable = !target.closest?.('[data-tooltip-tap]') && Boolean(target.closest?.(ACTIONABLE))
   touchPress = { actionable, x: event.clientX, y: event.clientY }
   if (!actionable) return
   // A tap on a button or link does its own thing; a long press shows the tooltip.

@@ -12,7 +12,7 @@
 
       <div>
         <div class="mb-2.5 flex flex-wrap items-center justify-between gap-2">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.credits.contributors') }}</h3>
+          <h3 class="text-xs font-bold uppercase tracking-wider text-meta">{{ $t('editor.credits.contributors') }}<EditorHelp id="credits.contributors" /></h3>
           <UiSegmented v-model="view" :items="views" :label="$t('editor.credits.view_label')" size="sm" />
         </div>
         <EditorAlbumCreditsByRole v-if="view === 'role'" />

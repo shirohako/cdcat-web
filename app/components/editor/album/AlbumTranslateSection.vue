@@ -26,7 +26,7 @@
 
       <template v-if="current">
         <div class="flex flex-wrap items-center gap-2">
-          <p class="text-[11px] text-meta">{{ $t(`editor.translate.kind_hint.${current.kind}`) }}</p>
+          <p class="text-[11px] text-meta">{{ $t(`editor.translate.kind_hint.${current.kind}`) }}<EditorHelp id="translate.names" /></p>
           <UiButton variant="danger-soft" size="xs" :icon="Trash2" class="ml-auto ring-1 ring-inset ring-danger/20" @click="remove(current)">{{ $t('editor.translate.remove') }}</UiButton>
         </div>
 
@@ -66,7 +66,7 @@ import { setTitleIn, sortedDiscs, titleIn, tracksOn } from '~/utils/albumDocumen
 import { isReading, languageTag } from '~/utils/contentLanguages'
 
 /**
- * 翻译曲目表: names of the album, its discs and tracks in other languages (docs/catalog/editing.md#曲目表翻译), and
+ * 专辑标题和曲目翻译: names of the album, its discs and tracks in other languages (docs/catalog/editing.md#曲目表翻译), and
  * the album's aliases and abbreviations (EditorTitleRows), as the album's other names all live here. Each
  * translation is one language and kind; the album's own names in the three title lists show as the translations it
  * has, one tab each, with as many new ones as wanted (新建翻译, TranslationAdd). Nothing shows but a placeholder while

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { COMMON_LANGUAGES } from '~/utils/contentLanguages'
-
 /**
  * 其他名称怎么选: the "add a name" dialog with the real labels and the made-up album's official English title being
- * added: the three kinds as cards in their own colours (official chosen), the language chips (English chosen) and the
+ * added: the three kinds as cards in their own colours (official chosen), the language dropdown (English chosen) and the
  * tips line.
  */
 defineProps<{ text: Record<string, string> }>()
@@ -46,12 +44,9 @@ const GROUPS = [
       </div>
       <div>
         <p class="mb-1.5 text-[11px] font-medium text-body">{{ t('catalog.field.locale') }}</p>
-        <p class="flex flex-wrap gap-1">
-          <GuideMockChip v-for="code in COMMON_LANGUAGES" :key="code" :label="localeName(code)" :selected="code === 'en'" />
-          <span class="inline-flex h-5 items-center gap-1 rounded-md border border-field-line px-1.5 text-[11px] text-faint">
-            {{ t('editor.dialog.locale_other') }}<Icon name="lucide:chevron-down" class="size-3" />
-          </span>
-        </p>
+        <span class="inline-flex h-6 w-40 items-center justify-between gap-1 rounded-md border border-field-line px-2 text-[11px] text-title">
+          {{ localeName('en') }}<Icon name="lucide:chevron-down" class="size-3 text-meta" />
+        </span>
       </div>
       <p class="flex items-center gap-1.5 text-[11px] text-meta">
         <Icon name="lucide:lightbulb" class="size-3.5 shrink-0" />{{ t('editor.names.tip_title') }}<Icon name="lucide:chevron-down" class="size-3" />

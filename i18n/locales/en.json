@@ -2528,6 +2528,9 @@
     "fields_changed": "{count} fields"
   },
   "editor": {
+    "help": {
+      "examples": "Examples"
+    },
     "search_placeholder": "Search…",
     "create_new": "Create “{name}”",
     "new": "New",
@@ -2621,7 +2624,7 @@
     "preview": "Preview",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "Use 2024, 2024-05 or 2024-05-12",
-    "mode_translate": "Translate tracklist",
+    "mode_translate": "Album and track title translations",
     "my_revisions": "My revisions",
     "continue_draft": "Continue it",
     "ignore": "Ignore",
@@ -2640,7 +2643,6 @@
         "note": "How the album will look once published. It isn't published yet, so the buttons and links on the page do nothing."
       },
       "cover": "Cover",
-      "title_placeholder": "The title as printed on the release",
       "type_placeholder": "Choose a type",
       "type_title": "Choose an album type",
       "type_intro": "Choose how this release was issued. The type decides how it is structured and categorized.",
@@ -2680,7 +2682,6 @@
       "release_event_placeholder": "Search events, e.g. Comic Market",
       "release_event_hint": "For releases first sold at an event such as Comic Market or M3.",
       "first_edition_hint": "These belong to the first edition. Other editions are under",
-      "categories_hint": "What the music comes from. Leave empty for an artist's own album.",
       "description_placeholder": "Background and notes about this release…",
       "other_names": "Other names",
       "is_adult": "Adult content (R-18)",
@@ -2693,7 +2694,9 @@
         "images": "Images",
         "relations": "Links & relations"
       },
-      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.\nLengths stop at whole seconds, rounded down: 3:58.90 is entered as 3:58.",
+      "quick_import": "Quick fill (auto-detect)",
+      "tracks_hint": "Track numbers count per disc. Press Enter in a title to go to the next track; open a track for its originals, details and links.",
+      "duration_tip": "Lengths stop at whole seconds, rounded down: 3:58.90 is entered as 3:58.",
       "empty_tracklist": "No tracks yet",
       "empty_tracklist_hint": "Paste a tracklist from the booklet, a shop page or VGMdb, or add tracks one by one.",
       "disc_n": "Disc {n}",
@@ -2973,7 +2976,7 @@
       "attributes_hint": "Extra facts with an agreed meaning."
     },
     "translate": {
-      "title": "Translate tracklist",
+      "title": "Album and track title translations",
       "hint": "Names of the album, its discs and tracks by language, one translation per language. Make as many as you like and submit them together; leave rows you don’t need blank.",
       "language": "Language",
       "new": "New translation",
@@ -2983,7 +2986,7 @@
       "remove_confirm": "Remove the {count} names of “{name}”?",
       "empty_title": "No translations yet",
       "empty_hint": "Start a translation to fill in the names of the album, its discs and tracks in one language.",
-      "aliases": "Aliases and abbreviations",
+      "aliases": "Album aliases and abbreviations",
       "album_title": "Album title",
       "tracks": "Tracks",
       "progress": "{done} of {total} done",
@@ -3076,7 +3079,6 @@
       "link_label_hint": "Optional. Tells several links to one site apart; shown after the site’s name.",
       "name_edit": "Edit name",
       "name_required": "Enter the name.",
-      "locale_other": "Other language…",
       "attribute_edit": "Edit detail",
       "attribute_key": "Field",
       "attribute_value": "Value",

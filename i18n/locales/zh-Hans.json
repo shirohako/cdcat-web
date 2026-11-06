@@ -2528,6 +2528,9 @@
     "fields_changed": "{count} 个字段"
   },
   "editor": {
+    "help": {
+      "examples": "示例"
+    },
     "search_placeholder": "搜索…",
     "create_new": "新建「{name}」",
     "new": "新建",
@@ -2621,7 +2624,7 @@
     "preview": "预览",
     "date_placeholder": "年-月-日",
     "date_invalid": "请写成 2024、2024-05 或 2024-05-12",
-    "mode_translate": "翻译曲目表",
+    "mode_translate": "专辑标题和曲目翻译",
     "my_revisions": "我的修订",
     "continue_draft": "继续编辑",
     "ignore": "忽略",
@@ -2640,7 +2643,6 @@
         "note": "发布后的样子。还没有发布，页面里的按钮和链接不起作用。"
       },
       "cover": "封面",
-      "title_placeholder": "按实物上印的标题填写",
       "type_placeholder": "请选择类型",
       "type_title": "选择专辑类型",
       "type_intro": "选择作品的发行类型。不同类型决定了作品的结构与归类方式。",
@@ -2680,7 +2682,6 @@
       "release_event_placeholder": "搜索活动，如 Comic Market",
       "release_event_hint": "在 Comic Market、M3 等活动首发的作品填写。",
       "first_edition_hint": "这两项属于第一个版本。其他版本见",
-      "categories_hint": "音乐的出处。艺术家自己的专辑留空即可。",
       "description_placeholder": "这张专辑的背景和说明……",
       "other_names": "其他名称",
       "is_adult": "成人内容（R-18）",
@@ -2693,7 +2694,9 @@
         "images": "图片",
         "relations": "链接与关联"
       },
-      "tracks_hint": "曲目号按碟分别计数。在标题里按回车跳到下一首；展开曲目可以设置原曲、信息和链接。\n时长只记到秒，不足一秒的部分向下取整（直接舍去），比如 3:58.90 记作 3:58。",
+      "quick_import": "快速填写 (自动识别)",
+      "tracks_hint": "曲目号按碟分别计数。在标题里按回车跳到下一首；展开曲目可以设置原曲、信息和链接。",
+      "duration_tip": "时长只记到秒，不足一秒的部分向下取整（直接舍去），比如 3:58.90 记作 3:58。",
       "empty_tracklist": "还没有曲目",
       "empty_tracklist_hint": "可以从歌词本、商店页面或 VGMdb 粘贴曲目表，也可以一首一首添加。",
       "disc_n": "Disc {n}",
@@ -2973,7 +2976,7 @@
       "attributes_hint": "含义事先约定好的补充信息"
     },
     "translate": {
-      "title": "翻译曲目表",
+      "title": "专辑标题和曲目翻译",
       "hint": "专辑、碟片和曲目的名称按语言填写，一份翻译是一种语言。可以建好几份，一起提交；不需要的行留空即可。",
       "language": "语言",
       "new": "新建翻译",
@@ -2983,7 +2986,7 @@
       "remove_confirm": "删除「{name}」的 {count} 个名称吗？",
       "empty_title": "还没有翻译",
       "empty_hint": "新建一份翻译，按一种语言填写专辑、碟片和曲目的名称。",
-      "aliases": "别名和简称",
+      "aliases": "专辑的别名和简称",
       "album_title": "专辑标题",
       "tracks": "曲目",
       "progress": "已完成 {done}/{total}",
@@ -3076,7 +3079,6 @@
       "link_label_hint": "可以不填。同一网站有几条链接时用来区分，显示在网站名后面。",
       "name_edit": "编辑名称",
       "name_required": "请填写名称。",
-      "locale_other": "其他语言…",
       "attribute_edit": "编辑信息",
       "attribute_key": "项目",
       "attribute_value": "内容",

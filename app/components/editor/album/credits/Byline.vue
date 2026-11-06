@@ -38,7 +38,7 @@ const preview = computed(() => {
 <template>
   <section class="rounded-lg border border-line">
     <p class="flex flex-wrap items-baseline gap-x-2 border-b border-line bg-sunken px-3 py-1.5">
-      <span class="text-xs font-semibold text-title">{{ t('editor.credits.byline_title') }}</span>
+      <span class="text-xs font-semibold text-title">{{ t('editor.credits.byline_title') }}<EditorHelp id="credits.byline" /></span>
       <span class="text-[11px] text-meta">{{ t('editor.credits.byline_hint') }}</span>
     </p>
     <div class="space-y-2 px-3 py-2.5">

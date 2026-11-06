@@ -2528,6 +2528,9 @@
     "fields_changed": "{count} 項目"
   },
   "editor": {
+    "help": {
+      "examples": "例"
+    },
     "search_placeholder": "検索…",
     "create_new": "「{name}」を新規作成",
     "new": "新規",
@@ -2621,7 +2624,7 @@
     "preview": "プレビュー",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "2024、2024-05、2024-05-12 のように入力してください",
-    "mode_translate": "トラックリストを翻訳",
+    "mode_translate": "アルバム名と曲名の翻訳",
     "my_revisions": "自分の修正",
     "continue_draft": "続きを編集",
     "ignore": "無視",
@@ -2640,7 +2643,6 @@
         "note": "公開後の表示です。まだ公開されていないため、ページ内のボタンやリンクは動作しません。"
       },
       "cover": "ジャケット",
-      "title_placeholder": "商品に印刷されたとおりのタイトル",
       "type_placeholder": "種類を選択",
       "type_title": "アルバムの種類を選択",
       "type_intro": "作品のリリース形態を選択してください。種類によって作品の構成と分類が決まります。",
@@ -2680,7 +2682,6 @@
       "release_event_placeholder": "イベントを検索（例：コミックマーケット）",
       "release_event_hint": "コミックマーケットや M3 などで初頒布された作品に入力します。",
       "first_edition_hint": "この 2 項目は最初のエディションのものです。ほかのエディションは",
-      "categories_hint": "音楽の出どころ。アーティスト自身のアルバムなら空欄のままで構いません。",
       "description_placeholder": "このアルバムの背景や補足…",
       "other_names": "ほかの名前",
       "is_adult": "成人向け（R-18）",
@@ -2693,7 +2694,9 @@
         "images": "画像",
         "relations": "リンクと関連"
       },
-      "tracks_hint": "トラック番号はディスクごとに数えます。タイトルで Enter を押すと次のトラックへ。トラックを開くと原曲、情報、リンクを設定できます。\n再生時間は秒単位で記録し、1 秒未満は切り捨てます（例：3:58.90 は 3:58）。",
+      "quick_import": "まとめて入力 (自動認識)",
+      "tracks_hint": "トラック番号はディスクごとに数えます。タイトルで Enter を押すと次のトラックへ。トラックを開くと原曲、情報、リンクを設定できます。",
+      "duration_tip": "再生時間は秒単位で記録し、1 秒未満は切り捨てます（例：3:58.90 は 3:58）。",
       "empty_tracklist": "トラックがまだありません",
       "empty_tracklist_hint": "ブックレット、ショップのページ、VGMdb からトラックリストを貼り付けるか、1 曲ずつ追加してください。",
       "disc_n": "Disc {n}",
@@ -2973,7 +2976,7 @@
       "attributes_hint": "意味があらかじめ決められた補足情報"
     },
     "translate": {
-      "title": "トラックリストを翻訳",
+      "title": "アルバム名と曲名の翻訳",
       "hint": "アルバム、ディスク、曲の名前を言語ごとに入力します。1 つの翻訳が 1 つの言語です。いくつでも作ってまとめて提出できます。不要な行は空欄のままで構いません。",
       "language": "言語",
       "new": "翻訳を追加",
@@ -2983,7 +2986,7 @@
       "remove_confirm": "「{name}」の名前 {count} 件を削除しますか？",
       "empty_title": "翻訳はまだありません",
       "empty_hint": "翻訳を追加して、アルバム、ディスク、曲の名前を 1 つの言語で入力しましょう。",
-      "aliases": "別名と略称",
+      "aliases": "アルバムの別名と略称",
       "album_title": "アルバムタイトル",
       "tracks": "トラック",
       "progress": "{done}/{total} 完了",
@@ -3076,7 +3079,6 @@
       "link_label_hint": "空欄でもかまいません。同じサイトのリンクが複数あるときの区別に使い、サイト名の後ろに表示されます。",
       "name_edit": "名前を編集",
       "name_required": "名前を入力してください。",
-      "locale_other": "その他の言語…",
       "attribute_edit": "情報を編集",
       "attribute_key": "項目",
       "attribute_value": "内容",

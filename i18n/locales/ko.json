@@ -2528,6 +2528,9 @@
     "fields_changed": "항목 {count}개"
   },
   "editor": {
+    "help": {
+      "examples": "예시"
+    },
     "search_placeholder": "검색…",
     "create_new": "‘{name}’ 새로 만들기",
     "new": "신규",
@@ -2621,7 +2624,7 @@
     "preview": "미리보기",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "2024, 2024-05, 2024-05-12 형식으로 입력해 주세요",
-    "mode_translate": "트랙 리스트 번역",
+    "mode_translate": "앨범 제목과 트랙 번역",
     "my_revisions": "내 편집 내역",
     "continue_draft": "이어서 수정",
     "ignore": "무시",
@@ -2640,7 +2643,6 @@
         "note": "게시된 후의 모습입니다. 아직 게시되지 않았으므로 페이지의 버튼과 링크는 작동하지 않습니다."
       },
       "cover": "커버",
-      "title_placeholder": "실물에 적힌 제목을 그대로 입력해 주세요",
       "type_placeholder": "유형 선택",
       "type_title": "앨범 유형 선택",
       "type_intro": "작품의 발매 유형을 고르세요. 유형에 따라 작품의 구성과 분류 방식이 정해집니다.",
@@ -2680,7 +2682,6 @@
       "release_event_placeholder": "행사 검색 (예: Comic Market)",
       "release_event_hint": "코믹마켓이나 M3 같은 행사에서 처음 판매된 앨범이라면 입력해 주세요.",
       "first_edition_hint": "품번과 바코드는 첫 번째 에디션의 정보예요. 다른 에디션은 여기에서 입력해 주세요.",
-      "categories_hint": "어디에서 나온 음악인지 골라 주세요. 아티스트의 오리지널 앨범이라면 비워 두세요.",
       "description_placeholder": "발매 배경이나 참고할 내용…",
       "other_names": "다른 이름",
       "is_adult": "성인용 콘텐츠 (R-18)",
@@ -2693,7 +2694,9 @@
         "images": "이미지",
         "relations": "링크와 관련 정보"
       },
-      "tracks_hint": "트랙 번호는 디스크마다 따로 매겨요. 제목 칸에서 Enter 키를 누르면 다음 트랙으로 넘어가고, 트랙을 펼치면 원곡, 세부 정보, 링크를 입력할 수 있어요.\n재생 시간은 초 단위로 기록하고 1초 미만은 버려요. 예를 들어 3:58.90은 3:58로 적어요.",
+      "quick_import": "빠른 입력 (자동 인식)",
+      "tracks_hint": "트랙 번호는 디스크마다 따로 매겨요. 제목 칸에서 Enter 키를 누르면 다음 트랙으로 넘어가고, 트랙을 펼치면 원곡, 세부 정보, 링크를 입력할 수 있어요.",
+      "duration_tip": "재생 시간은 초 단위로 기록하고 1초 미만은 버려요. 예를 들어 3:58.90은 3:58로 적어요.",
       "empty_tracklist": "아직 트랙이 없어요",
       "empty_tracklist_hint": "부클릿, 판매 페이지, VGMdb에서 트랙 리스트를 붙여넣거나 한 곡씩 추가해 주세요.",
       "disc_n": "디스크 {n}",
@@ -2973,7 +2976,7 @@
       "attributes_hint": "의미가 정해져 있는 추가 정보예요."
     },
     "translate": {
-      "title": "트랙 리스트 번역",
+      "title": "앨범 제목과 트랙 번역",
       "hint": "앨범, 디스크, 트랙의 이름을 언어별로 입력합니다. 번역 하나가 언어 하나입니다. 여러 개를 만들어 함께 제출할 수 있으며, 필요 없는 줄은 비워 두면 됩니다.",
       "language": "언어",
       "new": "새 번역",
@@ -2983,7 +2986,7 @@
       "remove_confirm": "「{name}」의 이름 {count}개를 삭제할까요?",
       "empty_title": "아직 번역이 없습니다",
       "empty_hint": "번역을 추가해 앨범, 디스크, 트랙의 이름을 한 언어로 입력하세요.",
-      "aliases": "별칭과 약칭",
+      "aliases": "앨범 별칭과 약칭",
       "album_title": "앨범 제목",
       "tracks": "트랙",
       "progress": "{done}/{total} 완료",
@@ -3076,7 +3079,6 @@
       "link_label_hint": "비워 둬도 돼요. 같은 사이트 링크가 여러 개일 때 구분하는 데 쓰고, 사이트 이름 뒤에 표시돼요.",
       "name_edit": "이름 편집",
       "name_required": "이름을 입력해 주세요.",
-      "locale_other": "다른 언어…",
       "attribute_edit": "세부 정보 편집",
       "attribute_key": "항목",
       "attribute_value": "내용",
