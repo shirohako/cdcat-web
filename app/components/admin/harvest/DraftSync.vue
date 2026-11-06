@@ -91,7 +91,7 @@ const short = (value: unknown) => {
 }
 
 const load = async () => {
-  if (conflict.value && !await confirm({ title: '载入服务器上的新版本？', description: '这里还没存到服务器的修改会丢掉。', confirmText: '载入' })) return
+  if (conflict.value && !await confirm({ variant: 'confirm', title: '载入服务器上的新版本？', description: '这里还没存到服务器的修改会丢掉。', confirmText: '载入' })) return
   loading.value = true
   try {
     await props.draft.pullRemote()
@@ -101,7 +101,7 @@ const load = async () => {
   }
 }
 const keep = async () => {
-  if (!await confirm({ title: '用这里的草稿覆盖服务器上的？', description: '服务器上的新版本（包括模型的修改）会被替换掉。', confirmText: '覆盖' })) return
+  if (!await confirm({ variant: 'confirm', title: '用这里的草稿覆盖服务器上的？', description: '服务器上的新版本（包括模型的修改）会被替换掉。', confirmText: '覆盖' })) return
   loading.value = true
   try { await props.draft.keepMine() } finally { loading.value = false }
 }

@@ -2,8 +2,8 @@
   <UiDialog
     :model-value="modelValue"
     :title="title"
-    :icon="variant === 'warning' ? 'lucide:triangle-alert' : 'lucide:trash-2'"
-    :tone="variant === 'warning' ? 'warning' : 'danger'"
+    :icon="variant === 'warning' ? 'lucide:triangle-alert' : variant === 'confirm' ? 'lucide:circle-help' : 'lucide:trash-2'"
+    :tone="variant === 'warning' ? 'warning' : variant === 'confirm' ? 'primary' : 'danger'"
     :size="wide ? 'md' : 'sm'"
     @update:model-value="(open) => { if (!open) onCancel() }"
   >
@@ -24,8 +24,8 @@
         <UiButton size="sm" @click="onCancel">
           {{ $t('common.cancel') }}
         </UiButton>
-        <UiButton variant="danger" size="sm" :disabled="!phraseMatches" @click="onConfirm">
-          {{ confirmText ?? $t('common.confirm_delete') }}
+        <UiButton :variant="variant === 'confirm' ? 'primary' : 'danger'" size="sm" :disabled="!phraseMatches" @click="onConfirm">
+          {{ confirmText ?? $t(variant === 'confirm' ? 'common.confirm' : 'common.confirm_delete') }}
         </UiButton>
       </template>
     </template>
@@ -37,7 +37,8 @@ const props = defineProps<{
   modelValue: boolean
   title: string
   description?: string
-  variant?: 'delete' | 'warning'
+  /** `delete` (the default) for what can't be got back, `confirm` for any other question, `warning` to only inform. */
+  variant?: 'delete' | 'confirm' | 'warning'
   confirmText?: string
   /** The text to type before confirming, for deletions that are hard to undo. */
   confirmPhrase?: string

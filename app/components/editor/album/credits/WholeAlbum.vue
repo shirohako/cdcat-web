@@ -1,5 +1,5 @@
 <template>
-  <EditorAlbumCreditsBlock name="album" :title="t('editor.credits.contributors')" scope="album">
+  <EditorAlbumCreditsBlock kind="album" :title="t('editor.credits.contributors_album')" :description="t('editor.credits.contributors_album_description')">
     <div class="space-y-2">
       <EditorAlbumCreditsRoleRow
         v-for="item in credits"
@@ -7,13 +7,13 @@
         :role="item.role"
         :rows="item.rows"
         changeable
-        :exclude="EXCLUDED_ROLES"
+        :exclude="BYLINE_ROLES"
         @add="add(item.role, $event)"
         @role="changeRole(item.rows, $event)"
         @update="update"
         @remove="remove"
       />
-      <EditorAlbumCreditsRoleRow v-if="started" v-model:roles="started" @add="firstPerson" @cancel="started = undefined" />
+      <EditorAlbumCreditsRoleRow v-if="started" v-model:roles="started" :exclude="BYLINE_ROLES" @add="firstPerson" @cancel="started = undefined" />
       <EditorAlbumCreditsStartRow v-else @start="started = []" />
     </div>
   </EditorAlbumCreditsBlock>
@@ -23,15 +23,13 @@
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
 import { addCredit, changeCreditRole, patchCredits, removeCredits } from '~/utils/albumDocument'
-import { creditsOn } from '~/utils/creditLines'
+import { BYLINE_ROLES, creditsOn } from '~/utils/creditLines'
 
 /**
- * 参与创作 (专辑): the credits of the whole album outside the byline block, by role. A role's name changes the role of
- * the whole row, but not to 艺术家, which is the byline block's. A row being started has its role picked first and
- * stays here until its first person.
+ * 专辑参与创作: the credits of the whole album outside the byline block, by role, 厂牌、经销、制造、企划 among them. A role's
+ * name changes the role of the whole row, but not to the byline block's. A row being started has its role picked first
+ * and stays here until its first person.
  */
-const EXCLUDED_ROLES = ['artist']
-
 const { t } = useI18n()
 const editor = useAlbumEditor()
 const { roleOrder } = useCatalogSchema()

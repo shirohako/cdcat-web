@@ -14,7 +14,7 @@ import { personOf } from '~/utils/creditLines'
  * a 客串 always one of them, the default the one before it; another role one or none. A credit others belong to
  * belongs to none itself.
  */
-const props = defineProps<{ role?: string, rows?: AlbumCreditRow[], roles?: string[], trackRows?: AlbumCreditRow[], changeable?: boolean, exclude?: string[] }>()
+const props = defineProps<{ role?: string, rows?: AlbumCreditRow[], roles?: string[], trackRows?: AlbumCreditRow[], changeable?: boolean, exclude?: readonly string[] }>()
 const emit = defineEmits<{
   'add': [person: CreditPerson]
   'role': [role: string]
@@ -53,7 +53,7 @@ const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(
 
 <template>
   <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-    <EditorAlbumCreditsRoles v-if="starting" :model-value="roles!" starting class="shrink-0" @update:model-value="emit('update:roles', $event)" />
+    <EditorAlbumCreditsRoles v-if="starting" :model-value="roles!" :exclude="exclude" starting class="shrink-0" @update:model-value="emit('update:roles', $event)" />
     <EditorAlbumCreditsRoles v-else-if="changeable" single :model-value="[role!]" :exclude="exclude" @update:model-value="emit('role', $event[0]!)">
       <template #trigger="{ toggle, attrs }">
         <button

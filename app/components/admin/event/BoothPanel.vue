@@ -26,6 +26,7 @@ interface AdminBooth {
 type BoothPick = { kind: 'existing', artist: BoothArtist } | { kind: 'new', name: string, name_kana: string, links: string[] }
 
 const props = defineProps<{ eventId: number }>()
+const { confirm } = useConfirm()
 const { $api } = useNuxtApp()
 const boothStateLabels: Record<string, string> = {
   '': '全部', 'pending': '待核对', 'suspect': '名字可疑', 'suggested': '有建议', 'unlinked': '未关联', 'linked': '已关联', 'confirmed': '已核对',
@@ -61,7 +62,7 @@ const selectPage = () => {
 }
 const createSelected = async () => {
   const ids = [...selected.value]
-  if (!ids.length || !window.confirm(`为选中的 ${ids.length} 个摊位各新建一个社团艺术家？同名的摊位共用一个，建好后这些摊位标为已核对。`)) return
+  if (!ids.length || !await confirm({ variant: 'confirm', title: '新建社团艺术家？', description: `为选中的 ${ids.length} 个摊位各新建一个社团艺术家。同名的摊位共用一个，建好后这些摊位标为已核对。` })) return
   busy.value = true
   message.value = ''
   notice.value = ''
@@ -141,7 +142,9 @@ const save = async (booth: AdminBooth, chosen: BoothPick[]) => {
   }
 }
 const confirmAsIs = (booth: AdminBooth) => save(booth, booth.artists.map(artist => ({ kind: 'existing', artist })))
-const setNone = (booth: AdminBooth) => window.confirm(`把「${booth.name}」标为不关联艺术家？以后的导入不会再给它关联。`) && save(booth, [])
+const setNone = async (booth: AdminBooth) => {
+  if (await confirm({ variant: 'confirm', title: '标为不关联艺术家？', description: `「${booth.name}」以后的导入不会再给它关联。` })) await save(booth, [])
+}
 const linkLabel = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
 </script>
 

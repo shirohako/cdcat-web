@@ -4,6 +4,7 @@
     :title="shown.title"
     :description="shown.description"
     :confirm-text="shown.confirmText"
+    :variant="shown.variant"
     @confirm="answerConfirm(true)"
     @cancel="answerConfirm(false)"
   />
@@ -17,7 +18,7 @@ const { request } = useConfirm()
 // Kept after the question is answered, so the text doesn't vanish while the dialog fades out.
 const shown = ref<ConfirmOptions>({ title: '' })
 watch(request, (value) => {
-  if (value) shown.value = { title: value.title, description: value.description, confirmText: value.confirmText }
+  if (value) shown.value = { title: value.title, description: value.description, confirmText: value.confirmText, variant: value.variant }
 })
 
 const onKeydown = (event: KeyboardEvent) => {

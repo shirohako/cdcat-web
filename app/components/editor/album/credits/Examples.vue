@@ -1,23 +1,23 @@
 <template>
   <div>
-    <!-- The two levels a credit can be on, tagged as the blocks below it are. -->
+    <!-- The two levels a credit can be on, in the colours of their blocks. -->
     <div class="grid gap-1.5 sm:grid-cols-2">
-      <p v-for="level in LEVELS" :key="level.scope" class="flex items-start gap-2 rounded-md bg-black/[0.05] px-2 py-1.5 dark:bg-white/[0.08]">
-        <span class="shrink-0 rounded px-1.5 text-[11px] font-semibold leading-5" :class="level.tone">{{ t(`editor.credits.scope_${level.scope}`) }}</span>
-        <span class="text-body">{{ t(`editor.credits.level_${level.scope}`) }}</span>
-      </p>
+      <div v-for="level in LEVELS" :key="level.scope" class="rounded-md bg-black/[0.05] px-2 py-1.5 dark:bg-white/[0.08]">
+        <span class="inline-block rounded px-1.5 text-[11px] font-semibold leading-5" :class="level.tone">{{ t(`editor.credits.scope_${level.scope}`) }}</span>
+        <p class="mt-1 text-body">{{ t(`editor.credits.level_${level.scope}`) }}</p>
+      </div>
     </div>
     <ul class="mt-2 divide-y divide-line border-t border-line">
       <li v-for="row in rows" :key="row.key" class="py-2">
         <p class="flex items-center gap-1.5 font-semibold">
-          <component :is="row.icon" :size="13" class="shrink-0 text-primary" />{{ t(`editor.credits.album_examples.${row.key}`) }}
+          <component :is="row.icon" :size="13" class="shrink-0 text-blue-600 dark:text-blue-300" />{{ t(`editor.credits.album_examples.${row.key}`) }}
         </p>
         <!-- When to use it, then the cases, each its ways of filling it in with what the album page draws; a closing note. -->
         <div class="pl-[1.1875rem]">
           <!-- The printed jobs in question first, then what to do about them. -->
-          <div v-if="row.intro" class="mb-2 mt-1 border-l-2 border-primary/50 pl-2.5">
+          <div v-if="row.intro" class="mb-2 mt-1 border-l-2 border-blue-300 pl-2.5 dark:border-blue-400/40">
             <p class="flex flex-wrap items-center gap-1.5">
-              <span v-for="job in row.jobs" :key="job" class="rounded bg-primary/20 px-1.5 font-medium text-title">{{ job }}</span>
+              <span v-for="job in row.jobs" :key="job" class="rounded bg-blue-100 dark:bg-blue-400/20 px-1.5 font-medium text-title">{{ job }}</span>
               <span class="font-semibold">{{ t('editor.credits.album_examples.job_lead') }}</span>
             </p>
             <p class="mt-1 text-body">{{ t(`editor.credits.album_examples.${row.intro}`) }}</p>
@@ -40,8 +40,8 @@ import { Guitar, Mic, PenLine, Tag, UsersRound } from '@lucide/vue'
 
 /** When each way of filling in a credit is for: the recommended way first, then the ones that aren't, each with what the album page shows. Role names are in English in every language. */
 const LEVELS = [
-  { scope: 'album', tone: 'bg-primary/20 text-primary' },
-  { scope: 'tracks', tone: 'bg-info/20 text-info' },
+  { scope: 'album', tone: 'bg-blue-100 text-blue-700 dark:bg-blue-400/20 dark:text-blue-200' },
+  { scope: 'tracks', tone: 'bg-rose-100/60 text-rose-700 dark:bg-rose-400/12 dark:text-rose-200' },
 ]
 
 const tag = (role: string, label: string, name: string): ExampleTag => ({ role, label, name })

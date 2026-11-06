@@ -13,6 +13,7 @@ import { TAG_NAME_MAX, tagErrorKey } from '~/utils/tags'
  */
 const props = defineProps<{ articleId: number | null }>()
 const { t, locale } = useI18n()
+const { confirm } = useConfirm()
 const { hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { showToast } = useToast()
@@ -182,7 +183,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 // Unsaved edits stay in this browser, but they are not on the server yet.
-onBeforeRouteLeave(() => !dirty.value || !can.value.edit || window.confirm(t('article_ui.writer.leave_confirm')))
+onBeforeRouteLeave(async () => !dirty.value || !can.value.edit || await confirm({ variant: 'confirm', title: t('article_ui.writer.leave_confirm'), description: t('article_ui.writer.leave_confirm_desc') }))
 
 const time = (value: string | null) => value ? new Intl.DateTimeFormat(locale.value, { hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : ''
 const saveLabel = computed(() => {

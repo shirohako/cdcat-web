@@ -8,20 +8,23 @@ import { foldRoleWord } from '~/utils/creditParser'
  * ones first, then the whole dictionary by group, searchable by every language's name and the other spellings. With
  * `required` (a line that has people) one role at least stays ticked, and the list says why; a line with no one yet
  * can be emptied to pick again. `starting` (a row being started) opens the list at once while no role is picked, and
- * the first pick closes it, so the search for a person comes next. Roles only the whole album has (发行、厂牌 …) belong in the byline block and are not
- * offered, nor those in `exclude`. `single` picks one role instead, replacing the one there and closing the list; the
+ * the first pick closes it, so the search for a person comes next. Roles in `exclude` are not offered, by default the
+ * ones only the whole album has (发行、厂牌 …). 其他 fits anything, so it opens the list in a 通用 group of its own. `single` picks one role instead, replacing the one there and closing the list; the
  * `trigger` slot replaces the button.
  */
 const model = defineModel<string[]>({ required: true })
-const props = defineProps<{ invalid?: boolean, single?: boolean, exclude?: string[], required?: boolean, starting?: boolean }>()
+const props = defineProps<{ invalid?: boolean, single?: boolean, exclude?: readonly string[], required?: boolean, starting?: boolean }>()
 
 const { t } = useI18n()
 const { separator } = useListPunctuation()
 const { schema, roleName, roleNameEn } = useCatalogSchema()
 const { enumLabel } = useCatalogDisplay()
 
+const GENERAL = 'general'
+const GENERAL_ROLES = ['other']
+
 const query = ref('')
-const offered = (key: string) => !ALBUM_ONLY_ROLES.includes(key) && !props.exclude?.includes(key)
+const offered = (key: string) => !(props.exclude ?? ALBUM_ONLY_ROLES).includes(key)
 const roles = computed(() => (schema.value?.credit_roles ?? []).filter(role => offered(role.key)))
 const common = computed(() => COMMON_ROLES.filter(offered))
 const matches = (role: CreditRoleDefinition) => {
@@ -29,9 +32,17 @@ const matches = (role: CreditRoleDefinition) => {
   return !term || [role.key, ...Object.values(role.names ?? {}), ...(role.aliases ?? [])].some(name => foldRoleWord(String(name ?? '')).includes(term))
 }
 const groups = computed(() => {
-  const byCategory = new Map<string, CreditRoleDefinition[]>()
-  for (const role of roles.value.filter(matches)) byCategory.set(role.category, [...(byCategory.get(role.category) ?? []), role])
-  return [...byCategory].map(([category, list]) => ({ category, label: enumLabel('credit_role_category', category), roles: list }))
+  // 通用 comes first and is only this list's: the dictionary keeps these roles in their own categories.
+  const byCategory = new Map<string, CreditRoleDefinition[]>([[GENERAL, []]])
+  for (const role of roles.value.filter(matches)) {
+    const category = GENERAL_ROLES.includes(role.key) ? GENERAL : role.category
+    byCategory.set(category, [...(byCategory.get(category) ?? []), role])
+  }
+  return [...byCategory].filter(([, list]) => list.length).map(([category, list]) => ({
+    category,
+    label: category === GENERAL ? t('editor.credits.roles_general') : enumLabel('credit_role_category', category),
+    roles: list,
+  }))
 })
 const label = computed(() => model.value.map(roleName).join(separator.value))
 

@@ -76,7 +76,7 @@ const save = async () => {
 // Starting from a group mail template copies its text into the campaign.
 const templateId = ref<number | null>(null)
 const loadTemplate = async () => {
-  if (!templateId.value || !await confirm({ title: '载入模板', description: '模板的内容会替换当前所有语言的标题和正文，未保存的修改会丢失。' })) return
+  if (!templateId.value || !await confirm({ variant: 'confirm', title: '载入模板', description: '模板的内容会替换当前所有语言的标题和正文，未保存的修改会丢失。' })) return
   try {
     const template = await $api<AdminMailTemplate>(`/v1/admin/mail/templates/${templateId.value}`)
     form.contents = plain<AdminMailContents>(template.contents)
@@ -162,7 +162,7 @@ async function run(action: () => Promise<unknown>, done: string) {
   }
 }
 const unschedule = async () => {
-  if (await confirm({ title: '取消定时', description: '取消后回到草稿，可以继续编辑，之后再重新发送或定时。' })) {
+  if (await confirm({ variant: 'confirm', title: '取消定时', description: '取消后回到草稿，可以继续编辑，之后再重新发送或定时。' })) {
     await run(() => $api(`/v1/admin/mail/campaigns/${id.value}/cancel`, { method: 'POST' }), '已取消定时，回到草稿。')
   }
 }

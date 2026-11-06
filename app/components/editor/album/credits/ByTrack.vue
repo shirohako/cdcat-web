@@ -44,6 +44,7 @@ const copyPrevious = async (index: number) => {
   const track = tracks.value[index]!
   const own = trackCredits(track.id).reduce((count, item) => count + item.rows.length, 0)
   if (own && !await confirm({
+    variant: 'confirm',
     title: t('editor.credits.same_confirm_title'),
     description: t('editor.credits.same_confirm_desc', { count: own }),
     confirmText: t('editor.credits.same_as_previous'),
@@ -56,8 +57,9 @@ const copyPrevious = async (index: number) => {
   <div class="space-y-3">
     <p v-if="!tracks.length" class="rounded-lg border border-dashed border-line px-4 py-4 text-center text-xs text-meta">{{ t('editor.credits.no_tracks_hint') }}</p>
     <section v-for="(track, index) in tracks" :key="String(track.id)" class="rounded-lg border border-line">
-      <p class="flex items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-xs">
-        <span class="w-8 shrink-0 font-mono text-faint">{{ track.number_label || String(track.track_number).padStart(2, '0') }}</span>
+      <!-- As tall with 和上一首相同 as without it. -->
+      <p class="flex min-h-[2.5625rem] items-center gap-2 rounded-t-[7px] border-b border-line bg-sunken px-3 py-1.5 text-xs">
+        <span class="min-w-5 shrink-0 font-mono text-faint">{{ track.number_label || String(track.track_number).padStart(2, '0') }}</span>
         <span class="min-w-0 flex-1 truncate font-semibold text-title">{{ track.title || '—' }}</span>
         <UiButton v-if="canCopy(index)" size="xs" icon="lucide:copy" icon-class="size-3" class="shrink-0 gap-1 ring-1 ring-inset ring-line" @click="copyPrevious(index)">{{ t('editor.credits.same_as_previous') }}</UiButton>
       </p>

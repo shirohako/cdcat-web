@@ -7,7 +7,7 @@ import { newKey } from '~/utils/documentKeys'
 
 /**
  * 按角色: the tracks' credits as lines, each a line of the booklet (roles × people × tracks). A line left with no track
- * is the whole album's, so it moves up to 参与创作 (专辑); a line starts with every track for that reason. It has no
+ * is the whole album's, so it moves up to 专辑参与创作; a line starts with every track for that reason. It has no
  * one yet, so it lives here until its first person is added; then it is credits like the others.
  */
 const { t } = useI18n()

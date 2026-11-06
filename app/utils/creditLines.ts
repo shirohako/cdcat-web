@@ -22,14 +22,17 @@ export const personOf = (row: AlbumCreditRow): CreditPerson => ({ artist_id: row
 export const personKey = (person: CreditPerson) => JSON.stringify([person.artist_id, person.credited_as || null, person.role_label || null, person.detail || null])
 const isPerson = (person: CreditPerson) => (row: AlbumCreditRow) => personKey(personOf(row)) === personKey(person)
 
-/** The whole album's 署名与发行 credits, which the byline block edits; everything else is in the lines or the track lists. */
-export const isBylineCredit = (row: AlbumCreditRow) => row.track_id === null && (RELEASE_ROLES as readonly string[]).includes(row.role)
+/** The roles that decide the names under an album's title, which the byline block edits. */
+export const BYLINE_ROLES: readonly string[] = ['artist', 'publisher']
 
-/** Roles only the whole album can have (发行、厂牌 …): they belong in the byline block. */
+/** The whole album's credits in the byline block; everything else is in the lines or the track lists. */
+export const isBylineCredit = (row: AlbumCreditRow) => row.track_id === null && BYLINE_ROLES.includes(row.role)
+
+/** Roles only the whole album can have (发行、厂牌 …), so a track never offers them. */
 export const ALBUM_ONLY_ROLES: readonly string[] = RELEASE_ROLES.filter(role => role !== 'artist')
 
 /** The roles a line can be started with in one click; the rest are under 更多角色. */
-export const COMMON_ROLES = ['composer', 'lyricist', 'arranger', 'vocals', 'performer', 'illustrator', 'mixing', 'mastering']
+export const COMMON_ROLES = ['composer', 'lyricist', 'arranger', 'vocals', 'performer', 'illustrator', 'mixing', 'mastering', 'other']
 
 /** The byline block's credits of one role, in order. */
 export const bylineCredits = (doc: AlbumDocument, role: string) => byOrder(doc.credits).filter(row => isBylineCredit(row) && row.role === role)

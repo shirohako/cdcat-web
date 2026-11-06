@@ -37,7 +37,7 @@ const add = async () => {
   }
 }
 const remove = async (suppression: AdminMailSuppression) => {
-  if (!await confirm({ title: `把 ${suppression.email} 移出退信名单？`, description: '移出后，这个地址会重新收到群发。' })) return
+  if (!await confirm({ variant: 'confirm', title: `把 ${suppression.email} 移出退信名单？`, description: '移出后，这个地址会重新收到群发。' })) return
   busy.value = true
   message.value = ''
   notice.value = ''

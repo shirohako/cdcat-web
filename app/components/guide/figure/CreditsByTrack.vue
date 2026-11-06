@@ -23,7 +23,7 @@ const TRACKS = [
 <template>
   <GuideMockPanel :title="t('editor.album.section.credits')" icon="lucide:contact" aria-hidden="true">
     <p class="mb-2 flex flex-wrap items-center justify-between gap-2">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors') }}</span>
+      <span class="text-[10px] font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors_tracks') }}</span>
       <span class="flex gap-0.5 rounded-md bg-sunken p-0.5 text-[10px] font-semibold">
         <span class="rounded-[4px] px-2 py-px text-body">{{ t('editor.credits.view_by_role') }}</span>
         <span class="rounded-[4px] bg-primary px-2 py-px text-on-primary">{{ t('editor.credits.view_by_track') }}</span>

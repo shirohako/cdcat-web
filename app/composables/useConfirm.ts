@@ -2,6 +2,8 @@ export interface ConfirmOptions {
   title: string
   description?: string
   confirmText?: string
+  /** `delete` (the default): red, a bin and 确认删除. `confirm`: anything else that deserves a second thought. */
+  variant?: 'delete' | 'confirm'
 }
 
 interface ConfirmRequest extends ConfirmOptions {
@@ -12,7 +14,8 @@ interface ConfirmRequest extends ConfirmOptions {
 const request = shallowRef<ConfirmRequest | null>(null)
 
 /**
- * Asks for confirmation in the site's dialog instead of the browser's: `if (!await confirm({ title })) return`.
+ * Asks for confirmation in the site's dialog instead of the browser's: `if (!await confirm({ title })) return`. Pass
+ * `variant: 'confirm'` unless it deletes something.
  * A new question answers an open one with no.
  */
 export function useConfirm() {

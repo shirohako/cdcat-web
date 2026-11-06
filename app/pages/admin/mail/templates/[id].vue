@@ -70,7 +70,7 @@ const save = async () => {
 const resetLocale = ref<'all' | AdminMailLocale>('all')
 const reset = async () => {
   const language = resetLocale.value === 'all' ? '全部语言' : localeName(resetLocale.value)
-  if (!await confirm({ title: `把${language}恢复成默认文案？`, description: '会用代码里的默认文案覆盖当前内容，覆盖后不能撤销。' })) return
+  if (!await confirm({ variant: 'confirm', title: `把${language}恢复成默认文案？`, description: '会用代码里的默认文案覆盖当前内容，覆盖后不能撤销。' })) return
   busy.value = true
   message.value = ''
   notice.value = ''

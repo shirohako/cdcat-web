@@ -95,6 +95,7 @@ const draftCompareOpen = ref(false)
 const draftSources = computed(() => [...new Map((detail.value?.records ?? []).map(record => [record.source, record.label])).entries()])
 const regenerate = async (prefer?: string) => {
   if (!await confirm({
+    variant: 'confirm',
     title: prefer ? `以${sourceName(prefer)}为主重新生成草稿？` : '按来源重新生成草稿？',
     description: '草稿里现在的修改会丢掉。',
     confirmText: '重新生成',
@@ -173,6 +174,7 @@ const approve = async (payload: RevisionDraftPayload) => {
   const document = payload.items.find(item => item.resource_type === 'album')?.document as unknown as AlbumDocument | undefined
   const left = document ? peopleWarnings(document, people.value, circleMatch.value).filter(warning => warning.open) : []
   if (left.length && !await confirm({
+    variant: 'confirm',
     title: `还有 ${left.length} 个名字没处理，仍然提交吗？`,
     description: `${left.map(warning => warning.names[0]).join('、')} 会保持纯署名${left.some(warning => warning.kind === 'circle') ? '，专辑也没有专辑艺人' : ''}。`,
     confirmText: '仍然提交',
@@ -221,6 +223,7 @@ const act = async (path: string, body: Record<string, unknown> = {}, after: 'nex
 /** Takes one source out into a candidate of its own, after asking: both candidates' sources are pinned then, and merging never joins them again. */
 const split = async (record: { record_id: number, part: number, label: string, title: string }) => {
   if (!await confirm({
+    variant: 'confirm',
     title: `把${record.label}的「${record.title}」拆成单独的候选？`,
     description: '拆出后两个候选的来源都会固定，自动合并和重新分组不会再把它们合到一起；拆错了只能在新候选里用「合并」并回来。',
     confirmText: '拆出',

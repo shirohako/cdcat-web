@@ -24,6 +24,8 @@
             :class="SIZES[size]"
             role="dialog"
             aria-modal="true"
+            :data-theme="dark ? 'dark' : undefined"
+            :data-palette="dark ? appliedPalette : undefined"
             :aria-labelledby="titleId"
             :novalidate="as === 'form' || undefined"
             @submit.prevent="emit('submit')"
@@ -59,7 +61,7 @@ import { dialogStack as stack } from '~/utils/dialogStack'
  * A dialog, centred at every width with the page showing around it. With `as="form"` the body is a form, so a
  * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field or button
  * marked `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of
- * the close button.
+ * the close button. `dark` keeps it dark on the light theme too, in the tooltips' colours; on the dark theme nothing changes.
  */
 withDefaults(defineProps<{
   title: string
@@ -68,13 +70,15 @@ withDefaults(defineProps<{
   tone?: UiTone
   size?: 'sm' | 'md' | 'ml' | 'lg' | 'xl'
   as?: 'form' | 'div'
-}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div' })
+  dark?: boolean
+}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div', dark: false })
 
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
 
 const SIZES = { sm: 'sm:max-w-sm', md: 'sm:max-w-lg', ml: 'sm:max-w-2xl', lg: 'sm:max-w-3xl', xl: 'sm:max-w-5xl' }
 
+const { appliedPalette } = useAppearance()
 const titleId = useId()
 const panel = ref<HTMLElement | null>(null)
 const token = Symbol('dialog')
