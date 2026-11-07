@@ -2,12 +2,16 @@
 // "Xeudo Code & Xeno feat. eili" eili is Xeno's. Pages show each credit with the 客串 that belong to it, "Xeno feat.
 // eili", one tag in the tracklist. × & and the like are not kept: names are simply listed. On a track every 客串 has
 // one (the backend gives it, App\Services\Catalog\Aggregates\AlbumSchema::parents); parentOf gives the same answer
-// while the editor's document is not saved yet. See docs/catalog/README.md#署名行.
+// while the editor's document is not saved yet. Two artists of a track stay two artists, but a word printed between
+// them (join_phrase, on the later one) shows them as one: "awfuless meets PODA". See docs/catalog/README.md#署名行.
 
 type Id = number | string
 
 /** The 客串 role: its people belong to another credit of the track rather than leading it themselves. */
 export const FEATURING_ROLE = 'featuring'
+
+/** The role a track's own artists are credited in; their order is printed, and a word can join two (join_phrase). */
+export const ARTIST_ROLE = 'artist'
 
 export interface ParentCredit {
   id: Id

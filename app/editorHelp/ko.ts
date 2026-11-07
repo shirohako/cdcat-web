@@ -146,11 +146,16 @@ const help: Record<string, EditorHelpEntry> = {
     where: '페이지에서 역할 이름 대신 이 텍스트가 표시돼요. 어느 언어에서든 원문 그대로 보여요.',
     mock: { page: 'track', mark: 'role_label' },
   },
+  'person.join_phrase': {
+    text: '두 아티스트 사이에 meets, vs 같은 말이 인쇄돼 있고 그대로 남기고 싶을 때 적어요. 둘 다 아티스트로 남고, 페이지에서 한 태그로 이어질 뿐이에요.',
+    dont: ['그냥 나란히 적힌 이름에는 쓰지 않아요. 따로 표시돼요', 'feat.는 여기에 적지 말고 뒤 사람의 역할을 Featuring으로 골라요'],
+    where: '트랙리스트와 곡 페이지의 아티스트 줄. 크레딧 목록과 아티스트 페이지에는 표시되지 않아요.',
+  },
   'person.parent': {
-    text: '같은 곡의 참여자 중 이 사람이 누구에게 속하는지 골라요. 피처링만 꼭 골라야 하고, 기본값은 바로 앞에 있는 사람이에요.',
+    text: '이 Featuring이 같은 곡의 누구와 함께인지 골라요. 기본값은 바로 앞에 있는 사람이에요.',
     rows: [
-      ['Gardens feat. moon jelly', 'moon jelly의 역할은 피처링, 소속은 Gardens를 선택'],
-      ['Xeno feat. eili', 'eili의 역할은 피처링, 소속은 Xeno를 선택'],
+      ['Gardens feat. moon jelly', 'moon jelly의 역할은 Featuring, 소속은 Gardens를 선택'],
+      ['Xeno feat. eili', 'eili의 역할은 Featuring, 소속은 Xeno를 선택'],
     ],
     where: '수록곡 목록에서 두 이름이 이어져 표시돼요.',
   },

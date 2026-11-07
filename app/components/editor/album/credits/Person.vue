@@ -10,7 +10,9 @@ import type { CreditPerson } from '~/utils/creditLines'
  * card closes, since they decide which line the person is in), a new artist's type, and linking the person to an
  * artist or keeping only the printed name.
  * Given `parent` (on a track card), also which credit of the track it belongs to (parent_id, utils/artistLine): the
- * 客串's 艺术家, shown on the tag as "↳ Xeno" when there was a choice.
+ * 客串's 艺术家, shown on the tag as "↳ Xeno" when there was a choice. A track's artists (on a track card) also have a
+ * place: `movable` moves them along, and `joinAfter` names the artist before, whom a word printed before this
+ * one (`joinPhrase`, on the tag too) joins it to.
  */
 const props = defineProps<{
   person: CreditPerson
@@ -18,14 +20,17 @@ const props = defineProps<{
   /** The credit has one role that can take a job title (canHaveRoleLabel) */
   labelable?: boolean
   parent?: { value: string, options: UiSelectOption<string>[], label: string | null }
+  joinPhrase?: string | null
+  joinAfter?: string
+  movable?: { earlier: boolean, later: boolean }
 }>()
-const emit = defineEmits<{ update: [patch: Partial<CreditPerson>], remove: [], parent: [value: string] }>()
+const emit = defineEmits<{ update: [patch: Partial<CreditPerson>], remove: [], parent: [value: string], move: [delta: number] }>()
 
 const { t } = useI18n()
 const people = useCreditPeople()
 
 const open = ref(false)
-const form = reactive({ credited_as: '', role_label: '', detail: '' })
+const form = reactive({ credited_as: '', role_label: '', join_phrase: '', detail: '' })
 const name = computed(() => people.nameOf(props.person))
 const isNew = computed(() => people.isNew(props.person))
 const type = computed({
@@ -42,6 +47,7 @@ const formPatch = (): Partial<CreditPerson> => {
   if (printed !== props.person.credited_as) patch.credited_as = printed
   if ((form.detail.trim() || null) !== props.person.detail) patch.detail = form.detail.trim() || null
   if (props.labelable && (form.role_label.trim() || null) !== (props.person.role_label ?? null)) patch.role_label = form.role_label.trim() || null
+  if (props.joinAfter !== undefined && (form.join_phrase.trim() || null) !== (props.joinPhrase ?? null)) patch.join_phrase = form.join_phrase.trim() || null
   return patch
 }
 
@@ -51,6 +57,7 @@ watch(open, (opened) => {
   if (opened) {
     form.credited_as = props.person.credited_as ?? ''
     form.role_label = props.person.role_label ?? ''
+    form.join_phrase = props.joinPhrase ?? ''
     form.detail = props.person.detail ?? ''
     applied = false
     return
@@ -58,6 +65,14 @@ watch(open, (opened) => {
   const patch = formPatch()
   if (!applied && Object.keys(patch).length) emit('update', patch)
 })
+
+/** A move hands the word on to whoever takes this place, so what is typed goes first and the field follows. */
+const move = (delta: number) => {
+  const patch = formPatch()
+  if (Object.keys(patch).length) emit('update', patch)
+  emit('move', delta)
+}
+watch(() => props.joinPhrase, (value) => { form.join_phrase = value ?? '' })
 
 const finish = (patch: Partial<CreditPerson>) => {
   applied = true
@@ -84,6 +99,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         ]"
       >
         <button type="button" class="flex h-full min-w-0 items-center gap-1.5 rounded-l-md pl-2 pr-1 text-left hover:bg-btn-hover/60" v-bind="attrs" @click="toggle">
+          <span v-if="joinPhrase" class="shrink-0 text-[11px] text-meta">{{ joinPhrase }}</span>
           <span class="truncate font-medium text-title">{{ name || '—' }}</span>
           <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-[11px] text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
           <span v-if="person.role_label" class="truncate text-[11px] text-primary">· {{ person.role_label }}</span>
@@ -118,6 +134,16 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}<EditorHelp id="person.detail" /></span>
         <input v-model="form.detail" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
       </label>
+      <label v-if="joinAfter !== undefined" class="block">
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.join_phrase') }}<EditorHelp id="person.join_phrase" /></span>
+        <input v-model="form.join_phrase" class="input input-sm w-full" maxlength="50" :placeholder="t('editor.credits.join_phrase_hint')" @keydown.enter.prevent="open = false">
+        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.join_phrase_note', { name: joinAfter }) }}</span>
+      </label>
+      <div v-if="movable" class="flex items-center gap-1.5">
+        <span class="mr-auto text-xs font-medium text-body">{{ t('editor.credits.artist_order') }}</span>
+        <UiButton size="xs" icon="lucide:arrow-left" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" :disabled="!movable.earlier" @click="move(-1)">{{ t('editor.credits.move_earlier') }}</UiButton>
+        <UiButton size="xs" icon-right="lucide:arrow-right" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" :disabled="!movable.later" @click="move(1)">{{ t('editor.credits.move_later') }}</UiButton>
+      </div>
       <label v-if="labelable" class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}<EditorHelp id="person.role_label" /></span>
         <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">

@@ -2,7 +2,7 @@
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
 import { canHaveRoleLabel } from '~/utils/albumDocument'
-import { FEATURING_ROLE, parentCandidates, parentOf } from '~/utils/artistLine'
+import { ARTIST_ROLE, FEATURING_ROLE, parentCandidates, parentOf } from '~/utils/artistLine'
 import { personOf } from '~/utils/creditLines'
 
 /**
@@ -10,9 +10,10 @@ import { personOf } from '~/utils/creditLines'
  * person, and a search to add another. `roles` makes it a row being started, with the role still to pick; then the
  * search opens as soon as there is one, and it can be dropped (`cancel`). Otherwise, when `changeable`, a click on the role's name changes it for the
  * whole row (not to the roles in `exclude`), which joins the row of that role if the track has one. Each tag is one
- * credit row. Given the track's credits (`trackRows`), each tag also picks the credit it belongs to (utils/artistLine):
- * a 客串 always one of them, the default the one before it; another role one or none. A credit others belong to
- * belongs to none itself. A row with people can be emptied at once from the bin right after the role, shown on hovering the row (always on touch), after a question (`remove` for each).
+ * credit row. Given the track's credits (`trackRows`), a 客串's tag also picks the credit it belongs to (utils/artistLine),
+ * the default the one before it; only 客串 show that anywhere, so no other role offers it. The artists of a track also have an order to change and a word to join them by. A row with
+ * people can be emptied at once from the bin right after the role, shown on hovering the row (always on touch), after a
+ * question (`remove` for each).
  */
 const props = defineProps<{ role?: string, rows?: AlbumCreditRow[], roles?: string[], trackRows?: AlbumCreditRow[], changeable?: boolean, exclude?: readonly string[] }>()
 const emit = defineEmits<{
@@ -23,6 +24,7 @@ const emit = defineEmits<{
   'update:roles': [roles: string[]]
   'cancel': []
   'parent': [row: AlbumCreditRow, parent: AlbumCreditRow | null]
+  'move': [row: AlbumCreditRow, delta: number]
 }>()
 
 const { t } = useI18n()
@@ -33,21 +35,29 @@ const { roleName, roleNameEn } = useCatalogSchema()
 
 const parentOfRow = (row: AlbumCreditRow) => {
   const rows = props.trackRows
-  if (!rows) return undefined
+  if (!rows || row.role !== FEATURING_ROLE) return undefined
   const candidates = parentCandidates(row, rows)
-  const featuring = row.role === FEATURING_ROLE
-  const hasOwn = rows.some(other => other !== row && parentOf(other, rows) === row)
-  if (!candidates.length || hasOwn || (featuring && candidates.length < 2 && row.parent_id == null)) return undefined
+  if (!candidates.length || (candidates.length < 2 && row.parent_id == null)) return undefined
   const current = parentOf(row, rows)
   const label = (credit: AlbumCreditRow) => `${people.nameOf(personOf(credit)) || '—'} · ${roleName(credit.role)}`
   return {
     value: current ? String(current.id) : '',
-    options: [...(featuring ? [] : [{ value: '', label: t('editor.credits.parent_none') }]), ...candidates.map(credit => ({ value: String(credit.id), label: label(credit) }))],
-    label: current && (candidates.length > 1 || !featuring) ? people.nameOf(personOf(current)) : null,
+    options: candidates.map(credit => ({ value: String(credit.id), label: label(credit) })),
+    label: current && candidates.length > 1 ? people.nameOf(personOf(current)) : null,
   }
 }
 const setParent = (row: AlbumCreditRow, value: string) => emit('parent', row, props.trackRows?.find(other => String(other.id) === value) ?? null)
 const starting = computed(() => props.roles !== undefined)
+/** A track's artists: printed in order, so they can be moved and joined by a word (utils/artistLine). */
+const ordered = computed(() => !!props.trackRows && props.role === ARTIST_ROLE)
+const placeOf = (index: number) => {
+  const rows = props.rows ?? []
+  if (!ordered.value) return {}
+  return {
+    joinAfter: index ? people.nameOf(personOf(rows[index - 1]!)) || '—' : undefined,
+    movable: rows.length > 1 ? { earlier: index > 0, later: index < rows.length - 1 } : undefined,
+  }
+}
 const invalid = (row: AlbumCreditRow) => editor.errorsIn(`credits.${row.id}`).length > 0
 const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(`credits.${row.id}`)))
 const removeAll = async () => {
@@ -87,12 +97,15 @@ const removeAll = async () => {
     </div>
     <span class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
       <EditorAlbumCreditsPerson
-        v-for="row in rows ?? []"
+        v-for="(row, index) in rows ?? []"
         :key="String(row.id)"
         :person="personOf(row)"
         :invalid="invalid(row)"
         :labelable="canHaveRoleLabel(row.role)"
         :parent="parentOfRow(row)"
+        :join-phrase="row.join_phrase"
+        v-bind="placeOf(index)"
+        @move="emit('move', row, $event)"
         @update="emit('update', row, $event)"
         @remove="emit('remove', row)"
         @parent="setParent(row, $event)"

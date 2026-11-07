@@ -7,7 +7,7 @@ import type { AlbumImage } from '~/types/album'
 import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/document'
 import type { ParsedDisc } from './tracklistParser'
 import { RELEASE_ROLES } from '../types/album'
-import { FEATURING_ROLE } from './artistLine'
+import { ARTIST_ROLE, FEATURING_ROLE } from './artistLine'
 import { newKey } from './documentKeys'
 import { byOrder, nextOrder, sameId } from './documentRows'
 import { mainImageOf, makeMainImage } from './mainImages'
@@ -413,6 +413,7 @@ const dedupeCredits = (doc: AlbumDocument) => {
     if (kept) {
       dropped.set(String(row.id), kept)
       kept.parent_id ??= row.parent_id ?? null
+      kept.join_phrase ||= row.join_phrase ?? null
       return false
     }
     seen.set(key, row)
@@ -422,7 +423,7 @@ const dedupeCredits = (doc: AlbumDocument) => {
     const kept = row.parent_id != null ? dropped.get(String(row.parent_id)) : undefined
     if (kept) row.parent_id = kept.id
   }
-  tidyParents(doc)
+  tidyCredits(doc)
 }
 
 /**
@@ -436,6 +437,40 @@ const tidyParents = (doc: AlbumDocument) => {
     const parent = ids.get(String(row.parent_id))
     if (!parent || parent === row || String(parent.track_id ?? '') !== String(row.track_id ?? '')) row.parent_id = null
   }
+}
+
+const isTrackArtist = (row: AlbumCreditRow) => row.role === ARTIST_ROLE && row.track_id !== null
+
+/** A word printed before an artist joins it to the artist before it: the first of a track has none, as nothing else does (AlbumSchema::joinPhrases). */
+const tidyJoinPhrases = (doc: AlbumDocument) => {
+  const started = new Set<string>()
+  for (const row of byOrder(doc.credits)) {
+    if (row.join_phrase && !(isTrackArtist(row) && started.has(String(row.track_id)))) row.join_phrase = null
+    if (isTrackArtist(row)) started.add(String(row.track_id))
+  }
+}
+
+const tidyCredits = (doc: AlbumDocument) => {
+  tidyParents(doc)
+  tidyJoinPhrases(doc)
+}
+
+/** A track's artists in printed order. */
+export const trackArtists = (doc: AlbumDocument, trackId: RowId | null) =>
+  byOrder(doc.credits).filter(row => isTrackArtist(row) && sameId(row.track_id, trackId))
+
+/**
+ * Swaps a track's artist with the one next to it. The word stays where it is printed, between the two places, so
+ * "PODA meets awfuless" becomes "awfuless meets PODA".
+ */
+export function moveTrackArtist(doc: AlbumDocument, row: AlbumCreditRow, delta: number) {
+  const artists = trackArtists(doc, row.track_id)
+  const index = artists.findIndex(item => sameId(item.id, row.id))
+  const [mine, other] = [artists[index], artists[index + delta]]
+  if (!mine || !other) return
+  const { sort_order: place, join_phrase: word } = mine
+  Object.assign(mine, { sort_order: other.sort_order, join_phrase: other.join_phrase ?? null })
+  Object.assign(other, { sort_order: place, join_phrase: word ?? null })
 }
 
 /** Sets the credit `row` belongs to, null for none (a 客串 then belongs to the default one, parentOf). */
@@ -495,24 +530,30 @@ export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'arti
 export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
   const ids = new Set(rows.map(row => String(row.id)))
   doc.credits = doc.credits.filter(row => !ids.has(String(row.id)))
-  tidyParents(doc)
+  tidyCredits(doc)
 }
 
 /** Changes these credit rows in place (their ids stay), dropping any that become duplicates of others. */
-export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'role_label' | 'detail'>>) {
+export function patchCredits(doc: AlbumDocument, rows: AlbumCreditRow[], patch: Partial<Pick<AlbumCreditRow, 'artist_id' | 'credited_as' | 'role' | 'role_label' | 'join_phrase' | 'detail'>>) {
   for (const row of rows) Object.assign(row, patch)
   dedupeCredits(doc)
 }
 
 /**
  * Gives the rows another role, the job title with it where the new role can have one. A 客串 is no credit to belong
- * to, so what belonged to one of them belongs to none.
+ * to, so what belonged to one of them belongs to none; and one that stops being a 客串 belongs to none itself, since
+ * no other role can pick that.
  */
 export function changeCreditRole(doc: AlbumDocument, rows: AlbumCreditRow[], role: string) {
   if (role === FEATURING_ROLE) {
     const ids = new Set(rows.map(row => String(row.id)))
     for (const row of doc.credits) {
       if (row.parent_id != null && ids.has(String(row.parent_id))) row.parent_id = null
+    }
+  }
+  else {
+    for (const row of rows) {
+      if (row.role === FEATURING_ROLE) row.parent_id = null
     }
   }
   patchCredits(doc, rows, canHaveRoleLabel(role) ? { role } : { role, role_label: null })

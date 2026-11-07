@@ -296,7 +296,7 @@ const guide: GuideContent = {
           - 「M1.曲名」「M-01.」开头的分块（VGMdb 备注常这样写）也认得：下面缩进的行算这首的，中间有空行也不要紧；「Music&Lyric」这样连写的角色会拆开，「つぐ&るる」这样日文名之间的 & 是两个人；
           - 英文角色加曲号列表也认得，如「Composer: Kaito Mizuno (01, 10, 14)」，「02-09」是第 2 到第 9 首；「Starlit Sound, LLC.」「Co., Ltd.」这样公司名里的逗号不会把名字拆开，用《》「」括起来的名字也不拆，括号会去掉。窗口里有几个示例，鼠标移上去能看到每种写法能自动识别什么；
           - 名字会自动对上库里的艺术家（主名称和别名都算）；库里没有的默认新建，也可以改成「仅署名」；
-          - 「Gardens feat. moon jelly」里 feat. 后面的人记成「客串」，属于 feat. 前面紧挨的那位；「A & B」「A × B」拆成两个人，整串正好是库里一位艺术家时不拆。& × 这些只用来分开名字，不会记下来；
+          - 「Gardens feat. moon jelly」里 feat. 后面的人记成「Featuring」，属于 feat. 前面紧挨的那位；「A & B」「A × B」拆成两个人，整串正好是库里一位艺术家时不拆。& × 这些只用来分开名字，不会记下来；
           - 认不出的角色、有好几位同名的艺术家会标黄，选好之后才会加进去。
 
           **适合**：手边有现成的文字时，先整段贴进来，再用按角色或按曲目补上认不出来的部分。
@@ -311,8 +311,9 @@ const guide: GuideContent = {
           |---|---|
           | 作曲・編曲：ミナト | 一行，角色选作曲和编曲，人选 ミナト |
           | 两位艺术家并列署名 | 「艺术家」里放两个人 |
-          | Gardens feat. moon jelly | Gardens 填「艺术家」，moon jelly 填「客串」，页面上显示成「Gardens feat. moon jelly」，两个名字各有名片 |
-          | Xeudo Code & Xeno feat. eili | 两人都填「艺术家」，eili 填「客串」，所属选 Xeno；曲目表显示成 [Xeudo Code] [Xeno feat. eili] |
+          | Gardens feat. moon jelly | Gardens 填「艺术家」，moon jelly 填「Featuring」，页面上显示成「Gardens feat. moon jelly」，两个名字各有名片 |
+          | Xeudo Code & Xeno feat. eili | 两人都填「艺术家」，eili 填「Featuring」，所属选 Xeno；曲目表显示成 [Xeudo Code] [Xeno feat. eili] |
+          | awfuless meets PODA | 两人都填「艺术家」，awfuless 在前；在「按曲目」里点 PODA，在「连接词」里写 meets，曲目表显示成 [awfuless meets PODA]。只是并列署名就不用填；顺序不对时，点人名用「前移」「后移」调整 |
           | Yuki Kajiura（库里叫梶浦由記） | 选梶浦由記，再点人名，在「署名」里填 Yuki Kajiura |
           | 封面只印社团名 | 社团填进发行；作曲、演唱等按角色另填 |
           | 合辑，每首曲目的歌手不同 | 切换到按曲目，每首曲目添加「艺术家」 |

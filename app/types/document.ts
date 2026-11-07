@@ -51,7 +51,7 @@ export interface AlbumDocument {
    */
   disc_tocs: Array<{ id: RowId, disc_id: RowId, first_track: number, last_track: number, leadout_offset: number, offsets: number[], data_track: number | null, source: string }>
   /** parent_id: the credit of the same track (or album) this one belongs to, a 客串's 艺术家 (utils/artistLine) */
-  credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, parent_id?: RowId | null, role: string, role_label?: string | null, detail: string | null, sort_order?: number }>
+  credits: Array<{ id: RowId, track_id: RowId | null, artist_id: AggregateRef | null, credited_as: string | null, parent_id?: RowId | null, role: string, role_label?: string | null, join_phrase?: string | null, detail: string | null, sort_order?: number }>
   /** is_primary marks the main cover and banner (albums.image_url and banner_url are derived from them). */
   images: Array<{
     id: RowId, image_id: number, kind: string, label: string | null, caption: string | null,

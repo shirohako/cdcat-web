@@ -5,8 +5,9 @@ import { nameParts } from '~/utils/artistLine'
 
 /**
  * The people of one credit, each a grey tag at the role tags' height (the 制作人员 card's look), the detail note inside
- * it. The 客串 that belong to a credit share its tag, "Xeno feat. eili", each name its own link and artist hover card
- * (while it is on). A credited name holding the artist's own name links only that part ("void (Mournfinale)": void).
+ * it. The 客串 that belong to a credit share its tag, "Xeno feat. eili", and so do the artists joined to it by a printed
+ * word, "awfuless meets PODA", each name its own link and artist hover card (while it is on). A credited name holding
+ * the artist's own name links only that part ("void (Mournfinale)": void).
  * No joiners: the tags simply follow one another. They wrap with a small gap, stack one per line with `stack` (to the
  * right with `end`), or sit in the text around them with `inline`, for a line cut with ….
  */
@@ -26,7 +27,9 @@ const layout = computed(() => {
 })
 
 /** A tag that is one link, the whole of it darkening on hover: one name, linked whole, with no 客串 */
-const whole = (person: TracklistPerson) => person.artistId !== null && !person.guests.length && !nameParts(person.name, person.artistName)
+const whole = (person: TracklistPerson) => person.artistId !== null && !person.guests.length && !person.joined?.length && !nameParts(person.name, person.artistName)
+/** Everyone in the tag that has their own name, the word, and 客串 */
+const members = (person: TracklistPerson) => [person, ...(person.joined ?? [])]
 /**
  * A name inside a tag that holds more: its own darker patch on hover, 16px tall in the 18px tag and 5px wider than the
  * text on each side, so it sits 1px in from the tag's edges (such a tag has 1px padding, not 6px, and the text stays
@@ -51,17 +54,20 @@ const namePad = (person: TracklistPerson) => {
       class="inline-flex h-[1.125rem] min-w-0 max-w-full items-center gap-1 rounded-[4px] bg-black/[0.05] text-xs leading-[1.125rem] text-title transition-colors duration-150 dark:bg-white/[0.08]"
       :class="[inline && 'align-middle', whole(person) ? 'px-1.5 hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]' : 'gap-0 px-px']"
     >
-      <span v-if="whole(person)" class="truncate">{{ person.name }}</span>
-      <CatalogArtistName v-else :name="person.name" :artist-id="person.artistId" :artist-name="person.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(person)" />
-      <span v-if="person.detail" class="shrink-0 text-[11px] text-meta" :class="!whole(person) && 'px-[3px]'">{{ person.detail }}</span>
-      <template v-if="person.guests.length">
-        <!-- Pulled into the names' 5px patches, so about 2px of air on each side -->
-        <span class="-mx-[3px] shrink-0 text-meta">feat.</span>
-        <span v-for="(guest, index) in person.guests" :key="guest.creditId" class="inline-flex min-w-0 items-center">
-          <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(guest)" />
-          <span v-if="guest.detail" class="shrink-0 pr-[5px] text-[11px] text-meta">{{ guest.detail }}</span>
-          <span v-if="index < person.guests.length - 1" class="-ml-1 mr-0.5 text-meta">,</span>
-        </span>
+      <template v-for="(member, position) in members(person)" :key="member.creditId">
+        <!-- The words are pulled into the names' 5px patches, so about 2px of air on each side -->
+        <span v-if="position" class="-mx-[3px] shrink-0 text-meta">{{ member.joinPhrase }}</span>
+        <span v-if="whole(person)" class="truncate">{{ member.name }}</span>
+        <CatalogArtistName v-else :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(member)" />
+        <span v-if="member.detail" class="shrink-0 text-[11px] text-meta" :class="!whole(person) && 'px-[3px]'">{{ member.detail }}</span>
+        <template v-if="member.guests.length">
+          <span class="-mx-[3px] shrink-0 text-meta">feat.</span>
+          <span v-for="(guest, index) in member.guests" :key="guest.creditId" class="inline-flex min-w-0 items-center">
+            <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(guest)" />
+            <span v-if="guest.detail" class="shrink-0 pr-[5px] text-[11px] text-meta">{{ guest.detail }}</span>
+            <span v-if="index < member.guests.length - 1" class="-ml-1 mr-0.5 text-meta">,</span>
+          </span>
+        </template>
       </template>
     </component>
   </span>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { addCredit, addTrack, emptyAlbumDocument, tracksOn } from '../../app/utils/albumDocument'
+import { addCredit, addTrack, changeCreditRole, emptyAlbumDocument, moveTrackArtist, patchCredits, removeCredits, trackArtists, tracksOn } from '../../app/utils/albumDocument'
 import {
   addCreditLine, addLinePerson, copyTrackCredits, creditLines, creditsOn, removeLinePerson, sameTrackCredits,
   setLineRoles, setLineTracks, updateLinePerson,
@@ -122,5 +122,86 @@ describe('lists by track', () => {
     copyTrackCredits(doc, tracks[0]!, tracks[1]!)
     expect(sameTrackCredits(doc, tracks[0]!, tracks[1]!)).toBe(true)
     expect(doc.credits.some(row => row.role === 'lyricist')).toBe(false)
+  })
+})
+
+describe('artists joined by a word', () => {
+  /** Two or three artists of the first track, one word already on the second. */
+  const joined = (...ids: number[]) => {
+    const { doc, tracks } = album()
+    for (const id of ids) addCredit(doc, { ...person(id), role: 'artist', role_label: null }, [tracks[0]!])
+    const rows = trackArtists(doc, tracks[0]!)
+    patchCredits(doc, [rows[1]!], { join_phrase: 'meets' })
+    return { doc, tracks, track: tracks[0]!, rows: () => trackArtists(doc, tracks[0]!) }
+  }
+  const line = (rows: Array<{ artist_id: unknown, join_phrase?: string | null }>) => rows.map(row => [row.join_phrase, row.artist_id].filter(Boolean).join(' ')).join(' ')
+
+  it('swaps two artists and leaves the word where it is printed', () => {
+    const { doc, rows } = joined(2, 1)
+    expect(line(rows())).toBe('2 meets 1')
+    moveTrackArtist(doc, rows()[1]!, -1)
+    expect(line(rows())).toBe('1 meets 2')
+  })
+
+  it('moves one place along among the artists only, past nothing else', () => {
+    const { doc, track, rows } = joined(1, 2, 3)
+    addCredit(doc, { ...person(9), role: 'composer', role_label: null }, [track])
+    moveTrackArtist(doc, rows()[2]!, -1)
+    expect(line(rows())).toBe('1 meets 3 2')
+    moveTrackArtist(doc, rows()[0]!, -1)
+    moveTrackArtist(doc, rows()[2]!, 1)
+    expect(line(rows())).toBe('1 meets 3 2')
+    expect(creditsOn(doc, track, roleOrder).map(item => item.role)).toEqual(['artist', 'composer'])
+  })
+
+  it('drops the word of an artist left first, and of anything but a track\'s artist', () => {
+    const removed = joined(1, 2, 3)
+    removeCredits(removed.doc, [removed.rows()[0]!])
+    expect(line(removed.rows())).toBe('2 3')
+
+    const changed = joined(1, 2)
+    changeCreditRole(changed.doc, [changed.rows()[1]!], 'composer')
+    expect(changed.doc.credits.map(row => row.join_phrase ?? null)).toEqual([null, null])
+
+    const { doc } = album()
+    const [first] = addCredit(doc, { ...person(1), role: 'artist', role_label: null }, null)
+    const [second] = addCredit(doc, { ...person(2), role: 'artist', role_label: null }, null)
+    patchCredits(doc, [first!, second!], { join_phrase: 'meets' })
+    expect(doc.credits.map(row => row.join_phrase)).toEqual([null, null])
+  })
+
+  it('leaves the word out of who a person is: one artist stays one person in a line by role', () => {
+    const { doc, tracks, rows } = joined(1, 2)
+    addCredit(doc, { ...person(2), role: 'artist', role_label: null }, [tracks[1]!])
+    expect(rows()[1]!.join_phrase).toBe('meets')
+    expect(new Set(creditLines(doc, roleOrder).flatMap(item => item.people.map(entry => entry.person.artist_id)))).toEqual(new Set([1, 2]))
+    expect(creditLines(doc, roleOrder).find(item => item.trackIds.length === 2)?.people.map(entry => entry.person.artist_id)).toEqual([2])
+  })
+
+  it('takes order and words over with 和上一首相同, and tells tracks apart by them', () => {
+    const { doc, tracks, track } = joined(1, 2)
+    const other = tracks[1]!
+    for (const id of [2, 1]) addCredit(doc, { ...person(id), role: 'artist', role_label: null }, [other])
+    expect(sameTrackCredits(doc, track, other)).toBe(false)
+    copyTrackCredits(doc, track, other)
+    expect(line(trackArtists(doc, other))).toBe('1 meets 2')
+    expect(sameTrackCredits(doc, track, other)).toBe(true)
+    patchCredits(doc, [trackArtists(doc, other)[1]!], { join_phrase: 'vs' })
+    expect(sameTrackCredits(doc, track, other)).toBe(false)
+  })
+})
+
+describe('belonging to a credit', () => {
+  it('ends when a 客串 becomes another role, and leaves other roles alone', () => {
+    const { doc, tracks } = album()
+    const [host] = addCredit(doc, { ...person(1), role: 'artist', role_label: null }, [tracks[0]!])
+    const [guest] = addCredit(doc, { ...person(2), role: 'featuring', role_label: null }, [tracks[0]!])
+    const [member] = addCredit(doc, { ...person(3), role: 'composer', role_label: null }, [tracks[0]!])
+    guest!.parent_id = host!.id
+    member!.parent_id = host!.id
+    changeCreditRole(doc, [member!], 'arranger')
+    expect(member!.parent_id).toBe(host!.id)
+    changeCreditRole(doc, [guest!], 'vocals')
+    expect(guest!.parent_id).toBeNull()
   })
 })

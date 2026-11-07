@@ -146,11 +146,16 @@ const help: Record<string, EditorHelpEntry> = {
     where: '頁面上用這段文字代替角色名，所有語言都顯示原文。',
     mock: { page: 'track', mark: 'role_label' },
   },
+  'person.join_phrase': {
+    text: '兩位藝術家之間印著 meets、vs 這類詞，又想保留時填。兩人都還是藝術家，只是頁面上連成一個標籤。',
+    dont: ['一般的並列署名不用填，兩位分開顯示就好', 'feat. 不寫在這裡，後面的人角色選 Featuring'],
+    where: '曲目表和曲目頁的藝術家一行。人員列表和藝術家頁不顯示。',
+  },
   'person.parent': {
-    text: '這個人屬於同一首曲目裡的哪一位。只有客串必須選，預設是排在它前面的那位。',
+    text: '這位 Featuring 跟著同一首曲目裡的哪一位。預設是排在它前面的那位。',
     rows: [
-      ['Gardens feat. moon jelly', 'moon jelly 的角色選客串，所屬選 Gardens'],
-      ['Xeno feat. eili', 'eili 的角色選客串，所屬選 Xeno'],
+      ['Gardens feat. moon jelly', 'moon jelly 的角色選 Featuring，所屬選 Gardens'],
+      ['Xeno feat. eili', 'eili 的角色選 Featuring，所屬選 Xeno'],
     ],
     where: '曲目表裡，這兩個名字連在一起顯示。',
   },

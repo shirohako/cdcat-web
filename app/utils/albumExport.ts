@@ -50,7 +50,8 @@ const numberOf = (row: TracklistRow) => row.number.replace(/^0+(?=\d)/, '')
 
 const personText = (person: TracklistPerson, helpers: AlbumExportHelpers): string => {
   const own = `${person.name}${person.detail ? helpers.aside(person.detail) : ''}`
-  return person.guests.length ? `${own} feat. ${person.guests.map(guest => personText(guest, helpers)).join(helpers.separator)}` : own
+  const guests = person.guests.length ? `${own} feat. ${person.guests.map(guest => personText(guest, helpers)).join(helpers.separator)}` : own
+  return [guests, ...(person.joined ?? []).map(next => `${next.joinPhrase} ${personText(next, helpers)}`)].join(' ')
 }
 
 const peopleText = (people: TracklistPerson[], helpers: AlbumExportHelpers) => people.map(person => personText(person, helpers)).join(helpers.separator)

@@ -146,8 +146,13 @@ const help: Record<string, EditorHelpEntry> = {
     where: 'The page shows this text instead of the role name, as written in every language.',
     mock: { page: 'track', mark: 'role_label' },
   },
+  'person.join_phrase': {
+    text: 'Fill it in when a word like meets or vs is printed between two artists and you want to keep it. Both stay artists; the page just joins them in one tag.',
+    dont: ['Not for artists simply listed side by side: they show apart', 'Not for feat.: give the later name the role Featuring'],
+    where: 'The artist line in the tracklist and on the track page. Not in the credits list or on artist pages.',
+  },
   'person.parent': {
-    text: 'Which person on the same track this one belongs to. Only Featuring has to pick one, and the default is the person listed just before.',
+    text: 'Who on the same track this Featuring credit goes with. The default is the person listed just before.',
     rows: [
       ['Gardens feat. moon jelly', 'For moon jelly, set the role to Featuring and pick Gardens here.'],
       ['Xeno feat. eili', 'For eili, set the role to Featuring and pick Xeno here.'],

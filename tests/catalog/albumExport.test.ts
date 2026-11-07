@@ -86,6 +86,12 @@ describe('albumCsv', () => {
     expect(csv).toContain('A (vocals)')
   })
 
+  it('prints the word between artists joined by one', () => {
+    const lead = credit('artist', 'awfuless')
+    const csv = albumCsv(album({ discs: [disc(1, [track(1, 'T', [lead, credit('artist', 'PODA', { join_phrase: 'meets' })])])] }), source, helpers)
+    expect(csv).toContain('awfuless meets PODA')
+  })
+
   it('puts a 客串 with the credit it belongs to', () => {
     const lead = credit('artist', 'Xeno')
     const csv = albumCsv(album({ discs: [disc(1, [track(1, 'T', [lead, credit('featuring', 'eili', { parent_id: lead.id })])])] }), source, helpers)

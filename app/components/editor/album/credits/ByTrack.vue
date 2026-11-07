@@ -2,7 +2,7 @@
 import type { RowId } from '~/types/document'
 import type { AlbumCreditRow } from '~/utils/albumDocument'
 import type { CreditPerson } from '~/utils/creditLines'
-import { addCredit, changeCreditRole, orderedTracks, patchCredits, removeCredits, setCreditParent } from '~/utils/albumDocument'
+import { addCredit, changeCreditRole, moveTrackArtist, orderedTracks, patchCredits, removeCredits, setCreditParent } from '~/utils/albumDocument'
 import { copyTrackCredits, creditsOn, sameTrackCredits } from '~/utils/creditLines'
 
 /**
@@ -34,6 +34,7 @@ const add = (trackId: RowId, role: string, person: CreditPerson) => addCredit(al
 const update = (row: AlbumCreditRow, patch: Partial<CreditPerson>) => patchCredits(album.value, [row], patch)
 const remove = (row: AlbumCreditRow) => removeCredits(album.value, [row])
 const changeRole = (rows: AlbumCreditRow[], role: string) => changeCreditRole(album.value, rows, role)
+const move = (row: AlbumCreditRow, delta: number) => moveTrackArtist(album.value, row, delta)
 
 const canCopy = (index: number) => {
   const previous = tracks.value[index - 1]
@@ -76,6 +77,7 @@ const copyPrevious = async (index: number) => {
           @update="update"
           @remove="remove"
           @parent="setParent"
+          @move="move"
         />
         <EditorAlbumCreditsRoleRow
           v-if="started[keyOf(track.id)]"

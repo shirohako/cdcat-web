@@ -146,11 +146,16 @@ const help: Record<string, EditorHelpEntry> = {
     where: 'ページでは役割名の代わりにこの文字を表示します。どの言語でも原文のままです。',
     mock: { page: 'track', mark: 'role_label' },
   },
+  'person.join_phrase': {
+    text: '2人のアーティストの間に meets や vs などと印刷されていて、残したいときに書きます。2人ともアーティストのままで、ページでは1つのタグにつながります。',
+    dont: ['ただ並んでいるだけの署名には不要です。別々に表示されます', 'feat. はここに書かず、後ろの人の役割を Featuring にします'],
+    where: '曲目表と曲ページのアーティスト行。クレジット一覧やアーティストページには表示しません。',
+  },
   'person.parent': {
-    text: 'この人が、同じ曲のどの人に属するかを選びます。選ぶ必要があるのは「フィーチャリング」だけで、既定ではすぐ前の人になります。',
+    text: 'この Featuring が、同じ曲のどの人に付くかを選びます。既定ではすぐ前の人になります。',
     rows: [
-      ['Gardens feat. moon jelly', 'moon jelly の役割は「フィーチャリング」、所属は Gardens'],
-      ['Xeno feat. eili', 'eili の役割は「フィーチャリング」、所属は Xeno'],
+      ['Gardens feat. moon jelly', 'moon jelly の役割は「Featuring」、所属は Gardens'],
+      ['Xeno feat. eili', 'eili の役割は「Featuring」、所属は Xeno'],
     ],
     where: 'トラックリストでは、2 人の名前をつなげて表示します。',
   },

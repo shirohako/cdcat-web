@@ -81,6 +81,19 @@ describe('buildTracklist', () => {
     expect(row([])).toMatchObject({ lead: null, maker: null })
   })
 
+  it('shows artists joined by a word in one tag, in order, each with their 客串', () => {
+    const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    const first = credit('artist', 'awfuless', 1)
+    const second = { ...credit('artist', 'PODA', 2), join_phrase: 'meets' }
+    const third = { ...credit('artist', 'TAG', 3), join_phrase: 'vs' }
+    const guest = { ...credit('featuring', 'eili', 4), parent_id: second.id }
+    const { lead, groups } = row([first, second, third, credit('artist', 'KARUT', 5), guest])
+    expect(lead!.people.map(person => person.name)).toEqual(['awfuless', 'KARUT'])
+    expect(lead!.people[0]!.joined).toMatchObject([{ name: 'PODA', joinPhrase: 'meets', guests: [{ name: 'eili' }] }, { name: 'TAG', joinPhrase: 'vs' }])
+    expect(lead!.people[1]!.joined).toBeUndefined()
+    expect(groups.map(group => group.role)).toEqual(['artist'])
+  })
+
   it('puts each 客串 with the credit it belongs to, in 完整 too, and keeps the role only for those it can\'t place', () => {
     const row = (credits: CatalogCredit[]) => buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
     const xeudo = credit('artist', 'Xeudo Code', 1)

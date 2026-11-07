@@ -1,6 +1,6 @@
 import type { AlbumBonus, AlbumDisc, AlbumTrack, TrackOriginal, TracklistLanguage } from '~/types/album'
 import type { CatalogAttribute, CatalogCredit, CatalogTitle } from '~/types/catalog'
-import { attachGuests, FEATURING_ROLE } from './artistLine'
+import { ARTIST_ROLE, attachGuests, FEATURING_ROLE } from './artistLine'
 
 /**
  * The album page's tracklist, worked out once for every style: shown titles, numbers, durations, credits grouped by
@@ -59,6 +59,10 @@ export interface TracklistPerson {
   detail: string | null
   /** The 客串 that belong to this credit (parent_id, utils/artistLine), shown with it: "Xeno feat. eili" */
   guests: TracklistPerson[]
+  /** The word printed before this artist, joining it to the one before: "awfuless meets PODA" */
+  joinPhrase?: string
+  /** The artists joined to this one, shown in its tag */
+  joined?: TracklistPerson[]
 }
 
 export interface TracklistRoleGroup {
@@ -169,6 +173,7 @@ export const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers
       artistName: credit.artist?.name ?? null,
       detail: credit.detail,
       guests: [],
+      ...(credit.join_phrase ? { joinPhrase: credit.join_phrase } : {}),
     })
     groups.set(key, group)
   }
@@ -190,9 +195,21 @@ const attachFeaturing = (groups: TracklistRoleGroup[], credits: CatalogCredit[])
   return left.length ? groups : groups.filter(group => group !== featuring)
 }
 
+/** An artist with a word before it goes into the tag of the one before it, 客串 and all; they stay in order. */
+const joinArtists = (groups: TracklistRoleGroup[]): TracklistRoleGroup[] => groups.map((group) => {
+  if (group.role !== ARTIST_ROLE) return group
+  const heads: TracklistPerson[] = []
+  for (const person of group.people) {
+    const head = heads.at(-1)
+    if (person.joinPhrase && head) head.joined = [...(head.joined ?? []), person]
+    else heads.push(person)
+  }
+  return { ...group, people: heads }
+})
+
 const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
-  const groups = attachFeaturing(groupCredits(track.credits, helpers), track.credits)
+  const groups = joinArtists(attachFeaturing(groupCredits(track.credits, helpers), track.credits))
   // A role split by job titles counts as one for the key people: they are all of the role, under its own name.
   const whole = (group: TracklistRoleGroup | undefined) => {
     if (!group) return null
@@ -218,7 +235,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
     lyrics: Math.max(0, track.lyrics_count - track.translations_count),
     translations: track.translations_count,
     // The 艺术家, else the first role of the vocals; the 客串 when no credit of the track takes them
-    lead: whole(groups.find(group => group.role === 'artist')) ?? byCategory('vocals'),
+    lead: whole(groups.find(group => group.role === ARTIST_ROLE)) ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
     groups,
     originals: track.originals,

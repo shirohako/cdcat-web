@@ -35,8 +35,9 @@
 
               <h1 class="mb-1 wrap-break-word text-center text-lg font-bold leading-snug text-title md:text-left md:text-xl lg:text-2xl">{{ shownTitle }}</h1>
               <p v-if="originalTitle" class="mb-2 text-center text-sm text-body md:text-left">{{ originalTitle }}</p>
-              <!-- The track's own 艺术家 (else the album's byline), each with the 客串 that belong to it
-                   (utils/artistLine): "Xeudo Code, Xeno feat. eili"; each name opens its artist's card -->
+              <!-- The track's own 艺术家 (else the album's byline), each with the 客串 that belong to it and the
+                   word printed before it (utils/artistLine): "Xeudo Code, Xeno feat. eili", "awfuless meets PODA"; each
+                   name opens its artist's card -->
               <p v-if="line.lines.length || line.left.length" ref="artistLine" class="flex flex-wrap items-center justify-center gap-x-1 text-sm text-body md:justify-start">
                 <UserRound :size="13" class="text-meta" />
                 <span>
@@ -48,7 +49,7 @@
                         <CatalogArtistName :name="guest.name" :artist-id="guest.id" :artist-name="guest.artistName" card /><span v-if="guestIndex < item.guests.length - 1" class="text-meta">, </span>
                       </template>
                     </template>
-                    <span v-if="index < line.lines.length - 1" class="text-meta">, </span>
+                    <span v-if="index < line.lines.length - 1" class="text-meta">{{ between(line.lines[index + 1]!.item) }}</span>
                   </template>
                   <!-- 客串 that belong to none of these names (the byline stands in, or a credit of another role) -->
                   <template v-if="line.left.length">
@@ -133,7 +134,7 @@
 import type { TrackDetail } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
 import type { TracklistArtist, TracklistArtistRole } from '~/utils/tracklistView'
-import { attachGuests, FEATURING_ROLE } from '~/utils/artistLine'
+import { ARTIST_ROLE, attachGuests, FEATURING_ROLE } from '~/utils/artistLine'
 import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music, UserRound } from '@lucide/vue'
 
 /** The top of a track page: the album's cover and banner, the title, favorite, edit and moving to the next track. */
@@ -156,16 +157,17 @@ const shownTitle = computed(() => localName(props.track.title, props.track.title
 const originalTitle = computed(() => shownTitle.value !== props.track.title ? props.track.title : '')
 const albumTitle = computed(() => props.track.album?.title ?? '')
 const credits = computed(() => props.track.credits ?? [])
-type LineName = { creditId: number | null, parentId: number | null, id: number | null, name: string, artistName: string | null }
+type LineName = { creditId: number | null, parentId: number | null, id: number | null, name: string, artistName: string | null, joinPhrase: string | null }
 const named = (credit: CatalogCredit): LineName => ({
-  creditId: credit.id, parentId: credit.parent_id ?? null, id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '', artistName: credit.artist?.name ?? null,
+  creditId: credit.id, parentId: credit.parent_id ?? null, id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '', artistName: credit.artist?.name ?? null, joinPhrase: credit.join_phrase ?? null,
 })
+const between = (next: LineName) => next.joinPhrase ? ` ${next.joinPhrase} ` : ', '
 /** The artist line (utils/artistLine): the track's own 艺术家, else the album's byline, each with its 客串. */
 const line = computed(() => {
-  const own = credits.value.filter(credit => credit.role === 'artist').map(named)
+  const own = credits.value.filter(credit => credit.role === ARTIST_ROLE).map(named)
   const lead = own.length
     ? own
-    : (props.track.album?.byline?.artists ?? []).map(artist => ({ creditId: null, parentId: null, id: artist.id, name: artist.name, artistName: null }))
+    : (props.track.album?.byline?.artists ?? []).map(artist => ({ creditId: null, parentId: null, id: artist.id, name: artist.name, artistName: null, joinPhrase: null }))
   const featuring = credits.value.filter(credit => credit.role === FEATURING_ROLE).map(named)
   return attachGuests(lead, featuring, item => item.creditId, guest => guest.parentId)
 })

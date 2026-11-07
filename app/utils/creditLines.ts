@@ -6,15 +6,19 @@
 
 import type { AggregateRef, AlbumDocument, RowId } from '~/types/document'
 import { RELEASE_ROLES } from '../types/album'
-import { addCredit, canHaveRoleLabel, orderedTracks, patchCredits, removeCredits, type AlbumCreditRow } from './albumDocument'
-import { parentOf } from './artistLine'
+import { addCredit, canHaveRoleLabel, orderedTracks, patchCredits, removeCredits, trackArtists, type AlbumCreditRow } from './albumDocument'
+import { ARTIST_ROLE, parentOf } from './artistLine'
 import { byOrder, sameId } from './documentRows'
 
-/** Who a credit names: an artist (an id, or "@ref" of one new in this revision) or only a printed name, the printed job title and the detail. */
+/**
+ * Who a credit names: an artist (an id, or "@ref" of one new in this revision) or only a printed name, the printed job
+ * title and the detail. `join_phrase` only comes with a change to a row: it says where on its track an artist stands, not who it is.
+ */
 export interface CreditPerson {
   artist_id: AggregateRef | null
   credited_as: string | null
   role_label?: string | null
+  join_phrase?: string | null
   detail: string | null
 }
 
@@ -170,22 +174,23 @@ const creditOnTrackKey = (row: AlbumCreditRow) => JSON.stringify([row.role, pers
 /** A credit with the one it belongs to, so that "eili, Xeno's 客串" differs from "eili, Xeudo Code's". */
 const creditWithParentKey = (row: AlbumCreditRow, rows: AlbumCreditRow[]) => {
   const parent = parentOf(row, rows)
-  return JSON.stringify([creditOnTrackKey(row), parent ? creditOnTrackKey(parent) : null])
+  return JSON.stringify([creditOnTrackKey(row), parent ? creditOnTrackKey(parent) : null, row.join_phrase || null])
 }
 
-/** Whether two tracks credit the same people in the same roles, each 客串 with the same credit. */
+/** Whether two tracks credit the same people in the same roles, each 客串 with the same credit, the artists in the same order and joined by the same words. */
 export function sameTrackCredits(doc: AlbumDocument, a: RowId, b: RowId) {
   const keys = (id: RowId) => {
     const rows = doc.credits.filter(row => sameId(row.track_id, id))
     return new Set(rows.map(row => creditWithParentKey(row, rows)))
   }
   const [left, right] = [keys(a), keys(b)]
-  return left.size === right.size && [...left].every(key => right.has(key))
+  const order = (id: RowId) => JSON.stringify(trackArtists(doc, id).map(creditOnTrackKey))
+  return left.size === right.size && [...left].every(key => right.has(key)) && order(a) === order(b)
 }
 
 /**
- * Makes a track's credits the same as another's: what the other has is added, what it lacks is removed, and each
- * belongs to the same credit as there.
+ * Makes a track's credits the same as another's: what the other has is added, what it lacks is removed, each belongs
+ * to the same credit as there, and the artists stand in the same order with the same words between them.
  */
 export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId) {
   const source = byOrder(doc.credits).filter(row => sameId(row.track_id, fromId))
@@ -202,4 +207,9 @@ export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId)
     const copy = copies.get(creditOnTrackKey(row))
     if (copy) copy.parent_id = parent ? copies.get(creditOnTrackKey(parent))?.id ?? null : null
   }
+  const places = trackArtists(doc, toId).map(row => row.sort_order)
+  source.filter(row => row.role === ARTIST_ROLE).forEach((row, index) => {
+    const copy = copies.get(creditOnTrackKey(row))
+    if (copy) Object.assign(copy, { sort_order: places[index], join_phrase: row.join_phrase ?? null })
+  })
 }
