@@ -131,9 +131,9 @@ const help: Record<string, EditorHelpEntry> = {
     mock: { page: 'track', mark: 'credit' },
   },
   'person.detail': {
-    text: '파트처럼 이 사람이 맡은 부분을 자세히 적어 주세요.',
-    examples: ['1st Violin', '2nd Violin'],
-    where: '이름 태그 안, 이름 뒤에 작은 글씨로 표시돼요.',
+    text: '독자를 위한 보충 설명으로, 자유롭게 적을 수 있어요. 실물에 인쇄된 직무는 여기가 아니라 ‘구체적인 직무’에 적어요.',
+    examples: ['5현', '한정판에만 수록'],
+    where: '이름 옆의 i 아이콘. 마우스를 올리거나 누르면 보여요.',
     mock: { page: 'track', mark: 'detail' },
   },
   'person.role_label': {

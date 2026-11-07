@@ -131,9 +131,9 @@ const help: Record<string, EditorHelpEntry> = {
     mock: { page: 'track', mark: 'credit' },
   },
   'person.detail': {
-    text: 'What this person did specifically, such as the part they played.',
-    examples: ['1st Violin', '2nd Violin'],
-    where: 'Small text after the name in the person’s tag.',
+    text: 'A note for readers, in any words. A job title printed on the release goes under Specific role, not here.',
+    examples: ['5-string', 'Limited edition only'],
+    where: 'Behind the i icon by the name, on hover or tap.',
     mock: { page: 'track', mark: 'detail' },
   },
   'person.role_label': {

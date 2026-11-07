@@ -6,7 +6,7 @@ import type { CreditPerson } from '~/utils/creditLines'
 /**
  * One person of a credit, as a tag: the name with what to look at beside it (新建, 选类型 for a new artist without
  * a type, 仅署名 for a printed name only, the harvest page's notes, ⓘ where it tidied a name), and a remove button.
- * A click opens the rest: the printed name, the detail and, when `labelable`, the printed job title (applied when the
+ * A click opens the rest: the printed name, when `labelable` the printed job title, the note for readers (`detail`) (applied when the
  * card closes, since they decide which line the person is in), a new artist's type, and linking the person to an
  * artist or keeping only the printed name.
  * Given `parent` (on a track card), also which credit of the track it belongs to (parent_id, utils/artistLine): the
@@ -103,7 +103,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
           <span class="truncate font-medium text-title">{{ name || '—' }}</span>
           <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-[11px] text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
           <span v-if="person.role_label" class="truncate text-[11px] text-primary">· {{ person.role_label }}</span>
-          <span v-if="person.detail" class="truncate text-[11px] text-meta">· {{ person.detail }}</span>
+          <span v-if="person.detail" class="grid shrink-0 place-items-center text-meta" :title="person.detail"><Icon name="lucide:info" class="size-3" /></span>
           <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
           <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-[10px] font-bold text-success">{{ t('editor.new') }}</span>
           <span v-else-if="person.artist_id === null" class="shrink-0 text-[10px] text-meta">{{ t('editor.dialog.name_only') }}</span>
@@ -129,10 +129,17 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.dialog.credited_as') }}<EditorHelp id="person.credited_as" /></span>
         <input v-model="form.credited_as" class="input input-sm w-full" maxlength="200" :placeholder="person.artist_id === null ? '' : t('editor.credits.printed_hint')" @keydown.enter.prevent="open = false">
+        <span v-if="person.artist_id !== null" class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.printed_note') }}</span>
+      </label>
+      <label v-if="labelable" class="block">
+        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}<EditorHelp id="person.role_label" /></span>
+        <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">
+        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.role_label_note') }}</span>
       </label>
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}<EditorHelp id="person.detail" /></span>
-        <input v-model="form.detail" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
+        <input v-model="form.detail" class="input input-sm w-full" maxlength="200" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
+        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.detail_note') }}</span>
       </label>
       <label v-if="joinAfter !== undefined" class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.join_phrase') }}<EditorHelp id="person.join_phrase" /></span>
@@ -144,11 +151,6 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
         <UiButton size="xs" icon="lucide:arrow-left" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" :disabled="!movable.earlier" @click="move(-1)">{{ t('editor.credits.move_earlier') }}</UiButton>
         <UiButton size="xs" icon-right="lucide:arrow-right" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" :disabled="!movable.later" @click="move(1)">{{ t('editor.credits.move_later') }}</UiButton>
       </div>
-      <label v-if="labelable" class="block">
-        <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}<EditorHelp id="person.role_label" /></span>
-        <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">
-        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.role_label_note') }}</span>
-      </label>
       <div v-if="parent">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}<EditorHelp id="person.parent" /></span>
         <UiSelect :model-value="parent.value" :options="parent.options" size="sm" class="w-full" @update:model-value="emit('parent', $event as string)" />

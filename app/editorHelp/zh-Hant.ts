@@ -131,9 +131,9 @@ const help: Record<string, EditorHelpEntry> = {
     mock: { page: 'track', mark: 'credit' },
   },
   'person.detail': {
-    text: '補充這個人具體負責的部分，例如聲部。',
-    examples: ['1st Violin', '2nd Violin'],
-    where: '人名標籤裡，名字後面的小字。',
+    text: '給讀者看的補充說明，想寫什麼都可以。實物上印的職務寫在「具體職務」裡，不寫在這裡。',
+    examples: ['5弦', '僅限定盤收錄'],
+    where: '人名旁的 i 圖示，懸停或點按時顯示。',
     mock: { page: 'track', mark: 'detail' },
   },
   'person.role_label': {

@@ -18,6 +18,16 @@ const detail = (links: Array<{ url: string, kind: string, provider_id: number | 
 }) as unknown as HarvestCandidateDetail
 
 describe('buildHarvestDraft', () => {
+  it('makes a performer\'s instrument the job title and keeps other notes as notes', () => {
+    const candidate = detail([])
+    candidate.candidate.merged.credits = [
+      { name: 'Ken', role: 'performer', detail: 'Flute', artist_id: 1, track: null },
+      { name: 'Rin', role: 'vocals', detail: '5弦', artist_id: 2, track: null },
+    ] as unknown as typeof candidate.candidate.merged.credits
+    const document = buildHarvestDraft(candidate).items[0]!.document as unknown as AlbumDocument
+    expect(document.credits.map(row => [row.role, row.role_label ?? null, row.detail])).toEqual([['performer', 'Flute', null], ['vocals', null, '5弦']])
+  })
+
   it('keeps the album\'s own X posts and its database page, but not the circle\'s X account', () => {
     const { items } = buildHarvestDraft(detail([
       { url: 'https://www.dojin-music.info/cd/35813', kind: 'source', provider_id: 40, provider: 'dojin_music' },

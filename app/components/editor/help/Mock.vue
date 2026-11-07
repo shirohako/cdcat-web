@@ -41,7 +41,7 @@
       <p class="flex flex-wrap items-center gap-1 pl-5">
         <span class="rounded-sm bg-blue-100 px-1 font-semibold text-blue-700 dark:bg-blue-400/20 dark:text-blue-200" :class="on('role_label')">{{ mock.mark === 'role_label' ? 'Graphic Designer' : 'Composer' }}</span>
         <span class="rounded-sm bg-black/[0.05] px-1 text-title dark:bg-white/[0.08]" :class="on('credit')">Minato</span>
-        <span class="rounded-sm bg-black/[0.05] px-1 text-title dark:bg-white/[0.08]" :class="on('detail')">1st Violin</span>
+        <span class="grid place-items-center rounded-sm text-meta" :class="on('detail')"><Icon name="lucide:info" class="size-3" /></span>
         <span class="ml-1 text-meta" :class="on('original')">Original: Memory of Stars</span>
       </p>
     </div>

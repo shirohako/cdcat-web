@@ -21,7 +21,7 @@
                   <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
                     <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category).badge">{{ role.role_label || roleName(role.role) }}</span>
                   </UiTooltip>
-                  <span v-if="role.details.length" class="mr-1 text-[11px] text-meta">{{ role.details.join(' / ') }}</span>
+                  <span v-if="role.details.length" class="mr-1 inline-flex"><CatalogCreditNote :note="role.details.join('\n')" /></span>
                 </template>
               </div>
             </div>
@@ -65,7 +65,7 @@
                     :class="person.artistId && 'hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]'"
                   >
                     {{ person.name }}
-                    <span v-if="person.detail" class="text-[11px] text-meta">{{ person.detail }}</span>
+                    <CatalogCreditNote v-if="person.detail" :note="person.detail" />
                   </component>
                   <span class="min-w-0 text-xs tabular-nums text-meta">{{ person.tracks ?? $t('album.track_people.all') }}</span>
                 </span>
@@ -103,9 +103,8 @@
                   <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
                     <span class="inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge">{{ role.role_label || roleName(role.role) }}</span>
                   </UiTooltip>
-                  <span class="min-w-0 text-xs tabular-nums text-meta">
-                    <span v-if="role.detail" class="text-body">{{ role.detail }} · </span>{{ role.tracks ?? $t('album.track_people.all') }}
-                  </span>
+                  <CatalogCreditNote v-if="role.detail" :note="role.detail" />
+                  <span class="min-w-0 text-xs tabular-nums text-meta">{{ role.tracks ?? $t('album.track_people.all') }}</span>
                 </span>
               </span>
             </CatalogInfoRow>

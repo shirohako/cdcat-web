@@ -257,7 +257,7 @@ function creditRows(ctx: CompareContext): CompareRow[] {
       apply: () => {
         for (const { credit, trackId } of rows) {
           const artist = typeof credit.artist_id === 'string' && credit.artist_id.startsWith('@') ? ctx.createArtist(credit.artist_id) : credit.artist_id
-          addCredit(album, { artist_id: artist, credited_as: credit.credited_as, role: credit.role, detail: credit.detail }, trackId === null ? null : [trackId])
+          addCredit(album, { artist_id: artist, credited_as: credit.credited_as, role: credit.role, role_label: credit.role_label ?? null, detail: credit.detail }, trackId === null ? null : [trackId])
         }
       },
     }

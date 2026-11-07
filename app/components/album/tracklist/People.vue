@@ -4,8 +4,8 @@ import { NuxtLink } from '#components'
 import { nameParts } from '~/utils/artistLine'
 
 /**
- * The people of one credit, each a grey tag at the role tags' height (the 制作人员 card's look), the detail note inside
- * it. The 客串 that belong to a credit share its tag, "Xeno feat. eili", and so do the artists joined to it by a printed
+ * The people of one credit, each a grey tag at the role tags' height (the 制作人员 card's look), a note (detail) as an ⓘ
+ * inside it. The 客串 that belong to a credit share its tag, "Xeno feat. eili", and so do the artists joined to it by a printed
  * word, "awfuless meets PODA", each name its own link and artist hover card (while it is on). A credited name holding
  * the artist's own name links only that part ("void (Mournfinale)": void).
  * No joiners: the tags simply follow one another. They wrap with a small gap, stack one per line with `stack` (to the
@@ -27,7 +27,7 @@ const layout = computed(() => {
 })
 
 /** A tag that is one link, the whole of it darkening on hover: one name, linked whole, with no 客串 */
-const whole = (person: TracklistPerson) => person.artistId !== null && !person.guests.length && !person.joined?.length && !nameParts(person.name, person.artistName)
+const whole = (person: TracklistPerson) => person.artistId !== null && !person.detail && !person.guests.length && !person.joined?.length && !nameParts(person.name, person.artistName)
 /** Everyone in the tag that has their own name, the word, and 客串 */
 const members = (person: TracklistPerson) => [person, ...(person.joined ?? [])]
 /**
@@ -59,12 +59,12 @@ const namePad = (person: TracklistPerson) => {
         <span v-if="position" class="-mx-[3px] shrink-0 text-meta">{{ member.joinPhrase }}</span>
         <span v-if="whole(person)" class="truncate">{{ member.name }}</span>
         <CatalogArtistName v-else :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(member)" />
-        <span v-if="member.detail" class="shrink-0 text-[11px] text-meta" :class="!whole(person) && 'px-[3px]'">{{ member.detail }}</span>
+        <span v-if="member.detail" class="inline-flex shrink-0 pr-[3px]"><CatalogCreditNote :note="member.detail" /></span>
         <template v-if="member.guests.length">
           <span class="-mx-[3px] shrink-0 text-meta">feat.</span>
           <span v-for="(guest, index) in member.guests" :key="guest.creditId" class="inline-flex min-w-0 items-center">
             <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="NAME_LINK" class="truncate" :class="namePad(guest)" />
-            <span v-if="guest.detail" class="shrink-0 pr-[5px] text-[11px] text-meta">{{ guest.detail }}</span>
+            <span v-if="guest.detail" class="inline-flex shrink-0 pr-[3px]"><CatalogCreditNote :note="guest.detail" /></span>
             <span v-if="index < member.guests.length - 1" class="-ml-1 mr-0.5 text-meta">,</span>
           </span>
         </template>

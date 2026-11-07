@@ -131,9 +131,9 @@ const help: Record<string, EditorHelpEntry> = {
     mock: { page: 'track', mark: 'credit' },
   },
   'person.detail': {
-    text: 'この人が担当した部分を補足します（パートなど）。',
-    examples: ['1st Violin', '2nd Violin'],
-    where: '名前タグの中で、名前の後ろに小さく表示します。',
+    text: '読者向けの補足で、自由に書けます。実物に印刷された役職はここではなく「具体的な役職」に書きます。',
+    examples: ['5弦', '限定盤のみ収録'],
+    where: '名前の横の i アイコン。ホバーまたはタップで表示します。',
     mock: { page: 'track', mark: 'detail' },
   },
   'person.role_label': {

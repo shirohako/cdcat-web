@@ -18,6 +18,8 @@ export const withMerge = (detail: HarvestCandidateDetail, remerge: HarvestRemerg
   catalog_images: { ...detail.catalog_images, ...remerge.catalog_images },
 })
 
+const PERFORMER_ROLE = 'performer'
+
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }
 
@@ -99,7 +101,9 @@ export function buildHarvestDraft(detail: HarvestCandidateDetail): { items: Draf
     const trackId = credit.track && !albumOnly ? tracks.get(`${credit.track.disc}-${credit.track.number}`) : null
     if (credit.track && !albumOnly && !trackId) continue
     const who = people.credit(credit.name) ?? { artist_id: credit.artist_id, credited_as: credit.artist_id ? null : credit.name }
-    addCredit(doc, { ...who, role: credit.role, detail: credit.detail }, trackId ? [trackId] : null)
+    // The instrument a source names is what a booklet prints as the job; notes are for what no source can say.
+    const instrument = credit.role === PERFORMER_ROLE ? credit.detail : null
+    addCredit(doc, { ...who, role: credit.role, role_label: instrument, detail: instrument ? null : credit.detail }, trackId ? [trackId] : null)
   }
 
   const seen = new Set<string>()
