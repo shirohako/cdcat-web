@@ -11,8 +11,9 @@ import { foldRoleWord, newArtistName, parseCredits, voiceCredit } from '~/utils/
 
 /**
  * 粘贴人员表: a credit list pasted from a booklet, a shop page or a VGMdb note (examples of each on hover), read by
- * utils/creditParser into roles, names and tracks, its names looked up among the artists (GET /artists/lookup), and
- * shown as a table to check before it is added in one go. Each name becomes the one artist of that name, a new artist (its type picked later), or a
+ * utils/creditParser into roles, names and tracks as it is typed, its names looked up among the artists on 识别匹配
+ * (GET /artists/lookup), and shown as a table to check before it is added in one go: nothing can be added while a name
+ * hasn't been looked up, so a failed lookup can't pass for "no such artist". Each name becomes the one artist of that name, a new artist (its type picked later), or a
  * printed name only; namesakes and unknown role words stay yellow until settled, and are left out until then.
  * Roles only the whole album has go on the whole album wherever they were written. "A & B" is two people unless
  * the whole of it is an artist's name; who comes after feat. is a 客串 of the name right before it (utils/artistLine).
@@ -40,6 +41,8 @@ interface Row {
   trackIds: RowId[] | null
   /** Track numbers the album has no track for */
   missing: string[]
+  /** Looked up among the artists yet; until then `choice` means nothing */
+  matched: boolean
   /** 'a:<id>' for an artist, 'new', 'name', or '' while namesakes wait for a pick */
   choice: string
   candidates: Match[]
@@ -83,32 +86,41 @@ const featuringRoles = computed(() => schema.value?.credit_roles.some(role => ro
 
 // ---- looking the names up ----
 
-const matches = reactive<Record<string, Match[]>>({})
+const LOOKUP_TIMEOUT = 10_000
+
+const matches = ref<Record<string, Match[]>>({})
 const looking = ref(false)
-let timer: ReturnType<typeof setTimeout> | undefined
-const unknownNames = computed(() => [...new Set(parsed.value.lines.flatMap(line => line.names.flatMap(name => [name.name, ...(name.unit ? [name.unit.name] : [])])))]
-  .filter(name => !(name in matches)))
-watch(unknownNames, (names) => {
-  clearTimeout(timer)
-  if (!names.length) return
+const failed = ref(false)
+const names = computed(() => [...new Set(parsed.value.lines.flatMap(line => line.names.flatMap(name => [name.name, ...(name.unit ? [name.unit.name] : [])])))])
+const unknownNames = computed(() => names.value.filter(name => !(name in matches.value)))
+const lookupFailed = computed(() => failed.value && names.value.length > 0)
+
+/**
+ * Looks up every name again, not only the new ones, so artists added meanwhile turn up. What a failed run didn't reach
+ * keeps its last result. Counts the lookups, so one still running when the dialog reopens leaves the new list alone.
+ */
+let lookup = 0
+const lookUp = async () => {
+  const run = ++lookup
+  const list = names.value
   looking.value = true
-  timer = setTimeout(async () => {
-    try {
-      for (let start = 0; start < names.length; start += 100) {
-        const data = await $api<{ matches: Record<string, Match[]> }>('/v1/artists/lookup', { query: { 'names[]': names.slice(start, start + 100) }, progress: false })
-        for (const name of names.slice(start, start + 100)) matches[name] = data.matches[name] ?? []
-      }
+  failed.value = false
+  try {
+    for (let start = 0; start < list.length; start += 100) {
+      const batch = list.slice(start, start + 100)
+      const data = await $api<{ matches: Record<string, Match[]> }>('/v1/artists/lookup', { query: { 'names[]': batch }, progress: false, timeout: LOOKUP_TIMEOUT, retry: 0 })
+      if (run !== lookup) return
+      for (const name of batch) matches.value[name] = data.matches[name] ?? []
     }
-    catch {
-      // Unmatched names become new artists or printed names, which the user can still change.
-      for (const name of names) matches[name] ??= []
-    }
-    finally {
-      looking.value = false
-    }
-  }, 400)
-}, { immediate: true })
-onBeforeUnmount(() => clearTimeout(timer))
+  }
+  catch {
+    // Names not looked up stay unknown: "no match" would quietly turn them into new artists, duplicates of the ones they are.
+    if (run === lookup) failed.value = true
+  }
+  finally {
+    if (run === lookup) looking.value = false
+  }
+}
 
 // ---- the table ----
 
@@ -118,6 +130,10 @@ watch(open, (value) => {
   if (!value) return
   text.value = ''
   picks.value = {}
+  lookup++
+  looking.value = false
+  failed.value = false
+  matches.value = {}
 })
 
 const trackIdsOf = (tracks: TrackRef[] | 'all' | null) => {
@@ -135,6 +151,9 @@ const trackIdsOf = (tracks: TrackRef[] | 'all' | null) => {
 }
 
 const defaultChoice = (candidates: Match[]) => candidates.length === 1 ? `a:${candidates[0]!.id}` : candidates.length ? '' : 'new'
+/** The user's pick, unless it is an artist a later lookup no longer found. */
+const choiceOf = (picked: string | undefined, candidates: Match[]) =>
+  picked && (!picked.startsWith('a:') || candidates.some(match => `a:${match.id}` === picked)) ? picked : defaultChoice(candidates)
 
 /**
  * The names of a line, the people split from one written name joined again when that whole name is an artist's;
@@ -146,7 +165,7 @@ const namesOf = (names: ParsedCreditName[]) => {
   for (let index = 0; index < names.length; index++) {
     const name = names[index]!
     const unit = name.unit
-    if (unit && matches[unit.name]?.length) {
+    if (unit && matches.value[unit.name]?.length) {
       const last = names[index + unit.size - 1]!
       for (let member = 0; member < unit.size; member++) at[index + member] = result.length
       result.push({ ...name, name: unit.name, detail: last.detail, index })
@@ -166,18 +185,25 @@ const rows = computed<Row[]>(() => parsed.value.lines.flatMap((line) => {
   return names.map((name) => {
     const key = keyOf(name)
     const host = name.featuring && name.host !== undefined ? names[at[name.host]!] : undefined
-    const candidates = matches[name.name] ?? []
+    const candidates = matches.value[name.name] ?? []
     const roles = picks.value[key]?.roles ?? (name.featuring && featuringRoles.value ? featuringRoles.value : line.roles)
     const albumOnly = roles.length > 0 && roles.every(role => ALBUM_ONLY_ROLES.includes(role))
     const { ids, missing } = albumOnly ? { ids: null, missing: [] } : trackIdsOf(name.tracks)
     return {
       key, roleText: line.roleText, roles, unknown: line.unknown, roleLabel: roles.length === 1 && canHaveRoleLabel(roles[0]!) ? line.roleLabel : null, name: name.name, detail: name.detail, character: name.character ?? null, hostKey: host && host !== name ? keyOf(host) : null,
-      trackIds: ids, missing, choice: picks.value[key]?.choice ?? defaultChoice(candidates), candidates,
+      trackIds: ids, missing, matched: name.name in matches.value, choice: choiceOf(picks.value[key]?.choice, candidates), candidates,
     }
   })
 }))
 const ready = (row: Row) => row.roles.length > 0 && row.choice !== ''
 const count = computed(() => rows.value.filter(ready).reduce((sum, row) => sum + row.roles.length, 0))
+
+const status = computed(() => {
+  if (looking.value) return t('editor.paste_credits.looking')
+  if (lookupFailed.value) return t('editor.paste_credits.lookup_failed')
+  if (unknownNames.value.length) return t('editor.paste_credits.needs_match')
+  return rows.value.some(row => !ready(row)) ? t('editor.paste_credits.unsettled') : ''
+})
 
 const choiceOptions = (row: Row): UiSelectOption<string>[] => [
   ...row.candidates.map(match => ({ value: `a:${match.id}`, label: match.name, hint: `#${match.id}`, group: t('editor.paste_credits.existing') })),
@@ -245,6 +271,9 @@ const apply = () => {
         </UiTooltip>
       </div>
       <textarea v-model="text" rows="7" class="textarea w-full font-mono text-xs" :placeholder="t('editor.paste_credits.placeholder')" :aria-label="t('editor.paste_credits.title')" />
+      <div>
+        <UiButton variant="primary" size="sm" icon="lucide:search-check" class="shadow-xs active:translate-y-px" :loading="looking" :disabled="!names.length" @click="lookUp">{{ lookupFailed ? t('common.retry') : t('editor.paste_credits.match') }}</UiButton>
+      </div>
 
       <div v-if="rows.length" class="max-h-80 overflow-auto rounded-lg border border-line">
         <table class="w-full min-w-[34rem] border-separate border-spacing-0 text-xs">
@@ -270,7 +299,9 @@ const apply = () => {
                     <span v-if="row.character" class="block truncate text-[10px] text-meta">{{ printedOf(row) }}</span>
                     <span v-if="row.detail" class="block truncate text-[10px] text-meta">{{ row.detail }}</span>
                   </span>
+                  <span v-if="!row.matched" class="ml-auto text-[11px] text-meta">{{ t('editor.paste_credits.unmatched') }}</span>
                   <UiSelect
+                    v-else
                     :model-value="row.choice"
                     :options="choiceOptions(row)"
                     :placeholder="t('editor.paste_credits.namesakes', { count: row.candidates.length })"
@@ -293,9 +324,9 @@ const apply = () => {
       <p v-if="parsed.skipped.length" class="text-[11px] text-meta">{{ t('editor.paste_credits.skipped', { lines: parsed.skipped.join(', ') }) }}</p>
     </div>
     <template #footer>
-      <span class="mr-auto text-xs text-meta">{{ looking ? t('editor.paste_credits.looking') : rows.some(row => !ready(row)) ? t('editor.paste_credits.unsettled') : '' }}</span>
+      <span class="mr-auto text-xs" :class="lookupFailed ? 'text-danger' : 'text-meta'">{{ status }}</span>
       <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="open = false">{{ t('common.cancel') }}</UiButton>
-      <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!count || looking" @click="apply">{{ t('editor.paste_credits.apply', { count }) }}</UiButton>
+      <UiButton variant="primary" size="sm" class="shadow-xs active:translate-y-px" :disabled="!count || looking || unknownNames.length > 0" @click="apply">{{ t('editor.paste_credits.apply', { count }) }}</UiButton>
     </template>
   </EditorModal>
 </template>

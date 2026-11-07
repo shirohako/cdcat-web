@@ -39,6 +39,7 @@
               <slot name="actions" />
               <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5" @click="close" />
             </header>
+            <div v-if="$slots.toolbar" class="shrink-0 px-5 pb-2"><slot name="toolbar" /></div>
             <div class="min-h-0 overflow-y-auto px-5 pt-1" :class="plainFooter ? 'pb-3' : 'pb-5'"><slot /></div>
             <footer
               v-if="$slots.footer"
@@ -66,7 +67,7 @@ import { dialogStack as stack } from '~/utils/dialogStack'
  * A dialog, centred at every width with the page showing around it. With `as="form"` the body is a form, so a
  * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field or button
  * marked `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of
- * the close button. `dark` keeps it dark on the light theme too, in the tooltips' colours; on the dark theme nothing changes.
+ * the close button; `toolbar` is a band under the header that stays while the body scrolls. `dark` keeps it dark on the light theme too, in the tooltips' colours; on the dark theme nothing changes.
  */
 withDefaults(defineProps<{
   title: string
