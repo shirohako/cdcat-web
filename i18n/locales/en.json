@@ -29,11 +29,6 @@
     "console": "Admin Console"
   },
   "album": {
-    "credits_merge": {
-      "label": "Roles with the same people",
-      "merged": "Merge roles",
-      "split": "Separate roles"
-    },
     "album_people": {
       "title": "Album credits"
     },
@@ -1336,7 +1331,6 @@
     "favorite": "Favorite",
     "unfavorite": "Remove from favorites",
     "instrumental": "Instrumental",
-    "versions": "{count} editions",
     "limited": "Limited edition",
     "regular": "Regular edition",
     "out_of_print": "Out of print",
@@ -1348,7 +1342,6 @@
       "event": "Event exclusive",
       "region": "Region exclusive"
     },
-    "bonuses": "{count} bonuses",
     "details": "Details",
     "contributors": "{count} contributors",
     "links": "{count} links",

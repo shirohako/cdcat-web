@@ -2,11 +2,7 @@
   <section :class="bare ? 'overflow-hidden' : 'card overflow-hidden'">
     <!-- Header; left out when `bare` (the album editor's editions show just the table). -->
     <!-- Editions and, under them, the bonuses (特典): one card, each part under its own small heading when both are there. -->
-    <UiSectionTitle v-if="!bare" :title="$t(bonuses.length ? 'album.section.products_bonuses' : 'album.section.products')" :icon="Package" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
-      <template v-if="counts" #actions>
-        <span class="text-xs text-meta">{{ counts }}</span>
-      </template>
-    </UiSectionTitle>
+    <UiSectionTitle v-if="!bare" :title="$t(bonuses.length ? 'album.section.products_bonuses' : 'album.section.products')" :icon="Package" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5" />
 
     <!-- Editions, then bonuses, each a table without a head, so editions still line up and compare. Editions are filled in freely, so only what each has is a column (type, format) plus the
          price; the rest are tags under the name. On a phone a row wraps into lines (PHONE_ROW). -->
@@ -25,7 +21,7 @@
               <tr :class="[PHONE_ROW, product.note && 'sm:[&>td]:pb-1 max-sm:pb-1.5']">
                 <td class="px-2.5 py-3 align-middle max-sm:block max-sm:basis-full max-sm:p-0">
                   <div class="flex items-center gap-2.5 sm:min-w-44">
-                    <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="editionName(product, index)" class="size-12 shrink-0 rounded-md object-cover">
+                    <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="editionName(product, index)" class="size-12 shrink-0 rounded-md object-cover" :class="!editionCovers[product.id] && [PICTURE_TILE, 'p-1']">
                     <div class="min-w-0">
                       <p class="text-[15px] font-semibold leading-5 text-title">{{ editionName(product, index) }}</p>
                       <!-- Whatever this edition has filled, each fact a tag; the line goes away when none is. -->
@@ -38,7 +34,7 @@
                         <span v-if="product.region" :class="TAG" class="text-body"><CommonFlag :code="product.region" />{{ regionEnglishName(product.region) }}</span>
                         <span v-if="product.release_date" :class="TAG" class="tabular-nums text-body"><Calendar :size="12" />{{ formatDate(product.release_date, product.release_date_precision) }}</span>
                         <span v-if="discNumbers.size > 1 && discsLabel(product.disc_ids)" :class="TAG" class="text-body"><Layers :size="12" />{{ discsLabel(product.disc_ids) }}</span>
-                        <span v-if="product.edition_type === 'limited' && product.limited_rule" class="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] leading-4 text-amber-700 dark:bg-amber-400/20 dark:text-amber-200"><Hourglass :size="12" />{{ limitedRuleLabel(product.limited_rule) }}</span>
+                        <span v-if="product.edition_type === 'limited' && product.limited_rule" :class="LIMITED_TAG"><Hourglass :size="12" />{{ limitedRuleLabel(product.limited_rule) }}</span>
                         <span v-if="product.edition_type === 'limited' && product.limited_name" :class="TAG" class="text-body"><Tag :size="12" />{{ product.limited_name }}</span>
                         <span v-if="product.is_hires" class="inline-flex items-center gap-1 rounded-md bg-violet-100 px-1.5 py-0.5 text-[11px] leading-4 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200"><AudioLines :size="12" />Hi-Res</span>
                         <span v-if="!product.is_available" :class="TAG" class="text-meta"><CircleOff :size="12" />{{ $t('content_display.out_of_print') }}</span>
@@ -80,7 +76,7 @@
               <tr :class="[PHONE_ROW, (bonus.description || bonus.note) && 'sm:[&>td]:pb-1 max-sm:pb-1.5']">
                 <td class="px-2.5 py-3 align-middle max-sm:block max-sm:basis-full max-sm:p-0">
                   <div class="flex items-center gap-2.5 sm:min-w-44">
-                    <div class="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-black/[0.05] dark:bg-white/[0.08] dark:ring-1 dark:ring-inset dark:ring-line">
+                    <div class="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md" :class="PICTURE_TILE">
                       <img v-if="bonusImage(bonus.id)" :src="bonusImage(bonus.id)!" :alt="bonus.name" class="h-full w-full object-cover">
                       <Gift v-else :size="18" class="text-meta" />
                     </div>
@@ -94,7 +90,7 @@
                         <NuxtLink v-if="bonus.event && !bare" :to="`/albums?event=${bonus.event.id}`" :class="TAG" class="text-body transition-colors hover:text-primary"><CalendarDays :size="12" />{{ bonus.event.name }}</NuxtLink>
                         <span v-else-if="bonus.event" :class="TAG" class="text-body"><CalendarDays :size="12" />{{ bonus.event.name }}</span>
                         <span v-if="bonus.shop" :class="TAG" class="text-body"><Store :size="12" />{{ bonus.shop }}</span>
-                        <span v-if="bonus.availability" class="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] leading-4 text-amber-700 dark:bg-amber-400/20 dark:text-amber-200"><Hourglass :size="12" />{{ enumLabel('limited_rule', bonus.availability) }}</span>
+                        <span v-if="bonus.availability" :class="LIMITED_TAG"><Hourglass :size="12" />{{ enumLabel('limited_rule', bonus.availability) }}</span>
                         <span v-if="bonus.product_ids.length" :class="TAG" class="text-body"><Package :size="12" />{{ editionNames(bonus.product_ids) }}</span>
                       </p>
                     </div>
@@ -127,6 +123,10 @@ import type { AlbumBonus, AlbumDisc, AlbumImage, AlbumProduct, MediumType, Editi
 import { AudioLines, Box, Calendar, CalendarDays, CircleOff, CloudDownload, Disc3, Gem, Gift, Hash, Hourglass, Layers, Package, Store, Tag } from '@lucide/vue'
 
 const TAG = PRODUCT_TAG
+/** The grey behind a row's stand-in picture: an edition's default CD, a bonus's gift. */
+const PICTURE_TILE = 'bg-black/[0.05] dark:bg-white/[0.08] dark:ring-1 dark:ring-inset dark:ring-line'
+/** The one warm tag: see-through, so it takes on the row's grey instead of sitting on it as a pale yellow patch. */
+const LIMITED_TAG = 'inline-flex items-center gap-1 rounded-md bg-amber-500/[0.14] px-1.5 py-0.5 text-[11px] font-medium leading-4 text-amber-800 dark:bg-amber-300/[0.13] dark:text-amber-200 dark:ring-1 dark:ring-inset dark:ring-amber-300/20'
 /** The small heading over the editions and over the bonuses, when the card has both. */
 const PART_TITLE = 'flex items-center gap-1.5 px-5 pb-1 text-[13px] font-semibold leading-5 text-title'
 
@@ -150,10 +150,11 @@ const props = withDefaults(defineProps<{
 })
 const emit = defineEmits<{ rowClick: [index: number] }>()
 /**
- * Each row is a block of the card's soft grey, darker on hover; the grey tags on it come out as a deeper shade of it. Table parts can't be rounded, so the cells at the corners do it; an edition can be two rows. On a phone the
+ * Each row is a block: the card's soft grey on light pages, where the grey tags on it come out as a deeper shade of it,
+ * and sunken below the card on dark ones. Table parts can't be rounded, so the cells at the corners do it; an edition can be two rows. On a phone the
  * cells no longer fill the row, so the block itself does.
  */
-const ROW = 'sm:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] dark:sm:[&>tr>td]:bg-white/[0.04] sm:[&>tr>td]:transition-colors sm:[&>tr>td]:duration-150 sm:hover:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:sm:hover:[&>tr>td]:bg-white/[0.08] sm:[&>tr>td:first-child]:pl-3 sm:[&>tr>td:last-child]:pr-3 sm:[&>tr:first-child>td:first-child]:rounded-tl-lg sm:[&>tr:first-child>td:last-child]:rounded-tr-lg sm:[&>tr:last-child>td:first-child]:rounded-bl-lg sm:[&>tr:last-child>td:last-child]:rounded-br-lg max-sm:mb-1.5 max-sm:rounded-lg max-sm:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] max-sm:transition-colors max-sm:last:mb-0 dark:max-sm:bg-white/[0.04] max-sm:hover:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:max-sm:hover:bg-white/[0.08]'
+const ROW = 'sm:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] dark:sm:[&>tr>td]:bg-sunken sm:[&>tr>td]:transition-colors sm:[&>tr>td]:duration-150 sm:hover:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:sm:hover:[&>tr>td]:bg-white/[0.08] sm:[&>tr>td:first-child]:pl-3 sm:[&>tr>td:last-child]:pr-3 sm:[&>tr:first-child>td:first-child]:rounded-tl-lg sm:[&>tr:first-child>td:last-child]:rounded-tr-lg sm:[&>tr:last-child>td:first-child]:rounded-bl-lg sm:[&>tr:last-child>td:last-child]:rounded-br-lg max-sm:mb-1.5 max-sm:rounded-lg max-sm:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] max-sm:transition-colors max-sm:last:mb-0 dark:max-sm:bg-sunken max-sm:hover:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:max-sm:hover:bg-white/[0.08]'
 /** On a phone a row wraps instead of scrolling: the first cell takes a line, the others share the next ones (an edition's price starts under its name). */
 const PHONE_ROW = 'max-sm:flex max-sm:flex-wrap max-sm:items-center max-sm:gap-x-1.5 max-sm:gap-y-2 max-sm:p-3'
 /** A click on the row itself, not on a button or link in it. */
@@ -164,12 +165,6 @@ const { t } = useI18n()
 const { separator } = useListPunctuation()
 const { sorted: sortedPrices } = usePriceDisplay()
 const { formatDate, enumLabel } = useCatalogDisplay()
-
-/** "2 个版本 · 3 项特典" on the title row, each part only when there are several. */
-const counts = computed(() => [
-  props.products.length > 1 && t('content_display.versions', { count: props.products.length }),
-  props.bonuses.length > 1 && t('content_display.bonuses', { count: props.bonuses.length }),
-].filter(Boolean).join(' · '))
 
 /** Without a name, the first edition goes by its type and the others by their id, the same in every language. */
 const editionName = (product: AlbumProduct, index: number) => product.name || (index === 0 ? formatEditionType(product.edition_type) : `Release #${product.id}`)

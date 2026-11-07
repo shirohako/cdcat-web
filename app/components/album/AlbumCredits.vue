@@ -1,41 +1,33 @@
 <template>
   <CatalogSection v-if="groups.length || people.length" :title="$t('album.section.credits')" :icon="Users" size="sm" clip>
-    <template v-if="canMerge" #actions>
-      <UiSegmented v-model="creditsMerge" :items="creditsMerges" size="sm" collapse :label="$t('album.credits_merge.label')" />
-    </template>
-    <!-- 专辑参与人员: the album's own credits, open from the start. One row per role, or per set of people, the roles as
-         coloured tags; a hairline list, as a single role looks lost in the 简介 card's booklet layout. -->
+    <!-- 专辑参与人员: the album's own credits, open from the start. By person, in two columns from sm, so everyone appears
+         once with all their jobs and short rows don't leave the card's right half empty. -->
     <div class="px-5 pb-5 pt-2">
-      <div v-if="rows.length">
+      <div v-if="albumPeople.length">
         <div class="-mx-5 flex px-3">
           <AlbumCreditsFold :open="albumOpen" :title="$t('album.album_people.title')" :count="albumPeopleCount" @click="albumOpen = !albumOpen" />
         </div>
         <UiCollapse :open="albumOpen">
-          <CatalogInfoTable variant="lines" class="pt-1">
-            <CatalogInfoRow v-for="row in rows" :key="row.key">
-              <template #label>
-                <span class="flex flex-wrap gap-1">
-                  <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleName(group.role)" :disabled="!group.role_label">
-                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
+          <div class="grid gap-x-6 pt-1 sm:grid-cols-2">
+            <div v-for="person in albumPeople" :key="person.key" class="min-w-0 border-line py-2.5 max-sm:[&:nth-child(n+2)]:border-t sm:[&:nth-child(n+3)]:border-t">
+              <component
+                :is="person.artistId ? NuxtLink : 'span'"
+                :to="person.artistId ? `/artists/${person.artistId}` : undefined"
+                class="text-sm font-semibold leading-5 text-title"
+                :class="person.artistId && 'transition-colors duration-150 hover:text-primary'"
+              >{{ person.name }}</component>
+              <div class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                <template v-for="role in person.roles" :key="role.key">
+                  <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
+                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(role.category).badge">{{ role.role_label || roleName(role.role) }}</span>
                   </UiTooltip>
-                </span>
-              </template>
-              <!-- Each person a grey tag (a link darkens and takes the theme colour on hover), the note inside it -->
-              <span class="flex flex-wrap gap-1.5">
-                <component
-                  :is="person.artistId ? NuxtLink : 'span'"
-                  v-for="(person, index) in row.people"
-                  :key="index"
-                  :to="person.artistId ? `/artists/${person.artistId}` : undefined"
-                  class="inline-flex items-center gap-1 rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 text-title transition-colors duration-150 dark:bg-white/[0.08]"
-                  :class="person.artistId && 'hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]'"
-                >
-                  {{ person.name }}
-                  <span v-if="person.detail" class="text-[11px] text-meta">{{ person.detail }}</span>
-                </component>
-              </span>
-            </CatalogInfoRow>
-          </CatalogInfoTable>
+                  <span v-if="role.details.length" class="mr-1 text-[11px] text-meta">{{ role.details.join(' / ') }}</span>
+                </template>
+              </div>
+            </div>
+            <!-- An empty last cell in the second column, so the line above the last row runs across both. -->
+            <div v-if="albumPeople.length > 1 && albumPeople.length % 2" aria-hidden="true" class="border-t border-line max-sm:hidden" />
+          </div>
         </UiCollapse>
       </div>
 
@@ -128,11 +120,11 @@
 <script setup lang="ts">
 import type { AlbumDisc } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
-import { Combine, Rows3, Users } from '@lucide/vue'
+import { Users } from '@lucide/vue'
 import { NuxtLink } from '#components'
 import { RELEASE_ROLES } from '~/types/album'
 import { getAlbumRolePalette } from '~/utils/albumRolePalette'
-import { mergeCreditRoles } from '~/utils/creditMerge'
+import { albumCreditPeople } from '~/utils/albumCreditPeople'
 import { trackPeople, trackRoleGroups } from '~/utils/trackPeople'
 
 const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
@@ -140,7 +132,7 @@ const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
 const { roleName, roleCategory, roleOrder } = useCatalogSchema()
 
 /**
- * The album's own credits, one row per role and printed job title (shown instead of the role's name); a person credited under another name shows that name. The 署名与发行
+ * The album's own credits by role and printed job title (shown instead of the role's name); a person credited under another name shows that name. The 署名与发行
  * roles are left to the hero, 专辑信息 and the tracklist. The tracks' credits go to 曲目参与人员, by person.
  */
 const groups = computed(() => {
@@ -163,17 +155,7 @@ const groups = computed(() => {
 })
 
 const { t } = useI18n()
-/** Roles held by the same people on one row, or each on its own. In a cookie, so the server already renders the reader's choice. */
-const creditsMerge = useCookie<'merged' | 'split'>('album_credits_merge', { default: () => 'merged', maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' })
-if (creditsMerge.value !== 'merged' && creditsMerge.value !== 'split') creditsMerge.value = 'merged'
-const creditsMerges = computed(() => [
-  { value: 'merged' as const, label: t('album.credits_merge.merged'), icon: Combine },
-  { value: 'split' as const, label: t('album.credits_merge.split'), icon: Rows3 },
-])
-const mergedRows = computed(() => mergeCreditRoles(groups.value))
-/** With nothing to merge the switch would change nothing, so it stays away. */
-const canMerge = computed(() => mergedRows.value.length < groups.value.length)
-const rows = computed(() => creditsMerge.value === 'merged' ? mergedRows.value : groups.value.map(group => ({ key: group.key, roles: [group], people: group.people })))
+const albumPeople = computed(() => albumCreditPeople(groups.value))
 
 /** The album's own list starts open; it is folded by hand, per visit. */
 const albumOpen = ref(true)

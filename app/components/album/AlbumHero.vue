@@ -15,7 +15,7 @@
         v-img-fade
         :src="coverUrl"
         alt=""
-        class="absolute inset-0 size-full scale-110 object-cover blur-md saturate-125"
+        class="absolute inset-0 size-full scale-110 object-cover blur-[6px] saturate-125"
       >
       <div class="absolute inset-0 bg-black/10 dark:bg-black/30" />
     </div>

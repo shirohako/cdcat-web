@@ -29,11 +29,6 @@
     "console": "관리자 페이지"
   },
   "album": {
-    "credits_merge": {
-      "label": "담당자가 같은 역할",
-      "merged": "역할 합치기",
-      "split": "나눠서 보기"
-    },
     "album_people": {
       "title": "앨범 참여자"
     },
@@ -1336,7 +1331,6 @@
     "favorite": "좋아요",
     "unfavorite": "좋아요 취소",
     "instrumental": "연주곡",
-    "versions": "에디션 {count}개",
     "limited": "한정판",
     "regular": "통상판",
     "out_of_print": "절판",
@@ -1348,7 +1342,6 @@
       "event": "행사장 한정",
       "region": "지역 한정"
     },
-    "bonuses": "특전 {count}개",
     "details": "상세 정보",
     "contributors": "{count}명",
     "links": "{count}개",

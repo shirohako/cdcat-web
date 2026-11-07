@@ -29,11 +29,6 @@
     "console": "管理後台"
   },
   "album": {
-    "credits_merge": {
-      "label": "相同人員的職位",
-      "merged": "合併職位",
-      "split": "分開顯示"
-    },
     "album_people": {
       "title": "專輯參與人員"
     },
@@ -1336,7 +1331,6 @@
     "favorite": "收藏",
     "unfavorite": "取消收藏",
     "instrumental": "純音樂",
-    "versions": "{count} 個版本",
     "limited": "限定版",
     "regular": "通常版",
     "out_of_print": "已絕版",
@@ -1348,7 +1342,6 @@
       "event": "活動限定",
       "region": "地區限定"
     },
-    "bonuses": "{count} 項特典",
     "details": "詳細資訊",
     "contributors": "{count} 位",
     "links": "{count} 個",

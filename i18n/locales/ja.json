@@ -29,11 +29,6 @@
     "console": "管理画面"
   },
   "album": {
-    "credits_merge": {
-      "label": "同じ担当者の役職",
-      "merged": "役職をまとめる",
-      "split": "分けて表示"
-    },
     "album_people": {
       "title": "アルバムのクレジット"
     },
@@ -1336,7 +1331,6 @@
     "favorite": "お気に入り",
     "unfavorite": "お気に入りから削除",
     "instrumental": "インストゥルメンタル",
-    "versions": "全{count}形態",
     "limited": "限定盤",
     "regular": "通常盤",
     "out_of_print": "廃盤",
@@ -1348,7 +1342,6 @@
       "event": "イベント限定",
       "region": "地域限定"
     },
-    "bonuses": "特典{count}件",
     "details": "詳細",
     "contributors": "{count}人",
     "links": "{count}件",

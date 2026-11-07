@@ -29,11 +29,6 @@
     "console": "管理后台"
   },
   "album": {
-    "credits_merge": {
-      "label": "相同人员的职位",
-      "merged": "合并职位",
-      "split": "分开显示"
-    },
     "album_people": {
       "title": "专辑参与人员"
     },
@@ -1336,7 +1331,6 @@
     "favorite": "收藏",
     "unfavorite": "取消收藏",
     "instrumental": "纯音乐",
-    "versions": "{count} 个版本",
     "limited": "限定版",
     "regular": "通常版",
     "out_of_print": "绝版",
@@ -1348,7 +1342,6 @@
       "event": "活动限定",
       "region": "地区限定"
     },
-    "bonuses": "{count} 项特典",
     "details": "详情",
     "contributors": "{count} 位",
     "links": "{count} 个",
