@@ -12,6 +12,7 @@ import { newKey } from '~/utils/documentKeys'
  */
 const { t } = useI18n()
 const editor = useAlbumEditor()
+const { confirm } = useConfirm()
 const { roleName, roleOrder } = useCatalogSchema()
 const album = computed(() => editor.album.value)
 
@@ -33,7 +34,10 @@ const edit = {
   add: (line: CreditLine, person: CreditPerson) => addLinePerson(album.value, line, person),
   update: (line: CreditLine, person: CreditPerson, patch: Partial<CreditPerson>) => updateLinePerson(album.value, line, person, patch),
   removePerson: (line: CreditLine, person: CreditPerson) => removeLinePerson(album.value, line, person),
-  remove: (line: CreditLine) => removeCreditLine(album.value, line),
+  remove: async (line: CreditLine) => {
+    const role = line.roles.map(roleName).join('・')
+    if (await confirm({ title: t('editor.credits.remove_role_confirm_title'), description: t('editor.credits.remove_role_confirm_desc', { role, count: line.people.length }) })) removeCreditLine(album.value, line)
+  },
 }
 </script>
 

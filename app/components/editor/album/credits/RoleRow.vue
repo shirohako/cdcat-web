@@ -12,7 +12,7 @@ import { personOf } from '~/utils/creditLines'
  * whole row (not to the roles in `exclude`), which joins the row of that role if the track has one. Each tag is one
  * credit row. Given the track's credits (`trackRows`), each tag also picks the credit it belongs to (utils/artistLine):
  * a 客串 always one of them, the default the one before it; another role one or none. A credit others belong to
- * belongs to none itself.
+ * belongs to none itself. A row with people can be emptied at once from the bin right after the role, shown on hovering the row (always on touch), after a question (`remove` for each).
  */
 const props = defineProps<{ role?: string, rows?: AlbumCreditRow[], roles?: string[], trackRows?: AlbumCreditRow[], changeable?: boolean, exclude?: readonly string[] }>()
 const emit = defineEmits<{
@@ -28,6 +28,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const editor = useAlbumEditor()
 const people = useCreditPeople()
+const { confirm } = useConfirm()
 const { roleName, roleNameEn } = useCatalogSchema()
 
 const parentOfRow = (row: AlbumCreditRow) => {
@@ -49,32 +50,41 @@ const setParent = (row: AlbumCreditRow, value: string) => emit('parent', row, pr
 const starting = computed(() => props.roles !== undefined)
 const invalid = (row: AlbumCreditRow) => editor.errorsIn(`credits.${row.id}`).length > 0
 const errors = computed(() => (props.rows ?? []).flatMap(row => editor.errorsIn(`credits.${row.id}`)))
+const removeAll = async () => {
+  const rows = [...props.rows ?? []]
+  if (await confirm({ title: t('editor.credits.remove_role_confirm_title'), description: t('editor.credits.remove_role_confirm_desc', { role: roleName(props.role!), count: rows.length }) })) {
+    for (const row of rows) emit('remove', row)
+  }
+}
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+  <div class="group/row flex flex-wrap items-center gap-x-3 gap-y-1.5">
     <EditorAlbumCreditsRoles v-if="starting" :model-value="roles!" :exclude="exclude" starting class="shrink-0" @update:model-value="emit('update:roles', $event)" />
-    <EditorAlbumCreditsRoles v-else-if="changeable" single :model-value="[role!]" :exclude="exclude" @update:model-value="emit('role', $event[0]!)">
-      <template #trigger="{ toggle, attrs }">
-        <button
-          type="button"
-          v-bind="attrs"
-          class="group flex w-24 shrink-0 flex-col rounded-md text-left text-xs sm:w-28"
-          :title="t('editor.credits.change_role')"
-          @click="toggle"
-        >
-          <span class="flex max-w-full items-center gap-1 font-medium text-primary">
-            <span class="truncate group-hover:underline">{{ roleName(role!) }}</span>
-            <Icon name="lucide:chevron-down" class="size-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100" />
-          </span>
-          <span v-if="roleNameEn(role!)" class="truncate text-[10px] text-meta">{{ roleNameEn(role!) }}</span>
-        </button>
-      </template>
-    </EditorAlbumCreditsRoles>
-    <span v-else class="flex w-24 shrink-0 flex-col text-xs sm:w-28">
-      <span class="truncate font-medium text-primary">{{ roleName(role!) }}</span>
-      <span v-if="roleNameEn(role!)" class="truncate text-[10px] text-meta">{{ roleNameEn(role!) }}</span>
-    </span>
+    <div v-else class="flex w-24 shrink-0 items-center gap-1 sm:w-28">
+      <EditorAlbumCreditsRoles v-if="changeable" single :model-value="[role!]" :exclude="exclude" @update:model-value="emit('role', $event[0]!)">
+        <template #trigger="{ toggle, attrs }">
+          <button
+            type="button"
+            v-bind="attrs"
+            class="group flex min-w-0 flex-col rounded-md text-left text-xs"
+            :title="t('editor.credits.change_role')"
+            @click="toggle"
+          >
+            <span class="flex max-w-full items-center gap-1 font-medium text-primary">
+              <span class="truncate group-hover:underline">{{ roleName(role!) }}</span>
+              <Icon name="lucide:chevron-down" class="size-3 shrink-0 opacity-0 transition-opacity group-hover/row:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100" />
+            </span>
+            <span v-if="roleNameEn(role!)" class="truncate text-[10px] text-meta">{{ roleNameEn(role!) }}</span>
+          </button>
+        </template>
+      </EditorAlbumCreditsRoles>
+      <span v-else class="flex min-w-0 flex-col text-xs">
+        <span class="truncate font-medium text-primary">{{ roleName(role!) }}</span>
+        <span v-if="roleNameEn(role!)" class="truncate text-[10px] text-meta">{{ roleNameEn(role!) }}</span>
+      </span>
+      <UiButton v-if="rows?.length" variant="danger-soft" icon="lucide:trash-2" icon-class="size-3" :label="t('editor.credits.remove_role')" size="xs" class="ml-1 min-h-6! w-6! shrink-0 opacity-0 transition-[opacity,color,background-color] group-hover/row:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100" @click="removeAll" />
+    </div>
     <span class="flex min-w-0 flex-1 flex-wrap items-center gap-1.5">
       <EditorAlbumCreditsPerson
         v-for="row in rows ?? []"
