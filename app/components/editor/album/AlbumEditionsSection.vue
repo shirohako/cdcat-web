@@ -1,8 +1,8 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.editions')" :icon="Package" :description="$t('editor.editions.hint')">
     <div class="space-y-4 p-3 sm:p-5">
-      <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
-        <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
+      <ul v-if="allErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
+        <li v-for="error in allErrors" :key="error.path">{{ error.message }}</li>
       </ul>
       <p v-if="unticked.length" class="rounded-lg border border-warning/25 bg-warning/10 px-3 py-2 text-xs text-warning">
         {{ $t('editor.editions.unticked', { discs: unticked.map(disc => $t('editor.album.disc_n', { n: disc.position })).join(separator) }) }}
@@ -12,41 +12,19 @@
         {{ $t('editor.editions.none') }}
       </div>
 
-      <ul v-else class="space-y-2">
-        <li
-          v-for="(product, index) in products"
-          :key="product.id"
-          class="group flex flex-wrap items-start gap-x-3 gap-y-2 rounded-xl p-3 transition-colors sm:flex-nowrap"
-          :class="errorsOf(product.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
-        >
-          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-bold text-primary">{{ index + 1 }}</span>
-          <div class="min-w-0 flex-1 basis-[calc(100%-2.25rem)] cursor-pointer sm:basis-0" @click="edit(product)">
-            <p class="flex flex-wrap items-center gap-1.5">
-              <span class="truncate text-sm font-semibold text-title">{{ product.name || enumLabel('edition_type', product.edition_type) }}</span>
-              <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('edition_type', product.edition_type) }}</span>
-              <span class="rounded-md bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content" :title="$t('editor.editions.format_hint')">{{ formatOf(product.disc_ids) || '—' }}</span>
-              <span v-if="product.is_hires" class="rounded-md bg-amber-50 px-1.5 py-0.5 text-[11px] text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">Hi-Res</span>
-            </p>
-            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-meta">
-              <span v-if="product.catalog_number" class="font-mono text-body">{{ product.catalog_number }}</span>
-              <span v-if="product.barcode" class="font-mono">{{ product.barcode }}</span>
-              <span v-if="product.release_date">{{ formatDate(product.release_date, product.release_date_precision) }}</span>
-              <span v-if="product.region">{{ regionEnglishName(product.region) }}</span>
-              <span v-for="(price, i) in sortedPrices(product.prices)" :key="i">{{ priceLine(price) }}</span>
-              <span v-if="product.edition_type === 'limited' && (product.limited_name || product.limited_rule)">{{ product.limited_name || enumLabel('limited_rule', product.limited_rule!) }}</span>
-              <span v-if="!product.is_available" class="text-faint">{{ $t('editor.dialog.unavailable') }}</span>
-            </p>
-            <p v-if="product.note" class="mt-1 truncate text-xs text-meta">{{ product.note }}</p>
-            <p v-for="error in errorsOf(product.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
-          </div>
-          <span class="ml-auto flex shrink-0 gap-0.5">
-            <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.products, product, -1)" />
-            <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === products.length - 1" @click="moveRow(album.products, product, 1)" />
-            <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(product)" />
-            <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="removeProduct(album, product.id)" />
-          </span>
-        </li>
-      </ul>
+      <!-- The editions as the album page's table draws them, with the row's buttons at its end. -->
+      <div v-else>
+        <AlbumProducts :products="pageRows" :discs="pageDiscs" :images="pageImages(album, editor.references.images)" bare :row-class="rowClass" @row-click="edit(products[$event]!)">
+          <template #actions="{ index }">
+            <span class="flex gap-0.5">
+              <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.products, products[index]!, -1)" />
+              <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === products.length - 1" @click="moveRow(album.products, products[index]!, 1)" />
+              <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(products[index]!)" />
+              <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="removeProduct(album, products[index]!.id)" />
+            </span>
+          </template>
+        </AlbumProducts>
+      </div>
 
       <EditorAddButton @click="edit(null)">{{ $t('editor.editions.add') }}</EditorAddButton>
     </div>
@@ -91,7 +69,7 @@
               </label>
               <div>
                 <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}<EditorHelp id="edition.release_date" /></span>
-                <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" />
+                <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" v-model:rejected="rejectedDate" />
                 <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
               </div>
               <label class="block">
@@ -125,15 +103,6 @@
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.note') }}<EditorHelp id="edition.note" /></span>
           <textarea v-model="form.note" rows="2" class="textarea textarea-sm w-full text-sm" maxlength="1000" :placeholder="$t('editor.editions.note_placeholder')" />
         </label>
-
-        <!-- The row this edition gets in the album page's editions table, drawn by that table itself. -->
-        <div class="space-y-2 border-t border-line pt-4">
-          <p class="text-sm font-medium text-body">{{ $t('editor.editions.preview') }} <span class="font-normal text-meta">· {{ $t('editor.editions.preview_live') }}</span></p>
-          <div class="rounded-xl border border-line">
-            <AlbumProducts :products="previewProducts" :discs="previewDiscs" bare />
-          </div>
-          <p class="text-[11px] text-meta">{{ $t('editor.editions.preview_hint') }}</p>
-        </div>
       </div>
       <template #footer>
         <UiButton size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="dialog = false">{{ $t('common.cancel') }}</UiButton>
@@ -149,16 +118,15 @@ import type { AlbumProductRow } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, Package, PencilLine, Trash2 } from '@lucide/vue'
-import { blankProduct, findDisc, mainDiscs as mainDiscsOf, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
+import { blankProduct, findDisc, mainDiscs as mainDiscsOf, pageEditionName, pageImages, removeProduct, setProductDisc, sortedProducts, untickedDiscs } from '~/utils/albumDocument'
 import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { moveRow, sameId } from '~/utils/documentRows'
 import { plainAmount } from '~/utils/priceAmount'
 
 const editor = useAlbumEditor()
 const { schema } = useCatalogSchema()
-const { enumLabel, formatDate } = useCatalogDisplay()
+const { enumLabel } = useCatalogDisplay()
 const { separator } = useListPunctuation()
-const { line: priceLine, sorted: sortedPrices } = usePriceDisplay()
 
 const album = computed(() => editor.album.value)
 const enums = computed(() => schema.value?.enums ?? {})
@@ -171,8 +139,18 @@ const limitedRuleOptions = computed<UiSelectOption<string | null>[]>(() => [
 const products = computed(() => sortedProducts(album.value))
 const mainDiscs = computed(() => mainDiscsOf(album.value))
 const unticked = computed(() => untickedDiscs(album.value))
-const levelErrors = computed(() => editor.errorsIn('products').filter(error => error.path.split('.').length === 3))
+const rowName = (id: RowId) => {
+  const row = products.value.find(product => sameId(product.id, id))
+  return row && (row.name || enumLabel('edition_type', row.edition_type))
+}
+/** The server's errors: those of the list as a whole, and those of an edition under its name. */
+const allErrors = computed(() => editor.errorsIn('products').map((error) => {
+  const name = error.path.split('.').length > 3 ? rowName(error.path.split('.')[3]!) : null
+  return name ? { ...error, message: `${name}: ${error.message}` } : error
+}))
 const errorsOf = (id: RowId) => editor.errorsIn(`products.${id}`)
+/** A row opens its edition, and shows when the server found something wrong in it. */
+const rowClass = (index: number) => `cursor-pointer ${errorsOf(products.value[index]!.id).length ? 'sm:[&>tr>td]:bg-danger/10! max-sm:bg-danger/10!' : ''}`
 const ticked = (ids: RowId[], discId: RowId) => ids.some(id => sameId(id, discId))
 
 const SHORT: Record<string, string> = { cd: 'CD', sacd: 'SACD', dvd: 'DVD', bd: 'BD', vinyl: 'LP', cassette: 'CT', minidisc: 'MiniDisc', usb: 'USB', digital: 'DL', other: '?' }
@@ -194,38 +172,39 @@ const editing = ref<AlbumProductRow | null>(null)
 const form = ref<AlbumProductRow | null>(null)
 
 /** The format the album page shows, as the API derives it: "DL" for digital editions, else the ticked discs ("2CD+BD"). */
-const formLabel = computed(() => form.value ? (form.value.medium === 'digital' ? 'DL' : formatOf(form.value.disc_ids)) : '')
+const formatLabel = (values: AlbumProductRow) => values.medium === 'digital' ? 'DL' : formatOf(values.disc_ids)
+const formLabel = computed(() => form.value ? formatLabel(form.value) : '')
 
-/** The album's discs and the edition being edited, shaped as the album page gets them, for the live preview row. */
-const previewDiscs = computed(() => mainDiscs.value.map((disc, index) => ({ id: index + 1, position: disc.position, format: disc.format }) as AlbumDisc))
-const previewProducts = computed<AlbumProduct[]>(() => {
-  if (!form.value) return []
-  const values = form.value
-  const discIds = mainDiscs.value.flatMap((disc, index) => ticked(values.disc_ids, disc.id) ? [index + 1] : [])
+/** The album's discs and its editions, shaped as the album page gets them. */
+const pageDiscs = computed(() => mainDiscs.value.map((disc, index) => ({ id: index + 1, position: disc.position, format: disc.format }) as AlbumDisc))
+const pageRow = (values: AlbumProductRow, index: number): AlbumProduct => {
   const limited = values.edition_type === 'limited'
-  return [{
+  return {
     ...values,
-    id: 0,
-    sort_order: 0,
-    name: values.name?.trim() || null,
+    name: pageEditionName(values, index),
     note: values.note?.trim() || null,
     limited_rule: limited ? values.limited_rule : null,
     limited_name: limited ? values.limited_name : null,
     catalog_number: values.catalog_number ? formatCatalogNumber(values.catalog_number) : null,
     prices: values.prices.filter(price => String(price.amount ?? '').trim() !== '').map(price => ({ ...price, amount: plainAmount(price.amount), currency: price.currency.trim().toUpperCase() })),
-    disc_ids: discIds,
-    format_label: formLabel.value || null,
-  } as AlbumProduct]
-})
+    disc_ids: mainDiscs.value.flatMap((disc, index) => ticked(values.disc_ids, disc.id) ? [index + 1] : []),
+    format_label: formatLabel(values) || null,
+  } as AlbumProduct
+}
+const pageRows = computed(() => products.value.map(pageRow))
+
+/** The date as typed while it can't be read: the dialog stays open until it is fixed. */
+const rejectedDate = ref<string | null>(null)
 
 const edit = (product: AlbumProductRow | null) => {
   editing.value = product
   form.value = product ? JSON.parse(JSON.stringify(product)) : blankProduct(album.value)
+  rejectedDate.value = null
   dialog.value = true
 }
 
 const save = () => {
-  if (!form.value) return
+  if (!form.value || rejectedDate.value !== null) return
   const prices = form.value.prices
     .map(price => ({ ...price, amount: plainAmount(price.amount), currency: price.currency.trim().toUpperCase(), note: price.note?.trim() || null }))
     .filter(price => price.amount !== '')

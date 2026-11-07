@@ -1,6 +1,5 @@
 <script lang="ts">
 import type { Placement } from '@floating-ui/dom'
-import type { Theme } from '~/composables/useAppearance'
 import { arrow as arrowMiddleware, autoUpdate, computePosition, flip, hide as hideMiddleware, offset as offsetMiddleware, shift } from '@floating-ui/dom'
 
 // One tooltip shows at a time, and right after one closes the next opens without waiting, so moving along a row of
@@ -13,6 +12,13 @@ let lastBubble: { group: string, x: number, y: number, width: number, height: nu
 const LONG_PRESS = 500
 /** The side of the bubble its arrow stands on, by the side of the trigger the bubble is on. */
 const ARROW_SIDE = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' } as const
+/** The half of the arrow's rotated square that stands out of the bubble: over a see-through bubble the other half would show. */
+const ARROW_CLIP = {
+  top: 'polygon(100% 0, 100% 100%, 0 100%)',
+  bottom: 'polygon(0 0, 100% 0, 0 100%)',
+  left: 'polygon(0 0, 100% 0, 100% 100%)',
+  right: 'polygon(0 0, 100% 100%, 0 100%)',
+} as const
 /** Triggers whose tap does something of their own; on touch screens their tooltip waits for a long press instead. */
 const ACTIONABLE = 'a[href], button, input, select, textarea, label, summary, [contenteditable="true"], '
   + '[role="button"], [role="link"], [role="checkbox"], [role="switch"], [role="tab"], [role="menuitem"], [role="option"]'
@@ -20,9 +26,9 @@ const ACTIONABLE = 'a[href], button, input, select, textarea, label, summary, [c
 
 <script setup lang="ts">
 /**
- * A tooltip in the inverted theme: light on dark pages, dark on light ones. `text` shows one short line; the `content`
- * slot takes any layout (covers, badges, lists …) and gets a wider bubble with more padding. The bubble carries the
- * opposite `data-theme`, so the usual tokens and Ui components in it come out right without `dark:` classes. A small
+ * A tooltip, always dark and a little see-through over a blur: black on dark pages, with a thin edge. `text` shows one short
+ * line; the `content` slot takes any layout (covers, badges, lists …) and gets a wider bubble with more padding. The
+ * bubble carries `data-theme="dark"`, so the usual tokens, `dark:` classes and Ui components in it come out right. A small
  * arrow on its edge points at the trigger's middle, also when the bubble is pushed aside at the edge of the screen.
  *
  * It shows after `delay` when the pointer rests on the trigger, at once on keyboard focus, and on touch screens on a
@@ -60,7 +66,6 @@ const open = ref(false)
 // The teleported bubble stays rendered until its leave transition ends, and isn't rendered at all before the first show.
 const rendered = ref(false)
 const layer = ref<HTMLElement | 'body'>('body')
-const theme = ref<Theme>('light')
 const position = reactive({ x: 0, y: 0, placement: props.placement as Placement, placed: false, hidden: false })
 const arrowAt = reactive<{ x?: number, y?: number }>({})
 // Set while the bubble took over from another of its group: no pop-in. `moving` then turns on the transition that
@@ -71,11 +76,15 @@ const moving = ref(false)
 const rich = computed(() => Boolean(slots.content))
 const anchor = () => triggerIn(root.value)
 /** Half of the arrow stands out of the bubble's edge, on the side facing the trigger. */
-const arrowStyle = computed(() => ({
-  left: arrowAt.x === undefined ? undefined : `${arrowAt.x}px`,
-  top: arrowAt.y === undefined ? undefined : `${arrowAt.y}px`,
-  [ARROW_SIDE[position.placement.split('-')[0] as keyof typeof ARROW_SIDE]]: '-5px',
-}))
+const arrowStyle = computed(() => {
+  const side = position.placement.split('-')[0] as keyof typeof ARROW_SIDE
+  return {
+    left: arrowAt.x === undefined ? undefined : `${arrowAt.x}px`,
+    top: arrowAt.y === undefined ? undefined : `${arrowAt.y}px`,
+    [ARROW_SIDE[side]]: '-5px',
+    clipPath: ARROW_CLIP[side],
+  }
+})
 
 let showTimer: ReturnType<typeof setTimeout> | undefined
 let pressTimer: ReturnType<typeof setTimeout> | undefined
@@ -127,7 +136,6 @@ const show = async () => {
   from?.drop()
   gliding.value = Boolean(from)
   layer.value = floatingLayer(reference)
-  theme.value = invertedTheme(reference)
   position.placed = false
   rendered.value = true
   open.value = true
@@ -308,9 +316,9 @@ onBeforeUnmount(hide)
         :id="id"
         ref="bubble"
         role="tooltip"
-        :data-theme="theme"
+        data-theme="dark"
         v-bind="$attrs"
-        class="pointer-events-none fixed left-0 top-0 z-[90] bg-popover shadow-lg"
+        class="pointer-events-none fixed left-0 top-0 z-[90] bg-popover/85 shadow-lg backdrop-blur-sm [html[data-theme=dark]_&]:bg-black/65 [html[data-theme=dark]_&]:backdrop-blur-[4px] [html[data-theme=dark]_&]:ring-1 [html[data-theme=dark]_&]:ring-line"
         :class="[rich
           ? 'max-w-[min(22rem,calc(100vw-1rem))] rounded-[10px] p-3 text-sm text-body'
           : 'max-w-60 rounded-md px-2.5 py-1.5 text-xs font-medium leading-4 text-title',
@@ -323,7 +331,7 @@ onBeforeUnmount(hide)
         @transitionend.self="event => event.propertyName === 'translate' && (moving = false)"
       >
         <!-- Behind the text, though in front of the bubble's own background: it is the same colour. -->
-        <span ref="pointer" aria-hidden="true" class="absolute -z-10 size-2.5 rotate-45 rounded-[2px] bg-popover" :style="arrowStyle" />
+        <span ref="pointer" aria-hidden="true" class="absolute -z-10 size-2.5 rotate-45 rounded-[2px] bg-inherit" :style="arrowStyle" />
         <slot name="content">{{ text }}</slot>
       </div>
     </Transition>

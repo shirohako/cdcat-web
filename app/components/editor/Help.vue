@@ -2,8 +2,8 @@
   <UiTooltip v-if="entry" :placement="placement" :delay="120" class="w-[min(22rem,calc(100vw-1rem))]">
     <!-- Inside a <label>, a click must not move on to the field, and a tap has to open the tooltip (data-tooltip-tap).
          No tab stop, so Tab keeps going from field to field; the fields stay named by their labels alone. -->
-    <span class="ml-1 inline-flex cursor-help align-[-2px] text-faint transition-colors duration-150 hover:text-primary" data-tooltip-tap aria-hidden="true" @click.prevent>
-      <CircleHelp :size="13" />
+    <span class="inline-flex cursor-help transition-[color,opacity] duration-150" :class="tagged ? 'opacity-70 hover:opacity-100' : 'ml-1 align-[-2px] text-faint hover:text-primary'" data-tooltip-tap aria-hidden="true" @click.prevent>
+      <CircleHelp :size="tagged ? 11 : 13" />
     </span>
     <template #content>
       <div class="space-y-2 text-xs leading-5">
@@ -46,7 +46,12 @@ import { CircleHelp, MapPin, X } from '@lucide/vue'
 import { editorHelp } from '~/editorHelp'
 
 /** The small ? after a field's label: on hover, or a tap, how to fill the field and where it shows. Text in app/editorHelp. */
-const props = withDefaults(defineProps<{ id: string, placement?: Placement }>(), { placement: 'top' })
+const props = withDefaults(defineProps<{
+  id: string
+  placement?: Placement
+  /** Inside a EditorRequiredTag: smaller, in the tag's colour */
+  tagged?: boolean
+}>(), { placement: 'top' })
 
 const { t, locale } = useI18n()
 const entry = computed(() => editorHelp(locale.value, props.id))

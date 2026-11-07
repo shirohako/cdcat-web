@@ -15,7 +15,7 @@ const description = computed(() => props.text.description ?? '')
     <div class="grid gap-4 sm:grid-cols-[8.5rem_minmax(0,1fr)]">
       <div>
         <p class="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-body">
-          <GuideMockMarker :n="1" />{{ t('editor.album.cover') }}<span class="-ml-1 text-danger">*</span>
+          <GuideMockMarker :n="1" />{{ t('editor.album.cover') }}<EditorRequiredTag class="ml-0!" />
         </p>
         <GuideFigureSampleCover class="aspect-square w-full max-w-36 rounded-lg" />
         <p class="mt-1.5 flex gap-1">

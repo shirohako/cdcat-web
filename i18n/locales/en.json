@@ -157,7 +157,7 @@
     },
     "products": {
       "all_prices": "All prices",
-      "all_prices_count": "All {count}"
+      "no_price": "No price yet"
     },
     "bonuses": {
       "all_editions": "All editions"
@@ -2605,11 +2605,13 @@
     "advanced": "More options",
     "recommended": "Recommended",
     "required": "Required",
+    "required_tag": "Required",
     "required_missing": "Still needed",
     "required_item": {
       "title": "Title",
       "type": "Album type",
       "release_date": "Release date",
+      "release_date_invalid": "A valid release date",
       "cover": "Square cover",
       "tracks": "At least one track",
       "artist_types": "Types of new artists ({count})"
@@ -2625,7 +2627,7 @@
     "preview": "Preview",
     "date_placeholder": "YYYY-MM-DD",
     "date_invalid": "Use 2024, 2024-05 or 2024-05-12",
-    "mode_translate": "Album and track title translations",
+    "mode_translate": "Title translations",
     "my_revisions": "My revisions",
     "continue_draft": "Continue it",
     "ignore": "Ignore",
@@ -2925,7 +2927,6 @@
       "limited_name_placeholder": "e.g. Animate exclusive",
       "note_placeholder": "e.g. 2024 repress with a different cover",
       "add_price": "Add a price",
-      "add_other_kind": "Add another kind",
       "no_prices": "No prices yet",
       "price_note_placeholder": "Note, e.g. C107 or Melonbooks",
       "price_amount": "Amount",
@@ -2933,10 +2934,7 @@
       "remove_price": "Remove this price",
       "change_price_kind": "Change kind",
       "price_note": "Note",
-      "price_order_hint": "The first price shows in the editions table. Drag a row under another kind to change its kind.",
-      "preview": "On the album page",
-      "preview_live": "live preview",
-      "preview_hint": "As on the album page: columns nobody fills are left out, and a blank cell of this edition shows “—”."
+      "price_order_hint": "The first price shows in the editions table. Drag a row under another kind to change its kind."
     },
     "bonuses": {
       "hint": "Shop and event bonuses: items, bonus CDs, download codes.",
@@ -3028,7 +3026,7 @@
     "relations": {
       "entries_hint": "The games, anime and other works this album belongs to.",
       "links_hint": "Shops, streaming services, official pages, VGMdb, MusicBrainz…",
-      "attributes_hint": "Extra facts with an agreed meaning."
+      "attributes_hint": "Add details by picking from the attribute dictionary."
     },
     "translate": {
       "title": "Album and track title translations",
@@ -3146,7 +3144,6 @@
       "edition_edit": "Edit edition",
       "edition_name": "Edition name",
       "edition_date_hint": "Only when it differs from the album’s release date.",
-      "unavailable": "No longer sold",
       "bonus_edit": "Edit bonus",
       "digital": "Digital",
       "new_disc": "New bonus disc",

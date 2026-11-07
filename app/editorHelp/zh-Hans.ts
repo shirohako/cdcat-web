@@ -9,16 +9,15 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'album.title': {
     text: '按专辑封面上印的原文填写。',
-    examples: ['星屑のアトラス', 'Stardust Atlas EP'],
     dont: ['不要加「初回限定盘」这样的版本说明，版本在「版本」里填'],
     where: '专辑页、列表和搜索结果。专辑页在界面语言有官方名称或翻译时先显示它，这个标题显示在下面；列表和搜索结果只显示这个标题。',
   },
   'album.release_date': {
-    text: '知道多详细就填多详细，不要猜。',
+    text: '按年-月-日的顺序填，年写 4 位，月和日写 2 位。',
     rows: [
-      ['2026-10-25', '知道具体哪一天'],
-      ['2026-10', '只知道月份'],
-      ['2026', '只知道年份'],
+      ['2026-10-25', '年-月-日，知道具体哪一天'],
+      ['2026-10', '年-月，只知道月份'],
+      ['2026', '年，只知道年份'],
     ],
     where: '专辑页标题下面的日期标签。按发售时间排序和按年份筛选也用它。',
   },
@@ -47,7 +46,6 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'album.description': {
     text: '这张专辑的背景和说明，比如企划缘由、收录情况。可以用 Markdown。',
-    examples: ['2026 年秋季 M3 首发，收录社团成立十周年的新曲。'],
     where: '专辑页的「简介」卡片。',
   },
   'album.slug': {
@@ -56,7 +54,7 @@ const help: Record<string, EditorHelpEntry> = {
     where: '目前专辑页的地址用的是数字编号，这一项暂时不显示在任何地方。',
   },
   'album.is_adult': {
-    text: '成人向的专辑勾选这一项。',
+    text: '成人向的专辑打开这一项。',
     where: '专辑页照常显示，同时告诉搜索引擎这是成人内容。',
   },
 
@@ -169,22 +167,22 @@ const help: Record<string, EditorHelpEntry> = {
   'edition.name': {
     text: '实物或商店上的叫法。只有一个版本时可以不填。',
     examples: ['初回限定盤', '通常盤', '配信版'],
-    where: '专辑页「发行」卡片。没填时按版本类型显示「通常版」或「限定版」。',
+    where: '专辑页「发行」卡片。没填时，第一个版本显示版本类型（如「通常版」），其他版本显示 Release #编号。',
     mock: { page: 'edition', mark: 'name' },
   },
   'edition.type': {
     text: '通常盘还是限定盘。选限定盘后，可以再填限定方式和限定名称。',
-    where: '限定盘在「发行」卡片的版本名后面带一个标签。',
-    mock: { page: 'edition', mark: 'limited' },
+    where: '「发行」卡片的版本类型一栏，显示「通常版」或「限定版」。',
+    mock: { page: 'edition', mark: 'type' },
   },
   'edition.medium': {
     text: '实体还是数字内容。配信版和 CD 内容相同时，同样勾选 Disc 1，只把载体设为数字内容。',
-    where: '「发行」卡片的规格一栏：实体版显示 CD 这样的形态，数字内容显示「数字版」。',
-    mock: { page: 'edition', mark: 'format' },
+    where: '「发行」卡片的载体一栏，显示「实体版」或「数字版」。',
+    mock: { page: 'edition', mark: 'medium' },
   },
   'edition.limited_rule': {
     text: '这张限定盘怎么限定：初回、数量、期间、店铺、活动或地区。',
-    where: '「发行」卡片版本名后面的标签，如「初回限定」。',
+    where: '「发行」卡片版本名下面的标签，如「初回限定」。',
     mock: { page: 'edition', mark: 'limited' },
   },
   'edition.limited_name': {
@@ -208,30 +206,30 @@ const help: Record<string, EditorHelpEntry> = {
     where: '页面上不显示，用来搜索和新建时查重。',
   },
   'edition.release_date': {
-    text: '和专辑的发行日期不同时才填，比如再版或晚一些的配信。写法和专辑的日期一样。',
+    text: '和专辑的发行日期不同时才填，比如再版或晚一些的配信。写法和专辑的日期一样，按年-月-日的顺序填。',
     examples: ['2026-10-25', '2026-10', '2026'],
-    where: '「发行」卡片，地区下面。',
+    where: '「发行」卡片版本名下面的标签。',
     mock: { page: 'edition', mark: 'date' },
   },
   'edition.region': {
     text: '这个版本在哪个地区发行。',
-    where: '「发行」卡片，显示旗帜和英文地区名。',
+    where: '「发行」卡片版本名下面的标签，显示旗帜和英文地区名。',
     mock: { page: 'edition', mark: 'region' },
   },
   'edition.discs': {
     text: '勾选这个版本包含的碟，形态（如 CD+BD）会自动算出来。每张普通的碟至少要被一个版本勾选。',
     dont: ['特典碟不属于任何版本，不能勾选'],
-    where: '「发行」卡片的规格一栏。碟不止一张时，下面还有 Disc 1–2 这样的范围。',
+    where: '「发行」卡片版本名下面的标签：实体版显示 CD+BD 这样的形态，碟不止一张时还有 Disc 1–2。',
     mock: { page: 'edition', mark: 'discs' },
   },
   'edition.hires': {
     text: '高解析度音源勾选这一项。',
-    where: '「发行」卡片版本名后面的 Hi-Res 标签。',
+    where: '「发行」卡片版本名下面的 Hi-Res 标签。',
     mock: { page: 'edition', mark: 'hires' },
   },
   'edition.available': {
     text: '已经停售的版本关掉这一项。',
-    where: '关掉后，「发行」卡片版本名后面标上「绝版」。',
+    where: '关掉后，「发行」卡片版本名下面标上「绝版」。',
     mock: { page: 'edition', mark: 'sold_out' },
   },
   'edition.prices': {
@@ -242,13 +240,13 @@ const help: Record<string, EditorHelpEntry> = {
       ['税', '印的是含税价还是税前价，不知道就不选'],
       ['备注', '在哪里卖的这个价，如 C107、メロンブックス'],
     ],
-    where: '「发行」卡片。排在最前的价格显示在行内，有好几个时其余的收在「全部 N」里。',
+    where: '「发行」卡片的价格一栏。排在最前的价格显示在行内，有好几个时点开能看到全部；没填时显示「暂无价格」。',
     mock: { page: 'edition', mark: 'price' },
   },
   'edition.note': {
     text: '这个版本和其他版本不一样的地方，可以写几行。',
     examples: ['2024 年再版，封面与初版不同'],
-    where: '「发行」卡片，版本名下面。',
+    where: '「发行」卡片，这个版本的下面单独一行，占满宽度。',
     mock: { page: 'edition', mark: 'note' },
   },
 
@@ -260,43 +258,43 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'bonus.type': {
     text: '特典是什么东西：特典曲、特典碟、小册子、照片、周边、数字内容、序列号、活动参加券、签名或其他。',
-    where: '特典表里的彩色标签。',
+    where: '特典行的类型一栏。',
   },
   'bonus.shop': {
     text: '送这个特典的店。',
     examples: ['Animate', 'とらのあな', 'メロンブックス'],
-    where: '特典表的渠道一栏。选了活动时显示活动，不显示店铺。',
+    where: '特典名下面的标签。',
   },
   'bonus.availability': {
     text: '怎样才能拿到：初回、数量、期间、店铺、活动或地区限定。',
-    where: '特典表的渠道一栏，跟在店铺后面。',
+    where: '特典名下面的标签。',
   },
   'bonus.event': {
     text: '会场特典是哪一届活动送的，搜索并选上。',
     examples: ['M3-2026 Autumn'],
-    where: '特典表的渠道一栏，点开是这场活动的所有专辑。',
+    where: '特典名下面的标签，点开是这场活动的所有专辑。',
   },
   'bonus.is_digital': {
     text: '下载或序列号形式的特典勾选这一项。',
-    where: '特典名后面的 DL 标签。',
+    where: '特典名下面的 DL 标签。',
   },
   'bonus.editions': {
     text: '只有某些版本才送时，勾选那些版本。所有版本都送就一个都不勾。',
-    where: '特典表的适用版本一栏，一个都不勾时显示「所有版本」。',
+    where: '特典名下面的标签，一个都不勾时不显示，表示所有版本都有。',
   },
   'bonus.discs': {
     text: '特典是一张 CD 时，在这里新建特典碟，或者把已有的碟改成特典碟。新建的碟要到「碟片与曲目」里填曲目，那里带粉色的「特典」标记。',
-    where: '特典名后面的 Disc 标签，点一下跳到曲目表里那张碟。',
+    where: '特典名下面的 Disc 标签，点一下跳到曲目表里那张碟。',
   },
   'bonus.description': {
     text: '这个特典是什么样的：尺寸、内容、收录曲。',
     examples: ['272mm×242mm、OPP 袋入り'],
-    where: '特典表，名称下面。',
+    where: '特典下面单独一行，占满宽度。',
   },
   'bonus.note': {
     text: '获得条件。',
     examples: ['購入者全員', '抽選'],
-    where: '特典表，简介下面的小字。',
+    where: '特典下面单独一行，说明下面的小字。',
   },
 
   // ── 图片

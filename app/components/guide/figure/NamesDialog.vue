@@ -17,7 +17,7 @@ const GROUPS = [
 
 <template>
   <div class="mx-auto max-w-xl overflow-hidden rounded-lg bg-popover shadow-overlay ring-1 ring-line" aria-hidden="true">
-    <div class="flex items-start gap-2.5 border-b border-line px-4 py-3">
+    <div class="flex items-center gap-2.5 border-b border-line px-4 py-3">
       <span class="grid size-7 shrink-0 place-items-center rounded-md bg-primary/10 text-primary"><Icon name="lucide:type" class="size-4" /></span>
       <span class="min-w-0">
         <span class="block text-[13px] font-semibold text-title">{{ t('editor.add_name') }}</span>

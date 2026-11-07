@@ -157,7 +157,7 @@
     },
     "products": {
       "all_prices": "全部價格",
-      "all_prices_count": "全部 {count}"
+      "no_price": "暫無價格"
     },
     "bonuses": {
       "all_editions": "所有版本"
@@ -2605,11 +2605,13 @@
     "advanced": "更多選項",
     "recommended": "建議補充",
     "required": "必填",
+    "required_tag": "必須",
     "required_missing": "還缺這些",
     "required_item": {
       "title": "標題",
       "type": "專輯類型",
       "release_date": "發行日期",
+      "release_date_invalid": "正確的發行日期",
       "cover": "正方形封面",
       "tracks": "至少一首曲目",
       "artist_types": "新藝術家的類型（{count} 位）"
@@ -2685,7 +2687,7 @@
       "first_edition_hint": "這兩項屬於第一個版本。其他版本見",
       "description_placeholder": "這張專輯的背景和說明……",
       "other_names": "其他名稱",
-      "is_adult": "成人內容（R-18）",
+      "is_adult": "成人內容(R-18)",
       "section": {
         "basic": "基本資訊",
         "tracks": "碟片與曲目",
@@ -2925,7 +2927,6 @@
       "limited_name_placeholder": "如 Animate 限定",
       "note_placeholder": "如 2024 年再版，封面與初版不同",
       "add_price": "新增價格",
-      "add_other_kind": "新增其他類型",
       "no_prices": "還沒有價格",
       "price_note_placeholder": "備註，如 C107、メロンブックス",
       "price_amount": "金額",
@@ -2933,10 +2934,7 @@
       "remove_price": "刪除這個價格",
       "change_price_kind": "改類型",
       "price_note": "備註",
-      "price_order_hint": "排在最前的價格顯示在版本表格裡。把一列拖到別的類型下，類型會跟著改。",
-      "preview": "在專輯頁上",
-      "preview_live": "即時預覽",
-      "preview_hint": "和專輯頁一樣：沒人填的欄位不顯示，這個版本沒填的格子顯示「—」。"
+      "price_order_hint": "排在最前的價格顯示在版本表格裡。把一列拖到別的類型下，類型會跟著改。"
     },
     "bonuses": {
       "hint": "店鋪和活動特典：周邊、特典 CD、下載碼。",
@@ -3028,7 +3026,7 @@
     "relations": {
       "entries_hint": "這張專輯所屬的遊戲、動畫等作品。",
       "links_hint": "商店、串流、官方頁面、VGMdb、MusicBrainz……",
-      "attributes_hint": "含義事先約定好的補充資訊"
+      "attributes_hint": "從屬性字典裡選擇內容來補充"
     },
     "translate": {
       "title": "專輯標題和曲目翻譯",
@@ -3146,7 +3144,6 @@
       "edition_edit": "編輯版本",
       "edition_name": "版本名稱",
       "edition_date_hint": "和專輯發售日不同時才填。",
-      "unavailable": "已停售",
       "bonus_edit": "編輯特典",
       "digital": "數位",
       "new_disc": "新特典碟",

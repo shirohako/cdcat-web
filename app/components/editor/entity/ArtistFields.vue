@@ -3,12 +3,12 @@
     <CatalogSection :title="$t('editor.entity.section.basic')" :icon="UserRound">
       <div class="grid gap-4 p-5 sm:grid-cols-2">
         <label class="block sm:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }} <span class="text-danger">*</span></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}<EditorRequiredTag /></span>
           <input v-model="doc.name" class="input w-full" :class="{ 'input-error': editor.errorAt('name') }" maxlength="500" :placeholder="$t('editor.entity.artist_name_placeholder')">
           <span v-if="editor.errorAt('name')" class="mt-1 block text-xs text-danger">{{ editor.errorAt('name') }}</span>
         </label>
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}<EditorRequiredTag /></span>
           <UiSelect v-model="doc.type" :options="typeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-full" :invalid="!!editor.errorAt('type')" />
           <span v-if="editor.errorAt('type')" class="mt-1 block text-xs text-danger">{{ editor.errorAt('type') }}</span>
         </label>

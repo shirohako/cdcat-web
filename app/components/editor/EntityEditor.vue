@@ -35,7 +35,7 @@
           <slot />
           <CatalogSection :title="$t('editor.section_submit')" :icon="Send">
             <div class="p-5">
-              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" @submitted="submitted" @errors="setErrors" @discarded="restart" />
+              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" :required="required" @submitted="submitted" @errors="setErrors" @discarded="restart" />
             </div>
           </CatalogSection>
         </div>
@@ -143,7 +143,9 @@ const setErrors = (list: FieldError[]) => {
   if (list.length) showToast(t('editor.fix_errors'), 'error')
 }
 
-const context: EntityEditorContext = { type: props.type, id, doc, references, remember, errorAt, errorsIn, notify: showToast }
+const rejectedDate = ref<string | null>(null)
+const required = computed(() => rejectedDate.value === null ? [] : [{ key: 'release_date', label: t('editor.required_item.release_date_invalid'), section: '' }])
+const context: EntityEditorContext = { type: props.type, id, doc, references, remember, errorAt, errorsIn, rejectedDate, notify: showToast }
 provide(entityEditorKey, context)
 
 const clone = (value: unknown) => JSON.parse(JSON.stringify(value)) as Record<string, unknown>
@@ -198,6 +200,7 @@ const open = async () => {
 /** Starts over after the draft was thrown away: a new item from scratch, an entity or revision as stored. */
 const restart = () => {
   if (!id && !props.revisionId) return navigateTo('/revisions')
+  rejectedDate.value = null
   loading.value = true
   return open().finally(() => { loading.value = false })
 }

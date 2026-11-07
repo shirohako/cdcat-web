@@ -157,7 +157,7 @@
     },
     "products": {
       "all_prices": "すべての価格",
-      "all_prices_count": "すべて {count}"
+      "no_price": "価格未登録"
     },
     "bonuses": {
       "all_editions": "全形態"
@@ -2605,11 +2605,13 @@
     "advanced": "その他の設定",
     "recommended": "入力推奨",
     "required": "必須",
+    "required_tag": "必須",
     "required_missing": "まだ足りないもの",
     "required_item": {
       "title": "タイトル",
       "type": "アルバムの種類",
       "release_date": "発売日",
+      "release_date_invalid": "正しい発売日",
       "cover": "正方形のジャケット",
       "tracks": "1 曲以上のトラック",
       "artist_types": "新しいアーティストの種類（{count} 件）"
@@ -2685,7 +2687,7 @@
       "first_edition_hint": "この 2 項目は最初のエディションのものです。ほかのエディションは",
       "description_placeholder": "このアルバムの背景や補足…",
       "other_names": "ほかの名前",
-      "is_adult": "成人向け（R-18）",
+      "is_adult": "成人向け(R-18)",
       "section": {
         "basic": "基本情報",
         "tracks": "ディスクとトラック",
@@ -2925,7 +2927,6 @@
       "limited_name_placeholder": "例：アニメイト限定",
       "note_placeholder": "例：2024年再プレス。ジャケットは初版と異なる",
       "add_price": "価格を追加",
-      "add_other_kind": "他の種類を追加",
       "no_prices": "価格はまだありません",
       "price_note_placeholder": "メモ（例：C107、メロンブックス）",
       "price_amount": "金額",
@@ -2933,10 +2934,7 @@
       "remove_price": "この価格を削除",
       "change_price_kind": "種類を変更",
       "price_note": "メモ",
-      "price_order_hint": "先頭の価格が版の表に表示されます。行を別の種類へドラッグすると、種類も変わります。",
-      "preview": "アルバムページでの表示",
-      "preview_live": "リアルタイムプレビュー",
-      "preview_hint": "アルバムページと同じく、誰も入力していない列は表示されず、この版の空欄は「—」になります。"
+      "price_order_hint": "先頭の価格が版の表に表示されます。行を別の種類へドラッグすると、種類も変わります。"
     },
     "bonuses": {
       "hint": "店舗特典やイベント特典：グッズ、特典 CD、ダウンロードコード。",
@@ -3028,7 +3026,7 @@
     "relations": {
       "entries_hint": "このアルバムが属するゲームやアニメなどの作品。",
       "links_hint": "ショップ、配信サービス、公式ページ、VGMdb、MusicBrainz など",
-      "attributes_hint": "意味があらかじめ決められた補足情報"
+      "attributes_hint": "属性辞書から選んで情報を補足します"
     },
     "translate": {
       "title": "アルバム名と曲名の翻訳",
@@ -3146,7 +3144,6 @@
       "edition_edit": "エディションを編集",
       "edition_name": "エディション名",
       "edition_date_hint": "アルバムの発売日と違うときだけ入力。",
-      "unavailable": "販売終了",
       "bonus_edit": "特典を編集",
       "digital": "デジタル",
       "new_disc": "新しい特典ディスク",

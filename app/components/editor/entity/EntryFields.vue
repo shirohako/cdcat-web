@@ -3,7 +3,7 @@
     <CatalogSection :title="$t('editor.entity.section.basic')" :icon="Clapperboard">
       <div class="grid gap-4 p-5 sm:grid-cols-2">
         <label class="block sm:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }} <span class="text-danger">*</span></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}<EditorRequiredTag /></span>
           <input v-model="doc.name" class="input w-full" :class="{ 'input-error': editor.errorAt('name') }" maxlength="500" :placeholder="$t('editor.entity.entry_name_placeholder')">
           <span v-if="editor.errorAt('name')" class="mt-1 block text-xs text-danger">{{ editor.errorAt('name') }}</span>
         </label>
@@ -17,7 +17,7 @@
         </label>
         <div>
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}</span>
-          <EditorDateInput v-model:date="doc.release_date" v-model:precision="doc.release_date_precision" />
+          <EditorDateInput v-model:date="doc.release_date" v-model:precision="doc.release_date_precision" v-model:rejected="editor.rejectedDate.value" />
         </div>
         <label v-if="doc.type === 'game'" class="block sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.platforms') }}</span>

@@ -157,7 +157,7 @@
     },
     "products": {
       "all_prices": "전체 가격",
-      "all_prices_count": "전체 {count}"
+      "no_price": "가격 미등록"
     },
     "bonuses": {
       "all_editions": "모든 에디션"
@@ -2605,11 +2605,13 @@
     "advanced": "추가 옵션",
     "recommended": "권장",
     "required": "필수",
+    "required_tag": "필수",
     "required_missing": "아직 채워야 할 항목",
     "required_item": {
       "title": "제목",
       "type": "앨범 유형",
       "release_date": "발매일",
+      "release_date_invalid": "올바른 발매일",
       "cover": "정사각형 커버",
       "tracks": "1곡 이상",
       "artist_types": "새 아티스트 유형 ({count}명)"
@@ -2925,7 +2927,6 @@
       "limited_name_placeholder": "예: Animate 한정",
       "note_placeholder": "예: 2024년 재발매, 초판과 재킷이 다름",
       "add_price": "가격 추가",
-      "add_other_kind": "다른 종류 추가",
       "no_prices": "아직 가격이 없습니다",
       "price_note_placeholder": "메모 (예: C107, 멜론북스)",
       "price_amount": "금액",
@@ -2933,10 +2934,7 @@
       "remove_price": "이 가격 삭제",
       "change_price_kind": "종류 변경",
       "price_note": "메모",
-      "price_order_hint": "맨 앞의 가격이 판 표에 표시돼요. 행을 다른 종류로 드래그하면 종류도 함께 바뀌어요.",
-      "preview": "앨범 페이지에서",
-      "preview_live": "실시간 미리보기",
-      "preview_hint": "앨범 페이지와 같이, 아무도 입력하지 않은 열은 표시되지 않고 이 판의 빈칸은 「—」로 표시돼요."
+      "price_order_hint": "맨 앞의 가격이 판 표에 표시돼요. 행을 다른 종류로 드래그하면 종류도 함께 바뀌어요."
     },
     "bonuses": {
       "hint": "굿즈, 특전 CD, 다운로드 코드 같은 매장·행사 특전을 입력해요.",
@@ -3028,7 +3026,7 @@
     "relations": {
       "entries_hint": "이 앨범이 속한 게임, 애니메이션 등의 작품이에요.",
       "links_hint": "판매처, 스트리밍 서비스, 공식 페이지, VGMdb, MusicBrainz…",
-      "attributes_hint": "의미가 정해져 있는 추가 정보예요."
+      "attributes_hint": "속성 사전에서 골라 정보를 보충해요."
     },
     "translate": {
       "title": "앨범 제목과 트랙 번역",
@@ -3146,7 +3144,6 @@
       "edition_edit": "에디션 편집",
       "edition_name": "에디션 이름",
       "edition_date_hint": "앨범 발매일과 다를 때만 입력해 주세요.",
-      "unavailable": "판매 종료",
       "bonus_edit": "특전 편집",
       "digital": "디지털",
       "new_disc": "새 특전 디스크",

@@ -15,6 +15,8 @@ export interface EntityEditorContext {
   /** The error at items.main.<path>, if the last submit reported one. */
   errorAt: (...path: Array<string | number>) => string | null
   errorsIn: (collection: string) => FieldError[]
+  /** A date field's text while it can't be read; submitting waits for a fix. */
+  rejectedDate: Ref<string | null>
   notify: (message: string, type?: 'success' | 'error' | 'info') => void
 }
 

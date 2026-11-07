@@ -30,14 +30,14 @@
             :novalidate="as === 'form' || undefined"
             @submit.prevent="emit('submit')"
           >
-            <header class="flex shrink-0 items-start gap-3 px-5 pb-3 pt-5">
+            <header class="flex shrink-0 items-center gap-3 px-5 pb-3 pt-5">
               <UiIconTile v-if="icon" :icon="icon" :tone="tone" />
-              <div class="min-w-0 flex-1 pt-0.5">
+              <div class="min-w-0 flex-1">
                 <h2 :id="titleId" class="truncate text-base font-bold leading-6 text-title">{{ title }}</h2>
                 <p v-if="description" class="mt-0.5 text-xs leading-5 text-meta">{{ description }}</p>
               </div>
               <slot name="actions" />
-              <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5 -mt-0.5" @click="close" />
+              <UiButton variant="ghost" icon="lucide:x" :label="$t('common.close')" size="sm" class="-mr-1.5" @click="close" />
             </header>
             <div class="min-h-0 overflow-y-auto px-5 pt-1" :class="plainFooter ? 'pb-3' : 'pb-5'"><slot /></div>
             <footer

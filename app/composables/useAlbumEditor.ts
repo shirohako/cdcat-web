@@ -31,6 +31,8 @@ export interface AlbumEditorContext {
   /** Errors under items.album.<collection> */
   errorsIn: (collection: string) => FieldError[]
   go: (section: AlbumSection) => void
+  /** The album's release date as typed while it can't be read; submitting waits for a fix. */
+  rejectedDate: Ref<string | null>
   notify: (message: string, type?: 'success' | 'error' | 'info') => void
   /** Printed names in the credits that need a person to look at them, with why (the harvest review page) */
   nameNotes: ComputedRef<Record<string, string>>

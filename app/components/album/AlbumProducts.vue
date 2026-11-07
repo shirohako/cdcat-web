@@ -1,6 +1,6 @@
 <template>
   <section :class="bare ? 'overflow-hidden' : 'card overflow-hidden'">
-    <!-- Header; left out when `bare` (the edition editor's preview shows just the table). -->
+    <!-- Header; left out when `bare` (the album editor's editions show just the table). -->
     <!-- Editions and, under them, the bonuses (特典): one card, each part under its own small heading when both are there. -->
     <UiSectionTitle v-if="!bare" :title="$t(bonuses.length ? 'album.section.products_bonuses' : 'album.section.products')" :icon="Package" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
       <template v-if="counts" #actions>
@@ -8,109 +8,111 @@
       </template>
     </UiSectionTitle>
 
-    <!-- Editions, then bonuses, each a table without a head, so editions still line up and compare; the rows take a
-         neutral grey on hover. An edition has too many facts for a column each, so they pair up on two lines: the catalog number under
-         the name, the discs under the format, the date under the region, the price's kind under the amount. Columns nobody
-         fills are left out; on a phone a table scrolls sideways. -->
-    <template v-if="products.length">
-      <h3 v-if="bonuses.length" class="px-5 pt-2 text-xs font-semibold text-meta">{{ $t('album.section.products') }}</h3>
-      <div class="overflow-x-auto px-5 pt-1" :class="bare ? 'pb-1' : 'pb-4'">
-        <table class="w-full border-collapse text-[13px]">
-          <tbody>
-            <tr v-for="product in sortedProducts" :key="product.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
-              <td class="border-b border-line px-2.5 py-2.5 align-top">
-                <div class="flex min-w-44 items-start gap-2.5">
-                  <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="product.name || formatEditionType(product.edition_type)" class="size-10 shrink-0 rounded-md object-cover">
-                  <div class="min-w-0">
-                    <p class="flex flex-wrap items-center gap-1.5">
-                      <span class="font-semibold text-title">{{ product.name || formatEditionType(product.edition_type) }}</span>
-                      <span v-if="product.edition_type === 'limited'" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-amber-100 text-amber-700 dark:bg-amber-400/20 dark:text-amber-200">{{ limitedRuleLabel(product.limited_rule) || $t('content_display.limited') }}</span>
-                      <span v-if="product.is_hires" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-violet-100 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200">Hi-Res</span>
-                      <span v-if="!product.is_available" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-black/[0.05] text-meta dark:bg-white/[0.08]">{{ $t('content_display.out_of_print') }}</span>
-                    </p>
-                    <p v-if="product.catalog_number" class="mt-0.5 font-mono text-xs text-meta">{{ product.catalog_number }}</p>
-                    <p v-if="product.edition_type === 'limited' && product.limited_name" class="mt-0.5 text-[11px] text-meta">{{ product.limited_name }}</p>
-                    <p v-if="product.note" class="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-body">{{ product.note }}</p>
+    <!-- Editions, then bonuses, each a table without a head, so editions still line up and compare. Editions are filled in freely, so only what each has is a column (type, format) plus the
+         price; the rest are tags under the name. On a phone a row wraps into lines (PHONE_ROW). -->
+    <template v-if="products.length && !onlyBonuses">
+      <h3 v-if="bonuses.length" :class="PART_TITLE" class="pt-1"><Disc3 :size="14" />{{ $t('album.section.products') }}</h3>
+      <div class="overflow-x-auto" :class="!bare && ['px-5 pt-1 max-sm:px-3', !bonuses.length && 'pb-5 max-sm:pb-3']">
+        <table class="w-full border-separate border-spacing-0 text-[13px] max-sm:block">
+          <!-- An edition is a tbody: its row, and under it the note, as wide as the table. Empty ones keep the blocks apart. -->
+          <template v-for="(product, index) in sortedProducts" :key="product.id">
+            <tbody v-if="index" aria-hidden="true" class="max-sm:hidden"><tr class="h-1.5"><td /></tr></tbody>
+            <tbody
+              class="max-sm:block"
+              :class="[ROW, rowClass?.(index)]"
+              @click="onRowClick($event, index)"
+            >
+              <tr :class="[PHONE_ROW, product.note && 'sm:[&>td]:pb-1 max-sm:pb-1.5']">
+                <td class="px-2.5 py-3 align-middle max-sm:block max-sm:basis-full max-sm:p-0">
+                  <div class="flex items-center gap-2.5 sm:min-w-44">
+                    <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="editionName(product, index)" class="size-12 shrink-0 rounded-md object-cover">
+                    <div class="min-w-0">
+                      <p class="text-[15px] font-semibold leading-5 text-title">{{ editionName(product, index) }}</p>
+                      <!-- Whatever this edition has filled, each fact a tag; the line goes away when none is. -->
+                      <div class="mt-1 flex flex-wrap items-center gap-1 empty:hidden">
+                        <!-- On a phone the two columns join the tags. -->
+                        <span :class="TAG" class="text-body sm:hidden"><component :is="editionIcon(product.edition_type)" :size="12" />{{ formatEditionType(product.edition_type) }}</span>
+                        <span :class="TAG" class="text-body sm:hidden"><component :is="mediumIcon(product.medium)" :size="12" />{{ mediumLabel(product.medium) }}</span>
+                        <span v-if="product.medium !== 'digital' && product.format_label" :class="TAG" class="text-body"><Disc3 :size="12" />{{ product.format_label }}</span>
+                        <span v-if="product.catalog_number" :class="TAG" class="font-mono text-body"><Hash :size="12" />{{ product.catalog_number }}</span>
+                        <span v-if="product.region" :class="TAG" class="text-body"><CommonFlag :code="product.region" />{{ regionEnglishName(product.region) }}</span>
+                        <span v-if="product.release_date" :class="TAG" class="tabular-nums text-body"><Calendar :size="12" />{{ formatDate(product.release_date, product.release_date_precision) }}</span>
+                        <span v-if="discNumbers.size > 1 && discsLabel(product.disc_ids)" :class="TAG" class="text-body"><Layers :size="12" />{{ discsLabel(product.disc_ids) }}</span>
+                        <span v-if="product.edition_type === 'limited' && product.limited_rule" class="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] leading-4 text-amber-700 dark:bg-amber-400/20 dark:text-amber-200"><Hourglass :size="12" />{{ limitedRuleLabel(product.limited_rule) }}</span>
+                        <span v-if="product.edition_type === 'limited' && product.limited_name" :class="TAG" class="text-body"><Tag :size="12" />{{ product.limited_name }}</span>
+                        <span v-if="product.is_hires" class="inline-flex items-center gap-1 rounded-md bg-violet-100 px-1.5 py-0.5 text-[11px] leading-4 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200"><AudioLines :size="12" />Hi-Res</span>
+                        <span v-if="!product.is_available" :class="TAG" class="text-meta"><CircleOff :size="12" />{{ $t('content_display.out_of_print') }}</span>
+                        <!-- On a phone the price goes last among the tags. -->
+                        <div class="sm:hidden"><AlbumProductPrice :prices="product.prices" tag /></div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-body">
-                {{ formatLabel(product) }}
-                <p v-if="columns.discs && discsLabel(product.disc_ids)" class="mt-0.5 text-xs text-meta">{{ discsLabel(product.disc_ids) }}</p>
-              </td>
-              <td v-if="columns.region || columns.date" class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-body">
-                <!-- Flag + English name; long names ("United Arab Emirates") are cut at the column's width and shown whole on hover. -->
-                <template v-if="product.region">
-                  <UiTooltip v-if="regionEnglishName(product.region).length > LONG_REGION" :text="regionEnglishName(product.region)">
-                    <span class="flex max-w-36 items-center gap-1.5"><CommonFlag :code="product.region" /><span class="min-w-0 truncate">{{ regionEnglishName(product.region) }}</span></span>
-                  </UiTooltip>
-                  <span v-else class="flex items-center gap-1.5"><CommonFlag :code="product.region" />{{ regionEnglishName(product.region) }}</span>
-                </template>
-                <p v-if="product.release_date" class="text-xs tabular-nums text-meta" :class="product.region && 'mt-0.5'">{{ formatDate(product.release_date, product.release_date_precision) }}</p>
-              </td>
-              <td v-if="columns.price" class="whitespace-nowrap border-b border-line px-2.5 py-2.5 align-top text-right">
-                <!-- Several prices keep the cell one line: the first in display order, and all of them behind a button. -->
-                <div v-if="product.prices.length > 1" class="flex items-center justify-end gap-2">
-                  <span class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]!) }}</span>
-                  <UiPopover placement="bottom-end" :label="$t('album.products.all_prices')" class="w-max p-3!">
-                    <template #trigger="{ toggle, attrs }">
-                      <UiButton size="xs" v-bind="attrs" @click="toggle">{{ $t('album.products.all_prices_count', { count: product.prices.length }) }}</UiButton>
-                    </template>
-                    <table class="text-[13px]">
-                      <tbody>
-                        <tr v-for="(price, i) in product.prices" :key="i">
-                          <td class="max-w-48 py-0.5 pr-4 text-xs text-meta">{{ priceLabel(price) }}</td>
-                          <td class="whitespace-nowrap py-0.5 text-right font-semibold tabular-nums text-title">{{ priceAmount(price) }}</td>
-                          <td v-if="product.prices.some(item => item.tax_included !== null)" class="whitespace-nowrap py-0.5 pl-2 text-[11px] text-meta">{{ price.tax_included === null ? '' : taxLabel(price.tax_included) }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </UiPopover>
-                </div>
-                <template v-else-if="product.prices[0]">
-                  <p class="font-semibold tabular-nums text-title">{{ priceAmount(product.prices[0]) }}</p>
-                  <p v-if="priceNote(product.prices[0])" class="ml-auto mt-0.5 max-w-40 whitespace-normal text-[11px] text-meta">{{ priceNote(product.prices[0]) }}</p>
-                </template>
-              </td>
-            </tr>
-          </tbody>
+                </td>
+                <!-- Only what every edition has gets a column: its type and what it comes on. -->
+                <td class="whitespace-nowrap px-2.5 py-3 align-middle max-sm:hidden"><span :class="TAG" class="text-body"><component :is="editionIcon(product.edition_type)" :size="12" />{{ formatEditionType(product.edition_type) }}</span></td>
+                <td class="whitespace-nowrap px-2.5 py-3 align-middle max-sm:hidden"><span :class="TAG" class="text-body"><component :is="mediumIcon(product.medium)" :size="12" />{{ mediumLabel(product.medium) }}</span></td>
+                <td class="whitespace-nowrap px-2.5 py-3 align-middle text-right max-sm:hidden"><AlbumProductPrice :prices="product.prices" /></td>
+                <td v-if="$slots.actions" class="whitespace-nowrap px-2.5 py-3 align-middle max-sm:ml-auto max-sm:block max-sm:p-0 sm:w-px">
+                  <slot name="actions" :index="index" />
+                </td>
+              </tr>
+              <tr v-if="product.note" class="max-sm:block">
+                <td :colspan="$slots.actions ? 5 : 4" class="whitespace-pre-line px-2.5 pb-3 text-xs leading-relaxed text-body max-sm:block max-sm:px-3">{{ product.note }}</td>
+              </tr>
+            </tbody>
+          </template>
         </table>
       </div>
     </template>
 
     <template v-if="bonuses.length">
-      <h3 class="px-5 pt-3 text-xs font-semibold text-meta" :class="products.length > 0 && 'border-t border-line'">{{ $t('album.section.bonuses') }}</h3>
-      <div class="overflow-x-auto px-5 pb-4 pt-1">
-        <table class="w-full border-collapse text-[13px]">
-          <tbody>
-            <tr v-for="bonus in sortedBonuses" :key="bonus.id" class="transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07] [&:last-child>td]:border-b-0">
-              <td class="border-b border-line px-2.5 py-2 align-middle">
-                <div class="flex min-w-48 items-center gap-2.5">
-                  <div class="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-md bg-sunken">
-                    <img v-if="bonusImage(bonus.id)" :src="bonusImage(bonus.id)!" :alt="bonus.name" class="h-full w-full object-cover">
-                    <Gift v-else :size="15" class="text-meta" />
+      <h3 v-if="!bare" :class="[PART_TITLE, products.length ? 'pt-4' : 'pt-1']"><Gift :size="14" />{{ $t('album.section.bonuses') }}</h3>
+      <div class="overflow-x-auto" :class="!bare && 'px-5 pb-5 pt-1 max-sm:px-3 max-sm:pb-3'">
+        <table class="w-full border-separate border-spacing-0 text-[13px] max-sm:block">
+          <!-- Laid out as the editions are: only the type is a column, the rest tags, the texts as wide as the table. -->
+          <template v-for="(bonus, index) in sortedBonuses" :key="bonus.id">
+            <tbody v-if="index" aria-hidden="true" class="max-sm:hidden"><tr class="h-1.5"><td /></tr></tbody>
+            <tbody
+              class="max-sm:block"
+              :class="[ROW, rowClass?.(index)]"
+              @click="onRowClick($event, index)"
+            >
+              <tr :class="[PHONE_ROW, (bonus.description || bonus.note) && 'sm:[&>td]:pb-1 max-sm:pb-1.5']">
+                <td class="px-2.5 py-3 align-middle max-sm:block max-sm:basis-full max-sm:p-0">
+                  <div class="flex items-center gap-2.5 sm:min-w-44">
+                    <div class="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-black/[0.05] dark:bg-white/[0.08] dark:ring-1 dark:ring-inset dark:ring-line">
+                      <img v-if="bonusImage(bonus.id)" :src="bonusImage(bonus.id)!" :alt="bonus.name" class="h-full w-full object-cover">
+                      <Gift v-else :size="18" class="text-meta" />
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-[15px] font-semibold leading-5 text-title">{{ bonus.name || '—' }}</p>
+                      <p class="mt-1 flex flex-wrap items-center gap-1 empty:hidden">
+                        <!-- On a phone the type joins the tags. -->
+                        <span :class="TAG" class="text-body sm:hidden"><Gift :size="12" />{{ enumLabel('bonus_type', bonus.type) }}</span>
+                        <span v-if="bonus.is_digital" :class="TAG" class="text-body"><CloudDownload :size="12" />DL</span>
+                        <a v-for="discId in bonus.disc_ids" :key="discId" :href="bare ? undefined : `#disc-${discId}`" :class="[TAG, !bare && 'transition-colors hover:text-primary']" class="text-body"><Disc3 :size="12" />Disc {{ discNumbers.get(discId) }}</a>
+                        <NuxtLink v-if="bonus.event && !bare" :to="`/albums?event=${bonus.event.id}`" :class="TAG" class="text-body transition-colors hover:text-primary"><CalendarDays :size="12" />{{ bonus.event.name }}</NuxtLink>
+                        <span v-else-if="bonus.event" :class="TAG" class="text-body"><CalendarDays :size="12" />{{ bonus.event.name }}</span>
+                        <span v-if="bonus.shop" :class="TAG" class="text-body"><Store :size="12" />{{ bonus.shop }}</span>
+                        <span v-if="bonus.availability" class="inline-flex items-center gap-1 rounded-md bg-amber-100 px-1.5 py-0.5 text-[11px] leading-4 text-amber-700 dark:bg-amber-400/20 dark:text-amber-200"><Hourglass :size="12" />{{ enumLabel('limited_rule', bonus.availability) }}</span>
+                        <span v-if="bonus.product_ids.length" :class="TAG" class="text-body"><Package :size="12" />{{ editionNames(bonus.product_ids) }}</span>
+                      </p>
+                    </div>
                   </div>
-                  <div class="min-w-0">
-                    <p class="flex flex-wrap items-center gap-1.5">
-                      <span class="font-semibold text-title">{{ bonus.name }}</span>
-                      <span v-if="bonus.is_digital" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-blue-100 text-blue-700 dark:bg-blue-400/20 dark:text-blue-200">DL</span>
-                      <a v-for="discId in bonus.disc_ids" :key="discId" :href="`#disc-${discId}`" class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-black/[0.05] text-meta dark:bg-white/[0.08] hover:text-primary">
-                        <Disc3 :size="10" />Disc {{ discNumbers.get(discId) }}
-                      </a>
-                    </p>
-                    <p v-if="bonus.description" class="mt-0.5 whitespace-pre-line text-xs leading-relaxed text-body">{{ bonus.description }}</p>
-                    <p v-if="bonus.note" class="mt-0.5 text-[11px] text-meta">{{ bonus.note }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle"><span class="inline-flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-[10px] font-bold leading-4 bg-pink-100 text-pink-700 dark:bg-pink-400/20 dark:text-pink-200">{{ enumLabel('bonus_type', bonus.type) }}</span></td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">
-                <NuxtLink v-if="bonus.event" :to="`/albums?event=${bonus.event.id}`" class="transition-colors hover:text-primary">{{ bonus.event.name }}</NuxtLink>
-                <template v-else>{{ [bonus.shop, bonus.availability && enumLabel('limited_rule', bonus.availability)].filter(Boolean).join(' · ') }}</template>
-              </td>
-              <td class="whitespace-nowrap border-b border-line px-2.5 py-2 align-middle text-body">{{ bonus.product_ids.length ? editionNames(bonus.product_ids) : $t('album.bonuses.all_editions') }}</td>
-            </tr>
-          </tbody>
+                </td>
+                <td class="w-px whitespace-nowrap px-2.5 py-3 text-right align-middle max-sm:hidden"><span :class="TAG" class="text-body"><Gift :size="12" />{{ enumLabel('bonus_type', bonus.type) }}</span></td>
+                <td v-if="$slots.actions" class="whitespace-nowrap px-2.5 py-3 align-middle max-sm:ml-auto max-sm:block max-sm:p-0 sm:w-px">
+                  <slot name="actions" :index="index" />
+                </td>
+              </tr>
+              <tr v-if="bonus.description || bonus.note" class="max-sm:block">
+                <td :colspan="$slots.actions ? 3 : 2" class="px-2.5 pb-3 max-sm:block max-sm:px-3">
+                  <p v-if="bonus.description" class="whitespace-pre-line text-xs leading-relaxed text-body">{{ bonus.description }}</p>
+                  <p v-if="bonus.note" class="text-[11px] leading-relaxed text-meta" :class="bonus.description && 'mt-0.5'">{{ bonus.note }}</p>
+                </td>
+              </tr>
+            </tbody>
+          </template>
         </table>
       </div>
     </template>
@@ -122,28 +124,45 @@
 
 <script setup lang="ts">
 import type { AlbumBonus, AlbumDisc, AlbumImage, AlbumProduct, MediumType, EditionType } from '~/types/album'
-import type { ProductPrice } from '~/types/document'
-import { Disc3, Gift, Package } from '@lucide/vue'
+import { AudioLines, Box, Calendar, CalendarDays, CircleOff, CloudDownload, Disc3, Gem, Gift, Hash, Hourglass, Layers, Package, Store, Tag } from '@lucide/vue'
 
-/** Region names longer than this get cut with a tooltip, so one long name does not widen the table. */
-const LONG_REGION = 16
+const TAG = PRODUCT_TAG
+/** The small heading over the editions and over the bonuses, when the card has both. */
+const PART_TITLE = 'flex items-center gap-1.5 px-5 pb-1 text-[13px] font-semibold leading-5 text-title'
 
 const props = withDefaults(defineProps<{
   products?: AlbumProduct[]
   bonuses?: AlbumBonus[]
   discs?: AlbumDisc[]
   images?: AlbumImage[]
-  /** Just the tables, without the card and its title (the edition editor's live preview). */
+  /** Just the tables, without the card and its title (the album editor's editions and bonuses). */
   bare?: boolean
+  /** Just the bonuses; `products` only names the editions they come with. */
+  onlyBonuses?: boolean
+  /** Extra classes for a row, by its place in the list. */
+  rowClass?: (index: number) => string | undefined
 }>(), {
   products: () => [],
   bonuses: () => [],
   discs: () => [],
   images: () => [],
+  rowClass: undefined,
 })
+const emit = defineEmits<{ rowClick: [index: number] }>()
+/**
+ * Each row is a block of the card's soft grey, darker on hover; the grey tags on it come out as a deeper shade of it. Table parts can't be rounded, so the cells at the corners do it; an edition can be two rows. On a phone the
+ * cells no longer fill the row, so the block itself does.
+ */
+const ROW = 'sm:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] dark:sm:[&>tr>td]:bg-white/[0.04] sm:[&>tr>td]:transition-colors sm:[&>tr>td]:duration-150 sm:hover:[&>tr>td]:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:sm:hover:[&>tr>td]:bg-white/[0.08] sm:[&>tr>td:first-child]:pl-3 sm:[&>tr>td:last-child]:pr-3 sm:[&>tr:first-child>td:first-child]:rounded-tl-lg sm:[&>tr:first-child>td:last-child]:rounded-tr-lg sm:[&>tr:last-child>td:first-child]:rounded-bl-lg sm:[&>tr:last-child>td:last-child]:rounded-br-lg max-sm:mb-1.5 max-sm:rounded-lg max-sm:bg-[color-mix(in_oklab,var(--card-hover)_40%,oklch(0.985_0_0))] max-sm:transition-colors max-sm:last:mb-0 dark:max-sm:bg-white/[0.04] max-sm:hover:bg-[color-mix(in_oklab,var(--card-hover),black_5%)] dark:max-sm:hover:bg-white/[0.08]'
+/** On a phone a row wraps instead of scrolling: the first cell takes a line, the others share the next ones (an edition's price starts under its name). */
+const PHONE_ROW = 'max-sm:flex max-sm:flex-wrap max-sm:items-center max-sm:gap-x-1.5 max-sm:gap-y-2 max-sm:p-3'
+/** A click on the row itself, not on a button or link in it. */
+const onRowClick = (event: MouseEvent, index: number) => {
+  if (!(event.target as Element).closest('a, button')) emit('rowClick', index)
+}
 const { t } = useI18n()
 const { separator } = useListPunctuation()
-const { label: priceLabel, amount: priceAmount, taxLabel, sorted: sortedPrices } = usePriceDisplay()
+const { sorted: sortedPrices } = usePriceDisplay()
 const { formatDate, enumLabel } = useCatalogDisplay()
 
 /** "2 个版本 · 3 项特典" on the title row, each part only when there are several. */
@@ -152,22 +171,16 @@ const counts = computed(() => [
   props.bonuses.length > 1 && t('content_display.bonuses', { count: props.bonuses.length }),
 ].filter(Boolean).join(' · '))
 
-/** Columns shown only when some edition fills them; `discs` is a line, only when the album has several discs. */
-const columns = computed(() => ({
-  discs: discNumbers.value.size > 1,
-  region: props.products.some(product => product.region),
-  date: props.products.some(product => product.release_date),
-  price: props.products.some(product => product.prices.length),
-}))
-
+/** Without a name, the first edition goes by its type and the others by their id, the same in every language. */
+const editionName = (product: AlbumProduct, index: number) => product.name || (index === 0 ? formatEditionType(product.edition_type) : `Release #${product.id}`)
 const sortedProducts = computed(() => props.products.map(product => ({ ...product, prices: sortedPrices(product.prices) })))
 const sortedBonuses = computed(() => [...props.bonuses].sort((a, b) => a.sort_order - b.sort_order))
 const editionNames = (ids: number[]) => ids
-  .map(id => props.products.find(product => product.id === id))
+  .map(id => props.products.find(product => String(product.id) === String(id)))
   .filter(Boolean)
-  .map(product => product!.name || t(product!.edition_type === 'limited' ? 'content_display.limited' : 'content_display.regular'))
+  .map(product => editionName(product!, props.products.indexOf(product!)))
   .join(separator.value)
-const bonusImage = (bonusId: number) => props.images.find(image => image.bonus_id === bonusId && image.image)?.image?.thumbnail_url ?? null
+const bonusImage = (bonusId: number) => props.images.find(image => String(image.bonus_id) === String(bonusId) && image.image)?.image?.thumbnail_url ?? null
 
 const discNumbers = computed(() => new Map(props.discs.map(disc => [disc.id, disc.position])))
 /** "Disc 1–3" or "Disc 1, 3": an edition's discs, neighbours joined. */
@@ -194,7 +207,8 @@ const mediumLabel = (medium: MediumType) => {
 
 
 /** "2CD+BD" says it is physical by itself; 实体版 is left for an edition without a format, 数字版 for every digital one (its "DL" would only repeat it). */
-const formatLabel = (product: AlbumProduct) => (product.medium !== 'digital' && product.format_label) || mediumLabel(product.medium);
+const editionIcon = (type: EditionType) => type === 'limited' ? Gem : Package
+const mediumIcon = (medium: MediumType) => medium === 'digital' ? CloudDownload : Box
 
 const formatEditionType = (type: EditionType) => {
   if (type === 'limited') return t('content_display.limited');
@@ -214,8 +228,4 @@ const limitedRuleLabel = (rule: string | null) => {
 };
 
 /** What goes under a lone price: its kind (a list price without a note needs none) and the tax. */
-const priceNote = (price: ProductPrice) => [
-  (price.kind !== 'list' || price.note) && priceLabel(price),
-  price.tax_included !== null && taxLabel(price.tax_included),
-].filter(Boolean).join(' · ')
 </script>

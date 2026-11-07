@@ -1,5 +1,4 @@
 import type { Placement } from '@floating-ui/dom'
-import type { Theme } from '~/composables/useAppearance'
 
 /**
  * Helpers for the layers placed with floating-ui (UiSelect, UiTooltip, UiPopover): they are teleported out of the
@@ -18,10 +17,6 @@ export const triggerIn = (wrapper: Element | null) => {
   while (element?.hasAttribute('data-ui-trigger')) element = element.firstElementChild
   return element
 }
-
-/** The theme opposite to the one the anchor is shown in, for layers that invert it. */
-export const invertedTheme = (anchor: Element): Theme =>
-  anchor.closest('[data-theme]')?.getAttribute('data-theme') === 'light' ? 'dark' : 'light'
 
 /** The transform origin that makes a layer grow out of its anchor, for the side it ended up on. */
 export const placementOrigin = (placement: Placement) => {

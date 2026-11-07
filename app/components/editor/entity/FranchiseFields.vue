@@ -3,7 +3,7 @@
     <CatalogSection :title="$t('editor.entity.section.basic')" :icon="Library">
       <div class="grid gap-4 p-5 sm:grid-cols-2">
         <label class="block sm:col-span-2">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }} <span class="text-danger">*</span></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.name') }}<EditorRequiredTag /></span>
           <input v-model="doc.name" class="input w-full" :class="{ 'input-error': editor.errorAt('name') }" maxlength="500">
           <span v-if="editor.errorAt('name')" class="mt-1 block text-xs text-danger">{{ editor.errorAt('name') }}</span>
         </label>

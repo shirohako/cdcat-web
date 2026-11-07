@@ -3,6 +3,7 @@
 // point at a removed disc, track, edition or bonus go with it. Pure functions: pass the reactive
 // document and they mutate it in place.
 
+import type { AlbumImage } from '~/types/album'
 import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/document'
 import type { ParsedDisc } from './tracklistParser'
 import { RELEASE_ROLES } from '../types/album'
@@ -277,6 +278,14 @@ export const untickedDiscs = (doc: AlbumDocument) => doc.products.length
   : []
 
 /** A new bonus, not yet on the album. */
+/** An edition's name for the album page's table: after the first, one without a name goes by its id, which an unsaved one doesn't have yet. */
+export const pageEditionName = (row: AlbumProductRow, index: number) => row.name?.trim() || (index === 0 || /^\d+$/.test(String(row.id)) ? null : 'Release #new')
+
+/** The pictures of editions and bonuses, shaped as the album page gets them. */
+export const pageImages = (doc: AlbumDocument, files: Record<string, unknown> | undefined) => doc.images
+  .filter(row => (row.product_id || row.bonus_id) && files?.[String(row.image_id)])
+  .map(row => ({ ...row, image: files![String(row.image_id)] })) as unknown as AlbumImage[]
+
 export const blankBonus = (doc: AlbumDocument, fields: Partial<AlbumBonusRow> = {}): AlbumBonusRow => ({
   id: newKey('b'), name: '', type: 'other', description: null, is_digital: false, shop: null, availability: null,
   note: null, event_id: null, sort_order: nextOrder(doc.bonuses), product_ids: [], ...fields,

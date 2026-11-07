@@ -9,7 +9,7 @@
            and banners too, and makes one of them the main one only with 用作封面 / 用作横幅. -->
       <div class="grid gap-5 sm:grid-cols-[14rem_minmax(0,1fr)]">
         <div class="mx-auto w-full max-w-52 sm:mx-0 sm:max-w-none">
-          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span><EditorHelp id="album.cover" /></p>
+          <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }}<EditorRequiredTag><EditorHelp id="album.cover" tagged /></EditorRequiredTag></p>
           <EditorAlbumCoverSlot />
         </div>
         <div class="min-w-0">

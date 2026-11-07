@@ -75,7 +75,7 @@
                 @click="go(section.key)"
               >
                 <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
-                <span class="flex-1 whitespace-nowrap">{{ section.label }}</span>
+                <span class="flex-1 whitespace-nowrap lg:whitespace-normal">{{ section.label }}</span>
                 <span v-if="errorCounts[section.key]" class="rounded-full bg-danger/15 px-1.5 text-[10px] font-bold text-danger">{{ errorCounts[section.key] }}</span>
                 <span v-else-if="missingIn(section.key)" class="h-2 w-2 rounded-full bg-warning" :title="$t('editor.required_missing')" />
               </button>
@@ -358,6 +358,7 @@ watch([active, sectionNav], async () => {
 })
 
 const missing = computed(() => missingRequired(album.value))
+const rejectedDate = ref<string | null>(null)
 const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic', cover: 'basic', tracks: 'tracks' } as const
 /**
  * Artists made in the credits whose type nobody has picked yet: required too, but listed only while there are some.
@@ -365,9 +366,10 @@ const REQUIRED_SECTIONS = { title: 'basic', type: 'basic', release_date: 'basic'
  */
 const untypedArtists = computed(() => draft.prepared.value.filter(item => item.action === 'create' && item.resource_type === 'artist' && !item.document?.type).length)
 const requiredChecks = computed(() => [
-  ...(['title', 'type', 'release_date', 'cover', 'tracks'] as const).map(key => ({
-    key: key as string, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !missing.value.includes(key), label: t(`editor.required_item.${key}`),
-  })),
+  ...(['title', 'type', 'release_date', 'cover', 'tracks'] as const).map((key) => {
+    const rejected = key === 'release_date' && rejectedDate.value !== null
+    return { key: key as string, section: REQUIRED_SECTIONS[key] as AlbumSection, done: !rejected && !missing.value.includes(key), label: t(`editor.required_item.${rejected ? 'release_date_invalid' : key}`) }
+  }),
   ...(untypedArtists.value ? [{ key: 'artist_types', section: 'credits' as AlbumSection, done: false, label: t('editor.required_item.artist_types', { count: untypedArtists.value }) }] : []),
 ])
 const missingIn = (section: AlbumSection) => requiredChecks.value.some(check => !check.done && check.section === section)
@@ -418,7 +420,7 @@ const openPreview = async () => {
 
 const context: AlbumEditorContext = {
   albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,
-  remember, errors, errorAt, errorsIn, go, notify: showToast, nameNotes, nameInfo,
+  remember, errors, errorAt, errorsIn, go, rejectedDate, notify: showToast, nameNotes, nameInfo,
 }
 provide(albumEditorKey, context)
 defineExpose({ album, ready, draft, references, pending, remember, go, createItem, removeItem })
@@ -516,6 +518,7 @@ onMounted(async () => {
 const restart = () => {
   if (props.embedded) return emit('discarded')
   if (!albumId && !props.revisionId) return navigateTo('/revisions')
+  rejectedDate.value = null
   loading.value = true
   return open().finally(() => { loading.value = false })
 }

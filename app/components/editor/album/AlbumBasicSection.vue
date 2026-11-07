@@ -3,25 +3,25 @@
     <div class="grid gap-6 p-5 md:grid-cols-[13rem_1fr]">
       <!-- As wide as beside the fields, not the whole screen: the fields would start a full square further down. -->
       <div class="mx-auto w-full max-w-52 md:max-w-none">
-        <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }} <span class="text-danger">*</span><EditorHelp id="album.cover" /></p>
+        <p class="mb-1.5 text-sm font-medium text-body">{{ $t('editor.album.cover') }}<EditorRequiredTag><EditorHelp id="album.cover" tagged /></EditorRequiredTag></p>
         <EditorAlbumCoverSlot />
       </div>
 
       <div class="min-w-0 space-y-4">
         <label class="block">
-          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.title') }} <span class="text-danger">*</span><EditorHelp id="album.title" /></span>
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.title') }}<EditorRequiredTag><EditorHelp id="album.title" tagged /></EditorRequiredTag></span>
           <input v-model="album.title" class="input w-full text-base" :class="{ 'input-error': errorAt('title') }" maxlength="500">
           <span v-if="errorAt('title')" class="mt-1 block text-xs text-danger">{{ errorAt('title') }}</span>
         </label>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <div>
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }} <span class="text-danger">*</span><EditorHelp id="album.release_date" /></span>
-            <EditorDateInput v-model:date="album.release_date" v-model:precision="album.release_date_precision" />
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}<EditorRequiredTag><EditorHelp id="album.release_date" tagged /></EditorRequiredTag></span>
+            <EditorDateInput v-model:date="album.release_date" v-model:precision="album.release_date_precision" v-model:rejected="editor.rejectedDate.value" />
             <span v-if="errorAt('release_date')" class="mt-1 block text-xs text-danger">{{ errorAt('release_date') }}</span>
           </div>
           <label class="block">
-            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }} <span class="text-danger">*</span></span>
+            <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.type') }}<EditorRequiredTag /></span>
             <UiDialogSelect v-model="album.type" :options="typeOptions" :title="$t('editor.album.type_title')" :description="$t('editor.album.type_intro')" :placeholder="$t('editor.album.type_placeholder')" size="sm" class="w-full" :invalid="!!errorAt('type')" />
             <span v-if="errorAt('type')" class="mt-1 block text-xs text-danger">{{ errorAt('type') }}</span>
           </label>
@@ -55,7 +55,10 @@
             >{{ $t('editor.album.section.editions') }}</UiButton>
           </p>
         </div>
+      </div>
 
+      <!-- Past the cover's column, so nothing stays blank under the cover. -->
+      <div class="min-w-0 space-y-4 md:col-span-2">
         <div>
           <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.categories') }}<EditorHelp id="album.categories" /></span>
           <div class="flex flex-wrap gap-1.5">
@@ -76,23 +79,22 @@
 
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.description') }}<EditorHelp id="album.description" /></span>
-          <textarea v-model="album.description" rows="4" class="textarea w-full text-sm" :placeholder="$t('editor.album.description_placeholder')" />
+          <textarea v-model="album.description" rows="6" class="textarea w-full text-sm" :placeholder="$t('editor.album.description_placeholder')" />
         </label>
       </div>
     </div>
 
-    <div class="border-t border-line px-5 py-4">
-      <h3 class="mb-3 text-sm font-semibold text-body">{{ $t('editor.advanced') }}</h3>
-      <div class="space-y-3">
-        <label class="block max-w-sm">
-          <span class="mb-1 block text-xs font-medium text-body">{{ $t('catalog.field.slug') }}<EditorHelp id="album.slug" /></span>
+    <div class="border-t border-line p-5">
+      <h3 class="mb-3 text-sm font-semibold text-title">{{ $t('editor.advanced') }}</h3>
+      <div class="grid items-end gap-4 sm:grid-cols-2">
+        <label class="block">
+          <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.slug') }}<EditorHelp id="album.slug" /></span>
           <input v-model="album.slug" class="input input-sm w-full font-mono" :class="{ 'input-error': errorAt('slug') }" placeholder="my-album-2024">
-          <span v-if="errorAt('slug')" class="mt-1 block text-xs text-danger">{{ errorAt('slug') }}</span>
         </label>
-        <label class="flex items-center gap-2 text-sm text-body">
-          <input v-model="album.is_adult" type="checkbox" class="checkbox checkbox-sm">{{ $t('editor.album.is_adult') }}<EditorHelp id="album.is_adult" />
-        </label>
+        <!-- As tall as the input beside it, so both sit on one line. -->
+        <span class="flex h-8 items-center"><UiSwitch v-model="album.is_adult">{{ $t('editor.album.is_adult') }}</UiSwitch><EditorHelp id="album.is_adult" /></span>
       </div>
+      <p v-if="errorAt('slug')" class="mt-1 text-xs text-danger">{{ errorAt('slug') }}</p>
     </div>
   </CatalogSection>
 </template>

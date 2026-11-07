@@ -1,39 +1,24 @@
 <template>
   <CatalogSection :title="$t('editor.album.section.bonuses')" :icon="Gift" :description="$t('editor.bonuses.hint')">
     <div class="space-y-4 p-3 sm:p-5">
+      <ul v-if="allErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
+        <li v-for="error in allErrors" :key="error.path">{{ error.message }}</li>
+      </ul>
       <p v-if="!bonuses.length" class="text-sm text-meta">{{ $t('editor.bonuses.none') }}</p>
 
-      <ul v-else class="space-y-2">
-        <li
-          v-for="(bonus, index) in bonuses"
-          :key="bonus.id"
-          class="flex flex-wrap items-start gap-x-3 gap-y-2 rounded-xl p-3 transition-colors sm:flex-nowrap"
-          :class="errorsOf(bonus.id).length ? 'bg-danger/10 ring-1 ring-inset ring-danger/25' : 'bg-sunken hover:bg-card-hover'"
-        >
-          <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-pink-50 text-pink-500 dark:bg-pink-400/15 dark:text-pink-400"><Gift :size="13" /></span>
-          <div class="min-w-0 flex-1 basis-[calc(100%-2.25rem)] cursor-pointer sm:basis-0" @click="edit(bonus)">
-            <p class="flex flex-wrap items-center gap-1.5">
-              <span class="truncate text-sm font-semibold text-title">{{ bonus.name || '—' }}</span>
-              <span class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('bonus_type', bonus.type) }}</span>
-              <span v-if="bonus.is_digital" class="rounded-md bg-primary/10 px-1.5 py-0.5 text-[11px] text-primary">{{ $t('editor.dialog.digital') }}</span>
-            </p>
-            <p class="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-meta">
-              <span v-if="bonus.shop">{{ bonus.shop }}</span>
-              <span v-if="bonus.availability">{{ enumLabel('limited_rule', bonus.availability) }}</span>
-              <span v-if="bonus.event_id" class="inline-flex items-center gap-1"><CalendarDays :size="11" />{{ eventName(bonus.event_id) }}</span>
-              <span v-if="bonus.product_ids.length">{{ bonus.product_ids.map(productNameOf).join(' / ') }}</span>
-              <span v-for="disc in discsOf(bonus.id)" :key="disc.id" class="inline-flex items-center gap-1 text-pink-700 dark:text-pink-300"><Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }}</span>
-            </p>
-            <p v-for="error in errorsOf(bonus.id)" :key="error.path" class="mt-1 text-[11px] text-danger">{{ error.message }}</p>
-          </div>
-          <span class="ml-auto flex shrink-0 gap-0.5">
-            <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.bonuses, bonus, -1)" />
-            <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === bonuses.length - 1" @click="moveRow(album.bonuses, bonus, 1)" />
-            <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(bonus)" />
-            <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(bonus.id)" />
-          </span>
-        </li>
-      </ul>
+      <!-- The bonuses as the album page's table draws them, with the row's buttons at its end. -->
+      <div v-else>
+        <AlbumProducts :bonuses="pageBonuses" :products="pageEditions" :discs="pageDiscs" :images="pageImages(album, editor.references.images)" only-bonuses bare :row-class="rowClass" @row-click="edit(bonuses[$event]!)">
+          <template #actions="{ index }">
+            <span class="flex gap-0.5">
+              <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === 0" @click="moveRow(album.bonuses, bonuses[index]!, -1)" />
+              <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="index === bonuses.length - 1" @click="moveRow(album.bonuses, bonuses[index]!, 1)" />
+              <UiButton :icon="PencilLine" :label="$t('common.edit')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="edit(bonuses[index]!)" />
+              <UiButton variant="danger-soft" :icon="Trash2" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(bonuses[index]!.id)" />
+            </span>
+          </template>
+        </AlbumProducts>
+      </div>
 
       <EditorAddButton @click="edit(null)">{{ $t('editor.bonuses.add') }}</EditorAddButton>
     </div>
@@ -120,11 +105,12 @@
 
 <script setup lang="ts">
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
+import type { AlbumBonus, AlbumDisc, AlbumProduct } from '~/types/album'
 import type { AlbumBonusRow, AlbumProductRow } from '~/utils/albumDocument'
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, CalendarDays, Disc3, Gift, PencilLine, Trash2, X } from '@lucide/vue'
-import { addDisc, blankBonus, mainDiscs, removeBonus, setDiscBonus, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
+import { addDisc, blankBonus, mainDiscs, pageEditionName, pageImages, removeBonus, setDiscBonus, sortedDiscs, sortedProducts } from '~/utils/albumDocument'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, moveRow, sameId } from '~/utils/documentRows'
 
@@ -149,11 +135,24 @@ const has = (ids: RowId[], id: RowId) => ids.some(item => sameId(item, id))
 const discsOf = (bonusId: RowId) => sortedDiscs(album.value).filter(disc => sameId(disc.bonus_id, bonusId))
 
 const productName = (product: AlbumProductRow) => product.name || product.catalog_number || enumLabel('edition_type', product.edition_type)
-const productNameOf = (id: RowId) => {
-  const product = products.value.find(item => sameId(item.id, id))
-  return product ? productName(product) : '—'
-}
 const eventName = (id: number) => String((editor.references.events?.[String(id)] as { name?: string } | undefined)?.name ?? `#${id}`)
+
+/** The server's errors, each under its bonus's name. */
+const allErrors = computed(() => editor.errorsIn('bonuses').map((error) => {
+  const row = bonuses.value.find(bonus => sameId(bonus.id, error.path.split('.')[3]))
+  return row?.name ? { ...error, message: `${row.name}: ${error.message}` } : error
+}))
+/** A row opens its bonus, and shows when the server found something wrong in it. */
+const rowClass = (index: number) => `cursor-pointer ${errorsOf(bonuses.value[index]!.id).length ? 'sm:[&>tr>td]:bg-danger/10! max-sm:bg-danger/10!' : ''}`
+
+/** The album's discs, editions and bonuses, shaped as the album page gets them. */
+const pageDiscs = computed(() => sortedDiscs(album.value).map((disc, index) => ({ id: index + 1, position: disc.position, format: disc.format }) as AlbumDisc))
+const pageEditions = computed(() => products.value.map((product, index) => ({ ...product, name: pageEditionName(product, index) }) as unknown as AlbumProduct))
+const pageBonuses = computed(() => bonuses.value.map((bonus) => {
+  const event = bonus.event_id ? { id: bonus.event_id, name: eventName(bonus.event_id), slug: null } : null
+  const discIds = sortedDiscs(album.value).flatMap((disc, index) => sameId(disc.bonus_id, bonus.id) ? [index + 1] : [])
+  return { ...bonus, event, disc_ids: discIds } as unknown as AlbumBonus
+}))
 
 const remove = async (bonusId: RowId) => {
   if (discsOf(bonusId).length && !await confirm({ title: t('editor.bonuses.remove_confirm') })) return

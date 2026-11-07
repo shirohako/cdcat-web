@@ -9,7 +9,6 @@
       <div class="flex items-center gap-2">
         <h4 class="text-xs font-semibold text-title">{{ kindLabel(group.kind) }}</h4>
         <span class="text-xs text-meta tabular-nums">{{ group.rows.length }}</span>
-        <EditorAddButton small class="ml-auto" @click="add(group.kind)">{{ $t('common.add') }}</EditorAddButton>
       </div>
       <ul class="space-y-2">
         <li
@@ -52,9 +51,9 @@
         </li>
       </ul>
     </section>
-    <div v-if="unusedKinds.length" class="flex flex-wrap items-center gap-1.5 text-xs text-meta" :class="rows.length && 'border-t border-dashed border-line pt-3'">
-      <span>{{ $t(rows.length ? 'editor.editions.add_other_kind' : 'editor.editions.add_price') }}</span>
-      <EditorAddButton v-for="kind in unusedKinds" :key="kind" small @click="add(kind)">{{ kindLabel(kind) }}</EditorAddButton>
+    <div class="flex flex-wrap items-center gap-1.5 text-xs text-meta" :class="rows.length && 'border-t border-dashed border-line pt-3'">
+      <span>{{ $t('editor.editions.add_price') }}</span>
+      <EditorAddButton v-for="kind in kindOrder" :key="kind" small @click="add(kind)">{{ kindLabel(kind) }}</EditorAddButton>
     </div>
     <datalist id="editor-currencies">
       <option v-for="code in ['JPY', 'CNY', 'USD', 'EUR', 'TWD', 'HKD', 'KRW', 'GBP']" :key="code" :value="code" />
@@ -101,7 +100,6 @@ const groups = computed(() => {
   }
   return list
 })
-const unusedKinds = computed(() => kindOrder.filter(kind => !rows.value.some(row => row.price.kind === kind)))
 
 /** Puts the row before the one at `index` of the shown list. Dropped on a row of another kind, it takes that kind; the sort then keeps it at the edge of its group. */
 const place = (row: PriceRow, index: number, over?: PriceRow) => {

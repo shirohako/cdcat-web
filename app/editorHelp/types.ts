@@ -1,6 +1,6 @@
 /** A small drawing of a part of the album page, with the piece the field fills marked. */
 export type EditorHelpMock =
-  | { page: 'edition', mark: 'name' | 'limited' | 'hires' | 'sold_out' | 'catalog' | 'note' | 'format' | 'discs' | 'region' | 'date' | 'price' }
+  | { page: 'edition', mark: 'name' | 'type' | 'medium' | 'limited' | 'hires' | 'sold_out' | 'catalog' | 'note' | 'discs' | 'region' | 'date' | 'price' }
   | { page: 'track', mark: 'disc_title' | 'disc_format' | 'number' | 'title' | 'duration' | 'instrumental' | 'credit' | 'detail' | 'role_label' | 'original' }
 
 /**
