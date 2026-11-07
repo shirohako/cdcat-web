@@ -83,7 +83,6 @@ const rows = computed<Array<{ key: string, icon: Component, intro?: string, jobs
         options: [
           { recommended: true, shown: [tag('performer', 'Flute', 'ぱとり')], fill: [[role, 'Performer'], [person, 'ぱとり'], [job, 'Flute', true]] },
           { shown: [tag('performer', 'Performer', 'ぱとり')], fill: [[role, 'Performer'], [person, 'ぱとり']] },
-          { shown: [tag('performer', 'Guitar', 'ぱとり')], fill: [[role, 'Performer'], [person, 'ぱとり'], [job, 'Guitar']] },
         ],
       }],
     },

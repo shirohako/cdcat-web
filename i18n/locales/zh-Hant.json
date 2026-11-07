@@ -2834,7 +2834,7 @@
         "job_text": "角色裡有相近的大類時，例如 Website Designer，選 Designer 就可以，然後在「具體職務」填寫更詳細的角色名稱。",
         "job_outro": "「相似」目前沒有嚴格的標準。例如 Character Designer，選 Illustrator 和 Designer 都不算錯。\n庫裡沒有這個人時，選「僅署名」，只記下名字。",
         "job_other_text": "找不到相似的情況，例如 Crossfade Video、Promotion Movie，選 Other 就可以，然後在「具體職務」填寫更詳細的角色名稱。",
-        "instrument_text": "樂器沒有專屬角色時用。吉他、鋼琴這些有專屬角色，直接選就行；長笛、薩克斯風、手風琴這類沒有，角色選 Performer，樂器名填進「具體職務」。",
+        "instrument_text": "樂器都選 Performer 這一個角色，樂器名填進「具體職務」：吉他、鋼琴、長笛、古箏都一樣。中國樂器寫中文，其他寫英文；歌詞本上有更具體的寫法就照印的寫。",
         "name_text": "印的名字和藝術家的名字不一樣時用，例如羅馬字寫法、簡稱、舊名義。先選庫裡的藝術家，再把印的名字填進「署名」：頁面顯示印的名字，連結仍指向這位藝術家。",
         "recommended": "推薦",
         "not_recommended": "不推薦",

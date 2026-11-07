@@ -2834,7 +2834,7 @@
         "job_text": "When a role comes close, as Designer does for Website Designer, pick it and enter the more detailed name under Specific role.",
         "job_outro": "“Similar” has no strict rule for now. For Character Designer, neither Illustrator nor Designer is wrong.\nIf the person isn’t in the catalog, use Name only to record just the name.",
         "job_other_text": "When nothing is similar, as with Crossfade Video or Promotion Movie, pick Other and enter the more detailed name under Specific role.",
-        "instrument_text": "For instruments with no role of their own. Guitar and Piano have one, so just pick it. For flute, saxophone, accordion and the like, pick Performer and enter the instrument under Specific role.",
+        "instrument_text": "Every instrument goes under Performer, with the instrument under Specific role: guitar, piano, flute and guzheng alike. Write Chinese instruments in Chinese and the others in English, or as the booklet prints them when it is more specific.",
         "name_text": "When the printed name differs from the artist’s: a romanized spelling, a short form, an old name. Pick the artist in the catalog and enter the printed name under Credited as. The page shows the printed name and still links to the artist.",
         "recommended": "Recommended",
         "not_recommended": "Not recommended",

@@ -8,8 +8,6 @@ const WORDS: Record<string, string[]> = {
   vocals: ['Vocal', 'ボーカル'],
   artist: ['Artist', '艺术家'],
   illustrator: ['Illustration', 'Illust'],
-  guitar: ['Guitar'],
-  bass: ['Bass'],
   publisher: ['発売元'],
   designer: ['设计'],
   mixing: ['Mixing'],
@@ -101,7 +99,7 @@ describe('pasted credit lists', () => {
 
   it('keeps brackets that are no track list as the detail, and reads shorthands and 全曲', () => {
     const { lines } = parse('Bass：ルナ（5弦）\nVo.: 星野あかり (Tr.2, 5)\nMusic: ZUN (全曲)\n作編曲：Yuki')
-    expect(lines.map(line => line.roles)).toEqual([['bass'], ['vocals'], ['composer'], ['composer', 'arranger']])
+    expect(lines.map(line => line.roles)).toEqual([['performer'], ['vocals'], ['composer'], ['composer', 'arranger']])
     expect(lines[0]!.names[0]).toMatchObject({ name: 'ルナ', detail: '5弦', tracks: null })
     expect(tracks(lines[1]!.names[0]!.tracks)).toEqual(['1-2', '1-5'])
     expect(lines[2]!.names[0]!.tracks).toBe('all')
@@ -119,7 +117,7 @@ describe('pasted credit lists', () => {
   it('reads M-01. and M1.Title blocks, indented or double-spaced, and & between Japanese names', () => {
     const credits = (text: string) => parse(text).lines.map(line => [line.roles.join('+'), line.names.map(name => `${name.name}@${tracks(name.tracks) ?? 'album'}`).join(' / ')])
     expect(credits('M-01.\nVocal: nayuta\nMusic&Lyric: Minato Suzuya\n\nM-02.\nGuitar&Bass: Maki Hanagata\n\nIllust: K-ko')).toEqual([
-      ['vocals', 'nayuta@1-1'], ['composer+lyricist', 'Minato Suzuya@1-1'], ['guitar+bass', 'Maki Hanagata@1-2'], ['illustrator', 'K-ko@album'],
+      ['vocals', 'nayuta@1-1'], ['composer+lyricist', 'Minato Suzuya@1-1'], ['performer', 'Maki Hanagata@1-2'], ['illustrator', 'K-ko@album'],
     ])
     const indented = 'M1.プリズムにさよならを\n\n   Vocal:nayuta\n\n   Music&Lyric:鈴谷皆人\n\n\n\nM3.破滅しゅぎ的恋愛\n\n   Vocal:つぐ&るる'
     const expected = [['vocals', 'nayuta@1-1'], ['composer+lyricist', '鈴谷皆人@1-1'], ['vocals', 'つぐ@1-3 / るる@1-3']]
@@ -127,6 +125,17 @@ describe('pasted credit lists', () => {
     expect(credits(`${indented.replace(/^ {3}/gm, '')}\n\n\n\nIllust:K子`)).toEqual([...expected, ['illustrator', 'K子@album']])
     expect(credits('Artist: Tom&Jerry')).toEqual([['artist', 'Tom&Jerry@album']])
     expect([newArtistName('上杉 悟'), newArtistName('ナツメ\u3000ユウキ'), newArtistName('Aki Ra')]).toEqual(['上杉悟', 'ナツメユウキ', 'Aki Ra'])
+  })
+
+  it('credits instruments as 演奏 with each instrument as the job title', () => {
+    const { lines } = parse('Gt. / Bass: Maki\nギター・編曲：ミナト\n古箏：Rin\nGuitar-Lead: Yuki\nGuitar&Bass: Aoi')
+    expect(lines.map(line => [line.roles, line.instruments, line.roleLabel, line.unknown])).toEqual([
+      [['performer'], ['Guitar', 'Bass'], null, []],
+      [['performer', 'arranger'], ['Guitar'], null, []],
+      [['performer'], ['古筝'], null, []],
+      [[], [], null, ['Guitar-Lead']],
+      [['performer'], ['Guitar', 'Bass'], null, []],
+    ])
   })
 
   it('keeps a company suffix after a comma with the name, and reads ranges of zero-padded numbers', () => {

@@ -84,6 +84,20 @@ describe('compareWithAlbum', () => {
     expect(compareWithAlbum({ ...ctx, catalogImages: { ['a'.repeat(64)]: 5, ['b'.repeat(64)]: 99 } })).toEqual([])
   })
 
+  it('tells instruments apart, all 演奏, by the instrument', () => {
+    const album = albumWith('Stillwater', [['Opening', 60]])
+    const source = albumWith('Stillwater', [['Opening', 60]])
+    const [track, sourceTrack] = [album.tracks[0]!.id, source.tracks[0]!.id]
+    addCredit(album, { artist_id: 7, credited_as: null, role: 'performer', role_label: 'Guitar', detail: null }, [track])
+    addCredit(source, { artist_id: 7, credited_as: null, role: 'performer', role_label: 'Guitar', detail: null }, [sourceTrack])
+    addCredit(source, { artist_id: 7, credited_as: null, role: 'performer', role_label: 'Piano', detail: null }, [sourceTrack])
+
+    const rows = compareWithAlbum(context(album, source))
+    expect(rows.map(row => row.key)).toEqual(['credits:performer'])
+    void rows[0]!.apply()
+    expect(album.credits.map(credit => credit.role_label)).toEqual(['Guitar', 'Piano'])
+  })
+
   it('compared with the draft, removes the tracks and discs the source lacks, so its tracklist takes over', () => {
     const album = albumWith('Stillwater', [['Opening', 60], ['Tide', 200], ['Bonus', 30]])
     const second = addDisc(album, { position: 2 })

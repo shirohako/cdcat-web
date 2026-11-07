@@ -19,6 +19,7 @@
 //   (2.2)、E(2.3)                               the brackets or separator of the name before
 //   设计-CD Design: A                           a role, then the job title as printed (credits.role_label)
 //   custom-Comic: B                             the same under the role 其他, for titles no role stands for
+//   Gt. / Bass: C                               instruments are 演奏 with the instrument as the job title, one credit each
 //
 // Role words are looked up by the caller (the role dictionary's names and other spellings); matching the
 // names to artists is the dialog's business.
@@ -54,6 +55,8 @@ export interface ParsedCreditLine {
   unknown: string[]
   /** The job title as printed, after "设计-" or "custom-" */
   roleLabel: string | null
+  /** The instruments the role words name (INSTRUMENT_WORDS): with them the line has the role 演奏, a credit for each */
+  instruments: string[]
   names: ParsedCreditName[]
 }
 
@@ -66,10 +69,44 @@ export interface ParsedCredits {
 /** Shorthands booklets use that the role dictionary doesn't list, folded (see foldRoleWord). */
 export const ROLE_SHORTHANDS: Record<string, string[]> = {
   vo: ['vocals'], vox: ['vocals'], 唄: ['vocals'], 歌唱: ['vocals'], cho: ['chorus'],
-  gt: ['guitar'], gtr: ['guitar'], ba: ['bass'], dr: ['drums'], ds: ['drums'], key: ['keyboards'], kb: ['keyboards'],
-  pf: ['piano'], vn: ['violin'], vln: ['violin'], str: ['strings'], prog: ['programming'],
+  str: ['strings'], prog: ['programming'],
   comp: ['composer'], arr: ['arranger'], arrange: ['arranger'], lyric: ['lyricist'], rec: ['recording'],
   作編曲: ['composer', 'arranger'], 作詞作曲: ['lyricist', 'composer'], 詞曲: ['lyricist', 'composer'],
+}
+
+export const PERFORMER_ROLE = 'performer'
+
+/**
+ * Instruments have no roles of their own: each is credited as 演奏 with the instrument as the job title. Folded words to
+ * the name to print, Chinese instruments in Chinese and the others in English, as the server's
+ * config('harvest.instrument_marks').
+ */
+export const INSTRUMENT_WORDS: Record<string, string> = {
+  guitar: 'Guitar', guitars: 'Guitar', guitarist: 'Guitar', guitarsolo: 'Guitar', 'ギター': 'Guitar', '吉他': 'Guitar',
+  '기타': 'Guitar', gt: 'Guitar', gtr: 'Guitar', acousticguitar: 'Acoustic Guitar', aguitar: 'Acoustic Guitar',
+  agt: 'Acoustic Guitar', acgt: 'Acoustic Guitar', 'アコースティックギター': 'Acoustic Guitar', '木吉他': 'Acoustic Guitar',
+  electricguitar: 'Electric Guitar', eguitar: 'Electric Guitar', egt: 'Electric Guitar', 'エレキギター': 'Electric Guitar',
+  '电吉他': 'Electric Guitar', '電吉他': 'Electric Guitar', leadguitar: 'Lead Guitar', bass: 'Bass', bassist: 'Bass',
+  bassguitar: 'Bass', ba: 'Bass', 'ベース': 'Bass', '贝斯': 'Bass', '貝斯': 'Bass', '贝司': 'Bass', '베이스': 'Bass',
+  electricbass: 'Electric Bass', ebass: 'Electric Bass', eba: 'Electric Bass', 'エレキベース': 'Electric Bass',
+  wba: 'Wood Bass', drums: 'Drums', drum: 'Drums', drummer: 'Drums', drumset: 'Drums', 'drums(drumset)': 'Drums',
+  dr: 'Drums', ds: 'Drums', 'ドラム': 'Drums', '架子鼓': 'Drums', '爵士鼓': 'Drums', '鼓': 'Drums', '드럼': 'Drums',
+  keyboards: 'Keyboards', keyboard: 'Keyboards', keyboardist: 'Keyboards', keys: 'Keyboards', key: 'Keyboards',
+  kb: 'Keyboards', 'キーボード': 'Keyboards', '键盘': 'Keyboards', '鍵盤': 'Keyboards', '키보드': 'Keyboards', piano: 'Piano',
+  pianist: 'Piano', pf: 'Piano', 'ピアノ': 'Piano', 'ピアノ演奏': 'Piano', '钢琴': 'Piano', '鋼琴': 'Piano', '피아노': 'Piano',
+  grandpiano: 'Grand Piano', violin: 'Violin', violinist: 'Violin', vn: 'Violin', vln: 'Violin', 'ヴァイオリン': 'Violin',
+  'バイオリン': 'Violin', '小提琴': 'Violin', '바이올린': 'Violin', cello: 'Cello', 'チェロ': 'Cello', '大提琴': 'Cello',
+  hammondorgan: 'Hammond Organ', 'ハモンド': 'Hammond Organ', '哈蒙德风琴': 'Hammond Organ', synthesizer: 'Synthesizer',
+  synthesizers: 'Synthesizer', synth: 'Synthesizer', 'シンセサイザー': 'Synthesizer', 'シンセサイザ': 'Synthesizer',
+  'シンセ': 'Synthesizer', '合成器': 'Synthesizer', trumpet: 'Trumpet', 'トランペット': 'Trumpet', '小号': 'Trumpet',
+  '小號': 'Trumpet', flugelhorn: 'Flugelhorn', 'フリューゲルホルン': 'Flugelhorn', 'フリューゲルホーン': 'Flugelhorn',
+  '富鲁格号': 'Flugelhorn', recorder: 'Recorder', 'リコーダー': 'Recorder', 'リコーダ': 'Recorder', '竖笛': 'Recorder',
+  percussion: 'Percussion', 'パーカッション': 'Percussion', '打击乐': 'Percussion', '打擊樂': 'Percussion', '打击乐器': 'Percussion',
+  pipa: '琵琶', biwa: '琵琶', '琵琶': '琵琶', guqin: '古琴', '古琴': '古琴', guzheng: '古筝', '古筝': '古筝', '古箏': '古筝', xiao: '箫',
+  '箫': '箫', '簫': '箫', '洞箫': '箫', '洞簫': '箫', sheng: '笙', sho: '笙', '笙': '笙', yangqin: '扬琴', '扬琴': '扬琴', '揚琴': '扬琴',
+  sanxian: '三弦', '三弦': '三弦', zhongruan: '中阮', '中阮': '中阮', daruan: '大阮', '大阮': '大阮', dizi: '笛子', di: '笛子', '笛子': '笛子',
+  '笛': '笛子', '曲笛': '笛子', '梆笛': '笛子', '橫笛': '笛子', '横笛': '笛子', guanzi: '管子', guan: '管子', bili: '管子', '管子': '管子',
+  '管': '管子', '筚篥': '管子',
 }
 
 /**
@@ -297,28 +334,45 @@ function startsAsTail(line: string): boolean {
 
 /**
  * Reads a pasted credit list. `rolesOf` gives the role keys a folded role word stands for (none when it is not
- * one); ROLE_SHORTHANDS are tried after it.
+ * one); ROLE_SHORTHANDS are tried after it, then INSTRUMENT_WORDS, which stand for 演奏.
  */
 export function parseCredits(text: string, rolesOf: (folded: string) => string[]): ParsedCredits {
-  const lookup = (word: string) => {
-    const folded = foldRoleWord(word)
+  const known = (folded: string) => {
     const found = rolesOf(folded)
     return found.length ? found : ROLE_SHORTHANDS[folded] ?? []
   }
-  /** One role and a job title for it. A role whose own name has a hyphen (Co-Producer) stays that role. */
+  const instrumentOf = (word: string) => {
+    const folded = foldRoleWord(word)
+    return known(folded).length ? null : INSTRUMENT_WORDS[folded] ?? null
+  }
+  const lookup = (word: string) => {
+    const found = known(foldRoleWord(word))
+    return found.length ? found : instrumentOf(word) ? [PERFORMER_ROLE] : []
+  }
+  /**
+   * One role and a job title for it. A role whose own name has a hyphen (Co-Producer) stays that role. An instrument
+   * already is the job title of 演奏, so "Guitar-Lead" is no role and title.
+   */
   const labelled = (left: string) => {
     const [, word, roleLabel] = lookup(left).length ? [] : left.match(ROLE_AND_LABEL) ?? []
     if (!word || !roleLabel) return null
-    const roles = foldRoleWord(word) === CUSTOM_WORD ? [CUSTOM_ROLE] : lookup(word)
+    const roles = foldRoleWord(word) === CUSTOM_WORD ? [CUSTOM_ROLE] : known(foldRoleWord(word))
     return roles.length === 1 ? { roles, roleLabel } : null
   }
   const rolesIn = (line: string) => {
     const colon = roleColon(line)
     const left = colon > 0 ? line.slice(0, colon).trim() : ''
     const label = labelled(left)
-    if (label) return { colon, left, ...label, unknown: [] as string[] }
+    if (label) return { colon, left, ...label, unknown: [] as string[], instruments: [] as string[] }
     const words = left ? left.split(/\s*[・/／&＆,，、+＋]\s*|\s+(?:and|&)\s+/i).map(word => word.trim()).filter(Boolean) : []
-    return { colon, left, roles: [...new Set(words.flatMap(lookup))], roleLabel: null, unknown: words.filter(word => !lookup(word).length) }
+    return {
+      colon,
+      left,
+      roles: [...new Set(words.flatMap(lookup))],
+      roleLabel: null,
+      unknown: words.filter(word => !lookup(word).length),
+      instruments: [...new Set(words.map(instrumentOf).filter((name): name is string => name !== null))],
+    }
   }
   const lines: ParsedCreditLine[] = []
   const skipped: number[] = []
@@ -362,7 +416,7 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
     if (blanks > spacing && indentOf(raw) <= headingIndent) track = null
     blanks = 0
     const discHeading = line.match(DISC_LINE)
-    const { colon, left, roles, roleLabel, unknown } = rolesIn(line)
+    const { colon, left, roles, roleLabel, unknown, instruments } = rolesIn(line)
 
     // A line naming no known role may be a disc or a track heading: "Disc 2", "01. Title", "M1 Title: Subtitle".
     if (!roles.length) {
@@ -390,7 +444,7 @@ export function parseCredits(text: string, rolesOf: (folded: string) => string[]
       skipped.push(number)
       return
     }
-    lines.push({ line: number, roleText: left, roles, roleLabel, unknown, names })
+    lines.push({ line: number, roleText: left, roles, roleLabel, unknown, instruments, names })
   })
   return { lines, skipped }
 }

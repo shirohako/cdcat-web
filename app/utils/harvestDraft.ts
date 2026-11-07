@@ -6,6 +6,7 @@ import { addCredit, addDisc, addProduct, addTrack, emptyAlbumDocument, setTitleI
 import { newKey, newRef } from '~/utils/documentKeys'
 import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { DRAFT_REF, draftPeople, setCirclePublisher } from '~/utils/harvestPeople'
+import { PERFORMER_ROLE } from '~/utils/creditParser'
 import { RELEASE_ROLES } from '~/types/album'
 
 /** The detail with another merge of its sources in place of the saved one (buildHarvestDraft from one source first, or one alone). */
@@ -17,8 +18,6 @@ export const withMerge = (detail: HarvestCandidateDetail, remerge: HarvestRemerg
   references: { ...detail.references, artist: { ...detail.references.artist, ...remerge.references.artist } },
   catalog_images: { ...detail.catalog_images, ...remerge.catalog_images },
 })
-
-const PERFORMER_ROLE = 'performer'
 
 /** Album types the editor knows, by the kind a source gave. */
 const TYPES: Record<string, string> = { album: 'album', single: 'single', ep: 'ep', compilation: 'compilation', drama: 'drama' }

@@ -4,6 +4,7 @@ import type { AggregateRef, AlbumDocument, ProductPrice, RowId } from '~/types/d
 import type { HarvestMergedImage } from '~/types/harvest'
 import { addCredit, addDisc, addImage, addTrack, coverOf, firstProduct, removeDisc, removeTrack, setCover, setTitleIn } from '~/utils/albumDocument'
 import { sameName } from '~/utils/harvestPeople'
+import { PERFORMER_ROLE } from '~/utils/creditParser'
 import { newKey } from '~/utils/documentKeys'
 
 const PRICE_KINDS: Record<string, string> = { list: '定价', event: '会场价', shop: '通贩价', other: '其他价格' }
@@ -240,7 +241,9 @@ function creditRows(ctx: CompareContext): CompareRow[] {
     const trackId = albumTrackOf(credit.track_id)
     if (trackId === undefined) continue // the album lacks the track: its row comes first
     const name = nameOf(credit)
+    // Instruments are all 演奏, told apart by the instrument (role_label).
     const present = album.credits.some(row => row.role === credit.role && String(row.track_id) === String(trackId)
+      && (credit.role !== PERFORMER_ROLE || (row.role_label || null) === (credit.role_label || null))
       && ((typeof credit.artist_id === 'number' && row.artist_id === credit.artist_id) || (name !== '' && sameName(nameOf(row), name))))
     if (present) continue
     missing.set(credit.role, [...missing.get(credit.role) ?? [], { credit, trackId }])
