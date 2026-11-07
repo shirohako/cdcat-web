@@ -23,7 +23,8 @@ export interface CreditPerson {
 }
 
 export const personOf = (row: AlbumCreditRow): CreditPerson => ({ artist_id: row.artist_id, credited_as: row.credited_as || null, role_label: row.role_label || null, detail: row.detail || null })
-export const personKey = (person: CreditPerson) => JSON.stringify([person.artist_id, person.credited_as || null, person.role_label || null, person.detail || null])
+/** Who a credit is about; a note doesn't make it someone else, so a note on one track doesn't split a line. */
+export const personKey = (person: CreditPerson) => JSON.stringify([person.artist_id, person.credited_as || null, person.role_label || null])
 const isPerson = (person: CreditPerson) => (row: AlbumCreditRow) => personKey(personOf(row)) === personKey(person)
 
 /** The roles that decide the names under an album's title, which the byline block edits. */
@@ -76,6 +77,7 @@ export function creditLines(doc: AlbumDocument, roleOrder: (role: string) => num
     const key = JSON.stringify([personKey(person), row.role, row.track_id === null])
     const entry = byRole.get(key) ?? { person, role: row.role, trackIds: [], rows: [] }
     byRole.set(key, entry)
+    entry.person.detail ||= person.detail
     entry.rows.push(row)
     if (row.track_id !== null) entry.trackIds.push(row.track_id)
   }
@@ -174,10 +176,10 @@ const creditOnTrackKey = (row: AlbumCreditRow) => JSON.stringify([row.role, pers
 /** A credit with the one it belongs to, so that "eili, Xeno's 客串" differs from "eili, Xeudo Code's". */
 const creditWithParentKey = (row: AlbumCreditRow, rows: AlbumCreditRow[]) => {
   const parent = parentOf(row, rows)
-  return JSON.stringify([creditOnTrackKey(row), parent ? creditOnTrackKey(parent) : null, row.join_phrase || null])
+  return JSON.stringify([creditOnTrackKey(row), parent ? creditOnTrackKey(parent) : null, row.join_phrase || null, row.detail || null])
 }
 
-/** Whether two tracks credit the same people in the same roles, each 客串 with the same credit, the artists in the same order and joined by the same words. */
+/** Whether two tracks credit the same people in the same roles with the same notes, each 客串 with the same credit, the artists in the same order and joined by the same words. */
 export function sameTrackCredits(doc: AlbumDocument, a: RowId, b: RowId) {
   const keys = (id: RowId) => {
     const rows = doc.credits.filter(row => sameId(row.track_id, id))
@@ -189,8 +191,8 @@ export function sameTrackCredits(doc: AlbumDocument, a: RowId, b: RowId) {
 }
 
 /**
- * Makes a track's credits the same as another's: what the other has is added, what it lacks is removed, each belongs
- * to the same credit as there, and the artists stand in the same order with the same words between them.
+ * Makes a track's credits the same as another's: what the other has is added, what it lacks is removed, each has the
+ * same note and belongs to the same credit as there, and the artists stand in the same order with the same words between them.
  */
 export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId) {
   const source = byOrder(doc.credits).filter(row => sameId(row.track_id, fromId))
@@ -205,7 +207,7 @@ export function copyTrackCredits(doc: AlbumDocument, fromId: RowId, toId: RowId)
   for (const row of source) {
     const parent = parentOf(row, source)
     const copy = copies.get(creditOnTrackKey(row))
-    if (copy) copy.parent_id = parent ? copies.get(creditOnTrackKey(parent))?.id ?? null : null
+    if (copy) Object.assign(copy, { parent_id: parent ? copies.get(creditOnTrackKey(parent))?.id ?? null : null, detail: row.detail })
   }
   const places = trackArtists(doc, toId).map(row => row.sort_order)
   source.filter(row => row.role === ARTIST_ROLE).forEach((row, index) => {

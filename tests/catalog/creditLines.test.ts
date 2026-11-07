@@ -205,3 +205,40 @@ describe('belonging to a credit', () => {
     expect(guest!.parent_id).toBeNull()
   })
 })
+
+describe('notes', () => {
+  const note = (id: number, detail: string | null) => ({ ...person(id), detail, role: 'vocals', role_label: null })
+
+  it('are no reason for a second credit: the first stays, an empty one takes the note', () => {
+    const { doc, tracks } = album()
+    const [first] = addCredit(doc, note(1, 'first'), [tracks[0]!])
+    expect(addCredit(doc, note(1, 'second'), [tracks[0]!])[0]).toBe(first)
+    expect(doc.credits.map(row => row.detail)).toEqual(['first'])
+
+    const [plain] = addCredit(doc, note(2, null), [tracks[0]!])
+    const [noted] = addCredit(doc, note(3, 'kept'), [tracks[0]!])
+    patchCredits(doc, [noted!], { artist_id: 2 })
+    expect(doc.credits.filter(row => row.artist_id === 2).map(row => row.detail)).toEqual(['kept'])
+    expect(plain!.detail).toBe('kept')
+  })
+
+  it('don\'t split a person in a line by role, and show there', () => {
+    const { doc, tracks } = album()
+    addCredit(doc, note(1, null), [tracks[0]!])
+    addCredit(doc, note(1, '5弦'), [tracks[1]!])
+    const lines = creditLines(doc, roleOrder)
+    expect(lines).toHaveLength(1)
+    expect(lines[0]!.people.map(entry => [entry.person.artist_id, entry.person.detail])).toEqual([[1, '5弦']])
+    expect(lines[0]!.trackIds).toHaveLength(2)
+  })
+
+  it('come along with 和上一首相同, and tell tracks apart', () => {
+    const { doc, tracks } = album()
+    addCredit(doc, note(1, '5弦'), [tracks[0]!])
+    addCredit(doc, note(1, null), [tracks[1]!])
+    expect(sameTrackCredits(doc, tracks[0]!, tracks[1]!)).toBe(false)
+    copyTrackCredits(doc, tracks[0]!, tracks[1]!)
+    expect(doc.credits.map(row => row.detail)).toEqual(['5弦', '5弦'])
+    expect(sameTrackCredits(doc, tracks[0]!, tracks[1]!)).toBe(true)
+  })
+})

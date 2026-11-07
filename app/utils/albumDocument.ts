@@ -400,20 +400,24 @@ export function creditGroups(doc: AlbumDocument): CreditGroup[] {
   return [...groups.values()]
 }
 
+/** What makes a credit one row, as AlbumSchema's natural key: a note is about the credit and doesn't make it another. */
+const creditRowKey = (row: AlbumCreditRow) => JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.role_label || null])
+
 /**
- * Drops exact duplicates, e.g. after two groups were edited into the same one; what belonged to a dropped one (its
- * 客串, parent_id) belongs to the one kept.
+ * Drops duplicates, e.g. after two groups were edited into the same one; the one kept keeps its note or takes the
+ * dropped one's, and what belonged to a dropped one (its 客串, parent_id) belongs to the one kept.
  */
 const dedupeCredits = (doc: AlbumDocument) => {
   const seen = new Map<string, AlbumCreditRow>()
   const dropped = new Map<string, AlbumCreditRow>()
   doc.credits = doc.credits.filter((row) => {
-    const key = JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.role_label || null, row.detail || null])
+    const key = creditRowKey(row)
     const kept = seen.get(key)
     if (kept) {
       dropped.set(String(row.id), kept)
       kept.parent_id ??= row.parent_id ?? null
       kept.join_phrase ||= row.join_phrase ?? null
+      kept.detail ||= row.detail
       return false
     }
     seen.set(key, row)
@@ -523,8 +527,7 @@ export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'arti
     return row
   })
   dedupeCredits(doc)
-  const key = (row: AlbumCreditRow) => JSON.stringify([row.track_id, row.artist_id, row.credited_as || null, row.role, row.role_label || null, row.detail || null])
-  return added.map(row => doc.credits.find(other => key(other) === key(row))!)
+  return added.map(row => doc.credits.find(other => creditRowKey(other) === creditRowKey(row))!)
 }
 
 export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
