@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { markdownContainers, markdownHeadings, renderMarkdown, renderMarkdownInline } from '../../app/utils/markdown'
+import { markdownContainers, markdownHeadings, renderMarkdown, textParts, renderMarkdownInline } from '../../app/utils/markdown'
 
 describe('Heading anchors', () => {
   it('slugs headings in every script and numbers repeats', () => {
@@ -213,5 +213,25 @@ describe('Markdown renderer', () => {
     expect(html).toContain('<td data-label="Item">A</td>')
     expect(html).toContain('<td data-label="&lt;b&gt;Use &amp; keep&lt;/b&gt;">B</td>')
     expect(html).toContain('<td>C</td>')
+  })
+})
+
+describe('textParts', () => {
+  it('keeps text as written, indents and Markdown marks included', () => {
+    const text = '───星を見た\n\n          riveder le stelle\n\n*.·⿻ **bold** # no\n-----'
+    expect(textParts(text)).toEqual([{ text }])
+  })
+
+  it('cuts at web and mail addresses', () => {
+    expect(textParts('詳細は https://example.com/a?b=1 へ。or me@example.com')).toEqual([
+      { text: '詳細は ' },
+      { text: 'https://example.com/a?b=1', href: 'https://example.com/a?b=1' },
+      { text: ' へ。or ' },
+      { text: 'me@example.com', href: 'mailto:me@example.com' },
+    ])
+  })
+
+  it('returns nothing for empty text', () => {
+    expect(textParts('')).toEqual([])
   })
 })

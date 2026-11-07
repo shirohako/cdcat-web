@@ -733,6 +733,25 @@ export const renderMarkdown = (src: string, env?: MarkdownEnv | null) =>
 export const renderMarkdownInline = (src: string) =>
   md.renderInline(src ?? '', { cdcatReferences: null } satisfies RenderContext)
 
+/** A stretch of plain text; `href` when it is a web address or a mail address. */
+export interface TextPart {
+  text: string
+  href?: string
+}
+
+/** Plain text cut at the addresses in it, found the way Markdown finds bare ones, for text that isn't Markdown. */
+export function textParts(text: string): TextPart[] {
+  const parts: TextPart[] = []
+  let from = 0
+  for (const match of md.linkify.match(text) ?? []) {
+    if (match.index > from) parts.push({ text: text.slice(from, match.index) })
+    parts.push({ text: match.text, href: match.url })
+    from = match.lastIndex
+  }
+  if (from < text.length) parts.push({ text: text.slice(from) })
+  return parts
+}
+
 /**
  * The headings `renderMarkdown` gives ids to. Build a contents list from this
  * rather than a second parser, so every entry links to an anchor that exists.

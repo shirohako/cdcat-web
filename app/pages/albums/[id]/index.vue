@@ -25,7 +25,7 @@
 import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
 import { ldDate, musicAlbumLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { composeDescription, descriptionLength, oneLine } from '~/utils/seoText'
 import { bylineText } from '~/utils/albumByline'
 
 const route = useRoute()
@@ -98,7 +98,7 @@ usePageSeo({
       value.catalog_number && t('seo.album.catalog', { number: value.catalog_number }),
       count('seo.album.tracks', value.track_count),
     ])
-    return composeDescription(lead, plainText(value.description), descriptionLength(locale.value))
+    return composeDescription(lead, oneLine(value.description), descriptionLength(locale.value))
   },
   image: () => album.value?.cover?.medium_url || album.value?.image_url,
   card: () => album.value?.share_card_url,
@@ -115,7 +115,7 @@ usePageSeo({
       alternateNames: [value.title, ...value.titles.map(title => title.title)],
       url: absolute(`/albums/${value.id}`),
       image: value.cover?.url || value.image_url,
-      description: plainText(value.description),
+      description: oneLine(value.description),
       datePublished: ldDate(value.release_date, value.release_date_precision),
       genre: value.categories.map(category => enumLabel('album_category', category)),
       artists: creditedAs(['artist']),

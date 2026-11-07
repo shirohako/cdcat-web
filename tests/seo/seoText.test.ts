@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { composeDescription, descriptionLength, nameWithOriginal, plainText, truncateText } from '../../app/utils/seoText'
+import { composeDescription, descriptionLength, nameWithOriginal, plainText, truncateText, oneLine } from '../../app/utils/seoText'
 
 describe('plainText', () => {
   it('keeps the words of Markdown and drops its markup', () => {
@@ -71,5 +71,15 @@ describe('nameWithOriginal', () => {
     expect(nameWithOriginal('东方改编', '東方アレンジ', format)).toBe('东方改编（東方アレンジ）')
     expect(nameWithOriginal('東方アレンジ', '東方アレンジ', format)).toBe('東方アレンジ')
     expect(nameWithOriginal('東方アレンジ', null, format)).toBe('東方アレンジ')
+  })
+})
+
+describe('oneLine', () => {
+  it('joins the lines and leaves the marks alone', () => {
+    expect(oneLine('  *.· 星\n\n    **見た** \n')).toBe('*.· 星 **見た**')
+  })
+
+  it('is empty without text', () => {
+    expect(oneLine(null)).toBe('')
   })
 })

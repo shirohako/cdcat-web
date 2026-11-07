@@ -45,7 +45,7 @@ const help: Record<string, EditorHelpEntry> = {
     where: '專輯頁標題上方的標籤。專輯列表也可以依類別篩選。',
   },
   'album.description': {
-    text: '這張專輯的背景和說明，例如企劃緣由、收錄情況。可以用 Markdown。',
+    text: '這張專輯的背景和說明，例如企劃緣由、收錄情況。以純文字顯示，換行和空格都會保留，網址會自動變成連結。',
     where: '專輯頁的「簡介」卡片。',
   },
   'album.slug': {

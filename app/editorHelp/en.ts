@@ -45,7 +45,7 @@ const help: Record<string, EditorHelpEntry> = {
     where: 'The tags above the title on the album page. The album list can be filtered by category too.',
   },
   'album.description': {
-    text: 'Background and notes about this album, such as how the project came about or what it collects. Markdown works here.',
+    text: 'Background and notes about this album, such as how the project came about or what it collects. Shown as plain text: line breaks and spaces stay as typed, and web addresses become links.',
     where: 'The “Description” card on the album page.',
   },
   'album.slug': {

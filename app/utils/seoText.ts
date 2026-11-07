@@ -23,6 +23,9 @@ export function plainText(markdown: string | null | undefined, { spoiler = '' } 
     .trim()
 }
 
+/** Plain text (no Markdown in it) as one line for meta descriptions. */
+export const oneLine = (text: string | null | undefined) => (text ?? '').replace(/\s+/g, ' ').trim()
+
 /** Cuts text to `max` characters, at a space when one is near the end, and adds "…". */
 export function truncateText(text: string, max: number) {
   const chars = [...text]

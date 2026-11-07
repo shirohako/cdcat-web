@@ -45,7 +45,7 @@ const help: Record<string, EditorHelpEntry> = {
     where: '专辑页标题上方的标签。专辑列表也可以按类别筛选。',
   },
   'album.description': {
-    text: '这张专辑的背景和说明，比如企划缘由、收录情况。可以用 Markdown。',
+    text: '这张专辑的背景和说明，比如企划缘由、收录情况。按纯文本显示，换行和空格都保留，网址会自动变成链接。',
     where: '专辑页的「简介」卡片。',
   },
   'album.slug': {
