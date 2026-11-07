@@ -261,23 +261,7 @@ const apply = () => {
   <EditorModal v-model="open" :title="t('editor.paste_credits.title')" wide as="div">
     <div class="space-y-3">
       <p class="whitespace-pre-line text-sm text-body">{{ t('editor.paste_credits.hint') }}</p>
-      <div class="flex flex-wrap items-center gap-2 text-xs">
-        <span class="text-meta">{{ t('editor.paste_credits.examples') }}</span>
-        <UiTooltip v-for="(example, index) in EXAMPLES" :key="example.key" placement="bottom-start" :delay="150" group="paste-examples" class="w-[26rem] max-w-[calc(100vw-2rem)]">
-          <span tabindex="0" class="inline-flex h-6 cursor-help items-center gap-1 rounded-md bg-btn px-2 font-medium text-body hover:bg-btn-hover">
-            <Icon name="lucide:file-text" class="size-3.5 text-meta" />{{ t('editor.paste_credits.example', { n: index + 1 }) }}
-            <span class="font-normal text-meta">· {{ t(`editor.paste_credits.${example.key}_title`) }}</span>
-          </span>
-          <template #content>
-            <p class="text-xs font-semibold text-title">{{ t(`editor.paste_credits.${example.key}_title`) }}</p>
-            <pre class="mt-1.5 whitespace-pre-wrap rounded-md bg-sunken px-2.5 py-2 font-mono text-[11px] leading-4 text-title">{{ example.text }}</pre>
-            <p class="mt-2 text-[11px] font-semibold text-title">{{ t('editor.paste_credits.handles') }}</p>
-            <ul class="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-body">
-              <li v-for="point in t(`editor.paste_credits.${example.key}_points`).split('\n')" :key="point">{{ point }}</li>
-            </ul>
-          </template>
-        </UiTooltip>
-      </div>
+      <EditorPasteExamples :formats="EXAMPLES" scope="editor.paste_credits" />
       <textarea v-model="text" rows="7" class="textarea w-full font-mono text-xs" :placeholder="t('editor.paste_credits.placeholder')" :aria-label="t('editor.paste_credits.title')" />
       <div>
         <UiButton variant="primary" size="sm" icon="lucide:search-check" class="shadow-xs active:translate-y-px" :loading="looking" :disabled="!names.length" @click="lookUp">{{ lookupFailed ? t('common.retry') : t('editor.paste_credits.match') }}</UiButton>

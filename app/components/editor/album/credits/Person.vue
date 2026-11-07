@@ -138,7 +138,7 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       </label>
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}<EditorHelp id="person.detail" /></span>
-        <input v-model="form.detail" class="input input-sm w-full" maxlength="200" :placeholder="t('editor.credits.detail_hint')" @keydown.enter.prevent="open = false">
+        <input v-model="form.detail" class="input input-sm w-full" maxlength="200" @keydown.enter.prevent="open = false">
         <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.detail_note') }}</span>
       </label>
       <label v-if="joinAfter !== undefined" class="block">
