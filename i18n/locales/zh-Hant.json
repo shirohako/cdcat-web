@@ -2870,6 +2870,8 @@
       "pick_artist": "選擇或新建藝術家…",
       "link_artist": "關聯藝術家",
       "unlink_artist": "取消關聯，保留署名",
+      "relink_artist": "恢復關聯「{name}」",
+      "create_artist": "新建藝術家「{name}」",
       "printed_as": "署名為「{name}」",
       "parent": "所屬",
       "parent_hint": "「A feat. B」裡，B 是 A 的客串。\n同一首有幾位藝術家時，在這裡選 B 跟著誰，預設是它前面的那位。",

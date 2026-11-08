@@ -2870,6 +2870,8 @@
       "pick_artist": "アーティストを選択・新規作成…",
       "link_artist": "アーティストを関連付け",
       "unlink_artist": "関連付けを外し、表記名を残す",
+      "relink_artist": "「{name}」との関連付けに戻す",
+      "create_artist": "アーティスト「{name}」を新規作成",
       "printed_as": "表記「{name}」",
       "parent": "所属",
       "parent_hint": "「A feat. B」では、B は A のゲストです。\n同じ曲にアーティストが複数いるときは、B が誰に付くかをここで選びます。初期値は B の直前の人です。",

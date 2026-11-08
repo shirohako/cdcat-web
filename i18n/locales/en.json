@@ -2870,6 +2870,8 @@
       "pick_artist": "Pick or create an artist…",
       "link_artist": "Link an artist",
       "unlink_artist": "Unlink the artist and keep the name",
+      "relink_artist": "Link “{name}” again",
+      "create_artist": "Create the artist “{name}”",
       "printed_as": "printed as “{name}”",
       "parent": "Belongs to",
       "parent_hint": "In “A feat. B”, B is A’s guest.\nWhen a track has several artists, pick who B goes with here. It defaults to the one before B.",

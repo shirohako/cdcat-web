@@ -1,6 +1,10 @@
 import type { PickedEntity } from '~/components/editor/EntityPicker.vue'
 import type { CreditPerson } from '~/utils/creditLines'
 
+/** Who a printed name was linked to before 取消关联, while the editor is open: by editor, then by the printed name. */
+interface Unlinked { artist_id: NonNullable<CreditPerson['artist_id']>, credited_as: string | null, name: string, reopen: boolean }
+const unlinkedByEditor = new WeakMap<object, Map<string, Unlinked>>()
+
 /**
  * The people of the album editor's credits (inside the editor only): what to call them, which are new in this
  * revision and still need a type, and the people the pickers add. A name typed twice makes one new artist.
@@ -48,5 +52,28 @@ export const useCreditPeople = () => {
   const created = (name: string): CreditPerson => ({ artist_id: newArtistRef(name), credited_as: null, detail: null })
   const printed = (name: string): CreditPerson => ({ artist_id: null, credited_as: name.trim(), detail: null })
 
-  return { nameOf, artistName, isNew, newType, setNewType, noteOf, infoOf, picked, created, printed, newArtistRef }
+  // ---- undoing 取消关联 ----
+
+  if (!unlinkedByEditor.has(editor)) unlinkedByEditor.set(editor, reactive(new Map<string, Unlinked>()))
+  const unlinked = unlinkedByEditor.get(editor)!
+  /** Remembers whom `person` was linked to, now that only `printedName` is left; `reopen` asks its tag to open again. */
+  const rememberUnlink = (person: CreditPerson, printedName: string) => {
+    if (person.artist_id === null) return
+    unlinked.set(printedName, { artist_id: person.artist_id, credited_as: person.credited_as, name: nameOf(person), reopen: true })
+  }
+  /** Whom a printed name was linked to before, if it was unlinked in this editor. */
+  const unlinkedFrom = (person: CreditPerson) => person.artist_id === null && person.credited_as ? unlinked.get(person.credited_as) ?? null : null
+  /**
+   * The link to put back: the same artist and printed name. A new artist removed from the new items meanwhile is
+   * created again under its name.
+   */
+  const relink = (person: CreditPerson): Pick<CreditPerson, 'artist_id' | 'credited_as'> | null => {
+    const before = unlinkedFrom(person)
+    if (!before) return null
+    unlinked.delete(person.credited_as!)
+    const ref = typeof before.artist_id === 'string' ? before.artist_id.replace(/^@/, '') : null
+    return { artist_id: ref && !itemOf(ref) ? newArtistRef(before.name) : before.artist_id, credited_as: before.credited_as }
+  }
+
+  return { nameOf, artistName, isNew, newType, setNewType, noteOf, infoOf, picked, created, printed, newArtistRef, rememberUnlink, unlinkedFrom, relink }
 }

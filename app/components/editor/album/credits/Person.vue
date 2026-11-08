@@ -8,7 +8,8 @@ import type { CreditPerson } from '~/utils/creditLines'
  * a type, 仅署名 for a printed name only, the harvest page's notes, ⓘ where it tidied a name), and a remove button.
  * A click opens the rest: the printed name, when `labelable` the printed job title, the note for readers (`detail`) (applied when the
  * card closes, since they decide which line the person is in), a new artist's type, and linking the person to an
- * artist or keeping only the printed name.
+ * artist (one found, or a new one) or keeping only the printed name. Unlinking keeps the card open, and while the editor
+ * is open a printed name that was unlinked offers to link back to whom it was (useCreditPeople().relink).
  * Given `parent` (on a track card), also which credit of the track it belongs to (parent_id, utils/artistLine): the
  * 客串's 艺术家, shown on the tag as "↳ Xeno" when there was a choice. A track's artists (on a track card) also have a
  * place: `movable` moves them along, and `joinAfter` names the artist before, whom a word printed before this
@@ -80,12 +81,41 @@ const finish = (patch: Partial<CreditPerson>) => {
   open.value = false
 }
 /** The printed name stays only where it differs from the artist's. */
-const link = (item: PickedEntity) => {
+const linkTo = (artistId: NonNullable<CreditPerson['artist_id']>, artistName: string) => {
   const printed = form.credited_as.trim() || props.person.credited_as
-  finish({ artist_id: people.picked(item).artist_id, credited_as: printed && printed !== item.label ? printed : null })
+  finish({ artist_id: artistId, credited_as: printed && printed !== artistName ? printed : null })
 }
-/** Keeps the name as printed when the artist goes. */
-const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.trim() || name.value })
+const link = (item: PickedEntity) => linkTo(people.picked(item).artist_id!, item.label)
+/** A new artist under the name typed in the search, or under the printed name. */
+const create = (artistName: string) => linkTo(people.created(artistName).artist_id!, artistName.trim())
+
+const unlinked = computed(() => people.unlinkedFrom(props.person))
+const relink = () => {
+  const before = people.relink(props.person)
+  if (before) finish(before)
+}
+
+/**
+ * Keeps the name as printed when the artist goes, and the card open on the printed name. A tag in a line is another
+ * tag once its person changes, so the new one opens its card as it mounts (`reopen`, dropped after that render).
+ */
+const unlink = () => {
+  const printed = form.credited_as.trim() || name.value
+  people.rememberUnlink(props.person, printed)
+  form.credited_as = printed
+  emit('update', { ...formPatch(), artist_id: null, credited_as: printed })
+  nextTick(() => {
+    const entry = people.unlinkedFrom({ artist_id: null, credited_as: printed, detail: null })
+    if (entry) entry.reopen = false
+  })
+}
+onMounted(() => {
+  const entry = unlinked.value
+  if (entry?.reopen) {
+    entry.reopen = false
+    open.value = true
+  }
+})
 </script>
 
 <template>
@@ -158,7 +188,11 @@ const unlink = () => finish({ artist_id: null, credited_as: form.credited_as.tri
       </div>
       <div v-if="person.artist_id === null">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}<EditorHelp id="person.link_artist" /></span>
-        <EditorEntityPicker kind="artist" :placeholder="t('editor.credits.pick_artist')" @select="link" />
+        <EditorEntityPicker kind="artist" allow-create create-label="editor.credits.create_artist" :placeholder="t('editor.credits.pick_artist')" @select="link" @create="create" />
+        <div class="mt-2 flex flex-wrap gap-1.5">
+          <UiButton v-if="unlinked" size="xs" icon="lucide:undo-2" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" @click="relink">{{ t('editor.credits.relink_artist', { name: unlinked.name }) }}</UiButton>
+          <UiButton v-if="name && unlinked?.name !== name" size="xs" icon="lucide:plus" icon-class="size-3" class="gap-1 ring-1 ring-inset ring-line" @click="create(name)">{{ t('editor.credits.create_artist', { name }) }}</UiButton>
+        </div>
       </div>
       <p v-if="note" class="rounded-md bg-warning/10 px-2.5 py-1.5 text-xs text-warning">⚠ {{ note }}</p>
       <p v-else-if="info" class="flex gap-1.5 rounded-md bg-info/10 px-2.5 py-1.5 text-xs text-info"><Icon name="lucide:info" class="mt-px size-3.5 shrink-0" />{{ info }}</p>
