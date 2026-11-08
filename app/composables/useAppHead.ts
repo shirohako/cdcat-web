@@ -6,6 +6,7 @@ const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-H
  */
 export function useAppHead() {
   const { appliedTheme, appliedHue, appliedPalette } = useAppearance()
+  const { style: creditLinks } = useCreditLinks()
   const { t, locale } = useI18n()
   const config = useRuntimeConfig()
   const absolute = useSiteUrl()
@@ -19,6 +20,8 @@ export function useAppHead() {
       'style': () => `--hue: ${appliedHue.value}`,
       // ink: a near-black theme colour on faintly violet greys (theme.css); left out for the hue presets.
       'data-palette': () => appliedPalette.value,
+      // How credited names show the part that links (main.css, useCreditLinks)
+      'data-credit-links': () => creditLinks.value,
     },
     link: [
       { rel: 'icon', href: '/favicon.ico', sizes: 'any' },

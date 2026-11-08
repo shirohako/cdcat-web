@@ -7,7 +7,7 @@ import { nameParts } from '~/utils/artistLine'
  * page is a grey tag: linked whole when the printed name doesn't hold the artist's own name, the whole tag darkening
  * on hover; when it does ("Silence Akarin", "Akarin / Silence", "Akarin (Silence)"), only that part is a link, its own
  * darker patch on hover. Either way the link opens the artist hover card of the region around it (`[data-artist-card]`,
- * useHoverCard). A name with no artist page is plain text with the same padding, so names line up. A note (detail) is
+ * useHoverCard). A name with no artist page is plain text, flush with the edge (no padding without a tag). A note (detail) is
  * an ⓘ inside the tag; with one, the name is a patch too, so the ⓘ isn't inside the link.
  * `size` sm is the bold name of the by-person list, xs the small tags elsewhere.
  */
@@ -35,9 +35,22 @@ const SIZES = {
  * A name inside a tag that holds more: 5px wider than the text on each side and 1px in from the tag's edges (such a
  * tag has 1px padding, not 6px, so the text stays where a plain tag has it).
  */
-const patch = computed(() => ['inline-block px-[5px] transition-colors duration-150 hover:bg-black/[0.08] hover:text-primary dark:hover:bg-white/[0.12]', SIZES[props.size].patch])
+const patch = computed(() => [
+  'inline-block pl-[5px] transition-colors duration-150 hover:bg-black/[0.08] hover:text-primary dark:hover:bg-white/[0.12]',
+  linkEnds.value ? 'pr-[3px]' : 'pr-[5px]',
+  SIZES[props.size].patch,
+])
+/**
+ * A note right after the link (no plain text between): the patch ends 3px after the text, so it doesn't run under the
+ * ⓘ, and the ⓘ sits 1px after it; after plain text (5px padding) it is pulled back 1px. Either way, 4px from the text.
+ */
+const linkEnds = computed(() => Boolean(props.detail) && props.artistId !== null && !parts.value?.[2])
+const notePull = computed(() => {
+  if (props.artistId === null) return ''
+  return linkEnds.value ? 'ml-px pr-[3px]' : '-ml-px pr-[3px]'
+})
 const namePad = computed(() => {
-  if (props.artistId === null) return 'px-[5px]'
+  if (props.artistId === null) return ''
   return parts.value ? [parts.value[0] && 'pl-[5px]', parts.value[2] && 'pr-[5px]'] : ''
 })
 </script>
@@ -51,11 +64,11 @@ const namePad = computed(() => {
     :class="[
       SIZES[size].tag,
       artistId !== null && 'bg-black/[0.05] dark:bg-white/[0.08]',
-      whole ? 'px-1.5 transition-colors duration-150 hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]' : 'px-px',
+      artistId === null ? 'gap-1' : whole ? 'px-1.5 transition-colors duration-150 hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]' : 'px-px',
     ]"
   >
-    <span v-if="whole" class="truncate">{{ name }}</span>
+    <span v-if="whole" class="credit-link truncate">{{ name }}</span>
     <CatalogArtistName v-else :name="name" :artist-id="artistId" :artist-name="artistName" card :link-class="patch.join(' ')" class="truncate" :class="namePad" />
-    <span v-if="detail" class="inline-flex shrink-0 pr-[3px]"><CatalogCreditNote :note="detail" /></span>
+    <span v-if="detail" class="inline-flex shrink-0" :class="notePull"><CatalogCreditNote :note="detail" /></span>
   </component>
 </template>

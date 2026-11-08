@@ -24,7 +24,8 @@
     <div class="container mx-auto max-w-6xl px-4 md:px-8 2xl:max-w-7xl">
       <div class="card relative -mt-12 flex flex-col items-center gap-x-8 px-4 pb-6 sm:px-6 md:-mt-16 md:flex-row md:items-start lg:gap-x-10 lg:px-8 lg:pb-7 2xl:-mt-18">
         <!-- The cover sticks out of the card's top into the banner, cut out of it by a ring in the card colour; the
-             like button fills the room under it. -->
+             like button fills the room under it (from md; on phones it goes under the byline). Stacked (below md) it grows with the screen, 62% of its width up to
+             240px, as a fixed size left most of a phone's width empty. -->
         <div class="flex shrink-0 flex-col gap-3">
           <button
             type="button"
@@ -37,20 +38,13 @@
               v-img-fade
               :src="coverUrl"
               :alt="album.title"
-              class="size-40 rounded-md object-cover sm:size-44 md:size-48 lg:size-52 xl:size-56 2xl:size-60"
+              class="size-[min(15rem,62vw)] rounded-md object-cover md:size-48 lg:size-52 xl:size-56 2xl:size-60"
             >
-            <span v-else class="flex size-40 items-center justify-center rounded-md bg-sunken text-meta sm:size-44 md:size-48 lg:size-52 xl:size-56 2xl:size-60">
+            <span v-else class="flex size-[min(15rem,62vw)] items-center justify-center rounded-md bg-sunken text-meta md:size-48 lg:size-52 xl:size-56 2xl:size-60">
               <Disc3 :size="56" />
             </span>
           </button>
-          <UiButton
-            :variant="isFavorited ? 'danger' : 'danger-soft'"
-            size="sm"
-            block
-            :disabled="isToggling || (album.is_pending && !isFavorited)"
-            :title="album.is_pending ? $t('pending.locked') : undefined"
-            @click="toggleLike"
-          >
+          <UiButton v-bind="likeButton" block class="max-md:hidden" @click="toggleLike">
             <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
             {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
           </UiButton>
@@ -105,6 +99,13 @@
                   <span class="truncate">{{ tag.name }}</span>
                 </component>
               </div>
+
+              <!-- Phones: the like button under the title and byline, where a music app keeps its actions, rather than
+                   under the cover, a screen away from the rest -->
+              <UiButton v-bind="likeButton" class="mt-3 px-4 md:hidden" @click="toggleLike">
+                <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
+                {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
+              </UiButton>
             </div>
 
             <dl v-if="figures.length" class="flex shrink-0 justify-center divide-x divide-line md:justify-start @2xl:pt-1">
@@ -230,6 +231,13 @@ const bylineTags = computed(() => {
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
+/** The like button's settings, shared by its two places (under the cover from md, under the byline on phones) */
+const likeButton = computed(() => ({
+  variant: isFavorited.value ? 'danger' as const : 'danger-soft' as const,
+  size: 'sm' as const,
+  disabled: isToggling.value || (props.album.is_pending && !isFavorited.value),
+  title: props.album.is_pending ? t('pending.locked') : undefined,
+}))
 const banner = computed(() => props.album.images.find(item => item.kind === 'banner' && item.is_primary)?.image ?? null)
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
 const typeIcon = computed(() => ALBUM_TYPE_ICONS[props.album.type] ?? 'lucide:disc-3')
