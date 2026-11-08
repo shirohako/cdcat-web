@@ -4,7 +4,7 @@
     <div class="mx-auto w-full max-w-6xl px-4 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <div class="card overflow-hidden">
         <div class="page-hero-banner skeleton" />
-        <div class="relative h-11 md:h-13">
+        <div class="relative h-12.5 md:h-17">
           <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 rounded-full border-4 border-card bg-card md:left-6">
             <div class="skeleton size-full rounded-full" />
           </div>

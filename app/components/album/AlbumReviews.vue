@@ -85,7 +85,7 @@
         </div>
       </div>
     </SkeletonStatus>
-    <div v-else class="flex justify-center px-5 py-4">
+    <div v-else class="flex justify-center px-5 pb-6 pt-4">
       <UiButton v-if="isAuthenticated" variant="primary" size="xs" :icon="PenLine" @click="openEditor()">{{ $t('album.comments.write') }}</UiButton>
       <UiButton v-else :to="loginPath" size="xs">{{ $t('album.comments.login') }}</UiButton>
     </div>

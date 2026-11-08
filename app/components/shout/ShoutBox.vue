@@ -2,42 +2,26 @@
   <CatalogSection :title="$t('shouts.title')" :icon="MessageSquareQuote">
     <template #actions>{{ $t('shouts.count', { count: total }) }}</template>
 
-    <div class="space-y-3 border-b border-line px-5 py-4">
-      <template v-if="isAuthenticated">
-        <div v-if="editing || !mine">
-          <textarea
-            v-model="draft"
-            rows="2"
-            :maxlength="SHOUT_MAX_LENGTH"
-            class="textarea field-sizing-content max-h-60 min-h-16 w-full text-sm"
-            :placeholder="$t('shouts.placeholder')"
-          />
-          <div class="mt-1 flex items-center gap-2">
-            <span class="text-[11px] tabular-nums text-meta">{{ draft.length }} / {{ SHOUT_MAX_LENGTH }}</span>
-            <span v-if="errorMessage" class="text-xs text-danger">{{ errorMessage }}</span>
-            <UiButton v-if="mine" size="xs" class="ml-auto" @click="editing = false">{{ $t('common.cancel') }}</UiButton>
-            <UiButton variant="primary" size="xs" :class="{ 'ml-auto': !mine }" :disabled="saving || !draft.trim()" @click="save">
-              {{ $t(mine ? 'shouts.update' : 'shouts.post') }}
-            </UiButton>
-          </div>
+    <!-- Like the album page's 留言: the viewer's own shout on top; else, with shouts below, the button that opens the
+         Markdown editor in a dialog. With none at all, only that button, centred. -->
+    <div v-if="isAuthenticated && mine" class="border-b border-line px-5 py-4">
+      <div class="rounded-md bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
+        <p class="mb-1 text-xs font-semibold text-title">{{ $t('shouts.mine') }}</p>
+        <RichContent :content="mine.content" format="markdown" class="text-sm" />
+        <div class="mt-1.5 flex gap-1.5">
+          <UiButton size="xs" @click="openEditor">{{ $t('common.edit') }}</UiButton>
+          <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
         </div>
-        <div v-else class="rounded-lg bg-primary/10 px-3 py-2 text-sm">
-          <p class="mb-1 text-[11px] font-semibold text-primary">{{ $t('shouts.mine') }}</p>
-          <p class="whitespace-pre-line text-title">{{ mine.content }}</p>
-          <div class="mt-1 flex gap-3 text-[11px] text-meta">
-            <UiButton size="xs" @click="startEdit">{{ $t('common.edit') }}</UiButton>
-            <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
-          </div>
-        </div>
-      </template>
-      <p v-else class="text-sm text-meta">
-        <UiButton :to="`/auth/login?redirect=${encodeURIComponent(route.fullPath)}`" size="sm">{{ $t('shouts.login') }}</UiButton>
-      </p>
+      </div>
+    </div>
+    <div v-else-if="shouts.length" class="border-b border-line px-5 py-3">
+      <UiButton v-if="isAuthenticated" variant="primary" size="xs" :icon="PenLine" @click="openEditor">{{ $t('shouts.write') }}</UiButton>
+      <UiButton v-else :to="loginPath" size="xs">{{ $t('shouts.login') }}</UiButton>
     </div>
 
     <ul v-if="shouts.length" class="divide-y divide-line">
-      <li v-for="shout in shouts" :key="shout.id" class="flex gap-3 px-5 py-3">
-        <NuxtLink :to="`/profile/${shout.user?.username}`" class="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-sunken">
+      <li v-for="shout in shouts" :key="shout.id" class="flex gap-3 px-5 py-4">
+        <NuxtLink :to="`/profile/${shout.user?.username}`" class="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-sunken">
           <img v-if="shout.user?.avatar_url" :src="shout.user.avatar_url" :alt="shout.user.nickname" class="h-full w-full object-cover">
         </NuxtLink>
         <div class="min-w-0 flex-1">
@@ -53,7 +37,13 @@
               @click="reporting = shout"
             />
           </p>
-          <p class="mt-0.5 whitespace-pre-line wrap-break-word text-sm text-title">{{ shout.content }}</p>
+          <div class="relative mt-1" :class="{ 'max-h-56 overflow-hidden': isLong(shout) && !expanded.has(shout.id) }">
+            <RichContent :content="shout.content" format="markdown" class="text-sm" />
+            <div v-if="isLong(shout) && !expanded.has(shout.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card" />
+          </div>
+          <UiButton v-if="isLong(shout)" size="xs" class="mt-1" @click="toggleExpanded(shout.id)">
+            {{ $t(expanded.has(shout.id) ? 'reviews.collapse' : 'reviews.expand') }}
+          </UiButton>
         </div>
       </li>
     </ul>
@@ -66,12 +56,17 @@
         </div>
       </div>
     </SkeletonStatus>
-    <p v-else class="px-5 py-6 text-center text-sm text-meta">{{ $t('shouts.empty') }}</p>
+    <div v-else class="flex justify-center px-5 pb-6 pt-4">
+      <UiButton v-if="isAuthenticated" variant="primary" size="xs" :icon="PenLine" @click="openEditor">{{ $t('shouts.write') }}</UiButton>
+      <UiButton v-else :to="loginPath" size="xs">{{ $t('shouts.login') }}</UiButton>
+    </div>
 
     <div v-if="page < lastPage" class="border-t border-line px-5 py-2 text-center">
       <UiButton size="xs" :disabled="pending" @click="loadMore">{{ $t('shouts.more') }}</UiButton>
     </div>
   </CatalogSection>
+
+  <ShoutEditorModal v-if="editorOpen" :id="id" :resource="resource" :content="mine?.content" @close="editorOpen = false" @saved="onSaved" />
 
   <dialog class="modal" :open="!!reporting">
     <div class="modal-box max-w-sm">
@@ -90,8 +85,7 @@
 <script setup lang="ts">
 import type { Shout, ShoutPage } from '~/types/shout'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { SHOUT_MAX_LENGTH } from '~/types/shout'
-import { Flag, MessageSquareQuote } from '@lucide/vue'
+import { Flag, MessageSquareQuote, PenLine } from '@lucide/vue'
 
 const props = defineProps<{ resource: 'artists', id: number }>()
 
@@ -131,29 +125,21 @@ const loadMore = () => load(page.value + 1)
 if (import.meta.client && !useNuxtApp().isHydrating) load()
 else onMounted(() => load())
 
-const draft = ref('')
-const editing = ref(false)
-const saving = ref(false)
-const errorMessage = ref('')
+const loginPath = computed(() => `/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
 
-const startEdit = () => {
-  draft.value = mine.value?.content ?? ''
-  editing.value = true
+const expanded = ref(new Set<number>())
+const isLong = (shout: Shout) => shout.content.length > 600 || shout.content.split('\n').length > 12
+const toggleExpanded = (id: number) => {
+  const next = new Set(expanded.value)
+  if (!next.delete(id)) next.add(id)
+  expanded.value = next
 }
 
-const save = async () => {
-  saving.value = true
-  errorMessage.value = ''
-  try {
-    mine.value = await $api<Shout>(`/v1/${props.resource}/${props.id}/shout`, { method: 'PUT', body: { content: draft.value } })
-    editing.value = false
-    draft.value = ''
-    await load()
-  } catch (error) {
-    errorMessage.value = localizeError(error)
-  } finally {
-    saving.value = false
-  }
+const editorOpen = ref(false)
+const openEditor = () => { editorOpen.value = true }
+const onSaved = async () => {
+  editorOpen.value = false
+  await load()
 }
 
 const remove = async () => {

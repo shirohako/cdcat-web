@@ -15,8 +15,8 @@
         >
         <div v-else class="h-full w-full bg-linear-to-br from-primary/35 via-sunken to-card" />
       </div>
-      <div class="relative h-11 md:h-13">
-        <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
+      <div class="relative h-12.5 md:h-17">
+        <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-[oklch(0.92_0.008_var(--hue))] bg-sunken md:left-6 dark:border-card dark:ring-1 dark:ring-line">
           <img
             v-if="displayAvatar"
             v-img-fade

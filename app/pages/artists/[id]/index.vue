@@ -8,15 +8,17 @@
           <CommonBannerImage v-if="banner" :image="banner" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
           <img v-else :src="pageHeroConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
         </div>
-        <div class="relative h-11 md:h-13">
-          <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-card bg-sunken ring-1 ring-line md:left-6">
+        <div class="relative h-12.5 md:h-17">
+          <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-[oklch(0.92_0.008_var(--hue))] bg-sunken md:left-6 dark:border-card dark:ring-1 dark:ring-line">
             <img v-if="artist?.image_url" v-img-fade :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
-            <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users class="h-7 w-7 md:h-9 md:w-9" /></div>
+            <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users class="h-8 w-8 md:h-11 md:w-11" /></div>
           </div>
         </div>
         <div class="p-4 pt-3 sm:p-5 sm:pt-3 md:p-6 md:pt-3">
-          <div v-if="artist" class="flex flex-col gap-4 sm:flex-row sm:items-start" :class="revealClass">
-            <div class="min-w-0 flex-1">
+          <!-- The name and the buttons share the first row (the buttons right after the name on phones); everything else
+               runs the full width under them, rather than beside a column of buttons. -->
+          <div v-if="artist" class="grid gap-y-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-4 sm:gap-y-1.5" :class="revealClass">
+            <div class="min-w-0 self-center">
               <h1 class="flex flex-wrap items-center gap-2 text-lg font-bold tracking-tight text-title md:text-xl">
                 {{ shownName }}
                 <span v-if="artist.type" class="rounded bg-btn px-2 py-0.5 text-[11px] font-semibold text-btn-content">{{ enumLabel('artist_type', artist.type) }}</span>
@@ -24,70 +26,16 @@
                 <CatalogPendingBadge v-if="artist.is_pending" />
               </h1>
               <p v-if="originalName" class="mt-0.5 text-sm text-meta">{{ originalName }}</p>
-              <p class="mt-1.5 max-w-3xl whitespace-pre-line text-sm leading-6 text-body">{{ artist.bio || $t('artists.detail.no_bio') }}</p>
-              <div class="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-meta">
-                <span class="inline-flex items-center gap-2"><Disc3 :size="16" class="text-meta" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
-                <span class="inline-flex items-center gap-2"><Users :size="16" class="text-meta" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
-              </div>
-              <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
-              <div v-if="otherTitles.length || artist.catalog_prefixes?.length || artist.relations?.length || artist.attributes?.length" class="mt-4 space-y-2 border-t border-line pt-4 text-sm">
-                <div v-if="otherTitles.length" class="space-y-1.5">
-                  <p class="text-xs text-meta">{{ $t('catalog.other_names') }}</p>
-                  <ul class="flex flex-wrap gap-1.5">
-                    <li v-for="(title, index) in otherTitles" :key="index" class="max-w-full">
-                      <UiTooltip group="artist-names" class="px-2.5! py-2! text-xs!">
-                        <template #content>
-                          <p class="flex items-center gap-1.5 font-semibold text-title">
-                            <Languages :size="13" class="shrink-0" aria-hidden="true" />
-                            {{ enumLabel('title_kind', title.kind) }}
-                          </p>
-                          <p v-if="title.locale" class="mt-0.5 flex items-center gap-1.5 text-meta">
-                            <Globe :size="13" class="shrink-0" aria-hidden="true" />
-                            {{ localeName(title.locale) }}
-                          </p>
-                        </template>
-                        <div class="flex h-full items-center gap-1.5 rounded-md bg-page px-2 py-1">
-                          <Languages :size="13" class="shrink-0 text-meta" aria-hidden="true" />
-                          <span class="min-w-0 break-words text-[13px] leading-5 text-title">{{ title.title }}</span>
-                          <span class="sr-only">{{ titleDetail(title) }}</span>
-                        </div>
-                      </UiTooltip>
-                    </li>
-                  </ul>
-                </div>
-                <div v-if="artist.catalog_prefixes?.length" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-5 text-meta">{{ $t('artists.detail.catalog_prefixes') }}</span>
-                  <span class="min-w-0 font-mono text-body">{{ artist.catalog_prefixes.join(', ') }}</span>
-                </div>
-                <!-- Current relations, then the ended ones (former members, earlier voices) on a row of their own, lighter. -->
-                <div v-for="part in relationParts" :key="part.key" class="flex gap-3">
-                  <span class="w-24 shrink-0 text-xs leading-6 text-meta">{{ $t(part.key === 'ended' ? 'artists.detail.ended_relations' : 'artists.detail.relations') }}</span>
-                  <ul class="flex min-w-0 flex-wrap gap-1.5">
-                    <li v-for="relation in part.relations" :key="`${relation.artist.id}-${relation.relation_type}`">
-                      <UiTooltip :text="relation.note ?? undefined">
-                        <NuxtLink
-                          :to="`/artists/${relation.artist.id}`"
-                          class="inline-flex h-6 items-center gap-1.5 rounded-full pl-0.5 pr-2.5 text-xs transition-colors duration-150 ease-out"
-                          :class="relation.ended ? 'bg-sunken text-meta hover:bg-btn hover:text-btn-content' : 'bg-btn text-btn-content hover:bg-btn-hover'"
-                        >
-                          <span class="h-5 w-5 shrink-0 overflow-hidden rounded-full bg-sunken" :class="relation.ended && 'opacity-70'">
-                            <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
-                          </span>
-                          {{ relation.artist.name }}
-                          <span class="text-[11px] text-meta">{{ enumLabel(relation.ended ? 'artist_relation_ended' : 'artist_relation', relation.relation_type) }}</span>
-                        </NuxtLink>
-                      </UiTooltip>
-                    </li>
-                  </ul>
-                </div>
-                <CatalogAttributeList v-if="artist.attributes?.length" :attributes="artist.attributes" />
-              </div>
             </div>
-            <div class="flex shrink-0 items-center gap-2 sm:ml-auto">
+            <div class="flex shrink-0 items-center gap-2 self-start sm:col-start-2 sm:row-start-1">
+              <!-- 关注 is the black (primary) button; once following, the grey one. Hovering lifts it a pixel onto a soft
+                   shadow and the icon grows a little, all eased; reduced motion keeps only the colour change. -->
               <UiButton
-                :variant="isFavorited ? 'primary' : 'default'"
+                :variant="isFavorited ? 'default' : 'primary'"
                 size="sm"
                 :icon="isFavorited ? UserCheck : UserPlus"
+                icon-class="size-4 transition-transform duration-200 ease-out group-hover/follow:scale-115 group-hover/follow:-rotate-6 motion-reduce:transition-none motion-reduce:group-hover/follow:transform-none"
+                class="group/follow transition-[color,background-color,translate,box-shadow] duration-200 ease-out enabled:hover:-translate-y-px enabled:hover:shadow-[0_4px_12px_-4px_rgb(0_0_0/0.35)] enabled:active:translate-y-0 enabled:active:shadow-none motion-reduce:enabled:hover:translate-y-0"
                 :disabled="isToggling || (artist.is_pending && !isFavorited)"
                 :title="artist.is_pending ? $t('pending.locked') : undefined"
                 @click="toggleFollow"
@@ -96,6 +44,76 @@
               </UiButton>
               <UiButton :to="`/artists/${artist.id}/versions`" size="sm" :icon="History" :label="$t('versions.title')" />
               <UiButton :to="`/contribute/artist/${artist.id}`" size="sm" :icon="Edit" :label="$t('common.edit')" />
+            </div>
+            <div class="min-w-0 sm:col-span-2">
+              <ArtistBio :text="artist.bio || $t('artists.detail.no_bio')" />
+              <!-- The counts as pills in the theme colour (the link chips under them stay grey), the chips' size. -->
+              <div class="mt-3 flex flex-wrap items-center gap-1.5 text-[13px] text-btn-content">
+                <span :class="countPill"><Disc3 :size="15" class="opacity-70" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
+                <span :class="countPill"><Users :size="15" class="opacity-70" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
+              </div>
+              <CatalogLinkChips v-if="artist.links?.length" :links="artist.links" class="mt-3" />
+              <!-- 其他名称, 品番前缀, relations and attributes as rows under a rule, a row per group with its name on the left (above
+                   it on phones); everything is spelled out, nothing hides behind a tooltip. No panel fill: the tiles carry the grey,
+                   so a short list leaves plain card, not an empty grey box. -->
+              <div v-if="otherTitles.length || artist.catalog_prefixes?.length || relationGroups.length || artist.attributes?.length" class="mt-4 divide-y divide-line border-t border-line text-sm sm:grid sm:grid-cols-[minmax(6.5rem,max-content)_minmax(0,1fr)] sm:gap-x-8">
+                <div v-if="otherTitles.length" :class="panelRow">
+                  <p :class="[panelLabel, 'sm:pt-[23px]']">{{ $t('catalog.other_names') }} <span :class="panelCount">{{ otherTitles.length }}</span></p>
+                  <ul class="flex flex-wrap gap-2">
+                    <li v-for="(title, index) in otherTitles" :key="index" :class="['min-w-0 max-w-full rounded-lg px-4 py-2.5', tileFill]">
+                      <span class="block break-words text-[15px] font-medium leading-snug text-title">{{ title.title }}</span>
+                      <span class="mt-2 flex flex-wrap gap-1.5 text-xs text-meta">
+                        <span :class="nameTag">{{ enumLabel('title_kind', title.kind) }}</span>
+                        <span v-if="title.locale" :class="nameTag">{{ localeName(title.locale) }}</span>
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div v-if="artist.catalog_prefixes?.length" :class="panelRow">
+                  <p :class="[panelLabel, 'sm:pt-0.5']">{{ $t('artists.detail.catalog_prefixes') }}</p>
+                  <p class="min-w-0 font-mono leading-6 text-body">{{ artist.catalog_prefixes.join(', ') }}</p>
+                </div>
+                <!-- One row per kind of relation, the ended ones (former members, earlier voices) last, drawn the same: the row's
+                     name says they ended. Other names of the same person are plain tags; the rest are small cards with the picture
+                     and the note. -->
+                <div v-for="group in relationGroups" :key="group.key" :class="panelRow">
+                  <p :class="[panelLabel, group.alias ? 'sm:pt-1.5' : 'sm:pt-[18px]']">{{ group.label }} <span :class="panelCount">{{ group.relations.length }}</span></p>
+                  <ul v-if="group.alias" class="flex flex-wrap gap-1.5">
+                    <li v-for="relation in group.relations" :key="relation.artist.id" class="min-w-0">
+                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="group/rel block rounded-md px-3 py-1.5 text-[13px] leading-5 text-title" :class="tileFill">
+                        <span class="block break-words" :class="slideRight">{{ relation.artist.name }}</span>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                  <!-- Cards as wide as their content, so no card carries an empty stretch of grey. A group with a long note gets
+                       columns of 22rem+ instead (two on a desktop): its text fills them and wraps at a readable width. -->
+                  <ul v-else :class="group.longNotes ? 'grid gap-2 sm:grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))]' : 'flex flex-wrap gap-2'">
+                    <li v-for="relation in group.relations" :key="relation.artist.id" class="min-w-0 max-w-full">
+                      <!-- Hover keeps the colour: the picture and the name slide right a little instead. -->
+                      <NuxtLink
+                        :to="`/artists/${relation.artist.id}`"
+                        class="group/rel flex h-full rounded-lg py-2.5 pl-3 pr-4"
+                        :class="tileFill"
+                      >
+                        <span class="flex min-w-0 flex-1 gap-3" :class="[relation.note ? 'items-start' : 'items-center', slideRight]">
+                          <span class="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card text-faint ring-1 ring-black/8 dark:ring-white/10">
+                            <img v-if="relation.artist.image_url" :src="relation.artist.image_url" :alt="relation.artist.name" class="h-full w-full object-cover">
+                            <component :is="relation.artist.type === 'person' ? User : Users" v-else :size="17" aria-hidden="true" />
+                          </span>
+                          <span class="min-w-0" :class="relation.note && 'pt-px'">
+                            <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 leading-snug">
+                              <span class="min-w-0 break-words font-medium text-title">{{ relation.artist.name }}</span>
+                              <span v-if="relation.artist.type" class="text-xs text-meta" :class="nameTag">{{ enumLabel('artist_type', relation.artist.type) }}</span>
+                            </span>
+                            <span v-if="relation.note" class="mt-0.5 block whitespace-pre-line break-words text-[13px] leading-5 text-meta">{{ relation.note }}</span>
+                          </span>
+                        </span>
+                      </NuxtLink>
+                    </li>
+                  </ul>
+                </div>
+                <CatalogAttributeList v-if="artist.attributes?.length" :attributes="artist.attributes" panel />
+              </div>
             </div>
           </div>
           <div v-else-if="status === 'error'" class="flex min-h-28 items-center justify-center text-sm text-meta">{{ $t('common.load_failed') }}</div>
@@ -180,8 +198,9 @@
 <script setup lang="ts">
 import type { ArtistCreditedAlbum, ArtistDetail, ArtistImage } from '~/types/artist'
 import type { AlbumSimple } from '~/types/album'
-import type { CatalogImage, CatalogTitle } from '~/types/catalog'
-import { Disc3, Edit, Globe, History, Languages, Library, UserCheck, UserPlus, Users } from '@lucide/vue'
+import type { CatalogImage } from '~/types/catalog'
+import { Disc3, Edit, History, Library, User, UserCheck, UserPlus, Users } from '@lucide/vue'
+import { ARTIST_RELATIONS } from '~/types/artist'
 import { pageHeroConfig } from '~/config/pageHero'
 import { artistLdType, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
@@ -198,14 +217,35 @@ const { roleName, roleOrder } = useCatalogSchema()
 const artistId = Number(route.params.id)
 const { data: artist, status, error, mutate, revealClass } = await usePageAPI<ArtistDetail>(`/v1/artists/${artistId}`, { notFound: true })
 
-/** The relations row, then the ended ones ("过往关系") when there are any; each keeps the order the API gives. */
-const relationParts = computed(() => {
+/** A panel row per kind of relation (成员, 声优, 另一名义 …), then the ended ones (前成员 …); each keeps the API's order. */
+const relationGroups = computed(() => {
   const relations = artist.value?.relations ?? []
-  return [
-    { key: 'current', relations: relations.filter(relation => !relation.ended) },
-    { key: 'ended', relations: relations.filter(relation => relation.ended) },
-  ].filter(part => part.relations.length)
+  return [false, true].flatMap(ended => ARTIST_RELATIONS.map((type) => {
+    const members = relations.filter(relation => relation.relation_type === type && relation.ended === ended)
+    return {
+      key: `${type}-${ended}`,
+      label: enumLabel(ended ? 'artist_relation_ended' : 'artist_relation', type),
+      ended,
+      alias: type === 'alias',
+      /** A note longer than a short title ("Owner", "ギター"): give the cards wider columns. */
+      longNotes: members.some(relation => (relation.note?.length ?? 0) > 40),
+      relations: members,
+    }
+  })).filter(group => group.relations.length)
 })
+// The rows share the block's columns (subgrid), so the label column is as wide as the longest label, on one line.
+const panelRow = 'grid gap-2 py-3 sm:col-span-2 sm:grid-cols-subgrid sm:gap-y-0'
+// Beside its items, a row's name sits on the middle of their first line: a 67px name tile (23px down), a person card's
+// 36px picture under 10px padding (18px), a 32px tag (6px), a 24px line of text (2px). Phones put it above them.
+const panelLabel = 'flex items-center gap-1.5 self-start whitespace-nowrap text-sm font-semibold leading-5 text-title'
+/** The row's count as a small grey tag, the filters' grey like the tiles. */
+const panelCount = 'inline-grid h-5 min-w-5 place-items-center rounded-md bg-black/5 px-1.5 text-xs font-medium tabular-nums text-meta dark:bg-btn'
+const nameTag = 'rounded-[3px] border border-black/14 px-1.5 leading-4 dark:border-white/16'
+const countPill = 'inline-flex h-7 items-center gap-1.5 rounded-md bg-btn px-2.5'
+/** Tiles: the album list filters' grey (the default button's too), the tags on them outlined rather than filled. */
+const tileFill = 'bg-black/5 dark:bg-btn'
+/** A linked tile's hover (and keyboard focus): no colour change, its content slides 4px to the right. */
+const slideRight = 'transition-transform duration-200 ease-out group-hover/rel:translate-x-1 group-focus-visible/rel:translate-x-1 motion-reduce:transition-none'
 
 const shownName = computed(() => artist.value ? localName(artist.value.name, artist.value.titles) : '')
 // The main banner up top, the main avatar in its circle; the 图片 card has the rest, other avatars and banners too.
@@ -215,7 +255,6 @@ const galleryItems = computed(() => images.value.filter(item => !item.is_primary
 const originalName = computed(() => artist.value && shownName.value !== artist.value.name ? artist.value.name : '')
 /** The names the header does not show already. */
 const otherTitles = computed(() => (artist.value?.titles ?? []).filter(title => title.title !== shownName.value && title.title !== artist.value?.name))
-const titleDetail = (title: CatalogTitle) => [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' ')
 // One full-width column: up to six albums a row; a page of 30 ends on a full row at 2, 3, 5 and 6 columns.
 const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6 lg:grid-cols-5 xl:grid-cols-6'
 

@@ -135,12 +135,26 @@
 /* The banner strip and the round avatar at the top of the artist and profile pages (config/pageHero.ts). */
 @layer components {
   .page-hero-banner {
+    position: relative;
     height: 192px;
   }
 
+  /* A hairline along the banner's foot, over the image: a white banner would otherwise run straight into the card. */
+  .page-hero-banner::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    background: color-mix(in oklab, var(--line) 60%, transparent);
+    pointer-events: none;
+  }
+
+  /* About half the banner's height (it was 84 / 104px, small beside a wide banner). The pages give it a light grey ring in
+     the light theme (a white one vanished into the card and a light banner, even with a shadow); in the dark theme
+     a ring in the card's colour with a thin outline. */
   .page-hero-avatar {
-    width: 84px;
-    height: 84px;
+    width: 96px;
+    height: 96px;
   }
 
   @media (width >= 48rem) {
@@ -149,8 +163,8 @@
     }
 
     .page-hero-avatar {
-      width: 104px;
-      height: 104px;
+      width: 136px;
+      height: 136px;
     }
   }
 }

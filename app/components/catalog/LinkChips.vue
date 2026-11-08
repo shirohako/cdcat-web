@@ -6,7 +6,7 @@
       :href="link.url"
       target="_blank"
       rel="noopener noreferrer"
-      class="inline-flex h-7 items-center gap-1.5 rounded-md bg-btn px-2.5 text-xs font-medium text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover"
+      class="inline-flex h-7 items-center gap-1.5 rounded-md bg-black/5 px-2.5 text-xs font-medium text-body transition-colors duration-150 ease-out hover:bg-black/10 dark:bg-btn dark:hover:bg-btn-hover"
       :title="link.url"
     >
       <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" alt="" class="h-3.5 w-3.5 rounded-sm object-contain">
