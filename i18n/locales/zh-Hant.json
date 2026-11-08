@@ -153,7 +153,9 @@
       "grid": "網格",
       "list": "列表",
       "show_all": "展開全部 {count} 張",
-      "collapse": "收起"
+      "collapse": "收起",
+      "loading": "正在載入圖片",
+      "failed": "圖片載入失敗"
     },
     "info": {
       "people": "發行"

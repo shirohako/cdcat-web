@@ -153,7 +153,9 @@
       "grid": "网格",
       "list": "列表",
       "show_all": "展开全部 {count} 张",
-      "collapse": "收起"
+      "collapse": "收起",
+      "loading": "正在加载图片",
+      "failed": "图片加载失败"
     },
     "info": {
       "people": "发行"

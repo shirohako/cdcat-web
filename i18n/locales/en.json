@@ -153,7 +153,9 @@
       "grid": "Grid",
       "list": "List",
       "show_all": "Show all {count} images",
-      "collapse": "Show less"
+      "collapse": "Show less",
+      "loading": "Loading image",
+      "failed": "Couldn't load the image"
     },
     "info": {
       "people": "Release"

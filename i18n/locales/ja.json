@@ -153,7 +153,9 @@
       "grid": "グリッド",
       "list": "リスト",
       "show_all": "すべて表示（{count}枚）",
-      "collapse": "閉じる"
+      "collapse": "閉じる",
+      "loading": "画像を読み込み中",
+      "failed": "画像を読み込めませんでした"
     },
     "info": {
       "people": "発売"

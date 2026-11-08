@@ -9,8 +9,9 @@
     ]"
   >
     <!-- Navigation (the logo lives in the navbar, which runs across the top) -->
-    <!-- Scrolls only vertically: nothing may widen it while the sidebar collapses. -->
-    <nav class="flex-1 min-h-0 overflow-x-hidden overflow-y-auto pb-6 pt-3">
+    <!-- Scrolls only vertically: nothing may widen it while the sidebar collapses. Folded, without a scrollbar (still
+         scrolls by wheel and touch): its 10px would push the centred icons to the left once the list overflows. -->
+    <nav :class="['flex-1 min-h-0 overflow-x-hidden overflow-y-auto pb-6 pt-3', FOLD.nav[mode]]">
       <ul :class="['relative space-y-2', FOLD.list[mode]]" @mouseleave="leave">
         <!-- One highlight for the whole list: it glides to the item under the pointer. -->
         <div
@@ -84,6 +85,7 @@ defineProps<{
  */
 const FOLD = {
   aside: { auto: 'w-52 sidebar-folds:w-16', collapsed: 'w-52 lg:w-16', expanded: 'w-52' },
+  nav: { auto: 'sidebar-folds:[scrollbar-width:none] sidebar-folds:[&::-webkit-scrollbar]:hidden', collapsed: 'lg:[scrollbar-width:none] lg:[&::-webkit-scrollbar]:hidden', expanded: '' },
   list: { auto: 'px-3 sidebar-folds:px-2', collapsed: 'px-3 lg:px-2', expanded: 'px-3' },
   highlight: { auto: 'inset-x-3 sidebar-folds:inset-x-2', collapsed: 'inset-x-3 lg:inset-x-2', expanded: 'inset-x-3' },
   link: { auto: 'gap-3 px-3.5 sidebar-folds:justify-center sidebar-folds:px-3', collapsed: 'gap-3 px-3.5 lg:justify-center lg:px-3', expanded: 'gap-3 px-3.5' },

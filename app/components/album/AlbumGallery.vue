@@ -4,7 +4,7 @@
   <section class="card overflow-hidden">
     <UiSectionTitle :title="$t('album.section.gallery')" :icon="Images" :count="thumbnails.length || undefined" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
       <template v-if="thumbnails.length" #actions>
-        <UiSegmented v-model="view" :items="views" size="sm" :label="$t('album.gallery.view')" />
+        <UiSegmented v-model="view" :items="views" size="sm" collapse :label="$t('album.gallery.view')" />
       </template>
     </UiSectionTitle>
 
@@ -20,11 +20,14 @@
         </UiTooltip>
       </div>
 
-      <!-- List: a small thumbnail, the kind, and its label and what it belongs to; hover turns the name, no fill -->
-      <ul v-else class="space-y-1">
+      <!-- List: a small thumbnail, the kind, and its label and what it belongs to; hover fills the row (the tracklist's
+           fill), zooms the thumbnail as the grid does and turns the name -->
+      <ul v-else class="-mx-1 space-y-0.5">
         <li v-for="item in shown" :key="item.id">
-          <button type="button" class="group flex w-full min-w-0 items-center gap-3 py-0.5 text-left" @click="open(item.index)">
-            <img :src="item.image.thumbnail_url" :alt="item.caption || describe(item)" loading="lazy" class="size-10 shrink-0 rounded-md bg-sunken object-cover">
+          <button type="button" class="group flex w-full min-w-0 items-center gap-3 rounded-lg p-1 pr-2 text-left transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]" @click="open(item.index)">
+            <span class="size-10 shrink-0 overflow-hidden rounded-md bg-sunken">
+              <img :src="item.image.thumbnail_url" :alt="item.caption || describe(item)" loading="lazy" class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
+            </span>
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium text-title transition-colors group-hover:text-primary">{{ enumLabel('image_kind', item.kind) }}</span>
               <span v-if="item.label || item.scope" class="block truncate text-11 text-meta">{{ [item.label, item.scope].filter(Boolean).join(' · ') }}</span>
