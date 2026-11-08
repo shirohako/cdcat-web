@@ -1,7 +1,10 @@
 /** One person's credit on the album, as AlbumCredits gathers them by role. */
 export interface CreditRowPerson {
+  /** As credited */
   name: string
   artistId: number | null
+  /** The artist's own name, so a credited name holding it links only that part */
+  artistName: string | null
   detail: string | null
 }
 
@@ -26,6 +29,7 @@ export interface AlbumCreditPerson {
   key: string
   name: string
   artistId: number | null
+  artistName: string | null
   roles: AlbumCreditPersonRole[]
 }
 
@@ -38,7 +42,7 @@ export function albumCreditPeople(groups: CreditRowRole[]): AlbumCreditPerson[] 
   for (const group of groups) {
     for (const credit of group.people) {
       const key = JSON.stringify([credit.artistId, credit.name])
-      const person = people.get(key) ?? { key, name: credit.name, artistId: credit.artistId, roles: [] }
+      const person = people.get(key) ?? { key, name: credit.name, artistId: credit.artistId, artistName: credit.artistName, roles: [] }
       people.set(key, person)
       let role = person.roles.find(item => item.key === group.key)
       if (!role) {

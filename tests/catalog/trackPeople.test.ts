@@ -45,6 +45,18 @@ describe('track people', () => {
     ])
   })
 
+  it('shows the printed name and keeps an artist\'s two printed names apart', () => {
+    const as = (role: string, artistId: number, name: string, printed: string | null): CatalogCredit => ({ ...credit(role, name, artistId), credited_as: printed })
+    const people = trackPeople([disc(1, [
+      track(1, [as('composer', 1, 'Akarin', 'Silence Akarin')]),
+      track(2, [as('composer', 1, 'Akarin', null), as('arranger', 1, 'Akarin', 'Silence Akarin')]),
+    ])], role => ORDER.indexOf(role))
+    expect(people.map(person => [person.name, person.artistId, person.artistName, person.roles.map(role => [role.role, role.tracks])])).toEqual([
+      ['Silence Akarin', 1, 'Akarin', [['composer', '1'], ['arranger', '2']]],
+      ['Akarin', 1, 'Akarin', [['composer', '2']]],
+    ])
+  })
+
   it('names the disc when there are several and keeps printed numbers', () => {
     const people = trackPeople([
       disc(2, [track(1, [credit('composer', 'A', 1)], { disc_number: 2 })]),

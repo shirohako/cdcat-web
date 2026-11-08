@@ -1,8 +1,9 @@
 import type { AlbumDisc } from '~/types/album'
 
 /**
- * The album page's 曲目参与人员: everyone credited on the tracks, grouped by artist (a name-only credit by its name),
- * in the order they first appear in the tracklist. Each person lists their roles in the dictionary's order, a role
+ * The album page's 曲目参与人员: everyone credited on the tracks, grouped by artist and printed name (credited_as, else
+ * the artist's name; a name-only credit by its name), so someone credited under two names is two people, as in
+ * 专辑参与人员, in the order they first appear in the tracklist. Each person lists their roles in the dictionary's order, a role
  * with another job title or detail (an instrument) apart, with the tracks as ranges: "1–3, 5", per disc when there are several
  * ("Disc 1: 1–3 · Disc 2: 2"), or `all` when it is every track of the album. For the by-track view each person also
  * lists their tracks one by one, per disc, with what they did on each.
@@ -30,8 +31,11 @@ export interface TrackPersonTrack {
 
 export interface TrackPerson {
   key: string
+  /** As credited */
   name: string
   artistId: number | null
+  /** The artist's own name, so a credited name holding it links only that part */
+  artistName: string | null
   roles: TrackPersonRole[]
   /** The tracks per disc (`disc` null on a one-disc album), or null for every track */
   tracks: Array<{ disc: number | null, tracks: TrackPersonTrack[] }> | null
@@ -49,10 +53,10 @@ export function trackPeople(discs: AlbumDisc[], roleOrder: (role: string) => num
   for (const { tracks } of ordered) {
     for (const track of tracks) {
       for (const credit of track.credits) {
-        const name = credit.artist?.name || credit.credited_as || ''
+        const name = credit.credited_as || credit.artist?.name || ''
         if (!name) continue
-        const key = credit.artist ? `a:${credit.artist.id}` : `n:${name}`
-        const person = people.get(key) ?? { key, name, artistId: credit.artist?.id ?? null, roles: [], byRole: new Map(), byTrack: new Map() }
+        const key = credit.artist ? `a:${credit.artist.id}:${name}` : `n:${name}`
+        const person = people.get(key) ?? { key, name, artistId: credit.artist?.id ?? null, artistName: credit.artist?.name ?? null, roles: [], byRole: new Map(), byTrack: new Map() }
         people.set(key, person)
         const roleLabel = credit.role_label || null
         const detail = credit.detail || null
@@ -114,7 +118,7 @@ export interface TrackRoleGroup {
   role_label: string | null
   category: string | null
   /** Everyone with this role, in the order they first appear in the tracklist, a role detail (an instrument) apart */
-  people: Array<{ key: string, name: string, artistId: number | null, detail: string | null, tracks: string | null }>
+  people: Array<{ key: string, name: string, artistId: number | null, artistName: string | null, detail: string | null, tracks: string | null }>
 }
 
 /** The same credits turned around for the by-role view: one group per role and job title in the dictionary's order, its people under it. */
@@ -125,7 +129,7 @@ export function trackRoleGroups(people: TrackPerson[], roleOrder: (role: string)
       const key = JSON.stringify([role.role, role.role_label])
       const group = groups.get(key) ?? { key, role: role.role, role_label: role.role_label, category: role.category, people: [] }
       groups.set(key, group)
-      group.people.push({ key: `${person.key}:${role.detail ?? ''}`, name: person.name, artistId: person.artistId, detail: role.detail, tracks: role.tracks })
+      group.people.push({ key: `${person.key}:${role.detail ?? ''}`, name: person.name, artistId: person.artistId, artistName: person.artistName, detail: role.detail, tracks: role.tracks })
     }
   }
   return [...groups.values()].sort((a, b) => roleOrder(a.role) - roleOrder(b.role))

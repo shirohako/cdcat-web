@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { CreditRowPerson, CreditRowRole } from '../../app/utils/albumCreditPeople'
 import { albumCreditPeople } from '../../app/utils/albumCreditPeople'
 
-const person = (name: string, detail: string | null = null, artistId: number | null = null): CreditRowPerson => ({ name, artistId, detail })
+const person = (name: string, detail: string | null = null, artistId: number | null = null): CreditRowPerson => ({ name, artistId, artistName: artistId ? name : null, detail })
 const group = (role: string, people: CreditRowPerson[], role_label: string | null = null): CreditRowRole => ({ key: JSON.stringify([role, role_label]), role, role_label, category: 'music', people })
 
 describe('albumCreditPeople', () => {

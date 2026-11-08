@@ -14,7 +14,9 @@ let lastClosedAt = 0
 /**
  * One hover card for a whole region: any element matching `selector` inside `root` opens it after the pointer rests
  * on it. Listeners are delegated on the root, so a long list costs two listeners rather than a component per row.
- * Only for a mouse or pen on a device that can hover; touch taps go to the link as usual.
+ * A mouse or pen on a device that can hover opens it by resting; a tap (touch, or any press on a device that can't
+ * hover) opens it instead of following the link, and a second tap on the same name, or the name in the card, goes to
+ * the page. Keyboard presses follow the link as usual.
  *
  * `anchor` is the element the card shows for (null when closed), `current` the last one, kept while the card fades
  * out. The card calls `enter` and `leave` as the pointer moves in and out of it, and `close` when it closes itself
@@ -69,6 +71,8 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
   const enter = () => clearTimeout(hideTimer)
 
   const onPointerOut = (event: PointerEvent) => {
+    // A finger "leaves" after every tap; a card opened by a tap stays until a press elsewhere
+    if (event.pointerType === 'touch') return
     const target = (event.target as Element | null)?.closest?.<HTMLElement>(selector)
     if (!target || (event.relatedTarget instanceof Node && target.contains(event.relatedTarget))) return
     if (target === pending) {
@@ -78,19 +82,41 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
     if (anchor.value) leave()
   }
 
+  // Taps: the pointer type of the press, as a click event doesn't carry it everywhere (Safari before 17).
+  let pressType = ''
+  const onPointerDown = (event: PointerEvent) => {
+    pressType = event.pointerType
+  }
+  /** In the capture phase, so the link's own handler sees the click already prevented and doesn't navigate. */
+  const onClick = (event: MouseEvent) => {
+    if (!enabled() || event.detail === 0) return
+    if (pressType !== 'touch' && canHover()) return
+    const target = (event.target as Element | null)?.closest?.<HTMLElement>(selector)
+    if (!target || !root.value?.contains(target) || target === anchor.value) return
+    event.preventDefault()
+    clearTimeout(showTimer)
+    clearTimeout(hideTimer)
+    pending = null
+    show(target)
+  }
+
+  const listen = (element: HTMLElement | null | undefined, on: boolean) => {
+    const method = on ? 'addEventListener' : 'removeEventListener'
+    element?.[method]('pointerover', onPointerOver as EventListener)
+    element?.[method]('pointerout', onPointerOut as EventListener)
+    element?.[method]('pointerdown', onPointerDown as EventListener, true)
+    element?.[method]('click', onClick as EventListener, true)
+  }
   watch(root, (element, previous) => {
-    previous?.removeEventListener('pointerover', onPointerOver)
-    previous?.removeEventListener('pointerout', onPointerOut)
-    element?.addEventListener('pointerover', onPointerOver)
-    element?.addEventListener('pointerout', onPointerOut)
+    listen(previous, false)
+    listen(element, true)
   }, { immediate: true, flush: 'post' })
   watch(enabled, (on) => {
     if (!on) close()
   })
   onBeforeUnmount(() => {
     close()
-    root.value?.removeEventListener('pointerover', onPointerOver)
-    root.value?.removeEventListener('pointerout', onPointerOut)
+    listen(root.value, false)
   })
 
   return { anchor, current, enter, leave, close }

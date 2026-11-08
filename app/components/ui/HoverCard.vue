@@ -4,7 +4,7 @@ import type { Placement } from '@floating-ui/dom'
 /**
  * The card a hover-card region shows (see useHoverCard): a UiPopover anchored on the hovered element, as the venue
  * map's booth card is. It never takes focus. Moving the pointer into the card keeps it open, so its links can be
- * used; Escape, a press elsewhere or leaving the page closes it. Attributes go to the card, e.g. a width. With
+ * used; Escape, a press elsewhere or leaving the page closes it (a finger lifting off the card doesn't). Attributes go to the card, e.g. a width. With
  * `textInset` (the card's own left padding), the card's content starts where the hovered element's text does, so a
  * name and the card about it line up.
  */
@@ -37,7 +37,7 @@ const emit = defineEmits<{ enter: [], leave: [], close: [] }>()
     v-bind="$attrs"
     @update:open="value => value || emit('close')"
     @pointerenter="emit('enter')"
-    @pointerleave="emit('leave')"
+    @pointerleave="(event: PointerEvent) => event.pointerType === 'touch' || emit('leave')"
   >
     <slot />
   </UiPopover>
