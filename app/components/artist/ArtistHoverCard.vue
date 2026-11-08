@@ -55,7 +55,7 @@ const showRoles = computed(() => Boolean(props.roles?.length && (card.value || f
       </div>
     </div>
 
-    <p v-if="card?.bio" class="mt-3 line-clamp-2 px-4 text-12.5 leading-relaxed text-body">{{ card.bio }}</p>
+    <p v-if="card?.bio" class="mt-3 line-clamp-2 px-4 text-13 leading-relaxed text-body">{{ card.bio }}</p>
     <p v-else-if="failed" class="mt-3 px-4 text-xs text-meta">{{ t('artist_card.load_failed') }}</p>
     <div v-else-if="!card" class="mt-3.5 space-y-2 px-4" aria-hidden="true">
       <div class="h-2.5 w-11/12 rounded skeleton" />

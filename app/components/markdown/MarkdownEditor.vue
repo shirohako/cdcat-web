@@ -668,7 +668,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-baseline gap-2">
                   <span class="truncate text-13 font-semibold text-title">{{ t(definition.labelKey) }}</span>
-                  <span class="shrink-0 text-9 font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
+                  <span class="shrink-0 text-10 font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
                 </span>
                 <span class="mt-0.5 block truncate text-11 leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
               </span>

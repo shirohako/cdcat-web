@@ -416,7 +416,7 @@
   .badge-ghost { background: var(--sunken); color: var(--meta); }
   .badge-outline { border-color: var(--line); background: transparent; }
   .badge-sm { min-height: 1.25rem; padding: 0.1rem 0.45rem; font-size: 0.7rem; }
-  .badge-xs { min-height: 1rem; padding: 0 0.35rem; font-size: 0.65rem; }
+  .badge-xs { min-height: 1rem; padding: 0 0.35rem; font-size: 0.6875rem; }
 
   /* A card: vivia's flat, borderless surface. */
   .card {

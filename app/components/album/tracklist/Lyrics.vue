@@ -17,7 +17,7 @@ const total = computed(() => props.row.lyrics + (props.merged ? props.row.transl
 const mergedTip = computed(() => (props.row.translations ? `${lyricsTip.value} · ${t('album.tracklist.translation_with_count', { count: props.row.translations })}` : lyricsTip.value))
 const translationsTip = computed(() => t('album.tracklist.translation_with_count', { count: props.row.translations }))
 
-const CHIP = 'inline-flex h-[1.375rem] items-center gap-0.75 rounded-[0.3125rem] px-1.5 text-11.5 font-semibold leading-none tabular-nums transition-colors duration-150'
+const CHIP = 'inline-flex h-[1.375rem] items-center gap-0.75 rounded-[0.3125rem] px-1.5 text-xs font-semibold leading-none tabular-nums transition-colors duration-150'
 const FILLED = 'bg-black/[0.05] text-body hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.13] [&_svg]:text-meta'
 </script>
 

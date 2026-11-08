@@ -101,7 +101,7 @@ onMounted(() => {
       </p>
       <div class="max-h-64 space-y-2 overflow-y-auto overscroll-contain">
         <div v-for="group in groups" :key="group.category">
-          <p class="px-2 pb-0.5 text-10 font-bold uppercase tracking-wider text-meta">{{ group.label }}</p>
+          <p class="px-2 pb-0.5 text-11 font-bold uppercase tracking-wider text-meta">{{ group.label }}</p>
           <template v-if="single">
             <button
               v-for="role in group.roles"
@@ -113,13 +113,13 @@ onMounted(() => {
             >
               <Icon name="lucide:check" class="size-3.5 shrink-0 text-primary" :class="{ invisible: !has(role.key) }" />
               <span class="min-w-0 flex-1 truncate text-title">{{ roleName(role.key) }}</span>
-              <span v-if="roleNameEn(role.key)" class="shrink-0 text-10 text-meta">{{ roleNameEn(role.key) }}</span>
+              <span v-if="roleNameEn(role.key)" class="shrink-0 text-11 text-meta">{{ roleNameEn(role.key) }}</span>
             </button>
           </template>
           <label v-for="role in group.roles" v-else :key="role.key" class="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-xs hover:bg-ghost-hover">
             <input type="checkbox" class="checkbox checkbox-xs" :checked="has(role.key)" :disabled="locked(role.key)" @change="toggle(role.key, close)">
             <span class="min-w-0 flex-1 truncate text-title">{{ roleName(role.key) }}</span>
-            <span v-if="roleNameEn(role.key)" class="shrink-0 text-10 text-meta">{{ roleNameEn(role.key) }}</span>
+            <span v-if="roleNameEn(role.key)" class="shrink-0 text-11 text-meta">{{ roleNameEn(role.key) }}</span>
           </label>
         </div>
         <p v-if="!groups.length" class="px-2 py-1.5 text-xs text-meta">{{ t('catalog.form.no_results') }}</p>

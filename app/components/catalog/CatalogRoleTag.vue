@@ -15,7 +15,7 @@ const props = withDefaults(defineProps<{
   tip?: string
 }>(), { size: 'sm', tip: undefined })
 
-const SIZES = { xs: 'h-4 px-1 text-10', sm: 'h-[1.125rem] px-1.5 text-11' }
+const SIZES = { xs: 'h-4 px-1 text-11', sm: 'h-[1.125rem] px-1.5 text-11' }
 const badge = computed(() => getAlbumRolePalette(props.category).badge)
 </script>
 

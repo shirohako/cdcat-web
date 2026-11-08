@@ -46,11 +46,13 @@
     --on-badge: oklch(0.25 0.02 var(--hue));
     --selection: oklch(0.4 0.08 var(--hue));
 
-    /* Text and lines are white or black at a fixed strength, so they sit right on any surface. */
+    /* Text and lines are white or black at a fixed strength, so they sit right on any surface. --meta is the
+       weakest strength for reading text: 5:1 on the cards and the page here, above the 4.5:1 small text needs
+       (WCAG AA); --faint, 3.7:1, is for hints, icons and lines. */
     --title: oklch(1 0 0 / 0.9);
     --body: oklch(1 0 0 / 0.75);
     --meta: oklch(1 0 0 / 0.5);
-    --faint: oklch(1 0 0 / 0.3);
+    --faint: oklch(1 0 0 / 0.4);
     --line: oklch(1 0 0 / 0.1);
     /* Input borders: darker than --line so empty fields still read as fields; hover goes on to --faint. */
     --field-line: oklch(1 0 0 / 0.18);
@@ -99,10 +101,11 @@
     --on-badge: oklch(0.55 0.12 var(--hue));
     --selection: oklch(0.9 0.05 var(--hue));
 
+    /* As in the dark theme: --meta 4.8:1 on the page and the cards, --faint 3:1. */
     --title: oklch(0 0 0 / 0.9);
     --body: oklch(0 0 0 / 0.75);
-    --meta: oklch(0 0 0 / 0.5);
-    --faint: oklch(0 0 0 / 0.3);
+    --meta: oklch(0 0 0 / 0.56);
+    --faint: oklch(0 0 0 / 0.42);
     --line: oklch(0 0 0 / 0.1);
     /* Input borders: darker than --line so empty fields still read as fields; hover goes on to --faint. */
     --field-line: oklch(0 0 0 / 0.18);
@@ -181,19 +184,19 @@
 
 /*
  * Text sizes between Tailwind's steps (text-xs is 12px, text-sm 14px), named by their size in px at the default root
- * size of 16px: text-11, text-12.5 … They are rem, like everything that should grow with the visitor's text size, so
- * write text-11 rather than text-[11px]. Sizes from 16px up are written as rem directly (text-[1.375rem]).
+ * size of 16px: text-11, text-13, text-15. They are rem, like everything that should grow with the visitor's text size,
+ * so write text-11 rather than text-[11px]. Sizes from 16px up are written as rem directly (text-[1.375rem]).
+ *
+ * Words are never smaller than text-11; text-10 is for numbers, initials and short Latin codes in badges. Below 16px
+ * the scale is 10, 11, 12, 13, 14, 15, with no half sizes. text-9 and text-10.5 are only for the guide's miniature
+ * pictures of the interface (components/guide/figure, editor/help/Mock.vue).
  */
 @theme {
   --text-9: 0.5625rem;
-  --text-9\.5: 0.59375rem;
   --text-10: 0.625rem;
   --text-10\.5: 0.65625rem;
   --text-11: 0.6875rem;
-  --text-11\.5: 0.71875rem;
-  --text-12\.5: 0.78125rem;
   --text-13: 0.8125rem;
-  --text-13\.5: 0.84375rem;
   --text-15: 0.9375rem;
 }
 

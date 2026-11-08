@@ -10,7 +10,7 @@
         </template>
         <template v-else>
           <span class="min-w-0 truncate">{{ row.original_title }}</span>
-          <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-10 text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
+          <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-11 text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
         </template>
         <UiButton :icon="X" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ml-auto ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="remove(row.id)" />
         <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-11 text-danger">{{ error.message }}</p>

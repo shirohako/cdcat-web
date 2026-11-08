@@ -115,7 +115,7 @@ const errorText = (key: string) => props.errors[key]
             <input v-model="license" type="radio" name="writer-license" :value="item.key" :disabled="disabled" class="radio radio-sm mt-0.5 shrink-0">
             <span class="min-w-0">
               <span class="block text-sm font-medium leading-5 text-title">{{ t(`article_ui.licenses.${item.key}.name`) }}</span>
-              <span v-if="item.url" class="block font-mono text-10 text-meta">{{ item.short }}</span>
+              <span v-if="item.url" class="block font-mono text-11 text-meta">{{ item.short }}</span>
               <ArticleLicensePermissions :info="item" class="mt-1" />
             </span>
           </label>

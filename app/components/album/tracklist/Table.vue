@@ -65,9 +65,9 @@ const CELL_CLASSES: Record<string, string> = {
   lyrics: 'c-lyrics w-px whitespace-nowrap',
   heart: 'c-heart w-px !px-0.5',
   duration: 'c-duration w-px whitespace-nowrap text-right text-xs/5 tabular-nums',
-  key: 'c-people text-12.5 text-title',
-  category: 'c-people text-12.5 text-title',
-  others: 'c-people c-others text-12.5 text-title',
+  key: 'c-people text-13 text-title',
+  category: 'c-people text-13 text-title',
+  others: 'c-people c-others text-13 text-title',
 }
 </script>
 

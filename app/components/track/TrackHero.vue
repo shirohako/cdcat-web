@@ -68,7 +68,7 @@
                 <span v-if="track.has_lyrics" class="flex items-center gap-1.5">
                   <FileText :size="14" class="shrink-0 text-meta" />{{ $t('lyrics_ui.lyrics') }}<span v-if="track.translations_count" class="text-teal-600 dark:text-teal-400">+{{ track.translations_count }}</span>
                 </span>
-                <span v-if="track.is_instrumental" class="rounded bg-btn px-2 py-1 text-10 font-bold uppercase tracking-wider text-btn-content">{{ $t('content_display.instrumental') }}</span>
+                <span v-if="track.is_instrumental" class="rounded bg-btn px-2 py-1 text-11 font-bold uppercase tracking-wider text-btn-content">{{ $t('content_display.instrumental') }}</span>
                 <span v-if="track.isrc" class="font-mono text-xs text-body">ISRC {{ track.isrc }}</span>
                 <CatalogPendingBadge v-if="track.is_pending" />
               </div>

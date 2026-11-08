@@ -4,7 +4,7 @@
   <div class="pointer-events-none sticky bottom-5 z-10 flex justify-center pt-4 transition-[opacity,visibility] duration-150" :class="!shown && 'invisible opacity-0'">
     <UiButton
       :data-theme="pillTheme"
-      class="group/fold pointer-events-auto h-7 min-h-7 gap-1 rounded-md border-0 bg-popover pl-2 pr-2.5 text-11.5 font-semibold text-title shadow-[0_2px_8px_-2px_oklch(0_0_0/0.25)] ring-1 ring-line transition-colors duration-150 hover:bg-card-hover"
+      class="group/fold pointer-events-auto h-7 min-h-7 gap-1 rounded-md border-0 bg-popover pl-2 pr-2.5 text-xs font-semibold text-title shadow-[0_2px_8px_-2px_oklch(0_0_0/0.25)] ring-1 ring-line transition-colors duration-150 hover:bg-card-hover"
       @click="$emit('click')"
     >
       <!-- On hover the arrow slides up out of its slot and a second one rises in from below, once, like the list

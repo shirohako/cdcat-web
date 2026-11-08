@@ -1,6 +1,6 @@
 <template>
   <span class="flex flex-wrap gap-1">
-    <span v-for="permission in PERMISSIONS" :key="permission" class="rounded px-1.5 py-px text-10" :class="TONES[info[permission]]">
+    <span v-for="permission in PERMISSIONS" :key="permission" class="rounded px-1.5 py-px text-11" :class="TONES[info[permission]]">
       {{ t(`article_ui.licenses.permissions.${permission}`) }} {{ t(`article_ui.licenses.permissions.${info[permission]}`) }}
     </span>
   </span>

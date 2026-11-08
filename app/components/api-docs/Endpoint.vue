@@ -67,7 +67,7 @@ async function copyLink() {
       <ul class="mt-2 grid gap-1.5">
         <li v-for="status in statuses" :key="status.status + (status.name ?? '')" class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-sm leading-6">
           <span class="rounded-sm px-1.5 font-mono text-xs font-semibold" :class="status.status >= 400 ? 'status-bad' : 'status-ok'">{{ status.status }}</span>
-          <code v-if="status.name" class="font-mono text-12.5 text-title">{{ status.name }}</code>
+          <code v-if="status.name" class="font-mono text-13 text-title">{{ status.name }}</code>
           <!-- eslint-disable-next-line vue/no-v-html -- the reference's own texts, rendered by the site's Markdown -->
           <span class="min-w-0 text-body" v-html="docs.inline(status.text)" />
         </li>

@@ -38,7 +38,7 @@
   overflow-wrap: anywhere;
   color: var(--title);
   font-family: var(--font-mono);
-  font-size: 0.84375rem;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 
@@ -126,7 +126,7 @@ a.ad-chip:hover {
   padding: 0.75rem 1rem;
   color: oklch(0.62 0.01 290);
   font-family: var(--font-mono);
-  font-size: 0.78125rem;
+  font-size: 0.8125rem;
   line-height: 1.7;
 }
 

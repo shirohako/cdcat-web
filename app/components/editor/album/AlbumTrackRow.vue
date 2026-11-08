@@ -27,7 +27,7 @@
         <Music2 :size="13" aria-hidden="true" />
         <span class="sm:hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
       </label>
-      <button v-if="badge" type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-10 font-medium" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
+      <button v-if="badge" type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-11 font-medium" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
       <UiButton :label="$t('editor.album.track_details')" size="sm" class="ml-auto shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px sm:ml-0" :aria-expanded="open" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </UiButton>

@@ -6,7 +6,7 @@
       <UiSelect v-model="disc.format" :options="formatOptions" size="sm" class="h-8 w-28 text-xs" :aria-label="$t('catalog.field.format')" />
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <EditorHelp id="disc" />
-      <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-10 font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
+      <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-11 font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
         <UiButton v-if="isCd || tocCount" size="xs" class="ring-1 ring-inset shadow-xs active:translate-y-px" :class="tocErrors.length || !isCd ? 'text-danger ring-danger/40' : 'ring-line'" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" :class="tocErrors.length || !isCd ? 'text-danger' : 'text-primary'">·{{ tocCount }}</span></UiButton>
         <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="moveDisc(album, disc.id, -1)" />

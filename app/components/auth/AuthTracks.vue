@@ -47,7 +47,7 @@ const done = (step: number) => props.finished || step < props.current
       <p class="flex items-center gap-2 text-13 font-semibold text-title">
         <span v-if="!finished" class="auth-tracks-eq" aria-hidden="true"><i /><i /><i /><i /></span>
         <span>A{{ current }} · {{ steps[current - 1] }}</span>
-        <span class="rounded-full bg-(--auth-tint)/10 px-2 py-px text-11.5 font-semibold text-(--auth-tint)">{{ finished ? t('auth.steps.finished') : t('auth.steps.playing') }}</span>
+        <span class="rounded-full bg-(--auth-tint)/10 px-2 py-px text-xs font-semibold text-(--auth-tint)">{{ finished ? t('auth.steps.finished') : t('auth.steps.playing') }}</span>
       </p>
     </div>
     <div class="flex flex-col gap-2 sm:hidden">

@@ -69,9 +69,10 @@
             <CatalogPendingBadge v-if="album.is_pending" />
           </div>
 
-          <!-- The album's size in big figures: beside the title when the column is wide enough, under it when not. -->
-          <div class="mt-3 flex flex-col gap-4 @2xl:flex-row @2xl:items-start @2xl:justify-between @2xl:gap-10">
-            <div class="min-w-0">
+          <!-- The album's size in big figures: beside the title when both fit, under it when not. The row wraps by the
+               real widths, so the title keeps at least 18rem and the figures take what they need at any text size. -->
+          <div class="mt-3 flex flex-wrap items-start justify-center gap-x-10 gap-y-3 md:justify-between">
+            <div class="min-w-0 grow basis-72">
               <h1 class="wrap-break-word text-balance font-bold leading-tight text-title" :class="titleSize">
                 {{ shownTitle }}
               </h1>
@@ -108,11 +109,12 @@
               </UiButton>
             </div>
 
-            <dl v-if="figures.length" class="flex shrink-0 justify-center divide-x divide-line md:justify-start @2xl:pt-1">
+            <!-- pt-1 lines the figures up with the title beside it; under it, gap-y-3 plus pt-1 keep the old 16px. -->
+            <dl v-if="figures.length" class="flex shrink-0 justify-center divide-x divide-line pt-1 md:justify-start">
               <!-- The label comes first for screen readers and shows under its figure. -->
               <div v-for="figure in figures" :key="figure.key" class="flex flex-col-reverse px-5 first:pl-0 last:pr-0">
                 <dt class="mt-1.5 text-xs text-meta">{{ figure.label }}</dt>
-                <dd class="text-2xl font-bold leading-none tabular-nums text-title lg:text-[1.75rem]">{{ figure.value }}</dd>
+                <dd class="text-2xl font-bold leading-none tabular-nums text-title">{{ figure.value }}</dd>
               </div>
             </dl>
           </div>
@@ -175,7 +177,7 @@ import { NuxtLink } from '#components'
 import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
-const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-12.5 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
+const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-13 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
 
 const props = defineProps<{ album: Album }>()
 const emit = defineEmits<{ 'open-cover': [], favorited: [value: boolean] }>()

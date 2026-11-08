@@ -134,11 +134,11 @@ onMounted(() => {
           <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-11 text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
           <span v-if="person.role_label" class="truncate text-11 text-primary">· {{ person.role_label }}</span>
           <span v-if="person.detail" class="grid shrink-0 place-items-center text-meta" :title="person.detail"><Icon name="lucide:info" class="size-3" /></span>
-          <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-10 font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
-          <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-10 font-bold text-success">{{ t('editor.new') }}</span>
-          <span v-else-if="person.artist_id === null" class="shrink-0 text-10 text-meta">{{ t('editor.dialog.name_only') }}</span>
+          <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-11 font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
+          <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-11 font-bold text-success">{{ t('editor.new') }}</span>
+          <span v-else-if="person.artist_id === null" class="shrink-0 text-11 text-meta">{{ t('editor.dialog.name_only') }}</span>
           <span v-if="parent?.label" class="truncate text-11 text-meta">↳ {{ parent.label }}</span>
-          <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-10 font-bold text-warning" :title="note">⚠</span>
+          <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-11 font-bold text-warning" :title="note">⚠</span>
           <span v-else-if="info" class="grid shrink-0 place-items-center text-info" :title="info"><Icon name="lucide:info" class="size-3.5" /></span>
         </button>
         <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger [@media(hover:none)]:size-6" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">

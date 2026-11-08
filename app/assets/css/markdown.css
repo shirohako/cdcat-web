@@ -475,7 +475,7 @@
     background: var(--btn);
     padding: 0.15rem 0.5rem;
     color: var(--btn-content);
-    font-size: 0.68rem;
+    font-size: 0.6875rem;
     font-weight: 750;
     line-height: 1.35;
     transition: background-color 180ms ease, color 180ms ease;
@@ -540,7 +540,7 @@
     background: var(--primary);
     color: var(--on-primary);
     box-shadow: 0 0 0 2px var(--sunken);
-    font-size: 0.55rem;
+    font-size: 0.625rem;
     font-weight: 700;
     line-height: 1;
     z-index: 1;
@@ -747,7 +747,7 @@
   }
 
   .markdown-ref-card-type {
-    font-size: 0.68rem;
+    font-size: 0.6875rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     color: var(--meta);
@@ -785,7 +785,7 @@
 
   .markdown-quote-header {
     margin-bottom: 0.3rem;
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     color: var(--meta);
   }
 

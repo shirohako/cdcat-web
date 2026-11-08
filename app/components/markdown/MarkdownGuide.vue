@@ -171,7 +171,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
           </div>
           <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <div class="p-3">
-            <span class="mb-2 block text-10 font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
+            <span class="mb-2 block text-11 font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
             <RichContent :content="example.source" format="markdown" />
           </div>
         </article>
@@ -214,7 +214,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
             <header class="border-b border-line bg-sunken px-3 py-2.5">
               <div class="flex items-center justify-between gap-2">
                 <h4 class="text-sm font-semibold text-title">{{ example.label }}</h4>
-                <span class="shrink-0 rounded-full px-2 py-0.5 text-10 font-bold" :class="example.badgeClass">{{ example.badge }}</span>
+                <span class="shrink-0 rounded-full px-2 py-0.5 text-11 font-bold" :class="example.badgeClass">{{ example.badge }}</span>
               </div>
               <p class="mt-1 text-xs leading-5 text-meta">{{ example.description }}</p>
             </header>

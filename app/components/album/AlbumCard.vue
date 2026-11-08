@@ -76,7 +76,7 @@ const props = defineProps<{
 const { t, te, locale } = useI18n()
 
 /** The three labels on the cover (type, views, likes) share one look. */
-const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-0.75 text-10 font-medium leading-none text-on-media backdrop-blur-sm'
+const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-0.75 text-11 font-medium leading-none text-on-media backdrop-blur-sm'
 
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
 /**

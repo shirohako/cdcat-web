@@ -85,13 +85,13 @@ const removeAll = async () => {
               <span class="truncate group-hover:underline">{{ roleName(role!) }}</span>
               <Icon name="lucide:chevron-down" class="size-3 shrink-0 opacity-0 transition-opacity group-hover/row:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100" />
             </span>
-            <span v-if="roleNameEn(role!)" class="truncate text-10 text-meta">{{ roleNameEn(role!) }}</span>
+            <span v-if="roleNameEn(role!)" class="truncate text-11 text-meta">{{ roleNameEn(role!) }}</span>
           </button>
         </template>
       </EditorAlbumCreditsRoles>
       <span v-else class="flex min-w-0 flex-col text-xs">
         <span class="truncate font-medium text-primary">{{ roleName(role!) }}</span>
-        <span v-if="roleNameEn(role!)" class="truncate text-10 text-meta">{{ roleNameEn(role!) }}</span>
+        <span v-if="roleNameEn(role!)" class="truncate text-11 text-meta">{{ roleNameEn(role!) }}</span>
       </span>
       <UiButton v-if="rows?.length" variant="danger-soft" icon="lucide:trash-2" icon-class="size-3" :label="t('editor.credits.remove_role')" size="xs" class="ml-1 min-h-6! w-6! shrink-0 opacity-0 transition-[opacity,color,background-color] group-hover/row:opacity-100 focus-visible:opacity-100 [@media(hover:none)]:opacity-100" @click="removeAll" />
     </div>

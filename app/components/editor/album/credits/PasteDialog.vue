@@ -281,15 +281,15 @@ const apply = () => {
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join(separator) }}<span v-if="labelOf(row)" class="ml-1 font-normal text-primary">· {{ labelOf(row) }}</span></span>
                 <EditorAlbumCreditsRoles v-else :model-value="row.roles" :invalid="!row.roles.length" @update:model-value="setRoles(row, $event)" />
-                <span class="block text-10 text-faint">{{ row.roleText }}</span>
-                <span v-if="row.unknown.length" class="block text-10 text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>
+                <span class="block text-11 text-faint">{{ row.roleText }}</span>
+                <span v-if="row.unknown.length" class="block text-11 text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>
               </td>
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="flex flex-wrap items-center gap-2">
                   <span class="min-w-0">
                     <span class="block truncate font-medium text-title">{{ row.name }}<span v-if="hostName(row)" class="ml-1 font-normal text-meta">↳ {{ hostName(row) }}</span></span>
-                    <span v-if="row.character" class="block truncate text-10 text-meta">{{ printedOf(row) }}</span>
-                    <span v-if="row.detail" class="block truncate text-10 text-meta">{{ row.detail }}</span>
+                    <span v-if="row.character" class="block truncate text-11 text-meta">{{ printedOf(row) }}</span>
+                    <span v-if="row.detail" class="block truncate text-11 text-meta">{{ row.detail }}</span>
                   </span>
                   <span v-if="!row.matched" class="ml-auto text-11 text-meta">{{ t('editor.paste_credits.unmatched') }}</span>
                   <UiSelect
@@ -306,7 +306,7 @@ const apply = () => {
               </td>
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="text-body">{{ tracksText(row) }}</span>
-                <span v-if="row.missing.length" class="block text-10 text-warning">{{ t('editor.paste_credits.missing_tracks', { tracks: row.missing.join(', ') }) }}</span>
+                <span v-if="row.missing.length" class="block text-11 text-warning">{{ t('editor.paste_credits.missing_tracks', { tracks: row.missing.join(', ') }) }}</span>
               </td>
             </tr>
           </tbody>

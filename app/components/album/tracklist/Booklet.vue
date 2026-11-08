@@ -33,8 +33,8 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
             :data-track-id="row.id"
             class="group -mx-1.5 flex h-8 scroll-mt-24 break-inside-avoid items-baseline gap-2 rounded-sm px-1.5 leading-8 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
           >
-            <span class="w-[1.125rem] shrink-0 text-11.5 tabular-nums text-faint">{{ row.number }}</span>
-            <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-13.5" />
+            <span class="w-[1.125rem] shrink-0 text-xs tabular-nums text-faint">{{ row.number }}</span>
+            <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-sm" />
             <span class="leader" aria-hidden="true" />
             <!-- The heart right against the length -->
             <span class="flex shrink-0 items-center gap-0.5 self-center">
@@ -58,7 +58,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
           <span class="text-[1.0625rem] font-light leading-6 tracking-tight tabular-nums text-faint @lg:text-xl">{{ row.number }}</span>
           <span class="flex h-6 min-w-0 items-baseline gap-2.5">
             <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-15 font-semibold leading-6" />
-            <span v-if="row.instrumental" class="shrink-0 text-10.5 font-medium tracking-[0.12em] text-meta">{{ t('content_display.instrumental') }}</span>
+            <span v-if="row.instrumental" class="shrink-0 text-11 font-medium tracking-[0.12em] text-meta">{{ t('content_display.instrumental') }}</span>
             <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
               <AlbumTracklistLyrics v-if="lyricsInline(row, density)" :row="row" class="ml-auto self-center" />
             </Transition>
@@ -71,7 +71,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
 
           <UiCollapse v-if="hasComfy(row)" class="col-[2/-1]" :open="density === 'comfy'">
             <div class="flex items-start gap-3 pt-1">
-              <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3.5 gap-y-1 text-12.5 leading-[1.125rem] text-title">
+              <div class="flex min-w-0 flex-1 flex-wrap items-center gap-x-3.5 gap-y-1 text-13 leading-[1.125rem] text-title">
                 <span v-for="group in keyGroups(row)" :key="group.key" class="inline-flex min-w-0 items-start gap-1.5">
                   <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" />
@@ -147,7 +147,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
   column-gap: 0.5rem;
   min-width: 0;
   padding-block: 0.1875rem;
-  font-size: 0.78125rem;
+  font-size: 0.8125rem;
   line-height: 1.375rem;
 }
 

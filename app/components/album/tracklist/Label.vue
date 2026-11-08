@@ -2,7 +2,7 @@
 /** A grey label in a tracklist: 纯音乐, 原曲, BPM … (roles are coloured CatalogRoleTags, in the same two sizes). */
 withDefaults(defineProps<{ size?: 'xs' | 'sm' }>(), { size: 'sm' })
 
-const SIZES = { xs: 'h-4 px-1 text-10', sm: 'h-[1.125rem] px-1.25 text-10.5' }
+const SIZES = { xs: 'h-4 px-1 text-11', sm: 'h-[1.125rem] px-1.25 text-11' }
 </script>
 
 <template>
