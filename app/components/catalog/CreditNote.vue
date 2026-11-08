@@ -25,8 +25,8 @@ defineProps<{
       class="inline-grid shrink-0 cursor-help place-items-center rounded-full align-middle transition duration-150"
       :class="tinted ? 'size-3 translate-y-[0.5px] opacity-75 hover:opacity-100' : 'size-3.5 text-meta hover:text-title'"
     >
-      <Info v-if="tinted" :size="11" :stroke-width="2.5" />
-      <Icon v-else name="lucide:info" class="size-3" />
+      <!-- 11px in either case: at 12px the circle stood as tall as the 12px text beside it and looked heavy -->
+      <Info :size="11" :stroke-width="tinted ? 2.5 : 2" />
     </span>
   </UiTooltip>
 </template>

@@ -11,12 +11,12 @@
           <UiSegmented v-if="albumOpen" v-model="albumView" :items="albumViews" :label="$t('album.track_people.view_label')" size="sm" class="mr-2 shrink-0" />
         </div>
         <UiCollapse :open="albumOpen">
-          <CatalogInfoTable v-if="albumView === 'roles'" variant="lines" class="pt-1">
+          <CatalogInfoTable v-if="albumView === 'roles'" variant="lines" fit-labels class="pt-1">
             <CatalogInfoRow v-for="row in albumRoleRows" :key="row.key">
               <template #label>
                 <span class="flex flex-wrap gap-1">
-                  <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleName(group.role)" :disabled="!group.role_label">
-                    <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category).badge">{{ group.role_label || roleName(group.role) }}</span>
+                  <UiTooltip v-for="group in row.roles" :key="group.key" :text="roleTip(group.role, group.role_label)" :disabled="!group.role_label" class="whitespace-pre-line">
+                    <span :class="[ROLE_TAG, getAlbumRolePalette(group.category).badge]">{{ group.role_label || roleName(group.role) }}</span>
                   </UiTooltip>
                 </span>
               </template>
@@ -33,7 +33,7 @@
                 <template v-for="role in person.roles" :key="role.key">
                   <!-- A note is an ⓘ inside its role's tag, in the tag's colour, so it reads as that role's note -->
                   <span class="inline-flex items-center gap-[3px] rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="[getAlbumRolePalette(role.category).badge, role.details.length && 'pr-[5px]']">
-                    <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
+                    <UiTooltip :text="roleTip(role.role, role.role_label)" :disabled="!role.role_label" class="whitespace-pre-line">
                       <span>{{ role.role_label || roleName(role.role) }}</span>
                     </UiTooltip>
                     <CatalogCreditNote v-if="role.details.length" :note="role.details.join('\n')" tinted />
@@ -65,11 +65,11 @@
         </div>
         <UiCollapse :open="peopleOpen" lazy>
           <!-- By role: one row per role as in the album's own credits, each person a tag with their tracks after it -->
-          <CatalogInfoTable v-if="peopleView === 'role_groups'" variant="lines" class="pt-1">
+          <CatalogInfoTable v-if="peopleView === 'role_groups'" variant="lines" fit-labels class="pt-1">
             <CatalogInfoRow v-for="group in roleGroups" :key="group.key">
               <template #label>
-                <UiTooltip :text="roleName(group.role)" :disabled="!group.role_label">
-                  <span class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="getAlbumRolePalette(group.category ?? roleCategory(group.role)).badge">{{ group.role_label || roleName(group.role) }}</span>
+                <UiTooltip :text="roleTip(group.role, group.role_label)" :disabled="!group.role_label" class="whitespace-pre-line">
+                  <span :class="[ROLE_TAG, getAlbumRolePalette(group.category ?? roleCategory(group.role)).badge]">{{ group.role_label || roleName(group.role) }}</span>
                 </UiTooltip>
               </template>
               <span class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
@@ -104,7 +104,7 @@
               <span v-else class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
                 <span v-for="role in person.roles" :key="`${role.role}:${role.role_label}:${role.detail}`" class="inline-flex min-w-0 items-center gap-1.5">
                   <span class="inline-flex shrink-0 items-center gap-[3px] rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="[getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge, role.detail && 'pr-[5px]']">
-                    <UiTooltip :text="roleName(role.role)" :disabled="!role.role_label">
+                    <UiTooltip :text="roleTip(role.role, role.role_label)" :disabled="!role.role_label" class="whitespace-pre-line">
                       <span>{{ role.role_label || roleName(role.role) }}</span>
                     </UiTooltip>
                     <CatalogCreditNote v-if="role.detail" :note="role.detail" tinted />
@@ -139,7 +139,7 @@ import { trackPeople, trackRoleGroups } from '~/utils/trackPeople'
 
 const props = defineProps<{ credits: CatalogCredit[], discs?: AlbumDisc[] }>()
 
-const { roleName, roleCategory, roleOrder } = useCatalogSchema()
+const { roleName, roleTip, roleCategory, roleOrder } = useCatalogSchema()
 
 /**
  * The album's own credits by role and printed job title (shown instead of the role's name); a person credited under another name shows that name. The 署名与发行
@@ -165,6 +165,12 @@ const groups = computed(() => {
 })
 
 const { t } = useI18n()
+
+/**
+ * A role tag in the label column of the by-role views: always one line. The column fits its widest tag (CatalogInfoTable
+ * `fit-labels`, up to 14rem); a longer job title is cut with …, and its tooltip spells it out (roleTip).
+ */
+const ROLE_TAG = 'inline-block min-w-0 max-w-full truncate rounded-md px-1.5 py-0.5 align-top text-[11px] font-semibold leading-4'
 const albumPeople = computed(() => albumCreditPeople(groups.value))
 const albumRoleRows = computed(() => mergeCreditRoles(groups.value))
 

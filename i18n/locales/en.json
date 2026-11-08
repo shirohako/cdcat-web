@@ -2002,6 +2002,10 @@
       "original_track_id": "Original track",
       "original_title": "Original title"
     },
+    "role_tip": {
+      "title": "Job title: {label}",
+      "role": "Role: {role}"
+    },
     "collection": {
       "titles": "Other names",
       "products": "Editions",

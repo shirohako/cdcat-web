@@ -11,6 +11,7 @@ const helpers: AlbumExportHelpers = {
   uiLocale: 'en',
   titleIn: (titles, wanted) => wanted ? titles?.find(title => title.locale === wanted.locale && title.kind === wanted.kind)?.title ?? null : null,
   roleName: role => NAMES[role] ?? role,
+  roleTip: () => '',
   roleCategory: () => 'other',
   roleOrder: role => ORDER.indexOf(role),
   enumLabel: (_group, value) => value ?? '',

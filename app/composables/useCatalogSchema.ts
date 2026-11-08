@@ -6,7 +6,7 @@ import type { AttributeDefinition, CatalogSchema, CreditRoleDefinition } from '~
  */
 export const useCatalogSchema = () => {
   const { $api } = useNuxtApp()
-  const { locale } = useI18n()
+  const { locale, t } = useI18n()
   const { localizedContent } = useLocaleFormatting()
   const { data: schema, pending } = useAsyncData('catalog:schema', () => $api<CatalogSchema>('/v1/catalog/schema'), {
     getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
@@ -21,6 +21,16 @@ export const useCatalogSchema = () => {
   const roleNameEn = (key: string) => {
     const english = roles.value.get(key)?.names?.en
     return locale.value === 'en' || !english || english === roleName(key) ? '' : english
+  }
+  /**
+   * The tooltip of a tag showing a printed job title, two lines: the job title, and the role it is filed under with
+   * its English name in brackets outside the English UI. Empty without a job title (the tag shows the role's name).
+   * The tooltip shows it as two lines with `whitespace-pre-line`.
+   */
+  const roleTip = (key: string, label: string | null | undefined) => {
+    if (!label) return ''
+    const english = roleNameEn(key)
+    return `${t('catalog.role_tip.title', { label })}\n${t('catalog.role_tip.role', { role: english ? `${roleName(key)} (${english})` : roleName(key) })}`
   }
   const roleCategory = (key: string) => roles.value.get(key)?.category ?? 'other'
   /** Position of the role in the dictionary, for sorting credits the way the admin ordered them. */
@@ -37,5 +47,5 @@ export const useCatalogSchema = () => {
   }
   const attributeDefinition = (key: string) => attributes.value.get(key) ?? null
 
-  return { schema, pending, roleName, roleNameEn, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
+  return { schema, pending, roleName, roleNameEn, roleTip, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
 }

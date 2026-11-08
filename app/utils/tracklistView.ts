@@ -73,6 +73,8 @@ export interface TracklistRoleGroup {
   label: string
   /** The role's own name */
   roleName: string
+  /** The tooltip of a printed job title (useCatalogSchema roleTip), empty when the tag shows the role's name */
+  tip: string
   category: string
   people: TracklistPerson[]
 }
@@ -138,6 +140,7 @@ export interface TracklistArtistRole {
 export interface TracklistHelpers {
   titleIn: (titles: CatalogTitle[], wanted: TracklistLanguageChoice | null) => string | null
   roleName: (role: string) => string
+  roleTip: (role: string, label: string | null | undefined) => string
   roleCategory: (role: string) => string
   roleOrder: (role: string) => number
   enumLabel: (group: string, value: string | null | undefined) => string
@@ -163,6 +166,7 @@ export const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers
       role: credit.role,
       label: credit.role_label || helpers.roleName(credit.role),
       roleName: helpers.roleName(credit.role),
+      tip: helpers.roleTip(credit.role, credit.role_label),
       category: credit.category ?? helpers.roleCategory(credit.role),
       people: [],
     }
@@ -214,7 +218,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
   const whole = (group: TracklistRoleGroup | undefined) => {
     if (!group) return null
     const same = groups.filter(other => other.role === group.role)
-    return same.length > 1 ? { ...group, key: group.role, label: group.roleName, people: same.flatMap(other => other.people) } : group
+    return same.length > 1 ? { ...group, key: group.role, label: group.roleName, tip: '', people: same.flatMap(other => other.people) } : group
   }
   const byCategory = (category: string) => whole(groups.find(group => group.category === category))
   return {

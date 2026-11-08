@@ -10,6 +10,7 @@ const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'compo
 const helpers: TracklistHelpers = {
   titleIn: (titles, wanted) => (wanted ? titles.find(title => title.locale === wanted.locale && title.kind === wanted.kind)?.title ?? null : null),
   roleName: role => role.toUpperCase(),
+  roleTip: (role, label) => (label ? `${label}\n${role.toUpperCase()}` : ''),
   roleCategory: role => CATEGORIES[role] ?? 'other',
   roleOrder: role => ORDER.indexOf(role),
   enumLabel: (group, value) => `${group}:${value}`,

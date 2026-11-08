@@ -79,7 +79,7 @@ const { isAuthenticated } = useAuth()
 const { setFavoriteTrack } = useFavorites()
 const route = useRoute()
 const { titleIn, localeName, enumLabel, formatDuration, attributeText } = useCatalogDisplay()
-const { roleName, roleCategory, roleOrder, attributeName } = useCatalogSchema()
+const { roleName, roleTip, roleCategory, roleOrder, attributeName } = useCatalogSchema()
 
 const { prefs, update } = useTracklistPrefs(Object.keys(STYLES))
 const activeStyle = computed(() => STYLES[prefs.value.style] ?? STYLES.list!)
@@ -114,6 +114,7 @@ const view = computed(() => buildTracklist(
   {
     titleIn,
     roleName,
+    roleTip,
     roleCategory,
     roleOrder,
     enumLabel,

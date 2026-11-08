@@ -6,12 +6,24 @@
  */
 export type InfoTableVariant = 'frame' | 'lines'
 
-const props = withDefaults(defineProps<{ variant?: InfoTableVariant }>(), { variant: 'frame' })
+/**
+ * `fitLabels`: the label column is as wide as its widest label, up to 14rem (45% of the table on a narrow screen),
+ * instead of the fixed 6–7rem; the rows share the table's columns (subgrid), so every value starts at one line. A
+ * label wider than that is the caller's to cut short.
+ */
+const props = withDefaults(defineProps<{ variant?: InfoTableVariant, fitLabels?: boolean }>(), { variant: 'frame', fitLabels: false })
 provide('infoTableVariant', toRef(props, 'variant'))
+provide('infoTableFit', toRef(props, 'fitLabels'))
 </script>
 
 <template>
-  <dl class="grid" :class="variant === 'frame' && 'divide-y divide-line overflow-hidden rounded-md border border-line'">
+  <dl
+    class="grid"
+    :class="[
+      variant === 'frame' && 'divide-y divide-line overflow-hidden rounded-md border border-line',
+      fitLabels && ['@container grid-cols-[fit-content(14rem)_minmax(0,1fr)]', variant === 'lines' && 'gap-x-3'],
+    ]"
+  >
     <slot />
   </dl>
 </template>

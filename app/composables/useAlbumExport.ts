@@ -8,7 +8,7 @@ export const useAlbumExport = () => {
   const { t, locale } = useI18n()
   const { showToast } = useToast()
   const display = useCatalogDisplay()
-  const { roleName, roleCategory, roleOrder, attributeName } = useCatalogSchema()
+  const { roleName, roleTip, roleCategory, roleOrder, attributeName } = useCatalogSchema()
   const prices = usePriceDisplay()
   const { separator, aside } = useListPunctuation()
   const absolute = useSiteUrl()
@@ -21,6 +21,7 @@ export const useAlbumExport = () => {
     formatDate: display.formatDate,
     attribute: attribute => ({ label: attributeName(attribute.key), value: display.attributeText(attribute) }),
     roleName,
+    roleTip,
     roleCategory,
     roleOrder,
     uiLocale: locale.value,

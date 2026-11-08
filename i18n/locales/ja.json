@@ -2002,6 +2002,10 @@
       "original_track_id": "原曲のトラック",
       "original_title": "原曲名"
     },
+    "role_tip": {
+      "title": "具体的な役職：{label}",
+      "role": "役割の分類：{role}"
+    },
     "collection": {
       "titles": "別名",
       "products": "形態",

@@ -55,7 +55,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
                  long -->
             <p class="min-w-0 flex-1 truncate text-xs leading-5 text-body">
               <template v-for="(group, index) in keyGroups(row)" :key="group.key">
-                <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" class="mr-1 align-middle" :class="index > 0 && 'ml-3'" />
+                <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="mr-1 align-middle" :class="index > 0 && 'ml-3'" />
                 <AlbumTracklistPeople :people="group.people" inline />
               </template>
               <template v-if="row.originals.length">
@@ -77,7 +77,7 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
               </p>
               <div v-if="row.groups.length" class="grid gap-x-5 gap-y-1.5 @xl:grid-cols-2">
                 <div v-for="group in row.groups" :key="group.key" class="flex min-w-0 items-start gap-2 text-[12.5px] leading-[1.125rem] text-title">
-                  <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" />
+                  <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" class="min-w-0" />
                 </div>
               </div>

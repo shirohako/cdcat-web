@@ -114,13 +114,13 @@ const CELL_CLASSES: Record<string, string> = {
                   <template v-else-if="column.kind === 'key' || column.kind === 'category'">
                     <span v-for="group in groupsOf(row, column)" :key="group.key" class="flex items-start gap-1.5 [&+&]:mt-1">
                       <!-- Its own tag when the role differs from the column's, and always once rows turn into blocks -->
-                      <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" class="mt-px" :class="group.key === column.head.role && 'cell-tag'" />
+                      <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="mt-px" :class="group.key === column.head.role && 'cell-tag'" />
                       <AlbumTracklistPeople :people="group.people" stack class="mt-px" />
                     </span>
                   </template>
                   <template v-else-if="column.kind === 'others'">
                     <span v-for="group in groupsOf(row, column)" :key="group.key" class="flex items-start gap-1.5 [&+&]:mt-1">
-                      <CatalogRoleTag :label="group.label" :role-name="group.roleName" :category="group.category" class="mt-px" />
+                      <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="mt-px" />
                       <AlbumTracklistPeople :people="group.people" class="mt-px" />
                     </span>
                   </template>

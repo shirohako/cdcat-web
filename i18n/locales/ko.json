@@ -2002,6 +2002,10 @@
       "original_track_id": "원곡 트랙",
       "original_title": "원곡 제목"
     },
+    "role_tip": {
+      "title": "구체적인 직무: {label}",
+      "role": "역할 분류: {role}"
+    },
     "collection": {
       "titles": "다른 이름",
       "products": "에디션",

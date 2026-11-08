@@ -2002,6 +2002,10 @@
       "original_track_id": "原曲曲目",
       "original_title": "原曲名稱"
     },
+    "role_tip": {
+      "title": "具體職務：{label}",
+      "role": "角色分類：{role}"
+    },
     "collection": {
       "titles": "其他名稱",
       "products": "版本",

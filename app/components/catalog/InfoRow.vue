@@ -9,16 +9,21 @@ import type { InfoTableVariant } from './InfoTable.vue'
  */
 defineProps<{ label?: string }>()
 const variant = inject<Ref<InfoTableVariant>>('infoTableVariant', ref('frame'))
+/** The table sizes the label column to its labels: the row takes the table's two columns (subgrid). */
+const fit = inject<Ref<boolean>>('infoTableFit', ref(false))
 </script>
 
 <template>
   <div
-    class="grid grid-cols-[6rem_minmax(0,1fr)] transition-colors duration-150 hover:bg-black/[0.06] sm:grid-cols-[7rem_minmax(0,1fr)] dark:hover:bg-white/[0.07]"
-    :class="variant === 'lines' && 'info-line relative -mx-2 gap-3 rounded-md px-2 py-2.5'"
+    class="grid transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+    :class="[
+      fit ? 'col-span-2 grid-cols-subgrid' : 'grid-cols-[6rem_minmax(0,1fr)] sm:grid-cols-[7rem_minmax(0,1fr)]',
+      variant === 'lines' && 'info-line relative -mx-2 gap-3 rounded-md px-2 py-2.5',
+    ]"
   >
     <dt
       class="text-xs font-medium leading-5 text-meta"
-      :class="variant === 'frame' && 'bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]'"
+      :class="[variant === 'frame' && 'bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]', fit && 'min-w-0 max-w-[min(14rem,45cqw)]']"
     >
       <slot name="label">{{ label }}</slot>
     </dt>

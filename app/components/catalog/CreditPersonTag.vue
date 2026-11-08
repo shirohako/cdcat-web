@@ -7,7 +7,8 @@ import { nameParts } from '~/utils/artistLine'
  * page is a grey tag: linked whole when the printed name doesn't hold the artist's own name, the whole tag darkening
  * on hover; when it does ("Silence Akarin", "Akarin / Silence", "Akarin (Silence)"), only that part is a link, its own
  * darker patch on hover. Either way the link opens the artist hover card of the region around it (`[data-artist-card]`,
- * useHoverCard). A name with no artist page is plain text, flush with the edge (no padding without a tag). A note (detail) is
+ * useHoverCard). A name with no artist page is a grey tag too, not a link; which part links is shown by the reader's
+ * chosen style (useCreditLinks: faded or dotted). A note (detail) is
  * an ⓘ inside the tag; with one, the name is a patch too, so the ⓘ isn't inside the link.
  * `size` sm is the bold name of the by-person list, xs the small tags elsewhere.
  */
@@ -46,7 +47,7 @@ const patch = computed(() => [
  */
 const linkEnds = computed(() => Boolean(props.detail) && props.artistId !== null && !parts.value?.[2])
 const notePull = computed(() => {
-  if (props.artistId === null) return ''
+  if (props.artistId === null) return '-mr-0.5'
   return linkEnds.value ? 'ml-px pr-[3px]' : '-ml-px pr-[3px]'
 })
 const namePad = computed(() => {
@@ -63,8 +64,8 @@ const namePad = computed(() => {
     class="inline-flex min-w-0 max-w-full items-center rounded-md text-title"
     :class="[
       SIZES[size].tag,
-      artistId !== null && 'bg-black/[0.05] dark:bg-white/[0.08]',
-      artistId === null ? 'gap-1' : whole ? 'px-1.5 transition-colors duration-150 hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]' : 'px-px',
+      'bg-black/[0.05] dark:bg-white/[0.08]',
+      artistId === null ? 'gap-1 px-1.5' : whole ? 'px-1.5 transition-colors duration-150 hover:bg-black/[0.1] hover:text-primary dark:hover:bg-white/[0.14]' : 'px-px',
     ]"
   >
     <span v-if="whole" class="credit-link truncate">{{ name }}</span>
