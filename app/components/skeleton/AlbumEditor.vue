@@ -18,7 +18,7 @@
       <aside class="-mx-3 mb-4 space-y-4 md:-mx-6 lg:mx-0 lg:mb-0">
         <div class="card flex gap-1 overflow-hidden p-1.5 max-lg:rounded-none lg:flex-col">
           <div v-for="(width, index) in NAV_WIDTHS" :key="index" class="flex shrink-0 items-center gap-2 px-3 py-2">
-            <div class="skeleton size-[15px] shrink-0 rounded" />
+            <div class="skeleton size-3.75 shrink-0 rounded" />
             <div class="skeleton h-3 rounded-full" :class="width" />
           </div>
         </div>

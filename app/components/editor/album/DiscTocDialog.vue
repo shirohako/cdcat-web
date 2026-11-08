@@ -23,7 +23,7 @@
       <p v-else class="text-xs text-meta">{{ $t('editor.toc.none') }}</p>
 
       <div class="space-y-2">
-        <textarea v-model="text" rows="6" class="textarea w-full font-mono text-[11px]" :placeholder="PLACEHOLDER" :aria-label="$t('editor.toc.paste_label')" />
+        <textarea v-model="text" rows="6" class="textarea w-full font-mono text-11" :placeholder="PLACEHOLDER" :aria-label="$t('editor.toc.paste_label')" />
         <p v-if="problem" class="text-xs text-danger">{{ $t(`editor.toc.unreadable.${problem}`) }}</p>
         <EditorAlbumDiscTocCard v-else-if="pending" :toc="pending" :label="$t('editor.toc.pasted')" :track-count="tracks.length">
           <div v-if="pending.offsets.length > 1" class="flex flex-wrap items-center gap-2">

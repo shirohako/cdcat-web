@@ -18,9 +18,9 @@ import { ChevronDown, ChevronUp } from '@lucide/vue'
 /** An artist's 简介 on their page, folded when it runs long. */
 const props = defineProps<{ text: string }>()
 
-/** max-h-90: fifteen 24px lines. Up to two lines more still show whole, as folding would hide next to nothing. */
-const COLLAPSED_HEIGHT = 360
-const SLACK = 48
+/** max-h-90 (22.5rem): fifteen lines. Up to two lines more (3rem) still show whole, as folding would hide next to nothing. */
+const COLLAPSED_REM = 22.5
+const SLACK_REM = 3
 const body = ref<HTMLElement | null>(null)
 const measured = ref(false)
 const folds = ref(false)
@@ -29,7 +29,7 @@ let observer: ResizeObserver | null = null
 onMounted(() => {
   if (!body.value) return
   observer = new ResizeObserver(() => {
-    folds.value = (body.value?.offsetHeight ?? 0) > COLLAPSED_HEIGHT + SLACK
+    folds.value = (body.value?.offsetHeight ?? 0) > remToPx(COLLAPSED_REM + SLACK_REM)
     measured.value = true
   })
   observer.observe(body.value)

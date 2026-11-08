@@ -489,7 +489,7 @@ onBeforeUnmount(() => {
 
 .td-legend .td-sticker.is-on { transform: rotate(var(--td-turn)); }
 
-@media (max-width: 639px) {
+@media (width < 40rem) {
   .td-placed,
   .td-leaders.td-stickers { display: none; }
   .td-legend { display: flex; }

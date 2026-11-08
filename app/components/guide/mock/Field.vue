@@ -17,7 +17,7 @@ withDefaults(defineProps<{
 
 <template>
   <div class="min-w-0">
-    <span v-if="label || n" class="mb-1 flex items-center gap-1.5 text-[11px] font-medium text-body">
+    <span v-if="label || n" class="mb-1 flex items-center gap-1.5 text-11 font-medium text-body">
       <GuideMockMarker v-if="n" :n="n" />
       <span class="truncate">{{ label }}</span>
       <EditorRequiredTag v-if="required" class="ml-0!" />

@@ -29,7 +29,7 @@
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
     <p v-else-if="note" class="text-xs text-meta">{{ note }}</p>
-    <p class="text-[11px] leading-snug text-meta">{{ texts.rules }}<template v-if="pasteOnPage"> {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</template></p>
+    <p class="text-11 leading-snug text-meta">{{ texts.rules }}<template v-if="pasteOnPage"> {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</template></p>
     <EditorImageImportDialog v-if="purpose !== 'profile'" v-model="showUrl" :busy="busy" :error="message" :description="texts.rules" @import="fromUrl" />
     <EditorImageCropDialog v-if="variant !== 'banner'" :file="cropFile" :hint="texts.cropHint" :round="variant === 'avatar'" :min-size="minSize" :tolerance="limits.tolerance" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>

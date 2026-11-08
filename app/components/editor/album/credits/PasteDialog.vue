@@ -269,7 +269,7 @@ const apply = () => {
 
       <div v-if="rows.length" class="max-h-80 overflow-auto rounded-lg border border-line">
         <table class="w-full min-w-[34rem] border-separate border-spacing-0 text-xs">
-          <thead class="sticky top-0 z-10 bg-sunken text-[11px] text-meta">
+          <thead class="sticky top-0 z-10 bg-sunken text-11 text-meta">
             <tr>
               <th class="px-3 py-1.5 text-left font-semibold">{{ t('editor.paste_credits.col_role') }}</th>
               <th class="px-3 py-1.5 text-left font-semibold">{{ t('editor.paste_credits.col_who') }}</th>
@@ -281,17 +281,17 @@ const apply = () => {
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span v-if="!row.unknown.length && !picks[row.key]?.roles" class="block font-medium text-title">{{ row.roles.map(roleName).join(separator) }}<span v-if="labelOf(row)" class="ml-1 font-normal text-primary">· {{ labelOf(row) }}</span></span>
                 <EditorAlbumCreditsRoles v-else :model-value="row.roles" :invalid="!row.roles.length" @update:model-value="setRoles(row, $event)" />
-                <span class="block text-[10px] text-faint">{{ row.roleText }}</span>
-                <span v-if="row.unknown.length" class="block text-[10px] text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>
+                <span class="block text-10 text-faint">{{ row.roleText }}</span>
+                <span v-if="row.unknown.length" class="block text-10 text-warning">{{ t('editor.paste_credits.unknown_roles', { words: row.unknown.join(separator) }) }}</span>
               </td>
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="flex flex-wrap items-center gap-2">
                   <span class="min-w-0">
                     <span class="block truncate font-medium text-title">{{ row.name }}<span v-if="hostName(row)" class="ml-1 font-normal text-meta">↳ {{ hostName(row) }}</span></span>
-                    <span v-if="row.character" class="block truncate text-[10px] text-meta">{{ printedOf(row) }}</span>
-                    <span v-if="row.detail" class="block truncate text-[10px] text-meta">{{ row.detail }}</span>
+                    <span v-if="row.character" class="block truncate text-10 text-meta">{{ printedOf(row) }}</span>
+                    <span v-if="row.detail" class="block truncate text-10 text-meta">{{ row.detail }}</span>
                   </span>
-                  <span v-if="!row.matched" class="ml-auto text-[11px] text-meta">{{ t('editor.paste_credits.unmatched') }}</span>
+                  <span v-if="!row.matched" class="ml-auto text-11 text-meta">{{ t('editor.paste_credits.unmatched') }}</span>
                   <UiSelect
                     v-else
                     :model-value="row.choice"
@@ -306,14 +306,14 @@ const apply = () => {
               </td>
               <td class="border-t border-line px-3 py-1.5 align-middle">
                 <span class="text-body">{{ tracksText(row) }}</span>
-                <span v-if="row.missing.length" class="block text-[10px] text-warning">{{ t('editor.paste_credits.missing_tracks', { tracks: row.missing.join(', ') }) }}</span>
+                <span v-if="row.missing.length" class="block text-10 text-warning">{{ t('editor.paste_credits.missing_tracks', { tracks: row.missing.join(', ') }) }}</span>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <p v-else-if="text.trim()" class="rounded-lg bg-sunken px-3 py-2 text-xs text-meta">{{ t('editor.paste_credits.nothing') }}</p>
-      <p v-if="parsed.skipped.length" class="text-[11px] text-meta">{{ t('editor.paste_credits.skipped', { lines: parsed.skipped.join(', ') }) }}</p>
+      <p v-if="parsed.skipped.length" class="text-11 text-meta">{{ t('editor.paste_credits.skipped', { lines: parsed.skipped.join(', ') }) }}</p>
     </div>
     <template #footer>
       <span class="mr-auto text-xs" :class="lookupFailed ? 'text-danger' : 'text-meta'">{{ status }}</span>

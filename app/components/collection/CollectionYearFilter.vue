@@ -65,7 +65,7 @@ const choose = (year: number | null, close?: () => void) => {
 
     <template #default="{ close }">
       <section v-for="group in decades" :key="group.decade" class="not-first:mt-1.5">
-        <h3 class="px-1.5 pb-1 pt-1 text-[11px] font-semibold tabular-nums text-faint">{{ t('year_filter.decade', { decade: group.decade }) }}</h3>
+        <h3 class="px-1.5 pb-1 pt-1 text-11 font-semibold tabular-nums text-faint">{{ t('year_filter.decade', { decade: group.decade }) }}</h3>
         <div class="grid grid-cols-5 gap-1">
           <button
             v-for="entry in group.years"

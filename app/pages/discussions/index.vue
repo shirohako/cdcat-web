@@ -16,7 +16,7 @@ usePageSeo({ title: () => t('discussions.title'), description: () => t('discussi
         <div class="flex min-w-0 items-center gap-3.5">
           <HeaderArtDiscussions />
           <div class="min-w-0">
-            <h1 class="text-2xl font-bold tracking-tight text-title sm:text-[28px]">{{ t('discussions.title') }}</h1>
+            <h1 class="text-2xl font-bold tracking-tight text-title sm:text-[1.75rem]">{{ t('discussions.title') }}</h1>
             <p class="mt-1 text-sm text-meta">{{ t('discussions.description') }}</p>
           </div>
         </div>

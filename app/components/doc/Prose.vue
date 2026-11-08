@@ -28,8 +28,8 @@ defineProps<{ content: string }>()
   border: 1px solid var(--line);
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
   line-height: 1.65;
 }
 
@@ -42,17 +42,17 @@ defineProps<{ content: string }>()
   padding-block: 0.5rem;
   background: var(--sunken);
   color: var(--meta);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
 }
 
 /* The header's tint stays inside the frame's rounded corners. */
 .prose-host :deep(th:first-child) {
-  border-top-left-radius: 5px;
+  border-top-left-radius: 0.3125rem;
 }
 
 .prose-host :deep(th:last-child) {
-  border-top-right-radius: 5px;
+  border-top-right-radius: 0.3125rem;
 }
 
 .prose-host :deep(td) {
@@ -101,7 +101,7 @@ defineProps<{ content: string }>()
     content: attr(data-label);
     display: block;
     color: var(--meta);
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
   }
 }

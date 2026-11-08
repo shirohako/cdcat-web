@@ -75,7 +75,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
         :class="status === tab.value ? 'border-primary font-semibold text-primary' : 'border-transparent text-meta hover:text-title'"
         @click="selectTab(tab.value)">
         {{ tab.value ? t(`article_ui.statuses.${tab.value}`) : t('article_ui.mine.all') }}
-        <span v-if="data" class="rounded-full bg-btn px-1.5 text-[11px] tabular-nums text-btn-content">{{ tab.count }}</span>
+        <span v-if="data" class="rounded-full bg-btn px-1.5 text-11 tabular-nums text-btn-content">{{ tab.count }}</span>
       </button>
     </nav>
 
@@ -97,7 +97,7 @@ useHead({ title: computed(() => t('article_ui.mine.title')) })
           <div class="flex flex-wrap items-center gap-2">
             <ArticleStatusBadge :status="article.status" />
             <span v-if="article.type" class="text-xs text-meta">{{ typeName(article.type) }}</span>
-            <span v-if="article.featured" class="rounded bg-primary/15 px-1.5 text-[11px] text-primary">{{ t('article_ui.featured') }}</span>
+            <span v-if="article.featured" class="rounded bg-primary/15 px-1.5 text-11 text-primary">{{ t('article_ui.featured') }}</span>
           </div>
           <NuxtLink :to="`/articles/${article.id}/edit`" class="mt-1 block truncate font-medium text-title transition-colors duration-150 ease-out hover:text-primary">
             {{ article.title || t('article_ui.untitled') }}

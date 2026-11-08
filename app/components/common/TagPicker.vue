@@ -60,7 +60,7 @@ const onEnter = () => {
         :class="isNewTag(tag) ? 'bg-success/10 text-success ring-success/30' : 'bg-primary/10 text-primary ring-primary/30'">
         <Lock v-if="tag.is_staff_only" :size="10" />
         {{ tagName(tag) }}
-        <span v-if="isNewTag(tag)" class="rounded-full bg-success/15 px-1 text-[10px] font-bold">{{ t('article_ui.tags.new') }}</span>
+        <span v-if="isNewTag(tag)" class="rounded-full bg-success/15 px-1 text-10 font-bold">{{ t('article_ui.tags.new') }}</span>
         <button
           type="button" class="grid size-4 place-items-center rounded-full transition-colors hover:bg-current/15 disabled:opacity-40" :disabled="disabled"
           :aria-label="t('article_ui.tags.remove', { name: tagName(tag) })" @click="remove(tag)">
@@ -92,7 +92,7 @@ const onEnter = () => {
           {{ tooLong ? t('article_ui.tags.errors.too_long', { max: TAG_NAME_MAX }) : alreadyPicked ? t('article_ui.tags.picked') : staffOnly ? t('article_ui.tags.errors.staff') : tags.length || typed ? t('article_ui.tags.no_match') : t('article_ui.tags.empty') }}
         </p>
       </div>
-      <p v-if="!full" class="text-[11px] text-faint">{{ t('article_ui.tags.create_hint', { max: TAG_NAME_MAX }) }}</p>
+      <p v-if="!full" class="text-11 text-faint">{{ t('article_ui.tags.create_hint', { max: TAG_NAME_MAX }) }}</p>
     </template>
   </div>
 </template>

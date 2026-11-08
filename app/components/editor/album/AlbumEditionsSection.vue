@@ -70,7 +70,7 @@
               <div>
                 <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.release_date') }}<EditorHelp id="edition.release_date" /></span>
                 <EditorDateInput v-model:date="form.release_date" v-model:precision="form.release_date_precision" v-model:rejected="rejectedDate" />
-                <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
+                <span class="mt-1 block text-11 text-meta">{{ $t('editor.dialog.edition_date_hint') }}</span>
               </div>
               <label class="block">
                 <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.region') }}<EditorHelp id="edition.region" /></span>

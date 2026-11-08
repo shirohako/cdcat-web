@@ -28,7 +28,7 @@ defineProps<{ label?: string, lit?: boolean, vertical?: boolean, dashed?: boolea
     />
     <span
       v-if="label"
-      class="relative max-w-full rounded-sm bg-sunken px-1 text-center text-[10px] leading-[0.875rem] transition-colors duration-200 ease-out"
+      class="relative max-w-full rounded-sm bg-sunken px-1 text-center text-10 leading-[0.875rem] transition-colors duration-200 ease-out"
       :class="lit ? 'text-title' : 'text-meta'"
     >{{ label }}</span>
   </div>

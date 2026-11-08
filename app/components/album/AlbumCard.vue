@@ -37,9 +37,9 @@
          card nearer square -->
     <div class="flex flex-col gap-1 px-1.5 pb-1.5 pt-2">
       <!-- Cut off, the title and the byline show in full in a tooltip -->
-      <UiTruncate :text="album.title" tag="h3" class="text-[13px] leading-5 font-bold text-title transition-colors group-hover:text-primary" />
+      <UiTruncate :text="album.title" tag="h3" class="text-13 leading-5 font-bold text-title transition-colors group-hover:text-primary" />
       <!-- No byline: the line stays empty, so the cards of a row keep one height -->
-      <div class="flex h-4 min-w-0 items-center gap-1.5 text-[11px] text-meta">
+      <div class="flex h-4 min-w-0 items-center gap-1.5 text-11 text-meta">
         <template v-if="bylineNames.length">
           <UserRound :size="11" class="shrink-0" />
           <!-- Several 艺术家 don't fit: Various Artists, with all of them in the tooltip -->
@@ -49,7 +49,7 @@
           <UiTruncate v-else :text="allArtists" class="min-w-0" />
         </template>
       </div>
-      <div class="mt-1 flex items-center justify-between gap-2 border-t border-line pt-2 text-[11px] tabular-nums text-meta">
+      <div class="mt-1 flex items-center justify-between gap-2 border-t border-line pt-2 text-11 tabular-nums text-meta">
         <span class="inline-flex min-w-0 items-center gap-1" :class="{ 'text-faint': !album.release_date }">
           <Calendar :size="11" class="shrink-0" />
           <span class="truncate">{{ shortDate || '—' }}</span>
@@ -76,7 +76,7 @@ const props = defineProps<{
 const { t, te, locale } = useI18n()
 
 /** The three labels on the cover (type, views, likes) share one look. */
-const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-[3px] text-[10px] font-medium leading-none text-on-media backdrop-blur-sm'
+const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-0.75 text-10 font-medium leading-none text-on-media backdrop-blur-sm'
 
 const typeLabel = computed(() => te(`albums.type.${props.album.type}`) ? t(`albums.type.${props.album.type}`) : props.album.type)
 /**

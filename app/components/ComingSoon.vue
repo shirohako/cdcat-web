@@ -13,7 +13,7 @@
         {{ titleText }}
       </h2>
 
-      <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600 md:text-[15px]">
+      <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600 md:text-15">
         {{ descriptionText }}
       </p>
 

@@ -24,8 +24,8 @@ const emit = defineEmits<{ hover: [id: string] }>()
         <Icon :name="icon" :class="central ? 'size-5' : 'size-4'" />
       </span>
       <span class="min-w-0">
-        <span class="block font-semibold text-title" :class="central ? 'text-[15px]' : 'text-[13px]'">{{ name }}</span>
-        <span class="mt-0.5 block text-[11px] leading-4 text-meta">{{ desc }}</span>
+        <span class="block font-semibold text-title" :class="central ? 'text-15' : 'text-13'">{{ name }}</span>
+        <span class="mt-0.5 block text-11 leading-4 text-meta">{{ desc }}</span>
       </span>
     </a>
     <slot />

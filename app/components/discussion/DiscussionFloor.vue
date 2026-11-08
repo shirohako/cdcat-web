@@ -116,9 +116,9 @@ function quote() {
         <header class="flex flex-wrap items-center gap-x-2 gap-y-1">
           <NuxtLink :to="`/profile/${post.user.username}`" class="font-semibold text-title transition-colors duration-150 ease-out hover:text-primary">{{ post.user.nickname || post.user.username }}</NuxtLink>
           <span class="text-xs text-meta">@{{ post.user.username }}</span>
-          <span v-if="post.user.is_op" class="rounded-md bg-sky-50 px-1.5 py-0.5 text-[11px] font-semibold text-sky-700 dark:bg-sky-400/15 dark:text-sky-300">{{ t('discussions.post.op') }}</span>
-          <span v-if="post.user.is_moderator" class="rounded-md bg-indigo-50 px-1.5 py-0.5 text-[11px] font-semibold text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">{{ t('discussions.post.moderator') }}</span>
-          <span v-if="accepted" class="inline-flex items-center gap-1 rounded-md bg-success/15 px-1.5 py-0.5 text-[11px] font-semibold text-success"><CheckCircle2 :size="12" />{{ t('discussions.answer.badge') }}</span>
+          <span v-if="post.user.is_op" class="rounded-md bg-sky-50 px-1.5 py-0.5 text-11 font-semibold text-sky-700 dark:bg-sky-400/15 dark:text-sky-300">{{ t('discussions.post.op') }}</span>
+          <span v-if="post.user.is_moderator" class="rounded-md bg-indigo-50 px-1.5 py-0.5 text-11 font-semibold text-indigo-700 dark:bg-indigo-400/15 dark:text-indigo-300">{{ t('discussions.post.moderator') }}</span>
+          <span v-if="accepted" class="inline-flex items-center gap-1 rounded-md bg-success/15 px-1.5 py-0.5 text-11 font-semibold text-success"><CheckCircle2 :size="12" />{{ t('discussions.answer.badge') }}</span>
           <span class="ml-auto flex items-center gap-2 text-xs text-meta">
             <NuxtLink :to="`/discussions/${post.topic_id}?post=${post.id}`" class="font-semibold tabular-nums transition-colors duration-150 ease-out hover:text-primary">#{{ post.floor }}</NuxtLink>
             <time :datetime="post.created_at ?? undefined" :title="exact(post.created_at)">{{ ago(post.created_at) }}</time>

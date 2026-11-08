@@ -20,7 +20,7 @@ const { user } = useAuth()
       <UiAvatar :src="user.avatar_url" :name="user.nickname" />
       <div class="min-w-0">
         <p class="truncate font-bold text-title">{{ user.nickname }}</p>
-        <p class="truncate text-[13px] text-meta">@{{ user.username }}</p>
+        <p class="truncate text-13 text-meta">@{{ user.username }}</p>
       </div>
     </div>
     <div class="flex flex-wrap gap-2.5">

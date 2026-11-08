@@ -20,7 +20,7 @@
             <span class="flex items-center gap-1.5 text-sm font-semibold" :class="group === key ? TITLE_GROUPS[key].text : 'text-title'">
               <component :is="TITLE_GROUPS[key].icon" :size="14" class="shrink-0" />{{ $t(`editor.names.${key}`) }}
             </span>
-            <span class="text-[11px] leading-4 text-meta">{{ $t(`editor.names.${key}_hint`) }}</span>
+            <span class="text-11 leading-4 text-meta">{{ $t(`editor.names.${key}_hint`) }}</span>
           </button>
         </div>
       </fieldset>
@@ -29,7 +29,7 @@
         <span class="mb-1.5 block text-sm font-medium text-body">{{ $t('catalog.field.locale') }}</span>
         <UiLanguageSelect v-model="locale" :readings="group !== 'official'" :aria-label="$t('catalog.field.locale')" size="sm" class="w-60" />
         <span v-if="problem" class="mt-1 block text-xs text-danger">{{ problem }}</span>
-        <span v-else-if="kind === 'transliteration'" class="mt-1 block text-[11px] text-meta">{{ $t('editor.names.reading_note') }}</span>
+        <span v-else-if="kind === 'transliteration'" class="mt-1 block text-11 text-meta">{{ $t('editor.names.reading_note') }}</span>
       </div>
 
       <details class="group rounded-xl border border-warning/25 bg-warning/10 px-3.5 py-2.5 text-xs text-body">

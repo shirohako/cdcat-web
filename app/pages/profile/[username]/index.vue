@@ -81,7 +81,7 @@ definePageMeta({
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(1rem);
   }
   to {
     opacity: 1;

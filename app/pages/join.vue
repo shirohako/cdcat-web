@@ -33,7 +33,7 @@
           <div class="photo mt-2 grid aspect-square place-items-center rounded-xl ring-1 ring-line">
             <span class="text-4xl font-black text-faint">?</span>
           </div>
-          <span class="mt-1 font-mono text-[11px] font-semibold tracking-[0.12em] text-meta">{{ content.badge.role }}</span>
+          <span class="mt-1 font-mono text-11 font-semibold tracking-[0.12em] text-meta">{{ content.badge.role }}</span>
           <span class="text-xl font-bold text-title">{{ content.badge.name }}</span>
         </div>
       </div>
@@ -71,16 +71,16 @@
     <section class="admin-pass grid grid-cols-[3rem_minmax(0,1fr)] overflow-hidden rounded-2xl md:grid-cols-[4.5rem_minmax(0,1fr)_auto]" data-reveal>
       <div class="foil relative flex flex-col items-center gap-4 py-4 md:py-5" aria-hidden="true">
         <span class="size-4 rounded-full bg-page shadow-[inset_0_1px_2px_rgb(0_0_0/0.3)] md:size-4.5" />
-        <span class="font-mono text-[11px] font-semibold tracking-[0.32em] [writing-mode:vertical-rl] md:text-xs">{{ content.admin.pass }}</span>
+        <span class="font-mono text-11 font-semibold tracking-[0.32em] [writing-mode:vertical-rl] md:text-xs">{{ content.admin.pass }}</span>
       </div>
       <div class="flex min-w-0 flex-col justify-center gap-3.5 p-5 md:px-7 md:py-6.5">
-        <p class="font-mono text-[11px] font-semibold tracking-[0.16em] opacity-60">{{ content.admin.eyebrow }}</p>
+        <p class="font-mono text-11 font-semibold tracking-[0.16em] opacity-60">{{ content.admin.eyebrow }}</p>
         <h2 class="flex flex-wrap items-center gap-3 text-[1.75rem] font-black leading-tight tracking-wide md:text-3xl">
           {{ content.admin.name }}
           <span class="inline-flex h-6.5 items-center rounded-full bg-white/14 px-2.5 text-xs font-medium tracking-normal">{{ content.admin.tag }}</span>
         </h2>
         <ul class="grid gap-2">
-          <li v-for="requirement in content.admin.requirements" :key="requirement" class="flex items-center gap-2.5 text-[15px]">
+          <li v-for="requirement in content.admin.requirements" :key="requirement" class="flex items-center gap-2.5 text-15">
             <span class="grid size-5.5 shrink-0 place-items-center rounded-full bg-white/14">
               <Icon name="lucide:check" class="size-3.5" />
             </span>
@@ -218,7 +218,7 @@ usePageSeo({
 
 .pass-back {
   rotate: 5deg;
-  translate: 12px -6px;
+  translate: 0.75rem -0.375rem;
   transition: rotate 500ms cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 

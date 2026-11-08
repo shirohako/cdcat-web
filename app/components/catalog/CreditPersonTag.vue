@@ -29,16 +29,16 @@ const parts = computed(() => {
 const whole = computed(() => props.artistId !== null && !parts.value && !props.detail)
 
 const SIZES = {
-  xs: { tag: 'h-5 text-xs leading-5', patch: 'h-[18px] leading-[18px] rounded-[5px]' },
-  sm: { tag: 'h-6 text-sm font-semibold leading-6', patch: 'h-[22px] leading-[22px] rounded-[5px]' },
+  xs: { tag: 'h-5 text-xs leading-5', patch: 'h-4.5 leading-4.5 rounded-[0.3125rem]' },
+  sm: { tag: 'h-6 text-sm font-semibold leading-6', patch: 'h-5.5 leading-5.5 rounded-[0.3125rem]' },
 }
 /**
  * A name inside a tag that holds more: 5px wider than the text on each side and 1px in from the tag's edges (such a
  * tag has 1px padding, not 6px, so the text stays where a plain tag has it).
  */
 const patch = computed(() => [
-  'inline-block pl-[5px] transition-colors duration-150 hover:bg-black/[0.08] hover:text-primary dark:hover:bg-white/[0.12]',
-  linkEnds.value ? 'pr-[3px]' : 'pr-[5px]',
+  'inline-block pl-1.25 transition-colors duration-150 hover:bg-black/[0.08] hover:text-primary dark:hover:bg-white/[0.12]',
+  linkEnds.value ? 'pr-0.75' : 'pr-1.25',
   SIZES[props.size].patch,
 ])
 /**
@@ -48,11 +48,11 @@ const patch = computed(() => [
 const linkEnds = computed(() => Boolean(props.detail) && props.artistId !== null && !parts.value?.[2])
 const notePull = computed(() => {
   if (props.artistId === null) return '-mr-0.5'
-  return linkEnds.value ? 'ml-px pr-[3px]' : '-ml-px pr-[3px]'
+  return linkEnds.value ? 'ml-px pr-0.75' : '-ml-px pr-0.75'
 })
 const namePad = computed(() => {
   if (props.artistId === null) return ''
-  return parts.value ? [parts.value[0] && 'pl-[5px]', parts.value[2] && 'pr-[5px]'] : ''
+  return parts.value ? [parts.value[0] && 'pl-1.25', parts.value[2] && 'pr-1.25'] : ''
 })
 </script>
 

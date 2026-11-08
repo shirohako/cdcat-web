@@ -96,7 +96,7 @@ function pick(event: MouseEvent, id: string) {
                 :aria-current="child.id === activeItem ? 'location' : undefined"
                 @click="pick($event, child.id)"
               >
-                <span v-if="child.method" class="shrink-0 text-[9.5px] text-faint">{{ child.method }}</span>
+                <span v-if="child.method" class="shrink-0 text-9.5 text-faint">{{ child.method }}</span>
                 <span class="min-w-0 break-all">{{ child.label }}</span>
               </a>
             </li>

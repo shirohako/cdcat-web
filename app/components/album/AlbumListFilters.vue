@@ -47,7 +47,7 @@ const moreOpen = ref(false)
 const morePanelId = useId()
 
 // The bar's chips: the chosen one in the theme colour, the rest plain grey (the quiet button colour in the dark theme).
-const CHIP = 'inline-flex h-7.5 shrink-0 items-center rounded-md px-3 text-[13px] font-medium whitespace-nowrap ring-1 ring-inset transition-colors duration-150 ease-out'
+const CHIP = 'inline-flex h-7.5 shrink-0 items-center rounded-md px-3 text-13 font-medium whitespace-nowrap ring-1 ring-inset transition-colors duration-150 ease-out'
 const ON = 'bg-primary text-on-primary ring-primary'
 const OFF = 'bg-black/5 text-body ring-transparent hover:bg-black/10 dark:bg-btn dark:text-btn-content dark:hover:bg-btn-hover'
 const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 pr-1.5 text-xs font-medium text-body transition-colors hover:bg-black/10 dark:bg-btn dark:hover:bg-btn-hover'
@@ -109,7 +109,7 @@ const TAG = 'inline-flex h-6.5 items-center gap-1 rounded-md bg-black/5 pl-2.5 p
         @click="moreOpen = !moreOpen"
       >
         {{ t('albums.more_filters') }}
-        <span v-if="hiddenOn" class="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-primary px-1 text-[11px] font-semibold tabular-nums text-on-primary">{{ hiddenOn }}</span>
+        <span v-if="hiddenOn" class="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-primary px-1 text-11 font-semibold tabular-nums text-on-primary">{{ hiddenOn }}</span>
         <Icon name="lucide:chevron-down" class="size-3 opacity-60 transition-transform duration-200 ease-out" :class="moreOpen ? 'rotate-180' : ''" />
       </UiButton>
 

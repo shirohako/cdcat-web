@@ -81,7 +81,8 @@ const arrowStyle = computed(() => {
   return {
     left: arrowAt.x === undefined ? undefined : `${arrowAt.x}px`,
     top: arrowAt.y === undefined ? undefined : `${arrowAt.y}px`,
-    [ARROW_SIDE[side]]: '-5px',
+    // Half the arrow's size-2.5
+    [ARROW_SIDE[side]]: '-0.3125rem',
     clipPath: ARROW_CLIP[side],
   }
 })
@@ -320,7 +321,7 @@ onBeforeUnmount(hide)
         v-bind="$attrs"
         class="pointer-events-none fixed left-0 top-0 z-[90] bg-popover/85 shadow-lg backdrop-blur-sm [html[data-theme=dark]_&]:bg-black/65 [html[data-theme=dark]_&]:backdrop-blur-[4px] [html[data-theme=dark]_&]:ring-1 [html[data-theme=dark]_&]:ring-line"
         :class="[rich
-          ? 'max-w-[min(22rem,calc(100vw-1rem))] rounded-[10px] p-3 text-sm text-body'
+          ? 'max-w-[min(22rem,calc(100vw-1rem))] rounded-[0.625rem] p-3 text-sm text-body'
           : 'max-w-60 rounded-md px-2.5 py-1.5 text-xs font-medium leading-4 text-title',
         moving && 'transition-[translate] duration-200 ease-out motion-reduce:transition-none']"
         :style="{
@@ -331,7 +332,7 @@ onBeforeUnmount(hide)
         @transitionend.self="event => event.propertyName === 'translate' && (moving = false)"
       >
         <!-- Behind the text, though in front of the bubble's own background: it is the same colour. -->
-        <span ref="pointer" aria-hidden="true" class="absolute -z-10 size-2.5 rotate-45 rounded-[2px] bg-inherit" :style="arrowStyle" />
+        <span ref="pointer" aria-hidden="true" class="absolute -z-10 size-2.5 rotate-45 rounded-xs bg-inherit" :style="arrowStyle" />
         <slot name="content">{{ text }}</slot>
       </div>
     </Transition>

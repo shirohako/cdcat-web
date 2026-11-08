@@ -19,11 +19,11 @@
             >
               <p class="flex items-center gap-2 text-sm">
                 <span class="font-mono font-semibold text-title">v{{ version.version }}</span>
-                <span class="rounded px-1.5 py-0.5 text-[10px] font-semibold" :class="causeStyle(version.cause)">{{ enumLabel('version_cause', version.cause) }}</span>
+                <span class="rounded px-1.5 py-0.5 text-10 font-semibold" :class="causeStyle(version.cause)">{{ enumLabel('version_cause', version.cause) }}</span>
                 <span v-if="version.is_deleted" class="badge badge-error badge-xs">{{ $t('versions.deleted') }}</span>
               </p>
               <p class="mt-0.5 truncate text-xs text-meta">{{ version.reason || summaryText(version) }}</p>
-              <p class="mt-0.5 text-[11px] text-faint">
+              <p class="mt-0.5 text-11 text-faint">
                 {{ version.actor ? (version.actor.nickname || version.actor.username) : $t('versions.system') }} · {{ ago(version.created_at) }}
               </p>
             </button>

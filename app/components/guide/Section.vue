@@ -102,7 +102,7 @@ async function copyLink() {
       >
         {{ sectionNumber(index) }}
       </span>
-      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[22px]">{{ section.title }}</h2>
+      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[1.375rem]">{{ section.title }}</h2>
       <UiButton
         icon="lucide:link"
         :label="t('legal.copy_link')"
@@ -112,7 +112,7 @@ async function copyLink() {
       />
     </header>
 
-    <p class="mt-3 text-[15px] leading-7 text-body md:pl-12">{{ section.lead }}</p>
+    <p class="mt-3 text-15 leading-7 text-body md:pl-12">{{ section.lead }}</p>
 
     <figure v-if="section.figure" class="figure mt-5 overflow-hidden rounded-md bg-sunken p-3 ring-1 ring-line sm:p-5">
       <component :is="FIGURES[section.figure.name]" :text="section.figure.text ?? {}" />

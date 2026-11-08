@@ -111,8 +111,8 @@ const place = () => {
         padding: 8,
         apply({ rects, availableHeight }) {
           Object.assign(floating.style, {
-            minWidth: `${Math.max(rects.reference.width, props.searchable ? 256 : 0)}px`,
-            maxHeight: `${Math.max(120, Math.min(availableHeight, 320))}px`,
+            minWidth: `${Math.max(rects.reference.width, props.searchable ? remToPx(16) : 0)}px`,
+            maxHeight: `${Math.max(remToPx(7.5), Math.min(availableHeight, remToPx(20)))}px`,
           })
         },
       }),
@@ -302,7 +302,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
         >
           <li v-if="!rows.length" role="presentation" class="px-3 py-2 text-sm text-faint">{{ $t('common.no_matches') }}</li>
           <template v-for="row in rows" :key="row.index">
-            <li v-if="row.heading" role="presentation" class="px-3 pb-1 pt-2.5 text-[11px] font-semibold tracking-wide text-faint">
+            <li v-if="row.heading" role="presentation" class="px-3 pb-1 pt-2.5 text-11 font-semibold tracking-wide text-faint">
               {{ row.heading }}
             </li>
             <li
@@ -323,7 +323,7 @@ const setTrigger = (element: Element | ComponentPublicInstance | null) => {
             >
               <UiIcon v-if="row.option.icon" :icon="row.option.icon" class="size-4 shrink-0" />
               <span class="min-w-0 flex-1 truncate">{{ row.option.label }}</span>
-              <span v-if="row.option.hint" class="shrink-0 font-mono text-[11px] text-faint">{{ row.option.hint }}</span>
+              <span v-if="row.option.hint" class="shrink-0 font-mono text-11 text-faint">{{ row.option.hint }}</span>
               <Icon v-if="row.index === selectedIndex" name="lucide:check" class="size-4 shrink-0" />
             </li>
           </template>

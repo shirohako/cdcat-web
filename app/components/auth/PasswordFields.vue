@@ -85,7 +85,7 @@ const warningIcon = (warning: PasswordWarning) => (warning === 'common' ? 'lucid
               :aria-pressed="visible"
               @click="visible = !visible"
             >
-              <UiIcon :icon="visible ? 'lucide:eye-off' : 'lucide:eye'" class="size-[18px]" />
+              <UiIcon :icon="visible ? 'lucide:eye-off' : 'lucide:eye'" class="size-4.5" />
             </button>
           </div>
         </template>
@@ -103,18 +103,18 @@ const warningIcon = (warning: PasswordWarning) => (warning === 'common' ? 'lucid
           <span>{{ t('auth.password.strength') }}<b v-if="password" :class="{ danger: 'text-danger', warning: 'text-warning', success: 'text-success' }[tone]">{{ t(`auth.password.levels.${check.score}`) }}</b></span>
           <span class="tabular-nums">{{ t('auth.password.length', { n: password.length }) }}</span>
         </p>
-        <ul v-if="password" class="flex flex-col gap-1 text-[13px]" aria-live="polite">
+        <ul v-if="password" class="flex flex-col gap-1 text-13" aria-live="polite">
           <li v-for="warning in check.warnings" :key="warning" class="flex items-center gap-2" :class="warning === 'common' ? 'text-danger' : 'text-warning'">
-            <UiIcon :icon="warningIcon(warning)" class="size-[15px] shrink-0" />{{ t(`auth.password.warnings.${warning}`) }}
+            <UiIcon :icon="warningIcon(warning)" class="size-3.75 shrink-0" />{{ t(`auth.password.warnings.${warning}`) }}
           </li>
           <li class="flex items-center gap-2" :class="check.longEnough ? 'text-meta' : 'text-danger'">
-            <UiIcon :icon="check.longEnough ? 'lucide:check' : 'lucide:x'" class="size-[15px] shrink-0" :class="{ 'text-success': check.longEnough }" />{{ t('auth.password.min_length', { n: MIN_PASSWORD_LENGTH }) }}
+            <UiIcon :icon="check.longEnough ? 'lucide:check' : 'lucide:x'" class="size-3.75 shrink-0" :class="{ 'text-success': check.longEnough }" />{{ t('auth.password.min_length', { n: MIN_PASSWORD_LENGTH }) }}
           </li>
           <li v-if="common?.size && !check.warnings.includes('common')" class="flex items-center gap-2 text-meta">
-            <UiIcon icon="lucide:check" class="size-[15px] shrink-0 text-success" />{{ t('auth.password.not_common') }}
+            <UiIcon icon="lucide:check" class="size-3.75 shrink-0 text-success" />{{ t('auth.password.not_common') }}
           </li>
           <li v-if="(nickname || birthday) && !personal" class="flex items-center gap-2 text-meta">
-            <UiIcon icon="lucide:check" class="size-[15px] shrink-0 text-success" />{{ t('auth.password.not_personal') }}
+            <UiIcon icon="lucide:check" class="size-3.75 shrink-0 text-success" />{{ t('auth.password.not_personal') }}
           </li>
         </ul>
       </div>
@@ -139,7 +139,7 @@ const warningIcon = (warning: PasswordWarning) => (warning === 'common' ? 'lucid
             :aria-describedby="describedBy"
           />
           <span v-if="matched" class="absolute right-3 top-1/2 -translate-y-1/2 text-success" :title="t('auth.password.match')">
-            <UiIcon icon="lucide:check" class="size-[18px]" />
+            <UiIcon icon="lucide:check" class="size-4.5" />
           </span>
         </div>
       </template>

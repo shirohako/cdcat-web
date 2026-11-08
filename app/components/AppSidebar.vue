@@ -34,7 +34,7 @@
               ]"
             >
               <Icon :name="item.icon" class="size-5 shrink-0" />
-              <span :class="['whitespace-nowrap font-semibold text-[15px]', FOLD.hidden[mode]]">
+              <span :class="['whitespace-nowrap font-semibold text-15', FOLD.hidden[mode]]">
                 {{ $t(item.i18nKey) }}
               </span>
             </NuxtLink>
@@ -78,16 +78,16 @@ defineProps<{
 
 /**
  * The folded and the open sidebar's classes, by mode. Folding applies from lg: below it the sidebar is the phone
- * drawer, always open. Written out in full so Tailwind finds every class; 'auto' uses lg:max-xl variants, so the
- * server-rendered sidebar is already folded or open as the width calls for, and the labels are hidden rather than
- * removed.
+ * drawer, always open. Written out in full so Tailwind finds every class; 'auto' uses the sidebar-folds variant
+ * (main.css: from lg to xl, wider at a larger text size), so the server-rendered sidebar is already folded or open as
+ * the width calls for, and the labels are hidden rather than removed.
  */
 const FOLD = {
-  aside: { auto: 'w-52 lg:max-xl:w-16', collapsed: 'w-52 lg:w-16', expanded: 'w-52' },
-  list: { auto: 'px-3 lg:max-xl:px-2', collapsed: 'px-3 lg:px-2', expanded: 'px-3' },
-  highlight: { auto: 'inset-x-3 lg:max-xl:inset-x-2', collapsed: 'inset-x-3 lg:inset-x-2', expanded: 'inset-x-3' },
-  link: { auto: 'gap-3 px-3.5 lg:max-xl:justify-center lg:max-xl:px-3', collapsed: 'gap-3 px-3.5 lg:justify-center lg:px-3', expanded: 'gap-3 px-3.5' },
-  hidden: { auto: 'lg:max-xl:hidden', collapsed: 'lg:hidden', expanded: '' },
+  aside: { auto: 'w-52 sidebar-folds:w-16', collapsed: 'w-52 lg:w-16', expanded: 'w-52' },
+  list: { auto: 'px-3 sidebar-folds:px-2', collapsed: 'px-3 lg:px-2', expanded: 'px-3' },
+  highlight: { auto: 'inset-x-3 sidebar-folds:inset-x-2', collapsed: 'inset-x-3 lg:inset-x-2', expanded: 'inset-x-3' },
+  link: { auto: 'gap-3 px-3.5 sidebar-folds:justify-center sidebar-folds:px-3', collapsed: 'gap-3 px-3.5 lg:justify-center lg:px-3', expanded: 'gap-3 px-3.5' },
+  hidden: { auto: 'sidebar-folds:hidden', collapsed: 'lg:hidden', expanded: '' },
 } satisfies Record<string, Record<SidebarMode, string>>
 
 const emit = defineEmits<{

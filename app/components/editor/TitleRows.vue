@@ -4,8 +4,8 @@
     <ul v-if="shown.length" class="space-y-1.5">
       <EditorListRow v-for="row in shown" :key="row.id" :invalid="!row.title.trim()" @edit="edit(row)" @remove="remove(row)">
         <span class="min-w-0 truncate text-sm font-medium text-title">{{ row.title || '—' }}</span>
-        <span class="shrink-0 rounded-md px-1.5 py-0.5 text-[11px]" :class="TITLE_GROUPS[titleGroupOf(row.kind)].chip">{{ enumLabel('title_kind', row.kind) }}</span>
-        <span v-if="row.locale" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content" :title="row.locale">{{ localeName(row.locale) }}</span>
+        <span class="shrink-0 rounded-md px-1.5 py-0.5 text-11" :class="TITLE_GROUPS[titleGroupOf(row.kind)].chip">{{ enumLabel('title_kind', row.kind) }}</span>
+        <span v-if="row.locale" class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-11 text-btn-content" :title="row.locale">{{ localeName(row.locale) }}</span>
       </EditorListRow>
     </ul>
     <EditorAddButton @click="edit(null)">{{ $t('editor.add_name') }}</EditorAddButton>
@@ -33,7 +33,7 @@
               <span class="flex items-center gap-1.5 text-sm font-semibold" :class="form.group === key ? group.text : 'text-title'">
                 <component :is="group.icon" :size="14" class="shrink-0" />{{ $t(`editor.names.${key}`) }}
               </span>
-              <span class="text-[11px] leading-4 text-meta">{{ $t(`editor.names.${key}_hint`) }}</span>
+              <span class="text-11 leading-4 text-meta">{{ $t(`editor.names.${key}_hint`) }}</span>
             </button>
           </div>
         </fieldset>
@@ -48,7 +48,7 @@
             <UiButton v-if="form.group === 'alias' && form.locale" icon="lucide:x" :label="$t('common.clear')" size="xs" @click="form.locale = ''" />
           </span>
           <span v-if="localeProblem" class="mt-1 block text-xs text-danger">{{ localeProblem }}</span>
-          <span v-else-if="kind === 'transliteration'" class="mt-1 block text-[11px] text-meta">{{ $t('editor.names.reading_note') }}</span>
+          <span v-else-if="kind === 'transliteration'" class="mt-1 block text-11 text-meta">{{ $t('editor.names.reading_note') }}</span>
         </div>
 
         <label v-if="form.group === 'alias'" class="flex items-center gap-2 text-sm text-body">

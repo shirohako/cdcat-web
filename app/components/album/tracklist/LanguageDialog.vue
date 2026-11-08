@@ -36,12 +36,12 @@ const pick = (key: string) => {
         type="button"
         role="radio"
         :aria-checked="option.key === language"
-        class="flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-[13.5px] text-title transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+        class="flex h-10 w-full items-center gap-2.5 rounded-md px-2.5 text-left text-13.5 text-title transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
         @click="pick(option.key)"
       >
         <span class="size-4 shrink-0 rounded-full transition-shadow duration-150" :class="option.key === language ? 'shadow-[inset_0_0_0_5px_var(--primary)]' : 'shadow-[inset_0_0_0_1.5px_var(--faint)]'" aria-hidden="true" />
         <span :class="option.key === language && 'font-semibold'">{{ option.name }}</span>
-        <span v-if="option.kind" class="text-[11px] text-meta">{{ option.kind }}</span>
+        <span v-if="option.kind" class="text-11 text-meta">{{ option.kind }}</span>
         <span v-if="option.meta" class="ml-auto text-xs tabular-nums text-meta">{{ option.meta }}</span>
       </button>
     </div>

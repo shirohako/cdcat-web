@@ -5,7 +5,7 @@ defineProps<{ label?: string, icon?: string, variant?: 'plain' | 'primary' | 'ad
 
 <template>
   <span
-    class="inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-[11px] font-semibold"
+    class="inline-flex h-7 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2.5 text-11 font-semibold"
     :class="{
       'bg-btn text-btn-content shadow-xs ring-1 ring-inset ring-line': !variant || variant === 'plain',
       'bg-primary text-on-primary shadow-xs': variant === 'primary',

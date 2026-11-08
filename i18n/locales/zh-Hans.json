@@ -1577,7 +1577,11 @@
     "light": "亮色",
     "color": "主题色",
     "preset": "使用色相 {hue}",
-    "ink": "墨色"
+    "ink": "墨色",
+    "text_size": "字号",
+    "text_small": "小",
+    "text_default": "标准",
+    "text_large": "大"
   },
   "year_filter": {
     "decade": "{decade} 年代"

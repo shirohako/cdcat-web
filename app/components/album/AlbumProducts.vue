@@ -9,7 +9,7 @@
     <template v-if="products.length && !onlyBonuses">
       <h3 v-if="bonuses.length" :class="PART_TITLE" class="pt-1"><Disc3 :size="14" />{{ $t('album.section.products') }}</h3>
       <div class="overflow-x-auto" :class="!bare && ['px-5 pt-1 max-sm:px-3', !bonuses.length && 'pb-5 max-sm:pb-3']">
-        <table class="w-full border-separate border-spacing-0 text-[13px] max-sm:block">
+        <table class="w-full border-separate border-spacing-0 text-13 max-sm:block">
           <!-- An edition is a tbody: its row, and under it the note, as wide as the table. Empty ones keep the blocks apart. -->
           <template v-for="(product, index) in sortedProducts" :key="product.id">
             <tbody v-if="index" aria-hidden="true" class="max-sm:hidden"><tr class="h-1.5"><td /></tr></tbody>
@@ -23,7 +23,7 @@
                   <div class="flex items-center gap-2.5 sm:min-w-44">
                     <img :src="editionCovers[product.id] || pressedCdImageUrl" :alt="editionName(product, index)" class="size-12 shrink-0 rounded-md object-cover" :class="!editionCovers[product.id] && [PICTURE_TILE, 'p-1']">
                     <div class="min-w-0">
-                      <p class="text-[15px] font-semibold leading-5 text-title">{{ editionName(product, index) }}</p>
+                      <p class="text-15 font-semibold leading-5 text-title">{{ editionName(product, index) }}</p>
                       <!-- Whatever this edition has filled, each fact a tag; the line goes away when none is. -->
                       <div class="mt-1 flex flex-wrap items-center gap-1 empty:hidden">
                         <!-- On a phone the two columns join the tags. -->
@@ -36,7 +36,7 @@
                         <span v-if="discNumbers.size > 1 && discsLabel(product.disc_ids)" :class="TAG" class="text-body"><Layers :size="12" />{{ discsLabel(product.disc_ids) }}</span>
                         <span v-if="product.edition_type === 'limited' && product.limited_rule" :class="LIMITED_TAG"><Hourglass :size="12" />{{ limitedRuleLabel(product.limited_rule) }}</span>
                         <span v-if="product.edition_type === 'limited' && product.limited_name" :class="TAG" class="text-body"><Tag :size="12" />{{ product.limited_name }}</span>
-                        <span v-if="product.is_hires" class="inline-flex items-center gap-1 rounded-md bg-violet-100 px-1.5 py-0.5 text-[11px] leading-4 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200"><AudioLines :size="12" />Hi-Res</span>
+                        <span v-if="product.is_hires" class="inline-flex items-center gap-1 rounded-md bg-violet-100 px-1.5 py-0.5 text-11 leading-4 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200"><AudioLines :size="12" />Hi-Res</span>
                         <span v-if="!product.is_available" :class="TAG" class="text-meta"><CircleOff :size="12" />{{ $t('content_display.out_of_print') }}</span>
                         <!-- On a phone the price goes last among the tags. -->
                         <div class="sm:hidden"><AlbumProductPrice :prices="product.prices" tag /></div>
@@ -64,7 +64,7 @@
     <template v-if="bonuses.length">
       <h3 v-if="!bare" :class="[PART_TITLE, products.length ? 'pt-4' : 'pt-1']"><Gift :size="14" />{{ $t('album.section.bonuses') }}</h3>
       <div class="overflow-x-auto" :class="!bare && 'px-5 pb-5 pt-1 max-sm:px-3 max-sm:pb-3'">
-        <table class="w-full border-separate border-spacing-0 text-[13px] max-sm:block">
+        <table class="w-full border-separate border-spacing-0 text-13 max-sm:block">
           <!-- Laid out as the editions are: only the type is a column, the rest tags, the texts as wide as the table. -->
           <template v-for="(bonus, index) in sortedBonuses" :key="bonus.id">
             <tbody v-if="index" aria-hidden="true" class="max-sm:hidden"><tr class="h-1.5"><td /></tr></tbody>
@@ -81,7 +81,7 @@
                       <Gift v-else :size="18" class="text-meta" />
                     </div>
                     <div class="min-w-0">
-                      <p class="text-[15px] font-semibold leading-5 text-title">{{ bonus.name || '—' }}</p>
+                      <p class="text-15 font-semibold leading-5 text-title">{{ bonus.name || '—' }}</p>
                       <p class="mt-1 flex flex-wrap items-center gap-1 empty:hidden">
                         <!-- On a phone the type joins the tags. -->
                         <span :class="TAG" class="text-body sm:hidden"><Gift :size="12" />{{ enumLabel('bonus_type', bonus.type) }}</span>
@@ -104,7 +104,7 @@
               <tr v-if="bonus.description || bonus.note" class="max-sm:block">
                 <td :colspan="$slots.actions ? 3 : 2" class="px-2.5 pb-3 max-sm:block max-sm:px-3">
                   <p v-if="bonus.description" class="whitespace-pre-line text-xs leading-relaxed text-body">{{ bonus.description }}</p>
-                  <p v-if="bonus.note" class="text-[11px] leading-relaxed text-meta" :class="bonus.description && 'mt-0.5'">{{ bonus.note }}</p>
+                  <p v-if="bonus.note" class="text-11 leading-relaxed text-meta" :class="bonus.description && 'mt-0.5'">{{ bonus.note }}</p>
                 </td>
               </tr>
             </tbody>
@@ -126,9 +126,9 @@ const TAG = PRODUCT_TAG
 /** The grey behind a row's stand-in picture: an edition's default CD, a bonus's gift. */
 const PICTURE_TILE = 'bg-black/[0.05] dark:bg-white/[0.08] dark:ring-1 dark:ring-inset dark:ring-line'
 /** The one warm tag: see-through, so it takes on the row's grey instead of sitting on it as a pale yellow patch. */
-const LIMITED_TAG = 'inline-flex items-center gap-1 rounded-md bg-amber-500/[0.14] px-1.5 py-0.5 text-[11px] font-medium leading-4 text-amber-800 dark:bg-amber-300/[0.13] dark:text-amber-200 dark:ring-1 dark:ring-inset dark:ring-amber-300/20'
+const LIMITED_TAG = 'inline-flex items-center gap-1 rounded-md bg-amber-500/[0.14] px-1.5 py-0.5 text-11 font-medium leading-4 text-amber-800 dark:bg-amber-300/[0.13] dark:text-amber-200 dark:ring-1 dark:ring-inset dark:ring-amber-300/20'
 /** The small heading over the editions and over the bonuses, when the card has both. */
-const PART_TITLE = 'flex items-center gap-1.5 px-5 pb-1 text-[13px] font-semibold leading-5 text-title'
+const PART_TITLE = 'flex items-center gap-1.5 px-5 pb-1 text-13 font-semibold leading-5 text-title'
 
 const props = withDefaults(defineProps<{
   products?: AlbumProduct[]

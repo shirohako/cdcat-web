@@ -3,7 +3,7 @@
     <div class="space-y-4 p-3 pt-1 sm:p-5 sm:pt-1">
       <!-- The ways to bring in a whole tracklist at once, right under the title. -->
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-primary/10 bg-primary/5 px-2.5 py-1.5">
-        <span class="flex items-center gap-1.5 text-[13px] font-semibold text-title">
+        <span class="flex items-center gap-1.5 text-13 font-semibold text-title">
           <Zap :size="14" class="shrink-0 text-primary" />{{ $t('editor.album.quick_import') }}
         </span>
         <span class="flex flex-wrap gap-1.5">

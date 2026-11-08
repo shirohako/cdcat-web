@@ -155,7 +155,7 @@ const markdownHighlight = HighlightStyle.define([
   { tag: tags.emphasis, fontStyle: 'italic' },
   { tag: tags.strikethrough, color: 'var(--meta)', textDecoration: 'line-through' },
   { tag: [tags.link, tags.url], color: 'var(--primary)' },
-  { tag: tags.monospace, color: 'var(--title)', backgroundColor: 'var(--code)', borderRadius: '3px' },
+  { tag: tags.monospace, color: 'var(--title)', backgroundColor: 'var(--code)', borderRadius: '0.1875rem' },
   { tag: tags.quote, color: 'var(--meta)' },
   { tag: [tags.processingInstruction, tags.contentSeparator, tags.meta], color: 'var(--faint)' },
   { tag: [tags.keyword, tags.atom, tags.bool], color: 'var(--md-purple)' },
@@ -316,9 +316,9 @@ onMounted(() => {
           },
         }),
         EditorView.theme({
-          '&': { minHeight: compact.value ? '6rem' : '18rem', height: '100%', fontSize: '14px', color: 'var(--title)', backgroundColor: 'var(--field)' },
+          '&': { minHeight: compact.value ? '6rem' : '18rem', height: '100%', fontSize: '0.875rem', color: 'var(--title)', backgroundColor: 'var(--field)' },
           '.cm-scroller': { fontFamily: 'var(--font-mono-cjk)', lineHeight: '1.65' },
-          '.cm-content': { padding: compact.value ? '8px 0' : '12px 0', caretColor: 'var(--primary)' },
+          '.cm-content': { padding: compact.value ? '0.5rem 0' : '0.75rem 0', caretColor: 'var(--primary)' },
           '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--primary)' },
           '.cm-selectionBackground, &.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground': { backgroundColor: 'var(--selection)' },
           '.cm-activeLine': { backgroundColor: 'color-mix(in oklab, var(--title) 4%, transparent)' },
@@ -328,7 +328,7 @@ onMounted(() => {
           '&.cm-focused .cm-matchingBracket': { backgroundColor: 'color-mix(in oklab, var(--primary) 25%, transparent)', outline: 'none' },
           '.cm-searchMatch': { backgroundColor: 'color-mix(in oklab, var(--warning) 30%, transparent)', outline: 'none' },
           '.cm-tooltip': { backgroundColor: 'var(--popover)', color: 'var(--body)', border: 'none', borderRadius: '0.5rem', boxShadow: '0 0 0 1px var(--line), var(--overlay-shadow)', overflow: 'hidden' },
-          '.cm-tooltip-autocomplete > ul > li': { padding: '4px 10px' },
+          '.cm-tooltip-autocomplete > ul > li': { padding: '0.25rem 0.625rem' },
           '.cm-tooltip-autocomplete > ul > li[aria-selected]': { backgroundColor: 'color-mix(in oklab, var(--primary) 20%, transparent)', color: 'var(--title)' },
           '.cm-completionDetail': { color: 'var(--meta)' },
           '.cm-completionMatchedText': { color: 'var(--primary)', textDecoration: 'none' },
@@ -626,7 +626,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       </div>
 
       <div v-if="compact" class="order-2 flex items-center gap-2">
-        <span v-if="maxLength" class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
+        <span v-if="maxLength" class="text-11 tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
         <button
           type="button"
           class="inline-flex h-7 items-center gap-1 rounded-md px-2 text-xs font-semibold transition-colors duration-150 ease-out"
@@ -667,10 +667,10 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
               </span>
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-baseline gap-2">
-                  <span class="truncate text-[13px] font-semibold text-title">{{ t(definition.labelKey) }}</span>
-                  <span class="shrink-0 text-[9px] font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
+                  <span class="truncate text-13 font-semibold text-title">{{ t(definition.labelKey) }}</span>
+                  <span class="shrink-0 text-9 font-bold uppercase tracking-[0.12em] text-faint">{{ containerMenuMeta[definition.name].englishLabel }}</span>
                 </span>
-                <span class="mt-0.5 block truncate text-[11px] leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
+                <span class="mt-0.5 block truncate text-11 leading-4 text-meta">{{ t(definition.descriptionKey) }}</span>
               </span>
             </button>
           </template>
@@ -717,7 +717,7 @@ function applyTextStyle(kind: 'color' | 'size' | 'underline', value: MarkdownTex
       </div>
     </div>
     <div v-if="maxLength && !compact" class="flex shrink-0 justify-end border-t border-line bg-card px-3 py-1">
-      <span class="text-[11px] tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
+      <span class="text-11 tabular-nums" :class="tooLong ? 'font-semibold text-danger' : 'text-faint'">{{ t('markdown.editor.count', { count: length, max: maxLength }) }}</span>
     </div>
   </div>
   <input v-if="upload" ref="fileInput" type="file" accept="image/*" multiple class="hidden" @change="onFilesPicked">

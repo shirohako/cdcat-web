@@ -32,7 +32,7 @@
               <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
                 <template v-for="role in person.roles" :key="role.key">
                   <!-- A note is an ⓘ inside its role's tag, in the tag's colour, so it reads as that role's note -->
-                  <span class="inline-flex items-center gap-[3px] rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="[getAlbumRolePalette(role.category).badge, role.details.length && 'pr-[5px]']">
+                  <span class="inline-flex items-center gap-0.75 rounded-md px-1.5 py-0.5 text-11 font-semibold leading-4" :class="[getAlbumRolePalette(role.category).badge, role.details.length && 'pr-1.25']">
                     <UiTooltip :text="roleTip(role.role, role.role_label)" :disabled="!role.role_label" class="whitespace-pre-line">
                       <span>{{ role.role_label || roleName(role.role) }}</span>
                     </UiTooltip>
@@ -90,7 +90,7 @@
               <span v-if="peopleView === 'tracks'" class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
                 <span v-if="!person.tracks" class="text-xs text-meta">{{ $t('album.track_people.all') }}</span>
                 <span v-for="part in person.tracks ?? []" v-else :key="part.disc ?? 0" class="inline-flex flex-wrap items-center gap-1">
-                  <span v-if="part.disc" class="mr-0.5 text-[11px] text-meta">Disc {{ part.disc }}</span>
+                  <span v-if="part.disc" class="mr-0.5 text-11 text-meta">Disc {{ part.disc }}</span>
                   <UiTooltip v-for="track in part.tracks" :key="track.id" group="track-people">
                     <span tabindex="0" class="inline-flex min-w-6 cursor-default justify-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-xs leading-4 tabular-nums text-title dark:bg-white/[0.08]">{{ track.label }}</span>
                     <template #content>
@@ -103,7 +103,7 @@
               <!-- By role: each role as its tag, the tracks after it -->
               <span v-else class="flex flex-wrap items-center gap-x-3.5 gap-y-1.5">
                 <span v-for="role in person.roles" :key="`${role.role}:${role.role_label}:${role.detail}`" class="inline-flex min-w-0 items-center gap-1.5">
-                  <span class="inline-flex shrink-0 items-center gap-[3px] rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="[getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge, role.detail && 'pr-[5px]']">
+                  <span class="inline-flex shrink-0 items-center gap-0.75 rounded-md px-1.5 py-0.5 text-11 font-semibold leading-4" :class="[getAlbumRolePalette(role.category ?? roleCategory(role.role)).badge, role.detail && 'pr-1.25']">
                     <UiTooltip :text="roleTip(role.role, role.role_label)" :disabled="!role.role_label" class="whitespace-pre-line">
                       <span>{{ role.role_label || roleName(role.role) }}</span>
                     </UiTooltip>
@@ -170,7 +170,7 @@ const { t } = useI18n()
  * A role tag in the label column of the by-role views: always one line. The column fits its widest tag (CatalogInfoTable
  * `fit-labels`, up to 14rem); a longer job title is cut with …, and its tooltip spells it out (roleTip).
  */
-const ROLE_TAG = 'inline-block min-w-0 max-w-full truncate rounded-md px-1.5 py-0.5 align-top text-[11px] font-semibold leading-4'
+const ROLE_TAG = 'inline-block min-w-0 max-w-full truncate rounded-md px-1.5 py-0.5 align-top text-11 font-semibold leading-4'
 const albumPeople = computed(() => albumCreditPeople(groups.value))
 const albumRoleRows = computed(() => mergeCreditRoles(groups.value))
 

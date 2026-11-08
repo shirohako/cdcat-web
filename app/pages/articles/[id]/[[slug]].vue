@@ -15,7 +15,7 @@
               <a
                 v-else-if="license" :href="licenseUrl ?? '#article-license'" :target="licenseUrl ? '_blank' : undefined" :rel="licenseUrl ? 'license noopener' : undefined"
                 class="inline-flex items-center gap-1 rounded-md bg-btn px-2 py-0.5 text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover" :title="t(`article_ui.licenses.${license.key}.summary`)">
-                <Copyright v-if="!license.url" :size="12" /><span v-else class="font-mono text-[10px] font-bold">cc</span>
+                <Copyright v-if="!license.url" :size="12" /><span v-else class="font-mono text-10 font-bold">cc</span>
                 {{ license.url ? license.short : t(`article_ui.licenses.${license.key}.name`) }}<ExternalLink v-if="licenseUrl" :size="10" />
               </a>
               <span v-if="article.updated_at" class="inline-flex items-center gap-1"><History :size="12" />{{ t('article_ui.reader.updated', { date: formatDate(article.updated_at) }) }}</span>

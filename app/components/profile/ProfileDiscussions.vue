@@ -44,7 +44,7 @@ const posts = computed(() => data.value?.posts ?? [])
         <NuxtLink v-for="topic in topics" :key="topic.id" :to="`/discussions/${topic.id}`" class="group flex items-center gap-3 py-2.5">
           <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-medium text-title transition-colors group-hover:text-primary">{{ topic.title }}</p>
-            <p class="mt-0.5 flex items-center gap-2 text-[11px] text-meta"><DiscussionCategoryBadge :category="topic.category" :link="false" />{{ ago(topic.created_at) }}</p>
+            <p class="mt-0.5 flex items-center gap-2 text-11 text-meta"><DiscussionCategoryBadge :category="topic.category" :link="false" />{{ ago(topic.created_at) }}</p>
           </div>
           <span class="flex shrink-0 items-center gap-1 text-xs tabular-nums text-meta"><MessageSquare :size="12" />{{ topic.replies_count }}</span>
         </NuxtLink>
@@ -53,7 +53,7 @@ const posts = computed(() => data.value?.posts ?? [])
       <div v-else class="divide-y divide-line">
         <NuxtLink v-for="post in posts" :key="post.id" :to="`/discussions/${post.topic?.id}?post=${post.id}`" class="group block py-2.5">
           <p class="line-clamp-2 text-sm text-body">{{ post.excerpt }}</p>
-          <p class="mt-1 truncate text-[11px] text-meta">{{ t('discussions.profile.in_topic', { title: post.topic?.title }) }} · {{ ago(post.created_at) }}</p>
+          <p class="mt-1 truncate text-11 text-meta">{{ t('discussions.profile.in_topic', { title: post.topic?.title }) }} · {{ ago(post.created_at) }}</p>
         </NuxtLink>
         <p v-if="!posts.length" class="py-6 text-center text-sm text-meta">{{ t('discussions.profile.no_posts') }}</p>
       </div>

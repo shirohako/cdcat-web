@@ -2,7 +2,7 @@
   <div class="space-y-3">
     <div class="flex flex-wrap items-baseline justify-between gap-x-3">
       <p class="text-sm font-medium text-body">{{ $t('catalog.field.prices') }}<EditorHelp id="edition.prices" /></p>
-      <p v-if="rows.length > 1" class="text-[11px] text-meta">{{ $t('editor.editions.price_order_hint') }}</p>
+      <p v-if="rows.length > 1" class="text-11 text-meta">{{ $t('editor.editions.price_order_hint') }}</p>
     </div>
     <p v-if="!rows.length" class="text-xs text-meta">{{ $t('editor.editions.no_prices') }}</p>
     <section v-for="group in groups" :key="group.kind" class="space-y-2">
@@ -23,7 +23,7 @@
           @dragend="endDrag"
         >
           <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
-          <span v-if="dropEdge(row)" class="pointer-events-none absolute inset-x-0 h-0.5 rounded-full bg-primary" :class="dropEdge(row) === 'before' ? '-top-[5px]' : '-bottom-[5px]'" />
+          <span v-if="dropEdge(row)" class="pointer-events-none absolute inset-x-0 h-0.5 rounded-full bg-primary" :class="dropEdge(row) === 'before' ? '-top-1.25' : '-bottom-1.25'" />
           <!-- Dragging starts from the handle only, so text in the fields stays selectable. Touch uses the arrows and the
                kind list, so it has no handle; its cell stays, or the fields would slip a column. -->
           <span class="hidden w-4 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing md:flex [@media(hover:none)]:invisible" :class="rows.length < 2 && 'invisible'" aria-hidden="true" @pointerdown="grab(row)">

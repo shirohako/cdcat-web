@@ -96,7 +96,7 @@
                       :class="video.site === 'youtube' ? 'from-red-950 via-slate-900 to-slate-950' : 'from-slate-700 via-slate-800 to-slate-950'"
                     >
                       <Icon :name="video.site === 'youtube' ? 'simple-icons:youtube' : 'simple-icons:niconico'" class="size-4 text-white/45" />
-                      <span class="text-[11px] font-medium leading-4 text-white/50">{{ VIDEO_SITES[video.site] }}</span>
+                      <span class="text-11 font-medium leading-4 text-white/50">{{ VIDEO_SITES[video.site] }}</span>
                     </span>
                     <span class="absolute inset-0 flex items-center justify-center">
                       <span class="flex size-11 items-center justify-center rounded-full bg-black/60 text-white ring-1 ring-white/30 backdrop-blur-sm transition-transform group-hover:scale-110" :class="video.site === 'youtube' ? 'group-hover:bg-red-600' : 'group-hover:bg-slate-700'">
@@ -217,7 +217,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 .drawer-enter-active .drawer-panel, .drawer-leave-active .drawer-panel { transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .drawer-enter-from, .drawer-leave-to { opacity: 0; }
 .drawer-enter-from .drawer-panel, .drawer-leave-to .drawer-panel { transform: translateY(40%); }
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .drawer-enter-from .drawer-panel, .drawer-leave-to .drawer-panel { transform: translateX(100%); }
 }
 </style>

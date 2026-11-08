@@ -3,7 +3,7 @@
     <!-- The two levels a credit can be on, in the colours of their blocks. -->
     <div class="grid gap-1.5 sm:grid-cols-2">
       <div v-for="level in LEVELS" :key="level.scope" class="rounded-md bg-black/[0.05] px-2 py-1.5 dark:bg-white/[0.08]">
-        <span class="inline-block rounded px-1.5 text-[11px] font-semibold leading-5" :class="level.tone">{{ t(`editor.credits.scope_${level.scope}`) }}</span>
+        <span class="inline-block rounded px-1.5 text-11 font-semibold leading-5" :class="level.tone">{{ t(`editor.credits.scope_${level.scope}`) }}</span>
         <p class="mt-1 text-body">{{ t(`editor.credits.level_${level.scope}`) }}</p>
       </div>
     </div>

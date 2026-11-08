@@ -3,7 +3,7 @@
     <template #actions>{{ $t('content_display.track_count', { count: tracks.length }) }}</template>
     <div ref="list" class="relative max-h-[30rem] overflow-y-auto py-1.5">
       <template v-for="disc in discs" :key="disc.number">
-        <p v-if="discs.length > 1" class="px-4 pb-1 pt-2.5 text-[11px] font-bold uppercase tracking-wider text-meta">Disc {{ disc.number }}</p>
+        <p v-if="discs.length > 1" class="px-4 pb-1 pt-2.5 text-11 font-bold uppercase tracking-wider text-meta">Disc {{ disc.number }}</p>
         <NuxtLink
           v-for="item in disc.tracks"
           :key="item.id"
@@ -15,7 +15,7 @@
           <span class="w-6 shrink-0 text-right font-mono text-xs" :class="item.id === currentId ? 'text-primary/70' : 'text-meta'">{{ item.number_label || item.track_number }}</span>
           <span class="min-w-0 flex-1 truncate">{{ localName(item.title, item.titles) }}</span>
           <FileText v-if="item.has_lyrics" :size="11" class="shrink-0 text-primary" />
-          <span v-if="item.duration" class="shrink-0 font-mono text-[11px] text-meta">{{ formatDuration(item.duration) }}</span>
+          <span v-if="item.duration" class="shrink-0 font-mono text-11 text-meta">{{ formatDuration(item.duration) }}</span>
         </NuxtLink>
       </template>
     </div>

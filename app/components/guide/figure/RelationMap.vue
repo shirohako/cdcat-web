@@ -63,7 +63,7 @@ const others = computed(() => (['artist', 'event', 'entry', 'franchise', 'vinyl'
             <Icon :name="NODES.vinyl.icon" class="size-3.5 shrink-0 text-(--accent)" />
             <span class="min-w-0">
               <span class="block text-xs font-semibold text-title">{{ t(NODES.vinyl.label) }}</span>
-              <span class="block text-[11px] leading-4 text-meta">{{ text.vinyl }}</span>
+              <span class="block text-11 leading-4 text-meta">{{ text.vinyl }}</span>
             </span>
           </a>
         </GuideFigureMapNode>
@@ -82,7 +82,7 @@ const others = computed(() => (['artist', 'event', 'entry', 'franchise', 'vinyl'
 
     <!-- The forum and the articles reach every block above. -->
     <div class="mt-4 hidden border-t border-dashed border-line pt-4 md:block">
-      <p class="mb-3 flex items-center justify-center gap-1.5 text-[11px] text-meta" :class="{ 'text-title!': hovered === 'discussion' || hovered === 'article' }">
+      <p class="mb-3 flex items-center justify-center gap-1.5 text-11 text-meta" :class="{ 'text-title!': hovered === 'discussion' || hovered === 'article' }">
         <Icon name="lucide:arrow-up" class="size-3.5" />{{ text.community }}<Icon name="lucide:arrow-up" class="size-3.5" />
       </p>
       <div class="mx-auto grid max-w-xl grid-cols-2 gap-4">
@@ -97,14 +97,14 @@ const others = computed(() => (['artist', 'event', 'entry', 'franchise', 'vinyl'
       <div v-for="item in others" :key="item.id" class="flex gap-2">
         <span class="mt-3 w-4 shrink-0 border-t border-l border-line" aria-hidden="true" />
         <GuideFigureMapNode :id="item.id" :icon="item.icon" :shift="item.shift" :name="item.name" :desc="item.desc" class="min-w-0 flex-1">
-          <span v-if="item.via" class="mt-1.5 inline-flex items-center gap-1 rounded-sm bg-sunken px-1.5 py-0.5 text-[10px] text-body">
+          <span v-if="item.via" class="mt-1.5 inline-flex items-center gap-1 rounded-sm bg-sunken px-1.5 py-0.5 text-10 text-body">
             <Icon name="lucide:link-2" class="size-3 shrink-0 text-faint" />{{ item.via }}
           </span>
         </GuideFigureMapNode>
       </div>
-      <p class="pt-1 text-[11px] leading-4 text-meta">{{ text.community }}</p>
+      <p class="pt-1 text-11 leading-4 text-meta">{{ text.community }}</p>
     </div>
 
-    <p class="mt-4 text-center text-[11px] text-faint">{{ text.hint }}</p>
+    <p class="mt-4 text-center text-11 text-faint">{{ text.hint }}</p>
   </div>
 </template>

@@ -59,7 +59,7 @@ async function copyLink() {
       >
         {{ sectionNumber(section.index) }}
       </span>
-      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[22px]">{{ section.title }}</h2>
+      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[1.375rem]">{{ section.title }}</h2>
       <UiButton
         icon="lucide:link"
         :label="t('legal.copy_link')"
@@ -70,7 +70,7 @@ async function copyLink() {
     </header>
 
     <!-- eslint-disable-next-line vue/no-v-html -- the reference's own texts, rendered by the site's Markdown -->
-    <p class="mt-3 text-[15px] leading-7 text-body md:pl-12" v-html="docs.inline(section.lead)" />
+    <p class="mt-3 text-15 leading-7 text-body md:pl-12" v-html="docs.inline(section.lead)" />
 
     <div class="md:pl-12">
       <nav v-if="index.length > 1" :aria-label="docs.texts.labels.in_section" class="mt-5 grid gap-0.5 rounded-md bg-sunken p-1.5 ring-1 ring-line">
@@ -80,10 +80,10 @@ async function copyLink() {
           :href="`#${entry.id}`"
           class="flex min-w-0 items-baseline gap-2.5 rounded-sm px-2.5 py-1.5 text-sm transition-colors duration-150 ease-out hover:bg-card"
         >
-          <span v-if="entry.method" class="w-8 shrink-0 font-mono text-[11px] font-semibold text-meta">{{ entry.method }}</span>
-          <span v-else class="w-8 shrink-0 text-[11px] text-faint">{{ docs.texts.labels.model }}</span>
-          <ApiDocsPath v-if="entry.method" :path="entry.path" class="min-w-0 shrink-0 text-[13px]" />
-          <code v-else class="shrink-0 font-mono text-[13px] text-title">{{ entry.path }}</code>
+          <span v-if="entry.method" class="w-8 shrink-0 font-mono text-11 font-semibold text-meta">{{ entry.method }}</span>
+          <span v-else class="w-8 shrink-0 text-11 text-faint">{{ docs.texts.labels.model }}</span>
+          <ApiDocsPath v-if="entry.method" :path="entry.path" class="min-w-0 shrink-0 text-13" />
+          <code v-else class="shrink-0 font-mono text-13 text-title">{{ entry.path }}</code>
           <span class="min-w-0 truncate text-meta">{{ entry.title }}</span>
         </a>
       </nav>
@@ -97,7 +97,7 @@ async function copyLink() {
         <ApiDocsModel v-else-if="block.item.kind === 'model'" :model="block.item" :flash="flashId === modelId(block.item.name)" class="mt-8" />
         <ol v-else-if="block.item.kind === 'changes'" class="mt-5 grid gap-3">
           <li v-for="change in changes" :key="change.id" class="grid gap-x-4 gap-y-1 border-t border-line pt-3 text-sm leading-6 sm:grid-cols-[6.5rem_minmax(0,1fr)]">
-            <time :datetime="change.date" class="font-mono text-[13px] text-meta">{{ change.date }}</time>
+            <time :datetime="change.date" class="font-mono text-13 text-meta">{{ change.date }}</time>
             <!-- eslint-disable-next-line vue/no-v-html -- the reference's own texts, rendered by the site's Markdown -->
             <span class="text-body" v-html="docs.inline(change.text)" />
           </li>

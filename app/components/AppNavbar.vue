@@ -2,8 +2,9 @@
   <!-- Spans the full width above the sidebar; z-50 keeps its dropdowns over the sidebar. -->
   <header class="fixed inset-x-0 top-0 z-50 h-14 border-b border-line bg-card">
     <div class="h-full px-4 flex items-center justify-between">
-      <!-- Left Section: Menu Toggle & Logo -->
-      <div class="flex items-center gap-3">
+      <!-- Left Section: Menu Toggle & Logo. On phones the two sit closer and the name is a size smaller, so the navbar
+           keeps to one row at the larger text sizes. -->
+      <div class="flex items-center gap-1 sm:gap-3">
         <!-- Mobile Menu Toggle -->
         <UiButton variant="ghost" icon="lucide:menu" :label="$t('site.toggle_menu')" class="lg:hidden" @click="toggleMobileMenu" />
 
@@ -13,7 +14,7 @@
         <!-- Logo: the site name in the theme colour, with vivia's hover pill -->
         <NuxtLink
           to="/"
-          class="flex h-10 items-center gap-2 rounded-lg px-2 text-2xl font-bold leading-none tracking-tight text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover"
+          class="flex h-10 items-center gap-2 rounded-lg px-2 text-xl font-bold leading-none tracking-tight text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover sm:text-2xl"
         >
           <!-- The name follows, so the picture needs no alt text of its own. -->
           <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg">
@@ -23,7 +24,8 @@
 
       <!-- Right Section: Appearance, Language Switcher & User. Every control is a 40px square; the glyphs are
            sized by eye rather than all at 20px (moon 19, sun 21, the dense languages glyph and the bell 18),
-           so they look the same size, and the avatar is 26px with 7px of room around it on hover. -->
+           so they look the same size, and the avatar is 26px with 7px of room around it on hover. Phones leave out the
+           chevron beside it, which makes the avatar button a 40px square as well. -->
       <div class="flex items-center gap-1">
         <!-- Appearance: dark or light, and the theme colour -->
         <div class="relative">
@@ -37,9 +39,9 @@
               @click="toggleAppearance"
             >
               <!-- vivia's sun and moon, cross-fading with the theme -->
-              <span class="relative grid size-[21px] place-items-center">
-                <Icon name="lucide:moon" class="absolute size-[19px] transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
-                <Icon name="lucide:sun" class="absolute size-[21px] transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
+              <span class="relative grid size-5.25 place-items-center">
+                <Icon name="lucide:moon" class="absolute size-4.75 transition-opacity duration-150 ease-out" :class="theme === 'dark' ? 'opacity-100' : 'opacity-0'" />
+                <Icon name="lucide:sun" class="absolute size-5.25 transition-opacity duration-150 ease-out" :class="theme === 'light' ? 'opacity-100' : 'opacity-0'" />
               </span>
             </button>
           </UiTooltip>
@@ -55,7 +57,7 @@
           <UiButton
             variant="ghost"
             icon="lucide:languages"
-            icon-class="size-[18px]"
+            icon-class="size-4.5"
             :label="$t('site.switch_language')"
             :class="{ 'bg-ghost-hover text-primary': showLanguageMenu }"
             @click="toggleLanguageMenu"
@@ -85,34 +87,40 @@
           </UiDropdown>
         </div>
 
-        <NotificationBell v-if="isAuthenticated" v-model:open="showNotifications" />
+        <!-- Phones have no room for the bell: it is only hidden there (it keeps the unread count up to date), and the
+             notifications get a row in the user menu instead. -->
+        <NotificationBell v-if="isAuthenticated" v-model:open="showNotifications" class="max-sm:hidden" />
 
         <!-- User Menu or Login/Register Buttons -->
         <div v-if="isAuthenticated" class="relative ml-1">
           <button
             type="button"
-            class="flex h-10 items-center gap-1 rounded-lg pl-[7px] pr-1.5 transition-colors duration-150 ease-out hover:bg-ghost-hover"
+            class="flex h-10 items-center gap-1 rounded-lg pl-1.75 pr-1.75 transition-colors duration-150 ease-out hover:bg-ghost-hover sm:pr-1.5"
             :class="{ 'bg-ghost-hover': showUserMenu }"
             :aria-label="$t('site.user_menu')"
             :aria-expanded="showUserMenu"
             @click="toggleUserMenu"
           >
-            <div
-              class="flex size-[26px] items-center justify-center overflow-hidden rounded-full"
-              :class="user?.avatar_url ? '' : 'bg-primary'"
-            >
-              <NuxtImg
-                v-if="user?.avatar_url"
-                :src="user.avatar_url"
-                alt="avatar"
-                class="w-full h-full object-cover"
-              />
-              <span v-else class="text-on-primary text-xs font-semibold">{{ userInitial }}</span>
-            </div>
-            <!-- Turns over while the menu is open. -->
+            <span class="relative">
+              <span
+                class="flex size-6.5 items-center justify-center overflow-hidden rounded-full"
+                :class="user?.avatar_url ? '' : 'bg-primary'"
+              >
+                <NuxtImg
+                  v-if="user?.avatar_url"
+                  :src="user.avatar_url"
+                  alt="avatar"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else class="text-on-primary text-xs font-semibold">{{ userInitial }}</span>
+              </span>
+              <!-- On phones, where the bell is hidden, unread notifications show as a dot on the avatar. -->
+              <span v-if="unread" class="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-danger ring-2 ring-card sm:hidden" aria-hidden="true" />
+            </span>
+            <!-- Turns over while the menu is open. Not on phones, where the row has no room for it. -->
             <Icon
               name="lucide:chevron-down"
-              class="size-4 text-meta transition-transform duration-200 motion-reduce:transition-none"
+              class="size-4 text-meta transition-transform duration-200 motion-reduce:transition-none max-sm:hidden"
               :class="{ 'rotate-180': showUserMenu }"
             />
           </button>
@@ -151,8 +159,28 @@
               />
             </NuxtLink>
 
+            <!-- Phones only, in place of the bell: the notifications page, with the unread count as the bell shows it. -->
+            <div class="sm:hidden">
+              <UiMenuItem
+                to="/notifications"
+                icon="lucide:bell"
+                :active="isCurrent('/notifications')"
+                glide
+                class="mt-1"
+                @mouseenter="glideTo($event.currentTarget)"
+              >
+                {{ $t('notifications.title') }}
+                <template #trailing>
+                  <span v-if="unread" class="min-w-4 shrink-0 rounded-full bg-danger px-1 text-center text-10 font-bold leading-4 text-on-primary">
+                    {{ unread > 99 ? '99+' : unread }}
+                  </span>
+                </template>
+              </UiMenuItem>
+              <div role="separator" class="mx-3 my-1 h-px bg-line/35" />
+            </div>
+
             <div v-for="group in userMenuGroups" :key="group.key" role="group" :aria-label="$t(`site.user_menu_groups.${group.key}`)">
-              <p class="px-3 pb-1 pt-2 text-[11px] font-semibold tracking-wide text-faint" aria-hidden="true">
+              <p class="px-3 pb-1 pt-2 text-11 font-semibold tracking-wide text-faint" aria-hidden="true">
                 {{ $t(`site.user_menu_groups.${group.key}`) }}
               </p>
               <UiMenuItem
@@ -176,7 +204,7 @@
                 v-if="hasPermission('admin.access')"
                 to="/admin"
                 role="menuitem"
-                class="inline-flex min-w-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-[13px] text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-title"
+                class="inline-flex min-w-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-13 text-meta transition-colors duration-150 ease-out hover:bg-ghost-hover hover:text-title"
                 @click="showUserMenu = false"
               >
                 <Icon name="lucide:layout-dashboard" class="size-3.5 shrink-0" />
@@ -185,7 +213,7 @@
               <button
                 type="button"
                 role="menuitem"
-                class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-[13px] text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger"
+                class="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-sm px-2 py-1.5 text-13 text-meta transition-colors duration-150 ease-out hover:bg-danger/10 hover:text-danger"
                 @click="handleLogout"
               >
                 <Icon name="lucide:log-out" class="size-3.5 shrink-0" />
@@ -208,7 +236,7 @@
           <UiButton
             variant="ghost"
             icon="lucide:log-in"
-            icon-class="size-[19px]"
+            icon-class="size-4.75"
             :label="$t('user.login')"
             :class="{ 'bg-ghost-hover text-primary': showGuestMenu }"
             :aria-expanded="showGuestMenu"
@@ -256,6 +284,8 @@ const emit = defineEmits<{
 const { t, locale, locales, setLocale } = useI18n()
 const { user, isAuthenticated, logout, hasPermission } = useAuth()
 const { theme } = useAppearance()
+// The bell's count (it polls while mounted), for the avatar dot and the menu row on phones.
+const { unread } = useNotifications()
 
 const showUserMenu = ref(false)
 const { enter: glideTo, leave: glideAway, style: menuHighlight } = useGlideHighlight()

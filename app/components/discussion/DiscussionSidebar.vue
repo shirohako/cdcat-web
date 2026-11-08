@@ -48,15 +48,15 @@ const isActive = (slug: string) => props.activeSlug === slug
           <span class="size-2 shrink-0 rounded-full" :class="categoryTone(category.color).dot" aria-hidden="true" />
           <span class="min-w-0 flex-1 truncate">{{ categoryName(category) }}</span>
           <Lock v-if="category.visibility === 'moderators'" :size="11" class="text-meta" />
-          <span class="text-[11px] tabular-nums text-meta">{{ category.stats.topics_count }}</span>
+          <span class="text-11 tabular-nums text-meta">{{ category.stats.topics_count }}</span>
         </NuxtLink>
         <NuxtLink
           v-for="child in category.children" :key="child.id" :to="`/discussions/c/${child.slug}`"
-          class="flex items-center gap-2 py-1.5 pl-9 pr-4 text-[13px] transition-colors duration-150 ease-out"
+          class="flex items-center gap-2 py-1.5 pl-9 pr-4 text-13 transition-colors duration-150 ease-out"
           :class="isActive(child.slug) ? 'bg-primary/10 font-semibold text-primary' : 'text-meta hover:bg-card-hover active:bg-card-active'"
         >
           <span class="min-w-0 flex-1 truncate">{{ categoryName(child) }}</span>
-          <span class="text-[11px] tabular-nums text-meta">{{ child.stats.topics_count }}</span>
+          <span class="text-11 tabular-nums text-meta">{{ child.stats.topics_count }}</span>
         </NuxtLink>
       </template>
     </nav>
@@ -74,7 +74,7 @@ const isActive = (slug: string) => props.activeSlug === slug
           v-for="tag in tags" :key="tag.id" :to="`/discussions/tags/${tag.slug}`"
           class="inline-flex items-center gap-0.5 rounded-md bg-btn px-2 py-1 text-xs text-btn-content transition-colors duration-150 ease-out hover:bg-btn-hover active:bg-btn-active"
         >
-          <Hash :size="11" class="opacity-60" />{{ tagName(tag) }}<span class="ml-0.5 text-[10px] opacity-60">{{ tag.topics_count }}</span>
+          <Hash :size="11" class="opacity-60" />{{ tagName(tag) }}<span class="ml-0.5 text-10 opacity-60">{{ tag.topics_count }}</span>
         </NuxtLink>
       </div>
     </section>

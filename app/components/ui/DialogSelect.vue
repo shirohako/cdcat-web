@@ -158,7 +158,7 @@ const onKeydown = (event: KeyboardEvent) => {
           <span class="min-w-0">
             <span class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
               <span class="text-sm font-bold leading-5" :class="chosen ? tone.title : 'text-title'">{{ option.label }}</span>
-              <span v-if="option.hint" class="rounded px-1.5 py-0.5 text-[10px] font-semibold leading-3 tracking-wider" :class="badge">{{ option.hint }}</span>
+              <span v-if="option.hint" class="rounded px-1.5 py-0.5 text-10 font-semibold leading-3 tracking-wider" :class="badge">{{ option.hint }}</span>
             </span>
             <span v-if="option.summary" class="mt-0.5 block text-xs" :class="chosen ? tone.title : 'text-body'">{{ option.summary }}</span>
           </span>
@@ -169,11 +169,11 @@ const onKeydown = (event: KeyboardEvent) => {
 
         <span class="w-full border-t pt-2" :class="[chosen ? tone.divider : 'border-line', option.span === 6 ? 'space-y-2 md:grid md:grid-cols-[minmax(0,1fr)_14rem] md:gap-6 md:space-y-0' : 'space-y-2']">
           <span class="block">
-            <span class="mb-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-wider" :class="badge">{{ $t('common.option_description') }}</span>
+            <span class="mb-1 inline-block rounded px-1.5 py-0.5 text-10 font-semibold tracking-wider" :class="badge">{{ $t('common.option_description') }}</span>
             <span class="block text-xs leading-5 text-body">{{ option.description }}</span>
           </span>
           <span v-if="option.content?.length" class="block">
-            <span class="mb-1 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold tracking-wider" :class="badge">{{ $t('common.option_content') }}</span>
+            <span class="mb-1 inline-block rounded px-1.5 py-0.5 text-10 font-semibold tracking-wider" :class="badge">{{ $t('common.option_content') }}</span>
             <span class="flex flex-wrap gap-x-3 gap-y-1">
               <span v-for="item in option.content" :key="item" class="flex items-start gap-1.5 text-xs text-body">
                 <span class="mt-0.5 size-1 shrink-0 translate-y-0.75 rounded-full bg-current opacity-50" />

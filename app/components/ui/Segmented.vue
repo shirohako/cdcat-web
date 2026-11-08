@@ -68,7 +68,7 @@ function measure() {
   }
   // Labels are still opening or closing: place the thumb where the chosen option will end up, from each option's
   // width without its label plus the chosen label's full width. Offsets, not rects, so a scaling popover can't skew it.
-  let left = Number.parseFloat(SIZES[props.size].pad)
+  let left = remToPx(SIZES[props.size].pad)
   all.forEach((element, at) => {
     const wrap = element.querySelector<HTMLElement>('[data-label]')
     const base = element.offsetWidth - (wrap?.offsetWidth ?? 0)
@@ -127,11 +127,11 @@ function onKeydown(event: KeyboardEvent) {
   options()[target.index]?.focus()
 }
 
-// `pad` is the track's padding, which the thumb keeps above and below it.
+// `pad` is the track's padding in rem, which the thumb keeps above and below it.
 const SIZES = {
-  sm: { pad: '3px', option: 'h-7 gap-1.5 px-3 text-xs', collapsed: 'h-[1.625rem] px-[0.4375rem] text-xs', icon: 'size-3.5' },
-  md: { pad: '3px', option: 'h-8 gap-2 px-3.5 text-sm', collapsed: 'h-8 px-2.5 text-sm', icon: 'size-4' },
-  lg: { pad: '4px', option: 'h-10 gap-2 px-4 text-sm', collapsed: 'h-10 px-3 text-sm', icon: 'size-4' },
+  sm: { pad: 0.1875, option: 'h-7 gap-1.5 px-3 text-xs', collapsed: 'h-[1.625rem] px-[0.4375rem] text-xs', icon: 'size-3.5' },
+  md: { pad: 0.1875, option: 'h-8 gap-2 px-3.5 text-sm', collapsed: 'h-8 px-2.5 text-sm', icon: 'size-4' },
+  lg: { pad: 0.25, option: 'h-10 gap-2 px-4 text-sm', collapsed: 'h-10 px-3 text-sm', icon: 'size-4' },
 }
 
 const optionRole = computed(() => (asLinks.value ? undefined : props.semantics))
@@ -144,7 +144,7 @@ const isOn = (item: UiSegmentedItem<T>) => item.value === shown.value
     ref="track"
     class="segmented relative isolate rounded-lg"
     :class="[block ? 'grid w-full' : 'inline-flex max-w-full', collapse && 'is-collapse']"
-    :style="{ '--pad': SIZES[size].pad, 'padding': SIZES[size].pad, 'gridTemplateColumns': block ? `repeat(${items.length}, minmax(0, 1fr))` : undefined }"
+    :style="{ '--pad': `${SIZES[size].pad}rem`, 'padding': `${SIZES[size].pad}rem`, 'gridTemplateColumns': block ? `repeat(${items.length}, minmax(0, 1fr))` : undefined }"
     :role="asLinks ? undefined : semantics === 'tab' ? 'tablist' : 'radiogroup'"
     :aria-label="label"
     @keydown="onKeydown"

@@ -87,7 +87,7 @@ onBeforeUnmount(() => clearTimeout(timer))
             <span class="sr-only">{{ texts.title }}</span>
             <span aria-hidden="true"><span v-for="(char, index) in texts.title" :key="index" class="char" :style="{ '--i': index }">{{ char }}</span></span>
           </h1>
-          <p class="intro mt-3 max-w-2xl text-[15px] leading-7 text-body">{{ texts.intro }}</p>
+          <p class="intro mt-3 max-w-2xl text-15 leading-7 text-body">{{ texts.intro }}</p>
         </div>
 
         <!-- Left out on phones, where it would only push the base address further down. -->
@@ -111,7 +111,7 @@ onBeforeUnmount(() => clearTimeout(timer))
         </p>
         <div class="flex min-w-0 max-w-full items-center gap-2.5 rounded-md bg-sunken py-1 pl-3 pr-1 ring-1 ring-line">
           <span class="shrink-0 text-xs text-meta">{{ labels.base_url }}</span>
-          <code class="min-w-0 truncate font-mono text-[13px] text-title">{{ base }}</code>
+          <code class="min-w-0 truncate font-mono text-13 text-title">{{ base }}</code>
           <UiButton :icon="copied ? 'lucide:check' : 'lucide:copy'" :label="copied ? labels.copied : labels.copy" size="xs" @click="copyBase" />
         </div>
       </div>
@@ -200,7 +200,7 @@ onBeforeUnmount(() => clearTimeout(timer))
 @keyframes rise {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 0.625rem;
   }
 }
 

@@ -59,7 +59,7 @@ const copyPrevious = async (index: number) => {
     <p v-if="!tracks.length" class="rounded-lg border border-dashed border-line px-4 py-4 text-center text-xs text-meta">{{ t('editor.credits.no_tracks_hint') }}</p>
     <section v-for="(track, index) in tracks" :key="String(track.id)" class="rounded-lg border border-line">
       <!-- As tall with 和上一首相同 as without it. -->
-      <p class="flex min-h-[2.5625rem] items-center gap-2 rounded-t-[7px] border-b border-line bg-sunken px-3 py-1.5 text-xs">
+      <p class="flex min-h-[2.5625rem] items-center gap-2 rounded-t-[0.4375rem] border-b border-line bg-sunken px-3 py-1.5 text-xs">
         <span class="min-w-5 shrink-0 font-mono text-faint">{{ track.number_label || String(track.track_number).padStart(2, '0') }}</span>
         <span class="min-w-0 flex-1 truncate font-semibold text-title">{{ track.title || '—' }}</span>
         <UiButton v-if="canCopy(index)" size="xs" icon="lucide:copy" icon-class="size-3" class="shrink-0 gap-1 ring-1 ring-inset ring-line" @click="copyPrevious(index)">{{ t('editor.credits.same_as_previous') }}</UiButton>

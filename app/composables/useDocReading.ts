@@ -96,7 +96,7 @@ export function useDocReading(content: Readonly<Ref<HTMLElement | null>>, sectio
   }
 
   onMounted(() => {
-    wide = window.matchMedia('(min-width: 1024px)')
+    wide = window.matchMedia('(width >= 64rem)')
     window.addEventListener('scroll', scheduleTrack, { passive: true })
     window.addEventListener('resize', scheduleTrack, { passive: true })
     track()

@@ -1577,7 +1577,11 @@
     "light": "라이트",
     "color": "테마 색상",
     "preset": "색조 {hue} 적용",
-    "ink": "먹색"
+    "ink": "먹색",
+    "text_size": "글자 크기",
+    "text_small": "작게",
+    "text_default": "기본",
+    "text_large": "크게"
   },
   "year_filter": {
     "decade": "{decade}년대"

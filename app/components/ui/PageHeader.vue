@@ -18,7 +18,7 @@ withDefaults(defineProps<{
           {{ back.label }}
         </UiLink>
       </div>
-      <h1 class="flex items-center gap-3 text-[28px] font-bold leading-tight tracking-tight text-title md:text-[32px]">
+      <h1 class="flex items-center gap-3 text-[1.75rem] font-bold leading-tight tracking-tight text-title md:text-[2rem]">
         <span class="h-[0.62em] w-1 shrink-0 rounded-full bg-primary" aria-hidden="true" />
         <span class="min-w-0">{{ title }}</span>
       </h1>

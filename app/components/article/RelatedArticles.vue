@@ -31,7 +31,7 @@ const articles = computed(() => data.value ?? [])
         </div>
         <div class="min-w-0 flex-1">
           <p class="line-clamp-2 text-sm font-medium leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ article.title }}</p>
-          <p class="mt-1 text-[11px] text-meta">{{ [article.type ? typeName(article.type) : null, article.published_at ? formatDate(article.published_at) : null].filter(Boolean).join(' · ') }}</p>
+          <p class="mt-1 text-11 text-meta">{{ [article.type ? typeName(article.type) : null, article.published_at ? formatDate(article.published_at) : null].filter(Boolean).join(' · ') }}</p>
         </div>
       </NuxtLink>
     </div>

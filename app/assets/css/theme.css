@@ -179,6 +179,24 @@
   }
 }
 
+/*
+ * Text sizes between Tailwind's steps (text-xs is 12px, text-sm 14px), named by their size in px at the default root
+ * size of 16px: text-11, text-12.5 … They are rem, like everything that should grow with the visitor's text size, so
+ * write text-11 rather than text-[11px]. Sizes from 16px up are written as rem directly (text-[1.375rem]).
+ */
+@theme {
+  --text-9: 0.5625rem;
+  --text-9\.5: 0.59375rem;
+  --text-10: 0.625rem;
+  --text-10\.5: 0.65625rem;
+  --text-11: 0.6875rem;
+  --text-11\.5: 0.71875rem;
+  --text-12\.5: 0.78125rem;
+  --text-13: 0.8125rem;
+  --text-13\.5: 0.84375rem;
+  --text-15: 0.9375rem;
+}
+
 /* `inline` makes each utility read the token at run time, so a theme or hue switch needs no new CSS. */
 @theme inline {
   --color-primary: var(--primary);

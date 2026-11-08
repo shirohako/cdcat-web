@@ -15,15 +15,15 @@
       <div class="flex gap-3">
         <UiCover :src="circle.image_url" :alt="circle.name" :icon="Users" rounded="xl" eager class="size-20 ring-1 ring-line" />
         <div class="min-w-0 flex-1">
-          <p class="text-[11px] font-semibold tracking-wide text-meta">{{ spaceLabel }}</p>
-          <p class="mt-0.5 line-clamp-2 text-[15px] font-bold leading-snug text-title">{{ circle.name }}</p>
+          <p class="text-11 font-semibold tracking-wide text-meta">{{ spaceLabel }}</p>
+          <p class="mt-0.5 line-clamp-2 text-15 font-bold leading-snug text-title">{{ circle.name }}</p>
           <p v-if="circle.name_kana && circle.name_kana !== circle.name" class="truncate text-xs text-meta">{{ circle.name_kana }}</p>
           <div class="mt-1.5 flex flex-wrap items-center gap-1.5">
-            <span v-if="circle.genre" class="inline-flex items-center gap-1 rounded-full bg-btn px-2 py-0.5 text-[11px] font-medium text-btn-content">
+            <span v-if="circle.genre" class="inline-flex items-center gap-1 rounded-full bg-btn px-2 py-0.5 text-11 font-medium text-btn-content">
               <span class="size-2 rounded-full" :style="{ background: familyColor }" />{{ genreShortLabel(circle.genre, genres) }}
             </span>
             <!-- The checklist's gold star -->
-            <span v-if="checked" class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">
+            <span v-if="checked" class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-11 font-medium text-amber-700 dark:bg-amber-400/15 dark:text-amber-300">
               <Star :size="11" fill="currentColor" />{{ t('event_page.checklist.short') }}
             </span>
           </div>

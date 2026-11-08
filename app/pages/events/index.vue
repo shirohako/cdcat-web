@@ -81,13 +81,13 @@ usePageSeo({
                 <h2 class="line-clamp-2 font-bold leading-snug text-title transition-colors group-hover:text-primary" :title="series.name">{{ series.name }}</h2>
                 <div class="mt-auto space-y-1.5 pt-3 text-xs text-meta">
                   <p v-if="series.location" class="truncate" :title="series.location">
-                    <MapPin class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)]" />{{ series.location }}
+                    <MapPin class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" />{{ series.location }}
                   </p>
                   <p class="truncate font-medium text-body">
-                    <CalendarDays class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)] text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}
+                    <CalendarDays class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-0.4375rem)] text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}
                   </p>
                   <p v-if="series.latest_start_date" class="truncate">
-                    <CalendarClock class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-7px)]" />{{ t('collection_pages.events.latest', { date: latestDate(series) }) }}
+                    <CalendarClock class="mr-1.5 inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" />{{ t('collection_pages.events.latest', { date: latestDate(series) }) }}
                   </p>
                 </div>
               </div>

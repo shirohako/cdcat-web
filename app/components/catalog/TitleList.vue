@@ -2,7 +2,7 @@
   <ul v-if="titles.length" class="space-y-1 text-sm">
     <li v-for="(title, index) in titles" :key="index" class="flex items-baseline gap-2">
       <span class="text-title">{{ title.title }}</span>
-      <span class="shrink-0 text-[11px] text-meta">
+      <span class="shrink-0 text-11 text-meta">
         {{ [title.locale ? localeName(title.locale) : '', enumLabel('title_kind', title.kind)].filter(Boolean).join(' · ') }}
       </span>
     </li>

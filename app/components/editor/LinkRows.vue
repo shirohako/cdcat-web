@@ -2,7 +2,7 @@
   <div class="space-y-2">
     <!-- Grouped by category as on the page; rows move only inside their category, so the order here is the order shown. -->
     <div v-for="group in groups" :key="group.category">
-      <p class="mb-1 text-[11px] font-semibold text-meta">{{ $t(`catalog.link_category.${group.category}`) }}</p>
+      <p class="mb-1 text-11 font-semibold text-meta">{{ $t(`catalog.link_category.${group.category}`) }}</p>
       <ul class="space-y-1.5">
         <EditorListRow
           v-for="(row, index) in group.rows"
@@ -20,11 +20,11 @@
           @edit="edit(row)"
           @remove="remove(row)"
         >
-          <span class="max-w-36 shrink-0 truncate rounded-md bg-btn px-1.5 py-0.5 text-[11px] font-medium text-btn-content">{{ providerOf(row.link_provider_id) }}</span>
+          <span class="max-w-36 shrink-0 truncate rounded-md bg-btn px-1.5 py-0.5 text-11 font-medium text-btn-content">{{ providerOf(row.link_provider_id) }}</span>
           <!-- A named link shows its name, with the address small underneath. -->
           <span v-if="row.label" class="flex min-w-0 flex-col leading-tight">
-            <span class="truncate text-[13px] font-medium text-title">{{ row.label }}</span>
-            <span class="mt-0.5 truncate text-[11px] text-meta">{{ bare(row.url) || '—' }}</span>
+            <span class="truncate text-13 font-medium text-title">{{ row.label }}</span>
+            <span class="mt-0.5 truncate text-11 text-meta">{{ bare(row.url) || '—' }}</span>
           </span>
           <span v-else class="min-w-0 truncate text-sm text-body">{{ bare(row.url) || '—' }}</span>
           <template #actions>
@@ -58,12 +58,12 @@
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.link_provider_id') }}<EditorHelp id="link.provider" /></span>
           <UiSelect v-model="form.provider" :options="providerOptions" placeholder="—" size="sm" class="w-full" @change="pickedByHand = true" />
-          <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_provider_hint') }}</span>
+          <span class="mt-1 block text-11 text-meta">{{ $t('editor.dialog.link_provider_hint') }}</span>
         </label>
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.link_label') }}<EditorHelp id="link.label" /></span>
           <input v-model="form.label" class="input w-full" maxlength="100" :placeholder="$t('editor.dialog.link_label_placeholder')">
-          <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.dialog.link_label_hint') }}</span>
+          <span class="mt-1 block text-11 text-meta">{{ $t('editor.dialog.link_label_hint') }}</span>
         </label>
       </div>
       <template #footer>

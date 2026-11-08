@@ -13,7 +13,7 @@
           <template v-for="(step, index) in STEPS" :key="step">
             <ArrowRight v-if="index" :size="12" class="shrink-0 text-faint" />
             <li class="inline-flex items-center gap-1.5 rounded bg-black/[0.05] pl-0.5 pr-1.5 text-body dark:bg-white/[0.08]">
-              <span class="grid size-4 place-items-center rounded-sm bg-violet-100 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200 text-[10px] font-bold leading-none">{{ index + 1 }}</span>{{ t(`editor.credits.byline_guide.step_${step}`) }}
+              <span class="grid size-4 place-items-center rounded-sm bg-violet-100 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200 text-10 font-bold leading-none">{{ index + 1 }}</span>{{ t(`editor.credits.byline_guide.step_${step}`) }}
             </li>
           </template>
         </ol>
@@ -25,7 +25,7 @@
       <!-- Who goes where, by the kind of album. -->
       <div class="pl-[1.1875rem]">
         <div v-for="kind in KINDS" :key="kind" class="mt-1.5">
-          <span class="inline-block rounded bg-violet-100 px-1.5 text-[11px] font-semibold leading-5 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200">{{ t(`editor.credits.byline_guide.${kind}`) }}</span>
+          <span class="inline-block rounded bg-violet-100 px-1.5 text-11 font-semibold leading-5 text-violet-700 dark:bg-violet-400/20 dark:text-violet-200">{{ t(`editor.credits.byline_guide.${kind}`) }}</span>
           <p class="mt-0.5 text-body">{{ t(`editor.credits.byline_guide.${kind}_text`) }}</p>
         </div>
       </div>

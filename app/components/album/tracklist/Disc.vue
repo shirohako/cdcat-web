@@ -54,16 +54,16 @@ const meta = computed(() => (isFolded.value
         @click="toggleDisc(disc, header)"
       >
         <span
-          class="shrink-0 text-[11px] uppercase text-title"
+          class="shrink-0 text-11 uppercase text-title"
           :class="variant === 'bar' ? 'font-bold tracking-[0.08em]' : 'font-semibold tracking-[0.16em]'"
         >{{ variant === 'booklet' ? `Disc ${String(disc.position).padStart(2, '0')}` : `Disc ${disc.position}` }}</span>
-        <span v-if="disc.title" class="min-w-0 truncate" :class="variant === 'bar' ? 'text-xs text-meta' : 'text-[12.5px] font-semibold text-body'">{{ disc.title }}</span>
+        <span v-if="disc.title" class="min-w-0 truncate" :class="variant === 'bar' ? 'text-xs text-meta' : 'text-12.5 font-semibold text-body'">{{ disc.title }}</span>
         <AlbumTracklistLabel v-if="disc.format">{{ disc.format }}</AlbumTracklistLabel>
         <UiTooltip v-if="disc.bonus" :text="disc.bonus.name" placement="bottom">
-          <span class="inline-flex h-[1.125rem] shrink-0 items-center rounded-[4px] bg-pink-100 px-[5px] text-[10.5px] font-semibold leading-none text-pink-600 dark:bg-pink-400/20 dark:text-pink-200">{{ t('content_display.bonus') }}</span>
+          <span class="inline-flex h-[1.125rem] shrink-0 items-center rounded-sm bg-pink-100 px-1.25 text-10.5 font-semibold leading-none text-pink-600 dark:bg-pink-400/20 dark:text-pink-200">{{ t('content_display.bonus') }}</span>
         </UiTooltip>
         <span v-if="variant === 'booklet'" class="h-px min-w-4 flex-1 bg-line" aria-hidden="true" />
-        <span class="shrink-0 text-[11px] tabular-nums text-meta" :class="variant === 'bar' && 'ml-auto'">{{ meta }}</span>
+        <span class="shrink-0 text-11 tabular-nums text-meta" :class="variant === 'bar' && 'ml-auto'">{{ meta }}</span>
         <ChevronDown :size="14" class="shrink-0 text-faint transition-[rotate,color] duration-200 group-hover/disc:text-title" :class="isFolded && '-rotate-90'" />
       </button>
     </div>

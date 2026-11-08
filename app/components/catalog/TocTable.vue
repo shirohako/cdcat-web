@@ -14,7 +14,7 @@
         <tr v-for="row in rows" :key="row.track" class="border-b border-line/60 last:border-0" :class="row.data && 'text-meta'">
           <td class="py-1 pr-3">
             {{ row.track }}
-            <span v-if="row.data" class="ml-1.5 rounded-sm bg-black/5 px-1 py-px font-sans text-[10px] dark:bg-white/10">{{ $t('catalog.toc.data') }}</span>
+            <span v-if="row.data" class="ml-1.5 rounded-sm bg-black/5 px-1 py-px font-sans text-10 dark:bg-white/10">{{ $t('catalog.toc.data') }}</span>
           </td>
           <td class="py-1 pr-3">{{ formatFrames(row.start) }}</td>
           <td class="py-1 pr-3">{{ formatFrames(row.length) }}</td>

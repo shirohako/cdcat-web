@@ -41,7 +41,7 @@
             <p class="truncate text-xs font-semibold leading-4 text-title transition-colors group-hover:text-primary">
               {{ album.title }}
             </p>
-            <p class="mt-1 inline-flex items-center gap-1 text-[11px] text-meta">
+            <p class="mt-1 inline-flex items-center gap-1 text-11 text-meta">
               <Heart :size="12" />
               <span>{{ formatCollectedAt(album.favorited_at) }}</span>
             </p>

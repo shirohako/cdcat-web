@@ -20,14 +20,14 @@ const GROUPS = [
     <div class="flex items-center gap-2.5 border-b border-line px-4 py-3">
       <span class="grid size-7 shrink-0 place-items-center rounded-md bg-primary/10 text-primary"><Icon name="lucide:type" class="size-4" /></span>
       <span class="min-w-0">
-        <span class="block text-[13px] font-semibold text-title">{{ t('editor.add_name') }}</span>
-        <span class="block text-[11px] leading-4 text-meta">{{ t('editor.names_hint') }}</span>
+        <span class="block text-13 font-semibold text-title">{{ t('editor.add_name') }}</span>
+        <span class="block text-11 leading-4 text-meta">{{ t('editor.names_hint') }}</span>
       </span>
     </div>
     <div class="space-y-3 px-4 py-3">
       <GuideMockField :label="t('catalog.field.title')" value="Atlas of Stardust" />
       <div>
-        <p class="mb-1.5 text-[11px] font-medium text-body">{{ t('editor.names.question') }}</p>
+        <p class="mb-1.5 text-11 font-medium text-body">{{ t('editor.names.question') }}</p>
         <div class="grid gap-1.5 sm:grid-cols-3">
           <div
             v-for="group in GROUPS"
@@ -38,17 +38,17 @@ const GROUPS = [
             <p class="flex items-center gap-1.5 text-xs font-semibold" :class="group.title ?? 'text-title'">
               <Icon :name="group.icon" class="size-3.5 shrink-0" />{{ t(`editor.names.${group.key}`) }}
             </p>
-            <p class="mt-1 line-clamp-3 text-[10px] leading-3.5 text-meta">{{ t(`editor.names.${group.key}_hint`) }}</p>
+            <p class="mt-1 line-clamp-3 text-10 leading-3.5 text-meta">{{ t(`editor.names.${group.key}_hint`) }}</p>
           </div>
         </div>
       </div>
       <div>
-        <p class="mb-1.5 text-[11px] font-medium text-body">{{ t('catalog.field.locale') }}</p>
-        <span class="inline-flex h-6 w-40 items-center justify-between gap-1 rounded-md border border-field-line px-2 text-[11px] text-title">
+        <p class="mb-1.5 text-11 font-medium text-body">{{ t('catalog.field.locale') }}</p>
+        <span class="inline-flex h-6 w-40 items-center justify-between gap-1 rounded-md border border-field-line px-2 text-11 text-title">
           {{ localeName('en') }}<Icon name="lucide:chevron-down" class="size-3 text-meta" />
         </span>
       </div>
-      <p class="flex items-center gap-1.5 text-[11px] text-meta">
+      <p class="flex items-center gap-1.5 text-11 text-meta">
         <Icon name="lucide:lightbulb" class="size-3.5 shrink-0" />{{ t('editor.names.tip_title') }}<Icon name="lucide:chevron-down" class="size-3" />
       </p>
     </div>

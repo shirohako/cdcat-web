@@ -42,8 +42,8 @@ const linkStyles = computed(() => CREDIT_LINK_STYLES.map(key => ({ key, label: t
         @click="emit('update', { style: style.key })"
       >
         <UiIcon :icon="style.icon" class="mb-0.5 size-5" :class="prefs.style === style.key ? 'text-primary' : 'text-meta'" />
-        <span class="text-[13px] font-semibold leading-[1.125rem] text-title">{{ style.label }}</span>
-        <span class="text-[11px] leading-snug text-meta">{{ style.hint }}</span>
+        <span class="text-13 font-semibold leading-[1.125rem] text-title">{{ style.label }}</span>
+        <span class="text-11 leading-snug text-meta">{{ style.hint }}</span>
         <span v-if="prefs.style === style.key" class="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-primary text-on-primary" aria-hidden="true"><Check :size="11" :stroke-width="3" /></span>
       </button>
     </div>
@@ -67,7 +67,7 @@ const linkStyles = computed(() => CREDIT_LINK_STYLES.map(key => ({ key, label: t
           <span v-if="linkStyle === option.key" class="size-1.5 rounded-full bg-on-primary" />
         </span>
         <span class="min-w-0">
-          <span class="block text-[13.5px] font-semibold leading-5 text-title">{{ option.label }}</span>
+          <span class="block text-13.5 font-semibold leading-5 text-title">{{ option.label }}</span>
           <span class="block text-xs leading-[1.125rem] text-meta">{{ option.hint }}</span>
         </span>
         <span :data-credit-links="option.key" aria-hidden="true" class="col-start-2 inline-flex h-5 items-center justify-self-start rounded-md bg-black/[0.05] px-1.5 text-xs leading-5 text-title sm:col-start-3 sm:row-start-1 sm:justify-self-end dark:bg-white/[0.08]">
@@ -80,7 +80,7 @@ const linkStyles = computed(() => CREDIT_LINK_STYLES.map(key => ({ key, label: t
       <p class="mb-1 mt-5 text-xs font-semibold text-meta">{{ t('album.tracklist.settings.cards') }}</p>
       <div class="divide-y divide-line">
         <UiSwitch :model-value="prefs.artistCard" class="w-full flex-row-reverse justify-between py-2.5" @update:model-value="value => emit('update', { artistCard: Boolean(value) })">
-          <span class="block text-[13.5px] font-semibold leading-5 text-title">{{ t('album.tracklist.settings.artist_card') }}</span>
+          <span class="block text-13.5 font-semibold leading-5 text-title">{{ t('album.tracklist.settings.artist_card') }}</span>
           <span class="block text-xs leading-[1.125rem] text-meta">{{ t('album.tracklist.settings.artist_card_hint') }}</span>
         </UiSwitch>
       </div>

@@ -27,26 +27,26 @@
         <Music2 :size="13" aria-hidden="true" />
         <span class="sm:hidden md:inline">{{ $t('catalog.field.is_instrumental') }}</span>
       </label>
-      <button v-if="badge" type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
+      <button v-if="badge" type="button" class="shrink-0 rounded-full px-1.5 py-0.5 text-10 font-medium" :class="badge.tone" :title="badge.title" @click="open = true">{{ badge.text }}</button>
       <UiButton :label="$t('editor.album.track_details')" size="sm" class="ml-auto shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px sm:ml-0" :aria-expanded="open" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </UiButton>
       <UiButton variant="danger-soft" :icon="X" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
     </div>
-    <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-[11px] text-danger">{{ error.message }}</p>
+    <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-11 text-danger">{{ error.message }}</p>
 
     <div v-if="open" class="space-y-4 border-t border-dashed border-line bg-sunken px-4 py-3">
       <div class="flex flex-wrap items-end gap-3">
         <label class="block">
-          <span class="mb-1 block text-[11px] text-meta">{{ $t('catalog.field.number_label') }}<EditorHelp id="track.number_label" /></span>
+          <span class="mb-1 block text-11 text-meta">{{ $t('catalog.field.number_label') }}<EditorHelp id="track.number_label" /></span>
           <input v-model="track.number_label" class="input input-sm w-20 font-mono" placeholder="A1" maxlength="10">
         </label>
         <label class="block">
-          <span class="mb-1 block text-[11px] text-meta">ISRC<EditorHelp id="track.isrc" /></span>
+          <span class="mb-1 block text-11 text-meta">ISRC<EditorHelp id="track.isrc" /></span>
           <input v-model="track.isrc" class="input input-sm w-36 font-mono uppercase" placeholder="JPXX01234567" maxlength="12">
         </label>
         <label v-if="discs.length > 1" class="block">
-          <span class="mb-1 block text-[11px] text-meta">{{ $t('editor.album.move_to_disc') }}<EditorHelp id="track.move" /></span>
+          <span class="mb-1 block text-11 text-meta">{{ $t('editor.album.move_to_disc') }}<EditorHelp id="track.move" /></span>
           <UiSelect :model-value="String(track.disc_id)" :options="discOptions" size="sm" class="w-32" @change="moveTo" />
         </label>
         <div class="flex gap-1">

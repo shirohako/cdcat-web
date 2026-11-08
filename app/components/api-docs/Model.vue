@@ -15,12 +15,12 @@ const extendsLabel = computed(() => labels.value.extends.split('{model}'))
 <template>
   <article :id="modelId(model.name)" class="scroll-mt-36 border-t border-line pt-6 lg:scroll-mt-20">
     <header class="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-      <span class="tag rounded-sm bg-sunken px-1.5 py-0.5 text-[11px] font-medium text-meta ring-1 ring-line" :class="{ 'is-flashing': flash }">{{ labels.model }}</span>
-      <h3 class="font-mono text-[17px] font-semibold text-title">{{ model.name }}</h3>
+      <span class="tag rounded-sm bg-sunken px-1.5 py-0.5 text-11 font-medium text-meta ring-1 ring-line" :class="{ 'is-flashing': flash }">{{ labels.model }}</span>
+      <h3 class="font-mono text-[1.0625rem] font-semibold text-title">{{ model.name }}</h3>
       <span class="text-sm text-meta">{{ text.title }}</span>
     </header>
     <!-- eslint-disable-next-line vue/no-v-html -- the reference's own texts, rendered by the site's Markdown -->
-    <p class="mt-2 text-[15px] leading-7 text-body" v-html="docs.inline(text.description)" />
+    <p class="mt-2 text-15 leading-7 text-body" v-html="docs.inline(text.description)" />
     <p v-if="model.extends" class="mt-3 text-sm text-body">
       {{ extendsLabel[0] }}<ApiDocsType :type="model.extends" />{{ extendsLabel[1] }}
     </p>

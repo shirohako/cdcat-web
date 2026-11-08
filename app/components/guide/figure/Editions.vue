@@ -25,15 +25,15 @@ const DISCS = computed(() => [
     <GuideMockPanel :title="t('editor.album.section.editions')" icon="lucide:package">
       <ul class="space-y-1.5">
         <li v-for="(edition, index) in EDITIONS" :key="edition.name" class="flex gap-2 rounded-md px-2 py-1.5" :class="index === 0 ? 'bg-primary/8 ring-1 ring-primary/30' : 'bg-sunken'">
-          <span class="mt-0.5 grid size-4.5 shrink-0 place-items-center rounded-full bg-card font-mono text-[10px] font-bold text-meta ring-1 ring-line">{{ index + 1 }}</span>
+          <span class="mt-0.5 grid size-4.5 shrink-0 place-items-center rounded-full bg-card font-mono text-10 font-bold text-meta ring-1 ring-line">{{ index + 1 }}</span>
           <span class="min-w-0 flex-1">
             <span class="flex flex-wrap items-center gap-1.5">
               <span class="text-xs font-semibold text-title">{{ edition.name }}</span>
               <GuideMockChip :label="edition.type" />
-              <span class="rounded-sm bg-card px-1 font-mono text-[10px] font-semibold text-body ring-1 ring-line">{{ edition.format }}</span>
-              <span v-if="edition.hires" class="rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning">Hi-Res</span>
+              <span class="rounded-sm bg-card px-1 font-mono text-10 font-semibold text-body ring-1 ring-line">{{ edition.format }}</span>
+              <span v-if="edition.hires" class="rounded-sm bg-warning/15 px-1 text-10 font-bold text-warning">Hi-Res</span>
             </span>
-            <span class="mt-0.5 flex flex-wrap gap-x-2 text-[10px] text-meta">
+            <span class="mt-0.5 flex flex-wrap gap-x-2 text-10 text-meta">
               <span v-for="detail in edition.details" :key="detail" :class="{ 'font-mono': numeric(detail) }">{{ detail }}</span>
             </span>
           </span>
@@ -43,7 +43,7 @@ const DISCS = computed(() => [
     </GuideMockPanel>
 
     <div class="overflow-hidden rounded-lg bg-popover shadow-overlay ring-1 ring-line">
-      <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-[13px] font-semibold text-title">
+      <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-13 font-semibold text-title">
         <Icon name="lucide:package" class="size-3.5 text-primary" />{{ t('editor.dialog.edition_edit') }}
       </p>
       <div class="space-y-2.5 p-3">
@@ -57,9 +57,9 @@ const DISCS = computed(() => [
           <GuideMockField :label="t('catalog.field.catalog_number')" value="STNT-0012~3" mono />
         </div>
         <div>
-          <p class="mb-1 flex items-center gap-2 text-[11px] font-medium text-body">
+          <p class="mb-1 flex items-center gap-2 text-11 font-medium text-body">
             {{ t('editor.editions.discs') }}
-            <span class="rounded-sm bg-sunken px-1 font-mono text-[10px] font-semibold text-title">CD+BD</span>
+            <span class="rounded-sm bg-sunken px-1 font-mono text-10 font-semibold text-title">CD+BD</span>
           </p>
           <p class="flex flex-wrap gap-1.5">
             <span

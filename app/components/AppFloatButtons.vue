@@ -7,7 +7,7 @@
   >
     <!-- How far down the page is read; hovered, the number gives way to an arrow up, and a click goes back to the top. -->
     <UiFloatButton :label="topLabel" :tooltip="`${readLabel} · ${topLabel}`" class="group/top relative overflow-hidden" @click="toTop">
-      <span class="text-xs font-bold leading-none tabular-nums transition-[translate,opacity] duration-200 ease-out group-hover/top:-translate-y-2 group-hover/top:opacity-0">{{ percent }}<span class="text-[9px]">%</span></span>
+      <span class="text-xs font-bold leading-none tabular-nums transition-[translate,opacity] duration-200 ease-out group-hover/top:-translate-y-2 group-hover/top:opacity-0">{{ percent }}<span class="text-9">%</span></span>
       <ArrowUp :size="20" class="absolute translate-y-2 opacity-0 transition-[translate,opacity] duration-200 ease-out group-hover/top:translate-y-0 group-hover/top:opacity-100" aria-hidden="true" />
     </UiFloatButton>
   </div>

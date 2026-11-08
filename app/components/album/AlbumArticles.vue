@@ -33,7 +33,7 @@
           <p class="text-sm font-medium text-title leading-snug line-clamp-2 transition-colors group-hover:text-primary">
             {{ article.title }}
           </p>
-          <p v-if="article.published_at" class="text-[11px] text-meta mt-1">
+          <p v-if="article.published_at" class="text-11 text-meta mt-1">
             {{ formatDate(article.published_at) }}
           </p>
         </div>

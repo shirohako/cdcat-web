@@ -30,7 +30,7 @@ const href = (link: ContentLinkSummary) => ({
         </div>
         <div class="min-w-0">
           <p class="truncate text-sm font-medium text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ link.title }}</p>
-          <p class="mt-0.5 text-[11px] text-meta">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
+          <p class="mt-0.5 text-11 text-meta">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
         </div>
       </NuxtLink>
     </div>

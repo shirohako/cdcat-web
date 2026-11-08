@@ -1,5 +1,5 @@
 <template>
-  <div aria-hidden="true" class="rounded-md bg-card p-2 text-[10.5px] leading-4 text-body ring-1 ring-line">
+  <div aria-hidden="true" class="rounded-md bg-card p-2 text-10.5 leading-4 text-body ring-1 ring-line">
     <!-- A row of the album page's editions table -->
     <div v-if="mock.page === 'edition'" class="space-y-1">
       <div class="flex items-center justify-between gap-3">

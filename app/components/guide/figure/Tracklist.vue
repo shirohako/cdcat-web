@@ -19,12 +19,12 @@ const TRACKS = [
 <template>
   <div class="grid gap-3 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]" aria-hidden="true">
     <div class="overflow-hidden rounded-lg bg-popover shadow-overlay ring-1 ring-line">
-      <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-[13px] font-semibold text-title">
+      <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-13 font-semibold text-title">
         <Icon name="lucide:clipboard-paste" class="size-3.5 text-primary" />{{ t('editor.paste.title') }}
       </p>
       <div class="space-y-2 p-3">
-        <p class="line-clamp-3 text-[10px] leading-3.5 text-meta">{{ t('editor.paste.hint') }}</p>
-        <div class="rounded-md border border-field-line bg-field px-2 py-1.5 font-mono text-[10px] leading-4 text-title">
+        <p class="line-clamp-3 text-10 leading-3.5 text-meta">{{ t('editor.paste.hint') }}</p>
+        <div class="rounded-md border border-field-line bg-field px-2 py-1.5 font-mono text-10 leading-4 text-title">
           <p v-for="line in PASTED" :key="line" class="truncate" :class="{ 'font-bold text-primary': line === 'Disc 2' }">{{ line }}</p>
         </div>
         <p class="space-y-1">
@@ -32,7 +32,7 @@ const TRACKS = [
           <GuideMockCheck :label="t('editor.paste.mode_append')" class="flex!" />
         </p>
         <p class="flex items-center justify-end gap-2">
-          <span class="text-[11px] text-meta">{{ t('editor.paste.count', { count: 5 }) }}</span>
+          <span class="text-11 text-meta">{{ t('editor.paste.count', { count: 5 }) }}</span>
           <GuideMockButton :label="t('editor.paste.apply')" variant="primary" />
         </p>
       </div>
@@ -61,12 +61,12 @@ const TRACKS = [
             <GuideMockMarker v-if="track.n === 1" :n="3" class="absolute -left-2 -top-2 z-10" />
             <GuideMockField :value="track.time" mono class="w-14" />
           </span>
-          <span class="relative inline-flex shrink-0 items-center gap-1 px-0.5 text-[11px]" :class="track.instrumental ? 'text-primary' : 'text-meta'">
+          <span class="relative inline-flex shrink-0 items-center gap-1 px-0.5 text-11" :class="track.instrumental ? 'text-primary' : 'text-meta'">
             <GuideMockMarker v-if="track.n === 4" :n="4" class="absolute -left-2.5 -top-2.5 z-10" />
             <GuideMockCheck :checked="track.instrumental" />
             <Icon name="lucide:music-2" class="size-3" />
           </span>
-          <span v-if="track.open" class="hidden shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary sm:inline">{{ t('editor.originals.badge', { count: 1 }) }}</span>
+          <span v-if="track.open" class="hidden shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-10 font-medium text-primary sm:inline">{{ t('editor.originals.badge', { count: 1 }) }}</span>
           <span class="relative">
             <GuideMockMarker v-if="track.open" :n="5" class="absolute -left-2 -top-2 z-10" />
             <GuideMockButton icon="lucide:chevron-down" class="px-1.5!" :class="{ '[&_.iconify]:rotate-180': track.open }" />
@@ -79,11 +79,11 @@ const TRACKS = [
             <GuideMockField label="ISRC" value="JPXX02600003" mono class="w-32" />
           </div>
           <div>
-            <p class="mb-1 text-[11px] font-semibold text-body">{{ t('editor.originals.title') }}</p>
+            <p class="mb-1 text-11 font-semibold text-body">{{ t('editor.originals.title') }}</p>
             <span class="inline-flex h-7 max-w-full items-center gap-1.5 rounded-md bg-card px-2 text-xs text-title ring-1 ring-line">
               <Icon name="lucide:file-text" class="size-3.5 shrink-0 text-meta" />
               <span class="truncate">亡き王女の為のセプテット（東方紅魔郷）</span>
-              <span class="shrink-0 rounded-full bg-sunken px-1.5 text-[10px] text-meta">{{ t('editor.originals.text_only') }}</span>
+              <span class="shrink-0 rounded-full bg-sunken px-1.5 text-10 text-meta">{{ t('editor.originals.text_only') }}</span>
             </span>
           </div>
         </div>
@@ -91,7 +91,7 @@ const TRACKS = [
 
       <div class="flex items-center gap-2 border-t border-line px-2.5 py-1.5">
         <GuideMockButton :label="t('editor.album.add_track')" icon="lucide:plus" variant="add" class="h-6!" />
-        <span class="ml-auto font-mono text-[11px] text-meta">17:23</span>
+        <span class="ml-auto font-mono text-11 text-meta">17:23</span>
       </div>
     </div>
   </div>

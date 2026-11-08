@@ -18,17 +18,26 @@ export const ADMIN_HUE = 250
 /** The panel's choices: ink, then vivia's preset hues. */
 export const COLOR_PRESETS: readonly ThemeColor[] = ['ink', 0, 30, 60, 180, 250, 270, 300, 330, 345]
 
+/**
+ * The visitor's text size: the root font size as a percentage of the browser's own (16px unless they changed it). Every
+ * rem follows it, so text, spacing and icons grow together, as with the browser's zoom (main.css, data-text-size).
+ */
+export type TextSize = 100 | 110 | 120
+export const TEXT_SIZES: readonly TextSize[] = [100, 110, 120]
+export const DEFAULT_TEXT_SIZE: TextSize = 110
+
 const APPEARANCE_COOKIE = { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' } as const
 
 interface AppearanceCookies {
   theme: Ref<string | null | undefined>
   /** The theme colour: a hue, or 'ink'. */
   hue: Ref<number | string | null | undefined>
+  textSize: Ref<number | string | null | undefined>
 }
 
 const cache = new WeakMap<NuxtApp, AppearanceCookies>()
 
-/** The two cookies, one pair per app (per request on the server), like useAuthCookies. */
+/** The cookies, one set per app (per request on the server), like useAuthCookies. */
 const appearanceCookies = (): AppearanceCookies => {
   const nuxtApp = useNuxtApp()
   let cookies = cache.get(nuxtApp)
@@ -36,6 +45,7 @@ const appearanceCookies = (): AppearanceCookies => {
     cookies = nuxtApp._scope.run(() => ({
       theme: useCookie<string | null>('appearance_theme', APPEARANCE_COOKIE),
       hue: useCookie<number | string | null>('appearance_hue', APPEARANCE_COOKIE),
+      textSize: useCookie<number | string | null>('appearance_text_size', APPEARANCE_COOKIE),
     }))!
     cache.set(nuxtApp, cookies)
   }
@@ -51,11 +61,18 @@ export const toHue = (value: unknown): number | null => {
 /** `ink`, a hue, or null for anything else. */
 export const toColor = (value: unknown): ThemeColor | null => value === 'ink' ? 'ink' : toHue(value)
 
+/** One of TEXT_SIZES, or null for anything else. */
+export const toTextSize = (value: unknown): TextSize | null => {
+  const number = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN
+  return TEXT_SIZES.find(size => size === number) ?? null
+}
+
 /**
- * The visitor's theme (dark or light) and theme colour (a hue or ink), kept in cookies so the server renders the right
- * colours; the colour keeps the old cookie name, appearance_hue. app.vue puts what applies on <html> (data-theme,
- * --hue, data-palette): the admin console isn't themed yet, so it always gets the light theme in ADMIN_HUE. The setters
- * also write <html> straight away, because head updates wait while a page is loading.
+ * The visitor's theme (dark or light), theme colour (a hue or ink) and text size, kept in cookies so the server renders
+ * the right colours and sizes; the colour keeps the old cookie name, appearance_hue. app.vue puts what applies on <html>
+ * (data-theme, --hue, data-palette, data-text-size): the admin console isn't themed yet, so it always gets the light
+ * theme in ADMIN_HUE and the browser's own text size. The setters also write <html> straight away, because head
+ * updates wait while a page is loading.
  */
 export const useAppearance = () => {
   const cookies = appearanceCookies()
@@ -63,11 +80,13 @@ export const useAppearance = () => {
 
   const theme = computed<Theme>(() => cookies.theme.value === 'dark' || cookies.theme.value === 'light' ? cookies.theme.value : DEFAULT_THEME)
   const color = computed<ThemeColor>(() => toColor(cookies.hue.value) ?? DEFAULT_COLOR)
+  const textSize = computed<TextSize>(() => toTextSize(cookies.textSize.value) ?? DEFAULT_TEXT_SIZE)
 
   const themed = computed(() => route.path !== '/admin' && !route.path.startsWith('/admin/'))
   const appliedTheme = computed<Theme>(() => themed.value ? theme.value : 'light')
   const appliedHue = computed(() => !themed.value ? ADMIN_HUE : color.value === 'ink' ? INK_HUE : color.value)
   const appliedPalette = computed(() => themed.value && color.value === 'ink' ? 'ink' : undefined)
+  const appliedTextSize = computed(() => themed.value ? textSize.value : undefined)
 
   const paintTheme = (value: Theme) => {
     if (import.meta.client) document.documentElement.dataset.theme = value
@@ -91,5 +110,11 @@ export const useAppearance = () => {
     paintColor(next)
   }
 
-  return { theme, color, appliedTheme, appliedHue, appliedPalette, setTheme, setColor }
+  const setTextSize = (value: TextSize) => {
+    const next = toTextSize(value) ?? DEFAULT_TEXT_SIZE
+    cookies.textSize.value = next
+    if (import.meta.client) document.documentElement.dataset.textSize = String(next)
+  }
+
+  return { theme, color, textSize, appliedTheme, appliedHue, appliedPalette, appliedTextSize, setTheme, setColor, setTextSize }
 }

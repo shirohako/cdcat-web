@@ -39,7 +39,7 @@ async function copyLink() {
       >
         {{ sectionNumber(index) }}
       </span>
-      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[22px]">{{ section.title }}</h2>
+      <h2 class="min-w-0 flex-1 pt-1 text-xl font-bold leading-7 text-title md:text-[1.375rem]">{{ section.title }}</h2>
       <UiButton
         icon="lucide:link"
         :label="t('legal.copy_link')"
@@ -50,7 +50,7 @@ async function copyLink() {
     </header>
 
     <!-- In the section's colour, kept faint so a page of them doesn't shout; the label carries the colour. -->
-    <p class="summary mt-4 rounded-md px-4 py-3 text-[13px] leading-[1.375rem] text-meta">
+    <p class="summary mt-4 rounded-md px-4 py-3 text-13 leading-[1.375rem] text-meta">
       <span class="mr-2 mt-px inline-flex items-center gap-1 rounded-sm bg-(--accent-soft) px-1.5 align-top text-xs font-semibold leading-5 text-(--accent)">
         <Icon name="lucide:lightbulb" class="size-3" />
         {{ t('legal.in_short') }}

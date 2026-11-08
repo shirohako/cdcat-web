@@ -6,7 +6,7 @@ withDefaults(defineProps<{ value: number | string, size?: 'sm' | 'md' }>(), { si
 <template>
   <span
     class="inline-flex shrink-0 items-center justify-center bg-badge font-bold tabular-nums text-on-badge"
-    :class="size === 'md' ? 'h-7 min-w-8 rounded-lg px-1.5 text-sm' : 'h-5 min-w-5 rounded-md px-1.5 text-[11px]'"
+    :class="size === 'md' ? 'h-7 min-w-8 rounded-lg px-1.5 text-sm' : 'h-5 min-w-5 rounded-md px-1.5 text-11'"
   >
     {{ value }}
   </span>

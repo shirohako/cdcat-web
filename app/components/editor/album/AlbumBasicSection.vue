@@ -31,7 +31,7 @@
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.album.release_event') }}<EditorHelp id="album.release_event" /></span>
           <EditorPickedRef v-if="album.release_event_id" :id="album.release_event_id" type="events" :references="references" :icon="CalendarDays" class="max-w-sm" @remove="album.release_event_id = null" />
           <EditorEntityPicker v-else kind="event" class="max-w-sm" :placeholder="$t('editor.album.release_event_placeholder')" @select="pickEvent" />
-          <p class="mt-1 text-[11px] text-meta">{{ $t('editor.album.release_event_hint') }}</p>
+          <p class="mt-1 text-11 text-meta">{{ $t('editor.album.release_event_hint') }}</p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
@@ -43,7 +43,7 @@
             <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.barcode') }}<EditorHelp id="album.barcode" /></span>
             <input v-model="barcode" class="input input-sm w-full font-mono" inputmode="numeric" maxlength="32">
           </label>
-          <p class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-meta sm:col-span-2">
+          <p class="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-11 text-meta sm:col-span-2">
             {{ $t('editor.album.first_edition_hint') }}
             <UiButton
               variant="outline"
@@ -71,7 +71,7 @@
               @click="toggleCategory(value)"
             >{{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="ml-1 opacity-60">{{ categoryEn(value) }}</span></button>
           </div>
-          <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px] text-meta">
+          <p v-if="suggestedCategories.length" class="mt-1.5 flex flex-wrap items-center gap-1.5 text-11 text-meta">
             {{ $t('editor.album.categories_suggested') }}
             <UiButton v-for="value in suggestedCategories" :key="value" variant="add" size="xs" icon="lucide:plus" icon-class="size-3" class="gap-1 shadow-xs active:translate-y-px" @click="toggleCategory(value)">{{ enumLabel('album_category', value) }}<span v-if="categoryEn(value)" class="opacity-60">{{ categoryEn(value) }}</span></UiButton>
           </p>

@@ -22,7 +22,7 @@ const checked = defineModel<boolean>({ required: true })
       <svg
         viewBox="0 0 15 14"
         fill="none"
-        class="pointer-events-none absolute left-1 top-[5px] z-1 h-3.5 w-[15px] text-on-primary [stroke-dasharray:19] [stroke-dashoffset:19] peer-checked:[stroke-dashoffset:0] motion-safe:transition-[stroke-dashoffset] motion-safe:delay-200 motion-safe:duration-300"
+        class="pointer-events-none absolute left-1 top-1.25 z-1 h-3.5 w-3.75 text-on-primary [stroke-dasharray:19] [stroke-dashoffset:19] peer-checked:[stroke-dashoffset:0] motion-safe:transition-[stroke-dashoffset] motion-safe:delay-200 motion-safe:duration-300"
         aria-hidden="true"
       >
         <path d="M2 8.36364L6.23077 12L13 2" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />

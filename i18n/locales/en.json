@@ -1577,7 +1577,11 @@
     "light": "Light",
     "color": "Theme colour",
     "preset": "Use hue {hue}",
-    "ink": "Ink"
+    "ink": "Ink",
+    "text_size": "Text size",
+    "text_small": "Small",
+    "text_default": "Standard",
+    "text_large": "Large"
   },
   "year_filter": {
     "decade": "{decade}s"

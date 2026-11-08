@@ -1,7 +1,7 @@
 import type { Ref } from 'vue'
 
-/** The fixed navbar's height: rows under it count as off screen. */
-const NAVBAR = 56
+/** The fixed navbar's height (h-14): rows under it count as off screen. */
+const NAVBAR_REM = 3.5
 
 /**
  * Keeps what the reader is looking at in place while a list changes height above or around it (a density switch, a
@@ -28,9 +28,10 @@ export const useScrollAnchor = (root: Ref<HTMLElement | null>) => {
     const list = root.value
     if (!import.meta.client || !list) return
     stop()
+    const navbar = remToPx(NAVBAR_REM)
     const box = list.getBoundingClientRect()
-    if (box.bottom < NAVBAR || box.top > window.innerHeight) return
-    let target = element ?? [...list.querySelectorAll<HTMLElement>('[data-track-id]')].find(row => row.getBoundingClientRect().bottom > NAVBAR) ?? null
+    if (box.bottom < navbar || box.top > window.innerHeight) return
+    let target = element ?? [...list.querySelectorAll<HTMLElement>('[data-track-id]')].find(row => row.getBoundingClientRect().bottom > navbar) ?? null
     if (!target) return
     const id = target.dataset.trackId
     const top = target.getBoundingClientRect().top

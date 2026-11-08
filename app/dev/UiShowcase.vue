@@ -533,7 +533,7 @@ const markdownEnv: MarkdownEnv = {
             <p class="mb-2 text-xs font-semibold text-title">快捷键</p>
             <dl class="grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-1.5 text-xs">
               <template v-for="[key, action] in shortcuts" :key="key">
-                <dt><kbd class="rounded bg-btn px-1.5 py-0.5 font-mono text-[11px] text-btn-content">{{ key }}</kbd></dt>
+                <dt><kbd class="rounded bg-btn px-1.5 py-0.5 font-mono text-11 text-btn-content">{{ key }}</kbd></dt>
                 <dd>{{ action }}</dd>
               </template>
             </dl>

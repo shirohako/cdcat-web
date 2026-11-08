@@ -1577,7 +1577,11 @@
     "light": "ライト",
     "color": "テーマカラー",
     "preset": "色相 {hue} を使う",
-    "ink": "インク"
+    "ink": "インク",
+    "text_size": "文字サイズ",
+    "text_small": "小",
+    "text_default": "標準",
+    "text_large": "大"
   },
   "year_filter": {
     "decade": "{decade} 年代"

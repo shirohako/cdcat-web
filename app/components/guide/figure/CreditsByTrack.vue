@@ -23,30 +23,30 @@ const TRACKS = [
 <template>
   <GuideMockPanel :title="t('editor.album.section.credits')" icon="lucide:contact" aria-hidden="true">
     <p class="mb-2 flex flex-wrap items-center justify-between gap-2">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors_tracks') }}</span>
-      <span class="flex gap-0.5 rounded-md bg-sunken p-0.5 text-[10px] font-semibold">
-        <span class="rounded-[4px] px-2 py-px text-body">{{ t('editor.credits.view_by_role') }}</span>
-        <span class="rounded-[4px] bg-primary px-2 py-px text-on-primary">{{ t('editor.credits.view_by_track') }}</span>
+      <span class="text-10 font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors_tracks') }}</span>
+      <span class="flex gap-0.5 rounded-md bg-sunken p-0.5 text-10 font-semibold">
+        <span class="rounded-sm px-2 py-px text-body">{{ t('editor.credits.view_by_role') }}</span>
+        <span class="rounded-sm bg-primary px-2 py-px text-on-primary">{{ t('editor.credits.view_by_track') }}</span>
       </span>
     </p>
 
     <div class="space-y-2">
       <div class="rounded-md ring-1 ring-line">
-        <p class="flex items-center gap-1.5 border-b border-line bg-sunken px-2.5 py-1 text-[11px] font-semibold text-title">
+        <p class="flex items-center gap-1.5 border-b border-line bg-sunken px-2.5 py-1 text-11 font-semibold text-title">
           <Icon name="lucide:disc-3" class="size-3 text-meta" />{{ t('editor.credits.whole_album') }}
         </p>
         <div class="space-y-1 px-2.5 py-1.5">
           <p v-for="item in ALBUM" :key="item.role" class="flex items-center gap-2">
-            <span class="w-14 shrink-0 truncate text-[11px] font-medium text-primary">{{ role(item.role) }}</span>
+            <span class="w-14 shrink-0 truncate text-11 font-medium text-primary">{{ role(item.role) }}</span>
             <span
               v-for="person in item.people"
               :key="person.name"
-              class="inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-medium text-title"
+              class="inline-flex h-6 items-center gap-1 rounded-md px-2 text-11 font-medium text-title"
               :class="person.printed ? 'border border-dashed border-field-line' : 'bg-success/12'"
             >
               {{ person.name }}
-              <span v-if="person.created" class="rounded-sm bg-success/15 px-1 text-[9px] font-bold text-success">{{ t('editor.new') }}</span>
-              <span v-if="person.printed" class="text-[9px] text-meta">{{ t('editor.dialog.name_only') }}</span>
+              <span v-if="person.created" class="rounded-sm bg-success/15 px-1 text-9 font-bold text-success">{{ t('editor.new') }}</span>
+              <span v-if="person.printed" class="text-9 text-meta">{{ t('editor.dialog.name_only') }}</span>
             </span>
             <GuideFigureCreditAdd />
           </p>
@@ -55,21 +55,21 @@ const TRACKS = [
 
       <div class="grid gap-2 sm:grid-cols-2">
         <div v-for="(track, index) in TRACKS" :key="track.n" class="rounded-md ring-1" :class="index === 1 ? 'ring-primary/45' : 'ring-line'">
-          <p class="flex items-center gap-1.5 border-b border-line bg-sunken px-2.5 py-1 text-[11px]">
+          <p class="flex items-center gap-1.5 border-b border-line bg-sunken px-2.5 py-1 text-11">
             <span class="w-5 shrink-0 font-mono text-faint">{{ track.n }}</span>
             <span class="min-w-0 flex-1 truncate font-semibold text-title">{{ track.title }}</span>
             <span
               v-if="track.copy"
-              class="inline-flex h-5 shrink-0 items-center gap-0.5 rounded-md px-1.5 text-[10px] font-semibold ring-1 ring-inset"
+              class="inline-flex h-5 shrink-0 items-center gap-0.5 rounded-md px-1.5 text-10 font-semibold ring-1 ring-inset"
               :class="index === 1 ? 'bg-primary text-on-primary ring-primary' : 'bg-btn text-btn-content ring-line'"
             ><Icon name="lucide:copy" class="size-2.5" />{{ t('editor.credits.same_as_previous') }}</span>
           </p>
           <div class="space-y-1 px-2.5 py-1.5">
             <p v-for="[key, name] in track.credits" :key="key" class="flex items-center gap-2">
-              <span class="w-10 shrink-0 truncate text-[11px] font-medium text-primary">{{ role(key!) }}</span>
-              <span class="inline-flex h-5 items-center rounded-md px-1.5 text-[11px] font-medium text-title" :class="name === 'Yuki' ? 'bg-success/12' : 'bg-btn'">{{ name }}</span>
+              <span class="w-10 shrink-0 truncate text-11 font-medium text-primary">{{ role(key!) }}</span>
+              <span class="inline-flex h-5 items-center rounded-md px-1.5 text-11 font-medium text-title" :class="name === 'Yuki' ? 'bg-success/12' : 'bg-btn'">{{ name }}</span>
             </p>
-            <span class="inline-flex h-5 items-center gap-0.5 rounded-md border border-dashed border-primary/45 bg-primary/8 px-1.5 text-[10px] font-semibold text-primary">
+            <span class="inline-flex h-5 items-center gap-0.5 rounded-md border border-dashed border-primary/45 bg-primary/8 px-1.5 text-10 font-semibold text-primary">
               <Icon name="lucide:plus" class="size-2.5" />{{ t('editor.credits.add_role') }}
             </span>
           </div>

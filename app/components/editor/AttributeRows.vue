@@ -13,7 +13,7 @@
         <label class="block">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_key') }}<EditorHelp id="attribute.key" /></span>
           <UiSelect v-model="form.key" :options="keyOptions" data-autofocus size="sm" class="w-full" @change="form.value = null" />
-          <span v-if="hint(form.key)" class="mt-1 block text-[11px] leading-4 text-meta">{{ hint(form.key) }}</span>
+          <span v-if="hint(form.key)" class="mt-1 block text-11 leading-4 text-meta">{{ hint(form.key) }}</span>
         </label>
         <div>
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('editor.dialog.attribute_value') }}<EditorHelp id="attribute.value" /></span>

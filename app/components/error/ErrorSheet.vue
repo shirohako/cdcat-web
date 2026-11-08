@@ -191,11 +191,11 @@ function reload() {
   --sheet-head: rgb(201 207 230 / 0.08);
 }
 
-@media (min-width: 640px) {
+@media (width >= 40rem) {
   .sheet { padding: 2.25rem; }
 }
 
-@media (min-width: 1024px) {
+@media (width >= 64rem) {
   .sheet {
     grid-template-columns: minmax(0, 1fr) 18rem;
     grid-template-rows: auto minmax(0, 1fr) auto;

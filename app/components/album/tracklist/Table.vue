@@ -65,9 +65,9 @@ const CELL_CLASSES: Record<string, string> = {
   lyrics: 'c-lyrics w-px whitespace-nowrap',
   heart: 'c-heart w-px !px-0.5',
   duration: 'c-duration w-px whitespace-nowrap text-right text-xs/5 tabular-nums',
-  key: 'c-people text-[12.5px] text-title',
-  category: 'c-people text-[12.5px] text-title',
-  others: 'c-people c-others text-[12.5px] text-title',
+  key: 'c-people text-12.5 text-title',
+  category: 'c-people text-12.5 text-title',
+  others: 'c-people c-others text-12.5 text-title',
 }
 </script>
 
@@ -76,7 +76,7 @@ const CELL_CLASSES: Record<string, string> = {
     <div :key="density" class="px-5 pb-1.5">
       <AlbumTracklistDisc v-for="disc in discs" :key="disc.id" :disc="disc">
         <div class="table-scroll overflow-x-auto">
-          <table class="tl-table w-full border-collapse text-[13px] leading-5" :class="`is-${density}`">
+          <table class="tl-table w-full border-collapse text-13 leading-5" :class="`is-${density}`">
             <thead v-if="density !== 'compact'">
               <tr>
                 <th v-for="column in columns.get(disc.id)" :key="columnKey(column)" :class="CELL_CLASSES[column.kind]">
@@ -162,7 +162,7 @@ const CELL_CLASSES: Record<string, string> = {
   padding: 0.4375rem 0.5rem;
   border-bottom: 1px solid var(--line);
   color: var(--meta);
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1.125rem;
   text-align: left;

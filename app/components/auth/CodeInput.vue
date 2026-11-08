@@ -71,7 +71,7 @@ defineExpose({ focus: () => input.value?.focus() })
 
 .auth-code-caret {
   width: 2px;
-  height: 22px;
+  height: 1.375rem;
   background: var(--primary);
   animation: auth-code-blink 1s steps(1) infinite;
 }

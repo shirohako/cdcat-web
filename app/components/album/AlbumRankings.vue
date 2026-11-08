@@ -19,7 +19,7 @@
         </UiTooltip>
         <div class="min-w-0">
           <!-- The verdict; under five ratings, how many rated; nobody yet, that. -->
-          <p class="truncate text-[15px] font-bold leading-5 text-title">
+          <p class="truncate text-15 font-bold leading-5 text-title">
             <template v-if="score">{{ $t(`reviews.score.verdict.${score.verdict}`) }}</template>
             <template v-else-if="ratingCount === 0">{{ $t('reviews.no_ratings') }}</template>
             <template v-else>{{ $t('reviews.score.few', { count: number.format(ratingCount) }, ratingCount) }}</template>
@@ -59,7 +59,7 @@
       <!-- The groups' shares and counts in three columns, as under Metacritic's bar. -->
       <div class="mt-3 grid grid-cols-3 divide-x divide-line text-center">
         <div v-for="group in groups" :key="group.band" class="min-w-0 px-1">
-          <p class="truncate text-[13px] font-bold leading-5 text-title"><span class="tabular-nums">{{ group.share }}%</span> {{ $t(`reviews.score.group.${group.band}`) }}</p>
+          <p class="truncate text-13 font-bold leading-5 text-title"><span class="tabular-nums">{{ group.share }}%</span> {{ $t(`reviews.score.group.${group.band}`) }}</p>
           <p class="truncate text-xs leading-5 tabular-nums text-meta">{{ $t('reviews.score.ratings', { count: number.format(group.count) }, group.count) }}</p>
         </div>
       </div>

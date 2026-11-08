@@ -171,7 +171,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
           </div>
           <pre class="overflow-x-auto border-b border-line p-3 text-xs leading-6 text-body"><code>{{ example.source }}</code></pre>
           <div class="p-3">
-            <span class="mb-2 block text-[10px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
+            <span class="mb-2 block text-10 font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
             <RichContent :content="example.source" format="markdown" />
           </div>
         </article>
@@ -214,7 +214,7 @@ onUnmounted(() => clearTimeout(copiedTimer))
             <header class="border-b border-line bg-sunken px-3 py-2.5">
               <div class="flex items-center justify-between gap-2">
                 <h4 class="text-sm font-semibold text-title">{{ example.label }}</h4>
-                <span class="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" :class="example.badgeClass">{{ example.badge }}</span>
+                <span class="shrink-0 rounded-full px-2 py-0.5 text-10 font-bold" :class="example.badgeClass">{{ example.badge }}</span>
               </div>
               <p class="mt-1 text-xs leading-5 text-meta">{{ example.description }}</p>
             </header>
@@ -244,13 +244,13 @@ onUnmounted(() => clearTimeout(copiedTimer))
             <div class="grid md:grid-cols-2 md:divide-x md:divide-line">
               <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
-                  <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
+                  <span class="text-11 font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
                   <UiButton size="xs" :icon="copiedSource === containerExample(definition.name) ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(containerExample(definition.name))" @click="copy(containerExample(definition.name))" />
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ containerExample(definition.name) }}</code></pre>
               </div>
               <div class="min-w-0 p-4">
-                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
+                <span class="mb-2 block text-11 font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
                 <RichContent :content="containerExample(definition.name)" format="markdown" />
               </div>
             </div>
@@ -267,13 +267,13 @@ onUnmounted(() => clearTimeout(copiedTimer))
             <div class="grid md:grid-cols-2 md:divide-x md:divide-line">
               <div class="min-w-0 bg-codeblock p-4 text-on-media/80">
                 <div class="mb-2 flex items-center justify-between">
-                  <span class="text-[11px] font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
+                  <span class="text-11 font-semibold uppercase tracking-wide text-on-media/45">{{ t('markdown.help.source') }}</span>
                   <UiButton size="xs" :icon="copiedSource === inlineSpoilerExample ? 'lucide:check' : 'lucide:clipboard'" :label="copyLabel(inlineSpoilerExample)" @click="copy(inlineSpoilerExample)" />
                 </div>
                 <pre class="overflow-x-auto whitespace-pre-wrap text-xs leading-6"><code>{{ inlineSpoilerExample }}</code></pre>
               </div>
               <div class="min-w-0 p-4">
-                <span class="mb-2 block text-[11px] font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
+                <span class="mb-2 block text-11 font-semibold uppercase tracking-wide text-faint">{{ t('markdown.help.result') }}</span>
                 <RichContent :content="inlineSpoilerExample" format="markdown" />
               </div>
             </div>

@@ -44,7 +44,7 @@
     </label>
 
     <p v-if="errorMessage" class="text-sm text-danger">{{ errorMessage }}</p>
-    <p class="text-[11px] text-meta">{{ $t('lyrics_ui.moderation_hint') }}</p>
+    <p class="text-11 text-meta">{{ $t('lyrics_ui.moderation_hint') }}</p>
     <div class="flex justify-end gap-2">
       <UiButton size="sm" @click="$emit('cancel')">{{ $t('common.cancel') }}</UiButton>
       <UiButton type="submit" variant="primary" size="sm" :loading="saving">{{ $t('common.save') }}</UiButton>

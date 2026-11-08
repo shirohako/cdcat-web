@@ -7,7 +7,7 @@
         <li
           v-for="item in tocItems"
           :key="item.id"
-          :style="{ paddingLeft: `${(item.level - minLevel) * 12}px` }"
+          :style="{ paddingLeft: `${(item.level - minLevel) * 0.75}rem` }"
         >
           <a
             :href="`#${item.id}`"
@@ -43,7 +43,7 @@ const activeId = ref('');
 const scrollTo = (id) => {
   const el = document.getElementById(id);
   if (!el) return;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - remToPx(5), behavior: 'smooth' });
 };
 
 let observer = null;
@@ -61,7 +61,7 @@ const setupObserver = () => {
         }
       }
     },
-    { rootMargin: '-60px 0px -70% 0px', threshold: 0 }
+    { rootMargin: `-${Math.round(remToPx(3.75))}px 0px -70% 0px`, threshold: 0 }
   );
 
   const headings = props.articleEl.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');

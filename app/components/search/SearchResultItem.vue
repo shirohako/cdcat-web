@@ -10,7 +10,7 @@
         <CatalogPendingBadge v-if="result.is_pending" class="shrink-0" />
       </span>
       <span v-if="subtitle" class="block truncate text-xs text-meta">{{ subtitle }}</span>
-      <span v-if="matchedText" class="block truncate text-[11px] text-meta">{{ $t('search.matched', { text: matchedText }) }}</span>
+      <span v-if="matchedText" class="block truncate text-11 text-meta">{{ $t('search.matched', { text: matchedText }) }}</span>
     </span>
   </NuxtLink>
 </template>

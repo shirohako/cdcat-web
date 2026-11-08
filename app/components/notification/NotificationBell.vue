@@ -76,7 +76,7 @@ const ago = (value: string) => {
       :aria-label="unread ? t('notifications.bell_unread', { count: unread }) : t('notifications.title')" :aria-expanded="open" @click.stop="toggle">
       <!-- 18px: at 20 the bell looks bigger than the navbar's other icons. On hover it rings (ui-bell-ring in ui.css). -->
       <Bell :size="18" class="origin-top motion-safe:group-hover:animate-[ui-bell-ring_0.9s_both]" />
-      <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-danger px-1 text-center text-[10px] font-bold leading-4 text-on-primary">
+      <span v-if="unread" class="absolute right-1 top-1 min-w-4 rounded-full bg-danger px-1 text-center text-10 font-bold leading-4 text-on-primary">
         {{ unread > 99 ? '99+' : unread }}
       </span>
     </button>
@@ -111,7 +111,7 @@ const ago = (value: string) => {
             <span class="min-w-0 flex-1">
               <span class="block text-sm leading-snug" :class="item.read ? 'text-meta' : 'text-title'">{{ text(item) }}</span>
               <span v-if="detail(item)" class="mt-0.5 block truncate text-xs text-meta">{{ detail(item) }}</span>
-              <span class="mt-0.5 block text-[11px] text-faint">{{ ago(item.updated_at) }}</span>
+              <span class="mt-0.5 block text-11 text-faint">{{ ago(item.updated_at) }}</span>
             </span>
           </button>
         </li>

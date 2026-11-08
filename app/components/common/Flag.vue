@@ -15,7 +15,7 @@ const src = computed(() => `/flags/${props.code.toLowerCase()}.svg`)
       alt=""
       loading="lazy"
       decoding="async"
-      class="h-3 w-4 rounded-[2px] object-cover ring-1 ring-line"
+      class="h-3 w-4 rounded-xs object-cover ring-1 ring-line"
     >
   </span>
 </template>

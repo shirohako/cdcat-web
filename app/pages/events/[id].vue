@@ -113,7 +113,7 @@ const mapSection = ref<HTMLElement | null>(null)
 const locate = (id: number) => {
   mapSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   venueMap.value?.focusCircle(id)
-  if (window.matchMedia('(max-width: 639px)').matches) select(null)
+  if (window.matchMedia('(width < 40rem)').matches) select(null)
 }
 const selectedSpaceLabel = computed(() => {
   if (!selected.value?.space_code) return ''
@@ -261,7 +261,7 @@ usePageSeo({
               </div>
             </header>
 
-            <div class="h-[68vh] min-h-[420px] max-h-[820px]">
+            <div class="h-[68vh] min-h-105 max-h-205">
               <EventVenueMap
                 v-if="map && circleData"
                 ref="venueMap"

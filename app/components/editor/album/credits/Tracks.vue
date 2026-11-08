@@ -37,12 +37,12 @@ const setAll = async () => {
 <template>
   <span class="inline-flex min-w-0 flex-wrap items-center gap-1">
     <template v-for="{ disc, tracks } in discs" :key="disc.id">
-      <span v-if="discs.length > 1" class="ml-1 text-[10px] font-semibold uppercase tracking-wide text-meta first:ml-0">Disc {{ disc.position }}</span>
+      <span v-if="discs.length > 1" class="ml-1 text-10 font-semibold uppercase tracking-wide text-meta first:ml-0">Disc {{ disc.position }}</span>
       <button
         v-for="track in tracks"
         :key="track.id"
         type="button"
-        class="grid h-6 min-w-6 place-items-center rounded-[5px] border px-1 font-mono text-[11px] transition-colors"
+        class="grid h-6 min-w-6 place-items-center rounded-[0.3125rem] border px-1 font-mono text-11 transition-colors"
         :class="on(track.id) ? 'border-primary bg-primary text-on-primary' : 'border-line bg-card text-meta hover:border-faint hover:text-title'"
         :aria-pressed="on(track.id)"
         :title="track.title"
@@ -50,6 +50,6 @@ const setAll = async () => {
       >{{ track.number_label || track.track_number }}</button>
     </template>
     <UiButton v-if="all.length" size="xs" class="ring-1 ring-inset ring-line" @click="setAll">{{ allOn ? t('editor.credits.no_tracks_on') : t('common.all') }}</UiButton>
-    <span v-if="!model.length" class="text-[11px] text-meta">{{ t('editor.credits.whole_album') }}</span>
+    <span v-if="!model.length" class="text-11 text-meta">{{ t('editor.credits.whole_album') }}</span>
   </span>
 </template>

@@ -48,7 +48,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-title group-hover:text-primary transition-colors">{{ album.title }}</p>
-              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-meta">
+              <p class="mt-0.5 inline-flex items-center gap-1 text-11 text-meta">
                 <Heart :size="11" />
                 <span>{{ formatDate(album.favorited_at) }}</span>
               </p>

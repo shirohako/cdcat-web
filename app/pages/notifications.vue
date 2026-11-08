@@ -74,7 +74,7 @@ useHead({ title: computed(() => t('notifications.title')) })
           <span class="min-w-0 flex-1">
             <span class="block text-sm" :class="item.read ? 'text-meta' : 'font-medium text-title'">{{ text(item) }}</span>
             <span v-if="detail(item)" class="mt-1 block line-clamp-2 text-xs text-meta">{{ detail(item) }}</span>
-            <span class="mt-1 block text-[11px] text-meta">{{ date(item.updated_at) }}</span>
+            <span class="mt-1 block text-11 text-meta">{{ date(item.updated_at) }}</span>
           </span>
         </button>
       </li>

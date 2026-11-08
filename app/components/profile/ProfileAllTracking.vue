@@ -64,7 +64,7 @@
             </div>
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-title group-hover:text-primary transition-colors">{{ album.title }}</p>
-              <div class="mt-0.5 flex items-center gap-2 text-[11px] text-meta">
+              <div class="mt-0.5 flex items-center gap-2 text-11 text-meta">
                 <span v-if="album.catalog_number">{{ album.catalog_number }}</span>
                 <span v-if="album.release_date">{{ formatDate(album.release_date) }}</span>
               </div>

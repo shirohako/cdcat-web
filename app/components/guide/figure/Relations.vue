@@ -23,7 +23,7 @@ const LINKS = [
             <span class="truncate text-xs font-semibold text-title">銀河鉄道の放課後</span>
             <GuideMockChip :label="t('catalog.album_relation.opening')" tone="soft" />
           </span>
-          <span class="block truncate text-[10px] text-meta">{{ text.note }}</span>
+          <span class="block truncate text-10 text-meta">{{ text.note }}</span>
         </span>
         <Icon name="lucide:pencil-line" class="size-3.5 shrink-0 text-faint" />
       </p>
@@ -32,7 +32,7 @@ const LINKS = [
 
     <GuideMockPanel :title="t('catalog.collection.links')" icon="lucide:link-2">
       <ul class="space-y-1">
-        <li v-for="link in LINKS" :key="link.url" class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5 text-[11px]">
+        <li v-for="link in LINKS" :key="link.url" class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5 text-11">
           <span class="w-16 shrink-0 truncate font-semibold text-title">{{ link.provider }}</span>
           <span class="min-w-0 flex-1 truncate text-meta">{{ link.url }}</span>
           <Icon name="lucide:external-link" class="size-3 shrink-0 text-faint" />
@@ -42,7 +42,7 @@ const LINKS = [
     </GuideMockPanel>
 
     <GuideMockPanel :title="t('catalog.collection.attributes')" icon="lucide:list-checks">
-      <p class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5 text-[11px]">
+      <p class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5 text-11">
         <span class="shrink-0 font-semibold text-title">{{ text.attribute }}</span>
         <span class="min-w-0 flex-1 truncate text-body">ルナ</span>
       </p>

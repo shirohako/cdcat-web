@@ -54,7 +54,7 @@
               <p class="truncate text-sm font-medium text-title group-hover:text-primary transition-colors">
                 {{ track.title }}
               </p>
-              <div class="mt-0.5 flex items-center gap-2 text-[11px] text-meta">
+              <div class="mt-0.5 flex items-center gap-2 text-11 text-meta">
                 <span v-if="track.album" class="truncate">{{ track.album.title }}</span>
                 <span v-if="track.track_number" class="shrink-0">
                   <template v-if="track.disc_number">Disc {{ track.disc_number }} · </template>#{{ track.track_number }}
@@ -65,7 +65,7 @@
             <!-- Duration & date -->
             <div class="shrink-0 text-right">
               <p v-if="track.duration" class="tabular-nums text-xs font-medium text-meta">{{ formatDuration(track.duration) }}</p>
-              <p class="mt-0.5 inline-flex items-center gap-1 text-[11px] text-meta">
+              <p class="mt-0.5 inline-flex items-center gap-1 text-11 text-meta">
                 <Heart :size="11" />
                 <span>{{ formatDate(track.favorited_at) }}</span>
               </p>

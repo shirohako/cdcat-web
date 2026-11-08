@@ -74,7 +74,7 @@
               </div>
 
               <div class="min-w-0 flex-1">
-                <UiTruncate :text="artist.name" tag="h3" class="text-[13px] font-medium text-title transition-colors group-hover:text-primary" />
+                <UiTruncate :text="artist.name" tag="h3" class="text-13 font-medium text-title transition-colors group-hover:text-primary" />
               </div>
             </NuxtLink>
           </div>

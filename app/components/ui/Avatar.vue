@@ -7,7 +7,7 @@ const props = withDefaults(defineProps<{
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 }>(), { src: undefined, name: undefined, alt: undefined, size: 'md' })
 
-const SIZES = { xs: 'size-6 text-[10px]', sm: 'size-8 text-xs', md: 'size-10 text-sm', lg: 'size-14 text-lg', xl: 'size-20 text-2xl' }
+const SIZES = { xs: 'size-6 text-10', sm: 'size-8 text-xs', md: 'size-10 text-sm', lg: 'size-14 text-lg', xl: 'size-20 text-2xl' }
 
 const initial = computed(() => (props.name ?? '').trim().charAt(0).toUpperCase() || '?')
 // One of twelve hues round the colour wheel, at a lightness that reads in both themes.

@@ -5,7 +5,7 @@ defineProps<{ label: string, selected?: boolean, tone?: 'plain' | 'soft' | 'succ
 
 <template>
   <span
-    class="inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 text-[11px] font-semibold"
+    class="inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-1.5 text-11 font-semibold"
     :class="selected
       ? 'bg-primary text-on-primary'
       : {

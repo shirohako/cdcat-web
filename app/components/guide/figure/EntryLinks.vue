@@ -22,13 +22,13 @@ const ALBUMS = [
 <template>
   <div class="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)_minmax(0,1fr)]" aria-hidden="true">
     <div class="rounded-lg bg-card p-2.5 ring-1 ring-line">
-      <p class="mb-2 text-[11px] font-semibold text-meta">{{ text.entries_title }}</p>
+      <p class="mb-2 text-11 font-semibold text-meta">{{ text.entries_title }}</p>
       <ul class="space-y-1.5">
         <li v-for="entry in ENTRIES" :key="entry.relation" class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5">
           <Icon :name="entry.icon" class="size-3.5 shrink-0 text-meta" />
           <span class="min-w-0 flex-1">
-            <span class="block truncate text-[11px] text-title">{{ text[entry.key] }}</span>
-            <span class="block truncate text-[10px] text-meta">{{ entry.kind }}</span>
+            <span class="block truncate text-11 text-title">{{ text[entry.key] }}</span>
+            <span class="block truncate text-10 text-meta">{{ entry.kind }}</span>
           </span>
           <GuideMockChip :label="t(`catalog.relation.${entry.relation}`)" tone="soft" />
         </li>
@@ -39,7 +39,7 @@ const ALBUMS = [
       <span class="grid size-12 place-items-center rounded-md bg-(--accent-soft) text-(--accent)">
         <Icon name="lucide:tv" class="size-6" />
       </span>
-      <p class="mt-2 text-[13px] font-bold leading-5 text-title">{{ text.title }}</p>
+      <p class="mt-2 text-13 font-bold leading-5 text-title">{{ text.title }}</p>
       <p class="mt-1 flex flex-wrap justify-center gap-1">
         <GuideMockChip :label="t('catalog.entry_type.anime')" />
         <GuideMockChip :label="t('catalog.format.tv')" />
@@ -50,11 +50,11 @@ const ALBUMS = [
     </div>
 
     <div class="rounded-lg bg-card p-2.5 ring-1 ring-line">
-      <p class="mb-2 text-[11px] font-semibold text-meta">{{ text.albums_title }}</p>
+      <p class="mb-2 text-11 font-semibold text-meta">{{ text.albums_title }}</p>
       <ul class="space-y-1.5">
         <li v-for="album in ALBUMS" :key="album.relation" class="flex items-center gap-2 rounded-md bg-sunken px-2 py-1.5">
-          <GuideFigureSampleCover class="size-6 shrink-0 rounded-[3px]" :style="{ '--shift': album.shift }" />
-          <span class="min-w-0 flex-1 truncate text-[11px] text-title">{{ album.title }}</span>
+          <GuideFigureSampleCover class="size-6 shrink-0 rounded-[0.1875rem]" :style="{ '--shift': album.shift }" />
+          <span class="min-w-0 flex-1 truncate text-11 text-title">{{ album.title }}</span>
           <GuideMockChip :label="t(`catalog.album_relation.${album.relation}`)" tone="soft" />
         </li>
       </ul>

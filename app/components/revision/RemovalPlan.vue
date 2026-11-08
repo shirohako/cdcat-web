@@ -10,7 +10,7 @@
       <p class="mb-1.5 font-semibold text-title">{{ $t('revision_page.plan.delete', { count: plan.delete.length }) }}</p>
       <ul class="space-y-1">
         <li v-for="entry in plan.delete" :key="`${entry.type}:${entry.id}`" class="flex min-w-0 items-center gap-2 text-body">
-          <span class="shrink-0 rounded bg-danger/10 px-1.5 py-0.5 text-[11px] text-danger">{{ enumLabel('catalog_type', entry.type) }}</span>
+          <span class="shrink-0 rounded bg-danger/10 px-1.5 py-0.5 text-11 text-danger">{{ enumLabel('catalog_type', entry.type) }}</span>
           <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" class="min-w-0 truncate transition-colors hover:text-primary">{{ entry.label }}</NuxtLink>
           <span v-if="counts(entry)" class="shrink-0 text-xs text-faint">{{ counts(entry) }}</span>
         </li>
@@ -21,7 +21,7 @@
       <ul class="space-y-1.5">
         <li v-for="entry in plan.keep" :key="`${entry.type}:${entry.id}`" class="text-body">
           <p class="flex min-w-0 items-center gap-2">
-            <span class="shrink-0 rounded bg-success/10 px-1.5 py-0.5 text-[11px] text-success">{{ enumLabel('catalog_type', entry.type) }}</span>
+            <span class="shrink-0 rounded bg-success/10 px-1.5 py-0.5 text-11 text-success">{{ enumLabel('catalog_type', entry.type) }}</span>
             <NuxtLink v-if="entityPath(entry.type, entry.id)" :to="entityPath(entry.type, entry.id)!" class="min-w-0 truncate transition-colors hover:text-primary">{{ entry.label }}</NuxtLink>
             <span class="shrink-0 text-xs text-meta">{{ entry.action === 'move' ? $t('revision_page.plan.move', { id: entry.move_to }) : $t('revision_page.plan.release') }}</span>
           </p>

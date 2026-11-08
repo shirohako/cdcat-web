@@ -57,7 +57,7 @@
 
         <div v-if="products.length > 1">
           <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.editions') }}<EditorHelp id="bonus.editions" /></p>
-          <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.editions_hint') }}</p>
+          <p class="mb-1.5 text-11 text-meta">{{ $t('editor.bonuses.editions_hint') }}</p>
           <div class="flex flex-wrap gap-2">
             <label v-for="product in products" :key="product.id" class="flex cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-colors" :class="has(form.product_ids, product.id) ? 'border-primary/40 bg-primary/10 text-primary' : 'border-line text-meta hover:bg-card-hover'">
               <input type="checkbox" class="checkbox checkbox-xs" :checked="has(form.product_ids, product.id)" @change="toggleProduct(product.id)">
@@ -68,7 +68,7 @@
 
         <div>
           <p class="text-sm font-medium text-body">{{ $t('editor.bonuses.discs') }}<EditorHelp id="bonus.discs" /></p>
-          <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.bonuses.discs_hint') }}</p>
+          <p class="mb-1.5 text-11 text-meta">{{ $t('editor.bonuses.discs_hint') }}</p>
           <div class="flex flex-wrap items-center gap-2">
             <span v-for="disc in linkedDiscs" :key="disc.id" class="inline-flex items-center gap-1 rounded-lg bg-pink-50 px-2 py-1 text-xs text-pink-800 dark:bg-pink-400/15 dark:text-pink-300">
               <Disc3 :size="11" />{{ $t('editor.album.disc_n', { n: disc.position }) }} · {{ enumLabel('disc_format', disc.format) }}<span v-if="disc.title" class="max-w-28 truncate text-pink-500 dark:text-pink-400"> · {{ disc.title }}</span>

@@ -73,7 +73,7 @@
         <div class="absolute inset-y-0 left-0 flex aspect-square h-full overflow-hidden rounded-md bg-hero ring-1 ring-line">
           <div class="flex w-[15%] shrink-0 flex-col items-center justify-between bg-primary py-3 text-on-primary">
             <span class="text-xs font-bold tracking-[0.2em] [writing-mode:vertical-rl]">CDCat</span>
-            <span class="text-[10px] tracking-[0.15em] [writing-mode:vertical-rl]">{{ t('about_page.obi') }}</span>
+            <span class="text-10 tracking-[0.15em] [writing-mode:vertical-rl]">{{ t('about_page.obi') }}</span>
           </div>
           <!-- The cover is at most 240px tall; srcset picks the copy for the screen's density. -->
           <img
@@ -103,7 +103,7 @@
           <div class="flex flex-col justify-center md:py-3">
             <span class="font-mono text-xs tabular-nums text-(--accent)">01</span>
             <h3 class="mt-2 text-xl font-semibold text-title md:text-2xl">{{ featured.title }}</h3>
-            <p class="mt-3 text-[15px] leading-7 text-body">{{ featured.desc }}</p>
+            <p class="mt-3 text-15 leading-7 text-body">{{ featured.desc }}</p>
           </div>
         </article>
         <article
@@ -597,7 +597,7 @@ usePageSeo({
 @keyframes rise {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 0.625rem;
   }
 }
 
@@ -621,7 +621,7 @@ usePageSeo({
 
 .legal-card .go {
   opacity: 0;
-  translate: -6px 0;
+  translate: -0.375rem 0;
 }
 
 .legal-card:is(:hover, :focus-visible) .title {
@@ -634,7 +634,7 @@ usePageSeo({
 
 .legal-card:is(:hover, :focus-visible) .rest {
   opacity: 0;
-  translate: 4px 0;
+  translate: 0.25rem 0;
 }
 
 .legal-card:is(:hover, :focus-visible) .go {
@@ -693,7 +693,7 @@ usePageSeo({
 }
 
 .link-row:is(:hover, :focus-visible) .trail:not(:has(.external)):not(.external) {
-  translate: 3px 0;
+  translate: 0.1875rem 0;
 }
 
 .link-row:is(:hover, :focus-visible) .external {

@@ -10,12 +10,12 @@
               <span class="min-w-0 flex-1">
                 <span class="flex min-w-0 items-center gap-1.5">
                   <span class="truncate text-sm font-medium text-title">{{ entryName(row.entry_id) }}</span>
-                  <span class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
+                  <span class="shrink-0 rounded-md bg-btn px-1.5 py-0.5 text-11 text-btn-content">{{ enumLabel('entry_album_relation', row.relation_type) }}<span v-if="labelEn('entry_album_relation', row.relation_type)" class="ml-1 opacity-60">{{ labelEn('entry_album_relation', row.relation_type) }}</span></span>
                 </span>
-                <span v-if="row.note" class="block truncate text-[11px] text-meta">{{ row.note }}</span>
+                <span v-if="row.note" class="block truncate text-11 text-meta">{{ row.note }}</span>
               </span>
             </EditorListRow>
-            <p v-for="error in errorsOf('entries', row.id)" :key="error.path" class="px-1 text-[11px] text-danger">{{ error.message }}</p>
+            <p v-for="error in errorsOf('entries', row.id)" :key="error.path" class="px-1 text-11 text-danger">{{ error.message }}</p>
           </template>
         </ul>
         <EditorAddButton @click="edit(null)">{{ $t('editor.dialog.entry_add') }}</EditorAddButton>

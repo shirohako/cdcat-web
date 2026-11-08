@@ -18,7 +18,7 @@ const IMAGES = computed(() => [
     <p class="flex flex-wrap items-center gap-1.5">
       <GuideMockButton :label="t('editor.image.upload_many')" icon="lucide:upload" variant="primary" />
       <GuideMockButton :label="t('editor.image.from_url')" icon="lucide:link-2" />
-      <span class="text-[10px] text-meta">{{ t('editor.image.gallery_hint') }}</span>
+      <span class="text-10 text-meta">{{ t('editor.image.gallery_hint') }}</span>
     </p>
     <ul class="mt-3 grid gap-2.5 sm:grid-cols-3">
       <li v-for="image in IMAGES" :key="image.art" class="overflow-hidden rounded-md bg-sunken ring-1 ring-line">
@@ -49,7 +49,7 @@ const IMAGES = computed(() => [
           </p>
           <GuideMockField :value="image.scope" select />
           <GuideMockField :placeholder="t('editor.image.caption_placeholder')" />
-          <p class="text-right font-mono text-[9px] text-faint">{{ image.size }}</p>
+          <p class="text-right font-mono text-9 text-faint">{{ image.size }}</p>
         </div>
       </li>
     </ul>

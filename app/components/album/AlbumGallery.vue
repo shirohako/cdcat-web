@@ -27,7 +27,7 @@
             <img :src="item.image.thumbnail_url" :alt="item.caption || describe(item)" loading="lazy" class="size-10 shrink-0 rounded-md bg-sunken object-cover">
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium text-title transition-colors group-hover:text-primary">{{ enumLabel('image_kind', item.kind) }}</span>
-              <span v-if="item.label || item.scope" class="block truncate text-[11px] text-meta">{{ [item.label, item.scope].filter(Boolean).join(' · ') }}</span>
+              <span v-if="item.label || item.scope" class="block truncate text-11 text-meta">{{ [item.label, item.scope].filter(Boolean).join(' · ') }}</span>
             </span>
           </button>
         </li>

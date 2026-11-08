@@ -26,7 +26,7 @@ const TONES: Record<Tone, Record<Variant, string>> = {
   info: { soft: 'bg-info/15 text-info', solid: 'bg-info text-on-primary', outline: 'text-info ring-1 ring-inset ring-info/40' },
 }
 const OVERLAY = 'bg-scrim text-on-media backdrop-blur-sm'
-const SIZES = { xs: 'h-4.5 gap-1 px-1.5 text-[10px]', sm: 'h-5 gap-1 px-2 text-[11px]', md: 'h-6 gap-1.5 px-2.5 text-xs' }
+const SIZES = { xs: 'h-4.5 gap-1 px-1.5 text-10', sm: 'h-5 gap-1 px-2 text-11', md: 'h-6 gap-1.5 px-2.5 text-xs' }
 </script>
 
 <template>

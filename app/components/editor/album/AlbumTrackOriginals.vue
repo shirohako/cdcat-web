@@ -1,7 +1,7 @@
 <template>
   <div v-if="track">
     <p class="text-xs font-semibold text-body">{{ $t('editor.originals.title') }}<EditorHelp id="track.originals" /></p>
-    <p class="mb-1.5 text-[11px] text-meta">{{ $t('editor.originals.hint') }}</p>
+    <p class="mb-1.5 text-11 text-meta">{{ $t('editor.originals.hint') }}</p>
     <ul v-if="rows.length" class="mb-2 space-y-1.5">
       <li v-for="row in rows" :key="row.id" class="flex flex-wrap items-center gap-2 text-sm">
         <template v-if="row.original_track_id !== null">
@@ -10,10 +10,10 @@
         </template>
         <template v-else>
           <span class="min-w-0 truncate">{{ row.original_title }}</span>
-          <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-[10px] text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
+          <span class="shrink-0 rounded-full bg-btn px-1.5 py-0.5 text-10 text-btn-content" :title="$t('editor.originals.text_only_hint')">{{ $t('editor.originals.text_only') }}</span>
         </template>
         <UiButton :icon="X" :label="$t('common.delete')" icon-class="size-3" size="xs" class="ml-auto ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="remove(row.id)" />
-        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
+        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-11 text-danger">{{ error.message }}</p>
       </li>
     </ul>
     <EditorEntityPicker

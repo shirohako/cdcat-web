@@ -129,16 +129,16 @@ onMounted(() => {
         ]"
       >
         <button type="button" class="flex h-full min-w-0 items-center gap-1.5 rounded-l-md pl-2 pr-1 text-left hover:bg-btn-hover/60" v-bind="attrs" @click="toggle">
-          <span v-if="joinPhrase" class="shrink-0 text-[11px] text-meta">{{ joinPhrase }}</span>
+          <span v-if="joinPhrase" class="shrink-0 text-11 text-meta">{{ joinPhrase }}</span>
           <span class="truncate font-medium text-title">{{ name || '—' }}</span>
-          <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-[11px] text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
-          <span v-if="person.role_label" class="truncate text-[11px] text-primary">· {{ person.role_label }}</span>
+          <span v-if="person.artist_id !== null && person.credited_as" class="truncate text-11 text-meta">{{ t('editor.credits.printed_as', { name: person.credited_as }) }}</span>
+          <span v-if="person.role_label" class="truncate text-11 text-primary">· {{ person.role_label }}</span>
           <span v-if="person.detail" class="grid shrink-0 place-items-center text-meta" :title="person.detail"><Icon name="lucide:info" class="size-3" /></span>
-          <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
-          <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-[10px] font-bold text-success">{{ t('editor.new') }}</span>
-          <span v-else-if="person.artist_id === null" class="shrink-0 text-[10px] text-meta">{{ t('editor.dialog.name_only') }}</span>
-          <span v-if="parent?.label" class="truncate text-[11px] text-meta">↳ {{ parent.label }}</span>
-          <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-[10px] font-bold text-warning" :title="note">⚠</span>
+          <span v-if="isNew && !type" class="shrink-0 rounded-sm bg-warning/15 px-1 text-10 font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
+          <span v-else-if="isNew" class="shrink-0 rounded-sm bg-success/15 px-1 text-10 font-bold text-success">{{ t('editor.new') }}</span>
+          <span v-else-if="person.artist_id === null" class="shrink-0 text-10 text-meta">{{ t('editor.dialog.name_only') }}</span>
+          <span v-if="parent?.label" class="truncate text-11 text-meta">↳ {{ parent.label }}</span>
+          <span v-if="note" class="shrink-0 rounded-sm bg-warning/15 px-1 text-10 font-bold text-warning" :title="note">⚠</span>
           <span v-else-if="info" class="grid shrink-0 place-items-center text-info" :title="info"><Icon name="lucide:info" class="size-3.5" /></span>
         </button>
         <button type="button" class="mr-0.5 grid size-5 shrink-0 place-items-center rounded text-meta hover:bg-danger/15 hover:text-danger [@media(hover:none)]:size-6" :aria-label="t('editor.credits.remove_person', { name })" @click="emit('remove')">
@@ -159,22 +159,22 @@ onMounted(() => {
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.dialog.credited_as') }}<EditorHelp id="person.credited_as" /></span>
         <input v-model="form.credited_as" class="input input-sm w-full" maxlength="200" :placeholder="person.artist_id === null ? '' : t('editor.credits.printed_hint')" @keydown.enter.prevent="open = false">
-        <span v-if="person.artist_id !== null" class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.printed_note') }}</span>
+        <span v-if="person.artist_id !== null" class="mt-1 block text-11 text-meta">{{ t('editor.credits.printed_note') }}</span>
       </label>
       <label v-if="labelable" class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.role_label') }}<EditorHelp id="person.role_label" /></span>
         <input v-model="form.role_label" class="input input-sm w-full" maxlength="100" :placeholder="t('editor.credits.role_label_hint')" @keydown.enter.prevent="open = false">
-        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.role_label_note') }}</span>
+        <span class="mt-1 block text-11 text-meta">{{ t('editor.credits.role_label_note') }}</span>
       </label>
       <label class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('catalog.field.detail') }}<EditorHelp id="person.detail" /></span>
         <input v-model="form.detail" class="input input-sm w-full" maxlength="200" @keydown.enter.prevent="open = false">
-        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.detail_note') }}</span>
+        <span class="mt-1 block text-11 text-meta">{{ t('editor.credits.detail_note') }}</span>
       </label>
       <label v-if="joinAfter !== undefined" class="block">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.join_phrase') }}<EditorHelp id="person.join_phrase" /></span>
         <input v-model="form.join_phrase" class="input input-sm w-full" maxlength="50" :placeholder="t('editor.credits.join_phrase_hint')" @keydown.enter.prevent="open = false">
-        <span class="mt-1 block text-[11px] text-meta">{{ t('editor.credits.join_phrase_note', { name: joinAfter }) }}</span>
+        <span class="mt-1 block text-11 text-meta">{{ t('editor.credits.join_phrase_note', { name: joinAfter }) }}</span>
       </label>
       <div v-if="movable" class="flex items-center gap-1.5">
         <span class="mr-auto text-xs font-medium text-body">{{ t('editor.credits.artist_order') }}</span>
@@ -184,7 +184,7 @@ onMounted(() => {
       <div v-if="parent">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.parent') }}<EditorHelp id="person.parent" /></span>
         <UiSelect :model-value="parent.value" :options="parent.options" size="sm" class="w-full" @update:model-value="emit('parent', $event as string)" />
-        <span class="mt-1 block whitespace-pre-line text-[11px] text-meta">{{ t('editor.credits.parent_hint') }}</span>
+        <span class="mt-1 block whitespace-pre-line text-11 text-meta">{{ t('editor.credits.parent_hint') }}</span>
       </div>
       <div v-if="person.artist_id === null">
         <span class="mb-1 block text-xs font-medium text-body">{{ t('editor.credits.link_artist') }}<EditorHelp id="person.link_artist" /></span>

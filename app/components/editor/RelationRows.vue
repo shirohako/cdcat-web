@@ -34,7 +34,7 @@
           >
         </template>
         <UiButton :icon="Trash2" :label="$t('common.delete')" icon-class="size-3.5" size="sm" @click="remove(row)" />
-        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
+        <p v-for="error in errorsOf(row.id)" :key="error.path" class="basis-full text-11 text-danger">{{ error.message }}</p>
       </li>
     </ul>
     <div class="flex flex-wrap items-center gap-2">

@@ -37,7 +37,7 @@ usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('
         </UiButton>
       </p>
 
-      <ul v-if="moreOpen" class="card mt-4 space-y-2 p-4 text-[13px] leading-6 text-body">
+      <ul v-if="moreOpen" class="card mt-4 space-y-2 p-4 text-13 leading-6 text-body">
         <li v-for="item in details" :key="item" class="flex gap-2">
           <Icon name="lucide:check" class="mt-1 h-3.5 w-3.5 shrink-0 text-success" />{{ t(`contribute_page.details.${item}`) }}
         </li>

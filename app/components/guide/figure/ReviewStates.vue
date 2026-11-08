@@ -22,22 +22,22 @@ const OUTCOMES = [
           <span class="grid size-6 place-items-center rounded-full bg-primary text-on-primary"><Icon name="lucide:send" class="size-3.5" /></span>
           {{ text.submit }}
         </p>
-        <p class="mt-2 flex items-center gap-1.5 text-[11px] text-body">
-          <span class="rounded-full bg-warning/15 px-1.5 py-px text-[10px] font-semibold text-warning">{{ t('pending.badge') }}</span>
+        <p class="mt-2 flex items-center gap-1.5 text-11 text-body">
+          <span class="rounded-full bg-warning/15 px-1.5 py-px text-10 font-semibold text-warning">{{ t('pending.badge') }}</span>
           {{ text.live }}
         </p>
-        <p class="mt-1.5 text-[11px] text-meta">{{ t('revision_page.status.pending') }}</p>
+        <p class="mt-1.5 text-11 text-meta">{{ t('revision_page.status.pending') }}</p>
       </div>
       <Icon name="lucide:arrow-right" class="hidden size-5 text-faint sm:block" />
       <ul class="space-y-1.5">
         <li v-for="outcome in OUTCOMES" :key="outcome.status" class="flex items-center gap-2 rounded-lg bg-card px-2.5 py-1.5 ring-1 ring-line">
           <span class="grid size-6 shrink-0 place-items-center rounded-full" :class="outcome.tone"><Icon :name="outcome.icon" class="size-3.5" /></span>
           <span class="shrink-0 text-xs font-semibold text-title">{{ t(`revision_page.status.${outcome.status}`) }}</span>
-          <span v-if="outcome.note" class="min-w-0 truncate text-[11px] text-meta">{{ text[outcome.note] }}</span>
+          <span v-if="outcome.note" class="min-w-0 truncate text-11 text-meta">{{ text[outcome.note] }}</span>
         </li>
       </ul>
     </div>
-    <p class="mt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-meta">
+    <p class="mt-2.5 flex items-center justify-center gap-1.5 text-11 text-meta">
       <Icon name="lucide:bell" class="size-3.5" />{{ text.notify }}
     </p>
   </div>

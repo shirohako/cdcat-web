@@ -19,7 +19,7 @@
         </div>
         <div v-if="total" class="max-h-72 overflow-y-auto rounded-lg border border-line" :class="stale && 'opacity-60'">
           <template v-for="disc in result.discs" :key="disc.position">
-            <p class="sticky top-0 bg-sunken px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-meta">
+            <p class="sticky top-0 bg-sunken px-3 py-1 text-11 font-bold uppercase tracking-wider text-meta">
               {{ t('editor.album.disc_n', { n: disc.position }) }}<span v-if="disc.title" class="normal-case"> · {{ disc.title }}</span>
             </p>
             <p v-for="track in disc.tracks" :key="track.track_number" class="flex items-baseline gap-3 border-t border-line px-3 py-1 text-xs">

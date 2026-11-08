@@ -43,7 +43,7 @@ const changeLocale = (code?: string) => {
         <div class="min-w-0 flex-1">
           <p class="text-sm font-semibold text-title">
             {{ localized(item.names) || item.key }}
-            <span v-if="item.is_required" class="ml-1.5 inline-flex items-center gap-1 rounded bg-btn px-1.5 py-0.5 align-middle text-[11px] font-medium text-btn-content">
+            <span v-if="item.is_required" class="ml-1.5 inline-flex items-center gap-1 rounded bg-btn px-1.5 py-0.5 align-middle text-11 font-medium text-btn-content">
               <Lock :size="10" />{{ t('mail_settings.required') }}
             </span>
           </p>

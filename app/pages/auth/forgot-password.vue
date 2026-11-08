@@ -62,7 +62,7 @@
       </div>
     </Transition>
 
-    <p v-if="step !== 3" class="text-center text-[13px] text-meta">
+    <p v-if="step !== 3" class="text-center text-13 text-meta">
       <NuxtLink to="/auth/login" class="link -mx-2 -my-1 px-2 py-1 font-semibold">{{ t('auth.forgot_password.back_to_login') }}</NuxtLink>
     </p>
   </div>
@@ -144,12 +144,12 @@ useHead({
 
 .auth-step-enter-from {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(0.375rem);
 }
 
 .auth-step-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-0.25rem);
 }
 
 @media (prefers-reduced-motion: reduce) {

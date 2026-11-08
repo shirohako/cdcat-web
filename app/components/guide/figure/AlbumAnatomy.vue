@@ -27,8 +27,8 @@ const editions = computed(() => [
     <div class="flex items-center gap-3 rounded-lg bg-card p-3 shadow-xs ring-1 ring-line">
       <GuideFigureSampleCover class="size-14 shrink-0 rounded-md" />
       <div class="min-w-0">
-        <p class="truncate text-[15px] font-bold text-title">星屑のアトラス</p>
-        <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-meta">
+        <p class="truncate text-15 font-bold text-title">星屑のアトラス</p>
+        <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-11 text-meta">
           <GuideMockChip :label="t('albums.type.album')" tone="soft" />
           <span class="font-mono">STNT-0012~3</span>
           <span>2026-10-25</span>
@@ -47,19 +47,19 @@ const editions = computed(() => [
     <div class="mt-3 grid gap-3 sm:mt-0 sm:grid-cols-3">
       <div class="rounded-lg bg-card p-3 ring-1 ring-line">
         <p class="flex items-center gap-1.5 text-xs font-semibold text-title"><Icon name="lucide:package" class="size-3.5 text-meta" />{{ t('editor.album.section.editions') }}</p>
-        <p class="mt-0.5 text-[11px] leading-4 text-meta">{{ text.editions_note }}</p>
+        <p class="mt-0.5 text-11 leading-4 text-meta">{{ text.editions_note }}</p>
         <ul class="mt-2.5 space-y-2">
           <li v-for="edition in editions" :key="edition.name" class="rounded-md bg-sunken px-2 py-1.5">
             <p class="flex items-center gap-1.5 text-xs">
               <span class="min-w-0 flex-1 truncate font-semibold text-title">{{ edition.name }}</span>
-              <span class="shrink-0 font-mono text-[10px] text-meta">{{ edition.format }}</span>
+              <span class="shrink-0 font-mono text-10 text-meta">{{ edition.format }}</span>
             </p>
             <p class="mt-1 flex flex-wrap items-center gap-1">
               <GuideMockChip :label="edition.type" />
               <span
                 v-for="n in edition.discs"
                 :key="n"
-                class="accent inline-flex h-5 items-center gap-1 rounded-md bg-(--accent-soft) px-1.5 text-[10px] font-semibold text-(--accent)"
+                class="accent inline-flex h-5 items-center gap-1 rounded-md bg-(--accent-soft) px-1.5 text-10 font-semibold text-(--accent)"
                 :style="{ '--shift': DISC_SHIFTS[n] }"
               ><Icon name="lucide:check" class="size-2.5" />{{ t('editor.album.disc_n', { n }) }}</span>
             </p>
@@ -69,14 +69,14 @@ const editions = computed(() => [
 
       <div class="rounded-lg bg-card p-3 ring-1 ring-line">
         <p class="flex items-center gap-1.5 text-xs font-semibold text-title"><Icon name="lucide:list-music" class="size-3.5 text-meta" />{{ t('editor.album.section.tracks') }}</p>
-        <p class="mt-0.5 text-[11px] leading-4 text-meta">{{ text.discs_note }}</p>
+        <p class="mt-0.5 text-11 leading-4 text-meta">{{ text.discs_note }}</p>
         <div class="mt-2.5 space-y-2">
           <div v-for="disc in discs" :key="disc.n" class="accent overflow-hidden rounded-md ring-1 ring-(--accent)/35" :style="{ '--shift': DISC_SHIFTS[disc.n] }">
-            <p class="flex items-center gap-1.5 bg-(--accent)/10 px-2 py-1 text-[11px] font-semibold text-(--accent)">
+            <p class="flex items-center gap-1.5 bg-(--accent)/10 px-2 py-1 text-11 font-semibold text-(--accent)">
               <Icon name="lucide:disc-3" class="size-3" />{{ t('editor.album.disc_n', { n: disc.n }) }} · {{ disc.format }}
             </p>
             <ol class="px-2 py-1">
-              <li v-for="([title, time], index) in disc.tracks" :key="title" class="flex items-center gap-2 py-0.5 text-[11px]">
+              <li v-for="([title, time], index) in disc.tracks" :key="title" class="flex items-center gap-2 py-0.5 text-11">
                 <span class="w-4 shrink-0 font-mono text-faint">{{ String(index + 1).padStart(2, '0') }}</span>
                 <span class="min-w-0 flex-1 truncate text-body">{{ title }}</span>
                 <span class="shrink-0 font-mono text-meta">{{ time }}</span>
@@ -88,7 +88,7 @@ const editions = computed(() => [
 
       <div class="rounded-lg bg-card p-3 ring-1 ring-line">
         <p class="flex items-center gap-1.5 text-xs font-semibold text-title"><Icon name="lucide:gift" class="size-3.5 text-meta" />{{ t('editor.album.section.bonuses') }}</p>
-        <p class="mt-0.5 text-[11px] leading-4 text-meta">{{ text.bonuses_note }}</p>
+        <p class="mt-0.5 text-11 leading-4 text-meta">{{ text.bonuses_note }}</p>
         <ul class="mt-2.5 space-y-2">
           <li class="rounded-md bg-sunken px-2 py-1.5">
             <p class="truncate text-xs font-semibold text-title">{{ text.bonus_shop }}</p>
@@ -97,10 +97,10 @@ const editions = computed(() => [
               <GuideMockChip :label="t('catalog.limited_rule.shop')" />
             </p>
             <div class="mt-1.5 overflow-hidden rounded-md ring-1 ring-pink-300/70 dark:ring-pink-400/40">
-              <p class="flex items-center gap-1.5 bg-pink-100/70 px-2 py-1 text-[11px] font-semibold text-pink-600 dark:bg-pink-400/15 dark:text-pink-200">
+              <p class="flex items-center gap-1.5 bg-pink-100/70 px-2 py-1 text-11 font-semibold text-pink-600 dark:bg-pink-400/15 dark:text-pink-200">
                 <Icon name="lucide:disc-3" class="size-3" />{{ t('editor.album.disc_n', { n: 4 }) }} · {{ t('catalog.disc_format.cd') }}
               </p>
-              <p class="flex items-center gap-2 px-2 py-1 text-[11px]">
+              <p class="flex items-center gap-2 px-2 py-1 text-11">
                 <span class="w-4 shrink-0 font-mono text-faint">01</span>
                 <span class="min-w-0 flex-1 truncate text-body">星屑のアトラス (Acoustic)</span>
               </p>

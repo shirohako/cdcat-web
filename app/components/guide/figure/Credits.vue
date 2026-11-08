@@ -35,30 +35,30 @@ const QUICK = ['composer', 'arranger', 'vocals', 'illustrator']
 
     <div class="rounded-md ring-1 ring-line">
       <p class="flex flex-wrap items-baseline gap-x-2 border-b border-line bg-sunken px-2.5 py-1">
-        <span class="text-[11px] font-semibold text-title">{{ t('editor.credits.byline_title') }}</span>
-        <span class="text-[10px] text-meta">{{ t('editor.credits.byline_hint') }}</span>
+        <span class="text-11 font-semibold text-title">{{ t('editor.credits.byline_title') }}</span>
+        <span class="text-10 text-meta">{{ t('editor.credits.byline_hint') }}</span>
       </p>
       <div class="space-y-1.5 px-2.5 py-2">
         <p v-for="key in ['artist', 'publisher']" :key="key" class="flex items-center gap-2">
-          <span class="w-20 shrink-0 text-[11px] font-medium text-primary">{{ role(key) }}</span>
-          <span class="inline-flex h-6 items-center rounded-md bg-btn px-2 text-[11px] font-medium text-title">ステラノート</span>
+          <span class="w-20 shrink-0 text-11 font-medium text-primary">{{ role(key) }}</span>
+          <span class="inline-flex h-6 items-center rounded-md bg-btn px-2 text-11 font-medium text-title">ステラノート</span>
           <GuideFigureCreditAdd />
         </p>
       </div>
     </div>
 
     <p class="mb-2 mt-3 flex flex-wrap items-center justify-between gap-2">
-      <span class="text-[10px] font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors_tracks') }}</span>
-      <span class="flex gap-0.5 rounded-md bg-sunken p-0.5 text-[10px] font-semibold">
-        <span class="rounded-[4px] bg-primary px-2 py-px text-on-primary">{{ t('editor.credits.view_by_role') }}</span>
-        <span class="rounded-[4px] px-2 py-px text-body">{{ t('editor.credits.view_by_track') }}</span>
+      <span class="text-10 font-bold uppercase tracking-wider text-meta">{{ t('editor.credits.contributors_tracks') }}</span>
+      <span class="flex gap-0.5 rounded-md bg-sunken p-0.5 text-10 font-semibold">
+        <span class="rounded-sm bg-primary px-2 py-px text-on-primary">{{ t('editor.credits.view_by_role') }}</span>
+        <span class="rounded-sm px-2 py-px text-body">{{ t('editor.credits.view_by_track') }}</span>
       </span>
     </p>
     <ul class="space-y-1">
       <li v-for="(line, index) in LINES" :key="index" class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 rounded-md bg-sunken px-2 py-1.5">
         <span class="relative">
           <GuideMockMarker v-if="index === 0" :n="1" class="absolute -left-2 -top-2 z-10" />
-          <span class="inline-flex h-6 items-center gap-1 rounded-md border border-field-line bg-field px-1.5 text-[11px] font-semibold text-title">
+          <span class="inline-flex h-6 items-center gap-1 rounded-md border border-field-line bg-field px-1.5 text-11 font-semibold text-title">
             {{ line.roles.map(role).join('、') }}<Icon name="lucide:chevron-down" class="size-2.5 text-meta" />
           </span>
         </span>
@@ -67,14 +67,14 @@ const QUICK = ['composer', 'arranger', 'vocals', 'illustrator']
           <span
             v-for="person in line.people"
             :key="person.name"
-            class="relative inline-flex h-6 items-center gap-1 rounded-md px-2 text-[11px] font-medium text-title"
+            class="relative inline-flex h-6 items-center gap-1 rounded-md px-2 text-11 font-medium text-title"
             :class="person.printed ? 'border border-dashed border-field-line' : person.untyped || person.created ? 'bg-success/12' : 'bg-btn'"
           >
             <GuideMockMarker v-if="person.untyped" :n="4" class="absolute -left-2 -top-2 z-10" />
             {{ person.name }}
-            <span v-if="person.untyped" class="rounded-sm bg-warning/15 px-1 text-[9px] font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
-            <span v-if="person.created" class="rounded-sm bg-success/15 px-1 text-[9px] font-bold text-success">{{ t('editor.new') }}</span>
-            <span v-if="person.printed" class="text-[9px] text-meta">{{ t('editor.dialog.name_only') }}</span>
+            <span v-if="person.untyped" class="rounded-sm bg-warning/15 px-1 text-9 font-bold text-warning">{{ t('editor.credits.pick_type') }}</span>
+            <span v-if="person.created" class="rounded-sm bg-success/15 px-1 text-9 font-bold text-success">{{ t('editor.new') }}</span>
+            <span v-if="person.printed" class="text-9 text-meta">{{ t('editor.dialog.name_only') }}</span>
           </span>
           <GuideFigureCreditAdd />
         </span>
@@ -83,19 +83,19 @@ const QUICK = ['composer', 'arranger', 'vocals', 'illustrator']
           <span
             v-for="n in 4"
             :key="n"
-            class="grid h-5 min-w-5 place-items-center rounded-[4px] border font-mono text-[10px]"
+            class="grid h-5 min-w-5 place-items-center rounded-sm border font-mono text-10"
             :class="line.tracks.includes(n) ? 'border-primary bg-primary text-on-primary' : 'border-line bg-card text-meta'"
           >{{ n }}</span>
-          <span v-if="!line.tracks.length" class="ml-1 text-[10px] text-meta">{{ t('editor.credits.whole_album') }}</span>
+          <span v-if="!line.tracks.length" class="ml-1 text-10 text-meta">{{ t('editor.credits.whole_album') }}</span>
         </span>
       </li>
     </ul>
     <p class="mt-2 flex flex-wrap items-center gap-1">
-      <span class="mr-0.5 text-[10px] text-meta">{{ t('editor.credits.add_line') }}</span>
-      <span v-for="key in QUICK" :key="key" class="inline-flex h-6 items-center gap-0.5 rounded-md border border-dashed border-primary/45 bg-primary/8 px-1.5 text-[11px] font-semibold text-primary">
+      <span class="mr-0.5 text-10 text-meta">{{ t('editor.credits.add_line') }}</span>
+      <span v-for="key in QUICK" :key="key" class="inline-flex h-6 items-center gap-0.5 rounded-md border border-dashed border-primary/45 bg-primary/8 px-1.5 text-11 font-semibold text-primary">
         <Icon name="lucide:plus" class="size-2.5" />{{ role(key) }}
       </span>
-      <span class="inline-flex h-6 items-center rounded-md bg-btn px-1.5 text-[11px] font-semibold text-btn-content ring-1 ring-inset ring-line">{{ t('editor.credits.more_roles') }}</span>
+      <span class="inline-flex h-6 items-center rounded-md bg-btn px-1.5 text-11 font-semibold text-btn-content ring-1 ring-inset ring-line">{{ t('editor.credits.more_roles') }}</span>
     </p>
   </GuideMockPanel>
 </template>

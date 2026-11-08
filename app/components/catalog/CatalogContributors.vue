@@ -29,7 +29,7 @@
           </span>
         </div>
         <!-- Name -->
-        <span class="text-[10px] text-meta group-hover:text-primary transition-colors max-w-14 truncate text-center leading-none">
+        <span class="text-10 text-meta group-hover:text-primary transition-colors max-w-14 truncate text-center leading-none">
           {{ user.nickname || user.username }}
         </span>
       </NuxtLink>

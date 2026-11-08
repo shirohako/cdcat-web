@@ -19,11 +19,11 @@ const LINKS = [
     <div class="rounded-lg bg-card p-2 shadow-xs ring-1 ring-line">
       <div class="relative">
         <GuideFigureSampleCover class="h-24 w-full rounded-md" preserveAspectRatio="xMidYMid slice" />
-        <span class="absolute left-1.5 top-1.5 rounded-sm bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-white">{{ text.type }}</span>
+        <span class="absolute left-1.5 top-1.5 rounded-sm bg-black/55 px-1.5 py-0.5 text-10 font-semibold text-white">{{ text.type }}</span>
       </div>
       <p class="mt-2 line-clamp-2 px-0.5 text-xs font-bold leading-[1.125rem] text-title">{{ text.title }}</p>
-      <p class="mt-1 line-clamp-2 px-0.5 text-[11px] leading-4 text-meta">{{ text.summary }}</p>
-      <p class="mt-2 flex items-center gap-1.5 px-0.5 text-[10px] text-meta">
+      <p class="mt-1 line-clamp-2 px-0.5 text-11 leading-4 text-meta">{{ text.summary }}</p>
+      <p class="mt-2 flex items-center gap-1.5 px-0.5 text-10 text-meta">
         <GuideFigureForumAvatar :shift="0" class="size-4! [&_.iconify]:size-2.5!" />
         <span class="text-body">{{ text.author }}</span>
         <span>2026-10-27</span>
@@ -33,31 +33,31 @@ const LINKS = [
 
     <div class="flex min-w-0 flex-col gap-2.5">
       <div class="rounded-lg bg-card p-2.5 ring-1 ring-line">
-        <p class="flex flex-wrap items-center gap-1.5 text-[11px]">
+        <p class="flex flex-wrap items-center gap-1.5 text-11">
           <GuideMockChip :label="t('article_ui.declaration.original')" selected />
-          <span class="inline-flex h-5 items-center gap-1 rounded-md border border-line px-1.5 font-mono text-[10px] font-semibold text-title">
+          <span class="inline-flex h-5 items-center gap-1 rounded-md border border-line px-1.5 font-mono text-10 font-semibold text-title">
             <Icon name="lucide:creative-commons" class="size-3" />CC BY-NC-SA 4.0
           </span>
-          <span class="text-[10px] text-meta">{{ t('article_ui.licenses.cc_by_nc_sa.summary') }}</span>
+          <span class="text-10 text-meta">{{ t('article_ui.licenses.cc_by_nc_sa.summary') }}</span>
         </p>
-        <p class="mt-2.5 text-[11px] font-semibold text-meta">{{ text.links_title }}</p>
+        <p class="mt-2.5 text-11 font-semibold text-meta">{{ text.links_title }}</p>
         <p class="mt-1 flex flex-wrap gap-1.5">
-          <span v-for="link in LINKS" :key="link.name" class="inline-flex h-6 items-center gap-1 rounded-md bg-sunken px-1.5 text-[11px] text-title">
+          <span v-for="link in LINKS" :key="link.name" class="inline-flex h-6 items-center gap-1 rounded-md bg-sunken px-1.5 text-11 text-title">
             <Icon :name="link.icon" class="size-3 text-meta" />{{ link.name }}
           </span>
-          <span class="inline-flex h-6 items-center rounded-md bg-(--accent-soft) px-1.5 text-[11px] text-(--accent)">#{{ text.tag }}</span>
+          <span class="inline-flex h-6 items-center rounded-md bg-(--accent-soft) px-1.5 text-11 text-(--accent)">#{{ text.tag }}</span>
         </p>
       </div>
 
       <div class="rounded-lg bg-card p-2.5 ring-1 ring-line">
-        <p class="text-[11px] font-semibold text-meta">{{ text.states_title }}</p>
-        <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-[11px]">
+        <p class="text-11 font-semibold text-meta">{{ text.states_title }}</p>
+        <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-11">
           <GuideMockChip :label="t('article_ui.statuses.draft')" />
           <Icon name="lucide:arrow-right" class="size-3 text-faint" />
           <GuideMockChip :label="t('article_ui.statuses.published')" tone="success" />
           <Icon name="lucide:arrow-left-right" class="size-3 text-faint" />
           <GuideMockChip :label="t('article_ui.statuses.hidden')" />
-          <span class="ml-auto inline-flex items-center gap-1 text-[10px] text-meta">
+          <span class="ml-auto inline-flex items-center gap-1 text-10 text-meta">
             {{ t('discussions.post.moderator') }}<Icon name="lucide:arrow-right" class="size-3 text-faint" />
             <GuideMockChip :label="t('article_ui.statuses.locked')" tone="warning" />
           </span>

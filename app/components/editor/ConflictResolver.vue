@@ -13,11 +13,11 @@
         <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <label class="flex cursor-pointer items-start gap-2 rounded border p-2 transition-colors" :class="choices[conflict.id] === 'mine' ? 'border-primary bg-primary/10' : 'border-line hover:bg-card-hover'">
             <input v-model="choices[conflict.id]" type="radio" value="mine" class="radio radio-sm mt-0.5">
-            <span><span class="block text-[11px] text-meta">{{ $t('editor.mine') }}</span>{{ show(conflict.mine) }}</span>
+            <span><span class="block text-11 text-meta">{{ $t('editor.mine') }}</span>{{ show(conflict.mine) }}</span>
           </label>
           <label class="flex cursor-pointer items-start gap-2 rounded border p-2 transition-colors" :class="choices[conflict.id] === 'current' ? 'border-primary bg-primary/10' : 'border-line hover:bg-card-hover'">
             <input v-model="choices[conflict.id]" type="radio" value="current" class="radio radio-sm mt-0.5">
-            <span><span class="block text-[11px] text-meta">{{ $t('editor.current') }}</span>{{ show(conflict.current) }}</span>
+            <span><span class="block text-11 text-meta">{{ $t('editor.current') }}</span>{{ show(conflict.current) }}</span>
           </label>
         </div>
       </li>

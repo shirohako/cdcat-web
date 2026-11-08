@@ -16,7 +16,7 @@ const seeLabel = computed(() => labels.value.see.split('{name}'))
 
 <template>
   <section class="mt-6">
-    <h4 class="text-[13px] font-semibold text-meta">{{ label }}</h4>
+    <h4 class="text-13 font-semibold text-meta">{{ label }}</h4>
     <dl class="ad-rows mt-2">
       <div v-for="param in params" :key="param.name" class="ad-row">
         <dt class="ad-key">

@@ -25,16 +25,16 @@ const count = ROWS.filter(row => row.match !== 'namesakes').reduce((sum, row) =>
 
 <template>
   <div class="mx-auto max-w-2xl overflow-hidden rounded-lg bg-popover shadow-overlay ring-1 ring-line" aria-hidden="true">
-    <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-[13px] font-semibold text-title">
+    <p class="flex items-center gap-2 border-b border-line px-3 py-2 text-13 font-semibold text-title">
       <Icon name="lucide:clipboard-paste" class="size-3.5 text-primary" />{{ t('editor.paste_credits.title') }}
     </p>
     <div class="space-y-2.5 p-3">
-      <div class="rounded-md border border-field-line bg-field px-2 py-1.5 font-mono text-[10px] leading-4 text-title">
+      <div class="rounded-md border border-field-line bg-field px-2 py-1.5 font-mono text-10 leading-4 text-title">
         <p v-for="line in PASTED" :key="line" class="truncate">{{ line }}</p>
       </div>
       <div class="overflow-x-auto rounded-md ring-1 ring-line">
-        <table class="w-full min-w-[30rem] border-separate border-spacing-0 text-[11px]">
-          <thead class="bg-sunken text-[10px] text-meta">
+        <table class="w-full min-w-[30rem] border-separate border-spacing-0 text-11">
+          <thead class="bg-sunken text-10 text-meta">
             <tr>
               <th class="px-2.5 py-1 text-left font-semibold">{{ t('editor.paste_credits.col_role') }}</th>
               <th class="px-2.5 py-1 text-left font-semibold">{{ t('editor.paste_credits.col_who') }}</th>
@@ -45,13 +45,13 @@ const count = ROWS.filter(row => row.match !== 'namesakes').reduce((sum, row) =>
             <tr v-for="(row, index) in ROWS" :key="index" :class="{ 'bg-warning/10': row.match === 'namesakes' }">
               <td class="border-t border-line px-2.5 py-1">
                 <span class="block font-medium text-title">{{ row.roles.map(role).join('、') }}</span>
-                <span class="block text-[9px] text-faint">{{ row.source }}</span>
+                <span class="block text-9 text-faint">{{ row.source }}</span>
               </td>
               <td class="border-t border-line px-2.5 py-1">
                 <span class="flex items-center gap-2">
                   <span class="min-w-0 truncate font-medium text-title">{{ row.name }}</span>
                   <span
-                    class="ml-auto inline-flex h-5 w-28 shrink-0 items-center justify-between gap-1 rounded-md border px-1.5 text-[10px]"
+                    class="ml-auto inline-flex h-5 w-28 shrink-0 items-center justify-between gap-1 rounded-md border px-1.5 text-10"
                     :class="row.match === 'namesakes' ? 'border-danger/50 bg-field text-faint' : 'border-field-line bg-field text-title'"
                   >
                     <span class="truncate">{{ row.match === 'existing' ? row.name : row.match === 'new' ? t('editor.paste_credits.new') : t('editor.paste_credits.namesakes', { count: 2 }) }}</span>
@@ -66,7 +66,7 @@ const count = ROWS.filter(row => row.match !== 'namesakes').reduce((sum, row) =>
       </div>
     </div>
     <div class="flex flex-wrap items-center justify-end gap-1.5 border-t border-line bg-sunken/60 px-3 py-2">
-      <span class="mr-auto text-[10px] text-meta">{{ t('editor.paste_credits.unsettled') }}</span>
+      <span class="mr-auto text-10 text-meta">{{ t('editor.paste_credits.unsettled') }}</span>
       <GuideMockButton :label="t('common.cancel')" />
       <GuideMockButton :label="t('editor.paste_credits.apply', { count })" variant="primary" />
     </div>

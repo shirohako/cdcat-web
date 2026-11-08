@@ -9,7 +9,7 @@
     ]"
   >
     <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
-    <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-[4px]' : '-bottom-[4px]'" />
+    <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-1' : '-bottom-1'" />
     <!-- Dragging starts from the handle only; the move buttons are the keyboard and touch way, so touch has no handle. -->
     <span v-if="sortable" class="flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing [@media(hover:none)]:hidden" aria-hidden="true" @pointerdown="emit('grab')">
       <GripVertical :size="14" />

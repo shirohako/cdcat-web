@@ -66,7 +66,7 @@
 
       <div v-if="current" class="mt-3">
         <div class="rounded-xl bg-sunken px-4 py-4 sm:px-6 sm:py-5">
-          <div v-if="comparison" class="mb-3 hidden grid-cols-2 gap-x-8 border-b border-line pb-2 text-[11px] font-medium text-meta sm:grid">
+          <div v-if="comparison" class="mb-3 hidden grid-cols-2 gap-x-8 border-b border-line pb-2 text-11 font-medium text-meta sm:grid">
             <span>{{ lyricLabel(current) }}</span>
             <span>{{ lyricLabel(comparison) }}</span>
           </div>
@@ -74,13 +74,13 @@
             <!-- A blank line in both texts separates stanzas. -->
             <div v-if="!row[0] && !row[1]" class="h-4" />
             <div v-else class="grid gap-x-8" :class="{ 'mb-1.5 sm:mb-0 sm:grid-cols-2': comparison }">
-              <p class="whitespace-pre-wrap break-words text-[15px] leading-7 text-title">{{ row[0] }}</p>
-              <p v-if="comparison" class="whitespace-pre-wrap break-words text-[13px] leading-6 text-meta sm:text-[15px] sm:leading-7">{{ row[1] }}</p>
+              <p class="whitespace-pre-wrap break-words text-15 leading-7 text-title">{{ row[0] }}</p>
+              <p v-if="comparison" class="whitespace-pre-wrap break-words text-13 leading-6 text-meta sm:text-15 sm:leading-7">{{ row[1] }}</p>
             </div>
           </template>
         </div>
 
-        <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-meta">
+        <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-11 text-meta">
           <span v-if="current.creator">{{ $t('lyrics_ui.added_by', { name: current.creator.nickname || current.creator.username }) }}</span>
           <span v-if="current.translator">{{ $t('lyrics_ui.translator', { name: current.translator }) }}</span>
           <span v-if="current.is_ai_generated" class="rounded bg-warning/10 px-1.5 py-px font-medium text-warning">{{ $t('lyrics_ui.ai_generated') }}</span>

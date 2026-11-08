@@ -92,7 +92,7 @@ function remove(link: ContentLinkSummary) {
         </div>
         <div class="min-w-0 flex-1">
           <p class="truncate text-sm font-medium text-title">{{ link.title }}</p>
-          <p class="text-[11px] text-faint">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
+          <p class="text-11 text-faint">{{ t(`article_ui.link_types.${link.type}`) }}<span v-if="link.date"> · {{ link.date }}</span></p>
         </div>
         <UiButton
           variant="danger-soft" size="xs" :icon="X" :label="t('article_ui.links.remove', { title: link.title })"
@@ -129,7 +129,7 @@ function remove(link: ContentLinkSummary) {
             </div>
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm text-title">{{ result.title }}</span>
-              <span v-if="result.date" class="block text-[11px] text-faint">{{ result.date }}</span>
+              <span v-if="result.date" class="block text-11 text-faint">{{ result.date }}</span>
             </span>
             <Plus v-if="!isLinked(result)" :size="14" class="shrink-0 text-primary" />
           </button>

@@ -18,22 +18,22 @@ const SIDES = [
     <div class="grid items-stretch gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
       <div class="rounded-lg bg-card p-3 ring-1 ring-line">
         <p class="flex items-center gap-2">
-          <GuideFigureSampleCover class="size-9 shrink-0 rounded-[4px]" />
+          <GuideFigureSampleCover class="size-9 shrink-0 rounded-sm" />
           <span class="min-w-0 flex-1">
             <span class="block truncate text-xs font-semibold text-title">星屑のアトラス</span>
-            <span class="block text-[10px] text-meta">{{ text.cd }}</span>
+            <span class="block text-10 text-meta">{{ text.cd }}</span>
           </span>
           <GuideMockChip :label="t('catalog.disc_format.cd')" />
         </p>
         <ol class="mt-2.5 space-y-0.5">
-          <li v-for="(title, index) in CD" :key="title" class="flex items-center gap-2 text-[11px]">
+          <li v-for="(title, index) in CD" :key="title" class="flex items-center gap-2 text-11">
             <span class="w-4 shrink-0 text-right font-mono text-faint">{{ index + 1 }}</span>
             <span class="min-w-0 truncate text-body">{{ title }}</span>
           </li>
         </ol>
       </div>
 
-      <div class="flex items-center justify-center gap-1.5 text-[11px] font-medium text-(--accent) sm:flex-col sm:px-1">
+      <div class="flex items-center justify-center gap-1.5 text-11 font-medium text-(--accent) sm:flex-col sm:px-1">
         <Icon name="lucide:equal-not" class="size-4" />
         <span class="max-w-28 text-center leading-4">{{ text.note }}</span>
       </div>
@@ -49,17 +49,17 @@ const SIDES = [
           </svg>
           <span class="min-w-0 flex-1">
             <span class="block truncate text-xs font-semibold text-title">星屑のアトラス</span>
-            <span class="block text-[10px] text-meta">{{ text.vinyl }}</span>
+            <span class="block text-10 text-meta">{{ text.vinyl }}</span>
           </span>
           <GuideMockChip :label="t('catalog.disc_format.vinyl')" tone="soft" />
         </p>
         <div class="mt-2.5 space-y-1.5">
           <div v-for="(side, at) in SIDES" :key="side.side">
-            <p class="mb-0.5 text-[10px] font-semibold uppercase tracking-wider text-meta">Side {{ side.side }}</p>
+            <p class="mb-0.5 text-10 font-semibold uppercase tracking-wider text-meta">Side {{ side.side }}</p>
             <ol class="space-y-0.5">
-              <li v-for="(title, index) in side.tracks" :key="title" class="flex items-center gap-2 text-[11px]">
+              <li v-for="(title, index) in side.tracks" :key="title" class="flex items-center gap-2 text-11">
                 <span class="w-4 shrink-0 text-right font-mono text-faint">{{ (at ? SIDES[0]!.tracks.length : 0) + index + 1 }}</span>
-                <span class="w-6 shrink-0 rounded-sm bg-(--accent-soft) text-center font-mono text-[10px] font-semibold text-(--accent)">{{ side.side }}{{ index + 1 }}</span>
+                <span class="w-6 shrink-0 rounded-sm bg-(--accent-soft) text-center font-mono text-10 font-semibold text-(--accent)">{{ side.side }}{{ index + 1 }}</span>
                 <span class="min-w-0 truncate text-body">{{ title }}</span>
               </li>
             </ol>
@@ -67,6 +67,6 @@ const SIDES = [
         </div>
       </div>
     </div>
-    <p class="mt-2.5 text-center text-[11px] text-meta">{{ text.numbers }}</p>
+    <p class="mt-2.5 text-center text-11 text-meta">{{ text.numbers }}</p>
   </div>
 </template>

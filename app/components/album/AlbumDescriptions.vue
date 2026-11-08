@@ -7,7 +7,7 @@
     <CatalogEmptyLine v-if="!album.description && !hasInfo" :icon="FileText" :text="$t('album.empty.description')" />
 
     <div v-else class="px-5 pb-5 pt-2">
-      <!-- Taller than COLLAPSED_HEIGHT and the card folds there, fading out, until expanded. The page comes from the
+      <!-- Taller than COLLAPSED_REM and the card folds there, fading out, until expanded. The page comes from the
            server already clipped, so long text doesn't jump; once measured, text that fits is let out. -->
       <div class="relative" :class="!expanded && (folds || !measured) && 'max-h-72 overflow-hidden'">
         <div ref="body">
@@ -26,7 +26,7 @@
                 <li v-for="releaser in releasers" :key="releaser.key" class="flex items-baseline gap-2">
                   <NuxtLink v-if="releaser.id" :to="`/artists/${releaser.id}`" class="min-w-0 truncate text-title transition-colors hover:text-primary">{{ releaser.name }}</NuxtLink>
                   <span v-else class="min-w-0 truncate text-title">{{ releaser.name }}</span>
-                  <span class="shrink-0 text-[11px] text-meta">{{ releaser.roles.map(roleName).join(', ') }}</span>
+                  <span class="shrink-0 text-11 text-meta">{{ releaser.roles.map(roleName).join(', ') }}</span>
                 </li>
               </ul>
             </CatalogInfoRow>
@@ -37,7 +37,7 @@
               <ul class="space-y-1">
                 <li v-for="entry in album.entries" :key="entry.id" class="flex items-baseline gap-2">
                   <NuxtLink :to="`/entries/${entry.id}`" class="min-w-0 truncate text-title transition-colors hover:text-primary">{{ entry.name }}</NuxtLink>
-                  <span class="shrink-0 text-[11px] text-meta">{{ albumRelationLabel(entry.relation_type) }}</span>
+                  <span class="shrink-0 text-11 text-meta">{{ albumRelationLabel(entry.relation_type) }}</span>
                 </li>
               </ul>
             </CatalogInfoRow>
@@ -94,9 +94,9 @@ const releasers = computed(() => {
   return [...rows.values()].map(row => ({ ...row, roles: row.roles.sort((a, b) => order(a) - order(b)) }))
 })
 
-/** max-h-72 in pixels; content up to two lines taller still shows whole, as folding it would hide next to nothing. */
-const COLLAPSED_HEIGHT = 288
-const SLACK = 48
+/** max-h-72 (18rem); content up to two lines (3rem) taller still shows whole, as folding it would hide next to nothing. */
+const COLLAPSED_REM = 18
+const SLACK_REM = 3
 const body = ref<HTMLElement | null>(null)
 const measured = ref(false)
 const folds = ref(false)
@@ -105,7 +105,7 @@ let observer: ResizeObserver | null = null
 onMounted(() => {
   if (!body.value) return
   observer = new ResizeObserver(() => {
-    folds.value = (body.value?.offsetHeight ?? 0) > COLLAPSED_HEIGHT + SLACK
+    folds.value = (body.value?.offsetHeight ?? 0) > remToPx(COLLAPSED_REM + SLACK_REM)
     measured.value = true
   })
   observer.observe(body.value)

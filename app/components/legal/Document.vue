@@ -44,7 +44,7 @@ const { active, progress, flashId, navigate, followLink } = useDocReading(conten
             <span class="sr-only">{{ title }}</span>
             <span aria-hidden="true"><span v-for="(char, index) in title" :key="index" class="char" :style="{ '--i': index }">{{ char }}</span></span>
           </h1>
-          <p class="intro mt-3 max-w-2xl text-[15px] leading-7 text-body">{{ doc.intro }}</p>
+          <p class="intro mt-3 max-w-2xl text-15 leading-7 text-body">{{ doc.intro }}</p>
         </div>
 
         <!-- Left out on phones, where it would only push the switch further down. -->
@@ -90,7 +90,7 @@ const { active, progress, flashId, navigate, followLink } = useDocReading(conten
             <span class="min-w-0 flex-1 text-sm font-semibold leading-5 text-title">{{ highlight.title }}</span>
             <Icon name="lucide:arrow-right" class="size-4 shrink-0 text-faint transition duration-150 ease-out group-hover:translate-x-0.5 group-hover:text-(--accent)" />
           </span>
-          <span class="mt-1.5 block text-[13px] leading-5 text-body">{{ highlight.text }}</span>
+          <span class="mt-1.5 block text-13 leading-5 text-body">{{ highlight.text }}</span>
         </a>
       </div>
     </section>
@@ -182,7 +182,7 @@ const { active, progress, flashId, navigate, followLink } = useDocReading(conten
 @keyframes rise {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 0.625rem;
   }
 }
 

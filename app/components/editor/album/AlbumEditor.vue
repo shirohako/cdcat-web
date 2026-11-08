@@ -76,7 +76,7 @@
               >
                 <component :is="section.icon" :size="15" class="shrink-0 text-meta" />
                 <span class="flex-1 whitespace-nowrap lg:whitespace-normal">{{ section.label }}</span>
-                <span v-if="errorCounts[section.key]" class="rounded-full bg-danger/15 px-1.5 text-[10px] font-bold text-danger">{{ errorCounts[section.key] }}</span>
+                <span v-if="errorCounts[section.key]" class="rounded-full bg-danger/15 px-1.5 text-10 font-bold text-danger">{{ errorCounts[section.key] }}</span>
                 <span v-else-if="missingIn(section.key)" class="h-2 w-2 rounded-full bg-warning" :title="$t('editor.required_missing')" />
               </button>
             </nav>

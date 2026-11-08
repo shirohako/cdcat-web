@@ -42,7 +42,7 @@ const confirm = () => { if (!props.busy && !blocked.value) emit('confirm') }
           <XCircle v-else-if="check.required" :size="16" class="shrink-0 text-danger" />
           <Circle v-else :size="16" class="shrink-0 text-faint" />
           <span :class="check.ok ? 'text-body' : check.required ? 'text-danger' : 'text-meta'">{{ t(`article_ui.submit.checks.${check.key}`, check.params ?? {}) }}</span>
-          <span v-if="!check.required" class="ml-auto text-[11px] text-meta">{{ t('article_ui.submit.optional') }}</span>
+          <span v-if="!check.required" class="ml-auto text-11 text-meta">{{ t('article_ui.submit.optional') }}</span>
         </li>
       </ul>
       <p v-if="error" role="alert" class="rounded-lg bg-danger/10 px-3 py-2 text-sm text-danger">{{ error }}</p>

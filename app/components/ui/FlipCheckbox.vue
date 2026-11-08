@@ -15,8 +15,8 @@ withDefaults(defineProps<{
 const checked = defineModel<boolean>({ required: true })
 
 const SIZES = {
-  sm: { label: 'gap-2 text-xs', box: 'size-4 rounded-[4px] border-[1.5px]', tick: 'size-2.5' },
-  md: { label: 'gap-2.5 text-sm', box: 'size-5 rounded-[5px] border-2', tick: 'size-3' },
+  sm: { label: 'gap-2 text-xs', box: 'size-4 rounded-sm border-[1.5px]', tick: 'size-2.5' },
+  md: { label: 'gap-2.5 text-sm', box: 'size-5 rounded-[0.3125rem] border-2', tick: 'size-3' },
 }
 </script>
 

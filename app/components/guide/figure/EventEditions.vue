@@ -37,7 +37,7 @@ const CIRCLES = [
         <span class="grid size-9 shrink-0 place-items-center rounded-md bg-(--accent) font-mono text-sm font-bold text-(--on-accent)">M3</span>
         <span class="min-w-0">
           <span class="block text-xs font-semibold text-title">M3</span>
-          <span class="block text-[11px] text-meta">{{ text.series_note }}</span>
+          <span class="block text-11 text-meta">{{ text.series_note }}</span>
         </span>
       </div>
       <ol class="relative flex flex-1 items-center gap-1.5 overflow-hidden rounded-lg bg-card p-2.5 ring-1 ring-line">
@@ -48,15 +48,15 @@ const CIRCLES = [
           class="relative min-w-0 flex-1 rounded-md px-2 py-1.5 text-center"
           :class="edition.current ? 'bg-(--accent-soft) ring-1 ring-(--accent)/50' : 'bg-sunken'"
         >
-          <span class="block truncate text-[11px] font-semibold" :class="edition.current ? 'text-(--accent)' : 'text-body'">{{ edition.name }}</span>
-          <span class="block truncate font-mono text-[10px] text-meta">{{ edition.date }}</span>
+          <span class="block truncate text-11 font-semibold" :class="edition.current ? 'text-(--accent)' : 'text-body'">{{ edition.name }}</span>
+          <span class="block truncate font-mono text-10 text-meta">{{ edition.date }}</span>
         </li>
       </ol>
     </div>
 
     <div class="mt-3 rounded-lg bg-card p-3 ring-1 ring-(--accent)/40">
-      <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-meta">
-        <span class="text-[13px] font-bold text-title">M3-2026秋</span>
+      <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-11 text-meta">
+        <span class="text-13 font-bold text-title">M3-2026秋</span>
         <span class="inline-flex items-center gap-1"><Icon name="lucide:calendar" class="size-3" />2026-10-25 10:30–15:30</span>
         <span class="inline-flex items-center gap-1"><Icon name="lucide:map-pin" class="size-3" />{{ text.venue }}</span>
         <span class="ml-auto rounded-sm bg-sunken px-1.5 py-0.5">{{ text.edition_note }}</span>
@@ -64,7 +64,7 @@ const CIRCLES = [
 
       <div class="mt-3 grid gap-3 sm:grid-cols-3">
         <div class="rounded-md bg-sunken p-2">
-          <p class="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-title"><Icon name="lucide:map" class="size-3 text-meta" />{{ t('event_page.map.title') }}</p>
+          <p class="mb-1.5 flex items-center gap-1 text-11 font-semibold text-title"><Icon name="lucide:map" class="size-3 text-meta" />{{ t('event_page.map.title') }}</p>
           <svg viewBox="0 0 120 72" class="w-full rounded-sm bg-card">
             <rect x="4" y="6" width="112" height="62" rx="2" class="fill-none stroke-line" stroke-width="1" />
             <rect x="52" y="6" width="16" height="4" class="fill-line" />
@@ -85,24 +85,24 @@ const CIRCLES = [
         </div>
 
         <div class="rounded-md bg-sunken p-2">
-          <p class="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-title"><Icon name="lucide:users-round" class="size-3 text-meta" />{{ t('event_page.stats.circles') }}</p>
+          <p class="mb-1.5 flex items-center gap-1 text-11 font-semibold text-title"><Icon name="lucide:users-round" class="size-3 text-meta" />{{ t('event_page.stats.circles') }}</p>
           <ul class="space-y-1">
             <li v-for="circle in CIRCLES" :key="circle.space" class="flex items-center gap-1.5 rounded-sm bg-card px-1.5 py-1">
-              <span class="accent size-5 shrink-0 rounded-[3px] bg-(--accent) opacity-70" :style="{ '--shift': FAMILIES[circle.family] }" />
-              <span class="w-9 shrink-0 font-mono text-[10px] text-meta">{{ circle.space }}</span>
-              <span class="min-w-0 flex-1 truncate text-[11px] text-title">{{ circle.name }}</span>
+              <span class="accent size-5 shrink-0 rounded-[0.1875rem] bg-(--accent) opacity-70" :style="{ '--shift': FAMILIES[circle.family] }" />
+              <span class="w-9 shrink-0 font-mono text-10 text-meta">{{ circle.space }}</span>
+              <span class="min-w-0 flex-1 truncate text-11 text-title">{{ circle.name }}</span>
               <Icon v-if="circle.wanted" name="lucide:heart" class="size-3 shrink-0 fill-current text-danger" />
             </li>
           </ul>
         </div>
 
         <div class="rounded-md bg-sunken p-2">
-          <p class="mb-1.5 flex items-center gap-1 text-[11px] font-semibold text-title"><Icon name="lucide:disc-3" class="size-3 text-meta" />{{ t('event_page.stats.albums') }}</p>
+          <p class="mb-1.5 flex items-center gap-1 text-11 font-semibold text-title"><Icon name="lucide:disc-3" class="size-3 text-meta" />{{ t('event_page.stats.albums') }}</p>
           <div class="grid grid-cols-2 gap-1.5">
             <div v-for="(album, index) in ['星屑のアトラス', '真夜中ラジオ']" :key="album" class="min-w-0">
               <GuideFigureSampleCover class="aspect-square w-full rounded-sm" :style="index ? { '--shift': 20 } : undefined" />
-              <p class="mt-0.5 truncate text-[10px] text-title">{{ album }}</p>
-              <p class="font-mono text-[9px] text-primary">{{ index ? 'C-15a' : 'A-01a' }}</p>
+              <p class="mt-0.5 truncate text-10 text-title">{{ album }}</p>
+              <p class="font-mono text-9 text-primary">{{ index ? 'C-15a' : 'A-01a' }}</p>
             </div>
           </div>
         </div>

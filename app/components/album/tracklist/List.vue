@@ -72,17 +72,17 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
                of their own -->
           <div class="flex items-start gap-3 pb-1.5 pt-1">
             <div class="min-w-0 flex-1">
-              <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-[12.5px] leading-[1.125rem] text-title">
+              <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-12.5 leading-[1.125rem] text-title">
                 <AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>
               </p>
               <div v-if="row.groups.length" class="grid gap-x-5 gap-y-1.5 @xl:grid-cols-2">
-                <div v-for="group in row.groups" :key="group.key" class="flex min-w-0 items-start gap-2 text-[12.5px] leading-[1.125rem] text-title">
+                <div v-for="group in row.groups" :key="group.key" class="flex min-w-0 items-start gap-2 text-12.5 leading-[1.125rem] text-title">
                   <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" class="min-w-0" />
                 </div>
               </div>
               <!-- The notes, each behind a grey label tag like the roles above: 原曲, attributes (BPM …), ISRC -->
-              <div v-if="hasNotes(row)" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12.5px] leading-[1.375rem] text-title" :class="row.groups.length > 0 && 'mt-2'">
+              <div v-if="hasNotes(row)" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-12.5 leading-[1.375rem] text-title" :class="row.groups.length > 0 && 'mt-2'">
                 <span v-if="row.originals.length" class="inline-flex min-w-0 items-center gap-2"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                 <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-2"><AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
                 <span v-if="row.isrc" class="inline-flex items-center gap-2"><AlbumTracklistLabel>ISRC</AlbumTracklistLabel><span class="font-mono text-xs">{{ row.isrc }}</span></span>

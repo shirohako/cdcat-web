@@ -19,7 +19,7 @@ const TONES: Record<UiTone, string> = {
   info: 'bg-info/15 text-info',
 }
 const SIZES = { sm: 'size-7 rounded-md', md: 'size-9 rounded-lg', lg: 'size-12 rounded-xl' }
-const ICON_SIZES = { sm: 'size-3.5', md: 'size-[18px]', lg: 'size-6' }
+const ICON_SIZES = { sm: 'size-3.5', md: 'size-4.5', lg: 'size-6' }
 </script>
 
 <template>

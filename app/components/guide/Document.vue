@@ -53,7 +53,7 @@ const { active, progress, flashId, navigate, followLink } = useDocReading(conten
             <span class="sr-only">{{ title }}</span>
             <span aria-hidden="true"><span v-for="(char, index) in title" :key="index" class="char" :style="{ '--i': index }">{{ char }}</span></span>
           </h1>
-          <p class="intro mt-3 max-w-2xl text-[15px] leading-7 text-body" :lang="doc.locale">{{ doc.intro }}</p>
+          <p class="intro mt-3 max-w-2xl text-15 leading-7 text-body" :lang="doc.locale">{{ doc.intro }}</p>
         </div>
 
         <!-- Left out on phones, where it would only push the switch further down. -->
@@ -171,7 +171,7 @@ const { active, progress, flashId, navigate, followLink } = useDocReading(conten
 @keyframes rise {
   from {
     opacity: 0;
-    translate: 0 10px;
+    translate: 0 0.625rem;
   }
 }
 

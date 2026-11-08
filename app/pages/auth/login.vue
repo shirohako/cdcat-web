@@ -30,14 +30,14 @@
               :aria-pressed="showPassword"
               @click="showPassword = !showPassword"
             >
-              <UiIcon :icon="showPassword ? 'lucide:eye-off' : 'lucide:eye'" class="size-[18px]" />
+              <UiIcon :icon="showPassword ? 'lucide:eye-off' : 'lucide:eye'" class="size-4.5" />
             </button>
           </div>
         </template>
       </UiField>
       <div class="flex items-center justify-between gap-3">
         <UiFlipCheckbox v-model="formData.remember">{{ t('auth.login.remember_me') }}</UiFlipCheckbox>
-        <NuxtLink to="/auth/forgot-password" class="link -mx-2 -my-1 px-2 py-1 text-[13px] font-semibold">{{ t('auth.login.forgot_password') }}</NuxtLink>
+        <NuxtLink to="/auth/forgot-password" class="link -mx-2 -my-1 px-2 py-1 text-13 font-semibold">{{ t('auth.login.forgot_password') }}</NuxtLink>
       </div>
       <UiButton type="submit" variant="primary" size="lg" block class="rounded-md" :loading="isLoading" :icon-right="isLoading ? undefined : 'lucide:arrow-right'">
         {{ isLoading ? t('auth.login.logging_in') : t('auth.login.login') }}
@@ -54,7 +54,7 @@
       <span>{{ t('auth.login.github_login') }}</span>
     </UiButton>
 
-    <p class="text-center text-[13px] text-meta">
+    <p class="text-center text-13 text-meta">
       {{ t('auth.login.no_account') }}
       <NuxtLink to="/auth/register" class="link -my-1 -mr-2 ml-0.5 px-2 py-1 font-semibold">{{ t('auth.login.register_now') }}</NuxtLink>
     </p>

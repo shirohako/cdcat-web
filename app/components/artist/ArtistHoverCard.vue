@@ -43,11 +43,11 @@ const showRoles = computed(() => Boolean(props.roles?.length && (card.value || f
 </script>
 
 <template>
-  <div class="text-[13px]">
+  <div class="text-13">
     <div class="flex items-center gap-3 px-4 pt-4">
       <UiCover :src="card?.image_url ?? artist.image_url" :alt="artist.name" :icon="typeIcon" rounded="lg" eager class="size-12 shrink-0 ring-1 ring-line" />
       <div class="min-w-0 flex-1">
-        <NuxtLink :to="`/artists/${artist.id}`" class="block truncate text-[15px] font-bold leading-5 text-title transition-colors hover:text-primary">{{ artist.name }}</NuxtLink>
+        <NuxtLink :to="`/artists/${artist.id}`" class="block truncate text-15 font-bold leading-5 text-title transition-colors hover:text-primary">{{ artist.name }}</NuxtLink>
         <p class="mt-1 flex min-w-0 items-center gap-1.5 text-xs text-meta">
           <span v-if="type" class="inline-flex shrink-0 items-center gap-1"><Icon :name="typeIcon" class="size-3.5" />{{ enumLabel('artist_type', type) }}</span>
           <span v-for="name in otherNames" :key="name" class="truncate"><span v-if="type" class="mr-1.5 text-faint">·</span>{{ name }}</span>
@@ -55,7 +55,7 @@ const showRoles = computed(() => Boolean(props.roles?.length && (card.value || f
       </div>
     </div>
 
-    <p v-if="card?.bio" class="mt-3 line-clamp-2 px-4 text-[12.5px] leading-relaxed text-body">{{ card.bio }}</p>
+    <p v-if="card?.bio" class="mt-3 line-clamp-2 px-4 text-12.5 leading-relaxed text-body">{{ card.bio }}</p>
     <p v-else-if="failed" class="mt-3 px-4 text-xs text-meta">{{ t('artist_card.load_failed') }}</p>
     <div v-else-if="!card" class="mt-3.5 space-y-2 px-4" aria-hidden="true">
       <div class="h-2.5 w-11/12 rounded skeleton" />
@@ -63,7 +63,7 @@ const showRoles = computed(() => Boolean(props.roles?.length && (card.value || f
     </div>
 
     <div v-if="showRoles" class="mt-3 flex flex-wrap items-center gap-1.5 px-4">
-      <span class="mr-0.5 text-[11px] font-semibold text-meta">{{ t('artist_card.on_album') }}</span>
+      <span class="mr-0.5 text-11 font-semibold text-meta">{{ t('artist_card.on_album') }}</span>
       <CatalogRoleTag v-for="role in roles" :key="role.role" :label="role.count > 1 ? `${role.label} ×${role.count}` : role.label" :category="role.category" />
     </div>
 

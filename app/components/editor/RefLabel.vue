@@ -3,7 +3,7 @@
     <img v-if="image" :src="image" alt="" class="h-5 w-5 shrink-0 rounded object-cover">
     <NuxtLink v-if="typeof id === 'number'" :to="`/${resource}/${id}`" target="_blank" class="truncate transition-colors hover:text-primary">{{ name }}</NuxtLink>
     <span v-else class="truncate">{{ name }}</span>
-    <span v-if="typeof id === 'string'" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-[10px] font-bold text-success">{{ $t('editor.new') }}</span>
+    <span v-if="typeof id === 'string'" class="shrink-0 rounded-full bg-success/15 px-1.5 py-0.5 text-10 font-bold text-success">{{ $t('editor.new') }}</span>
   </span>
 </template>
 

@@ -129,7 +129,7 @@ usePageSeo({
       <!-- Icons beside text sit in the text on its baseline, centred on the glyphs (0.37em up) rather than on the
            line box, which puts them a pixel high in fonts with a tall ascent. -->
       <NuxtLink to="/events" class="inline-block text-sm text-meta transition-colors duration-150 ease-out hover:text-primary">
-        <ArrowLeft :size="16" class="mr-1.5 inline-block align-[calc(0.37em-8px)]" />{{ t('collection_pages.events.back') }}
+        <ArrowLeft :size="16" class="mr-1.5 inline-block align-[calc(0.37em-0.5rem)]" />{{ t('collection_pages.events.back') }}
       </NuxtLink>
 
       <div v-if="series" class="space-y-6" :class="revealClass">
@@ -143,8 +143,8 @@ usePageSeo({
           <div class="min-w-0 flex-1 space-y-3">
             <h1 class="text-3xl font-bold tracking-tight text-title">{{ series.name }}</h1>
             <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-body">
-              <span v-if="series.location"><MapPin :size="15" class="mr-1.5 inline-block align-[calc(0.37em-7.5px)] text-meta" />{{ series.location }}</span>
-              <span><CalendarDays :size="15" class="mr-1.5 inline-block align-[calc(0.37em-7.5px)] text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</span>
+              <span v-if="series.location"><MapPin :size="15" class="mr-1.5 inline-block align-[calc(0.37em-0.46875rem)] text-meta" />{{ series.location }}</span>
+              <span><CalendarDays :size="15" class="mr-1.5 inline-block align-[calc(0.37em-0.46875rem)] text-meta" />{{ t('collection_pages.events.event_count', { count: series.events_count }) }}</span>
             </div>
             <p class="max-w-2xl text-sm leading-relaxed text-meta">{{ description }}</p>
             <UiButton
@@ -186,7 +186,7 @@ usePageSeo({
           <article
             v-for="event in events"
             :key="event.id"
-            class="group @container relative flex flex-col rounded-[14px] bg-card p-1.5 shadow-[0_1px_2px_oklch(0_0_0/0.05)] ring-1 ring-line transition-shadow duration-200 ease-out
+            class="group @container relative flex flex-col rounded-[0.875rem] bg-card p-1.5 shadow-[0_1px_2px_oklch(0_0_0/0.05)] ring-1 ring-line transition-shadow duration-200 ease-out
                    hover:shadow-[0_14px_32px_-16px_color-mix(in_oklch,var(--primary)_60%,transparent)] hover:ring-primary/40"
           >
             <div class="overflow-hidden rounded-lg bg-sunken" :style="{ aspectRatio: visualRatio }">
@@ -201,22 +201,22 @@ usePageSeo({
             </div>
 
             <div class="flex flex-1 flex-col px-1 pb-1 pt-2 @min-[9rem]:px-2.5 @min-[9rem]:pb-2.5 @min-[9rem]:pt-3">
-              <p class="mb-1 truncate text-[10px] font-semibold uppercase tracking-wide text-primary @min-[9rem]:mb-1.5 @min-[9rem]:text-[11px]">{{ event.slug }}</p>
-              <h2 class="line-clamp-2 text-[13px] font-bold leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary @min-[9rem]:text-[15px]">
+              <p class="mb-1 truncate text-10 font-semibold uppercase tracking-wide text-primary @min-[9rem]:mb-1.5 @min-[9rem]:text-11">{{ event.slug }}</p>
+              <h2 class="line-clamp-2 text-13 font-bold leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary @min-[9rem]:text-15">
                 <NuxtLink
                   :to="`/events/${event.id}`"
-                  class="outline-none after:absolute after:inset-0 after:rounded-[14px] focus-visible:after:ring-2 focus-visible:after:ring-primary"
+                  class="outline-none after:absolute after:inset-0 after:rounded-[0.875rem] focus-visible:after:ring-2 focus-visible:after:ring-primary"
                 >{{ event.name || event.slug }}</NuxtLink>
               </h2>
 
-              <div class="mt-auto space-y-1 pt-2.5 text-[11px] text-meta @min-[9rem]:space-y-1.5 @min-[9rem]:pt-3.5 @min-[9rem]:text-xs">
+              <div class="mt-auto space-y-1 pt-2.5 text-11 text-meta @min-[9rem]:space-y-1.5 @min-[9rem]:pt-3.5 @min-[9rem]:text-xs">
                 <!-- Each icon gets a line box of its own in the same font, so it lines up with the text's baseline. -->
                 <p class="flex gap-1.5">
-                  <span class="shrink-0"><Calendar class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>
+                  <span class="shrink-0"><Calendar class="inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" /></span>
                   <span class="truncate font-medium text-body">{{ formatEventDate(event) }}</span>
                 </p>
                 <p class="flex min-w-0 gap-1.5">
-                  <span class="shrink-0"><Disc3 class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>
+                  <span class="shrink-0"><Disc3 class="inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" /></span>
                   <NuxtLink
                     v-if="event.released_albums_count"
                     :to="{ path: '/albums', query: { event: event.id } }"
@@ -227,11 +227,11 @@ usePageSeo({
                   <span v-else class="truncate">{{ t('content_display.albums_count', { count: 0 }) }}</span>
                 </p>
                 <p class="flex gap-1.5">
-                  <span class="shrink-0"><Store class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>
+                  <span class="shrink-0"><Store class="inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" /></span>
                   <span class="truncate">{{ t('content_display.booths_count', { count: event.booths_count.toLocaleString() }) }}</span>
                 </p>
                 <p v-if="event.venue || event.location" class="flex gap-1.5">
-                  <span class="shrink-0"><MapPin class="inline-block size-3.5 align-[calc(0.37em-7px)]" /></span>
+                  <span class="shrink-0"><MapPin class="inline-block size-3.5 align-[calc(0.37em-0.4375rem)]" /></span>
                   <span class="truncate" :title="[event.venue, event.location].filter(Boolean).join(' · ')">{{ [event.venue, event.location].filter(Boolean).join(' · ') }}</span>
                 </p>
               </div>

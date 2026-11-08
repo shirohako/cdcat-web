@@ -8,20 +8,20 @@
     <ul class="divide-y divide-success/25">
       <li v-for="item in created" :key="item.ref" class="space-y-2 px-3 py-3 sm:px-5">
         <div class="flex flex-wrap items-center gap-2">
-          <span class="rounded-full bg-success/15 px-2 py-0.5 text-[10px] font-bold text-success">{{ enumLabel('catalog_type', item.resource_type) }}</span>
+          <span class="rounded-full bg-success/15 px-2 py-0.5 text-10 font-bold text-success">{{ enumLabel('catalog_type', item.resource_type) }}</span>
           <input v-model="docOf(item).name" class="input input-sm min-w-48 flex-1" :class="{ 'input-error': errorsOf(item.ref).length }" :placeholder="$t('catalog.field.name')">
           <UiSelect v-if="item.resource_type === 'artist'" v-model="docOf(item).type" :options="artistTypeOptions" :placeholder="$t('editor.entity.artist_type_placeholder')" size="sm" class="w-36" :invalid="!docOf(item).type" :aria-label="$t('catalog.field.type')" />
-          <span class="text-[11px]" :class="usage(item.ref) === null ? 'text-warning' : 'text-meta'">{{ usage(item.ref) ?? $t('editor.new_items.unused') }}</span>
+          <span class="text-11" :class="usage(item.ref) === null ? 'text-warning' : 'text-meta'">{{ usage(item.ref) ?? $t('editor.new_items.unused') }}</span>
           <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.new_items.remove')" icon-class="size-3" size="xs" class="ml-auto ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove(item.ref)" />
         </div>
 
-        <p v-for="error in errorsOf(item.ref)" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
+        <p v-for="error in errorsOf(item.ref)" :key="error.path" class="text-11 text-danger">{{ error.message }}</p>
       </li>
       <li v-for="item in edited" :key="item.ref" class="flex flex-wrap items-center gap-2 px-3 py-2.5 text-sm sm:px-5">
-        <span class="rounded-full bg-info/15 px-2 py-0.5 text-[10px] font-bold text-info">{{ $t('editor.new_items.edited', { type: enumLabel('catalog_type', item.resource_type) }) }}</span>
+        <span class="rounded-full bg-info/15 px-2 py-0.5 text-10 font-bold text-info">{{ $t('editor.new_items.edited', { type: enumLabel('catalog_type', item.resource_type) }) }}</span>
         <EditorRefLabel :id="item.resource_id ?? null" :type="item.resource_type" :references="editor.references" />
-        <span class="text-[11px] text-meta">{{ $t('editor.new_items.edited_hint') }}</span>
-        <p v-for="error in errorsOf(item.ref)" :key="error.path" class="basis-full text-[11px] text-danger">{{ error.message }}</p>
+        <span class="text-11 text-meta">{{ $t('editor.new_items.edited_hint') }}</span>
+        <p v-for="error in errorsOf(item.ref)" :key="error.path" class="basis-full text-11 text-danger">{{ error.message }}</p>
       </li>
     </ul>
   </section>

@@ -35,12 +35,12 @@ const saved = computed(() => t('editor.state_saved', { at: ago(new Date().toISOS
     <div class="rounded-lg bg-card px-3 py-2.5 shadow-xs ring-1 ring-line">
       <div class="flex items-end gap-2">
         <div class="min-w-0 flex-1">
-          <p class="text-[10px] font-semibold uppercase tracking-wider text-meta">{{ t('editor.album.new_title') }}</p>
-          <p class="truncate text-[15px] font-bold text-title">星屑のアトラス</p>
+          <p class="text-10 font-semibold uppercase tracking-wider text-meta">{{ t('editor.album.new_title') }}</p>
+          <p class="truncate text-15 font-bold text-title">星屑のアトラス</p>
         </div>
         <GuideMockButton :label="t('editor.my_revisions')" icon="lucide:clipboard-list" />
       </div>
-      <p class="mt-2 flex items-center gap-1.5 border-t border-line pt-2 text-[11px] text-meta">
+      <p class="mt-2 flex items-center gap-1.5 border-t border-line pt-2 text-11 text-meta">
         <GuideMockMarker :n="4" />
         <span class="size-1.5 shrink-0 rounded-full bg-success" />
         <span class="shrink-0 text-body">{{ saved }}</span>
@@ -57,7 +57,7 @@ const saved = computed(() => t('editor.state_saved', { at: ago(new Date().toISOS
             <li
               v-for="(section, index) in SECTIONS"
               :key="section.key"
-              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px]"
+              class="flex items-center gap-1.5 rounded-md px-2 py-1 text-11"
               :class="index === 0 ? 'bg-primary/10 font-semibold text-primary' : 'text-body'"
             >
               <Icon :name="section.icon" class="size-3 shrink-0 text-meta" />
@@ -69,21 +69,21 @@ const saved = computed(() => t('editor.state_saved', { at: ago(new Date().toISOS
 
         <div class="relative rounded-lg bg-card p-2.5 shadow-xs ring-1 ring-line">
           <GuideMockMarker :n="2" class="absolute -left-1.5 -top-1.5 z-10" />
-          <p class="mb-1 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-meta">
+          <p class="mb-1 flex items-center justify-between text-10 font-bold uppercase tracking-wider text-meta">
             {{ t('editor.required') }}<span class="font-mono tracking-normal">3/5</span>
           </p>
           <ul class="space-y-0.5">
-            <li v-for="item in REQUIRED" :key="item.key" class="flex items-center gap-1.5 text-[11px]" :class="item.done ? 'text-meta' : 'text-title'">
+            <li v-for="item in REQUIRED" :key="item.key" class="flex items-center gap-1.5 text-11" :class="item.done ? 'text-meta' : 'text-title'">
               <Icon :name="item.done ? 'lucide:circle-check' : 'lucide:circle'" class="size-3 shrink-0" :class="item.done ? 'text-success' : 'text-warning'" />
               <span class="min-w-0 flex-1 truncate">{{ t(`editor.required_item.${item.key}`) }}</span>
               <Icon v-if="!item.done" name="lucide:chevron-right" class="size-3 shrink-0 text-faint" />
             </li>
           </ul>
-          <p class="relative mb-1 mt-2 border-t border-line pt-2 text-[10px] font-bold uppercase tracking-wider text-meta">
+          <p class="relative mb-1 mt-2 border-t border-line pt-2 text-10 font-bold uppercase tracking-wider text-meta">
             <GuideMockMarker :n="3" class="absolute -left-4 top-1.5" />{{ t('editor.recommended') }}
           </p>
           <ul class="space-y-0.5">
-            <li v-for="key in ['catalog_number', 'credits']" :key="key" class="flex items-center gap-1.5 text-[11px] text-body">
+            <li v-for="key in ['catalog_number', 'credits']" :key="key" class="flex items-center gap-1.5 text-11 text-body">
               <Icon name="lucide:circle-plus" class="size-3 shrink-0 text-meta" />
               <span class="min-w-0 flex-1 truncate">{{ t(`editor.suggested_item.${key}`) }}</span>
             </li>

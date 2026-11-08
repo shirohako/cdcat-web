@@ -48,8 +48,8 @@ async function toggleDetails(details: HTMLDetailsElement) {
   const height = body.scrollHeight
   const animation = body.animate(
     opening
-      ? [{ height: '0px', opacity: 0, transform: 'translateY(-4px)' }, { height: `${height}px`, opacity: 1, transform: 'translateY(0)' }]
-      : [{ height: `${height}px`, opacity: 1, transform: 'translateY(0)' }, { height: '0px', opacity: 0, transform: 'translateY(-4px)' }],
+      ? [{ height: '0px', opacity: 0, transform: 'translateY(-0.25rem)' }, { height: `${height}px`, opacity: 1, transform: 'translateY(0)' }]
+      : [{ height: `${height}px`, opacity: 1, transform: 'translateY(0)' }, { height: '0px', opacity: 0, transform: 'translateY(-0.25rem)' }],
     { duration: 220, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
   )
   detailsAnimations.set(details, animation)

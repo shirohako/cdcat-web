@@ -6,7 +6,7 @@
       <UiSelect v-model="disc.format" :options="formatOptions" size="sm" class="h-8 w-28 text-xs" :aria-label="$t('catalog.field.format')" />
       <input v-model="disc.title" class="input input-sm h-8 min-w-32 flex-1 text-xs" :placeholder="$t('editor.album.disc_title_placeholder')" maxlength="500">
       <EditorHelp id="disc" />
-      <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-[10px] font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
+      <span v-if="bonus" class="shrink-0 rounded-full bg-pink-100 px-2 py-0.5 text-10 font-bold text-pink-600 dark:bg-pink-400/20 dark:text-pink-200" :title="$t('editor.album.bonus_disc_hint')">{{ $t('editor.album.bonus_disc', { name: bonus.name || '…' }) }}</span>
       <span class="ml-auto flex shrink-0 items-center gap-0.5">
         <UiButton v-if="isCd || tocCount" size="xs" class="ring-1 ring-inset shadow-xs active:translate-y-px" :class="tocErrors.length || !isCd ? 'text-danger ring-danger/40' : 'ring-line'" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" :class="tocErrors.length || !isCd ? 'text-danger' : 'text-primary'">·{{ tocCount }}</span></UiButton>
         <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="moveDisc(album, disc.id, -1)" />
@@ -14,12 +14,12 @@
         <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.album.remove_disc')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
       </span>
     </div>
-    <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ error.message }}</p>
-    <p v-if="tocCount && !isCd" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ $t('editor.toc.not_cd_disc') }}</p>
-    <p v-else-if="tocErrors.length" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-[11px] text-danger">{{ $t('editor.toc.has_errors') }}</p>
+    <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-11 text-danger">{{ error.message }}</p>
+    <p v-if="tocCount && !isCd" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-11 text-danger">{{ $t('editor.toc.not_cd_disc') }}</p>
+    <p v-else-if="tocErrors.length" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-11 text-danger">{{ $t('editor.toc.has_errors') }}</p>
 
     <!-- The track rows have no labels of their own, so the first disc says what their fields are, once. -->
-    <p v-if="first" class="flex flex-wrap items-center gap-x-3.5 gap-y-0.5 border-b border-line px-3 py-1 text-[11px] text-meta">
+    <p v-if="first" class="flex flex-wrap items-center gap-x-3.5 gap-y-0.5 border-b border-line px-3 py-1 text-11 text-meta">
       <span>{{ $t('catalog.field.track_number') }}<EditorHelp id="track.number" /></span>
       <span>{{ $t('catalog.field.title') }}<EditorHelp id="track.title" /></span>
       <span>{{ $t('catalog.field.duration') }}<EditorHelp id="track.duration" /></span>
@@ -39,7 +39,7 @@
 
     <div class="flex items-center gap-2 border-t border-line px-3 py-1.5">
       <EditorAddButton small @click="add">{{ $t('editor.album.add_track') }}</EditorAddButton>
-      <span v-if="duration" class="ml-auto font-mono text-[11px] text-meta">{{ formatDuration(duration) }}</span>
+      <span v-if="duration" class="ml-auto font-mono text-11 text-meta">{{ formatDuration(duration) }}</span>
     </div>
   </div>
 </template>

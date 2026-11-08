@@ -45,6 +45,6 @@ const labelable = computed(() => props.roles.length === 1 && canHaveRoleLabel(pr
       <EditorAlbumCreditsTracks :model-value="trackIds" class="ml-auto" @update:model-value="emit('tracks', $event)" />
       <UiButton variant="danger-soft" icon="lucide:trash-2" :label="t('editor.credits.remove_line')" size="xs" class="shrink-0 ring-1 ring-inset ring-danger/20" @click="emit('remove')" />
     </div>
-    <p v-for="error in errors" :key="error.path" class="mt-1.5 text-[11px] text-danger">{{ error.message }}</p>
+    <p v-for="error in errors" :key="error.path" class="mt-1.5 text-11 text-danger">{{ error.message }}</p>
   </li>
 </template>

@@ -153,7 +153,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
       <div class="flex h-[min(24rem,70vh)] text-xs">
         <!-- Level one: the series -->
         <div class="w-full shrink-0 overflow-y-auto overscroll-contain border-line p-1.5 sm:block sm:w-48 sm:border-r" :class="pane === 'series' ? 'block' : 'hidden'">
-          <p class="px-2.5 pb-1.5 pt-1 text-[11px] font-medium text-faint">{{ t('event_filter.series') }}</p>
+          <p class="px-2.5 pb-1.5 pt-1 text-11 font-medium text-faint">{{ t('event_filter.series') }}</p>
           <template v-if="series">
             <button
               v-for="item in series"
@@ -168,7 +168,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
             >
               <span class="min-w-0 flex-1">
                 <span class="block truncate font-semibold">{{ item.name }}</span>
-                <span class="block text-[11px] tabular-nums text-meta">{{ t('event_filter.editions', { count: item.events_count }) }}</span>
+                <span class="block text-11 tabular-nums text-meta">{{ t('event_filter.editions', { count: item.events_count }) }}</span>
               </span>
               <Icon name="lucide:chevron-right" class="h-3.5 w-3.5 shrink-0 transition-[color,translate] duration-150 ease-out" :class="item.id === activeId ? 'translate-x-0.5 text-primary' : 'text-faint'" />
             </button>
@@ -193,7 +193,7 @@ const ROW = 'flex w-full items-center gap-2 rounded-sm px-2.5 text-left transiti
             <template v-if="Array.isArray(activeEditions)">
               <p v-if="!years.length" class="px-2.5 py-6 text-center text-meta">{{ t('event_filter.empty') }}</p>
               <section v-for="group in years" :key="group.year">
-                <h3 class="sticky top-0 z-10 bg-popover px-2.5 pb-1 pt-2.5 text-[11px] font-semibold tabular-nums text-faint">{{ group.year }}</h3>
+                <h3 class="sticky top-0 z-10 bg-popover px-2.5 pb-1 pt-2.5 text-11 font-semibold tabular-nums text-faint">{{ group.year }}</h3>
                 <button
                   v-for="edition in group.editions"
                   :key="edition.id"

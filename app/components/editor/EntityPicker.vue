@@ -71,9 +71,9 @@
                 <span class="truncate text-sm text-title">{{ option.item.label }}</span>
                 <CatalogPendingBadge v-if="option.item.is_pending" />
               </span>
-              <span v-if="option.item.subtitle" class="block truncate text-[11px] text-meta">{{ option.item.subtitle }}</span>
+              <span v-if="option.item.subtitle" class="block truncate text-11 text-meta">{{ option.item.subtitle }}</span>
             </span>
-            <span class="shrink-0 text-[11px] text-faint">#{{ option.item.id }}</span>
+            <span class="shrink-0 text-11 text-faint">#{{ option.item.id }}</span>
           </div>
           <div
             v-else
@@ -324,15 +324,15 @@ const MARGIN = 8
 const place = () => {
   const box = input.value?.getBoundingClientRect()
   if (!box) return
-  const width = Math.min(Math.max(box.width, 256), window.innerWidth - MARGIN * 2)
+  const width = Math.min(Math.max(box.width, remToPx(16)), window.innerWidth - MARGIN * 2)
   const left = Math.max(MARGIN, Math.min(box.left, window.innerWidth - width - MARGIN))
   const below = window.innerHeight - box.bottom - GAP - MARGIN
   const above = box.top - GAP - MARGIN
-  const up = below < 240 && above > below
+  const up = below < remToPx(15) && above > below
   panelStyle.value = {
     left: `${left}px`,
     width: `${width}px`,
-    maxHeight: `${Math.max(120, Math.min(320, up ? above : below))}px`,
+    maxHeight: `${Math.max(remToPx(7.5), Math.min(remToPx(20), up ? above : below))}px`,
     ...(up ? { bottom: `${window.innerHeight - box.top + GAP}px` } : { top: `${box.bottom + GAP}px` }),
   }
 }

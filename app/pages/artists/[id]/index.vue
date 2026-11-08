@@ -21,8 +21,8 @@
             <div class="min-w-0 self-center">
               <h1 class="flex flex-wrap items-center gap-2 text-lg font-bold tracking-tight text-title md:text-xl">
                 {{ shownName }}
-                <span v-if="artist.type" class="rounded bg-btn px-2 py-0.5 text-[11px] font-semibold text-btn-content">{{ enumLabel('artist_type', artist.type) }}</span>
-                <span v-if="!artist.is_active" class="rounded bg-sunken px-2 py-0.5 text-[11px] text-meta">{{ $t('artists.detail.inactive') }}</span>
+                <span v-if="artist.type" class="rounded bg-btn px-2 py-0.5 text-11 font-semibold text-btn-content">{{ enumLabel('artist_type', artist.type) }}</span>
+                <span v-if="!artist.is_active" class="rounded bg-sunken px-2 py-0.5 text-11 text-meta">{{ $t('artists.detail.inactive') }}</span>
                 <CatalogPendingBadge v-if="artist.is_pending" />
               </h1>
               <p v-if="originalName" class="mt-0.5 text-sm text-meta">{{ originalName }}</p>
@@ -48,7 +48,7 @@
             <div class="min-w-0 sm:col-span-2">
               <ArtistBio :text="artist.bio || $t('artists.detail.no_bio')" />
               <!-- The counts as pills in the theme colour (the link chips under them stay grey), the chips' size. -->
-              <div class="mt-3 flex flex-wrap items-center gap-1.5 text-[13px] text-btn-content">
+              <div class="mt-3 flex flex-wrap items-center gap-1.5 text-13 text-btn-content">
                 <span :class="countPill"><Disc3 :size="15" class="opacity-70" />{{ $t('artists.detail.albums', { count: artist.albums_count }) }}</span>
                 <span :class="countPill"><Users :size="15" class="opacity-70" />{{ $t('artists.detail.followers', { count: artist.followers_count }) }}</span>
               </div>
@@ -58,10 +58,10 @@
                    so a short list leaves plain card, not an empty grey box. -->
               <div v-if="otherTitles.length || artist.catalog_prefixes?.length || relationGroups.length || artist.attributes?.length" class="mt-4 divide-y divide-line border-t border-line text-sm sm:grid sm:grid-cols-[minmax(6.5rem,max-content)_minmax(0,1fr)] sm:gap-x-8">
                 <div v-if="otherTitles.length" :class="panelRow">
-                  <p :class="[panelLabel, 'sm:pt-[23px]']">{{ $t('catalog.other_names') }} <span :class="panelCount">{{ otherTitles.length }}</span></p>
+                  <p :class="[panelLabel, 'sm:pt-5.75']">{{ $t('catalog.other_names') }} <span :class="panelCount">{{ otherTitles.length }}</span></p>
                   <ul class="flex flex-wrap gap-2">
                     <li v-for="(title, index) in otherTitles" :key="index" :class="['min-w-0 max-w-full rounded-lg px-4 py-2.5', tileFill]">
-                      <span class="block break-words text-[15px] font-medium leading-snug text-title">{{ title.title }}</span>
+                      <span class="block break-words text-15 font-medium leading-snug text-title">{{ title.title }}</span>
                       <span class="mt-2 flex flex-wrap gap-1.5 text-xs text-meta">
                         <span :class="nameTag">{{ enumLabel('title_kind', title.kind) }}</span>
                         <span v-if="title.locale" :class="nameTag">{{ localeName(title.locale) }}</span>
@@ -77,10 +77,10 @@
                      name says they ended. Other names of the same person are plain tags; the rest are small cards with the picture
                      and the note. -->
                 <div v-for="group in relationGroups" :key="group.key" :class="panelRow">
-                  <p :class="[panelLabel, group.alias ? 'sm:pt-1.5' : 'sm:pt-[18px]']">{{ group.label }} <span :class="panelCount">{{ group.relations.length }}</span></p>
+                  <p :class="[panelLabel, group.alias ? 'sm:pt-1.5' : 'sm:pt-4.5']">{{ group.label }} <span :class="panelCount">{{ group.relations.length }}</span></p>
                   <ul v-if="group.alias" class="flex flex-wrap gap-1.5">
                     <li v-for="relation in group.relations" :key="relation.artist.id" class="min-w-0">
-                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="group/rel block rounded-md px-3 py-1.5 text-[13px] leading-5 text-title" :class="tileFill">
+                      <NuxtLink :to="`/artists/${relation.artist.id}`" class="group/rel block rounded-md px-3 py-1.5 text-13 leading-5 text-title" :class="tileFill">
                         <span class="block break-words" :class="slideRight">{{ relation.artist.name }}</span>
                       </NuxtLink>
                     </li>
@@ -105,7 +105,7 @@
                               <span class="min-w-0 break-words font-medium text-title">{{ relation.artist.name }}</span>
                               <span v-if="relation.artist.type" class="text-xs text-meta" :class="nameTag">{{ enumLabel('artist_type', relation.artist.type) }}</span>
                             </span>
-                            <span v-if="relation.note" class="mt-0.5 block whitespace-pre-line break-words text-[13px] leading-5 text-meta">{{ relation.note }}</span>
+                            <span v-if="relation.note" class="mt-0.5 block whitespace-pre-line break-words text-13 leading-5 text-meta">{{ relation.note }}</span>
                           </span>
                         </span>
                       </NuxtLink>
@@ -240,7 +240,7 @@ const panelRow = 'grid gap-2 py-3 sm:col-span-2 sm:grid-cols-subgrid sm:gap-y-0'
 const panelLabel = 'flex items-center gap-1.5 self-start whitespace-nowrap text-sm font-semibold leading-5 text-title'
 /** The row's count as a small grey tag, the filters' grey like the tiles. */
 const panelCount = 'inline-grid h-5 min-w-5 place-items-center rounded-md bg-black/5 px-1.5 text-xs font-medium tabular-nums text-meta dark:bg-btn'
-const nameTag = 'rounded-[3px] border border-black/14 px-1.5 leading-4 dark:border-white/16'
+const nameTag = 'rounded-[0.1875rem] border border-black/14 px-1.5 leading-4 dark:border-white/16'
 const countPill = 'inline-flex h-7 items-center gap-1.5 rounded-md bg-btn px-2.5'
 /** Tiles: the album list filters' grey (the default button's too), the tags on them outlined rather than filled. */
 const tileFill = 'bg-black/5 dark:bg-btn'

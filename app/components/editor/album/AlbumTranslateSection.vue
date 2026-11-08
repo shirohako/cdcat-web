@@ -26,13 +26,13 @@
 
       <template v-if="current">
         <div class="flex flex-wrap items-center gap-2">
-          <p class="text-[11px] text-meta">{{ $t(`editor.translate.kind_hint.${current.kind}`) }}<EditorHelp id="translate.names" /></p>
+          <p class="text-11 text-meta">{{ $t(`editor.translate.kind_hint.${current.kind}`) }}<EditorHelp id="translate.names" /></p>
           <UiButton variant="danger-soft" size="xs" :icon="Trash2" class="ml-auto ring-1 ring-inset ring-danger/20" @click="remove(current)">{{ $t('editor.translate.remove') }}</UiButton>
         </div>
 
         <div class="overflow-hidden rounded-xl border border-line">
           <div v-for="row in rows" :key="row.key">
-            <div v-if="row.heading" class="border-b border-line bg-sunken px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-meta">{{ row.heading }}</div>
+            <div v-if="row.heading" class="border-b border-line bg-sunken px-3 py-1.5 text-11 font-bold uppercase tracking-wider text-meta">{{ row.heading }}</div>
             <div class="grid items-center gap-2 border-b border-line px-3 py-1.5 last:border-b-0 sm:grid-cols-2" :class="{ 'bg-warning/5': !nameOf(row, current) }">
               <p class="flex min-w-0 items-baseline gap-2 text-sm text-body">
                 <span v-if="row.number" class="w-8 shrink-0 text-right font-mono text-xs text-meta">{{ row.number }}</span>

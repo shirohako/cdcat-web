@@ -61,7 +61,7 @@ const errorText = (key: string) => props.errors[key]
       <textarea
         id="writer-summary" v-model="summary" rows="3" maxlength="200" :disabled="disabled" class="textarea w-full resize-none"
         :placeholder="t('article_ui.fields.summary_placeholder')" />
-      <p class="flex justify-between text-[11px] text-meta">
+      <p class="flex justify-between text-11 text-meta">
         <span>{{ t('article_ui.fields.summary_hint') }}</span><span class="tabular-nums">{{ summary.length }}/200</span>
       </p>
     </section>
@@ -79,7 +79,7 @@ const errorText = (key: string) => props.errors[key]
     <section class="space-y-2">
       <label :class="label" for="writer-banner">{{ t('article_ui.fields.banner') }}</label>
       <input id="writer-banner" v-model="bannerUrl" type="url" inputmode="url" maxlength="500" :disabled="disabled" :class="field" placeholder="https://…">
-      <p class="text-[11px] text-meta">{{ t('article_ui.fields.banner_hint') }}</p>
+      <p class="text-11 text-meta">{{ t('article_ui.fields.banner_hint') }}</p>
       <p v-if="!bannerIsHttps || errorText('banner_url')" class="text-xs text-danger">{{ errorText('banner_url') || t('article_ui.fields.cover_https') }}</p>
       <div v-else-if="bannerUrl.trim()" class="aspect-[3/1] overflow-hidden rounded-lg border border-line bg-sunken">
         <img v-if="!bannerBroken" :src="bannerUrl.trim()" :alt="t('article_ui.fields.banner_preview')" class="size-full object-cover" referrerpolicy="no-referrer" @error="bannerBroken = true">
@@ -89,7 +89,7 @@ const errorText = (key: string) => props.errors[key]
 
     <section class="space-y-2">
       <span :class="label">{{ t('article_ui.fields.links') }}</span>
-      <p class="text-[11px] text-meta">{{ t('article_ui.fields.links_hint') }}</p>
+      <p class="text-11 text-meta">{{ t('article_ui.fields.links_hint') }}</p>
       <CommonContentLinkPicker v-model="links" :disabled="disabled" />
       <p v-if="errorText('links')" class="text-xs text-danger">{{ errorText('links') }}</p>
     </section>
@@ -115,12 +115,12 @@ const errorText = (key: string) => props.errors[key]
             <input v-model="license" type="radio" name="writer-license" :value="item.key" :disabled="disabled" class="radio radio-sm mt-0.5 shrink-0">
             <span class="min-w-0">
               <span class="block text-sm font-medium leading-5 text-title">{{ t(`article_ui.licenses.${item.key}.name`) }}</span>
-              <span v-if="item.url" class="block font-mono text-[10px] text-meta">{{ item.short }}</span>
+              <span v-if="item.url" class="block font-mono text-10 text-meta">{{ item.short }}</span>
               <ArticleLicensePermissions :info="item" class="mt-1" />
             </span>
           </label>
         </div>
-        <p class="text-[11px] text-meta">{{ t('article_ui.declaration.license_hint') }}</p>
+        <p class="text-11 text-meta">{{ t('article_ui.declaration.license_hint') }}</p>
         <p v-if="errorText('license')" class="text-xs text-danger">{{ errorText('license') }}</p>
       </template>
 
@@ -131,7 +131,7 @@ const errorText = (key: string) => props.errors[key]
         <label :class="label" for="writer-source-author">{{ t('article_ui.declaration.source_author') }}</label>
         <input id="writer-source-author" v-model="sourceAuthor" maxlength="100" :disabled="disabled" :class="field" :placeholder="t('article_ui.declaration.source_author_placeholder')">
         <p v-if="errorText('source_author')" class="text-xs text-danger">{{ errorText('source_author') }}</p>
-        <p class="text-[11px] text-meta">{{ t('article_ui.declaration.repost_hint') }}</p>
+        <p class="text-11 text-meta">{{ t('article_ui.declaration.repost_hint') }}</p>
       </div>
     </section>
 
@@ -140,7 +140,7 @@ const errorText = (key: string) => props.errors[key]
       <div class="space-y-2 border-t border-line p-3">
         <label :class="label" for="writer-slug">{{ t('article_ui.fields.slug') }}</label>
         <input id="writer-slug" v-model="slug" maxlength="100" :disabled="disabled" :class="[field, 'font-mono']" placeholder="my-article">
-        <p class="text-[11px] text-meta">{{ t('article_ui.fields.slug_hint') }}</p>
+        <p class="text-11 text-meta">{{ t('article_ui.fields.slug_hint') }}</p>
         <p v-if="errorText('slug')" class="text-xs text-danger">{{ errorText('slug') }}</p>
       </div>
     </details>

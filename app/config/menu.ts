@@ -72,7 +72,8 @@ export const menuItems: MenuItem[] = [
 
 /**
  * The account menu, in groups under small headings (`site.user_menu_groups.*`). The profile is not a row: the menu's
- * header (avatar and name) links to it. Notifications aren't either: the bell beside it has them.
+ * header (avatar and name) links to it. Notifications aren't either: the bell beside it has them, and on phones, where
+ * the bell is hidden, the navbar puts a row for them under the header.
  */
 export const userMenuGroups = [
   {

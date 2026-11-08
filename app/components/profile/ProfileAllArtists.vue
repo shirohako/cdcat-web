@@ -43,7 +43,7 @@
               <span class="block text-sm font-medium text-body group-hover:text-primary transition-colors truncate">
                 {{ artist.name }}
               </span>
-              <span v-if="artist.favorited_at" class="text-[11px] text-meta">{{ formatDate(artist.favorited_at) }}</span>
+              <span v-if="artist.favorited_at" class="text-11 text-meta">{{ formatDate(artist.favorited_at) }}</span>
             </div>
             <ChevronRight :size="14" class="ml-auto text-faint group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
           </NuxtLink>

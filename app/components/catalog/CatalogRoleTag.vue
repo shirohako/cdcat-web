@@ -15,13 +15,13 @@ const props = withDefaults(defineProps<{
   tip?: string
 }>(), { size: 'sm', tip: undefined })
 
-const SIZES = { xs: 'h-4 px-1 text-[10px]', sm: 'h-[1.125rem] px-1.5 text-[11px]' }
+const SIZES = { xs: 'h-4 px-1 text-10', sm: 'h-[1.125rem] px-1.5 text-11' }
 const badge = computed(() => getAlbumRolePalette(props.category).badge)
 </script>
 
 <template>
   <UiTooltip v-if="tip" :text="tip" class="whitespace-pre-line">
-    <span v-bind="$attrs" class="inline-flex shrink-0 items-center rounded-[4px] font-semibold leading-none whitespace-nowrap" :class="[SIZES[size], badge]">{{ label }}</span>
+    <span v-bind="$attrs" class="inline-flex shrink-0 items-center rounded-sm font-semibold leading-none whitespace-nowrap" :class="[SIZES[size], badge]">{{ label }}</span>
   </UiTooltip>
-  <span v-else v-bind="$attrs" class="inline-flex shrink-0 items-center rounded-[4px] font-semibold leading-none whitespace-nowrap" :class="[SIZES[size], badge]">{{ label }}</span>
+  <span v-else v-bind="$attrs" class="inline-flex shrink-0 items-center rounded-sm font-semibold leading-none whitespace-nowrap" :class="[SIZES[size], badge]">{{ label }}</span>
 </template>

@@ -8,7 +8,7 @@
       <!-- Block index, by hall: jumps to the page and heading of a block -->
       <nav class="sticky top-14 z-20 -mx-1 mb-4 space-y-1.5 rounded-2xl bg-card/80 p-2.5 ring-1 ring-line backdrop-blur" :aria-label="t('event_page.circles.index')">
         <div v-for="group in index" :key="group.hall" class="flex items-start gap-2">
-          <span class="w-24 shrink-0 truncate pt-1 text-[11px] font-semibold text-meta sm:w-28" :title="group.hall">{{ group.hall || t('event_page.circles.off_map') }}</span>
+          <span class="w-24 shrink-0 truncate pt-1 text-11 font-semibold text-meta sm:w-28" :title="group.hall">{{ group.hall || t('event_page.circles.off_map') }}</span>
           <div class="flex flex-wrap gap-1">
             <button
               v-for="block in group.blocks"
@@ -47,10 +47,10 @@
                 </template>
               </UiCover>
               <div class="min-w-0 flex-1 py-0.5">
-                <span class="rounded-md bg-title px-1.5 py-0.5 font-mono text-[11px] font-semibold text-page">{{ circle.space_code ?? t('event_page.circle.catalog_only') }}</span>
+                <span class="rounded-md bg-title px-1.5 py-0.5 font-mono text-11 font-semibold text-page">{{ circle.space_code ?? t('event_page.circle.catalog_only') }}</span>
                 <p class="mt-1 line-clamp-1 text-sm font-bold text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ circle.name }}</p>
                 <p class="line-clamp-1 text-xs text-meta">{{ circle.description || circle.name_kana }}</p>
-                <div class="mt-1.5 flex items-center gap-2 text-[11px] text-meta">
+                <div class="mt-1.5 flex items-center gap-2 text-11 text-meta">
                   <span v-if="circle.genre" class="inline-flex min-w-0 items-center gap-1 truncate">
                     <span class="size-1.5 shrink-0 rounded-full" :style="{ background: familyColor(circle) }" />{{ genreShortLabel(circle.genre, genres) }}
                   </span>

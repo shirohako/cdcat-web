@@ -11,7 +11,7 @@
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.form.parent') }}</span>
           <EditorPickedRef v-if="doc.parent_id !== null" :id="doc.parent_id" type="franchise" :references="editor.references" :icon="Library" class="max-w-md" @remove="doc.parent_id = null" />
           <EditorEntityPicker v-else kind="franchise" class="max-w-md" :exclude="[editor.id]" :placeholder="$t('catalog.form.search_series')" @select="pickParent" />
-          <p class="mt-1 text-[11px] text-meta">{{ $t('catalog.form.parent_hint') }}</p>
+          <p class="mt-1 text-11 text-meta">{{ $t('catalog.form.parent_hint') }}</p>
           <p v-if="editor.errorAt('parent_id')" class="mt-1 text-xs text-danger">{{ editor.errorAt('parent_id') }}</p>
         </div>
         <label v-if="doc.parent_id !== null" class="block">

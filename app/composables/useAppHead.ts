@@ -5,7 +5,7 @@ const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-H
  * error.vue, which Nuxt renders in its place.
  */
 export function useAppHead() {
-  const { appliedTheme, appliedHue, appliedPalette } = useAppearance()
+  const { appliedTheme, appliedHue, appliedPalette, appliedTextSize } = useAppearance()
   const { style: creditLinks } = useCreditLinks()
   const { t, locale } = useI18n()
   const config = useRuntimeConfig()
@@ -22,6 +22,8 @@ export function useAppHead() {
       'data-palette': () => appliedPalette.value,
       // How credited names show the part that links (main.css, useCreditLinks)
       'data-credit-links': () => creditLinks.value,
+      // The root font size every rem follows (main.css); left out in the admin console, which keeps the browser's own.
+      'data-text-size': () => appliedTextSize.value === undefined ? undefined : String(appliedTextSize.value),
     },
     link: [
       { rel: 'icon', href: '/favicon.ico', sizes: 'any' },

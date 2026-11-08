@@ -2,13 +2,22 @@
 import type { ThemeColor } from '~/composables/useAppearance'
 import { COLOR_PRESETS } from '~/composables/useAppearance'
 
-/** The navbar's appearance panel: dark or light, and the theme colour, ink or one of vivia's presets. Both apply at once. */
-const { theme, color, setTheme, setColor } = useAppearance()
+/**
+ * The navbar's appearance panel: dark or light, the theme colour (ink or one of vivia's presets) and the text size. Each
+ * applies at once.
+ */
+const { theme, color, textSize, setTheme, setColor, setTextSize } = useAppearance()
 
 const { t } = useI18n()
 const themes = computed(() => [
   { value: 'dark' as const, label: t('appearance.dark'), icon: 'lucide:moon' },
   { value: 'light' as const, label: t('appearance.light'), icon: 'lucide:sun' },
+])
+/** 110% is the default, so it is the one called standard. */
+const textSizes = computed(() => [
+  { value: 100 as const, label: t('appearance.text_small') },
+  { value: 110 as const, label: t('appearance.text_default') },
+  { value: 120 as const, label: t('appearance.text_large') },
 ])
 
 /** A swatch: ink as it looks in the light theme, a hue as vivia shows it. */
@@ -42,5 +51,15 @@ const swatch = (preset: ThemeColor) => preset === 'ink' ? 'oklch(0.19 0.027 298)
         @click="setColor(preset)"
       />
     </div>
+
+    <p class="mt-5 text-xs font-semibold tracking-wide text-meta">{{ $t('appearance.text_size') }}</p>
+    <UiSegmented
+      :model-value="textSize"
+      :items="textSizes"
+      :label="$t('appearance.text_size')"
+      block
+      class="mt-2.5"
+      @update:model-value="value => value && setTextSize(value)"
+    />
   </div>
 </template>

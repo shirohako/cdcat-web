@@ -175,7 +175,7 @@ import { NuxtLink } from '#components'
 import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
-const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-[12.5px] font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
+const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-12.5 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
 
 const props = defineProps<{ album: Album }>()
 const emit = defineEmits<{ 'open-cover': [], favorited: [value: boolean] }>()
@@ -195,8 +195,8 @@ const originalTitle = computed(() => shownTitle.value !== props.album.title ? pr
 const titleSize = computed(() => {
   let width = 0
   for (const char of shownTitle.value) width += /[\u3000-\u9fff\uac00-\ud7af\uf900-\ufaff\uff00-\uffef]/.test(char) ? 1 : 0.55
-  if (width <= 22) return 'text-[22px] lg:text-[26px]'
-  if (width <= 40) return 'text-xl lg:text-[23px]'
+  if (width <= 22) return 'text-[1.375rem] lg:text-[1.625rem]'
+  if (width <= 40) return 'text-xl lg:text-[1.4375rem]'
   return 'text-lg lg:text-xl'
 })
 /** The album-wide 艺术家 when the byline names the publishers instead, each once. */

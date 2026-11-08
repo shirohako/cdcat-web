@@ -29,13 +29,13 @@ const VERSIONS = [
     <div class="rounded-lg bg-card p-3 ring-1 ring-line">
       <p class="flex items-center gap-1.5 text-xs font-semibold text-title"><Icon name="lucide:languages" class="size-3.5 text-meta" />{{ text.names_title }}</p>
       <div class="mt-2.5 rounded-md bg-(--accent-soft) px-2.5 py-2">
-        <p class="text-[10px] font-semibold text-(--accent)">{{ text.primary }}</p>
-        <p class="text-[13px] font-bold text-title">星屑のアトラス</p>
+        <p class="text-10 font-semibold text-(--accent)">{{ text.primary }}</p>
+        <p class="text-13 font-bold text-title">星屑のアトラス</p>
       </div>
       <ul class="mt-1.5 divide-y divide-line">
         <li v-for="name in NAMES" :key="name.kind" class="flex items-center gap-2 py-1.5">
-          <span class="min-w-0 flex-1 truncate text-[11px] text-title">{{ name.title }}</span>
-          <span v-if="name.locale" class="shrink-0 text-[10px] text-meta">{{ localeName(name.locale) }}</span>
+          <span class="min-w-0 flex-1 truncate text-11 text-title">{{ name.title }}</span>
+          <span v-if="name.locale" class="shrink-0 text-10 text-meta">{{ localeName(name.locale) }}</span>
           <!-- Official names by the name the "add a name" dialog gives them. -->
           <GuideMockChip :label="name.kind === 'official' ? t('editor.names.official') : t(`catalog.title_kind.${name.kind}`)" :tone="name.kind === 'official' ? 'soft' : 'plain'" />
         </li>
@@ -50,12 +50,12 @@ const VERSIONS = [
             class="absolute -left-[1.3rem] top-1 size-2.5 rounded-full ring-2 ring-card"
             :class="version.cause === 'restore' ? 'bg-(--accent)' : version.n === 1 ? 'bg-success' : 'bg-faint'"
           />
-          <p class="flex items-center gap-1.5 text-[11px]">
+          <p class="flex items-center gap-1.5 text-11">
             <span class="font-mono font-semibold text-title">v{{ version.n }}</span>
             <GuideMockChip :label="t(`catalog.version_cause.${version.cause}`)" :tone="version.cause === 'restore' ? 'soft' : 'plain'" />
-            <span class="ml-auto text-[10px] text-meta">{{ version.who === 'moderator' ? t('discussions.post.moderator') : version.who }}</span>
+            <span class="ml-auto text-10 text-meta">{{ version.who === 'moderator' ? t('discussions.post.moderator') : version.who }}</span>
           </p>
-          <p v-if="version.note" class="mt-0.5 truncate text-[11px] text-body">{{ text[version.note] }}</p>
+          <p v-if="version.note" class="mt-0.5 truncate text-11 text-body">{{ text[version.note] }}</p>
         </li>
       </ol>
     </div>

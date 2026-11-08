@@ -52,7 +52,7 @@ onBeforeUnmount(() => clearTimeout(settleTimer))
 
 .ui-collapse:not(.is-open) .ui-collapse-body {
   opacity: 0;
-  translate: 0 4px;
+  translate: 0 0.25rem;
   transition: opacity 120ms ease-in, translate 120ms ease-in;
 }
 

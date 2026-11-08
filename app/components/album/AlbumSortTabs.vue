@@ -63,7 +63,7 @@ watch(() => [props.modelValue, props.items.length], () => nextTick(measure))
       :key="item.value"
       type="button"
       :data-value="item.value"
-      class="group/tab relative flex items-center gap-2 pb-3 pt-0.5 text-[15px] transition-colors duration-200 ease-out"
+      class="group/tab relative flex items-center gap-2 pb-3 pt-0.5 text-15 transition-colors duration-200 ease-out"
       :class="item.value === modelValue ? 'font-semibold text-title' : 'font-medium text-meta hover:text-title'"
       :aria-pressed="item.value === modelValue"
       @click="emit('update:modelValue', item.value)"

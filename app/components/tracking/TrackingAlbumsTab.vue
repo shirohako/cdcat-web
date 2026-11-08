@@ -62,7 +62,7 @@
               <div class="mt-2 flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1 text-xs text-meta">
                 <span v-if="album.release_date">{{ formatDate(album.release_date) }}</span>
                 <span>{{ album.catalog_number }}</span>
-                <span v-if="album.type !== 'album'" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-btn text-btn-content uppercase">{{ album.type }}</span>
+                <span v-if="album.type !== 'album'" class="inline-flex items-center px-1.5 py-0.5 rounded text-10 font-medium bg-btn text-btn-content uppercase">{{ album.type }}</span>
               </div>
             </div>
 

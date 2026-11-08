@@ -26,7 +26,7 @@ const search = defineModel<string>({ required: true })
       v-model="search"
       type="search"
       maxlength="100"
-      class="h-full min-w-0 flex-1 bg-transparent pr-2.5 text-[13px] text-title outline-none placeholder:text-faint"
+      class="h-full min-w-0 flex-1 bg-transparent pr-2.5 text-13 text-title outline-none placeholder:text-faint"
       :placeholder="placeholder"
       :aria-label="placeholder"
     >

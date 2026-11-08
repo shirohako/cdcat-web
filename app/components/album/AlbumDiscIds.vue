@@ -54,7 +54,7 @@ onBeforeUnmount(() => clearTimeout(timer))
         <dl class="divide-y divide-line overflow-hidden rounded-lg ring-1 ring-inset ring-line">
           <div v-for="item in ids(toc)" :key="item.key" class="flex items-center gap-3 py-1.5 pl-3 pr-1.5">
             <dt class="w-28 shrink-0 text-xs text-meta sm:w-40">{{ item.label }}</dt>
-            <dd class="min-w-0 flex-1 break-all font-mono text-[13px] leading-5 text-title">{{ item.value }}</dd>
+            <dd class="min-w-0 flex-1 break-all font-mono text-13 leading-5 text-title">{{ item.value }}</dd>
             <UiButton
               v-if="item.href"
               :href="item.href"

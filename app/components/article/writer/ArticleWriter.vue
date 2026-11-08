@@ -42,7 +42,7 @@ onMounted(async () => {
     if (stored === 'edit' || stored === 'split' || stored === 'preview') mode.value = stored
   }
   catch { /* storage unavailable */ }
-  settingsOpen.value = window.matchMedia('(min-width: 1280px)').matches
+  settingsOpen.value = window.matchMedia('(width >= 80rem)').matches
   window.addEventListener('keydown', onKeydown)
   // A new article only brings back the unsaved copy kept in this browser.
   try { await draft.load() }

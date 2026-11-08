@@ -1,7 +1,7 @@
 <template>
   <li v-if="image" class="relative flex flex-wrap gap-3 rounded-xl border p-3 transition-opacity sm:flex-nowrap sm:gap-4" :class="[errors.length ? 'border-danger/25 bg-danger/10' : 'border-line', dragging && 'opacity-40']">
     <!-- Where the row being dragged would land, in the middle of the gap between two rows. -->
-    <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-[5px]' : '-bottom-[5px]'" />
+    <span v-if="dropEdge" class="pointer-events-none absolute inset-x-2 h-0.5 rounded-full bg-primary" :class="dropEdge === 'before' ? '-top-1.25' : '-bottom-1.25'" />
     <!-- Dragging starts from the handle only, so text in the fields can still be selected; the buttons move rows by keyboard and touch, so touch has no handle. -->
     <span class="-ml-1 flex w-4 shrink-0 cursor-grab touch-none items-center justify-center self-stretch text-faint transition-colors hover:text-body active:cursor-grabbing [@media(hover:none)]:hidden" aria-hidden="true" @pointerdown="emit('grab')">
       <GripVertical :size="16" />
@@ -10,9 +10,9 @@
     <figure class="mx-auto w-28 shrink-0 sm:mx-0 sm:w-36">
       <a :href="file?.url" target="_blank" rel="noopener" class="block" draggable="false">
         <img v-if="file" :src="file.thumbnail_url" alt="" class="mx-auto max-h-52 max-w-full rounded-lg bg-sunken object-contain ring-1 ring-line" loading="lazy">
-        <span v-else class="flex aspect-square w-full items-center justify-center rounded-lg bg-sunken p-2 text-center text-[11px] text-danger">{{ $t('editor.image.missing') }}</span>
+        <span v-else class="flex aspect-square w-full items-center justify-center rounded-lg bg-sunken p-2 text-center text-11 text-danger">{{ $t('editor.image.missing') }}</span>
       </a>
-      <figcaption v-if="file" class="mt-1.5 text-center text-[11px] tabular-nums text-meta">{{ file.width }} × {{ file.height }}</figcaption>
+      <figcaption v-if="file" class="mt-1.5 text-center text-11 tabular-nums text-meta">{{ file.width }} × {{ file.height }}</figcaption>
     </figure>
     <div class="@container min-w-0 flex-1 basis-full space-y-2 sm:basis-0">
       <!-- Kind, label and scope share one line when the form is wide enough, the row's buttons at its end; narrower, two lines. -->
@@ -39,10 +39,10 @@
       </div>
       <input v-model="image.caption" class="input input-sm w-full" maxlength="500" :placeholder="$t('editor.image.caption_placeholder')">
       <details :open="hasAttributes">
-        <summary class="cursor-pointer text-[11px] font-medium text-meta transition-colors hover:text-primary">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
+        <summary class="cursor-pointer text-11 font-medium text-meta transition-colors hover:text-primary">{{ $t('catalog.collection.image_attributes') }}<span v-if="hasAttributes"> ({{ attributeCount }})</span></summary>
         <EditorAttributeRows v-model="album.image_attributes" compact subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
       </details>
-      <p v-for="error in errors" :key="error.path" class="text-[11px] text-danger">{{ error.message }}</p>
+      <p v-for="error in errors" :key="error.path" class="text-11 text-danger">{{ error.message }}</p>
     </div>
   </li>
 </template>

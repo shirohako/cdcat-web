@@ -53,10 +53,10 @@
                 >
                   {{ review.album?.title }}
                 </NuxtLink>
-                <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 shrink-0" :class="reviewRatingTone(review.rating)">
+                <span v-if="review.rating" class="rounded-full px-2 py-0.5 text-11 font-medium ring-1 shrink-0" :class="reviewRatingTone(review.rating)">
                   {{ $t(reviewRatingKey(review.rating)) }}
                 </span>
-                <span v-if="review.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-[10px] font-medium text-btn-content shrink-0" :title="$t('reviews.hidden_hint')">
+                <span v-if="review.is_hidden" class="rounded bg-btn px-1.5 py-0.5 text-10 font-medium text-btn-content shrink-0" :title="$t('reviews.hidden_hint')">
                   {{ $t('reviews.hidden') }}
                 </span>
               </div>

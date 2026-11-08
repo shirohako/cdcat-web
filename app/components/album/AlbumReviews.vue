@@ -13,8 +13,8 @@
       <div class="rounded-md bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
         <p class="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-title">
           {{ $t('album.comments.mine') }}
-          <span v-if="mine.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[mine.rating].solid">{{ $t(reviewRatingKey(mine.rating)) }}</span>
-          <span v-if="mine.is_hidden" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-[11px] leading-4 text-meta dark:bg-white/[0.08]">{{ $t('reviews.hidden') }}</span>
+          <span v-if="mine.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-11 font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[mine.rating].solid">{{ $t(reviewRatingKey(mine.rating)) }}</span>
+          <span v-if="mine.is_hidden" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-11 leading-4 text-meta dark:bg-white/[0.08]">{{ $t('reviews.hidden') }}</span>
         </p>
         <RichContent :content="mine.content" format="markdown" class="text-sm" />
         <div class="mt-1.5 flex gap-1.5">
@@ -36,8 +36,8 @@
         <div class="min-w-0 flex-1">
           <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
             <NuxtLink :to="`/profile/${review.user?.username}`" class="font-semibold text-body transition-colors hover:text-primary">{{ review.user?.nickname || review.user?.username }}</NuxtLink>
-            <span v-if="review.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[review.rating].solid">{{ $t(reviewRatingKey(review.rating)) }}</span>
-            <span v-if="review.tracking_status" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-[11px] leading-4 text-meta dark:bg-white/[0.08]">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
+            <span v-if="review.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-11 font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[review.rating].solid">{{ $t(reviewRatingKey(review.rating)) }}</span>
+            <span v-if="review.tracking_status" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-11 leading-4 text-meta dark:bg-white/[0.08]">{{ $t(`album.stats.${review.tracking_status}`) }}</span>
             <time class="text-meta" :datetime="review.created_at" :title="exact(review.created_at)">{{ ago(review.created_at) }}</time>
             <UiButton
               v-if="isAuthenticated && review.user_id !== user?.id"

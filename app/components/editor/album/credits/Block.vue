@@ -1,11 +1,11 @@
 <template>
   <section class="rounded-lg border" :class="TONES[kind].edge">
-    <header class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-t-[7px] border-b px-3 py-1.5" :class="[TONES[kind].edge, TONES[kind].head]">
+    <header class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-t-[0.4375rem] border-b px-3 py-1.5" :class="[TONES[kind].edge, TONES[kind].head]">
       <div class="flex min-w-0 items-center gap-2" :class="TONES[kind].title">
         <component :is="TONES[kind].icon" :size="18" class="shrink-0" />
         <div class="min-w-0">
           <h3 class="text-sm font-semibold leading-5">{{ title }}</h3>
-          <p class="text-[11px] leading-4 opacity-75">{{ description }}</p>
+          <p class="text-11 leading-4 opacity-75">{{ description }}</p>
         </div>
       </div>
       <div class="ml-auto flex items-center gap-2">

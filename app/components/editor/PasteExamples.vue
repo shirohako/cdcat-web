@@ -8,9 +8,9 @@
       </span>
       <template #content>
         <p class="text-xs font-semibold text-title">{{ t(`${scope}.${format.key}_title`) }}</p>
-        <pre class="mt-1.5 whitespace-pre-wrap rounded-md bg-sunken px-2.5 py-2 font-mono text-[11px] leading-4 text-title">{{ format.text }}</pre>
-        <p class="mt-2 text-[11px] font-semibold text-title">{{ t(`${scope}.handles`) }}</p>
-        <ul class="mt-1 list-disc space-y-0.5 pl-4 text-[11px] text-body">
+        <pre class="mt-1.5 whitespace-pre-wrap rounded-md bg-sunken px-2.5 py-2 font-mono text-11 leading-4 text-title">{{ format.text }}</pre>
+        <p class="mt-2 text-11 font-semibold text-title">{{ t(`${scope}.handles`) }}</p>
+        <ul class="mt-1 list-disc space-y-0.5 pl-4 text-11 text-body">
           <li v-for="point in t(`${scope}.${format.key}_points`).split('\n')" :key="point">{{ point }}</li>
         </ul>
       </template>

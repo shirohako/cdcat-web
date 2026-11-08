@@ -21,7 +21,7 @@
           <p class="truncate text-xs text-meta">
             {{ [candidate.album.catalog_number, formatDate(candidate.album.release_date, candidate.album.release_date_precision as DatePrecision | null)].filter(Boolean).join(' · ') }}
           </p>
-          <p class="truncate text-[11px]" :class="candidate.strength === 'strong' ? 'text-warning' : 'text-meta'">
+          <p class="truncate text-11" :class="candidate.strength === 'strong' ? 'text-warning' : 'text-meta'">
             {{ candidate.reasons.map(reason => $t(`duplicates.reasons.${reason.kind}`, { value: reason.value })).join(clauseSeparator) }}
           </p>
         </div>

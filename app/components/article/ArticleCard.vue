@@ -22,7 +22,7 @@ const count = computed(() => new Intl.NumberFormat(locale.value, { notation: 'co
 <template>
   <NuxtLink
     :to="href"
-    class="group flex flex-col rounded-[14px] bg-card p-1.5 shadow-[0_1px_2px_oklch(0_0_0/0.05)] ring-1 ring-line transition-shadow duration-200 ease-out
+    class="group flex flex-col rounded-[0.875rem] bg-card p-1.5 shadow-[0_1px_2px_oklch(0_0_0/0.05)] ring-1 ring-line transition-shadow duration-200 ease-out
            hover:shadow-[0_14px_32px_-16px_color-mix(in_oklch,var(--primary)_60%,transparent)] hover:ring-primary/40"
   >
     <div class="relative aspect-video overflow-hidden rounded-lg">
@@ -31,10 +31,10 @@ const count = computed(() => new Intl.NumberFormat(locale.value, { notation: 'co
         class="size-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04] motion-reduce:transition-none">
       <ArticleCoverArt v-else />
 
-      <span v-if="article.featured" class="absolute left-2 top-2 inline-flex h-6 items-center gap-1 rounded-md bg-primary px-2 text-[11px] font-semibold text-on-primary shadow-sm">
+      <span v-if="article.featured" class="absolute left-2 top-2 inline-flex h-6 items-center gap-1 rounded-md bg-primary px-2 text-11 font-semibold text-on-primary shadow-sm">
         <Sparkles :size="12" aria-hidden="true" />{{ t('article_ui.featured') }}
       </span>
-      <div class="absolute bottom-2 right-2 flex gap-1.5 text-[11px] font-semibold tabular-nums text-on-media">
+      <div class="absolute bottom-2 right-2 flex gap-1.5 text-11 font-semibold tabular-nums text-on-media">
         <span class="inline-flex h-6 items-center gap-1 rounded-md bg-scrim px-2 backdrop-blur-sm">
           <Eye :size="12" aria-hidden="true" /><span aria-hidden="true">{{ count.format(article.views_count) }}</span>
           <span class="sr-only">{{ t('article_ui.views', { count: article.views_count }) }}</span>
@@ -47,11 +47,11 @@ const count = computed(() => new Intl.NumberFormat(locale.value, { notation: 'co
     </div>
 
     <div class="flex flex-1 flex-col px-2.5 pb-2.5 pt-3">
-      <p class="mb-1.5 truncate text-[11px] font-semibold tracking-wide text-primary">{{ typeName(article.type) }}</p>
-      <h2 class="line-clamp-2 text-[15px] font-bold leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ article.title }}</h2>
+      <p class="mb-1.5 truncate text-11 font-semibold tracking-wide text-primary">{{ typeName(article.type) }}</p>
+      <h2 class="line-clamp-2 text-15 font-bold leading-snug text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ article.title }}</h2>
       <p v-if="article.summary" class="mt-1.5 line-clamp-2 text-xs leading-relaxed text-meta">{{ article.summary }}</p>
       <div v-if="article.tags.length" class="mt-2.5 flex flex-wrap gap-1">
-        <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id" class="rounded-md bg-btn px-1.5 py-0.5 text-[11px] text-btn-content">#{{ tagName(tag) }}</span>
+        <span v-for="tag in article.tags.slice(0, 3)" :key="tag.id" class="rounded-md bg-btn px-1.5 py-0.5 text-11 text-btn-content">#{{ tagName(tag) }}</span>
       </div>
 
       <!-- The poster takes the whole row, with the date under the name. -->
@@ -59,7 +59,7 @@ const count = computed(() => new Intl.NumberFormat(locale.value, { notation: 'co
         <UiAvatar :src="article.author?.avatar_url" :name="authorName" alt="" size="sm" />
         <div class="min-w-0 flex-1">
           <p class="truncate text-xs font-semibold leading-5 text-body">{{ authorName }}</p>
-          <time v-if="date" :datetime="article.published_at ?? undefined" class="block text-[11px] leading-4 text-faint">{{ date }}</time>
+          <time v-if="date" :datetime="article.published_at ?? undefined" class="block text-11 leading-4 text-faint">{{ date }}</time>
         </div>
       </div>
     </div>

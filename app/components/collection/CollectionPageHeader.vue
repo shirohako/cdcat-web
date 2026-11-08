@@ -57,7 +57,7 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
         <slot name="icon"><UiIconTile :icon="icon" /></slot>
 
         <div class="min-w-0">
-          <h1 class="text-2xl font-bold tracking-[-0.025em] text-title sm:text-[28px]">
+          <h1 class="text-2xl font-bold tracking-[-0.025em] text-title sm:text-[1.75rem]">
             {{ title }}
           </h1>
 

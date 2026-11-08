@@ -26,7 +26,7 @@ const done = (step: number) => props.finished || step < props.current
   <nav :aria-label="t('auth.steps.label')">
     <div class="flex flex-col gap-2 max-sm:hidden">
       <div class="flex items-center gap-2.5">
-        <span class="font-mono text-[11px] font-bold tracking-wider text-meta">SIDE A</span>
+        <span class="font-mono text-11 font-bold tracking-wider text-meta">SIDE A</span>
         <ol class="flex flex-1 gap-1">
           <li v-for="(name, i) in steps" :key="name" class="min-w-0 basis-0" :style="{ flexGrow: widths[i] }">
             <button
@@ -42,16 +42,16 @@ const done = (step: number) => props.finished || step < props.current
             </button>
           </li>
         </ol>
-        <span class="font-mono text-[11px] font-bold tabular-nums text-meta">{{ current }} / {{ total }}</span>
+        <span class="font-mono text-11 font-bold tabular-nums text-meta">{{ current }} / {{ total }}</span>
       </div>
-      <p class="flex items-center gap-2 text-[13px] font-semibold text-title">
+      <p class="flex items-center gap-2 text-13 font-semibold text-title">
         <span v-if="!finished" class="auth-tracks-eq" aria-hidden="true"><i /><i /><i /><i /></span>
         <span>A{{ current }} · {{ steps[current - 1] }}</span>
-        <span class="rounded-full bg-(--auth-tint)/10 px-2 py-px text-[11.5px] font-semibold text-(--auth-tint)">{{ finished ? t('auth.steps.finished') : t('auth.steps.playing') }}</span>
+        <span class="rounded-full bg-(--auth-tint)/10 px-2 py-px text-11.5 font-semibold text-(--auth-tint)">{{ finished ? t('auth.steps.finished') : t('auth.steps.playing') }}</span>
       </p>
     </div>
     <div class="flex flex-col gap-2 sm:hidden">
-      <p class="flex justify-between gap-3 text-[13px] font-semibold text-title">
+      <p class="flex justify-between gap-3 text-13 font-semibold text-title">
         <span>{{ t('auth.steps.short', { n: current, total, name: steps[current - 1] }) }}</span>
         <span class="font-normal tabular-nums text-meta">{{ Math.round(((finished ? total : current) / total) * 100) }}%</span>
       </p>
@@ -73,11 +73,11 @@ const done = (step: number) => props.finished || step < props.current
   display: inline-flex;
   align-items: flex-end;
   gap: 2px;
-  height: 12px;
+  height: 0.75rem;
 }
 
 .auth-tracks-eq i {
-  width: 3px;
+  width: 0.1875rem;
   height: 100%;
   border-radius: 1px;
   background: var(--auth-tint);

@@ -12,17 +12,17 @@
          COLLAPSED_COUNT links only the first ones show until expanded. -->
     <div v-if="links && links.length > 0" class="space-y-3 px-5 pb-4 pt-1.5">
       <div v-for="(group, category) in shownGroups" :key="category">
-        <p class="text-[11px] font-semibold text-meta">{{ $t(`catalog.link_category.${categoryKey(category)}`) }}</p>
+        <p class="text-11 font-semibold text-meta">{{ $t(`catalog.link_category.${categoryKey(category)}`) }}</p>
         <div class="mt-1.5 flex flex-wrap gap-1.5">
           <UiTooltip v-for="link in group" :key="link.id" group="album-links" :text="getDomain(link.url)">
             <a
               :href="link.url"
               target="_blank"
               rel="noopener noreferrer"
-              class="group inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] pl-1 pr-2.5 text-[12.5px] font-semibold text-title transition-colors duration-150 hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.14]"
+              class="group inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] pl-1 pr-2.5 text-12.5 font-semibold text-title transition-colors duration-150 hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.14]"
             >
               <span
-                class="flex size-5 shrink-0 items-center justify-center rounded-[5px]"
+                class="flex size-5 shrink-0 items-center justify-center rounded-[0.3125rem]"
                 :class="tileHue(link) === null ? 'bg-black/[0.06] text-meta dark:bg-white/[0.1]' : 'bg-[oklch(0.94_0.035_var(--hue-link))] text-[oklch(0.56_0.14_var(--hue-link))] dark:bg-[oklch(0.36_0.06_var(--hue-link))] dark:text-[oklch(0.82_0.1_var(--hue-link))]'"
                 :style="tileHue(link) === null ? undefined : { '--hue-link': tileHue(link) }"
               >

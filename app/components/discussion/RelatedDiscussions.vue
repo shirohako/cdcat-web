@@ -34,7 +34,7 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
       <NuxtLink v-for="topic in topics" :key="topic.id" :to="`/discussions/${topic.id}`" class="group flex items-center gap-3 px-4 py-2.5">
         <div class="min-w-0 flex-1">
           <p class="truncate text-sm font-medium text-title transition-colors duration-150 ease-out group-hover:text-primary">{{ topic.title }}</p>
-          <p class="mt-0.5 text-[11px] text-meta">{{ topic.author?.nickname || topic.author?.username }} · {{ ago(topic.bumped_at) }}</p>
+          <p class="mt-0.5 text-11 text-meta">{{ topic.author?.nickname || topic.author?.username }} · {{ ago(topic.bumped_at) }}</p>
         </div>
         <span class="flex shrink-0 items-center gap-1 text-xs tabular-nums text-meta"><MessageSquare :size="12" />{{ topic.replies_count }}</span>
       </NuxtLink>

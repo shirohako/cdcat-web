@@ -19,7 +19,7 @@
         <label v-if="doc.type === 'company' || doc.type === 'circle' || doc.catalog_prefixes.length" class="block sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.catalog_prefixes') }}</span>
           <input :value="doc.catalog_prefixes.join(', ')" class="input input-sm w-full font-mono" placeholder="KICA, KICS" @change="setPrefixes(($event.target as HTMLInputElement).value)">
-          <span class="mt-1 block text-[11px] text-meta">{{ $t('editor.entity.prefixes_hint') }}</span>
+          <span class="mt-1 block text-11 text-meta">{{ $t('editor.entity.prefixes_hint') }}</span>
         </label>
         <label class="block sm:col-span-2">
           <span class="mb-1 block text-sm font-medium text-body">{{ $t('catalog.field.bio') }}</span>

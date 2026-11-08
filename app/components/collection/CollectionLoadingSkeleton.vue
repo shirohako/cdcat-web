@@ -39,7 +39,7 @@
         v-for="item in total"
         :key="item"
         class="flex flex-col overflow-hidden"
-        :class="variant === 'events' ? '@container rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'articles' ? 'rounded-[14px] bg-card p-1.5 ring-1 ring-line' : variant === 'covers' ? 'rounded-xl bg-black/[0.035] dark:bg-white/[0.04]' : 'rounded-xl bg-sunken'"
+        :class="variant === 'events' ? '@container rounded-[0.875rem] bg-card p-1.5 ring-1 ring-line' : variant === 'articles' ? 'rounded-[0.875rem] bg-card p-1.5 ring-1 ring-line' : variant === 'covers' ? 'rounded-xl bg-black/[0.035] dark:bg-white/[0.04]' : 'rounded-xl bg-sunken'"
       >
         <div class="skeleton" :class="mediaClass" />
 
