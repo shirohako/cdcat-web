@@ -10,7 +10,7 @@ const router = useRouter()
 const { t, locale } = useI18n()
 const { $api } = useNuxtApp()
 const { localizeError } = useLocalizedApiError()
-const { unread } = useNotifications()
+const { unread, record } = useNotifications()
 const { text, detail, link } = useNotificationText()
 
 const filter = computed(() => route.query.filter === 'unread' ? 'unread' : 'all')
@@ -24,11 +24,11 @@ const { data, status, error, refresh, loading, refetching, revealKey, revealClas
   ({ signal }) => $api<{ notifications: NotificationItem[], unread_count: number, pagination: Pagination }>('/v1/me/notifications', { query: { filter: filter.value, page: page.value }, signal }),
   { cache: false },
 )
-watch(data, (value) => { if (value) unread.value = value.unread_count })
+watch(data, (value) => { if (value) record(value.unread_count) })
 
 async function markRead(ids: number[] | null) {
   const response = await $api<{ unread_count: number }>('/v1/me/notifications/read', { method: 'POST', body: ids ? { ids } : { all: true } })
-  unread.value = response.unread_count
+  record(response.unread_count)
   await refresh()
 }
 

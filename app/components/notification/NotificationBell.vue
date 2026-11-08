@@ -3,14 +3,14 @@ import { Bell, CheckCheck } from '@lucide/vue'
 import type { NotificationItem } from '~/types/article'
 
 /**
- * The navbar bell: unread badge, polled every minute, and the latest notifications on click. The navbar binds
- * `v-model:open`, so opening it closes the navbar's other menus and they close it.
+ * The navbar bell: unread badge (checked now and then, see useNotifications), and the latest notifications on
+ * click. The navbar binds `v-model:open`, so opening it closes the navbar's other menus and they close it.
  */
 const { t, locale } = useI18n()
 const { $api } = useNuxtApp()
 const route = useRoute()
 const router = useRouter()
-const { unread, refresh, startPolling, stopPolling } = useNotifications()
+const { unread, record, refreshIfStale, subscribe, unsubscribe } = useNotifications()
 const { text, detail, link } = useNotificationText()
 
 const open = defineModel<boolean>('open', { default: false })
@@ -18,11 +18,11 @@ const loading = ref(false)
 const items = ref<NotificationItem[]>([])
 const root = useTemplateRef<HTMLElement>('root')
 
-onMounted(startPolling)
-onBeforeUnmount(stopPolling)
+onMounted(subscribe)
+onBeforeUnmount(unsubscribe)
 watch(() => route.fullPath, () => {
   open.value = false
-  void refresh()
+  refreshIfStale()
 })
 
 async function toggle() {
@@ -34,7 +34,7 @@ async function toggle() {
   try {
     const response = await $api<{ notifications: NotificationItem[], unread_count: number }>('/v1/me/notifications', { query: { per_page: 8 } })
     items.value = response.notifications
-    unread.value = response.unread_count
+    record(response.unread_count)
   }
   catch { items.value = [] }
   finally { loading.value = false }
@@ -43,10 +43,10 @@ async function toggle() {
 async function markRead(ids: number[] | null) {
   try {
     const response = await $api<{ unread_count: number }>('/v1/me/notifications/read', { method: 'POST', body: ids ? { ids } : { all: true } })
-    unread.value = response.unread_count
+    record(response.unread_count)
     items.value = items.value.map(item => ids === null || ids.includes(item.id) ? { ...item, read: true } : item)
   }
-  catch { /* the badge corrects itself on the next poll */ }
+  catch { /* the badge corrects itself on the next check */ }
 }
 
 async function openItem(item: NotificationItem) {
