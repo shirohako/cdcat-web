@@ -426,6 +426,8 @@ const texts: ApiDocsTexts = {
         bio: 'The start of the bio, at most 160 characters, cut as is; may contain Markdown syntax.',
         albums_count: 'Number of albums worked on.',
         followers_count: 'Number of people who favorited this artist.',
+        releases_count: 'Number of "Releases", see [List an artist\'s releases](#get-artists-id-albums).',
+        credited_albums_count: 'Number of albums under "Credits", see [List an artist\'s credited tracks](#get-artists-id-tracks).',
       },
     },
     'get-artists-lookup': {

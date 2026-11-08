@@ -108,4 +108,7 @@ export interface ArtistCard {
   bio: string | null
   albums_count: number
   followers_count: number
+  /** The artist page's two album tabs: 发行的专辑 and 参与的专辑 */
+  releases_count: number
+  credited_albums_count: number
 }

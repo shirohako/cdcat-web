@@ -3527,8 +3527,8 @@
   },
   "artist_card": {
     "on_album": "在本專輯",
-    "albums": "專輯 {count}",
-    "favorites": "收藏 {count}",
+    "releases": "發行 {count}",
+    "credits": "參與 {count}",
     "open": "查看藝術家",
     "load_failed": "更多資訊沒能載入"
   },

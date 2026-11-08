@@ -426,6 +426,8 @@ const texts: ApiDocsTexts = {
         bio: '簡介的開頭，最多 160 個字，原樣擷取，可能帶有 Markdown 標記。',
         albums_count: '參與的專輯數。',
         followers_count: '收藏這位藝術家的人數。',
+        releases_count: '「發行的專輯」的數量，見[藝術家發行的專輯](#get-artists-id-albums)。',
+        credited_albums_count: '「參與的專輯」的數量，見[藝術家參與的曲目](#get-artists-id-tracks)。',
       },
     },
     'get-artists-lookup': {

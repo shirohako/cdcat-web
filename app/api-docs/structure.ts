@@ -670,12 +670,13 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
             fields: [
               f('id', 'integer'), f('name', 'string'), f('type', 'string', { enum: 'artist_type' }), f('image_url', 'url | null'), f('is_active', 'boolean'),
               shared('is_pending', 'boolean'), shared('titles', 'Title[]'), f('bio', 'string | null'), f('albums_count', 'integer'), f('followers_count', 'integer'),
+              f('releases_count', 'integer'), f('credited_albums_count', 'integer'),
             ],
           },
           statuses: [moved, missing],
           example: {
             request: '/artists/352/card',
-            body: { success: true, data: { id: 352, name: 'ステラノート', type: 'circle', image_url: null, is_active: true, is_pending: false, titles: [{ title: 'Stella Note', locale: 'en', kind: 'official' }], bio: '2019年から活動している同人音楽サークル。', albums_count: 7, followers_count: 41 } },
+            body: { success: true, data: { id: 352, name: 'ステラノート', type: 'circle', image_url: null, is_active: true, is_pending: false, titles: [{ title: 'Stella Note', locale: 'en', kind: 'official' }], bio: '2019年から活動している同人音楽サークル。', albums_count: 7, followers_count: 41, releases_count: 6, credited_albums_count: 2 } },
           },
         }),
         get('/artists/lookup', {

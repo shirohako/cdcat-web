@@ -3527,8 +3527,8 @@
   },
   "artist_card": {
     "on_album": "On this album",
-    "albums": "{count} album | {count} albums",
-    "favorites": "{count} favorite | {count} favorites",
+    "releases": "Releases {count}",
+    "credits": "Credits {count}",
     "open": "View artist",
     "load_failed": "More details failed to load"
   },

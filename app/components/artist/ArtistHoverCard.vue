@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ArtistType } from '~/types/artist'
-import { ArrowRight, Disc3, Heart } from '@lucide/vue'
+import { ArrowRight, Disc3, Music } from '@lucide/vue'
 
 export interface ArtistAlbumRole {
   role: string
@@ -12,7 +12,7 @@ export interface ArtistAlbumRole {
 
 /**
  * The artist hover card. What the page already has (picture, name, type) shows at once; the other names, the start of
- * the bio and the counts come from GET /artists/{id}/card, with placeholder lines meanwhile. The roles on this album
+ * the bio and the album counts come from GET /artists/{id}/card, with placeholder lines meanwhile. The roles on this album
  * are on the page too, but wait for the card, so they don't show ahead of the placeholders and then move down under
  * the bio. Without a picture it shows the type's icon, never initials.
  *
@@ -67,14 +67,16 @@ const showRoles = computed(() => Boolean(props.roles?.length && (card.value || f
       <CatalogRoleTag v-for="role in roles" :key="role.role" :label="role.count > 1 ? `${role.label} ×${role.count}` : role.label" :category="role.category" />
     </div>
 
-    <!-- The counts and the way to the artist's page share the foot -->
-    <div class="mt-4 flex items-center gap-3 border-t border-line px-4 py-2.5 text-xs text-meta">
+    <!-- The counts of the artist page's two album tabs, 发行 and 参与 (a count of 0 left out), and the way to the page
+         share the foot; no favourites count since 2026-11-09. Nothing breaks inside a count or the link; when a
+         language's words don't fit on one line, the link moves to a second line, still on the right. -->
+    <div class="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 border-t border-line px-4 py-2.5 text-xs text-meta">
       <template v-if="card">
-        <span class="inline-flex items-center gap-1 tabular-nums"><Disc3 :size="13" class="text-faint" />{{ t('artist_card.albums', { count: card.albums_count }) }}</span>
-        <span class="inline-flex items-center gap-1 tabular-nums"><Heart :size="13" class="text-faint" />{{ t('artist_card.favorites', { count: card.followers_count }) }}</span>
+        <span v-if="card.releases_count" :title="t('artists.detail.tab_releases')" class="inline-flex items-center gap-1 whitespace-nowrap tabular-nums"><Disc3 :size="13" class="text-faint" />{{ t('artist_card.releases', { count: card.releases_count }) }}</span>
+        <span v-if="card.credited_albums_count" :title="t('artists.detail.tab_credits')" class="inline-flex items-center gap-1 whitespace-nowrap tabular-nums"><Music :size="13" class="text-faint" />{{ t('artist_card.credits', { count: card.credited_albums_count }) }}</span>
       </template>
       <div v-else-if="!failed" class="h-2.5 w-28 rounded skeleton" aria-hidden="true" />
-      <NuxtLink :to="`/artists/${artist.id}`" class="group/open ml-auto inline-flex shrink-0 items-center gap-1 font-semibold text-title transition-colors hover:text-primary">
+      <NuxtLink :to="`/artists/${artist.id}`" class="group/open ml-auto inline-flex shrink-0 items-center gap-1 whitespace-nowrap font-semibold text-title transition-colors hover:text-primary">
         {{ t('artist_card.open') }}<ArrowRight :size="13" class="transition-transform group-hover/open:translate-x-0.5" />
       </NuxtLink>
     </div>

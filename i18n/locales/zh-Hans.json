@@ -3527,8 +3527,8 @@
   },
   "artist_card": {
     "on_album": "在本专辑",
-    "albums": "专辑 {count}",
-    "favorites": "收藏 {count}",
+    "releases": "发行 {count}",
+    "credits": "参与 {count}",
     "open": "查看艺术家",
     "load_failed": "更多信息没能加载"
   },

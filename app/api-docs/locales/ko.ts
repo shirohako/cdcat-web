@@ -426,6 +426,8 @@ const texts: ApiDocsTexts = {
         bio: '소개의 앞부분입니다. 최대 160자를 그대로 자른 것이라 Markdown 문법이 섞여 있을 수 있습니다.',
         albums_count: '참여한 앨범 수',
         followers_count: '이 아티스트를 좋아요한 사람 수',
+        releases_count: '‘발매 앨범’ 수. [아티스트 발매 앨범 목록](#get-artists-id-albums)을 참고하세요.',
+        credited_albums_count: '‘크레딧’에 잡히는 앨범 수. [아티스트 참여곡 목록](#get-artists-id-tracks)을 참고하세요.',
       },
     },
     'get-artists-lookup': {

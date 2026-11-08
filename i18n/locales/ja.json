@@ -3527,9 +3527,9 @@
   },
   "artist_card": {
     "on_album": "このアルバムで",
-    "albums": "アルバム {count}",
-    "favorites": "お気に入り {count}",
-    "open": "アーティストを見る",
+    "releases": "リリース {count}",
+    "credits": "参加 {count}",
+    "open": "詳しく見る",
     "load_failed": "詳しい情報を読み込めませんでした"
   },
   "error_page": {

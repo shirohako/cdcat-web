@@ -3527,8 +3527,8 @@
   },
   "artist_card": {
     "on_album": "이 앨범에서",
-    "albums": "앨범 {count}장",
-    "favorites": "팔로워 {count}명",
+    "releases": "발매 {count}장",
+    "credits": "참여 {count}장",
     "open": "아티스트 보기",
     "load_failed": "자세한 정보를 불러오지 못했어요"
   },

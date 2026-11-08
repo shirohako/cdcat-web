@@ -426,6 +426,8 @@ const texts: ApiDocsTexts = {
         bio: '紹介文の冒頭。最大 160 文字をそのまま切り出したもので、Markdown の記号を含むことがあります。',
         albums_count: '参加アルバム数。',
         followers_count: 'このアーティストをフォローしている人数。',
+        releases_count: '「リリース」の数。[アーティストのリリース](#get-artists-id-albums)を参照してください。',
+        credited_albums_count: '「参加作品」の数。[アーティストの参加作品](#get-artists-id-tracks)を参照してください。',
       },
     },
     'get-artists-lookup': {
