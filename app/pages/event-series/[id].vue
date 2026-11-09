@@ -40,9 +40,16 @@ const seriesId = Number(route.params.id)
 
 const { t } = useI18n()
 const { localizedContent, formatDate } = useLocaleFormatting()
+const { onClick: onExternalClick } = useExternalLink()
 const { localizeError } = useLocalizedApiError()
 
 const { data: series, status, error, revealClass } = await usePageAPI<EventSeriesDetail>(`/v1/event-series/${seriesId}`, { notFound: true })
+
+/** The official site opens behind the external link card. */
+const openWebsite = (event: MouseEvent) => {
+  const url = series.value?.website
+  if (url) onExternalClick(event, { url, name: t('collection_pages.events.official_site'), category: 'official' })
+}
 
 // 24 fills whole rows in every grid (2/3/4 portrait columns, 1/2/3 landscape).
 const PER_PAGE = 24
@@ -154,6 +161,7 @@ usePageSeo({
               target="_blank"
               rel="noopener"
               :icon-right="ExternalLink"
+              @click="openWebsite"
             >
               {{ t('collection_pages.events.official_site') }}
             </UiButton>

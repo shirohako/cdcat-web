@@ -2091,6 +2091,19 @@
       "offsets_short": "{n} 個起點（{first} … {last}）"
     }
   },
+  "external_link": {
+    "title": "外部連結",
+    "type": "類型",
+    "site": "網站",
+    "name": "名稱",
+    "url": "網址",
+    "leaving_title": "你即將離開 CDCat",
+    "leaving_text": "這個連結指向 CDCat 以外的網站。請先確認網址無誤；在該網站登入、付款或填寫個人資料時，請留意保護你的財產與隱私安全。",
+    "copy": "複製連結",
+    "copied": "已複製",
+    "copy_failed": "複製失敗",
+    "open": "開啟連結"
+  },
   "notifications": {
     "title": "通知",
     "bell_unread": "通知，{count} 則未讀",

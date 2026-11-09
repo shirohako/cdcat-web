@@ -42,3 +42,35 @@ export const linkCategoryRank = (category?: string | null) => {
   const index = LINK_CATEGORIES.indexOf(category ?? 'other')
   return index === -1 ? LINK_CATEGORIES.length : index
 }
+
+/** The categories that have an icon of their own; any other category shows as `other`. */
+const KNOWN_CATEGORIES = new Set(LINK_CATEGORIES)
+
+/** A link category as shown: unknown or missing categories count as `other`. */
+export const linkCategoryKey = (category?: string | null) => category && KNOWN_CATEGORIES.has(category) ? category : 'other'
+
+/** A link tile's hue: the site's own, so links of one category differ; links without a known site stay grey (null). */
+export const linkTileHue = (category?: string | null, providerKey?: string | null) =>
+  !providerKey || linkCategoryKey(category) === 'other' ? null : providerHue(providerKey)
+
+/** The host a link points at, without `www.`; the address itself when it isn't one. */
+export const linkHost = (url: string) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}
+
+/** The name a link shows under: its own name when it has one, else the site's, else the host. */
+export const linkName = (link: { url: string, label?: string | null, provider?: { name?: string | null } | null }) =>
+  link.label?.trim() || link.provider?.name || linkHost(link.url)
+
+/**
+ * An address in three parts, as written, so the host can stand out: `https://` + `store.example.com` +
+ * `/items/1?x=2`. Anything that doesn't start with a scheme and `//` is all `rest`.
+ */
+export const splitUrl = (url: string) => {
+  const match = /^([a-z][a-z\d+.-]*:\/\/)([^/?#]*)(.*)$/is.exec(url)
+  return match ? { scheme: match[1]!, host: match[2]!, rest: match[3]! } : { scheme: '', host: '', rest: url }
+}

@@ -8,27 +8,23 @@
     </UiSectionTitle>
 
     <!-- Links grouped by category in their own order, each group a small label over a row of grey tags (the category's
-         icon on a tile in the site's own hue, the site's name and the link's own name; the address in the tooltip, which glides along the tags). Past
-         COLLAPSED_COUNT links only the first ones show until expanded. -->
+         icon on a tile in the site's own hue, then the link's own name, or the site's when it has none; the host in the
+         tooltip, which glides along the tags). A click opens the external link card. Past COLLAPSED_COUNT links only the
+         first ones show until expanded. -->
     <div v-if="links && links.length > 0" class="space-y-3 px-5 pb-4 pt-1.5">
       <div v-for="(group, category) in shownGroups" :key="category">
-        <p class="text-11 font-semibold text-meta">{{ $t(`catalog.link_category.${categoryKey(category)}`) }}</p>
+        <p class="text-11 font-semibold text-meta">{{ $t(`catalog.link_category.${linkCategoryKey(category)}`) }}</p>
         <div class="mt-1.5 flex flex-wrap gap-1.5">
-          <UiTooltip v-for="link in group" :key="link.id" group="album-links" :text="getDomain(link.url)">
+          <UiTooltip v-for="link in group" :key="link.id" group="album-links" :text="linkHost(link.url)">
             <a
               :href="link.url"
               target="_blank"
               rel="noopener noreferrer"
               class="group inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] pl-1 pr-2.5 text-13 font-semibold text-title transition-colors duration-150 hover:bg-black/[0.1] dark:bg-white/[0.08] dark:hover:bg-white/[0.14]"
+              @click="onClick($event, catalogLinkInfo(link))"
             >
-              <span
-                class="flex size-5 shrink-0 items-center justify-center rounded-[0.3125rem]"
-                :class="tileHue(link) === null ? 'bg-black/[0.06] text-meta dark:bg-white/[0.1]' : 'bg-[oklch(0.94_0.035_var(--hue-link))] text-[oklch(0.56_0.14_var(--hue-link))] dark:bg-[oklch(0.36_0.06_var(--hue-link))] dark:text-[oklch(0.82_0.1_var(--hue-link))]'"
-                :style="tileHue(link) === null ? undefined : { '--hue-link': tileHue(link) }"
-              >
-                <component :is="categoryIcons[categoryKey(category)]" :size="12" />
-              </span>
-              <span class="truncate">{{ link.provider?.name || getDomain(link.url) }}<span v-if="link.label" class="font-medium text-meta"> · {{ link.label }}</span></span>
+              <CatalogLinkTile :category="link.provider?.category" :provider-key="link.provider?.key" />
+              <span class="truncate">{{ linkName(link) }}</span>
               <ExternalLink :size="11" class="shrink-0 text-faint transition-colors duration-150 group-hover:text-title" />
             </a>
           </UiTooltip>
@@ -46,16 +42,17 @@
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
 import type { CatalogLink } from '~/types/catalog'
-import { LINK_CATEGORIES, providerHue } from '~/utils/linkProviders'
-import { AtSign, ChevronDown, ChevronUp, Database, ExternalLink, Globe, Headphones, House, Link2, Megaphone, ShoppingBag } from '@lucide/vue'
+import { LINK_CATEGORIES, linkCategoryKey, linkHost, linkName } from '~/utils/linkProviders'
+import { ChevronDown, ChevronUp, ExternalLink, Link2 } from '@lucide/vue'
 
 const props = withDefaults(defineProps<{
   links?: CatalogLink[]
 }>(), {
   links: () => [],
 })
+
+const { onClick } = useExternalLink()
 
 const groupedLinks = computed(() => {
   const groups: Record<string, CatalogLink[]> = {};
@@ -90,20 +87,4 @@ const shownGroups = computed(() => {
   }
   return result
 })
-
-const categoryIcons: Record<string, Component> = {
-  official: House, promotion: Megaphone, streaming: Headphones, shop: ShoppingBag, social: AtSign, database: Database, other: Globe,
-}
-const categoryKey = (category: string) => category in categoryIcons ? category : 'other'
-
-/** The tile's hue: the site's own, so links of one category differ; links without a known site stay grey. */
-const tileHue = (link: CatalogLink) => !link.provider || link.provider.category === 'other' ? null : providerHue(link.provider.key)
-
-const getDomain = (url: string) => {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-};
 </script>

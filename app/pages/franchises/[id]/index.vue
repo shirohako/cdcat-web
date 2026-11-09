@@ -3,10 +3,12 @@ import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
 import type { FranchiseDetail } from '~/types/entry'
 import { namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { linkName } from '~/utils/linkProviders'
 
 const route = useRoute()
 const { t, locale } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
+const { onClick: onExternalClick } = useExternalLink()
 
 const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`, { notFound: true })
 
@@ -94,9 +96,10 @@ const currentTab = ref('entries')
               target="_blank"
               rel="noopener noreferrer"
               class="group flex items-center gap-3 rounded-lg p-2 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
+              @click="onExternalClick($event, catalogLinkInfo(link))"
             >
               <ExternalLink :size="16" class="text-meta transition-colors group-hover:text-primary" />
-              <span class="truncate text-body transition-colors group-hover:text-primary">{{ link.provider?.name || link.url }}</span>
+              <span class="truncate text-body transition-colors group-hover:text-primary">{{ linkName(link) }}</span>
             </a>
           </section>
         </div>

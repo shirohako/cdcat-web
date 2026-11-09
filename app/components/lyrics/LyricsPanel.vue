@@ -84,7 +84,7 @@
           <span v-if="current.creator">{{ $t('lyrics_ui.added_by', { name: current.creator.nickname || current.creator.username }) }}</span>
           <span v-if="current.translator">{{ $t('lyrics_ui.translator', { name: current.translator }) }}</span>
           <span v-if="current.is_ai_generated" class="rounded bg-warning/10 px-1.5 py-px font-medium text-warning">{{ $t('lyrics_ui.ai_generated') }}</span>
-          <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate transition-colors hover:text-primary">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
+          <a v-if="current.source && isUrl(current.source)" :href="current.source" target="_blank" rel="noopener nofollow" class="max-w-[16rem] truncate transition-colors hover:text-primary" @click="openSource">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</a>
           <span v-else-if="current.source" class="max-w-[16rem] truncate">{{ $t('lyrics_ui.source_label', { source: current.source }) }}</span>
           <span class="ml-auto flex items-center gap-1">
             <UiButton :to="`/lyrics/${current.id}/versions`" size="xs">{{ $t('versions.short', { version: current.version }) }}</UiButton>
@@ -120,6 +120,7 @@ const { isAuthenticated, hasPermission } = useAuth()
 const { localizeError } = useLocalizedApiError()
 const { localeName, enumLabel } = useCatalogDisplay()
 const { showToast } = useToast()
+const { onClick: onExternalClick } = useExternalLink()
 
 const { data, status, error, loading, refresh } = usePageData(`track:${props.trackId}:lyrics`,
   ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/tracks/${props.trackId}/lyrics`, { signal, progress: !background }))
@@ -157,6 +158,11 @@ const load = async (id: number | null) => {
 watch([selectedId, compareId], ([a, b]) => Promise.all([load(a), load(b)]), { immediate: true })
 
 const current = computed(() => selectedId.value ? texts[selectedId.value] ?? null : null)
+/** A source that is a web address opens behind the external link card. */
+const openSource = (event: MouseEvent) => {
+  const source = current.value?.source
+  if (source) onExternalClick(event, { url: source })
+}
 const lyricLabel = (lyric: LyricSummary) => `${localeName(lyric.language)} · ${enumLabel('lyric_kind', lyric.kind)}`
 const isUrl = (text: string) => /^https?:\/\//i.test(text)
 const comparison = computed(() => compareId.value ? texts[compareId.value] ?? null : null)

@@ -157,6 +157,7 @@
               :style="hoveredLinkId === link.id ? { backgroundColor: getStreamingProvider(link.provider?.key ?? '').color + '22' } : {}"
               @mouseenter="hoveredLinkId = link.id"
               @mouseleave="hoveredLinkId = null"
+              @click="onExternalClick($event, catalogLinkInfo(link))"
             >
               <Icon
                 :name="getStreamingProvider(link.provider?.key ?? '').icon"
@@ -193,6 +194,7 @@ const { isAuthenticated } = useAuth()
 const { setFavoriteAlbum } = useFavorites()
 const route = useRoute()
 const { localName, formatDate, formatDuration, enumLabel } = useCatalogDisplay()
+const { onClick: onExternalClick } = useExternalLink()
 
 const shownTitle = computed(() => localName(props.album.title, props.album.titles))
 const originalTitle = computed(() => shownTitle.value !== props.album.title ? props.album.title : '')

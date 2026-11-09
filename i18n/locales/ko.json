@@ -2091,6 +2091,19 @@
       "offsets_short": "시작 위치 {n}개 ({first} … {last})"
     }
   },
+  "external_link": {
+    "title": "외부 링크",
+    "type": "유형",
+    "site": "사이트",
+    "name": "이름",
+    "url": "URL",
+    "leaving_title": "CDCat을 떠나려고 해요",
+    "leaving_text": "이 링크는 CDCat 밖의 사이트로 연결돼요. 주소가 맞는지 먼저 확인하고, 그 사이트에서 로그인하거나 결제하거나 개인정보를 입력할 때는 재산과 개인정보 보호에 주의하세요.",
+    "copy": "링크 복사",
+    "copied": "복사됨",
+    "copy_failed": "복사하지 못했어요",
+    "open": "링크 열기"
+  },
   "notifications": {
     "title": "알림",
     "bell_unread": "알림 (읽지 않음 {count}개)",

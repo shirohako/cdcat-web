@@ -4,6 +4,7 @@
     <NuxtPage />
   </NuxtLayout>
   <AppConfirm />
+  <AppExternalLink />
   <UiToaster />
 </template>
 

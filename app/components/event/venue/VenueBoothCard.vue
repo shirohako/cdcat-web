@@ -38,6 +38,7 @@
           size="xs"
           icon="simple-icons:x"
           class="min-w-0"
+          @click="openXAccount"
         >
           <span class="truncate">@{{ circle.twitter_handle }}</span>
         </UiButton>
@@ -76,10 +77,16 @@ const props = defineProps<{
 }>()
 defineEmits<{ open: [], enter: [], leave: [] }>()
 const { t } = useI18n()
+const { onClick: onExternalClick } = useExternalLink()
 
 const circle = computed(() => props.piece.circle)
 // The template's `v-if="circle"` doesn't narrow inside UiButton's slot, so these are worked out here.
 const shownArtists = computed(() => circle.value?.artists.slice(0, 2) ?? [])
+/** The circle's X account opens behind the external link card. */
+const openXAccount = (event: MouseEvent) => {
+  const handle = circle.value?.twitter_handle
+  if (handle) onExternalClick(event, { url: `https://x.com/${handle}`, name: `@${handle}`, site: 'X', category: 'social', providerKey: 'twitter' })
+}
 const familyColor = computed(() => {
   const family = genreFamily(circle.value?.genre, props.genres)
   return GENRE_FAMILIES.find(f => f.key === family)?.color ?? 'var(--meta)'

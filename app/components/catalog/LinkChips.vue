@@ -8,10 +8,11 @@
       rel="noopener noreferrer"
       class="inline-flex h-7 items-center gap-1.5 rounded-md bg-black/5 px-2.5 text-xs font-medium text-body transition-colors duration-150 ease-out hover:bg-black/10 dark:bg-btn dark:hover:bg-btn-hover"
       :title="link.url"
+      @click="onClick($event, catalogLinkInfo(link))"
     >
       <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" alt="" class="h-3.5 w-3.5 rounded-sm object-contain">
       <Globe v-else :size="13" class="opacity-60" />
-      <span>{{ label(link) }}<span v-if="link.label" class="opacity-70"> · {{ link.label }}</span></span>
+      <span>{{ linkName(link) }}</span>
       <ExternalLink :size="11" class="opacity-40" />
     </a>
   </div>
@@ -20,20 +21,15 @@
 <script setup lang="ts">
 import type { CatalogLink } from '~/types/catalog'
 import { ExternalLink, Globe } from '@lucide/vue'
-import { linkCategoryRank } from '~/utils/linkProviders'
+import { linkCategoryRank, linkName } from '~/utils/linkProviders'
 
-/** External links as one compact row, for page headers. The full grouped list is AlbumLinks. */
+/**
+ * External links as one compact row, for page headers: each under its own name, or the site's when it has none. A
+ * click opens the external link card. The full grouped list is AlbumLinks.
+ */
 const props = defineProps<{ links: CatalogLink[] }>()
+const { onClick } = useExternalLink()
 
 /** By category, each category's links in their own order (the sort is stable). */
 const sorted = computed(() => [...props.links].sort((a, b) => linkCategoryRank(a.provider?.category) - linkCategoryRank(b.provider?.category)))
-
-const label = (link: CatalogLink) => {
-  if (link.provider?.name) return link.provider.name
-  try {
-    return new URL(link.url).hostname.replace(/^www\./, '')
-  } catch {
-    return link.url
-  }
-}
 </script>

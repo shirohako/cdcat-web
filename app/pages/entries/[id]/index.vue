@@ -3,10 +3,12 @@ import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } fro
 import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
 import { entryLdType, ldDate, namedLd } from '~/utils/structuredData'
 import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { linkName } from '~/utils/linkProviders'
 
 const route = useRoute()
 const { t, locale } = useI18n()
 const { languageName } = useLocaleFormatting()
+const { onClick: onExternalClick } = useExternalLink()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
 
 const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail>(() => `/v1/entries/${route.params.id}`, { notFound: true })
@@ -235,9 +237,10 @@ const relationGroups = computed(() => groupBy<RelatedEntry>(entry.value?.related
                   target="_blank"
                   rel="noopener noreferrer"
                   class="group flex items-center gap-3 rounded-lg p-2.5 transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active"
+                  @click="onExternalClick($event, catalogLinkInfo(link))"
                 >
                   <ExternalLink :size="16" class="text-meta transition-colors group-hover:text-primary" />
-                  <span class="flex-1 truncate text-body transition-colors group-hover:text-primary">{{ link.provider?.name || link.url }}</span>
+                  <span class="flex-1 truncate text-body transition-colors group-hover:text-primary">{{ linkName(link) }}</span>
                 </a>
               </div>
             </section>

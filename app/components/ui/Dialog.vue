@@ -7,7 +7,7 @@
       leave-to-class="opacity-0"
       @after-leave="restoreFocus"
     >
-      <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4" @mousedown.self="close">
+      <div v-if="open" class="fixed inset-0 flex items-center justify-center p-4" :class="topmost ? 'z-[85]' : 'z-50'" @mousedown.self="close">
         <div class="pointer-events-none absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
         <Transition
           appear
@@ -65,9 +65,11 @@ import { dialogStack as stack } from '~/utils/dialogStack'
 <script setup lang="ts">
 /**
  * A dialog, centred at every width with the page showing around it. With `as="form"` the body is a form, so a
- * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field or button
- * marked `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of
+ * `type="submit"` button in the footer (or Enter in a text field) emits `submit`. Focus moves to the field, button or
+ * link marked `data-autofocus`, else the first field, and goes back where it was on close. The `actions` slot sits left of
  * the close button; `toolbar` is a band under the header that stays while the body scrolls. `dark` keeps it dark on the light theme too, in the tooltips' colours; on the dark theme nothing changes.
+ * `topmost` puts it above the other layers (drawers, the image viewer, popovers and lists), for a dialog any of them
+ * can open; tooltips and toasts still show over it.
  */
 withDefaults(defineProps<{
   title: string
@@ -79,7 +81,8 @@ withDefaults(defineProps<{
   dark?: boolean
   /** The footer without its band: the body fades out just above it. */
   plainFooter?: boolean
-}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div', dark: false, plainFooter: false })
+  topmost?: boolean
+}>(), { description: undefined, icon: undefined, tone: 'primary', size: 'md', as: 'div', dark: false, plainFooter: false, topmost: false })
 
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
@@ -107,7 +110,7 @@ const focusFirst = () => {
   const field = 'input:not([type=hidden]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
   // The mark may sit on a component's wrapper, such as a picker's, rather than on the field itself.
   const marked = root.querySelector<HTMLElement>('[data-autofocus]')
-  const target = (marked?.matches(`${field}, button`) ? marked : marked?.querySelector<HTMLElement>(field))
+  const target = (marked?.matches(`${field}, button, a[href]`) ? marked : marked?.querySelector<HTMLElement>(field))
     ?? root.querySelector<HTMLElement>(`.overflow-y-auto :is(${field})`)
   target?.focus({ preventScroll: true })
 }

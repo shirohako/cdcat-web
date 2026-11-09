@@ -2091,6 +2091,19 @@
       "offsets_short": "{n} starts ({first} … {last})"
     }
   },
+  "external_link": {
+    "title": "External link",
+    "type": "Type",
+    "site": "Site",
+    "name": "Name",
+    "url": "URL",
+    "leaving_title": "You're leaving CDCat",
+    "leaving_text": "This link leads to a site outside CDCat. Check that the address is the one you expect, and look after your money and privacy when you sign in, pay or share personal details there.",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "copy_failed": "Couldn't copy",
+    "open": "Open link"
+  },
   "notifications": {
     "title": "Notifications",
     "bell_unread": "Notifications, {count} unread",

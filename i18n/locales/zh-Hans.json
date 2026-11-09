@@ -2091,6 +2091,19 @@
       "offsets_short": "{n} 个起点（{first} … {last}）"
     }
   },
+  "external_link": {
+    "title": "外部链接",
+    "type": "类型",
+    "site": "网站",
+    "name": "名称",
+    "url": "网址",
+    "leaving_title": "你即将离开 CDCat",
+    "leaving_text": "这个链接指向 CDCat 以外的网站。请先确认网址无误；在对方网站登录、付款或填写个人信息时，请注意保护你的财产与隐私安全。",
+    "copy": "复制链接",
+    "copied": "已复制",
+    "copy_failed": "复制失败",
+    "open": "打开链接"
+  },
   "notifications": {
     "title": "通知",
     "bell_unread": "通知，{count} 条未读",

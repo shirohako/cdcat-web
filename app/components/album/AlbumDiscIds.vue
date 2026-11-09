@@ -11,6 +11,7 @@ const open = defineModel<boolean>({ required: true })
 
 const { t, te } = useI18n()
 const { showToast } = useToast()
+const { onClick: onExternalClick } = useExternalLink()
 
 const current = ref(props.discs[0]?.id ?? 0)
 watch(() => props.discs, (discs) => {
@@ -63,6 +64,7 @@ onBeforeUnmount(() => clearTimeout(timer))
               icon="lucide:external-link"
               :label="t('album.toc.open_musicbrainz')"
               size="xs"
+              @click="onExternalClick($event, { url: item.href!, name: item.label, site: 'MusicBrainz', category: 'database', providerKey: 'musicbrainz' })"
             />
             <UiButton
               :icon="copied === `${toc.id}:${item.key}` ? 'lucide:check' : 'lucide:copy'"

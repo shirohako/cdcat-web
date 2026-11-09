@@ -58,7 +58,7 @@
               <h3 class="drawer-heading">{{ t('event_page.circle.links') }}</h3>
               <ul class="space-y-1">
                 <li v-for="link in circle.links" :key="link.url">
-                  <a :href="link.url" target="_blank" rel="noopener" class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-body transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active">
+                  <a :href="link.url" target="_blank" rel="noopener" class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-sm text-body transition-colors duration-150 ease-out hover:bg-card-hover active:bg-card-active" @click="onExternalClick($event, { url: link.url })">
                     <Icon :name="linkIcon(link.url)" class="size-4 shrink-0 text-meta" />
                     <span class="min-w-0 flex-1 truncate">{{ displayUrl(link.url) }}</span>
                     <ExternalLink :size="13" class="shrink-0 text-faint" />
@@ -79,6 +79,7 @@
                   rel="noopener"
                   class="group block"
                   :aria-label="t('event_page.circle.watch_on', { site: VIDEO_SITES[video.site] })"
+                  @click="onExternalClick($event, { url: video.url, site: VIDEO_SITES[video.site] })"
                 >
                   <span class="relative block aspect-video overflow-hidden rounded-xl bg-hero">
                     <img
@@ -163,6 +164,7 @@ const props = defineProps<{
 const emit = defineEmits<{ 'close': [], 'toggle-check': [], 'locate': [] }>()
 const { t } = useI18n()
 const { $api } = useNuxtApp()
+const { onClick: onExternalClick } = useExternalLink()
 
 const panel = ref<HTMLElement | null>(null)
 const VIDEO_SITES = { youtube: 'YouTube', niconico: 'ニコニコ動画' } as const

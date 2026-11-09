@@ -2091,6 +2091,19 @@
       "offsets_short": "{n} 個（{first} … {last}）"
     }
   },
+  "external_link": {
+    "title": "外部リンク",
+    "type": "種類",
+    "site": "サイト",
+    "name": "名前",
+    "url": "URL",
+    "leaving_title": "CDCat を離れます",
+    "leaving_text": "このリンクは CDCat の外のサイトにつながっています。アドレスに間違いがないかを確かめ、ログインや支払い、個人情報の入力をするときは、財産とプライバシーの安全にご注意ください。",
+    "copy": "リンクをコピー",
+    "copied": "コピーしました",
+    "copy_failed": "コピーできませんでした",
+    "open": "リンクを開く"
+  },
   "notifications": {
     "title": "通知",
     "bell_unread": "通知（未読 {count} 件）",

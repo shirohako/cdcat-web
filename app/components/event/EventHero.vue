@@ -77,6 +77,7 @@
               target="_blank"
               rel="noopener"
               :icon-right="ExternalLink"
+              @click="onExternalClick($event, { url: link.url, name: link.label, category: 'official' })"
             >
               {{ link.label }}
             </UiButton>
@@ -99,6 +100,7 @@ const props = defineProps<{
 defineEmits<{ 'jump-map': [] }>()
 const { t } = useI18n()
 const { formatDate, localizedContent } = useLocaleFormatting()
+const { onClick: onExternalClick } = useExternalLink()
 
 const landscape = computed(() => props.event.series?.visual_orientation === 'landscape')
 const description = computed(() => localizedContent(props.event.description))
