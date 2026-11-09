@@ -61,16 +61,11 @@
               :to="`/artists/${artist.id}`"
               class="group flex min-w-0 items-center gap-2.5 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out bg-black/5 hover:bg-black/10 active:bg-black/[0.13] dark:bg-btn dark:hover:bg-btn-hover dark:active:bg-btn-active"
             >
-              <div class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card ring-1 ring-line">
-                <img
-                  v-if="artist.image_url"
-                  :src="artist.image_url"
-                  :alt="artist.name"
-                  class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                >
-                <div v-else class="text-faint">
-                  <Users :size="12" />
-                </div>
+              <div class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card text-faint ring-1 ring-line">
+                <UiImage v-if="artist.image_url" :src="artist.image_url" :alt="artist.name" img-class="group-hover:scale-105" class="size-full">
+                  <template #fallback><Users :size="12" /></template>
+                </UiImage>
+                <Users v-else :size="12" />
               </div>
 
               <div class="min-w-0 flex-1">

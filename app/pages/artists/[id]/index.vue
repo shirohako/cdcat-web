@@ -10,7 +10,9 @@
         </div>
         <div class="relative h-12.5 md:h-17">
           <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-[oklch(0.92_0.008_var(--hue))] bg-sunken md:left-6 dark:border-card dark:ring-1 dark:ring-line">
-            <img v-if="artist?.image_url" v-img-fade :src="artist.image_url" :alt="artist.name" class="h-full w-full object-cover">
+            <UiImage v-if="artist?.image_url" :src="artist.image_url" :alt="artist.name" reveal="develop" eager class="size-full text-faint">
+              <template #fallback><Users class="h-8 w-8 md:h-11 md:w-11" /></template>
+            </UiImage>
             <div v-else class="flex h-full w-full items-center justify-center text-faint"><Users class="h-8 w-8 md:h-11 md:w-11" /></div>
           </div>
         </div>

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-/** A round avatar, or the name's first letter on a colour picked from the name (the same name gets the same colour). */
+/**
+ * A round avatar (UiImage: a sweep while it loads, then a fade), or the name's first letter on a colour picked from the
+ * name (the same name gets the same colour); a picture that fails shows the letter on grey.
+ */
 const props = withDefaults(defineProps<{
   src?: string | null
   name?: string | null
@@ -24,7 +27,9 @@ const hue = computed(() => {
     :class="SIZES[size]"
     :style="src ? undefined : { backgroundColor: `oklch(0.72 0.11 ${hue})`, color: `oklch(0.25 0.04 ${hue})` }"
   >
-    <img v-if="src" :src="src" :alt="alt ?? name ?? ''" class="size-full object-cover" loading="lazy" referrerpolicy="no-referrer">
+    <UiImage v-if="src" :src="src" :alt="alt ?? name ?? ''" no-referrer class="size-full">
+      <template #fallback><span aria-hidden="true">{{ initial }}</span></template>
+    </UiImage>
     <span v-else aria-hidden="true">{{ initial }}</span>
   </span>
 </template>

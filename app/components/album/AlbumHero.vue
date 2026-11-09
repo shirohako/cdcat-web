@@ -33,13 +33,17 @@
             :disabled="!album.cover"
             @click="$emit('open-cover')"
           >
-            <img
+            <!-- While the cover downloads: its small thumbnail, blurred, under the sweep; then the cover sharpens over it
+                 (UiImage, develop). -->
+            <UiImage
               v-if="coverUrl"
-              v-img-fade
               :src="coverUrl"
               :alt="album.title"
-              class="size-[min(15rem,62vw)] rounded-md object-cover md:size-48 lg:size-52 xl:size-56 2xl:size-60"
-            >
+              :placeholder="thumbnailUrl"
+              reveal="develop"
+              eager
+              class="size-[min(15rem,62vw)] rounded-md bg-sunken md:size-48 lg:size-52 xl:size-56 2xl:size-60"
+            />
             <span v-else class="flex size-[min(15rem,62vw)] items-center justify-center rounded-md bg-sunken text-meta md:size-48 lg:size-52 xl:size-56 2xl:size-60">
               <Disc3 :size="56" />
             </span>
@@ -93,7 +97,9 @@
                   class="inline-flex min-w-0 max-w-full items-center gap-2.5 rounded-lg py-1.5 pl-1.5 pr-4 text-sm font-semibold text-title transition-colors duration-150"
                   :class="tag.id && 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'"
                 >
-                  <img v-if="tag.image" :src="tag.image" alt="" class="size-7 shrink-0 rounded-md object-cover">
+                  <UiImage v-if="tag.image" :src="tag.image" alt="" eager class="size-7 shrink-0 rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
+                    <template #fallback><component :is="tag.icon" :size="14" /></template>
+                  </UiImage>
                   <span v-else class="grid size-7 shrink-0 place-items-center rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
                     <component :is="tag.icon" :size="14" />
                   </span>
@@ -233,6 +239,8 @@ const bylineTags = computed(() => {
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
+/** The cover's 300px variant, small enough to arrive first: the hero cover's blurred stand-in (UiImage placeholder). */
+const thumbnailUrl = computed(() => props.album.cover?.thumbnail_url !== coverUrl.value ? props.album.cover?.thumbnail_url : undefined)
 /** The like button's settings, shared by its two places (under the cover from md, under the byline on phones) */
 const likeButton = computed(() => ({
   variant: isFavorited.value ? 'danger' as const : 'danger-soft' as const,
@@ -285,3 +293,4 @@ const toggleLike = async () => {
   }
 }
 </script>
+
