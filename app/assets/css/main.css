@@ -288,6 +288,12 @@
     background: transparent;
   }
 
+  /* The page keeps the room of its scrollbar while a dialog locks it (overflow: hidden on <body>), so the page and the
+     fixed navbar don't widen by the bar's width when one opens. */
+  html {
+    scrollbar-gutter: stable;
+  }
+
   /* The page's scrollbar sits beside the fixed navbar (h-14, border-b) rather than under it, so its track carries
      the navbar's colour and bottom line that far down, and the bar reads as running the full width.
      Chromium styles the page's scrollbar from <body> whenever body has scrollbar styles of its own (and the rules
