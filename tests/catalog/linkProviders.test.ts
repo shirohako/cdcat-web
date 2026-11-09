@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { linkCategoryKey, linkHost, linkName, linkTileHue, providerHue, splitUrl } from '../../app/utils/linkProviders'
+import { canonicalLinkUrl, linkCategoryKey, linkHost, linkName, linkTileHue, providerHue, splitUrl } from '../../app/utils/linkProviders'
 
 describe('linkName', () => {
   const provider = { name: 'TANO*C STORE' }
@@ -55,5 +55,19 @@ describe('link tiles', () => {
     expect(linkTileHue('other', 'kickstarter')).toBeNull()
     expect(linkTileHue('shop', null)).toBeNull()
     expect(linkTileHue(undefined, 'vgmdb')).toBeNull()
+  })
+})
+
+describe('canonicalLinkUrl', () => {
+  it('turns BOOTH items on booth.pm into the Japanese page', () => {
+    expect(canonicalLinkUrl('https://booth.pm/zh-cn/items/8034195')).toBe('https://booth.pm/ja/items/8034195')
+    expect(canonicalLinkUrl(' http://www.booth.pm/en/items/8034195?a=1 ')).toBe('https://booth.pm/ja/items/8034195')
+    expect(canonicalLinkUrl('https://booth.pm/items/8034195')).toBe('https://booth.pm/ja/items/8034195')
+  })
+
+  it('leaves shop addresses and other links alone', () => {
+    expect(canonicalLinkUrl('https://hagall.booth.pm/items/8034195')).toBe('https://hagall.booth.pm/items/8034195')
+    expect(canonicalLinkUrl('https://booth.pm/ja/events/m3-2026s')).toBe('https://booth.pm/ja/events/m3-2026s')
+    expect(canonicalLinkUrl('https://vgmdb.net/album/1')).toBe('https://vgmdb.net/album/1')
   })
 })

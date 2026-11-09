@@ -80,7 +80,7 @@ import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ChevronDown, ChevronUp, ExternalLink, Link2 } from '@lucide/vue'
 import { newKey } from '~/utils/documentKeys'
 import { byOrder, nextOrder, sameId } from '~/utils/documentRows'
-import { LINK_CATEGORIES, linkCategoryRank } from '~/utils/linkProviders'
+import { canonicalLinkUrl, LINK_CATEGORIES, linkCategoryRank } from '~/utils/linkProviders'
 
 /**
  * External links of an album, artist, label, entry or series, added and edited in a dialog, each with an optional name of
@@ -193,6 +193,7 @@ const problem = computed(() => {
 })
 
 const save = () => {
+  form.url = canonicalLinkUrl(form.url)
   tried.value = true
   if (problem.value) return
   const provider = form.provider ?? detect(form.url)

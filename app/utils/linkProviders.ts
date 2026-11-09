@@ -74,3 +74,12 @@ export const splitUrl = (url: string) => {
   const match = /^([a-z][a-z\d+.-]*:\/\/)([^/?#]*)(.*)$/is.exec(url)
   return match ? { scheme: match[1]!, host: match[2]!, rest: match[3]! } : { scheme: '', host: '', rest: url }
 }
+
+/**
+ * The spelling saving keeps (the backend's LinkResolver::canonical): a BOOTH item on booth.pm, in whatever language,
+ * becomes the Japanese page (the bare booth.pm/items/123 answers 404); a shop's own address stays as it is.
+ */
+export const canonicalLinkUrl = (url: string) => {
+  const booth = url.trim().match(/^https?:\/\/(?:www\.)?booth\.pm\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?items\/(\d+)(?:[/?#].*)?$/i)
+  return booth ? `https://booth.pm/ja/items/${booth[1]}` : url.trim()
+}
