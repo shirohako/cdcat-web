@@ -23,7 +23,7 @@ const description = computed(() => props.text.description ?? '')
           <GuideMockButton icon="lucide:clipboard-paste" class="px-1.5!" />
           <GuideMockButton icon="lucide:link-2" class="px-1.5!" />
         </p>
-        <p class="mt-1.5 text-10 leading-3.5 text-meta">{{ t('editor.image.cover_rules', { size: 500 }) }}</p>
+        <p class="mt-1.5 text-10 leading-3.5 text-meta">{{ t('editor.image.cover_rules', { size: 500, ratio: '2:1' }) }}</p>
       </div>
 
       <div class="min-w-0 space-y-3">

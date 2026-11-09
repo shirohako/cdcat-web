@@ -4,7 +4,7 @@ import type { EditorHelpEntry } from './types'
 const help: Record<string, EditorHelpEntry> = {
   // ── Basic info
   'album.cover': {
-    text: '專輯的正面封面，必須是正方形，短邊至少 500 像素。比例只差一點時會自動從中間裁好，差得多會開啟裁切框。',
+    text: '專輯的正面封面，最好是正方形，短邊至少 500 像素。比例只差一點時會自動從中間裁好；差得多會先問你：裁成正方形，還是保留原比例（最長 2:1）。只有實體封面本來就不是正方形時（DVD 盒、卡帶等）才保留，這樣的封面只在專輯頁按原比例顯示，其他地方都裁成正方形。',
     where: '專輯列表、卡片和專輯頁頂端。',
   },
   'album.title': {

@@ -2640,7 +2640,7 @@
       "type": "Album type",
       "release_date": "Release date",
       "release_date_invalid": "A valid release date",
-      "cover": "Square cover",
+      "cover": "Cover",
       "tracks": "At least one track",
       "artist_types": "Types of new artists ({count})"
     },
@@ -3020,8 +3020,8 @@
       "remove_confirm": "Remove this bonus? Its discs become regular discs."
     },
     "image": {
-      "cover_needed": "A square cover is required",
-      "cover_rules": "Square (within 1%) and at least {size} px. Other shapes can be cropped.",
+      "cover_needed": "A cover is required",
+      "cover_rules": "Ideally square, at least {size} px on its short side. Other shapes can be cropped, or kept once you confirm (at most {ratio}).",
       "upload": "Upload cover",
       "banner": "Banner",
       "banner_empty": "No banner yet",
@@ -3040,7 +3040,6 @@
       "clipboard_denied": "The browser did not allow reading the clipboard. Paste with {keys} instead.",
       "import": "Import",
       "too_small": "The image must be at least {size} px on its short side.",
-      "not_square": "The cover must be square.",
       "url_not_square": "This image is not square. Download it and upload the file to crop it.",
       "auto_cropped": "Cropped to the centred square ({from} → {to}).",
       "too_large": "The file is larger than 25 MB.",
@@ -3080,7 +3079,7 @@
     },
     "crop": {
       "title": "Crop to a square",
-      "hint": "Album covers are square. Drag the frame to choose the part to keep; zoom with the wheel, a pinch or the slider below.",
+      "hint": "Album covers are usually square. Drag the frame to choose the part to keep; zoom with the wheel, a pinch or the slider below.",
       "zoom": "Zoom",
       "zoom_in": "Zoom in",
       "zoom_out": "Zoom out",
@@ -3088,6 +3087,21 @@
       "frame": "Crop frame (arrow keys move it, + / − zoom)",
       "result": "Result: {size} × {size} px",
       "apply": "Crop and upload"
+    },
+    "cover_shape": {
+      "title": "This image is not square",
+      "size": "This image is {size}.",
+      "keep_effect": "If you still want to use a non-standard shape, only the album page shows it as it is; lists, search, favorites and everywhere else crop it to the centred square.",
+      "too_wide": "It is longer than {ratio}, so it can't be the cover as it is; you can crop it to a square instead.",
+      "elsewhere": "Lists, search and elsewhere",
+      "on_album_page": "Album page",
+      "recommend": "CDCat recommends {square} images for album covers.",
+      "square": "square",
+      "tip": "Use this only when you really can't find a suitable image and don't want to crop it.",
+      "crop": "Crop to a square",
+      "keep": "Use this non-standard cover",
+      "fetch_failed": "Couldn't read this image. Please try again later.",
+      "slot_note": "Non-standard cover ({size}): lists and other places crop it to the centred square."
     },
     "relations": {
       "entries_hint": "The games, anime and other works this album belongs to.",

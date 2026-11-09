@@ -1,27 +1,30 @@
 <template>
   <div class="min-w-0 space-y-2">
-    <!-- The cover square, the avatar round as on the artist page, the banner wide as the top of a page. -->
-    <div
-      class="relative w-full overflow-hidden border-2"
+    <!-- The cover square, the avatar round as on the artist page, the banner wide as the top of a page. The whole box
+         picks a file, as the upload button does. -->
+    <label
+      :for="inputId"
+      class="group relative block w-full cursor-pointer overflow-hidden border-2 transition-colors"
       :class="[
         variant === 'avatar' ? 'aspect-square rounded-full' : variant === 'banner' ? 'aspect-[3/1] rounded-xl' : 'aspect-square rounded-xl',
-        file || previewUrl ? 'border-transparent bg-sunken' : error ? 'border-dashed border-danger/40 bg-danger/10' : 'border-dashed border-line bg-sunken',
+        file || previewUrl ? 'border-transparent bg-sunken hover:border-primary/40' : error ? 'border-dashed border-danger/40 bg-danger/10 hover:border-danger/70' : 'border-dashed border-line bg-sunken hover:border-primary/50',
+        busy && 'pointer-events-none',
       ]"
     >
       <CommonBannerImage v-if="file && variant === 'banner'" :image="file" sizes="(min-width: 768px) 50vw, 100vw" />
-      <img v-else-if="file" :src="file.medium_url" alt="" class="h-full w-full object-cover">
+      <img v-else-if="file" :src="file.medium_url" alt="" class="h-full w-full" :class="otherShape ? 'object-contain' : 'object-cover'">
       <img v-else-if="previewUrl" :src="previewUrl" alt="" class="h-full w-full object-cover">
-      <div v-else class="flex h-full flex-col items-center justify-center gap-1.5 p-3 text-center text-meta">
+      <span v-else class="flex h-full flex-col items-center justify-center gap-1.5 p-3 text-center text-meta transition-colors group-hover:text-primary">
         <ImagePlus :size="variant === 'cover' ? 28 : 22" />
         <!-- The row points at an upload that images:prune or an admin removed. -->
         <span class="text-xs" :class="{ 'text-danger': missing }">{{ missing ? $t('editor.image.missing') : texts.empty }}</span>
-      </div>
-      <div v-if="busy" class="absolute inset-0 flex items-center justify-center bg-card/70 text-meta"><span class="loading loading-spinner" /></div>
-    </div>
+      </span>
+      <span v-if="busy" class="absolute inset-0 flex items-center justify-center bg-card/70 text-meta"><span class="loading loading-spinner" /></span>
+    </label>
     <div class="flex gap-1.5">
       <label class="btn btn-sm min-w-0 flex-1 cursor-pointer ring-1 ring-inset ring-line shadow-xs transition active:translate-y-px" :class="{ 'btn-disabled': busy }">
         <Upload :size="14" class="shrink-0" /><span class="truncate">{{ file || previewUrl ? $t('editor.image.replace') : texts.upload }}</span>
-        <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" @change="pick">
+        <input :id="inputId" type="file" accept="image/jpeg,image/png,image/webp,image/avif" class="hidden" :disabled="busy" @change="pick">
       </label>
       <UiButton :icon="ClipboardPaste" :label="$t('editor.image.from_clipboard')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="busy" @click="fromClipboard" />
       <UiButton v-if="purpose !== 'profile'" :icon="Link2" :label="$t('editor.image.from_url')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="busy" @click="openUrl" />
@@ -29,23 +32,30 @@
     </div>
     <p v-if="(message && !showUrl) || error" class="text-xs text-danger">{{ message || error }}</p>
     <p v-else-if="note" class="text-xs text-meta">{{ note }}</p>
+    <!-- A cover kept at its own shape: what that means, and the way back to a square. -->
+    <p v-if="otherShape && file" class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-meta">
+      <span>{{ $t('editor.cover_shape.slot_note', { size: `${file.width} × ${file.height}` }) }}</span>
+      <UiButton size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="busy" @click="recrop">{{ $t('editor.cover_shape.crop') }}</UiButton>
+    </p>
     <p class="text-11 leading-snug text-meta">{{ texts.rules }}<template v-if="pasteOnPage"> {{ $t('editor.image.paste_hint', { keys: pasteKeys }) }}</template></p>
     <EditorImageImportDialog v-if="purpose !== 'profile'" v-model="showUrl" :busy="busy" :error="message" :description="texts.rules" @import="fromUrl" />
-    <EditorImageCropDialog v-if="variant !== 'banner'" :file="cropFile" :hint="texts.cropHint" :round="variant === 'avatar'" :min-size="minSize" :tolerance="limits.tolerance" @cropped="uploadCropped" @cancel="cropFile = null" />
+    <EditorImageCropDialog v-if="variant === 'avatar'" :file="cropFile" :hint="texts.cropHint" round :min-size="minSize" :tolerance="limits.tolerance" @cropped="uploadCropped" @cancel="cropFile = null" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
+import type { CoverFit } from '~/composables/useCoverShape'
 import { ClipboardPaste, ImagePlus, Link2, Trash2, Upload } from '@lucide/vue'
-import { autoCropTolerance, cropToSquare, isSquare } from '~/utils/imageCrop'
+import { isSquare } from '~/utils/imageCrop'
 
 /**
  * The slot of a main image: an album's cover or banner, an artist's avatar or banner. Upload, paste from the clipboard
  * (the button, or Ctrl+V / ⌘V on the page with `paste-on-page`) or import from a link; what fits is handed on with
- * `use`, whoever owns the slot decides what becomes of the old one. A cover or avatar is square: an avatar always goes
- * to the crop dialog (to pick the part to keep, even of a square one); a nearly square cover is cropped to the centre,
- * any other shape goes to the crop dialog. A banner is taken as it is, when it is big enough.
+ * `use`, whoever owns the slot decides what becomes of the old one. An avatar is square and always goes to the crop
+ * dialog (to pick the part to keep, even of a square one). A cover goes through useCoverShape: square is used, nearly
+ * square cropped to the centre, any other shape asks (crop it, or keep its shape); one kept at its own shape is shown
+ * whole here, with a note and a button to crop it after all. A banner is taken as it is, when it is big enough.
  * The account settings use it too, for the user's own avatar and banner (`purpose="profile"`: upload or paste, no link).
  */
 const props = defineProps<{
@@ -68,6 +78,7 @@ const emit = defineEmits<{ use: [image: CatalogImage], remove: [] }>()
 const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
 const { limits, upload, importUrl, bannerFits } = useImageUpload()
+const { fitCover } = useCoverShape()
 
 const square = computed(() => props.variant !== 'banner')
 const minSize = computed(() => props.variant === 'avatar' ? limits.value.avatarMinSize : limits.value.coverMinSize)
@@ -79,17 +90,20 @@ const texts = computed(() => {
     case 'banner':
       return { empty: t('editor.image.banner_empty'), upload: t('editor.image.upload_banner'), rules: `${t('editor.image.banner_rules', banner)} ${t('editor.image.banner_recommended', { width: limits.value.bannerRecommendedWidth, height: limits.value.bannerRecommendedHeight })}`, notSquare: '', cropHint: undefined }
     default:
-      return { empty: t('editor.image.cover_needed'), upload: t('editor.image.upload'), rules: t('editor.image.cover_rules', { size: minSize.value }), notSquare: t('editor.image.not_square'), cropHint: undefined }
+      return { empty: t('editor.image.cover_needed'), upload: t('editor.image.upload'), rules: t('editor.image.cover_rules', { size: minSize.value, ratio: `${limits.value.coverMaxRatio}:1` }), notSquare: '', cropHint: undefined }
   }
 })
 
+const inputId = useId()
 const busy = ref(false)
 const message = ref('')
 const note = ref('')
 const showUrl = ref(false)
 const cropFile = ref<File | null>(null)
+/** The cover in the slot was kept at a shape other than square. */
+const otherShape = computed(() => props.variant === 'cover' && !!props.file && !isSquare(props.file.width, props.file.height, limits.value.tolerance))
 
-/** Why an image of this size cannot go in the slot, or '' when it can; a square one that is too far off can be cropped. */
+/** Why an avatar or banner of this size cannot go in the slot, or '' when it can (covers: useCoverShape). */
 const problem = (width: number, height: number, fromLink = false) => {
   if (!square.value) return bannerFits(width, height) ? '' : t('editor.image.banner_too_small', { width: limits.value.bannerMinWidth, height: limits.value.bannerMinHeight })
   if (Math.min(width, height) < minSize.value) return t('editor.image.too_small', { size: minSize.value })
@@ -121,16 +135,31 @@ const pick = (event: Event) => {
   if (picked) void take(picked)
 }
 
+const onBusy = (value: boolean) => { busy.value = value }
+/** What useCoverShape made of a cover: used (with a note when it was cropped without asking), refused, or cancelled. */
+const useFit = (fit: CoverFit | { error: string } | null) => {
+  if (!fit) return
+  if ('error' in fit) {
+    message.value = fit.error
+    return
+  }
+  emit('use', fit.image)
+  if (fit.note) note.value = fit.note
+}
+
 /**
- * A chosen or pasted file: too large, too small or (a banner) too narrow is refused; an avatar goes to the crop dialog;
- * a square cover is uploaded, a nearly square one is cropped to the centred square and uploaded, any other shape goes
- * to the crop dialog.
+ * A chosen or pasted file: too large is refused; a cover goes to useCoverShape; an avatar big enough goes to the crop
+ * dialog; anything else too small or (a banner) too narrow is refused.
  */
 const take = async (picked: File) => {
   message.value = ''
   note.value = ''
   if (picked.size > limits.value.maxBytes) {
     message.value = t('editor.image.too_large')
+    return
+  }
+  if (props.variant === 'cover') {
+    useFit(await fitCover(picked, { onBusy }))
     return
   }
   let image: HTMLImageElement
@@ -142,15 +171,8 @@ const take = async (picked: File) => {
   }
   try {
     const { naturalWidth: width, naturalHeight: height } = image
-    if (square.value && Math.min(width, height) >= minSize.value && (props.variant === 'avatar' || !isSquare(width, height, limits.value.tolerance))) {
-      if (props.variant === 'avatar' || !isSquare(width, height, autoCropTolerance)) {
-        cropFile.value = picked
-        return
-      }
-      const size = Math.min(width, height)
-      await uploadCropped(await cropToSquare(image))
-      // The upload's own error, if any, shows instead.
-      if (!message.value) note.value = t('editor.image.auto_cropped', { from: `${width}×${height}`, to: `${size}×${size}` })
+    if (props.variant === 'avatar' && Math.min(width, height) >= minSize.value) {
+      cropFile.value = picked
       return
     }
     message.value = problem(width, height)
@@ -207,11 +229,30 @@ const openUrl = () => {
   showUrl.value = true
 }
 
+/** The slot's 裁成正方形 under a cover kept at its own shape: the crop dialog, its square uploaded as the new cover. */
+const recrop = async () => {
+  if (!props.file || busy.value) return
+  message.value = ''
+  note.value = ''
+  useFit(await fitCover(props.file, { crop: true, onBusy }))
+}
+
 const fromUrl = async (url: string) => {
   busy.value = true
   message.value = ''
   try {
     const image = await importUrl(url)
+    if (props.variant === 'cover') {
+      // Too small is said in the link dialog; any other shape is for useCoverShape, once the link dialog is closed.
+      if (Math.min(image.width, image.height) < minSize.value) {
+        message.value = t('editor.image.too_small', { size: minSize.value })
+        return
+      }
+      showUrl.value = false
+      busy.value = false
+      useFit(await fitCover(image, { onBusy }))
+      return
+    }
     message.value = problem(image.width, image.height, true)
     if (message.value) return
     emit('use', image)

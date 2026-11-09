@@ -25,11 +25,15 @@
       <div class="card relative -mt-12 flex flex-col items-center gap-x-8 px-4 pb-6 sm:px-6 md:-mt-16 md:flex-row md:items-start lg:gap-x-10 lg:px-8 lg:pb-7 2xl:-mt-18">
         <!-- The cover sticks out of the card's top into the banner, cut out of it by a ring in the card colour; the
              like button fills the room under it (from md; on phones it goes under the byline). Stacked (below md) it grows with the screen, 62% of its width up to
-             240px, as a fixed size left most of a phone's width empty. -->
+             240px, as a fixed size left most of a phone's width empty.
+             A cover kept at another shape (a DVD case, a cassette) shows at its own, the only place it does: as wide as a
+             square one (--cover-w), as tall as its shape makes it, at most 1.5 times its width (a taller one is narrower
+             instead); it sticks out as far as a square one (--cover-lift), a wide one by at most half its height. -->
         <div class="flex shrink-0 flex-col gap-3">
           <button
             type="button"
-            class="relative -mt-22 cursor-zoom-in rounded-md shadow-lg ring-4 ring-card disabled:cursor-default sm:-mt-24 lg:-mt-26 xl:-mt-28 2xl:-mt-30"
+            class="relative -mt-[min(var(--cover-lift),calc(var(--cover-w)/var(--cover-r)/2))] cursor-zoom-in rounded-md shadow-lg ring-4 ring-card [--cover-lift:5.5rem] [--cover-w:min(15rem,62vw)] disabled:cursor-default sm:[--cover-lift:6rem] md:[--cover-w:12rem] lg:[--cover-lift:6.5rem] lg:[--cover-w:13rem] xl:[--cover-lift:7rem] xl:[--cover-w:14rem] 2xl:[--cover-lift:7.5rem] 2xl:[--cover-w:15rem]"
+            :style="{ '--cover-r': coverShape }"
             :disabled="!album.cover"
             @click="$emit('open-cover')"
           >
@@ -42,9 +46,10 @@
               :placeholder="thumbnailUrl"
               reveal="develop"
               eager
-              class="size-[min(15rem,62vw)] rounded-md bg-sunken md:size-48 lg:size-52 xl:size-56 2xl:size-60"
+              :class="COVER_BOX"
+              class="rounded-md bg-sunken"
             />
-            <span v-else class="flex size-[min(15rem,62vw)] items-center justify-center rounded-md bg-sunken text-meta md:size-48 lg:size-52 xl:size-56 2xl:size-60">
+            <span v-else :class="COVER_BOX" class="flex items-center justify-center rounded-md bg-sunken text-meta">
               <Disc3 :size="56" />
             </span>
           </button>
@@ -180,9 +185,12 @@
 <script setup lang="ts">
 import { ALBUM_CATEGORY_ICONS, ALBUM_TYPE_ICONS, DISC_FORMAT_ICONS, type Album } from '~/types/album'
 import { getStreamingProvider } from '~/utils/streamingProviders'
+import { coverRatio } from '~/utils/imageCrop'
 import { NuxtLink } from '#components'
 import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
+/** The cover's box: --cover-w wide, or narrower for a cover more than 1.5 times as tall as wide; its own shape (--cover-r). */
+const COVER_BOX = 'aspect-(--cover-r) w-[min(var(--cover-w),calc(var(--cover-w)*1.5*var(--cover-r)))]'
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
 const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-13 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
 
@@ -241,6 +249,8 @@ const bylineTags = computed(() => {
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
+/** The cover's shape, width / height: 1 for a square one, as anywhere else; its own for one kept at another shape. */
+const coverShape = computed(() => coverRatio(props.album.cover?.width, props.album.cover?.height))
 /** The cover's 300px variant, small enough to arrive first: the hero cover's blurred stand-in (UiImage placeholder). */
 const thumbnailUrl = computed(() => props.album.cover?.thumbnail_url !== coverUrl.value ? props.album.cover?.thumbnail_url : undefined)
 /** The like button's settings, shared by its two places (under the cover from md, under the byline on phones) */

@@ -104,7 +104,7 @@ export interface CatalogSchema {
   attribute_definitions: AttributeDefinition[]
   link_providers: Array<CatalogLinkProvider & { url_pattern: string | null }>
   limits: {
-    cover_min_size: number, cover_square_tolerance: number, image_max_bytes: number
+    cover_min_size: number, cover_square_tolerance: number, cover_max_ratio: number, image_max_bytes: number
     avatar_min_size: number, banner_min_width: number, banner_min_height: number
   }
 }

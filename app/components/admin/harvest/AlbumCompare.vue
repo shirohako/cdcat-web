@@ -74,6 +74,20 @@ const createArtist = (sourceRef: string) => {
   created.set(sourceRef, ref)
   return ref
 }
+const { fitCover: fitCoverShape } = useCoverShape()
+/** A harvested image about to be the cover: as in the editor (useCoverShape), so a picture that is not square asks first. */
+const fitCover = async (id: number) => {
+  const stored = props.editor.references.images?.[String(id)] as CatalogImage | undefined
+  if (!stored) return id
+  const fit = await fitCoverShape(stored)
+  if (!fit) return null
+  if ('error' in fit) {
+    message.value = fit.error
+    return null
+  }
+  props.editor.remember('images', fit.image.id, fit.image)
+  return fit.image.id
+}
 const storeImage = async (url: string) => {
   const image = await $api<CatalogImage>(`/v1/admin/harvest/candidates/${props.detail.candidate.id}/images`, { method: 'POST', body: { url } })
   props.editor.remember('images', image.id, image)
@@ -98,6 +112,7 @@ const rows = computed(() => {
     artistName,
     createArtist,
     storeImage,
+    fitCover,
     roleName,
     localeName,
     providerName: id => schema.value?.link_providers.find(provider => provider.id === id)?.name || '链接',

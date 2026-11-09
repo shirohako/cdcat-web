@@ -21,7 +21,8 @@
         <input v-model="image.label" class="input input-sm w-full" :list="`editor-image-labels-${image.kind}`" maxlength="100" :placeholder="$t('editor.image.label_placeholder')" :aria-label="$t('catalog.field.label')">
         <UiSelect :model-value="scope" :options="scopeOptions" size="sm" class="w-full" :aria-label="$t('editor.image.scope')" @change="setScope" />
         <span class="flex flex-wrap justify-end gap-1">
-          <!-- Another cover or banner becomes the main one only from here; one that doesn't fit says why. -->
+          <!-- Another cover or banner becomes the main one only from here; one that doesn't fit says why. A cover that
+               is not square asks first (useCoverShape): crop it, or keep its shape. -->
           <UiButton
             v-if="mainKind"
             :icon="Star"
@@ -29,8 +30,9 @@
             size="sm"
             class="gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
             :disabled="!!mainProblem"
+            :loading="coverBusy"
             :title="mainProblem || undefined"
-            @click="useAsMain(album, image)"
+            @click="mainKind === 'cover' ? useAsCover() : useAsMain(album, image)"
           >{{ $t(`editor.image.use_as_${mainKind}`) }}</UiButton>
           <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="emit('move', -1)" />
           <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3.5" size="sm" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="emit('move', 1)" />
@@ -43,6 +45,7 @@
         <EditorAttributeRows v-model="album.image_attributes" compact subject="album_image" :owner="{ field: 'album_image_id', id: imageId }" :references="editor.references" class="mt-2" />
       </details>
       <p v-for="error in errors" :key="error.path" class="text-11 text-danger">{{ error.message }}</p>
+      <p v-if="coverMessage" class="text-11 text-danger">{{ coverMessage }}</p>
     </div>
   </li>
 </template>
@@ -52,7 +55,7 @@ import type { CatalogImage } from '~/types/catalog'
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { ArrowDown, ArrowUp, GripVertical, Star, Trash2 } from '@lucide/vue'
-import { removeImage, sortedDiscs, sortedProducts, useAsMain } from '~/utils/albumDocument'
+import { addMainImage, removeImage, sortedDiscs, sortedProducts, useAsMain } from '~/utils/albumDocument'
 import { byOrder, sameId } from '~/utils/documentRows'
 
 /**
@@ -67,6 +70,7 @@ const { enumLabel } = useCatalogDisplay()
 const { t } = useI18n()
 const imageKindOptions = useImageKindOptions()
 const { limits, coverProblem, bannerFits } = useImageUpload()
+const { fitCover } = useCoverShape()
 
 const album = computed(() => editor.album.value)
 const image = computed(() => album.value.images.find(row => sameId(row.id, props.imageId)) ?? null)
@@ -81,8 +85,32 @@ const mainKind = computed(() => image.value?.kind === 'cover' || image.value?.ki
 const mainProblem = computed(() => {
   if (!mainKind.value || !file.value) return mainKind.value ? t('editor.image.missing') : ''
   if (mainKind.value === 'banner') return bannerFits(file.value.width, file.value.height) ? '' : t('editor.image.banner_rules', { width: limits.value.bannerMinWidth, height: limits.value.bannerMinHeight })
-  return coverProblem(file.value.width, file.value.height) ? t('editor.image.cover_rules', { size: limits.value.coverMinSize }) : ''
+  return coverProblem(file.value.width, file.value.height) ? t('editor.image.too_small', { size: limits.value.coverMinSize }) : ''
 })
+
+const coverBusy = ref(false)
+const coverMessage = ref('')
+/**
+ * 用作封面: a square picture becomes the main cover as it is; any other shape goes through useCoverShape, and a square
+ * cropped from it becomes the main cover as a new upload, this row staying in the gallery as it is.
+ */
+const useAsCover = async () => {
+  const picture = file.value
+  if (!image.value || !picture || coverBusy.value) return
+  coverMessage.value = ''
+  const fit = await fitCover(picture, { onBusy: (value) => { coverBusy.value = value } })
+  if (!fit || !image.value) return
+  if ('error' in fit) {
+    coverMessage.value = fit.error
+    return
+  }
+  if (fit.image.id === picture.id) {
+    useAsMain(album.value, image.value)
+    return
+  }
+  editor.remember('images', fit.image.id, fit.image)
+  addMainImage(album.value, 'cover', fit.image.id)
+}
 const scopeOptions = computed<UiSelectOption<string>[]>(() => [
   { value: 'album', label: t('editor.image.scope_album') },
   ...products.value.map(product => ({ value: `p:${product.id}`, label: product.name || product.catalog_number || enumLabel('edition_type', product.edition_type), group: t('catalog.collection.products') })),

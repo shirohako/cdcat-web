@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { autoCropTolerance, clampCrop, isSquare, outputSize, resizeCrop, squareCrop } from '../../app/utils/imageCrop'
+import { autoCropTolerance, clampCrop, coverRatio, coverShape, isSquare, outputSize, resizeCrop, squareCrop } from '../../app/utils/imageCrop'
 
 describe('image crop', () => {
   it('accepts images within two percent of square', () => {
@@ -38,5 +38,34 @@ describe('image crop', () => {
   it('never upscales', () => {
     expect(outputSize(800)).toBe(800)
     expect(outputSize(5000)).toBe(3000)
+  })
+
+  it('sorts would-be covers by what the editor does with them', () => {
+    expect(coverShape(1500, 1523)).toBe('square')
+    // Nearly square: cropped to the centre without asking.
+    expect(coverShape(1500, 1540)).toBe('near')
+    expect(coverShape(1000, 1052)).toBe('near')
+    // Any other shape asks: crop it or keep it, up to 2:1 plus the two percent.
+    expect(coverShape(1000, 1060)).toBe('off')
+    expect(coverShape(1500, 2100)).toBe('off')
+    expect(coverShape(2040, 1000)).toBe('off')
+    expect(coverShape(2050, 1000)).toBe('too_wide')
+    expect(coverShape(3000, 1000)).toBe('too_wide')
+    // Too small whatever its shape, as cropping can't mend it.
+    expect(coverShape(450, 450)).toBe('too_small')
+    expect(coverShape(2000, 499)).toBe('too_small')
+    expect(coverShape(0, 0)).toBe('too_small')
+    expect(coverShape(3000, 1000, { maxRatio: 3 })).toBe('off')
+    expect(coverShape(300, 300, { minSize: 200 })).toBe('square')
+  })
+
+  it('gives the album page a cover\'s own shape only when it is not square', () => {
+    expect(coverRatio(1500, 1523)).toBe(1)
+    expect(coverRatio(null, null)).toBe(1)
+    expect(coverRatio(1000, 1400)).toBeCloseTo(0.714, 3)
+    expect(coverRatio(1600, 900)).toBeCloseTo(1.778, 3)
+    // Kept within 1:2 … 2:1.
+    expect(coverRatio(1000, 2040)).toBe(0.5)
+    expect(coverRatio(3000, 1000)).toBe(2)
   })
 })

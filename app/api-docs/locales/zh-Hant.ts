@@ -1450,7 +1450,7 @@ const texts: ApiDocsTexts = {
       title: '圖片類別',
       description: '圖片在專輯裡的用途，參考 VGMdb 的分類。',
       values: {
-        cover: '專輯封面，可以有多張；主封面（`is_primary`）正方形，每張專輯恰好一張。',
+        cover: '專輯封面，可以有多張；主封面（`is_primary`）每張專輯恰好一張，一般是正方形，也可能是別的形狀（最長 2:1），用 `width`、`height` 判斷。',
         banner: '橫幅，可以有多張；主橫幅（`is_primary`）顯示在專輯頁頂部，至多一張。',
         front: '正面。',
         back: '背面。',

@@ -1450,7 +1450,7 @@ const texts: ApiDocsTexts = {
       title: 'Image kind',
       description: 'What an image is used for in an album, based on VGMdb\'s categories.',
       values: {
-        cover: 'Album cover; there may be several. The main one (`is_primary`) is square; exactly one per album.',
+        cover: 'Album cover; there may be several. Exactly one per album is the main one (`is_primary`): usually square, but it may have another shape (at most 2:1), so check `width` and `height`.',
         banner: 'Banner; there may be several. The main one (`is_primary`), at most one, is shown across the top of the album page.',
         front: 'Front.',
         back: 'Back.',

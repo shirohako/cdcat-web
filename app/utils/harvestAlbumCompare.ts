@@ -68,6 +68,11 @@ export interface CompareContext {
   createArtist: (sourceRef: string) => AggregateRef
   /** Stores a source image in this site; returns the image id. */
   storeImage: (url: string) => Promise<number>
+  /**
+   * Makes a stored image fit as the main cover, asking when it is not square (useCoverShape): the image id to use (its
+   * own, or a square cropped from it), or null when cancelled or refused. Without it the image is used as it is.
+   */
+  fitCover?: (imageId: number) => Promise<number | null>
   roleName: (role: string) => string
   localeName: (locale: string) => string
   providerName: (id: number | null) => string
@@ -291,8 +296,10 @@ function imageRows(ctx: CompareContext): CompareRow[] {
     apply: async () => {
       const id = await ctx.storeImage(image.url)
       if (album.images.some(row => row.image_id === id)) return
-      if (image.kind === 'cover' && !coverOf(album)) setCover(album, id)
-      else addImage(album, id, { kind: image.kind })
+      if (image.kind === 'cover' && !coverOf(album)) {
+        const cover = ctx.fitCover ? await ctx.fitCover(id) : id
+        if (cover !== null && !coverOf(album)) setCover(album, cover)
+      } else addImage(album, id, { kind: image.kind })
     },
   }))
 }

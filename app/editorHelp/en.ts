@@ -4,7 +4,7 @@ import type { EditorHelpEntry } from './types'
 const help: Record<string, EditorHelpEntry> = {
   // ── Basics
   'album.cover': {
-    text: 'The album’s front cover. It must be square, at least 500 px on its short side. If it’s only slightly off, it’s cropped from the centre automatically; further off, the crop box opens.',
+    text: 'The album’s front cover: ideally square, at least 500 px on its short side. If it’s only slightly off, it’s cropped from the centre automatically; further off, you’re asked whether to crop it to a square or keep its shape (at most 2:1). Keep it only when the real cover isn’t square (a DVD case, a cassette): such a cover shows at its own shape on the album page only, and is cropped to a square everywhere else.',
     where: 'Album lists, cards and the top of the album page.',
   },
   'album.title': {

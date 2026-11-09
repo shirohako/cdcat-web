@@ -2640,7 +2640,7 @@
       "type": "专辑类型",
       "release_date": "发行日期",
       "release_date_invalid": "正确的发行日期",
-      "cover": "正方形封面",
+      "cover": "封面",
       "tracks": "至少一首曲目",
       "artist_types": "新艺术家的类型（{count} 位）"
     },
@@ -3020,8 +3020,8 @@
       "remove_confirm": "删除这个特典？它的碟会变成普通碟。"
     },
     "image": {
-      "cover_needed": "必须有正方形封面",
-      "cover_rules": "正方形（宽高差不超过 1%），至少 {size} 像素。其他比例可以裁切。",
+      "cover_needed": "必须有封面",
+      "cover_rules": "最好是正方形，短边至少 {size} 像素。其他比例可以裁切，或确认后保留原比例（最长 {ratio}）。",
       "upload": "上传封面",
       "banner": "横幅",
       "banner_empty": "还没有横幅",
@@ -3040,7 +3040,6 @@
       "clipboard_denied": "浏览器没有允许读取剪贴板，请按 {keys} 粘贴。",
       "import": "导入",
       "too_small": "图片短边至少要 {size} 像素。",
-      "not_square": "封面必须是正方形。",
       "url_not_square": "这张图不是正方形。请下载后上传文件，再进行裁切。",
       "auto_cropped": "已从中间裁成正方形（{from} → {to}）。",
       "too_large": "文件超过 25 MB。",
@@ -3080,7 +3079,7 @@
     },
     "crop": {
       "title": "裁切成正方形",
-      "hint": "专辑封面是正方形的。拖动方框选择要保留的部分，用滚轮、双指或下方滑块缩放。",
+      "hint": "专辑封面一般是正方形。拖动方框选择要保留的部分，用滚轮、双指或下方滑块缩放。",
       "zoom": "缩放",
       "zoom_in": "放大",
       "zoom_out": "缩小",
@@ -3088,6 +3087,21 @@
       "frame": "裁切框（方向键移动，+ / − 缩放）",
       "result": "结果：{size} × {size} 像素",
       "apply": "裁切并上传"
+    },
+    "cover_shape": {
+      "title": "这张图不是正方形",
+      "size": "这张图是 {size}。",
+      "keep_effect": "如果仍然想要使用非标准尺寸的话，只有专辑页按原比例显示，列表、搜索、收藏等其他地方都会从中间裁成正方形。",
+      "too_wide": "这张图比 {ratio} 还长，不能直接当封面，可以裁成正方形再用。",
+      "elsewhere": "列表、搜索等处",
+      "on_album_page": "专辑页",
+      "recommend": "CDCat 推荐使用{square}图片作为专辑封面。",
+      "square": "正方形",
+      "tip": "只有真的找不到合适的图片，又不想裁剪的时候使用。",
+      "crop": "裁成正方形",
+      "keep": "确定使用非标准比例封面",
+      "fetch_failed": "读取这张图片失败，请稍后再试。",
+      "slot_note": "非标准比例封面（{size}），列表等处会从中间裁成正方形显示。"
     },
     "relations": {
       "entries_hint": "这张专辑所属的游戏、动画等作品。",

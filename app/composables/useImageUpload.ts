@@ -21,6 +21,8 @@ export const useImageUpload = () => {
   const limits = computed(() => ({
     coverMinSize: schema.value?.limits?.cover_min_size ?? 500,
     tolerance: schema.value?.limits?.cover_square_tolerance ?? 0.02,
+    // A cover of another shape may be at most this many times as long as it is wide, either way (plus the tolerance).
+    coverMaxRatio: schema.value?.limits?.cover_max_ratio ?? 2,
     avatarMinSize: schema.value?.limits?.avatar_min_size ?? 200,
     bannerMinWidth: schema.value?.limits?.banner_min_width ?? 1000,
     bannerMinHeight: schema.value?.limits?.banner_min_height ?? 300,
@@ -45,12 +47,19 @@ export const useImageUpload = () => {
     return $api<CatalogImage>('/v1/images', { method: 'POST', body })
   }
 
-  /** Whether an image may be the album cover: square within the tolerance and large enough. */
-  const coverProblem = (width: number, height: number): 'too_small' | 'not_square' | null => {
-    if (Math.min(width, height) < limits.value.coverMinSize) return 'too_small'
-    if (!isSquare(width, height, limits.value.tolerance)) return 'not_square'
-    return null
+  /**
+   * GET /v1/images/{id}/file: a stored image's file, for cropping it in the browser (the image host sends no CORS
+   * headers, so the picture at its address can be shown but not read).
+   */
+  const fetchFile = async (image: CatalogImage) => {
+    const blob = await $api<Blob>(`/v1/images/${image.id}/file`, { responseType: 'blob' })
+    const type = blob.type || image.mime
+    return new File([blob], `image-${image.id}.${type.split('/')[1] ?? 'webp'}`, { type })
   }
+
+  /** Whether an image can become the album cover: large enough. Any other shape is cropped or kept (useCoverShape). */
+  const coverProblem = (width: number, height: number): 'too_small' | null =>
+    Math.min(width, height) < limits.value.coverMinSize ? 'too_small' : null
 
   /** Whether an image may be an artist's avatar: square within the tolerance and large enough. */
   const avatarProblem = (width: number, height: number): 'too_small' | 'not_square' | null => {
@@ -62,5 +71,5 @@ export const useImageUpload = () => {
   /** Whether an image may be a main banner: at least banner_min_width wide and banner_min_height tall, of any shape. */
   const bannerFits = (width: number, height: number) => width >= limits.value.bannerMinWidth && height >= limits.value.bannerMinHeight
 
-  return { limits, upload, importUrl, coverProblem, avatarProblem, bannerFits }
+  return { limits, upload, importUrl, fetchFile, coverProblem, avatarProblem, bannerFits }
 }

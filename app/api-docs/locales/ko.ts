@@ -1449,7 +1449,7 @@ const texts: ApiDocsTexts = {
       title: '이미지 종류',
       description: '이미지가 앨범에서 쓰이는 용도입니다. VGMdb의 분류를 참고했습니다.',
       values: {
-        cover: '앨범 커버. 여러 장일 수 있으며 대표 커버(`is_primary`)는 정사각형이고 앨범마다 정확히 하나입니다.',
+        cover: '앨범 커버. 여러 장일 수 있으며 대표 커버(`is_primary`)는 앨범마다 정확히 하나입니다. 보통 정사각형이지만 다른 비율(최대 2:1)일 수도 있으니 `width`, `height`로 확인하세요.',
         banner: '배너. 여러 장일 수 있으며 대표 배너(`is_primary`)는 하나까지이고 앨범 페이지 위쪽에 보입니다.',
         front: '앞면',
         back: '뒷면',

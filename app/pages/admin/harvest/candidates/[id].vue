@@ -10,7 +10,7 @@ import { buildHarvestDraft, withMerge } from '~/utils/harvestDraft'
 import { formatCatalogNumber } from '~/utils/catalogNumber'
 import { harvestFilters } from '~/utils/harvestFilters'
 import { peopleWarnings, sameName } from '~/utils/harvestPeople'
-import { isSquare } from '~/utils/imageCrop'
+import { coverShape } from '~/utils/imageCrop'
 import { errorName } from '~/utils/revisionErrors'
 import { ALBUM_REF } from '~/composables/useAlbumEditor'
 import { draftKey, localDrafts } from '~/utils/localDrafts'
@@ -276,26 +276,46 @@ onBeforeUnmount(() => {
   for (const preview of Object.values(previews)) if (typeof preview === 'object') URL.revokeObjectURL(preview.src)
 })
 const coverNote = ref('')
+const { limits } = useImageUpload()
+const { fitCover } = useCoverShape()
+/**
+ * 设为封面: stored on this site, then as in the editor (useCoverShape): square is used, nearly square cropped to the
+ * centre, any other shape asks whether to crop it or keep it; cancelled leaves the cover as it was (the stored copy is
+ * pruned later, unused).
+ */
 const useCover = async (url: string) => {
   if (busy.value || !editor.value) return
   busy.value = true
   message.value = ''
   coverNote.value = ''
   try {
-    const image = await $api<CatalogImage>(`/v1/admin/harvest/candidates/${id.value}/images`, { method: 'POST', body: { url } })
-    editor.value.remember('images', image.id, image)
-    setCover(editor.value.album, image.id)
-    coverNote.value = `已设为封面（${image.width ?? '?'}×${image.height ?? '?'}）`
+    const stored = await $api<CatalogImage>(`/v1/admin/harvest/candidates/${id.value}/images`, { method: 'POST', body: { url } })
+    const fit = await fitCover(stored)
+    if (!fit || !editor.value) return
+    if ('error' in fit) {
+      message.value = fit.error
+      return
+    }
+    editor.value.remember('images', fit.image.id, fit.image)
+    setCover(editor.value.album, fit.image.id)
+    coverNote.value = fit.note ?? `已设为封面（${fit.image.width}×${fit.image.height}）`
   } catch (e) {
     message.value = harvestError(e)
   } finally {
     busy.value = false
   }
 }
-const sizeNote = (preview: { width: number, height: number }) => [
-  !isSquare(preview.width, preview.height) ? '不是正方形' : null,
-  Math.min(preview.width, preview.height) < 500 ? '小于 500px' : null,
-].filter(Boolean).join('，')
+/** What 设为封面 would do with an image of this size, when it is not simply square. */
+const sizeNote = (preview: { width: number, height: number }) => {
+  const { coverMinSize: minSize, coverMaxRatio: maxRatio, tolerance } = limits.value
+  switch (coverShape(preview.width, preview.height, { tolerance, maxRatio, minSize })) {
+    case 'too_small': return `短边小于 ${minSize}px，不能当封面`
+    case 'near': return '接近正方形，设为封面时自动从中间裁好'
+    case 'off': return '不是正方形，设为封面时可以裁成正方形或保留原比例'
+    case 'too_wide': return `比 ${maxRatio}:1 还长，设为封面时只能裁成正方形`
+    default: return ''
+  }
+}
 
 const useTitle = (value: string) => { if (editor.value) editor.value.album.title = value }
 const useDescription = (value: string) => { if (editor.value) editor.value.album.description = value.trim() || null }
@@ -613,7 +633,7 @@ useHead({ title: computed(() => detail.value?.candidate.title ?? '标题') })
                   <UiButton v-if="!showImages && remoteCount" size="xs" class="ml-auto font-normal" @click="showImages = true">取回其他来源的图片（{{ remoteCount }}）</UiButton>
                 </h3>
                 <div class="space-y-3 px-4 py-3">
-                  <p class="text-xs leading-5 text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面要求正方形、至少 500px。</p>
+                  <p class="text-xs leading-5 text-slate-500">采集器交来的图片直接显示；其他图片要点按钮由本站去取。点「设为封面」才会存进本站；封面最好是正方形、短边至少 {{ limits.coverMinSize }}px，别的形状可以裁成正方形，或确认后保留原比例（最长 {{ limits.coverMaxRatio }}:1）。</p>
                   <p v-if="coverNote" class="text-xs text-emerald-700">{{ coverNote }}</p>
                   <p v-if="!shownImages.length && !remoteCount" class="text-xs text-slate-400">来源里没有图片。</p>
                   <div v-if="shownImages.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">

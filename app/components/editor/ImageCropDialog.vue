@@ -1,5 +1,5 @@
 <template>
-  <EditorModal :model-value="!!file" :title="$t('editor.crop.title')" wide @update:model-value="value => !value && emit('cancel')">
+  <EditorModal :model-value="!!file" :title="$t('editor.crop.title')" wide :topmost="topmost" @update:model-value="value => !value && emit('cancel')">
     <div v-if="image && crop" class="space-y-4">
       <p class="text-sm text-body">{{ hint ?? $t('editor.crop.hint') }}</p>
       <!-- The whole picture with the square on it: drag anywhere to move the square, wheel or pinch to resize it. -->
@@ -48,8 +48,9 @@ import { clampCrop, cropToBlob, isSquare, outputSize, resizeCrop, squareCrop } f
  * and + / − do the same on the focused square. It never gets smaller than `minSize` (the slot's smallest allowed
  * image). `round` shows the square as the circle an avatar is shown in. Left whole, an image within `tolerance` of
  * square is handed back as it was picked, so it is not compressed again. `hint` says why (an album cover by default).
+ * `topmost` lifts it above other dialogs (AppCoverShape opens it from anywhere).
  */
-const props = defineProps<{ file: File | null, hint?: string, round?: boolean, minSize?: number, tolerance?: number }>()
+const props = defineProps<{ file: File | null, hint?: string, round?: boolean, minSize?: number, tolerance?: number, topmost?: boolean }>()
 const emit = defineEmits<{ cropped: [Blob], cancel: [] }>()
 
 const image = shallowRef<HTMLImageElement | null>(null)
