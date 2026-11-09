@@ -130,6 +130,10 @@ useHead({ title: '角色字典' })
 
     <section v-if="formOpen" ref="formSection" class="scroll-mt-20 rounded-xl border border-slate-300 bg-white p-5">
       <h2 class="font-semibold">{{ editing ? `编辑角色 ${editing}` : '新建角色' }}</h2>
+      <p v-if="!editing" role="note" class="mt-3 flex items-start gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm text-amber-900">
+        <Icon name="lucide:triangle-alert" class="mt-0.5 size-4 shrink-0 text-amber-600" aria-hidden="true" />
+        <span><strong class="font-semibold">乐器不要单独建角色</strong>（如吉他、贝斯、钢琴）。演奏乐器的人请用「演奏」角色，再在「具体职务」里填乐器名，如 Guitar。</span>
+      </p>
       <form class="mt-4 grid gap-4 text-sm sm:grid-cols-2" @submit.prevent="save">
         <label class="block">Key
           <input v-model="form.key" :disabled="!!editing" required pattern="[a-z][a-z0-9_]{1,39}" class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono disabled:bg-slate-100">
