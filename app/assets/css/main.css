@@ -335,31 +335,40 @@
   }
 }
 
-/* The visitor's text size (useAppearance, the appearance panel; 110% unless they pick another): the root font size,
-   which every rem follows, so text, spacing and icons grow together as with the browser's zoom. A percentage, so a
-   larger font size set in the browser still counts. The admin console has no data-text-size and keeps 100%. */
+/* The visitor's text size (useAppearance, the appearance panel): the root font size, which every rem follows, so text,
+   spacing and icons grow together as with the browser's zoom. A percentage, so a larger font size set in the browser
+   still counts. Until they pick one it is "auto": 110%, but 100% on phones (below sm, PHONE_TEXT_QUERY). The admin
+   console has no data-text-size and keeps 100%. */
 @layer base {
-  html[data-text-size="110"] {
+  html[data-text-size="110"],
+  html[data-text-size="auto"] {
     font-size: 110%;
   }
 
   html[data-text-size="120"] {
     font-size: 120%;
   }
+
+  @media (width < 40rem) {
+    html[data-text-size="auto"] {
+      font-size: 100%;
+    }
+  }
 }
 
 /* Where the sidebar folds to its icons by itself (AppSidebar's 'auto' mode, layouts/default.vue): from lg until there
    is room for it open beside the page, which is xl (80rem) at 100% and as much wider as the text is larger. Media
-   queries measure rem in the browser's 16px, not the page's root size, hence one range per text size. */
+   queries measure rem in the browser's 16px, not the page's root size, hence one range per text size. "auto" is 110%
+   at these widths. */
 @custom-variant sidebar-folds {
   @media (width >= 64rem) and (width < 80rem) {
-    &:where(:root:not([data-text-size="110"], [data-text-size="120"]) *) {
+    &:where(:root:not([data-text-size="110"], [data-text-size="auto"], [data-text-size="120"]) *) {
       @slot;
     }
   }
 
   @media (width >= 64rem) and (width < 88rem) {
-    &:where(:root[data-text-size="110"] *) {
+    &:where(:root:is([data-text-size="110"], [data-text-size="auto"]) *) {
       @slot;
     }
   }

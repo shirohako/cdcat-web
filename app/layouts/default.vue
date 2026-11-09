@@ -36,6 +36,7 @@
 
 <script setup lang="ts">
 import type { SidebarMode } from '~/components/AppSidebar.vue'
+import { DEFAULT_TEXT_SIZE } from '~/composables/useAppearance'
 
 /**
  * From lg up the sidebar sits beside the page. By itself ('auto') it folds to its icons below xl, where the full one
@@ -53,9 +54,13 @@ const toggleSidebar = () => {
   sidebarMode.value = isSidebarCollapsed.value ? 'expanded' : 'collapsed'
 }
 
-// The same widths as the sidebar-folds variant: lg up to xl (80rem) times the text size.
+// The same widths as the sidebar-folds variant: lg up to xl (80rem) times the text size. 'auto' is the standard size
+// at these widths (only phones get the small one).
 const { appliedTextSize } = useAppearance()
-const foldQuery = computed(() => `(width >= 64rem) and (width < ${(80 * (appliedTextSize.value ?? 100)) / 100}rem)`)
+const foldQuery = computed(() => {
+  const size = appliedTextSize.value === 'auto' ? DEFAULT_TEXT_SIZE : appliedTextSize.value ?? 100
+  return `(width >= 64rem) and (width < ${(80 * size) / 100}rem)`
+})
 let foldWidth: MediaQueryList | undefined
 const onWidthChange = () => {
   isFoldWidth.value = !!foldWidth?.matches

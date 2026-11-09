@@ -13,7 +13,7 @@ const themes = computed(() => [
   { value: 'dark' as const, label: t('appearance.dark'), icon: 'lucide:moon' },
   { value: 'light' as const, label: t('appearance.light'), icon: 'lucide:sun' },
 ])
-/** 110% is the default, so it is the one called standard. */
+/** 110% is the default (on phones 100%, see useAppearance), so it is the one called standard. */
 const textSizes = computed(() => [
   { value: 100 as const, label: t('appearance.text_small') },
   { value: 110 as const, label: t('appearance.text_default') },

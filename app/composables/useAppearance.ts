@@ -21,10 +21,15 @@ export const COLOR_PRESETS: readonly ThemeColor[] = ['ink', 0, 30, 60, 180, 250,
 /**
  * The visitor's text size: the root font size as a percentage of the browser's own (16px unless they changed it). Every
  * rem follows it, so text, spacing and icons grow together, as with the browser's zoom (main.css, data-text-size).
+ * Until they pick one it is 'auto': standard, but small on phones (below sm, where the layout turns to the phone one).
+ * That is decided in CSS, so the server, which can't know the width, still draws the right size.
  */
 export type TextSize = 100 | 110 | 120
 export const TEXT_SIZES: readonly TextSize[] = [100, 110, 120]
 export const DEFAULT_TEXT_SIZE: TextSize = 110
+export const PHONE_TEXT_SIZE: TextSize = 100
+/** Where the phone default applies; main.css repeats it for data-text-size="auto". */
+export const PHONE_TEXT_QUERY = '(width < 40rem)'
 
 const APPEARANCE_COOKIE = { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' } as const
 
@@ -80,13 +85,19 @@ export const useAppearance = () => {
 
   const theme = computed<Theme>(() => cookies.theme.value === 'dark' || cookies.theme.value === 'light' ? cookies.theme.value : DEFAULT_THEME)
   const color = computed<ThemeColor>(() => toColor(cookies.hue.value) ?? DEFAULT_COLOR)
-  const textSize = computed<TextSize>(() => toTextSize(cookies.textSize.value) ?? DEFAULT_TEXT_SIZE)
+  const chosenTextSize = computed(() => toTextSize(cookies.textSize.value))
+  /**
+   * The size in use, for the panel: the visitor's pick, else the default for this width. The width is read in the
+   * browser only (the panel renders only there, when opened); the server takes the standard size.
+   */
+  const textSize = computed<TextSize>(() => chosenTextSize.value
+    ?? (import.meta.client && window.matchMedia(PHONE_TEXT_QUERY).matches ? PHONE_TEXT_SIZE : DEFAULT_TEXT_SIZE))
 
   const themed = computed(() => route.path !== '/admin' && !route.path.startsWith('/admin/'))
   const appliedTheme = computed<Theme>(() => themed.value ? theme.value : 'light')
   const appliedHue = computed(() => !themed.value ? ADMIN_HUE : color.value === 'ink' ? INK_HUE : color.value)
   const appliedPalette = computed(() => themed.value && color.value === 'ink' ? 'ink' : undefined)
-  const appliedTextSize = computed(() => themed.value ? textSize.value : undefined)
+  const appliedTextSize = computed<TextSize | 'auto' | undefined>(() => themed.value ? chosenTextSize.value ?? 'auto' : undefined)
 
   const paintTheme = (value: Theme) => {
     if (import.meta.client) document.documentElement.dataset.theme = value
