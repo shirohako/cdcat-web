@@ -106,7 +106,9 @@ export const INSTRUMENT_WORDS: Record<string, string> = {
   '箫': '箫', '簫': '箫', '洞箫': '箫', '洞簫': '箫', sheng: '笙', sho: '笙', '笙': '笙', yangqin: '扬琴', '扬琴': '扬琴', '揚琴': '扬琴',
   sanxian: '三弦', '三弦': '三弦', zhongruan: '中阮', '中阮': '中阮', daruan: '大阮', '大阮': '大阮', dizi: '笛子', di: '笛子', '笛子': '笛子',
   '笛': '笛子', '曲笛': '笛子', '梆笛': '笛子', '橫笛': '笛子', '横笛': '笛子', guanzi: '管子', guan: '管子', bili: '管子', '管子': '管子',
-  '管': '管子', '筚篥': '管子',
+  '管': '管子', '筚篥': '管子', harmonica: 'Harmonica', 'ハーモニカ': 'Harmonica', 'ハモニカ': 'Harmonica', '口琴': 'Harmonica',
+  '하모니카': 'Harmonica', baritonehorn: 'Baritone Horn', 'バリトンホルン': 'Baritone Horn', '上低音号': 'Baritone Horn',
+  '上低音號': 'Baritone Horn',
 }
 
 /**

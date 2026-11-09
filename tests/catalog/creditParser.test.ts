@@ -128,13 +128,15 @@ describe('pasted credit lists', () => {
   })
 
   it('credits instruments as 演奏 with each instrument as the job title', () => {
-    const { lines } = parse('Gt. / Bass: Maki\nギター・編曲：ミナト\n古箏：Rin\nGuitar-Lead: Yuki\nGuitar&Bass: Aoi')
+    const { lines } = parse('Gt. / Bass: Maki\nギター・編曲：ミナト\n古箏：Rin\nGuitar-Lead: Yuki\nGuitar&Bass: Aoi\nハモニカ：Natsume\nBaritone horn: Arai')
     expect(lines.map(line => [line.roles, line.instruments, line.roleLabel, line.unknown])).toEqual([
       [['performer'], ['Guitar', 'Bass'], null, []],
       [['performer', 'arranger'], ['Guitar'], null, []],
       [['performer'], ['古筝'], null, []],
       [[], [], null, ['Guitar-Lead']],
       [['performer'], ['Guitar', 'Bass'], null, []],
+      [['performer'], ['Harmonica'], null, []],
+      [['performer'], ['Baritone Horn'], null, []],
     ])
   })
 
