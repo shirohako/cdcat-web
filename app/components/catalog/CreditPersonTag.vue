@@ -69,7 +69,7 @@ const namePad = computed(() => {
     ]"
   >
     <span v-if="whole" class="credit-link truncate">{{ name }}</span>
-    <CatalogArtistName v-else :name="name" :artist-id="artistId" :artist-name="artistName" card :link-class="patch.join(' ')" class="truncate" :class="namePad" />
+    <CatalogArtistName v-else :name="name" :artist-id="artistId" :artist-name="artistName" card :link-class="patch.join(' ')" truncate :class="namePad" />
     <span v-if="detail" class="inline-flex shrink-0" :class="notePull"><CatalogCreditNote :note="detail" /></span>
   </component>
 </template>

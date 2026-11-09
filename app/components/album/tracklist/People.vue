@@ -71,12 +71,12 @@ const namePad = (person: TracklistPerson) => {
         <!-- The words are pulled into the names' 5px patches, so about 2px of air on each side -->
         <span v-if="position" class="-mx-0.75 shrink-0 text-meta">{{ member.joinPhrase }}</span>
         <span v-if="whole(person)" class="credit-link truncate">{{ member.name }}</span>
-        <CatalogArtistName v-else :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="linkClass(member)" class="truncate" :class="namePad(member)" />
+        <CatalogArtistName v-else :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="linkClass(member)" truncate :class="namePad(member)" />
         <span v-if="member.detail" class="inline-flex shrink-0 pr-0.75" :class="notePull(member, true)"><CatalogCreditNote :note="member.detail" /></span>
         <template v-if="member.guests.length">
           <span class="-mx-0.75 shrink-0 text-meta">feat.</span>
           <span v-for="(guest, index) in member.guests" :key="guest.creditId" class="inline-flex min-w-0 items-center">
-            <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="linkClass(guest)" class="truncate" :class="namePad(guest)" />
+            <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="linkClass(guest)" truncate :class="namePad(guest)" />
             <span v-if="guest.detail" class="inline-flex shrink-0 pr-0.75" :class="notePull(guest, false)"><CatalogCreditNote :note="guest.detail" /></span>
             <span v-if="index < member.guests.length - 1" class="-ml-1 mr-0.5 text-meta">,</span>
           </span>
