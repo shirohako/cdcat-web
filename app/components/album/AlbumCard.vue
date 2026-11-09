@@ -49,14 +49,17 @@
           <UiTruncate v-else :text="allArtists" class="min-w-0" />
         </template>
       </div>
-      <div class="mt-1 flex items-center justify-between gap-2 border-t border-line pt-2 text-11 tabular-nums text-meta">
-        <span class="inline-flex min-w-0 items-center gap-1" :class="{ 'text-faint': !album.release_date }">
-          <Calendar :size="11" class="shrink-0" />
-          <span class="truncate">{{ shortDate || '—' }}</span>
+      <!-- The icons sit in the text's own line, lifted to the middle of the digits (as on the event cards): centred on
+           the line box they looked off, as the digits sit low in it. On phones, where the cards are narrow, the date
+           stops at the month on every card (not only where it would be cut off, so a row doesn't mix the two). -->
+      <div class="mt-1 flex justify-between gap-2 border-t border-line pt-2 text-11 tabular-nums text-meta">
+        <span class="flex min-w-0 gap-1" :class="{ 'text-faint': !album.release_date }">
+          <span class="shrink-0"><Calendar :size="11" :class="ICON" /></span>
+          <span class="truncate">{{ shortDate.month || '—' }}<span v-if="shortDate.day" class="max-sm:hidden">{{ shortDate.day }}</span></span>
         </span>
-        <span class="inline-flex shrink-0 items-center gap-2">
-          <span class="inline-flex items-center gap-1" :aria-label="t('albums.card.discs', { count: album.disc_count || 0 }, album.disc_count || 0)"><Disc3 :size="11" aria-hidden="true" />{{ album.disc_count || 0 }}</span>
-          <span class="inline-flex items-center gap-1" :aria-label="t('albums.card.tracks', { count: album.track_count || 0 }, album.track_count || 0)"><ListMusic :size="11" aria-hidden="true" />{{ album.track_count || 0 }}</span>
+        <span class="flex shrink-0 gap-2">
+          <span :aria-label="t('albums.card.discs', { count: album.disc_count || 0 }, album.disc_count || 0)"><Disc3 :size="11" aria-hidden="true" :class="[ICON, 'mr-1']" />{{ album.disc_count || 0 }}</span>
+          <span :aria-label="t('albums.card.tracks', { count: album.track_count || 0 }, album.track_count || 0)"><ListMusic :size="11" aria-hidden="true" :class="[ICON, 'mr-1']" />{{ album.track_count || 0 }}</span>
         </span>
       </div>
     </div>
@@ -75,6 +78,9 @@ const props = defineProps<{
 
 const { t, te, locale } = useI18n()
 
+/** The footer's 11px icons: inline in the text's line, their middle 0.37em above the baseline (the digits' middle). */
+const ICON = 'inline-block align-[calc(0.37em-0.34375rem)]'
+
 /** The three labels on the cover (type, views, likes) share one look. */
 const PILL = 'inline-flex items-center gap-1 rounded bg-scrim px-1.5 py-0.75 text-11 font-medium leading-none text-on-media backdrop-blur-sm'
 
@@ -88,14 +94,16 @@ const various = computed(() => props.album.byline?.role === 'artist' && bylineNa
 const allArtists = computed(() => bylineNames.value.join(', '))
 /**
  * The release date as digits, to its precision (2026.10.25, 2026.10, 2026): short and the same in every language, so
- * it fits beside the counts on a narrow card. The album page gives the date in full.
+ * it fits beside the counts on a narrow card. The album page gives the date in full. In two parts, up to the month and
+ * the day (".25"), which phones leave out.
  */
 const shortDate = computed(() => {
   const date = props.album.release_date
-  if (!date) return ''
+  if (!date) return { month: '', day: '' }
   const [year, month, day] = date.slice(0, 10).split('-')
   const precision = props.album.release_date_precision ?? 'day'
-  return precision === 'year' ? year : precision === 'month' ? `${year}.${month}` : `${year}.${month}.${day}`
+  if (precision === 'year') return { month: year!, day: '' }
+  return { month: `${year}.${month}`, day: precision === 'month' ? '' : `.${day}` }
 })
 /** 1234 as 1.2K / 1234 in the UI language's own short form. */
 const compact = (value: number | undefined) => new Intl.NumberFormat(locale.value, { notation: 'compact', maximumFractionDigits: 1 }).format(value || 0)

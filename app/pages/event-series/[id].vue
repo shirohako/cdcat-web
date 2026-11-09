@@ -85,10 +85,11 @@ const bannerUrl = computed(() => series.value ? eventSeriesBanner(series.value) 
 
 // The series decides the visual format (Comic Market and M3 portrait catalogs, TGS landscape),
 // so every card in a series shares one ratio and a missing visual keeps its slot. Portrait cards
-// go three to a row on phones; each card tightens its text by its own width (@container).
+// go two to a row on phones (three were too cramped), three from sm; each card tightens its text by
+// its own width (@container).
 const landscape = computed(() => series.value?.visual_orientation === 'landscape')
 const visualRatio = computed(() => landscape.value ? '16 / 9' : '5 / 7')
-const gridClass = computed(() => landscape.value ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-3 md:grid-cols-4 xl:grid-cols-5')
+const gridClass = computed(() => landscape.value ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5')
 
 const startDate = (event: SeriesEvent) => event.start_date
   ? formatDate(event.start_date, { year: 'numeric', month: '2-digit', day: '2-digit' })

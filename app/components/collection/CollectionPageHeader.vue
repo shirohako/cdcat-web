@@ -52,7 +52,8 @@ const idleFilterClass = 'bg-black/5 text-body ring-transparent hover:bg-black/10
 
 <template>
   <section class="border-b border-line">
-    <div class="flex items-start justify-between gap-3 px-4 py-3.5 sm:items-center sm:px-6 sm:py-4.5">
+    <!-- The right side is centred on the title block at every width (it was top-aligned on phones). -->
+    <div class="flex items-center justify-between gap-3 px-4 py-3.5 sm:px-6 sm:py-4.5">
       <div class="flex min-w-0 items-center gap-3.5">
         <slot name="icon"><UiIconTile :icon="icon" /></slot>
 
