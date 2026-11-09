@@ -61,7 +61,11 @@ withDefaults(defineProps<{
 
 <style>
 /* In the components layer, so utilities given through `img-class` (a hover zoom) still win. Not scoped: the marks are
-   set outside Vue, and these only ever match this component's own class names. */
+   set outside Vue, and these only ever match this component's own class names.
+   The layer order is restated first: in dev, Vite can inject this style before main.css, and a bare
+   `@layer components` would then put components below base, so preflight's transparent button background beat .btn. */
+@layer theme, base, components, utilities;
+
 @layer components {
   .ui-image-placeholder {
     background-color: var(--skeleton);
