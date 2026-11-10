@@ -36,13 +36,14 @@ const meta = computed(() => (isFolded.value
 </script>
 
 <template>
+  <!-- The last disc folded leaves its line to the tracklist's footer, whose line follows it right away -->
   <section :id="`disc-${disc.id}`" class="scroll-mt-14">
     <span v-if="disc.showHeader" ref="sentinel" class="block h-0" aria-hidden="true" />
     <div
       v-if="disc.showHeader"
       ref="header"
       class="sticky top-14 z-10 bg-card"
-      :class="variant === 'bar' ? 'border-b border-line px-2 pt-2.5 [section+section_&]:mt-1.5' : 'pt-4 [section:first-child_&]:pt-1'"
+      :class="variant === 'bar' ? ['border-b border-line px-2 pt-2.5 [section+section_&]:mt-1.5', isFolded && '[section:last-child>&]:border-b-transparent'] : 'pt-4 [section:first-child_&]:pt-1'"
     >
       <button
         type="button"
