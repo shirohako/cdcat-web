@@ -1,6 +1,12 @@
 <template>
   <UiDialog v-model="asking" :title="$t('editor.cover_shape.title')" icon="lucide:triangle-alert" tone="warning" topmost>
     <div v-if="shown" class="space-y-4">
+      <!-- First a light tip (the icon says it is one): square is recommended, the word picked out. -->
+      <UiAlert tone="info" icon="lucide:lightbulb" compact>
+        <i18n-t keypath="editor.cover_shape.recommend" tag="p" scope="global">
+          <template #square><span class="font-semibold text-info">{{ $t('editor.cover_shape.square') }}</span></template>
+        </i18n-t>
+      </UiAlert>
       <!-- A line at a time: the size, then what keeping the shape means (or why it can't be kept). -->
       <div class="space-y-1.5 text-sm leading-relaxed text-body">
         <i18n-t keypath="editor.cover_shape.size" tag="p" scope="global">
@@ -20,13 +26,9 @@
           <figcaption class="text-xs text-meta">{{ $t('editor.cover_shape.on_album_page') }}</figcaption>
         </figure>
       </div>
-      <!-- Just above the buttons, a light tip (the icon says it is one): square is recommended, the word picked out;
-           when keeping the shape is worth it, unless it can't be kept. -->
-      <UiAlert tone="info" icon="lucide:lightbulb" compact>
-        <i18n-t keypath="editor.cover_shape.recommend" tag="p" scope="global">
-          <template #square><span class="font-semibold text-info">{{ $t('editor.cover_shape.square') }}</span></template>
-        </i18n-t>
-        <p v-if="!shown.tooWide">{{ $t('editor.cover_shape.tip') }}</p>
+      <!-- Just above the buttons, a second tip: when keeping the shape is worth it (none when it can't be kept). -->
+      <UiAlert v-if="!shown.tooWide" tone="info" icon="lucide:lightbulb" compact>
+        {{ $t('editor.cover_shape.tip') }}
       </UiAlert>
       <p v-if="error" class="text-xs text-danger">{{ error }}</p>
     </div>
