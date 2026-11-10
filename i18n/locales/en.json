@@ -120,6 +120,7 @@
       "language_note": "Tracks without a title in that language keep the original, in a lighter colour.",
       "lyrics_count": "Lyrics {count}",
       "lyrics_none": "No lyrics yet; open to add them",
+      "lyrics_instrumental": "Instrumental, no lyrics",
       "disc": {
         "tracks": "{count} track | {count} tracks",
         "folded": "{count} track folded | {count} tracks folded",
@@ -147,7 +148,8 @@
         "title": "Title",
         "duration": "Length",
         "lyrics": "Lyrics",
-        "others": "Other credits"
+        "others": "Other credits",
+        "people": "People"
       },
       "language_none": "No other languages for these titles yet"
     },

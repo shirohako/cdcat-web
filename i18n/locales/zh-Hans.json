@@ -120,6 +120,7 @@
       "language_note": "没有这种语言标题的曲目仍显示原文，字色变浅。",
       "lyrics_count": "歌词 {count}",
       "lyrics_none": "还没有歌词，点开可以添加",
+      "lyrics_instrumental": "纯音乐，没有歌词",
       "disc": {
         "tracks": "{count} 首",
         "folded": "已收起 {count} 首",
@@ -147,7 +148,8 @@
         "title": "标题",
         "duration": "时长",
         "lyrics": "歌词",
-        "others": "其他人员"
+        "others": "其他人员",
+        "people": "参与人员"
       },
       "language_none": "曲目标题还没有其他语言"
     },

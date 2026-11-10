@@ -82,6 +82,12 @@ describe('buildTracklist', () => {
     expect(row.key[0]!.more.map(person => person.name)).toEqual(['C'])
   })
 
+  it('lists everyone once for the table, the key roles first', () => {
+    const credits = [credit('lyricist', 'Mio', 5), credit('arranger', 'NAGI', 1), credit('composer', 'NAGI', 1), credit('vocals', 'Eris', 4), credit('artist', 'Mio', 5)]
+    const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    expect(row.everyone.map(person => person.name)).toEqual(['Mio', 'NAGI', 'Eris'])
+  })
+
   it('merges roles held by the same people, keeping apart the same people with other notes', () => {
     const credits = [credit('composer', 'NAGI', 1), credit('lyricist', 'Mio', 5), credit('arranger', 'NAGI', 1), credit('recording', 'Ken', 9, 'Studio A'), credit('mixing', 'Ken', 9, 'Studio B')]
     const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!

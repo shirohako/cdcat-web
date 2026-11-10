@@ -4,9 +4,10 @@ import { Heart } from '@lucide/vue'
 
 /**
  * A track's heart. Unfavourited ones appear when the pointer is over the row (always on touch screens and for the
- * keyboard); favourited ones always show, and pop when they become favourited. Albums awaiting review have none.
+ * keyboard), or always with `always` (the table's heart column); favourited ones always show, and pop when they become
+ * favourited. Albums awaiting review have none.
  */
-const props = defineProps<{ row: TracklistRow }>()
+const props = defineProps<{ row: TracklistRow, always?: boolean }>()
 
 const { t } = useI18n()
 const { locked, favoriting, toggleFavorite } = useTracklist()
@@ -24,7 +25,7 @@ watch(() => props.row.favorited, (on, was) => {
     :class="[
       row.favorited
         ? 'text-red-500 dark:text-red-400'
-        : 'text-black/25 hover:bg-red-500/10 hover:text-red-400 dark:text-white/25 dark:hover:bg-red-400/15 dark:hover:text-red-300 pointer-fine:scale-85 pointer-fine:opacity-0 pointer-fine:group-hover:scale-100 pointer-fine:group-hover:opacity-100 focus-visible:scale-100 focus-visible:opacity-100',
+        : ['text-black/25 hover:bg-red-500/10 hover:text-red-400 dark:text-white/25 dark:hover:bg-red-400/15 dark:hover:text-red-300', !always && 'pointer-fine:scale-85 pointer-fine:opacity-0 pointer-fine:group-hover:scale-100 pointer-fine:group-hover:opacity-100 focus-visible:scale-100 focus-visible:opacity-100'],
       popping && 'is-popping',
     ]"
     :aria-pressed="row.favorited"

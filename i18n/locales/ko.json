@@ -120,6 +120,7 @@
       "language_note": "선택한 언어로 된 제목이 없는 곡은 원제를 연한 색으로 보여 줘요.",
       "lyrics_count": "가사 {count}",
       "lyrics_none": "아직 가사가 없어요. 눌러서 추가할 수 있어요",
+      "lyrics_instrumental": "연주곡이라 가사가 없어요",
       "disc": {
         "tracks": "{count}곡",
         "folded": "{count}곡 접힘",
@@ -147,7 +148,8 @@
         "title": "제목",
         "duration": "재생 시간",
         "lyrics": "가사",
-        "others": "기타 크레딧"
+        "others": "기타 크레딧",
+        "people": "참여자"
       },
       "language_none": "아직 다른 언어로 된 곡 제목이 없어요"
     },

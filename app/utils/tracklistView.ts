@@ -143,6 +143,8 @@ export interface TracklistRow {
   maker: TracklistRoleGroup | null
   /** 清单 · 舒适: 艺术家, 作曲, 编曲, 演唱 (keyCredits) */
   key: TracklistKeyCredit[]
+  /** 表格 · 舒适's 参与人员: everyone credited, once each, 艺术家, 作曲, 编曲 and 演唱 first, then the rest by role */
+  everyone: TracklistPerson[]
   /** 完整: every credit by role, in the dictionary's order; the 客串 inside the lead rather than a group of their own */
   groups: TracklistRoleGroup[]
   /** How many people `groups` names, each once (countPeople): the 清单 · 简洁 people button */
@@ -334,6 +336,21 @@ export const mergeSamePeople = (groups: Array<TracklistRoleGroup | null | undefi
 export const keyCredits = (picks: Array<TracklistRoleGroup | null | undefined>): TracklistKeyCredit[] =>
   mergeSamePeople(picks).map(credit => ({ ...credit, people: credit.people.slice(0, KEY_NAMES), more: credit.people.slice(KEY_NAMES) }))
 
+/** The people of these groups in order, each once (by artist and credited name); 客串 stay inside their tag. */
+const everyoneIn = (groups: Array<TracklistRoleGroup | null | undefined>): TracklistPerson[] => {
+  const seen = new Set<string>()
+  const people: TracklistPerson[] = []
+  for (const group of groups) {
+    for (const person of group?.people ?? []) {
+      const key = `${person.artistId ?? ''}|${person.name}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      people.push(person)
+    }
+  }
+  return people
+}
+
 const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
   const groups = joinArtists(attachFeaturing(groupCredits(track.credits, helpers), track.credits))
@@ -344,12 +361,13 @@ const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input
     return same.length > 1 ? { ...group, key: group.role, label: group.roleName, tip: '', people: same.flatMap(other => other.people) } : group
   }
   const byCategory = (category: string) => whole(groups.find(group => group.category === category))
-  const key = keyCredits([
+  const keyPicks = [
     whole(groups.find(group => group.role === ARTIST_ROLE)),
     byCategory('composition'),
     byCategory('arrangement'),
     whole(groups.find(group => group.role === 'vocals')) ?? byCategory('vocals'),
-  ])
+  ]
+  const key = keyCredits(keyPicks)
   const subtitle = translated && translated !== track.title ? track.title : ''
   return {
     id: track.id,
@@ -372,6 +390,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input
     lead: whole(groups.find(group => group.role === ARTIST_ROLE)) ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
     key,
+    everyone: everyoneIn([...keyPicks, ...groups]),
     groups,
     people: countPeople(groups),
     originals: track.originals,

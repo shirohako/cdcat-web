@@ -5,10 +5,11 @@ import { FileText, Languages } from '@lucide/vue'
 /**
  * Lyrics and translations as icon-and-count buttons that open the lyrics dialog, the second on a translation. With
  * `merged` (the table's narrow column) it is one button counting both. A sung track without lyrics keeps a faint
- * lyrics button without a number, the way in to add them; instrumentals have none. `small` is 20px with a 12px icon,
- * for a line of 20px buttons: everywhere in 清单 (the first line beside the length, the 舒适 line, the 完整 block).
+ * lyrics button without a number, the way in to add them; instrumentals have none, unless `always` (the table's
+ * column), where they get a greyed-out one that can't be pressed. `small` is 20px with a 12px icon, for a line of 20px
+ * buttons: everywhere in 清单 (the first line beside the length, the 舒适 line, the 完整 block).
  */
-const props = defineProps<{ row: TracklistRow, merged?: boolean, small?: boolean }>()
+const props = defineProps<{ row: TracklistRow, merged?: boolean, small?: boolean, always?: boolean }>()
 
 const { t } = useI18n()
 const { openLyrics } = useTracklist()
@@ -25,7 +26,13 @@ const FILLED = 'bg-black/[0.05] text-body hover:bg-black/[0.1] dark:bg-white/[0.
 </script>
 
 <template>
-  <span v-if="!row.instrumental" class="inline-flex shrink-0 items-center gap-1">
+  <!-- An instrumental in the table: there, but greyed out and not pressable (aria-disabled, so its tooltip still shows) -->
+  <UiTooltip v-if="row.instrumental && always" :text="t('album.tracklist.lyrics_instrumental')">
+    <button type="button" aria-disabled="true" :aria-label="t('album.tracklist.lyrics_instrumental')" :class="[CHIP, SIZE, 'cursor-not-allowed bg-black/[0.03] text-faint opacity-60 dark:bg-white/[0.05]']" @click.prevent>
+      <FileText :size="icon" />
+    </button>
+  </UiTooltip>
+  <span v-else-if="!row.instrumental" class="inline-flex shrink-0 items-center gap-1">
     <UiTooltip :text="merged ? mergedTip : lyricsTip">
       <button
         type="button"

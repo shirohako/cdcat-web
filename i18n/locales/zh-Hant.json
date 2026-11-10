@@ -120,6 +120,7 @@
       "language_note": "沒有這種語言標題的曲目仍顯示原文，字色變淺。",
       "lyrics_count": "歌詞 {count}",
       "lyrics_none": "還沒有歌詞，點開可以新增",
+      "lyrics_instrumental": "純音樂，沒有歌詞",
       "disc": {
         "tracks": "{count} 首",
         "folded": "已收起 {count} 首",
@@ -147,7 +148,8 @@
         "title": "標題",
         "duration": "時長",
         "lyrics": "歌詞",
-        "others": "其他人員"
+        "others": "其他人員",
+        "people": "參與人員"
       },
       "language_none": "曲目標題還沒有其他語言"
     },

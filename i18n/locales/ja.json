@@ -120,6 +120,7 @@
       "language_note": "その言語のタイトルがない曲は原題のまま、薄い色で表示します。",
       "lyrics_count": "歌詞 {count}",
       "lyrics_none": "歌詞はまだありません。開くと追加できます",
+      "lyrics_instrumental": "インストのため歌詞はありません",
       "disc": {
         "tracks": "{count} 曲",
         "folded": "{count} 曲を折りたたみ中",
@@ -147,7 +148,8 @@
         "title": "タイトル",
         "duration": "時間",
         "lyrics": "歌詞",
-        "others": "その他のクレジット"
+        "others": "その他のクレジット",
+        "people": "参加者"
       },
       "language_none": "ほかの言語のタイトルはまだありません"
     },
