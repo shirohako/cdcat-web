@@ -71,6 +71,18 @@ describe('buildTracklist', () => {
     expect(discs.map(item => item.duration)).toEqual(['5:00', null])
   })
 
+  it('counts each person once, by artist and credited name, guests included', () => {
+    const credits = [
+      credit('composer', 'NAGI', 1), credit('arranger', 'NAGI', 1), credit('lyricist', 'Eris'), credit('vocals', 'Eris'),
+      // The same artist under another name counts apart
+      credit('vocals', 'N4GI', 1), credit('featuring', 'Vivienne', 3),
+    ]
+    credits[4] = { ...credits[4]!, credited_as: 'N4GI' }
+    const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    expect(row.people).toBe(4)
+    expect(buildTracklist({ discs: [disc(1, [track(1)])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!.people).toBe(0)
+  })
+
   it('groups credits by role in order, keeps detail notes and picks the key people by category', () => {
     const credits = [credit('vocals', 'Vivienne', 3), credit('arranger', 'NAGI', 1), credit('arranger', 'Eris', null, 'remix'), credit('composer', 'NAGI', 1)]
     const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!

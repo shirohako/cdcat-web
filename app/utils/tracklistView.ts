@@ -127,6 +127,8 @@ export interface TracklistRow {
   maker: TracklistRoleGroup | null
   /** 完整: every credit by role, in the dictionary's order; the 客串 inside the lead rather than a group of their own */
   groups: TracklistRoleGroup[]
+  /** How many people `groups` names, each once (countPeople): the 清单 · 简洁 people button */
+  people: number
   originals: TrackOriginal[]
   attributes: Array<{ key: string, label: string, value: string }>
 }
@@ -256,6 +258,23 @@ const joinArtists = (groups: TracklistRoleGroup[]): TracklistRoleGroup[] => grou
   return { ...group, people: heads }
 })
 
+/**
+ * Everyone named in a track's credit groups, each once however many roles they hold: an artist by id and the name
+ * they are credited under (someone under two names is two people, as in the credits card), a name-only credit by its
+ * name. The 客串 and joined artists inside a tag count too.
+ */
+export const countPeople = (groups: TracklistRoleGroup[]) => {
+  const keys = new Set<string>()
+  const add = (person: TracklistPerson) => {
+    keys.add(`${person.artistId ?? ''}|${person.name}`)
+    for (const other of [...person.guests, ...(person.joined ?? [])]) add(other)
+  }
+  for (const group of groups) {
+    for (const person of group.people) add(person)
+  }
+  return keys.size
+}
+
 const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
   const groups = joinArtists(attachFeaturing(groupCredits(track.credits, helpers), track.credits))
@@ -287,6 +306,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input
     lead: whole(groups.find(group => group.role === ARTIST_ROLE)) ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
     groups,
+    people: countPeople(groups),
     originals: track.originals,
     attributes: track.attributes.map(attribute => ({ key: attribute.key, ...helpers.attribute(attribute) })),
   }

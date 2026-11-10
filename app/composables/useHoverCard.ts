@@ -20,7 +20,8 @@ let lastClosedAt = 0
  *
  * `anchor` is the element the card shows for (null when closed), `current` the last one, kept while the card fades
  * out. The card calls `enter` and `leave` as the pointer moves in and out of it, and `close` when it closes itself
- * (Escape, a press elsewhere, leaving the page). Render the card with UiHoverCard.
+ * (Escape, a press elsewhere, leaving the page). `open` shows it for an element right away, for a button that also
+ * opens it when pressed (a mouse click or the keyboard). Render the card with UiHoverCard.
  */
 export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, options: { enabled?: MaybeRefOrGetter<boolean>, delay?: number } = {}) => {
   const anchor = shallowRef<HTMLElement | null>(null)
@@ -119,5 +120,12 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
     listen(root.value, false)
   })
 
-  return { anchor, current, enter, leave, close }
+  const open = (element: HTMLElement) => {
+    clearTimeout(showTimer)
+    clearTimeout(hideTimer)
+    pending = null
+    if (element !== anchor.value) show(element)
+  }
+
+  return { anchor, current, enter, leave, close, open }
 }

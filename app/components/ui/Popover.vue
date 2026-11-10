@@ -15,7 +15,10 @@ import { autoUpdate, computePosition, flip, offset as offsetMiddleware, shift, s
  * Without a trigger, pass `reference` (the element to anchor on) and drive `v-model:open` yourself, as the venue map
  * does on hover; focus then stays where it is. Attributes (class, listeners …) go to the card, e.g. a width. The card
  * is teleported to <body> (or into the open modal <dialog>) and placed with floating-ui, flipping and shrinking to fit
- * the screen; layers opened from inside it, such as a select's list, count as part of it.
+ * the screen; layers opened from inside it, such as a select's list, count as part of it. With `arrow`, a small point
+ * on its top or bottom edge aims at the middle of what it opened from (kept a little in from the corners); it is
+ * drawn beside the card rather than inside, so the card's own scrolling can't clip it. Card and arrow then take a
+ * stronger outline, as the point mostly sits over the hovered row, whose fill is close to the card's own colour.
  */
 defineOptions({ inheritAttrs: false })
 
@@ -27,7 +30,9 @@ const props = withDefaults(defineProps<{
   reference?: Element | null
   /** Names the card for screen readers */
   label?: string
-}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined })
+  /** A point on the edge facing the trigger, aimed at it (top and bottom placements) */
+  arrow?: boolean
+}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined, arrow: false })
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -37,6 +42,27 @@ const panel = ref<HTMLElement | null>(null)
 const rendered = ref(false)
 const layer = ref<HTMLElement | 'body'>('body')
 const position = reactive({ x: 0, y: 0, placement: props.placement as Placement, placed: false, maxHeight: 0 })
+/** The arrow's corner on the screen, and the card's edge it sits on (null: none, e.g. a side placement) */
+const point = reactive({ x: 0, y: 0, edge: null as 'top' | 'bottom' | null })
+
+/** The arrow: a 0.5rem square turned 45°, half of it past the card's edge, over the card's ring line. */
+const ARROW_REM = 0.5
+const placeArrow = (reference: Element, floating: HTMLElement, x: number, y: number, placement: Placement) => {
+  const side = placement.split('-')[0]
+  if (side !== 'top' && side !== 'bottom') {
+    point.edge = null
+    return
+  }
+  const size = remToPx(ARROW_REM)
+  const box = reference.getBoundingClientRect()
+  const inset = size + 4
+  const centre = Math.min(Math.max(box.left + box.width / 2, x + inset), x + floating.offsetWidth - inset)
+  Object.assign(point, {
+    x: Math.round(centre - size / 2),
+    y: Math.round(side === 'bottom' ? y - size / 2 : y + floating.offsetHeight - size / 2),
+    edge: side === 'bottom' ? 'top' : 'bottom',
+  })
+}
 
 let stopAutoUpdate: (() => void) | null = null
 let focusOnOpen = false
@@ -60,6 +86,7 @@ const place = () => {
     ],
   }).then(({ x, y, placement }) => {
     Object.assign(position, { x: Math.round(x), y: Math.round(y), placement, placed: true })
+    if (props.arrow) placeArrow(reference, floating, x, y, placement)
   })
 }
 
@@ -198,6 +225,7 @@ const triggerAttrs = computed(() => ({
         data-ui-layer
         v-bind="$attrs"
         class="fixed left-0 top-0 z-[80] max-w-[calc(100vw-1rem)] overflow-y-auto overscroll-contain rounded-lg bg-popover p-4 text-sm text-body shadow-overlay outline-none ring-1 ring-line"
+        :class="arrow && 'ring-[color-mix(in_oklab,var(--title)_20%,transparent)]!'"
         :style="{
           translate: `${position.x}px ${position.y}px`,
           maxHeight: position.maxHeight ? `${position.maxHeight}px` : undefined,
@@ -208,6 +236,20 @@ const triggerAttrs = computed(() => ({
       >
         <slot :close="() => close()" />
       </div>
+    </Transition>
+    <Transition
+      enter-active-class="transition-opacity duration-150 ease-out motion-reduce:transition-none"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-100 ease-in motion-reduce:transition-none"
+      leave-to-class="opacity-0"
+    >
+      <span
+        v-if="arrow && open && point.edge"
+        aria-hidden="true"
+        class="pointer-events-none fixed left-0 top-0 z-[81] size-2 rotate-45 border-[color-mix(in_oklab,var(--title)_20%,transparent)] bg-popover"
+        :class="point.edge === 'top' ? 'border-l border-t' : 'border-b border-r'"
+        :style="{ translate: `${point.x}px ${point.y}px`, visibility: position.placed ? 'visible' : 'hidden' }"
+      />
     </Transition>
   </Teleport>
 </template>

@@ -23,7 +23,7 @@ watch(() => props.row.favorited, (on, was) => {
     class="inline-flex size-5 shrink-0 items-center justify-center rounded-md transition-[color,background-color,opacity,scale] duration-150 disabled:cursor-wait"
     :class="[
       row.favorited
-        ? 'text-red-400 dark:text-red-300'
+        ? 'text-red-500 dark:text-red-400'
         : 'text-black/25 hover:bg-red-500/10 hover:text-red-400 dark:text-white/25 dark:hover:bg-red-400/15 dark:hover:text-red-300 pointer-fine:scale-85 pointer-fine:opacity-0 pointer-fine:group-hover:scale-100 pointer-fine:group-hover:opacity-100 focus-visible:scale-100 focus-visible:opacity-100',
       popping && 'is-popping',
     ]"

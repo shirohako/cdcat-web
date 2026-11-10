@@ -2,8 +2,9 @@
 import type { TracklistDensity, TracklistDisc, TracklistRow } from '~/utils/tracklistView'
 
 /**
- * Style A, 清单: one row per track. 简洁 is ruled rows of number, title, heart and length (until 2026-11-11 this was
- * 表格 · 简洁; the old 清单 · 简洁 went). 舒适 and 完整 are like a music app: the first line (number, heart, title,
+ * Style A, 清单: one row per track. 简洁 is ruled rows (until 2026-11-11 this was 表格 · 简洁; the old 清单 · 简洁
+ * went): number and title, then on the right the people button (opens the credits), the more menu, the heart and the
+ * length, in fixed columns so they line up down the list. 舒适 and 完整 are like a music app: the first line (number, heart, title,
  * length) is the same in both, so switching only opens and folds what is under it: the 舒适 line (who sings, who
  * arranged, 原曲, lyrics) and the 完整 block (every credit as a role tag, notes, counts), which mounts the first time it
  * opens. 简洁 and the others differ in structure, so that switch crossfades.
@@ -34,12 +35,22 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
           :id="`track-${row.id}`"
           :key="row.id"
           :data-track-id="row.id"
-          class="tl-ruled group relative grid scroll-mt-24 grid-cols-[1.5rem_minmax(0,1fr)_auto_auto] items-start gap-x-2 rounded-md px-2 py-1.5 text-13 leading-5 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          class="tl-ruled group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-1.5 text-13 leading-5 transition-colors duration-150 max-sm:grid-cols-[0.875rem_minmax(0,1fr)_auto] max-sm:gap-x-1.5 max-sm:text-11/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
         >
-          <span class="text-xs/5 tabular-nums text-meta">{{ row.number }}</span>
+          <!-- A column just wide enough for two digits; on phones the titles are 11px (the smallest for words) and the
+               columns closer, so more of the titles fits -->
+          <span class="text-xs/5 tabular-nums text-meta max-sm:text-11/5">{{ row.number }}</span>
           <AlbumTracklistTitle :row="row" class="min-w-0 font-medium" />
-          <AlbumTracklistFavorite :row="row" />
-          <span class="text-right text-xs/5 tabular-nums" :class="row.duration ? 'text-meta' : 'text-faint'">{{ row.duration || '—' }}</span>
+          <!-- People, "…", heart and length close together at the right (albums awaiting review have no heart). The
+               length keeps a width, so a "—" doesn't move the buttons before it out of line. -->
+          <span class="flex items-center gap-1">
+            <AlbumTracklistPeopleButton :row="row" />
+            <AlbumTracklistMoreButton :row="row" />
+            <span class="flex items-center gap-0.5">
+              <AlbumTracklistFavorite :row="row" />
+              <span class="min-w-[2.25em] text-right text-xs/5 tabular-nums max-sm:text-11/5" :class="row.duration ? 'text-meta' : 'text-faint'">{{ row.duration || '—' }}</span>
+            </span>
+          </span>
         </div>
       </AlbumTracklistDisc>
     </div>

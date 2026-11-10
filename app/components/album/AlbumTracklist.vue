@@ -67,6 +67,38 @@
   <AlbumTracklistLanguageDialog v-if="languages.length" v-model="languageOpen" :language="languageKey" :languages="languages" @update:language="swapLanguage" />
   <AlbumTracklistSettingsDialog v-model="settingsOpen" :styles="styleOptions" :prefs="prefs" @update="change" />
   <LyricsModal v-model="showLyrics" :track-id="lyricsTarget.trackId" :title="lyricsTarget.title" :prefer="lyricsTarget.prefer" />
+
+  <!-- The rows' more menu (清单 · 简洁): one for the list, under the "…" that opened it, teleported so the card's
+       clipping can't cut it off. 查看歌词 as the lyrics buttons do (none for instrumentals); 分享 comes later. -->
+  <UiPopover v-model:open="moreOpen" :reference="moreAnchor" placement="bottom-end" :label="t('album.tracklist.more')" role="menu" class="w-40 rounded-md! p-1!">
+    <div ref="moreBox">
+      <UiMenuItem :icon="FileText" :class="MORE_ITEM" :disabled="moreRow?.instrumental" @click="viewLyrics">{{ t('album.tracklist.view_lyrics') }}</UiMenuItem>
+      <UiMenuDivider />
+      <UiMenuItem :icon="Copy" :class="MORE_ITEM" @click="copyTitle">{{ t('album.tracklist.copy_title') }}</UiMenuItem>
+      <UiMenuItem :icon="Link" :class="MORE_ITEM" @click="copyLink">{{ t('album.tracklist.copy_link') }}</UiMenuItem>
+      <UiMenuItem :icon="Share2" :class="MORE_ITEM" disabled>{{ t('album.tracklist.share') }}</UiMenuItem>
+    </div>
+  </UiPopover>
+
+  <!-- A track's credits by role, under its people button (清单 · 简洁): opens on hover or a tap, like the artist card.
+       A role tag and its names per line, the tags in one column of at most 9rem. At most 20rem wide, where names and
+       long job titles wrap, and 20rem tall (less on a short screen), past which it scrolls. The names link to their
+       artists; they open no card of their own here, as one hover card shows at a time. -->
+  <UiHoverCard :anchor="peopleCard.anchor.value" :label="peopleRow?.title" placement="bottom" arrow class="max-h-[min(20rem,calc(100dvh-1rem))]! min-h-20 w-max min-w-60 max-w-80 overflow-x-hidden p-3.5!" @enter="peopleCard.enter" @leave="peopleCard.leave" @close="peopleCard.close">
+    <template v-if="peopleRow">
+      <p class="mb-1.5 text-xs font-semibold text-meta">{{ t('album.tracklist.people_button', { count: peopleRow.people }) }}</p>
+      <div class="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-3">
+        <template v-for="(group, index) in peopleRow.groups" :key="group.key">
+          <div class="flex min-w-0 py-1.5" :class="index > 0 && 'border-t border-line'">
+            <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="h-auto! min-h-[1.125rem] whitespace-normal! py-0.5 leading-[0.875rem] wrap-anywhere" />
+          </div>
+          <div class="flex min-w-0 py-1.5" :class="index > 0 && 'border-t border-line'">
+            <AlbumTracklistPeople :people="group.people" class="min-w-0" />
+          </div>
+        </template>
+      </div>
+    </template>
+  </UiHoverCard>
 </template>
 
 <script setup lang="ts">
@@ -75,7 +107,7 @@ import type { TracklistStyleOption } from './tracklist/SettingsDialog.vue'
 import type { AlbumBonus, AlbumDisc, TracklistLanguage } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
 import type { TracklistDensity, TracklistDisc, TracklistPrefs, TracklistRow } from '~/utils/tracklistView'
-import { BookOpenText, Check, ChevronDown, Languages, List, ListMusic, Settings2, Table2 } from '@lucide/vue'
+import { BookOpenText, Check, ChevronDown, Copy, FileText, Languages, Link, List, ListMusic, Settings2, Share2, Table2 } from '@lucide/vue'
 import { AlbumTracklistBooklet, AlbumTracklistList, AlbumTracklistTable } from '#components'
 import { buildTracklist, defaultLanguageKey, parseLanguageKey } from '~/utils/tracklistView'
 
@@ -229,7 +261,65 @@ const openLyrics = (row: TracklistRow, prefer: 'original' | 'translation') => {
   showLyrics.value = true
 }
 
-provideTracklist({ prefs, locked: computed(() => Boolean(props.locked)), folded, toggleDisc, favoriting, toggleFavorite, openLyrics })
+// ── A track's credits, in a card under its people button: hover, a tap, a press or the keyboard opens it.
+const peopleCard = useHoverCard(list, '[data-people-card]', { enabled: !previewing })
+const peopleRow = computed(() => rowsById.value.get(Number(peopleCard.current.value?.dataset.peopleCard)) ?? null)
+const openPeople = (button: HTMLElement) => {
+  if (!previewing && button.dataset.peopleCard) peopleCard.open(button)
+}
+
+// ── The rows' more menu: one popover, anchored on the "…" that opened it. Pressing the same "…" again closes it; a
+// press on another one closes it (a press outside) and opens it there.
+const moreOpen = ref(false)
+const moreRow = shallowRef<TracklistRow | null>(null)
+const moreAnchor = shallowRef<HTMLElement | null>(null)
+const moreFor = ref<number | null>(null)
+const moreBox = ref<HTMLElement | null>(null)
+const openMore = (row: TracklistRow, button: HTMLElement) => {
+  if (previewing) return
+  if (moreOpen.value && moreFor.value === row.id) {
+    moreOpen.value = false
+    return
+  }
+  moreRow.value = row
+  moreAnchor.value = button
+  moreFor.value = row.id
+  moreOpen.value = true
+}
+watch(moreOpen, (open) => {
+  if (open) {
+    // Into the menu for the keyboard; a mouse press shows no ring for it
+    void nextTick(() => moreBox.value?.querySelector<HTMLElement>('button:not(:disabled)')?.focus({ preventScroll: true }))
+    return
+  }
+  moreFor.value = null
+  // Escape or a choice leaves focus in the closing menu: back to the "…"
+  const focused = document.activeElement
+  if (!focused || focused === document.body || moreBox.value?.contains(focused)) moreAnchor.value?.focus({ preventScroll: true })
+})
+
+// Rows the size of the titles they act on: 13px text, 14px icons, 28px tall
+const MORE_ITEM = 'gap-2! px-2.5! py-1! text-13! [&_svg]:size-3.5!'
+
+const { showToast } = useToast()
+const copy = async (text: string, done: string) => {
+  moreOpen.value = false
+  try {
+    await navigator.clipboard.writeText(text)
+    showToast(done)
+  } catch {
+    showToast(t('album.tracklist.copy_failed', { text }), 'error')
+  }
+}
+const viewLyrics = () => {
+  moreOpen.value = false
+  if (moreRow.value) openLyrics(moreRow.value, 'original')
+}
+// The title as shown, in the chosen title language
+const copyTitle = () => moreRow.value && copy(moreRow.value.title, t('album.tracklist.title_copied'))
+const copyLink = () => moreRow.value && copy(`${window.location.origin}/tracks/${moreRow.value.id}`, t('album.tracklist.link_copied'))
+
+provideTracklist({ prefs, locked: computed(() => Boolean(props.locked)), folded, toggleDisc, favoriting, toggleFavorite, openLyrics, openPeople, openMore, moreFor })
 
 // ── The artist hover card, one for the whole list; titles have none (2026-11-02).
 const artistCard = useHoverCard(list, '[data-artist-card]')

@@ -21,8 +21,9 @@ export const useTracklistPrefs = (
 }
 
 /**
- * What every part of the tracklist shares: the preferences, folded discs, favourites and the lyrics dialog. The
- * tracklist provides it; styles and row parts inject it, so a new style only renders rows.
+ * What every part of the tracklist shares: the preferences, folded discs, favourites, the lyrics dialog, the
+ * credits card and the row's more menu. The tracklist provides it; styles and row parts inject it, so a new style only renders rows.
+ * The dialog, the card and the menu are one each for the whole list, not one per row.
  */
 export interface TracklistContext {
   prefs: ComputedRef<TracklistPrefs>
@@ -34,6 +35,12 @@ export interface TracklistContext {
   favoriting: Ref<Set<number>>
   toggleFavorite: (row: TracklistRow) => void
   openLyrics: (row: TracklistRow, prefer: 'original' | 'translation') => void
+  /** The card listing the track's credits by role, under its people button (it also opens on hover and on a tap) */
+  openPeople: (button: HTMLElement) => void
+  /** The more menu (copy title, copy link, share) under `button`; again on the same row closes it */
+  openMore: (row: TracklistRow, button: HTMLElement) => void
+  /** The row whose more menu is open */
+  moreFor: Ref<number | null>
 }
 
 const KEY: InjectionKey<TracklistContext> = Symbol('album-tracklist')

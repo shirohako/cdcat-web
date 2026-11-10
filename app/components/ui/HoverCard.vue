@@ -16,12 +16,15 @@ const props = withDefaults(defineProps<{
   /** Names the card for screen readers */
   label?: string
   textInset?: number
-}>(), { placement: 'bottom-start', label: undefined, textInset: undefined })
+  /** A point on the card's edge aimed at the hovered element (UiPopover `arrow`); the card sits a little further off */
+  arrow?: boolean
+}>(), { placement: 'bottom-start', label: undefined, textInset: undefined, arrow: false })
 
 const offset = computed(() => {
-  if (props.textInset === undefined || !props.anchor) return 6
+  const gap = props.arrow ? 9 : 6
+  if (props.textInset === undefined || !props.anchor) return gap
   const style = getComputedStyle(props.anchor)
-  return { mainAxis: 6, crossAxis: (Number.parseFloat(style.paddingLeft) || 0) + (Number.parseFloat(style.borderLeftWidth) || 0) - props.textInset }
+  return { mainAxis: gap, crossAxis: (Number.parseFloat(style.paddingLeft) || 0) + (Number.parseFloat(style.borderLeftWidth) || 0) - props.textInset }
 })
 
 const emit = defineEmits<{ enter: [], leave: [], close: [] }>()
@@ -34,6 +37,7 @@ const emit = defineEmits<{ enter: [], leave: [], close: [] }>()
     :placement="placement"
     :offset="offset"
     :label="label"
+    :arrow="arrow"
     v-bind="$attrs"
     @update:open="value => value || emit('close')"
     @pointerenter="emit('enter')"
