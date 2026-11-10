@@ -13,6 +13,7 @@ import { joinKind, joinText, nameParts } from '~/utils/artistLine'
  * Asayami &" / "Mei Naganowa" / "feat. L4hee"), never inside one, nor between "feat." and the 客串 after it.
  * No joiners: the tags simply follow one another. They wrap with a small gap, stack one per line with `stack` (to the
  * right with `end`), or sit in the text around them with `inline`, for a line cut with ….
+ * A name with no artist page, or printed other than the artist's own name, shows whole in a tooltip (CatalogArtistName `tip`).
  */
 const props = defineProps<{
   people: TracklistPerson[]
@@ -22,6 +23,7 @@ const props = defineProps<{
 }>()
 
 const { prefs } = useTracklist()
+const creditTip = useCreditTip()
 
 const layout = computed(() => {
   if (props.inline) return '[&>*:not(:last-child)]:mr-1'
@@ -130,7 +132,7 @@ const namePad = (person: TracklistPerson, glued: boolean) => {
             <span v-if="name.gap" class="text-meta [word-spacing:0.125rem]">{{ name.gap }}</span>
             <span class="whitespace-nowrap">
               <span v-if="name.prefix" class="text-meta [word-spacing:0.125rem]">{{ name.prefix }}</span>
-              <CatalogArtistName :name="name.person.name" :artist-id="name.person.artistId" :artist-name="name.person.artistName" :card="prefs.artistCard" :link-class="flowLinkClass(name)" />
+              <CatalogArtistName tip :name="name.person.name" :artist-id="name.person.artistId" :artist-name="name.person.artistName" :card="prefs.artistCard" :link-class="flowLinkClass(name)" />
               <span v-if="name.person.detail" class="ml-1 inline-flex"><CatalogCreditNote :note="name.person.detail" /></span>
               <span v-if="name.suffix" class="ml-px text-meta">{{ name.suffix }}</span>
             </span>
@@ -148,13 +150,18 @@ const namePad = (person: TracklistPerson, glued: boolean) => {
         <template v-for="(member, position) in members(person)" :key="member.creditId">
           <!-- The words are pulled into the names' 5px patches (joinClass) -->
           <span v-if="position" class="shrink-0 text-meta" :class="joinClass(member.joinPhrase ?? '')">{{ member.joinPhrase }}</span>
-          <span v-if="whole(person)" class="credit-link truncate">{{ member.name }}</span>
-          <CatalogArtistName v-else :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="linkClass(member, gluedNames(person).has(member.creditId))" truncate :class="namePad(member, gluedNames(person).has(member.creditId))" />
+          <!-- A tag linked whole has the artist card; with the card off, a printed name other than the artist's own is
+               spelled out in a tooltip, as CatalogArtistName does -->
+          <UiTooltip v-if="whole(person) && !prefs.artistCard && creditTip(member.name, member.artistId, member.artistName)" :text="creditTip(member.name, member.artistId, member.artistName)" class="whitespace-pre-line leading-5!">
+            <span class="credit-link truncate">{{ member.name }}</span>
+          </UiTooltip>
+          <span v-else-if="whole(person)" class="credit-link truncate">{{ member.name }}</span>
+          <CatalogArtistName v-else tip :name="member.name" :artist-id="member.artistId" :artist-name="member.artistName" :card="prefs.artistCard" :link-class="linkClass(member, gluedNames(person).has(member.creditId))" truncate :class="namePad(member, gluedNames(person).has(member.creditId))" />
           <span v-if="member.detail" class="inline-flex shrink-0 pr-0.75" :class="notePull(member, true)"><CatalogCreditNote :note="member.detail" /></span>
           <template v-if="member.guests.length">
             <span class="-mx-0.75 shrink-0 text-meta">feat.</span>
             <span v-for="(guest, index) in member.guests" :key="guest.creditId" class="inline-flex min-w-0 items-center">
-              <CatalogArtistName :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="linkClass(guest, gluedNames(person).has(guest.creditId))" truncate :class="namePad(guest, gluedNames(person).has(guest.creditId))" />
+              <CatalogArtistName tip :name="guest.name" :artist-id="guest.artistId" :artist-name="guest.artistName" :card="prefs.artistCard" :link-class="linkClass(guest, gluedNames(person).has(guest.creditId))" truncate :class="namePad(guest, gluedNames(person).has(guest.creditId))" />
               <span v-if="guest.detail" class="inline-flex shrink-0 pr-0.75" :class="notePull(guest, false)"><CatalogCreditNote :note="guest.detail" /></span>
               <span v-if="index < member.guests.length - 1" class="mr-0.5 text-meta">,</span>
             </span>

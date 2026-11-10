@@ -34,14 +34,16 @@
     },
     "track_people": {
       "title": "Track credits",
-      "count": "{count} person | {count} people",
       "name_only_count": "({count} name only)",
       "all": "All tracks",
       "view_label": "View",
       "view_roles": "By person",
       "view_tracks": "By track",
       "view_role_groups": "By role",
-      "collapse": "Show less"
+      "collapse": "Show less",
+      "copy_row": "Copy this row",
+      "row_copied": "Copied",
+      "copy_failed": "Couldn't copy"
     },
     "section": {
       "description": "Description",
@@ -2016,6 +2018,10 @@
     "role_tip": {
       "title": "Job title: {label}",
       "role": "Role: {role}"
+    },
+    "credit_tip": {
+      "artist": "Artist: {name}",
+      "credited": "Credited as: {name}"
     },
     "collection": {
       "titles": "Other names",

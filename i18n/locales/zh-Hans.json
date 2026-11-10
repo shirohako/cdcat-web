@@ -34,14 +34,16 @@
     },
     "track_people": {
       "title": "曲目参与人员",
-      "count": "{count} 位",
       "name_only_count": "(仅署名 {count})",
       "all": "全曲",
       "view_label": "显示方式",
       "view_roles": "按人员",
       "view_tracks": "按曲目",
       "view_role_groups": "按角色",
-      "collapse": "收起"
+      "collapse": "收起",
+      "copy_row": "复制这一行",
+      "row_copied": "已复制",
+      "copy_failed": "复制失败"
     },
     "section": {
       "description": "简介",
@@ -2016,6 +2018,10 @@
     "role_tip": {
       "title": "具体职务：{label}",
       "role": "角色分类：{role}"
+    },
+    "credit_tip": {
+      "artist": "关联艺术家：{name}",
+      "credited": "署名：{name}"
     },
     "collection": {
       "titles": "其他名称",

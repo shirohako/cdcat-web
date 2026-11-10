@@ -10,7 +10,9 @@ import { nameParts } from '~/utils/artistLine'
  * useHoverCard). A name with no artist page is a grey tag too, not a link; which part links is shown by the reader's
  * chosen style (useCreditLinks: faded or dotted). A note (detail) is
  * an ⓘ inside the tag; with one, the name is a patch too, so the ⓘ isn't inside the link.
- * `size` sm is the bold name of the by-person list, xs the small tags elsewhere.
+ * `size` sm is the bold name of the by-person list, xs the small tags elsewhere. With `tip` (the 参与创作的人 card) a name
+ * with no artist page, or printed other than the artist's own name, shows whole in a tooltip (CatalogArtistName); a tag
+ * linked whole has the artist card instead.
  */
 const props = withDefaults(defineProps<{
   name: string
@@ -18,7 +20,8 @@ const props = withDefaults(defineProps<{
   artistName?: string | null
   detail?: string | null
   size?: 'xs' | 'sm'
-}>(), { artistName: null, detail: null, size: 'xs' })
+  tip?: boolean
+}>(), { artistName: null, detail: null, size: 'xs', tip: false })
 
 /** The printed name around the artist's own name, null when it holds none, or nothing else (a different case, "LBG" for lbg) */
 const parts = computed(() => {
@@ -69,7 +72,7 @@ const namePad = computed(() => {
     ]"
   >
     <span v-if="whole" class="credit-link truncate">{{ name }}</span>
-    <CatalogArtistName v-else :name="name" :artist-id="artistId" :artist-name="artistName" card :link-class="patch.join(' ')" truncate :class="namePad" />
+    <CatalogArtistName v-else :name="name" :artist-id="artistId" :artist-name="artistName" card :link-class="patch.join(' ')" truncate :tip="tip" :class="namePad" />
     <span v-if="detail" class="inline-flex shrink-0" :class="notePull"><CatalogCreditNote :note="detail" /></span>
   </component>
 </template>

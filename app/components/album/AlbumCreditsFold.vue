@@ -14,14 +14,13 @@
 import { ChevronRight } from '@lucide/vue'
 
 /**
- * The fold header of the credits card's two lists: an arrow, the list's name and a tag with how many people are in it,
- * those with no artist page (仅署名, names only) counted again in brackets when there are any.
+ * The fold header of the credits card's two lists: an arrow, the list's name and a tag with how many people are in it
+ * (the bare number, no unit), those with no artist page (仅署名, names only) counted again in brackets when there are any.
  */
 const props = withDefaults(defineProps<{ open: boolean, title: string, count: number, nameOnly?: number }>(), { nameOnly: 0 })
 
 const { t } = useI18n()
 const countText = computed(() => {
-  const count = t('album.track_people.count', { count: props.count }, props.count)
-  return props.nameOnly ? `${count} ${t('album.track_people.name_only_count', { count: props.nameOnly })}` : count
+  return props.nameOnly ? `${props.count} ${t('album.track_people.name_only_count', { count: props.nameOnly })}` : String(props.count)
 })
 </script>

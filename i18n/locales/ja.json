@@ -34,14 +34,16 @@
     },
     "track_people": {
       "title": "曲ごとのクレジット",
-      "count": "{count} 人",
       "name_only_count": "(表記のみ {count})",
       "all": "全曲",
       "view_label": "表示",
       "view_roles": "人ごと",
       "view_tracks": "曲ごと",
       "view_role_groups": "役割ごと",
-      "collapse": "閉じる"
+      "collapse": "閉じる",
+      "copy_row": "この行をコピー",
+      "row_copied": "コピーしました",
+      "copy_failed": "コピーできませんでした"
     },
     "section": {
       "description": "概要",
@@ -2016,6 +2018,10 @@
     "role_tip": {
       "title": "具体的な役職：{label}",
       "role": "役割の分類：{role}"
+    },
+    "credit_tip": {
+      "artist": "アーティスト：{name}",
+      "credited": "クレジット表記：{name}"
     },
     "collection": {
       "titles": "別名",
