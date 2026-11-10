@@ -918,7 +918,7 @@ const texts: ApiDocsTexts = {
         'id': '가사 ID',
         'track_id': '곡 ID',
         'kind': '원문, 번역, 음역 중 하나',
-        'language': '언어(BCP 47). 예: `ja`, `zh-Hans`, `ja-Latn`',
+        'language': '언어(BCP 47). 예: `ja`, `zh-Hans`, `ja-Latn`. 인공어는 `art`',
         'translation_of_id': '번역과 음역에만 있습니다. 대응하는 원문 가사의 ID로, 줄 단위로 대조할 때 씁니다.',
         'format': '본문 형식',
         'translator': '번역자 표기명',

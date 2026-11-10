@@ -919,7 +919,7 @@ const texts: ApiDocsTexts = {
         'id': '歌词 ID。',
         'track_id': '曲目 ID。',
         'kind': '原文、翻译还是音译。',
-        'language': '语言（BCP 47），例如 `ja`、`zh-Hans`、`ja-Latn`。',
+        'language': '语言（BCP 47），例如 `ja`、`zh-Hans`、`ja-Latn`；`art` 为造语。',
         'translation_of_id': '翻译和音译才有：对应的原文歌词 ID，可以逐行对照。',
         'format': '正文的格式。',
         'translator': '译者的署名。',

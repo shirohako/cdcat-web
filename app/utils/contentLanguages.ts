@@ -13,6 +13,12 @@ export const LANGUAGES = [
   'ms', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'yue',
 ]
 
+/**
+ * 造语: lyrics in a made-up language (Yuki Kajiura's songs and the like), as the BCP 47 tag for artificial languages.
+ * Offered for lyrics only (UiLanguageSelect `constructed`); browsers have no name for it, so localeName gives one.
+ */
+export const CONSTRUCTED_LANGUAGE = 'art'
+
 export const isReading = (code: string) => /-(Latn|Hrkt)$/.test(code)
 
 /** `text` as a tag the API accepts, in canonical case (pt-br → pt-BR); null when it isn't one. */
@@ -39,7 +45,7 @@ const nameIn = (language: string, code: string) => {
 export const languageKeywords = (code: string) => {
   let words = keywords.get(code)
   if (words === undefined) {
-    words = `${nameIn(code, code)} ${nameIn('en', code)}`
+    words = code === CONSTRUCTED_LANGUAGE ? 'conlang constructed artificial 造语 造語 인공어' : `${nameIn(code, code)} ${nameIn('en', code)}`
     keywords.set(code, words)
   }
   return words

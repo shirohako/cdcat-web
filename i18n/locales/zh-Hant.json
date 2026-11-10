@@ -1807,6 +1807,7 @@
     },
     "romanized": "{language}（羅馬字）",
     "kana_reading": "{language}（假名讀音）",
+    "constructed_language": "造語",
     "new_item": "新建：{ref}",
     "yes": "是",
     "no": "否",

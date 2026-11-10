@@ -919,7 +919,7 @@ const texts: ApiDocsTexts = {
         'id': 'Lyrics ID.',
         'track_id': 'Track ID.',
         'kind': 'Original, translation or transliteration.',
-        'language': 'Language (BCP 47), for example `ja`, `zh-Hans`, `ja-Latn`.',
+        'language': 'Language (BCP 47), for example `ja`, `zh-Hans`, `ja-Latn`; `art` is a constructed language.',
         'translation_of_id': 'Only for translations and transliterations: the ID of the original lyrics they correspond to, for line-by-line comparison.',
         'format': 'Format of the text.',
         'translator': 'The translator\'s credited name.',

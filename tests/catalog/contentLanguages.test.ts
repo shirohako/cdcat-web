@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isReading, languageKeywords, languageTag } from '../../app/utils/contentLanguages'
+import { CONSTRUCTED_LANGUAGE, isReading, languageKeywords, languageTag } from '../../app/utils/contentLanguages'
 
 describe('languageTag', () => {
   it('canonicalizes tags the API accepts', () => {
@@ -27,5 +27,12 @@ describe('languages', () => {
   it('finds a language by its own and its English name', () => {
     expect(languageKeywords('de')).toContain('Deutsch')
     expect(languageKeywords('de')).toContain('German')
+  })
+
+  it('stores 造语 as a tag the API accepts and finds it by its names', () => {
+    expect(languageTag(CONSTRUCTED_LANGUAGE)).toBe('art')
+    expect(languageKeywords(CONSTRUCTED_LANGUAGE)).toContain('conlang')
+    expect(languageKeywords(CONSTRUCTED_LANGUAGE)).toContain('造语')
+    expect(isReading(CONSTRUCTED_LANGUAGE)).toBe(false)
   })
 })

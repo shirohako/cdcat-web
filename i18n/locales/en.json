@@ -1807,6 +1807,7 @@
     },
     "romanized": "{language} (romanized)",
     "kana_reading": "{language} (kana reading)",
+    "constructed_language": "Constructed language",
     "new_item": "new: {ref}",
     "yes": "Yes",
     "no": "No",

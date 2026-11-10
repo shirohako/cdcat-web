@@ -7,7 +7,7 @@
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.language') }}</span>
-        <UiLanguageSelect v-model="form.language" :suggested="originals.map(original => original.language)" readings size="sm" :invalid="tried && !form.language" />
+        <UiLanguageSelect v-model="form.language" :suggested="originals.map(original => original.language)" readings constructed size="sm" :invalid="tried && !form.language" />
       </label>
       <label class="form-control">
         <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.format') }}</span>

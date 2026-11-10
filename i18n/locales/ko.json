@@ -1807,6 +1807,7 @@
     },
     "romanized": "{language} (로마자 표기)",
     "kana_reading": "{language} (가나 표기)",
+    "constructed_language": "인공어",
     "new_item": "새 항목: {ref}",
     "yes": "예",
     "no": "아니요",

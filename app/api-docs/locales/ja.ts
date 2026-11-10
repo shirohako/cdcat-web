@@ -919,7 +919,7 @@ const texts: ApiDocsTexts = {
         'id': '歌詞 ID。',
         'track_id': 'トラック ID。',
         'kind': '原文、翻訳、音訳のどれか。',
-        'language': '言語（BCP 47）。例：`ja`、`zh-Hans`、`ja-Latn`。',
+        'language': '言語（BCP 47）。例：`ja`、`zh-Hans`、`ja-Latn`。造語は `art`。',
         'translation_of_id': '翻訳と音訳にだけあります：対応する原文の歌詞 ID で、行ごとに対照できます。',
         'format': '本文の形式。',
         'translator': '訳者のクレジット。',

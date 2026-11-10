@@ -1,5 +1,6 @@
 import type { CatalogAttribute, CatalogTitle } from '~/types/catalog'
 import type { DatePrecision } from '~/types/entry'
+import { CONSTRUCTED_LANGUAGE } from '~/utils/contentLanguages'
 
 /** Enums whose labels live outside catalog.<enum>, e.g. album_type under albums.type. */
 const ENUM_GROUPS: Record<string, string> = {
@@ -43,8 +44,9 @@ export const useCatalogDisplay = () => {
   const titleIn = (titles: CatalogTitle[] | null | undefined, wanted: { locale: string, kind: string } | null) =>
     wanted ? titles?.find(title => title.locale === wanted.locale && title.kind === wanted.kind)?.title ?? null : null
 
-  /** "日本語 (Latin)" style names for BCP 47 tags, e.g. ja-Latn. */
+  /** "日本語 (Latin)" style names for BCP 47 tags, e.g. ja-Latn; 造语 for the artificial-language tag. */
   const localeName = (code: string) => {
+    if (code === CONSTRUCTED_LANGUAGE) return t('catalog.constructed_language')
     const [language, script] = code.split('-')
     if (script === 'Latn' && language) return t('catalog.romanized', { language: languageName(language) })
     if (script === 'Hrkt' && language) return t('catalog.kana_reading', { language: languageName(language) })
