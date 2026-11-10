@@ -1805,8 +1805,8 @@
       "social": "社交媒体",
       "other": "其他"
     },
-    "romanized": "{language}（罗马字）",
-    "kana_reading": "{language}（假名读音）",
+    "romanized": "{language} (罗马字)",
+    "kana_reading": "{language} (假名读音)",
     "constructed_language": "造语",
     "new_item": "新建：{ref}",
     "yes": "是",
