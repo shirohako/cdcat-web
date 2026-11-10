@@ -6,6 +6,7 @@ import type { Album, AlbumProduct } from '~/types/album'
 import type { ProductPrice } from '~/types/document'
 import type { TracklistDisc, TracklistHelpers, TracklistPerson, TracklistRow } from './tracklistView'
 import { buildTracklist, defaultLanguageKey, groupCredits, parseLanguageKey } from './tracklistView'
+import { joinText } from './artistLine'
 
 export type AlbumExportFormat = 'csv' | 'markdown' | 'json'
 
@@ -51,7 +52,7 @@ const numberOf = (row: TracklistRow) => row.number.replace(/^0+(?=\d)/, '')
 const personText = (person: TracklistPerson, helpers: AlbumExportHelpers): string => {
   const own = `${person.name}${person.detail ? helpers.aside(person.detail) : ''}`
   const guests = person.guests.length ? `${own} feat. ${person.guests.map(guest => personText(guest, helpers)).join(helpers.separator)}` : own
-  return [guests, ...(person.joined ?? []).map(next => `${next.joinPhrase} ${personText(next, helpers)}`)].join(' ')
+  return [guests, ...(person.joined ?? []).map(next => `${joinText(next.joinPhrase ?? '')}${personText(next, helpers)}`)].join('')
 }
 
 const peopleText = (people: TracklistPerson[], helpers: AlbumExportHelpers) => people.map(person => personText(person, helpers)).join(helpers.separator)

@@ -93,6 +93,12 @@ describe('albumCsv', () => {
     expect(csv).toContain('awfuless meets PODA')
   })
 
+  it('puts a comma joiner right after the name before it', () => {
+    const lead = credit('artist', 'Asatsumei')
+    const csv = albumCsv(album({ discs: [disc(1, [track(1, 'T', [lead, credit('artist', 'Asayami', { join_phrase: ',' }), credit('artist', 'Mei Naganowa', { join_phrase: '&' })])])] }), source, helpers)
+    expect(csv).toContain('Asatsumei, Asayami & Mei Naganowa')
+  })
+
   it('puts a 客串 with the credit it belongs to', () => {
     const lead = credit('artist', 'Xeno')
     const csv = albumCsv(album({ discs: [disc(1, [track(1, 'T', [lead, credit('featuring', 'eili', { parent_id: lead.id })])])] }), source, helpers)

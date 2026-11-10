@@ -79,3 +79,23 @@ export function nameParts(name: string, artistName: string | null | undefined): 
   if (at < 0) return null
   return [name.slice(0, at), name.slice(at, at + artistName.length), name.slice(at + artistName.length)]
 }
+
+/** A join_phrase that is punctuation sitting right after the name before it: "A, B", "A、B" (no space before it). */
+const HUGGING = /^[,;:]/
+/** Full-width punctuation, which carries its own space: no space after it either. */
+const FULL_WIDTH = /^[、，；：・／]/
+
+/** How a join_phrase hugs the names around it: 'word' ("A & B"), 'comma' ("A, B") or 'full' ("A、B"). */
+export function joinKind(phrase: string): 'word' | 'comma' | 'full' {
+  const word = phrase.trim()
+  if (FULL_WIDTH.test(word)) return 'full'
+  return HUGGING.test(word) ? 'comma' : 'word'
+}
+
+/** The text between two names a join_phrase joins: "A & B", "A, B", "A、B". */
+export function joinText(phrase: string): string {
+  const word = phrase.trim()
+  const kind = joinKind(word)
+  if (kind === 'full') return word
+  return kind === 'comma' ? `${word} ` : ` ${word} `
+}

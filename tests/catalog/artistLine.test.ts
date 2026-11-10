@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { attachGuests, lineText, nameParts, parentCandidates, parentOf } from '../../app/utils/artistLine'
+import { attachGuests, joinText, lineText, nameParts, parentCandidates, parentOf } from '../../app/utils/artistLine'
 
 type Credit = { id: number | string, track_id: number | string | null, parent_id?: number | string | null, role: string, sort_order: number, name: string }
 const credit = (id: Credit['id'], role: string, sortOrder: number, extra: Partial<Credit> = {}): Credit =>
@@ -35,5 +35,16 @@ describe('credit parents', () => {
     expect(nameParts('CV: YUKI', 'yuki')).toEqual(['CV: ', 'YUKI', ''])
     expect(nameParts('Yuki Kajiura', '梶浦由記')).toBeNull()
     expect(nameParts('void', 'void')).toBeNull()
+  })
+})
+
+describe('joinText', () => {
+  it('spaces a word on both sides, a comma only after, full-width punctuation not at all', () => {
+    expect(joinText('&')).toBe(' & ')
+    expect(joinText('meets')).toBe(' meets ')
+    expect(joinText(',')).toBe(', ')
+    expect(joinText(' ; ')).toBe('; ')
+    expect(joinText('、')).toBe('、')
+    expect(joinText('，')).toBe('，')
   })
 })

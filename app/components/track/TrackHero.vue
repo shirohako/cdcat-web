@@ -134,7 +134,7 @@
 import type { TrackDetail } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
 import type { TracklistArtist, TracklistArtistRole } from '~/utils/tracklistView'
-import { ARTIST_ROLE, attachGuests, FEATURING_ROLE } from '~/utils/artistLine'
+import { ARTIST_ROLE, attachGuests, FEATURING_ROLE, joinText } from '~/utils/artistLine'
 import { ChevronLeft, ChevronRight, Clock, Disc3, Edit, FileText, Heart, Music, UserRound } from '@lucide/vue'
 
 /** The top of a track page: the album's cover and banner, the title, favorite, edit and moving to the next track. */
@@ -161,7 +161,7 @@ type LineName = { creditId: number | null, parentId: number | null, id: number |
 const named = (credit: CatalogCredit): LineName => ({
   creditId: credit.id, parentId: credit.parent_id ?? null, id: credit.artist?.id ?? null, name: credit.credited_as || credit.artist?.name || '', artistName: credit.artist?.name ?? null, joinPhrase: credit.join_phrase ?? null,
 })
-const between = (next: LineName) => next.joinPhrase ? ` ${next.joinPhrase} ` : ', '
+const between = (next: LineName) => next.joinPhrase ? joinText(next.joinPhrase) : ', '
 /** The artist line (utils/artistLine): the track's own 艺术家, else the album's byline, each with its 客串. */
 const line = computed(() => {
   const own = credits.value.filter(credit => credit.role === ARTIST_ROLE).map(named)
