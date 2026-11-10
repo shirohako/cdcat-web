@@ -82,12 +82,12 @@
         "full": "자세히"
       },
       "style_hints": {
-        "list_compact": "구분선이 있는 줄, 제목과 길이만",
-        "list_comfy": "제목 아래에 보컬·편곡·원곡",
-        "list_full": "모든 크레딧을 역할마다 한 줄로",
-        "booklet_full": "CD 부클릿처럼, 왼쪽에 크레딧",
-        "table_comfy": "보컬·편곡·가사를 열로",
-        "table_full": "작곡·작사·편곡·보컬을 열로"
+        "list_compact": "한 곡 한 줄, 크레딧은 인원 버튼에",
+        "list_comfy": "제목 아래 주요 크레딧, 곡마다 펼치기",
+        "list_full": "곡마다 모든 크레딧을 역할별 한 줄로",
+        "booklet_full": "CD 부클릿처럼, 크레딧은 두 단으로",
+        "table_comfy": "참여한 모두를 한 열에",
+        "table_full": "크레딧마다 열, 좌우로 스크롤"
       },
       "styles": {
         "list": "목록",
@@ -144,6 +144,10 @@
       "title_copied": "곡명을 복사했어요",
       "link_copied": "링크를 복사했어요",
       "copy_failed": "복사하지 못했어요: {text}",
+      "fullscreen": "전체 화면으로 보기",
+      "scroll_prev": "이전 열",
+      "scroll_next": "다음 열",
+      "scroll_area": "곡별 크레딧, 좌우로 스크롤",
       "columns": {
         "title": "제목",
         "duration": "재생 시간",

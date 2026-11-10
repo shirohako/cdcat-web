@@ -82,12 +82,12 @@
         "full": "完整"
       },
       "style_hints": {
-        "list_compact": "带分隔线，只有标题和时长",
-        "list_comfy": "标题下加演唱、编曲和原曲",
-        "list_full": "全部署名，一个角色一行",
-        "booklet_full": "像 CD 内页，左署名右备注",
-        "table_comfy": "演唱、编曲和歌词各一列",
-        "table_full": "作曲、作词、编曲、演唱各一列"
+        "list_compact": "一首一行，署名收进人数按钮",
+        "list_comfy": "标题下列出主要署名，每首可展开",
+        "list_full": "每首列出全部署名，一个角色一行",
+        "booklet_full": "像 CD 内页，署名分两栏排开",
+        "table_comfy": "所有参与人员合在一列",
+        "table_full": "每种署名一列，可以左右滚动"
       },
       "styles": {
         "list": "清单",
@@ -144,6 +144,10 @@
       "title_copied": "已复制曲名",
       "link_copied": "已复制链接",
       "copy_failed": "没能复制，请手动复制：{text}",
+      "fullscreen": "全屏查看",
+      "scroll_prev": "向左一列",
+      "scroll_next": "向右一列",
+      "scroll_area": "曲目署名，可以左右滚动",
       "columns": {
         "title": "标题",
         "duration": "时长",

@@ -2,10 +2,10 @@ import type { AlbumDisc, AlbumTrack } from '../../app/types/album'
 import type { CatalogCredit } from '../../app/types/catalog'
 import type { TracklistHelpers, TracklistRoleGroup } from '../../app/utils/tracklistView'
 import { describe, expect, it } from 'vitest'
-import { buildTracklist, defaultLanguageKey, mergeSamePeople, normalizeTracklistPrefs } from '../../app/utils/tracklistView'
+import { buildTracklist, defaultLanguageKey, mergeSamePeople, normalizeTracklistPrefs, tableLayout } from '../../app/utils/tracklistView'
 
-const ORDER = ['artist', 'composer', 'lyricist', 'arranger', 'vocals', 'voice_actor', 'featuring']
-const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'composition', lyricist: 'lyrics', arranger: 'arrangement', vocals: 'vocals', voice_actor: 'vocals', featuring: 'vocals' }
+const ORDER = ['artist', 'composer', 'lyricist', 'arranger', 'vocals', 'voice_actor', 'featuring', 'performer', 'mixing']
+const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'composition', lyricist: 'lyrics', arranger: 'arrangement', vocals: 'vocals', voice_actor: 'vocals', featuring: 'vocals', performer: 'performance', mixing: 'engineering' }
 
 const helpers: TracklistHelpers = {
   titleIn: (titles, wanted) => (wanted ? titles.find(title => title.locale === wanted.locale && title.kind === wanted.kind)?.title ?? null : null),
@@ -127,7 +127,6 @@ describe('buildTracklist', () => {
     const split = row([titled('A', 1, 'Strings Arrangement'), titled('B', 2, 'Brass Arrangement'), credit('arranger', 'C', 3)])
     expect(split.rows[0]!.groups.map(group => [group.label, group.people.map(person => person.name)])).toEqual([['Strings Arrangement', ['A']], ['Brass Arrangement', ['B']], [helpers.roleName('arranger'), ['C']]])
     expect(split.rows[0]!.maker).toMatchObject({ label: helpers.roleName('arranger'), people: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] })
-    expect(split.roles).toEqual([{ role: 'arranger', label: helpers.roleName('arranger'), category: 'arrangement' }])
     expect(row([titled('A', 1, 'Strings Arrangement')]).rows[0]!.maker).toMatchObject({ label: 'Strings Arrangement', roleName: helpers.roleName('arranger') })
   })
 
@@ -170,10 +169,47 @@ describe('buildTracklist', () => {
     expect(alone.groups).toEqual([alone.lead])
   })
 
-  it('lists the roles credited on each disc for the table', () => {
-    const { discs } = buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('vocals', 'A', 1)] }), track(2, { credits: [credit('composer', 'B', 2)] })]), disc(2, [track(1)])], bonuses: [], language: null }, helpers)
-    expect(discs[0]!.roles.map(role => role.role)).toEqual(['composer', 'vocals'])
-    expect(discs[1]!.roles).toEqual([])
+  it('gives the table a column for each credit group on two tracks or more, the rest to 其他人员', () => {
+    const played = (role_label: string, name: string, id: number) => ({ ...credit('performer', name, id), role_label })
+    const { discs } = buildTracklist({
+      discs: [disc(1, [
+        track(1, { credits: [credit('mixing', 'M', 9), played('Guitar', 'G', 1), credit('composer', 'A', 2)] }),
+        track(2, { credits: [credit('composer', 'B', 3), played('Guitar', 'G', 1), played('Drums', 'D', 4), credit('mixing', 'M', 9)] }),
+        track(3, { credits: [credit('composer', 'A', 2), played('Bass', 'E', 5), credit('vocals', 'V', 6)] }),
+      ])],
+      bonuses: [],
+      language: null,
+    }, helpers)
+    const table = tableLayout(discs[0]!.rows, helpers.roleOrder)
+    // The dictionary's order, the job titles of one role as they first come; Drums, Bass and the vocals once each
+    expect(table.columns.map(column => column.label)).toEqual(['COMPOSER', 'Guitar', 'MIXING'])
+    expect(table.columns[1]).toMatchObject({ role: 'performer', category: 'performance', tip: 'Guitar\nPERFORMER' })
+    expect(table.others.get(20)!.map(item => item.roles.map(role => role.label))).toEqual([['Drums']])
+    expect(table.others.get(30)!.map(item => item.roles.map(role => role.label))).toEqual([['VOCALS'], ['Bass']])
+    expect(table.others.get(10)).toEqual([])
+  })
+
+  it('puts no credit in a column on a one-track disc', () => {
+    const { discs } = buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('composer', 'A', 1), credit('arranger', 'A', 1), credit('vocals', 'V', 2)] })])], bonuses: [], language: null }, helpers)
+    const table = tableLayout(discs[0]!.rows, helpers.roleOrder)
+    expect(table.columns).toEqual([])
+    // Roles held by the same people share a line
+    expect(table.others.get(10)!.map(item => item.roles.map(role => role.role))).toEqual([['composer', 'arranger'], ['vocals']])
+  })
+
+  it('gives credits the same on every track their columns too', () => {
+    const same = () => [credit('composer', 'A', 1), credit('mixing', 'M', 9)]
+    const table = tableLayout(buildTracklist({ discs: [disc(1, [track(1, { credits: same() }), track(2, { credits: same() })])], bonuses: [], language: null }, helpers).discs[0]!.rows, helpers.roleOrder)
+    expect(table.columns.map(column => column.role)).toEqual(['composer', 'mixing'])
+    expect(table.others.get(10)).toEqual([])
+    expect(table.lines.get(10)!.map(item => item.roles.map(role => role.role))).toEqual([['composer'], ['mixing']])
+  })
+
+  it('gives the table a column for each attribute any track has, and ISRC', () => {
+    const attribute = (key: string, value: unknown) => ({ key, value }) as never
+    const { discs } = buildTracklist({ discs: [disc(1, [track(1, { attributes: [attribute('bpm', 128)] }), track(2, { isrc: 'JPX012500102', attributes: [attribute('key', 'C'), attribute('bpm', 96)] })]), disc(2, [track(1)])], bonuses: [], language: null }, helpers)
+    expect(tableLayout(discs[0]!.rows, helpers.roleOrder)).toMatchObject({ attributes: [{ key: 'bpm', label: 'BPM' }, { key: 'key', label: 'KEY' }], isrc: true })
+    expect(tableLayout(discs[1]!.rows, helpers.roleOrder)).toMatchObject({ attributes: [], isrc: false })
   })
 
   it('counts each artist\'s roles on the album, album-wide credits as 0', () => {

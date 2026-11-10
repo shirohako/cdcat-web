@@ -9,7 +9,8 @@ import type { TracklistDensity } from '~/utils/tracklistView'
 const props = defineProps<{ layout: string, density: TracklistDensity }>()
 
 interface Bar { x: number, y: number, w: number, h: number, tone: 'title' | 'meta' | 'faint' | 'tag' | 'number', r?: number }
-interface Rule { x1: number, x2: number, y: number, dotted?: boolean }
+/** A line, level unless `y2` is given (then it runs down from `y`) */
+interface Rule { x1: number, x2: number, y: number, y2?: number, dotted?: boolean }
 
 // Title lengths, so the rows don't look ruled
 const WIDTHS = [44, 30, 52, 38, 26, 48, 34, 41]
@@ -78,25 +79,39 @@ const drawing = computed(() => {
     }
   }
 
-  if (layout === 'table') {
-    // A header row, then the columns: 舒适 演唱, 编曲, lyrics; 完整 the four role columns and 其他人员
-    const columns = density === 'comfy' ? [5, 13, 48, 64, 78, 85] : [5, 11, 32, 44, 56, 68, 80, 88]
+  if (layout === 'table' && density === 'comfy') {
+    // A header row, then the columns: 参与人员, lyrics, length
+    const columns = [5, 13, 48, 64, 78, 85]
     columns.forEach((x, k) => bar(x, 4, k === 1 ? 8 : 5, 2.6, 'meta'))
     rules.push({ x1: 5, x2: 91, y: 9.5 })
     for (let i = 0; i < 5; i++) {
       const y = 14 + i * 10
       bar(5, y, 3, 3, 'meta')
-      bar(columns[1]!, y - 0.2, WIDTHS[i]! * (density === 'comfy' ? 0.62 : 0.42), 3.4, 'title')
-      if (density === 'comfy') {
-        bar(48, y - 0.2, 11, 3.4, 'faint')
-        bar(64, y - 0.2, 10, 3.4, 'faint')
-        bar(78, y - 0.4, 4, 4, 'tag')
-        bar(85, y, 6, 3, 'meta')
-      } else {
-        for (const x of [32, 44, 56, 68]) bar(x, y - 0.2, 9, 3.4, 'faint')
-        bar(80, y - 0.2, 7, 3.4, 'faint')
-        bar(88, y - 0.2, 6, 3.4, 'faint')
-      }
+      bar(13, y - 0.2, WIDTHS[i]! * 0.62, 3.4, 'title')
+      bar(48, y - 0.2, 11, 3.4, 'faint')
+      bar(64, y - 0.2, 10, 3.4, 'faint')
+      bar(78, y - 0.4, 4, 4, 'tag')
+      bar(85, y, 6, 3, 'meta')
+      if (i < 4) rules.push({ x1: 5, x2: 91, y: y + 6.5 })
+    }
+  }
+
+  if (layout === 'table' && density === 'full') {
+    // The number and title pinned on the left, the lyrics and length on the right, and between them role-tag headed
+    // columns that run on past the right edge
+    for (const x of [34, 46, 58, 70]) bar(x, 3.8, 7, 3, 'tag')
+    bar(5, 4, 3, 2.6, 'meta')
+    bar(11, 4, 8, 2.6, 'meta')
+    bar(86, 4, 5, 2.6, 'meta')
+    rules.push({ x1: 5, x2: 91, y: 9.5 }, { x1: 31.5, x2: 31.5, y: 2, y2: 61 }, { x1: 78.5, x2: 78.5, y: 2, y2: 61 })
+    for (let i = 0; i < 5; i++) {
+      const y = 14 + i * 10
+      bar(5, y, 3, 3, 'meta')
+      bar(11, y - 0.2, WIDTHS[i]! * 0.4, 3.4, 'title')
+      for (const x of [34, 46, 58]) bar(x, y - 0.2, 9, 3.4, 'faint')
+      bar(70, y - 0.2, 8, 3.4, 'faint')
+      bar(80.5, y - 0.4, 4, 4, 'tag')
+      bar(86.5, y, 5, 3, 'meta')
       if (i < 4) rules.push({ x1: 5, x2: 91, y: y + 6.5 })
     }
   }
@@ -107,7 +122,7 @@ const drawing = computed(() => {
 
 <template>
   <svg viewBox="0 0 96 64" class="block aspect-[3/2] h-auto rounded-[0.25rem] bg-sunken" aria-hidden="true">
-    <line v-for="(rule, index) in drawing.rules" :key="`r${index}`" :x1="rule.x1" :x2="rule.x2" :y1="rule.y" :y2="rule.y" :class="rule.dotted ? 'dotted' : 'rule'" />
+    <line v-for="(rule, index) in drawing.rules" :key="`r${index}`" :x1="rule.x1" :x2="rule.x2" :y1="rule.y" :y2="rule.y2 ?? rule.y" :class="rule.dotted ? 'dotted' : 'rule'" />
     <rect v-for="(bar, index) in drawing.bars" :key="`b${index}`" :x="bar.x" :y="bar.y" :width="bar.w" :height="bar.h" :rx="bar.r" :class="bar.tone" />
   </svg>
 </template>

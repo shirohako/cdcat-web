@@ -5,7 +5,7 @@ import { ARTIST_ROLE, attachGuests, FEATURING_ROLE } from './artistLine'
 /**
  * The album page's tracklist, worked out once for every style: shown titles, numbers, durations, credits grouped by
  * role with their names and categories, the key people of the 舒适 line, disc totals, and each artist's roles on the
- * album for the hover card. Row components only display what is here, so they call no composables.
+ * album for the hover card. 表格 · 完整's columns (tableLayout) are worked out by that view alone, when it shows. Row components only display what is here, so they call no composables.
  */
 
 export type TracklistDensity = 'compact' | 'comfy' | 'full'
@@ -164,8 +164,6 @@ export interface TracklistDisc {
   /** The disc's running time; null when any track's is unknown */
   duration: string | null
   rows: TracklistRow[]
-  /** The roles credited on this disc, in order, for the table's columns */
-  roles: Array<{ role: string, label: string, category: string }>
 }
 
 export interface TracklistArtist {
@@ -327,6 +325,67 @@ export const mergeSamePeople = (groups: Array<TracklistRoleGroup | null | undefi
   return credits
 }
 
+/** 表格 · 完整: a credit group gets a column of its own once this many tracks of the disc have it. */
+export const TABLE_COLUMN_TRACKS = 2
+
+export interface TracklistTableColumn {
+  /** The credit group's key: its role and printed job title, so each instrument of 演奏 (Guitar, Drums) is a column */
+  key: string
+  role: string
+  label: string
+  tip: string
+  category: string
+}
+
+export interface TracklistTableLayout {
+  /** The groups on at least TABLE_COLUMN_TRACKS tracks, in the dictionary's order, job titles as they first come */
+  columns: TracklistTableColumn[]
+  /** Each row's other groups (by track id), one line per set held by the same people: 其他人员, or 参与人员 with no columns */
+  others: Map<number, TracklistMergedCredit[]>
+  /** Each row's groups, the same way: the row's credits once the rows turn into blocks */
+  lines: Map<number, TracklistMergedCredit[]>
+  /** The attributes any track of the disc has (BPM …), as they first come: a column each, after the credits */
+  attributes: Array<{ key: string, label: string }>
+  /** Whether any track has an ISRC: its column, the last that scrolls */
+  isrc: boolean
+}
+
+/**
+ * 表格 · 完整's layout of one disc (user picks of 2026-11-11: B2, E1). A credit group (a role and its printed job
+ * title) gets a column once it is on TABLE_COLUMN_TRACKS tracks or more, the same people on every track or not; one on
+ * a single track goes to the row's 其他人员 cell, so a disc of one track has no columns at all. Columns come in the
+ * dictionary's order (`roleOrder`), the job titles of one role in the order they first come. (A 全碟署名 box for
+ * credits the same on every track, pick A3, was built and then dropped by the user the same day.)
+ */
+export const tableLayout = (rows: TracklistRow[], roleOrder: (role: string) => number): TracklistTableLayout => {
+  const first = new Map<string, { group: TracklistRoleGroup, at: number }>()
+  const tracks = new Map<string, number>()
+  for (const row of rows) {
+    for (const group of row.groups) {
+      if (!first.has(group.key)) first.set(group.key, { group, at: first.size })
+      tracks.set(group.key, (tracks.get(group.key) ?? 0) + 1)
+    }
+  }
+  const ordered = [...first.values()].sort((a, b) => roleOrder(a.group.role) - roleOrder(b.group.role) || a.at - b.at).map(item => item.group)
+  const columns = ordered
+    .filter(group => (tracks.get(group.key) ?? 0) >= TABLE_COLUMN_TRACKS)
+    .map(group => ({ key: group.key, role: group.role, label: group.label, tip: group.tip, category: group.category }))
+  const inColumns = new Set(columns.map(column => column.key))
+  const attributes = new Map<string, string>()
+  for (const row of rows) {
+    for (const attribute of row.attributes) {
+      if (!attributes.has(attribute.key)) attributes.set(attribute.key, attribute.label)
+    }
+  }
+  return {
+    columns,
+    others: new Map(rows.map(row => [row.id, mergeSamePeople(row.groups.filter(group => !inColumns.has(group.key)))])),
+    lines: new Map(rows.map(row => [row.id, mergeSamePeople(row.groups)])),
+    attributes: [...attributes].map(([key, label]) => ({ key, label })),
+    isrc: rows.some(row => Boolean(row.isrc)),
+  }
+}
+
 /**
  * 清单 · 舒适's line, the credits that matter most at a glance, in this order: the 艺术家 (with their 客串), 作曲, 编曲
  * and 演唱 (the vocals role, else the first of the vocals category); the first role of each category, a role split by
@@ -423,8 +482,6 @@ export const buildTracklist = (input: TracklistInput, helpers: TracklistHelpers)
       }
     }
     const rows = tracks.map(track => buildRow(track, disc.position, offsets?.get(disc.id) ?? 0, input, helpers))
-    const roles = new Map<string, { role: string, label: string, category: string }>()
-    for (const row of rows) for (const group of row.groups) roles.set(group.role, { role: group.role, label: group.roleName, category: group.category })
     const known = tracks.every(track => track.duration !== null)
     const bonus = input.bonuses.find(item => item.id === disc.bonus_id)
     const title = helpers.titleIn(disc.titles, input.language) ?? disc.title ?? ''
@@ -437,7 +494,6 @@ export const buildTracklist = (input: TracklistInput, helpers: TracklistHelpers)
       showHeader: false,
       duration: known && tracks.length ? helpers.formatDuration(tracks.reduce((sum, track) => sum + (track.duration ?? 0), 0)) : null,
       rows,
-      roles: [...roles.values()].sort((a, b) => helpers.roleOrder(a.role) - helpers.roleOrder(b.role)),
     }
   })
   for (const disc of discs) disc.showHeader = discs.length > 1 || Boolean(disc.bonus || disc.format || disc.title)

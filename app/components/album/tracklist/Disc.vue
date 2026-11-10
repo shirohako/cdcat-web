@@ -7,12 +7,15 @@ import { ChevronDown } from '@lucide/vue'
  * the disc scrolls past and folds the disc when pressed, keeping itself where it is on screen; folded, it says how
  * many tracks are hidden. There is no floating 收起 button (the user had it removed on 2026-11-11); the header is the
  * way to fold. Albums with one plain CD show no header, so they don't fold. Every style wraps its discs in this, so a
- * new style gets folding and sticky headers for free.
+ * new style gets folding and sticky headers for free. The header sticks at `--tl-top` (the navbar's 3.5rem, 0 in a
+ * dialog), and the bar's height is `--tl-disc-head`, for what sticks under it (表格 · 完整's column header).
  */
 const props = withDefaults(defineProps<{
   disc: TracklistDisc
   variant?: 'bar' | 'booklet'
-}>(), { variant: 'bar' })
+  /** The `disc-{id}` anchor; off for a second copy, such as the full-screen dialog's */
+  anchor?: boolean
+}>(), { variant: 'bar', anchor: true })
 
 const { t } = useI18n()
 const { folded, toggleDisc } = useTracklist()
@@ -28,11 +31,12 @@ const meta = computed(() => (isFolded.value
 
 <template>
   <!-- The last disc folded leaves its line to the tracklist's footer, whose line follows it right away -->
-  <section :id="`disc-${disc.id}`" class="scroll-mt-14">
+  <!-- The bar: 0.625rem above a 2.25rem button and a 1px line -->
+  <section :id="anchor ? `disc-${disc.id}` : undefined" class="scroll-mt-14" :style="disc.showHeader && variant === 'bar' ? { '--tl-disc-head': 'calc(2.875rem + 1px)' } : undefined">
     <div
       v-if="disc.showHeader"
       ref="header"
-      class="sticky top-14 z-10 bg-card"
+      class="sticky top-[var(--tl-top,3.5rem)] z-10 bg-card"
       :class="variant === 'bar' ? ['border-b border-line px-2 pt-2.5 [section+section_&]:mt-1.5', isFolded && '[section:last-child>&]:border-b-transparent'] : 'pt-4 [section:first-child_&]:pt-1'"
     >
       <button

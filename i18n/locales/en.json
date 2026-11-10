@@ -82,12 +82,12 @@
         "full": "Full"
       },
       "style_hints": {
-        "list_compact": "Ruled rows: titles and lengths",
-        "list_comfy": "Adds singers, arrangers and originals",
-        "list_full": "Every credit, one role per line",
-        "booklet_full": "Like a CD booklet: credits, then notes",
-        "table_comfy": "Columns for vocals, arrangement, lyrics",
-        "table_full": "Columns for music, lyrics, arrangement, vocals"
+        "list_compact": "A line per track, credits behind a count",
+        "list_comfy": "Key credits under titles, each track opens",
+        "list_full": "Every credit of each track, a role per line",
+        "booklet_full": "Like a CD booklet, credits in two columns",
+        "table_comfy": "Everyone credited in one column",
+        "table_full": "A column per credit, scrolls sideways"
       },
       "styles": {
         "list": "List",
@@ -144,6 +144,10 @@
       "title_copied": "Title copied",
       "link_copied": "Link copied",
       "copy_failed": "Couldn't copy. Copy it yourself: {text}",
+      "fullscreen": "Full screen",
+      "scroll_prev": "Previous column",
+      "scroll_next": "Next column",
+      "scroll_area": "Track credits, scrolls sideways",
       "columns": {
         "title": "Title",
         "duration": "Length",

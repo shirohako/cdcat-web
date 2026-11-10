@@ -8,8 +8,9 @@ import { MENU_CLOSE } from './Menu.vue'
  * A row in a UiMenu: a link with `to`, else a button. Choosing it closes the menu. The icon stays muted and takes the
  * theme colour on hover, so the labels lead. With `glide`, the menu draws one highlight that glides between rows
  * (useGlideHighlight), so the row draws no hover background of its own. `hint` is a smaller line under the label, for
- * rows whose label alone doesn't say what they do. The `leading` slot takes something larger than an icon before the
- * label (the tracklist's 样式 menu puts a small drawing there); `trailing` goes after it.
+ * rows whose label alone doesn't say what they do; `hintClass` replaces its size and colour (12px, meta grey). The
+ * `leading` slot takes something larger than an icon before the label (the tracklist's 样式 menu puts a small drawing
+ * there); `trailing` goes after it.
  */
 withDefaults(defineProps<{
   to?: RouteLocationRaw
@@ -19,7 +20,8 @@ withDefaults(defineProps<{
   disabled?: boolean
   glide?: boolean
   hint?: string
-}>(), { to: undefined, icon: undefined, hint: undefined })
+  hintClass?: string
+}>(), { to: undefined, icon: undefined, hint: undefined, hintClass: undefined })
 
 const emit = defineEmits<{ click: [event: MouseEvent] }>()
 const close = inject(MENU_CLOSE, () => {})
@@ -52,7 +54,7 @@ const choose = (event: MouseEvent) => {
     <slot name="leading" />
     <span class="min-w-0 flex-1 truncate">
       <slot />
-      <span v-if="hint" class="block whitespace-normal text-xs font-normal leading-4 text-meta">{{ hint }}</span>
+      <span v-if="hint" class="block whitespace-normal font-normal" :class="hintClass ?? 'text-xs leading-4 text-meta'">{{ hint }}</span>
     </span>
     <slot name="trailing" />
   </component>

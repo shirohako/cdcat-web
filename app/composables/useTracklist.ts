@@ -35,7 +35,10 @@ export interface TracklistContext {
   favoriting: Ref<Set<number>>
   toggleFavorite: (row: TracklistRow) => void
   openLyrics: (row: TracklistRow, prefer: 'original' | 'translation') => void
-  /** The card listing the track's credits by role, under its people button (it also opens on hover and on a tap) */
+  /**
+   * The card listing the track's credits by role, under its people button; again on the same button closes it (it
+   * also opens on hover)
+   */
   openPeople: (button: HTMLElement) => void
   /** The more menu (copy title, copy link, share) under `button`; again on the same row closes it */
   openMore: (row: TracklistRow, button: HTMLElement) => void

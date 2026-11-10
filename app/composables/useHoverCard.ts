@@ -22,11 +22,22 @@ let lastClosedAt = 0
  * out. The card calls `enter` and `leave` as the pointer moves in and out of it, and `close` when it closes itself
  * (Escape, a press elsewhere, leaving the page). `open` shows it for an element right away, for a button that also
  * opens it when pressed (a mouse click or the keyboard). Render the card with UiHoverCard.
+ *
+ * With `ownClicks`, the elements are buttons that handle their clicks themselves by calling `toggle`: a click, tap or
+ * key opens the card there, and again closes it (the tracklist's people button, user ask 2026-11-11). Taps then
+ * aren't handled here, or one tap would open the card and toggle it shut. A card closed that way doesn't come back
+ * under a pointer still resting on its button; it can once the pointer has left it.
  */
-export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, options: { enabled?: MaybeRefOrGetter<boolean>, delay?: number } = {}) => {
+export const useHoverCard = (
+  root: Ref<HTMLElement | null>,
+  selector: string,
+  options: { enabled?: MaybeRefOrGetter<boolean>, delay?: number, ownClicks?: boolean } = {},
+) => {
   const anchor = shallowRef<HTMLElement | null>(null)
   const current = shallowRef<HTMLElement | null>(null)
   let pending: HTMLElement | null = null
+  /** The button whose card a click just closed (ownClicks): no reopening on hover until the pointer leaves it */
+  let dismissed: HTMLElement | null = null
   let showTimer: ReturnType<typeof setTimeout> | undefined
   let hideTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -53,7 +64,7 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
   const onPointerOver = (event: PointerEvent) => {
     if (event.pointerType === 'touch' || !enabled() || !canHover()) return
     const target = (event.target as Element | null)?.closest?.<HTMLElement>(selector)
-    if (!target || !root.value?.contains(target)) return
+    if (!target || !root.value?.contains(target) || target === dismissed) return
     clearTimeout(hideTimer)
     if (target === anchor.value || target === pending) return
     pending = target
@@ -76,6 +87,7 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
     if (event.pointerType === 'touch') return
     const target = (event.target as Element | null)?.closest?.<HTMLElement>(selector)
     if (!target || (event.relatedTarget instanceof Node && target.contains(event.relatedTarget))) return
+    if (target === dismissed) dismissed = null
     if (target === pending) {
       clearTimeout(showTimer)
       pending = null
@@ -90,7 +102,7 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
   }
   /** In the capture phase, so the link's own handler sees the click already prevented and doesn't navigate. */
   const onClick = (event: MouseEvent) => {
-    if (!enabled() || event.detail === 0) return
+    if (!enabled() || event.detail === 0 || options.ownClicks) return
     if (pressType !== 'touch' && canHover()) return
     const target = (event.target as Element | null)?.closest?.<HTMLElement>(selector)
     if (!target || !root.value?.contains(target) || target === anchor.value) return
@@ -127,5 +139,16 @@ export const useHoverCard = (root: Ref<HTMLElement | null>, selector: string, op
     if (element !== anchor.value) show(element)
   }
 
-  return { anchor, current, enter, leave, close, open }
+  /** Opens the card for the element, or closes it when it is already open there */
+  const toggle = (element: HTMLElement) => {
+    if (element !== anchor.value) {
+      dismissed = null
+      open(element)
+      return
+    }
+    close()
+    dismissed = element
+  }
+
+  return { anchor, current, enter, leave, close, open, toggle }
 }

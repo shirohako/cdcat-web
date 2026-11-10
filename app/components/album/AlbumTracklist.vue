@@ -21,6 +21,7 @@
               :aria-checked="option === activeOption"
               :active="option === activeOption"
               :hint="option.hint"
+              hint-class="text-11 leading-[0.9375rem] text-meta/80"
               class="gap-3! py-1! pl-2!"
               @click="change({ style: option.style, density: option.density }); close()"
             >
@@ -35,6 +36,10 @@
           </template>
         </template>
       </UiPopover>
+      <!-- 表格 · 完整 only, and only on a card wide enough for a table: the same tables in a dialog as wide as the window -->
+      <span v-if="tableFull" class="hidden @min-[40rem]:contents">
+        <UiButton size="sm" :icon="Maximize2" :label="t('album.tracklist.fullscreen')" @click="tableOpen = true" />
+      </span>
       <!-- Always there, so the header doesn't change between albums; disabled when the titles have no other language. -->
       <UiButton
         size="sm"
@@ -66,6 +71,18 @@
 
   <AlbumTracklistLanguageDialog v-if="languages.length" v-model="languageOpen" :language="languageKey" :languages="languages" @update:language="swapLanguage" />
   <AlbumTracklistSettingsDialog v-model="settingsOpen" :styles="styleOptions" :prefs="prefs" @update="change" />
+  <!-- 表格 · 完整 full screen: every disc's table at the window's width, the headers sticking at the dialog's top. Before
+       the lyrics dialog, which opens over it at the same layer. -->
+  <UiDialog v-model="tableOpen" size="full" :title="t('album.section.tracklist')" :description="total">
+    <div ref="dialogList" class="@container [--tl-top:0px]">
+      <AlbumTracklistDisc v-for="disc in view.discs" :key="disc.id" :disc="disc" :anchor="false">
+        <AlbumTracklistTableFull :disc="disc" :anchors="false" />
+      </AlbumTracklistDisc>
+    </div>
+  </UiDialog>
+  <UiHoverCard :anchor="dialogArtistCard.anchor.value" :label="dialogArtist?.name" :text-inset="16" class="w-76 p-0!" @enter="dialogArtistCard.enter" @leave="dialogArtistCard.leave" @close="dialogArtistCard.close">
+    <ArtistHoverCard v-if="dialogArtist" :artist="dialogArtist" :roles="view.artistRoles.get(dialogArtist.id)" />
+  </UiHoverCard>
   <LyricsModal v-model="showLyrics" :track-id="lyricsTarget.trackId" :title="lyricsTarget.title" :prefer="lyricsTarget.prefer" />
 
   <!-- The rows' more menu (清单 · 简洁): one for the list, under the "…" that opened it, teleported so the card's
@@ -83,8 +100,9 @@
   <!-- A track's credits by role, under its people button (清单 · 简洁): opens on hover or a tap, like the artist card.
        A role tag and its names per line, the tags in one column of at most 9rem. At most 20rem wide, where names and
        long job titles wrap, and 20rem tall (less on a short screen), past which it scrolls. The names link to their
-       artists; they open no card of their own here, as one hover card shows at a time. -->
-  <UiHoverCard :anchor="peopleCard.anchor.value" :label="peopleRow?.title" placement="bottom" arrow class="max-h-[min(20rem,calc(100dvh-1rem))]! min-h-20 w-max min-w-60 max-w-80 overflow-x-hidden p-3.5!" @enter="peopleCard.enter" @leave="peopleCard.leave" @close="peopleCard.close">
+       artists; they open no card of their own here, as one hover card shows at a time. On phones it keeps 1.5rem clear
+       of the screen's edges (user ask, 2026-11-11), rather than the popovers' 0.5rem. -->
+  <UiHoverCard :anchor="peopleCard.anchor.value" :label="peopleRow?.title" placement="bottom" arrow :edge="24" class="max-h-[min(20rem,calc(100dvh-1rem))]! min-h-20 w-max min-w-60 max-w-[min(20rem,calc(100vw-3rem))]! overflow-x-hidden p-3.5!" @enter="peopleCard.enter" @leave="peopleCard.leave" @close="peopleCard.close">
     <template v-if="peopleRow">
       <p class="mb-1.5 text-xs font-semibold text-meta">{{ t('album.tracklist.people_button', { count: peopleRow.people }) }}</p>
       <div class="grid grid-cols-[fit-content(9rem)_minmax(0,1fr)] gap-x-3">
@@ -107,7 +125,7 @@ import type { TracklistStyleOption } from './tracklist/SettingsDialog.vue'
 import type { AlbumBonus, AlbumDisc, TracklistLanguage } from '~/types/album'
 import type { CatalogCredit } from '~/types/catalog'
 import type { TracklistDensity, TracklistDisc, TracklistPrefs, TracklistRow } from '~/utils/tracklistView'
-import { BookOpenText, Check, ChevronDown, Copy, FileText, Languages, Link, List, ListMusic, Settings2, Share2, Table2 } from '@lucide/vue'
+import { BookOpenText, Check, ChevronDown, Copy, FileText, Languages, Link, List, ListMusic, Maximize2, Settings2, Share2, Table2 } from '@lucide/vue'
 import { AlbumTracklistBooklet, AlbumTracklistList, AlbumTracklistTable } from '#components'
 import { buildTracklist, defaultLanguageKey, parseLanguageKey } from '~/utils/tracklistView'
 
@@ -173,6 +191,13 @@ const languageTip = computed(() => {
 })
 const languageOpen = ref(false)
 const settingsOpen = ref(false)
+
+// ── 表格 · 完整 in a dialog as wide as the window (user pick F2, 2026-11-11); it closes if the 样式 changes.
+const tableFull = computed(() => prefs.value.style === 'table' && prefs.value.density === 'full')
+const tableOpen = ref(false)
+watch(tableFull, (on) => {
+  if (!on) tableOpen.value = false
+})
 
 const view = computed(() => buildTracklist(
   { discs: props.discs, bonuses: props.bonuses, credits: props.credits, language: parseLanguageKey(languageKey.value), numbering: prefs.value.numbering },
@@ -261,11 +286,12 @@ const openLyrics = (row: TracklistRow, prefer: 'original' | 'translation') => {
   showLyrics.value = true
 }
 
-// ── A track's credits, in a card under its people button: hover, a tap, a press or the keyboard opens it.
-const peopleCard = useHoverCard(list, '[data-people-card]', { enabled: !previewing })
+// ── A track's credits, in a card under its people button: hover, a tap, a press or the keyboard opens it, and a tap,
+// press or key on the same button again closes it.
+const peopleCard = useHoverCard(list, '[data-people-card]', { enabled: !previewing, ownClicks: true })
 const peopleRow = computed(() => rowsById.value.get(Number(peopleCard.current.value?.dataset.peopleCard)) ?? null)
 const openPeople = (button: HTMLElement) => {
-  if (!previewing && button.dataset.peopleCard) peopleCard.open(button)
+  if (!previewing && button.dataset.peopleCard) peopleCard.toggle(button)
 }
 
 // ── The rows' more menu: one popover, anchored on the "…" that opened it. Pressing the same "…" again closes it; a
@@ -324,6 +350,10 @@ provideTracklist({ prefs, locked: computed(() => Boolean(props.locked)), folded,
 // ── The artist hover card, one for the whole list; titles have none (2026-11-02).
 const artistCard = useHoverCard(list, '[data-artist-card]')
 const hoverArtist = computed(() => view.value.artists.get(Number(artistCard.current.value?.dataset.artistCard)) ?? null)
+// The full-screen tables sit outside the list, in the dialog: a card of their own
+const dialogList = ref<HTMLElement | null>(null)
+const dialogArtistCard = useHoverCard(dialogList, '[data-artist-card]')
+const dialogArtist = computed(() => view.value.artists.get(Number(dialogArtistCard.current.value?.dataset.artistCard)) ?? null)
 
 // The old 显示制作人员 switch, replaced by the densities.
 onMounted(() => {

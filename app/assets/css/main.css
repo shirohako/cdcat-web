@@ -313,9 +313,11 @@
     background: transparent padding-box;
   }
 
-  /* The page's own scrollbar, on the right, always shows. */
+  /* The page's own scrollbar, on the right, always shows, and so does a box marked .scrollbar-always (the tracklist
+     tables', so it is plain there is more to the side). */
   html::-webkit-scrollbar-thumb,
   body::-webkit-scrollbar-thumb,
+  .scrollbar-always::-webkit-scrollbar-thumb,
   [data-scrolling]::-webkit-scrollbar-thumb {
     background-color: color-mix(in oklab, var(--primary) 35%, transparent);
   }
@@ -335,6 +337,7 @@
     }
 
     :root,
+    .scrollbar-always,
     [data-scrolling] {
       scrollbar-color: color-mix(in oklab, var(--primary) 35%, transparent) transparent;
     }

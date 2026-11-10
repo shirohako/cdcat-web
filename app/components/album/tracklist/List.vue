@@ -13,7 +13,9 @@ import { ChevronDown } from '@lucide/vue'
  * the title: the block opens over the line while the line fades, so a row grows once rather than one part closing
  * while the other opens; the lyrics buttons and, in 舒适, a 展开更多 chip (always, as the faded line may hide names) stay at the
  * right of it. The chip opens that one track as in 完整 and turns into 收起, its arrow turning round; changing the
- * density folds them all.
+ * density folds them all. On phones that right-hand strip would squeeze the credits for its whole height, so it goes:
+ * the lyrics buttons move to the first line, before the length, and the chip becomes an arrow button at its end
+ * (user ask, 2026-11-11), leaving the credits the full width.
  */
 const props = defineProps<{ discs: TracklistDisc[], density: TracklistDensity }>()
 
@@ -39,6 +41,8 @@ watch(() => props.density, () => {
 const showsFull = (row: TracklistRow, density: TracklistDensity) => density === 'full' || (density === 'comfy' && expanded.value.has(row.id))
 const lyricsInline = (row: TracklistRow) => !row.instrumental && !hasFull(row)
 
+/** The phone's 展开更多 / 收起: the chip's outline as a 20px arrow button at the end of the first line */
+const ARROW = 'hidden size-5 shrink-0 items-center justify-center rounded-[0.3125rem] text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title max-sm:inline-flex dark:hover:bg-white/[0.07]'
 const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px-1.5 text-11 font-semibold leading-none text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title dark:hover:bg-white/[0.07]'
 </script>
 
@@ -57,7 +61,9 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
           <!-- A column just wide enough for two digits; on phones the titles are 11px (the smallest for words) and the
                columns closer, so more of the titles fits -->
           <span class="text-xs/5 tabular-nums text-meta max-sm:text-11/5">{{ row.number }}</span>
-          <AlbumTracklistTitle :row="row" class="min-w-0 font-medium" />
+          <!-- In a box of its own, so the link is only as wide as the title's text, not its whole column: only the title
+               opens the track page (user ask, 2026-11-11) -->
+          <span class="min-w-0"><AlbumTracklistTitle :row="row" class="font-medium" /></span>
           <!-- People, "…", heart and length close together at the right (albums awaiting review have no heart). The
                length keeps a width, so a "—" doesn't move the buttons before it out of line. -->
           <span class="flex items-center gap-1">
@@ -97,8 +103,21 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
               <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
                 <AlbumTracklistLyrics v-if="lyricsInline(row)" :row="row" small class="ml-0.5" />
               </Transition>
+              <!-- Phones: the lyrics buttons of a track with a line below come up here too -->
+              <span v-if="hasFull(row)" class="hidden max-sm:contents"><AlbumTracklistLyrics :row="row" small class="ml-0.5" /></span>
               <span class="min-w-[2.25em] text-right text-xs leading-6 tabular-nums" :class="row.duration ? 'text-meta' : 'text-faint'">{{ row.duration || '—' }}</span>
             </span>
+            <!-- Phones, 舒适: 展开更多 / 收起 as an arrow, turning as the track opens -->
+            <button
+              v-if="density === 'comfy' && hasFull(row)"
+              type="button"
+              :class="ARROW"
+              :aria-expanded="expanded.has(row.id)"
+              :aria-label="t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more')"
+              @click="toggleMore(row)"
+            >
+              <ChevronDown :size="13" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />
+            </button>
           </span>
 
           <div v-if="hasFull(row)" class="col-[2/-1] flex items-start gap-3">
@@ -157,7 +176,7 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
             </div>
             <!-- Stays put through both: the lyrics buttons, and at the far right 展开更多 / 收起 in 舒适, its arrow turning;
                  rightmost so it lines up down the list whatever the lyrics buttons hold (or none, for instrumentals) -->
-            <span class="mt-0.5 flex shrink-0 items-center gap-1">
+            <span class="mt-0.5 flex shrink-0 items-center gap-1 max-sm:hidden">
               <AlbumTracklistLyrics :row="row" small />
               <button v-if="density === 'comfy'" type="button" :class="CHIP" :aria-expanded="expanded.has(row.id)" @click="toggleMore(row)">
                 <ChevronDown :size="12" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />

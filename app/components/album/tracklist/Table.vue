@@ -1,65 +1,41 @@
 <script setup lang="ts">
-import type { TracklistDensity, TracklistDisc, TracklistRoleGroup, TracklistRow } from '~/utils/tracklistView'
+import type { TracklistDensity, TracklistDisc } from '~/utils/tracklistView'
 
 /**
  * Style C, 表格: like the editions table, one table per disc. 舒适 has one 参与人员 column with everyone credited,
  * roles left out, the 艺术家, 作曲, 编曲 and 演唱 first and TABLE_NAMES at most, the rest as +N (its names in a
- * tooltip); who did what is 完整's job. 完整 has fixed columns, one for each core category on that disc (作曲, 作词, 编曲, 演唱, in the
- * dictionary's order), and one 其他人员 column for every other role, as role tags with names, so a disc with dozens of
- * roles stays a few columns wide. On a narrow card each row turns into a block, in CSS alone, with a role tag in each
- * cell. The columns change with the density, so that switch crossfades. Its 简洁 moved to 清单 on 2026-11-11.
+ * tooltip); who did what is 完整's job, one AlbumTracklistTableFull per disc (pinned title and controls, a column
+ * per credit group on two tracks or more, redone on 2026-11-11). On a narrow card each row turns into a block, in CSS
+ * alone: number, title, lyrics, more, heart and length on the first line, the people under the title. The columns
+ * change with the density, so that switch crossfades. Its 简洁 moved to 清单 on 2026-11-11.
  */
 const props = defineProps<{ discs: TracklistDisc[], density: TracklistDensity }>()
 
 const { t } = useI18n()
 
-/** The role categories that get a column of their own in 完整; every other role goes to 其他人员. */
-const CORE_CATEGORIES = ['composition', 'lyrics', 'arrangement', 'vocals']
 /** How many names 舒适's 参与人员 shows before the rest go behind a +N. */
 const TABLE_NAMES = 4
 const { separator } = useListPunctuation()
 
-type Head = { label: string, category: string, role: string }
-type Column =
-  | { kind: 'number' | 'title' | 'people' | 'others' | 'lyrics' | 'more' | 'heart' | 'duration' }
-  | { kind: 'category', head: Head }
+type Column = { kind: 'number' | 'title' | 'people' | 'lyrics' | 'more' | 'heart' | 'duration' }
 
 const columnsOf = (disc: TracklistDisc): Column[] => {
   const columns: Column[] = [{ kind: 'number' }, { kind: 'title' }]
-  if (props.density === 'comfy' && disc.rows.some(row => row.everyone.length)) columns.push({ kind: 'people' })
-  if (props.density === 'full') {
-    // Headed by the category's first role on the disc; the roles come in the dictionary's order.
-    const seen = new Set<string>()
-    for (const role of disc.roles) {
-      if (!CORE_CATEGORIES.includes(role.category) || seen.has(role.category)) continue
-      seen.add(role.category)
-      columns.push({ kind: 'category', head: role })
-    }
-    if (disc.roles.some(role => !CORE_CATEGORIES.includes(role.category))) columns.push({ kind: 'others' })
-  }
+  if (disc.rows.some(row => row.everyone.length)) columns.push({ kind: 'people' })
   // On every disc, instrumentals and all (their button is greyed out), so all the tables have the same columns
-  columns.push({ kind: 'lyrics' })
-  columns.push({ kind: 'more' }, { kind: 'heart' }, { kind: 'duration' })
+  columns.push({ kind: 'lyrics' }, { kind: 'more' }, { kind: 'heart' }, { kind: 'duration' })
   return columns
 }
 const columns = computed(() => new Map(props.discs.map(disc => [disc.id, columnsOf(disc)])))
 
-const groupsOf = (row: TracklistRow, column: Column): TracklistRoleGroup[] => {
-  if (column.kind === 'category') return row.groups.filter(group => group.category === column.head.category)
-  if (column.kind === 'others') return row.groups.filter(group => !CORE_CATEGORIES.includes(group.category))
-  return []
-}
-const columnKey = (column: Column) => ('head' in column ? `${column.kind}-${column.head.category}-${column.head.role}` : column.kind)
-const CELL_CLASSES: Record<string, string> = {
+const CELL_CLASSES: Record<Column['kind'], string> = {
   number: 'c-number w-px whitespace-nowrap text-xs/5 tabular-nums text-meta',
   title: 'c-title',
   lyrics: 'c-lyrics w-px whitespace-nowrap',
-  more: 'c-more w-px !px-0.5',
-  heart: 'c-heart w-px !px-0.5',
+  more: 'c-more w-px',
+  heart: 'c-heart w-px',
   duration: 'c-duration w-px whitespace-nowrap text-right text-xs/5 tabular-nums',
   people: 'c-people text-13 text-title',
-  category: 'c-people text-13 text-title',
-  others: 'c-people c-others text-13 text-title',
 }
 </script>
 
@@ -67,16 +43,15 @@ const CELL_CLASSES: Record<string, string> = {
   <Transition mode="out-in" enter-active-class="transition-opacity duration-[180ms]" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
     <div :key="density" class="px-5 pb-1.5">
       <AlbumTracklistDisc v-for="disc in discs" :key="disc.id" :disc="disc">
-        <div class="table-scroll overflow-x-auto">
+        <AlbumTracklistTableFull v-if="density === 'full'" :disc="disc" />
+        <div v-else class="scrollbar-always overflow-x-auto">
           <table class="tl-table w-full border-collapse text-13 leading-5">
             <thead>
               <tr>
-                <th v-for="column in columns.get(disc.id)" :key="columnKey(column)" :class="CELL_CLASSES[column.kind]">
-                  <CatalogRoleTag v-if="'head' in column" :label="column.head.label" :category="column.head.category" />
-                  <template v-else-if="column.kind === 'number'">#</template>
+                <th v-for="column in columns.get(disc.id)" :key="column.kind" :class="CELL_CLASSES[column.kind]">
+                  <template v-if="column.kind === 'number'">#</template>
                   <template v-else-if="column.kind === 'title'">{{ t('album.tracklist.columns.title') }}</template>
                   <template v-else-if="column.kind === 'lyrics'">{{ t('album.tracklist.columns.lyrics') }}</template>
-                  <template v-else-if="column.kind === 'others'">{{ t('album.tracklist.columns.others') }}</template>
                   <template v-else-if="column.kind === 'people'">{{ t('album.tracklist.columns.people') }}</template>
                   <template v-else-if="column.kind === 'duration'">{{ t('album.tracklist.columns.duration') }}</template>
                 </th>
@@ -90,18 +65,13 @@ const CELL_CLASSES: Record<string, string> = {
                 :data-track-id="row.id"
                 class="group scroll-mt-24 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
               >
-                <td v-for="column in columns.get(disc.id)" :key="columnKey(column)" :class="CELL_CLASSES[column.kind]">
+                <td v-for="column in columns.get(disc.id)" :key="column.kind" :class="CELL_CLASSES[column.kind]">
                   <template v-if="column.kind === 'number'">{{ row.number }}</template>
                   <template v-else-if="column.kind === 'title'">
                     <AlbumTracklistTitle :row="row" class="font-medium" />
                     <AlbumTracklistLabel v-if="row.instrumental" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
-                    <span v-if="row.originals.length || (density === 'full' && (row.attributes.length || row.isrc || row.subtitle))" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-                      <span v-if="density === 'full' && row.subtitle" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel>{{ row.subtitle }}</span>
-                      <span v-if="row.originals.length" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
-                      <template v-if="density === 'full'">
-                        <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
-                        <span v-if="row.isrc" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>ISRC</AlbumTracklistLabel><span class="font-mono">{{ row.isrc }}</span></span>
-                      </template>
+                    <span v-if="row.originals.length" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
+                      <span class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                     </span>
                   </template>
                   <!-- 舒适: everyone, no roles; four names at most, the rest behind +N, which flows on after the last
@@ -112,19 +82,6 @@ const CELL_CLASSES: Record<string, string> = {
                       <AlbumTracklistLabel class="tabular-nums">+{{ row.everyone.length - TABLE_NAMES }}</AlbumTracklistLabel>
                     </UiTooltip>
                   </span>
-                  <template v-else-if="column.kind === 'category'">
-                    <span v-for="group in groupsOf(row, column)" :key="group.key" class="flex items-start gap-1.5 [&+&]:mt-1">
-                      <!-- Its own tag when the role differs from the column's, and always once rows turn into blocks -->
-                      <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="mt-px" :class="group.key === column.head.role && 'cell-tag'" />
-                      <AlbumTracklistPeople :people="group.people" stack class="mt-px" />
-                    </span>
-                  </template>
-                  <template v-else-if="column.kind === 'others'">
-                    <span v-for="group in groupsOf(row, column)" :key="group.key" class="flex items-start gap-1.5 [&+&]:mt-1">
-                      <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" class="mt-px" />
-                      <AlbumTracklistPeople :people="group.people" class="mt-px" />
-                    </span>
-                  </template>
                   <AlbumTracklistLyrics v-else-if="column.kind === 'lyrics'" :row="row" merged always />
                   <!-- Always shown here, as columns: the more menu and the heart -->
                   <AlbumTracklistMoreButton v-else-if="column.kind === 'more'" :row="row" always />
@@ -141,26 +98,6 @@ const CELL_CLASSES: Record<string, string> = {
 </template>
 
 <style scoped>
-/* A table wider than the card scrolls sideways; its scrollbar always shows (other boxes only show theirs while they
-   scroll, see main.css), so it is plain that there is more to the right. Same colours as the site's scrollbars. */
-.table-scroll::-webkit-scrollbar-thumb {
-  background-color: color-mix(in oklab, var(--primary) 35%, transparent);
-}
-
-.table-scroll::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(in oklab, var(--primary) 50%, transparent);
-}
-
-.table-scroll::-webkit-scrollbar-thumb:active {
-  background-color: color-mix(in oklab, var(--primary) 65%, transparent);
-}
-
-@supports not selector(::-webkit-scrollbar) {
-  .table-scroll {
-    scrollbar-color: color-mix(in oklab, var(--primary) 35%, transparent) transparent;
-  }
-}
-
 .tl-table th {
   padding: 0.4375rem 0.5rem;
   border-bottom: 1px solid var(--line);
@@ -192,13 +129,15 @@ const CELL_CLASSES: Record<string, string> = {
   text-align: right;
 }
 
-/* The tag of a cell whose role matches its column only shows once rows become blocks. */
-.cell-tag {
-  display: none;
-}
-
 /* A narrow card: each row becomes a block, the number, title, more menu, heart and length on its first line and every other
    cell on a line of its own under the title, its role as a tag. */
+/* The more menu and the heart sit close (in the CSS rather than as !px utilities, so the narrow card can change it) */
+.tl-table .c-more,
+.tl-table .c-heart {
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
+}
+
 @container (max-width: 40rem) {
   .tl-table thead {
     display: none;
@@ -210,8 +149,8 @@ const CELL_CLASSES: Record<string, string> = {
 
   .tl-table tr {
     display: grid;
-    grid-template-columns: 1.5rem minmax(0, 1fr) auto auto auto;
-    column-gap: 0.5rem;
+    grid-template-columns: 1.5rem minmax(0, 1fr) auto auto auto auto;
+    column-gap: 0.25rem;
     padding-block: 0.5rem;
     border-bottom: 1px solid var(--line);
   }
@@ -220,8 +159,10 @@ const CELL_CLASSES: Record<string, string> = {
     border-bottom: 0;
   }
 
+  /* No widths: the table's 1px cells would let the buttons spill over each other and past the card */
   .tl-table td {
     display: block;
+    width: auto;
     padding: 0;
     border: 0;
   }
@@ -238,37 +179,42 @@ const CELL_CLASSES: Record<string, string> = {
     line-height: 1.5rem;
   }
 
-  /* The 20px more menu and heart centred on the 24px first line */
-  .tl-table td.c-more {
+  /* The first line ends with the lyrics, the more menu, the heart and the length, as the table's columns do; the
+     22px lyrics button and the 20px ones centred on the 24px line */
+  .tl-table td.c-lyrics {
     grid-column: 3;
     grid-row: 1;
-    padding: 0.125rem 0 0;
+    margin-left: 0.25rem;
+    padding-top: 0.0625rem;
   }
 
-  .tl-table td.c-heart {
+  .tl-table td.c-more {
     grid-column: 4;
     grid-row: 1;
     padding: 0.125rem 0 0;
   }
 
-  .tl-table td.c-duration {
+  .tl-table td.c-heart {
     grid-column: 5;
     grid-row: 1;
+    padding: 0.125rem 0 0;
+  }
+
+  .tl-table td.c-duration {
+    grid-column: 6;
+    grid-row: 1;
+    min-width: 2.25em;
+    margin-left: -0.125rem;
     line-height: 1.5rem;
   }
 
-  .tl-table td.c-people,
-  .tl-table td.c-lyrics {
+  .tl-table td.c-people {
     grid-column: 2 / -1;
     margin-top: 0.25rem;
   }
 
   .tl-table td:empty {
     display: none;
-  }
-
-  .cell-tag {
-    display: inline-flex;
   }
 }
 </style>

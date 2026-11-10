@@ -32,7 +32,10 @@ const props = withDefaults(defineProps<{
   label?: string
   /** A point on the edge facing the trigger, aimed at it (top and bottom placements) */
   arrow?: boolean
-}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined, arrow: false })
+  /** How close to the window's edges the card may come, in pixels (8); a card that should keep clear of them on
+      phones asks for more, and caps its width to match */
+  edge?: number
+}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined, arrow: false, edge: 8 })
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -80,9 +83,9 @@ const place = () => {
     placement: props.placement,
     middleware: [
       offsetMiddleware(props.offset),
-      flip({ padding: 8 }),
-      shift({ padding: 8 }),
-      fitSize({ padding: 8, apply: ({ availableHeight }) => { position.maxHeight = Math.max(160, availableHeight) } }),
+      flip({ padding: props.edge }),
+      shift({ padding: props.edge }),
+      fitSize({ padding: props.edge, apply: ({ availableHeight }) => { position.maxHeight = Math.max(160, availableHeight) } }),
     ],
   }).then(({ x, y, placement }) => {
     Object.assign(position, { x: Math.round(x), y: Math.round(y), placement, placed: true })
@@ -169,6 +172,15 @@ const opened = async () => {
   focusOnOpen = false
 }
 
+/**
+ * The closing card has faded out: the layer goes, unless the card opened again meanwhile. A press on another row's
+ * button closes the card (a press outside) and its click opens it there 0–100ms later, while the first one is still
+ * fading; taking the layer away then took the new card with it (phones, the tracklist's people card, 2026-11-11).
+ */
+const afterLeave = () => {
+  if (!open.value) rendered.value = false
+}
+
 const closed = () => {
   unlisten()
   stopAutoUpdate?.()
@@ -213,7 +225,7 @@ const triggerAttrs = computed(() => ({
       enter-from-class="scale-[0.97] opacity-0"
       leave-active-class="transition-[opacity,scale] duration-100 ease-in motion-reduce:transition-none"
       leave-to-class="scale-[0.97] opacity-0"
-      @after-leave="rendered = false"
+      @after-leave="afterLeave"
     >
       <div
         v-if="open"

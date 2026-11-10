@@ -4,8 +4,8 @@ import { Users } from '@lucide/vue'
 
 /**
  * How many people are credited on the track, as an outlined chip. Resting the pointer on it (a tap on touch screens,
- * a press or the keyboard too) opens the tracklist's credits card under it (`data-people-card`, useHoverCard). Always
- * shown; with no one credited it reads a faded 0 and opens nothing.
+ * a press or the keyboard too) opens the tracklist's credits card under it (`data-people-card`, useHoverCard); a tap,
+ * press or key on it again closes the card. Always shown; with no one credited it reads a faded 0 and opens nothing.
  */
 const props = defineProps<{ row: TracklistRow }>()
 

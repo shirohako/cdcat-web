@@ -82,12 +82,12 @@
         "full": "詳細"
       },
       "style_hints": {
-        "list_compact": "罫線つき、タイトルと長さだけ",
-        "list_comfy": "タイトルの下にボーカル・編曲・原曲",
+        "list_compact": "1曲1行、クレジットは人数ボタンに",
+        "list_comfy": "タイトルの下に主なクレジット、曲ごとに展開",
         "list_full": "全クレジットを役割ごとに一行",
-        "booklet_full": "CD ブックレット風、左にクレジット",
-        "table_comfy": "ボーカル・編曲・歌詞を列に",
-        "table_full": "作曲・作詞・編曲・ボーカルを列に"
+        "booklet_full": "CD ブックレット風、クレジットは2段組み",
+        "table_comfy": "参加者全員を1列に",
+        "table_full": "クレジットごとに列、横にスクロール"
       },
       "styles": {
         "list": "リスト",
@@ -144,6 +144,10 @@
       "title_copied": "曲名をコピーしました",
       "link_copied": "リンクをコピーしました",
       "copy_failed": "コピーできませんでした：{text}",
+      "fullscreen": "全画面で見る",
+      "scroll_prev": "前の列へ",
+      "scroll_next": "次の列へ",
+      "scroll_area": "曲ごとのクレジット（横にスクロール）",
       "columns": {
         "title": "タイトル",
         "duration": "時間",

@@ -76,7 +76,8 @@ withDefaults(defineProps<{
   description?: string
   icon?: string | Component
   tone?: UiTone
-  size?: 'sm' | 'md' | 'ml' | 'lg' | 'xl'
+  /** `full`: as wide as the window allows, up to 110rem (表格 · 完整's full-screen view) */
+  size?: 'sm' | 'md' | 'ml' | 'lg' | 'xl' | 'full'
   as?: 'form' | 'div'
   dark?: boolean
   /** The footer without its band: the body fades out just above it. */
@@ -87,7 +88,7 @@ withDefaults(defineProps<{
 const open = defineModel<boolean>({ required: true })
 const emit = defineEmits<{ submit: [] }>()
 
-const SIZES = { sm: 'sm:max-w-sm', md: 'sm:max-w-lg', ml: 'sm:max-w-2xl', lg: 'sm:max-w-3xl', xl: 'sm:max-w-5xl' }
+const SIZES = { sm: 'sm:max-w-sm', md: 'sm:max-w-lg', ml: 'sm:max-w-2xl', lg: 'sm:max-w-3xl', xl: 'sm:max-w-5xl', full: 'sm:max-w-[110rem]' }
 
 const { appliedPalette } = useAppearance()
 const titleId = useId()
