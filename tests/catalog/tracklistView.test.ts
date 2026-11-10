@@ -2,7 +2,7 @@ import type { AlbumDisc, AlbumTrack } from '../../app/types/album'
 import type { CatalogCredit } from '../../app/types/catalog'
 import type { TracklistHelpers, TracklistRoleGroup } from '../../app/utils/tracklistView'
 import { describe, expect, it } from 'vitest'
-import { buildTracklist, defaultLanguageKey, normalizeTracklistPrefs } from '../../app/utils/tracklistView'
+import { buildTracklist, defaultLanguageKey, mergeSamePeople, normalizeTracklistPrefs } from '../../app/utils/tracklistView'
 
 const ORDER = ['artist', 'composer', 'lyricist', 'arranger', 'vocals', 'voice_actor', 'featuring']
 const CATEGORIES: Record<string, string> = { artist: 'release', composer: 'composition', lyricist: 'lyrics', arranger: 'arrangement', vocals: 'vocals', voice_actor: 'vocals', featuring: 'vocals' }
@@ -80,11 +80,15 @@ describe('buildTracklist', () => {
     expect(row.key.map(item => item.roles.map(role => role.role))).toEqual([['artist'], ['composer', 'arranger'], ['vocals']])
     expect(row.key[0]!.people.map(person => person.name)).toEqual(['A', 'B'])
     expect(row.key[0]!.more.map(person => person.name)).toEqual(['C'])
-    // 作词 is left to 完整, and C is behind the +1
-    expect(row.hasMore).toBe(true)
-    const plain = buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('composer', 'NAGI', 1), credit('vocals', 'Eris', 4)] })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
-    expect(plain.hasMore).toBe(false)
-    expect(buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('composer', 'NAGI', 1)], isrc: 'JPX' })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!.hasMore).toBe(true)
+  })
+
+  it('merges roles held by the same people, keeping apart the same people with other notes', () => {
+    const credits = [credit('composer', 'NAGI', 1), credit('lyricist', 'Mio', 5), credit('arranger', 'NAGI', 1), credit('recording', 'Ken', 9, 'Studio A'), credit('mixing', 'Ken', 9, 'Studio B')]
+    const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    // The order follows the role dictionary, which in this test knows neither recording nor mixing
+    const merged = mergeSamePeople(row.groups).map(item => item.roles.map(role => role.role))
+    expect(merged).toHaveLength(4)
+    expect(merged).toEqual(expect.arrayContaining([['composer', 'arranger'], ['lyricist'], ['recording'], ['mixing']]))
   })
 
   it('counts each person once, by artist and credited name, guests included', () => {

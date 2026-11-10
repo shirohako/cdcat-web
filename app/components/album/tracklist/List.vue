@@ -11,7 +11,7 @@ import { ChevronDown } from '@lucide/vue'
  * lyrics) and the 完整 block (every credit as a role tag, notes, counts), which mounts the first time it opens. 简洁 and
  * the others differ in structure, so that switch crossfades. The 舒适 line and the 完整 block share one place under
  * the title: the block opens over the line while the line fades, so a row grows once rather than one part closing
- * while the other opens; the lyrics buttons and, in 舒适, a 展开更多 chip (when 完整 has more to show) stay at the
+ * while the other opens; the lyrics buttons and, in 舒适, a 展开更多 chip (always, as the faded line may hide names) stay at the
  * right of it. The chip opens that one track as in 完整 and turns into 收起, its arrow turning round; changing the
  * density folds them all.
  */
@@ -79,7 +79,7 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
           :id="`track-${row.id}`"
           :key="row.id"
           :data-track-id="row.id"
-          class="tl-row group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-1.5 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          class="tl-row group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
         >
           <!-- A column just wide enough for two digits, centred on the 24px first line -->
           <span class="flex h-6 items-center text-xs tabular-nums text-meta">{{ row.number }}</span>
@@ -159,7 +159,7 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
                  rightmost so it lines up down the list whatever the lyrics buttons hold (or none, for instrumentals) -->
             <span class="mt-0.5 flex shrink-0 items-center gap-1">
               <AlbumTracklistLyrics :row="row" small />
-              <button v-if="density === 'comfy' && row.hasMore" type="button" :class="CHIP" :aria-expanded="expanded.has(row.id)" @click="toggleMore(row)">
+              <button v-if="density === 'comfy'" type="button" :class="CHIP" :aria-expanded="expanded.has(row.id)" @click="toggleMore(row)">
                 <ChevronDown :size="12" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />
                 <!-- Both labels in one cell, the other hidden, so the chip keeps the longer one's width and the lyrics
                      buttons beside it don't move -->
@@ -192,25 +192,5 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
 .tl-ruled:hover + .tl-ruled::before {
   opacity: 0;
 }
-
-/* 完整: hairlines between tracks, faded in with the switch; none next to the row under the pointer. */
-.tl-row + .tl-row::before {
-  position: absolute;
-  top: 0;
-  inset-inline: 0.5rem;
-  height: 1px;
-  background: var(--line);
-  content: "";
-  opacity: 0;
-  transition: opacity 200ms ease-out;
-}
-
-.is-full .tl-row + .tl-row::before {
-  opacity: 1;
-}
-
-.is-full .tl-row:hover::before,
-.is-full .tl-row:hover + .tl-row::before {
-  opacity: 0;
-}
+/* 舒适 and 完整 have no hairlines between tracks (完整's went on 2026-11-11): space sets them apart. */
 </style>

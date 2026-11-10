@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { TracklistDensity, TracklistDisc } from '~/utils/tracklistView'
+import type { TracklistDisc } from '~/utils/tracklistView'
 import { ChevronDown } from '@lucide/vue'
 
 /**
  * One disc of a tracklist style: its header and its rows (the default slot). The header sticks under the navbar while
  * the disc scrolls past and folds the disc when pressed, keeping itself where it is on screen; folded, it says how
- * many tracks are hidden. A long disc also has the floating 收起 button at the bottom of the screen, once its header is
- * stuck: so only the disc being read has one. Albums with one plain CD show no header, so they don't fold. Every style wraps its discs in this, so a new style gets folding and
- * sticky headers for free.
+ * many tracks are hidden. There is no floating 收起 button (the user had it removed on 2026-11-11); the header is the
+ * way to fold. Albums with one plain CD show no header, so they don't fold. Every style wraps its discs in this, so a
+ * new style gets folding and sticky headers for free.
  */
 const props = withDefaults(defineProps<{
   disc: TracklistDisc
@@ -15,17 +15,12 @@ const props = withDefaults(defineProps<{
 }>(), { variant: 'bar' })
 
 const { t } = useI18n()
-const { prefs, folded, toggleDisc } = useTracklist()
+const { folded, toggleDisc } = useTracklist()
 const header = ref<HTMLElement | null>(null)
-const sentinel = ref<HTMLElement | null>(null)
-const stuck = useStuckHeader(sentinel)
 const bodyId = useId()
 
 const isFolded = computed(() => folded.value.has(props.disc.id))
 const count = computed(() => props.disc.rows.length)
-/** Tracks from which a disc is about a screen or more tall, as rows grow with the density. Counted, not measured, so the server renders the button too. */
-const LONG_DISC: Record<TracklistDensity, number> = { compact: 20, comfy: 14, full: 8 }
-const long = computed(() => props.disc.showHeader && count.value >= LONG_DISC[prefs.value.density])
 const meta = computed(() => (isFolded.value
   ? t('album.tracklist.disc.folded', { count: count.value })
   : [t('album.tracklist.disc.tracks', { count: count.value }), props.disc.duration].filter(Boolean).join(' · ')))
@@ -34,7 +29,6 @@ const meta = computed(() => (isFolded.value
 <template>
   <!-- The last disc folded leaves its line to the tracklist's footer, whose line follows it right away -->
   <section :id="`disc-${disc.id}`" class="scroll-mt-14">
-    <span v-if="disc.showHeader" ref="sentinel" class="block h-0" aria-hidden="true" />
     <div
       v-if="disc.showHeader"
       ref="header"
@@ -68,7 +62,6 @@ const meta = computed(() => (isFolded.value
       <!-- Air under the bar's line, so the first row's hover fill doesn't touch it -->
       <div v-if="disc.showHeader && variant === 'bar'" class="h-1" aria-hidden="true" />
       <slot />
-      <AlbumFoldPill v-if="long" :label="t('album.tracklist.disc.fold')" :shown="stuck" class="pb-1" @click="toggleDisc(disc, header)" />
     </UiCollapse>
   </section>
 </template>
