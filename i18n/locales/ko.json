@@ -35,6 +35,7 @@
     "track_people": {
       "title": "곡별 참여자",
       "count": "{count}명",
+      "name_only_count": "(이름만 표기 {count})",
       "all": "전곡",
       "view_label": "보기",
       "view_roles": "사람별",

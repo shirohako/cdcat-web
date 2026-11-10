@@ -35,6 +35,7 @@
     "track_people": {
       "title": "曲目參與人員",
       "count": "{count} 位",
+      "name_only_count": "(僅署名 {count})",
       "all": "全曲",
       "view_label": "顯示方式",
       "view_roles": "按人員",

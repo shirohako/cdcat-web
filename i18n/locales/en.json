@@ -35,6 +35,7 @@
     "track_people": {
       "title": "Track credits",
       "count": "{count} person | {count} people",
+      "name_only_count": "({count} name only)",
       "all": "All tracks",
       "view_label": "View",
       "view_roles": "By person",

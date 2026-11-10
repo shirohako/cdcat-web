@@ -7,7 +7,7 @@
     <div ref="region" class="px-5 pb-5 pt-2">
       <div v-if="albumPeople.length">
         <div class="-mx-5 flex items-center gap-2 px-3">
-          <AlbumCreditsFold :open="albumOpen" :title="$t('album.album_people.title')" :count="albumPeopleCount" @click="albumOpen = !albumOpen" />
+          <AlbumCreditsFold :open="albumOpen" :title="$t('album.album_people.title')" :count="albumPeopleCount" :name-only="albumNameOnlyCount" @click="albumOpen = !albumOpen" />
           <UiSegmented v-if="albumOpen" v-model="albumView" :items="albumViews" :label="$t('album.track_people.view_label')" size="sm" class="mr-2 shrink-0" />
         </div>
         <UiCollapse :open="albumOpen">
@@ -60,7 +60,7 @@
           class="-mx-5 flex items-center gap-2 px-3 transition-shadow duration-150"
           :class="peopleOpen && ['sticky top-14 z-10 bg-card', peopleStuck && 'shadow-[0_1px_0_0_var(--color-line)]']"
         >
-          <AlbumCreditsFold :open="peopleOpen" :title="$t('album.track_people.title')" :count="people.length" @click="togglePeople" />
+          <AlbumCreditsFold :open="peopleOpen" :title="$t('album.track_people.title')" :count="people.length" :name-only="peopleNameOnlyCount" @click="togglePeople" />
           <UiSegmented v-if="peopleOpen" v-model="peopleView" :items="peopleViews" :label="$t('album.track_people.view_label')" size="sm" class="mr-2 shrink-0" />
         </div>
         <UiCollapse :open="peopleOpen" lazy>
@@ -186,8 +186,11 @@ const albumViews = computed(() => [
 /** The album's own list starts open; it is folded by hand, per visit. */
 const albumOpen = ref(true)
 const albumPeopleCount = computed(() => new Set(groups.value.flatMap(group => group.people.map(person => person.artistId ?? person.name))).size)
+/** Of those, the names with no artist page (仅署名), counted in brackets in the fold's tag. */
+const albumNameOnlyCount = computed(() => new Set(groups.value.flatMap(group => group.people.filter(person => person.artistId === null).map(person => person.name))).size)
 
 const people = computed(() => trackPeople(props.discs ?? [], roleOrder))
+const peopleNameOnlyCount = computed(() => people.value.filter(person => person.artistId === null).length)
 const roleGroups = computed(() => trackRoleGroups(people.value, roleOrder))
 const peopleOpen = ref(!groups.value.length)
 

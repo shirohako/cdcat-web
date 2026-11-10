@@ -35,6 +35,7 @@
     "track_people": {
       "title": "曲ごとのクレジット",
       "count": "{count} 人",
+      "name_only_count": "(表記のみ {count})",
       "all": "全曲",
       "view_label": "表示",
       "view_roles": "人ごと",

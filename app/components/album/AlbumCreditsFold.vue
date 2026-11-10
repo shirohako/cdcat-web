@@ -6,13 +6,22 @@
   >
     <ChevronRight :size="15" class="shrink-0 text-meta transition-transform duration-200" :class="open && 'rotate-90'" />
     {{ title }}
-    <span class="font-normal text-meta">{{ $t('album.track_people.count', { count }) }}</span>
+    <UiBadge class="ml-0.5">{{ countText }}</UiBadge>
   </button>
 </template>
 
 <script setup lang="ts">
 import { ChevronRight } from '@lucide/vue'
 
-/** The fold header of the credits card's two lists: an arrow, the list's name and how many people are in it. */
-defineProps<{ open: boolean, title: string, count: number }>()
+/**
+ * The fold header of the credits card's two lists: an arrow, the list's name and a tag with how many people are in it,
+ * those with no artist page (仅署名, names only) counted again in brackets when there are any.
+ */
+const props = withDefaults(defineProps<{ open: boolean, title: string, count: number, nameOnly?: number }>(), { nameOnly: 0 })
+
+const { t } = useI18n()
+const countText = computed(() => {
+  const count = t('album.track_people.count', { count: props.count }, props.count)
+  return props.nameOnly ? `${count} ${t('album.track_people.name_only_count', { count: props.nameOnly })}` : count
+})
 </script>
