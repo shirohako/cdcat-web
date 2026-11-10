@@ -3,7 +3,7 @@ import type { TracklistDisc, TracklistPrefs, TracklistRow } from '~/utils/trackl
 import { normalizeTracklistPrefs } from '~/utils/tracklistView'
 
 /**
- * The album tracklist's view preferences (style, density, the two hover cards), kept in one cookie so the server
+ * The album tracklist's view preferences (style, density, track numbering), kept in one cookie so the server
  * renders the reader's last choice. Reading never writes the cookie back, so pages without a choice send no Set-Cookie.
  * Call it once, in AlbumTracklist, and share the result through the context.
  */

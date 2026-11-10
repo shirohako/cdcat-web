@@ -24,6 +24,9 @@
     --primary: oklch(0.75 0.14 var(--hue));
     --primary-strong: oklch(0.65 0.12 var(--hue));
     --on-primary: oklch(0.25 0.02 var(--hue));
+    /* Text that stands out in the theme colour (credited names' linked parts); the ink palette has a blue instead,
+       as its near-black or near-white theme colour would not stand out from the text around it. */
+    --accent-text: var(--primary);
 
     --page: oklch(0.16 0.014 var(--hue));
     --card: oklch(0.25 0.02 var(--hue));
@@ -79,6 +82,7 @@
     --primary: oklch(0.7 0.14 var(--hue));
     --primary-strong: oklch(0.6 0.12 var(--hue));
     --on-primary: oklch(1 0 0 / 0.9);
+    --accent-text: var(--primary);
 
     --page: oklch(0.95 0.01 var(--hue));
     --card: oklch(1 0 0);
@@ -127,6 +131,7 @@
     --primary: oklch(0.19 0.027 298);
     --primary-strong: oklch(0.3 0.03 298);
     --on-primary: oklch(1 0 0);
+    --accent-text: oklch(0.55 0.16 255);
 
     --page: oklch(0.972 0.012 281);
     --card-hover: oklch(0.965 0.006 285);
@@ -151,6 +156,7 @@
     --primary: oklch(0.93 0.012 285);
     --primary-strong: oklch(0.84 0.015 285);
     --on-primary: oklch(0.19 0.027 298);
+    --accent-text: oklch(0.75 0.13 250);
 
     --btn-content: oklch(1 0 0 / 0.8);
     --link-hover: oklch(0.32 0.02 285);

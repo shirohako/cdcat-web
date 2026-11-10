@@ -110,7 +110,7 @@ const languageOpen = ref(false)
 const settingsOpen = ref(false)
 
 const view = computed(() => buildTracklist(
-  { discs: props.discs, bonuses: props.bonuses, credits: props.credits, language: parseLanguageKey(languageKey.value) },
+  { discs: props.discs, bonuses: props.bonuses, credits: props.credits, language: parseLanguageKey(languageKey.value), numbering: prefs.value.numbering },
   {
     titleIn,
     roleName,
@@ -198,7 +198,7 @@ const openLyrics = (row: TracklistRow, prefer: 'original' | 'translation') => {
 provideTracklist({ prefs, locked: computed(() => Boolean(props.locked)), folded, toggleDisc, favoriting, toggleFavorite, openLyrics })
 
 // ── The artist hover card, one for the whole list; titles have none (2026-11-02).
-const artistCard = useHoverCard(list, '[data-artist-card]', { enabled: () => prefs.value.artistCard })
+const artistCard = useHoverCard(list, '[data-artist-card]')
 const hoverArtist = computed(() => view.value.artists.get(Number(artistCard.current.value?.dataset.artistCard)) ?? null)
 
 // The old 显示制作人员 switch, replaced by the densities.

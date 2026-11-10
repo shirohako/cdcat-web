@@ -38,6 +38,24 @@ describe('buildTracklist', () => {
     expect(discs[0]!.rows.map(row => row.number)).toEqual(['A1', '02'])
   })
 
+  it('numbers later discs on from the one before when asked, bonus discs apart', () => {
+    const numbers = (numbering?: 'disc' | 'album') => buildTracklist({
+      discs: [
+        disc(1, [track(1), track(2), track(3)]),
+        disc(2, [track(2), track(1, { number_label: 'B1' })]),
+        disc(3, [track(1)], { bonus_id: 7 }),
+        disc(4, [track(1), track(2)], { bonus_id: 7 }),
+        // Already numbered on in the data: kept
+        disc(5, [track(6), track(7)]),
+      ],
+      bonuses: [{ id: 7, name: 'Bonus CD' } as never],
+      language: null,
+      numbering,
+    }, helpers).discs.map(item => item.rows.map(row => row.number))
+    expect(numbers()).toEqual([['01', '02', '03'], ['B1', '02'], ['01'], ['01', '02'], ['06', '07']])
+    expect(numbers('album')).toEqual([['01', '02', '03'], ['B1', '05'], ['01'], ['02', '03'], ['06', '07']])
+  })
+
   it('shows disc headers only for several discs, bonuses, other formats or titles', () => {
     const single = buildTracklist({ discs: [disc(1, [track(1)])], bonuses: [], language: null }, helpers)
     expect(single.discs[0]!.showHeader).toBe(false)
@@ -151,10 +169,10 @@ describe('buildTracklist', () => {
 
 describe('normalizeTracklistPrefs', () => {
   it('fills in defaults and drops unknown values', () => {
-    expect(normalizeTracklistPrefs(undefined, ['list', 'table'])).toEqual({ style: 'list', density: 'comfy', artistCard: true })
-    expect(normalizeTracklistPrefs({ style: 'table', density: 'full', trackCard: false, artistCard: 'no' }, ['list', 'table']))
-      .toEqual({ style: 'table', density: 'full', artistCard: true })
-    expect(normalizeTracklistPrefs({ style: 'gone', density: 'huge' }, ['list'])).toMatchObject({ style: 'list', density: 'comfy' })
+    expect(normalizeTracklistPrefs(undefined, ['list', 'table'])).toEqual({ style: 'list', density: 'comfy', numbering: 'disc' })
+    expect(normalizeTracklistPrefs({ style: 'table', density: 'full', numbering: 'album', trackCard: false, artistCard: false }, ['list', 'table']))
+      .toEqual({ style: 'table', density: 'full', numbering: 'album' })
+    expect(normalizeTracklistPrefs({ style: 'gone', density: 'huge', numbering: 'side' }, ['list'])).toMatchObject({ style: 'list', density: 'comfy', numbering: 'disc' })
   })
 })
 

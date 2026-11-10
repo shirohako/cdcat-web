@@ -3,13 +3,13 @@ import type { Ref } from 'vue'
 
 /**
  * How a credited name shows the part that links to the artist (main.css, `.credit-link` / `.credit-plain`):
- * - `hover`: nothing until the pointer is on it
+ * - `accent`: the linked part in a heavier weight and the theme colour (a blue with the ink palette), the rest as it is
  * - `fade`: the linked part in a heavier weight, the rest of the name faded (the default)
  * - `dotted`: a dotted line under the linked part, solid on hover
  */
-export type CreditLinkStyle = 'hover' | 'fade' | 'dotted'
+export type CreditLinkStyle = 'accent' | 'fade' | 'dotted'
 
-export const CREDIT_LINK_STYLES: readonly CreditLinkStyle[] = ['hover', 'fade', 'dotted']
+export const CREDIT_LINK_STYLES: readonly CreditLinkStyle[] = ['accent', 'fade', 'dotted']
 export const DEFAULT_CREDIT_LINK_STYLE: CreditLinkStyle = 'fade'
 
 const cache = new WeakMap<NuxtApp, Ref<string | null | undefined>>()

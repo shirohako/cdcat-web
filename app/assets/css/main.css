@@ -584,16 +584,18 @@
    reader picks a style (useCreditLinks), set as data-credit-links on <html>; an element with its own attribute shows
    another style inside it (the settings dialog's samples). Each style only sets these variables, so the nearest
    attribute wins; one left unset leaves the property as it was (a var() with nothing to read falls back to `unset`).
-   hover: nothing until the pointer is on it. fade: the linked part heavier, the rest of the name faded. dotted: a
-   dotted line under the linked part, a solid one drawn over it from left to right on hover.
+   accent: the linked part heavier and in the theme colour (--accent-text: a blue with the ink palette), the rest as
+   it is. fade: the linked part heavier, the rest of the name faded. dotted: a dotted line under the linked part, a
+   solid one drawn over it from left to right on hover.
    The dotted style's lines are background lines, not an underline (whose style can't animate): over the text only
    (content box, so not under a hover patch's padding), with their top 2px below the baseline. The baseline is at
    half the line plus 0.436em in Noto Sans (ascent 1.16, descent 0.288); a 1px line at calc(50% + x) is placed at
    (height - 1px) / 2 + x, hence the 2.5px. The empty last layer keeps a hover patch's colour on the whole box. */
 @layer components {
-  [data-credit-links="hover"] {
+  [data-credit-links="accent"] {
     --credit-plain-color: initial;
-    --credit-link-weight: initial;
+    --credit-link-weight: 600;
+    --credit-link-color: var(--accent-text);
     --credit-link-lines: initial;
     --credit-link-clip: initial;
   }
@@ -602,6 +604,7 @@
     /* Between --meta (0.5) and --faint (0.3): 0.4 in either theme */
     --credit-plain-color: color-mix(in oklab, var(--meta) 80%, transparent);
     --credit-link-weight: 600;
+    --credit-link-color: initial;
     --credit-link-lines: initial;
     --credit-link-clip: initial;
   }
@@ -609,6 +612,7 @@
   [data-credit-links="dotted"] {
     --credit-plain-color: initial;
     --credit-link-weight: initial;
+    --credit-link-color: initial;
     --credit-link-lines: linear-gradient(currentColor, currentColor), repeating-linear-gradient(to right, var(--meta) 0 1px, transparent 1px 3px), none;
     --credit-link-clip: content-box, content-box, border-box;
   }
@@ -619,6 +623,7 @@
 
   .credit-link {
     font-weight: var(--credit-link-weight);
+    color: var(--credit-link-color);
     background-image: var(--credit-link-lines);
     background-clip: var(--credit-link-clip);
     background-origin: content-box;
@@ -638,6 +643,13 @@
 /* Outside the layers, so it wins over a link's own transition-colors utility (which would drop background-size). */
 .credit-link {
   transition: background-size 220ms ease-out, background-color 150ms, color 150ms;
+}
+
+/* Credited links turn the theme colour on hover (their hover:text-primary). The accent style keeps its own colour
+   instead, which with the ink palette is a blue, not the near-black theme colour; outside the layers to beat the
+   utility. The other styles have no --credit-link-color and get the theme colour, as the utility gives. */
+a.credit-link:hover {
+  color: var(--credit-link-color, var(--primary));
 }
 
 @media (prefers-reduced-motion: reduce) {

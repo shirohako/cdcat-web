@@ -11,12 +11,16 @@ import { ARTIST_ROLE, attachGuests, FEATURING_ROLE } from './artistLine'
 export type TracklistDensity = 'compact' | 'comfy' | 'full'
 export const TRACKLIST_DENSITIES: readonly TracklistDensity[] = ['compact', 'comfy', 'full']
 
+/** Track numbers: each disc from 1 (`disc`), or later discs carrying on from the one before (`album`). */
+export type TracklistNumbering = 'disc' | 'album'
+export const TRACKLIST_NUMBERINGS: readonly TracklistNumbering[] = ['disc', 'album']
+
 export interface TracklistPrefs {
   style: string
   density: TracklistDensity
-  artistCard: boolean
+  numbering: TracklistNumbering
 }
-export const DEFAULT_TRACKLIST_PREFS: TracklistPrefs = { style: 'list', density: 'comfy', artistCard: true }
+export const DEFAULT_TRACKLIST_PREFS: TracklistPrefs = { style: 'list', density: 'comfy', numbering: 'disc' }
 
 /** The saved preferences, with anything unknown (a removed style, a hand-edited cookie) back at its default. */
 export const normalizeTracklistPrefs = (raw: unknown, styleKeys: readonly string[]): TracklistPrefs => {
@@ -24,7 +28,7 @@ export const normalizeTracklistPrefs = (raw: unknown, styleKeys: readonly string
   return {
     style: typeof value.style === 'string' && styleKeys.includes(value.style) ? value.style : DEFAULT_TRACKLIST_PREFS.style,
     density: TRACKLIST_DENSITIES.includes(value.density as TracklistDensity) ? value.density as TracklistDensity : DEFAULT_TRACKLIST_PREFS.density,
-    artistCard: typeof value.artistCard === 'boolean' ? value.artistCard : DEFAULT_TRACKLIST_PREFS.artistCard,
+    numbering: TRACKLIST_NUMBERINGS.includes(value.numbering as TracklistNumbering) ? value.numbering as TracklistNumbering : DEFAULT_TRACKLIST_PREFS.numbering,
   }
 }
 
@@ -155,6 +159,27 @@ export interface TracklistInput {
   /** The album-wide credits, for each artist's roles on the album */
   credits?: CatalogCredit[]
   language: TracklistLanguageChoice | null
+  /** Each disc from 1 when left out */
+  numbering?: TracklistNumbering
+}
+
+/**
+ * How much to add to each disc's track numbers when they run on through the album: a disc carries on from the last
+ * number of the disc before it. A bonus's discs (特典) run on among themselves, apart from the album's own. A disc
+ * already numbered on (its first number past the last one before it) keeps its numbers.
+ */
+const numberOffsets = (discs: AlbumDisc[]) => {
+  const offsets = new Map<number, number>()
+  const reached = new Map<number | null, number>()
+  for (const disc of [...discs].sort((a, b) => a.position - b.position)) {
+    const numbers = disc.tracks.map(track => track.track_number)
+    if (!numbers.length) continue
+    const last = reached.get(disc.bonus_id ?? null) ?? 0
+    const offset = Math.min(...numbers) > last ? 0 : last
+    offsets.set(disc.id, offset)
+    reached.set(disc.bonus_id ?? null, offset + Math.max(...numbers))
+  }
+  return offsets
 }
 
 export const groupCredits = (credits: CatalogCredit[], helpers: TracklistHelpers): TracklistRoleGroup[] => {
@@ -211,7 +236,7 @@ const joinArtists = (groups: TracklistRoleGroup[]): TracklistRoleGroup[] => grou
   return { ...group, people: heads }
 })
 
-const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
+const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
   const groups = joinArtists(attachFeaturing(groupCredits(track.credits, helpers), track.credits))
   // A role split by job titles counts as one for the key people: they are all of the role, under its own name.
@@ -224,7 +249,7 @@ const buildRow = (track: AlbumTrack, discPosition: number, input: TracklistInput
   return {
     id: track.id,
     discPosition,
-    number: track.number_label || String(track.track_number).padStart(2, '0'),
+    number: track.number_label || String(track.track_number + offset).padStart(2, '0'),
     title: translated ?? track.title,
     subtitle: translated && translated !== track.title ? track.title : '',
     translated: input.language ? translated !== null : null,
@@ -258,6 +283,7 @@ export const buildTracklist = (input: TracklistInput, helpers: TracklistHelpers)
     roleCounts.set(credit.artist.id, roles)
   }
   for (const credit of input.credits ?? []) count(credit, 0)
+  const offsets = input.numbering === 'album' ? numberOffsets(input.discs) : null
 
   const discs: TracklistDisc[] = input.discs.map((disc) => {
     const tracks = [...disc.tracks].sort((a, b) => a.track_number - b.track_number)
@@ -270,7 +296,7 @@ export const buildTracklist = (input: TracklistInput, helpers: TracklistHelpers)
         seen.add(key)
       }
     }
-    const rows = tracks.map(track => buildRow(track, disc.position, input, helpers))
+    const rows = tracks.map(track => buildRow(track, disc.position, offsets?.get(disc.id) ?? 0, input, helpers))
     const roles = new Map<string, { role: string, label: string, category: string }>()
     for (const row of rows) for (const group of row.groups) roles.set(group.role, { role: group.role, label: group.roleName, category: group.category })
     const known = tracks.every(track => track.duration !== null)
