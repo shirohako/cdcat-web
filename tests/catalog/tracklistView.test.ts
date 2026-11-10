@@ -71,6 +71,22 @@ describe('buildTracklist', () => {
     expect(discs.map(item => item.duration)).toEqual(['5:00', null])
   })
 
+  it('picks 艺术家, 作曲, 编曲 and 演唱 for the 舒适 line, merging roles held by the same people and capping names', () => {
+    const credits = [
+      credit('vocals', 'Eris', 4), credit('arranger', 'NAGI', 1), credit('composer', 'NAGI', 1), credit('lyricist', 'Mio', 5),
+      credit('artist', 'A', 6), credit('artist', 'B', 7), credit('artist', 'C', 8),
+    ]
+    const row = buildTracklist({ discs: [disc(1, [track(1, { credits })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    expect(row.key.map(item => item.roles.map(role => role.role))).toEqual([['artist'], ['composer', 'arranger'], ['vocals']])
+    expect(row.key[0]!.people.map(person => person.name)).toEqual(['A', 'B'])
+    expect(row.key[0]!.more.map(person => person.name)).toEqual(['C'])
+    // 作词 is left to 完整, and C is behind the +1
+    expect(row.hasMore).toBe(true)
+    const plain = buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('composer', 'NAGI', 1), credit('vocals', 'Eris', 4)] })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!
+    expect(plain.hasMore).toBe(false)
+    expect(buildTracklist({ discs: [disc(1, [track(1, { credits: [credit('composer', 'NAGI', 1)], isrc: 'JPX' })])], bonuses: [], language: null }, helpers).discs[0]!.rows[0]!.hasMore).toBe(true)
+  })
+
   it('counts each person once, by artist and credited name, guests included', () => {
     const credits = [
       credit('composer', 'NAGI', 1), credit('arranger', 'NAGI', 1), credit('lyricist', 'Eris'), credit('vocals', 'Eris'),

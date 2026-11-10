@@ -103,6 +103,22 @@ export interface TracklistRoleGroup {
   people: TracklistPerson[]
 }
 
+/**
+ * A credit on 清单 · 舒适's line: one or more roles held by exactly the same people (作曲·编曲 高田暁), with at most
+ * KEY_NAMES of them shown and the rest counted.
+ */
+export interface TracklistKeyCredit {
+  key: string
+  roles: TracklistRoleGroup[]
+  /** The names shown, at most KEY_NAMES */
+  people: TracklistPerson[]
+  /** The names past those, behind a +N */
+  more: TracklistPerson[]
+}
+
+/** How many names a credit on 清单 · 舒适's line shows before the rest go behind a +N. */
+export const KEY_NAMES = 2
+
 export interface TracklistRow {
   id: number
   discPosition: number
@@ -125,6 +141,10 @@ export interface TracklistRow {
   /** 舒适: who performs (艺术家, else the first vocal role, with the 客串 after them) and who made it (arrangement, else composition) */
   lead: TracklistRoleGroup | null
   maker: TracklistRoleGroup | null
+  /** 清单 · 舒适: 艺术家, 作曲, 编曲, 演唱 (keyCredits) */
+  key: TracklistKeyCredit[]
+  /** Whether 完整 shows something the 舒适 line leaves out: other roles, names behind a +N, notes */
+  hasMore: boolean
   /** 完整: every credit by role, in the dictionary's order; the 客串 inside the lead rather than a group of their own */
   groups: TracklistRoleGroup[]
   /** How many people `groups` names, each once (countPeople): the 清单 · 简洁 people button */
@@ -275,6 +295,32 @@ export const countPeople = (groups: TracklistRoleGroup[]) => {
   return keys.size
 }
 
+/**
+ * 清单 · 舒适's line, the credits that matter most at a glance, in this order: the 艺术家 (with their 客串), 作曲, 编曲
+ * and 演唱 (the vocals role, else the first of the vocals category); the first role of each category, a role split by
+ * job titles taken whole. Roles held by exactly the same people share one credit (作曲·编曲 高田暁), and each shows
+ * KEY_NAMES names at most.
+ */
+export const keyCredits = (picks: Array<TracklistRoleGroup | null | undefined>): TracklistKeyCredit[] => {
+  const credits: TracklistKeyCredit[] = []
+  const bySameNames = new Map<string, TracklistKeyCredit>()
+  const seen = new Set<string>()
+  for (const group of picks) {
+    if (!group || seen.has(group.key)) continue
+    seen.add(group.key)
+    const names = group.people.map(person => `${person.artistId ?? ''}|${person.name}`).sort().join('\n')
+    const same = bySameNames.get(names)
+    if (same) {
+      same.roles.push(group)
+      continue
+    }
+    const credit = { key: group.key, roles: [group], people: group.people.slice(0, KEY_NAMES), more: group.people.slice(KEY_NAMES) }
+    bySameNames.set(names, credit)
+    credits.push(credit)
+  }
+  return credits
+}
+
 const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input: TracklistInput, helpers: TracklistHelpers): TracklistRow => {
   const translated = helpers.titleIn(track.titles, input.language)
   const groups = joinArtists(attachFeaturing(groupCredits(track.credits, helpers), track.credits))
@@ -285,12 +331,20 @@ const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input
     return same.length > 1 ? { ...group, key: group.role, label: group.roleName, tip: '', people: same.flatMap(other => other.people) } : group
   }
   const byCategory = (category: string) => whole(groups.find(group => group.category === category))
+  const key = keyCredits([
+    whole(groups.find(group => group.role === ARTIST_ROLE)),
+    byCategory('composition'),
+    byCategory('arrangement'),
+    whole(groups.find(group => group.role === 'vocals')) ?? byCategory('vocals'),
+  ])
+  const subtitle = translated && translated !== track.title ? track.title : ''
+  const shownRoles = new Set(key.flatMap(credit => credit.roles.flatMap(role => groups.filter(group => group.role === role.role).map(group => group.key))))
   return {
     id: track.id,
     discPosition,
     number: track.number_label || String(track.track_number + offset).padStart(2, '0'),
     title: translated ?? track.title,
-    subtitle: translated && translated !== track.title ? track.title : '',
+    subtitle,
     translated: input.language ? translated !== null : null,
     otherTitles: track.titles.map(title => ({
       title: title.title,
@@ -305,6 +359,9 @@ const buildRow = (track: AlbumTrack, discPosition: number, offset: number, input
     // The 艺术家, else the first role of the vocals; the 客串 when no credit of the track takes them
     lead: whole(groups.find(group => group.role === ARTIST_ROLE)) ?? byCategory('vocals'),
     maker: byCategory('arrangement') ?? byCategory('composition'),
+    key,
+    hasMore: groups.some(group => !shownRoles.has(group.key)) || key.some(credit => credit.more.length > 0)
+      || Boolean(subtitle || track.attributes.length || track.isrc),
     groups,
     people: countPeople(groups),
     originals: track.originals,
