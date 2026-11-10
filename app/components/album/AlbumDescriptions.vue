@@ -20,13 +20,17 @@
               <CatalogTitleList :titles="otherTitles" />
             </CatalogInfoRow>
 
-            <!-- Who labels, sells, makes and plans the album, each name once with all its roles -->
+            <!-- Who labels, sells, makes and plans the album, each name once with all its roles. Names in these rows are
+                 grey tags (the people's, CatalogCreditPersonTag, for artists), links marked as the reader chose for
+                 credited names (可点的名字), what follows them grey labels in the middle of the tag's first line (as in
+                 其他名称, CatalogTitleList). -->
             <CatalogInfoRow v-if="releasers.length" :label="$t('album.info.people')">
               <ul class="space-y-1">
-                <li v-for="releaser in releasers" :key="releaser.key" class="flex items-baseline gap-2">
-                  <NuxtLink v-if="releaser.id" :to="`/artists/${releaser.id}`" class="min-w-0 truncate text-title transition-colors hover:text-primary">{{ releaser.name }}</NuxtLink>
-                  <span v-else class="min-w-0 truncate text-title">{{ releaser.name }}</span>
-                  <span class="shrink-0 text-11 text-meta">{{ releaser.roles.map(roleName).join(', ') }}</span>
+                <li v-for="releaser in releasers" :key="releaser.key" class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                  <CatalogCreditPersonTag :name="releaser.name" :artist-id="releaser.id" :artist-name="releaser.artistName" />
+                  <span class="flex h-5 shrink-0 items-center gap-1">
+                    <AlbumTracklistLabel v-for="role in releaser.roles" :key="role">{{ roleName(role) }}</AlbumTracklistLabel>
+                  </span>
                 </li>
               </ul>
             </CatalogInfoRow>
@@ -35,16 +39,18 @@
 
             <CatalogInfoRow v-if="album.entries.length" :label="$t('content_display.linked_entries')">
               <ul class="space-y-1">
-                <li v-for="entry in album.entries" :key="entry.id" class="flex items-baseline gap-2">
-                  <NuxtLink :to="`/entries/${entry.id}`" class="min-w-0 truncate text-title transition-colors hover:text-primary">{{ entry.name }}</NuxtLink>
-                  <span class="shrink-0 text-11 text-meta">{{ albumRelationLabel(entry.relation_type) }}</span>
+                <li v-for="entry in album.entries" :key="entry.id" class="flex flex-wrap items-start gap-x-2 gap-y-1">
+                  <CatalogNameTag :to="`/entries/${entry.id}`">{{ entry.name }}</CatalogNameTag>
+                  <span v-if="albumRelationLabel(entry.relation_type)" class="flex h-5 shrink-0 items-center">
+                    <AlbumTracklistLabel>{{ albumRelationLabel(entry.relation_type) }}</AlbumTracklistLabel>
+                  </span>
                 </li>
               </ul>
             </CatalogInfoRow>
 
             <CatalogInfoRow v-if="album.franchises.length" :label="$t('catalog.belongs_to')">
-              <span class="flex flex-wrap gap-x-3">
-                <NuxtLink v-for="franchise in album.franchises" :key="franchise.id" :to="`/franchises/${franchise.id}`" class="text-title transition-colors hover:text-primary">{{ franchise.name }}</NuxtLink>
+              <span class="flex flex-wrap gap-1">
+                <CatalogNameTag v-for="franchise in album.franchises" :key="franchise.id" :to="`/franchises/${franchise.id}`">{{ franchise.name }}</CatalogNameTag>
               </span>
             </CatalogInfoRow>
           </CatalogInfoTable>
@@ -81,12 +87,12 @@ const otherTitles = computed(() => {
 
 /** The album-wide 署名与发行 credits but 艺术家 and 发行 (the hero shows those), grouped by name, roles in their fixed order. */
 const releasers = computed(() => {
-  const rows = new Map<string, { key: string, id: number | null, name: string, roles: string[] }>()
+  const rows = new Map<string, { key: string, id: number | null, name: string, artistName: string | null, roles: string[] }>()
   for (const credit of props.album.credits) {
     if (credit.role === 'artist' || credit.role === 'publisher' || !(RELEASE_ROLES as readonly string[]).includes(credit.role)) continue
     const name = credit.credited_as || credit.artist?.name || ''
     const key = credit.artist ? `id:${credit.artist.id}:${name}` : `name:${name}`
-    const row = rows.get(key) ?? { key, id: credit.artist?.id ?? null, name, roles: [] }
+    const row = rows.get(key) ?? { key, id: credit.artist?.id ?? null, name, artistName: credit.artist?.name ?? null, roles: [] }
     if (!row.roles.includes(credit.role)) row.roles.push(credit.role)
     rows.set(key, row)
   }
