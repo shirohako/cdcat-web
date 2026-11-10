@@ -75,11 +75,8 @@ const lyricsInline = (row: TracklistRow, density: TracklistDensity) => !row.inst
               <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-13 leading-[1.125rem] text-title">
                 <AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>
               </p>
-              <!-- Two columns, the first sized from the card's width (cqi) rather than this block's, which loses the
-                   lyrics buttons' width: so the second column starts at the same place in every track, instrumentals
-                   (no buttons) and tracks with a translation button too. 5rem puts it where 1fr 1fr did beside one
-                   lyrics button. -->
-              <div v-if="row.groups.length" class="grid gap-x-5 gap-y-1.5 @xl:grid-cols-[minmax(0,calc(50cqi_-_5rem))_minmax(0,1fr)]">
+              <!-- One role per line, its people after its tag -->
+              <div v-if="row.groups.length" class="grid gap-y-1.5">
                 <div v-for="group in row.groups" :key="group.key" class="flex min-w-0 items-start gap-2 text-13 leading-[1.125rem] text-title">
                   <CatalogRoleTag :label="group.label" :tip="group.tip" :category="group.category" />
                   <AlbumTracklistPeople :people="group.people" class="min-w-0" />
