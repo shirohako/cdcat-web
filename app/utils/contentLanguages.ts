@@ -9,7 +9,7 @@ export const READINGS = ['ja-Latn', 'ja-Hrkt']
 
 /** Chinese is listed by script (zh-Hans, zh-Hant), so plain zh is left out. */
 export const LANGUAGES = [
-  'ar', 'cs', 'da', 'de', 'el', 'es', 'fi', 'fil', 'fr', 'hi', 'hu', 'id', 'it', 'la',
+  'ar', 'cs', 'da', 'de', 'el', 'eo', 'es', 'fi', 'fil', 'fr', 'hi', 'hu', 'id', 'it', 'la',
   'ms', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'vi', 'yue',
 ]
 
