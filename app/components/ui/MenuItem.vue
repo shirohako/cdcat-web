@@ -8,7 +8,8 @@ import { MENU_CLOSE } from './Menu.vue'
  * A row in a UiMenu: a link with `to`, else a button. Choosing it closes the menu. The icon stays muted and takes the
  * theme colour on hover, so the labels lead. With `glide`, the menu draws one highlight that glides between rows
  * (useGlideHighlight), so the row draws no hover background of its own. `hint` is a smaller line under the label, for
- * rows whose label alone doesn't say what they do.
+ * rows whose label alone doesn't say what they do. The `leading` slot takes something larger than an icon before the
+ * label (the tracklist's 样式 menu puts a small drawing there); `trailing` goes after it.
  */
 withDefaults(defineProps<{
   to?: RouteLocationRaw
@@ -48,6 +49,7 @@ const choose = (event: MouseEvent) => {
       class="size-4 shrink-0 transition-colors duration-150 ease-out"
       :class="{ 'text-meta group-hover:text-primary': !danger && !active }"
     />
+    <slot name="leading" />
     <span class="min-w-0 flex-1 truncate">
       <slot />
       <span v-if="hint" class="block whitespace-normal text-xs font-normal leading-4 text-meta">{{ hint }}</span>

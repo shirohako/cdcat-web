@@ -25,11 +25,7 @@ const isFolded = computed(() => folded.value.has(props.disc.id))
 const count = computed(() => props.disc.rows.length)
 /** Tracks from which a disc is about a screen or more tall, as rows grow with the density. Counted, not measured, so the server renders the button too. */
 const LONG_DISC: Record<TracklistDensity, number> = { compact: 20, comfy: 14, full: 8 }
-/** The booklet sets its compact rows in two columns, so such a disc is half as tall. */
-const long = computed(() => {
-  const { density } = prefs.value
-  return props.disc.showHeader && count.value >= LONG_DISC[density] * (props.variant === 'booklet' && density === 'compact' ? 2 : 1)
-})
+const long = computed(() => props.disc.showHeader && count.value >= LONG_DISC[prefs.value.density])
 const meta = computed(() => (isFolded.value
   ? t('album.tracklist.disc.folded', { count: count.value })
   : [t('album.tracklist.disc.tracks', { count: count.value }), props.disc.duration].filter(Boolean).join(' · ')))
@@ -69,6 +65,8 @@ const meta = computed(() => (isFolded.value
       </button>
     </div>
     <UiCollapse :id="bodyId" :open="!isFolded">
+      <!-- Air under the bar's line, so the first row's hover fill doesn't touch it -->
+      <div v-if="disc.showHeader && variant === 'bar'" class="h-1" aria-hidden="true" />
       <slot />
       <AlbumFoldPill v-if="long" :label="t('album.tracklist.disc.fold')" :shown="stuck" class="pb-1" @click="toggleDisc(disc, header)" />
     </UiCollapse>

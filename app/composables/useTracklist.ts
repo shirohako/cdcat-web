@@ -1,15 +1,19 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
-import type { TracklistDisc, TracklistPrefs, TracklistRow } from '~/utils/tracklistView'
+import type { TracklistDensity, TracklistDisc, TracklistPrefs, TracklistRow } from '~/utils/tracklistView'
 import { normalizeTracklistPrefs } from '~/utils/tracklistView'
 
 /**
- * The album tracklist's view preferences (style, density, track numbering), kept in one cookie so the server
+ * The album tracklist's view preferences (layout, density, track numbering), kept in one cookie so the server
  * renders the reader's last choice. Reading never writes the cookie back, so pages without a choice send no Set-Cookie.
- * Call it once, in AlbumTracklist, and share the result through the context.
+ * `layouts` maps each layout to the densities it offers, `moved` old `style.density` pairs to where they went. Call it
+ * once, in AlbumTracklist, and share the result through the context.
  */
-export const useTracklistPrefs = (styleKeys: readonly string[]) => {
+export const useTracklistPrefs = (
+  layouts: Readonly<Record<string, readonly TracklistDensity[]>>,
+  moved: Readonly<Record<string, Pick<TracklistPrefs, 'style' | 'density'>>> = {},
+) => {
   const cookie = useCookie<Partial<TracklistPrefs> | undefined>('album_tracklist', { maxAge: 60 * 60 * 24 * 365, sameSite: 'lax' })
-  const prefs = computed(() => normalizeTracklistPrefs(cookie.value, styleKeys))
+  const prefs = computed(() => normalizeTracklistPrefs(cookie.value, layouts, moved))
   const update = (patch: Partial<TracklistPrefs>) => {
     cookie.value = { ...prefs.value, ...patch }
   }

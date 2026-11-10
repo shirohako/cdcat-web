@@ -7,7 +7,7 @@ import type { TracklistDensity, TracklistDisc, TracklistRoleGroup, TracklistRow 
  * its own small tag). 完整 has fixed columns, one for each core category on that disc (作曲, 作词, 编曲, 演唱, in the
  * dictionary's order), and one 其他人员 column for every other role, as role tags with names, so a disc with dozens of
  * roles stays a few columns wide. On a narrow card each row turns into a block, in CSS alone, with a role tag in each
- * cell. The columns change with the density, so that switch crossfades.
+ * cell. The columns change with the density, so that switch crossfades. Its 简洁 moved to 清单 on 2026-11-11.
  */
 const props = defineProps<{ discs: TracklistDisc[], density: TracklistDensity }>()
 
@@ -46,7 +46,7 @@ const columnsOf = (disc: TracklistDisc): Column[] => {
     }
     if (disc.roles.some(role => !CORE_CATEGORIES.includes(role.category))) columns.push({ kind: 'others' })
   }
-  if (props.density !== 'compact' && sung) columns.push({ kind: 'lyrics' })
+  if (sung) columns.push({ kind: 'lyrics' })
   columns.push({ kind: 'heart' }, { kind: 'duration' })
   return columns
 }
@@ -76,8 +76,8 @@ const CELL_CLASSES: Record<string, string> = {
     <div :key="density" class="px-5 pb-1.5">
       <AlbumTracklistDisc v-for="disc in discs" :key="disc.id" :disc="disc">
         <div class="table-scroll overflow-x-auto">
-          <table class="tl-table w-full border-collapse text-13 leading-5" :class="`is-${density}`">
-            <thead v-if="density !== 'compact'">
+          <table class="tl-table w-full border-collapse text-13 leading-5">
+            <thead>
               <tr>
                 <th v-for="column in columns.get(disc.id)" :key="columnKey(column)" :class="CELL_CLASSES[column.kind]">
                   <CatalogRoleTag v-if="'head' in column" :label="column.head.label" :category="column.head.category" />
@@ -101,8 +101,8 @@ const CELL_CLASSES: Record<string, string> = {
                   <template v-if="column.kind === 'number'">{{ row.number }}</template>
                   <template v-else-if="column.kind === 'title'">
                     <AlbumTracklistTitle :row="row" class="font-medium" />
-                    <AlbumTracklistLabel v-if="row.instrumental && density !== 'compact'" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
-                    <span v-if="density !== 'compact' && (row.originals.length || (density === 'full' && (row.attributes.length || row.isrc || row.subtitle)))" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
+                    <AlbumTracklistLabel v-if="row.instrumental" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
+                    <span v-if="row.originals.length || (density === 'full' && (row.attributes.length || row.isrc || row.subtitle))" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
                       <span v-if="density === 'full' && row.subtitle" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel>{{ row.subtitle }}</span>
                       <span v-if="row.originals.length" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                       <template v-if="density === 'full'">
@@ -176,10 +176,6 @@ const CELL_CLASSES: Record<string, string> = {
   vertical-align: top;
 }
 
-.tl-table.is-compact td {
-  padding-block: 0.375rem;
-}
-
 .tl-table tr:last-child td {
   border-bottom: 0;
 }
@@ -224,10 +220,6 @@ const CELL_CLASSES: Record<string, string> = {
     display: block;
     padding: 0;
     border: 0;
-  }
-
-  .tl-table.is-compact td {
-    padding: 0;
   }
 
   .tl-table td.c-number {

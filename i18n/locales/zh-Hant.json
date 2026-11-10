@@ -77,18 +77,22 @@
       "translation_with_count": "翻譯 {count}",
       "original": "原文",
       "density": {
-        "label": "資訊密度",
         "compact": "簡潔",
         "comfy": "舒適",
         "full": "完整"
       },
+      "style_hints": {
+        "list_compact": "帶分隔線，只有標題和時長",
+        "list_comfy": "標題下加演唱、編曲和原曲",
+        "list_full": "全部署名，一個角色一行",
+        "booklet_full": "像 CD 內頁，左署名右備註",
+        "table_comfy": "演唱、編曲和歌詞各一欄",
+        "table_full": "作曲、作詞、編曲、演唱各一欄"
+      },
       "styles": {
         "list": "清單",
-        "list_hint": "像音樂 App",
         "booklet": "內頁",
-        "booklet_hint": "CD 內頁排版",
-        "table": "表格",
-        "table_hint": "對齊的欄"
+        "table": "表格"
       },
       "settings": {
         "title": "曲目表設定",

@@ -15,6 +15,10 @@ export const TRACKLIST_DENSITIES: readonly TracklistDensity[] = ['compact', 'com
 export type TracklistNumbering = 'disc' | 'album'
 export const TRACKLIST_NUMBERINGS: readonly TracklistNumbering[] = ['disc', 'album']
 
+/**
+ * What a reader picks as one 样式 is a layout (`style`: 清单, 内页, 表格) at one of the densities that layout offers;
+ * the two are kept apart so a density change within a layout opens and folds rows instead of swapping the list.
+ */
 export interface TracklistPrefs {
   style: string
   density: TracklistDensity
@@ -22,12 +26,28 @@ export interface TracklistPrefs {
 }
 export const DEFAULT_TRACKLIST_PREFS: TracklistPrefs = { style: 'list', density: 'comfy', numbering: 'disc' }
 
-/** The saved preferences, with anything unknown (a removed style, a hand-edited cookie) back at its default. */
-export const normalizeTracklistPrefs = (raw: unknown, styleKeys: readonly string[]): TracklistPrefs => {
-  const value = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof TracklistPrefs, unknown>>
+/**
+ * The saved preferences, with anything unknown (a removed layout, a hand-edited cookie) back at its default. `layouts`
+ * maps each layout to the densities it offers; a density the layout doesn't offer (内页 · 简洁 before it went) becomes
+ * the default density if the layout has it, else the layout's first, so the reader keeps the layout. `moved` maps a
+ * `style.density` pair that went to another layout (表格 · 简洁 → 清单 · 简洁) to its new place.
+ */
+export const normalizeTracklistPrefs = (
+  raw: unknown,
+  layouts: Readonly<Record<string, readonly TracklistDensity[]>>,
+  moved: Readonly<Record<string, Pick<TracklistPrefs, 'style' | 'density'>>> = {},
+): TracklistPrefs => {
+  const saved = (raw && typeof raw === 'object' ? raw : {}) as Partial<Record<keyof TracklistPrefs, unknown>>
+  const pair = `${String(saved.style)}.${String(saved.density)}`
+  const value = Object.hasOwn(moved, pair) ? { ...saved, ...moved[pair] } : saved
+  const style = typeof value.style === 'string' && Object.hasOwn(layouts, value.style) ? value.style : DEFAULT_TRACKLIST_PREFS.style
+  const offered = layouts[style] ?? TRACKLIST_DENSITIES
+  const density = offered.includes(value.density as TracklistDensity)
+    ? value.density as TracklistDensity
+    : offered.includes(DEFAULT_TRACKLIST_PREFS.density) ? DEFAULT_TRACKLIST_PREFS.density : offered[0] ?? DEFAULT_TRACKLIST_PREFS.density
   return {
-    style: typeof value.style === 'string' && styleKeys.includes(value.style) ? value.style : DEFAULT_TRACKLIST_PREFS.style,
-    density: TRACKLIST_DENSITIES.includes(value.density as TracklistDensity) ? value.density as TracklistDensity : DEFAULT_TRACKLIST_PREFS.density,
+    style,
+    density,
     numbering: TRACKLIST_NUMBERINGS.includes(value.numbering as TracklistNumbering) ? value.numbering as TracklistNumbering : DEFAULT_TRACKLIST_PREFS.numbering,
   }
 }

@@ -77,18 +77,22 @@
       "translation_with_count": "Translations {count}",
       "original": "Original titles",
       "density": {
-        "label": "Detail",
         "compact": "Compact",
         "comfy": "Comfortable",
         "full": "Full"
       },
+      "style_hints": {
+        "list_compact": "Ruled rows: titles and lengths",
+        "list_comfy": "Adds singers, arrangers and originals",
+        "list_full": "Every credit, one role per line",
+        "booklet_full": "Like a CD booklet: credits, then notes",
+        "table_comfy": "Columns for vocals, arrangement, lyrics",
+        "table_full": "Columns for music, lyrics, arrangement, vocals"
+      },
       "styles": {
         "list": "List",
-        "list_hint": "Like a music app",
         "booklet": "Booklet",
-        "booklet_hint": "Like a CD booklet",
-        "table": "Table",
-        "table_hint": "Aligned columns"
+        "table": "Table"
       },
       "settings": {
         "title": "Tracklist settings",

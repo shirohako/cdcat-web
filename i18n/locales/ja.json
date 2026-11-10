@@ -77,18 +77,22 @@
       "translation_with_count": "翻訳 {count}",
       "original": "原題",
       "density": {
-        "label": "表示の詳しさ",
         "compact": "シンプル",
         "comfy": "標準",
         "full": "詳細"
       },
+      "style_hints": {
+        "list_compact": "罫線つき、タイトルと長さだけ",
+        "list_comfy": "タイトルの下にボーカル・編曲・原曲",
+        "list_full": "全クレジットを役割ごとに一行",
+        "booklet_full": "CD ブックレット風、左にクレジット",
+        "table_comfy": "ボーカル・編曲・歌詞を列に",
+        "table_full": "作曲・作詞・編曲・ボーカルを列に"
+      },
       "styles": {
         "list": "リスト",
-        "list_hint": "音楽アプリ風",
         "booklet": "ブックレット",
-        "booklet_hint": "CD ブックレット風",
-        "table": "表",
-        "table_hint": "列をそろえて"
+        "table": "表"
       },
       "settings": {
         "title": "トラックリストの設定",

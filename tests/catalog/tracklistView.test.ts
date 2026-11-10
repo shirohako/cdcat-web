@@ -168,11 +168,29 @@ describe('buildTracklist', () => {
 })
 
 describe('normalizeTracklistPrefs', () => {
+  const ALL = ['compact', 'comfy', 'full'] as const
+
   it('fills in defaults and drops unknown values', () => {
-    expect(normalizeTracklistPrefs(undefined, ['list', 'table'])).toEqual({ style: 'list', density: 'comfy', numbering: 'disc' })
-    expect(normalizeTracklistPrefs({ style: 'table', density: 'full', numbering: 'album', trackCard: false, artistCard: false }, ['list', 'table']))
+    expect(normalizeTracklistPrefs(undefined, { list: ALL, table: ALL })).toEqual({ style: 'list', density: 'comfy', numbering: 'disc' })
+    expect(normalizeTracklistPrefs({ style: 'table', density: 'full', numbering: 'album', trackCard: false, artistCard: false }, { list: ALL, table: ALL }))
       .toEqual({ style: 'table', density: 'full', numbering: 'album' })
-    expect(normalizeTracklistPrefs({ style: 'gone', density: 'huge', numbering: 'side' }, ['list'])).toMatchObject({ style: 'list', density: 'comfy', numbering: 'disc' })
+    expect(normalizeTracklistPrefs({ style: 'gone', density: 'huge', numbering: 'side' }, { list: ALL })).toMatchObject({ style: 'list', density: 'comfy', numbering: 'disc' })
+    expect(normalizeTracklistPrefs({ style: 'toString' }, { list: ALL })).toMatchObject({ style: 'list' })
+  })
+
+  it('keeps the layout when it no longer offers the saved density', () => {
+    const layouts = { list: ALL, booklet: ['full'] as const, short: ['compact', 'comfy'] as const }
+    expect(normalizeTracklistPrefs({ style: 'booklet', density: 'compact' }, layouts)).toMatchObject({ style: 'booklet', density: 'full' })
+    expect(normalizeTracklistPrefs({ style: 'booklet', density: 'comfy' }, layouts)).toMatchObject({ style: 'booklet', density: 'full' })
+    expect(normalizeTracklistPrefs({ style: 'short', density: 'full' }, layouts)).toMatchObject({ style: 'short', density: 'comfy' })
+  })
+
+  it('follows a style that moved to another layout', () => {
+    const layouts = { list: ALL, table: ['comfy', 'full'] as const }
+    const moved = { 'table.compact': { style: 'list', density: 'compact' as const } }
+    expect(normalizeTracklistPrefs({ style: 'table', density: 'compact', numbering: 'album' }, layouts, moved)).toEqual({ style: 'list', density: 'compact', numbering: 'album' })
+    expect(normalizeTracklistPrefs({ style: 'table', density: 'full' }, layouts, moved)).toMatchObject({ style: 'table', density: 'full' })
+    expect(normalizeTracklistPrefs({ style: 'table', density: 'compact' }, layouts)).toMatchObject({ style: 'table', density: 'comfy' })
   })
 })
 

@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
 import type { CreditLinkStyle } from '~/composables/useCreditLinks'
-import type { TracklistNumbering, TracklistPrefs } from '~/utils/tracklistView'
+import type { TracklistDensity, TracklistNumbering, TracklistPrefs } from '~/utils/tracklistView'
 import { Check } from '@lucide/vue'
 import { CREDIT_LINK_STYLES } from '~/composables/useCreditLinks'
 import { TRACKLIST_NUMBERINGS } from '~/utils/tracklistView'
 
+/** One 样式 on offer: a layout at one of its densities, shown as the layout's name with the density as a small tag. */
 export interface TracklistStyleOption {
   key: string
-  label: string
-  hint: string
-  icon: Component
+  style: string
+  density: TracklistDensity
+  name: string
+  tag: string
 }
 
 /**
- * The tracklist's settings: its style (a tile each; more styles wrap onto more rows), how credited names show the part
- * that links (for the whole site) and how later discs number their tracks. The artist hover card is always on.
- * Changes apply at once, behind the dialog.
+ * The tracklist's settings: its 样式 (a tile with a small drawing each, in order, three to a row however many there
+ * are), how credited names show the part that links (for the whole site) and how later discs number their tracks. The
+ * artist hover card is always on. Changes apply at once, behind the dialog.
  */
 const props = defineProps<{ styles: TracklistStyleOption[], prefs: TracklistPrefs }>()
 const emit = defineEmits<{ update: [patch: Partial<TracklistPrefs>] }>()
@@ -48,6 +49,8 @@ const choices = computed(() => [
 ])
 // The numbering samples: disc 2's first tracks after a disc 1 of 12
 const NUMBERING_SAMPLES: Record<TracklistNumbering, string> = { disc: '01 02 03', album: '13 14 15' }
+
+const isCurrent = (option: TracklistStyleOption) => props.prefs.style === option.style && props.prefs.density === option.density
 </script>
 
 <template>
@@ -59,15 +62,14 @@ const NUMBERING_SAMPLES: Record<TracklistNumbering, string> = { disc: '01 02 03'
         :key="style.key"
         type="button"
         role="radio"
-        :aria-checked="prefs.style === style.key"
-        class="relative grid justify-items-center gap-0.5 rounded-lg px-1.5 pb-2.5 pt-3 text-center transition-[box-shadow,background-color] duration-150 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-        :class="prefs.style === style.key ? 'shadow-[inset_0_0_0_2px_var(--primary)]' : 'shadow-[inset_0_0_0_1px_var(--line)]'"
-        @click="emit('update', { style: style.key })"
+        :aria-checked="isCurrent(style)"
+        class="relative grid gap-1.5 rounded-lg p-[0.4375rem] pb-2 text-center transition-[box-shadow,background-color] duration-150 hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+        :class="isCurrent(style) ? 'shadow-[inset_0_0_0_2px_var(--primary)]' : 'shadow-[inset_0_0_0_1px_var(--line)]'"
+        @click="emit('update', { style: style.style, density: style.density })"
       >
-        <UiIcon :icon="style.icon" class="mb-0.5 size-5" :class="prefs.style === style.key ? 'text-primary' : 'text-meta'" />
-        <span class="text-13 font-semibold leading-[1.125rem] text-title">{{ style.label }}</span>
-        <span class="text-11 leading-snug text-meta">{{ style.hint }}</span>
-        <span v-if="prefs.style === style.key" class="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-primary text-on-primary" aria-hidden="true"><Check :size="11" :stroke-width="3" /></span>
+        <AlbumTracklistThumb :layout="style.style" :density="style.density" class="w-full" />
+        <span class="flex items-center justify-center gap-1 text-13 font-semibold leading-[1.125rem] text-title">{{ style.name }}<AlbumTracklistLabel size="mini">{{ style.tag }}</AlbumTracklistLabel></span>
+        <span v-if="isCurrent(style)" class="absolute right-1.5 top-1.5 grid size-4 place-items-center rounded-full bg-primary text-on-primary" aria-hidden="true"><Check :size="11" :stroke-width="3" /></span>
       </button>
     </div>
 

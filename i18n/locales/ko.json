@@ -77,18 +77,22 @@
       "translation_with_count": "번역 {count}",
       "original": "원문",
       "density": {
-        "label": "정보량",
         "compact": "간단히",
         "comfy": "보통",
         "full": "자세히"
       },
+      "style_hints": {
+        "list_compact": "구분선이 있는 줄, 제목과 길이만",
+        "list_comfy": "제목 아래에 보컬·편곡·원곡",
+        "list_full": "모든 크레딧을 역할마다 한 줄로",
+        "booklet_full": "CD 부클릿처럼, 왼쪽에 크레딧",
+        "table_comfy": "보컬·편곡·가사를 열로",
+        "table_full": "작곡·작사·편곡·보컬을 열로"
+      },
       "styles": {
         "list": "목록",
-        "list_hint": "음악 앱처럼",
         "booklet": "부클릿",
-        "booklet_hint": "CD 부클릿처럼",
-        "table": "표",
-        "table_hint": "열을 맞춰서"
+        "table": "표"
       },
       "settings": {
         "title": "수록곡 보기 설정",
