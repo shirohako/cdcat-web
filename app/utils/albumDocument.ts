@@ -5,7 +5,7 @@
 
 import type { AlbumImage } from '~/types/album'
 import type { AggregateRef, AlbumDocument, RowId, TitleRow } from '~/types/document'
-import type { ParsedDisc } from './tracklistParser'
+import type { ParsedDisc, ParsedTrack } from './tracklistParser'
 import { RELEASE_ROLES } from '../types/album'
 import { ARTIST_ROLE, FEATURING_ROLE } from './artistLine'
 import { newKey } from './documentKeys'
@@ -199,25 +199,249 @@ export function moveTrackToDisc(doc: AlbumDocument, trackId: RowId, discId: RowI
 }
 
 /**
- * Applies a pasted tracklist. `update` matches tracks by disc and number: existing tracks get the
- * pasted title and duration, missing ones are added, nothing is removed. `append` adds every pasted
- * track after the tracks already on its disc. Discs that do not exist yet are added.
+ * Adds a track as number `trackNumber` of a disc. Tracks from that number on move down one while they collide, so a
+ * missing track 5 goes in between 4 and the old 5 (now 6); a free number moves nothing. Every track keeps its id, and
+ * with it its favourites, lyrics and credits: this is how a missing track is added, never by renaming the ones after it.
  */
-export function importTracklist(doc: AlbumDocument, parsed: ParsedDisc[], mode: 'update' | 'append' = 'update') {
+export function insertTrack(doc: AlbumDocument, discId: RowId, trackNumber: number, fields: Partial<AlbumTrackRow> = {}): AlbumTrackRow {
+  let taken = trackNumber
+  for (const track of tracksOn(doc, discId)) {
+    if (track.track_number < trackNumber) continue
+    if (track.track_number > taken) break
+    track.track_number = taken + 1
+    taken = track.track_number
+  }
+  return addTrack(doc, discId, { ...fields, track_number: trackNumber })
+}
+
+/** The numbers insertTrack would move down one, in order: [] when the number is free. */
+export function insertShift(doc: AlbumDocument, discId: RowId, trackNumber: number): number[] {
+  const moved: number[] = []
+  let taken = trackNumber
+  for (const track of tracksOn(doc, discId)) {
+    if (track.track_number < trackNumber) continue
+    if (track.track_number > taken) break
+    moved.push(track.track_number)
+    taken += 1
+  }
+  return moved
+}
+
+/** The first number missing between 1 and the disc's last track, null when the numbers have no gap. */
+export function firstGap(doc: AlbumDocument, discId: RowId): number | null {
+  const used = new Set(tracksOn(doc, discId).map(track => track.track_number))
+  const last = Math.max(0, ...used)
+  for (let number = 1; number < last; number++) {
+    if (!used.has(number)) return number
+  }
+  return null
+}
+
+/** A title as it compares: NFKC, lower case, spaces folded. */
+export const titleKey = (title: string | null | undefined) => (title ?? '').normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()
+
+/** A saved track renamed to the title another saved track had when the edit started. */
+export interface MovedTitle {
+  trackId: RowId
+  disc: number
+  number: number
+  title: string
+  fromTrackId: RowId
+  fromDisc: number
+  fromNumber: number
+}
+
+/**
+ * Saved tracks whose title is now the original title of another saved track: what renaming 5–11 to the next track's
+ * title, instead of inserting the missing one, looks like (also two titles swapped instead of the tracks moved).
+ * `originals` is the document the edit started from; new tracks don't count.
+ */
+export function movedTitles(doc: AlbumDocument, originals: AlbumDocument | null | undefined): MovedTitle[] {
+  if (!originals) return []
+  const before = new Map(originals.tracks.map(track => [String(track.id), track]))
+  const owners = new Map<string, AlbumTrackRow[]>()
+  for (const track of originals.tracks) {
+    const key = titleKey(track.title)
+    if (key) owners.set(key, [...owners.get(key) ?? [], track])
+  }
+  const discOf = (document: AlbumDocument, discId: RowId) => findDisc(document, discId)?.position ?? 1
+  const moved: MovedTitle[] = []
+  for (const track of orderedTracks(doc)) {
+    const old = before.get(String(track.id))
+    const key = titleKey(track.title)
+    if (!old || !key || key === titleKey(old.title)) continue
+    const from = owners.get(key)?.find(other => !sameId(other.id, track.id))
+    if (!from) continue
+    moved.push({
+      trackId: track.id, disc: discOf(doc, track.disc_id), number: track.track_number, title: track.title,
+      fromTrackId: from.id, fromDisc: discOf(originals, from.disc_id), fromNumber: from.track_number,
+    })
+  }
+  return moved
+}
+
+/** Puts back the titles these tracks had when the edit started. */
+export function restoreTitles(doc: AlbumDocument, originals: AlbumDocument, trackIds: RowId[]) {
+  for (const id of trackIds) {
+    const track = findTrack(doc, id)
+    const old = findTrack(originals, id)
+    if (track && old) track.title = old.title
+  }
+}
+
+/** What alignTracks compares. */
+export interface AlignableTrack {
+  title: string | null
+  duration: number | null
+  track_number: number
+}
+
+/**
+ * Lines up the tracks of a disc with an incoming list (a pasted tracklist, a CUE sheet, a source), keeping the order:
+ * the same title first (titleKey), else the same duration (±1 s). Between those anchors rows pair by number, then by
+ * position. Returns the merged order as [existing index | null, incoming index | null]: null on the left is a track to
+ * insert there, null on the right one the incoming list doesn't have. So a list with the missing 5th track inserts it
+ * instead of renaming 5–11.
+ */
+export function alignTracks(existing: AlignableTrack[], incoming: AlignableTrack[]): { pairs: Array<[number | null, number | null]>, anchors: number } {
+  const n = existing.length
+  const m = incoming.length
+  const score = (i: number, j: number) => {
+    const a = titleKey(existing[i]!.title)
+    if (a && a === titleKey(incoming[j]!.title)) return 2
+    const [x, y] = [existing[i]!.duration, incoming[j]!.duration]
+    return x !== null && y !== null && Math.abs(x - y) <= 1 ? 1 : 0
+  }
+  // best[i][j]: the best total score of existing[i..] against incoming[j..]
+  const best = Array.from({ length: n + 1 }, () => Array.from<number>({ length: m + 1 }).fill(0))
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = m - 1; j >= 0; j--) {
+      const s = score(i, j)
+      best[i]![j] = Math.max(best[i + 1]![j]!, best[i]![j + 1]!, s ? s + best[i + 1]![j + 1]! : 0)
+    }
+  }
+  const anchors: Array<[number, number]> = []
+  for (let i = 0, j = 0; i < n && j < m;) {
+    const s = score(i, j)
+    if (s && best[i]![j] === s + best[i + 1]![j + 1]!) {
+      anchors.push([i, j])
+      i++
+      j++
+    }
+    else if (best[i + 1]![j]! >= best[i]![j + 1]!) i++
+    else j++
+  }
+  const pairs: Array<[number | null, number | null]> = []
+  let i = 0
+  let j = 0
+  for (const [ai, aj] of [...anchors, [n, m] as [number, number]]) {
+    pairs.push(...pairGap(existing, incoming, [i, ai], [j, aj]))
+    if (ai < n) pairs.push([ai, aj])
+    i = ai + 1
+    j = aj + 1
+  }
+  return { pairs, anchors: anchors.length }
+}
+
+/** Rows between two anchors: the same number first, then by position; extra incoming rows insert, extra existing ones stay. */
+function pairGap(existing: AlignableTrack[], incoming: AlignableTrack[], [i0, i1]: [number, number], [j0, j1]: [number, number]) {
+  const numbered: Array<[number, number]> = []
+  let from = i0
+  for (let j = j0; j < j1; j++) {
+    for (let i = from; i < i1; i++) {
+      if (existing[i]!.track_number === incoming[j]!.track_number) {
+        numbered.push([i, j])
+        from = i + 1
+        break
+      }
+    }
+  }
+  const out: Array<[number | null, number | null]> = []
+  let i = i0
+  let j = j0
+  for (const [ai, aj] of [...numbered, [i1, j1] as [number, number]]) {
+    const paired = Math.min(ai - i, aj - j)
+    for (let k = 0; k < paired; k++) out.push([i + k, j + k])
+    for (let k = paired; k < aj - j; k++) out.push([null, j + k])
+    for (let k = paired; k < ai - i; k++) out.push([i + k, null])
+    if (ai < i1) out.push([ai, aj])
+    i = ai + 1
+    j = aj + 1
+  }
+  return out
+}
+
+/** One row of an import: an existing track updated from a parsed one, a parsed track added, or an existing one kept. */
+export interface TracklistImportStep {
+  kind: 'update' | 'insert' | 'keep'
+  trackId: RowId | null
+  parsed: ParsedTrack | null
+  /** The track's number once the import is applied */
+  number: number
+}
+
+export interface TracklistImportDisc {
+  position: number
+  /** null when the disc is added by the import */
+  discId: RowId | null
+  title: string | null
+  steps: TracklistImportStep[]
+  /** Tracks of the disc that matched by title or duration; 0 with a different count means rows only lined up by position */
+  anchors: number
+  existing: number
+}
+
+/**
+ * What applying a pasted tracklist or CUE sheet does, disc by disc. `update` lines the pasted tracks up with the disc
+ * (alignTracks): matched tracks take the pasted title, duration, label and ISRC, missing ones are inserted where they
+ * belong, and tracks the paste doesn't have stay; nothing is removed. `append` adds every pasted track after the
+ * tracks already on its disc. Discs that do not exist yet are added.
+ */
+export function planTracklistImport(doc: AlbumDocument, parsed: ParsedDisc[], mode: 'update' | 'append' = 'update'): TracklistImportDisc[] {
+  return parsed.map((parsedDisc) => {
+    const disc = sortedDiscs(doc).find(item => item.position === parsedDisc.position) ?? null
+    const tracks = disc ? tracksOn(doc, disc.id) : []
+    if (mode === 'append') {
+      const offset = tracks.at(-1)?.track_number ?? 0
+      return {
+        position: parsedDisc.position, discId: disc?.id ?? null, title: parsedDisc.title, anchors: 0, existing: tracks.length,
+        steps: [
+          ...tracks.map(track => ({ kind: 'keep' as const, trackId: track.id, parsed: null, number: track.track_number })),
+          ...parsedDisc.tracks.map(track => ({ kind: 'insert' as const, trackId: null, parsed: track, number: track.track_number + offset })),
+        ],
+      }
+    }
+    const { pairs, anchors } = alignTracks(tracks, parsedDisc.tracks)
+    let last = 0
+    const steps = pairs.map(([i, j]): TracklistImportStep => {
+      const track = i === null ? null : tracks[i]!
+      const row = j === null ? null : parsedDisc.tracks[j]!
+      const wanted = row?.track_number ?? track!.track_number
+      last = wanted > last ? wanted : last + 1
+      return { kind: track && row ? 'update' : track ? 'keep' : 'insert', trackId: track?.id ?? null, parsed: row, number: last }
+    })
+    return { position: parsedDisc.position, discId: disc?.id ?? null, title: parsedDisc.title, steps, anchors, existing: tracks.length }
+  })
+}
+
+/** Applies planTracklistImport's plan; counts the tracks added and the existing tracks whose content changed. */
+export function applyTracklistImport(doc: AlbumDocument, plan: TracklistImportDisc[]) {
   let added = 0
   let updated = 0
-  for (const parsedDisc of parsed) {
-    const disc = sortedDiscs(doc).find(item => item.position === parsedDisc.position) ?? addDisc(doc, { position: parsedDisc.position })
-    if (parsedDisc.title && !disc.title) disc.title = parsedDisc.title
-    const offset = mode === 'append' ? (tracksOn(doc, disc.id).at(-1)?.track_number ?? 0) : 0
-    for (const parsedTrack of parsedDisc.tracks) {
-      const trackNumber = parsedTrack.track_number + offset
-      const existing = mode === 'update' ? tracksOn(doc, disc.id).find(track => track.track_number === trackNumber) : undefined
-      if (!existing) {
-        addTrack(doc, disc.id, { track_number: trackNumber, title: parsedTrack.title, duration: parsedTrack.duration, number_label: parsedTrack.number_label, isrc: parsedTrack.isrc ?? null })
+  for (const planned of plan) {
+    const disc = (planned.discId !== null ? findDisc(doc, planned.discId) : null) ?? addDisc(doc, { position: planned.position })
+    if (planned.title && !disc.title) disc.title = planned.title
+    for (const step of planned.steps) {
+      const parsedTrack = step.parsed
+      if (step.kind === 'insert' && parsedTrack) {
+        addTrack(doc, disc.id, { track_number: step.number, title: parsedTrack.title, duration: parsedTrack.duration, number_label: parsedTrack.number_label, isrc: parsedTrack.isrc ?? null })
         added++
         continue
       }
+      const existing = findTrack(doc, step.trackId)
+      if (!existing) continue
+      existing.track_number = step.number
+      if (!parsedTrack) continue
       const before = JSON.stringify([existing.title, existing.duration, existing.number_label, existing.isrc])
       if (parsedTrack.title) existing.title = parsedTrack.title
       if (parsedTrack.duration !== null) existing.duration = parsedTrack.duration
@@ -227,6 +451,11 @@ export function importTracklist(doc: AlbumDocument, parsed: ParsedDisc[], mode: 
     }
   }
   return { added, updated }
+}
+
+/** Applies a pasted tracklist or CUE sheet; see planTracklistImport. */
+export function importTracklist(doc: AlbumDocument, parsed: ParsedDisc[], mode: 'update' | 'append' = 'update') {
+  return applyTracklistImport(doc, planTracklistImport(doc, parsed, mode))
 }
 
 // ---- editions and bonuses ---------------------------------------------------------------------

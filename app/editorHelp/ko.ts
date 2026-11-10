@@ -74,6 +74,7 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'track.title': {
     text: '실물에 인쇄된 원문 그대로 입력해 주세요. 제목 칸에서 Enter 키를 누르면 다음 곡으로 넘어가요. 다른 언어 제목은 「앨범 제목과 트랙 번역」에서 입력해요.',
+    dont: ['한 곡이 빠졌을 때 뒤 트랙들의 제목을 하나씩 다음 곡 제목으로 고치지 마세요. ‘트랙 삽입’으로 채워요'],
     where: '수록곡 목록과 트랙 페이지에 표시돼요.',
     mock: { page: 'track', mark: 'title' },
   },

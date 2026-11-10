@@ -16,6 +16,10 @@
               <span :title="exact(revision.updated_at)">{{ $t('revision_page.updated', { at: ago(revision.updated_at) }) }}</span>
               <span v-if="revision.requires_content_manage && revision.status === 'pending'" class="text-warning">{{ $t('revision_page.requires_manage') }}</span>
             </p>
+            <!-- Tracks the revision removes, as they are now (only an album under review, or an administrator's edit, has any). -->
+            <p v-if="removedTracks.length" class="mt-2 text-xs text-danger">
+              {{ $t('revision_page.removed_tracks', { tracks: removedTracks.map(track => $t('editor.album.disc_track', { disc: track.disc, number: track.number }) + ' ' + track.title).join(', ') }) }}
+            </p>
           </div>
           <RevisionStatusBadge :status="revision.status" />
         </header>
@@ -126,6 +130,7 @@ const { data: revision, status, error, refresh, revealClass } = await usePageDat
   ({ signal }) => $api<Revision>(`/v1/revisions/${route.params.id}`, { signal }), { cache: false, server: false, notFound: true })
 
 const mine = computed(() => !!revision.value && revision.value.submitter?.id === user.value?.id)
+const removedTracks = computed(() => (revision.value?.preview ?? []).flatMap(item => item.removed_tracks ?? []))
 const editor = computed(() => revision.value ? editorPath(revision.value) : null)
 const heading = computed(() => {
   const match = revision.value?.title?.match(/^([a-z]+): (.*)$/)

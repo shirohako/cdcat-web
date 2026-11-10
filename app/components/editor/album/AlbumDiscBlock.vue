@@ -11,7 +11,7 @@
         <UiButton v-if="isCd || tocCount" size="xs" class="ring-1 ring-inset shadow-xs active:translate-y-px" :class="tocErrors.length || !isCd ? 'text-danger ring-danger/40' : 'ring-line'" :title="$t('editor.toc.button')" @click="emit('toc')">TOC<span v-if="tocCount" :class="tocErrors.length || !isCd ? 'text-danger' : 'text-primary'">·{{ tocCount }}</span></UiButton>
         <UiButton :icon="ArrowUp" :label="$t('catalog.form.move_up')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="first" @click="moveDisc(album, disc.id, -1)" />
         <UiButton :icon="ArrowDown" :label="$t('catalog.form.move_down')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="last" @click="moveDisc(album, disc.id, 1)" />
-        <UiButton variant="danger-soft" :icon="Trash2" :label="$t('editor.album.remove_disc')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
+        <UiButton variant="danger-soft" :icon="Trash2" :label="hasLive ? $t('editor.album.remove_disc_locked') : $t('editor.album.remove_disc')" icon-class="size-3" size="xs" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" :disabled="hasLive" @click="remove" />
       </span>
     </div>
     <p v-for="error in errors" :key="error.path" class="border-b border-danger/25 bg-danger/10 px-3 py-1.5 text-11 text-danger">{{ error.message }}</p>
@@ -37,8 +37,25 @@
       <p v-if="!tracks.length" class="px-4 py-3 text-xs text-meta">{{ $t('editor.album.no_tracks') }}</p>
     </div>
 
-    <div class="flex items-center gap-2 border-t border-line px-3 py-1.5">
+    <div class="flex flex-wrap items-center gap-2 border-t border-line px-3 py-1.5">
       <EditorAddButton small @click="add">{{ $t('editor.album.add_track') }}</EditorAddButton>
+      <!-- A missing track goes in at its number and the ones after it move down: they keep their ids, unlike renaming them. -->
+      <UiPopover v-if="tracks.length" v-model:open="inserting" placement="bottom-start" :label="$t('editor.album.insert_track')" class="w-64">
+        <template #trigger="{ toggle, attrs }">
+          <UiButton v-bind="attrs" variant="add" size="xs" :icon="ListPlus" icon-class="size-3" class="gap-1" @click="openInsert(toggle)">{{ $t('editor.album.insert_track') }}</UiButton>
+        </template>
+        <form class="space-y-2" @submit.prevent="insert">
+          <i18n-t keypath="editor.album.insert_as" tag="label" class="flex items-center gap-1.5 text-sm text-body" scope="global">
+            <template #number>
+              <input v-model.number="insertNumber" type="number" min="1" max="999" class="input input-sm w-16 px-1 text-center font-mono" :aria-label="$t('catalog.field.track_number')">
+            </template>
+          </i18n-t>
+          <p class="text-xs leading-5 text-meta">{{ shiftText }}</p>
+          <div class="flex justify-end">
+            <UiButton type="submit" variant="primary" size="xs" :disabled="!insertValid">{{ $t('editor.album.insert') }}</UiButton>
+          </div>
+        </form>
+      </UiPopover>
       <span v-if="duration" class="ml-auto font-mono text-11 text-meta">{{ formatDuration(duration) }}</span>
     </div>
   </div>
@@ -47,8 +64,8 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { ArrowDown, ArrowUp, Disc3, Trash2 } from '@lucide/vue'
-import { addTrack, findDisc, moveDisc, removeDisc, sortedDiscs, tracksOn } from '~/utils/albumDocument'
+import { ArrowDown, ArrowUp, Disc3, ListPlus, Trash2 } from '@lucide/vue'
+import { addTrack, findDisc, firstGap, insertShift, insertTrack, moveDisc, removeDisc, sortedDiscs, tracksOn } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
 const props = defineProps<{ discId: RowId }>()
@@ -105,7 +122,39 @@ const next = (trackId: RowId) => {
   else focusTitle(index + 1)
 }
 
+// ---- inserting a track ----
+
+const inserting = ref(false)
+const insertNumber = ref<number | ''>('')
+const insertValid = computed(() => Number.isInteger(insertNumber.value) && Number(insertNumber.value) >= 1 && Number(insertNumber.value) <= 999)
+const shiftText = computed(() => {
+  if (!insertValid.value) return t('editor.album.insert_hint')
+  const moved = insertShift(album.value, props.discId, Number(insertNumber.value))
+  if (!moved.length) return t('editor.album.insert_no_shift')
+  const [from, to] = [moved[0]!, moved.at(-1)!]
+  return from === to ? t('editor.album.insert_shift_one', { from, to: from + 1 }) : t('editor.album.insert_shift', { from, to, newFrom: from + 1, newTo: to + 1 })
+})
+
+/** Opens the card with the first gap in the numbers filled in, if there is one. */
+const openInsert = (toggle: () => void) => {
+  if (!inserting.value) insertNumber.value = firstGap(album.value, props.discId) ?? ''
+  toggle()
+}
+
+const insert = () => {
+  if (!insertValid.value) return
+  const track = insertTrack(album.value, props.discId, Number(insertNumber.value))
+  inserting.value = false
+  focusTitle(tracks.value.findIndex(row => sameId(row.id, track.id)))
+}
+
+// ---- removing the disc ----
+
+/** A disc with saved tracks of an approved album stays: those tracks can only move to another disc. */
+const hasLive = computed(() => tracks.value.some(track => editor.isLiveTrack(track.id)))
+
 const remove = async () => {
+  if (hasLive.value) return
   if (tracks.value.length && !await confirm({ title: t('editor.album.remove_disc_confirm', { count: tracks.value.length }) })) return
   removeDisc(album.value, props.discId)
 }

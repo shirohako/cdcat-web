@@ -2,7 +2,7 @@ import type { DraftItem } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
 import type { AggregateRef, AlbumDocument, ProductPrice, RowId } from '~/types/document'
 import type { HarvestMergedImage } from '~/types/harvest'
-import { addCredit, addDisc, addImage, addTrack, coverOf, firstProduct, removeDisc, removeTrack, setCover, setTitleIn } from '~/utils/albumDocument'
+import { addCredit, addDisc, addImage, alignTracks, coverOf, firstProduct, insertTrack, removeDisc, removeTrack, setCover, setTitleIn, tracksOn } from '~/utils/albumDocument'
 import { sameName } from '~/utils/harvestPeople'
 import { PERFORMER_ROLE } from '~/utils/creditParser'
 import { newKey } from '~/utils/documentKeys'
@@ -167,49 +167,77 @@ function basicRows(ctx: CompareContext): CompareRow[] {
   return rows
 }
 
-/** Tracks are matched by disc position and track number. */
+/** The disc position of a disc of a document, 1 when it is not found. */
 const positionOf = (doc: AlbumDocument, discId: RowId) => doc.discs.find(disc => String(disc.id) === String(discId))?.position ?? 1
-const trackAt = (doc: AlbumDocument, position: number, number: number) => {
-  const disc = doc.discs.find(row => row.position === position)
-  return disc ? doc.tracks.find(track => String(track.disc_id) === String(disc.id) && track.track_number === number) ?? null : null
+
+/** The album track each source track lines up with (alignTracks, disc by disc), by source track id. */
+function alignedTracks(album: AlbumDocument, source: AlbumDocument): Map<string, RowId> {
+  const map = new Map<string, RowId>()
+  for (const position of new Set(source.tracks.map(track => positionOf(source, track.disc_id)))) {
+    const sourceTracks = source.tracks.filter(track => positionOf(source, track.disc_id) === position).sort((a, b) => a.track_number - b.track_number)
+    const disc = album.discs.find(row => row.position === position)
+    const albumTracks = disc ? tracksOn(album, disc.id) : []
+    for (const [i, j] of alignTracks(albumTracks, sourceTracks).pairs) {
+      if (i !== null && j !== null) map.set(String(sourceTracks[j]!.id), albumTracks[i]!.id)
+    }
+  }
+  return map
 }
 
+/**
+ * Tracks line up disc by disc as an import does (alignTracks): by title, then duration, then number. A track the album
+ * lacks is inserted after the album track that matches the source track before it, and the album's later tracks move
+ * down, instead of the source's titles being written over them by position.
+ */
 function trackRows(ctx: CompareContext): CompareRow[] {
   const { album, source } = ctx
   const several = new Set(source.tracks.map(track => positionOf(source, track.disc_id))).size > 1 || album.discs.filter(disc => disc.bonus_id === null).length > 1
-  const sorted = [...source.tracks].sort((a, b) => positionOf(source, a.disc_id) - positionOf(source, b.disc_id) || a.track_number - b.track_number)
+  const shown = (row: { title: string, duration: number | null }) => [row.title, ctx.formatDuration(row.duration)].filter(Boolean).join(' · ')
   const rows: CompareRow[] = []
-  for (const track of sorted) {
-    const position = positionOf(source, track.disc_id)
-    const label = several ? `${position}-${track.track_number}` : String(track.track_number)
-    const current = trackAt(album, position, track.track_number)
-    const shown = (row: { title: string, duration: number | null }) => [row.title, ctx.formatDuration(row.duration)].filter(Boolean).join(' · ')
-    if (!current) {
+  const paired = new Set<string>()
+  const positions = [...new Set(source.tracks.map(track => positionOf(source, track.disc_id)))].sort((a, b) => a - b)
+  for (const position of positions) {
+    const sourceTracks = source.tracks.filter(track => positionOf(source, track.disc_id) === position).sort((a, b) => a.track_number - b.track_number)
+    const disc = album.discs.find(row => row.position === position)
+    const albumTracks = disc ? tracksOn(album, disc.id) : []
+    for (const [i, j] of alignTracks(albumTracks, sourceTracks).pairs) {
+      if (j === null) continue
+      const current = i === null ? null : albumTracks[i]!
+      if (current) paired.add(String(current.id))
+      const track = sourceTracks[j]!
+      const label = several ? `${position}-${track.track_number}` : String(track.track_number)
+      if (!current) {
+        rows.push({
+          key: `track:${position}:${track.track_number}`, group: 'tracks', label: `曲目 ${label}`, album: '', source: shown(track), from: ctx.picked.tracks,
+          apply: () => {
+            const target = album.discs.find(row => row.position === position)
+              ?? addDisc(album, { position, format: source.discs.find(row => row.position === position)?.format ?? album.discs[0]?.format ?? 'cd' })
+            // Lined up again as the album is now, so rows applied one by one, in any order, keep the source's order.
+            const now = tracksOn(album, target.id)
+            const pairs = alignTracks(now, sourceTracks).pairs
+            if (pairs.some(([a, b]) => a !== null && b === j)) return
+            const before = pairs.filter(([a, b]) => a !== null && b !== null && b < j).at(-1)
+            const number = before ? now[before[0]!]!.track_number + 1 : Math.min(track.track_number, now[0]?.track_number ?? track.track_number)
+            insertTrack(album, target.id, number, { number_label: track.number_label, title: track.title, duration: track.duration })
+          },
+        })
+        continue
+      }
+      const title = text(track.title) !== '' && !same(track.title, current.title)
+      const duration = track.duration !== null && track.duration !== current.duration
+      if (!title && !duration) continue
       rows.push({
-        key: `track:${position}:${track.track_number}`, group: 'tracks', label: `曲目 ${label}`, album: '', source: shown(track), from: ctx.picked.tracks,
+        key: `track:${position}:${track.track_number}`, group: 'tracks', label: `曲目 ${label}`, album: shown(current), source: shown(track), from: ctx.picked.tracks,
         apply: () => {
-          const disc = album.discs.find(row => row.position === position)
-            ?? addDisc(album, { position, format: source.discs.find(row => row.position === position)?.format ?? album.discs[0]?.format ?? 'cd' })
-          if (!trackAt(album, position, track.track_number)) {
-            addTrack(album, disc.id, { track_number: track.track_number, number_label: track.number_label, title: track.title, duration: track.duration })
-          }
+          if (title) current.title = track.title
+          if (duration) current.duration = track.duration
         },
       })
-      continue
     }
-    const title = text(track.title) !== '' && !same(track.title, current.title)
-    const duration = track.duration !== null && track.duration !== current.duration
-    if (!title && !duration) continue
-    rows.push({
-      key: `track:${position}:${track.track_number}`, group: 'tracks', label: `曲目 ${label}`, album: shown(current), source: shown(track), from: ctx.picked.tracks,
-      apply: () => {
-        if (title) current.title = track.title
-        if (duration) current.duration = track.duration
-      },
-    })
   }
   if (!ctx.removeExtra || !source.tracks.length) return rows
-  const extra = album.tracks.filter(track => !source.tracks.some(row => positionOf(source, row.disc_id) === positionOf(album, track.disc_id) && row.track_number === track.track_number))
+  // Only a review draft (new tracks, a create item) loses the tracks the picked source doesn't have.
+  const extra = album.tracks.filter(track => !paired.has(String(track.id)))
   for (const track of extra) {
     const position = positionOf(album, track.disc_id)
     rows.push({
@@ -229,11 +257,8 @@ function trackRows(ctx: CompareContext): CompareRow[] {
 
 function creditRows(ctx: CompareContext): CompareRow[] {
   const { album, source } = ctx
-  const albumTrackOf = (sourceTrackId: RowId | null): RowId | null | undefined => {
-    if (sourceTrackId === null) return null
-    const track = source.tracks.find(row => String(row.id) === String(sourceTrackId))
-    return track ? trackAt(album, positionOf(source, track.disc_id), track.track_number)?.id : undefined
-  }
+  const aligned = alignedTracks(album, source)
+  const albumTrackOf = (sourceTrackId: RowId | null): RowId | null | undefined => sourceTrackId === null ? null : aligned.get(String(sourceTrackId))
   const nameOf = (row: { artist_id: AggregateRef | null, credited_as: string | null }) => row.credited_as || (row.artist_id !== null ? ctx.artistName(row.artist_id) : '')
   const trackLabel = (trackId: RowId | null) => {
     if (trackId === null) return ''

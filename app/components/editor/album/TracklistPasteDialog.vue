@@ -33,6 +33,7 @@
           </template>
         </div>
         <p v-else class="rounded-lg bg-sunken px-3 py-2 text-xs text-meta">{{ t('editor.paste.nothing') }}</p>
+        <EditorAlbumImportPlan v-if="plan" :plan="plan" />
       </template>
     </div>
     <template #footer>
@@ -46,7 +47,7 @@
 <script setup lang="ts">
 import type { UiSegmentedItem } from '~/components/ui/Segmented.vue'
 import type { ArtistSide } from '~/utils/tracklistParser'
-import { importTracklist } from '~/utils/albumDocument'
+import { applyTracklistImport, planTracklistImport } from '~/utils/albumDocument'
 import { formatDurationInput, readTracklist, TRACKLIST_FORMATS } from '~/utils/tracklistParser'
 
 /**
@@ -70,6 +71,8 @@ const picked = ref<ArtistSide>()
 const result = computed(() => read.value === null ? null : readTracklist(read.value, { artistSide: picked.value }))
 const stale = computed(() => read.value !== null && text.value !== read.value)
 const total = computed(() => result.value?.discs.reduce((sum, disc) => sum + disc.tracks.length, 0) ?? 0)
+/** What 应用 does in `update` mode, shown before it is pressed; append only adds. */
+const plan = computed(() => result.value && total.value && mode.value === 'update' ? planTracklistImport(editor.album.value, result.value.discs, 'update') : null)
 
 const side = computed<ArtistSide>({
   get: () => result.value?.artists?.side ?? 'none',
@@ -96,7 +99,7 @@ watch(open, (value) => {
 
 const apply = () => {
   if (!result.value) return
-  emit('applied', importTracklist(editor.album.value, result.value.discs, mode.value))
+  emit('applied', applyTracklistImport(editor.album.value, planTracklistImport(editor.album.value, result.value.discs, mode.value)))
   open.value = false
 }
 </script>

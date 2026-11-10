@@ -158,12 +158,12 @@ import type { AlbumEditorContext, AlbumSection, FieldError, NewItemType } from '
 import type { Album } from '~/types/album'
 import type { DraftItem, RevisionDraftPayload } from '~/composables/useRevisionDraft'
 import type { CatalogReferences } from '~/types/catalog'
-import type { AlbumDocument } from '~/types/document'
+import type { AlbumDocument, RowId } from '~/types/document'
 import type { DuplicateCandidate, Revision } from '~/types/revision'
 import { ChevronRight, ClipboardList, Contact, Eye, Gift, History, Images, Info, Languages, ListMusic, Network, Package, Send, Circle, CircleCheck, CirclePlus } from '@lucide/vue'
 import { ALBUM_REF, albumEditorKey } from '~/composables/useAlbumEditor'
 import { CATALOG_RESOURCES } from '~/types/catalog'
-import { emptyAlbumDocument, missingRequired, missingSuggested, pruneAlbumDocument, upgradeAlbumDocument } from '~/utils/albumDocument'
+import { emptyAlbumDocument, missingRequired, missingSuggested, movedTitles, pruneAlbumDocument, upgradeAlbumDocument } from '~/utils/albumDocument'
 import { newRef } from '~/utils/documentKeys'
 import { newDraftScope } from '~/utils/localDrafts'
 import { revisionFieldErrors } from '~/utils/revisionErrors'
@@ -374,7 +374,13 @@ const requiredChecks = computed(() => [
 ])
 const missingIn = (section: AlbumSection) => requiredChecks.value.some(check => !check.done && check.section === section)
 const SUGGESTED_SECTIONS = { byline: 'credits', catalog_number: 'basic', durations: 'tracks', credits: 'credits', categories: 'basic', links: 'relations' } as const
-const suggested = computed(() => missingSuggested(album.value).map(key => ({ key, section: SUGGESTED_SECTIONS[key] as AlbumSection, label: t(`editor.suggested_item.${key}`) })))
+const originalAlbum = computed(() => (originals[mainRef.value] ?? null) as unknown as AlbumDocument | null)
+/** Saved tracks renamed to another track's title: a missing track should have been inserted (shown in 碟片与曲目 too). */
+const moved = computed(() => movedTitles(album.value, originalAlbum.value))
+const suggested = computed(() => [
+  ...missingSuggested(album.value).map(key => ({ key: key as string, section: SUGGESTED_SECTIONS[key] as AlbumSection, label: t(`editor.suggested_item.${key}`) })),
+  ...(moved.value.length ? [{ key: 'moved_titles', section: 'tracks' as AlbumSection, label: t('editor.suggested_item.moved_titles', { count: moved.value.length }) }] : []),
+])
 
 const itemLabels = computed(() => Object.fromEntries(items.value.map((item) => {
   if (item.ref === mainRef.value) return [item.ref, album.value.title || t('editor.album.untitled')]
@@ -418,9 +424,14 @@ const openPreview = async () => {
   }
 }
 
+/** Set from the album's document when it loads; until then saved tracks count as approved, so nothing unlocks early. */
+const albumPending = ref(false)
+const isLiveTrack = (id: RowId) => typeof id === 'number' && !albumPending.value
+
 const context: AlbumEditorContext = {
   albumId, mainRef, album, draft, references, pending, createItem, removeItem, referenced,
   remember, errors, errorAt, errorsIn, go, rejectedDate, notify: showToast, nameNotes, nameInfo,
+  albumPending, isLiveTrack, originalAlbum,
 }
 provide(albumEditorKey, context)
 defineExpose({ album, ready, draft, references, pending, remember, go, createItem, removeItem })
@@ -446,8 +457,9 @@ const startNew = async () => {
 
 /** Edits kept in this browser for this album come back by themselves. */
 const openAlbum = async (id: number) => {
-  const data = await $api<{ document: AlbumDocument, version: number, references: CatalogReferences }>(`/v1/albums/${id}/document`)
+  const data = await $api<{ document: AlbumDocument, version: number, references: CatalogReferences, is_pending?: boolean }>(`/v1/albums/${id}/document`)
   mergeReferences(data.references)
+  albumPending.value = data.is_pending === true
   mainRef.value = ALBUM_REF
   const restored = await draft.start([{ ref: ALBUM_REF, resource_type: 'album', action: 'update', resource_id: id, base_version: data.version, document: clone(data.document) as unknown as Record<string, unknown> }], `album:${id}`)
   if (restored) await loadOriginals(items.value)
@@ -467,6 +479,11 @@ const openRevision = async (id: number) => {
   }
   mainRef.value = main.ref
   reviewComment.value = revision.review_comment
+  if (main.resource_id) {
+    try {
+      albumPending.value = (await $api<{ is_pending?: boolean }>(`/v1/albums/${main.resource_id}/document`)).is_pending === true
+    } catch { /* saved tracks stay locked */ }
+  }
   await loadOriginals(items.value)
 }
 

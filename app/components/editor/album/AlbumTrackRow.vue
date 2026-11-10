@@ -31,7 +31,17 @@
       <UiButton :label="$t('editor.album.track_details')" size="sm" class="ml-auto shrink-0 ring-1 ring-inset ring-line shadow-xs active:translate-y-px sm:ml-0" :aria-expanded="open" @click="open = !open">
         <ChevronDown :size="14" class="transition-transform" :class="{ 'rotate-180': open }" />
       </UiButton>
-      <UiButton variant="danger-soft" :icon="X" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
+      <!-- Saved tracks of an approved album can't be removed here (docs/catalog/editing.md#删除曲目): the lock only says so,
+           on hover, focus or a tap. Not a button, so a tap on a phone shows it straight away. -->
+      <UiTooltip v-if="live" placement="top-end" class="w-64">
+        <span tabindex="0" :aria-label="$t('editor.album.track_locked_label')" class="inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-lg text-meta ring-1 ring-inset ring-line shadow-xs">
+          <Lock class="size-3.5" aria-hidden="true" />
+        </span>
+        <template #content>
+          <p class="text-xs leading-5"><span class="font-semibold">{{ $t('editor.album.track_locked_title') }}</span>{{ $t('editor.album.track_locked_text') }}</p>
+        </template>
+      </UiTooltip>
+      <UiButton v-else variant="danger-soft" :icon="X" :label="$t('common.delete')" icon-class="size-3.5" size="sm" class="shrink-0 ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="remove" />
     </div>
     <p v-for="error in errors" :key="error.path" class="px-4 pb-1.5 text-11 text-danger">{{ error.message }}</p>
 
@@ -68,7 +78,7 @@
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
-import { ArrowDown, ArrowUp, ChevronDown, Music2, X } from '@lucide/vue'
+import { ArrowDown, ArrowUp, ChevronDown, Lock, Music2, X } from '@lucide/vue'
 import { findTrack, moveTrack, moveTrackToDisc, removeTrack, sortedDiscs } from '~/utils/albumDocument'
 import { sameId } from '~/utils/documentRows'
 
@@ -80,6 +90,8 @@ const { t } = useI18n()
 const { confirm } = useConfirm()
 const album = computed(() => editor.album.value)
 const track = computed(() => findTrack(album.value, props.trackId))
+/** A saved track of an approved album: only an administrator removes it, from the admin album page. */
+const live = computed(() => editor.isLiveTrack(props.trackId))
 const discs = computed(() => sortedDiscs(album.value))
 const discOptions = computed<UiSelectOption<string>[]>(() => discs.value.map(disc => ({ value: String(disc.id), label: t('editor.album.disc_n', { n: disc.position }) })))
 const open = ref(false)
@@ -104,7 +116,9 @@ const moveTo = (discId: string) => {
   if (disc) moveTrackToDisc(album.value, props.trackId, disc.id)
 }
 
+/** New tracks go at once; a saved track of an album under review asks first, as its lyrics go with it. */
 const remove = async () => {
+  if (live.value) return
   if (typeof props.trackId === 'number' && !await confirm({ title: t('editor.album.remove_track_confirm', { title: track.value?.title ?? '' }) })) return
   removeTrack(album.value, props.trackId)
 }

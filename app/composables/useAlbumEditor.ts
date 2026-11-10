@@ -1,6 +1,6 @@
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import type { CatalogReferences } from '~/types/catalog'
-import type { AlbumDocument } from '~/types/document'
+import type { AlbumDocument, RowId } from '~/types/document'
 import type { useRevisionDraft } from './useRevisionDraft'
 
 export interface FieldError { path: string, message: string }
@@ -38,6 +38,12 @@ export interface AlbumEditorContext {
   nameNotes: ComputedRef<Record<string, string>>
   /** Artists (by the name the credits show) whose name was tidied from what the sources print, with how (the harvest review page) */
   nameInfo: ComputedRef<Record<string, string>>
+  /** Whether the album still awaits review: its saved tracks may still be removed. False for a new album, whose tracks are all new. */
+  albumPending: Ref<boolean>
+  /** A saved track of an approved album, which only an administrator removes (docs/catalog/editing.md#删除曲目). */
+  isLiveTrack: (id: RowId) => boolean
+  /** The album as the edit started (its base version), null for a new one: what renamed tracks are compared with. */
+  originalAlbum: ComputedRef<AlbumDocument | null>
 }
 
 export const ALBUM_REF = 'album'

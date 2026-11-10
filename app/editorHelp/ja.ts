@@ -74,6 +74,7 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'track.title': {
     text: '現物に印刷された原文のとおりに入力します。タイトル欄で Enter を押すと次の曲へ移ります。ほかの言語の曲名は「アルバム名と曲名の翻訳」で入力します。',
+    dont: ['1 曲抜けているとき、以降のトラックの曲名を一つずつ次の曲名に書き換えないでください。「トラックを挿入」で補います'],
     where: 'トラックリストと曲のページ。',
     mock: { page: 'track', mark: 'title' },
   },

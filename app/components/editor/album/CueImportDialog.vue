@@ -29,6 +29,7 @@
             <span class="w-10 shrink-0 text-right font-mono text-meta">{{ formatDurationInput(track.duration) || '—' }}</span>
           </p>
         </div>
+        <EditorAlbumImportPlan v-if="plan" :plan="plan" />
         <ul class="space-y-0.5 text-xs text-meta">
           <li v-if="unknown === 1 && tracks.at(-1)?.duration === null">{{ $t('editor.cue.last_track') }}</li>
           <li v-else-if="unknown > 1">{{ $t('editor.cue.no_durations') }}</li>
@@ -46,7 +47,7 @@
 
 <script setup lang="ts">
 import { FileUp } from '@lucide/vue'
-import { importTracklist, sortedDiscs, tracksOn } from '~/utils/albumDocument'
+import { applyTracklistImport, planTracklistImport, sortedDiscs, tracksOn } from '~/utils/albumDocument'
 import { CUE_ENCODINGS, decodeCue, detectCueEncoding, parseCue } from '~/utils/cueParser'
 import { formatDurationInput } from '~/utils/tracklistParser'
 
@@ -111,12 +112,17 @@ const pick = async (event: Event) => {
   read()
 }
 
+/** The sheet as one parsed disc, going to the chosen disc. */
+const parsedDisc = computed(() => ({
+  position: target.value,
+  title: null,
+  tracks: tracks.value.map(track => ({ track_number: track.track_number, number_label: null, title: track.title, duration: track.duration, isrc: track.isrc })),
+}))
+/** What 应用 does in `update` mode, shown before it is pressed. */
+const plan = computed(() => tracks.value.length && mode.value === 'update' ? planTracklistImport(editor.album.value, [parsedDisc.value], 'update') : null)
+
 const apply = () => {
-  emit('applied', importTracklist(editor.album.value, [{
-    position: target.value,
-    title: null,
-    tracks: tracks.value.map(track => ({ track_number: track.track_number, number_label: null, title: track.title, duration: track.duration, isrc: track.isrc })),
-  }], mode.value))
+  emit('applied', applyTracklistImport(editor.album.value, planTracklistImport(editor.album.value, [parsedDisc.value], mode.value)))
   text.value = ''
   fileName.value = ''
   bytes.value = null

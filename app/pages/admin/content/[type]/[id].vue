@@ -39,7 +39,7 @@ const tab = computed({
 })
 
 const { data: current, pending, error, refresh } = await useAsyncData(() => `admin-content-${type.value}-${id.value}`,
-  () => $api<{ document: Record<string, unknown>, version: number }>(`/v1/${paths.value.api}/${id.value}/document`), { watch: [type, id] })
+  () => $api<{ document: Record<string, unknown>, version: number, is_pending?: boolean }>(`/v1/${paths.value.api}/${id.value}/document`), { watch: [type, id] })
 const name = computed(() => String(current.value?.document.title ?? current.value?.document.name ?? `${entityTypeLabels[type.value]} #${id.value}`))
 
 // ===== Versions and restore =====
@@ -185,6 +185,57 @@ const confirmMerge = async (reason: string) => {
   }
 }
 
+// ===== Remove tracks (albums) =====
+// Removing tracks of an approved album, deleting it, merging it away or a restore dropping its tracks is the top
+// role's (tracks.remove); an album under review keeps content.manage's rules. docs/catalog/editing.md#删除曲目
+const canRemoveTracks = computed(() => hasPermission('tracks.remove'))
+const liveAlbum = computed(() => type.value === 'album' && current.value?.is_pending === false)
+const lockedForTracks = computed(() => liveAlbum.value && !canRemoveTracks.value)
+const { formatDuration } = useCatalogDisplay()
+
+interface DocumentTrack { id: number, disc_id: number, track_number: number, number_label: string | null, title: string, duration: number | null }
+const albumDocument = computed(() => type.value === 'album'
+  ? current.value?.document as unknown as { discs: Array<{ id: number, position: number, title: string | null }>, tracks: DocumentTrack[], disc_tocs: Array<{ disc_id: number }> } | undefined
+  : undefined)
+const allTracks = computed(() => albumDocument.value?.tracks ?? [])
+const trackDiscs = computed(() => [...albumDocument.value?.discs ?? []].sort((a, b) => a.position - b.position).map(disc => ({
+  ...disc,
+  toc: albumDocument.value!.disc_tocs.some(toc => toc.disc_id === disc.id),
+  tracks: allTracks.value.filter(track => track.disc_id === disc.id).sort((a, b) => a.track_number - b.track_number),
+})))
+const removeIds = ref<number[]>([])
+const removedTitles = computed(() => allTracks.value.filter(track => removeIds.value.includes(track.id)))
+const removeTocs = computed(() => trackDiscs.value.filter(disc => disc.toc && disc.tracks.some(track => removeIds.value.includes(track.id))).map(disc => `Disc ${disc.position}`))
+const removeImpact = ref<DeletionImpact | null>(null)
+const removeOpen = ref(false)
+const startRemoveTracks = async () => {
+  message.value = ''
+  try {
+    removeImpact.value = await $api<DeletionImpact>(`/v1/admin/content/albums/${id.value}/deletion-impact`, { query: { 'track_ids[]': removeIds.value } })
+    removeOpen.value = true
+  } catch (failure) {
+    message.value = adminError(failure)
+  }
+}
+const confirmRemoveTracks = async (reason: string) => {
+  if (busy.value || !removeImpact.value) return
+  busy.value = true
+  try {
+    const result = await $api<{ removed: number }>(`/v1/admin/content/albums/${id.value}/remove-tracks`, {
+      method: 'POST', body: { track_ids: removeIds.value, reason, impact_checksum: removeImpact.value.checksum },
+    })
+    removeOpen.value = false
+    removeIds.value = []
+    notice.value = `已删除 ${result.removed} 首曲目。`
+    await Promise.all([refresh(), refreshVersions()])
+  } catch (failure) {
+    message.value = adminError(failure)
+    removeOpen.value = false
+  } finally {
+    busy.value = false
+  }
+}
+
 const canRestore = computed(() => hasPermission('revisions.rollback'))
 const time = (value: string | null) => value ? new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(value)) : '—'
 const latest = computed(() => current.value?.version ?? 0)
@@ -224,12 +275,16 @@ useHead({ title: computed(() => name.value) })
         <ul v-if="restore.problems.length" role="alert" class="mt-3 list-inside list-disc text-sm text-red-700">
           <li v-for="problem in restore.problems" :key="problem.path"><span class="font-mono text-xs">{{ problem.path }}</span> {{ problem.message }}</li>
         </ul>
+        <div v-if="restore.removes_live_tracks && restore.removed_tracks?.length" class="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800">
+          <p>这次恢复会删掉 {{ restore.removed_tracks.length }} 首已上线的曲目<template v-if="!canRemoveTracks">，只有超级管理员能执行</template>：</p>
+          <p class="mt-1 text-xs">{{ restore.removed_tracks.map(track => `Disc ${track.disc} · ${track.number}. ${track.title}`).join('；') }}</p>
+        </div>
         <AdminImpactPreview v-if="restore.impact" :impact="restore.impact" />
         <div class="mt-4">
           <p v-if="!restore.changes.length" class="text-sm text-slate-500">没有变化</p>
           <CatalogDiffView v-else :type="type as CatalogType" :changes="restore.changes" :references="restore.references" />
         </div>
-        <UiButton v-if="canRestore" variant="primary" class="mt-4" :disabled="busy || !!restore.problems.length || !restore.changes.length || !!restore.impact?.blockers.length" @click="restoreOpen = true">确认恢复</UiButton>
+        <UiButton v-if="canRestore" variant="primary" class="mt-4" :disabled="busy || !!restore.problems.length || !restore.changes.length || !!restore.impact?.blockers.length || (!!restore.removes_live_tracks && !canRemoveTracks)" @click="restoreOpen = true">确认恢复</UiButton>
       </section>
 
       <section class="rounded-xl border border-slate-200 bg-white">
@@ -282,12 +337,13 @@ useHead({ title: computed(() => name.value) })
       <section v-if="mergeable" class="rounded-xl border border-slate-200 bg-white p-5">
         <h2 class="font-semibold">合并到另一个{{ entityTypeLabels[type] }}</h2>
         <p class="mt-1 text-sm text-slate-600">{{ type === 'album' ? '以要保留的专辑为准：补进这张专辑的标题、其他名称、链接、关联条目和相关专辑，以及对应曲目的名称；收藏、追踪、评分、留言、文章和讨论的关联、种子转到保留方，同一用户只留一份。这张专辑的版本、品番、图片和制作人员不会保留。旧 ID 和对应上的曲目会跳转到保留方。' : '把这个重复项的所有引用（专辑、制作人员、属性、收藏等）改挂到要保留的一方，它的名称成为保留方的别名，然后删除它。旧 ID 会跳转到保留方。' }}</p>
-        <div class="mt-4 flex flex-wrap items-center gap-2">
+        <p v-if="lockedForTracks" class="mt-4 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">合并会删除这张已上线专辑的曲目，只有超级管理员能做。</p>
+        <div v-else class="mt-4 flex flex-wrap items-center gap-2">
           <span v-if="mergeTarget" class="rounded-lg bg-slate-100 px-3 py-2 text-sm">{{ mergeTarget.label }} #{{ mergeTarget.id }} <button type="button" class="ml-1 text-slate-500" @click="resetMerge">×</button></span>
           <EditorEntityPicker v-else :kind="mergeKind" :exclude="[Number(id)]" exclude-pending class="min-w-64" placeholder="搜索要保留的一方" @select="mergeTarget = { id: Number($event.id), label: $event.label }; trackMap = {}" />
           <UiButton :disabled="!mergeTarget" @click="previewMerge">预览合并</UiButton>
         </div>
-        <div v-if="merge && mergeTarget" class="mt-4 text-sm">
+        <div v-if="merge && mergeTarget && !lockedForTracks" class="mt-4 text-sm">
           <p>将“{{ name }}”合并到“{{ mergeTarget.label }}”（#{{ mergeTarget.id }}）</p>
           <dl class="mt-2 space-y-1">
             <div v-for="(count, key) in merge.affected" :key="`a-${key}`" class="flex justify-between gap-4"><dt>受影响的{{ entityTypeLabels[key] }}</dt><dd>{{ count }}</dd></div>
@@ -315,7 +371,28 @@ useHead({ title: computed(() => name.value) })
       <section class="rounded-xl border border-red-200 bg-white p-5">
         <h2 class="font-semibold text-red-800">永久删除</h2>
         <p class="mt-1 text-sm text-slate-600">永久删除，不进回收站。会一并清理列出的子数据，并写入操作日志。</p>
-        <UiButton variant="danger-soft" class="mt-4" @click="startDelete">预览删除影响</UiButton>
+        <p v-if="lockedForTracks" class="mt-4 rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">删除已上线的专辑会删掉它的曲目，只有超级管理员能做。</p>
+        <UiButton v-else variant="danger-soft" class="mt-4" @click="startDelete">预览删除影响</UiButton>
+      </section>
+      <section v-if="type === 'album' && canRemoveTracks && allTracks.length" class="rounded-xl border border-red-200 bg-white p-5 lg:col-span-2">
+        <h2 class="font-semibold text-red-800">删除曲目</h2>
+        <p class="mt-1 text-sm text-slate-600">只在曲目确实多余时使用（录重复了、实物上没有）。漏了曲目请在编辑器里插入。删除立即生效：收藏和歌词一起删除（收藏删掉后找不回），别处把它当原曲的改成文字原曲，后面的曲号前移；碟上登记的 TOC 也会删除。</p>
+        <div class="mt-3 max-h-96 overflow-y-auto rounded-lg border border-slate-200">
+          <template v-for="disc in trackDiscs" :key="disc.id">
+            <p class="sticky top-0 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-500">
+              Disc {{ disc.position }}<span v-if="disc.title"> · {{ disc.title }}</span><span v-if="disc.toc" class="ml-2 font-normal text-amber-700">登记了 TOC</span>
+            </p>
+            <label v-for="track in disc.tracks" :key="track.id" class="flex cursor-pointer items-center gap-3 border-t border-slate-100 px-3 py-1.5 text-sm hover:bg-slate-50">
+              <input v-model="removeIds" type="checkbox" :value="track.id" class="checkbox checkbox-sm">
+              <span class="w-8 shrink-0 text-right font-mono text-xs text-slate-500">{{ track.number_label || track.track_number }}</span>
+              <span class="min-w-0 flex-1 truncate">{{ track.title }}</span>
+              <span class="shrink-0 font-mono text-xs text-slate-500">{{ track.duration === null ? '' : formatDuration(track.duration) }}</span>
+            </label>
+          </template>
+        </div>
+        <p v-if="removeTocs.length" class="mt-2 text-sm text-amber-800">{{ removeTocs.join('、') }} 登记了 TOC，删除后曲目数和 TOC 对不上，TOC 会一起删除，之后可以在编辑器里重新登记。</p>
+        <p v-if="removeIds.length && removeIds.length === allTracks.length" class="mt-2 text-sm text-red-700">专辑至少要留一首曲目；整张不要了请用上面的「永久删除」。</p>
+        <UiButton variant="danger-soft" class="mt-4" :disabled="busy || !removeIds.length || removeIds.length === allTracks.length" @click="startRemoveTracks">删除所选的 {{ removeIds.length }} 首</UiButton>
       </section>
     </div>
 
@@ -324,5 +401,11 @@ useHead({ title: computed(() => name.value) })
     </AdminConfirmDialog>
     <AdminConfirmDialog v-model="mergeOpen" :busy="busy" reason-required :confirm-phrase="mergeTarget ? `#${mergeTarget.id}` : ''" title="确认合并" :description="merge && mergeTarget ? `将“${name}”合并到“${mergeTarget.label}”（#${mergeTarget.id}）` : ''" @confirm="confirmMerge" />
     <AdminConfirmDialog v-model="restoreOpen" :busy="busy" reason-required title="确认恢复" description="恢复会立即生效，并留在版本历史里。请填写原因。" @confirm="confirmRestore" />
+    <AdminConfirmDialog v-model="removeOpen" :busy="busy" reason-required :confirm-disabled="Boolean(removeImpact?.blockers.length)" :title="`删除 ${removeIds.length} 首曲目`" description="立即生效，留在版本历史和操作日志里。收藏删掉后找不回。请填写原因，比如「录重复了」。" @confirm="confirmRemoveTracks">
+      <ul class="mb-3 list-inside list-disc text-sm text-slate-700">
+        <li v-for="track in removedTitles" :key="track.id">{{ track.track_number }}. {{ track.title }}</li>
+      </ul>
+      <AdminImpactPreview v-if="removeImpact" :impact="removeImpact" />
+    </AdminConfirmDialog>
   </div>
 </template>

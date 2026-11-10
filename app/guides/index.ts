@@ -19,7 +19,7 @@ const SOURCE_LOCALE: GuideLocale = 'zh-Hans'
 /** When each guide's text last changed (YYYY-MM-DD); bump it with every edit that changes what the guide says. */
 const GUIDE_UPDATED: Record<GuideKind, string> = {
   design: '2026-10-28',
-  editor: '2026-11-02',
+  editor: '2026-11-10',
 }
 
 /** The guide in the reader's language, or in the language it was written in first. */

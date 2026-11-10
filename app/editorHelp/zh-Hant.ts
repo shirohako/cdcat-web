@@ -74,6 +74,7 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'track.title': {
     text: '依實物上印的原文填寫。在標題裡按 Enter，會跳到下一首。其他語言的曲名在「專輯標題和曲目翻譯」裡填。',
+    dont: ['漏了一首時，不要把後面的曲目逐一改成下一首的曲名，用「插入曲目」補上'],
     where: '曲目表和曲目頁。',
     mock: { page: 'track', mark: 'title' },
   },

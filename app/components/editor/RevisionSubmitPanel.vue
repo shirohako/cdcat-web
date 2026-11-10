@@ -195,7 +195,14 @@ const send = async () => {
         items: errors.value.map(entry => ({ key: entry.path, label: entry.message, path: shortPath(entry.path) })) })
     }
     else if (message.value && name !== 'DUPLICATE_SUSPECTED') {
-      show({ kind: 'failed', title: t('editor.check.failed_title'), icon: 'lucide:triangle-alert', tone: 'warning', items: [{ key: 'message', label: message.value }] })
+      // Removing saved tracks of an approved album (e.g. it was approved while this was edited): name the tracks.
+      const tracks = name === 'TRACK_REMOVAL_NOT_ALLOWED'
+        ? (error as { details?: { details?: { tracks?: Array<{ id: number, title: string, disc: number, number: number }> } } }).details?.details?.tracks ?? []
+        : []
+      show({ kind: 'failed', title: t('editor.check.failed_title'), icon: 'lucide:triangle-alert', tone: 'warning', items: [
+        { key: 'message', label: message.value },
+        ...tracks.map(track => ({ key: `track:${track.id}`, label: t('editor.check.removed_track', { disc: track.disc, number: track.number, title: track.title }), section: 'tracks' })),
+      ] })
     }
   } finally {
     emit('errors', errors.value)

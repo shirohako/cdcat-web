@@ -28,6 +28,7 @@ const CODES: Record<string, string> = {
   CONTENT_PENDING: '内容还在审核中，通过审核后才能这样做。',
   REVISION_ITEM_APPLIED: '这一项已经上线，请直接编辑内容本身。',
   DUPLICATE_SUSPECTED: '可能和已有的专辑重复，请先确认。',
+  TRACK_REMOVAL_NOT_ALLOWED: '删除已上线的曲目（包括删除、合并已上线的专辑）只有超级管理员能做。',
   REGISTRATION_CLOSED: '当前暂停注册。',
   UNDER_MINIMUM_AGE: '你还未达到注册年龄，暂时无法注册。',
   OPERATION_IN_PROGRESS: '相同的操作正在进行，请稍后再试。',

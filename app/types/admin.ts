@@ -123,6 +123,8 @@ export interface AdminMergePreview {
   external: Record<string, number>
   blockers: string[]
   checksum: string
+  /** Merging an approved album away deletes its tracks: tracks.remove (the top role) only */
+  removes_live_tracks?: boolean
   /** Albums only (docs/catalog/editing.md#合并专辑): source track id => kept track id, or null when it has none */
   track_map?: Record<string, number | null>
   source_tracks?: AdminMergeTrack[]
@@ -151,6 +153,9 @@ export interface AdminRestorePreview {
   summary: ChangeSummary
   problems: Array<{ path: string, message: string }>
   impact: DeletionImpact | null
+  /** Albums: the restore drops tracks of the approved album (tracks.remove, the top role, only) */
+  removes_live_tracks?: boolean
+  removed_tracks?: Array<{ id: number, title: string, disc: number, number: number }>
   references: CatalogReferences
 }
 

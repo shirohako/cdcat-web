@@ -14,6 +14,25 @@
       <p class="flex items-start gap-1.5 rounded-md border border-info/15 bg-info/10 px-2.5 py-1 text-xs leading-5 text-body">
         <Lightbulb :size="13" class="mt-1 shrink-0 text-info" />{{ $t('editor.album.duration_tip') }}
       </p>
+      <!-- Once the album is approved its tracks can't be removed in the editor, and a missing one is inserted rather than made by
+           renaming the ones after it (docs/catalog/editing.md#删除曲目): said up front, new albums too. -->
+      <div class="flex items-start gap-1.5 rounded-md border border-info/25 bg-info/10 px-2.5 py-1 text-xs leading-5 text-body">
+        <Lock :size="13" class="mt-1 shrink-0 text-info" />
+        <div>
+          <p class="font-semibold text-title">{{ $t('editor.album.remove_tip_lead') }}</p>
+          <p>{{ $t('editor.album.remove_tip') }}</p>
+          <p>{{ $t('editor.album.remove_tip_insert') }}</p>
+        </div>
+      </div>
+      <div v-if="moved.length" class="flex items-start gap-1.5 rounded-md border border-warning/30 bg-warning/10 px-2.5 py-1.5 text-xs leading-5 text-body">
+        <TriangleAlert :size="13" class="mt-1 shrink-0 text-warning" />
+        <div class="min-w-0 flex-1">
+          <p>
+            <span class="font-semibold text-title">{{ $t('editor.album.moved_lead') }}</span>{{ $t('editor.album.moved_text', { number: movedLabel(moved[0]!, false), from: movedLabel(moved[0]!, true), count: moved.length }) }}
+          </p>
+          <UiButton :icon="Undo2" icon-class="size-3" size="xs" class="mt-1 gap-1 ring-1 ring-inset ring-line shadow-xs active:translate-y-px" @click="restoreMoved">{{ $t('editor.album.moved_restore') }}</UiButton>
+        </div>
+      </div>
 
       <ul v-if="levelErrors.length" class="space-y-0.5 rounded-lg border border-danger/25 bg-danger/10 px-3 py-2 text-xs text-danger">
         <li v-for="error in levelErrors" :key="error.path">{{ error.message }}</li>
@@ -46,8 +65,9 @@
 
 <script setup lang="ts">
 import type { RowId } from '~/types/document'
-import { ClipboardPaste, FileMusic, Lightbulb, ListMusic, Zap } from '@lucide/vue'
-import { addDisc, sortedDiscs } from '~/utils/albumDocument'
+import type { MovedTitle } from '~/utils/albumDocument'
+import { ClipboardPaste, FileMusic, Lightbulb, ListMusic, Lock, TriangleAlert, Undo2, Zap } from '@lucide/vue'
+import { addDisc, findTrack, movedTitles, restoreTitles, sortedDiscs } from '~/utils/albumDocument'
 
 const editor = useAlbumEditor()
 const { t } = useI18n()
@@ -60,6 +80,24 @@ const tocDisc = ref<RowId | null>(null)
 
 /** Errors about the tracklist as a whole, e.g. "An album needs at least one track", or about all TOCs. */
 const levelErrors = computed(() => [...editor.errorsIn('discs'), ...editor.errorsIn('tracks'), ...editor.errorsIn('disc_tocs')].filter(error => error.path.split('.').length === 3))
+
+/** Saved tracks renamed to the title another one had before this edit. */
+const moved = computed(() => movedTitles(album.value, editor.originalAlbum.value))
+/** "Disc 2 · 6" with several discs, else "6": where a moved title is now, or where it came from. */
+const movedLabel = (row: MovedTitle, from: boolean) => {
+  const [disc, number] = from ? [row.fromDisc, row.fromNumber] : [row.disc, row.number]
+  return discs.value.length > 1 ? t('editor.album.disc_track', { disc, number }) : String(number)
+}
+/**
+ * Puts back the original titles of the saved tracks on the discs where titles moved, the first renamed one included
+ * (it got the missing track's title, which no other track had): then the missing track can be inserted.
+ */
+const restoreMoved = () => {
+  const original = editor.originalAlbum.value
+  if (!original) return
+  const discIds = new Set(moved.value.map(row => String(findTrack(album.value, row.trackId)?.disc_id)))
+  restoreTitles(album.value, original, album.value.tracks.filter(track => typeof track.id === 'number' && discIds.has(String(track.disc_id))).map(track => track.id))
+}
 
 const applied = ({ added, updated }: { added: number, updated: number }) => {
   editor.notify(t('editor.paste.applied', { added, updated }))

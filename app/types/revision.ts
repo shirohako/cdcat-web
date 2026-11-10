@@ -86,12 +86,22 @@ export interface RemovalPlan {
 }
 
 /** How an open revision merges with the current content right now. */
+/** A track an item removes, as it is now: disc position, number, title. */
+export interface RemovedTrack { id: number, title: string, disc: number, number: number, duration: number | null }
+
+/** A saved track renamed to the current title of another one (docs/catalog/editing.md#删除曲目). */
+export interface MovedTrackTitle { track_id: number, disc: number, number: number, title: string, from_track_id: number, from_disc: number, from_number: number }
+
 export interface RevisionPreviewItem {
   ref: string
   current_version: number
   conflicts: RevisionConflict[]
   errors: Record<string, string>
   requires_content_manage: boolean
+  /** Removes tracks of an approved album or deletes one: tracks.remove (the top role) approves it */
+  removes_live_tracks?: boolean
+  removed_tracks?: RemovedTrack[]
+  moved_titles?: MovedTrackTitle[]
   impact: DeletionImpact | null
 }
 

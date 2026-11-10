@@ -74,6 +74,7 @@ const help: Record<string, EditorHelpEntry> = {
   },
   'track.title': {
     text: 'Enter it in the original language, as printed on the release. Press Enter in a title to go to the next track. Titles in other languages go in “Album and track title translations”.',
+    dont: ['When a track is missing, don’t rename the tracks after it to the next title one by one: add it with “Insert track”'],
     where: 'The tracklist and the track page.',
     mock: { page: 'track', mark: 'title' },
   },

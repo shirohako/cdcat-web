@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   addBonus, addCredit, addDisc, addImage, addMainImage, addProduct, addTrack, bannerOf, changeCreditRole, coverOf, creditGroups, emptyAlbumDocument,
-  importTracklist,
+  alignTracks, firstGap, importTracklist, insertShift, insertTrack, movedTitles, planTracklistImport, restoreTitles,
   missingRequired, moveDisc, moveTrack, moveTrackToDisc, orderedTracks, pruneAlbumDocument, removeBonus, removeDisc,
   removeProduct, removeTrack, setCover, setDiscBonus, setTitleIn, sortedDiscs, titleIn,
   tracksOn, untickedDiscs, updateCreditGroup, upgradeAlbumDocument, useAsMain,
@@ -87,6 +87,88 @@ describe('discs and tracks', () => {
     importTracklist(doc, parseTracklist('E\nDisc 2\n1. F'), 'append')
     expect(titles(doc, disc.id)).toEqual(['1:A', '2:Bee', '3:C', '4:D', '5:E'])
     expect(sortedDiscs(doc)).toHaveLength(2)
+  })
+})
+
+describe('inserting tracks and lining up imports', () => {
+  /** A saved album: tracks with numeric ids, as the editor loads one. */
+  const saved = (names: string[]) => {
+    const doc = emptyAlbumDocument()
+    const disc = doc.discs[0]!
+    names.forEach((title, index) => addTrack(doc, disc.id, { id: index + 1, title, duration: 200 + index }))
+    return { doc, disc }
+  }
+
+  it('inserts a missing track at its number and moves the later ones down, ids kept', () => {
+    const { doc, disc } = saved(['One', 'Two', 'Three', 'Four', 'Six', 'Seven'])
+    expect(insertShift(doc, disc.id, 5)).toEqual([5, 6])
+    const five = insertTrack(doc, disc.id, 5, { title: 'Five' })
+    expect(titles(doc, disc.id)).toEqual(['1:One', '2:Two', '3:Three', '4:Four', '5:Five', '6:Six', '7:Seven'])
+    expect(tracksOn(doc, disc.id).map(track => track.id)).toEqual([1, 2, 3, 4, five.id, 5, 6])
+  })
+
+  it('moves nothing past a gap and finds the first free number', () => {
+    const { doc, disc } = saved(['One', 'Two', 'Four'])
+    tracksOn(doc, disc.id)[2]!.track_number = 4
+    expect(firstGap(doc, disc.id)).toBe(3)
+    expect(insertShift(doc, disc.id, 3)).toEqual([])
+    insertTrack(doc, disc.id, 3, { title: 'Three' })
+    expect(titles(doc, disc.id)).toEqual(['1:One', '2:Two', '3:Three', '4:Four'])
+    expect(firstGap(doc, disc.id)).toBeNull()
+  })
+
+  it('inserts the missing track of a pasted list instead of renaming the rest', () => {
+    const { doc, disc } = saved(['A', 'B', 'C', 'E', 'F'])
+    const plan = planTracklistImport(doc, parseTracklist('1. A\n2. B\n3. C\n4. D\n5. E\n6. F'))
+    expect(plan[0]!.steps.map(step => step.kind)).toEqual(['update', 'update', 'update', 'insert', 'update', 'update'])
+    expect(plan[0]!.anchors).toBe(5)
+    expect(importTracklist(doc, parseTracklist('1. A\n2. B\n3. C\n4. D\n5. E\n6. F'))).toEqual({ added: 1, updated: 0 })
+    expect(titles(doc, disc.id)).toEqual(['1:A', '2:B', '3:C', '4:D', '5:E', '6:F'])
+    expect(tracksOn(doc, disc.id).find(track => track.title === 'E')!.id).toBe(4)
+  })
+
+  it('fixes a wrong title in place, keeps tracks the paste lacks and lines up by duration', () => {
+    const { doc, disc } = saved(['Alpha', 'Bettta', 'Gamma', 'Delta'])
+    // Folded titles match ("alpha"), a typo pairs by number between anchors, Delta is not in the paste.
+    importTracklist(doc, parseTracklist('1. ALPHA\n2. Beta\n3. Gamma'))
+    expect(titles(doc, disc.id)).toEqual(['1:ALPHA', '2:Beta', '3:Gamma', '4:Delta'])
+    // No title in common, but the same durations: still lined up, the new second track inserted.
+    const other = saved(['甲', '乙'])
+    const plan = planTracklistImport(other.doc, [{ position: 1, title: null, tracks: [
+      { track_number: 1, number_label: null, title: 'Kou', duration: 200 },
+      { track_number: 2, number_label: null, title: 'New', duration: 300 },
+      { track_number: 3, number_label: null, title: 'Otsu', duration: 201 },
+    ] }])
+    expect(plan[0]!.steps.map(step => [step.kind, step.trackId, step.number])).toEqual([['update', 1, 1], ['insert', null, 2], ['update', 2, 3]])
+  })
+
+  it('falls back to numbers when nothing lines up, and says so', () => {
+    const { doc } = saved(['甲', '乙'])
+    const plan = planTracklistImport(doc, [{ position: 1, title: null, tracks: [
+      { track_number: 1, number_label: null, title: 'One', duration: null },
+      { track_number: 2, number_label: null, title: 'Two', duration: null },
+      { track_number: 3, number_label: null, title: 'Three', duration: null },
+    ] }])
+    expect(plan[0]!.anchors).toBe(0)
+    expect(plan[0]!.steps.map(step => step.kind)).toEqual(['update', 'update', 'insert'])
+    expect(alignTracks([], [{ title: 'X', duration: null, track_number: 1 }]).pairs).toEqual([[null, 0]])
+  })
+
+  it('spots titles moved along saved tracks and puts them back', () => {
+    const { doc, disc } = saved(['A', 'B', 'C', 'D'])
+    const originals = JSON.parse(JSON.stringify(doc))
+    const tracks = tracksOn(doc, disc.id)
+    tracks[1]!.title = 'New'
+    tracks[2]!.title = 'b '
+    tracks[3]!.title = 'C'
+    addTrack(doc, disc.id, { title: 'D' })
+    const moved = movedTitles(doc, originals)
+    expect(moved.map(row => [row.number, row.fromNumber])).toEqual([[3, 2], [4, 3]])
+    tracks[0]!.title = ''
+    expect(movedTitles(doc, originals)).toHaveLength(2)
+    restoreTitles(doc, originals, tracks.map(track => track.id))
+    expect(movedTitles(doc, originals)).toEqual([])
+    expect(titles(doc, disc.id).slice(0, 4)).toEqual(['1:A', '2:B', '3:C', '4:D'])
   })
 })
 

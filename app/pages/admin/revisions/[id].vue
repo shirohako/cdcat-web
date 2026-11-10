@@ -29,6 +29,8 @@ const canReview = computed(() => revision.value?.kind === 'lyric' ? hasPermissio
 const reviewable = computed(() => canReview.value && revision.value?.status === 'pending')
 const checkable = computed(() => canReview.value && revision.value?.status === 'approved' && revision.value.is_auto_approved && !revision.value.checked_at)
 const needsManage = computed(() => !!revision.value?.requires_content_manage && !hasPermission('content.manage'))
+/** Removing tracks of an approved album (or deleting one) is the top role's: docs/catalog/editing.md#删除曲目 */
+const needsTrackRemoval = computed(() => (revision.value?.preview ?? []).some(item => item.removes_live_tracks) && !hasPermission('tracks.remove'))
 
 const heading = computed(() => {
   const match = revision.value?.title?.match(/^([a-z]+): (.*)$/)
@@ -40,6 +42,9 @@ const preview = computed(() => (revision.value?.preview ?? []).map(item => ({
   type: revision.value?.items?.find(entry => entry.ref === item.ref)?.resource_type ?? 'album',
   errorList: Object.entries(item.errors ?? {}),
 })).filter(item => item.conflicts.length || item.errorList.length || item.impact))
+/** Items that remove tracks, and saved tracks renamed to another track's title, which a missing track inserted avoids. */
+const trackNotes = computed(() => (revision.value?.preview ?? []).filter(item => item.removed_tracks?.length || item.moved_titles?.length))
+const trackPlace = (disc: number, number: number) => `Disc ${disc} · ${number}`
 const show = (value: unknown) => value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value)
 
 /** Content the revision put live at submission, awaiting this review (docs/catalog/editing.md#待审内容). */
@@ -138,10 +143,11 @@ useHead({ title: computed(() => heading.value) })
 
         <div v-if="reviewable || checkable" class="flex flex-wrap items-center gap-2">
           <template v-if="reviewable">
-            <UiButton variant="primary" :disabled="busy || needsManage" @click="decision = 'approve'">通过</UiButton>
+            <UiButton variant="primary" :disabled="busy || needsManage || needsTrackRemoval" @click="decision = 'approve'">通过</UiButton>
             <UiButton :disabled="busy" @click="decision = 'request_changes'">退回修改</UiButton>
             <UiButton variant="danger-soft" :disabled="busy" @click="decision = 'reject'">拒绝</UiButton>
-            <span v-if="needsManage" class="text-xs text-amber-700">批准删除实体或移除有依赖的曲目需要内容管理权限。</span>
+            <span v-if="needsTrackRemoval" class="text-xs text-amber-700">这条修订会删除已上线的曲目（或整张已上线的专辑），只有超级管理员能批准。</span>
+            <span v-else-if="needsManage" class="text-xs text-amber-700">批准删除实体需要内容管理权限。</span>
           </template>
           <UiButton v-if="checkable" :disabled="busy" @click="check">标记已巡查</UiButton>
           <span class="text-xs text-slate-500">审核人不能代改；要补充内容请自己另提一条修订。</span>
@@ -189,6 +195,22 @@ useHead({ title: computed(() => heading.value) })
               >合并到这张</UiButton>
             </li>
           </ul>
+        </section>
+
+        <section v-for="item in trackNotes" :key="`tracks-${item.ref}`" class="space-y-2 rounded-xl border bg-white p-4 text-sm" :class="item.removed_tracks?.length ? 'border-rose-200' : 'border-amber-200'">
+          <template v-if="item.removed_tracks?.length">
+            <h2 class="font-semibold text-rose-800">{{ item.removes_live_tracks ? '删除已上线的曲目' : '删除曲目（专辑还在审核中）' }}</h2>
+            <ul class="list-inside list-disc text-slate-700">
+              <li v-for="track in item.removed_tracks" :key="track.id">{{ trackPlace(track.disc, track.number) }}. {{ track.title }}</li>
+            </ul>
+          </template>
+          <template v-if="item.moved_titles?.length">
+            <h2 class="font-semibold text-amber-800">曲名像是在曲目之间挪动了</h2>
+            <p class="text-slate-600">已有曲目改成了另一首曲目现在的曲名。漏了曲目应该插入新曲目，整体改名会让收藏、歌词和制作人员对不上；可以退回修改。</p>
+            <ul class="list-inside list-disc text-slate-700">
+              <li v-for="row in item.moved_titles" :key="row.track_id">{{ trackPlace(row.disc, row.number) }} 改成了 {{ trackPlace(row.from_disc, row.from_number) }} 的曲名「{{ row.title }}」</li>
+            </ul>
+          </template>
         </section>
 
         <section v-for="item in preview" :key="item.ref" class="rounded-xl border border-rose-200 bg-white p-4 text-sm">
