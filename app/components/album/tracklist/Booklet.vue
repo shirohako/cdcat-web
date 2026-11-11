@@ -25,7 +25,7 @@ const hasLiner = (row: TracklistRow) => Boolean(row.groups.length || row.subtitl
         :id="`track-${row.id}`"
         :key="row.id"
         :data-track-id="row.id"
-        class="tl-row group relative -mx-2 grid scroll-mt-24 grid-cols-[2rem_minmax(0,1fr)_auto] items-start gap-x-2.5 rounded-sm px-2 py-3.5 transition-colors duration-150 @lg:grid-cols-[2.25rem_minmax(0,1fr)_auto] hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+        class="tl-row group relative -mx-2 grid scroll-mt-24 grid-cols-[2rem_minmax(0,1fr)_auto] items-start gap-x-2.5 rounded-sm px-2 py-4 transition-colors duration-150 @lg:grid-cols-[2.25rem_minmax(0,1fr)_auto] hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
       >
         <span class="text-[1.0625rem] font-light leading-6 tracking-tight tabular-nums text-faint @lg:text-xl">{{ row.number }}</span>
         <!-- 13px as in every style (was 15px), a step above the 12px credits; one line cut with …, and on phones long
@@ -35,13 +35,13 @@ const hasLiner = (row: TracklistRow) => Boolean(row.groups.length || row.subtitl
           <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-13 font-semibold leading-6 max-sm:whitespace-normal max-sm:wrap-break-word" />
           <span v-if="row.instrumental" class="shrink-0 text-11 font-medium tracking-[0.12em] text-meta">{{ t('content_display.instrumental') }}</span>
         </span>
-        <!-- As in 清单: the more menu, the heart (none on albums awaiting review), the lyrics buttons (none for
+        <!-- As in 清单: the more menu, the heart (none on albums awaiting review), the lyrics buttons (greyed out on
              instrumentals) and the length, which keeps a width so a "—" doesn't move the buttons before it -->
         <span class="flex h-6 items-center gap-1">
           <AlbumTracklistMoreButton :row="row" />
           <span class="flex items-center gap-0.5">
             <AlbumTracklistFavorite :row="row" />
-            <AlbumTracklistLyrics :row="row" small class="ml-0.5" />
+            <AlbumTracklistLyrics :row="row" small always class="ml-0.5" />
             <span class="min-w-[2.25em] text-right text-13 leading-6 tabular-nums" :class="row.duration ? 'text-body' : 'text-faint'">{{ row.duration || '—' }}</span>
           </span>
         </span>

@@ -6,16 +6,15 @@ import { ChevronDown } from '@lucide/vue'
  * Style A, 清单: one row per track. 简洁 is ruled rows (until 2026-11-11 this was 表格 · 简洁; the old 清单 · 简洁
  * went): number and title, then on the right the people button (opens the credits), the more menu, the heart and the
  * length, in fixed columns so they line up down the list. 舒适 and 完整 are like a music app: the first line (number,
- * title, then the more menu, the heart and the length at the right, as in 简洁 but without the people button) is the
- * same in both, so switching only opens and folds what is under it: the 舒适 line (who sings, who arranged, 原曲,
- * lyrics) and the 完整 block (every credit as a role tag, notes, counts), which mounts the first time it opens. 简洁 and
+ * title, then at the right the more menu, the heart, the lyrics buttons and the length, the same on every track) is
+ * the same in both, so switching only opens and folds what is under it: the 舒适 line (who sings, who arranged,
+ * 原曲) and the 完整 block (every credit as a role tag, notes, counts), which mounts the first time it opens. 简洁 and
  * the others differ in structure, so that switch crossfades. The 舒适 line and the 完整 block share one place under
  * the title: the block opens over the line while the line fades, so a row grows once rather than one part closing
- * while the other opens; the lyrics buttons and, in 舒适, a 展开更多 chip (always, as the faded line may hide names) stay at the
- * right of it. The chip opens that one track as in 完整 and turns into 收起, its arrow turning round; changing the
- * density folds them all. On phones that right-hand strip would squeeze the credits for its whole height, so it goes:
- * the lyrics buttons move to the first line, before the length, and the chip becomes an arrow button at its end
- * (user ask, 2026-11-11), leaving the credits the full width.
+ * while the other opens. A track with neither is one line. In 舒适 a light arrow at the right end of that line, under
+ * the length, opens that one track as in 完整, turning round; changing the density folds them all. (User picks,
+ * 2026-11-11: the lyrics buttons and a 展开更多 chip used to sit at the right of the second line, the lyrics jumping
+ * between the two lines; an arrow on the first line, shown only on tracks with credits, dotted the column.)
  */
 const props = defineProps<{ discs: TracklistDisc[], density: TracklistDensity }>()
 
@@ -23,8 +22,7 @@ const { t } = useI18n()
 
 const { separator } = useListPunctuation()
 const hasNotes = (row: TracklistRow) => Boolean(row.originals.length || row.attributes.length || row.isrc)
-// What the 舒适 line and the 完整 block have besides the lyrics buttons (a track has both or neither). With nothing,
-// the buttons move to the end of the first line instead, so a track without credits doesn't get a line holding only them.
+// What the 舒适 line and the 完整 block hold (a track has both or neither). With nothing, the track is one line.
 const hasFull = (row: TracklistRow) => Boolean(row.groups.length || row.subtitle || hasNotes(row))
 
 // Tracks opened as in 完整 from 舒适
@@ -39,11 +37,9 @@ watch(() => props.density, () => {
   expanded.value = new Set()
 })
 const showsFull = (row: TracklistRow, density: TracklistDensity) => density === 'full' || (density === 'comfy' && expanded.value.has(row.id))
-const lyricsInline = (row: TracklistRow) => !row.instrumental && !hasFull(row)
 
-/** The phone's 展开更多 / 收起: the chip's outline as a 20px arrow button at the end of the first line */
-const ARROW = 'hidden size-5 shrink-0 items-center justify-center rounded-[0.3125rem] text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title max-sm:inline-flex dark:hover:bg-white/[0.07]'
-const CHIP = 'inline-grid h-5 shrink-0 items-center rounded-[0.3125rem] px-1.5 text-11 font-semibold leading-none text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title dark:hover:bg-white/[0.07]'
+/** 展开更多 / 收起: a light 20px arrow with no outline (like the more button), centred on the 舒适 line */
+const ARROW = 'mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-[0.3125rem] text-meta transition-colors duration-150 hover:bg-black/[0.06] hover:text-title dark:hover:bg-white/[0.1]'
 </script>
 
 <template>
@@ -87,44 +83,32 @@ const CHIP = 'inline-grid h-5 shrink-0 items-center rounded-[0.3125rem] px-1.5 t
           :id="`track-${row.id}`"
           :key="row.id"
           :data-track-id="row.id"
-          class="tl-row group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-2 transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          class="tl-row group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 transition-[color,background-color,padding] duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          :class="density === 'comfy' ? 'py-2.5' : 'py-2'"
         >
+          <!-- 舒适 rows stand further apart than 完整's (user ask, 2026-11-11), whose open blocks already set them apart -->
           <!-- A column just wide enough for two digits, centred on the 24px first line -->
           <span class="flex h-6 items-center text-xs tabular-nums text-meta">{{ row.number }}</span>
-          <!-- One line cut with … ; on phones, where the first line also holds the lyrics and the arrow, long titles wrap
-               instead (user ask, 2026-11-11), the buttons staying on their first line and 纯音乐 centred on it -->
+          <!-- One line cut with … ; on phones, where the buttons leave the title little room, long titles wrap instead
+               (user ask, 2026-11-11), the buttons staying on their first line and 纯音乐 centred on it -->
           <span class="flex h-6 min-w-0 items-center gap-1.5 max-sm:h-auto max-sm:items-start">
             <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-13 font-medium leading-6 max-sm:whitespace-normal max-sm:wrap-break-word" />
-            <AlbumTracklistLabel v-if="row.instrumental" class="max-sm:mt-[0.1875rem]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
+            <AlbumTracklistLabel v-if="row.instrumental" size="flag" class="max-sm:mt-1">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
           </span>
           <!-- At the right, close together and all 20px as in 简洁: the more menu, the heart (none on albums
-               awaiting review), the lyrics buttons when they have no line below to go to, right before the length, and
-               the length, which keeps a width, so a "—" doesn't move the buttons before it out of line. -->
+               awaiting review), the lyrics buttons (greyed out and not pressable on instrumentals, as in the tables;
+               user ask, 2026-11-11), and last the length, at the edge as in every style. The length keeps a width, so a "—" doesn't move the buttons before it out of line. The same
+               on every track, so the column reads evenly down the list. -->
           <span class="flex h-6 items-center gap-1">
             <AlbumTracklistMoreButton :row="row" />
             <span class="flex items-center gap-0.5">
               <AlbumTracklistFavorite :row="row" />
-              <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0" leave-active-class="transition-opacity duration-100" leave-to-class="opacity-0">
-                <AlbumTracklistLyrics v-if="lyricsInline(row)" :row="row" small class="ml-0.5" />
-              </Transition>
-              <!-- Phones: the lyrics buttons of a track with a line below come up here too -->
-              <span v-if="hasFull(row)" class="hidden max-sm:contents"><AlbumTracklistLyrics :row="row" small class="ml-0.5" /></span>
+              <AlbumTracklistLyrics :row="row" small always class="ml-0.5" />
               <span class="min-w-[2.25em] text-right text-xs leading-6 tabular-nums" :class="row.duration ? 'text-meta' : 'text-faint'">{{ row.duration || '—' }}</span>
             </span>
-            <!-- Phones, 舒适: 展开更多 / 收起 as an arrow, turning as the track opens -->
-            <button
-              v-if="density === 'comfy' && hasFull(row)"
-              type="button"
-              :class="ARROW"
-              :aria-expanded="expanded.has(row.id)"
-              :aria-label="t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more')"
-              @click="toggleMore(row)"
-            >
-              <ChevronDown :size="13" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />
-            </button>
           </span>
 
-          <div v-if="hasFull(row)" class="col-[2/-1] flex items-start gap-3">
+          <div v-if="hasFull(row)" class="col-[2/-1] flex items-start gap-3 max-sm:gap-2">
             <!-- The 舒适 line and the 完整 block in one cell: the block opens over the line as the line fades -->
             <div class="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)]">
               <!-- 舒适: roles as tags (原曲 as a grey one), the names after them as grey tags, on one line that fades out at the
@@ -179,21 +163,20 @@ const CHIP = 'inline-grid h-5 shrink-0 items-center rounded-[0.3125rem] px-1.5 t
                 </div>
               </UiCollapse>
             </div>
-            <!-- Stays put through both: the lyrics buttons, and at the far right 展开更多 / 收起 in 舒适, its arrow turning;
-                 rightmost so it lines up down the list whatever the lyrics buttons hold (or none, for instrumentals) -->
-            <span class="mt-0.5 flex shrink-0 items-center gap-1 max-sm:hidden">
-              <AlbumTracklistLyrics :row="row" small />
-              <button v-if="density === 'comfy'" type="button" :class="CHIP" :aria-expanded="expanded.has(row.id)" @click="toggleMore(row)">
-                <!-- Arrow and both labels, invisible, in one cell, so the chip keeps the longer one's width and the lyrics
-                     buttons beside it don't move; over them the arrow (one, so it turns) and the label shown, centred
-                     together (user ask, 2026-11-11: 收起 sat at the left) -->
-                <span class="invisible col-start-1 row-start-1 flex items-center gap-1" aria-hidden="true"><span class="size-3" />{{ t('album.tracklist.show_more') }}</span>
-                <span class="invisible col-start-1 row-start-1 flex items-center gap-1" aria-hidden="true"><span class="size-3" />{{ t('album.tracklist.show_less') }}</span>
-                <span class="col-start-1 row-start-1 flex items-center justify-center gap-1">
-                  <ChevronDown :size="12" class="shrink-0 transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />{{ t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more') }}
-                </span>
+            <!-- 舒适: 展开更多 / 收起 at the right end of this line, under the length, turning as the track opens; it stays
+                 put at the top while the block opens. Only a track with this line has one, so the arrows go with the
+                 credits rather than dotting the first line's column (user pick, 2026-11-11). -->
+            <UiTooltip v-if="density === 'comfy'" :text="t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more')">
+              <button
+                type="button"
+                :class="ARROW"
+                :aria-expanded="expanded.has(row.id)"
+                :aria-label="t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more')"
+                @click="toggleMore(row)"
+              >
+                <ChevronDown :size="14" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />
               </button>
-            </span>
+            </UiTooltip>
           </div>
         </div>
       </AlbumTracklistDisc>

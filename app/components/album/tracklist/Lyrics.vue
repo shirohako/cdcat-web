@@ -5,8 +5,8 @@ import { FileText, Languages } from '@lucide/vue'
 /**
  * Lyrics and translations as icon-and-count buttons that open the lyrics dialog, the second on a translation. With
  * `merged` (the table's narrow column) it is one button counting both. A sung track without lyrics keeps a faint
- * lyrics button without a number, the way in to add them; instrumentals have none, unless `always` (the table's
- * column), where they get a greyed-out one that can't be pressed. `small` is 20px with a 12px icon, for a line of 20px
+ * lyrics button without a number, the way in to add them; instrumentals have none, unless `always` (every style
+ * passes it since 2026-11-11, user ask), where they get a greyed-out one that can't be pressed. `small` is 20px with a 12px icon, for a line of 20px
  * buttons: everywhere in 清单 (the first line beside the length, the 舒适 line, the 完整 block).
  */
 const props = defineProps<{ row: TracklistRow, merged?: boolean, small?: boolean, always?: boolean }>()

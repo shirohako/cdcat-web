@@ -69,7 +69,7 @@ const CELL_CLASSES: Record<Column['kind'], string> = {
                   <template v-if="column.kind === 'number'">{{ row.number }}</template>
                   <template v-else-if="column.kind === 'title'">
                     <AlbumTracklistTitle :row="row" class="font-medium" />
-                    <AlbumTracklistLabel v-if="row.instrumental" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
+                    <AlbumTracklistLabel v-if="row.instrumental" size="flag" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
                     <span v-if="row.originals.length" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
                       <span class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                     </span>
