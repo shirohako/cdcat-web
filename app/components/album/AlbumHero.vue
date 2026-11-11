@@ -60,68 +60,37 @@
         </div>
 
         <div class="@container w-full min-w-0 flex-1 pt-5 text-center md:pt-6 md:text-left">
-          <!-- What the album is, on a row of its own, every tag with its icon: the type filled; the formats worth a word
-               and the categories outlined. -->
-          <div class="flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
-            <span class="inline-flex h-6 items-center gap-1 rounded bg-primary pl-1.5 pr-2 text-xs font-semibold text-on-primary">
-              <Icon :name="typeIcon" class="size-3.5 shrink-0" />
-              {{ typeLabel }}
-            </span>
-            <span
-              v-for="tag in tags"
-              :key="tag.key"
-              class="inline-flex h-6 items-center gap-1 rounded pl-1.5 pr-2 text-xs font-semibold text-title ring-1 ring-inset ring-title/20"
-            >
-              <Icon :name="tag.icon" class="size-3.5 shrink-0 text-meta" />
-              {{ tag.label }}
-            </span>
-            <CatalogPendingBadge v-if="album.is_pending" />
-          </div>
-
-          <!-- The album's size in big figures: beside the title when both fit, under it when not. The row wraps by the
-               real widths, so the title keeps at least 18rem and the figures take what they need at any text size. -->
-          <div class="mt-3 flex flex-wrap items-start justify-center gap-x-10 gap-y-3 md:justify-between">
+          <!-- What the album is and how big it is, as one group: the tags and the title on the left, the big figures
+               beside them, centred on both, when they fit; under the title when not. The row wraps by the real widths,
+               so the title keeps at least 18rem and the figures take what they need at any text size. Who made the
+               album and the facts follow under it across the column's full width, rather than in a narrow column beside
+               the figures; no line between (user ask, 2026-11-11). -->
+          <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 md:justify-between">
             <div class="min-w-0 grow basis-72">
-              <h1 class="wrap-break-word text-balance font-bold leading-tight text-title" :class="titleSize">
+              <!-- Every tag with its icon: the type filled; the formats worth a word and the categories outlined. -->
+              <div class="flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
+                <span class="inline-flex h-6 items-center gap-1 rounded bg-primary pl-1.5 pr-2 text-xs font-semibold text-on-primary">
+                  <Icon :name="typeIcon" class="size-3.5 shrink-0" />
+                  {{ typeLabel }}
+                </span>
+                <span
+                  v-for="tag in tags"
+                  :key="tag.key"
+                  class="inline-flex h-6 items-center gap-1 rounded pl-1.5 pr-2 text-xs font-semibold text-title ring-1 ring-inset ring-title/20"
+                >
+                  <Icon :name="tag.icon" class="size-3.5 shrink-0 text-meta" />
+                  {{ tag.label }}
+                </span>
+                <CatalogPendingBadge v-if="album.is_pending" />
+              </div>
+
+              <h1 class="mt-3 wrap-break-word text-pretty font-bold leading-tight text-title" :class="titleSize">
                 {{ shownTitle }}
               </h1>
               <p v-if="originalTitle" class="mt-1 text-sm text-body">{{ originalTitle }}</p>
-
-              <!-- The byline: the publishers, else the 艺术家, every one of them; under publishers, the 艺术家
-                   follow. Who labels, sells or makes the album is in 专辑信息. Unlike the grey fact tags further down,
-                   each name is the artist's picture (or its icon on a grey tile: a building for companies, people for
-                   circles and groups, a person otherwise; a name-only publisher gets the building) and the name, with no fill until hovered; then the whole block, picture and padding
-                   included, turns grey. The row moves left by that padding, so the pictures line up with the title.
-                   A name-only credit has no link. -->
-              <div v-if="bylineTags.length" class="mt-2 flex flex-wrap items-center justify-center gap-1 md:-ml-1.5 md:justify-start">
-                <component
-                  :is="tag.id ? NuxtLink : 'span'"
-                  v-for="tag in bylineTags"
-                  :key="tag.key"
-                  :to="tag.id ? `/artists/${tag.id}` : undefined"
-                  class="inline-flex min-w-0 max-w-full items-center gap-2.5 rounded-lg py-1.5 pl-1.5 pr-4 text-sm font-semibold text-title transition-colors duration-150"
-                  :class="tag.id && 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'"
-                >
-                  <UiImage v-if="tag.image" :src="tag.image" alt="" eager class="size-7 shrink-0 rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
-                    <template #fallback><component :is="tag.icon" :size="14" /></template>
-                  </UiImage>
-                  <span v-else class="grid size-7 shrink-0 place-items-center rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
-                    <component :is="tag.icon" :size="14" />
-                  </span>
-                  <span class="truncate">{{ tag.name }}</span>
-                </component>
-              </div>
-
-              <!-- Phones: the like button under the title and byline, where a music app keeps its actions, rather than
-                   under the cover, a screen away from the rest -->
-              <UiButton v-bind="likeButton" class="mt-3 px-4 md:hidden" @click="toggleLike">
-                <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
-                {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
-              </UiButton>
             </div>
 
-            <!-- pt-1 lines the figures up with the title beside it; under it, gap-y-3 plus pt-1 keep the old 16px. -->
-            <dl v-if="figures.length" class="flex shrink-0 justify-center divide-x divide-line pt-1 md:justify-start">
+            <dl v-if="figures.length" class="flex shrink-0 justify-center divide-x divide-line md:justify-start">
               <!-- The label comes first for screen readers and shows under its figure. -->
               <div v-for="figure in figures" :key="figure.key" class="flex flex-col-reverse px-5 first:pl-0 last:pr-0">
                 <dt class="mt-1.5 text-xs text-meta">{{ figure.label }}</dt>
@@ -130,8 +99,40 @@
             </dl>
           </div>
 
+          <!-- The byline: the publishers, else the 艺术家, every one of them; under publishers, the 艺术家 follow. Who
+               labels, sells or makes the album is in 专辑信息. Unlike the grey fact tags further down, each name is the
+               artist's picture (or its icon on a grey tile: a building for companies, people for circles and groups, a
+               person otherwise; a name-only publisher gets the building) and the name, with no fill until hovered; then
+               the whole block, picture and padding included, turns grey. The row moves left by that padding, so the
+               pictures line up with the title. A name-only credit has no link. -->
+          <div v-if="bylineTags.length" class="mt-3 flex flex-wrap items-center justify-center gap-1 md:-ml-1.5 md:justify-start">
+            <component
+              :is="tag.id ? NuxtLink : 'span'"
+              v-for="tag in bylineTags"
+              :key="tag.key"
+              :to="tag.id ? `/artists/${tag.id}` : undefined"
+              class="inline-flex min-w-0 max-w-full items-center gap-2.5 rounded-lg py-1.5 pl-1.5 pr-4 text-sm font-semibold text-title transition-colors duration-150"
+              :class="tag.id && 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'"
+            >
+              <UiImage v-if="tag.image" :src="tag.image" alt="" eager class="size-7 shrink-0 rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
+                <template #fallback><component :is="tag.icon" :size="14" /></template>
+              </UiImage>
+              <span v-else class="grid size-7 shrink-0 place-items-center rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
+                <component :is="tag.icon" :size="14" />
+              </span>
+              <span class="truncate">{{ tag.name }}</span>
+            </component>
+          </div>
+
+          <!-- Phones: the like button under the title and byline, where a music app keeps its actions, rather than
+               under the cover, a screen away from the rest -->
+          <UiButton v-bind="likeButton" class="mt-3 px-4 md:hidden" @click="toggleLike">
+            <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
+            {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
+          </UiButton>
+
           <!-- Catalog number, release date and event as grey tags like the links card's; the event's lists its albums. -->
-          <div v-if="album.catalog_number || album.release_date || album.release_event" class="mt-4 flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
+          <div v-if="hasFacts" class="mt-4 flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
             <span v-if="album.catalog_number" :class="FACT_TAG">
               <Hash :size="14" class="shrink-0 text-meta" />
               <span class="truncate font-mono">{{ album.catalog_number }}</span>
@@ -279,6 +280,7 @@ const figures = computed(() => {
     { key: 'duration', shown: duration > 0, value: formatDuration(duration), label: t('album.hero.duration') },
   ].filter(figure => figure.shown)
 })
+const hasFacts = computed(() => Boolean(props.album.catalog_number || props.album.release_date || props.album.release_event))
 
 const hoveredLinkId = ref<number | null>(null)
 const isFavorited = ref(props.album.is_favorited)

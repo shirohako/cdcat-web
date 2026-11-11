@@ -2,7 +2,7 @@
   <SkeletonStatus page>
     <!-- Full-width heroes (albums, tracks, entries, franchises) come with their own body container. -->
     <!-- AlbumHero: a banner, then a card riding over its lower edge with the cover sticking out of its top, the like
-         button under the cover, the title and the big figures beside it. -->
+         button under the cover; the tags, title and big figures as one group, the byline and the facts under it. -->
     <div v-if="hero === 'album'">
       <div class="skeleton h-40 sm:h-48 md:h-52 lg:h-60 2xl:h-64" />
       <div class="container mx-auto max-w-6xl px-4 md:px-8 2xl:max-w-7xl">
@@ -11,20 +11,24 @@
             <div class="skeleton -mt-22 size-40 rounded-md ring-4 ring-card sm:-mt-24 sm:size-44 md:size-48 lg:-mt-26 lg:size-52 xl:-mt-28 xl:size-56 2xl:-mt-30 2xl:size-60" />
             <div class="skeleton h-8 rounded-md" />
           </div>
-          <div class="flex w-full flex-1 flex-col items-center gap-3 pt-5 md:items-start md:pt-6">
-            <div class="flex gap-1.5">
-              <div class="skeleton h-6 w-12 rounded" />
-              <div class="skeleton h-6 w-10 rounded" />
+          <div class="w-full min-w-0 flex-1 pt-5 md:pt-6">
+            <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 md:justify-between">
+              <div class="flex min-w-0 grow basis-72 flex-col items-center gap-3 md:items-start">
+                <div class="flex gap-1.5">
+                  <div class="skeleton h-6 w-12 rounded" />
+                  <div class="skeleton h-6 w-10 rounded" />
+                </div>
+                <div class="skeleton h-8 w-3/5 rounded-md" />
+              </div>
+              <div class="flex gap-5">
+                <div v-for="figure in 3" :key="figure" class="skeleton h-10 w-14 rounded-md" />
+              </div>
             </div>
-            <div class="skeleton h-8 w-3/5 rounded-md" />
-            <div class="flex items-center gap-2.5 py-1.5">
+            <div class="mt-3 flex items-center justify-center gap-2.5 py-1.5 md:justify-start">
               <div class="skeleton size-7 rounded-md" />
               <div class="skeleton h-4 w-32 rounded-full" />
             </div>
-            <div class="mt-1 flex gap-5">
-              <div v-for="figure in 3" :key="figure" class="skeleton h-10 w-14 rounded-md" />
-            </div>
-            <div class="flex gap-1.5">
+            <div class="mt-4 flex justify-center gap-1.5 md:justify-start">
               <div class="skeleton h-7 w-24 rounded-md" />
               <div class="skeleton h-7 w-28 rounded-md" />
               <div class="skeleton h-7 w-32 rounded-md" />
