@@ -1,12 +1,10 @@
 <template>
-  <section class="card overflow-hidden">
+  <!-- No card with neither text nor facts (user ask, 2026-11-11); facts alone keep it -->
+  <section v-if="album.description || hasInfo" class="card overflow-hidden">
     <!-- Header -->
     <UiSectionTitle :title="$t('album.section.description')" :icon="FileText" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5" />
 
-    <!-- Neither text nor facts: one line, like the other cards. -->
-    <CatalogEmptyLine v-if="!album.description && !hasInfo" :icon="FileText" :text="$t('album.empty.description')" />
-
-    <div v-else class="px-5 pb-5 pt-2">
+    <div class="px-5 pb-5 pt-2">
       <!-- Taller than COLLAPSED_REM and the card folds there, fading out, until expanded. The page comes from the
            server already clipped, so long text doesn't jump; once measured, text that fits is let out. -->
       <div class="relative" :class="!expanded && (folds || !measured) && 'max-h-72 overflow-hidden'">

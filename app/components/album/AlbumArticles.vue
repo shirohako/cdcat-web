@@ -1,14 +1,15 @@
 <template>
-  <section class="card overflow-hidden">
+  <!-- No card without articles (user ask, 2026-11-11) -->
+  <section v-if="articles.length" class="card overflow-hidden">
     <!-- Header -->
     <UiSectionTitle :title="$t('album.section.articles')" :icon="FileText" size="sm" class="px-5 pb-2 pt-4 [&_h2]:leading-5">
-      <template v-if="articles.length > 0" #actions>
+      <template #actions>
         <span class="text-xs text-meta">{{ $t('content_display.article_count', { count: articles.length }) }}</span>
       </template>
     </UiSectionTitle>
 
     <!-- Article list -->
-    <div v-if="articles.length > 0" class="divide-y divide-line">
+    <div class="divide-y divide-line">
       <NuxtLink
         v-for="article in articles"
         :key="article.id"
@@ -39,8 +40,6 @@
         </div>
       </NuxtLink>
     </div>
-
-    <CatalogEmptyLine v-else :icon="FileText" :text="$t('album.empty.articles_title')" size="sm" />
   </section>
 </template>
 

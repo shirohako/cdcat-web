@@ -5,9 +5,14 @@ import type { DiscussionTopicList } from '~/types/discussion'
 
 /**
  * The latest topics linking a piece of content, with a button to start one unless `startable` is false. `compact`
- * (the album page's side column) draws the title smaller and the empty state tighter.
+ * (the album page's side column) draws the title smaller and the empty state tighter. With `hideEmpty` (the album
+ * page, user ask 2026-11-11) there is no card at all once it is known that no topic links the content; while loading
+ * it shows, with its skeleton.
  */
-const props = withDefaults(defineProps<{ type: ContentLinkType, id: number, startable?: boolean, compact?: boolean }>(), { startable: true, compact: false })
+const props = withDefaults(
+  defineProps<{ type: ContentLinkType, id: number, startable?: boolean, compact?: boolean, hideEmpty?: boolean }>(),
+  { startable: true, compact: false, hideEmpty: false },
+)
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const { isAuthenticated } = useAuth()
@@ -24,7 +29,7 @@ const start = computed(() => isAuthenticated.value ? { path: '/discussions/new',
 </script>
 
 <template>
-  <section class="card overflow-hidden">
+  <section v-if="!hideEmpty || topics.length || loading" class="card overflow-hidden">
     <UiSectionTitle :title="t('discussions.related.title')" :icon="MessageCircle" :count="total || undefined" :size="compact ? 'sm' : 'md'" class="px-5 pb-2 pt-4" :class="compact && '[&_h2]:leading-5'">
       <template v-if="startable" #actions>
         <UiButton :to="start" size="xs" :icon="PenSquare">{{ t('discussions.related.start') }}</UiButton>

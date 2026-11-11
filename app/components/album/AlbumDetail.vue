@@ -44,7 +44,8 @@
           <AlbumLinks :links="album.links" />
           <AlbumGallery ref="gallery" :images="album.images" :products="album.products" :bonuses="album.bonuses" :discs="album.discs" />
           <AlbumArticles :articles="album.articles ?? []" />
-          <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact />
+          <!-- 简介, 相关文章 and 相关讨论 show only with something in them (user ask, 2026-11-11) -->
+          <DiscussionRelatedDiscussions v-if="!album.is_pending" :id="album.id" type="album" :startable="false" compact hide-empty />
           <AlbumEditing :album="album" :preview="preview" />
         </div>
       </div>
