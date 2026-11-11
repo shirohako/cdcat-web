@@ -9,7 +9,8 @@ export type Theme = 'dark' | 'light'
  */
 export type ThemeColor = number | 'ink'
 
-export const DEFAULT_THEME: Theme = 'light'
+/** Dark since 2026-11-11 (user ask; light from 2026-10-25). A visitor's saved choice wins. */
+export const DEFAULT_THEME: Theme = 'dark'
 export const DEFAULT_COLOR: ThemeColor = 'ink'
 /** The hue the ink palette's greys lean to. */
 export const INK_HUE = 290
