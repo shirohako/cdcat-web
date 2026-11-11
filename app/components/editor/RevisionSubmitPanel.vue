@@ -44,6 +44,17 @@
         {{ $t(canAutoApprove ? 'editor.submit_publish' : 'editor.submit_review') }}
       </UiButton>
       <UiButton class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px" :disabled="draft.saveState.value === 'saving'" @click="draft.save()">{{ $t('editor.save_draft') }}</UiButton>
+      <!-- A member's draft goes to CDCat only on request (docs/catalog/editing.md#草稿); a candidate's is shared on its own. -->
+      <span v-if="draft.serverKind.value === 'personal'" class="inline-flex items-center">
+        <UiButton
+          :icon="CloudUpload"
+          class="ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
+          :loading="draft.syncState.value === 'syncing'"
+          :disabled="draft.syncState.value === 'conflict' || (draft.syncState.value === 'synced' && !draft.hasUnsaved())"
+          @click="saveToServer"
+        >{{ $t('editor.server.save') }}</UiButton>
+        <EditorHelp id="submit.server_draft" />
+      </span>
       <UiButton v-if="draft.persisted.value" variant="danger-soft" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
       <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
@@ -79,7 +90,7 @@ import type { useRevisionDraft } from '~/composables/useRevisionDraft'
 import type { DuplicateCandidate, Revision, RevisionConflict } from '~/types/revision'
 import type { DiffCollection } from '~/utils/documentDiff'
 import { documentDiff } from '~/utils/documentDiff'
-import { ChevronRight } from '@lucide/vue'
+import { ChevronRight, CloudUpload } from '@lucide/vue'
 import { errorName, revisionConflicts, revisionFieldErrors } from '~/utils/revisionErrors'
 
 /** Something the editor checks before submitting, and the section where it is fixed. */
@@ -207,6 +218,13 @@ const send = async () => {
   } finally {
     emit('errors', errors.value)
   }
+}
+
+/** 「保存到 CDCat」: the line above the editor (ServerDraftSync) shows how it went; a refusal (10 drafts, 2 MB) shows here too. */
+const saveToServer = async () => {
+  message.value = ''
+  await props.draft.saveToServer()
+  if (props.draft.syncState.value === 'error') message.value = localizeError(props.draft.lastError.value)
 }
 
 const discard = async () => {

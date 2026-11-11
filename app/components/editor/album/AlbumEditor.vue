@@ -49,6 +49,8 @@
 
         <!-- A harvest candidate's draft is shared on the server; the model's MCP edits come in from there. -->
         <AdminHarvestDraftSync v-if="draft.serverId.value !== null" :draft="draft" class="mb-4" @reloaded="contentKey++" />
+        <!-- A member's draft saved to CDCat: a newer version there (another device, a model over MCP) comes in from there. -->
+        <EditorServerDraftSync v-else-if="draft.serverKind.value === 'personal'" :draft="draft" class="mb-4" @reloaded="contentKey++" />
 
         <div v-if="openRevisions.length && !draft.revisionId.value" class="mb-4 flex flex-wrap items-center gap-3 rounded-xl border border-warning/25 bg-warning/10 px-4 py-3 text-sm text-body">
           <History :size="16" class="shrink-0 text-warning" />

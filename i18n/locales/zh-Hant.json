@@ -23,7 +23,7 @@
     "logout": "登出",
     "articles": "我的文章",
     "notifications": "通知",
-    "logout_drafts_confirm": "這個瀏覽器裡有 {count} 份未送出的草稿，登出後會被刪除。確定登出嗎？"
+    "logout_drafts_confirm": "這個瀏覽器裡有 {count} 份沒儲存到 CDCat 的草稿，登出後會被刪除。確定登出嗎？"
   },
   "admin": {
     "console": "管理後台"
@@ -751,7 +751,10 @@
       "email_same_as_current": "這就是你現在使用的信箱。",
       "verification_code_cooldown": "傳送得太頻繁了，請稍等一分鐘再試。",
       "verification_code_invalid": "驗證碼不對，請檢查後重新輸入。",
-      "verification_code_expired": "驗證碼已過期，請重新取得。"
+      "verification_code_expired": "驗證碼已過期，請重新取得。",
+      "draft_changed": "CDCat 上的這份草稿在別處改過了，請載入新版本，或選擇保留這裡的。",
+      "draft_limit": "CDCat 上最多儲存 10 份草稿，請先送出或刪除一份。這份仍在這個瀏覽器裡。",
+      "draft_too_large": "草稿超過 2 MB，存不到 CDCat。這份仍在這個瀏覽器裡。"
     }
   },
   "article_ui": {
@@ -1426,7 +1429,8 @@
       "security": "安全設定",
       "notifications": "通知設定",
       "privacy": "隱私設定",
-      "danger": "危險區域"
+      "danger": "危險區域",
+      "mcp": "MCP 權杖"
     },
     "profile_saved": "個人資料已儲存",
     "preferences_saved": "偏好設定已儲存",
@@ -1583,6 +1587,21 @@
       "updated": "地址已更新",
       "added": "地址已新增",
       "deleted": "地址已刪除"
+    },
+    "mcp": {
+      "title": "草稿 MCP",
+      "intro": "讓 Claude Code 這類 AI 用戶端透過 MCP 幫你寫儲存在 CDCat 上的草稿：新建專輯、藝術家、條目和系列，或修改站內已有的。AI 只能寫草稿，送出要你在編輯器裡檢查後自己來。權杖只能連草稿 MCP，不能存取其他介面。",
+      "name_placeholder": "用途（例如：Claude Code）",
+      "create": "新增權杖",
+      "created_hint": "權杖只顯示這一次。在終端機裡執行這條指令，把伺服器加進 Claude Code：",
+      "copy": "複製",
+      "copied": "已複製",
+      "empty": "還沒有權杖。",
+      "last_used": "最近使用 {at}",
+      "never_used": "沒用過",
+      "revoke": "撤銷",
+      "revoke_confirm": "撤銷權杖「{name}」？",
+      "revoke_hint": "用這個權杖的 AI 用戶端之後就連不上了。"
     }
   },
   "site": {
@@ -3253,7 +3272,7 @@
       "artist_type_placeholder": "請選擇藝術家類型"
     },
     "pending_notice": "新建的內容提交後立即上線，標記為「審核中」；對已有內容的修改要等審核通過。",
-    "local_hint": "草稿只儲存在這個瀏覽器，送出後才會傳送；登出會刪除",
+    "local_hint": "草稿自動儲存在這個瀏覽器，登出會刪除；「儲存到 CDCat」後換裝置也能繼續",
     "restored": "已還原這個瀏覽器 {at} 儲存的修改。",
     "restored_discard": "放棄這些修改",
     "restored_discard_confirm": "放棄這個瀏覽器裡儲存的修改？放棄後無法復原。",
@@ -3303,6 +3322,27 @@
       "text_only": "僅文字",
       "text_only_hint": "這首原曲還不在資料庫裡，只記了名稱",
       "badge": "原曲 {count}"
+    },
+    "restored_server": "已載入 {at}儲存到 CDCat 的草稿。",
+    "server": {
+      "save": "儲存到 CDCat",
+      "saving": "正在儲存到 CDCat…",
+      "synced": "已儲存到 CDCat（第 {version} 版）",
+      "unsaved": "有修改還沒儲存到 CDCat（CDCat 上是第 {version} 版）",
+      "conflict": "CDCat 上有更新的版本，這裡的修改還沒儲存上去",
+      "error": "沒能儲存到 CDCat：{message}",
+      "expires": "{count} 天後從 CDCat 刪除",
+      "newer": "CDCat 上有新版本（第 {version} 版）",
+      "by_mcp": "AI 透過 MCP 修改",
+      "by_web": "在別的裝置或頁面儲存",
+      "conflict_hint": "這裡也有還沒儲存到 CDCat 的修改，載入會丟掉它們。",
+      "load": "載入新版本",
+      "keep": "保留這裡的，覆蓋 CDCat",
+      "keep_short": "覆蓋",
+      "load_confirm": "載入 CDCat 上的新版本？",
+      "load_confirm_hint": "這裡還沒儲存到 CDCat 的修改會丟掉。",
+      "keep_confirm": "用這裡的草稿覆蓋 CDCat 上的？",
+      "keep_confirm_hint": "CDCat 上的新版本（包括 AI 的修改）會被取代。"
     }
   },
   "revision_page": {
@@ -3380,13 +3420,19 @@
       "move": "保留，改掛到提交 #{id}",
       "because": "原因：{names} 還在使用它"
     },
-    "local_title": "本機草稿",
-    "local_hint": "只儲存在這個瀏覽器裡，送出後才會出現在下面的修訂列表；登出會刪除。",
+    "local_title": "草稿",
+    "local_hint": "自動儲存在這個瀏覽器；儲存到 CDCat 的在每台裝置上都看得到，最後一次儲存 30 天後刪除。送出後會出現在下面的修訂列表。",
     "local_untitled": "未命名",
     "local_items": "共 {count} 項",
     "local_revision": "修訂 #{id} 的修改",
     "local_saved": "{at}儲存",
-    "local_edits": "這條修訂有儲存在本機的修改（{at}）還沒有送出，請繼續編輯，在編輯器裡重新送出。"
+    "local_edits": "這條修訂有儲存在本機的修改（{at}）還沒有送出，請繼續編輯，在編輯器裡重新送出。",
+    "on_device": "本機",
+    "on_server": "CDCat",
+    "server_newer": "CDCat 上較新",
+    "server_mcp": "AI 修改過",
+    "server_expires": "{count} 天後刪除",
+    "delete_both_confirm": "刪除這份草稿？這台裝置和 CDCat 上的都會刪除，無法復原。"
   },
   "pending": {
     "badge": "審核中",

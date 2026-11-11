@@ -377,6 +377,16 @@ const help: Record<string, EditorHelpEntry> = {
     examples: ['歌词本', 'https://vgmdb.net/album/1234'],
     where: '修订历史和审核页。',
   },
+  'submit.server_draft': {
+    text: '草稿平时只自动保存在这个浏览器。点「保存到 CDCat」把这一份存到你的账号，换设备也能打开继续；之后的修改要再点一次才会存上去。',
+    rows: [
+      ['谁能看到', '只有你自己'],
+      ['数量', '最多 10 份，每份不超过 2 MB'],
+      ['保留', '最后一次保存后 30 天删除，只在这份草稿里用到的图片一起删除'],
+      ['提交后', '自动删除'],
+    ],
+    where: '「我的编辑记录」顶部的草稿列表；用草稿 MCP 的 AI 也能读写它。',
+  },
 }
 
 export default help

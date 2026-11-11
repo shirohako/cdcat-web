@@ -23,7 +23,7 @@
     "logout": "로그아웃",
     "articles": "내 아티클",
     "notifications": "알림",
-    "logout_drafts_confirm": "이 브라우저에 제출하지 않은 임시 저장본이 {count}개 있어요. 로그아웃하면 모두 삭제돼요. 그래도 로그아웃할까요?"
+    "logout_drafts_confirm": "이 브라우저에 CDCat에 저장하지 않은 임시 저장본이 {count}개 있어요. 로그아웃하면 모두 삭제돼요. 그래도 로그아웃할까요?"
   },
   "admin": {
     "console": "관리자 페이지"
@@ -751,7 +751,10 @@
       "email_same_as_current": "지금 사용 중인 이메일이에요.",
       "verification_code_cooldown": "너무 자주 요청했어요. 1분 정도 기다린 뒤 다시 시도해 주세요.",
       "verification_code_invalid": "인증번호가 맞지 않아요. 확인한 뒤 다시 입력해 주세요.",
-      "verification_code_expired": "인증번호가 만료됐어요. 다시 받아 주세요."
+      "verification_code_expired": "인증번호가 만료됐어요. 다시 받아 주세요.",
+      "draft_changed": "CDCat의 이 임시 저장본이 다른 곳에서 바뀌었어요. 새 버전을 불러오거나 여기 것을 남겨 주세요.",
+      "draft_limit": "CDCat에는 임시 저장본을 10개까지 저장할 수 있어요. 먼저 하나를 제출하거나 삭제해 주세요. 이 임시 저장본은 이 브라우저에 남아 있어요.",
+      "draft_too_large": "임시 저장본이 2MB를 넘어 CDCat에 저장할 수 없어요. 이 브라우저에는 남아 있어요."
     }
   },
   "article_ui": {
@@ -1426,7 +1429,8 @@
       "security": "보안",
       "notifications": "알림",
       "privacy": "개인정보 보호",
-      "danger": "위험 구역"
+      "danger": "위험 구역",
+      "mcp": "MCP 토큰"
     },
     "profile_saved": "프로필을 저장했어요",
     "preferences_saved": "설정을 저장했어요",
@@ -1583,6 +1587,21 @@
       "updated": "배송지를 수정했어요",
       "added": "배송지를 추가했어요",
       "deleted": "배송지를 삭제했어요"
+    },
+    "mcp": {
+      "title": "임시 저장본 MCP",
+      "intro": "Claude Code 같은 AI 클라이언트가 MCP로 CDCat에 저장하는 임시 저장본을 대신 써 줄 수 있어요. 앨범·아티스트·작품·시리즈를 새로 만들거나 사이트에 있는 내용을 수정할 수 있어요. AI는 임시 저장본만 쓸 수 있고, 제출은 편집기에서 확인한 뒤 직접 해야 해요. 토큰으로는 임시 저장본 MCP에만 접속할 수 있어요.",
+      "name_placeholder": "용도 (예: Claude Code)",
+      "create": "토큰 만들기",
+      "created_hint": "토큰은 지금 한 번만 보여요. 터미널에서 이 명령을 실행해 서버를 Claude Code에 추가하세요:",
+      "copy": "복사",
+      "copied": "복사했어요",
+      "empty": "아직 토큰이 없어요.",
+      "last_used": "최근 사용 {at}",
+      "never_used": "사용한 적 없음",
+      "revoke": "폐기",
+      "revoke_confirm": "토큰 '{name}'을 폐기할까요?",
+      "revoke_hint": "이 토큰을 쓰는 AI 클라이언트는 더 이상 접속할 수 없어요."
     }
   },
   "site": {
@@ -3253,7 +3272,7 @@
       "artist_type_placeholder": "아티스트 유형 선택"
     },
     "pending_notice": "새로 추가한 내용은 제출하자마자 ‘검토 중’ 표시와 함께 공개되고, 기존 내용 수정은 승인된 뒤에 반영돼요.",
-    "local_hint": "임시 저장본은 제출하기 전까지 이 브라우저에만 남아요. 로그아웃하면 삭제돼요",
+    "local_hint": "임시 저장본은 이 브라우저에 자동으로 저장되고, 로그아웃하면 삭제돼요. 'CDCat에 저장'하면 다른 기기에서도 이어서 편집할 수 있어요",
     "restored": "{at} 이 브라우저에 저장한 변경 사항을 불러왔어요.",
     "restored_discard": "변경 사항 버리기",
     "restored_discard_confirm": "이 브라우저에 저장한 변경 사항을 버릴까요? 되돌릴 수 없어요.",
@@ -3303,6 +3322,27 @@
       "text_only": "텍스트만",
       "text_only_hint": "아직 등록되지 않은 원곡이라 이름만 기록돼 있어요",
       "badge": "원곡 {count}"
+    },
+    "restored_server": "{at} CDCat에 저장한 임시 저장본을 불러왔어요.",
+    "server": {
+      "save": "CDCat에 저장",
+      "saving": "CDCat에 저장하는 중…",
+      "synced": "CDCat에 저장됨 (버전 {version})",
+      "unsaved": "CDCat에 저장하지 않은 변경 사항이 있어요 (CDCat에는 버전 {version})",
+      "conflict": "CDCat에 더 새 버전이 있고, 여기의 변경 사항은 아직 저장되지 않았어요",
+      "error": "CDCat에 저장하지 못했어요: {message}",
+      "expires": "{count}일 뒤 CDCat에서 삭제",
+      "newer": "CDCat에 새 버전이 있어요 (버전 {version})",
+      "by_mcp": "AI가 MCP로 수정",
+      "by_web": "다른 기기나 페이지에서 저장",
+      "conflict_hint": "여기에도 CDCat에 저장하지 않은 변경 사항이 있어서, 불러오면 사라져요.",
+      "load": "새 버전 불러오기",
+      "keep": "여기 것을 남기고 CDCat 덮어쓰기",
+      "keep_short": "덮어쓰기",
+      "load_confirm": "CDCat의 새 버전을 불러올까요?",
+      "load_confirm_hint": "CDCat에 저장하지 않은 여기의 변경 사항은 사라져요.",
+      "keep_confirm": "여기 임시 저장본으로 CDCat의 것을 덮어쓸까요?",
+      "keep_confirm_hint": "CDCat의 새 버전(AI가 수정한 내용 포함)은 바뀌어요."
     }
   },
   "revision_page": {
@@ -3380,13 +3420,19 @@
       "move": "남겨 두고 편집 #{id} 쪽으로 옮겨요",
       "because": "{names}에서 아직 사용하고 있어요"
     },
-    "local_title": "이 브라우저의 임시 저장본",
-    "local_hint": "이 브라우저에만 저장돼요. 제출하면 아래 편집 목록으로 옮겨지고, 로그아웃하면 삭제돼요.",
+    "local_title": "임시 저장본",
+    "local_hint": "이 브라우저에 자동으로 저장돼요. CDCat에 저장한 임시 저장본은 모든 기기에 표시되고, 마지막 저장 후 30일이 지나면 삭제돼요. 제출하면 아래 편집 목록으로 옮겨져요.",
     "local_untitled": "제목 없음",
     "local_items": "항목 {count}개",
     "local_revision": "편집 #{id} 변경 사항",
     "local_saved": "{at} 저장됨",
-    "local_edits": "이 브라우저에만 저장된 변경 사항이 있어요({at}). 아직 제출 전이니 이어서 편집한 뒤 편집기에서 다시 제출해 주세요."
+    "local_edits": "이 브라우저에만 저장된 변경 사항이 있어요({at}). 아직 제출 전이니 이어서 편집한 뒤 편집기에서 다시 제출해 주세요.",
+    "on_device": "이 기기",
+    "on_server": "CDCat",
+    "server_newer": "CDCat 쪽이 최신",
+    "server_mcp": "AI가 수정",
+    "server_expires": "{count}일 뒤 삭제",
+    "delete_both_confirm": "이 임시 저장본을 삭제할까요? 이 기기와 CDCat에서 모두 삭제되고, 되돌릴 수 없어요."
   },
   "pending": {
     "badge": "검토 중",

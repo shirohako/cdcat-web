@@ -77,7 +77,7 @@ const scope = (use: AdminImageDetail['usage']['albums'][number]) => {
   if (use.disc_id) return `碟 #${use.disc_id}`
   return ''
 }
-const hasUses = computed(() => Boolean(image.value && (image.value.usage.albums.length || image.value.usage.artists.length || image.value.usage.addresses.length || image.value.usage.revisions.length)))
+const hasUses = computed(() => Boolean(image.value && (image.value.usage.albums.length || image.value.usage.artists.length || image.value.usage.addresses.length || image.value.usage.revisions.length || image.value.usage.drafts?.length)))
 
 const deleteOpen = ref(false)
 const busy = ref(false)
@@ -172,6 +172,16 @@ useHead({ title: computed(() => `图片 #${id.value}`) })
                 <li v-for="revision in image.usage.revisions" :key="revision.id" class="py-2">
                   <NuxtLink :to="`/admin/revisions/${revision.id}`" class="underline">#{{ revision.id }} {{ revision.title }}</NuxtLink>
                   <span class="ml-2 text-xs text-slate-500">{{ revisionPageStatusLabels[revision.status] }} · {{ revision.submitter ? (revision.submitter.nickname || revision.submitter.username) : '—' }} · {{ time(revision.submitted_at) }}</span>
+                </li>
+              </ul>
+            </template>
+
+            <template v-if="image.usage.drafts?.length">
+              <h3 class="mt-4 font-medium">存到 CDCat 的草稿</h3>
+              <ul class="mt-2 divide-y divide-slate-100">
+                <li v-for="draft in image.usage.drafts" :key="draft.id" class="py-2">
+                  <span>{{ draft.label || draft.scope }}</span>
+                  <span class="ml-2 text-xs text-slate-500">{{ draft.user ? (draft.user.nickname || draft.user.username) : '—' }} · 最后保存 {{ time(draft.updated_at) }}，30 天后删除</span>
                 </li>
               </ul>
             </template>

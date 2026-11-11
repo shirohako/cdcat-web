@@ -75,11 +75,12 @@ const stateText = computed(() => ({
   off: '',
   syncing: '正在存到服务器…',
   synced: props.draft.serverVersion.value ? `已存到服务器（第 ${props.draft.serverVersion.value} 版，审核人和 MCP 共用这份）` : '已存到服务器',
+  unsaved: '有修改还没存到服务器',
   conflict: '服务器上有更新的版本，这里的修改还没存上去',
   error: '没连上服务器，修改先存在本机',
 }[props.draft.syncState.value]))
 const dotClass = computed(() => ({
-  off: 'bg-faint', syncing: 'bg-info animate-pulse', synced: 'bg-success', conflict: 'bg-warning', error: 'bg-danger',
+  off: 'bg-faint', syncing: 'bg-info animate-pulse', synced: 'bg-success', unsaved: 'bg-warning', conflict: 'bg-warning', error: 'bg-danger',
 }[props.draft.syncState.value]))
 
 /** Where in the draft a change is: the item (when not the album) and the path. */

@@ -377,6 +377,16 @@ const help: Record<string, EditorHelpEntry> = {
     examples: ['Booklet', 'https://vgmdb.net/album/1234'],
     where: 'The revision history and the review page.',
   },
+  'submit.server_draft': {
+    text: 'Drafts autosave in this browser only. Save to CDCat stores this one in your account, so it opens on another device too; later changes go there when you save to CDCat again.',
+    rows: [
+      ['Who sees it', 'Only you'],
+      ['How many', 'Up to 10, each at most 2 MB'],
+      ['Kept', 'Deleted 30 days after its last save, with the images only this draft uses'],
+      ['Once submitted', 'Deleted'],
+    ],
+    where: 'The drafts at the top of My Revisions; an AI using the drafts MCP can read and write it too.',
+  },
 }
 
 export default help

@@ -23,7 +23,7 @@
     "logout": "ログアウト",
     "articles": "自分の記事",
     "notifications": "通知",
-    "logout_drafts_confirm": "このブラウザに未送信の下書きが {count} 件あります。ログアウトすると削除されます。ログアウトしますか？"
+    "logout_drafts_confirm": "このブラウザに CDCat に保存していない下書きが {count} 件あります。ログアウトすると削除されます。ログアウトしますか？"
   },
   "admin": {
     "console": "管理画面"
@@ -751,7 +751,10 @@
       "email_same_as_current": "現在お使いのメールアドレスです。",
       "verification_code_cooldown": "送信が多すぎます。1 分ほど待ってからお試しください。",
       "verification_code_invalid": "認証コードが正しくありません。確認してもう一度入力してください。",
-      "verification_code_expired": "認証コードの有効期限が切れました。もう一度取得してください。"
+      "verification_code_expired": "認証コードの有効期限が切れました。もう一度取得してください。",
+      "draft_changed": "CDCat のこの下書きは別の場所で変更されました。新しい版を読み込むか、ここの方を残してください。",
+      "draft_limit": "CDCat に保存できる下書きは 10 件までです。先に 1 件送信するか削除してください。この下書きはこのブラウザに残っています。",
+      "draft_too_large": "下書きが 2 MB を超えているため CDCat に保存できません。このブラウザには残っています。"
     }
   },
   "article_ui": {
@@ -1426,7 +1429,8 @@
       "security": "セキュリティ",
       "notifications": "通知",
       "privacy": "プライバシー",
-      "danger": "危険な操作"
+      "danger": "危険な操作",
+      "mcp": "MCP トークン"
     },
     "profile_saved": "プロフィールを保存しました",
     "preferences_saved": "環境設定を保存しました",
@@ -1583,6 +1587,21 @@
       "updated": "住所を更新しました",
       "added": "住所を追加しました",
       "deleted": "住所を削除しました"
+    },
+    "mcp": {
+      "title": "下書き MCP",
+      "intro": "Claude Code などの AI クライアントが MCP を通して、CDCat に保存するあなたの下書きを書けるようにします。アルバム・アーティスト・作品・シリーズの新規作成や、サイトにある内容の編集ができます。AI が書けるのは下書きだけで、送信はあなたがエディタで確認してから行います。トークンで接続できるのは下書き MCP だけです。",
+      "name_placeholder": "用途（例：Claude Code）",
+      "create": "トークンを作成",
+      "created_hint": "トークンはこの一度だけ表示されます。ターミナルでこのコマンドを実行して、サーバーを Claude Code に追加してください：",
+      "copy": "コピー",
+      "copied": "コピーしました",
+      "empty": "トークンはまだありません。",
+      "last_used": "最終使用 {at}",
+      "never_used": "未使用",
+      "revoke": "無効にする",
+      "revoke_confirm": "トークン「{name}」を無効にしますか？",
+      "revoke_hint": "このトークンを使う AI クライアントは接続できなくなります。"
     }
   },
   "site": {
@@ -3253,7 +3272,7 @@
       "artist_type_placeholder": "アーティストの種類を選択"
     },
     "pending_notice": "新しい項目は投稿するとすぐに公開され、「承認待ち」と表示されます。既存の内容への変更は承認後に反映されます。",
-    "local_hint": "下書きは送信するまでこのブラウザだけに保存され、ログアウトすると削除されます",
+    "local_hint": "下書きはこのブラウザに自動保存され、ログアウトすると削除されます。「CDCat に保存」すると別の端末でも続けられます",
     "restored": "このブラウザに{at}保存した変更を復元しました。",
     "restored_discard": "この変更を破棄",
     "restored_discard_confirm": "このブラウザに保存した変更を破棄しますか？元に戻せません。",
@@ -3303,6 +3322,27 @@
       "text_only": "テキストのみ",
       "text_only_hint": "この原曲はまだデータベースにないため、名前だけを記録しています",
       "badge": "原曲 {count}"
+    },
+    "restored_server": "{at}に CDCat に保存した下書きを読み込みました。",
+    "server": {
+      "save": "CDCat に保存",
+      "saving": "CDCat に保存中…",
+      "synced": "CDCat に保存済み（第 {version} 版）",
+      "unsaved": "CDCat に保存していない変更があります（CDCat は第 {version} 版）",
+      "conflict": "CDCat に新しい版があり、ここの変更はまだ保存されていません",
+      "error": "CDCat に保存できませんでした：{message}",
+      "expires": "{count} 日後に CDCat から削除",
+      "newer": "CDCat に新しい版があります（第 {version} 版）",
+      "by_mcp": "AI が MCP で変更",
+      "by_web": "別の端末かページで保存",
+      "conflict_hint": "ここにも CDCat に保存していない変更があり、読み込むと失われます。",
+      "load": "新しい版を読み込む",
+      "keep": "ここの方を残して CDCat を上書き",
+      "keep_short": "上書き",
+      "load_confirm": "CDCat の新しい版を読み込みますか？",
+      "load_confirm_hint": "CDCat に保存していないここの変更は失われます。",
+      "keep_confirm": "ここの下書きで CDCat の方を上書きしますか？",
+      "keep_confirm_hint": "CDCat の新しい版（AI の変更を含む）は置き換えられます。"
     }
   },
   "revision_page": {
@@ -3380,13 +3420,19 @@
       "move": "残して投稿 #{id} に移す",
       "because": "理由：{names} がまだ使っています"
     },
-    "local_title": "このブラウザの下書き",
-    "local_hint": "このブラウザだけに保存されています。送信すると下の修正一覧に表示されます。ログアウトすると削除されます。",
+    "local_title": "下書き",
+    "local_hint": "このブラウザに自動保存されます。CDCat に保存した下書きはどの端末にも表示され、最後の保存から 30 日後に削除されます。送信すると下の修正一覧に表示されます。",
     "local_untitled": "無題",
     "local_items": "{count} 項目",
     "local_revision": "修正 #{id} の変更",
     "local_saved": "{at}に保存",
-    "local_edits": "この修正には、このブラウザに保存された未送信の変更があります（{at}）。編集を続けて、エディタから再送信してください。"
+    "local_edits": "この修正には、このブラウザに保存された未送信の変更があります（{at}）。編集を続けて、エディタから再送信してください。",
+    "on_device": "この端末",
+    "on_server": "CDCat",
+    "server_newer": "CDCat の方が新しい",
+    "server_mcp": "AI が変更",
+    "server_expires": "{count} 日後に削除",
+    "delete_both_confirm": "この下書きを削除しますか？この端末と CDCat の両方から削除され、元に戻せません。"
   },
   "pending": {
     "badge": "承認待ち",

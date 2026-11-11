@@ -23,7 +23,7 @@
     "logout": "Sign Out",
     "articles": "My articles",
     "notifications": "Notifications",
-    "logout_drafts_confirm": "There are {count} unsubmitted drafts in this browser, and logging out deletes them. Log out anyway?"
+    "logout_drafts_confirm": "There are {count} drafts in this browser that aren't saved to CDCat, and logging out deletes them. Log out anyway?"
   },
   "admin": {
     "console": "Admin Console"
@@ -751,7 +751,10 @@
       "email_same_as_current": "That's the email you're using now.",
       "verification_code_cooldown": "That was too soon. Please wait a minute and try again.",
       "verification_code_invalid": "That code isn't right. Check it and try again.",
-      "verification_code_expired": "That code has expired. Please get a new one."
+      "verification_code_expired": "That code has expired. Please get a new one.",
+      "draft_changed": "This draft was changed on CDCat since you loaded it. Load the new version, or keep yours.",
+      "draft_limit": "CDCat keeps at most 10 drafts. Submit or delete one first; this draft is still in this browser.",
+      "draft_too_large": "This draft is over 2 MB and can't be saved to CDCat; it's still in this browser."
     }
   },
   "article_ui": {
@@ -1426,7 +1429,8 @@
       "security": "Security",
       "notifications": "Notifications",
       "privacy": "Privacy",
-      "danger": "Danger Zone"
+      "danger": "Danger Zone",
+      "mcp": "MCP tokens"
     },
     "profile_saved": "Profile saved",
     "preferences_saved": "Preferences saved",
@@ -1583,6 +1587,21 @@
       "updated": "Address updated",
       "added": "Address added",
       "deleted": "Address deleted"
+    },
+    "mcp": {
+      "title": "Drafts MCP",
+      "intro": "Let an AI client such as Claude Code write your drafts on CDCat through MCP: new albums, artists, entries and series, or edits of what's on the site. The AI only writes drafts; you check them in the editor and submit them yourself. Tokens open the drafts MCP server only, nothing else.",
+      "name_placeholder": "What it's for (e.g. Claude Code)",
+      "create": "New token",
+      "created_hint": "The token is shown only once. Run this command in a terminal to add the server to Claude Code:",
+      "copy": "Copy",
+      "copied": "Copied",
+      "empty": "No tokens yet.",
+      "last_used": "Last used {at}",
+      "never_used": "Never used",
+      "revoke": "Revoke",
+      "revoke_confirm": "Revoke the token “{name}”?",
+      "revoke_hint": "AI clients using it can't connect any more."
     }
   },
   "site": {
@@ -3253,7 +3272,7 @@
       "artist_type_placeholder": "Choose the artist type"
     },
     "pending_notice": "New content goes live as soon as you submit it, marked “Pending”; changes to existing content wait for approval.",
-    "local_hint": "Drafts stay in this browser until you submit them; logging out deletes them",
+    "local_hint": "Drafts autosave in this browser and logging out deletes them; save one to CDCat to continue on another device",
     "restored": "Restored the changes saved in this browser {at}.",
     "restored_discard": "Discard these changes",
     "restored_discard_confirm": "Discard the changes saved in this browser? This can't be undone.",
@@ -3303,6 +3322,27 @@
       "text_only": "Text only",
       "text_only_hint": "This original isn’t in the catalog yet; only its name is recorded",
       "badge": "Originals {count}"
+    },
+    "restored_server": "Loaded the draft saved to CDCat {at}.",
+    "server": {
+      "save": "Save to CDCat",
+      "saving": "Saving to CDCat…",
+      "synced": "Saved to CDCat (version {version})",
+      "unsaved": "Changes not saved to CDCat yet (CDCat has version {version})",
+      "conflict": "CDCat has a newer version, and the changes here aren't saved there",
+      "error": "Couldn't save to CDCat: {message}",
+      "expires": "deleted from CDCat in {count} day | deleted from CDCat in {count} days",
+      "newer": "CDCat has a newer version (version {version})",
+      "by_mcp": "Changed by AI through MCP",
+      "by_web": "Saved on another device or page",
+      "conflict_hint": "There are changes here not saved to CDCat; loading drops them.",
+      "load": "Load new version",
+      "keep": "Keep mine and overwrite CDCat",
+      "keep_short": "Overwrite",
+      "load_confirm": "Load the newer version from CDCat?",
+      "load_confirm_hint": "Changes here not saved to CDCat will be lost.",
+      "keep_confirm": "Overwrite the draft on CDCat with this one?",
+      "keep_confirm_hint": "The newer version on CDCat, including the AI's changes, will be replaced."
     }
   },
   "revision_page": {
@@ -3380,13 +3420,19 @@
       "move": "kept and moved to submission #{id}",
       "because": "Still used by {names}"
     },
-    "local_title": "Drafts in this browser",
-    "local_hint": "Kept only in this browser; they join the revisions below once submitted. Logging out deletes them.",
+    "local_title": "Drafts",
+    "local_hint": "Autosaved in this browser. Drafts saved to CDCat show on every device and are deleted 30 days after their last save. Once submitted they join the revisions below.",
     "local_untitled": "Untitled",
     "local_items": "{count} items",
     "local_revision": "Changes to revision #{id}",
     "local_saved": "saved {at}",
-    "local_edits": "Changes to this revision are kept in this browser ({at}) and haven't been submitted. Continue editing and resubmit from the editor."
+    "local_edits": "Changes to this revision are kept in this browser ({at}) and haven't been submitted. Continue editing and resubmit from the editor.",
+    "on_device": "This device",
+    "on_server": "CDCat",
+    "server_newer": "Newer on CDCat",
+    "server_mcp": "Changed by AI",
+    "server_expires": "deleted in {count} day | deleted in {count} days",
+    "delete_both_confirm": "Delete this draft? It's deleted on this device and on CDCat, and can't be undone."
   },
   "pending": {
     "badge": "Pending",

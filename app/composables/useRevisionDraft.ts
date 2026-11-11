@@ -3,8 +3,8 @@ import type { CatalogReferences } from '~/types/catalog'
 import type { Revision, RevisionItemInput, RevisionStatus } from '~/types/revision'
 import type { LocalDraft } from '~/utils/localDrafts'
 import { draftKey, dropLegacyBackups, localDrafts } from '~/utils/localDrafts'
-import type { ServerDraft, ServerDraftChange, ServerDraftMeta } from '~/utils/serverDrafts'
-import { serverDraftCandidate, serverDrafts } from '~/utils/serverDrafts'
+import type { DraftRemote, PersonalDraft, ServerDraft, ServerDraftChange, ServerDraftMeta } from '~/utils/serverDrafts'
+import { DRAFT_CHANGED_ERRORS, draftRemote, serverDraftTarget } from '~/utils/serverDrafts'
 import { errorName } from '~/utils/revisionErrors'
 import { fillRequiredText } from '~/utils/requiredText'
 import { mainItem } from '~/utils/revisionLinks'
@@ -32,10 +32,11 @@ const SAVE_DELAY = 1000
 const REMOTE_CHECK = 20_000
 
 /**
- * A draft kept on the server too (utils/serverDrafts): off (browser only), syncing, synced, conflict (the server has a
- * newer version while this copy has edits it has not taken), error (the server could not be reached; edits stay here).
+ * A draft kept on the server too (utils/serverDrafts): off (browser only), syncing, synced, unsaved (a member's draft
+ * saved to CDCat with edits here since), conflict (the server has a newer version while this copy has edits it has not
+ * taken), error (the server could not be reached or refused it; edits stay here).
  */
-export type SyncState = 'off' | 'syncing' | 'synced' | 'conflict' | 'error'
+export type SyncState = 'off' | 'syncing' | 'synced' | 'unsaved' | 'conflict' | 'error'
 
 /**
  * A catalog revision being edited (docs/catalog/editing.md#草稿): the items and their documents,
@@ -43,8 +44,9 @@ export type SyncState = 'off' | 'syncing' | 'synced' | 'conflict' | 'error'
  * shortly after each change; the server first sees it when it is submitted. A revision sent back for
  * changes is loaded from the server, and its edits are kept here too until it is resubmitted. A
  * harvest candidate's draft is also kept on the server (utils/serverDrafts), shared with the other
- * reviewers and the MCP server: each save goes there too, and a newer version there is offered
- * (`remote`) rather than taken or overwritten unseen.
+ * reviewers and the MCP server: each save goes there too. A member's draft goes to CDCat when they
+ * ask (`saveToServer`), and opens from there on another device; a model may edit it there. Either
+ * way a newer version there is offered (`remote`) rather than taken or overwritten unseen.
  *
  * `prepare` drops what the editor keeps only while editing, such as blank rows; `afterRebase` lets
  * the editor reload what it shows for an item whose base version moved.
@@ -83,11 +85,19 @@ export function useRevisionDraft(options: {
   const restoredAt = ref<string | null>(null)
   const lastError = ref<unknown>(null)
   const busy = ref(false)
-  /** The candidate whose server draft this is, or null. */
-  const serverId = computed(() => serverDraftCandidate(scope.value))
+  const target = computed(() => serverDraftTarget(scope.value))
+  /** The candidate whose shared server draft this is, or null. */
+  const serverId = computed(() => target.value?.kind === 'harvest' ? target.value.candidateId : null)
+  /** harvest: shared, each change goes up; personal: saved to CDCat when the member asks; null: this browser only. */
+  const serverKind = computed(() => target.value?.kind ?? null)
+  const server = computed<DraftRemote | null>(() => target.value ? draftRemote(target.value) : null)
   /** The server version this copy was loaded or last saved as; null before the server has it. */
   const serverVersion = ref<number | null>(null)
+  /** The server copy as last loaded or saved: when, how, and when a member's draft expires there. */
+  const serverMeta = ref<ServerDraftMeta | null>(null)
   const syncState = ref<SyncState>('off')
+  /** Where the edits the editor opened with came from: this browser, or the copy saved to CDCat. */
+  const restoredFrom = ref<'local' | 'server'>('local')
   /** A newer server version than this copy, with the MCP edits made since; offered to load. */
   const remote = ref<{ meta: ServerDraftMeta, changes: ServerDraftChange[] } | null>(null)
   /** Changed here since the server last took it. */
@@ -137,10 +147,13 @@ export function useRevisionDraft(options: {
     catch { return undefined }
   }
 
+  /** Whether the server keeps this draft: a candidate's always, a member's once saved to CDCat. */
+  const tracked = () => serverKind.value === 'harvest' || (serverKind.value === 'personal' && serverVersion.value !== null)
+
   const adopt = (record: LocalDraft) => {
     serverVersion.value = record.serverVersion ?? null
-    // A copy from before drafts were on the server has edits the server never saw.
-    unsynced = record.unsynced ?? serverId.value !== null
+    // A candidate's copy from before drafts were on the server has edits the server never saw.
+    unsynced = record.unsynced ?? serverKind.value === 'harvest'
     Object.assign(references, record.references)
     apply({ items: record.items, summary: record.summary, sources: record.sources })
     createdAt = record.createdAt
@@ -181,19 +194,35 @@ export function useRevisionDraft(options: {
     return record ?? null
   }
 
-  /** The server's draft as this browser keeps it. */
-  const fromServer = (server: ServerDraft, local?: LocalDraft): LocalDraft => {
+  /** The server's draft as this browser keeps it; a member's says what it is about, a model may have written it. */
+  const fromServer = (copy: ServerDraft | PersonalDraft, local?: LocalDraft): LocalDraft => {
     const id = user.value!.id
-    const main = mainItem(server.items)
+    const main = mainItem(copy.items)
+    const personal = 'scope' in copy ? copy : null
     return {
-      key: draftKey(id, scope.value!), userId: id, scope: scope.value!, mainRef: main?.ref ?? local?.mainRef ?? 'main',
-      type: main?.resource_type ?? 'album', action: main?.action ?? 'create', entityId: main?.resource_id ?? null, revisionId: null,
-      label: String(main?.document?.title ?? main?.document?.name ?? local?.label ?? ''),
-      items: server.items, summary: server.summary ?? '', sources: server.sources ?? [],
-      references: { ...(local?.references ?? {}), ...server.references },
-      createdAt: local?.createdAt ?? server.updated_at ?? new Date().toISOString(), updatedAt: server.updated_at ?? new Date().toISOString(),
-      serverVersion: server.version, unsynced: false,
+      key: draftKey(id, scope.value!), userId: id, scope: scope.value!, mainRef: personal?.main_ref ?? main?.ref ?? local?.mainRef ?? 'main',
+      type: personal?.type ?? main?.resource_type ?? 'album', action: personal?.action ?? main?.action ?? 'create',
+      entityId: personal ? personal.entity_id : main?.resource_id ?? null, revisionId: personal?.revision_id ?? local?.revisionId ?? null,
+      label: personal?.label || String(main?.document?.title ?? main?.document?.name ?? local?.label ?? ''),
+      items: copy.items.map(item => item.document ? { ...item, document: editable(item.resource_type, item.document) } : item),
+      summary: copy.summary ?? '', sources: copy.sources ?? [],
+      references: { ...(local?.references ?? {}), ...copy.references },
+      createdAt: local?.createdAt ?? copy.updated_at ?? new Date().toISOString(), updatedAt: copy.updated_at ?? new Date().toISOString(),
+      serverVersion: copy.version, unsynced: false,
     }
+  }
+
+  /** A member's copy gone from CDCat (submitted or deleted elsewhere, expired): this browser's is its own again. */
+  const untrack = async (local?: LocalDraft) => {
+    serverVersion.value = null
+    serverMeta.value = null
+    remote.value = null
+    unsynced = false
+    syncState.value = 'off'
+    if (!local || local.serverVersion == null) return local
+    const record = { ...local, serverVersion: null, unsynced: undefined }
+    await localDrafts.put(record).catch(() => undefined)
+    return record
   }
 
   /**
@@ -203,35 +232,50 @@ export function useRevisionDraft(options: {
    */
   const readReconciled = async (): Promise<LocalDraft | undefined> => {
     const local = await read()
-    const candidateId = serverId.value
-    syncState.value = candidateId === null ? 'off' : 'syncing'
-    if (candidateId === null) return local
-    let server: ServerDraft | null
-    try { server = await serverDrafts.load(candidateId) }
+    const api = server.value
+    restoredFrom.value = 'local'
+    remote.value = null
+    serverMeta.value = null
+    syncState.value = api ? 'syncing' : 'off'
+    if (!api) return local
+    let copy: ServerDraft | PersonalDraft | null
+    try { copy = await api.load() }
     catch (error) {
       lastError.value = error
-      syncState.value = 'error'
+      // A member's draft never saved to CDCat does not miss it.
+      syncState.value = serverKind.value === 'personal' && local?.serverVersion == null ? 'off' : 'error'
       return local
     }
-    if (!server) return local
+    if (!copy) return serverKind.value === 'personal' ? untrack(local) : local
+    serverMeta.value = copy
     const localUnsynced = local ? (local.unsynced ?? true) : false
-    if (local && local.serverVersion === server.version) return local
+    if (local && local.serverVersion === copy.version) return local
     if (!local || !localUnsynced) {
-      const record = fromServer(server, local)
+      const record = fromServer(copy, local)
       await localDrafts.put(record).catch(() => undefined)
+      restoredFrom.value = 'server'
       return record
     }
     syncState.value = 'conflict'
-    remote.value = { meta: server, changes: [] }
+    remote.value = { meta: copy, changes: [] }
     return local
   }
 
-  /** Once opened: edits the server has not taken go up. */
+  /** Once opened: a candidate's edits the server has not taken go up; a member's wait for 「保存到 CDCat」. */
   const afterOpen = async () => {
-    if (serverId.value === null) return
-    if (syncState.value === 'conflict' || syncState.value === 'error') return
-    if (unsynced || serverVersion.value === null) await push()
+    if (!serverKind.value || syncState.value === 'conflict' || syncState.value === 'error') return
+    if (serverKind.value === 'personal') syncState.value = serverVersion.value === null ? 'off' : unsynced ? 'unsaved' : 'synced'
+    else if (unsynced || serverVersion.value === null) await push()
     else syncState.value = 'synced'
+  }
+
+  /** What a member's draft list on CDCat shows of it (the candidate endpoint ignores these). */
+  const describe = () => {
+    const main = mainItem(items.value)
+    return {
+      label: String(main?.document?.title ?? main?.document?.name ?? ''), main_ref: main?.ref,
+      type: main?.resource_type, action: main?.action, entity_id: main?.resource_id ?? null,
+    }
   }
 
   /**
@@ -240,8 +284,8 @@ export function useRevisionDraft(options: {
    * follow.
    */
   async function push(force = false): Promise<void> {
-    const candidateId = serverId.value
-    if (candidateId === null || !user.value) return
+    const api = server.value
+    if (!api || !user.value) return
     if (pushing) {
       pushAgain = true
       return pushing
@@ -249,21 +293,25 @@ export function useRevisionDraft(options: {
     if (syncState.value === 'conflict' && !force) return
     pushing = (async () => {
       syncState.value = 'syncing'
+      const sent = serialized()
       try {
-        const saved = await serverDrafts.save(candidateId, {
+        const saved = await api.save({
           items: toRaw(items.value), summary: summary.value, sources: toRaw(sources.value), references: toRaw(references),
           version: force ? remote.value?.meta.version ?? null : serverVersion.value,
+          ...(serverKind.value === 'personal' ? describe() : {}),
         })
         serverVersion.value = saved.version
-        unsynced = false
+        serverMeta.value = saved
         remote.value = null
-        syncState.value = 'synced'
+        // A member's edits made while it was sent stay unsaved to CDCat; a candidate's follow (pushAgain).
+        unsynced = serverKind.value === 'personal' && serialized() !== sent
+        syncState.value = unsynced ? 'unsaved' : 'synced'
         const record = await read()
-        if (record) await localDrafts.put({ ...record, serverVersion: saved.version, unsynced: false }).catch(() => undefined)
+        if (record) await localDrafts.put({ ...record, serverVersion: saved.version, unsynced }).catch(() => undefined)
       }
       catch (error) {
         lastError.value = error
-        if (errorName(error) === 'HARVEST_DRAFT_CHANGED') {
+        if (DRAFT_CHANGED_ERRORS.includes(errorName(error) ?? '')) {
           syncState.value = 'conflict'
           await checkRemote(true)
         }
@@ -282,10 +330,14 @@ export function useRevisionDraft(options: {
 
   /** Looks for a newer server version than this copy; offers it with the MCP edits made since. */
   async function checkRemote(always = false): Promise<void> {
-    const candidateId = serverId.value
-    if (candidateId === null || (pushing && !always)) return
+    const api = server.value
+    if (!api || (pushing && !always) || !tracked()) return
     try {
-      const { draft: meta, changes } = await serverDrafts.meta(candidateId, serverVersion.value ?? 0)
+      const { draft: meta, changes } = await api.meta(serverVersion.value ?? 0)
+      if (!meta && serverKind.value === 'personal') {
+        if (syncState.value !== 'conflict') await untrack(await read())
+        return
+      }
       if (meta && meta.version !== serverVersion.value) remote.value = { meta, changes }
       else if (!always) remote.value = null
     }
@@ -294,17 +346,28 @@ export function useRevisionDraft(options: {
 
   /** Takes the server's version in place of this copy (dropping edits here it has not taken). */
   async function pullRemote(): Promise<void> {
-    const candidateId = serverId.value
-    if (candidateId === null) return
+    const api = server.value
+    if (!api) return
     clearTimeout(timer)
-    const server = await serverDrafts.load(candidateId)
-    if (!server) return
-    const record = fromServer(server, await read())
+    const copy = await api.load()
+    if (!copy) return
+    const record = fromServer(copy, await read())
     await localDrafts.put(record).catch(() => undefined)
     adopt(record)
+    serverMeta.value = copy
     restoredAt.value = null
     remote.value = null
     syncState.value = 'synced'
+  }
+
+  /**
+   * 「保存到 CDCat」: writes pending edits here, then sends the draft to CDCat from the version it was loaded or
+   * last saved as. Refused when CDCat has a newer one (another device's, the model's): that is offered instead.
+   */
+  async function saveToServer(): Promise<void> {
+    if (serverKind.value !== 'personal') return
+    if (hasUnsaved()) await save()
+    await push()
   }
 
   /** Keeps this copy, replacing the server's newer version with it. */
@@ -392,11 +455,15 @@ export function useRevisionDraft(options: {
         references: toRaw(references),
         createdAt,
         updatedAt: now,
-        ...(serverId.value !== null ? { serverVersion: serverVersion.value, unsynced: true } : {}),
+        ...(tracked() ? { serverVersion: serverVersion.value, unsynced: true } : {}),
       })
-      if (serverId.value !== null) {
+      if (serverKind.value === 'harvest') {
         unsynced = true
         void push()
+      }
+      else if (tracked()) {
+        unsynced = true
+        if (syncState.value === 'synced') syncState.value = 'unsaved'
       }
       persisted.value = true
       savedAt.value = now
@@ -421,15 +488,20 @@ export function useRevisionDraft(options: {
     schedule()
   }, { deep: true })
 
-  /** Deletes this browser's copy. */
-  async function forget() {
+  /** Deletes this browser's copy, and the server's unless `server` is false (submitting deleted it there already). */
+  async function forget(options: { server?: boolean } = {}) {
     clearTimeout(timer)
     const id = user.value?.id
     if (id && scope.value) await localDrafts.remove(id, scope.value).catch(() => undefined)
-    // The shared copy goes too (approving deletes it on the server anyway).
-    if (serverId.value !== null) await serverDrafts.remove(serverId.value).catch(() => undefined)
+    // A candidate's shared copy goes too (approving deletes it on the server anyway); a member's when CDCat has one.
+    const api = server.value
+    if (api && options.server !== false && (serverKind.value === 'harvest' || serverVersion.value !== null || remote.value)) {
+      await api.remove().catch(() => undefined)
+    }
     serverVersion.value = null
+    serverMeta.value = null
     remote.value = null
+    syncState.value = 'off'
     unsynced = false
     persisted.value = false
     restoredAt.value = null
@@ -459,10 +531,13 @@ export function useRevisionDraft(options: {
         revision = await $api<Revision>(`/v1/revisions/${revisionId.value}/submit`, { method: 'POST' })
       }
       else {
-        revision = options.submitTo ? await options.submitTo(payload()) : await $api<Revision>('/v1/revisions', { method: 'POST', body: payload() })
+        // The draft's copy saved to CDCat goes once the revision is in (draft_scope); a revision sent back takes its own.
+        revision = options.submitTo
+          ? await options.submitTo(payload())
+          : await $api<Revision>('/v1/revisions', { method: 'POST', body: { ...payload(), ...(serverKind.value === 'personal' ? { draft_scope: scope.value } : {}) } })
       }
       status.value = revision.status
-      await forget()
+      await forget({ server: serverKind.value === 'harvest' })
       return revision
     }
     finally {
@@ -470,7 +545,7 @@ export function useRevisionDraft(options: {
     }
   }
 
-  /** Throws the draft away: this browser's copy only; a revision sent back stays as it is on the server. */
+  /** Throws the draft away, here and on CDCat; a revision sent back stays as it is on the server. */
   const discard = () => forget()
 
   /**
@@ -522,6 +597,6 @@ export function useRevisionDraft(options: {
   return {
     scope, revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, persisted, restoredAt, lastError, busy,
     start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved, payload,
-    serverId, serverVersion, syncState, remote, checkRemote, pullRemote, keepMine, sync: () => push(),
+    serverId, serverKind, serverVersion, serverMeta, syncState, remote, restoredFrom, checkRemote, pullRemote, keepMine, saveToServer, sync: () => push(),
   }
 }

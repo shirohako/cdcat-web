@@ -545,6 +545,8 @@ export interface AdminImageDetail extends AdminImage {
     artists: { id: number, artist_id: number, name: string, kind: string, label: string | null, is_primary: boolean }[]
     addresses: { type: AdminImageUseType, id: number, name: string | null, field: string, album_id?: number, topic_id?: number, floor_number?: number | null }[]
     revisions: { id: number, status: string, title: string | null, submitter: AdminUserName | null, submitted_at: string | null }[]
+    /** Drafts saved to CDCat that use it, until they are submitted, deleted or expire. */
+    drafts?: { id: number, scope: string, label: string, user: AdminUserName | null, updated_at: string | null }[]
   }
 }
 

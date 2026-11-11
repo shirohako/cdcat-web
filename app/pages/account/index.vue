@@ -127,6 +127,10 @@
             v-if="activeTab === 'privacy'"
           />
 
+          <AccountMcpTab
+            v-if="activeTab === 'mcp'"
+          />
+
           <AccountDangerTab
             v-if="activeTab === 'danger'"
           />
@@ -139,14 +143,14 @@
 
 <script setup>
 import {
-  User as UserIcon, Mail, Lock, Bell, AlertTriangle, Settings, EyeOff,
+  User as UserIcon, Mail, Lock, Bell, AlertTriangle, Settings, EyeOff, Bot,
 } from '@lucide/vue'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-const { user } = useAuth()
+const { user, hasPermission } = useAuth()
 const { showToast } = useToast()
 const { t } = useI18n()
 
@@ -166,6 +170,8 @@ const tabs = computed(() => [
   { key: 'security', label: t('account_pages.tabs.security'), icon: Lock },
   { key: 'notifications', label: t('account_pages.tabs.notifications'), icon: Bell },
   { key: 'privacy', label: t('account_pages.tabs.privacy'), icon: EyeOff },
+  // Tokens for the drafts MCP server, for drafts.mcp (staff to begin with)
+  ...(hasPermission('drafts.mcp') ? [{ key: 'mcp', label: t('account_pages.tabs.mcp'), icon: Bot }] : []),
   { key: 'danger', label: t('account_pages.tabs.danger'), icon: AlertTriangle }
 ])
 

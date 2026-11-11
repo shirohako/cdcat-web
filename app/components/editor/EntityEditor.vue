@@ -30,6 +30,7 @@
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
         <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
+        <EditorServerDraftSync :draft="draft" class="mb-4" @reloaded="loadOriginals(draft.items.value)" />
 
         <div class="space-y-6">
           <slot />

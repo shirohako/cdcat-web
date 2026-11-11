@@ -6,14 +6,14 @@
       </span>
     </UiTooltip>
     <span v-if="draft.restoredAt.value" class="inline-flex items-center gap-1.5 rounded-full bg-info/10 py-0.5 pl-2.5 pr-1 text-info ring-1 ring-info/20">
-      <History :size="12" class="shrink-0" />{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}
+      <History :size="12" class="shrink-0" />{{ restoredText }}
       <UiButton size="xs" class="rounded-full bg-info/15 text-info hover:bg-info/25 ring-1 ring-inset ring-info/25 shadow-xs active:translate-y-px" @click="discard">{{ $t('editor.restored_discard') }}</UiButton>
     </span>
   </div>
   <div v-else class="space-y-2">
     <div v-if="draft.restoredAt.value" class="flex flex-wrap items-center gap-3 rounded-xl border border-info/25 bg-info/10 px-4 py-2.5 text-sm text-body">
       <History :size="16" class="shrink-0 text-info" />
-      <span class="min-w-0 flex-1">{{ $t('editor.restored', { at: ago(draft.restoredAt.value) }) }}</span>
+      <span class="min-w-0 flex-1">{{ restoredText }}</span>
       <UiButton size="xs" class="bg-info/15 text-info hover:bg-info/25 ring-1 ring-inset ring-info/25 shadow-xs active:translate-y-px" @click="discard">{{ $t('editor.restored_discard') }}</UiButton>
     </div>
     <p class="flex flex-wrap items-center gap-1.5 text-xs text-meta">
@@ -47,6 +47,9 @@ const discard = async () => {
   await props.draft.discard()
   emit('discard')
 }
+
+/** The edits the editor opened with: kept in this browser, or loaded from the copy saved to CDCat. */
+const restoredText = computed(() => t(props.draft.restoredFrom.value === 'server' ? 'editor.restored_server' : 'editor.restored', { at: ago(props.draft.restoredAt.value) }))
 
 const label = computed(() => ({
   idle: t('editor.state_idle'),

@@ -383,8 +383,9 @@ onMounted(() => window.addEventListener('keydown', onKey))
 onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 
 const handleLogout = async () => {
-  // Logging out deletes the revision drafts kept in this browser.
-  const drafts = user.value ? (await localDrafts.list(user.value.id).catch(() => [])).length : 0
+  // Logging out deletes the revision drafts kept in this browser; those saved to CDCat without later edits are kept there.
+  const kept = user.value ? await localDrafts.list(user.value.id).catch(() => []) : []
+  const drafts = kept.filter(draft => draft.serverVersion == null || draft.unsynced !== false).length
   if (drafts && !confirm(t('user.logout_drafts_confirm', { count: drafts }))) return
   await logout()
   showUserMenu.value = false
