@@ -28,8 +28,11 @@ const hasLiner = (row: TracklistRow) => Boolean(row.groups.length || row.subtitl
         class="tl-row group relative -mx-2 grid scroll-mt-24 grid-cols-[2rem_minmax(0,1fr)_auto] items-start gap-x-2.5 rounded-sm px-2 py-3.5 transition-colors duration-150 @lg:grid-cols-[2.25rem_minmax(0,1fr)_auto] hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
       >
         <span class="text-[1.0625rem] font-light leading-6 tracking-tight tabular-nums text-faint @lg:text-xl">{{ row.number }}</span>
-        <span class="flex h-6 min-w-0 items-baseline gap-2.5">
-          <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-15 font-semibold leading-6" />
+        <!-- 13px as in every style (was 15px), a step above the 12px credits; one line cut with …, and on phones long
+             titles wrap instead, as in 清单 (user asks, 2026-11-11), the buttons and 纯音乐 (on the first line's
+             baseline) staying on the first line -->
+        <span class="flex h-6 min-w-0 items-baseline gap-2.5 max-sm:h-auto">
+          <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-13 font-semibold leading-6 max-sm:whitespace-normal max-sm:wrap-break-word" />
           <span v-if="row.instrumental" class="shrink-0 text-11 font-medium tracking-[0.12em] text-meta">{{ t('content_display.instrumental') }}</span>
         </span>
         <!-- As in 清单: the more menu, the heart (none on albums awaiting review), the lyrics buttons (none for
@@ -58,19 +61,20 @@ const hasLiner = (row: TracklistRow) => Boolean(row.groups.length || row.subtitl
               <AlbumTracklistPeople :people="credit.people" stack end class="value mt-0.5" />
             </div>
             <div v-if="row.originals.length" class="liner-line break-inside-avoid">
-              <AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
+              <AlbumTracklistLabel size="md">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
               <span class="leader" aria-hidden="true" />
-              <AlbumTracklistOriginals :originals="row.originals" stack class="value text-title" />
+              <!-- The notes 12px like the names (user ask, 2026-11-11), their first line on the label's middle -->
+              <AlbumTracklistOriginals :originals="row.originals" stack class="value mt-px text-xs leading-5 text-title" />
             </div>
             <div v-for="attribute in row.attributes" :key="attribute.key" class="liner-line break-inside-avoid">
-              <AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>
+              <AlbumTracklistLabel size="md">{{ attribute.label }}</AlbumTracklistLabel>
               <span class="leader" aria-hidden="true" />
-              <span class="text-title">{{ attribute.value }}</span>
+              <span class="value mt-px text-xs leading-5 text-title">{{ attribute.value }}</span>
             </div>
             <div v-if="row.isrc" class="liner-line break-inside-avoid">
-              <AlbumTracklistLabel>ISRC</AlbumTracklistLabel>
+              <AlbumTracklistLabel size="md">ISRC</AlbumTracklistLabel>
               <span class="leader" aria-hidden="true" />
-              <span class="font-mono text-title">{{ row.isrc }}</span>
+              <span class="mt-px font-mono text-xs leading-5 text-title">{{ row.isrc }}</span>
             </div>
           </div>
         </div>
@@ -106,8 +110,10 @@ const hasLiner = (row: TracklistRow) => Boolean(row.groups.length || row.subtitl
   margin-top: 0.125rem;
 }
 
+/* Through the middle of the first line's tags (0.125rem down, 1.125rem tall), not at the text's baseline (user ask,
+   2026-11-11); its 1px dots centred on that line */
 .liner-line .leader {
-  margin-top: 0.875rem;
+  margin-top: calc(0.6875rem - 0.5px);
   translate: none;
 }
 

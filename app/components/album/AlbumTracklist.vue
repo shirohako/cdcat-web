@@ -3,12 +3,14 @@
     <template v-if="discs.length" #actions>
       <!-- The 样式 menu: every layout at each density it offers, grouped by layout; a small drawing, the name and what
            it shows per row. A UiPopover rather than a UiMenu: the card clips what overflows it (for the sticky disc
-           headers), and the popover is teleported out. It scrolls past 22rem or the screen's height. -->
-      <UiPopover placement="bottom-end" :label="t('album.tracklist.settings.style')" role="menu" class="max-h-[min(22rem,calc(100dvh-1rem))]! w-72 rounded-md! p-1!">
+           headers), and the popover is teleported out. It scrolls past 22rem or the screen's height. The header's
+           buttons are `xs`, as big as the 编辑 button in the side column; the menu opens centred under its button,
+           and on phones centred across the screen, as its button sits near the right edge (user asks, 2026-11-11). -->
+      <UiPopover placement="bottom" phone-centred :label="t('album.tracklist.settings.style')" role="menu" class="max-h-[min(22rem,calc(100dvh-1rem))]! w-72 rounded-md! p-1!">
         <template #trigger="{ open, toggle, attrs }">
-          <UiButton size="sm" :icon="activeStyle.icon" class="max-w-full min-w-0 gap-1.5 px-2.5" v-bind="attrs" aria-haspopup="menu" @click="toggle">
+          <UiButton size="xs" :icon="activeStyle.icon" class="max-w-full min-w-0 gap-1.5" v-bind="attrs" aria-haspopup="menu" @click="toggle">
             <span class="flex min-w-0 items-center gap-1"><span class="truncate">{{ activeOption?.name }}</span><AlbumTracklistLabel size="mini">{{ activeOption?.tag }}</AlbumTracklistLabel></span>
-            <ChevronDown :size="14" class="-ml-0.5 shrink-0 text-meta transition-transform duration-200" :class="open && 'rotate-180'" aria-hidden="true" />
+            <ChevronDown :size="13" class="-ml-0.5 shrink-0 text-meta transition-transform duration-200" :class="open && 'rotate-180'" aria-hidden="true" />
           </UiButton>
         </template>
         <template #default="{ close }">
@@ -38,21 +40,21 @@
       </UiPopover>
       <!-- 表格 · 完整 only, and only on a card wide enough for a table: the same tables in a dialog as wide as the window -->
       <span v-if="tableFull" class="hidden @min-[40rem]:contents">
-        <UiButton size="sm" :icon="Maximize2" :label="t('album.tracklist.fullscreen')" @click="tableOpen = true" />
+        <UiButton size="xs" :icon="Maximize2" :label="t('album.tracklist.fullscreen')" @click="tableOpen = true" />
       </span>
       <!-- Always there, so the header doesn't change between albums; disabled when the titles have no other language. -->
       <UiButton
-        size="sm"
+        size="xs"
         :disabled="!languages.length"
         :tooltip="languageTip"
         :aria-label="languageTip"
-        class="gap-1.5 px-2.5 tabular-nums"
+        class="gap-1.5 tabular-nums"
         :class="languageKey && '[--ui-btn-bg:color-mix(in_oklab,var(--primary)_16%,transparent)] [--ui-btn-color:var(--primary)] [--ui-btn-hover:color-mix(in_oklab,var(--primary)_24%,transparent)]'"
         @click="languageOpen = true"
       >
-        <Languages :size="15" /><template v-if="languages.length">{{ languages.length }}</template>
+        <Languages :size="14" /><template v-if="languages.length">{{ languages.length }}</template>
       </UiButton>
-      <UiButton size="sm" :icon="Settings2" :label="t('album.tracklist.settings.title')" @click="settingsOpen = true" />
+      <UiButton size="xs" :icon="Settings2" :label="t('album.tracklist.settings.title')" @click="settingsOpen = true" />
     </template>
 
     <div v-if="discs.length" ref="list" :class="swapping && 'is-swapping'">

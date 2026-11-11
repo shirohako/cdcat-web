@@ -43,7 +43,7 @@ const lyricsInline = (row: TracklistRow) => !row.instrumental && !hasFull(row)
 
 /** The phone's 展开更多 / 收起: the chip's outline as a 20px arrow button at the end of the first line */
 const ARROW = 'hidden size-5 shrink-0 items-center justify-center rounded-[0.3125rem] text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title max-sm:inline-flex dark:hover:bg-white/[0.07]'
-const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px-1.5 text-11 font-semibold leading-none text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title dark:hover:bg-white/[0.07]'
+const CHIP = 'inline-grid h-5 shrink-0 items-center rounded-[0.3125rem] px-1.5 text-11 font-semibold leading-none text-meta shadow-[inset_0_0_0_1px_var(--line)] transition-colors duration-150 hover:bg-black/[0.04] hover:text-title dark:hover:bg-white/[0.07]'
 </script>
 
 <template>
@@ -56,10 +56,12 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
           :id="`track-${row.id}`"
           :key="row.id"
           :data-track-id="row.id"
-          class="tl-ruled group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-1.5 text-13 leading-5 transition-colors duration-150 max-sm:grid-cols-[0.875rem_minmax(0,1fr)_auto] max-sm:gap-x-1.5 max-sm:text-11/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
+          class="tl-ruled group relative grid scroll-mt-24 grid-cols-[1.125rem_minmax(0,1fr)_auto] items-start gap-x-2 rounded-md px-2 py-1.5 text-13 leading-5 transition-colors duration-150 max-sm:grid-cols-[0.875rem_minmax(0,1fr)_auto] max-sm:gap-x-1.5 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]"
         >
-          <!-- A column just wide enough for two digits; on phones the titles are 11px (the smallest for words) and the
-               columns closer, so more of the titles fits -->
+          <!-- A column just wide enough for two digits; on phones the number and length are 11px (the smallest for
+               words) and the columns closer, so more of the title fits. Titles are 13px in every style, phones and
+               desktop alike (user picks, 2026-11-11: one size, a step above the 12px credits under them; it was 11px
+               here on phones, 14px in 舒适/完整 and 15px in 内页). -->
           <span class="text-xs/5 tabular-nums text-meta max-sm:text-11/5">{{ row.number }}</span>
           <!-- In a box of its own, so the link is only as wide as the title's text, not its whole column: only the title
                opens the track page (user ask, 2026-11-11) -->
@@ -89,9 +91,11 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
         >
           <!-- A column just wide enough for two digits, centred on the 24px first line -->
           <span class="flex h-6 items-center text-xs tabular-nums text-meta">{{ row.number }}</span>
-          <span class="flex h-6 min-w-0 items-center gap-1.5">
-            <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-sm font-medium leading-6" />
-            <AlbumTracklistLabel v-if="row.instrumental">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
+          <!-- One line cut with … ; on phones, where the first line also holds the lyrics and the arrow, long titles wrap
+               instead (user ask, 2026-11-11), the buttons staying on their first line and 纯音乐 centred on it -->
+          <span class="flex h-6 min-w-0 items-center gap-1.5 max-sm:h-auto max-sm:items-start">
+            <AlbumTracklistTitle :row="row" class="min-w-0 truncate text-13 font-medium leading-6 max-sm:whitespace-normal max-sm:wrap-break-word" />
+            <AlbumTracklistLabel v-if="row.instrumental" class="max-sm:mt-[0.1875rem]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
           </span>
           <!-- At the right, close together and all 20px as in 简洁: the more menu, the heart (none on albums
                awaiting review), the lyrics buttons when they have no line below to go to, right before the length, and
@@ -145,18 +149,18 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
                   />
                   <AlbumTracklistPeople :people="credit.people" inline />
                   <UiTooltip v-if="credit.more.length" :text="credit.more.map(person => person.name).join(separator)">
-                    <AlbumTracklistLabel class="ml-1 align-middle tabular-nums">+{{ credit.more.length }}</AlbumTracklistLabel>
+                    <AlbumTracklistLabel size="md" class="ml-1 align-middle tabular-nums">+{{ credit.more.length }}</AlbumTracklistLabel>
                   </UiTooltip>
                 </template>
                 <template v-if="row.originals.length">
-                  <AlbumTracklistLabel class="mr-1 align-middle" :class="row.key.length > 0 && 'ml-3'">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
+                  <AlbumTracklistLabel size="md" class="mr-1 align-middle" :class="row.key.length > 0 && 'ml-3'">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel>
                   <AlbumTracklistOriginals :originals="row.originals" />
                 </template>
               </p>
               <UiCollapse class="col-start-1 row-start-1" :open="showsFull(row, density)" lazy>
                 <div class="pb-1.5 pt-1">
-                  <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-13 leading-[1.125rem] text-title">
-                    <AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>
+                  <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-xs leading-[1.125rem] text-title">
+                    <AlbumTracklistLabel size="md">{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>
                   </p>
                   <!-- One role per line, its people after its tag -->
                   <div v-if="row.groups.length" class="grid gap-y-1.5">
@@ -166,10 +170,11 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
                     </div>
                   </div>
                   <!-- The notes, each behind a grey label tag like the roles above: 原曲, attributes (BPM …), ISRC -->
-                  <div v-if="hasNotes(row)" class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-13 leading-[1.375rem] text-title" :class="row.groups.length > 0 && 'mt-2'">
-                    <span v-if="row.originals.length" class="inline-flex min-w-0 items-center gap-2"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
-                    <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-2"><AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
-                    <span v-if="row.isrc" class="inline-flex items-center gap-2"><AlbumTracklistLabel>ISRC</AlbumTracklistLabel><span class="font-mono text-xs">{{ row.isrc }}</span></span>
+                  <!-- 12px like the names above (user ask, 2026-11-11); a note that wraps keeps its label on its first line -->
+                  <div v-if="hasNotes(row)" class="flex flex-wrap items-start gap-x-4 gap-y-1.5 text-xs leading-5 text-title" :class="row.groups.length > 0 && 'mt-2'">
+                    <span v-if="row.originals.length" class="inline-flex min-w-0 items-start gap-2"><AlbumTracklistLabel size="md" class="mt-px">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
+                    <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex min-w-0 items-start gap-2"><AlbumTracklistLabel size="md" class="mt-px">{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
+                    <span v-if="row.isrc" class="inline-flex items-start gap-2"><AlbumTracklistLabel size="md" class="mt-px">ISRC</AlbumTracklistLabel><span class="font-mono">{{ row.isrc }}</span></span>
                   </div>
                 </div>
               </UiCollapse>
@@ -179,12 +184,13 @@ const CHIP = 'inline-flex h-5 shrink-0 items-center gap-1 rounded-[0.3125rem] px
             <span class="mt-0.5 flex shrink-0 items-center gap-1 max-sm:hidden">
               <AlbumTracklistLyrics :row="row" small />
               <button v-if="density === 'comfy'" type="button" :class="CHIP" :aria-expanded="expanded.has(row.id)" @click="toggleMore(row)">
-                <ChevronDown :size="12" class="transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />
-                <!-- Both labels in one cell, the other hidden, so the chip keeps the longer one's width and the lyrics
-                     buttons beside it don't move -->
-                <span class="grid justify-items-start">
-                  <span class="col-start-1 row-start-1" :class="expanded.has(row.id) && 'invisible'">{{ t('album.tracklist.show_more') }}</span>
-                  <span class="col-start-1 row-start-1" :class="!expanded.has(row.id) && 'invisible'">{{ t('album.tracklist.show_less') }}</span>
+                <!-- Arrow and both labels, invisible, in one cell, so the chip keeps the longer one's width and the lyrics
+                     buttons beside it don't move; over them the arrow (one, so it turns) and the label shown, centred
+                     together (user ask, 2026-11-11: 收起 sat at the left) -->
+                <span class="invisible col-start-1 row-start-1 flex items-center gap-1" aria-hidden="true"><span class="size-3" />{{ t('album.tracklist.show_more') }}</span>
+                <span class="invisible col-start-1 row-start-1 flex items-center gap-1" aria-hidden="true"><span class="size-3" />{{ t('album.tracklist.show_less') }}</span>
+                <span class="col-start-1 row-start-1 flex items-center justify-center gap-1">
+                  <ChevronDown :size="12" class="shrink-0 transition-[rotate] duration-300 ease-out" :class="expanded.has(row.id) && 'rotate-180'" />{{ t(expanded.has(row.id) ? 'album.tracklist.show_less' : 'album.tracklist.show_more') }}
                 </span>
               </button>
             </span>

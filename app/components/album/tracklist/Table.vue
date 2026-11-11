@@ -71,7 +71,7 @@ const CELL_CLASSES: Record<Column['kind'], string> = {
                     <AlbumTracklistTitle :row="row" class="font-medium" />
                     <AlbumTracklistLabel v-if="row.instrumental" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
                     <span v-if="row.originals.length" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-                      <span class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
+                      <span class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
                     </span>
                   </template>
                   <!-- 舒适: everyone, no roles; four names at most, the rest behind +N, which flows on after the last
@@ -79,7 +79,7 @@ const CELL_CLASSES: Record<Column['kind'], string> = {
                   <span v-else-if="column.kind === 'people'" class="flex flex-wrap items-center gap-1 pt-px">
                     <AlbumTracklistPeople :people="row.everyone.slice(0, TABLE_NAMES)" class="contents!" />
                     <UiTooltip v-if="row.everyone.length > TABLE_NAMES" :text="row.everyone.slice(TABLE_NAMES).map(person => person.name).join(separator)">
-                      <AlbumTracklistLabel class="tabular-nums">+{{ row.everyone.length - TABLE_NAMES }}</AlbumTracklistLabel>
+                      <AlbumTracklistLabel size="md" class="tabular-nums">+{{ row.everyone.length - TABLE_NAMES }}</AlbumTracklistLabel>
                     </UiTooltip>
                   </span>
                   <AlbumTracklistLyrics v-else-if="column.kind === 'lyrics'" :row="row" merged always />

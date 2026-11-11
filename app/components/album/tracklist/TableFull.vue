@@ -61,6 +61,8 @@ const scroller = ref<HTMLElement | null>(null)
 const table = ref<HTMLTableElement | null>(null)
 const headBox = ref<HTMLElement | null>(null)
 const bar = ref<HTMLElement | null>(null)
+/** Where the box last put the bar's scroll */
+let barSetTo = 0
 const widths = shallowRef<number[] | null>(null)
 const tableWidth = ref(0)
 /** The box's visible width */
@@ -72,8 +74,10 @@ const sync = () => {
   const box = scroller.value
   if (!box) return
   if (headBox.value) headBox.value.scrollLeft = box.scrollLeft
-  // Only when it differs, so the bar's own scroll event doesn't set the box back and cut short a smooth ‹ › scroll
-  if (bar.value && Math.abs(bar.value.scrollLeft - box.scrollLeft) >= 1) bar.value.scrollLeft = box.scrollLeft
+  if (bar.value && Math.abs(bar.value.scrollLeft - box.scrollLeft) >= 1) {
+    bar.value.scrollLeft = box.scrollLeft
+    barSetTo = bar.value.scrollLeft
+  }
   edges.start = box.scrollLeft > 1
   edges.end = box.scrollLeft < box.scrollWidth - box.clientWidth - 1
 }
@@ -107,8 +111,16 @@ const barBox = computed(() => {
   const right = list.at(-1)!
   return { left, right, span: boxWidth.value - left - right + Math.max(0, tableWidth.value - boxWidth.value) }
 })
+/**
+ * The bar moves the box only from a position the box didn't give it (barSetTo): the reader dragging the bar. A scroll
+ * event comes a frame after the scroll, so the bar's event for a position the box gave it arrives once a smooth ‹ ›
+ * scroll has moved the box on; taking it as the reader's set the box back and ended that scroll after a frame (user
+ * report: ‹ › hardly moved).
+ */
 const onBarScroll = () => {
-  if (bar.value && scroller.value && Math.abs(scroller.value.scrollLeft - bar.value.scrollLeft) >= 1) scroller.value.scrollLeft = bar.value.scrollLeft
+  if (!bar.value || !scroller.value || Math.abs(bar.value.scrollLeft - barSetTo) < 1) return
+  barSetTo = bar.value.scrollLeft
+  scroller.value.scrollLeft = bar.value.scrollLeft
 }
 
 let observer: ResizeObserver | undefined
@@ -122,18 +134,28 @@ onBeforeUnmount(() => observer?.disconnect())
 // New rows (a title language, a favourite) may move the columns without resizing the table
 watch(() => props.disc, measure, { flush: 'post' })
 
-/** ‹ ›: the next or previous scrolling column lines up with the title's edge; past the last, the end. */
+/**
+ * ‹ › turn a page of columns (user ask: one column a press was too slow), each lining up with the title's edge: › to
+ * the first column not wholly in view, ‹ back to the first column that the visible width reaches from there, a single
+ * column wider than the view one at a time; past the last, the end.
+ */
 const step = (direction: 1 | -1) => {
   const box = scroller.value
   const cells = table.value?.tHead?.rows[0]?.cells
   if (!box || !cells) return
   const columns = [...cells].filter(cell => cell.dataset.scrolls !== undefined)
   const start = columns[0]?.offsetLeft ?? 0
+  const view = box.clientWidth - start - (cells[cells.length - 1]?.offsetWidth ?? 0)
   const at = box.scrollLeft
-  const target = direction > 0
-    ? columns.find(cell => cell.offsetLeft - start > at + 1)
-    : [...columns].reverse().find(cell => cell.offsetLeft - start < at - 1)
-  const left = target ? target.offsetLeft - start : direction > 0 ? box.scrollWidth : 0
+  const lefts = columns.map(cell => ({ left: cell.offsetLeft - start, right: cell.offsetLeft - start + cell.offsetWidth }))
+  let left: number
+  if (direction > 0) {
+    const cut = lefts.find(column => column.right > at + view + 1 && column.left > at + 1)
+    left = cut ? cut.left : box.scrollWidth
+  } else {
+    const back = lefts.find(column => column.left >= at - view - 1 && column.left < at - 1) ?? [...lefts].reverse().find(column => column.left < at - 1)
+    left = back ? back.left : 0
+  }
   box.scrollTo({ left, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
 }
 
@@ -203,8 +225,8 @@ const onHeadWheel = (event: WheelEvent) => {
               <AlbumTracklistTitle :row="row" class="font-medium" />
               <AlbumTracklistLabel v-if="row.instrumental" class="ml-1.5 align-[1px]">{{ t('content_display.instrumental') }}</AlbumTracklistLabel>
               <span v-if="row.subtitle || row.originals.length" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-                <span v-if="row.subtitle" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel>{{ row.subtitle }}</span>
-                <span v-if="row.originals.length" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
+                <span v-if="row.subtitle" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel>{{ row.subtitle }}</span>
+                <span v-if="row.originals.length" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">{{ t('album.tracklist.original_song') }}</AlbumTracklistLabel><AlbumTracklistOriginals :originals="row.originals" /></span>
               </span>
             </td>
             <td v-for="column in layout.columns" :key="column.key" class="c-credit text-title">
@@ -219,8 +241,8 @@ const onHeadWheel = (event: WheelEvent) => {
             <td class="c-lines text-title">
               <AlbumTracklistCreditLines v-if="layout.lines.get(row.id)?.length" :credits="layout.lines.get(row.id)!" />
               <span v-if="row.attributes.length || row.isrc" class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-meta">
-                <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
-                <span v-if="row.isrc" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel>ISRC</AlbumTracklistLabel><span class="font-mono">{{ row.isrc }}</span></span>
+                <span v-for="attribute in row.attributes" :key="attribute.key" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">{{ attribute.label }}</AlbumTracklistLabel>{{ attribute.value }}</span>
+                <span v-if="row.isrc" class="inline-flex items-center gap-1.5"><AlbumTracklistLabel size="md">ISRC</AlbumTracklistLabel><span class="font-mono">{{ row.isrc }}</span></span>
               </span>
             </td>
             <td class="c-end">

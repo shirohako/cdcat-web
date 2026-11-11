@@ -35,7 +35,11 @@ const props = withDefaults(defineProps<{
   /** How close to the window's edges the card may come, in pixels (8); a card that should keep clear of them on
       phones asks for more, and caps its width to match */
   edge?: number
-}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined, arrow: false, edge: 8 })
+  /** On a phone-wide window (under 640px), centred across the window rather than on its trigger, still above or
+      below it: for a card wider than the room beside a trigger near an edge, where shifting would leave it hugging
+      that edge (the tracklist's 样式 menu) */
+  phoneCentred?: boolean
+}>(), { placement: 'bottom', offset: 8, reference: null, label: undefined, arrow: false, edge: 8, phoneCentred: false })
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -87,7 +91,9 @@ const place = () => {
       shift({ padding: props.edge }),
       fitSize({ padding: props.edge, apply: ({ availableHeight }) => { position.maxHeight = Math.max(160, availableHeight) } }),
     ],
-  }).then(({ x, y, placement }) => {
+  }).then(({ x: placedX, y, placement }) => {
+    const width = document.documentElement.clientWidth
+    const x = props.phoneCentred && width < 640 ? Math.max(props.edge, (width - floating.offsetWidth) / 2) : placedX
     Object.assign(position, { x: Math.round(x), y: Math.round(y), placement, placed: true })
     if (props.arrow) placeArrow(reference, floating, x, y, placement)
   })
