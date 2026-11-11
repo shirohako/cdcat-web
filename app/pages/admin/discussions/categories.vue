@@ -179,7 +179,7 @@ useHead({ title: '讨论版块' })
         <label class="flex items-center gap-2"><input v-model="form.show_in_list" type="checkbox">显示在版块列表和侧栏里（关掉后仍可通过链接打开）</label>
         <label class="flex items-center gap-2"><input v-model="form.is_archived" type="checkbox">归档：不能再发主题和回复</label>
         <label class="block">发帖模板<textarea
-v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'font-mono text-xs']" placeholder="发主题时预填到编辑器里，例如：
+v-model="form.topic_template" maxlength="5000" rows="4" :class="[field, 'text-sm']" placeholder="发主题时预填到编辑器里，例如：
 曲目信息：
 试听链接：
 出处：" /></label>

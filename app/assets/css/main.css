@@ -492,16 +492,15 @@
     --font-sans-ko: "Pretendard Variable", "Apple SD Gothic Neo", "Malgun Gothic",
       "Noto Sans CJK KR", "Noto Sans KR", "Source Han Sans K";
 
-    /* 等宽字体 */
-    --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco, "Courier New", monospace;
-
     /* 当前语言的中日文字体，下面按 html[lang] 换 */
     --font-sans-cjk: var(--font-sans-zh-hans), var(--font-sans-ja);
 
-    /* Markdown 编辑器：西文和代码等宽，中日文落到网站的思源黑体（等宽字体都没有 CJK 字形）。
-       generic monospace 放最后，免得系统先拿它的 CJK 兜底 */
-    --font-mono-cjk: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, Monaco,
-      var(--font-sans-cjk), monospace;
+    /* 等宽字体（font-mono、code、Markdown 编辑器）：西文和数字用 Noto Sans Mono（@fontsource-variable/noto-sans-mono，
+       nuxt.config 引入），和正文的思源黑体同一家族，各平台一致；系统等宽字体只在字体下载完之前顶上。
+       中日韩文落到网站的思源黑体（等宽字体都没有 CJK 字形）。generic monospace 放最后，免得系统先拿它的 CJK 兜底
+       （Windows 上是宋体一类，和网站字体对不上） */
+    --font-mono: "Noto Sans Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo,
+      Monaco, "Courier New", var(--font-sans-cjk), monospace;
   }
 
   html[lang="zh-Hant"] {

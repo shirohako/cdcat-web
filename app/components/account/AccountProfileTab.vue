@@ -106,7 +106,7 @@
             id="bio"
             v-model="form.bio"
             rows="4"
-            class="textarea w-full resize-none font-mono text-sm"
+            class="textarea w-full resize-none text-sm"
             :disabled="isLoadingBio"
             :placeholder="t('account_pages.profile.bio_placeholder')"
             maxlength="500"

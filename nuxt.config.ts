@@ -155,6 +155,7 @@ export default defineNuxtConfig({
     '@fontsource-variable/noto-sans-sc/wght.css',
     '@fontsource-variable/noto-sans-tc/wght.css',
     '@fontsource-variable/noto-sans-jp/wght.css',
+    '@fontsource-variable/noto-sans-mono/wght.css',
     'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css',
     '~/assets/css/main.css',
     '~/assets/css/markdown.css',

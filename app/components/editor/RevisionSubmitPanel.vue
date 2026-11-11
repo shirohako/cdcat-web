@@ -6,7 +6,7 @@
     </label>
     <label class="form-control">
       <span class="label-text mb-1 text-sm font-medium">{{ $t('editor.sources') }}<EditorHelp id="submit.sources" /></span>
-      <textarea :value="sources.join('\n')" rows="2" class="textarea font-mono text-xs" :placeholder="$t('editor.sources_placeholder')" @input="setSources(($event.target as HTMLTextAreaElement).value)" />
+      <textarea :value="sources.join('\n')" rows="2" class="textarea text-sm" :placeholder="$t('editor.sources_placeholder')" @input="setSources(($event.target as HTMLTextAreaElement).value)" />
     </label>
 
     <details class="rounded-lg border border-line" open @toggle="previewOpen = ($event.target as HTMLDetailsElement).open">

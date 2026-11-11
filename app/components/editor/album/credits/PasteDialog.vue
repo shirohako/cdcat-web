@@ -262,7 +262,7 @@ const apply = () => {
     <div class="space-y-3">
       <p class="whitespace-pre-line text-sm text-body">{{ t('editor.paste_credits.hint') }}</p>
       <EditorPasteExamples :formats="EXAMPLES" scope="editor.paste_credits" />
-      <textarea v-model="text" rows="7" class="textarea w-full font-mono text-xs" :placeholder="t('editor.paste_credits.placeholder')" :aria-label="t('editor.paste_credits.title')" />
+      <textarea v-model="text" rows="7" class="textarea w-full text-sm" :placeholder="t('editor.paste_credits.placeholder')" :aria-label="t('editor.paste_credits.title')" />
       <div>
         <UiButton variant="primary" size="sm" icon="lucide:search-check" class="shadow-xs active:translate-y-px" :loading="looking" :disabled="!names.length" @click="lookUp">{{ lookupFailed ? t('common.retry') : t('editor.paste_credits.match') }}</UiButton>
       </div>

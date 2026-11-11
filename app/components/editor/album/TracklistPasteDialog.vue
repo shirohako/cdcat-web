@@ -3,7 +3,7 @@
     <div class="space-y-3">
       <p class="whitespace-pre-line text-sm text-body">{{ t('editor.paste.hint') }}</p>
       <EditorPasteExamples :formats="TRACKLIST_FORMATS" scope="editor.paste" />
-      <textarea v-model="text" rows="10" class="textarea w-full font-mono text-xs" :placeholder="t('editor.paste.placeholder')" :aria-label="t('editor.paste.title')" />
+      <textarea v-model="text" rows="10" class="textarea w-full text-sm" :placeholder="t('editor.paste.placeholder')" :aria-label="t('editor.paste.title')" />
       <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
         <UiButton variant="primary" size="sm" icon="lucide:scan-text" class="shadow-xs active:translate-y-px" :disabled="!text.trim()" @click="recognize">{{ t('editor.paste.recognize') }}</UiButton>
         <label class="flex items-center gap-2 text-sm"><input v-model="mode" type="radio" value="update" class="radio radio-sm">{{ t('editor.paste.mode_update') }}</label>

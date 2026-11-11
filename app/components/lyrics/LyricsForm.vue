@@ -22,7 +22,7 @@
 
     <label class="form-control">
       <span class="label-text mb-1 text-xs">{{ $t('lyrics_ui.content') }}</span>
-      <textarea v-model="form.content" rows="12" class="textarea font-mono text-sm leading-6" :placeholder="$t('lyrics_ui.content_placeholder')" required />
+      <textarea v-model="form.content" rows="12" class="textarea text-sm leading-6" :placeholder="$t('lyrics_ui.content_placeholder')" required />
     </label>
 
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
