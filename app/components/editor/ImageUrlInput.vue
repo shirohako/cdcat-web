@@ -22,13 +22,16 @@
 
 <script setup lang="ts">
 import { ImagePlus, Link2, Trash2, Upload } from '@lucide/vue'
+import type { CatalogImage } from '~/types/catalog'
 
 /**
  * An image URL column (entries, series). The image always comes through this
  * site: uploaded, or imported from a link by the server; there is no field to type a URL into.
  */
-defineProps<{ wide?: boolean }>()
+const props = defineProps<{ wide?: boolean }>()
 const model = defineModel<string | null>({ required: true })
+/** The address the field keeps: 1200 px for a banner across the page, 600 px for a picture shown at card size. */
+const addressOf = (image: CatalogImage) => props.wide ? image.medium_url : image.thumbnail_url
 
 const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
@@ -50,7 +53,7 @@ const pick = async (event: Event) => {
   }
   busy.value = true
   try {
-    model.value = (await upload(file, file.name)).medium_url
+    model.value = addressOf(await upload(file, file.name))
   } catch (error) {
     message.value = localizeError(error)
   } finally {
@@ -67,7 +70,7 @@ const fromUrl = async (url: string) => {
   busy.value = true
   urlError.value = ''
   try {
-    model.value = (await importUrl(url)).medium_url
+    model.value = addressOf(await importUrl(url))
     message.value = ''
     urlOpen.value = false
   } catch (error) {

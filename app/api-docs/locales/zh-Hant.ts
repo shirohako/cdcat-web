@@ -204,7 +204,7 @@ const texts: ApiDocsTexts = {
 
       ### 圖片
 
-      圖片網址都是完整的 URL。專輯的圖片（[Image](#object-image)）同時提供原圖 \`url\`、長邊最多 300px 的 \`thumbnail_url\` 和最多 1200px 的 \`medium_url\`。請直接使用這些網址，不要自己組合。條目、系列和活動的圖片可能放在其他網站上。
+      圖片網址都是完整的 URL。專輯的圖片（[Image](#object-image)）同時提供原圖 \`url\`、長邊最多 600px 的 \`thumbnail_url\` 和最多 1200px 的 \`medium_url\`。請直接使用這些網址，不要自己組合。條目、系列和活動的圖片可能放在其他網站上。
 
       ### 審核中的內容
 
@@ -639,7 +639,7 @@ const texts: ApiDocsTexts = {
         categories: '專輯類別，可以有好幾個；空陣列表示作曲家作品集，不屬於任何作品企劃。',
         release_date: '發行日期。',
         catalog_number: '品番，取第一個有品番的版本；可以是範圍，例如 `KECH-8059~62`。',
-        image_url: '封面，長邊最多 1200px。',
+        image_url: '封面，長邊最多 600px；少數舊封面最多 1200px。',
         disc_count: '碟數：第一個版本裡的碟片，不含特典碟。',
         track_count: '這些碟片上的曲目數。',
         duration: '這些曲目的總長度（秒），不知道長度的曲目不算。',
@@ -1215,7 +1215,7 @@ const texts: ApiDocsTexts = {
       fields: {
         id: '圖片 ID。',
         url: '原圖（WebP）。',
-        thumbnail_url: '長邊最多 300px 的縮圖。',
+        thumbnail_url: '長邊最多 600px 的縮圖。',
         medium_url: '長邊最多 1200px 的縮圖。',
         width: '原圖的寬（像素）。',
         height: '原圖的高（像素）。',

@@ -12,7 +12,7 @@
       ]"
     >
       <CommonBannerImage v-if="file && variant === 'banner'" :image="file" sizes="(min-width: 768px) 50vw, 100vw" />
-      <img v-else-if="file" :src="file.medium_url" alt="" class="h-full w-full" :class="otherShape ? 'object-contain' : 'object-cover'">
+      <img v-else-if="file" :src="file.thumbnail_url" alt="" class="h-full w-full" :class="otherShape ? 'object-contain' : 'object-cover'">
       <img v-else-if="previewUrl" :src="previewUrl" alt="" class="h-full w-full object-cover">
       <span v-else class="flex h-full flex-col items-center justify-center gap-1.5 p-3 text-center text-meta transition-colors group-hover:text-primary">
         <ImagePlus :size="variant === 'cover' ? 28 : 22" />

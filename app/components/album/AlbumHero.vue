@@ -252,7 +252,7 @@ const bylineTags = computed(() => {
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
 /** The cover's shape, width / height: 1 for a square one, as anywhere else; its own for one kept at another shape. */
 const coverShape = computed(() => coverRatio(props.album.cover?.width, props.album.cover?.height))
-/** The cover's 300px variant, small enough to arrive first: the hero cover's blurred stand-in (UiImage placeholder). */
+/** The cover's 600px variant, small enough to arrive first: the hero cover's blurred stand-in (UiImage placeholder). */
 const thumbnailUrl = computed(() => props.album.cover?.thumbnail_url !== coverUrl.value ? props.album.cover?.thumbnail_url : undefined)
 /** The like button's settings, shared by its two places (under the cover from md, under the byline on phones) */
 const likeButton = computed(() => ({

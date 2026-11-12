@@ -204,7 +204,7 @@ const texts: ApiDocsTexts = {
 
       ### 이미지
 
-      이미지 주소는 항상 전체 URL입니다. 앨범 이미지([Image](#object-image))에는 원본 \`url\`, 긴 변이 최대 300px인 \`thumbnail_url\`, 최대 1200px인 \`medium_url\`이 함께 제공됩니다. URL을 직접 조합하지 말고 이 주소를 그대로 사용하세요. 작품, 시리즈, 행사 이미지는 다른 사이트에 있을 수도 있습니다.
+      이미지 주소는 항상 전체 URL입니다. 앨범 이미지([Image](#object-image))에는 원본 \`url\`, 긴 변이 최대 600px인 \`thumbnail_url\`, 최대 1200px인 \`medium_url\`이 함께 제공됩니다. URL을 직접 조합하지 말고 이 주소를 그대로 사용하세요. 작품, 시리즈, 행사 이미지는 다른 사이트에 있을 수도 있습니다.
 
       ### 검토 중인 콘텐츠
 
@@ -638,7 +638,7 @@ const texts: ApiDocsTexts = {
         categories: '앨범 분류. 여러 개일 수 있습니다. 빈 배열이면 특정 작품에 속하지 않는 작곡가 작품집입니다.',
         release_date: '발매일',
         catalog_number: '품번. 품번이 있는 첫 번째 에디션의 값을 씁니다. `KECH-8059~62`처럼 범위일 수도 있습니다.',
-        image_url: '커버 이미지. 긴 변 기준 최대 1200px입니다.',
+        image_url: '커버 이미지. 긴 변 기준 최대 600px이며, 일부 오래된 커버는 최대 1200px입니다.',
         disc_count: '디스크 수. 첫 번째 에디션에 든 디스크만 세며, 특전 디스크는 제외합니다.',
         track_count: '그 디스크들에 수록된 곡 수',
         duration: '그 곡들의 총 재생 시간(초). 길이를 모르는 곡은 빠집니다.',
@@ -1214,7 +1214,7 @@ const texts: ApiDocsTexts = {
       fields: {
         id: '이미지 ID',
         url: '원본(WebP)',
-        thumbnail_url: '썸네일. 긴 변 기준 최대 300px입니다.',
+        thumbnail_url: '썸네일. 긴 변 기준 최대 600px입니다.',
         medium_url: '썸네일. 긴 변 기준 최대 1200px입니다.',
         width: '원본 너비(픽셀)',
         height: '원본 높이(픽셀)',

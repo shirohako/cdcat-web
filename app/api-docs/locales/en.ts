@@ -204,7 +204,7 @@ const texts: ApiDocsTexts = {
 
       ### Images
 
-      Image addresses are always full URLs. Album images ([Image](#object-image)) give the original \`url\`, a \`thumbnail_url\` at most 300px on the long side, and a \`medium_url\` at most 1200px. Use these addresses as they are; don't build your own. Images of entries, franchises and events may be hosted on other sites.
+      Image addresses are always full URLs. Album images ([Image](#object-image)) give the original \`url\`, a \`thumbnail_url\` at most 600px on the long side, and a \`medium_url\` at most 1200px. Use these addresses as they are; don't build your own. Images of entries, franchises and events may be hosted on other sites.
 
       ### Pending content
 
@@ -639,7 +639,7 @@ const texts: ApiDocsTexts = {
         categories: 'Album categories; there can be several. An empty array means a composer\'s own collection that isn\'t tied to any work.',
         release_date: 'Release date.',
         catalog_number: 'Catalog number, from the first edition that has one; can be a range, for example `KECH-8059~62`.',
-        image_url: 'Cover, at most 1200px on the long side.',
+        image_url: 'Cover, at most 600px on the long side; a few older covers at most 1200px.',
         disc_count: 'Number of discs: the discs in the first edition, not counting bonus discs.',
         track_count: 'Number of tracks on those discs.',
         duration: 'Total length of those tracks (seconds); tracks of unknown length aren\'t counted.',
@@ -1215,7 +1215,7 @@ const texts: ApiDocsTexts = {
       fields: {
         id: 'Image ID.',
         url: 'Original (WebP).',
-        thumbnail_url: 'Thumbnail, at most 300px on the long side.',
+        thumbnail_url: 'Thumbnail, at most 600px on the long side.',
         medium_url: 'Thumbnail, at most 1200px on the long side.',
         width: 'Width of the original (pixels).',
         height: 'Height of the original (pixels).',

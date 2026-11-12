@@ -204,7 +204,7 @@ const texts: ApiDocsTexts = {
 
       ### 画像
 
-      画像のアドレスはすべて完全な URL です。アルバムの画像（[Image](#object-image)）には、原寸の \`url\`、長辺最大 300px の \`thumbnail_url\`、最大 1200px の \`medium_url\` があります。URL は自分で組み立てず、これらをそのまま使ってください。エントリー、シリーズ、イベントの画像はほかのサイトにある場合があります。
+      画像のアドレスはすべて完全な URL です。アルバムの画像（[Image](#object-image)）には、原寸の \`url\`、長辺最大 600px の \`thumbnail_url\`、最大 1200px の \`medium_url\` があります。URL は自分で組み立てず、これらをそのまま使ってください。エントリー、シリーズ、イベントの画像はほかのサイトにある場合があります。
 
       ### 承認待ちの内容
 
@@ -639,7 +639,7 @@ const texts: ApiDocsTexts = {
         categories: 'アルバムのカテゴリー。複数の場合があります。空の配列は作曲家の作品集で、どの作品の企画にも属さないことを表します。',
         release_date: '発売日。',
         catalog_number: '品番。品番のある最初のエディションのものです。範囲の場合もあります。例：`KECH-8059~62`。',
-        image_url: 'ジャケット。長辺最大 1200px。',
+        image_url: 'ジャケット。長辺最大 600px。一部の古いジャケットは最大 1200px。',
         disc_count: 'ディスク枚数：最初のエディションのディスクで、特典ディスクは含みません。',
         track_count: 'それらのディスクのトラック数。',
         duration: 'それらのトラックの合計時間（秒）。長さが不明なトラックは含みません。',
@@ -1215,7 +1215,7 @@ const texts: ApiDocsTexts = {
       fields: {
         id: '画像 ID。',
         url: '原寸の画像（WebP）。',
-        thumbnail_url: '長辺最大 300px のサムネイル。',
+        thumbnail_url: '長辺最大 600px のサムネイル。',
         medium_url: '長辺最大 1200px のサムネイル。',
         width: '原寸の幅（ピクセル）。',
         height: '原寸の高さ（ピクセル）。',

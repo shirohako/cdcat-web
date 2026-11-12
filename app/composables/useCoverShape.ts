@@ -129,7 +129,7 @@ export function useCoverShape() {
         }
       }
       const answer = await ask({
-        src: picture?.src ?? (stored!.medium_url || stored!.url),
+        src: picture?.src ?? (stored!.thumbnail_url || stored!.url), // the dialog's previews are small
         width,
         height,
         tooWide: shape === 'too_wide',
