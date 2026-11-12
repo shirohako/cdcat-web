@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { KeyRound } from '@lucide/vue'
 
-/** One of the member's drafts MCP tokens; the secret comes once, right after creating it. */
+/** One of the member's MCP tokens; the secret comes once, right after creating it. */
 interface McpToken {
   id: number
   name: string
@@ -11,8 +11,9 @@ interface McpToken {
 }
 
 /**
- * Tokens for the drafts MCP server (docs/catalog/editing.md#草稿-mcp): an AI client such as Claude Code writes the
- * member's drafts saved to CDCat with one. Only for drafts.mcp (staff to begin with); a token opens /mcp/drafts alone.
+ * Tokens for the MCP server (docs/mcp/README.md): an AI client such as Claude Code writes the member's drafts saved
+ * to CDCat with one and, for reviewers, checks harvest candidates' drafts. Only for mcp.use (staff to begin with);
+ * a token opens /mcp alone, and the server lists only the tools the account may use.
  */
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -43,10 +44,10 @@ async function load() {
 if (import.meta.client && !useNuxtApp().isHydrating) load()
 else onMounted(load)
 
-/** The MCP server's address: the API's origin, /mcp/drafts. */
-const endpoint = computed(() => `${(useRuntimeConfig().public.apiBaseUrl || 'https://api.cdcat.net').replace(/\/v\d+\/?$/, '').replace(/\/$/, '')}/mcp/drafts`)
+/** The MCP server's address: the API's origin, /mcp. Shown on the tab too, for tokens made before the servers merged. */
+const endpoint = computed(() => `${(useRuntimeConfig().public.apiBaseUrl || 'https://api.cdcat.net').replace(/\/v\d+\/?$/, '').replace(/\/$/, '')}/mcp`)
 /** Registers the server in Claude Code with the new token. */
-const command = computed(() => `claude mcp add --transport http cdcat-drafts ${endpoint.value} --header "Authorization: Bearer ${fresh.value?.token ?? '<token>'}"`)
+const command = computed(() => `claude mcp add --transport http cdcat ${endpoint.value} --header "Authorization: Bearer ${fresh.value?.token ?? '<token>'}"`)
 
 async function create() {
   if (!name.value.trim() || busy.value) return
@@ -96,6 +97,10 @@ async function revoke(token: McpToken) {
         <p class="mt-1 text-sm text-meta">{{ t('account_pages.mcp.intro') }}</p>
       </div>
       <div class="space-y-4 p-6">
+        <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+          <span class="text-meta">{{ t('account_pages.mcp.address') }}</span>
+          <code class="break-all rounded-lg bg-sunken px-2 py-0.5 font-mono text-xs text-title">{{ endpoint }}</code>
+        </p>
         <form class="flex gap-2" @submit.prevent="create">
           <input v-model="name" maxlength="60" class="input min-w-0 flex-1" :placeholder="t('account_pages.mcp.name_placeholder')" :aria-label="t('account_pages.mcp.name_placeholder')">
           <UiButton type="submit" variant="primary" size="sm" :disabled="busy || !name.trim()">{{ t('account_pages.mcp.create') }}</UiButton>

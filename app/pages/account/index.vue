@@ -170,8 +170,8 @@ const tabs = computed(() => [
   { key: 'security', label: t('account_pages.tabs.security'), icon: Lock },
   { key: 'notifications', label: t('account_pages.tabs.notifications'), icon: Bell },
   { key: 'privacy', label: t('account_pages.tabs.privacy'), icon: EyeOff },
-  // Tokens for the drafts MCP server, for drafts.mcp (staff to begin with)
-  ...(hasPermission('drafts.mcp') ? [{ key: 'mcp', label: t('account_pages.tabs.mcp'), icon: Bot }] : []),
+  // Tokens for the MCP server, for mcp.use (staff to begin with)
+  ...(hasPermission('mcp.use') ? [{ key: 'mcp', label: t('account_pages.tabs.mcp'), icon: Bot }] : []),
   { key: 'danger', label: t('account_pages.tabs.danger'), icon: AlertTriangle }
 ])
 

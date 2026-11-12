@@ -385,7 +385,7 @@ const help: Record<string, EditorHelpEntry> = {
       ['Kept', 'Deleted 30 days after its last save, with the images only this draft uses'],
       ['Once submitted', 'Deleted'],
     ],
-    where: 'The drafts at the top of My Revisions; an AI using the drafts MCP can read and write it too.',
+    where: 'The drafts at the top of My Revisions; an AI connected over MCP can read and write it too.',
   },
 }
 

@@ -1589,8 +1589,9 @@
       "deleted": "地址已刪除"
     },
     "mcp": {
-      "title": "草稿 MCP",
-      "intro": "讓 Claude Code 這類 AI 用戶端透過 MCP 幫你寫儲存在 CDCat 上的草稿：新建專輯、藝術家、條目和系列，或修改站內已有的。AI 只能寫草稿，送出要你在編輯器裡檢查後自己來。權杖只能連草稿 MCP，不能存取其他介面。",
+      "title": "MCP",
+      "intro": "讓 Claude Code 這類 AI 用戶端透過 MCP 幫你寫儲存在 CDCat 上的草稿：新建專輯、藝術家、條目和系列，或修改站內已有的；能審核採集候選的帳號，還能讓它按官網核對候選的草稿。AI 只能寫草稿，送出和審核要你檢查後自己來。一個權杖就能用全部功能，但只能連 MCP，不能存取其他介面。",
+      "address": "伺服器位址",
       "name_placeholder": "用途（例如：Claude Code）",
       "create": "新增權杖",
       "created_hint": "權杖只顯示這一次。在終端機裡執行這條指令，把伺服器加進 Claude Code：",

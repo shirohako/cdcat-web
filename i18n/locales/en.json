@@ -1589,8 +1589,9 @@
       "deleted": "Address deleted"
     },
     "mcp": {
-      "title": "Drafts MCP",
-      "intro": "Let an AI client such as Claude Code write your drafts on CDCat through MCP: new albums, artists, entries and series, or edits of what's on the site. The AI only writes drafts; you check them in the editor and submit them yourself. Tokens open the drafts MCP server only, nothing else.",
+      "title": "MCP",
+      "intro": "Let an AI client such as Claude Code write your drafts on CDCat through MCP: new albums, artists, entries and series, or edits of what's on the site. If your account reviews harvest candidates, it can also check a candidate's draft against the official site. The AI only writes drafts; you check them and submit or approve them yourself. One token covers all of this, and it opens the MCP server only, nothing else.",
+      "address": "Server address",
       "name_placeholder": "What it's for (e.g. Claude Code)",
       "create": "New token",
       "created_hint": "The token is shown only once. Run this command in a terminal to add the server to Claude Code:",

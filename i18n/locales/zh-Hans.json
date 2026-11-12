@@ -1589,8 +1589,9 @@
       "deleted": "地址已删除"
     },
     "mcp": {
-      "title": "草稿 MCP",
-      "intro": "让 Claude Code 这类 AI 客户端通过 MCP 帮你写保存在 CDCat 上的草稿：新建专辑、艺术家、条目和系列，或修改站内已有的。AI 只能写草稿，提交要你在编辑器里检查后自己来。令牌只能连草稿 MCP，不能访问其他接口。",
+      "title": "MCP",
+      "intro": "让 Claude Code 这类 AI 客户端通过 MCP 帮你写保存在 CDCat 上的草稿：新建专辑、艺术家、条目和系列，或修改站内已有的；能审核采集候选的账号，还能让它按官网核对候选的草稿。AI 只能写草稿，提交和审核要你检查后自己来。一个令牌就能用全部功能，但只能连 MCP，不能访问其他接口。",
+      "address": "服务器地址",
       "name_placeholder": "用途（例如：Claude Code）",
       "create": "新建令牌",
       "created_hint": "令牌只显示这一次。在终端里运行这条命令，把服务器加进 Claude Code：",
