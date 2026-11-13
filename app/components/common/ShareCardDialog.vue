@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="styles.length > 1" class="grid grid-cols-2 gap-3 sm:grid-cols-4" role="radiogroup" :aria-label="title">
+      <div v-if="styles.length > 1" class="grid gap-3" :class="styles.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'" role="radiogroup" :aria-label="title">
         <button
           v-for="style in styles"
           :key="style"
@@ -46,7 +46,7 @@
     </div>
 
     <template #footer>
-      <span class="mr-auto text-xs text-meta">{{ $t('share_card.format') }}</span>
+      <span class="mr-auto text-xs text-meta">{{ $t('share_card.format', { size }) }}</span>
       <UiButton @click="open = false">{{ $t('common.cancel') }}</UiButton>
       <UiButton
         variant="primary"
@@ -71,7 +71,9 @@ const props = withDefaults(defineProps<{
   styles?: string[]
   /** Selected when the dialog opens: the link preview's style. */
   previewStyle?: string
-}>(), { styles: () => [], previewStyle: undefined })
+  /** The downloads' size: album cards are drawn at 1800×945, artist cards (all drawn ahead of time) at 1200×630. */
+  size?: string
+}>(), { styles: () => [], previewStyle: undefined, size: '1800×945' })
 
 const open = defineModel<boolean>({ required: true })
 

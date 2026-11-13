@@ -607,7 +607,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                 attributes: [],
                 images: [{ $more: 'ArtistImage' }],
                 relations: [{ artist: { id: 1404, name: '雨宮ルカ', image_url: null, type: 'person' }, relation_type: 'has_member', ended: false, note: null }],
-                share_card_url: null,
+                share_card_url: 'https://img.cdcat.net/share-cards/artists/0/352.jpg?v=1761400000',
                 version: 3,
                 is_pending: false,
                 pending_revision: null,

@@ -44,6 +44,8 @@
               >
                 {{ isFavorited ? $t('artists.detail.following') : $t('artists.detail.follow') }}
               </UiButton>
+              <!-- The share card: look at it, download it in one of three styles -->
+              <UiButton size="sm" :icon="ImageDown" :label="$t('share_card.button')" @click="shareOpen = true" />
               <UiButton :to="`/artists/${artist.id}/versions`" size="sm" :icon="History" :label="$t('versions.title')" />
               <UiButton :to="`/contribute/artist/${artist.id}`" size="sm" :icon="Edit" :label="$t('common.edit')" />
             </div>
@@ -190,6 +192,15 @@
         <ShoutBox :id="artist.id" resource="artists" />
         <ArticleRelatedArticles :id="artist.id" type="artist" />
       </template>
+
+      <CommonShareCardDialog
+        v-model="shareOpen"
+        :endpoint="`/v1/artists/${artist.id}/share-cards`"
+        :title="$t('share_card.title')"
+        :styles="SHARE_CARD_STYLES"
+        preview-style="wall"
+        size="1200×630"
+      />
     </main>
     <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
       <SkeletonCatalogDetail hero="none" :sections="2" :aside="false" />
@@ -201,7 +212,7 @@
 import type { ArtistCreditedAlbum, ArtistDetail, ArtistImage } from '~/types/artist'
 import type { AlbumSimple } from '~/types/album'
 import type { CatalogImage } from '~/types/catalog'
-import { Disc3, Edit, History, Library, User, UserCheck, UserPlus, Users } from '@lucide/vue'
+import { Disc3, Edit, History, ImageDown, Library, User, UserCheck, UserPlus, Users } from '@lucide/vue'
 import { ARTIST_RELATIONS } from '~/types/artist'
 import { pageHeroConfig } from '~/config/pageHero'
 import { artistLdType, namedLd } from '~/utils/structuredData'
@@ -313,6 +324,10 @@ const selectView = (value: 'releases' | 'credits') => {
   if (value === view.value) return
   router.push({ query: { ...route.query, view: value === 'credits' ? 'credits' : undefined, role: undefined, page: undefined } })
 }
+
+/** The share card's download styles in the order shown: B 唱片墙 (the link preview, selected first), C 通行证, D 封底. */
+const SHARE_CARD_STYLES = ['wall', 'pass', 'back']
+const shareOpen = ref(false)
 
 const isFavorited = computed(() => artist.value?.is_favorited ?? false)
 const isToggling = ref(false)

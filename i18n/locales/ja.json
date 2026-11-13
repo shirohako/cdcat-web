@@ -3726,13 +3726,16 @@
       "catalog": "目録カード",
       "disc": "ディスク",
       "color": "カラー",
-      "obi": "帯"
+      "obi": "帯",
+      "wall": "ジャケットウォール",
+      "pass": "パス",
+      "back": "バックカバー"
     },
     "preview_style": "リンクプレビューに使用",
     "drawing": "作成中…",
     "drawing_hint": "はじめて書き出すスタイルは数秒かかります",
     "failed": "作成できませんでした。しばらくしてからもう一度お試しください",
     "download": "保存",
-    "format": "JPEG · 1800×945"
+    "format": "JPEG · {size}"
   }
 }

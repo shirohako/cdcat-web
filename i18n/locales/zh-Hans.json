@@ -3726,13 +3726,16 @@
       "catalog": "目录卡",
       "disc": "出盘",
       "color": "色块",
-      "obi": "侧标"
+      "obi": "侧标",
+      "wall": "唱片墙",
+      "pass": "通行证",
+      "back": "封底"
     },
     "preview_style": "链接预览用的",
     "drawing": "正在生成…",
     "drawing_hint": "第一次导出一种样式要等几秒",
     "failed": "生成失败，请稍后再试",
     "download": "下载",
-    "format": "JPEG · 1800×945"
+    "format": "JPEG · {size}"
   }
 }

@@ -3726,13 +3726,16 @@
       "catalog": "카탈로그 카드",
       "disc": "디스크",
       "color": "컬러 블록",
-      "obi": "오비"
+      "obi": "오비",
+      "wall": "커버 월",
+      "pass": "패스",
+      "back": "뒷면"
     },
     "preview_style": "링크 미리보기에 사용",
     "drawing": "카드를 만드는 중…",
     "drawing_hint": "처음 내보내는 스타일은 몇 초 걸립니다",
     "failed": "카드를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
     "download": "다운로드",
-    "format": "JPEG · 1800×945"
+    "format": "JPEG · {size}"
   }
 }

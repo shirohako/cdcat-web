@@ -3726,13 +3726,16 @@
       "catalog": "Catalog card",
       "disc": "Disc",
       "color": "Color block",
-      "obi": "Obi"
+      "obi": "Obi",
+      "wall": "Cover wall",
+      "pass": "Pass",
+      "back": "Back cover"
     },
     "preview_style": "Used for link previews",
     "drawing": "Drawing the card…",
     "drawing_hint": "A style takes a few seconds the first time",
     "failed": "The card could not be drawn. Try again in a moment.",
     "download": "Download",
-    "format": "JPEG · 1800×945"
+    "format": "JPEG · {size}"
   }
 }

@@ -3726,13 +3726,16 @@
       "catalog": "目錄卡",
       "disc": "出盤",
       "color": "色塊",
-      "obi": "側標"
+      "obi": "側標",
+      "wall": "唱片牆",
+      "pass": "通行證",
+      "back": "封底"
     },
     "preview_style": "連結預覽用的",
     "drawing": "正在產生…",
     "drawing_hint": "第一次匯出一種樣式要等幾秒",
     "failed": "產生失敗，請稍後再試",
     "download": "下載",
-    "format": "JPEG · 1800×945"
+    "format": "JPEG · {size}"
   }
 }
