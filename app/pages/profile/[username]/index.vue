@@ -34,6 +34,7 @@
 
             <!-- Right column -->
             <div class="space-y-6">
+              <ProfileShareCard :username="profile.username" :card-url="profile.share_card_url" />
               <ProfileStats :stats="profile.tracking" @select-status="onSelectTrackingStatus" />
             </div>
           </div>
@@ -66,10 +67,13 @@ const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`
 
 // --------------- SEO ---------------
 
-useSeoMeta({
+usePageSeo({
   title: () => profile.value ? profile.value.nickname || profile.value.username : '',
+  // Shared links show the member card; before it is drawn, the avatar.
+  card: () => profile.value?.share_card_url,
+  image: () => profile.value?.avatar_url,
   // Profiles stay out of search results; their links are still followed.
-  robots: 'noindex, follow',
+  noindex: true,
 })
 
 definePageMeta({

@@ -53,10 +53,14 @@
               <Disc3 :size="56" />
             </span>
           </button>
-          <UiButton v-bind="likeButton" block class="max-md:hidden" @click="toggleLike">
-            <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
-            {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
-          </UiButton>
+          <!-- 喜欢, and beside it the share card (look at it, download it in one of four styles) -->
+          <div class="flex gap-2 max-md:hidden">
+            <UiButton v-bind="likeButton" class="flex-1" @click="toggleLike">
+              <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
+              {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
+            </UiButton>
+            <UiButton :icon="ImageDown" :label="$t('share_card.button')" class="shrink-0" @click="shareOpen = true" />
+          </div>
         </div>
 
         <div class="@container w-full min-w-0 flex-1 pt-5 text-center md:pt-6 md:text-left">
@@ -126,10 +130,13 @@
 
           <!-- Phones: the like button under the title and byline, where a music app keeps its actions, rather than
                under the cover, a screen away from the rest -->
-          <UiButton v-bind="likeButton" class="mt-3 px-4 md:hidden" @click="toggleLike">
-            <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
-            {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
-          </UiButton>
+          <div class="mt-3 flex justify-center gap-2 md:hidden">
+            <UiButton v-bind="likeButton" class="px-4" @click="toggleLike">
+              <Heart class="size-4 shrink-0" :fill="isFavorited ? 'currentColor' : 'none'" />
+              {{ $t(isFavorited ? 'content_display.liked' : 'content_display.like') }}
+            </UiButton>
+            <UiButton :icon="ImageDown" :label="$t('share_card.button')" @click="shareOpen = true" />
+          </div>
 
           <!-- Catalog number, release date and event as grey tags like the links card's; the event's lists its albums. -->
           <div v-if="hasFacts" class="mt-4 flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
@@ -180,6 +187,14 @@
         </div>
       </div>
     </div>
+
+    <CommonShareCardDialog
+      v-model="shareOpen"
+      :endpoint="`/v1/albums/${album.id}/share-cards`"
+      :title="$t('share_card.title')"
+      :styles="SHARE_CARD_STYLES"
+      preview-style="catalog"
+    />
   </div>
 </template>
 
@@ -188,15 +203,20 @@ import { ALBUM_CATEGORY_ICONS, ALBUM_TYPE_ICONS, DISC_FORMAT_ICONS, type Album }
 import { getStreamingProvider } from '~/utils/streamingProviders'
 import { coverRatio } from '~/utils/imageCrop'
 import { NuxtLink } from '#components'
-import { Building2, Calendar, Disc3, Hash, Heart, Ticket, UserRound, UsersRound } from '@lucide/vue'
+import { Building2, Calendar, Disc3, Hash, Heart, ImageDown, Ticket, UserRound, UsersRound } from '@lucide/vue'
 
 /** The cover's box: --cover-w wide, or narrower for a cover more than 1.5 times as tall as wide; its own shape (--cover-r). */
 const COVER_BOX = 'aspect-(--cover-r) w-[min(var(--cover-w),calc(var(--cover-w)*1.5*var(--cover-r)))]'
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
 const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-13 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
 
+/** The four share card styles, A–D; C (catalog) is also the page's link preview. */
+const SHARE_CARD_STYLES = ['disc', 'color', 'catalog', 'obi']
+
 const props = defineProps<{ album: Album }>()
 const emit = defineEmits<{ 'open-cover': [], favorited: [value: boolean] }>()
+
+const shareOpen = ref(false)
 
 const { t, te } = useI18n()
 const { isAuthenticated } = useAuth()

@@ -3716,5 +3716,23 @@
       "sheet": "Sheet",
       "repair": "Under repair"
     }
+  },
+  "share_card": {
+    "button": "Share card",
+    "title": "Export share card",
+    "title_profile": "Download member card",
+    "description": "The card shown when the link is shared, also as an image to download",
+    "styles": {
+      "catalog": "Catalog card",
+      "disc": "Disc",
+      "color": "Color block",
+      "obi": "Obi"
+    },
+    "preview_style": "Used for link previews",
+    "drawing": "Drawing the card…",
+    "drawing_hint": "A style takes a few seconds the first time",
+    "failed": "The card could not be drawn. Try again in a moment.",
+    "download": "Download",
+    "format": "JPEG · 1800×945"
   }
 }

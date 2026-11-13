@@ -3716,5 +3716,23 @@
       "sheet": "張次",
       "repair": "待修"
     }
+  },
+  "share_card": {
+    "button": "分享卡片",
+    "title": "匯出分享卡片",
+    "title_profile": "下載會員卡",
+    "description": "貼連結時顯示的卡片，也可以下載成圖片",
+    "styles": {
+      "catalog": "目錄卡",
+      "disc": "出盤",
+      "color": "色塊",
+      "obi": "側標"
+    },
+    "preview_style": "連結預覽用的",
+    "drawing": "正在產生…",
+    "drawing_hint": "第一次匯出一種樣式要等幾秒",
+    "failed": "產生失敗，請稍後再試",
+    "download": "下載",
+    "format": "JPEG · 1800×945"
   }
 }

@@ -3716,5 +3716,23 @@
       "sheet": "매수",
       "repair": "수리 중"
     }
+  },
+  "share_card": {
+    "button": "공유 카드",
+    "title": "공유 카드 내보내기",
+    "title_profile": "멤버 카드 다운로드",
+    "description": "링크를 공유할 때 보이는 카드입니다. 이미지로 내려받을 수도 있습니다",
+    "styles": {
+      "catalog": "카탈로그 카드",
+      "disc": "디스크",
+      "color": "컬러 블록",
+      "obi": "오비"
+    },
+    "preview_style": "링크 미리보기에 사용",
+    "drawing": "카드를 만드는 중…",
+    "drawing_hint": "처음 내보내는 스타일은 몇 초 걸립니다",
+    "failed": "카드를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "download": "다운로드",
+    "format": "JPEG · 1800×945"
   }
 }

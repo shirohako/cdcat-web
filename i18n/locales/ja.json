@@ -3716,5 +3716,23 @@
       "sheet": "枚数",
       "repair": "修理中"
     }
+  },
+  "share_card": {
+    "button": "シェアカード",
+    "title": "シェアカードを書き出す",
+    "title_profile": "会員カードを保存",
+    "description": "リンクを貼ったときに表示されるカードです。画像として保存もできます",
+    "styles": {
+      "catalog": "目録カード",
+      "disc": "ディスク",
+      "color": "カラー",
+      "obi": "帯"
+    },
+    "preview_style": "リンクプレビューに使用",
+    "drawing": "作成中…",
+    "drawing_hint": "はじめて書き出すスタイルは数秒かかります",
+    "failed": "作成できませんでした。しばらくしてからもう一度お試しください",
+    "download": "保存",
+    "format": "JPEG · 1800×945"
   }
 }

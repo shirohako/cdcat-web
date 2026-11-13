@@ -19,6 +19,8 @@ export interface PublicProfile {
   contributions_count: number
   favorite_albums: ProfileFavoriteAlbum[]
   favorite_artists: ProfileFavoriteArtist[]
+  /** The member card (og:image, 1200×630), once the backend has drawn it. */
+  share_card_url?: string | null
 }
 
 export interface ProfileFavorites {
