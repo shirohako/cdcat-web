@@ -23,6 +23,10 @@ export default defineNuxtConfig({
       indexable: false,
       // The `content` of Naver Search Advisor's ownership tag; empty leaves the tag out.
       naverSiteVerification: '',
+      // Umami page statistics (useAppHead): set NUXT_PUBLIC_UMAMI_WEBSITE_ID in production; empty leaves the script
+      // out, so dev visits stay out of the numbers.
+      umamiScriptUrl: 'https://aurora.cdcat.net/script.js',
+      umamiWebsiteId: '',
     }
   },
 

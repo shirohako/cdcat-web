@@ -69,4 +69,12 @@ export function useAppHead() {
   // Naver Search Advisor proves ownership of the site by this tag (NUXT_PUBLIC_NAVER_SITE_VERIFICATION).
   const naver = String(config.public.naverSiteVerification || '')
   if (naver) useHead({ meta: [{ name: 'naver-site-verification', content: naver }] })
+
+  // Umami counts visits, and follows client-side page switches by itself (NUXT_PUBLIC_UMAMI_WEBSITE_ID). The key keeps
+  // one copy when error.vue sets the head as well.
+  const umamiId = String(config.public.umamiWebsiteId || '')
+  const umamiSrc = String(config.public.umamiScriptUrl || '')
+  if (umamiId && umamiSrc) {
+    useHead({ script: [{ src: umamiSrc, defer: true, 'data-website-id': umamiId, key: 'umami' }] })
+  }
 }
