@@ -10,10 +10,11 @@
         alt=""
         class="absolute inset-0 size-full object-cover"
       >
+      <!-- The cover's 600px version: under the blur it looks the same as the large one, and it is a third of the bytes. -->
       <img
         v-else-if="coverUrl"
         v-img-fade
-        :src="coverUrl"
+        :src="album.cover?.thumbnail_url || coverUrl"
         alt=""
         class="absolute inset-0 size-full scale-110 object-cover blur-[6px] saturate-125"
       >
@@ -42,6 +43,10 @@
             <UiImage
               v-if="coverUrl"
               :src="coverUrl"
+              :srcset="coverSrcset"
+              :sizes="COVER_SIZES"
+              :width="album.cover?.width"
+              :height="album.cover?.height"
               :alt="album.title"
               :placeholder="thumbnailUrl"
               reveal="develop"
@@ -207,6 +212,8 @@ import { Building2, Calendar, Disc3, Hash, Heart, ImageDown, Ticket, UserRound, 
 
 /** The cover's box: --cover-w wide, or narrower for a cover more than 1.5 times as tall as wide; its own shape (--cover-r). */
 const COVER_BOX = 'aspect-(--cover-r) w-[min(var(--cover-w),calc(var(--cover-w)*1.5*var(--cover-r)))]'
+/** How wide the cover shows at each screen width (--cover-w on its button): what the browser picks a size by. */
+const COVER_SIZES = '(min-width: 1536px) 15rem, (min-width: 1280px) 14rem, (min-width: 1024px) 13rem, (min-width: 768px) 12rem, (max-width: 387px) 62vw, 15rem'
 /** Catalog number, date and event: the grey and size of the page's other tags (links card, credits). */
 const FACT_TAG = 'inline-flex h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md bg-black/[0.05] px-2.5 text-13 font-medium text-title transition-colors duration-150 dark:bg-white/[0.08]'
 
@@ -270,6 +277,17 @@ const bylineTags = computed(() => {
   ].map(tag => ({ ...tag, image: tag.id ? images.get(tag.id) ?? null : null }))
 })
 const coverUrl = computed(() => props.album.cover?.medium_url || props.album.image_url)
+/**
+ * The cover's two sizes with their real widths. It shows at 240px at most, so the 600px one is sharp on every
+ * screen up to twice the pixel density; only denser phones need the 1200px one. Both are bounded on their longer
+ * side and are never larger than the original.
+ */
+const coverSrcset = computed(() => {
+  const image = props.album.cover
+  if (!image?.width || !image.height || !image.thumbnail_url || image.thumbnail_url === image.medium_url) return undefined
+  const widthAt = (bound: number) => Math.round(image.width * Math.min(1, bound / Math.max(image.width, image.height)))
+  return `${image.thumbnail_url} ${widthAt(600)}w, ${image.medium_url} ${widthAt(1200)}w`
+})
 /** The cover's shape, width / height: 1 for a square one, as anywhere else; its own for one kept at another shape. */
 const coverShape = computed(() => coverRatio(props.album.cover?.width, props.album.cover?.height))
 /** The cover's 600px variant, small enough to arrive first: the hero cover's blurred stand-in (UiImage placeholder). */

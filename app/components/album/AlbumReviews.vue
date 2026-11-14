@@ -16,7 +16,7 @@
           <span v-if="mine.rating" class="inline-flex items-center rounded-md px-1.5 py-0.5 text-11 font-semibold leading-4" :class="REVIEW_LEVEL_COLORS[mine.rating].solid">{{ $t(reviewRatingKey(mine.rating)) }}</span>
           <span v-if="mine.is_hidden" class="inline-flex items-center rounded-md bg-black/[0.05] px-1.5 py-0.5 text-11 leading-4 text-meta dark:bg-white/[0.08]">{{ $t('reviews.hidden') }}</span>
         </p>
-        <RichContent :content="mine.content" format="markdown" class="text-sm" />
+        <LazyRichContent :content="mine.content" format="markdown" class="text-sm" />
         <div class="mt-1.5 flex gap-1.5">
           <UiButton size="xs" @click="openEditor()">{{ $t('common.edit') }}</UiButton>
           <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
@@ -50,7 +50,7 @@
           </p>
 
           <div class="relative mt-1" :class="{ 'max-h-56 overflow-hidden': isLong(review) && !expanded.has(review.id) }">
-            <RichContent :content="review.content" format="markdown" class="text-sm" />
+            <LazyRichContent :content="review.content" format="markdown" class="text-sm" />
             <div v-if="isLong(review) && !expanded.has(review.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card" />
           </div>
           <UiButton v-if="isLong(review)" size="xs" class="mt-1" @click="toggleExpanded(review.id)">
@@ -95,7 +95,8 @@
     </div>
   </CatalogSection>
 
-  <ReviewEditorModal
+  <!-- Lazy: the dialog brings the Markdown editor with it, a large download only someone writing a review needs. -->
+  <LazyReviewEditorModal
     v-if="editorOpen"
     :album-id="albumId"
     :review="mine"
@@ -155,24 +156,34 @@ const previewing = useContentPreview()
 // True until the first page is in, so the empty note doesn't flash first.
 const pending = ref(!previewing)
 
+const fetchPage = (at: number) => $api<ReviewPage>(`/v1/albums/${props.albumId}/reviews`, { params: { page: at, sort: sort.value } })
+const apply = (result: ReviewPage, at: number) => {
+  reviews.value = at === 1 ? result.reviews : [...reviews.value, ...result.reviews]
+  mine.value = result.mine
+  total.value = result.pagination.total
+  page.value = result.pagination.current_page
+  lastPage.value = result.pagination.last_page
+}
 const load = async (at = 1) => {
   if (previewing) return
   pending.value = true
   try {
-    const result = await $api<ReviewPage>(`/v1/albums/${props.albumId}/reviews`, { params: { page: at, sort: sort.value } })
-    reviews.value = at === 1 ? result.reviews : [...reviews.value, ...result.reviews]
-    mine.value = result.mine
-    total.value = result.pagination.total
-    page.value = result.pagination.current_page
-    lastPage.value = result.pagination.last_page
+    apply(await fetchPage(at), at)
   } finally {
     pending.value = false
   }
 }
 watch(sort, () => load())
-// On client-side navigation start at once; after a server render, wait until hydration is done.
-if (import.meta.client && !useNuxtApp().isHydrating) load()
-else onMounted(() => load())
+// The first page comes with the server render, so the reviews are in the HTML search engines read (docs/seo in the
+// API repo), and the browser takes it from the payload rather than asking again. After a navigation in the browser it
+// loads at once, without holding the page back.
+const first = useAsyncData(`album:${props.albumId}:reviews`, () => (previewing ? Promise.resolve(null) : fetchPage(1)), { deep: false })
+const applyFirst = () => {
+  if (first.data.value) apply(first.data.value, 1)
+  if (first.data.value || first.error.value) pending.value = false
+}
+if (import.meta.server) onServerPrefetch(async () => { await first; applyFirst() })
+else watch([first.data, first.error], applyFirst, { immediate: true })
 
 const expanded = ref(new Set<number>())
 const isLong = (review: AlbumReview) => review.content.length > 600 || review.content.split('\n').length > 12
@@ -183,6 +194,14 @@ const toggleExpanded = (id: number) => {
 }
 
 const editorOpen = ref(false)
+// The dialog is a large download (the Markdown editor), so it loads on its first opening. For a signed-in reader it is
+// fetched ahead of that, in an idle moment, so the dialog opens at once; a visitor never downloads it.
+onMounted(() => {
+  if (!isAuthenticated.value) return
+  const warm = () => { void import('~/components/review/ReviewEditorModal.vue') }
+  if ('requestIdleCallback' in window) window.requestIdleCallback(warm)
+  else setTimeout(warm, 2000)
+})
 /** Opens the editor on the viewer's review, or sends a guest to log in. */
 const openEditor = () => {
   if (previewing) return

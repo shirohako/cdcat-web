@@ -32,6 +32,13 @@
         <UiButton v-if="tocDiscs.length" size="xs" :icon="Fingerprint" @click="idsOpen = true">{{ $t('album.toc.button') }}</UiButton>
       </div>
 
+      <!-- The album for language models (docs/seo in the API repo): its Markdown on the clipboard, or at its own
+           address in a new tab. A plain link, so the server answers with the text. -->
+      <div v-if="!preview" class="flex flex-wrap items-center gap-2">
+        <UiButton size="xs" :icon="Copy" @click="copyMarkdown(album)">{{ $t('album.export.llm_copy') }}</UiButton>
+        <UiButton size="xs" :icon="FileCode" :href="`/albums/${album.id}.md`" target="_blank">{{ $t('album.export.view_markdown') }}</UiButton>
+      </div>
+
       <!-- A CD nobody has read a TOC from yet: a quiet way into the editor's tracklist, where TOCs are pasted. -->
       <NuxtLink v-if="!tocDiscs.length && hasCd" :to="tocTo" class="group inline-flex items-center gap-0.5 text-xs text-meta transition-colors hover:text-primary">
         {{ $t('album.toc.missing') }}
@@ -47,7 +54,7 @@
 import type { Component } from 'vue'
 import type { Album } from '~/types/album'
 import type { AlbumExportFormat } from '~/utils/albumExport'
-import { Braces, ChevronRight, Download, FileSpreadsheet, FileText, Fingerprint, History, PenLine, SquarePen } from '@lucide/vue'
+import { Braces, ChevronRight, Copy, Download, FileCode, FileSpreadsheet, FileText, Fingerprint, History, PenLine, SquarePen } from '@lucide/vue'
 
 /**
  * The side column's last card: the current version, when it was made, the ways to change the album, the export to a
@@ -58,7 +65,7 @@ const props = defineProps<{ album: Album, preview?: boolean }>()
 const { isAuthenticated } = useAuth()
 const { formatDate } = useLocaleFormatting()
 const { exact } = useRelativeTime()
-const { exportAlbum } = useAlbumExport()
+const { exportAlbum, copyMarkdown } = useAlbumExport()
 
 const exports: Array<{ format: AlbumExportFormat, icon: Component }> = [
   { format: 'csv', icon: FileSpreadsheet },

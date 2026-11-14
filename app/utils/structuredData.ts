@@ -66,10 +66,11 @@ export function breadcrumbLd(items: LdRef[]) {
   })
 }
 
-export function websiteLd(site: { name: string, url: string, logo: string, description?: string, inLanguage?: string }) {
+/** The site and who runs it; `sameAs` are the project's pages elsewhere (its source repository). */
+export function websiteLd(site: { name: string, url: string, logo: string, description?: string, inLanguage?: string, sameAs?: string[] }) {
   return [
     compactLd({ '@context': 'https://schema.org', '@type': 'WebSite', 'name': site.name, 'url': site.url, 'description': site.description, 'inLanguage': site.inLanguage }),
-    compactLd({ '@context': 'https://schema.org', '@type': 'Organization', 'name': site.name, 'url': site.url, 'logo': site.logo }),
+    compactLd({ '@context': 'https://schema.org', '@type': 'Organization', 'name': site.name, 'url': site.url, 'logo': site.logo, 'sameAs': site.sameAs }),
   ]
 }
 
@@ -113,7 +114,26 @@ export function musicAlbumLd(album: AlbumLdInput) {
   })
 }
 
-export function musicRecordingLd(track: { name: string, alternateNames: Array<string | null | undefined>, url: string, duration?: number | null, isrc?: string | null, album?: LdRef | null, artists: Array<LdRef & { type?: string | null }> }) {
+type LdArtist = LdRef & { type?: string | null }
+
+/**
+ * A track. `composers`, `lyricists` and `lyricsLanguage` describe the song it is a recording of (MusicComposition):
+ * who wrote it, and the language of its lyrics when the page has them.
+ */
+export function musicRecordingLd(track: {
+  name: string
+  alternateNames: Array<string | null | undefined>
+  url: string
+  duration?: number | null
+  isrc?: string | null
+  album?: LdRef | null
+  artists: LdArtist[]
+  composers?: LdArtist[]
+  lyricists?: LdArtist[]
+  lyricsLanguage?: string | null
+}) {
+  const people = (list: LdArtist[] | undefined) => (list ?? []).map(artist => ref(artistLdType(artist.type), artist))
+  const composition = compactLd({ composer: people(track.composers), lyricist: people(track.lyricists), inLanguage: track.lyricsLanguage })
   return compactLd({
     '@context': 'https://schema.org',
     '@type': 'MusicRecording',
@@ -123,7 +143,8 @@ export function musicRecordingLd(track: { name: string, alternateNames: Array<st
     'duration': ldDuration(track.duration),
     'isrcCode': track.isrc,
     'inAlbum': ref('MusicAlbum', track.album),
-    'byArtist': track.artists.map(artist => ref(artistLdType(artist.type), artist)),
+    'byArtist': people(track.artists),
+    'recordingOf': Object.keys(composition).length ? { '@type': 'MusicComposition', 'name': track.name, ...composition } : undefined,
   })
 }
 
@@ -143,7 +164,22 @@ export function namedLd(type: string, item: { name: string, alternateNames: Arra
   })
 }
 
-export function eventLd(event: { name: string, url: string, startDate?: string | null, endDate?: string | null, venue?: string | null, address?: string | null, image?: string | null, description?: string, series?: LdRef | null }) {
+/**
+ * An event, with the fields Google's event results ask for: where and when, that it takes place as scheduled, and
+ * who holds it (`organizer`, the series' name and the event's website).
+ */
+export function eventLd(event: {
+  name: string
+  url: string
+  startDate?: string | null
+  endDate?: string | null
+  venue?: string | null
+  address?: string | null
+  image?: string | null
+  description?: string
+  series?: LdRef | null
+  organizer?: LdRef | null
+}) {
   return compactLd({
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -151,10 +187,37 @@ export function eventLd(event: { name: string, url: string, startDate?: string |
     'url': event.url,
     'startDate': event.startDate,
     'endDate': event.endDate,
+    'eventStatus': 'https://schema.org/EventScheduled',
     'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
     'location': event.venue || event.address ? { '@type': 'Place', 'name': event.venue || event.address, 'address': event.address } : undefined,
     'image': event.image,
     'description': event.description,
+    'organizer': ref('Organization', event.organizer),
     'superEvent': ref('EventSeries', event.series),
+  })
+}
+
+/**
+ * A member's profile (Google's ProfilePage): who they are and how much they have written on the site (`posts`:
+ * topics, replies and reviews together).
+ */
+export function profilePageLd(profile: { name: string, username: string, url: string, image?: string | null, description?: string, joined?: string | null, posts?: number }) {
+  return compactLd({
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    'url': profile.url,
+    'dateCreated': profile.joined,
+    'mainEntity': {
+      '@type': 'Person',
+      'name': profile.name,
+      'alternateName': profile.username !== profile.name ? profile.username : undefined,
+      'identifier': profile.username,
+      'url': profile.url,
+      'image': profile.image,
+      'description': profile.description,
+      'agentInteractionStatistic': profile.posts
+        ? { '@type': 'InteractionCounter', 'interactionType': 'https://schema.org/WriteAction', 'userInteractionCount': profile.posts }
+        : undefined,
+    },
   })
 }

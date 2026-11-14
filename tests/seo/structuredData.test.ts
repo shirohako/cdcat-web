@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { artistLdType, breadcrumbLd, compactLd, entryLdType, eventLd, ldDate, ldDuration, musicAlbumLd } from '../../app/utils/structuredData'
+import { artistLdType, breadcrumbLd, compactLd, entryLdType, eventLd, ldDate, ldDuration, musicAlbumLd, musicRecordingLd, profilePageLd, websiteLd } from '../../app/utils/structuredData'
 
 describe('helpers', () => {
   it('drops empty values at every depth but keeps false and 0', () => {
@@ -83,6 +83,7 @@ describe('eventLd and breadcrumbLd', () => {
       'name': 'M3-58',
       'url': 'https://cdcat.net/events/5',
       'startDate': '2026-10-25',
+      'eventStatus': 'https://schema.org/EventScheduled',
       'eventAttendanceMode': 'https://schema.org/OfflineEventAttendanceMode',
       'location': { '@type': 'Place', 'name': '東京流通センター' },
       'superEvent': { '@type': 'EventSeries', 'name': 'M3', 'url': 'https://cdcat.net/event-series/1' },
@@ -95,5 +96,66 @@ describe('eventLd and breadcrumbLd', () => {
       { '@type': 'ListItem', 'position': 1, 'name': 'CDCat', 'item': 'https://cdcat.net/' },
       { '@type': 'ListItem', 'position': 2, 'name': 'アルバム', 'item': 'https://cdcat.net/albums' },
     ])
+  })
+})
+
+describe('musicRecordingLd', () => {
+  const base = { name: 'Yeren', alternateNames: [], url: 'https://cdcat.net/tracks/982', artists: [{ name: 'Sourai', url: 'https://cdcat.net/artists/5', type: 'circle' }] }
+
+  it('describes the song behind the recording when its writers or lyrics language are known', () => {
+    const ld = musicRecordingLd({ ...base, composers: [{ name: 'Kino', type: 'person' }], lyricists: [{ name: 'Himemiya', type: 'person' }], lyricsLanguage: 'ja' }) as Record<string, unknown>
+    expect(ld.recordingOf).toEqual({
+      '@type': 'MusicComposition',
+      'name': 'Yeren',
+      'composer': [{ '@type': 'Person', 'name': 'Kino' }],
+      'lyricist': [{ '@type': 'Person', 'name': 'Himemiya' }],
+      'inLanguage': 'ja',
+    })
+    expect(ld.byArtist).toEqual([{ '@type': 'MusicGroup', 'name': 'Sourai', 'url': 'https://cdcat.net/artists/5' }])
+  })
+
+  it('leaves the song out when nothing is known of it', () => {
+    expect(musicRecordingLd(base)).not.toHaveProperty('recordingOf')
+  })
+})
+
+describe('eventLd fields for event results', () => {
+  it('says the event takes place as scheduled and who holds it', () => {
+    const ld = eventLd({ name: 'M3-2026 Autumn', url: 'https://cdcat.net/events/58', startDate: '2026-10-25', organizer: { name: 'M3', url: 'https://www.m3net.jp/' } }) as Record<string, unknown>
+    expect(ld.eventStatus).toBe('https://schema.org/EventScheduled')
+    expect(ld.organizer).toEqual({ '@type': 'Organization', 'name': 'M3', 'url': 'https://www.m3net.jp/' })
+    expect(eventLd({ name: 'x', url: 'https://cdcat.net/events/1' })).not.toHaveProperty('organizer')
+  })
+})
+
+describe('profilePageLd', () => {
+  it('describes the member as a person, with what they have written', () => {
+    expect(profilePageLd({ name: 'SAkarin', username: 'sakarin_', url: 'https://cdcat.net/profile/sakarin_', joined: '2026-10-01T00:00:00Z', posts: 12 })).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      'url': 'https://cdcat.net/profile/sakarin_',
+      'dateCreated': '2026-10-01T00:00:00Z',
+      'mainEntity': {
+        '@type': 'Person',
+        'name': 'SAkarin',
+        'alternateName': 'sakarin_',
+        'identifier': 'sakarin_',
+        'url': 'https://cdcat.net/profile/sakarin_',
+        'agentInteractionStatistic': { '@type': 'InteractionCounter', 'interactionType': 'https://schema.org/WriteAction', 'userInteractionCount': 12 },
+      },
+    })
+  })
+
+  it('leaves out a handle that is the name, and a count of nothing', () => {
+    const person = (profilePageLd({ name: 'ame', username: 'ame', url: 'https://cdcat.net/profile/ame', posts: 0 }) as { mainEntity: Record<string, unknown> }).mainEntity
+    expect(person).not.toHaveProperty('alternateName')
+    expect(person).not.toHaveProperty('agentInteractionStatistic')
+  })
+})
+
+describe('websiteLd', () => {
+  it('lists the pages the project has elsewhere on the organisation', () => {
+    const [, organization] = websiteLd({ name: 'CDCat', url: 'https://cdcat.net/', logo: 'https://cdcat.net/icon.png', sameAs: ['https://github.com/shirohako/cdcat-web'] })
+    expect(organization).toMatchObject({ '@type': 'Organization', 'sameAs': ['https://github.com/shirohako/cdcat-web'] })
   })
 })

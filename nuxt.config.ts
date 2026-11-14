@@ -14,12 +14,22 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    // IndexNow (server/tasks/indexnow.ts): set NUXT_INDEXNOW_KEY in production; empty turns the task off.
+    indexnowKey: '',
     public: {
       baseUrl: process.env.NUXT_PUBLIC_BASE_URL,
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL || '',
       // Search engines may index the site only where NUXT_PUBLIC_INDEXABLE=true (production); see docs/seo in the API repo.
       indexable: false,
+      // The `content` of Naver Search Advisor's ownership tag; empty leaves the tag out.
+      naverSiteVerification: '',
     }
+  },
+
+  // Hourly, a few minutes past: tell IndexNow which pages changed (server/tasks/indexnow.ts).
+  nitro: {
+    experimental: { tasks: true },
+    scheduledTasks: { '7 * * * *': ['indexnow'] },
   },
 
   modules: [
@@ -36,6 +46,14 @@ export default defineNuxtConfig({
     '/forgot-password': { redirect: { to: '/auth/forgot-password', statusCode: 301 } },
     // /docs has one document so far; a temporary redirect, so it can become an index later.
     '/docs': { redirect: { to: '/docs/api', statusCode: 302 } },
+    // Addresses from before sections were renamed (docs/seo in the API repo): the guides were under /help, franchises
+    // were /series and event series were /events/series.
+    '/help/design': { redirect: { to: '/docs/design', statusCode: 301 } },
+    '/help/editor': { redirect: { to: '/docs/editor', statusCode: 301 } },
+    '/help/markdown': { redirect: { to: '/docs/markdown', statusCode: 301 } },
+    '/series': { redirect: { to: '/franchises', statusCode: 301 } },
+    '/series/**': { redirect: { to: '/franchises/**', statusCode: 301 } },
+    '/events/series/**': { redirect: { to: '/event-series/**', statusCode: 301 } },
   },
 
   // The component showcase (app/dev/UiShowcase.vue) lives outside app/pages and is routed only under `nuxt dev`,
@@ -138,10 +156,33 @@ export default defineNuxtConfig({
     plugins: [
       tailwindcss(),
     ],
+    // The browser's bundle only. Left to itself the bundler gives every small module that two pages share a file of
+    // its own: an album page asked for 131 scripts, 93 of them under a kilobyte. Three groups take most of those:
+    //  - framework: Vue, the router, i18n and the other libraries every page runs on. They change only when a
+    //    dependency is updated, so returning readers keep this file across releases.
+    //  - ui: the Ui* components, which every page is built from.
+    //  - icons: @lucide/vue, a few hundred bytes an icon. Grouped by the pages that use them, so a page fetches a few
+    //    icon files rather than one per icon, and not the icons of pages it isn't.
+    $client: {
+      build: {
+        rolldownOptions: {
+          output: {
+            codeSplitting: {
+              groups: [
+                { name: 'framework', test: /[\\/]node_modules[\\/](?:vue|@vue|vue-router|vue-i18n|@intlify|unhead|@unhead|ofetch|hookable|defu|destr|ufo|ohash|devalue)[\\/]/, priority: 30 },
+                { name: 'icons', test: /[\\/]@lucide[\\/]vue[\\/]/, priority: 20, entriesAware: true, entriesAwareMergeThreshold: 4_000 },
+                { name: 'ui', test: /[\\/]app[\\/]components[\\/]ui[\\/]/, priority: 10 },
+              ],
+            },
+          },
+        },
+      },
+    },
     optimizeDeps: {
       include: [
         '@lucide/vue',
         'lucide',
+        'linkify-it',
         'markdown-it',
         'markdown-it-container',
         'markdown-it-mark',
@@ -149,14 +190,9 @@ export default defineNuxtConfig({
       ],
     },
   },
-  // The body faces (font stacks in main.css). Only @font-face rules: a slice downloads when a page uses its characters.
-  // Korean uses Pretendard, the usual face of Korean sites, rather than Noto Sans KR.
+  // The body faces' @font-face rules (assets/css/fonts.css) are not in this list: they are a third of a megabyte and
+  // would hold up the first paint, so useAppHead loads them as a stylesheet of their own, without blocking.
   css: [
-    '@fontsource-variable/noto-sans-sc/wght.css',
-    '@fontsource-variable/noto-sans-tc/wght.css',
-    '@fontsource-variable/noto-sans-jp/wght.css',
-    '@fontsource-variable/noto-sans-mono/wght.css',
-    'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css',
     '~/assets/css/main.css',
     '~/assets/css/markdown.css',
   ],

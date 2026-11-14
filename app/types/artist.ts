@@ -42,6 +42,8 @@ export interface ArtistImage {
 }
 
 export interface ArtistDetail extends PendingFields {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   id: number
   name: string
   slug: string | null

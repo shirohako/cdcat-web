@@ -7,7 +7,7 @@
     <div v-if="isAuthenticated && mine" class="border-b border-line px-5 py-4">
       <div class="rounded-md bg-black/[0.03] px-3 py-2.5 dark:bg-white/[0.04]">
         <p class="mb-1 text-xs font-semibold text-title">{{ $t('shouts.mine') }}</p>
-        <RichContent :content="mine.content" format="markdown" class="text-sm" />
+        <LazyRichContent :content="mine.content" format="markdown" class="text-sm" />
         <div class="mt-1.5 flex gap-1.5">
           <UiButton size="xs" @click="openEditor">{{ $t('common.edit') }}</UiButton>
           <UiButton variant="danger-soft" size="xs" @click="remove">{{ $t('common.delete') }}</UiButton>
@@ -38,7 +38,7 @@
             />
           </p>
           <div class="relative mt-1" :class="{ 'max-h-56 overflow-hidden': isLong(shout) && !expanded.has(shout.id) }">
-            <RichContent :content="shout.content" format="markdown" class="text-sm" />
+            <LazyRichContent :content="shout.content" format="markdown" class="text-sm" />
             <div v-if="isLong(shout) && !expanded.has(shout.id)" class="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card" />
           </div>
           <UiButton v-if="isLong(shout)" size="xs" class="mt-1" @click="toggleExpanded(shout.id)">
@@ -66,7 +66,8 @@
     </div>
   </CatalogSection>
 
-  <ShoutEditorModal v-if="editorOpen" :id="id" :resource="resource" :content="mine?.content" @close="editorOpen = false" @saved="onSaved" />
+  <!-- Lazy: the dialog brings the Markdown editor with it, a large download only someone writing needs. -->
+  <LazyShoutEditorModal v-if="editorOpen" :id="id" :resource="resource" :content="mine?.content" @close="editorOpen = false" @saved="onSaved" />
 
   <dialog class="modal" :open="!!reporting">
     <div class="modal-box max-w-sm">
@@ -107,23 +108,33 @@ const lastPage = ref(1)
 // True until the first page is in, so the empty note doesn't flash first.
 const pending = ref(true)
 
+const fetchPage = (at: number) => $api<ShoutPage>(`/v1/${props.resource}/${props.id}/shouts`, { params: { page: at } })
+const apply = (result: ShoutPage, at: number) => {
+  shouts.value = at === 1 ? result.shouts : [...shouts.value, ...result.shouts]
+  mine.value = result.mine
+  total.value = result.pagination.total
+  page.value = result.pagination.current_page
+  lastPage.value = result.pagination.last_page
+}
 const load = async (at = 1) => {
   pending.value = true
   try {
-    const result = await $api<ShoutPage>(`/v1/${props.resource}/${props.id}/shouts`, { params: { page: at } })
-    shouts.value = at === 1 ? result.shouts : [...shouts.value, ...result.shouts]
-    mine.value = result.mine
-    total.value = result.pagination.total
-    page.value = result.pagination.current_page
-    lastPage.value = result.pagination.last_page
+    apply(await fetchPage(at), at)
   } finally {
     pending.value = false
   }
 }
 const loadMore = () => load(page.value + 1)
-// On client-side navigation start at once; after a server render, wait until hydration is done.
-if (import.meta.client && !useNuxtApp().isHydrating) load()
-else onMounted(() => load())
+// The first page comes with the server render, so the shouts are in the HTML search engines read (docs/seo in the API
+// repo), and the browser takes it from the payload rather than asking again. After a navigation in the browser it
+// loads at once, without holding the page back.
+const first = useAsyncData(`${props.resource}:${props.id}:shouts`, () => fetchPage(1), { deep: false })
+const applyFirst = () => {
+  if (first.data.value) apply(first.data.value, 1)
+  if (first.data.value || first.error.value) pending.value = false
+}
+if (import.meta.server) onServerPrefetch(async () => { await first; applyFirst() })
+else watch([first.data, first.error], applyFirst, { immediate: true })
 
 const loginPath = computed(() => `/auth/login?redirect=${encodeURIComponent(route.fullPath)}`)
 
@@ -136,6 +147,14 @@ const toggleExpanded = (id: number) => {
 }
 
 const editorOpen = ref(false)
+// The dialog is a large download (the Markdown editor), so it loads on its first opening. For a signed-in reader it is
+// fetched ahead of that, in an idle moment, so the dialog opens at once; a visitor never downloads it.
+onMounted(() => {
+  if (!isAuthenticated.value) return
+  const warm = () => { void import('~/components/shout/ShoutEditorModal.vue') }
+  if ('requestIdleCallback' in window) window.requestIdleCallback(warm)
+  else setTimeout(warm, 2000)
+})
 const openEditor = () => { editorOpen.value = true }
 const onSaved = async () => {
   editorOpen.value = false

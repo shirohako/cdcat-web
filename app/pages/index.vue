@@ -154,7 +154,7 @@ const absolute = useSiteUrl()
 usePageSeo({
   title: () => t('home.seo_title'),
   description: () => t('home.seo_description'),
-  jsonLd: () => websiteLd({ name: SITE_NAME, url: absolute('/'), logo: absolute('/icon.png'), description: t('home.seo_description') })
+  jsonLd: () => websiteLd({ name: SITE_NAME, url: absolute('/'), logo: absolute('/icon.png'), description: t('home.seo_description'), sameAs: [SOURCE_URL] })
 })
 useHead({
   // The home title already names the site.

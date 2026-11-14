@@ -255,8 +255,21 @@
         "products": "에디션",
         "bonuses": "특전",
         "links": "관련 링크",
-        "footer": "출처: {source}, {license}로 공유"
-      }
+        "footer": "출처: {source}, {license}로 공유",
+        "page": "페이지",
+        "rating": "평점",
+        "rating_value": "{rating} / 5 ({count}명 평가)",
+        "cover": "커버",
+        "updated": "최종 수정",
+        "related": "관련 작품",
+        "attributes": "기타 정보",
+        "images": "이미지",
+        "lyrics": "가사"
+      },
+      "llm_copy": "LLM용 복사",
+      "view_markdown": "Markdown으로 보기",
+      "llm_copied": "앨범 전체를 Markdown으로 복사했습니다",
+      "copy_failed": "복사하지 못했습니다. 다시 시도해 주세요."
     },
     "toc": {
       "button": "Disc ID",
@@ -1087,7 +1100,7 @@
       },
       "empty": "아직 등록된 회차가 없어요",
       "no_description": "소개가 없어요.",
-      "seo_description": "동인·음악 행사 기록을 둘러보세요."
+      "seo_description": "M3 등 동인 음악 즉매회와 음악 행사의 일정, 장소, 참가 서클, 발매 앨범 정보입니다."
     },
     "revisions": {
       "title": "내 편집 내역",
@@ -3653,9 +3666,9 @@
       "map": "부스 배치도 제공"
     },
     "pages": {
-      "albums": "CDCat에 등록된 앨범, 싱글, EP, 컴필레이션 음반을 둘러보세요.",
+      "albums": "CDCat에 등록된 동인 음악, 보컬로이드, 애니메이션·게임 음악 앨범 목록입니다. 수록곡, 에디션, 크레딧을 확인할 수 있으며 최근 등록순으로 정렬됩니다.",
       "vinyls": "CDCat에 등록된 LP(바이닐) 음반을 둘러보세요.",
-      "artists": "CDCat에 등록된 아티스트, 동인 서클, 버추얼 싱어를 디스코그래피와 함께 둘러보세요.",
+      "artists": "CDCat에 등록된 아티스트, 동인 서클, 레이블, 버추얼 싱어 목록입니다. 각자의 앨범과 참여 작품을 볼 수 있습니다.",
       "entries": "CDCat에 등록된 애니메이션, 게임, 영화 등 다양한 작품과 관련 음악을 둘러보세요.",
       "franchises": "CDCat에 등록된 시리즈와 관련 앨범을 둘러보세요.",
       "articles": "CDCat 회원들이 직접 쓴 음악 리뷰, 특집 기사, 자료 정리 글을 읽어 보세요.",
@@ -3667,6 +3680,28 @@
       "guide_editor": "CDCat 에디터 사용 가이드예요. 앨범을 추가하고 곡, 크레딧, 에디션, 특전을 입력해 검토를 요청하는 방법과 기존 정보를 바로잡는 방법을 알려 드려요.",
       "api_docs": "CDCat 공개 API 문서예요. 키 없이 HTTP로 앨범, 곡, 아티스트, 행사, 작품, 시리즈 정보를 읽어 올 수 있고, 데이터는 CC BY-SA 4.0으로 공유돼요.",
       "join": "CDCat을 함께 만들어 갈 사람을 찾고 있어요. 번역, 교정, 글쓰기, 일러스트, 디자인, 개발, 자료 정리, 커뮤니티 관리까지 함께해 주세요."
+    },
+    "title": {
+      "artist": "{name} 앨범 및 참여 작품",
+      "track_lyrics": "{title} 가사",
+      "entry": "{name} 관련 앨범 및 사운드트랙",
+      "franchise": "{name} 시리즈 앨범 및 작품",
+      "albums": "앨범 목록｜동인 음악·보컬로이드·애니메이션·게임 음악",
+      "artists": "아티스트·동인 서클 목록",
+      "entries": "애니메이션·게임 등 작품별 음악",
+      "franchises": "시리즈 목록",
+      "events": "동인 음악 행사·즉매회 목록",
+      "vinyls": "LP 레코드 목록"
+    },
+    "artist": {
+      "aliases": "다른 이름: {names}",
+      "recent": "최근 작품: {albums}"
+    },
+    "profile": {
+      "member": "CDCat 회원",
+      "joined": "{date} 가입",
+      "edits": "편집 {count}회",
+      "reviews": "평가 {count}개"
     }
   },
   "artist_card": {

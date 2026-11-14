@@ -52,8 +52,11 @@
 <script setup lang="ts">
 import type { PublicProfile } from '~/types/profile'
 import type { TrackingStatus } from '~/types/tracking'
+import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { profilePageLd } from '~/utils/structuredData'
 
 const route = useRoute()
+const { t, locale } = useI18n()
 const username = route.params.username as string
 const activeView = ref<'default' | 'favorites' | 'artists' | 'tracks' | 'tracking'>('default')
 const trackingStatus = ref<TrackingStatus>('plan_to_listen')
@@ -67,13 +70,43 @@ const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`
 
 // --------------- SEO ---------------
 
+const { sentence, count, own } = useSeoText()
+const { formatDate } = useCatalogDisplay()
+const absolute = useSiteUrl()
+const shownName = computed(() => profile.value?.nickname || profile.value?.username || '')
 usePageSeo({
-  title: () => profile.value ? profile.value.nickname || profile.value.username : '',
+  languages: false,
+  // The name people know the member by, and the handle the address uses.
+  title: () => (profile.value
+    ? (shownName.value !== profile.value.username ? `${shownName.value} (@${profile.value.username})` : `@${profile.value.username}`)
+    : ''),
+  description: () => {
+    const value = profile.value
+    if (!value) return undefined
+    const lead = sentence([
+      t('seo.profile.member'),
+      value.joined_at && t('seo.profile.joined', { date: formatDate(value.joined_at.slice(0, 10), 'month') }),
+      count('seo.profile.edits', value.contributions_count),
+      count('seo.profile.reviews', value.reviews_count),
+    ])
+    return composeDescription(lead, own(plainText(value.bio)), descriptionLength(locale.value))
+  },
   // Shared links show the member card; before it is drawn, the avatar.
   card: () => profile.value?.share_card_url,
   image: () => profile.value?.avatar_url,
-  // Profiles stay out of search results; their links are still followed.
-  noindex: true,
+  type: 'profile',
+  // Only members with something public of their own (an article, a review, a topic, or a fair number of approved
+  // edits) are offered to search engines; the API decides (docs/seo in the API repo). Links are followed either way.
+  noindex: () => profile.value?.indexable === false,
+  jsonLd: () => profile.value && profilePageLd({
+    name: shownName.value,
+    username: profile.value.username,
+    url: absolute(`/profile/${profile.value.username}`),
+    image: profile.value.avatar_url,
+    description: plainText(profile.value.bio),
+    joined: profile.value.joined_at,
+    posts: profile.value.reviews_count + profile.value.discussion_topics_count + profile.value.discussion_posts_count,
+  }),
 })
 
 definePageMeta({

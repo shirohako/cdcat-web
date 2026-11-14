@@ -75,7 +75,7 @@ const { data, status: loadStatus, refresh, loading, refetching, revealKey, revea
         :empty="tab === 'unread' ? t('discussions.list.empty_unread') : tab === 'watching' ? t('discussions.list.empty_watching') : ''"
       />
       <CommonPagination
-        v-if="data.pagination.last_page > 1" class="mt-5" :page="data.pagination.current_page" :total-pages="data.pagination.last_page"
+        v-if="data.pagination.last_page > 1" class="mt-5" :page="data.pagination.current_page" :total-pages="data.pagination.last_page" link
         :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })"
       />
     </template>

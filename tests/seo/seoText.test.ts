@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { composeDescription, descriptionLength, nameWithOriginal, plainText, truncateText, oneLine } from '../../app/utils/seoText'
+import { composeDescription, descriptionLength, nameWithOriginal, plainText, truncateText, oneLine, textLanguage, writtenIn } from '../../app/utils/seoText'
 
 describe('plainText', () => {
   it('keeps the words of Markdown and drops its markup', () => {
@@ -81,5 +81,39 @@ describe('oneLine', () => {
 
   it('is empty without text', () => {
     expect(oneLine(null)).toBe('')
+  })
+})
+
+describe('textLanguage', () => {
+  it('tells the language by the script most of the text is in', () => {
+    expect(textLanguage('東方アレンジを集めたコンピレーションです。')).toBe('ja')
+    expect(textLanguage('收录了十二首东方同人编曲。')).toBe('zh')
+    expect(textLanguage('收錄了十二首東方同人編曲。')).toBe('zh')
+    expect(textLanguage('동방 어레인지 12곡을 수록했습니다.')).toBe('ko')
+    expect(textLanguage('Twelve Touhou arrangements.')).toBe('en')
+  })
+
+  it('is not tipped by a title quoted in another script', () => {
+    expect(textLanguage('这张专辑收录了《アンダーキッズ》等十二首曲目，由多位编曲者共同完成制作。')).toBe('zh')
+    expect(textLanguage('A compilation of twelve arrangements, including a new version of 幽雅に咲かせ、墨染の桜.')).toBe('en')
+  })
+
+  it('has no answer for text without letters', () => {
+    expect(textLanguage('2026-04-26 / 12')).toBeNull()
+    expect(textLanguage('')).toBeNull()
+  })
+})
+
+describe('writtenIn', () => {
+  it('matches a text to the interface language, both Chinese scripts alike', () => {
+    expect(writtenIn('收录了十二首东方同人编曲。', 'zh-Hans')).toBe(true)
+    expect(writtenIn('收录了十二首东方同人编曲。', 'zh-Hant')).toBe(true)
+    expect(writtenIn('收录了十二首东方同人编曲。', 'ja')).toBe(false)
+    expect(writtenIn('東方アレンジを集めたコンピレーションです。', 'ja')).toBe(true)
+    expect(writtenIn('Twelve Touhou arrangements.', 'ko')).toBe(false)
+  })
+
+  it('lets text with no telling script through', () => {
+    expect(writtenIn('2026', 'en')).toBe(true)
   })
 })

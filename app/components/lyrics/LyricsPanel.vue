@@ -122,8 +122,9 @@ const { localeName, enumLabel } = useCatalogDisplay()
 const { showToast } = useToast()
 const { onClick: onExternalClick } = useExternalLink()
 
-const { data, status, error, loading, refresh } = usePageData(`track:${props.trackId}:lyrics`,
+const request = usePageData(`track:${props.trackId}:lyrics`,
   ({ signal, background }) => $api<{ lyrics: LyricSummary[] }>(`/v1/tracks/${props.trackId}/lyrics`, { signal, progress: !background }))
+const { data, status, error, loading, refresh } = request
 const kindOrder = { original: 0, transliteration: 1, translation: 2 } as const
 const lyrics = computed(() => [...(data.value?.lyrics ?? [])].sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.language.localeCompare(b.language)))
 const originals = computed(() => lyrics.value.filter(lyric => lyric.kind === 'original'))
@@ -132,32 +133,51 @@ const canSubmit = computed(() => isAuthenticated.value && hasPermission('content
 const selectedId = ref<number | null>(null)
 const compareId = ref<number | null>(null)
 const editing = ref<'new' | 'edit' | null>(null)
+/**
+ * What shows first: a translation in the interface language when there is one (it opens beside its original, so a
+ * reader gets both), else the original. `prefer: 'translation'` takes any translation over the original.
+ */
 const firstPick = (list: LyricSummary[]) => {
-  if (props.prefer !== 'translation') return list[0]
   const translations = list.filter(lyric => lyric.kind === 'translation')
-  return translations.find(lyric => lyric.language === locale.value) ?? translations[0] ?? list[0]
+  const own = translations.find(lyric => lyric.language === locale.value)
+  return props.prefer === 'translation' ? own ?? translations[0] ?? list[0] : own ?? list[0]
 }
+/** Translations open next to their original. */
+const companionOf = (id: number | null) => {
+  const lyric = lyrics.value.find(item => item.id === id)
+  const translationOf = lyric && lyric.kind !== 'original' ? lyric.translation_of_id : null
+  return translationOf && lyrics.value.some(item => item.id === translationOf) ? translationOf : null
+}
+const pick = (list: LyricSummary[]) => {
+  selectedId.value = firstPick(list)?.id ?? null
+  compareId.value = companionOf(selectedId.value)
+}
+// With the list already here (the page the server rendered, or a revisit), the pick is made before the first render,
+// so the browser's first render matches the server's HTML.
+if (lyrics.value.length) pick(lyrics.value)
 watch(lyrics, (list) => {
-  if (!list.some(lyric => lyric.id === selectedId.value)) selectedId.value = firstPick(list)?.id ?? null
-}, { immediate: true })
-
-const selected = computed(() => lyrics.value.find(lyric => lyric.id === selectedId.value) ?? null)
-const companions = computed(() => lyrics.value.filter(lyric => lyric.id !== selectedId.value))
-watch(selectedId, () => {
-  // Translations open next to their original.
-  const translationOf = selected.value?.translation_of_id
-  compareId.value = selected.value?.kind === 'original'
-    ? null
-    : (translationOf && lyrics.value.some(lyric => lyric.id === translationOf) ? translationOf : null)
+  if (!list.some(lyric => lyric.id === selectedId.value)) pick(list)
 })
 
-const texts = reactive<Record<number, Lyric>>({})
+const companions = computed(() => lyrics.value.filter(lyric => lyric.id !== selectedId.value))
+watch(selectedId, () => { compareId.value = companionOf(selectedId.value) })
+
+const texts = useLyricTexts(props.trackId)
 const load = async (id: number | null) => {
-  if (id && !texts[id]) texts[id] = await $api<Lyric>(`/v1/lyrics/${id}`)
+  if (id && !texts.value[id]) texts.value[id] = await $api<Lyric>(`/v1/lyrics/${id}`)
 }
 watch([selectedId, compareId], ([a, b]) => Promise.all([load(a), load(b)]), { immediate: true })
+// The server render carries the lyrics themselves, so search engines read them (docs/seo in the API repo). Watchers
+// don't run there after the list arrives, so the pick and its texts are fetched here, before the HTML is written.
+if (import.meta.server) {
+  onServerPrefetch(async () => {
+    await request
+    pick(lyrics.value)
+    await Promise.all([load(selectedId.value), load(compareId.value)]).catch(() => {})
+  })
+}
 
-const current = computed(() => selectedId.value ? texts[selectedId.value] ?? null : null)
+const current = computed(() => selectedId.value ? texts.value[selectedId.value] ?? null : null)
 /** A source that is a web address opens behind the external link card. */
 const openSource = (event: MouseEvent) => {
   const source = current.value?.source
@@ -165,7 +185,7 @@ const openSource = (event: MouseEvent) => {
 }
 const lyricLabel = (lyric: LyricSummary) => `${localeName(lyric.language)} · ${enumLabel('lyric_kind', lyric.kind)}`
 const isUrl = (text: string) => /^https?:\/\//i.test(text)
-const comparison = computed(() => compareId.value ? texts[compareId.value] ?? null : null)
+const comparison = computed(() => compareId.value ? texts.value[compareId.value] ?? null : null)
 /** Lines of the shown lyric, paired by position with the comparison. */
 const rows = computed(() => {
   const left = current.value ? lyricLines(current.value.content, current.value.format) : []
@@ -184,7 +204,7 @@ const onSaved = async (result: { revision: Revision, lyric: Lyric | null }) => {
   editing.value = null
   announce(result.revision)
   if (result.lyric) {
-    texts[result.lyric.id] = result.lyric
+    texts.value[result.lyric.id] = result.lyric
     selectedId.value = result.lyric.id
   }
   await refresh()

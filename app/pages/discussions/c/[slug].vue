@@ -16,9 +16,11 @@ watch(category, (value) => { level.value = value?.notification_level ?? null }, 
 const newTopic = computed(() => category.value ? { category: String(category.value.id) } : undefined)
 
 usePageSeo({
+  languages: false,
   title: () => category.value ? `${categoryName(category.value)} - ${t('discussions.title')}` : t('discussions.title'),
   description: () => categoryDescription(category.value) || t('discussions.description'),
-  noindex: () => category.value?.visibility === 'moderators',
+  // Staff-only categories, and ones nobody has posted in yet (the API's `indexable`), stay out of search results.
+  noindex: () => category.value?.visibility === 'moderators' || category.value?.indexable === false,
   error,
   breadcrumbs: () => category.value
     ? [{ name: t('discussions.title'), path: '/discussions' }, { name: categoryName(category.value), path: `/discussions/c/${category.value.slug}` }]

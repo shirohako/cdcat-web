@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+
 /**
  * A list page's results with its pages around them: below, always (with one page too), which results are on screen
  * and how many there are on the left and
@@ -18,9 +20,12 @@ const props = withDefaults(defineProps<{
    *  default, fewer for tall rows. */
   topAfter?: number
   disabled?: boolean
+  /** The page is in the address as `?page=`: the pages are links (see CommonPagination). */
+  link?: boolean | ((page: number) => RouteLocationRaw)
 }>(), {
   topAfter: 10,
   disabled: false,
+  link: false,
 })
 
 const emit = defineEmits<{
@@ -55,6 +60,7 @@ const line = computed(() => {
       :page="page"
       :total-pages="totalPages"
       :disabled="disabled"
+      :link="link"
       @update:page="emit('update:page', $event)"
     >
       <template #summary>
@@ -71,6 +77,7 @@ const line = computed(() => {
       :page="page"
       :total-pages="totalPages"
       :disabled="disabled"
+      :link="link"
       @update:page="emit('update:page', $event)"
     >
       <template #summary>

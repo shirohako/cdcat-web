@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { textParts } from '~/utils/markdown'
+import { textParts } from '~/utils/textParts'
 
 /**
  * Text people paste from shop pages and booklets, full of indents and decorative rules that Markdown would take for

@@ -41,9 +41,11 @@
 import type { TrackDetail } from '~/types/album'
 import { FileText, Info } from '@lucide/vue'
 import { musicRecordingLd } from '~/utils/structuredData'
+import { composeDescription, descriptionLength } from '~/utils/seoText'
+import { lyricLines } from '~/utils/lyricText'
 
 const route = useRoute()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { localName, formatDuration } = useCatalogDisplay()
 const { withOriginal, sentence, list } = useSeoText()
 const absolute = useSiteUrl()
@@ -79,22 +81,57 @@ const creditedArtists = computed(() => {
   return [...seen].map(([id, name]) => ({ id, name }))
 })
 
+/** The people credited in these roles, once each, for the title and structured data. */
+const creditedAs = (roles: string[]) => {
+  const seen = new Map<number, { name: string, url: string, type?: string | null }>()
+  for (const credit of track.value?.credits ?? []) {
+    if (credit.artist && roles.includes(credit.role) && !seen.has(credit.artist.id)) {
+      seen.set(credit.artist.id, { name: credit.credited_as || credit.artist.name, url: absolute(`/artists/${credit.artist.id}`), type: credit.artist.type })
+    }
+  }
+  return [...seen.values()]
+}
+/** Who performs the track: its 艺术家, else its vocalists. */
+const performers = computed(() => {
+  const artists = creditedAs(['artist'])
+  return artists.length ? artists : creditedAs(['vocals'])
+})
+
+// The lyric texts the panel below has loaded; the original's first lines go into the description.
+const lyricTexts = useLyricTexts(Number(route.params.id))
+const lyricsOriginal = computed(() => Object.values(lyricTexts.value).find(lyric => lyric.kind === 'original') ?? null)
+const lyricsLead = computed(() => (lyricsOriginal.value
+  ? lyricLines(lyricsOriginal.value.content, lyricsOriginal.value.format).filter(Boolean).slice(0, 4).join(' / ')
+  : ''))
+
 usePageSeo({
-  title: () => track.value ? [withOriginal(shownTitle.value, track.value.title), track.value.album?.title].filter(Boolean).join(' - ') : undefined,
+  // A track with lyrics is searched for as "title + lyrics", often with who sings it: the title says both. Without
+  // lyrics the page stays out of search results (see noindex) and keeps the plain title.
+  title: () => {
+    const value = track.value
+    if (!value) return undefined
+    const name = withOriginal(shownTitle.value, value.title)
+    return value.has_lyrics
+      ? [t('seo.title.track_lyrics', { title: name }), list(performers.value.slice(0, 2).map(artist => artist.name))].filter(Boolean).join(' - ')
+      : [name, value.album?.title].filter(Boolean).join(' - ')
+  },
   description: () => {
     const value = track.value
     if (!value) return undefined
-    return sentence([
+    const lead = sentence([
       value.album && t('seo.track.from', { album: value.album.title }),
       creditedArtists.value.length && t('seo.track.artists', { artists: list(creditedArtists.value.slice(0, 4).map(artist => artist.name)) }),
       value.duration && t('seo.track.duration', { time: formatDuration(value.duration) }),
       value.originals?.length && t('seo.track.original', { titles: list(value.originals.map(original => original.title)) }),
       value.has_lyrics ? t('seo.track.lyrics') : value.is_instrumental && t('seo.track.instrumental'),
     ])
+    return composeDescription(lead, lyricsLead.value, descriptionLength(locale.value))
   },
   image: () => track.value?.album?.image_url,
   type: 'music.song',
-  noindex: () => track.value?.is_pending,
+  // A track without lyrics says nothing its album's page doesn't: only tracks with lyrics are offered to search
+  // engines (docs/seo in the API repo). The page itself stays, and the album links to it.
+  noindex: () => track.value?.is_pending || !track.value?.has_lyrics,
   adult: () => track.value?.album?.is_adult,
   error,
   breadcrumbs: () => track.value?.album
@@ -107,7 +144,10 @@ usePageSeo({
     duration: track.value.duration,
     isrc: track.value.isrc,
     album: track.value.album ? { name: track.value.album.title, url: absolute(`/albums/${track.value.album.id}`) } : null,
-    artists: creditedArtists.value.map(artist => ({ name: artist.name, url: absolute(`/artists/${artist.id}`) })),
+    artists: performers.value.length ? performers.value : creditedArtists.value.map(artist => ({ name: artist.name, url: absolute(`/artists/${artist.id}`) })),
+    composers: creditedAs(['composer']),
+    lyricists: creditedAs(['lyricist']),
+    lyricsLanguage: lyricsOriginal.value?.language,
   }),
 })
 </script>

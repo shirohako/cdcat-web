@@ -1,4 +1,7 @@
-const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', 'ko': 'ko_KR' }
+import fontFacesUrl from '~/assets/css/fonts.css?url'
+
+/** Each interface language as Open Graph names it. */
+export const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', 'ko': 'ko_KR' }
 
 /**
  * The document's language, theme, title template, icons and default share tags. app.vue sets them, and so does
@@ -32,6 +35,27 @@ export function useAppHead() {
     ],
   })
 
+  // The body faces' @font-face rules (assets/css/fonts.css) are a stylesheet of their own, fetched at once and
+  // switched on when it arrives: as `media="print"` it holds up neither the first paint nor the scripts.
+  if (import.meta.dev) {
+    // Under `nuxt dev` the server and the browser know the file by one address, so the head can carry the links.
+    useHead({
+      link: [
+        // The preload is what gets it fetched early: browsers leave a print stylesheet for last.
+        { rel: 'preload', as: 'style', href: fontFacesUrl },
+        { rel: 'stylesheet', href: fontFacesUrl, media: 'print', onload: 'this.media=\'all\'', key: 'font-faces' },
+      ],
+      // Without scripts nothing switches it on, so it is linked the plain way.
+      noscript: [{ innerHTML: `<link rel="stylesheet" href="${fontFacesUrl}">`, key: 'font-faces' }],
+    })
+  }
+  else if (import.meta.client && !document.querySelector('link[data-font-faces]')) {
+    // In a build, the server's bundle hashes the file to another name than the browser's, and only the browser's
+    // exists: server/plugins/font-faces.ts writes the links, with the name the build's manifest gives. This is the
+    // net under it: should the page arrive without them, the browser links the file itself.
+    useHead({ link: [{ rel: 'stylesheet', href: fontFacesUrl, key: 'font-faces' }] })
+  }
+
   // Defaults for every page; pages fill in their own through usePageSeo (docs/seo in the API repo).
   useSeoMeta({
     description: () => t('home.seo_description'),
@@ -41,4 +65,8 @@ export function useAppHead() {
     twitterCard: 'summary',
     robots: config.public.indexable ? 'max-image-preview:large' : 'noindex, nofollow',
   })
+
+  // Naver Search Advisor proves ownership of the site by this tag (NUXT_PUBLIC_NAVER_SITE_VERIFICATION).
+  const naver = String(config.public.naverSiteVerification || '')
+  if (naver) useHead({ meta: [{ name: 'naver-site-verification', content: naver }] })
 }

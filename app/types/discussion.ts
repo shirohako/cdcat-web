@@ -55,6 +55,8 @@ export interface DiscussionCategory extends DiscussionCategorySummary {
 }
 
 export interface DiscussionCategoryDetail extends DiscussionCategory {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   topic_template: string | null
   parent: DiscussionCategorySummary | null
   children: DiscussionCategory[]

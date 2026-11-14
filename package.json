@@ -38,6 +38,7 @@
     "d3-zoom": "3.0.0",
     "diff": "^9.0.0",
     "eslint": "^10.14.0",
+    "linkify-it": "^6.1.0",
     "lucide": "^1.66.0",
     "markdown-it": "^15.0.3",
     "markdown-it-container": "^4.0.0",

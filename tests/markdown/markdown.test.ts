@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { markdownContainers, markdownHeadings, renderMarkdown, textParts, renderMarkdownInline } from '../../app/utils/markdown'
+import { markdownContainers, markdownHeadings, renderMarkdown, renderMarkdownInline } from '../../app/utils/markdown'
+import { textParts } from '../../app/utils/textParts'
 
 describe('Heading anchors', () => {
   it('slugs headings in every script and numbers repeats', () => {

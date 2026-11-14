@@ -3,12 +3,15 @@ import type { AlbumExportFormat, AlbumExportHelpers, AlbumExportSource } from '~
 import { DATA_LICENSE } from '~/legal/constants'
 import { ALBUM_EXPORT_FILES, albumCsv, albumExportFilename, albumJson, albumMarkdown } from '~/utils/albumExport'
 
-/** Saves the album page's data as a file, labelled in the UI language; see utils/albumExport. */
+/**
+ * The album page's data as a file, as text on the clipboard (LLM 副本) or as the answer to /albums/{id}.md, labelled
+ * in the UI language; see utils/albumExport.
+ */
 export const useAlbumExport = () => {
   const { t, locale } = useI18n()
   const { showToast } = useToast()
   const display = useCatalogDisplay()
-  const { roleName, roleTip, roleCategory, roleOrder, attributeName } = useCatalogSchema()
+  const { roleName, roleTip, roleCategory, roleOrder, attributeName, ready } = useCatalogSchema()
   const prices = usePriceDisplay()
   const { separator, aside } = useListPunctuation()
   const absolute = useSiteUrl()
@@ -34,7 +37,7 @@ export const useAlbumExport = () => {
   })
 
   const content = (album: Album, format: AlbumExportFormat) => {
-    const source: AlbumExportSource = { url: absolute(`/albums/${album.id}`), license: DATA_LICENSE }
+    const source: AlbumExportSource = { url: absolute(`/albums/${album.id}`), license: DATA_LICENSE, site: absolute }
     if (format === 'csv') return albumCsv(album, source, helpers())
     if (format === 'markdown') return albumMarkdown(album, source, helpers())
     return albumJson(album, source, new Date())
@@ -57,5 +60,22 @@ export const useAlbumExport = () => {
     }
   }
 
-  return { exportAlbum }
+  /** The album as Markdown, once the role names it prints have loaded. */
+  const markdown = async (album: Album) => {
+    await ready()
+    return content(album, 'markdown')
+  }
+
+  /** LLM 副本: the same Markdown on the clipboard, to paste into a chat with a language model. */
+  const copyMarkdown = async (album: Album) => {
+    try {
+      await navigator.clipboard.writeText(await markdown(album))
+      showToast(t('album.export.llm_copied'), 'success')
+    }
+    catch {
+      showToast(t('album.export.copy_failed'), 'error')
+    }
+  }
+
+  return { exportAlbum, markdown, copyMarkdown }
 }

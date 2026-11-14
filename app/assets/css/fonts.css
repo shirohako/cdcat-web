@@ -1,0 +1,10 @@
+/* The body faces: Noto Sans SC, TC and JP, Noto Sans Mono, and Pretendard for Korean (the font stacks are in main.css).
+   Each family is a few hundred @font-face rules, one per slice of characters, 432 in all: a third of a megabyte of
+   CSS that says nothing about how the page looks. It is a stylesheet of its own so that the main one stays small
+   and the page can paint before this arrives (composables/useAppHead.ts loads it without blocking). A slice's file
+   still downloads only when the page uses its characters. */
+@import "@fontsource-variable/noto-sans-sc/wght.css";
+@import "@fontsource-variable/noto-sans-tc/wght.css";
+@import "@fontsource-variable/noto-sans-jp/wght.css";
+@import "@fontsource-variable/noto-sans-mono/wght.css";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";

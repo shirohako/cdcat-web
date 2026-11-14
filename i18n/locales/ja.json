@@ -255,8 +255,21 @@
         "products": "エディション",
         "bonuses": "特典",
         "links": "関連リンク",
-        "footer": "出典：{source}（{license} で共有）"
-      }
+        "footer": "出典：{source}（{license} で共有）",
+        "page": "ページ",
+        "rating": "評価",
+        "rating_value": "{rating} / 5（{count} 件）",
+        "cover": "ジャケット",
+        "updated": "最終更新",
+        "related": "関連作品",
+        "attributes": "その他の情報",
+        "images": "画像",
+        "lyrics": "歌詞"
+      },
+      "llm_copy": "LLM 用にコピー",
+      "view_markdown": "Markdown で表示",
+      "llm_copied": "アルバム全体を Markdown でコピーしました",
+      "copy_failed": "コピーできませんでした。もう一度お試しください。"
     },
     "toc": {
       "button": "Disc ID",
@@ -1087,7 +1100,7 @@
       },
       "empty": "開催情報がありません",
       "no_description": "紹介文がありません。",
-      "seo_description": "登録されている同人・音楽イベントを一覧で探せます。"
+      "seo_description": "M3など同人音楽即売会・音楽イベントの開催日、会場、参加サークル、頒布作品を掲載しています。"
     },
     "revisions": {
       "title": "自分の編集履歴",
@@ -3653,9 +3666,9 @@
       "map": "会場マップあり"
     },
     "pages": {
-      "albums": "CDCatに登録されたアルバム・シングル・EP・コンピレーションを探せます。",
+      "albums": "CDCatに登録された同人音楽・VOCALOID・アニメ・ゲーム音楽のアルバム一覧。収録曲、エディション、クレジットを掲載しています。新着順。",
       "vinyls": "CDCatに登録されたアナログレコードを探せます。",
-      "artists": "CDCatに登録されたアーティスト・同人サークル・バーチャルシンガーとその作品を探せます。",
+      "artists": "CDCatに登録されたアーティスト・同人サークル・レーベル・バーチャルシンガーの一覧。アルバムと参加作品を確認できます。",
       "entries": "CDCatに登録されたアニメ・ゲーム・映像作品などとその音楽を探せます。",
       "franchises": "CDCatに登録されたシリーズと関連アルバムを探せます。",
       "articles": "CDCatユーザーによる音楽レビュー・特集・資料まとめ。",
@@ -3667,6 +3680,28 @@
       "guide_editor": "CDCat エディターの使い方：アルバムの追加、曲目・クレジット・エディション・特典の入力、審査への提出、既存データの修正。",
       "api_docs": "CDCat 公開API：アルバム、トラック、アーティスト、イベント、エントリー、シリーズの情報を HTTP で取得できます。キーは不要で、データは CC BY-SA 4.0 で共有しています。",
       "join": "CDCat スタッフ募集：翻訳、校正、編集、イラスト、デザイン、開発、データ整理、コミュニティ管理など、音楽が好きな方の参加をお待ちしています。"
+    },
+    "title": {
+      "artist": "{name} のアルバム・参加作品一覧",
+      "track_lyrics": "{title} 歌詞",
+      "entry": "{name} 関連アルバム・サウンドトラック",
+      "franchise": "{name} シリーズのアルバム・作品一覧",
+      "albums": "アルバム一覧｜同人音楽・VOCALOID・アニメ・ゲーム音楽",
+      "artists": "アーティスト・同人サークル一覧",
+      "entries": "アニメ・ゲームなど作品別の音楽",
+      "franchises": "シリーズ一覧",
+      "events": "同人音楽イベント・即売会一覧",
+      "vinyls": "アナログレコード一覧"
+    },
+    "artist": {
+      "aliases": "別名：{names}",
+      "recent": "最近の作品：{albums}"
+    },
+    "profile": {
+      "member": "CDCatメンバー",
+      "joined": "{date}登録",
+      "edits": "編集{count}件",
+      "reviews": "評価{count}件"
     }
   },
   "artist_card": {

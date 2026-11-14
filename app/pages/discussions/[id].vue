@@ -41,7 +41,7 @@ const articlePath = (value: DiscussionTopicPage | null | undefined) => {
   const article = value?.topic.article
   return article?.status === 'published' ? `/articles/${article.id}${article.slug ? `/${article.slug}` : ''}#comments` : null
 }
-if (articlePath(data.value)) await navigateTo(articlePath(data.value)!, { replace: true, redirectCode: 302 })
+if (articlePath(data.value)) await navigateTo(articlePath(data.value)!, { replace: true, redirectCode: 301 })
 watch(data, (value) => { if (articlePath(value)) void navigateTo(articlePath(value)!, { replace: true }) })
 const redirecting = computed(() => !!articlePath(data.value))
 
@@ -135,6 +135,14 @@ const go = (changes: Record<string, string | number | null | undefined>) => {
     if (value !== undefined && value !== null && value !== '') next[key] = String(value)
   }
   router.push({ query: next })
+}
+/** A page of the topic as an address, for the page numbers' links: as `go` builds it, without the post it was opened at. */
+const pageLink = (page: number) => {
+  const query: Record<string, string> = {}
+  for (const [key, value] of Object.entries({ ...route.query, floor: undefined, post: undefined, unread: undefined, page: page > 1 ? String(page) : undefined })) {
+    if (typeof value === 'string' && value) query[key] = value
+  }
+  return { path: route.path, query }
 }
 const jump = ref('')
 const jumpToFloor = () => {
@@ -270,6 +278,7 @@ const firstFloor = computed(() => floors.value.find(floor => floor.floor === 1))
 // Spoilers never reach the description.
 const description = computed(() => plainText(firstFloor.value?.status === 'visible' ? firstFloor.value.raw : '', { spoiler: '▇▇▇' }))
 const { canonical } = usePageSeo({
+  languages: false,
   title: () => topic.value ? `${topic.value.title} - ${categoryName(topic.value.category)}` : t('discussions.title'),
   description,
   noindex: () => topic.value?.noindex,
@@ -375,7 +384,7 @@ const { canonical } = usePageSeo({
             <label :for="`jump-${topic.id}`">{{ t('discussions.topic.jump') }}</label>
             <input :id="`jump-${topic.id}`" v-model="jump" inputmode="numeric" pattern="[0-9]*" class="input input-sm w-16 px-2 text-center text-xs" placeholder="#">
           </form>
-          <CommonPagination v-if="pagination && pagination.last_page > 1" class="ml-auto" :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" @update:page="value => go({ page: value > 1 ? value : null })" />
+          <CommonPagination v-if="pagination && pagination.last_page > 1" class="ml-auto" :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" :link="pageLink" @update:page="value => go({ page: value > 1 ? value : null })" />
         </div>
 
         <div class="mt-4 space-y-3" :class="pending ? 'opacity-60' : ''">
@@ -391,7 +400,7 @@ const { canonical } = usePageSeo({
         </UiButton>
 
         <div v-if="pagination && pagination.last_page > 1" class="mt-5 flex justify-center">
-          <CommonPagination :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" @update:page="value => go({ page: value > 1 ? value : null })" />
+          <CommonPagination :page="pagination.current_page" :total-pages="pagination.last_page" :disabled="pending" :link="pageLink" @update:page="value => go({ page: value > 1 ? value : null })" />
         </div>
 
         <section ref="composerSection" class="card mt-6 scroll-mt-24 p-4 sm:p-5">

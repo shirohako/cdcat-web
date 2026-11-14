@@ -2,6 +2,8 @@ import type { CatalogImage } from './catalog'
 import type { TrackingStatus } from './tracking'
 
 export interface PublicProfile {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   id: number
   username: string
   nickname?: string

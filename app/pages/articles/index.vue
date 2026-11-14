@@ -58,7 +58,7 @@ const { data: featuredData, loading: featuredLoading } = usePageData(
 )
 const featured = computed(() => featuredData.value ?? [])
 
-usePageSeo({ title: () => t('content_display.articles'), description: () => t('seo.pages.articles') })
+usePageSeo({ languages: false, title: () => t('content_display.articles'), description: () => t('seo.pages.articles') })
 </script>
 
 <template>
@@ -123,6 +123,7 @@ usePageSeo({ title: () => t('content_display.articles'), description: () => t('s
         </div>
         <div v-else :key="revealKey" class="transition-opacity @container" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <CommonPagedList
+            link
             :page="data?.pagination.current_page ?? 1" :total-pages="data?.pagination.last_page ?? 1" :total="data?.pagination.total ?? 0"
             :count="data?.articles.length ?? 0" :per-page="data?.pagination.per_page ?? 1" :top-after="6" :disabled="refetching" @update:page="value => update({ page: value > 1 ? String(value) : null })"
           >

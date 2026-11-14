@@ -255,8 +255,21 @@
         "products": "发行版本",
         "bonuses": "特典",
         "links": "相关链接",
-        "footer": "资料来源：{source}，以 {license} 共享"
-      }
+        "footer": "资料来源：{source}，以 {license} 共享",
+        "page": "页面",
+        "rating": "评分",
+        "rating_value": "{rating} / 5（{count} 人评分）",
+        "cover": "封面",
+        "updated": "最后更新",
+        "related": "关联作品",
+        "attributes": "其他信息",
+        "images": "图片",
+        "lyrics": "歌词"
+      },
+      "llm_copy": "LLM 副本",
+      "view_markdown": "以 Markdown 查看",
+      "llm_copied": "已复制整张专辑的 Markdown",
+      "copy_failed": "复制失败，请再试一次。"
     },
     "toc": {
       "button": "Disc ID",
@@ -1087,7 +1100,7 @@
       },
       "empty": "暂无具体届次",
       "no_description": "暂无介绍。",
-      "seo_description": "浏览归档的同人展会与音乐活动。"
+      "seo_description": "M3 等同人音乐即卖会与音乐活动的日期、会场、参展社团和首发专辑。"
     },
     "revisions": {
       "title": "我的编辑记录",
@@ -3653,9 +3666,9 @@
       "map": "附会场图"
     },
     "pages": {
-      "albums": "浏览 CDCat 收录的专辑、单曲、EP 与合辑。",
+      "albums": "CDCat 收录的同人音乐、VOCALOID、动画与游戏音乐专辑，每张都有完整的曲目、版本和制作人员，按最新添加排列。",
       "vinyls": "浏览 CDCat 收录的黑胶唱片。",
-      "artists": "浏览 CDCat 收录的艺术家、同人社团与虚拟歌手及其作品。",
+      "artists": "CDCat 收录的艺术家、同人社团、厂牌与虚拟歌手，可查看各自的专辑和参与作品。",
       "entries": "浏览 CDCat 收录的动画、游戏、影视等作品及其音乐。",
       "franchises": "浏览 CDCat 收录的作品系列及相关专辑。",
       "articles": "CDCat 用户撰写的音乐评论、专题与资料整理。",
@@ -3667,6 +3680,28 @@
       "guide_editor": "CDCat 编辑器使用说明：怎样新建专辑，填写曲目、参与创作的人、版本和特典，提交审核，以及更正已有的资料。",
       "api_docs": "CDCat 开放接口文档：用 HTTP 读取专辑、曲目、艺术家、活动、条目和系列资料，不需要密钥，数据以 CC BY-SA 4.0 共享。",
       "join": "CDCat 人员募集：翻译、校对、编辑、美术、设计、开发、资料整理和社区管理等岗位，欢迎喜欢音乐的你一起参与。"
+    },
+    "title": {
+      "artist": "{name} 的专辑与参与作品",
+      "track_lyrics": "{title} 歌词",
+      "entry": "{name} 相关专辑与原声",
+      "franchise": "{name} 系列的专辑与作品",
+      "albums": "专辑一览｜同人音乐、VOCALOID、动画与游戏音乐",
+      "artists": "艺术家与同人社团一览",
+      "entries": "动画、游戏等作品的音乐",
+      "franchises": "作品系列一览",
+      "events": "同人音乐活动与即卖会",
+      "vinyls": "黑胶唱片一览"
+    },
+    "artist": {
+      "aliases": "别名：{names}",
+      "recent": "近期作品：{albums}"
+    },
+    "profile": {
+      "member": "CDCat 成员",
+      "joined": "{date}加入",
+      "edits": "贡献 {count} 次编辑",
+      "reviews": "{count} 条评价"
     }
   },
   "artist_card": {

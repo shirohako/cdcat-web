@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationRaw } from 'vue-router'
+
 const props = withDefaults(defineProps<{
   page: number
   totalPages: number
@@ -10,11 +12,19 @@ const props = withDefaults(defineProps<{
   summary?: string
   /** Show the pages even when there is only one. */
   always?: boolean
+  /**
+   * The list keeps its page in the address as `?page=`: the pages are then real links to those addresses, which
+   * search engines follow (docs/seo in the API repo) and a reader can open in a new tab. A plain click still only
+   * emits `update:page`, so the list turns the page as it always did. A function gives a page's address itself,
+   * for a list whose address holds more than the page (a topic opened at one of its posts).
+   */
+  link?: boolean | ((page: number) => RouteLocationRaw)
 }>(), {
   disabled: false,
   size: 'xs',
   summary: undefined,
   always: false,
+  link: false,
 })
 
 const emit = defineEmits<{
@@ -61,6 +71,23 @@ const goTo = (target: number) => {
 
 const skip = (item: 'back' | 'forward') => goTo(item === 'back' ? Math.max(1, props.page - SKIP) : Math.min(props.totalPages, props.page + SKIP))
 
+const route = useRoute()
+const router = useRouter()
+/** With `link`, the address of a page: the current one with `page` set, left out for the first. Nothing for a page that isn't there. */
+const hrefOf = (target: number) => {
+  if (!props.link || props.disabled || target < 1 || target > props.totalPages) return undefined
+  const to = typeof props.link === 'function'
+    ? props.link(target)
+    : { path: route.path, query: { ...route.query, page: target > 1 ? String(target) : undefined } }
+  return router.resolve(to).href
+}
+/** A plain click turns the page in place; a modified one (new tab, new window) is the browser's to follow. */
+const onLinkClick = (event: MouseEvent, target: number) => {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+  event.preventDefault()
+  goTo(target)
+}
+
 // Out of range is taken as the nearest end; anything that is not a number is dropped.
 const jumpInput = ref('')
 // Only digits stay in the box.
@@ -84,10 +111,14 @@ const STEP = 'grid place-items-center bg-card text-primary transition-colors dur
   <!-- With a summary: the line on the left and the same pages (without it) in the middle; stacked on phones. -->
   <div v-if="summary || $slots.summary" class="flex flex-col items-center gap-3 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:gap-4">
     <p class="text-xs tabular-nums text-meta sm:justify-self-start"><slot name="summary">{{ summary }}</slot></p>
-    <CommonPagination :page="page" :total-pages="totalPages" :disabled="disabled" :size="size" always @update:page="emit('update:page', $event)" />
+    <CommonPagination :page="page" :total-pages="totalPages" :disabled="disabled" :size="size" :link="link" always @update:page="emit('update:page', $event)" />
   </div>
   <nav v-else-if="always || totalPages > 1" class="flex flex-wrap items-center justify-center gap-1.5" :aria-label="t('common.pagination_label')">
+    <a v-if="hrefOf(page - 1)" :href="hrefOf(page - 1)" rel="prev" :class="[STEP, SIZES[size]]" :aria-label="t('common.previousPage')" @click="onLinkClick($event, page - 1)">
+      <Icon name="lucide:chevron-left" :class="ICON_SIZES[size]" />
+    </a>
     <button
+      v-else
       type="button"
       :disabled="disabled || page <= 1"
       :class="[STEP, SIZES[size]]"
@@ -112,6 +143,17 @@ const STEP = 'grid place-items-center bg-card text-primary transition-colors dur
           <span class="group-hover/skip:hidden group-focus-visible/skip:hidden" aria-hidden="true">…</span>
           <Icon :name="item === 'back' ? 'lucide:chevrons-left' : 'lucide:chevrons-right'" class="hidden group-hover/skip:block group-focus-visible/skip:block" :class="ICON_SIZES[size]" />
         </button>
+        <a
+          v-else-if="hrefOf(item)"
+          :href="hrefOf(item)"
+          class="grid place-items-center px-2 font-semibold tabular-nums transition-colors duration-150 ease-out"
+          :class="[SIZES[size], item === page ? 'bg-primary text-on-primary' : 'bg-card text-body hover:bg-card-hover active:bg-card-active']"
+          :aria-current="item === page ? 'page' : undefined"
+          :aria-label="t('common.page_label', { page: item })"
+          @click="onLinkClick($event, item)"
+        >
+          {{ item }}
+        </a>
         <button
           v-else
           type="button"
@@ -127,7 +169,11 @@ const STEP = 'grid place-items-center bg-card text-primary transition-colors dur
       </template>
     </div>
 
+    <a v-if="hrefOf(page + 1)" :href="hrefOf(page + 1)" rel="next" :class="[STEP, SIZES[size]]" :aria-label="t('common.nextPage')" @click="onLinkClick($event, page + 1)">
+      <Icon name="lucide:chevron-right" :class="ICON_SIZES[size]" />
+    </a>
     <button
+      v-else
       type="button"
       :disabled="disabled || page >= totalPages"
       :class="[STEP, SIZES[size]]"

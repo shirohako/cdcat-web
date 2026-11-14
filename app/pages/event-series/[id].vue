@@ -24,6 +24,8 @@ interface SeriesEventPage {
 
 interface EventSeriesDetail {
   id: number
+  /** Whether search engines are offered this page: one of its events has releases or a circle list (docs/seo in the API repo). */
+  indexable?: boolean
   name: string
   slug: string
   location: string | null
@@ -116,6 +118,7 @@ usePageSeo({
   description: () => plainText(series.value ? localizedContent(series.value.description) : '') || t('collection_pages.events.seo_description'),
   image: () => bannerUrl.value,
   wideImage: true,
+  noindex: () => series.value?.indexable === false,
   error,
   breadcrumbs: () => series.value
     ? [{ name: t('collection_pages.events.title'), path: '/events' }, { name: series.value.name, path: `/event-series/${series.value.id}` }]
@@ -252,7 +255,7 @@ usePageSeo({
           {{ t('collection_pages.events.empty') }}
         </div>
 
-        <CommonPagination :page="page" :total-pages="lastPage" :disabled="eventsRefetching" @update:page="goToPage" />
+        <CommonPagination :page="page" :total-pages="lastPage" :disabled="eventsRefetching" link @update:page="goToPage" />
       </div>
 
       <div v-else-if="status === 'error'" class="flex min-h-60 items-center justify-center">

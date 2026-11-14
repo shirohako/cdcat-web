@@ -197,3 +197,56 @@ describe('albumExportFilename', () => {
     expect(albumExportFilename({ id: 7, title: '???', catalog_number: null }, 'json')).toBe('album-7.json')
   })
 })
+
+describe('albumMarkdown, as the page a language model reads', () => {
+  it('leads with the page it came from, and links nothing without a site to point at', () => {
+    const md = albumMarkdown(album({ byline: { role: 'artist', artists: [{ id: 5, name: 'Xeno' }] } as Album['byline'] }), source, helpers)
+    expect(md).toContain('- **page**：[https://cdcat.net/albums/1](https://cdcat.net/albums/1)')
+    expect(md).toContain('- **Artist**：Xeno')
+  })
+
+  it('links the artists, the release event, related works and tracks with lyrics to their pages', () => {
+    const site = (path: string) => `https://cdcat.net${path}`
+    const md = albumMarkdown(album({
+      byline: { role: 'artist', artists: [{ id: 5, name: 'Xeno' }, { id: 6, name: 'eili' }] } as Album['byline'],
+      release_event: { id: 58, name: 'M3-2026 Autumn', slug: null, main_visual_url: null, start_date: null },
+      entries: [{ id: 3, name: 'Touhou', slug: null, type: 'game', format: null, image_url: null, release_date: null, relation_type: 'arrange', note: 'tracks 1-4', franchises: [] }] as Album['entries'],
+      franchises: [{ id: 2, name: 'Touhou Project', slug: null, image_url: null }],
+      discs: [disc(1, [track(1, 'Sung', [], { lyrics_count: 1, has_lyrics: true }), track(2, 'Played', [])])],
+    }), { ...source, site }, helpers)
+    expect(md).toContain('- **Artist**：[Xeno](https://cdcat.net/artists/5), [eili](https://cdcat.net/artists/6)')
+    expect(md).toContain('- **release_date**：2024-08-12 ([M3-2026 Autumn](https://cdcat.net/events/58))')
+    expect(md).toContain('## related\n\n- [Touhou](https://cdcat.net/entries/3) · game · arrange · tracks 1-4\n- [Touhou Project](https://cdcat.net/franchises/2)')
+    expect(md).toContain('| # | title | duration | lyrics |')
+    expect(md).toContain('| 1 | Sung | 1:23 | [lyrics](https://cdcat.net/tracks/' )
+    expect(md).toContain('| 2 | Played | 1:23 |  |')
+  })
+
+  it('gives the rating, the cover, when it last changed, attributes and every image', () => {
+    const md = albumMarkdown(album({
+      rating: 4.5, rating_count: 12,
+      image_url: 'https://img.cdcat.net/cover_600.webp',
+      cover: { id: 1, url: 'https://img.cdcat.net/cover.webp', thumbnail_url: '', medium_url: '', width: 1, height: 1, mime: 'image/webp' },
+      edited_at: '2026-11-08T10:00:00Z',
+      attributes: [{ id: 1, key: 'bpm', value: 174, label: null, sort_order: 0 }],
+      images: [
+        { id: 1, kind: 'booklet', label: 'p. 01-02', caption: 'Lyrics spread', product_id: null, bonus_id: null, disc_id: null, is_primary: false, sort_order: 0, image: { id: 2, url: 'https://img.cdcat.net/b.webp', thumbnail_url: '', medium_url: '', width: 1, height: 1, mime: 'image/webp' }, attributes: [] },
+        { id: 2, kind: 'cover', label: null, caption: null, product_id: null, bonus_id: null, disc_id: null, is_primary: true, sort_order: 1, image: null, attributes: [] },
+      ] as Album['images'],
+    }), source, helpers)
+    expect(md).toContain('- **rating**：md.rating_value')
+    expect(md).toContain('- **cover**：[https://img.cdcat.net/cover.webp](https://img.cdcat.net/cover.webp)')
+    expect(md).toContain('- **updated**：2026-11-08')
+    expect(md).toContain('## attributes\n\n- **bpm**：174')
+    expect(md).toContain('## images\n\n- [booklet · p. 01-02 · Lyrics spread](https://img.cdcat.net/b.webp)\n\n')
+  })
+
+  it('dates an edition only when it came out on another day than the album', () => {
+    const edition = (extra: object) => ({ name: 'Reissue', edition_type: 'regular', catalog_number: null, format_label: 'CD', barcode: null, prices: [], note: null, release_date: '2024-08-12', release_date_precision: 'day', ...extra })
+    const same = albumMarkdown(album({ products: [edition({})] as unknown as Album['products'] }), source, helpers)
+    expect(same).toContain('- **Reissue** · CD\n')
+    const later = albumMarkdown(album({ products: [edition({ release_date: '2025-01-01' })] as unknown as Album['products'] }), source, helpers)
+    expect(later).toContain('- **Reissue** · CD · 2025-01-01')
+  })
+})
+

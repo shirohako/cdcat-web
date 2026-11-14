@@ -6,13 +6,17 @@
  * The inner box clips only while it moves or is folded (`overflow: clip`, never a scroll container), so open content
  * shows focus rings and sticky elements around it keep working. With `lazy`, the content mounts on the first opening
  * and then stays, so content that starts folded costs nothing until it is wanted (and isn't in the server render).
+ *
+ * `lazy="client"` is for folded content search engines should still read (an album's credits, docs/seo in the API
+ * repo): the server renders it, folded, and so does the page that hydrates that HTML; only pages built in the browser,
+ * after a navigation, wait for the first opening.
  */
 const props = withDefaults(defineProps<{
   open: boolean
-  lazy?: boolean
+  lazy?: boolean | 'client'
 }>(), { lazy: false })
 
-const mounted = ref(props.open || !props.lazy)
+const mounted = ref(props.open || !props.lazy || (props.lazy === 'client' && (import.meta.server || !!useNuxtApp().isHydrating)))
 const settled = ref(props.open)
 let settleTimer: ReturnType<typeof setTimeout> | undefined
 

@@ -63,7 +63,7 @@
           <AlbumCreditsFold :open="peopleOpen" :title="$t('album.track_people.title')" :count="people.length" :name-only="peopleNameOnlyCount" @click="togglePeople" />
           <UiSegmented v-if="peopleOpen" v-model="peopleView" :items="peopleViews" :label="$t('album.track_people.view_label')" size="sm" class="mr-2 shrink-0" />
         </div>
-        <UiCollapse :open="peopleOpen" lazy>
+        <UiCollapse :open="peopleOpen" lazy="client">
           <!-- By role: one row per role as in the album's own credits, each person a tag with their tracks after it -->
           <CatalogInfoTable v-if="peopleView === 'role_groups'" variant="lines" fit-labels class="pt-1">
             <CatalogInfoRow v-for="group in roleGroups" :key="group.key">

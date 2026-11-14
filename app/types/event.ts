@@ -1,5 +1,7 @@
 /** An event edition with its venue (GET /v1/events/{id}). See docs/api/events.md. */
 export interface EventDetail {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   id: number
   event_series_id: number | null
   series: { id: number, name: string, slug: string, website: string | null, visual_orientation: 'portrait' | 'landscape' } | null

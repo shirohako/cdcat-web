@@ -1,5 +1,6 @@
 <template>
-  <div ref="page" class="container mx-auto max-w-6xl space-y-14 px-4 py-10 md:space-y-16 md:px-8 md:py-16 2xl:max-w-7xl">
+  <div ref="page" lang="zh-Hans" class="container mx-auto max-w-6xl space-y-14 px-4 py-10 md:space-y-16 md:px-8 md:py-16 2xl:max-w-7xl">
+    <!-- lang: the page is written in Simplified Chinese only (app/join), whatever the interface language. -->
     <section class="grid items-center gap-10 md:grid-cols-[minmax(0,1fr)_15rem] lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-16">
       <div class="max-w-2xl">
         <p class="flex items-center gap-2.5 text-sm font-medium text-title">
@@ -187,6 +188,7 @@ async function copyQq() {
 onBeforeUnmount(() => clearTimeout(qqCopiedTimer))
 
 usePageSeo({
+  languages: false,
   title: () => t('about_page.recruit'),
   description: () => t('seo.pages.join'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.recruit'), path: '/join' }],

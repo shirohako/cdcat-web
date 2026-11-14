@@ -124,6 +124,7 @@ const moreByAuthor = computed(() => moreData.value ?? [])
 const articlePath = computed(() => article.value ? `/articles/${article.value.id}${article.value.slug ? `/${article.value.slug}` : ''}` : null)
 const absolute = useSiteUrl()
 usePageSeo({
+  languages: false,
   title: () => article.value?.title,
   description: () => article.value?.summary,
   image: () => article.value?.cover_url,

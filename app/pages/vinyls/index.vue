@@ -14,6 +14,7 @@
         <CollectionLoadingSkeleton v-if="loading" variant="covers" grid-class="grid-cols-2 gap-5 sm:grid-cols-4 md:gap-6 xl:grid-cols-5" />
         <CommonPagedList
           v-else-if="data"
+          link
           :page="page"
           :total-pages="lastPage"
           :total="data.pagination.total"
@@ -49,5 +50,5 @@ const { data, status, refresh, loading, refetching, revealKey, revealClass } = a
 })
 const albums = computed(() => data.value?.albums ?? [])
 const lastPage = computed(() => data.value?.pagination.last_page ?? 1)
-usePageSeo({ title: () => t('menu.vinyl'), description: () => t('seo.pages.vinyls') })
+usePageSeo({ title: () => t('seo.title.vinyls'), description: () => t('seo.pages.vinyls') })
 </script>

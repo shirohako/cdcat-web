@@ -8,7 +8,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 
-usePageSeo({ title: () => t('content_display.series'), description: () => t('seo.pages.franchises') })
+usePageSeo({ title: () => t('seo.title.franchises'), description: () => t('seo.pages.franchises') })
 
 const currentPage = computed(() => Math.max(1, Number.parseInt(route.query.page as string || '1') || 1))
 const search = computed(() => (route.query.search as string) || '')
@@ -69,6 +69,7 @@ const goToPage = (page: number) => {
 
       <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
         <CommonPagedList
+          link
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
           :total="pagination.total"

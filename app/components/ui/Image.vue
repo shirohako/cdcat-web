@@ -15,6 +15,15 @@ withDefaults(defineProps<{
   alt?: string
   /** A small version (a thumbnail), shown blurred until the picture is in. */
   placeholder?: string | null
+  /**
+   * The picture's other sizes (`url 600w, url 1200w`) and how wide it shows (`sizes`), for a large picture: the
+   * browser then fetches the smallest one that is sharp on its screen, and `src` is for browsers without `srcset`.
+   */
+  srcset?: string
+  sizes?: string
+  /** The picture's own size in pixels, when known: the browser reads its shape from them before it has loaded. */
+  width?: number | null
+  height?: number | null
   /** 'fade' for small pictures; 'develop' sharpens from a blur, for large ones. */
   reveal?: 'fade' | 'develop'
   fit?: 'cover' | 'contain'
@@ -29,6 +38,10 @@ withDefaults(defineProps<{
   src: undefined,
   alt: '',
   placeholder: undefined,
+  srcset: undefined,
+  sizes: undefined,
+  width: undefined,
+  height: undefined,
   reveal: 'fade',
   fit: 'cover',
   imgClass: undefined,
@@ -44,6 +57,10 @@ withDefaults(defineProps<{
       <img
         :key="src"
         :src="src"
+        :srcset="srcset"
+        :sizes="srcset ? sizes : undefined"
+        :width="width ?? undefined"
+        :height="height ?? undefined"
         :alt="alt"
         :loading="eager ? 'eager' : 'lazy'"
         :fetchpriority="eager ? 'high' : undefined"

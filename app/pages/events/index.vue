@@ -29,7 +29,7 @@ const latestDate = (series: EventSeriesSummary) => series.latest_start_date
   : ''
 
 usePageSeo({
-  title: () => t('collection_pages.events.title'),
+  title: () => t('seo.title.events'),
   description: () => t('collection_pages.events.seo_description'),
 })
 </script>

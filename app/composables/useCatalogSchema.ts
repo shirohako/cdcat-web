@@ -8,9 +8,12 @@ export const useCatalogSchema = () => {
   const { $api } = useNuxtApp()
   const { locale, t } = useI18n()
   const { localizedContent } = useLocaleFormatting()
-  const { data: schema, pending } = useAsyncData('catalog:schema', () => $api<CatalogSchema>('/v1/catalog/schema'), {
+  const request = useAsyncData('catalog:schema', () => $api<CatalogSchema>('/v1/catalog/schema'), {
     getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
   })
+  const { data: schema, pending } = request
+  /** Resolves once the dictionaries are in: for code that needs role names before the page renders (the album's Markdown). */
+  const ready = async () => { await request }
 
   const roles = computed(() => new Map<string, CreditRoleDefinition>((schema.value?.credit_roles ?? []).map(role => [role.key, role])))
   const attributes = computed(() => new Map<string, AttributeDefinition>((schema.value?.attribute_definitions ?? []).map(definition => [definition.key, definition])))
@@ -47,5 +50,5 @@ export const useCatalogSchema = () => {
   }
   const attributeDefinition = (key: string) => attributes.value.get(key) ?? null
 
-  return { schema, pending, roleName, roleNameEn, roleTip, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
+  return { schema, pending, ready, roleName, roleNameEn, roleTip, roleCategory, roleOrder, attributeName, attributeNameEn, attributeDefinition }
 }

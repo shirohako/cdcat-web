@@ -4,12 +4,17 @@ import { Info } from '@lucide/vue'
 /**
  * A credit's note (`detail`), free text for readers: an ⓘ beside the name, the text in its tooltip, so notes never crowd
  * the names. A tap shows it on touch screens. Attributes go to the tooltip, so spacing belongs on a wrapper.
+ *
+ * The text is also in the page, in brackets after the icon and out of sight: screen readers read it there, and so do
+ * search engines, which never hover (docs/seo in the API repo).
  */
 defineProps<{
   note: string
   /** Inside a coloured role tag: the tag's own colour, a little faded, instead of grey */
   tinted?: boolean
 }>()
+
+const { aside } = useListPunctuation()
 </script>
 
 <template>
@@ -20,13 +25,12 @@ defineProps<{
          text's letters sit about that far below the middle of its line -->
     <span
       tabindex="0"
-      role="img"
-      :aria-label="note"
       class="inline-grid shrink-0 cursor-help place-items-center rounded-full align-middle transition duration-150"
       :class="tinted ? 'size-3 translate-y-[0.5px] opacity-75 hover:opacity-100' : 'size-3.5 text-meta hover:text-title'"
     >
       <!-- 11px in either case: at 12px the circle stood as tall as the 12px text beside it and looked heavy -->
-      <Info :size="11" :stroke-width="tinted ? 2.5 : 2" />
+      <Info :size="11" :stroke-width="tinted ? 2.5 : 2" aria-hidden="true" />
+      <span class="sr-only">{{ aside(note).trim() }}</span>
     </span>
   </UiTooltip>
 </template>

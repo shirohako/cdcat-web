@@ -16,6 +16,7 @@ const absolute = useSiteUrl()
 const { data: doc } = await useAsyncData(() => `guide:editor:${locale.value}`, () => loadGuide('editor', locale.value), { deep: false })
 
 usePageSeo({
+  languages: false,
   title: () => t('about_page.guide_submit_title'),
   description: () => t('seo.pages.guide_editor'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_submit_title'), path: '/docs/editor' }],

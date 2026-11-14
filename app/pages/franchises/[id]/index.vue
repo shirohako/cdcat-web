@@ -12,11 +12,11 @@ const { onClick: onExternalClick } = useExternalLink()
 
 const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`, { notFound: true })
 
-const { withOriginal, sentence, count } = useSeoText()
+const { withOriginal, sentence, count, own } = useSeoText()
 const absolute = useSiteUrl()
 const seriesName = computed(() => displayName(series.value))
 usePageSeo({
-  title: () => series.value ? withOriginal(seriesName.value, series.value.name) : undefined,
+  title: () => series.value ? t('seo.title.franchise', { name: withOriginal(seriesName.value, series.value.name) }) : undefined,
   description: () => series.value
     ? composeDescription(
         sentence([
@@ -24,13 +24,13 @@ usePageSeo({
           count('seo.franchise.entries', series.value.entries_count ?? series.value.entries.length),
           count('seo.entry.albums', series.value.albums_count ?? series.value.albums.length),
         ]),
-        plainText(series.value.description),
+        own(plainText(series.value.description)),
         descriptionLength(locale.value),
       )
     : undefined,
   image: () => series.value?.banner_url || series.value?.image_url,
   wideImage: true,
-  noindex: () => series.value?.is_pending,
+  noindex: () => series.value?.is_pending || series.value?.indexable === false,
   error,
   breadcrumbs: () => series.value ? [{ name: t('menu.series'), path: '/franchises' }, { name: seriesName.value, path: `/franchises/${series.value.id}` }] : null,
   jsonLd: () => series.value && namedLd('CreativeWorkSeries', {

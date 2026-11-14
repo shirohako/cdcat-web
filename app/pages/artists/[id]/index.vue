@@ -346,21 +346,33 @@ const toggleFollow = async () => {
   }
 }
 
-const { withOriginal, sentence, count } = useSeoText()
+const { withOriginal, sentence, count, list, own } = useSeoText()
 const absolute = useSiteUrl()
+/** Names the artist also goes by, other than the two in the title: for the description. */
+const aliases = computed(() => {
+  const shown = new Set([shownName.value, artist.value?.name])
+  return [...new Set((artist.value?.titles ?? []).map(title => title.title))].filter(name => !shown.has(name)).slice(0, 3)
+})
 usePageSeo({
-  title: () => artist.value ? withOriginal(shownName.value, artist.value.name) : undefined,
+  // What people search an artist for is their records: the title says the page lists them.
+  title: () => artist.value ? t('seo.title.artist', { name: withOriginal(shownName.value, artist.value.name) }) : undefined,
   description: () => artist.value
     ? composeDescription(
-        sentence([enumLabel('artist_type', artist.value.type), count('seo.albums_count', artist.value.albums_count)]),
-        plainText(artist.value.bio),
+        sentence([
+          enumLabel('artist_type', artist.value.type),
+          aliases.value.length && t('seo.artist.aliases', { names: list(aliases.value) }),
+          count('seo.albums_count', artist.value.albums_count),
+          albums.value.length && t('seo.artist.recent', { albums: list(albums.value.slice(0, 3).map(album => album.title)) }),
+        ]),
+        own(plainText(artist.value.bio)),
         descriptionLength(locale.value),
       )
     : undefined,
   image: () => artist.value?.image_url,
   card: () => artist.value?.share_card_url,
   type: 'profile',
-  noindex: () => artist.value?.is_pending,
+  // Pages with little of their own (an artist on one or two albums) stay out of search results; the API decides.
+  noindex: () => artist.value?.is_pending || artist.value?.indexable === false,
   error,
   breadcrumbs: () => artist.value ? [{ name: t('menu.artist'), path: '/artists' }, { name: shownName.value, path: `/artists/${artist.value.id}` }] : null,
   jsonLd: () => artist.value && namedLd(artistLdType(artist.value.type), {

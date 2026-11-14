@@ -58,6 +58,7 @@
       <!-- 专辑列表 -->
       <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
         <CommonPagedList
+          link
           :page="pagination.current_page"
           :total-pages="pagination.last_page"
           :total="pagination.total"
@@ -142,7 +143,7 @@ watch(() => route.query.q, value => { searchInput.value = String(value || '') })
 const toast = useToast()
 
 usePageSeo({
-  title: () => t('albums.title'),
+  title: () => t('seo.title.albums'),
   description: () => t('seo.pages.albums'),
 })
 

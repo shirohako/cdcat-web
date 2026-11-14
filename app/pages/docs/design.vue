@@ -16,6 +16,7 @@ const absolute = useSiteUrl()
 const { data: doc } = await useAsyncData(() => `guide:design:${locale.value}`, () => loadGuide('design', locale.value), { deep: false })
 
 usePageSeo({
+  languages: false,
   title: () => t('about_page.guide_basics_title'),
   description: () => t('seo.pages.guide_design'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_basics_title'), path: '/docs/design' }],

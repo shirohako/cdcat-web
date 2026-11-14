@@ -1,7 +1,7 @@
 import type { LocationQuery } from 'vue-router'
+import type { SiteLocale } from '../../shared/utils/languageUrls'
 
-/** The interface languages, as i18n locale codes. */
-export type SiteLocale = 'zh-Hans' | 'zh-Hant' | 'en' | 'ja' | 'ko'
+export type { SiteLocale }
 
 /** Query parameters that pick the interface language: `lang`, then Steam's `l`. */
 export const LANGUAGE_QUERY = ['lang', 'l'] as const

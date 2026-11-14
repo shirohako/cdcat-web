@@ -9,7 +9,8 @@
            server already clipped, so long text doesn't jump; once measured, text that fits is let out. -->
       <div class="relative" :class="!expanded && (folds || !measured) && 'max-h-72 overflow-hidden'">
         <div ref="body">
-          <CatalogPlainText v-if="album.description" :text="album.description" class="text-body" />
+          <!-- Lazy: only an album with a description needs the code that finds the addresses in it. -->
+          <LazyCatalogPlainText v-if="album.description" :text="album.description" class="text-body" />
 
           <!-- The album's facts (once the side column's 信息 card) as a table under the text: a faint label column,
                the attributes as rows of it too. Whatever the hero already shows stays out of it. -->

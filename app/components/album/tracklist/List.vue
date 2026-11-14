@@ -141,7 +141,7 @@ const ARROW = 'mt-0.5 inline-flex size-5 shrink-0 items-center justify-center ro
                   <AlbumTracklistOriginals :originals="row.originals" />
                 </template>
               </p>
-              <UiCollapse class="col-start-1 row-start-1" :open="showsFull(row, density)" lazy>
+              <UiCollapse class="col-start-1 row-start-1" :open="showsFull(row, density)" lazy="client">
                 <div class="pb-1.5 pt-1">
                   <p v-if="row.subtitle" class="mb-1.5 flex min-w-0 items-center gap-2 text-xs leading-[1.125rem] text-title">
                     <AlbumTracklistLabel size="md">{{ t('album.tracklist.original_title') }}</AlbumTracklistLabel><span class="min-w-0 truncate">{{ row.subtitle }}</span>

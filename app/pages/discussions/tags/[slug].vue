@@ -15,8 +15,11 @@ const { data: tag, loading } = await usePageData(() => `discussion-tag-${slug.va
   { notFound: true })
 const name = computed(() => tag.value ? tagName(tag.value) : slug.value)
 usePageSeo({
+  languages: false,
   title: () => `#${name.value} - ${t('discussions.title')}`,
   description: () => t('seo.pages.discussion_tag', { tag: name.value }),
+  // A tag nobody has used yet has nothing to show.
+  noindex: () => !tag.value?.topics_count,
 })
 </script>
 

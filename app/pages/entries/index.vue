@@ -8,7 +8,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, formatReleaseDate } = useEntryDisplay()
 
-usePageSeo({ title: () => t('menu.entry'), description: () => t('seo.pages.entries') })
+usePageSeo({ title: () => t('seo.title.entries'), description: () => t('seo.pages.entries') })
 
 const selectedType = computed(() => (ENTRY_TYPES as readonly string[]).includes(route.query.type as string) ? route.query.type as EntryType : 'all')
 const selectedFormat = computed(() => (route.query.format as string) || '')
@@ -101,6 +101,7 @@ const goToPage = (page: number) => {
 
         <div v-else :key="revealKey" class="transition-opacity" :class="[revealClass, { 'pointer-events-none opacity-60': refetching }]" :inert="refetching">
           <CommonPagedList
+            link
             :page="pagination.current_page"
             :total-pages="pagination.last_page"
             :total="pagination.total"

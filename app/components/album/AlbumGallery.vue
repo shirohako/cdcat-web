@@ -15,7 +15,7 @@
       <div v-if="view === 'grid'" class="grid grid-cols-4 gap-1.5">
         <UiTooltip v-for="item in shown" :key="item.id" group="album-gallery" :text="describe(item)">
           <button type="button" class="group relative aspect-square overflow-hidden rounded-md bg-sunken" @click="open(item.index)">
-            <img :src="item.image.thumbnail_url" :alt="item.caption || describe(item)" loading="lazy" class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
+            <img :src="item.image.thumbnail_url" :alt="altOf(item)" loading="lazy" class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
           </button>
         </UiTooltip>
       </div>
@@ -26,7 +26,7 @@
         <li v-for="item in shown" :key="item.id">
           <button type="button" class="group flex w-full min-w-0 items-center gap-3 rounded-lg p-1 pr-2 text-left transition-colors duration-150 hover:bg-black/[0.06] dark:hover:bg-white/[0.07]" @click="open(item.index)">
             <span class="size-10 shrink-0 overflow-hidden rounded-md bg-sunken">
-              <img :src="item.image.thumbnail_url" :alt="item.caption || describe(item)" loading="lazy" class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
+              <img :src="item.image.thumbnail_url" :alt="altOf(item)" loading="lazy" class="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105">
             </span>
             <span class="min-w-0 flex-1">
               <span class="block truncate text-sm font-medium text-title transition-colors group-hover:text-primary">{{ enumLabel('image_kind', item.kind) }}</span>
@@ -105,6 +105,8 @@ const shown = computed(() => collapsible.value && !expanded.value ? thumbnails.v
 
 /** "背面 · 初回限定盤": the kind, its label and what it belongs to. */
 const describe = (item: Item) => [enumLabel('image_kind', item.kind), item.label, item.scope].filter(Boolean).join(' · ')
+/** What the picture is and what its caption says, for readers who can't see it and for image search */
+const altOf = (item: Item) => [describe(item), item.caption].filter(Boolean).join(' · ')
 
 const index = ref<number | null>(null)
 const viewerItems = computed(() => items.value.map(item => ({ ...item, title: enumLabel('image_kind', item.kind) })))

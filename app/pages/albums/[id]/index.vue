@@ -1,7 +1,10 @@
 <template>
   <div class="min-h-screen">
+    <!-- Nothing to render when the answer is the album's Markdown (see asMarkdown). -->
+    <template v-if="asMarkdown" />
+
     <AlbumDetail
-      v-if="album && !mergedInto"
+      v-else-if="album && !mergedInto"
       :class="revealClass"
       :album="album"
       @favorited="setAlbumFavorite"
@@ -31,16 +34,27 @@ import { bylineText } from '~/utils/albumByline'
 const route = useRoute()
 const { t, locale } = useI18n()
 const { localName, formatDate, enumLabel } = useCatalogDisplay()
-const { withOriginal, sentence, count } = useSeoText()
+const { withOriginal, sentence, count, own } = useSeoText()
 const absolute = useSiteUrl()
+const { markdown } = useAlbumExport()
 
-const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${route.params.id}`, { notFound: true })
+// `/albums/18.md` is the album as Markdown, for language models and anyone who wants the text (docs/seo in the API
+// repo). It is this same route, whose id then carries the suffix; a request for `text/markdown` gets it too.
+const routeId = String(route.params.id)
+const suffix = routeId.endsWith('.md') ? '.md' : ''
+const albumId = suffix ? routeId.slice(0, -suffix.length) : routeId
+const asMarkdown = useMarkdownRequest(!!suffix)
+
+const { data: album, status, error, refresh, mutate, revealClass } = await usePageAPI<Album>(`/v1/albums/${albumId}`, { notFound: true })
 
 // A merged album answers with the kept one; show its address instead of the old id. The check after the
 // await covers the server (a 301) and cached data; the watch covers data that arrives after client-side navigation.
-const mergedInto = computed(() => album.value && String(album.value.id) !== String(route.params.id) ? album.value.id : null)
+const mergedInto = computed(() => album.value && String(album.value.id) !== albumId ? album.value.id : null)
 if (mergedInto.value) {
-  await navigateTo({ path: `/albums/${mergedInto.value}`, query: route.query }, { replace: true, redirectCode: 301 })
+  await navigateTo({ path: `/albums/${mergedInto.value}${suffix}`, query: route.query }, { replace: true, redirectCode: 301 })
+}
+else if (asMarkdown && album.value) {
+  sendMarkdown(await markdown(album.value), absolute(`/albums/${album.value.id}`))
 }
 watch(mergedInto, (id) => {
   if (id) navigateTo({ path: `/albums/${id}`, query: route.query }, { replace: true })
@@ -98,11 +112,13 @@ usePageSeo({
       value.catalog_number && t('seo.album.catalog', { number: value.catalog_number }),
       count('seo.album.tracks', value.track_count),
     ])
-    return composeDescription(lead, oneLine(value.description), descriptionLength(locale.value))
+    return composeDescription(lead, own(oneLine(value.description)), descriptionLength(locale.value))
   },
   image: () => album.value?.cover?.medium_url || album.value?.image_url,
   card: () => album.value?.share_card_url,
   type: 'music.album',
+  // The page's own address, also when it was opened as `….md` in the browser.
+  path: () => (album.value ? `/albums/${album.value.id}` : undefined),
   noindex: () => album.value?.is_pending,
   adult: () => album.value?.is_adult,
   error,
@@ -129,4 +145,11 @@ usePageSeo({
     })
   },
 })
+
+// Where tools that read for a language model find the Markdown form.
+useHead(() => ({
+  link: album.value && !album.value.is_pending
+    ? [{ rel: 'alternate', type: 'text/markdown', href: absolute(`/albums/${album.value.id}.md`), key: 'markdown' }]
+    : [],
+}))
 </script>

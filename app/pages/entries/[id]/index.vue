@@ -16,10 +16,11 @@ const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail
 const name = computed(() => displayName(entry.value))
 const subtitle = computed(() => originalName(entry.value))
 
-const { withOriginal, sentence, count } = useSeoText()
+const { withOriginal, sentence, count, own } = useSeoText()
 const absolute = useSiteUrl()
 usePageSeo({
-  title: () => entry.value ? withOriginal(name.value, entry.value.name) : undefined,
+  // A work is searched for with its music: the title says the page lists the albums.
+  title: () => entry.value ? t('seo.title.entry', { name: withOriginal(name.value, entry.value.name) }) : undefined,
   description: () => entry.value
     ? composeDescription(
         sentence([
@@ -27,12 +28,12 @@ usePageSeo({
           formatReleaseDate(entry.value.release_date, entry.value.release_date_precision),
           count('seo.entry.albums', entry.value.albums.length),
         ]),
-        plainText(entry.value.description),
+        own(plainText(entry.value.description)),
         descriptionLength(locale.value),
       )
     : undefined,
   image: () => entry.value?.image_url,
-  noindex: () => entry.value?.is_pending,
+  noindex: () => entry.value?.is_pending || entry.value?.indexable === false,
   error,
   breadcrumbs: () => entry.value ? [{ name: t('menu.entry'), path: '/entries' }, { name: name.value, path: `/entries/${entry.value.id}` }] : null,
   jsonLd: () => entry.value && namedLd(entryLdType(entry.value.type), {

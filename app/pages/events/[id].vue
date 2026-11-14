@@ -161,7 +161,8 @@ const eventDates = computed(() => {
   return start && end && start !== end ? `${start} – ${end}` : start || end
 })
 usePageSeo({
-  title: () => event.value?.name,
+  // The date beside the name: when an event is held is what it is searched for most.
+  title: () => event.value ? [event.value.name, eventDates.value].filter(Boolean).join(' - ') : undefined,
   description: () => {
     const value = event.value
     if (!value) return undefined
@@ -177,6 +178,8 @@ usePageSeo({
   },
   image: () => event.value?.main_visual_url,
   card: () => event.value?.share_card_url,
+  // An event with neither releases nor a circle list has only its name and date to show; the API decides.
+  noindex: () => event.value?.indexable === false,
   error,
   breadcrumbs: () => event.value
     ? [
@@ -195,6 +198,7 @@ usePageSeo({
     image: event.value.main_visual_url,
     description: plainText(localizedContent(event.value.description)),
     series: event.value.series ? { name: event.value.series.name, url: absolute(`/event-series/${event.value.series.id}`) } : null,
+    organizer: event.value.series ? { name: event.value.series.name, url: event.value.website_url ?? undefined } : null,
   }),
 })
 </script>
@@ -299,7 +303,9 @@ usePageSeo({
               </button>
             </div>
 
-            <template v-if="tab === 'circles'">
+            <!-- Both panels are in the page, the one not chosen hidden: the albums released here are then in the HTML
+                 search engines read, whichever tab shows (docs/seo in the API repo). -->
+            <div v-show="tab === 'circles'">
               <div v-if="!event.has_map && circles.length" class="mb-4 flex flex-wrap gap-2">
                 <label class="relative w-full sm:w-80">
                   <Search :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
@@ -346,9 +352,9 @@ usePageSeo({
                   @toggle-check="checklist.toggle"
                 />
               </template>
-            </template>
+            </div>
 
-            <template v-else>
+            <div v-show="tab === 'albums'">
               <CollectionLoadingSkeleton v-if="albumsLoading" variant="covers" />
               <div v-else-if="albumData?.albums.length" class="space-y-6">
                 <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4" :class="{ 'pointer-events-none opacity-60': albumsRefetching }">
@@ -373,7 +379,7 @@ usePageSeo({
               <div v-else class="card flex min-h-40 items-center justify-center">
                 <UiEmpty :title="t('event_page.albums.empty')" :icon="Disc3" />
               </div>
-            </template>
+            </div>
           </section>
         </div>
       </div>

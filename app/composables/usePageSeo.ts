@@ -1,6 +1,9 @@
 import type { MaybeRefOrGetter, Ref } from 'vue'
 import { breadcrumbLd, type LdRef } from '~/utils/structuredData'
-import { descriptionLength, nameWithOriginal, truncateText } from '~/utils/seoText'
+import { descriptionLength, nameWithOriginal, truncateText, writtenIn } from '~/utils/seoText'
+import { queryLanguage } from '~/utils/languageQuery'
+import { BARE_LOCALE, SITE_LOCALES, languageAlternates, languageUrl, type SiteLocale } from '~~/shared/utils/languageUrls'
+import { OG_LOCALES } from './useAppHead'
 
 export interface PageSeoOptions {
   /** Without the site name; the title template adds "| CDCat". */
@@ -27,6 +30,12 @@ export interface PageSeoOptions {
    * canonical URL at the bare path. A function gives the canonical parameters outright.
    */
   query?: string[] | (() => Record<string, string | number | null | undefined>)
+  /**
+   * The languages the page has a version of (`?lang=`, with hreflang between them): all five by default. `false`
+   * for a page whose text is in one language whatever the interface is (an article, a topic, a profile, a guide
+   * written in Chinese only): it has one address and no hreflang.
+   */
+  languages?: readonly SiteLocale[] | false
   jsonLd?: MaybeRefOrGetter<object | object[] | null | undefined>
   /** Section › this page; the site's home crumb is added in front. */
   breadcrumbs?: MaybeRefOrGetter<Array<{ name: string, path: string }> | null | undefined>
@@ -47,8 +56,8 @@ export const useSiteUrl = () => {
 }
 
 /**
- * A public page's title, description, share card, canonical URL, robots and JSON-LD (docs/seo in the API
- * repo). Call it after the page's main `await`, so the server knows whether the data was found.
+ * A public page's title, description, share card, canonical URL, language versions, robots and JSON-LD
+ * (docs/seo in the API repo). Call it after the page's main `await`, so the server knows whether the data was found.
  */
 export function usePageSeo(options: PageSeoOptions) {
   const route = useRoute()
@@ -59,8 +68,14 @@ export function usePageSeo(options: PageSeoOptions) {
   if (import.meta.server && missing.value) setResponseStatus(useRequestEvent()!, 404)
 
   const noindex = computed(() => missing.value || !!toValue(options.noindex))
-  const canonical = computed(() => {
-    if (noindex.value) return undefined
+  const versions = computed<readonly SiteLocale[]>(() => (options.languages === false ? [] : options.languages ?? SITE_LOCALES))
+  /** The language version the address names. The bare address is the Japanese one, so `?lang=ja` is not a version. */
+  const version = computed(() => {
+    const named = queryLanguage(route.query)
+    return named && named !== BARE_LOCALE && versions.value.includes(named) ? named : null
+  })
+  /** The page's address without its language: the path and the parameters that are part of it. */
+  const pagePath = computed(() => {
     const params = new URLSearchParams()
     if (typeof options.query === 'function') {
       for (const [name, value] of Object.entries(options.query())) if (value !== null && value !== undefined && value !== '') params.set(name, String(value))
@@ -73,8 +88,18 @@ export function usePageSeo(options: PageSeoOptions) {
       }
     }
     const search = params.toString()
-    return absolute(`${toValue(options.path) || route.path}${search ? `?${search}` : ''}`)
+    // Without a trailing slash, as every link on the site is written (the server redirects the slashed form).
+    const path = (toValue(options.path) || route.path).replace(/(?!^)\/+$/, '')
+    return `${path}${search ? `?${search}` : ''}`
   })
+  const canonical = computed(() => {
+    if (noindex.value) return undefined
+    return absolute(version.value ? languageUrl(pagePath.value, version.value) : pagePath.value)
+  })
+  /** hreflang: every version lists all of them, itself included. Nothing for a page with one address. */
+  const alternates = computed(() => (noindex.value || versions.value.length < 2
+    ? []
+    : languageAlternates(pagePath.value, versions.value).map(entry => ({ hreflang: entry.hreflang, href: absolute(entry.path) }))))
 
   const title = computed(() => toValue(options.title) || undefined)
   const description = computed(() => {
@@ -97,6 +122,9 @@ export function usePageSeo(options: PageSeoOptions) {
     ogDescription: description,
     ogType: (options.type ?? 'website') as 'website',
     ogUrl: canonical,
+    ogLocaleAlternate: () => (alternates.value.length
+      ? versions.value.filter(code => code !== locale.value).map(code => OG_LOCALES[code]!)
+      : []),
     ogImage: image,
     ogImageWidth: () => (card.value ? 1200 : undefined),
     ogImageHeight: () => (card.value ? 630 : undefined),
@@ -117,7 +145,10 @@ export function usePageSeo(options: PageSeoOptions) {
   })
 
   useHead(() => ({
-    link: canonical.value ? [{ rel: 'canonical', href: canonical.value }] : [],
+    link: [
+      ...(canonical.value ? [{ rel: 'canonical', href: canonical.value }] : []),
+      ...alternates.value.map(entry => ({ rel: 'alternate', hreflang: entry.hreflang, href: entry.href, key: `hreflang-${entry.hreflang}` })),
+    ],
     meta: toValue(options.adult) ? [{ name: 'rating', content: 'adult' }] : [],
     script: ld.value.map(data => ({
       type: 'application/ld+json',
@@ -131,7 +162,7 @@ export function usePageSeo(options: PageSeoOptions) {
 
 /** Shared wording for titles and generated descriptions, in the page language. */
 export const useSeoText = () => {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   /** "Local name (Original)" when they differ. */
   const withOriginal = (shown: string, original: string | null | undefined) =>
     nameWithOriginal(shown, original, (name, other) => t('seo.with_original', { name, original: other }))
@@ -144,5 +175,10 @@ export const useSeoText = () => {
   const list = (names: Array<string | null | undefined>) => names.filter(Boolean).join(t('seo.list_separator'))
   /** "12 albums" style counts; nothing for zero. */
   const count = (key: string, value: number | null | undefined) => (value ? t(key, { count: value }, value) : '')
-  return { withOriginal, sentence, list, count }
+  /**
+   * A member's text (a description, a bio) for the page's description: itself when it is written in the page's
+   * language, nothing otherwise, so each language version's description stays in that language.
+   */
+  const own = (text: string | null | undefined) => (text && writtenIn(text, locale.value) ? text : '')
+  return { withOriginal, sentence, list, count, own }
 }

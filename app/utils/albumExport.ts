@@ -1,6 +1,9 @@
-// The album page's 导出: the album as a CSV, Markdown or JSON file, made in the browser from the data the page already
-// has. People and roles come from buildTracklist, so a file lists them as the tracklist does. DATA_LICENSE asks reusers
-// to credit CDCat and link the page, so every format carries both.
+// The album page's 导出: the album as a CSV, Markdown or JSON file, made from the data the page already has. People and
+// roles come from buildTracklist, so a file lists them as the tracklist does. DATA_LICENSE asks reusers to credit CDCat
+// and link the page, so every format carries both.
+//
+// The Markdown is also the album's page for language models (docs/seo in the API repo): /albums/{id}.md answers with
+// it and LLM 副本 copies it, so it has to hold everything the page shows.
 
 import type { Album, AlbumProduct } from '~/types/album'
 import type { ProductPrice } from '~/types/document'
@@ -20,6 +23,8 @@ export interface AlbumExportSource {
   /** The album page's address */
   url: string
   license: { name: string, url: string }
+  /** A path on the site as a full address, for the Markdown's links to artists, tracks, events and works. */
+  site?: (path: string) => string
 }
 
 export interface AlbumExportHelpers extends TracklistHelpers {
@@ -160,23 +165,32 @@ const hostOf = (url: string) => {
 /** How many role columns a track table takes before it is too wide to read; the rest go under it. */
 const TABLE_ROLES = 3
 
-const discTable = (disc: TracklistDisc, tableRoles: string[], helpers: AlbumExportHelpers) => {
+const discTable = (disc: TracklistDisc, tableRoles: string[], source: AlbumExportSource, helpers: AlbumExportHelpers) => {
   const { rows } = disc
   const tracked = (cell: (row: TracklistRow) => string) => rows.some(row => cell(row))
-  const columns: Array<{ header: string, cell: (row: TracklistRow) => string }> = [
+  const lyrics = helpers.label('md.lyrics')
+  // `markdown` cells are written as they are (a link); the others are plain text and get escaped.
+  const columns: Array<{ header: string, cell: (row: TracklistRow) => string, markdown?: boolean }> = [
     { header: '#', cell: numberOf },
     { header: helpers.label('csv_columns.title'), cell: originalTitle },
     { header: helpers.label('csv_columns.translation'), cell: translatedTitle },
     { header: helpers.label('csv_columns.duration'), cell: (row: TracklistRow) => row.duration },
     ...tableRoles.map(label => ({ header: label, cell: (row: TracklistRow) => roleCell(row, label, helpers) })),
     { header: helpers.label('csv_columns.originals'), cell: originalsCell },
+    // A track with lyrics links to its page, where they are.
+    { header: lyrics, cell: (row: TracklistRow) => (row.lyrics || row.translations ? (source.site ? mdLink(lyrics, source.site(`/tracks/${row.id}`)) : mdText(lyrics)) : ''), markdown: true },
   ].filter(column => tracked(column.cell))
   return [
     mdRow(columns.map(column => mdText(column.header))),
     mdRow(columns.map(() => '---')),
-    ...rows.map(row => mdRow(columns.map(column => mdText(column.cell(row))))),
+    ...rows.map(row => mdRow(columns.map(column => (column.markdown ? column.cell(row) : mdText(column.cell(row)))))),
   ].join('\n')
 }
+
+/** What a track says about itself beyond its credits (BPM, key …), under the table: one line per track that has any. */
+const discAttributes = (disc: TracklistDisc, helpers: AlbumExportHelpers) => disc.rows
+  .filter(row => row.attributes.length)
+  .map(row => `- **${mdText(numberOf(row))}**：${row.attributes.map(attribute => mdText(`${attribute.label} ${attribute.value}`)).join(helpers.separator)}`)
 
 /** The roles left out of the table: the whole disc's people as they are, the others with their tracks. */
 const discRest = (disc: TracklistDisc, rest: string[], helpers: AlbumExportHelpers) => rest.flatMap((label) => {
@@ -192,7 +206,7 @@ const discRest = (disc: TracklistDisc, rest: string[], helpers: AlbumExportHelpe
   return [`- **${mdText(label)}**：${names.join(helpers.separator)}`]
 })
 
-const tracksSection = (album: Album, helpers: AlbumExportHelpers) => {
+const tracksSection = (album: Album, source: AlbumExportSource, helpers: AlbumExportHelpers) => {
   const discs = tracklistOf(album, helpers).filter(disc => disc.rows.length)
   if (!discs.length) return []
   const columns = roleColumns(discs, helpers)
@@ -203,10 +217,10 @@ const tracksSection = (album: Album, helpers: AlbumExportHelpers) => {
     `## ${mdText(helpers.label('md.tracklist'))}`,
     ...discs.flatMap((disc) => {
       const heading = [helpers.discLabel(disc.position), disc.title, disc.format, disc.bonus?.name].filter(Boolean).join(' · ')
-      const lines = discRest(disc, rest, helpers)
+      const lines = [...discRest(disc, rest, helpers), ...discAttributes(disc, helpers)]
       return [
         ...(disc.showHeader ? [`### ${mdText(heading)}`] : []),
-        discTable(disc, tableRoles, helpers),
+        discTable(disc, tableRoles, source, helpers),
         ...(lines.length ? [lines.join('\n')] : []),
       ]
     }),
@@ -215,24 +229,55 @@ const tracksSection = (album: Album, helpers: AlbumExportHelpers) => {
 
 const section = (title: string, lines: string[]) => lines.length ? [`## ${mdText(title)}`, lines.join('\n')] : []
 
-/** A readable fact sheet of the album; sections with nothing in them are left out. */
+/**
+ * A readable fact sheet of the album, complete enough to stand in for the page; sections with nothing in them are left
+ * out. With `source.site`, the album's artists, release event, related works and tracks with lyrics link to their pages.
+ */
 export const albumMarkdown = (album: Album, source: AlbumExportSource, helpers: AlbumExportHelpers) => {
   const { label, separator, aside } = helpers
-  const fact = (key: string, value: string | number | null | undefined) => value ? [`- **${mdText(label(`md.${key}`))}**：${mdText(String(value))}`] : []
+  /** A fact whose value is already Markdown (a link) */
+  const line = (key: string, value: string) => value ? [`- **${mdText(label(`md.${key}`))}**：${value}`] : []
+  const fact = (key: string, value: string | number | null | undefined) => line(key, value ? mdText(String(value)) : '')
+  /** A name linked to its page on the site, or plain where the file has no site to point at */
+  const onSite = (text: string, path: string) => (source.site ? mdLink(text, source.site(path)) : mdText(text))
+  /** The locale's brackets around text that is Markdown already */
+  const [asideOpen = '', asideClose = ''] = aside('\n').split('\n')
+  const asideOf = (markdown: string) => `${asideOpen}${markdown}${asideClose}`
   const released = helpers.formatDate(album.release_date, album.release_date_precision)
+  const event = album.release_event
+  const cover = album.cover?.url || album.image_url
   const facts = [
+    ...line('page', mdLink(source.url, source.url)),
     ...fact('other_names', [...new Set(album.titles.map(title => title.title))].join(separator)),
     ...fact('catalog_number', album.catalog_number),
-    ...fact('release_date', released && `${released}${album.release_event ? aside(album.release_event.name) : ''}`),
+    ...line('release_date', released ? `${mdText(released)}${event ? asideOf(onSite(event.name, `/events/${event.id}`)) : ''}` : ''),
     ...fact('type', [helpers.enumLabel('album_type', album.type), ...album.categories.map(category => helpers.enumLabel('album_category', category))].join(' / ')),
-    ...(album.byline ? [`- **${mdText(helpers.roleName(album.byline.role))}**：${mdText(album.byline.artists.map(artist => artist.name).join(separator))}`] : []),
+    ...(album.byline ? [`- **${mdText(helpers.roleName(album.byline.role))}**：${album.byline.artists.map(artist => onSite(artist.name, `/artists/${artist.id}`)).join(mdText(separator))}`] : []),
     ...fact('disc_count', album.disc_count),
     ...fact('track_count', album.track_count),
     ...fact('duration', album.duration ? helpers.formatDuration(album.duration) : ''),
+    ...fact('rating', album.rating != null && album.rating_count ? label('md.rating_value', { rating: String(album.rating), count: String(album.rating_count) }) : ''),
+    ...line('cover', cover ? mdLink(cover, cover) : ''),
+    ...fact('updated', helpers.formatDate((album.edited_at || album.updated_at)?.slice(0, 10))),
   ]
+  const works = [
+    ...(album.entries ?? []).map(entry => `- ${[
+      onSite(entry.name, `/entries/${entry.id}`),
+      ...[helpers.enumLabel('entry_type', entry.type), helpers.enumLabel('entry_album_relation', entry.relation_type), entry.note].filter(Boolean).map(text => mdText(text!)),
+    ].join(' · ')}`),
+    ...(album.franchises ?? []).map(franchise => `- ${onSite(franchise.name, `/franchises/${franchise.id}`)}`),
+  ]
+  const attributes = (album.attributes ?? []).map(helpers.attribute).filter(attribute => attribute.value)
+    .map(attribute => `- **${mdText(attribute.label)}**：${mdText(attribute.value)}`)
+  const images = (album.images ?? []).filter(item => item.image).map((item) => {
+    const name = [helpers.enumLabel('image_kind', item.kind), item.label, item.caption].filter(Boolean).join(' · ')
+    return `- ${mdLink(name || item.image!.url, item.image!.url)}`
+  })
   const credits = groupCredits(album.credits, helpers).map(group => `- **${mdText(group.label)}**：${mdText(peopleText(group.people, helpers))}`)
   const products = album.products.map((product) => {
-    const details = [product.catalog_number, product.format_label, product.barcode, ...helpers.priceLines(product.prices), product.note]
+    // An edition's own date only when it isn't the album's: a reissue, a later pressing.
+    const dated = product.release_date && product.release_date !== album.release_date ? helpers.formatDate(product.release_date, product.release_date_precision) : ''
+    const details = [product.catalog_number, product.format_label, dated, product.barcode, ...helpers.priceLines(product.prices), product.note]
     return `- ${[`**${mdText(helpers.productName(product))}**`, ...details.filter(Boolean).map(detail => mdText(detail!))].join(' · ')}`
   })
   const bonuses = album.bonuses.map(bonus => `- ${[`**${mdText(bonus.name)}**`, ...(bonus.description ? [mdText(bonus.description)] : [])].join(' · ')}`)
@@ -242,10 +287,13 @@ export const albumMarkdown = (album: Album, source: AlbumExportSource, helpers: 
     `# ${mdText(album.title)}`,
     ...(facts.length ? [facts.join('\n')] : []),
     ...(album.description?.trim() ? [`## ${mdText(label('md.description'))}`, album.description.trim()] : []),
+    ...section(label('md.related'), works),
     ...section(label('md.credits'), credits),
-    ...tracksSection(album, helpers),
+    ...tracksSection(album, source, helpers),
     ...section(label('md.products'), products),
     ...section(label('md.bonuses'), bonuses),
+    ...section(label('md.attributes'), attributes),
+    ...section(label('md.images'), images),
     ...section(label('md.links'), links),
     '---',
     label('md.footer', { source: mdLink('CDCat', source.url), license: mdLink(source.license.name, source.license.url) }),

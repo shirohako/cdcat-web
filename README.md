@@ -2,7 +2,7 @@
 
 CDCat is a non-profit music database made by music lovers. It focuses on music that is easy to lose track of: doujin releases, game and anime soundtracks, Vocaloid, Touhou arrangements, covers and other Japanese music.
 
-This repository is the CDCat website.
+This repository is the code of the CDCat website, [cdcat.net](https://cdcat.net).
 
 CDCat only holds information about music. It has no audio files, so there is nothing to download or stream. If you like what you find, please buy the CD or the digital release, or listen on a licensed streaming service.
 
@@ -16,7 +16,7 @@ CDCat only holds information about music. It has no audio files, so there is not
 - **Keep track of your listening.** Favorite albums, tracks and artists, mark what you plan to listen to, have heard, want or own, and rate and review albums.
 - **Join the community.** Talk about music in the discussions and write or read articles.
 
-The site is available in English, Japanese, Simplified Chinese and Traditional Chinese.
+The site is available in English, Japanese, Korean, Simplified Chinese and Traditional Chinese.
 
 ## Contribute
 
@@ -28,7 +28,7 @@ Anyone with an account can add albums, artists, entries and series, or correct t
 
 ## Public API
 
-Other sites and apps can read CDCat's data over HTTP, for lyric tools, cover matching and more. No sign-up or API key is needed. The documentation is on the site, at `/docs/api`.
+Other sites and apps can read CDCat's data over HTTP, for lyric tools, cover matching and more. No sign-up or API key is needed. The documentation is at [cdcat.net/docs/api](https://cdcat.net/docs/api).
 
 ## Data license
 
@@ -36,5 +36,6 @@ The catalog data is shared under [CC BY-SA 4.0](https://creativecommons.org/lice
 
 ## Contact
 
+- Website: [cdcat.net](https://cdcat.net)
 - Email: support@cdcat.net
 - Issues: [github.com/shirohako/cdcat-web/issues](https://github.com/shirohako/cdcat-web/issues)

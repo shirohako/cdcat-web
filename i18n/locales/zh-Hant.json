@@ -255,8 +255,21 @@
         "products": "發行版本",
         "bonuses": "特典",
         "links": "相關連結",
-        "footer": "資料來源：{source}，以 {license} 授權共享"
-      }
+        "footer": "資料來源：{source}，以 {license} 授權共享",
+        "page": "頁面",
+        "rating": "評分",
+        "rating_value": "{rating} / 5（{count} 人評分）",
+        "cover": "封面",
+        "updated": "最後更新",
+        "related": "關聯作品",
+        "attributes": "其他資訊",
+        "images": "圖片",
+        "lyrics": "歌詞"
+      },
+      "llm_copy": "LLM 副本",
+      "view_markdown": "以 Markdown 檢視",
+      "llm_copied": "已複製整張專輯的 Markdown",
+      "copy_failed": "複製失敗，請再試一次。"
     },
     "toc": {
       "button": "Disc ID",
@@ -1087,7 +1100,7 @@
       },
       "empty": "目前沒有場次",
       "no_description": "目前沒有介紹。",
-      "seo_description": "瀏覽已收錄的同人展與音樂活動。"
+      "seo_description": "M3 等同人音樂即賣會與音樂活動的日期、會場、參展社團和首發專輯。"
     },
     "revisions": {
       "title": "我的編輯紀錄",
@@ -3653,9 +3666,9 @@
       "map": "附會場圖"
     },
     "pages": {
-      "albums": "瀏覽 CDCat 收錄的專輯、單曲、EP 與合輯。",
+      "albums": "CDCat 收錄的同人音樂、VOCALOID、動畫與遊戲音樂專輯，每張都有完整的曲目、版本和製作人員，依最新加入排列。",
       "vinyls": "瀏覽 CDCat 收錄的黑膠唱片。",
-      "artists": "瀏覽 CDCat 收錄的藝術家、同人社團與虛擬歌手及其作品。",
+      "artists": "CDCat 收錄的藝術家、同人社團、廠牌與虛擬歌手，可查看各自的專輯和參與作品。",
       "entries": "瀏覽 CDCat 收錄的動畫、遊戲、影視等作品及其音樂。",
       "franchises": "瀏覽 CDCat 收錄的作品系列及相關專輯。",
       "articles": "CDCat 使用者撰寫的音樂評論、專題與資料整理。",
@@ -3667,6 +3680,28 @@
       "guide_editor": "CDCat 編輯器使用說明：怎樣新增專輯，填寫曲目、參與創作的人、版本和特典，提交審核，以及修正已有的資料。",
       "api_docs": "CDCat 開放介面文件：用 HTTP 讀取專輯、曲目、藝術家、活動、條目和系列資料，不需要金鑰，資料以 CC BY-SA 4.0 共享。",
       "join": "CDCat 人員募集：翻譯、校對、編輯、美術、設計、開發、資料整理和社群管理等職位，歡迎喜歡音樂的你一起參與。"
+    },
+    "title": {
+      "artist": "{name} 的專輯與參與作品",
+      "track_lyrics": "{title} 歌詞",
+      "entry": "{name} 相關專輯與原聲",
+      "franchise": "{name} 系列的專輯與作品",
+      "albums": "專輯一覽｜同人音樂、VOCALOID、動畫與遊戲音樂",
+      "artists": "藝術家與同人社團一覽",
+      "entries": "動畫、遊戲等作品的音樂",
+      "franchises": "作品系列一覽",
+      "events": "同人音樂活動與即賣會",
+      "vinyls": "黑膠唱片一覽"
+    },
+    "artist": {
+      "aliases": "別名：{names}",
+      "recent": "近期作品：{albums}"
+    },
+    "profile": {
+      "member": "CDCat 成員",
+      "joined": "{date}加入",
+      "edits": "貢獻 {count} 次編輯",
+      "reviews": "{count} 則評價"
     }
   },
   "artist_card": {

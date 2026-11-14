@@ -255,8 +255,21 @@
         "products": "Editions",
         "bonuses": "Bonuses",
         "links": "Links",
-        "footer": "Source: {source}, shared under {license}"
-      }
+        "footer": "Source: {source}, shared under {license}",
+        "page": "Page",
+        "rating": "Rating",
+        "rating_value": "{rating} / 5 ({count} ratings)",
+        "cover": "Cover",
+        "updated": "Last updated",
+        "related": "Related works",
+        "attributes": "More details",
+        "images": "Images",
+        "lyrics": "Lyrics"
+      },
+      "llm_copy": "Copy for LLM",
+      "view_markdown": "View as Markdown",
+      "llm_copied": "Copied the album as Markdown",
+      "copy_failed": "Couldn't copy. Please try again."
     },
     "toc": {
       "button": "Disc ID",
@@ -1087,7 +1100,7 @@
       },
       "empty": "No editions listed",
       "no_description": "No description available.",
-      "seo_description": "Browse archived doujin and music events."
+      "seo_description": "Doujin music events such as M3: dates, venues, participating circles and the albums released there."
     },
     "revisions": {
       "title": "My Revisions",
@@ -3653,9 +3666,9 @@
       "map": "with a venue map"
     },
     "pages": {
-      "albums": "Browse albums, singles, EPs and compilations on CDCat.",
+      "albums": "Doujin, Vocaloid, anime and game music albums on CDCat, each with its full tracklist, editions and credits. Newest additions first.",
       "vinyls": "Browse vinyl records on CDCat.",
-      "artists": "Browse artists, doujin circles and virtual singers on CDCat, with their discographies.",
+      "artists": "Artists, doujin circles, labels and virtual singers on CDCat, with their albums and the works they took part in.",
       "entries": "Browse anime, games, films and other works on CDCat, with their music.",
       "franchises": "Browse franchises on CDCat and the albums that go with them.",
       "articles": "Music reviews, features and research written by CDCat users.",
@@ -3667,6 +3680,28 @@
       "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data.",
       "api_docs": "The CDCat public API: read albums, tracks, artists, events, entries and series over HTTP, with no key needed. The data is shared under CC BY-SA 4.0.",
       "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators."
+    },
+    "title": {
+      "artist": "{name} Discography",
+      "track_lyrics": "{title} Lyrics",
+      "entry": "{name} Soundtracks and Related Albums",
+      "franchise": "{name} Series: Albums and Works",
+      "albums": "Albums: Doujin, Vocaloid, Anime and Game Music",
+      "artists": "Artists and Doujin Circles",
+      "entries": "Music by Work: Anime, Games and More",
+      "franchises": "Franchises and Series",
+      "events": "Doujin Music Events",
+      "vinyls": "Vinyl Records"
+    },
+    "artist": {
+      "aliases": "also known as {names}",
+      "recent": "recent releases: {albums}"
+    },
+    "profile": {
+      "member": "CDCat member",
+      "joined": "joined {date}",
+      "edits": "{count} edit | {count} edits",
+      "reviews": "{count} review | {count} reviews"
     }
   },
   "artist_card": {

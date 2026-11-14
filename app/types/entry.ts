@@ -95,6 +95,8 @@ export interface RelatedEntry {
 }
 
 export interface EntryDetail extends EntrySummary {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   meta: Record<string, unknown> | null
   links: LinkItem[]
   albums: EntryAlbum[]
@@ -126,6 +128,8 @@ export interface FranchiseAlbum {
 }
 
 export interface FranchiseDetail extends FranchiseSummary {
+  /** Whether search engines are offered this page: it has enough of its own to show (docs/seo in the API repo). Detail responses only. */
+  indexable?: boolean
   links: LinkItem[]
   children: Array<FranchiseSummary & { entries: EntrySummary[] }>
   entries: EntrySummary[]
