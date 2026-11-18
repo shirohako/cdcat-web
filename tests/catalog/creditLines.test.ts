@@ -154,6 +154,13 @@ describe('artists joined by a word', () => {
     expect(creditsOn(doc, track, roleOrder).map(item => item.role)).toEqual(['artist', 'composer'])
   })
 
+  it('removes only the rows given, also when rows have no id', () => {
+    const { doc } = album()
+    doc.credits = [person(1), person(2), person(3)].map((who, index) => ({ ...who, track_id: null, role: 'composer', role_label: null, sort_order: index })) as typeof doc.credits
+    removeCredits(doc, [doc.credits[1]!])
+    expect(doc.credits.map(row => row.artist_id)).toEqual([1, 3])
+  })
+
   it('drops the word of an artist left first, and of anything but a track\'s artist', () => {
     const removed = joined(1, 2, 3)
     removeCredits(removed.doc, [removed.rows()[0]!])

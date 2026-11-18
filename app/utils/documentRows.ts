@@ -1,4 +1,5 @@
 import type { RowId } from '~/types/document'
+import { newKey } from '~/utils/documentKeys'
 
 type Ordered = { sort_order?: number }
 
@@ -33,4 +34,20 @@ export const placeRow = <T extends Ordered>(rows: T[], row: T, before: T | null)
   if (at < 0) return
   ordered.splice(at, 0, row)
   ordered.forEach((item, index) => { item.sort_order = index })
+}
+
+/**
+ * Gives a new key to every row of the document's collections that has no id: a draft a model wrote before the
+ * server filled them in (MCP create_draft kept rows as sent). The editor tells rows apart by id, so rows without
+ * one were all the same row to it: removing one credit removed every credit. Mutates and returns the document.
+ */
+export const fillRowIds = (document: Record<string, unknown>, aggregate: { collections: Array<{ name: string }> }) => {
+  for (const collection of aggregate.collections) {
+    const rows = document[collection.name]
+    if (!Array.isArray(rows)) continue
+    for (const row of rows as Array<Record<string, unknown>>) {
+      if (row && typeof row === 'object' && (row.id === undefined || row.id === null || row.id === '')) row.id = newKey('n')
+    }
+  }
+  return document
 }

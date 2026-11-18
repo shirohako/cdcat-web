@@ -7,6 +7,7 @@ import type { DraftRemote, PersonalDraft, ServerDraft, ServerDraftChange, Server
 import { DRAFT_CHANGED_ERRORS, draftRemote, serverDraftTarget } from '~/utils/serverDrafts'
 import { errorName } from '~/utils/revisionErrors'
 import { fillRequiredText } from '~/utils/requiredText'
+import { fillRowIds } from '~/utils/documentRows'
 import { mainItem } from '~/utils/revisionLinks'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
@@ -134,11 +135,16 @@ export function useRevisionDraft(options: {
     })
   })
 
-  /** A saved document as the editors bind it: required text fields the server stored empty come back as ''. */
+  /**
+   * A saved document as the editors bind it: required text fields the server stored empty come back as '', and rows
+   * saved without an id get one.
+   */
   const editable = (type: string, document: Record<string, unknown>) => {
     const aggregate = schema.value?.aggregates?.[type] as { fields: SchemaField[], collections: SchemaCollection[] } | undefined
-    return aggregate ? fillRequiredText(document, aggregate) : document
+    return aggregate ? fillRowIds(fillRequiredText(document, aggregate), aggregate) : document
   }
+
+  const editableItems = (list: DraftItem[]) => list.map(item => item.document ? { ...item, document: editable(item.resource_type, item.document) } : item)
 
   const read = async () => {
     const id = user.value?.id
@@ -155,7 +161,8 @@ export function useRevisionDraft(options: {
     // A candidate's copy from before drafts were on the server has edits the server never saw.
     unsynced = record.unsynced ?? serverKind.value === 'harvest'
     Object.assign(references, record.references)
-    apply({ items: record.items, summary: record.summary, sources: record.sources })
+    // This browser may have kept a model's draft from before its rows had ids.
+    apply({ items: editableItems(record.items), summary: record.summary, sources: record.sources })
     createdAt = record.createdAt
     persisted.value = true
     savedAt.value = record.updatedAt
@@ -204,7 +211,7 @@ export function useRevisionDraft(options: {
       type: personal?.type ?? main?.resource_type ?? 'album', action: personal?.action ?? main?.action ?? 'create',
       entityId: personal ? personal.entity_id : main?.resource_id ?? null, revisionId: personal?.revision_id ?? local?.revisionId ?? null,
       label: personal?.label || String(main?.document?.title ?? main?.document?.name ?? local?.label ?? ''),
-      items: copy.items.map(item => item.document ? { ...item, document: editable(item.resource_type, item.document) } : item),
+      items: editableItems(copy.items),
       summary: copy.summary ?? '', sources: copy.sources ?? [],
       references: { ...(local?.references ?? {}), ...copy.references },
       createdAt: local?.createdAt ?? copy.updated_at ?? new Date().toISOString(), updatedAt: copy.updated_at ?? new Date().toISOString(),
