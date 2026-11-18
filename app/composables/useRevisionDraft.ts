@@ -552,8 +552,38 @@ export function useRevisionDraft(options: {
     }
   }
 
-  /** Throws the draft away, here and on CDCat; a revision sent back stays as it is on the server. */
-  const discard = () => forget()
+  /** Whether CDCat has a copy of this member's draft: the editor goes back to it rather than deleting it. */
+  const onServer = computed(() => serverKind.value === 'personal' && (serverVersion.value !== null || !!remote.value))
+
+  /**
+   * Throws away the edits made here. A member's draft saved to CDCat goes back to the version there and stays
+   * (the drafts list deletes it); nothing goes up to CDCat. Other drafts are deleted here, a candidate's shared copy
+   * on the server too; a revision sent back stays as it is on the server. Answers which happened; when CDCat cannot
+   * be reached, it throws and the edits stay.
+   */
+  async function discard(): Promise<'reverted' | 'deleted'> {
+    if (!onServer.value) {
+      await forget()
+      return 'deleted'
+    }
+    const api = server.value!
+    clearTimeout(timer)
+    const copy = await api.load()
+    // Gone from CDCat meanwhile (submitted or deleted elsewhere): only this browser's copy is left to throw away.
+    if (!copy) {
+      await forget({ server: false })
+      return 'deleted'
+    }
+    const record = fromServer(copy)
+    await localDrafts.put(record).catch(() => undefined)
+    adopt(record)
+    serverMeta.value = copy
+    restoredAt.value = null
+    restoredFrom.value = 'server'
+    remote.value = null
+    syncState.value = 'synced'
+    return 'reverted'
+  }
 
   /**
    * Merges update item `ref` onto the current version of its entity (POST /revisions/rebase), keeping
@@ -603,7 +633,7 @@ export function useRevisionDraft(options: {
 
   return {
     scope, revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, persisted, restoredAt, lastError, busy,
-    start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved, payload,
+    start, resume, loadRevision, save, submit, discard, onServer, rebase, hasUnsaved, payload,
     serverId, serverKind, serverVersion, serverMeta, syncState, remote, restoredFrom, checkRemote, pullRemote, keepMine, saveToServer, sync: () => push(),
   }
 }

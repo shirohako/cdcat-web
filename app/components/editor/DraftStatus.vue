@@ -35,17 +35,18 @@ const props = defineProps<{
   /** One line for a header: the save state as a pill (what "local" means in its tooltip), the restored edits beside it */
   compact?: boolean
 }>()
-/** The editor starts over without the restored edits. */
-const emit = defineEmits<{ discard: [] }>()
+/** discard: the editor starts over without the restored edits; reverted: the draft went back to its CDCat version. */
+const emit = defineEmits<{ discard: [], reverted: [] }>()
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const { ago } = useRelativeTime()
 
 const discard = async () => {
-  if (!await confirm({ title: t('editor.restored_discard_confirm'), confirmText: t('editor.restored_discard') })) return
-  await props.draft.discard()
-  emit('discard')
+  const onServer = props.draft.onServer.value
+  if (!await confirm({ title: t(onServer ? 'editor.server.revert_confirm' : 'editor.restored_discard_confirm'), confirmText: t('editor.restored_discard') })) return
+  if (await props.draft.discard() === 'reverted') emit('reverted')
+  else emit('discard')
 }
 
 /** The edits the editor opened with: kept in this browser, or loaded from the copy saved to CDCat. */

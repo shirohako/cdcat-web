@@ -29,14 +29,14 @@
           <p class="font-semibold text-warning">{{ $t('editor.changes_requested') }}</p>
           <p v-if="reviewComment" class="mt-1 whitespace-pre-line">{{ reviewComment }}</p>
         </div>
-        <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" /></div>
+        <div class="mb-4"><EditorDraftStatus :draft="draft" @discard="restart" @reverted="loadOriginals(draft.items.value)" /></div>
         <EditorServerDraftSync :draft="draft" class="mb-4" @reloaded="loadOriginals(draft.items.value)" />
 
         <div class="space-y-6">
           <slot />
           <CatalogSection :title="$t('editor.section_submit')" :icon="Send">
             <div class="p-5">
-              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" :required="required" @submitted="submitted" @errors="setErrors" @discarded="restart" />
+              <EditorRevisionSubmitPanel :draft="draft" :originals="originals" :labels="{ main: name || typeLabel }" :required="required" @submitted="submitted" @errors="setErrors" @discarded="restart" @reverted="loadOriginals(draft.items.value)" />
             </div>
           </CatalogSection>
         </div>

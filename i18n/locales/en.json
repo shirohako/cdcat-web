@@ -3356,7 +3356,8 @@
       "load_confirm": "Load the newer version from CDCat?",
       "load_confirm_hint": "Changes here not saved to CDCat will be lost.",
       "keep_confirm": "Overwrite the draft on CDCat with this one?",
-      "keep_confirm_hint": "The newer version on CDCat, including the AI's changes, will be replaced."
+      "keep_confirm_hint": "The newer version on CDCat, including the AI's changes, will be replaced.",
+      "revert_confirm": "Discard the changes in this browser and go back to the version saved to CDCat? The draft on CDCat is kept."
     }
   },
   "revision_page": {

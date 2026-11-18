@@ -3356,7 +3356,8 @@
       "load_confirm": "CDCat の新しい版を読み込みますか？",
       "load_confirm_hint": "CDCat に保存していないここの変更は失われます。",
       "keep_confirm": "ここの下書きで CDCat の方を上書きしますか？",
-      "keep_confirm_hint": "CDCat の新しい版（AI の変更を含む）は置き換えられます。"
+      "keep_confirm_hint": "CDCat の新しい版（AI の変更を含む）は置き換えられます。",
+      "revert_confirm": "このブラウザでの変更を破棄して、CDCat に保存した版に戻しますか？CDCat の下書きは削除されません。"
     }
   },
   "revision_page": {

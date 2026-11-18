@@ -3356,7 +3356,8 @@
       "load_confirm": "载入 CDCat 上的新版本？",
       "load_confirm_hint": "这里还没保存到 CDCat 的修改会丢掉。",
       "keep_confirm": "用这里的草稿覆盖 CDCat 上的？",
-      "keep_confirm_hint": "CDCat 上的新版本（包括 AI 的修改）会被替换掉。"
+      "keep_confirm_hint": "CDCat 上的新版本（包括 AI 的修改）会被替换掉。",
+      "revert_confirm": "放弃这个浏览器里的修改，回到保存在 CDCat 上的版本？CDCat 上的草稿不会删除。"
     }
   },
   "revision_page": {
