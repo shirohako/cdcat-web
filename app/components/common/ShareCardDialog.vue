@@ -46,7 +46,7 @@
 
       <!-- The page's address in the sharer's language. Whoever opens it sees the link preview's card, whichever style
            is picked above; the picked style goes out as a picture (复制图片, or 更多… with the system's share sheet).
-           The same buttons everywhere; only QQ's differs on phones (see opensPage). -->
+           The same buttons on every device, but QQ works from phones only. -->
       <div class="flex flex-col gap-2 border-t border-line pt-4">
         <div class="flex items-baseline justify-between gap-3 text-xs text-meta">
           <span>{{ $t('share_card.link') }}</span>
@@ -64,14 +64,47 @@
           />
           <UiButton :icon="Copy" @click="copyLink()">{{ $t('share_card.copy') }}</UiButton>
           <UiButton
-            v-for="site in SITES"
+            v-for="site in LINK_SITES"
             :key="site.key"
             variant="outline"
             :label="$t('share_card.share_to', { site: site.name })"
-            v-bind="opensPage(site.key) ? { href: shareUrl(site.key as ShareSite, page), target: '_blank', rel: 'noopener noreferrer' } : {}"
-            @click="press(site.key)"
+            :href="shareUrl(site.key, page)"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Icon :name="site.icon" class="size-[18px]" :class="site.color" />
+          </UiButton>
+          <!-- QQ from phones only: a phone picks the link or the picture and hands it to the system's share sheet,
+               where QQ is listed and opens its own picker. A web page can't send QQ a card: that takes an app
+               registered with QQ Connect. On a computer the button says to use a phone. -->
+          <UiPopover v-if="mobile" placement="top-end" role="menu" :label="$t('share_card.share_to', { site: 'QQ' })" class="w-64 rounded-md! p-1!">
+            <template #trigger="{ toggle, attrs }">
+              <UiButton variant="outline" :label="$t('share_card.share_to', { site: 'QQ' })" v-bind="attrs" aria-haspopup="menu" @click="toggle">
+                <Icon name="simple-icons:qq" class="size-[18px] text-[#12b7f5]" />
+              </UiButton>
+            </template>
+            <template #default="{ close }">
+              <UiMenuItem :icon="Link" :hint="$t('share_card.qq_link_hint')" @click="shareToQq('link'); close()">
+                {{ $t('share_card.qq_link') }}
+              </UiMenuItem>
+              <UiMenuItem :icon="ImageIcon" :hint="$t('share_card.qq_image_hint', { style: styleName })" :disabled="canShare ? !file : !ready" @click="shareToQq('image'); close()">
+                {{ $t('share_card.qq_image') }}
+              </UiMenuItem>
+            </template>
+          </UiPopover>
+          <UiButton
+            v-else
+            variant="outline"
+            :label="$t('share_card.qq_on_phone')"
+            aria-disabled="true"
+            class="cursor-not-allowed opacity-45"
+            @click="showToast(t('share_card.qq_on_phone_hint'), 'info')"
+          >
+            <Icon name="simple-icons:qq" class="size-[18px] text-[#12b7f5]" />
+          </UiButton>
+          <!-- Discord has no share page: the link is copied, and pasted in a chat it unfolds into the card. -->
+          <UiButton variant="outline" :label="$t('share_card.share_to', { site: 'Discord' })" @click="copyLink('discord')">
+            <Icon name="simple-icons:discord" class="size-[18px] text-[#5865f2]" />
           </UiButton>
           <!-- The system's share sheet, where there is one: every app on the phone, and the picked style as a file. -->
           <UiButton v-if="canShare" :icon="Share2" :loading="fileLoading" @click="shareNatively">{{ $t('share_card.more') }}</UiButton>
@@ -106,22 +139,15 @@ const props = withDefaults(defineProps<{
   previewStyle?: string
   /** The downloads' size: album cards are drawn at 1800×945, artist cards (all drawn ahead of time) at 1200×630. */
   size?: string
-  /** A square picture of the page (the cover, the avatar), for QQ's small square thumbnail. */
-  cover?: string | null
-}>(), { styles: () => [], previewStyle: undefined, size: '1800×945', cover: null })
+}>(), { styles: () => [], previewStyle: undefined, size: '1800×945' })
 
 const open = defineModel<boolean>({ required: true })
 
-/** The sites' buttons, in the order shown. */
-const SITES: Array<{ key: ShareSite | 'discord', name: string, icon: string, color: string }> = [
+/** The sites with a share page, first in the row; QQ and Discord follow. */
+const LINK_SITES: Array<{ key: ShareSite, name: string, icon: string, color: string }> = [
   { key: 'x', name: 'X', icon: 'simple-icons:x', color: 'text-title' },
   { key: 'line', name: 'LINE', icon: 'simple-icons:line', color: 'text-[#06c755]' },
-  { key: 'qq', name: 'QQ', icon: 'simple-icons:qq', color: 'text-[#12b7f5]' },
-  { key: 'discord', name: 'Discord', icon: 'simple-icons:discord', color: 'text-[#5865f2]' },
 ]
-
-/** The buttons that copy the link instead of opening a share page, each with its own hint. */
-type CopiedFor = 'discord' | 'qq'
 
 const { t, locale } = useI18n()
 const route = useRoute()
@@ -132,6 +158,7 @@ const { states, request, stop } = useShareCardDownload(style => (style && props.
 const selected = ref(props.previewStyle ?? props.styles[0] ?? '')
 const current = computed(() => states[selected.value])
 const ready = computed(() => current.value?.status === 'ready')
+const styleName = computed(() => (selected.value ? t(`share_card.styles.${selected.value}`) : props.title))
 
 function select(style: string) {
   selected.value = style
@@ -148,35 +175,20 @@ onMounted(() => {
   canCopyImage.value = typeof ClipboardItem !== 'undefined' && typeof navigator.clipboard?.write === 'function'
 })
 
-/**
- * Whether a site's button opens its share page. Discord has none: the link is copied, and pasted in a chat it unfolds
- * into the card. QQ's page offers PC QQ or a code to scan with mobile QQ, which a phone can't do with its own screen,
- * so on phones the link is copied for pasting in QQ.
- */
-function opensPage(key: ShareSite | 'discord') {
-  return key !== 'discord' && !(key === 'qq' && mobile.value)
-}
 
-/** A button that opens a page is a link and needs nothing more; the others copy. */
-function press(key: ShareSite | 'discord') {
-  if (!opensPage(key)) copyLink(key as CopiedFor)
-}
-
-/** The page as it is shared: its address in the sharer's language, and what it tells crawlers it is. */
+/** The page as it is shared: its address in the sharer's language, and what it tells crawlers it is (og:title). */
 const page = ref<SharePage>({ url: '', title: '' })
 function readPage() {
-  const meta = (property: string) => document.head.querySelector<HTMLMetaElement>(`meta[property="${property}"]`)?.content || null
   const path = route.path.replace(/(?!^)\/+$/, '')
   page.value = {
     url: absolute(languageUrl(path, locale.value as SiteLocale)),
-    title: meta('og:title') ?? document.title,
-    description: meta('og:description'),
-    image: props.cover ? absolute(props.cover) : null,
+    title: document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content || document.title,
   }
 }
 
 const linkInput = useTemplateRef<{ $el: HTMLElement }>('linkInput')
-async function copyLink(site?: CopiedFor) {
+/** Copies the page's address; Discord's and QQ's buttons say where to paste it. */
+async function copyLink(site?: 'discord' | 'qq') {
   try {
     await navigator.clipboard.writeText(page.value.url)
     showToast(t(site ? `share_card.${site}_copied` : 'share_card.link_copied'))
@@ -253,13 +265,35 @@ watch([canShare, () => current.value?.download_url, open], async ([sharing, addr
   }
 }, { immediate: true })
 
-async function shareNatively() {
-  const data: ShareData = { title: page.value.title, url: page.value.url }
-  if (file.value && navigator.canShare?.({ files: [file.value] })) data.files = [file.value]
+/** The system's share sheet; called straight from the tap, as the sheet only opens in one. */
+async function share(data: ShareData) {
   try {
     await navigator.share(data)
   } catch (error) {
     if ((error as DOMException).name !== 'AbortError') showToast(t('share_card.share_failed'), 'error')
+  }
+}
+
+const shareable = (item: File | null): item is File => Boolean(item && navigator.canShare?.({ files: [item] }))
+
+/** 更多…: the link with the picked style as a file, for any app on the device. */
+function shareNatively() {
+  share(shareable(file.value) ? { title: page.value.title, url: page.value.url, files: [file.value] } : { title: page.value.title, url: page.value.url })
+}
+
+/**
+ * QQ from a phone, through the share sheet, where the sharer picks QQ: the page's link (a bare link in QQ, which only
+ * draws cards for sites it knows, but one the other side can tap), or the picked style with the link beside it, as the
+ * picture alone can only be scanned. Without a share sheet the link or the picture is copied, to paste in QQ.
+ */
+function shareToQq(kind: 'link' | 'image') {
+  if (kind === 'image') {
+    if (canShare.value && shareable(file.value)) share({ files: [file.value], text: page.value.url })
+    else copyImage()
+  } else if (canShare.value) {
+    share({ title: page.value.title, url: page.value.url })
+  } else {
+    copyLink('qq')
   }
 }
 

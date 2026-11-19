@@ -116,6 +116,12 @@ usePageSeo({
   },
   image: () => album.value?.cover?.medium_url || album.value?.image_url,
   card: () => album.value?.share_card_url,
+  // QQ's card: the title, the artists (the type without any) and the cover, as music apps' cards show a song.
+  chatCard: () => album.value && {
+    title: shownTitle.value,
+    description: artistLine.value || enumLabel('album_type', album.value.type),
+    image: album.value.cover?.thumbnail_url || album.value.image_url,
+  },
   type: 'music.album',
   // The page's own address, also when it was opened as `….md` in the browser.
   path: () => (album.value ? `/albums/${album.value.id}` : undefined),

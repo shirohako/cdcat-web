@@ -200,7 +200,6 @@
         :styles="SHARE_CARD_STYLES"
         preview-style="wall"
         size="1200×630"
-        :cover="artist.image_url"
       />
     </main>
     <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">
@@ -371,6 +370,12 @@ usePageSeo({
     : undefined,
   image: () => artist.value?.image_url,
   card: () => artist.value?.share_card_url,
+  // QQ's card: the name, the type and album count, and the avatar (always cropped square).
+  chatCard: () => artist.value && {
+    title: shownName.value,
+    description: [enumLabel('artist_type', artist.value.type), count('seo.albums_count', artist.value.albums_count)].filter(Boolean).join(' · '),
+    image: artist.value.image_url,
+  },
   type: 'profile',
   // Pages with little of their own (an artist on one or two albums) stay out of search results; the API decides.
   noindex: () => artist.value?.is_pending || artist.value?.indexable === false,

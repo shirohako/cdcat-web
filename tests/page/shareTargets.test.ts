@@ -4,8 +4,6 @@ import { shareUrl, type SharePage } from '../../app/utils/shareTargets'
 const page: SharePage = {
   url: 'https://cdcat.net/albums/138?lang=zh-Hans',
   title: 'マウカリタ - LUNA*RUMA',
-  description: 'LUNA*RUMA 的专辑，2010年10月31日发行。',
-  image: 'https://img.cdcat.net/covers/138.webp',
 }
 
 const params = (address: string) => Object.fromEntries(new URL(address).searchParams)
@@ -27,17 +25,7 @@ describe('shareUrl', () => {
     expect(params(address)).toEqual({ url: page.url })
   })
 
-  it('gives QQ the title, the summary and the square picture', () => {
-    const address = shareUrl('qq', page)
-    expect(address.startsWith('https://connect.qq.com/widget/shareqq/index.html?')).toBe(true)
-    expect(params(address)).toEqual({ url: page.url, title: page.title, summary: page.description, pics: page.image, site: 'CDCat' })
-  })
-
-  it('cuts a long summary and leaves out what is missing', () => {
-    const address = shareUrl('qq', { url: page.url, title: page.title, description: '长'.repeat(200), image: null })
-    const sent = params(address)
-    expect([...sent.summary!].length).toBeLessThanOrEqual(80)
-    expect(sent.summary!.endsWith('…')).toBe(true)
-    expect(sent).not.toHaveProperty('pics')
+  it('leaves out an empty title', () => {
+    expect(params(shareUrl('x', { url: page.url, title: '' }))).toEqual({ url: page.url })
   })
 })

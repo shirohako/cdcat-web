@@ -1,27 +1,19 @@
-import { truncateText } from './seoText'
-
 /**
  * Where the share card dialog sends a page's link (docs/share-cards in the API repo, 「分享」): each site's own share
- * page, opened in a new tab. None of them needs an app key. Discord has no such page, so its button copies the link;
- * KakaoTalk needs a registered Kakao app and is left for later.
+ * page, opened in a new tab. Neither needs an app key. The other buttons have no such page:
+ * - Discord: the link is copied.
+ * - QQ: shared from phones through the system's share sheet. A plain link stays a bare link in QQ, which draws
+ *   cards only for sites it knows; QQ Connect's share page address does too, and the page itself is only a code to scan.
+ * - KakaoTalk needs a registered Kakao app and is left for later.
  */
 export interface SharePage {
   /** The page's absolute address, in the sharer's language (`?lang=`). */
   url: string
   /** What the page tells crawlers it is (og:title): an album's title and artists, an artist's name. */
   title: string
-  /** og:description, for QQ's summary line. */
-  description?: string | null
-  /** A square picture (the cover, the avatar): QQ's link card shows a small square, where the wide card would be cut. */
-  image?: string | null
 }
 
-export type ShareSite = 'x' | 'line' | 'qq'
-
-export const SHARE_SITES: readonly ShareSite[] = ['x', 'line', 'qq']
-
-/** QQ shows two lines of summary under the title. */
-const QQ_SUMMARY_LENGTH = 80
+export type ShareSite = 'x' | 'line'
 
 /** Query parameters percent-encoded (not `+` for spaces, which not every share page reads back as a space). */
 function query(params: Record<string, string | null | undefined>) {
@@ -39,14 +31,5 @@ export function shareUrl(site: ShareSite, page: SharePage): string {
     case 'line':
       // LINE's official share page takes the address only; the chat shows the page's own preview.
       return `https://social-plugins.line.me/lineit/share?${query({ url: page.url })}`
-    case 'qq':
-      // QQ互联's share page: a logged-in QQ for PC sends it in one click, otherwise mobile QQ scans a code.
-      return `https://connect.qq.com/widget/shareqq/index.html?${query({
-        url: page.url,
-        title: page.title,
-        summary: page.description ? truncateText(page.description, QQ_SUMMARY_LENGTH) : null,
-        pics: page.image,
-        site: 'CDCat',
-      })}`
   }
 }

@@ -18,6 +18,12 @@ export interface PageSeoOptions {
    * as a large card in place of `image`, which stays the fallback until the card exists.
    */
   card?: MaybeRefOrGetter<string | null | undefined>
+  /**
+   * The small link card of chat apps that read schema.org meta rather than Open Graph (QQ, also WeChat): a short
+   * title, one line under it and a square picture. The wide share card would be cut to their square thumbnail, and the
+   * search description is too long for one line. Open Graph readers (X, Discord, Telegram) keep the large card.
+   */
+  chatCard?: MaybeRefOrGetter<{ title?: string | null, description?: string | null, image?: string | null } | null | undefined>
   /** og:type, `website` by default. */
   type?: string
   noindex?: MaybeRefOrGetter<boolean | null | undefined>
@@ -144,12 +150,26 @@ export function usePageSeo(options: PageSeoOptions) {
     return [...(Array.isArray(own) ? own : own ? [own] : []), ...(trail ? [breadcrumbLd(trail)] : [])]
   })
 
+  const chatMeta = computed(() => {
+    const chat = toValue(options.chatCard)
+    if (!chat) return []
+    const entries = [
+      ['name', chat.title || undefined],
+      ['description', chat.description || undefined],
+      ['image', chat.image ? absolute(chat.image) : undefined],
+    ] as const
+    return entries.flatMap(([prop, content]) => (content ? [{ itemprop: prop, content, key: `itemprop-${prop}` }] : []))
+  })
+
   useHead(() => ({
     link: [
       ...(canonical.value ? [{ rel: 'canonical', href: canonical.value }] : []),
       ...alternates.value.map(entry => ({ rel: 'alternate', hreflang: entry.hreflang, href: entry.href, key: `hreflang-${entry.hreflang}` })),
     ],
-    meta: toValue(options.adult) ? [{ name: 'rating', content: 'adult' }] : [],
+    meta: [
+      ...(toValue(options.adult) ? [{ name: 'rating', content: 'adult' }] : []),
+      ...chatMeta.value,
+    ],
     script: ld.value.map(data => ({
       type: 'application/ld+json',
       // `<` is escaped so text in the data can never close the script tag.
