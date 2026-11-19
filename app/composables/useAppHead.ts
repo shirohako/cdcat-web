@@ -3,6 +3,13 @@ import fontFacesUrl from '~/assets/css/fonts.css?url'
 /** Each interface language as Open Graph names it. */
 export const OG_LOCALES: Record<string, string> = { 'ja': 'ja_JP', 'en': 'en_US', 'zh-Hans': 'zh_CN', 'zh-Hant': 'zh_TW', 'ko': 'ko_KR' }
 
+/** Umami's before-send hook (useAppHead): no statistics from /admin pages. */
+const UMAMI_BEFORE_SEND = `window.cdcatUmamiBeforeSend=function(type,payload){`
+  + `function admin(u){try{var a=new URL(u,location.href);return a.origin===location.origin&&/^\\/admin(\\/|$)/.test(a.pathname)}catch(e){return false}}`
+  + `if(!payload||admin(payload.url||location.href))return null;`
+  + `if(payload.referrer&&admin(payload.referrer))payload.referrer='';`
+  + `return payload}`
+
 /**
  * The document's language, theme, title template, icons and default share tags. app.vue sets them, and so does
  * error.vue, which Nuxt renders in its place.
@@ -70,11 +77,20 @@ export function useAppHead() {
   const naver = String(config.public.naverSiteVerification || '')
   if (naver) useHead({ meta: [{ name: 'naver-site-verification', content: naver }] })
 
-  // Umami counts visits, and follows client-side page switches by itself (NUXT_PUBLIC_UMAMI_WEBSITE_ID). The key keeps
+  // Umami counts visits, and follows client-side page switches by itself (NUXT_PUBLIC_UMAMI_WEBSITE_ID). The keys keep
   // one copy when error.vue sets the head as well.
   const umamiId = String(config.public.umamiWebsiteId || '')
   const umamiSrc = String(config.public.umamiScriptUrl || '')
   if (umamiId && umamiSrc) {
-    useHead({ script: [{ src: umamiSrc, defer: true, 'data-website-id': umamiId, key: 'umami' }] })
+    useHead({
+      script: [
+        // The admin console stays out of the numbers. Umami hands every send to this function first (data-before-send)
+        // and drops it when nothing comes back. Not loading the script there would miss a switch from a public page
+        // into /admin, which the already running script would count. Inline and ahead of the deferred script, so the
+        // function is there for the first send, and an admin address left as the referrer is cleared as well.
+        { key: 'umami-before-send', innerHTML: UMAMI_BEFORE_SEND },
+        { src: umamiSrc, defer: true, 'data-website-id': umamiId, 'data-before-send': 'cdcatUmamiBeforeSend', key: 'umami' },
+      ],
+    })
   }
 }
