@@ -760,8 +760,9 @@ export function addCredit(doc: AlbumDocument, fields: Pick<AlbumCreditRow, 'arti
 }
 
 export function removeCredits(doc: AlbumDocument, rows: AlbumCreditRow[]) {
-  const ids = new Set(rows.map(row => String(row.id)))
-  doc.credits = doc.credits.filter(row => !ids.has(String(row.id)))
+  // A row without an id (fillRowIds gives them one on opening) is only itself: no other row has its id.
+  const ids = new Set(rows.filter(row => row.id != null && row.id !== '').map(row => String(row.id)))
+  doc.credits = doc.credits.filter(row => !rows.includes(row) && !(row.id != null && ids.has(String(row.id))))
   tidyCredits(doc)
 }
 

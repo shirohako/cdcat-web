@@ -3356,7 +3356,8 @@
       "load_confirm": "CDCat의 새 버전을 불러올까요?",
       "load_confirm_hint": "CDCat에 저장하지 않은 여기의 변경 사항은 사라져요.",
       "keep_confirm": "여기 임시 저장본으로 CDCat의 것을 덮어쓸까요?",
-      "keep_confirm_hint": "CDCat의 새 버전(AI가 수정한 내용 포함)은 바뀌어요."
+      "keep_confirm_hint": "CDCat의 새 버전(AI가 수정한 내용 포함)은 바뀌어요.",
+      "revert_confirm": "이 브라우저에서 바꾼 내용을 버리고 CDCat에 저장한 버전으로 돌아갈까요? CDCat의 임시 저장본은 삭제되지 않아요."
     }
   },
   "revision_page": {

@@ -3356,7 +3356,8 @@
       "load_confirm": "載入 CDCat 上的新版本？",
       "load_confirm_hint": "這裡還沒儲存到 CDCat 的修改會丟掉。",
       "keep_confirm": "用這裡的草稿覆蓋 CDCat 上的？",
-      "keep_confirm_hint": "CDCat 上的新版本（包括 AI 的修改）會被取代。"
+      "keep_confirm_hint": "CDCat 上的新版本（包括 AI 的修改）會被取代。",
+      "revert_confirm": "放棄這個瀏覽器裡的修改，回到儲存在 CDCat 上的版本？CDCat 上的草稿不會刪除。"
     }
   },
   "revision_page": {

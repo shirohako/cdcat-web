@@ -152,7 +152,7 @@ export const API_DOCS_STRUCTURE: ApiDocsStructure = {
                     offsets: [150, 7200, { $more: 10 }],
                     source: 'eac',
                     cdcat_id: 'CDCAT1-ZX8Q-8MGS-W6KN-TFK3',
-                    freedb_id: 'a20b6c0c',
+                    freedb_id: 'A20B6C0C',
                     mb_discid: '69NlS0CkCP9JOwZiBxgpOWqDB7o-',
                     accuraterip_id: '012-00147428-00c30a14-a20b6c0c',
                     ctdb_id: 'H9Tm5u2dMB4t6JwO6Op8lhJWuGQ-',

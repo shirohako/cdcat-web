@@ -55,7 +55,7 @@
         >{{ $t('editor.server.save') }}</UiButton>
         <EditorHelp id="submit.server_draft" />
       </span>
-      <UiButton v-if="draft.persisted.value" variant="danger-soft" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
+      <UiButton v-if="draft.persisted.value" variant="danger-soft" class="ring-1 ring-inset ring-danger/20 shadow-xs active:translate-y-px" @click="discard">{{ $t(draft.revisionId.value || draft.onServer.value ? 'editor.restored_discard' : 'editor.discard') }}</UiButton>
       <span class="text-xs text-meta">{{ $t(canAutoApprove ? 'editor.publish_notice' : creates ? 'editor.pending_notice' : 'editor.review_notice') }}</span>
     </div>
 
@@ -107,7 +107,7 @@ const props = defineProps<{
   /** What is worth adding: a dialog lists them, and the editor may submit anyway */
   suggested?: SubmitCheck[]
 }>()
-const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [], go: [section: string] }>()
+const emit = defineEmits<{ submitted: [Revision], errors: [Array<{ path: string, message: string }>], duplicates: [DuplicateCandidate[]], discarded: [], reverted: [], go: [section: string] }>()
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -227,9 +227,12 @@ const saveToServer = async () => {
   if (props.draft.syncState.value === 'error') message.value = localizeError(props.draft.lastError.value)
 }
 
+/** A draft saved to CDCat goes back to the version there (the drafts list deletes it); others are deleted. */
 const discard = async () => {
-  if (!await confirm({ title: t(props.draft.revisionId.value ? 'editor.restored_discard_confirm' : 'editor.discard_confirm'), confirmText: t(props.draft.revisionId.value ? 'editor.restored_discard' : 'editor.discard') })) return
-  await props.draft.discard()
-  emit('discarded')
+  const onServer = props.draft.onServer.value
+  const revert = !!props.draft.revisionId.value || onServer
+  if (!await confirm({ title: t(onServer ? 'editor.server.revert_confirm' : revert ? 'editor.restored_discard_confirm' : 'editor.discard_confirm'), confirmText: t(revert ? 'editor.restored_discard' : 'editor.discard') })) return
+  if (await props.draft.discard() === 'reverted') emit('reverted')
+  else emit('discarded')
 }
 </script>

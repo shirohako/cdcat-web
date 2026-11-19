@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { byOrder, moveRow, nextOrder, placeRow, sameId } from '../../app/utils/documentRows'
+import { byOrder, fillRowIds, moveRow, nextOrder, placeRow, sameId } from '../../app/utils/documentRows'
 
 describe('document rows', () => {
   it('orders by sort_order, then position', () => {
@@ -35,5 +35,21 @@ describe('document rows', () => {
     expect(sameId(3, 3)).toBe(true)
     expect(sameId('d1', 'd1')).toBe(true)
     expect(sameId(null, null)).toBe(false)
+  })
+
+  it('gives rows saved without an id a key of their own, and leaves the others', () => {
+    const doc: Record<string, unknown> = {
+      title: 'x',
+      credits: [{ role: 'artist' }, { id: null, role: 'vocals' }, { id: '', role: 'composer' }, { id: 7, role: 'arranger' }, { id: 'c1', role: 'mixing' }],
+      links: [{ url: 'https://example.com' }],
+      tracks: 'not rows',
+    }
+    fillRowIds(doc, { collections: [{ name: 'credits' }, { name: 'links' }, { name: 'tracks' }, { name: 'titles' }] })
+    const ids = (doc.credits as Array<{ id: unknown }>).map(row => row.id)
+    expect(ids.slice(3)).toEqual([7, 'c1'])
+    expect(ids.slice(0, 3).every(id => typeof id === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(id))).toBe(true)
+    expect(new Set(ids).size).toBe(5)
+    expect((doc.links as Array<{ id: unknown }>)[0]!.id).toEqual(expect.any(String))
+    expect(doc.tracks).toBe('not rows')
   })
 })

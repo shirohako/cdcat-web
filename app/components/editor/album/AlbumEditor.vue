@@ -14,7 +14,7 @@
           <div class="min-w-0 flex-1">
             <p v-if="!embedded" class="text-xs font-semibold uppercase tracking-wider text-meta">{{ $t(albumId ? 'editor.album.edit_title' : 'editor.album.new_title') }}</p>
             <component :is="embedded ? 'h3' : 'h1'" class="truncate text-title" :class="embedded ? 'text-base font-semibold' : 'text-xl font-bold sm:text-2xl'">{{ album.title || $t('editor.album.untitled') }}</component>
-            <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" />
+            <EditorDraftStatus v-if="embedded" :draft="draft" compact class="mt-1.5" @discard="restart" @reverted="contentKey++" />
           </div>
           <UiButton
             v-if="embedded"
@@ -44,7 +44,7 @@
               class="gap-1.5 ring-1 ring-inset ring-line shadow-xs active:translate-y-px"
             >{{ link.label }}</UiButton>
           </nav>
-          <EditorDraftStatus v-if="!embedded" :draft="draft" class="w-full border-t border-line pt-3" @discard="restart" />
+          <EditorDraftStatus v-if="!embedded" :draft="draft" class="w-full border-t border-line pt-3" @discard="restart" @reverted="contentKey++" />
         </header>
 
         <!-- A harvest candidate's draft is shared on the server; the model's MCP edits come in from there. -->
@@ -139,7 +139,7 @@
                 <EditorRevisionSubmitPanel
                   :draft="draft" :originals="originals" :labels="itemLabels"
                   :required="requiredChecks.filter(check => !check.done)" :suggested="suggested"
-                  @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" @go="go($event as AlbumSection)"
+                  @submitted="submitted" @errors="setErrors" @duplicates="duplicatePanel?.show($event)" @discarded="restart" @reverted="contentKey++" @go="go($event as AlbumSection)"
                 >
                   <EditorAlbumNewItems />
                 </EditorRevisionSubmitPanel>

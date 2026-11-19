@@ -7,6 +7,7 @@ import type { DraftRemote, PersonalDraft, ServerDraft, ServerDraftChange, Server
 import { DRAFT_CHANGED_ERRORS, draftRemote, serverDraftTarget } from '~/utils/serverDrafts'
 import { errorName } from '~/utils/revisionErrors'
 import { fillRequiredText } from '~/utils/requiredText'
+import { fillRowIds } from '~/utils/documentRows'
 import { mainItem } from '~/utils/revisionLinks'
 
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
@@ -134,11 +135,16 @@ export function useRevisionDraft(options: {
     })
   })
 
-  /** A saved document as the editors bind it: required text fields the server stored empty come back as ''. */
+  /**
+   * A saved document as the editors bind it: required text fields the server stored empty come back as '', and rows
+   * saved without an id get one.
+   */
   const editable = (type: string, document: Record<string, unknown>) => {
     const aggregate = schema.value?.aggregates?.[type] as { fields: SchemaField[], collections: SchemaCollection[] } | undefined
-    return aggregate ? fillRequiredText(document, aggregate) : document
+    return aggregate ? fillRowIds(fillRequiredText(document, aggregate), aggregate) : document
   }
+
+  const editableItems = (list: DraftItem[]) => list.map(item => item.document ? { ...item, document: editable(item.resource_type, item.document) } : item)
 
   const read = async () => {
     const id = user.value?.id
@@ -155,7 +161,8 @@ export function useRevisionDraft(options: {
     // A candidate's copy from before drafts were on the server has edits the server never saw.
     unsynced = record.unsynced ?? serverKind.value === 'harvest'
     Object.assign(references, record.references)
-    apply({ items: record.items, summary: record.summary, sources: record.sources })
+    // This browser may have kept a model's draft from before its rows had ids.
+    apply({ items: editableItems(record.items), summary: record.summary, sources: record.sources })
     createdAt = record.createdAt
     persisted.value = true
     savedAt.value = record.updatedAt
@@ -204,7 +211,7 @@ export function useRevisionDraft(options: {
       type: personal?.type ?? main?.resource_type ?? 'album', action: personal?.action ?? main?.action ?? 'create',
       entityId: personal ? personal.entity_id : main?.resource_id ?? null, revisionId: personal?.revision_id ?? local?.revisionId ?? null,
       label: personal?.label || String(main?.document?.title ?? main?.document?.name ?? local?.label ?? ''),
-      items: copy.items.map(item => item.document ? { ...item, document: editable(item.resource_type, item.document) } : item),
+      items: editableItems(copy.items),
       summary: copy.summary ?? '', sources: copy.sources ?? [],
       references: { ...(local?.references ?? {}), ...copy.references },
       createdAt: local?.createdAt ?? copy.updated_at ?? new Date().toISOString(), updatedAt: copy.updated_at ?? new Date().toISOString(),
@@ -545,8 +552,38 @@ export function useRevisionDraft(options: {
     }
   }
 
-  /** Throws the draft away, here and on CDCat; a revision sent back stays as it is on the server. */
-  const discard = () => forget()
+  /** Whether CDCat has a copy of this member's draft: the editor goes back to it rather than deleting it. */
+  const onServer = computed(() => serverKind.value === 'personal' && (serverVersion.value !== null || !!remote.value))
+
+  /**
+   * Throws away the edits made here. A member's draft saved to CDCat goes back to the version there and stays
+   * (the drafts list deletes it); nothing goes up to CDCat. Other drafts are deleted here, a candidate's shared copy
+   * on the server too; a revision sent back stays as it is on the server. Answers which happened; when CDCat cannot
+   * be reached, it throws and the edits stay.
+   */
+  async function discard(): Promise<'reverted' | 'deleted'> {
+    if (!onServer.value) {
+      await forget()
+      return 'deleted'
+    }
+    const api = server.value!
+    clearTimeout(timer)
+    const copy = await api.load()
+    // Gone from CDCat meanwhile (submitted or deleted elsewhere): only this browser's copy is left to throw away.
+    if (!copy) {
+      await forget({ server: false })
+      return 'deleted'
+    }
+    const record = fromServer(copy)
+    await localDrafts.put(record).catch(() => undefined)
+    adopt(record)
+    serverMeta.value = copy
+    restoredAt.value = null
+    restoredFrom.value = 'server'
+    remote.value = null
+    syncState.value = 'synced'
+    return 'reverted'
+  }
 
   /**
    * Merges update item `ref` onto the current version of its entity (POST /revisions/rebase), keeping
@@ -596,7 +633,7 @@ export function useRevisionDraft(options: {
 
   return {
     scope, revisionId, lockVersion, status, items, prepared, summary, sources, references, saveState, savedAt, persisted, restoredAt, lastError, busy,
-    start, resume, loadRevision, save, submit, discard, rebase, hasUnsaved, payload,
+    start, resume, loadRevision, save, submit, discard, onServer, rebase, hasUnsaved, payload,
     serverId, serverKind, serverVersion, serverMeta, syncState, remote, restoredFrom, checkRemote, pullRemote, keepMine, saveToServer, sync: () => push(),
   }
 }
