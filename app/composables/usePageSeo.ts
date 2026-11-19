@@ -1,6 +1,6 @@
 import type { MaybeRefOrGetter, Ref } from 'vue'
 import { breadcrumbLd, type LdRef } from '~/utils/structuredData'
-import { descriptionLength, nameWithOriginal, truncateText, writtenIn } from '~/utils/seoText'
+import { type DescriptionPart, descriptionLength, fillDescription, fitList, nameWithOriginal, writtenIn } from '~/utils/seoText'
 import { queryLanguage } from '~/utils/languageQuery'
 import { BARE_LOCALE, SITE_LOCALES, languageAlternates, languageUrl, type SiteLocale } from '~~/shared/utils/languageUrls'
 import { OG_LOCALES } from './useAppHead'
@@ -67,7 +67,7 @@ export const useSiteUrl = () => {
  */
 export function usePageSeo(options: PageSeoOptions) {
   const route = useRoute()
-  const { locale } = useI18n()
+  const { t, locale } = useI18n()
   const absolute = useSiteUrl()
 
   const missing = computed(() => options.error?.value?.statusCode === 404)
@@ -107,10 +107,21 @@ export function usePageSeo(options: PageSeoOptions) {
     ? []
     : languageAlternates(pagePath.value, versions.value).map(entry => ({ hreflang: entry.hreflang, href: absolute(entry.path) }))))
 
-  const title = computed(() => toValue(options.title) || undefined)
+  /** The page of a paged list or topic (`?page=2`), as its address names it; null on the first. */
+  const pageNumber = computed(() => {
+    const page = Number(new URLSearchParams(pagePath.value.split('?')[1] ?? '').get('page'))
+    return page > 1 ? page : null
+  })
+  // Later pages say which they are, so they don't repeat the first page's title and description.
+  const title = computed(() => {
+    const text = toValue(options.title) || undefined
+    return text && pageNumber.value ? t('seo.paged_title', { title: text, page: t('seo.page', { page: pageNumber.value }) }) : text
+  })
   const description = computed(() => {
     const text = toValue(options.description)
-    return text ? truncateText(text, descriptionLength(locale.value)) : undefined
+    if (!text) return undefined
+    const page = pageNumber.value && t('seo.sentence', { text: t('seo.page', { page: pageNumber.value }) })
+    return fillDescription([page, { cut: text }], descriptionLength(locale.value))
   })
   const card = computed(() => {
     const url = toValue(options.card)
@@ -186,10 +197,14 @@ export const useSeoText = () => {
   /** "Local name (Original)" when they differ. */
   const withOriginal = (shown: string, original: string | null | undefined) =>
     nameWithOriginal(shown, original, (name, other) => t('seo.with_original', { name, original: other }))
-  /** The non-empty parts as one sentence, with the locale's separator and full stop. */
-  const sentence = (parts: Array<string | 0 | false | null | undefined>) => {
+  /**
+   * The non-empty parts as one sentence, with the locale's separator and full stop, its first letter capitalized
+   * ("released …" → "Released …"). Pass `capitalize: false` when it starts with a name, which keeps its own case
+   * ("lbg", "illi").
+   */
+  const sentence = (parts: Array<string | 0 | false | null | undefined>, { capitalize = true } = {}) => {
     const text = parts.filter(Boolean).join(t('seo.separator'))
-    return text ? t('seo.sentence', { text: text.charAt(0).toLocaleUpperCase() + text.slice(1) }) : ''
+    return text ? t('seo.sentence', { text: capitalize ? text.charAt(0).toLocaleUpperCase() + text.slice(1) : text }) : ''
   }
   /** Names joined as a list: "A、B" or "A, B". */
   const list = (names: Array<string | null | undefined>) => names.filter(Boolean).join(t('seo.list_separator'))
@@ -200,5 +215,17 @@ export const useSeoText = () => {
    * language, nothing otherwise, so each language version's description stays in that language.
    */
   const own = (text: string | null | undefined) => (text && writtenIn(text, locale.value) ? text : '')
-  return { withOriginal, sentence, list, count, own }
+  /** An album's or work's title in the locale's title marks: 『』, 《》, “”. */
+  const albumTitle = (title: string) => t('seo.quote_album', { title })
+  /** A song's title in the locale's marks: 「」, 《》, 〈〉, “”. */
+  const songTitle = (title: string) => t('seo.quote_song', { title })
+  /**
+   * A sentence listing names (`key` with {names}), as many as fit the room the description has left, at most
+   * `limit`, with "and more" when some are left out. A part for `fill`.
+   */
+  const listing = (key: string, names: Array<string | null | undefined>, limit?: number) => (room: number) =>
+    fitList(names, room, (joined, more) => sentence([t(key, { names: more ? t('seo.list_more', { list: joined }) : joined })]), t('seo.list_separator'), limit)
+  /** The parts as one description of the locale's length (`fillDescription`). */
+  const fill = (parts: DescriptionPart[]) => fillDescription(parts, descriptionLength(locale.value))
+  return { withOriginal, sentence, list, count, own, albumTitle, songTitle, listing, fill }
 }

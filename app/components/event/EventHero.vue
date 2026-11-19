@@ -5,7 +5,8 @@
       v-if="event.main_visual_url"
       v-img-fade
       :src="event.main_visual_url"
-      alt=""
+      :alt="event.name"
+      aria-hidden="true"
       class="absolute inset-0 -z-10 h-full w-full scale-110 object-cover opacity-45 blur-2xl"
     >
     <div class="absolute inset-0 -z-10 bg-linear-to-br from-hero/70 via-hero/80 to-hero" />

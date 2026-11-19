@@ -16,7 +16,7 @@ const absolute = useSiteUrl()
 const { data: doc } = await useAsyncData(() => `legal:terms:${locale.value}`, () => loadLegal('terms', locale.value), { deep: false })
 
 usePageSeo({
-  title: () => t('legal.terms_title'),
+  title: () => t('seo.title.terms'),
   description: () => t('seo.pages.terms'),
   breadcrumbs: () => [{ name: t('legal.terms_title'), path: '/terms' }],
   jsonLd: () => doc.value && compactLd({

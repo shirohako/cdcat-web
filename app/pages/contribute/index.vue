@@ -22,7 +22,8 @@ const targetOf = (kind: Kind) => isAuthenticated.value ? `/contribute/${kind}` :
 const moreOpen = ref(false)
 const details = ['search', 'live', 'review', 'history'] as const
 
-usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('contribute_page.summary') })
+// A way into the editor rather than a page of its own: kept out of search results and the sitemap.
+usePageSeo({ title: () => t('contribute_page.seo_title'), description: () => t('seo.pages.contribute'), noindex: true })
 </script>
 
 <template>

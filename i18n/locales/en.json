@@ -1099,8 +1099,7 @@
         "albums": "Most releases"
       },
       "empty": "No editions listed",
-      "no_description": "No description available.",
-      "seo_description": "Doujin music events such as M3: dates, venues, participating circles and the albums released there."
+      "no_description": "No description available."
     },
     "revisions": {
       "title": "My Revisions",
@@ -1218,7 +1217,7 @@
   },
   "home": {
     "seo_title": "CDCat — Japanese Music Database for Doujin, Vocaloid, Anime and Games",
-    "seo_description": "Explore Japanese music, doujin releases, Vocaloid, anime and game soundtracks, events, and detailed track credits on CDCat.",
+    "seo_description": "CDCat is a non-profit, community-edited database of doujin, Vocaloid, Touhou, anime and game music: tracklists, full credits, editions and events like M3.",
     "seo_keywords": "Japanese music,doujin music,Vocaloid,Touhou Project,anime soundtrack,game music,music database,track credits"
   },
   "landing": {
@@ -3638,11 +3637,15 @@
     "sentence": "{text}.",
     "albums_count": "{count} album | {count} albums",
     "album": {
-      "by": "{type} by {artists}",
       "released": "released {date}",
       "event": "debuted at {event}",
       "catalog": "catalog no. {number}",
-      "tracks": "{count} track | {count} tracks"
+      "tracks": "{count} track | {count} tracks",
+      "lead": "{type} {title} by {artists}",
+      "lead_bare": "{type} {title}",
+      "works": "From {names}",
+      "tracklist": "Tracks: {names}",
+      "people": "Credits: {names}"
     },
     "track": {
       "from": "Track on {album}",
@@ -3653,34 +3656,41 @@
       "instrumental": "instrumental"
     },
     "entry": {
-      "albums": "{count} related album | {count} related albums"
+      "albums": "{count} related album | {count} related albums",
+      "platforms": "on {names}",
+      "album_list": "Albums: {names}"
     },
     "franchise": {
-      "lead": "Franchise",
-      "entries": "{count} entry | {count} entries"
+      "lead": "The {name} franchise",
+      "entries": "{count} entry | {count} entries",
+      "entry_list": "Works: {names}"
     },
     "event": {
       "date": "held {date}",
       "venue": "at {venue}",
       "circles": "{count} participating circle | {count} participating circles",
       "albums": "{count} new release | {count} new releases",
-      "map": "with a venue map"
+      "map": "with a venue map",
+      "releases": "Releases: {names}"
     },
     "pages": {
-      "albums": "Doujin, Vocaloid, anime and game music albums on CDCat, each with its full tracklist, editions and credits. Newest additions first.",
-      "vinyls": "Browse vinyl records on CDCat.",
-      "artists": "Artists, doujin circles, labels and virtual singers on CDCat, with their albums and the works they took part in.",
-      "entries": "Browse anime, games, films and other works on CDCat, with their music.",
-      "franchises": "Browse franchises on CDCat and the albums that go with them.",
-      "articles": "Music reviews, features and research written by CDCat users.",
-      "about": "About CDCat, a community-edited database of doujin and Japanese music.",
-      "terms": "CDCat's Terms of Service: the rules for using the site, how contributions are licensed (catalog data under CC BY-SA 4.0), community rules and copyright complaints.",
-      "privacy": "CDCat's Privacy Policy: what we collect, how we use it and your rights. No ads, and we never sell your data.",
-      "discussion_tag": "Topics tagged #{tag} in the CDCat forum.",
+      "albums": "Doujin, Vocaloid, Touhou, anime and game music albums on CDCat, each with its tracklist, full credits, editions, bonuses and cover art. Newest first.",
+      "vinyls": "Vinyl records on CDCat: doujin, anime and game soundtracks, Vocaloid and more on vinyl, each with its tracklist, credits, editions and cover art.",
+      "artists": "Artists, doujin circles, composers, singers, labels and virtual singers on CDCat, with their albums, the tracks they worked on and their other names.",
+      "entries": "Anime, games, films and other works on CDCat, each with its soundtracks, theme songs, character songs and doujin arrangements. Filter by type or search.",
+      "franchises": "Franchises on CDCat: series of games, anime and more, with every work in them and their soundtracks, theme songs and related albums.",
+      "articles": "Music articles by CDCat users: album reviews, features on artists and circles, event reports and research on doujin, Vocaloid, anime and game music.",
+      "about": "About CDCat, a non-profit, community-edited database of doujin and Japanese music: what we aim for, editing guides, the public API and how to join in.",
+      "terms": "CDCat's Terms of Service: rules for using the site, how contributions are licensed (catalog data under CC BY-SA 4.0), community rules and copyright complaints.",
+      "privacy": "CDCat's Privacy Policy: what we collect and why, what others can see, cookies, email, security and your rights. No ads, and we never sell your data.",
+      "discussion_tag": "Topics tagged #{tag} in the CDCat forum: thoughts, questions and news about doujin, Vocaloid, anime and game music. Read along or join the discussion.",
       "guide_design": "How CDCat is designed: what albums, artists, events, entries, series, vinyl, discussions and articles are for, and how they connect.",
       "guide_editor": "A guide to the CDCat editor: adding an album with its tracks, credits, editions and bonuses, sending it for review, and correcting existing data.",
       "api_docs": "The CDCat public API: read albums, tracks, artists, events, entries and series over HTTP, with no key needed. The data is shared under CC BY-SA 4.0.",
-      "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators."
+      "join": "Help build CDCat: we are looking for translators, proofreaders, writers, artists, designers, developers, catalogue editors and community moderators.",
+      "events": "Doujin music events such as M3, Comic Market and Reitaisai: every edition with its dates, venue, participating circles, new releases and venue map.",
+      "contribute": "Add albums, artists, entries and franchises to CDCat, or correct what is there. Changes go live at once, contributors review them and history keeps them.",
+      "discussions": "The CDCat forum: talk about albums, track down songs, share your collection, plan for events and discuss editing the database, by category and tag."
     },
     "title": {
       "artist": "{name} Discography",
@@ -3690,19 +3700,49 @@
       "albums": "Albums: Doujin, Vocaloid, Anime and Game Music",
       "artists": "Artists and Doujin Circles",
       "entries": "Music by Work: Anime, Games and More",
-      "franchises": "Franchises and Series",
+      "franchises": "Franchises and Series: Game and Anime Music by Series",
       "events": "Doujin Music Events",
-      "vinyls": "Vinyl Records"
+      "vinyls": "Vinyl Records: Doujin, Anime and Game Music on Vinyl",
+      "album_dated": "{title} ({year} {kind})",
+      "album_kind": "{title} ({kind})",
+      "album_doujin": "Doujin {type}",
+      "about": "About CDCat: Community Database of Doujin and Japanese Music",
+      "articles": "Articles: Music Reviews, Features and Research",
+      "discussions": "Discussions: Doujin, Vocaloid, Anime and Game Music Forum",
+      "terms": "Terms of Service: Site Rules and Content Licensing",
+      "privacy": "Privacy Policy: What We Collect and Your Rights",
+      "api_docs": "Public API Docs: Albums, Tracks and Artists over HTTP",
+      "join": "Join the Team: Translators, Editors, Designers, Developers",
+      "guide_design": "How CDCat Is Designed: The Database and Its Parts",
+      "event_series": "{name}: Editions, Circles and Releases",
+      "profile": "{name}'s Profile",
+      "track_from": "{title} (from {album})",
+      "album_doujin_spoken": "Doujin {type}",
+      "album_music": "{type}"
     },
     "artist": {
       "aliases": "also known as {names}",
-      "recent": "recent releases: {albums}"
+      "recent": "Recent releases: {names}",
+      "lead": "{name} ({type})"
     },
     "profile": {
-      "member": "CDCat member",
       "joined": "joined {date}",
       "edits": "{count} edit | {count} edits",
-      "reviews": "{count} review | {count} reviews"
+      "reviews": "{count} review | {count} reviews",
+      "lead": "Profile of {name} on CDCat",
+      "topics": "{count} topic | {count} topics",
+      "favorites": "{count} favorite | {count} favorites",
+      "favorite_albums": "Favorite albums: {names}",
+      "favorite_artists": "Favorite artists: {names}"
+    },
+    "quote_album": "“{title}”",
+    "quote_song": "“{title}”",
+    "list_more": "{list} and more",
+    "page": "Page {page}",
+    "paged_title": "{title} ({page})",
+    "event_series": {
+      "events": "{count} edition | {count} editions",
+      "editions": "Editions: {names}"
     }
   },
   "artist_card": {

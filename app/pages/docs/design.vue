@@ -17,7 +17,7 @@ const { data: doc } = await useAsyncData(() => `guide:design:${locale.value}`, (
 
 usePageSeo({
   languages: false,
-  title: () => t('about_page.guide_basics_title'),
+  title: () => t('seo.title.guide_design'),
   description: () => t('seo.pages.guide_design'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.guide_basics_title'), path: '/docs/design' }],
   jsonLd: () => doc.value && compactLd({

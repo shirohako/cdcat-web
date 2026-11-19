@@ -189,7 +189,7 @@ onBeforeUnmount(() => clearTimeout(qqCopiedTimer))
 
 usePageSeo({
   languages: false,
-  title: () => t('about_page.recruit'),
+  title: () => t('seo.title.join'),
   description: () => t('seo.pages.join'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.recruit'), path: '/join' }],
 })

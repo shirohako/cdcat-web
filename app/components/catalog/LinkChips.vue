@@ -10,7 +10,7 @@
       :title="link.url"
       @click="onClick($event, catalogLinkInfo(link))"
     >
-      <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" alt="" class="h-3.5 w-3.5 rounded-sm object-contain">
+      <img v-if="link.provider?.icon_url" :src="link.provider.icon_url" :alt="link.provider.name" aria-hidden="true" class="h-3.5 w-3.5 rounded-sm object-contain">
       <Globe v-else :size="13" class="opacity-60" />
       <span>{{ linkName(link) }}</span>
       <ExternalLink :size="11" class="opacity-40" />

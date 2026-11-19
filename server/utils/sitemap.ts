@@ -10,7 +10,7 @@ import { BARE_LOCALE, SITE_LOCALES, languageUrl, type SiteLocale } from '../../s
 export interface SitemapItem {
   id: number
   slug?: string | null
-  /** Profiles are addressed by name. */
+  /** Profiles are addressed by name (the type is not listed at present, see SITEMAP_PATHS). */
   username?: string | null
   /** The main cover, avatar or key visual, for image search. */
   image?: string | null
@@ -22,7 +22,12 @@ export interface SitemapSummary {
   types: Record<string, { total: number, last_modified: string | null }>
 }
 
-/** Each content type's page address. */
+/**
+ * Each content type's page address. A type the API offers but this leaves out is not listed, nor sent to IndexNow:
+ * `profiles` for now (`item => \`/profile/${encodeURIComponent(item.username ?? '')}\``), until members' pages have
+ * more of their own to show. A profile with a review, an article or a topic may still be indexed when a crawler
+ * finds it by a link; the page decides that by the API's `indexable`.
+ */
 export const SITEMAP_PATHS: Record<string, (item: SitemapItem) => string> = {
   'albums': item => `/albums/${item.id}`,
   'artists': item => `/artists/${item.id}`,
@@ -34,19 +39,18 @@ export const SITEMAP_PATHS: Record<string, (item: SitemapItem) => string> = {
   'articles': item => `/articles/${item.id}${item.slug ? `/${encodeURIComponent(item.slug)}` : ''}`,
   'topics': item => `/discussions/${item.id}`,
   'discussion-categories': item => `/discussions/c/${encodeURIComponent(item.slug ?? '')}`,
-  'profiles': item => `/profile/${encodeURIComponent(item.username ?? '')}`,
 }
 
 /**
  * Types whose pages are written by a member in one language, whatever the interface is: one address each, so no
  * language files (the pages pass `languages: false` to usePageSeo).
  */
-export const SITEMAP_SINGLE: ReadonlySet<string> = new Set(['articles', 'topics', 'discussion-categories', 'profiles'])
+export const SITEMAP_SINGLE: ReadonlySet<string> = new Set(['articles', 'topics', 'discussion-categories'])
 
 /** Pages that are always there and have a version in every language: the home page, the lists, the documents. */
 export const SITEMAP_PAGES = [
   '/', '/albums', '/vinyls', '/artists', '/entries', '/franchises', '/events',
-  '/contribute', '/about', '/terms', '/privacy', '/docs/api', '/docs/markdown',
+  '/about', '/terms', '/privacy', '/docs/api', '/docs/markdown',
 ]
 
 /** Fixed pages with one address: lists of members' writing, and the guides written in Chinese only. */

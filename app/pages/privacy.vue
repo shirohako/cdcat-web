@@ -16,7 +16,7 @@ const absolute = useSiteUrl()
 const { data: doc } = await useAsyncData(() => `legal:privacy:${locale.value}`, () => loadLegal('privacy', locale.value), { deep: false })
 
 usePageSeo({
-  title: () => t('legal.privacy_title'),
+  title: () => t('seo.title.privacy'),
   description: () => t('seo.pages.privacy'),
   breadcrumbs: () => [{ name: t('legal.privacy_title'), path: '/privacy' }],
   jsonLd: () => doc.value && compactLd({

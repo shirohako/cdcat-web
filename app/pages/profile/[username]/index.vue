@@ -52,11 +52,11 @@
 <script setup lang="ts">
 import type { PublicProfile } from '~/types/profile'
 import type { TrackingStatus } from '~/types/tracking'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { plainText } from '~/utils/seoText'
 import { profilePageLd } from '~/utils/structuredData'
 
 const route = useRoute()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const username = route.params.username as string
 const activeView = ref<'default' | 'favorites' | 'artists' | 'tracks' | 'tracking'>('default')
 const trackingStatus = ref<TrackingStatus>('plan_to_listen')
@@ -70,33 +70,40 @@ const { data: profile, status, revealClass } = await usePageAPI<PublicProfile>(`
 
 // --------------- SEO ---------------
 
-const { sentence, count, own } = useSeoText()
+const { sentence, count, own, albumTitle, listing, fill } = useSeoText()
 const { formatDate } = useCatalogDisplay()
 const absolute = useSiteUrl()
 const shownName = computed(() => profile.value?.nickname || profile.value?.username || '')
+/** The name people know the member by, and the handle the address uses. */
+const handleName = computed(() => (profile.value
+  ? (shownName.value !== profile.value.username ? `${shownName.value} (@${profile.value.username})` : `@${profile.value.username}`)
+  : ''))
 usePageSeo({
   languages: false,
-  // The name people know the member by, and the handle the address uses.
-  title: () => (profile.value
-    ? (shownName.value !== profile.value.username ? `${shownName.value} (@${profile.value.username})` : `@${profile.value.username}`)
-    : ''),
+  title: () => handleName.value && t('seo.title.profile', { name: handleName.value }),
   description: () => {
     const value = profile.value
     if (!value) return undefined
-    const lead = sentence([
-      t('seo.profile.member'),
-      value.joined_at && t('seo.profile.joined', { date: formatDate(value.joined_at.slice(0, 10), 'month') }),
-      count('seo.profile.edits', value.contributions_count),
-      count('seo.profile.reviews', value.reviews_count),
+    return fill([
+      sentence([t('seo.profile.lead', { name: handleName.value })], { capitalize: false }),
+      sentence([
+        value.joined_at && t('seo.profile.joined', { date: formatDate(value.joined_at.slice(0, 10), 'month') }),
+        count('seo.profile.edits', value.contributions_count),
+        count('seo.profile.reviews', value.reviews_count),
+        count('seo.profile.topics', value.discussion_topics_count),
+        count('seo.profile.favorites', value.favorites.albums + value.favorites.artists + value.favorites.tracks),
+      ]),
+      listing('seo.profile.favorite_albums', value.favorite_albums.map(album => albumTitle(album.title)), 3),
+      listing('seo.profile.favorite_artists', value.favorite_artists.map(artist => artist.name), 3),
+      { cut: own(plainText(value.bio)) },
     ])
-    return composeDescription(lead, own(plainText(value.bio)), descriptionLength(locale.value))
   },
   // Shared links show the member card; before it is drawn, the avatar.
   card: () => profile.value?.share_card_url,
   image: () => profile.value?.avatar_url,
   type: 'profile',
-  // Only members with something public of their own (an article, a review, a topic, or a fair number of approved
-  // edits) are offered to search engines; the API decides (docs/seo in the API repo). Links are followed either way.
+  // Only members with something public of their own (an article, a review or a topic) are offered to search engines;
+  // edits alone don't count. The API decides (docs/seo in the API repo). Links are followed either way.
   noindex: () => profile.value?.indexable === false,
   jsonLd: () => profile.value && profilePageLd({
     name: shownName.value,

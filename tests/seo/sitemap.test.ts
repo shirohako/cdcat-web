@@ -18,7 +18,8 @@ describe('sitemap files', () => {
   })
 
   it('refuses unknown types, languages and pages, and language files of single-address types', () => {
-    for (const file of ['labels-1.xml', 'albums-0.xml', 'albums-1.fr.xml', 'albums-1.ja.xml', 'albums.xml', 'topics-1.en.xml', 'profiles-1.ko.xml', '../x.xml']) {
+    // Profiles are a type the API offers and the sitemap leaves out.
+    for (const file of ['labels-1.xml', 'albums-0.xml', 'albums-1.fr.xml', 'albums-1.ja.xml', 'albums.xml', 'topics-1.en.xml', 'profiles-1.xml', '../x.xml']) {
       expect(parseSitemapFile(file)).toBeNull()
     }
   })
@@ -41,7 +42,7 @@ describe('sitemap entries', () => {
     const items = [{ id: 7, image: 'https://img.cdcat.net/a.webp', updated_at: '2026-11-01T00:00:00Z' }]
     expect(itemEntries('albums', items, BASE, 'ja')).toEqual([{ loc: 'https://cdcat.net/albums/7', lastmod: '2026-11-01T00:00:00Z', image: 'https://img.cdcat.net/a.webp' }])
     expect(itemEntries('albums', items, BASE, 'en')).toEqual([{ loc: 'https://cdcat.net/albums/7?lang=en', lastmod: '2026-11-01T00:00:00Z', image: null }])
-    expect(itemEntries('profiles', [{ id: 1, username: 'a b', updated_at: null }], BASE, 'ja')[0]!.loc).toBe('https://cdcat.net/profile/a%20b')
+    expect(itemEntries('profiles', [{ id: 1, username: 'a b', updated_at: null }], BASE, 'ja')).toEqual([])
     expect(itemEntries('articles', [{ id: 3, slug: '新譜', updated_at: null }], BASE, 'ja')[0]!.loc).toBe('https://cdcat.net/articles/3/%E6%96%B0%E8%AD%9C')
     expect(itemEntries('labels', items, BASE, 'ja')).toEqual([])
   })
@@ -52,6 +53,7 @@ describe('sitemap entries', () => {
       'https://cdcat.net/albums/7?lang=zh-Hant', 'https://cdcat.net/albums/7?lang=ko',
     ])
     expect(itemUrls('topics', [{ id: 9, updated_at: null }], BASE)).toEqual(['https://cdcat.net/discussions/9'])
+    expect(itemUrls('profiles', [{ id: 1, username: 'a', updated_at: null }], BASE)).toEqual([])
   })
 })
 

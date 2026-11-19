@@ -56,7 +56,7 @@ const count = computed(() => new Intl.NumberFormat(locale.value, { notation: 'co
 
       <!-- The poster takes the whole row, with the date under the name. -->
       <div class="mt-auto flex items-center gap-2.5 pt-4">
-        <UiAvatar :src="article.author?.avatar_url" :name="authorName" alt="" size="sm" />
+        <UiAvatar :src="article.author?.avatar_url" :name="authorName" aria-hidden="true" size="sm" />
         <div class="min-w-0 flex-1">
           <p class="truncate text-xs font-semibold leading-5 text-body">{{ authorName }}</p>
           <time v-if="date" :datetime="article.published_at ?? undefined" class="block text-11 leading-4 text-faint">{{ date }}</time>

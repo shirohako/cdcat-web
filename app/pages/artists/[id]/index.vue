@@ -5,8 +5,8 @@
       <div class="card overflow-hidden">
         <!-- The artist's banner, fitted to the strip; the site's default one when there is none. -->
         <div class="page-hero-banner relative bg-sunken">
-          <CommonBannerImage v-if="banner" :image="banner" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
-          <img v-else :src="pageHeroConfig.defaultBannerUrl" alt="" class="h-full w-full object-cover">
+          <CommonBannerImage v-if="banner" :image="banner" :alt="`${shownName} · ${$t('catalog.artist_image_kind.banner')}`" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
+          <img v-else :src="pageHeroConfig.defaultBannerUrl" :alt="$t('catalog.artist_image_kind.banner')" aria-hidden="true" class="h-full w-full object-cover">
         </div>
         <div class="relative h-12.5 md:h-17">
           <div class="page-hero-avatar absolute left-4 top-0 -translate-y-1/2 overflow-hidden rounded-full border-4 border-[oklch(0.92_0.008_var(--hue))] bg-sunken md:left-6 dark:border-card dark:ring-1 dark:ring-line">
@@ -216,12 +216,12 @@ import { Disc3, Edit, History, ImageDown, Library, User, UserCheck, UserPlus, Us
 import { ARTIST_RELATIONS } from '~/types/artist'
 import { pageHeroConfig } from '~/config/pageHero'
 import { artistLdType, namedLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { plainText } from '~/utils/seoText'
 
 const route = useRoute()
 const router = useRouter()
 const { $api } = useNuxtApp()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { isAuthenticated } = useAuth()
 const { setFavorite } = useFavorites()
 const { localName, localeName, enumLabel } = useCatalogDisplay()
@@ -277,7 +277,30 @@ const albumGridClass = 'grid-cols-2 gap-5 sm:grid-cols-3 md:grid-cols-4 md:gap-6
 type Releases = { pagination: { last_page: number } }
   & ({ view: 'releases', albums: AlbumSimple[] } | { view: 'credits', albums: ArtistCreditedAlbum[], all: number, roles: Record<string, number> })
 const views = ['releases', 'credits'] as const
-const view = computed(() => route.query.view === 'credits' || route.query.view === 'tracks' ? 'credits' : 'releases')
+type View = typeof views[number]
+/** The tab the address names, if it names one. */
+const namedView = computed<View | null>(() => {
+  const named = route.query.view
+  return named === 'credits' || named === 'tracks' ? 'credits' : named === 'releases' ? 'releases' : null
+})
+/**
+ * The tab the plain address opens: 发行的专辑, unless the artist has none and is credited on other people's albums
+ * (a composer, a singer, an illustrator). Their page then opens on those, for readers and for search engines, which
+ * read only what the plain address serves: it used to be an empty list.
+ */
+const defaultView = computed<View>(() => (artist.value && !artist.value.releases_count && artist.value.credited_albums_count ? 'credits' : 'releases'))
+const view = computed<View>(() => namedView.value ?? defaultView.value)
+/** The default tab is known once the artist is: client-side navigation renders this page before its data (usePageData). */
+const whenArtistKnown = (signal: AbortSignal) => new Promise<void>((resolve) => {
+  const known = () => !!artist.value || status.value === 'error' || signal.aborted
+  if (known()) return resolve()
+  const done = () => {
+    stop()
+    resolve()
+  }
+  const stop = watch(known, value => value && done())
+  signal.addEventListener('abort', done, { once: true })
+})
 const viewTabs = computed(() => views.map(option => option === 'releases'
   ? { value: option, label: t('artists.detail.tab_releases'), count: artist.value?.releases_count ?? 0 }
   : { value: option, label: t('artists.detail.tab_credits'), count: artist.value?.credited_albums_count ?? 0 }))
@@ -290,8 +313,10 @@ const {
   revealKey: albumsRevealKey,
   revealClass: albumsRevealClass,
 } = usePageData(
-  () => `artist:${artistId}:${view.value}:${role.value ?? 'all'}:${albumPage.value}`,
+  // Keyed by the tab the address names, so the default one is fetched once, when the artist says which it is.
+  () => `artist:${artistId}:${namedView.value ?? 'default'}:${role.value ?? 'all'}:${albumPage.value}`,
   async ({ signal, background }) => {
+    if (!namedView.value) await whenArtistKnown(signal)
     const current = view.value
     const result = await $api<Omit<Releases, 'view'>>(`/v1/artists/${artistId}/${current === 'releases' ? 'albums' : 'tracks'}`, {
       params: { page: albumPage.value, ...(current === 'releases' ? { per_page: 30 } : {}), ...(role.value ? { role: role.value } : {}) },
@@ -304,10 +329,13 @@ const {
 const albums = computed(() => albumData.value?.view === 'releases' ? albumData.value.albums : [])
 const trackGroups = computed(() => albumData.value?.view === 'credits' ? albumData.value.albums : [])
 const albumLastPage = computed(() => albumData.value?.pagination.last_page ?? 1)
-// The credit-role chips keep the last known counts while another role's list loads.
-const counts = shallowRef<{ roles: Record<string, number>, all: number }>({ roles: {}, all: 0 })
-watch(albumData, (data) => {
-  if (data?.view === 'credits') counts.value = { roles: data.roles, all: data.all }
+// The credit-role chips read the loaded list's counts, and keep the last known ones while another role's list loads.
+// Read from the data itself, so a page opened on 参与的专辑 has them in the server's HTML: a watcher alone runs only
+// on a later change, and left the chips at 0 until the first switch.
+const lastCounts = shallowRef<{ roles: Record<string, number>, all: number }>({ roles: {}, all: 0 })
+const counts = computed(() => (albumData.value?.view === 'credits' ? { roles: albumData.value.roles, all: albumData.value.all } : lastCounts.value))
+watch(counts, (value) => {
+  lastCounts.value = value
 })
 const roleTabs = computed(() => [
   { role: null, label: t('common.all'), count: counts.value.all },
@@ -320,9 +348,9 @@ const selectRole = (value: string | null) => {
   router.push({ query: { ...route.query, role: value ?? undefined, page: undefined } })
 }
 // The two tabs filter by different roles, so the role filter does not carry over.
-const selectView = (value: 'releases' | 'credits') => {
+const selectView = (value: View) => {
   if (value === view.value) return
-  router.push({ query: { ...route.query, view: value === 'credits' ? 'credits' : undefined, role: undefined, page: undefined } })
+  router.push({ query: { ...route.query, view: value === defaultView.value ? undefined : value, role: undefined, page: undefined } })
 }
 
 /** The share card's download styles in the order shown: B 唱片墙 (the link preview, selected first), C 通行证, D 封底. */
@@ -346,27 +374,26 @@ const toggleFollow = async () => {
   }
 }
 
-const { withOriginal, sentence, count, list, own } = useSeoText()
+const { withOriginal, sentence, count, list, own, albumTitle, listing, fill } = useSeoText()
 const absolute = useSiteUrl()
-/** Names the artist also goes by, other than the two in the title: for the description. */
+/** Names the artist also goes by, the original among them when another is shown: for the description. */
 const aliases = computed(() => {
-  const shown = new Set([shownName.value, artist.value?.name])
-  return [...new Set((artist.value?.titles ?? []).map(title => title.title))].filter(name => !shown.has(name)).slice(0, 3)
+  const names = [artist.value?.name, ...(artist.value?.titles ?? []).map(title => title.title)]
+  return [...new Set(names)].filter((name): name is string => !!name && name !== shownName.value).slice(0, 3)
 })
 usePageSeo({
   // What people search an artist for is their records: the title says the page lists them.
   title: () => artist.value ? t('seo.title.artist', { name: withOriginal(shownName.value, artist.value.name) }) : undefined,
   description: () => artist.value
-    ? composeDescription(
+    ? fill([
         sentence([
-          enumLabel('artist_type', artist.value.type),
+          t('seo.artist.lead', { name: shownName.value, type: enumLabel('artist_type', artist.value.type) }),
           aliases.value.length && t('seo.artist.aliases', { names: list(aliases.value) }),
           count('seo.albums_count', artist.value.albums_count),
-          albums.value.length && t('seo.artist.recent', { albums: list(albums.value.slice(0, 3).map(album => album.title)) }),
-        ]),
-        own(plainText(artist.value.bio)),
-        descriptionLength(locale.value),
-      )
+        ], { capitalize: false }),
+        listing('seo.artist.recent', (albums.value.length ? albums.value : trackGroups.value.map(group => group.album)).map(album => albumTitle(album.title)), 3),
+        { cut: own(plainText(artist.value.bio)) },
+      ])
     : undefined,
   image: () => artist.value?.image_url,
   card: () => artist.value?.share_card_url,

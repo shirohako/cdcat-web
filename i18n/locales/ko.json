@@ -1099,8 +1099,7 @@
         "albums": "앨범 많은 순"
       },
       "empty": "아직 등록된 회차가 없어요",
-      "no_description": "소개가 없어요.",
-      "seo_description": "M3 등 동인 음악 즉매회와 음악 행사의 일정, 장소, 참가 서클, 발매 앨범 정보입니다."
+      "no_description": "소개가 없어요."
     },
     "revisions": {
       "title": "내 편집 내역",
@@ -1218,7 +1217,7 @@
   },
   "home": {
     "seo_title": "CDCat — 동인·보컬로이드·애니·게임 일본 음악 데이터베이스",
-    "seo_description": "CDCat에서 일본 음악과 동인 음반, 보컬로이드, 애니메이션·게임 OST, 행사 정보, 곡별 상세 크레딧까지 찾아보세요.",
+    "seo_description": "CDCat은 음악 팬들이 함께 만드는 비영리 음악 데이터베이스입니다. 동인 음악, 보컬로이드, 동방 어레인지, 애니메이션·게임 음악의 수록곡과 작곡·편곡·보컬 크레딧, 에디션, M3 등 행사 정보를 찾아보세요.",
     "seo_keywords": "일본 음악,동인 음악,보컬로이드,동방 프로젝트,애니 OST,게임 음악,음악 데이터베이스,곡 크레딧"
   },
   "landing": {
@@ -3638,11 +3637,15 @@
     "sentence": "{text}.",
     "albums_count": "앨범 {count}장",
     "album": {
-      "by": "{artists}의 {type}",
       "released": "{date} 발매",
       "event": "{event} 신보",
       "catalog": "품번 {number}",
-      "tracks": "{count}곡 수록"
+      "tracks": "{count}곡 수록",
+      "lead": "{artists}의 {type} {title}",
+      "lead_bare": "{type} {title}",
+      "works": "관련 작품: {names}",
+      "tracklist": "수록곡: {names}",
+      "people": "참여: {names}"
     },
     "track": {
       "from": "‘{album}’ 수록곡",
@@ -3653,34 +3656,41 @@
       "instrumental": "연주곡"
     },
     "entry": {
-      "albums": "관련 앨범 {count}장"
+      "albums": "관련 앨범 {count}장",
+      "platforms": "플랫폼: {names}",
+      "album_list": "관련 앨범: {names}"
     },
     "franchise": {
-      "lead": "시리즈",
-      "entries": "작품 {count}편"
+      "lead": "{name} 시리즈",
+      "entries": "작품 {count}편",
+      "entry_list": "작품: {names}"
     },
     "event": {
       "date": "{date} 개최",
       "venue": "장소: {venue}",
       "circles": "참가 서클 {count}곳",
       "albums": "신보 {count}장",
-      "map": "부스 배치도 제공"
+      "map": "부스 배치도 제공",
+      "releases": "신보: {names}"
     },
     "pages": {
-      "albums": "CDCat에 등록된 동인 음악, 보컬로이드, 애니메이션·게임 음악 앨범 목록입니다. 수록곡, 에디션, 크레딧을 확인할 수 있으며 최근 등록순으로 정렬됩니다.",
-      "vinyls": "CDCat에 등록된 LP(바이닐) 음반을 둘러보세요.",
-      "artists": "CDCat에 등록된 아티스트, 동인 서클, 레이블, 버추얼 싱어 목록입니다. 각자의 앨범과 참여 작품을 볼 수 있습니다.",
-      "entries": "CDCat에 등록된 애니메이션, 게임, 영화 등 다양한 작품과 관련 음악을 둘러보세요.",
-      "franchises": "CDCat에 등록된 시리즈와 관련 앨범을 둘러보세요.",
-      "articles": "CDCat 회원들이 직접 쓴 음악 리뷰, 특집 기사, 자료 정리 글을 읽어 보세요.",
-      "about": "커뮤니티가 함께 편집하는 동인 음악·일본 음악 데이터베이스, CDCat을 소개해요.",
+      "albums": "CDCat에 등록된 동인 음악, 보컬로이드, 동방 어레인지, 애니메이션·게임 음악 앨범 목록입니다. 앨범마다 수록곡, 작곡·편곡·보컬 크레딧, 에디션, 특전, 재킷 이미지를 담았고 최근 등록순으로 정렬됩니다.",
+      "vinyls": "CDCat에 등록된 LP(바이닐) 음반 목록입니다. 동인 음악, 애니메이션·게임 사운드트랙, 보컬로이드 등의 바이닐을 수록곡, 크레딧, 에디션, 재킷 이미지와 함께 소개합니다.",
+      "artists": "CDCat에 등록된 아티스트, 동인 서클, 작곡가, 보컬리스트, 레이블, 버추얼 싱어 목록입니다. 발매한 앨범과 작곡·편곡·보컬로 참여한 곡, 다른 이름과 멤버 관계까지 확인할 수 있습니다.",
+      "entries": "CDCat에 등록된 애니메이션, 게임, 영화, 드라마 등 작품 목록입니다. 작품마다 사운드트랙, 주제가, 삽입곡, 캐릭터 송, 동인 어레인지 앨범을 모았고, 종류별로 보거나 검색할 수 있습니다.",
+      "franchises": "CDCat에 등록된 시리즈 목록입니다. 여러 게임과 애니메이션에 걸친 시리즈별로 각 작품과 그 사운드트랙, 주제가, 관련 앨범을 모아 시리즈의 음악을 한눈에 따라갈 수 있습니다.",
+      "articles": "CDCat 회원들이 직접 쓴 음악 글 목록입니다. 앨범 리뷰, 아티스트·서클 특집, 행사 후기, 자료 정리 등 동인 음악, 보컬로이드, 애니메이션·게임 음악에 관한 글을 종류와 태그로 찾아보세요.",
+      "about": "커뮤니티가 함께 편집하는 비영리 동인 음악·일본 음악 데이터베이스, CDCat을 소개해요. 우리가 지향하는 것, 편집 가이드, 공개 API, 팀원 모집, 커뮤니티 참여 방법을 안내합니다.",
       "terms": "CDCat 이용약관이에요. 사이트 이용 규칙, 기여 콘텐츠의 라이선스(카탈로그 데이터는 CC BY-SA 4.0), 커뮤니티 규칙, 저작권 침해 신고 방법을 담았어요.",
       "privacy": "CDCat 개인정보처리방침이에요. 어떤 정보를 수집해 어떻게 쓰는지, 이용자에게 어떤 권리가 있는지 안내해요. 광고는 없고, 데이터를 팔지도 않아요.",
-      "discussion_tag": "CDCat 커뮤니티에서 #{tag} 태그가 달린 글이에요.",
+      "discussion_tag": "CDCat 커뮤니티에서 #{tag} 태그가 달린 글 목록이에요. 동인 음악, 보컬로이드, 애니메이션·게임 음악에 관한 감상, 질문, 정보를 읽고 대화에 참여해 보세요.",
       "guide_design": "CDCat은 어떻게 설계됐을까요? 앨범, 아티스트, 행사, 작품, 시리즈, LP, 커뮤니티, 아티클이 각각 어떤 역할을 하고 서로 어떻게 연결되는지 알아봐요.",
       "guide_editor": "CDCat 에디터 사용 가이드예요. 앨범을 추가하고 곡, 크레딧, 에디션, 특전을 입력해 검토를 요청하는 방법과 기존 정보를 바로잡는 방법을 알려 드려요.",
       "api_docs": "CDCat 공개 API 문서예요. 키 없이 HTTP로 앨범, 곡, 아티스트, 행사, 작품, 시리즈 정보를 읽어 올 수 있고, 데이터는 CC BY-SA 4.0으로 공유돼요.",
-      "join": "CDCat을 함께 만들어 갈 사람을 찾고 있어요. 번역, 교정, 글쓰기, 일러스트, 디자인, 개발, 자료 정리, 커뮤니티 관리까지 함께해 주세요."
+      "join": "CDCat을 함께 만들어 갈 사람을 찾고 있어요. 번역, 교정, 글쓰기, 일러스트, 디자인, 개발, 자료 정리, 커뮤니티 관리까지, 동인 음악과 일본 음악을 좋아하는 분이라면 누구든 환영해요.",
+      "events": "M3, 코믹마켓, 하쿠레이 신사 예대제, THE VOC{'@'}LOiD M{'@'}STER 등 동인 음악 즉매회와 음악 행사 목록입니다. 회차마다 일정, 장소, 참가 서클, 신보, 부스 배치도를 정리했습니다.",
+      "contribute": "CDCat에 앨범, 아티스트, 작품, 시리즈를 새로 추가하거나 기존 정보를 바로잡을 수 있어요. 제출하면 바로 공개되고 다른 기여자들이 검토하며, 모든 변경은 편집 기록에 남아요.",
+      "discussions": "CDCat 커뮤니티입니다. 앨범 이야기, 곡 찾기, 컬렉션 자랑은 물론 행사와 데이터베이스 편집 이야기까지, 동인 음악·보컬로이드·애니메이션·게임 음악에 관한 대화를 카테고리와 태그로 찾아보세요."
     },
     "title": {
       "artist": "{name} 앨범 및 참여 작품",
@@ -3690,19 +3700,49 @@
       "albums": "앨범 목록｜동인 음악·보컬로이드·애니메이션·게임 음악",
       "artists": "아티스트·동인 서클 목록",
       "entries": "애니메이션·게임 등 작품별 음악",
-      "franchises": "시리즈 목록",
+      "franchises": "시리즈 목록｜게임·애니메이션 시리즈의 음악과 앨범",
       "events": "동인 음악 행사·즉매회 목록",
-      "vinyls": "LP 레코드 목록"
+      "vinyls": "LP 레코드 목록｜동인 음악·애니메이션·게임 음악 바이닐",
+      "album_dated": "{title} ({year}년 {kind})",
+      "album_kind": "{title} ({kind})",
+      "album_doujin": "동인 {type}",
+      "about": "CDCat 소개｜함께 만드는 동인 음악·일본 음악 데이터베이스",
+      "articles": "아티클｜음악 리뷰·특집·자료 정리",
+      "discussions": "커뮤니티｜동인 음악·보컬로이드·애니메이션·게임 음악 이야기",
+      "terms": "이용약관｜이용 규칙과 콘텐츠 라이선스",
+      "privacy": "개인정보처리방침｜수집하는 정보와 이용자의 권리",
+      "api_docs": "공개 API 문서｜앨범·곡·아티스트 정보 조회",
+      "join": "팀원 모집｜번역·편집·디자인·개발",
+      "guide_design": "CDCat 구조 이해하기｜데이터베이스 구성과 각 항목의 역할",
+      "event_series": "{name}｜개최 목록·참가 서클·신보",
+      "profile": "{name}의 프로필",
+      "track_from": "{title} ({album} 수록)",
+      "album_doujin_spoken": "동인 {type}",
+      "album_music": "{type}"
     },
     "artist": {
       "aliases": "다른 이름: {names}",
-      "recent": "최근 작품: {albums}"
+      "recent": "최근 작품: {names}",
+      "lead": "{name}({type})"
     },
     "profile": {
-      "member": "CDCat 회원",
       "joined": "{date} 가입",
       "edits": "편집 {count}회",
-      "reviews": "평가 {count}개"
+      "reviews": "평가 {count}개",
+      "lead": "{name}의 CDCat 프로필",
+      "topics": "토론 글 {count}개",
+      "favorites": "즐겨찾기 {count}개",
+      "favorite_albums": "좋아하는 앨범: {names}",
+      "favorite_artists": "좋아하는 아티스트: {names}"
+    },
+    "quote_album": "《{title}》",
+    "quote_song": "〈{title}〉",
+    "list_more": "{list} 등",
+    "page": "{page}페이지",
+    "paged_title": "{title} ({page})",
+    "event_series": {
+      "events": "{count}회 개최",
+      "editions": "회차: {names}"
     }
   },
   "artist_card": {

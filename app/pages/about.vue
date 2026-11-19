@@ -12,7 +12,8 @@
             src="/images/brand/icon-256.webp"
             srcset="/images/brand/icon-256.webp 256w, /images/brand/icon-512.webp 512w"
             sizes="64px"
-            alt=""
+            alt="CDCat"
+            aria-hidden="true"
             width="256"
             height="256"
             class="size-16 shrink-0 rounded-xl ring-1 ring-line md:hidden"
@@ -80,7 +81,7 @@
             src="/images/brand/icon-512.webp"
             srcset="/images/brand/icon-256.webp 256w, /images/brand/icon-512.webp 512w, /images/brand/icon-1024.webp 1024w"
             sizes="240px"
-            alt=""
+            alt="CDCat"
             width="512"
             height="512"
             class="h-full min-w-0 flex-1 object-cover"
@@ -479,7 +480,7 @@ const guides = computed(() => [
 ])
 
 usePageSeo({
-  title: () => t('menu.about'),
+  title: () => t('seo.title.about'),
   description: () => t('seo.pages.about'),
 })
 </script>

@@ -16,8 +16,9 @@
           to="/"
           class="flex h-10 items-center gap-2 rounded-lg px-2 text-xl font-bold leading-none tracking-tight text-primary transition-colors duration-150 ease-out hover:bg-ghost-hover sm:text-2xl"
         >
-          <!-- The name follows, so the picture needs no alt text of its own. -->
-          <img src="/icon.png" alt="" width="32" height="32" class="size-8 rounded-lg">
+          <!-- The name follows, so screen readers skip the picture; the alt text is for crawlers, which count an
+               empty one as missing. -->
+          <img src="/icon.png" alt="CDCat" aria-hidden="true" width="32" height="32" class="size-8 rounded-lg">
           CDCat
         </NuxtLink>
       </div>

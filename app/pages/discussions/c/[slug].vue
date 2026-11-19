@@ -18,7 +18,7 @@ const newTopic = computed(() => category.value ? { category: String(category.val
 usePageSeo({
   languages: false,
   title: () => category.value ? `${categoryName(category.value)} - ${t('discussions.title')}` : t('discussions.title'),
-  description: () => categoryDescription(category.value) || t('discussions.description'),
+  description: () => categoryDescription(category.value) || t('seo.pages.discussions'),
   // Staff-only categories, and ones nobody has posted in yet (the API's `indexable`), stay out of search results.
   noindex: () => category.value?.visibility === 'moderators' || category.value?.indexable === false,
   error,

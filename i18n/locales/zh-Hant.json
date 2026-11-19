@@ -1099,8 +1099,7 @@
         "albums": "專輯最多"
       },
       "empty": "目前沒有場次",
-      "no_description": "目前沒有介紹。",
-      "seo_description": "M3 等同人音樂即賣會與音樂活動的日期、會場、參展社團和首發專輯。"
+      "no_description": "目前沒有介紹。"
     },
     "revisions": {
       "title": "我的編輯紀錄",
@@ -1218,7 +1217,7 @@
   },
   "home": {
     "seo_title": "CDCat — 日系音樂資料庫｜同人、VOCALOID、動畫與遊戲",
-    "seo_description": "在 CDCat 探索日系音樂、同人作品、VOCALOID、動畫遊戲配樂、活動紀錄與詳細曲目資訊。",
+    "seo_description": "CDCat 是由音樂愛好者共同編輯的非營利音樂資料庫，收錄同人音樂、VOCALOID、東方改編、動畫與遊戲音樂等日系音樂。可以查看專輯曲目、作曲編曲演唱等製作人員、版本與特典，以及 M3、Comic Market 等活動資料。",
     "seo_keywords": "日系音樂,同人音樂,VOCALOID,東方Project,動畫原聲帶,遊戲音樂,音樂資料庫,曲目資訊"
   },
   "landing": {
@@ -3638,11 +3637,15 @@
     "sentence": "{text}。",
     "albums_count": "收錄 {count} 張專輯",
     "album": {
-      "by": "{artists} 的{type}",
       "released": "{date}發行",
       "event": "首發於 {event}",
       "catalog": "編號 {number}",
-      "tracks": "收錄 {count} 首曲目"
+      "tracks": "收錄 {count} 首曲目",
+      "lead": "{artists} 的{type}{title}",
+      "lead_bare": "{type}{title}",
+      "works": "關聯作品：{names}",
+      "tracklist": "曲目：{names}",
+      "people": "參與製作：{names}"
     },
     "track": {
       "from": "收錄於《{album}》的曲目",
@@ -3653,34 +3656,41 @@
       "instrumental": "純音樂"
     },
     "entry": {
-      "albums": "關聯 {count} 張專輯"
+      "albums": "關聯 {count} 張專輯",
+      "platforms": "平台：{names}",
+      "album_list": "相關專輯：{names}"
     },
     "franchise": {
-      "lead": "作品系列",
-      "entries": "包含 {count} 個條目"
+      "lead": "{name} 系列",
+      "entries": "包含 {count} 個條目",
+      "entry_list": "包含作品：{names}"
     },
     "event": {
       "date": "{date}舉辦",
       "venue": "地點：{venue}",
       "circles": "{count} 個參展社團",
       "albums": "{count} 張新專輯",
-      "map": "附會場圖"
+      "map": "附會場圖",
+      "releases": "首發專輯：{names}"
     },
     "pages": {
-      "albums": "CDCat 收錄的同人音樂、VOCALOID、動畫與遊戲音樂專輯，每張都有完整的曲目、版本和製作人員，依最新加入排列。",
-      "vinyls": "瀏覽 CDCat 收錄的黑膠唱片。",
-      "artists": "CDCat 收錄的藝術家、同人社團、廠牌與虛擬歌手，可查看各自的專輯和參與作品。",
-      "entries": "瀏覽 CDCat 收錄的動畫、遊戲、影視等作品及其音樂。",
-      "franchises": "瀏覽 CDCat 收錄的作品系列及相關專輯。",
-      "articles": "CDCat 使用者撰寫的音樂評論、專題與資料整理。",
-      "about": "認識 CDCat：專注同人與日系音樂、由社群共同編輯的音樂資料庫。",
-      "terms": "CDCat 服務條款：使用規則、貢獻內容的授權（資料庫資料以 CC BY-SA 4.0 分享）、社群規則與版權檢舉流程。",
-      "privacy": "CDCat 隱私政策：我們蒐集哪些資料、如何使用，以及你的權利。不放廣告，不出售資料。",
-      "discussion_tag": "CDCat 討論區中標記為 #{tag} 的話題。",
-      "guide_design": "CDCat 是怎樣設計的：專輯、藝術家、活動、條目、系列、黑膠、討論和文章各做什麼，彼此怎樣關聯。",
-      "guide_editor": "CDCat 編輯器使用說明：怎樣新增專輯，填寫曲目、參與創作的人、版本和特典，提交審核，以及修正已有的資料。",
-      "api_docs": "CDCat 開放介面文件：用 HTTP 讀取專輯、曲目、藝術家、活動、條目和系列資料，不需要金鑰，資料以 CC BY-SA 4.0 共享。",
-      "join": "CDCat 人員募集：翻譯、校對、編輯、美術、設計、開發、資料整理和社群管理等職位，歡迎喜歡音樂的你一起參與。"
+      "albums": "CDCat 收錄的同人音樂、VOCALOID、東方改編、動畫與遊戲音樂專輯一覽。每張專輯都有完整曲目、作曲編曲演唱等製作人員、版本、特典與封面圖，依最新加入排列，可依類型、分類、年份和活動篩選。",
+      "vinyls": "CDCat 收錄的黑膠唱片一覽，包括同人音樂、動畫與遊戲原聲、VOCALOID 等作品的黑膠版本。每張都附有完整曲目、製作人員、版本資訊與封面圖，方便收藏者查找和比對。",
+      "artists": "CDCat 收錄的藝術家、同人社團、作曲家、歌手、廠牌與虛擬歌手一覽。可以查看每位藝術家發行的專輯、擔任作曲編曲演唱的曲目，以及別名、成員等關聯，並依名稱和類型查找。",
+      "entries": "CDCat 收錄的動畫、遊戲、電影、電視劇等作品一覽。每部作品都整理了相關的原聲、主題曲、插曲、角色歌和同人改編專輯，可依類型和形式篩選，也可以依作品名搜尋。",
+      "franchises": "CDCat 收錄的作品系列一覽。依橫跨多部遊戲、動畫的系列整理其中的作品，以及它們的原聲、主題曲與相關專輯，可以依系列名搜尋，順著系列找到想聽的音樂。",
+      "articles": "CDCat 使用者撰寫的音樂文章一覽，包括專輯評論、藝術家與社團專題、活動報導和資料整理等，內容涵蓋同人音樂、VOCALOID、動畫與遊戲音樂，可以依類型和標籤查找。",
+      "about": "認識 CDCat：專注同人音樂、VOCALOID、動畫與遊戲音樂等日系音樂，由社群共同編輯的非營利音樂資料庫。這裡介紹我們的願景、編輯指南、開放介面、人員募集以及加入社群的方式。",
+      "terms": "CDCat 服務條款：服務的使用條件、帳號、投稿與編輯規則、內容授權（資料庫資料以 CC BY-SA 4.0 分享）、社群規則、管理措施、版權檢舉流程與免責聲明。",
+      "privacy": "CDCat 隱私政策：我們蒐集哪些資料、用於什麼目的、哪些資料會公開、Cookie 與本機儲存、第三方提供、電子郵件、安全措施，以及你的選擇與權利。不放廣告，不出售資料。",
+      "discussion_tag": "CDCat 討論區中標記為 #{tag} 的話題一覽。在這裡閱讀關於同人音樂、VOCALOID、動畫與遊戲音樂的感想、提問和情報，或者加入討論。",
+      "guide_design": "CDCat 是怎樣設計的：專輯、藝術家、活動、條目、系列、黑膠、討論和文章各記錄什麼，彼此怎樣關聯。想了解資料庫的思路、準備開始編輯的人可以從這裡讀起。",
+      "guide_editor": "CDCat 編輯器使用說明：怎樣新增專輯，填寫曲目、參與創作的人、版本和特典，提交審核，以及修正已有的資料。依編輯的順序一步步說明，第一次投稿可以從這裡開始。",
+      "api_docs": "CDCat 開放介面文件：用 HTTP 讀取專輯、曲目、藝術家、活動、條目和系列資料，不需要註冊和金鑰，資料以 CC BY-SA 4.0 共享，可用於歌詞工具、封面比對等。",
+      "join": "CDCat 人員募集：翻譯、校對、編輯、美術、設計、開發、資料整理和社群管理等職位，歡迎喜歡同人音樂和日系音樂的你，以自己擅長的方式一起參與，讓 CDCat 變得更好。",
+      "events": "M3、Comic Market、博麗神社例大祭、THE VOC{'@'}LOiD M{'@'}STER 等同人音樂即賣會與音樂活動一覽，依活動系列整理每一屆的日期、會場、參展社團、首發專輯與會場圖。",
+      "contribute": "為 CDCat 貢獻資料：新增專輯、藝術家、條目和系列，或修正已有的資訊。提交後馬上上線，由其他貢獻者審核，所有修改都會保留在編輯歷史中。",
+      "discussions": "CDCat 討論區：聊專輯、找歌、分享收藏，也聊展會和資料庫編輯。關於同人音樂、VOCALOID、動畫與遊戲音樂的話題都可以在這裡交流，依分類和標籤找到感興趣的文章。"
     },
     "title": {
       "artist": "{name} 的專輯與參與作品",
@@ -3690,19 +3700,49 @@
       "albums": "專輯一覽｜同人音樂、VOCALOID、動畫與遊戲音樂",
       "artists": "藝術家與同人社團一覽",
       "entries": "動畫、遊戲等作品的音樂",
-      "franchises": "作品系列一覽",
+      "franchises": "作品系列一覽｜遊戲、動畫系列的音樂與專輯",
       "events": "同人音樂活動與即賣會",
-      "vinyls": "黑膠唱片一覽"
+      "vinyls": "黑膠唱片一覽｜同人音樂、動畫與遊戲音樂的黑膠",
+      "album_dated": "{title} ({year}年 {kind})",
+      "album_kind": "{title} ({kind})",
+      "album_doujin": "同人音樂{type}",
+      "about": "關於 CDCat｜社群共同編輯的同人音樂與日系音樂資料庫",
+      "articles": "文章一覽｜音樂評論、專題與資料整理",
+      "discussions": "討論區｜同人音樂、VOCALOID、動畫與遊戲音樂交流",
+      "terms": "服務條款｜使用規則與內容授權",
+      "privacy": "隱私政策｜我們蒐集的資料與你的權利",
+      "api_docs": "開放介面（API）文件｜讀取專輯、曲目與藝術家資料",
+      "join": "人員募集｜翻譯、編輯、設計與開發",
+      "guide_design": "了解 CDCat 的設計｜資料庫的結構與各欄目的作用",
+      "event_series": "{name}｜歷屆活動、參展社團與首發專輯",
+      "profile": "{name} 的個人頁面",
+      "track_from": "{title} (收錄於{album})",
+      "album_doujin_spoken": "同人{type}",
+      "album_music": "音樂{type}"
     },
     "artist": {
       "aliases": "別名：{names}",
-      "recent": "近期作品：{albums}"
+      "recent": "近期作品：{names}",
+      "lead": "{name}（{type}）"
     },
     "profile": {
-      "member": "CDCat 成員",
       "joined": "{date}加入",
       "edits": "貢獻 {count} 次編輯",
-      "reviews": "{count} 則評價"
+      "reviews": "{count} 則評價",
+      "lead": "{name} 的 CDCat 個人頁面",
+      "topics": "{count} 篇討論",
+      "favorites": "收藏 {count} 項",
+      "favorite_albums": "喜歡的專輯：{names}",
+      "favorite_artists": "喜歡的藝術家：{names}"
+    },
+    "quote_album": "《{title}》",
+    "quote_song": "〈{title}〉",
+    "list_more": "{list}等",
+    "page": "第 {page} 頁",
+    "paged_title": "{title} ({page})",
+    "event_series": {
+      "events": "共 {count} 屆",
+      "editions": "歷屆：{names}"
     }
   },
   "artist_card": {

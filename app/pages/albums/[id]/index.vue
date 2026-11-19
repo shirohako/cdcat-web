@@ -28,13 +28,14 @@
 import type { Album } from '~/types/album'
 import type { TrackingStatus } from '~/types/tracking'
 import { ldDate, musicAlbumLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, oneLine } from '~/utils/seoText'
+import { creditedNames, isAlternateTake, oneLine } from '~/utils/seoText'
+import { RELEASE_ROLES } from '~/types/album'
 import { bylineText } from '~/utils/albumByline'
 
 const route = useRoute()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { localName, formatDate, enumLabel } = useCatalogDisplay()
-const { withOriginal, sentence, count, own } = useSeoText()
+const { withOriginal, sentence, count, own, albumTitle, songTitle, listing, fill } = useSeoText()
 const absolute = useSiteUrl()
 const { markdown } = useAlbumExport()
 
@@ -99,20 +100,49 @@ const creditedAs = (roles: string[]) => {
   return [...seen.values()]
 }
 
+/** Page titles shorter than this ("one - 鹿乃") also give the year and the kind of release. */
+const SHORT_TITLE = 16
+const pageTitle = computed(() => {
+  const value = album.value
+  if (!value) return undefined
+  const title = [withOriginal(shownTitle.value, value.title), artistLine.value].filter(Boolean).join(' - ')
+  if ([...title].length >= SHORT_TITLE) return title
+  const type = enumLabel('album_type', value.type)
+  // "同人アルバム", "同人音乐专辑"; otherwise "アルバム", "音乐专辑" (Chinese names it music, the others don't).
+  // A drama CD or a radio show is not music: "同人广播剧", "广播剧".
+  const spoken = value.type === 'drama' || value.type === 'radio'
+  const kind = value.categories.includes('doujin')
+    ? t(spoken ? 'seo.title.album_doujin_spoken' : 'seo.title.album_doujin', { type })
+    : spoken ? type : t('seo.title.album_music', { type })
+  const year = value.release_date?.slice(0, 4)
+  return year ? t('seo.title.album_dated', { title, year, kind }) : t('seo.title.album_kind', { title, kind })
+})
 usePageSeo({
-  title: () => album.value ? [withOriginal(shownTitle.value, album.value.title), artistLine.value].filter(Boolean).join(' - ') : undefined,
+  title: () => pageTitle.value,
+  // What the album is and who made it, then what people search it by: its works, songs and the people on it.
   description: () => {
     const value = album.value
     if (!value) return undefined
     const type = enumLabel('album_type', value.type)
-    const lead = sentence([
-      artistLine.value ? t('seo.album.by', { artists: artistLine.value, type }) : type,
-      value.release_date && t('seo.album.released', { date: formatDate(value.release_date, value.release_date_precision) }),
-      value.release_event && t('seo.album.event', { event: value.release_event.name }),
-      value.catalog_number && t('seo.album.catalog', { number: value.catalog_number }),
-      count('seo.album.tracks', value.track_count),
+    const title = albumTitle(shownTitle.value)
+    const tracks = value.discs.filter(disc => !disc.bonus_id).sort((a, b) => a.position - b.position)
+      .flatMap(disc => [...disc.tracks].sort((a, b) => a.track_number - b.track_number))
+    return fill([
+      sentence([
+        artistLine.value ? t('seo.album.lead', { title, artists: artistLine.value, type }) : t('seo.album.lead_bare', { title, type }),
+        value.release_date && t('seo.album.released', { date: formatDate(value.release_date, value.release_date_precision) }),
+        value.release_event && t('seo.album.event', { event: value.release_event.name }),
+        value.catalog_number && t('seo.album.catalog', { number: value.catalog_number }),
+        count('seo.album.tracks', value.track_count),
+      ], { capitalize: false }),
+      listing('seo.album.works', value.entries.map(entry => albumTitle(entry.name)), 2),
+      listing('seo.album.tracklist', tracks.map(track => localName(track.title, track.titles)).filter(name => !isAlternateTake(name)).map(songTitle), 5),
+      listing('seo.album.people', creditedNames([
+        ...value.credits.filter(credit => credit.role === 'artist' || !(RELEASE_ROLES as readonly string[]).includes(credit.role)),
+        ...tracks.flatMap(track => track.credits),
+      ], value.byline?.artists.map(artist => artist.name)), 5),
+      { cut: own(oneLine(value.description)) },
     ])
-    return composeDescription(lead, own(oneLine(value.description)), descriptionLength(locale.value))
   },
   image: () => album.value?.cover?.medium_url || album.value?.image_url,
   card: () => album.value?.share_card_url,

@@ -4,7 +4,8 @@
       v-if="cover"
       v-img-fade
       :src="cover"
-      alt=""
+      :alt="track.album?.title"
+      aria-hidden="true"
       class="absolute inset-0 h-full w-full scale-105 object-cover opacity-30 blur-[3px]"
     >
 

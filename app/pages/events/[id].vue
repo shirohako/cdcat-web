@@ -5,12 +5,12 @@ import type { GenreFamily } from '~/utils/eventVenue'
 import type { UiSelectOption } from '~/components/ui/Select.vue'
 import { Disc3, Layers, MapPin, Palette, Search, Star, Users, X } from '@lucide/vue'
 import { eventLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { plainText } from '~/utils/seoText'
 
 const route = useRoute()
 const router = useRouter()
 const eventId = Number(route.params.id)
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { localizeError } = useLocalizedApiError()
 const { formatDate, localizedContent } = useLocaleFormatting()
 
@@ -151,7 +151,7 @@ const stats = computed(() => {
   return out.filter(s => s.value || s.key === 'circles')
 })
 
-const { sentence, count } = useSeoText()
+const { sentence, count, albumTitle, listing, fill } = useSeoText()
 const absolute = useSiteUrl()
 /** "25 Oct 2026", or "25 Oct 2026 – 26 Oct 2026" over several days. */
 const eventDates = computed(() => {
@@ -167,14 +167,18 @@ usePageSeo({
     const value = event.value
     if (!value) return undefined
     const place = [value.venue, value.location].filter(Boolean).join(' ')
-    const lead = sentence([
-      eventDates.value && t('seo.event.date', { date: eventDates.value }),
-      place && t('seo.event.venue', { venue: place }),
-      count('seo.event.circles', value.booths_count),
-      count('seo.event.albums', value.released_albums_count),
-      value.has_map && t('seo.event.map'),
+    return fill([
+      sentence([
+        value.name,
+        eventDates.value && t('seo.event.date', { date: eventDates.value }),
+        place && t('seo.event.venue', { venue: place }),
+        count('seo.event.circles', value.booths_count),
+        count('seo.event.albums', value.released_albums_count),
+        value.has_map && t('seo.event.map'),
+      ], { capitalize: false }),
+      listing('seo.event.releases', (albumData.value?.albums ?? []).map(album => albumTitle(album.title)), 4),
+      { cut: plainText(localizedContent(value.description)) },
     ])
-    return composeDescription(lead, plainText(localizedContent(value.description)), descriptionLength(locale.value))
   },
   image: () => event.value?.main_visual_url,
   card: () => event.value?.share_card_url,

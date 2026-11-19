@@ -7,7 +7,7 @@
       :src="image.medium_url"
       :srcset="`${image.medium_url} ${mediumWidth}w, ${image.url} ${image.width}w`"
       :sizes="sizes"
-      alt=""
+      :alt="alt"
       class="banner-image-picture"
     >
   </div>
@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import type { CatalogImage } from '~/types/catalog'
 
-const props = withDefaults(defineProps<{ image: CatalogImage, sizes?: string }>(), { sizes: '100vw' })
+const props = withDefaults(defineProps<{ image: CatalogImage, sizes?: string, alt?: string }>(), { sizes: '100vw', alt: '' })
 
 // The medium thumbnail is at most 1200 px on its longest side, so a tall banner's is narrower than that.
 const mediumWidth = computed(() => Math.round(props.image.width * Math.min(1, 1200 / Math.max(props.image.width, props.image.height))))

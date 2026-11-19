@@ -16,7 +16,7 @@ const absolute = useSiteUrl()
 const { data: doc } = await useAsyncData(() => `api-docs:${locale.value}`, () => loadApiDocs(locale.value), { deep: false })
 
 usePageSeo({
-  title: () => t('about_page.api_docs'),
+  title: () => t('seo.title.api_docs'),
   description: () => t('seo.pages.api_docs'),
   breadcrumbs: () => [{ name: t('menu.about'), path: '/about' }, { name: t('about_page.api_docs'), path: '/docs/api' }],
   jsonLd: () => doc.value && compactLd({

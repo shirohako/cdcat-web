@@ -113,9 +113,16 @@ const formatEventDate = (event: SeriesEvent) => {
 }
 
 const absolute = useSiteUrl()
+const { sentence, count, listing, fill } = useSeoText()
 usePageSeo({
-  title: () => series.value?.name,
-  description: () => plainText(series.value ? localizedContent(series.value.description) : '') || t('collection_pages.events.seo_description'),
+  // The name alone is a word ("M3"): the title says what the page lists.
+  title: () => series.value && t('seo.title.event_series', { name: series.value.name }),
+  description: () => series.value && fill([
+    sentence([series.value.name, series.value.location, count('seo.event_series.events', series.value.events_count)], { capitalize: false }),
+    // The editions on the page, newest first whatever order the reader picked.
+    listing('seo.event_series.editions', [...events.value].sort((a, b) => (b.start_date ?? '').localeCompare(a.start_date ?? '')).map(event => event.name), 4),
+    { cut: plainText(localizedContent(series.value.description)) },
+  ]),
   image: () => bannerUrl.value,
   wideImage: true,
   noindex: () => series.value?.indexable === false,

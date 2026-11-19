@@ -4,12 +4,13 @@
     <header class="card overflow-hidden">
       <div class="page-hero-banner relative bg-sunken">
         <!-- An uploaded banner is fitted like an artist's; an address from before uploads is cropped to the middle. -->
-        <CommonBannerImage v-if="profile.banner_image" :image="profile.banner_image" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
+        <CommonBannerImage v-if="profile.banner_image" :image="profile.banner_image" :alt="`${profile.username} banner`" sizes="(min-width: 1536px) 1216px, (min-width: 1152px) 1088px, 100vw" />
         <img
           v-else-if="displayBanner"
           v-img-fade
           :src="displayBanner"
-          :alt="displayBanner === ownBanner ? `${profile.username} banner` : ''"
+          :alt="`${profile.username} banner`"
+          :aria-hidden="displayBanner === ownBanner ? undefined : 'true'"
           class="h-full w-full object-cover"
           @error="onBannerError"
         >

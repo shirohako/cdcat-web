@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { composeDescription, descriptionLength, nameWithOriginal, plainText, truncateText, oneLine, textLanguage, writtenIn } from '../../app/utils/seoText'
+import { composeDescription, creditedNames, descriptionLength, fillDescription, fitList, isAlternateTake, nameWithOriginal, plainText, truncateText, oneLine, textLanguage, writtenIn } from '../../app/utils/seoText'
 
 describe('plainText', () => {
   it('keeps the words of Markdown and drops its markup', () => {
@@ -46,6 +46,11 @@ describe('truncateText', () => {
   it('cuts Latin text at a space near the end, without trailing punctuation', () => {
     expect(truncateText('A doujin album, released at M3 in spring', 20)).toBe('A doujin album…')
   })
+
+  it('cuts CJK text at a 、 just before the limit, never back at a far space', () => {
+    expect(truncateText('関連作品：『NEEDY GIRL OVERDOSE』。収録曲：「月虹蝶」、「INTERNET YAMERO」', 40)).toBe('関連作品：『NEEDY GIRL OVERDOSE』。収録曲：「月虹蝶」…')
+    expect(truncateText('収録曲：『NEEDY GIRL OVERDOSE』、ほかにもたくさんの曲を収録しています', 30)).toBe('収録曲：『NEEDY GIRL OVERDOSE』…')
+  })
 })
 
 describe('composeDescription', () => {
@@ -62,6 +67,87 @@ describe('composeDescription', () => {
   it('uses a shorter length for CJK locales', () => {
     expect(descriptionLength('en')).toBe(160)
     expect(descriptionLength('ja')).toBe(120)
+  })
+})
+
+describe('fillDescription', () => {
+  it('adds sentences in order while they fit, joining CJK ones without a space', () => {
+    expect(fillDescription(['全3曲。', '収録曲：A、B。', 'CDCatで確認できます。'], 100)).toBe('全3曲。収録曲：A、B。CDCatで確認できます。')
+    expect(fillDescription(['Album by X.', 'Tracks: A, B.'], 100)).toBe('Album by X. Tracks: A, B.')
+  })
+
+  it('leaves out a sentence that does not fit and still tries the shorter ones after it', () => {
+    expect(fillDescription(['全3曲。', 'あいうえおかきくけこさしすせそ。', 'たちつ。'], 12)).toBe('全3曲。たちつ。')
+  })
+
+  it('cuts the first part when it alone is too long', () => {
+    expect(fillDescription(['あいうえおかきくけこ', '次。'], 6)).toBe('あいうえお…')
+  })
+
+  it('lets a member\'s text fill the rest, after which nothing follows', () => {
+    const text = 'あいうえおかきくけこさしすせそたちつてとなにぬねの'
+    expect(fillDescription(['全3曲。', { cut: text }, '次。'], 24)).toBe('全3曲。あいうえおかきくけこさしすせそたちつて…')
+    expect(fillDescription(['全3曲。', { cut: '' }, '次。'], 9)).toBe('全3曲。次。')
+  })
+
+  it('takes a member\'s text whole when it fits, and goes on after it', () => {
+    expect(fillDescription(['全3曲。', { cut: '本名罗赓。' }, '次。'], 20)).toBe('全3曲。本名罗赓。次。')
+  })
+
+  it('leaves out a member\'s text when too little room is left to cut it to', () => {
+    expect(fillDescription(['全3曲。', { cut: 'あいうえおかきくけこさしすせそたちつてと' }, '次。'], 12)).toBe('全3曲。次。')
+  })
+
+  it('hands a function the room that is left', () => {
+    const rooms: number[] = []
+    fillDescription(['Album by X.', (room) => { rooms.push(room); return '' }], 40)
+    expect(rooms).toEqual([28])
+  })
+
+  it('skips empty parts', () => {
+    expect(fillDescription([null, '', false, 0, undefined, '全3曲。'], 20)).toBe('全3曲。')
+  })
+})
+
+describe('fitList', () => {
+  const format = (joined: string, more: boolean) => `収録曲：${joined}${more ? 'ほか' : ''}。`
+  it('takes as many names as fit, saying when some are left out', () => {
+    expect(fitList(['A', 'B', 'C'], 100, format, '、')).toBe('収録曲：A、B、C。')
+    expect(fitList(['A', 'B', 'CCCC'], 10, format, '、')).toBe('収録曲：A、Bほか。')
+    expect(fitList(['A', 'B', 'C'], 100, format, '、', 2)).toBe('収録曲：A、Bほか。')
+  })
+
+  it('drops empty and repeated names, and is empty when not one fits', () => {
+    expect(fitList(['A', null, 'A', '', 'B'], 100, format, '、')).toBe('収録曲：A、B。')
+    expect(fitList(['とても長い曲名'], 5, format, '、')).toBe('')
+    expect(fitList([], 100, format, '、')).toBe('')
+  })
+})
+
+describe('isAlternateTake', () => {
+  it('spots instrumental, off vocal and karaoke versions', () => {
+    expect(isAlternateTake('浸春芜 (Instrumental)')).toBe(true)
+    expect(isAlternateTake('アンダーキッズ -off vocal-')).toBe(true)
+    expect(isAlternateTake('Lunarmare (Inst.)')).toBe(true)
+    expect(isAlternateTake('夜明け (カラオケ)')).toBe(true)
+    expect(isAlternateTake('オフボーカル')).toBe(true)
+  })
+
+  it('leaves ordinary titles alone', () => {
+    expect(isAlternateTake('Lunarmare')).toBe(false)
+    expect(isAlternateTake('Install')).toBe(false)
+    expect(isAlternateTake('Instrumentality')).toBe(false)
+  })
+})
+
+describe('creditedNames', () => {
+  const credit = (name: string, credited?: string) => ({ credited_as: credited ?? null, artist: { name } })
+  it('puts the most credited first, keeping first appearance among equals', () => {
+    expect(creditedNames([credit('A'), credit('B'), credit('B'), credit('C'), credit('A'), credit('B')])).toEqual(['B', 'A', 'C'])
+  })
+
+  it('uses the printed name and leaves out the ones to skip', () => {
+    expect(creditedNames([credit('A', 'A (Vo)'), credit('X'), { credited_as: 'Z', artist: null }], ['X'])).toEqual(['A (Vo)', 'Z'])
   })
 })
 

@@ -52,7 +52,7 @@ withDefaults(defineProps<{
   <span class="ui-image relative block overflow-hidden" :class="{ 'is-dark': dark }">
     <template v-if="src">
       <span class="ui-image-placeholder absolute inset-0" aria-hidden="true">
-        <img v-if="placeholder && placeholder !== src" :src="placeholder" alt="" class="size-full scale-110 object-cover blur-lg">
+        <img v-if="placeholder && placeholder !== src" :src="placeholder" :alt="alt" class="size-full scale-110 object-cover blur-lg">
       </span>
       <img
         :key="src"

@@ -2,12 +2,12 @@
   <div>
     <!-- The banner: the album's main banner, else its cover blurred into a wash. -->
     <div class="relative h-40 overflow-hidden bg-card-active sm:h-48 md:h-52 lg:h-60 2xl:h-64">
-      <CommonBannerImage v-if="banner" :image="banner" />
+      <CommonBannerImage v-if="banner" :image="banner" :alt="bannerAlt" />
       <img
         v-else-if="album.banner_url"
         v-img-fade
         :src="album.banner_url"
-        alt=""
+        :alt="bannerAlt"
         class="absolute inset-0 size-full object-cover"
       >
       <!-- The cover's 600px version: under the blur it looks the same as the large one, and it is a third of the bytes. -->
@@ -15,7 +15,8 @@
         v-else-if="coverUrl"
         v-img-fade
         :src="album.cover?.thumbnail_url || coverUrl"
-        alt=""
+        :alt="album.title"
+        aria-hidden="true"
         class="absolute inset-0 size-full scale-110 object-cover blur-[6px] saturate-125"
       >
       <div class="absolute inset-0 bg-black/10 dark:bg-black/30" />
@@ -123,7 +124,7 @@
               class="inline-flex min-w-0 max-w-full items-center gap-2.5 rounded-lg py-1.5 pl-1.5 pr-4 text-sm font-semibold text-title transition-colors duration-150"
               :class="tag.id && 'hover:bg-black/[0.06] dark:hover:bg-white/[0.08]'"
             >
-              <UiImage v-if="tag.image" :src="tag.image" alt="" eager class="size-7 shrink-0 rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
+              <UiImage v-if="tag.image" :src="tag.image" :alt="tag.name" aria-hidden="true" eager class="size-7 shrink-0 rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
                 <template #fallback><component :is="tag.icon" :size="14" /></template>
               </UiImage>
               <span v-else class="grid size-7 shrink-0 place-items-center rounded-md bg-black/[0.06] text-meta dark:bg-white/[0.1]">
@@ -233,6 +234,7 @@ const { localName, formatDate, formatDuration, enumLabel } = useCatalogDisplay()
 const { onClick: onExternalClick } = useExternalLink()
 
 const shownTitle = computed(() => localName(props.album.title, props.album.titles))
+const bannerAlt = computed(() => `${shownTitle.value} · ${t('catalog.image_kind.banner')}`)
 const originalTitle = computed(() => shownTitle.value !== props.album.title ? props.album.title : '')
 /**
  * Long titles step down in size, so they wrap onto fewer lines. The length is a rough width: a CJK or full-width

@@ -47,7 +47,9 @@ import { lyricLines } from '~/utils/lyricText'
 const route = useRoute()
 const { t, locale } = useI18n()
 const { localName, formatDuration } = useCatalogDisplay()
-const { withOriginal, sentence, list } = useSeoText()
+const { withOriginal, sentence, list, albumTitle } = useSeoText()
+/** Page titles shorter than this also name the album. */
+const SHORT_TITLE = 16
 const absolute = useSiteUrl()
 
 const { data: track, status, error, mutate, revealClass } = await usePageAPI<TrackDetail>(`/v1/tracks/${route.params.id}`, { notFound: true })
@@ -111,9 +113,10 @@ usePageSeo({
     const value = track.value
     if (!value) return undefined
     const name = withOriginal(shownTitle.value, value.title)
-    return value.has_lyrics
-      ? [t('seo.title.track_lyrics', { title: name }), list(performers.value.slice(0, 2).map(artist => artist.name))].filter(Boolean).join(' - ')
-      : [name, value.album?.title].filter(Boolean).join(' - ')
+    if (!value.has_lyrics) return [name, value.album?.title].filter(Boolean).join(' - ')
+    const title = [t('seo.title.track_lyrics', { title: name }), list(performers.value.slice(0, 2).map(artist => artist.name))].filter(Boolean).join(' - ')
+    // A short one ("幻日 歌詞 - 菜ノ") also names the album, which tells apart songs of the same name.
+    return [...title].length < SHORT_TITLE && value.album ? t('seo.title.track_from', { title, album: albumTitle(value.album.title) }) : title
   },
   description: () => {
     const value = track.value

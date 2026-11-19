@@ -2,11 +2,11 @@
 import { Calendar, Disc, ExternalLink, Film, Layers, Link2, Music2, Pencil } from '@lucide/vue'
 import { ENTRY_RELATIONS, ENTRY_ALBUM_RELATIONS, type EntryDetail, type EntryAlbum, type RelatedEntry } from '~/types/entry'
 import { entryLdType, ldDate, namedLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { plainText } from '~/utils/seoText'
 import { linkName } from '~/utils/linkProviders'
 
 const route = useRoute()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { languageName } = useLocaleFormatting()
 const { onClick: onExternalClick } = useExternalLink()
 const { displayName, originalName, typeLabel, formatLabel, typeWithFormat, relationLabel, albumRelationLabel, typeIcon, formatReleaseDate } = useEntryDisplay()
@@ -16,21 +16,23 @@ const { data: entry, status, error, revealClass } = await usePageAPI<EntryDetail
 const name = computed(() => displayName(entry.value))
 const subtitle = computed(() => originalName(entry.value))
 
-const { withOriginal, sentence, count, own } = useSeoText()
+const { withOriginal, sentence, count, list, own, albumTitle, listing, fill } = useSeoText()
 const absolute = useSiteUrl()
 usePageSeo({
   // A work is searched for with its music: the title says the page lists the albums.
   title: () => entry.value ? t('seo.title.entry', { name: withOriginal(name.value, entry.value.name) }) : undefined,
   description: () => entry.value
-    ? composeDescription(
+    ? fill([
         sentence([
+          withOriginal(name.value, entry.value.name),
           typeWithFormat(entry.value.type, entry.value.format),
+          entry.value.platforms?.length && t('seo.entry.platforms', { names: list(entry.value.platforms.slice(0, 3)) }),
           formatReleaseDate(entry.value.release_date, entry.value.release_date_precision),
           count('seo.entry.albums', entry.value.albums.length),
-        ]),
-        own(plainText(entry.value.description)),
-        descriptionLength(locale.value),
-      )
+        ], { capitalize: false }),
+        listing('seo.entry.album_list', entry.value.albums.map(album => albumTitle(album.title)), 4),
+        { cut: own(plainText(entry.value.description)) },
+      ])
     : undefined,
   image: () => entry.value?.image_url,
   noindex: () => entry.value?.is_pending || entry.value?.indexable === false,
@@ -64,7 +66,7 @@ const relationGroups = computed(() => groupBy<RelatedEntry>(entry.value?.related
     <div v-if="entry" :class="revealClass">
       <!-- Hero: always dark, the banner under a black scrim -->
       <div class="relative h-96 w-full overflow-hidden bg-hero">
-        <img v-if="entry.banner_url || entry.image_url" v-img-fade :src="entry.banner_url || entry.image_url!" alt="" class="absolute inset-0 h-full w-full object-cover" :class="{ 'scale-110 opacity-40 blur-2xl': !entry.banner_url }" >
+        <img v-if="entry.banner_url || entry.image_url" v-img-fade :src="entry.banner_url || entry.image_url!" :alt="name" aria-hidden="true" class="absolute inset-0 h-full w-full object-cover" :class="{ 'scale-110 opacity-40 blur-2xl': !entry.banner_url }" >
         <div class="absolute inset-0 bg-linear-to-t from-black via-black/60 to-transparent" />
 
         <div class="container relative z-10 mx-auto h-full max-w-6xl px-4 md:px-8 2xl:max-w-7xl">

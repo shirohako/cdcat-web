@@ -2,31 +2,31 @@
 import { Boxes, Disc3, ExternalLink, Film, Layers, Pencil } from '@lucide/vue'
 import type { FranchiseDetail } from '~/types/entry'
 import { namedLd } from '~/utils/structuredData'
-import { composeDescription, descriptionLength, plainText } from '~/utils/seoText'
+import { plainText } from '~/utils/seoText'
 import { linkName } from '~/utils/linkProviders'
 
 const route = useRoute()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const { displayName, originalName } = useEntryDisplay()
 const { onClick: onExternalClick } = useExternalLink()
 
 const { data: series, status, error, revealClass } = await usePageAPI<FranchiseDetail>(() => `/v1/franchises/${route.params.id}`, { notFound: true })
 
-const { withOriginal, sentence, count, own } = useSeoText()
+const { withOriginal, sentence, count, own, albumTitle, listing, fill } = useSeoText()
 const absolute = useSiteUrl()
 const seriesName = computed(() => displayName(series.value))
 usePageSeo({
   title: () => series.value ? t('seo.title.franchise', { name: withOriginal(seriesName.value, series.value.name) }) : undefined,
   description: () => series.value
-    ? composeDescription(
+    ? fill([
         sentence([
-          t('seo.franchise.lead'),
+          t('seo.franchise.lead', { name: withOriginal(seriesName.value, series.value.name) }),
           count('seo.franchise.entries', series.value.entries_count ?? series.value.entries.length),
           count('seo.entry.albums', series.value.albums_count ?? series.value.albums.length),
-        ]),
-        own(plainText(series.value.description)),
-        descriptionLength(locale.value),
-      )
+        ], { capitalize: false }),
+        listing('seo.franchise.entry_list', series.value.entries.map(entry => albumTitle(displayName(entry))), 4),
+        { cut: own(plainText(series.value.description)) },
+      ])
     : undefined,
   image: () => series.value?.banner_url || series.value?.image_url,
   wideImage: true,
@@ -56,7 +56,7 @@ const currentTab = ref('entries')
     <div v-if="series" :class="revealClass">
       <!-- Hero: the theme colour fading into the always-dark hero colour, the banner under a black scrim -->
       <div class="relative h-80 overflow-hidden bg-linear-to-br from-primary-strong to-hero">
-        <img v-if="series.banner_url || series.image_url" v-img-fade :src="series.banner_url || series.image_url!" alt="" class="h-full w-full object-cover opacity-40" >
+        <img v-if="series.banner_url || series.image_url" v-img-fade :src="series.banner_url || series.image_url!" :alt="seriesName" aria-hidden="true" class="h-full w-full object-cover opacity-40" >
         <div class="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent" />
 
         <div class="absolute bottom-0 left-0 right-0 p-6 md:p-8">
