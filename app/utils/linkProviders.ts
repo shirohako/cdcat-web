@@ -75,11 +75,53 @@ export const splitUrl = (url: string) => {
   return match ? { scheme: match[1]!, host: match[2]!, rest: match[3]! } : { scheme: '', host: '', rest: url }
 }
 
+/** Tracking parameters that say nothing about the page (the backend's LinkResolver::TRACKING; share links from apps add them). */
+const TRACKING = new Set(['si', 'igsh', 'igshid', 'feature', 'fbclid', 'ref_src', 'ref_url'])
+
+const paramName = (pair: string) => {
+  const name = pair.split('=')[0]!
+  try {
+    return decodeURIComponent(name).toLowerCase()
+  } catch {
+    return name.toLowerCase()
+  }
+}
+
+/** `query` (without `?`) minus the parameters `drop` names; the rest stay as written. */
+const keepParams = (query: string, drop: (name: string) => boolean) =>
+  query.split('&').filter(pair => paramName(pair) !== '' && !drop(paramName(pair))).join('&')
+
 /**
- * The spelling saving keeps (the backend's LinkResolver::canonical): a BOOTH item on booth.pm, in whatever language,
- * becomes the Japanese page (the bare booth.pm/items/123 answers 404); a shop's own address stays as it is.
+ * The address without tracking parameters: utm_*, ?si= and the like everywhere, ?s= and ?t= on X. A NetEase Cloud Music
+ * page is named by its id alone, so when it has one every other parameter goes (uct2, userid, dlt, app_version from the
+ * app's share links), in the `#/album?id=` form too. Anything that isn't an http(s) address comes back as it was.
+ */
+export const stripTrackingParams = (url: string) => {
+  const match = /^(https?:\/\/)([^/?#]+)([^?#]*)(?:\?([^#]*))?(#.*)?$/i.exec(url)
+  if (!match) return url
+  const [, scheme, host, path, query, fragment = ''] = match
+  const site = host!.toLowerCase().replace(/:\d+$/, '').replace(/^(www|mobile|m)\./, '')
+  const social = site === 'x.com' || site === 'twitter.com'
+  const netease = /(^|\.)music\.163\.com$/.test(site)
+  const clean = (part: string) => {
+    const onlyId = netease && part.split('&').some(pair => paramName(pair) === 'id')
+    return keepParams(part, name => onlyId
+      ? name !== 'id'
+      : TRACKING.has(name) || name.startsWith('utm_') || (social && (name === 's' || name === 't')))
+  }
+  const kept = query === undefined ? '' : clean(query)
+  // A hash-routed page (music.163.com/#/album?id=…) keeps its parameters in the fragment.
+  const hashed = netease ? /^(#\/[^?]*)\?(.*)$/.exec(fragment) : null
+  const tail = hashed ? `${hashed[1]}${clean(hashed[2]!) ? `?${clean(hashed[2]!)}` : ''}` : fragment
+  return `${scheme}${host}${path}${kept ? `?${kept}` : ''}${tail}`
+}
+
+/**
+ * The spelling saving keeps: tracking parameters dropped (stripTrackingParams), and a BOOTH item on booth.pm, in
+ * whatever language, becomes the Japanese page (the backend's LinkResolver::canonical; the bare booth.pm/items/123
+ * answers 404); a shop's own address stays as it is.
  */
 export const canonicalLinkUrl = (url: string) => {
   const booth = url.trim().match(/^https?:\/\/(?:www\.)?booth\.pm\/(?:[a-z]{2}(?:-[a-z]{2,4})?\/)?items\/(\d+)(?:[/?#].*)?$/i)
-  return booth ? `https://booth.pm/ja/items/${booth[1]}` : url.trim()
+  return booth ? `https://booth.pm/ja/items/${booth[1]}` : stripTrackingParams(url.trim())
 }

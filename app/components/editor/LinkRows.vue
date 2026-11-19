@@ -51,7 +51,7 @@
             class="input w-full"
             :class="{ 'input-error': problem }"
             placeholder="https://"
-            @input="autoDetect"
+            @input="onUrlInput"
           >
           <span v-if="problem" class="mt-1 block text-xs text-danger">{{ problem }}</span>
         </label>
@@ -175,6 +175,12 @@ const edit = (row: LinkRow | null) => {
 /** Follows the URL until a provider is chosen by hand. */
 const autoDetect = () => {
   if (!pickedByHand.value) form.provider = form.url ? detect(form.url) : null
+}
+
+/** A pasted or dropped address is tidied at once (tracking parameters off, see canonicalLinkUrl); typing is left alone. */
+const onUrlInput = (event: Event) => {
+  if ((event as InputEvent).inputType?.startsWith('insertFrom')) form.url = canonicalLinkUrl(form.url)
+  autoDetect()
 }
 
 const valid = (url: string) => {

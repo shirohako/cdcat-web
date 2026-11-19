@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { canonicalLinkUrl, linkCategoryKey, linkHost, linkName, linkTileHue, providerHue, splitUrl } from '../../app/utils/linkProviders'
+import { canonicalLinkUrl, linkCategoryKey, linkHost, linkName, linkTileHue, providerHue, splitUrl, stripTrackingParams } from '../../app/utils/linkProviders'
 
 describe('linkName', () => {
   const provider = { name: 'TANO*C STORE' }
@@ -69,5 +69,31 @@ describe('canonicalLinkUrl', () => {
     expect(canonicalLinkUrl('https://hagall.booth.pm/items/8034195')).toBe('https://hagall.booth.pm/items/8034195')
     expect(canonicalLinkUrl('https://booth.pm/ja/events/m3-2026s')).toBe('https://booth.pm/ja/events/m3-2026s')
     expect(canonicalLinkUrl('https://vgmdb.net/album/1')).toBe('https://vgmdb.net/album/1')
+  })
+
+  it('drops tracking parameters', () => {
+    expect(canonicalLinkUrl('https://music.163.com/album?id=379546550&uct2=U2FsdGVkX1/qwISCgO+FRrKUUQpoyjfHL5ULJeRm8FQ='))
+      .toBe('https://music.163.com/album?id=379546550')
+  })
+})
+
+describe('stripTrackingParams', () => {
+  it('keeps only the id on NetEase Cloud Music', () => {
+    expect(stripTrackingParams('https://y.music.163.com/m/song?id=1&uct=x&dlt=0846&app_version=9.1.65&sc=wm&tn='))
+      .toBe('https://y.music.163.com/m/song?id=1')
+    expect(stripTrackingParams('https://music.163.com/#/album?id=379546550&userid=42')).toBe('https://music.163.com/#/album?id=379546550')
+    expect(stripTrackingParams('https://music.163.com/album?uct2=x&id=5')).toBe('https://music.163.com/album?id=5')
+  })
+
+  it('drops the usual tracking parameters elsewhere and keeps the rest as written', () => {
+    expect(stripTrackingParams('https://open.spotify.com/album/abc?si=123')).toBe('https://open.spotify.com/album/abc')
+    expect(stripTrackingParams('https://www.youtube.com/watch?v=xyz&feature=share&utm_source=a#t=1')).toBe('https://www.youtube.com/watch?v=xyz#t=1')
+    expect(stripTrackingParams('https://x.com/someone/status/1?s=21&t=abc')).toBe('https://x.com/someone/status/1')
+    expect(stripTrackingParams('https://example.com/search?q=a+b&s=2')).toBe('https://example.com/search?q=a+b&s=2')
+  })
+
+  it('leaves addresses without tracking parameters alone', () => {
+    expect(stripTrackingParams('https://music.163.com/playlist')).toBe('https://music.163.com/playlist')
+    expect(stripTrackingParams('not a url?si=1')).toBe('not a url?si=1')
   })
 })
