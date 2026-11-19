@@ -3757,7 +3757,7 @@
     "button": "分享卡片",
     "title": "匯出分享卡片",
     "title_profile": "下載會員卡",
-    "description": "貼連結時顯示的卡片，也可以下載成圖片",
+    "description": "貼連結時顯示的卡片，也可以下載或分享成圖片",
     "styles": {
       "catalog": "目錄卡",
       "disc": "出盤",
@@ -3772,6 +3772,19 @@
     "drawing_hint": "第一次匯出一種樣式要等幾秒",
     "failed": "產生失敗，請稍後再試",
     "download": "下載",
-    "format": "JPEG · {size}"
+    "format": "JPEG · {size}",
+    "link": "分享連結",
+    "link_preview": "對方看到{style}",
+    "copy": "複製",
+    "link_copied": "已複製連結",
+    "copy_failed": "複製失敗，連結已選取，請手動複製",
+    "discord_copied": "已複製連結，貼到 Discord 會顯示卡片",
+    "qq_copied": "已複製連結，打開 QQ 貼上傳送",
+    "share_to": "分享到 {site}",
+    "copy_image": "複製圖片",
+    "image_copied": "已複製圖片",
+    "image_copy_failed": "複製圖片失敗，可以先下載再傳送",
+    "more": "更多…",
+    "share_failed": "無法開啟系統分享，請複製連結"
   }
 }

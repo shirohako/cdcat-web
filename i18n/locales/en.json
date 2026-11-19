@@ -3757,7 +3757,7 @@
     "button": "Share card",
     "title": "Export share card",
     "title_profile": "Download member card",
-    "description": "The card shown when the link is shared, also as an image to download",
+    "description": "The card shown when the link is shared, also as an image to download or share",
     "styles": {
       "catalog": "Catalog card",
       "disc": "Disc",
@@ -3772,6 +3772,19 @@
     "drawing_hint": "A style takes a few seconds the first time",
     "failed": "The card could not be drawn. Try again in a moment.",
     "download": "Download",
-    "format": "JPEG · {size}"
+    "format": "JPEG · {size}",
+    "link": "Share link",
+    "link_preview": "Previews as the {style}",
+    "copy": "Copy",
+    "link_copied": "Link copied",
+    "copy_failed": "Could not copy. The link is selected: copy it by hand.",
+    "discord_copied": "Link copied. Paste it in Discord to show the card.",
+    "qq_copied": "Link copied. Paste it in QQ to send it.",
+    "share_to": "Share on {site}",
+    "copy_image": "Copy image",
+    "image_copied": "Image copied",
+    "image_copy_failed": "Could not copy the image. Download it and send the file instead.",
+    "more": "More…",
+    "share_failed": "Could not open sharing. Copy the link instead."
   }
 }

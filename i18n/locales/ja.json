@@ -3757,7 +3757,7 @@
     "button": "シェアカード",
     "title": "シェアカードを書き出す",
     "title_profile": "会員カードを保存",
-    "description": "リンクを貼ったときに表示されるカードです。画像として保存もできます",
+    "description": "リンクを貼ったときに表示されるカードです。画像として保存・共有もできます",
     "styles": {
       "catalog": "目録カード",
       "disc": "ディスク",
@@ -3772,6 +3772,19 @@
     "drawing_hint": "はじめて書き出すスタイルは数秒かかります",
     "failed": "作成できませんでした。しばらくしてからもう一度お試しください",
     "download": "保存",
-    "format": "JPEG · {size}"
+    "format": "JPEG · {size}",
+    "link": "リンクを共有",
+    "link_preview": "相手には{style}が表示されます",
+    "copy": "コピー",
+    "link_copied": "リンクをコピーしました",
+    "copy_failed": "コピーできませんでした。リンクを選択したので、手動でコピーしてください",
+    "discord_copied": "リンクをコピーしました。Discord に貼るとカードが表示されます",
+    "qq_copied": "リンクをコピーしました。QQ に貼って送ってください",
+    "share_to": "{site} で共有",
+    "copy_image": "画像をコピー",
+    "image_copied": "画像をコピーしました",
+    "image_copy_failed": "画像をコピーできませんでした。保存してから送ってください",
+    "more": "その他…",
+    "share_failed": "共有メニューを開けませんでした。リンクをコピーしてください"
   }
 }

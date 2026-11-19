@@ -200,6 +200,7 @@
         :styles="SHARE_CARD_STYLES"
         preview-style="wall"
         size="1200×630"
+        :cover="artist.image_url"
       />
     </main>
     <div v-else-if="status !== 'error'" class="mx-auto w-full max-w-6xl px-4 pb-12 pt-6 md:px-8 md:pt-8 2xl:max-w-7xl">

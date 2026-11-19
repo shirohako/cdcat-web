@@ -3757,7 +3757,7 @@
     "button": "分享卡片",
     "title": "导出分享卡片",
     "title_profile": "下载会员卡",
-    "description": "贴链接时显示的卡片，也可以下载成图片",
+    "description": "贴链接时显示的卡片，也可以下载或分享成图片",
     "styles": {
       "catalog": "目录卡",
       "disc": "出盘",
@@ -3772,6 +3772,19 @@
     "drawing_hint": "第一次导出一种样式要等几秒",
     "failed": "生成失败，请稍后再试",
     "download": "下载",
-    "format": "JPEG · {size}"
+    "format": "JPEG · {size}",
+    "link": "分享链接",
+    "link_preview": "对方看到{style}",
+    "copy": "复制",
+    "link_copied": "已复制链接",
+    "copy_failed": "复制失败，链接已选中，请手动复制",
+    "discord_copied": "已复制链接，贴进 Discord 会显示卡片",
+    "qq_copied": "已复制链接，打开 QQ 粘贴发送",
+    "share_to": "分享到 {site}",
+    "copy_image": "复制图片",
+    "image_copied": "已复制图片",
+    "image_copy_failed": "复制图片失败，可以先下载再发送",
+    "more": "更多…",
+    "share_failed": "无法打开系统分享，请复制链接"
   }
 }

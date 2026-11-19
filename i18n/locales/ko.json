@@ -3757,7 +3757,7 @@
     "button": "공유 카드",
     "title": "공유 카드 내보내기",
     "title_profile": "멤버 카드 다운로드",
-    "description": "링크를 공유할 때 보이는 카드입니다. 이미지로 내려받을 수도 있습니다",
+    "description": "링크를 공유할 때 보이는 카드입니다. 이미지로 내려받거나 공유할 수도 있습니다",
     "styles": {
       "catalog": "카탈로그 카드",
       "disc": "디스크",
@@ -3772,6 +3772,19 @@
     "drawing_hint": "처음 내보내는 스타일은 몇 초 걸립니다",
     "failed": "카드를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.",
     "download": "다운로드",
-    "format": "JPEG · {size}"
+    "format": "JPEG · {size}",
+    "link": "링크 공유",
+    "link_preview": "미리보기: {style}",
+    "copy": "복사",
+    "link_copied": "링크를 복사했습니다",
+    "copy_failed": "복사하지 못했습니다. 링크를 선택해 두었으니 직접 복사해 주세요",
+    "discord_copied": "링크를 복사했습니다. Discord에 붙여 넣으면 카드가 보입니다",
+    "qq_copied": "링크를 복사했습니다. QQ에 붙여 넣어 보내 주세요",
+    "share_to": "{site}에 공유",
+    "copy_image": "이미지 복사",
+    "image_copied": "이미지를 복사했습니다",
+    "image_copy_failed": "이미지를 복사하지 못했습니다. 다운로드한 뒤 보내 주세요",
+    "more": "더 보기…",
+    "share_failed": "공유 메뉴를 열지 못했습니다. 링크를 복사해 주세요"
   }
 }

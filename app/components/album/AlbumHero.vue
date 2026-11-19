@@ -199,6 +199,7 @@
       :title="$t('share_card.title')"
       :styles="SHARE_CARD_STYLES"
       preview-style="catalog"
+      :cover="album.cover?.thumbnail_url ?? album.image_url"
     />
   </div>
 </template>
