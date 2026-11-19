@@ -4,7 +4,9 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  // Off with NUXT_DEVTOOLS=false (the shared dev server behind dev.cdcat.net): reached through a domain it can't connect,
+  // yet every page still loads its client, about a megabyte.
+  devtools: { enabled: process.env.NUXT_DEVTOOLS !== 'false' },
 
   // Pages render before their data (see composables/usePageData.ts), so a switch can animate straight away.
   // The admin console and reduced motion turn these off in middleware/transitions.global.ts.
